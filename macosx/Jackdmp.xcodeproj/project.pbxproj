@@ -25,6 +25,7 @@
 				4BFA994A0AAAED90009E916C /* PBXTargetDependency */,
 				4BFA994C0AAAED90009E916C /* PBXTargetDependency */,
 				4BFA994E0AAAED90009E916C /* PBXTargetDependency */,
+				4BFA99AC0AAAF41D009E916C /* PBXTargetDependency */,
 				4BFA99500AAAED90009E916C /* PBXTargetDependency */,
 				4BFA99520AAAED90009E916C /* PBXTargetDependency */,
 				4BFA99540AAAED90009E916C /* PBXTargetDependency */,
@@ -255,6 +256,7 @@
 		4BFA99730AAAF025009E916C /* jack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D2170834F03500C94B91 /* jack.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BFA99740AAAF02D009E916C /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21C0834F04800C94B91 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BFA99750AAAF030009E916C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21B0834F04800C94B91 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -397,6 +399,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B699D7F097D421700A18468;
 			remoteInfo = "synchroServerClient Universal";
+		};
+		4BFA99AB0AAAF41D009E916C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BFA99980AAAF3B0009E916C /* jdelay Universal */;
+			remoteInfo = "jdelay Universal";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -546,6 +555,8 @@
 		4BF8D2470834F20600C94B91 /* testSem.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSem.cpp; path = ../tests/testSem.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFrameTimer.cpp; path = ../common/JackFrameTimer.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFrameTimer.h; path = ../common/JackFrameTimer.h; sourceTree = SOURCE_ROOT; };
+		4BFA99A20AAAF3B0009E916C /* jdelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jdelay; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BFA99A90AAAF40C009E916C /* jdelay.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jdelay.cpp; path = ../tests/jdelay.cpp; sourceTree = SOURCE_ROOT; };
 		4BFB297708AF44ED00D450D4 /* JackMachServerNotifyChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachServerNotifyChannel.cpp; sourceTree = "<group>"; };
 		4BFB297808AF44ED00D450D4 /* JackMachServerChannel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JackMachServerChannel.h; sourceTree = "<group>"; };
 		4BFB297908AF44ED00D450D4 /* JackMachServerChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachServerChannel.cpp; sourceTree = "<group>"; };
@@ -694,6 +705,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BFA999C0AAAF3B0009E916C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -759,6 +777,7 @@
 				4B699DB0097D421700A18468 /* jack_dummy.so */,
 				4B978DBB0A31CF4A009E2DD1 /* jack_portaudio.so */,
 				4BE6C6A30A3E096F005A203A /* jack_test */,
+				4BFA99A20AAAF3B0009E916C /* jdelay */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -809,6 +828,7 @@
 		4B6BEB4A07A6CCDC00A5DBDA /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4BFA99A90AAAF40C009E916C /* jdelay.cpp */,
 				4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */,
 				4BF8D2470834F20600C94B91 /* testSem.cpp */,
 				4BA577BC08BF8BE200F82DE1 /* testSynchroClient.cpp */,
@@ -1314,6 +1334,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BFA99990AAAF3B0009E916C /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -1673,6 +1700,25 @@
 			productReference = 4BE6C6A30A3E096F005A203A /* jack_test */;
 			productType = "com.apple.product-type.tool";
 		};
+		4BFA99980AAAF3B0009E916C /* jdelay Universal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jdelay Universal" */;
+			buildPhases = (
+				4BFA99990AAAF3B0009E916C /* Headers */,
+				4BFA999A0AAAF3B0009E916C /* Sources */,
+				4BFA999C0AAAF3B0009E916C /* Frameworks */,
+				4BFA999D0AAAF3B0009E916C /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "jdelay Universal";
+			productInstallPath = /usr/local/bin;
+			productName = jack_lsp;
+			productReference = 4BFA99A20AAAF3B0009E916C /* jdelay */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1692,6 +1738,7 @@
 				4B699CD1097D421600A18468 /* jack_connect Universal */,
 				4B699CE1097D421600A18468 /* jack_disconnect Universal */,
 				4B699CF1097D421600A18468 /* jack_freewheel Universal */,
+				4BFA99980AAAF3B0009E916C /* jdelay Universal */,
 				4B699D03097D421600A18468 /* jack_external_metro Universal */,
 				4B699D13097D421600A18468 /* testAtomic Universal */,
 				4B699D27097D421600A18468 /* testSem Universal */,
@@ -1831,6 +1878,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4BE6C69E0A3E096F005A203A /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BFA999D0AAAF3B0009E916C /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2088,6 +2142,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BFA999A0AAAF3B0009E916C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2190,6 +2252,11 @@
 			isa = PBXTargetDependency;
 			target = 4B699D7F097D421700A18468 /* synchroServerClient Universal */;
 			targetProxy = 4BFA995B0AAAED90009E916C /* PBXContainerItemProxy */;
+		};
+		4BFA99AC0AAAF41D009E916C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BFA99980AAAF3B0009E916C /* jdelay Universal */;
+			targetProxy = 4BFA99AB0AAAF41D009E916C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4286,6 +4353,93 @@
 			};
 			name = Default;
 		};
+		4BFA999F0AAAF3B0009E916C /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jdelay;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4BFA99A00AAAF3B0009E916C /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jdelay;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4BFA99A10AAAF3B0009E916C /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jdelay;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4495,6 +4649,16 @@
 				4BE6C6A00A3E096F005A203A /* Development */,
 				4BE6C6A10A3E096F005A203A /* Deployment */,
 				4BE6C6A20A3E096F005A203A /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jdelay Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BFA999F0AAAF3B0009E916C /* Development */,
+				4BFA99A00AAAF3B0009E916C /* Deployment */,
+				4BFA99A10AAAF3B0009E916C /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
