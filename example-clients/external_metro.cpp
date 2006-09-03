@@ -129,18 +129,10 @@ int main (int argc, char *argv[])
     ExternalMetro* client5 = NULL;
 
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
-
-
-    //sleep(1);
     client2 = new ExternalMetro(600, 0.4, 20, 150, "t2");
-
-    //sleep(1);
     client3 = new ExternalMetro(1000, 0.4, 20, 110, "t3");
-
-    client4 = new ExternalMetro(400, 0.4, 20, 200, "t4");
-
+	client4 = new ExternalMetro(400, 0.4, 20, 200, "t4");
     client5 = new ExternalMetro(1500, 0.4, 20, 150, "t5");
-
 
     while ((getchar() != 'q')) {
         sleep(1);
