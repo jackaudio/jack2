@@ -1,10 +1,10 @@
-subprojects := ../common ../common/test alsa 
+subprojects := ../common ../tests ../example-clients alsa 
 
 # WARNING:  installation works correctly only when done in /usr/local
 
 prefix := /usr/local
 
-sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../common/test/*.cpp)
+sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../tests/*.cpp)
 
 TARGET_LINUX_SERVER := jackdmp
 
