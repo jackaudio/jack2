@@ -27,7 +27,6 @@ extern "C"
 {
 #endif
 
-    //#include <jack/types.h>
 #include "types.h"
 
     /**

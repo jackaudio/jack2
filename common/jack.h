@@ -34,10 +34,10 @@ extern "C"
 	#include <pthread.h>
 #endif
 
-    /*
-    #include <jack/types.h>
-    #include <jack/transport.h>
-    */
+/*
+#include <jack/types.h>
+#include <jack/transport.h>
+*/
 
 #include "types.h"
 #include "transport.h"

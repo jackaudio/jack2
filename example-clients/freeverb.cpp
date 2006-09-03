@@ -47,11 +47,6 @@ inline void *aligned_calloc(size_t nmemb, size_t size)
     return (void*)((unsigned)(calloc((nmemb*size) + 15, sizeof(char))) + 15 & 0xfffffff0);
 }
 
-
-
-
-
-
 /******************************************************************************
 *******************************************************************************
  
@@ -114,8 +109,7 @@ struct param
     float fMax;
     param(float* z, float a, float b) : fZone(z), fMin(a), fMax(b)
     {}
-}
-;
+};
 
 class CMDUI : public UI
 {
@@ -290,14 +284,12 @@ class dsp
         virtual void compute(int len, float** inputs, float** outputs) = 0;
         virtual void conclude()
         {}
-}
-;
+};
 
 
 //----------------------------------------------------------------------------
 // 	FAUST generated code
 //----------------------------------------------------------------------------
-
 
 class mydsp : public dsp
 {
@@ -734,8 +726,6 @@ class mydsp : public dsp
         }
 };
 
-
-
 mydsp	DSP;
 
 
@@ -746,7 +736,6 @@ mydsp	DSP;
  
 *******************************************************************************
 *******************************************************************************/
-
 
 
 //----------------------------------------------------------------------------
