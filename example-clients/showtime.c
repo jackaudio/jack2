@@ -9,7 +9,6 @@
 
 jack_client_t *client;
 
-
 void
 showtime ()
 {

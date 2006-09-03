@@ -46,19 +46,18 @@ jack_transport_state_t transport_state;
 
 void
 usage ()
-
 {
 	fprintf (stderr, "\n"
-"usage: jack_metro \n"
-"              [ --frequency OR -f frequency (in Hz) ]\n"
-"              [ --amplitude OR -A maximum amplitude (between 0 and 1) ]\n"
-"              [ --duration OR -D duration (in ms) ]\n"
-"              [ --attack OR -a attack (in percent of duration) ]\n"
-"              [ --decay OR -d decay (in percent of duration) ]\n"
-"              [ --name OR -n jack name for metronome client ]\n"
-"              [ --transport OR -t transport aware ]\n"
-"              --bpm OR -b beats per minute\n"
-);
+	"usage: jack_metro \n"
+	"              [ --frequency OR -f frequency (in Hz) ]\n"
+	"              [ --amplitude OR -A maximum amplitude (between 0 and 1) ]\n"
+	"              [ --duration OR -D duration (in ms) ]\n"
+	"              [ --attack OR -a attack (in percent of duration) ]\n"
+	"              [ --decay OR -d decay (in percent of duration) ]\n"
+	"              [ --name OR -n jack name for metronome client ]\n"
+	"              [ --transport OR -t transport aware ]\n"
+	"              --bpm OR -b beats per minute\n"
+	);
 }
 
 void
@@ -115,7 +114,6 @@ sample_rate_change () {
 int
 main (int argc, char *argv[])
 {
-	
 	sample_t scale;
 	int i, attack_length, decay_length;
 	double *amp;
@@ -266,7 +264,6 @@ main (int argc, char *argv[])
 		fprintf (stderr, "cannot activate client");
 		return 1;
 	}
-
     
 #ifdef WIN32
     // Connection can only be done after activation
@@ -280,7 +277,7 @@ main (int argc, char *argv[])
 #endif
 	
    while ((getchar() != 'q')) {
-	//while (1) {
+		//while (1) {
 		//sleep(1);
 		//printf("jack_frame_time %ld\n", (long)jack_frame_time(client));
 		//usleep(2000);

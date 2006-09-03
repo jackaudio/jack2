@@ -31,8 +31,6 @@
 	#include <jack/jack.h>
 #endif
 
-
-
 class Freq
 {
 public:
@@ -94,7 +92,6 @@ MTDM::MTDM (void) : _cnt (0), _inv (0)
     }
 }
 
-
 int MTDM::process (size_t len, float *ip, float *op)
 {
     int    i;
@@ -131,7 +128,6 @@ int MTDM::process (size_t len, float *ip, float *op)
     return 0;
 }
 
-
 int MTDM::resolve (void)
 {
     int     i, k, m;
@@ -164,21 +160,16 @@ int MTDM::resolve (void)
     return 0;
 }
 
-
 // --------------------------------------------------------------------------------
-
-
 static MTDM            mtdm;
 static jack_client_t  *jack_handle;
 static jack_port_t    *jack_capt;
 static jack_port_t    *jack_play;
 
-
 static void jack_shutdown (void *arg)
 {
     exit (1);
 }
-
 
 static int jack_callback (jack_nframes_t nframes, void *arg)
 {
@@ -188,7 +179,6 @@ static int jack_callback (jack_nframes_t nframes, void *arg)
     op = (float *)(jack_port_get_buffer (jack_play, nframes));
     return mtdm.process (nframes, ip, op);;
 }
-
 
 int main (int ac, char *av [])
 {
@@ -256,5 +246,3 @@ int main (int ac, char *av [])
     return 0;
 }
 
-
-// --------------------------------------------------------------------------------
