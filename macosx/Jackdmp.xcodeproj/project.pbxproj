@@ -404,7 +404,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4BFA99980AAAF3B0009E916C /* jdelay Universal */;
+			remoteGlobalIDString = 4BFA99980AAAF3B0009E916C;
 			remoteInfo = "jdelay Universal";
 		};
 /* End PBXContainerItemProxy section */
@@ -4148,7 +4148,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
-					../windows/libportaudio.a,
+					libportaudio.a,
 					"-framework",
 					Jackdmp,
 					"-framework",
@@ -4196,7 +4196,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
-					../windows/libportaudio.a,
+					libportaudio.a,
 					"-framework",
 					Jackdmp,
 					"-framework",
@@ -4242,7 +4242,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
-					../windows/libportaudio.a,
+					libportaudio.a,
 					"-framework",
 					Jackdmp,
 					"-framework",
