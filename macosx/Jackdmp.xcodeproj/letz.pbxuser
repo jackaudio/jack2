@@ -1,0 +1,2032 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Deployment;
+		activeExecutable = 4BE6C6A40A3E096F005A203A /* jack_test Universal */;
+		activeTarget = 4B699B26097D421600A18468 /* All Universal */;
+		addToTargets = (
+			4B699CD1097D421600A18468 /* jack_connect Universal */,
+			4B699CE1097D421600A18468 /* jack_disconnect Universal */,
+			4B89C81506382F5800464BF4 /* jack_connect */,
+			4B9686230771CA08002D75D5 /* jack_disconnect */,
+		);
+		breakpoints = (
+			4B978EDE0A31DDD3009E2DD1 /* JackPortAudioDriver.cpp:128 */,
+			4BA9D8BB0A3AECFE004F3D2C /* JackWinNamedPipeServerChannel.cpp:363 */,
+			4BA9D9EB0A3B0281004F3D2C /* JackWinNamedPipe.h:91 */,
+			4BA9DA280A3B0A26004F3D2C /* JackWinNamedPipeServerChannel.h:113 */,
+			4B98C8F60A3B6AFE00DBA3B2 /* JackDriver.cpp:79 */,
+			4BEBFBC50A45374400A23185 /* jack_test.c:1656 */,
+			4B3F9C220AAA1B2D000B2579 /* JackConnectionManager.h:394 */,
+		);
+		breakpointsGroup = 4B978DEA0A31D077009E2DD1 /* XCBreakpointsBucket */;
+		codeSenseManager = 4B0137400A2B977800D54320 /* Code sense */;
+		executables = (
+			4B0137200A2B975500D54320 /* jackdmp framework Universal */,
+			4B0137210A2B975500D54320 /* jack_metro Universal */,
+			4B0137220A2B975500D54320 /* jack_lsp Universal */,
+			4B0137230A2B975500D54320 /* jack_connect Universal */,
+			4B0137240A2B975500D54320 /* jack_disconnect Universal */,
+			4B0137250A2B975500D54320 /* jack_freewheel Universal */,
+			4B0137260A2B975500D54320 /* jack_external_metro Universal */,
+			4B0137270A2B975500D54320 /* testAtomic Universal */,
+			4B0137280A2B975500D54320 /* testSem Universal */,
+			4B0137290A2B975500D54320 /* zombie Universal */,
+			4B01372A0A2B975500D54320 /* synchroServer Universal */,
+			4B01372B0A2B975500D54320 /* synchroClient Universal */,
+			4B01372C0A2B975500D54320 /* synchroServerClient Universal */,
+			4B01372D0A2B975500D54320 /* jackdmp framework */,
+			4B01372E0A2B975500D54320 /* jack_metro */,
+			4B01372F0A2B975500D54320 /* jack_lsp */,
+			4B0137300A2B975500D54320 /* jack_connect */,
+			4B0137310A2B975500D54320 /* jack_disconnect */,
+			4B0137320A2B975500D54320 /* jack_freewheel */,
+			4B0137330A2B975500D54320 /* jack_external_metro */,
+			4B0137340A2B975500D54320 /* testAtomic */,
+			4B0137350A2B975500D54320 /* testSem */,
+			4B0137360A2B975500D54320 /* zombie */,
+			4B0137370A2B975500D54320 /* synchroServer */,
+			4B0137380A2B975500D54320 /* synchroClient */,
+			4B0137390A2B975500D54320 /* synchroServerClient */,
+			4BE6C6A40A3E096F005A203A /* jack_test Universal */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXBookmarksDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBookmarksDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					200,
+					200,
+					403.5835,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBookmarksDataSource_LocationID,
+					PBXBookmarksDataSource_NameID,
+					PBXBookmarksDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					594,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFindDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFindDataSource_LocationID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					443,
+					365,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFindDataSource_MessageID,
+					PBXFindDataSource_LocationID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXSymbolsDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXSymbolsDataSource_SymbolNameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					16,
+					200,
+					50,
+					534.2085,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXSymbolsDataSource_SymbolTypeIconID,
+					PBXSymbolsDataSource_SymbolNameID,
+					PBXSymbolsDataSource_SymbolTypeID,
+					PBXSymbolsDataSource_ReferenceNameID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.XCSCMDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					570,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_SCM_ColumnID,
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					200,
+					414,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 178961747;
+			PBXWorkspaceStateSaveDate = 178961747;
+		};
+		sourceControlManager = 4B01373F0A2B977800D54320 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	4B0137200A2B975500D54320 /* jackdmp framework Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jackdmp framework Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137210A2B975500D54320 /* jack_metro Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_metro Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137220A2B975500D54320 /* jack_lsp Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_lsp Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137230A2B975500D54320 /* jack_connect Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_connect Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137240A2B975500D54320 /* jack_disconnect Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_disconnect Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137250A2B975500D54320 /* jack_freewheel Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_freewheel Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137260A2B975500D54320 /* jack_external_metro Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_external_metro Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137270A2B975500D54320 /* testAtomic Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "testAtomic Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137280A2B975500D54320 /* testSem Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "testSem Universal";
+		sourceDirectories = (
+		);
+	};
+	4B0137290A2B975500D54320 /* zombie Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "zombie Universal";
+		sourceDirectories = (
+		);
+	};
+	4B01372A0A2B975500D54320 /* synchroServer Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "synchroServer Universal";
+		sourceDirectories = (
+		);
+	};
+	4B01372B0A2B975500D54320 /* synchroClient Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "synchroClient Universal";
+		sourceDirectories = (
+		);
+	};
+	4B01372C0A2B975500D54320 /* synchroServerClient Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "synchroServerClient Universal";
+		sourceDirectories = (
+		);
+	};
+	4B01372D0A2B975500D54320 /* jackdmp framework */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jackdmp framework";
+		sourceDirectories = (
+		);
+	};
+	4B01372E0A2B975500D54320 /* jack_metro */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = jack_metro;
+		sourceDirectories = (
+		);
+	};
+	4B01372F0A2B975500D54320 /* jack_lsp */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = jack_lsp;
+		sourceDirectories = (
+		);
+	};
+	4B0137300A2B975500D54320 /* jack_connect */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = jack_connect;
+		sourceDirectories = (
+		);
+	};
+	4B0137310A2B975500D54320 /* jack_disconnect */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = jack_disconnect;
+		sourceDirectories = (
+		);
+	};
+	4B0137320A2B975500D54320 /* jack_freewheel */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = jack_freewheel;
+		sourceDirectories = (
+		);
+	};
+	4B0137330A2B975500D54320 /* jack_external_metro */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = jack_external_metro;
+		sourceDirectories = (
+		);
+	};
+	4B0137340A2B975500D54320 /* testAtomic */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = testAtomic;
+		sourceDirectories = (
+		);
+	};
+	4B0137350A2B975500D54320 /* testSem */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = testSem;
+		sourceDirectories = (
+		);
+	};
+	4B0137360A2B975500D54320 /* zombie */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = zombie;
+		sourceDirectories = (
+		);
+	};
+	4B0137370A2B975500D54320 /* synchroServer */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = synchroServer;
+		sourceDirectories = (
+		);
+	};
+	4B0137380A2B975500D54320 /* synchroClient */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = synchroClient;
+		sourceDirectories = (
+		);
+	};
+	4B0137390A2B975500D54320 /* synchroServerClient */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = synchroServerClient;
+		sourceDirectories = (
+		);
+	};
+	4B01373F0A2B977800D54320 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+		scmType = "";
+	};
+	4B0137400A2B977800D54320 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	4B0C911D08DAF32100AE19BE /* jack_dummy */ = {
+		activeExec = 0;
+	};
+	4B123D3308B3954300540632 /* JackGlobalsClient.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 6454}}";
+			sepNavSelRange = "{10493, 0}";
+			sepNavVisRect = "{{0, 5819}, {842, 635}}";
+			sepNavWindowFrame = "{{276, 50}, {881, 764}}";
+		};
+	};
+	4B123D3608B3954A00540632 /* JackGlobalsServer.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 6454}}";
+			sepNavSelRange = "{5552, 0}";
+			sepNavVisRect = "{{0, 5819}, {842, 635}}";
+			sepNavWindowFrame = "{{494, 137}, {881, 764}}";
+		};
+	};
+	4B1CBD7B0799484F0096ABE0 /* testSem */ = {
+		activeExec = 0;
+		executables = (
+			4B0137350A2B975500D54320 /* testSem */,
+		);
+	};
+	4B1CBE2607994C6F0096ABE0 /* jack_freewheel */ = {
+		activeExec = 0;
+		executables = (
+			4B0137320A2B975500D54320 /* jack_freewheel */,
+		);
+	};
+	4B2C28D008DACC6B00249230 /* jack_coreaudio */ = {
+		activeExec = 0;
+	};
+	4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 737}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {925, 737}}";
+			sepNavWindowFrame = "{{61, 25}, {964, 866}}";
+		};
+	};
+	4B395C9606AEF53800923527 /* JackCoreAudioDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1256, 16618}}";
+			sepNavSelRange = "{1764, 0}";
+			sepNavVisRect = "{{0, 407}, {1051, 783}}";
+			sepNavWindowFrame = "{{303, -45}, {1090, 912}}";
+		};
+	};
+	4B395C9706AEF53800923527 /* JackCoreAudioDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 1764}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 736}, {1010, 760}}";
+			sepNavWindowFrame = "{{15, 44}, {1049, 889}}";
+		};
+	};
+	4B3F9C220AAA1B2D000B2579 /* JackConnectionManager.h:394 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4BF8D1C30834EF1400C94B91 /* JackConnectionManager.h */;
+		hitCount = 0;
+		lineNumber = 394;
+		modificationTime = 178920237.678636;
+		state = 1;
+	};
+	4B420C8107733D7C00DDA57E /* testAtomic */ = {
+		activeExec = 0;
+		executables = (
+			4B0137340A2B975500D54320 /* testAtomic */,
+		);
+	};
+	4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1148, 2604}}";
+			sepNavSelRange = "{1346, 9}";
+			sepNavVisRect = "{{0, 163}, {941, 696}}";
+			sepNavWindowFrame = "{{427, 97}, {980, 825}}";
+		};
+	};
+	4B50A111080917BA003F4C95 /* zombie */ = {
+		activeExec = 0;
+		executables = (
+			4B0137360A2B975500D54320 /* zombie */,
+		);
+	};
+	4B56880F08B5C8620022B32D /* JackFifo.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 2940}}";
+			sepNavSelRange = "{731, 10}";
+			sepNavVisRect = "{{0, 2203}, {925, 737}}";
+			sepNavWindowFrame = "{{394, 48}, {964, 866}}";
+		};
+	};
+	4B56881008B5C8620022B32D /* JackFifo.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1036}}";
+			sepNavSelRange = "{774, 13}";
+			sepNavVisRect = "{{0, 299}, {925, 737}}";
+			sepNavWindowFrame = "{{10, 72}, {964, 866}}";
+		};
+	};
+	4B646BED0636CC42003B5396 /* Jackmp.framework */ = {
+		activeExec = 0;
+	};
+	4B646C310636CEE6003B5396 /* jack_metro */ = {
+		activeExec = 0;
+		executables = (
+			4B01372E0A2B975500D54320 /* jack_metro */,
+		);
+	};
+	4B66A8580934964500A89560 /* JackConstants.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 910}}";
+			sepNavSelRange = "{752, 0}";
+			sepNavVisRect = "{{0, 0}, {853, 799}}";
+			sepNavWindowFrame = "{{15, 5}, {892, 928}}";
+		};
+	};
+	4B699B26097D421600A18468 /* All Universal */ = {
+		activeExec = 0;
+	};
+	4B699BA7097D421600A18468 /* jackdmp framework Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137200A2B975500D54320 /* jackdmp framework Universal */,
+		);
+	};
+	4B699C00097D421600A18468 /* Jackmp.framework Universal */ = {
+		activeExec = 0;
+	};
+	4B699C4C097D421600A18468 /* Jackdmp.framework Universal */ = {
+		activeExec = 0;
+	};
+	4B699CB1097D421600A18468 /* jack_metro Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137210A2B975500D54320 /* jack_metro Universal */,
+		);
+	};
+	4B699CC1097D421600A18468 /* jack_lsp Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137220A2B975500D54320 /* jack_lsp Universal */,
+		);
+	};
+	4B699CD1097D421600A18468 /* jack_connect Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137230A2B975500D54320 /* jack_connect Universal */,
+		);
+	};
+	4B699CE1097D421600A18468 /* jack_disconnect Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137240A2B975500D54320 /* jack_disconnect Universal */,
+		);
+	};
+	4B699CF1097D421600A18468 /* jack_freewheel Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137250A2B975500D54320 /* jack_freewheel Universal */,
+		);
+	};
+	4B699D03097D421600A18468 /* jack_external_metro Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137260A2B975500D54320 /* jack_external_metro Universal */,
+		);
+	};
+	4B699D13097D421600A18468 /* testAtomic Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137270A2B975500D54320 /* testAtomic Universal */,
+		);
+	};
+	4B699D27097D421600A18468 /* testSem Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137280A2B975500D54320 /* testSem Universal */,
+		);
+	};
+	4B699D3F097D421600A18468 /* zombie Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B0137290A2B975500D54320 /* zombie Universal */,
+		);
+	};
+	4B699D4F097D421600A18468 /* synchroServer Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B01372A0A2B975500D54320 /* synchroServer Universal */,
+		);
+	};
+	4B699D67097D421600A18468 /* synchroClient Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B01372B0A2B975500D54320 /* synchroClient Universal */,
+		);
+	};
+	4B699D7F097D421700A18468 /* synchroServerClient Universal */ = {
+		activeExec = 0;
+		executables = (
+			4B01372C0A2B975500D54320 /* synchroServerClient Universal */,
+		);
+	};
+	4B699D97097D421700A18468 /* jack_coreaudio Universal */ = {
+		activeExec = 0;
+	};
+	4B699DA6097D421700A18468 /* jack_dummy Universal */ = {
+		activeExec = 0;
+	};
+	4B799AD607899652003F3F15 /* JackMachPort.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1004, 3920}}";
+			sepNavSelRange = "{1698, 18}";
+			sepNavVisRect = "{{0, 3066}, {853, 799}}";
+			sepNavWindowFrame = "{{464, -77}, {892, 928}}";
+		};
+	};
+	4B7D792E0637B848001E7115 /* jack_lsp */ = {
+		activeExec = 0;
+		executables = (
+			4B01372F0A2B975500D54320 /* jack_lsp */,
+		);
+	};
+	4B869B4208C8D22F001CF041 /* JackDriverLoader.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 938}}";
+			sepNavSelRange = "{500, 0}";
+			sepNavVisRect = "{{0, 155}, {1051, 783}}";
+			sepNavWindowFrame = "{{15, 21}, {1090, 912}}";
+		};
+	};
+	4B869B6408C8D76B001CF041 /* jslist.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 4032}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 3295}, {925, 737}}";
+			sepNavWindowFrame = "{{38, 46}, {964, 866}}";
+		};
+	};
+	4B869D7F08C9CB00001CF041 /* JackDriverLoader.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 6986}}";
+			sepNavSelRange = "{817, 5}";
+			sepNavVisRect = "{{0, 6187}, {853, 799}}";
+			sepNavWindowFrame = "{{330, 4}, {892, 928}}";
+		};
+	};
+	4B89B759076B731100D170DE /* JackRPCClientUser.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1442, 6286}}";
+			sepNavSelRange = "{2133, 40}";
+			sepNavVisRect = "{{0, 838}, {997, 607}}";
+			sepNavWindowFrame = "{{84, 134}, {1036, 736}}";
+		};
+	};
+	4B89C81506382F5800464BF4 /* jack_connect */ = {
+		activeExec = 0;
+		executables = (
+			4B0137300A2B975500D54320 /* jack_connect */,
+		);
+	};
+	4B9686230771CA08002D75D5 /* jack_disconnect */ = {
+		activeExec = 0;
+		executables = (
+			4B0137310A2B975500D54320 /* jack_disconnect */,
+		);
+	};
+	4B97440C08AF54590094983C /* JackSocket.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 4382}}";
+			sepNavSelRange = "{5522, 5}";
+			sepNavVisRect = "{{0, 460}, {1051, 783}}";
+			sepNavWindowFrame = "{{293, 6}, {1090, 912}}";
+		};
+	};
+	4B97440D08AF54590094983C /* JackSocket.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 1470}}";
+			sepNavSelRange = "{1861, 5}";
+			sepNavVisRect = "{{0, 244}, {1051, 783}}";
+			sepNavWindowFrame = "{{15, 21}, {1090, 912}}";
+		};
+	};
+	4B97441408AF546F0094983C /* JackSocketClientChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 1260}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {1051, 783}}";
+			sepNavWindowFrame = "{{15, 21}, {1090, 912}}";
+		};
+	};
+	4B97441508AF546F0094983C /* JackSocketClientChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 3710}}";
+			sepNavSelRange = "{6547, 6}";
+			sepNavVisRect = "{{0, 2927}, {1051, 783}}";
+			sepNavWindowFrame = "{{353, 26}, {1090, 912}}";
+		};
+	};
+	4B97441A08AF54930094983C /* JackSocketNotifyChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 798}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {1051, 783}}";
+			sepNavWindowFrame = "{{290, 9}, {1090, 912}}";
+		};
+	};
+	4B97441B08AF54930094983C /* JackSocketServerChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 994}}";
+			sepNavSelRange = "{1317, 11}";
+			sepNavVisRect = "{{0, 197}, {1051, 783}}";
+			sepNavWindowFrame = "{{536, -46}, {1090, 912}}";
+		};
+	};
+	4B97452B08AF6D4B0094983C /* JackSocketServerChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 5264}}";
+			sepNavSelRange = "{11338, 10}";
+			sepNavVisRect = "{{0, 3655}, {1051, 783}}";
+			sepNavWindowFrame = "{{306, 26}, {1090, 912}}";
+		};
+	};
+	4B97458708AF74FF0094983C /* JackSocketNotifyChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 1120}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {1051, 783}}";
+			sepNavWindowFrame = "{{15, 21}, {1090, 912}}";
+		};
+	};
+	4B9745CB08AF771B0094983C /* JackSocketServerNotifyChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 784}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {1051, 783}}";
+			sepNavWindowFrame = "{{15, 21}, {1090, 912}}";
+		};
+	};
+	4B9745D908AF78200094983C /* JackSocketServerNotifyChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 840}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 56}, {1051, 783}}";
+			sepNavWindowFrame = "{{15, 21}, {1090, 912}}";
+		};
+	};
+	4B978DB10A31CF4A009E2DD1 /* jack_portaudio Universal */ = {
+		activeExec = 0;
+	};
+	4B978DEA0A31D077009E2DD1 /* XCBreakpointsBucket */ = {
+		isa = XCBreakpointsBucket;
+		name = "Project Breakpoints";
+		objects = (
+			4B978EDE0A31DDD3009E2DD1 /* JackPortAudioDriver.cpp:128 */,
+			4BA9D8BB0A3AECFE004F3D2C /* JackWinNamedPipeServerChannel.cpp:363 */,
+			4BA9D9EB0A3B0281004F3D2C /* JackWinNamedPipe.h:91 */,
+			4BA9DA280A3B0A26004F3D2C /* JackWinNamedPipeServerChannel.h:113 */,
+			4B98C8F60A3B6AFE00DBA3B2 /* JackDriver.cpp:79 */,
+			4BEBFBC50A45374400A23185 /* jack_test.c:1656 */,
+			4B3F9C220AAA1B2D000B2579 /* JackConnectionManager.h:394 */,
+		);
+	};
+	4B978DEB0A31D099009E2DD1 /* JackPortAudioDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1149, 1288}}";
+			sepNavSelRange = "{1374, 0}";
+			sepNavVisRect = "{{0, 0}, {1149, 762}}";
+			sepNavWindowFrame = "{{30, 9}, {1188, 891}}";
+		};
+	};
+	4B978DEC0A31D099009E2DD1 /* JackPortAudioDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1184, 9758}}";
+			sepNavSelRange = "{13356, 131}";
+			sepNavVisRect = "{{0, 4372}, {917, 720}}";
+			sepNavWindowFrame = "{{156, 85}, {956, 849}}";
+		};
+	};
+	4B978EDE0A31DDD3009E2DD1 /* JackPortAudioDriver.cpp:128 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4B978DEC0A31D099009E2DD1 /* JackPortAudioDriver.cpp */;
+		functionName = "JackPortAudioDriver::Open()";
+		hitCount = 0;
+		lineNumber = 128;
+		modificationTime = 171040211.473648;
+		state = 1;
+	};
+	4B98AE000931D30C0091932A /* JackDebugClient.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1028, 6412}}";
+			sepNavSelRange = "{17036, 0}";
+			sepNavVisRect = "{{0, 5848}, {845, 564}}";
+			sepNavWindowFrame = "{{222, 51}, {884, 693}}";
+		};
+	};
+	4B98AE010931D30C0091932A /* JackDebugClient.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1149, 1792}}";
+			sepNavSelRange = "{3959, 0}";
+			sepNavVisRect = "{{0, 0}, {1149, 762}}";
+			sepNavWindowFrame = "{{38, 21}, {1188, 891}}";
+		};
+	};
+	4B98C8F60A3B6AFE00DBA3B2 /* JackDriver.cpp:79 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4BF8D1B60834EEE400C94B91 /* JackDriver.cpp */;
+		functionName = "JackDriver::Open()";
+		hitCount = 0;
+		lineNumber = 79;
+		modificationTime = 171666174.644441;
+		state = 1;
+	};
+	4B9B815C08AFA45000D05A28 /* JackRequest.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 8582}}";
+			sepNavSelRange = "{2020, 0}";
+			sepNavVisRect = "{{0, 7799}, {1051, 783}}";
+			sepNavWindowFrame = "{{295, 26}, {1090, 912}}";
+		};
+	};
+	4BA577B308BF8BAB00F82DE1 /* synchroServer */ = {
+		activeExec = 0;
+		executables = (
+			4B0137370A2B975500D54320 /* synchroServer */,
+		);
+	};
+	4BA577D908BF8E0600F82DE1 /* synchroClient */ = {
+		activeExec = 0;
+		executables = (
+			4B0137380A2B975500D54320 /* synchroClient */,
+		);
+	};
+	4BA9D8B90A3AECFE004F3D2C /* JackWinNamedPipeServerChannel.cpp */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.cpp.cpp;
+		name = JackWinNamedPipeServerChannel.cpp;
+		path = /Volumes/Documents/Jackdmp/src_win32/windows/JackWinNamedPipeServerChannel.cpp;
+		sourceTree = "<absolute>";
+	};
+	4BA9D8BB0A3AECFE004F3D2C /* JackWinNamedPipeServerChannel.cpp:363 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4BA9D8B90A3AECFE004F3D2C /* JackWinNamedPipeServerChannel.cpp */;
+		functionName = "JackWinNamedPipeServerChannel1::JackWinNamedPipeServerChannel1()";
+		hitCount = 0;
+		lineNumber = 363;
+		modificationTime = 174550331.948546;
+		state = 1;
+	};
+	4BA9D9E90A3B0281004F3D2C /* JackWinNamedPipe.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = JackWinNamedPipe.h;
+		path = /Volumes/Documents/Jackdmp/src_win32/windows/JackWinNamedPipe.h;
+		sourceTree = "<group>";
+	};
+	4BA9D9EB0A3B0281004F3D2C /* JackWinNamedPipe.h:91 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4BA9D9E90A3B0281004F3D2C /* JackWinNamedPipe.h */;
+		hitCount = 0;
+		lineNumber = 91;
+		modificationTime = 171639427.137253;
+		state = 2;
+	};
+	4BA9DA260A3B0A26004F3D2C /* JackWinNamedPipeServerChannel.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = JackWinNamedPipeServerChannel.h;
+		path = /Volumes/Documents/Jackdmp/src_win32/windows/JackWinNamedPipeServerChannel.h;
+		sourceTree = "<group>";
+	};
+	4BA9DA280A3B0A26004F3D2C /* JackWinNamedPipeServerChannel.h:113 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4BA9DA260A3B0A26004F3D2C /* JackWinNamedPipeServerChannel.h */;
+		hitCount = 0;
+		lineNumber = 113;
+		modificationTime = 171641384.020329;
+		state = 2;
+	};
+	4BBD13AA08C71A480079F7FF /* synchroServerClient */ = {
+		activeExec = 0;
+		executables = (
+			4B0137390A2B975500D54320 /* synchroServerClient */,
+		);
+	};
+	4BC216880A444BDE00BDA09F /* JackServerGlobals.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1004, 5460}}";
+			sepNavSelRange = "{10717, 0}";
+			sepNavVisRect = "{{0, 4723}, {925, 737}}";
+			sepNavWindowFrame = "{{378, 21}, {964, 866}}";
+		};
+	};
+	4BC2168D0A444BED00BDA09F /* JackServerGlobals.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {962, 826}}";
+			sepNavSelRange = "{1475, 0}";
+			sepNavVisRect = "{{0, 89}, {925, 737}}";
+			sepNavWindowFrame = "{{38, 46}, {964, 866}}";
+		};
+	};
+	4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {890, 3150}}";
+			sepNavSelRange = "{2767, 13}";
+			sepNavVisRect = "{{0, 2322}, {853, 799}}";
+			sepNavWindowFrame = "{{15, 5}, {892, 928}}";
+		};
+	};
+	4BC3988A08B3CF6C00B6F371 /* JackDummyDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 966}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 229}, {925, 737}}";
+			sepNavWindowFrame = "{{15, 67}, {964, 866}}";
+		};
+	};
+	4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 1932}}";
+			sepNavSelRange = "{3339, 0}";
+			sepNavVisRect = "{{0, 1167}, {1010, 760}}";
+			sepNavWindowFrame = "{{15, 44}, {1049, 889}}";
+		};
+	};
+	4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 3640}}";
+			sepNavSelRange = "{8183, 0}";
+			sepNavVisRect = "{{0, 2719}, {925, 737}}";
+			sepNavWindowFrame = "{{284, 31}, {964, 866}}";
+		};
+	};
+	4BD561C708EEB910006BBC2A /* JackSynchro.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1442}}";
+			sepNavSelRange = "{843, 0}";
+			sepNavVisRect = "{{0, 705}, {925, 737}}";
+			sepNavWindowFrame = "{{146, 0}, {964, 866}}";
+		};
+	};
+	4BD81C7F07ACD3DE00ACB953 /* jack_external_metro */ = {
+		activeExec = 0;
+		executables = (
+			4B0137330A2B975500D54320 /* jack_external_metro */,
+		);
+	};
+	4BE6C6910A3E096F005A203A /* jack_test Universal */ = {
+		activeExec = 0;
+		executables = (
+			4BE6C6A40A3E096F005A203A /* jack_test Universal */,
+		);
+	};
+	4BE6C6A40A3E096F005A203A /* jack_test Universal */ = {
+		isa = PBXExecutable;
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "jack_test Universal";
+		sourceDirectories = (
+		);
+	};
+	4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1280, 25382}}";
+			sepNavSelRange = "{39845, 4}";
+			sepNavVisRect = "{{0, 14965}, {792, 184}}";
+			sepNavWindowFrame = "{{38, 46}, {964, 866}}";
+		};
+	};
+	4BEBFBC30A45374400A23185 /* jack_test.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = jack_test.c;
+		path = /Volumes/Documents/JackTools/jack_test/jack_test.c;
+		sourceTree = "<absolute>";
+	};
+	4BEBFBC50A45374400A23185 /* jack_test.c:1656 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		delayBeforeContinue = 0;
+		fileReference = 4BEBFBC30A45374400A23185 /* jack_test.c */;
+		functionName = "main()";
+		hitCount = 0;
+		lineNumber = 1656;
+		modificationTime = 172308292.440516;
+		state = 1;
+	};
+	4BEE0B2C08ACBB9F00D22B43 /* JackPosixSemaphore.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 2884}}";
+			sepNavSelRange = "{4774, 0}";
+			sepNavVisRect = "{{0, 0}, {925, 737}}";
+			sepNavWindowFrame = "{{369, 30}, {964, 866}}";
+		};
+	};
+	4BEE0B2D08ACBB9F00D22B43 /* JackPosixSemaphore.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1008}}";
+			sepNavSelRange = "{1081, 0}";
+			sepNavVisRect = "{{0, 425}, {845, 564}}";
+			sepNavWindowFrame = "{{84, 177}, {884, 693}}";
+		};
+	};
+	4BF2124508DADBB5008D17F1 /* jackdmp framework */ = {
+		activeExec = 0;
+		executables = (
+			4B01372D0A2B975500D54320 /* jackdmp framework */,
+		);
+	};
+	4BF2955B08BC475500F2602F /* All */ = {
+		activeExec = 0;
+	};
+	4BF5925D08F13D81005B1F5F /* Jackdmp.framework */ = {
+		activeExec = 0;
+	};
+	4BF6C1D508ACE64C001E2013 /* JackMachSemaphore.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 2758}}";
+			sepNavSelRange = "{4414, 9}";
+			sepNavVisRect = "{{0, 1643}, {925, 737}}";
+			sepNavWindowFrame = "{{108, 72}, {964, 866}}";
+		};
+	};
+	4BF6C1D608ACE64C001E2013 /* JackMachSemaphore.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1064}}";
+			sepNavSelRange = "{1184, 9}";
+			sepNavVisRect = "{{0, 462}, {845, 564}}";
+			sepNavWindowFrame = "{{199, 72}, {884, 693}}";
+		};
+	};
+	4BF70ACA0908EE95008B75AD /* JackLoopbackDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 2940}}";
+			sepNavSelRange = "{823, 0}";
+			sepNavVisRect = "{{0, 2203}, {925, 737}}";
+			sepNavWindowFrame = "{{247, 6}, {964, 866}}";
+		};
+	};
+	4BF70ACB0908EE95008B75AD /* JackLoopbackDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 896}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 159}, {925, 737}}";
+			sepNavWindowFrame = "{{61, 25}, {964, 866}}";
+		};
+	};
+	4BF772FD08B3330F00149912 /* JackAtomic.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 2744}}";
+			sepNavSelRange = "{837, 5}";
+			sepNavVisRect = "{{0, 2109}, {842, 635}}";
+			sepNavWindowFrame = "{{38, 148}, {881, 764}}";
+		};
+	};
+	4BF773AA08B3414500149912 /* JackTime.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {838, 1708}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {838, 756}}";
+			sepNavWindowFrame = "{{38, 27}, {877, 885}}";
+		};
+	};
+	4BF8D1670834EDD900C94B91 /* zombie.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {936, 1260}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {936, 591}}";
+			sepNavWindowFrame = "{{107, 129}, {975, 720}}";
+		};
+	};
+	4BF8D16B0834EDF000C94B91 /* metro.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 4004}}";
+			sepNavSelRange = "{867, 8}";
+			sepNavVisRect = "{{0, 0}, {842, 635}}";
+			sepNavWindowFrame = "{{130, 64}, {881, 764}}";
+		};
+	};
+	4BF8D1750834EE3600C94B91 /* external_metro.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {936, 2170}}";
+			sepNavSelRange = "{750, 0}";
+			sepNavVisRect = "{{0, 0}, {936, 591}}";
+			sepNavWindowFrame = "{{130, 108}, {975, 720}}";
+		};
+	};
+	4BF8D1770834EE4800C94B91 /* JackError.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {792, 658}}";
+			sepNavSelRange = "{866, 5}";
+			sepNavVisRect = "{{0, 364}, {792, 184}}";
+			sepNavWindowFrame = "{{15, 48}, {877, 885}}";
+		};
+	};
+	4BF8D1830834EE5800C94B91 /* JackTime.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 1568}}";
+			sepNavSelRange = "{317, 0}";
+			sepNavVisRect = "{{0, 0}, {1010, 760}}";
+			sepNavWindowFrame = "{{15, 44}, {1049, 889}}";
+		};
+	};
+	4BF8D1870834EE7900C94B91 /* JackShmMem.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 4326}}";
+			sepNavSelRange = "{1326, 21}";
+			sepNavVisRect = "{{0, 368}, {925, 737}}";
+			sepNavWindowFrame = "{{402, 16}, {964, 866}}";
+		};
+	};
+	4BF8D1880834EE7900C94B91 /* JackShmMem.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1302}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 565}, {925, 737}}";
+			sepNavWindowFrame = "{{38, 46}, {964, 866}}";
+		};
+	};
+	4BF8D18F0834EE8400C94B91 /* shm.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 2058}}";
+			sepNavSelRange = "{879, 5}";
+			sepNavVisRect = "{{0, 0}, {1010, 760}}";
+			sepNavWindowFrame = "{{38, 23}, {1049, 889}}";
+		};
+	};
+	4BF8D1900834EE8400C94B91 /* shm.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {838, 16562}}";
+			sepNavSelRange = "{10436, 5}";
+			sepNavVisRect = "{{0, 15806}, {838, 756}}";
+			sepNavWindowFrame = "{{384, 13}, {877, 885}}";
+		};
+	};
+	4BF8D1970834EE9700C94B91 /* JackPosixThread.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1036}}";
+			sepNavSelRange = "{796, 12}";
+			sepNavVisRect = "{{0, 294}, {925, 737}}";
+			sepNavWindowFrame = "{{358, 57}, {964, 866}}";
+		};
+	};
+	4BF8D1980834EE9700C94B91 /* JackPosixThread.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 2940}}";
+			sepNavSelRange = "{1917, 0}";
+			sepNavVisRect = "{{0, 2203}, {925, 737}}";
+			sepNavWindowFrame = "{{83, 15}, {964, 866}}";
+		};
+	};
+	4BF8D19F0834EE9E00C94B91 /* JackThread.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {860, 1372}}";
+			sepNavSelRange = "{783, 5}";
+			sepNavVisRect = "{{0, 616}, {838, 756}}";
+			sepNavWindowFrame = "{{120, 53}, {877, 885}}";
+		};
+	};
+	4BF8D1A70834EEB400C94B91 /* JackActivationCount.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1176}}";
+			sepNavSelRange = "{1531, 0}";
+			sepNavVisRect = "{{0, 439}, {925, 737}}";
+			sepNavWindowFrame = "{{15, 67}, {964, 866}}";
+		};
+	};
+	4BF8D1A80834EEB400C94B91 /* JackActivationCount.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1149, 762}}";
+			sepNavSelRange = "{1267, 0}";
+			sepNavVisRect = "{{0, 0}, {1149, 762}}";
+			sepNavWindowFrame = "{{232, 12}, {1188, 891}}";
+		};
+	};
+	4BF8D1AF0834EEC400C94B91 /* JackChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1040, 2954}}";
+			sepNavSelRange = "{4813, 2}";
+			sepNavVisRect = "{{0, 1166}, {925, 737}}";
+			sepNavWindowFrame = "{{396, 57}, {964, 866}}";
+		};
+	};
+	4BF8D1B30834EED500C94B91 /* JackInternalClientChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {992, 1638}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 901}, {925, 737}}";
+			sepNavWindowFrame = "{{38, 46}, {964, 866}}";
+		};
+	};
+	4BF8D1B50834EEE400C94B91 /* JackDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 3024}}";
+			sepNavSelRange = "{3161, 0}";
+			sepNavVisRect = "{{0, 2109}, {1051, 783}}";
+			sepNavWindowFrame = "{{291, -46}, {1090, 912}}";
+		};
+	};
+	4BF8D1B60834EEE400C94B91 /* JackDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 2870}}";
+			sepNavSelRange = "{5600, 0}";
+			sepNavVisRect = "{{0, 1654}, {1051, 783}}";
+			sepNavWindowFrame = "{{169, 10}, {1090, 912}}";
+		};
+	};
+	4BF8D1B90834EEF100C94B91 /* JackFreewheelDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {936, 770}}";
+			sepNavSelRange = "{1195, 0}";
+			sepNavVisRect = "{{0, 169}, {936, 591}}";
+			sepNavWindowFrame = "{{15, 213}, {975, 720}}";
+		};
+	};
+	4BF8D1BA0834EEF100C94B91 /* JackFreewheelDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1015, 672}}";
+			sepNavSelRange = "{1228, 0}";
+			sepNavVisRect = "{{0, 0}, {1015, 667}}";
+			sepNavWindowFrame = "{{38, 116}, {1054, 796}}";
+		};
+	};
+	4BF8D1BD0834EEFC00C94B91 /* JackThreadedDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1136, 2170}}";
+			sepNavSelRange = "{3637, 16}";
+			sepNavVisRect = "{{0, 1791}, {792, 184}}";
+			sepNavWindowFrame = "{{347, 72}, {964, 866}}";
+		};
+	};
+	4BF8D1BE0834EEFC00C94B91 /* JackThreadedDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1260}}";
+			sepNavSelRange = "{1845, 0}";
+			sepNavVisRect = "{{0, 523}, {925, 737}}";
+			sepNavWindowFrame = "{{15, 67}, {964, 866}}";
+		};
+	};
+	4BF8D1C10834EF0800C94B91 /* JackAtomicState.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {962, 3374}}";
+			sepNavSelRange = "{3177, 0}";
+			sepNavVisRect = "{{0, 1340}, {941, 696}}";
+			sepNavWindowFrame = "{{210, 2}, {980, 825}}";
+		};
+	};
+	4BF8D1C30834EF1400C94B91 /* JackConnectionManager.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1028, 6566}}";
+			sepNavSelRange = "{10526, 0}";
+			sepNavVisRect = "{{0, 5286}, {853, 799}}";
+			sepNavWindowFrame = "{{127, 10}, {892, 928}}";
+		};
+	};
+	4BF8D1C40834EF1400C94B91 /* JackConnectionManager.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 6342}}";
+			sepNavSelRange = "{1406, 0}";
+			sepNavVisRect = "{{0, 336}, {853, 799}}";
+			sepNavWindowFrame = "{{416, 10}, {892, 928}}";
+		};
+	};
+	4BF8D1C70834EF2200C94B91 /* JackGraphManager.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {902, 1708}}";
+			sepNavSelRange = "{3873, 0}";
+			sepNavVisRect = "{{0, 909}, {853, 799}}";
+			sepNavWindowFrame = "{{15, 5}, {892, 928}}";
+		};
+	};
+	4BF8D1C80834EF2200C94B91 /* JackGraphManager.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1088, 10892}}";
+			sepNavSelRange = "{5029, 67}";
+			sepNavVisRect = "{{0, 2378}, {1088, 214}}";
+			sepNavWindowFrame = "{{454, -26}, {892, 928}}";
+		};
+	};
+	4BF8D1CF0834EF2F00C94B91 /* JackPort.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1386}}";
+			sepNavSelRange = "{2135, 0}";
+			sepNavVisRect = "{{0, 758}, {845, 564}}";
+			sepNavWindowFrame = "{{268, 9}, {884, 693}}";
+		};
+	};
+	4BF8D1D00834EF2F00C94B91 /* JackPort.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 3220}}";
+			sepNavSelRange = "{1522, 29}";
+			sepNavVisRect = "{{0, 607}, {845, 564}}";
+			sepNavWindowFrame = "{{471, 177}, {884, 693}}";
+		};
+	};
+	4BF8D1D90834EF4500C94B91 /* JackClientInterface.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 798}}";
+			sepNavSelRange = "{1228, 7}";
+			sepNavVisRect = "{{0, 0}, {925, 737}}";
+			sepNavWindowFrame = "{{15, 67}, {964, 866}}";
+		};
+	};
+	4BF8D1DD0834EF4D00C94B91 /* JackClientControl.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1078}}";
+			sepNavSelRange = "{907, 0}";
+			sepNavVisRect = "{{0, 126}, {845, 564}}";
+			sepNavWindowFrame = "{{144, 245}, {884, 693}}";
+		};
+	};
+	4BF8D1E10834EF5500C94B91 /* JackClient.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {915, 2282}}";
+			sepNavSelRange = "{2886, 63}";
+			sepNavVisRect = "{{0, 1305}, {915, 232}}";
+			sepNavWindowFrame = "{{380, 49}, {1049, 889}}";
+		};
+	};
+	4BF8D1E50834EF6700C94B91 /* JackClient.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 10752}}";
+			sepNavSelRange = "{7820, 6}";
+			sepNavVisRect = "{{0, 3256}, {1051, 783}}";
+			sepNavWindowFrame = "{{40, 26}, {1090, 912}}";
+		};
+	};
+	4BF8D1E90834EF7500C94B91 /* JackAPI.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1010, 15610}}";
+			sepNavSelRange = "{10351, 0}";
+			sepNavVisRect = "{{0, 14850}, {1010, 760}}";
+			sepNavWindowFrame = "{{291, 27}, {1049, 889}}";
+		};
+	};
+	4BF8D1ED0834EF9200C94B91 /* JackInternalClient.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1484}}";
+			sepNavSelRange = "{2549, 0}";
+			sepNavVisRect = "{{0, 920}, {845, 564}}";
+			sepNavWindowFrame = "{{352, 122}, {884, 693}}";
+		};
+	};
+	4BF8D1EE0834EF9200C94B91 /* JackInternalClient.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 854}}";
+			sepNavSelRange = "{1390, 0}";
+			sepNavVisRect = "{{0, 290}, {845, 564}}";
+			sepNavWindowFrame = "{{15, 240}, {884, 693}}";
+		};
+	};
+	4BF8D1F50834EFB000C94B91 /* JackServerAPI.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {902, 2450}}";
+			sepNavSelRange = "{4508, 108}";
+			sepNavVisRect = "{{0, 1706}, {842, 635}}";
+			sepNavWindowFrame = "{{531, 130}, {881, 764}}";
+		};
+	};
+	4BF8D1F70834EFBD00C94B91 /* JackExternalClient.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 854}}";
+			sepNavSelRange = "{1534, 0}";
+			sepNavVisRect = "{{0, 117}, {925, 737}}";
+			sepNavWindowFrame = "{{61, 25}, {964, 866}}";
+		};
+	};
+	4BF8D1F80834EFBD00C94B91 /* JackExternalClient.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {908, 1176}}";
+			sepNavSelRange = "{2243, 16}";
+			sepNavVisRect = "{{0, 992}, {792, 184}}";
+			sepNavWindowFrame = "{{38, 46}, {964, 866}}";
+		};
+	};
+	4BF8D1FB0834EFD100C94B91 /* JackLibGlobals.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1372}}";
+			sepNavSelRange = "{1407, 0}";
+			sepNavVisRect = "{{0, 808}, {845, 564}}";
+			sepNavWindowFrame = "{{61, 198}, {884, 693}}";
+		};
+	};
+	4BF8D1FC0834EFD100C94B91 /* JackLibClient.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 854}}";
+			sepNavSelRange = "{1474, 0}";
+			sepNavVisRect = "{{0, 290}, {845, 564}}";
+			sepNavWindowFrame = "{{84, 177}, {884, 693}}";
+		};
+	};
+	4BF8D1FD0834EFD100C94B91 /* JackLibClient.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 2282}}";
+			sepNavSelRange = "{4586, 0}";
+			sepNavVisRect = "{{0, 1545}, {925, 737}}";
+			sepNavWindowFrame = "{{402, 52}, {964, 866}}";
+		};
+	};
+	4BF8D1FE0834EFD100C94B91 /* JackLibAPI.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 1876}}";
+			sepNavSelRange = "{991, 5}";
+			sepNavVisRect = "{{0, 1241}, {842, 635}}";
+			sepNavWindowFrame = "{{473, 63}, {881, 764}}";
+		};
+	};
+	4BF8D20F0834F01C00C94B91 /* JackEngineTiming.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 3220}}";
+			sepNavSelRange = "{4084, 0}";
+			sepNavVisRect = "{{0, 1359}, {853, 799}}";
+			sepNavWindowFrame = "{{485, 10}, {892, 928}}";
+		};
+	};
+	4BF8D2100834F01C00C94B91 /* JackEngineTiming.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {724, 1484}}";
+			sepNavSelRange = "{1170, 19}";
+			sepNavVisRect = "{{0, 790}, {724, 694}}";
+			sepNavWindowFrame = "{{600, 27}, {763, 823}}";
+		};
+	};
+	4BF8D2130834F02800C94B91 /* JackEngine.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1154, 1680}}";
+			sepNavSelRange = "{1085, 0}";
+			sepNavVisRect = "{{0, 950}, {724, 694}}";
+			sepNavWindowFrame = "{{518, 10}, {763, 823}}";
+		};
+	};
+	4BF8D2140834F02800C94B91 /* JackEngine.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1142, 9030}}";
+			sepNavSelRange = "{17117, 45}";
+			sepNavVisRect = "{{0, 725}, {941, 696}}";
+			sepNavWindowFrame = "{{109, 113}, {980, 825}}";
+		};
+	};
+	4BF8D2170834F03500C94B91 /* jack.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {838, 11284}}";
+			sepNavSelRange = "{961, 5}";
+			sepNavVisRect = "{{0, 0}, {838, 756}}";
+			sepNavWindowFrame = "{{507, 14}, {877, 885}}";
+		};
+	};
+	4BF8D2190834F03D00C94B91 /* JackEngineControl.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {724, 826}}";
+			sepNavSelRange = "{1366, 0}";
+			sepNavVisRect = "{{0, 122}, {724, 694}}";
+			sepNavWindowFrame = "{{15, 110}, {763, 823}}";
+		};
+	};
+	4BF8D21B0834F04800C94B91 /* types.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 5544}}";
+			sepNavSelRange = "{2664, 0}";
+			sepNavVisRect = "{{0, 4909}, {842, 635}}";
+			sepNavWindowFrame = "{{485, 108}, {881, 764}}";
+		};
+	};
+	4BF8D21C0834F04800C94B91 /* transport.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 6034}}";
+			sepNavSelRange = "{2618, 65}";
+			sepNavVisRect = "{{0, 5399}, {842, 635}}";
+			sepNavWindowFrame = "{{176, 22}, {881, 764}}";
+		};
+	};
+	4BF8D2210834F05C00C94B91 /* JackServer.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1014, 5082}}";
+			sepNavSelRange = "{6016, 16}";
+			sepNavVisRect = "{{0, 2585}, {1014, 764}}";
+			sepNavWindowFrame = "{{291, 32}, {1053, 893}}";
+		};
+	};
+	4BF8D2220834F05C00C94B91 /* JackServer.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 1358}}";
+			sepNavSelRange = "{776, 0}";
+			sepNavVisRect = "{{0, 575}, {1051, 783}}";
+			sepNavWindowFrame = "{{339, 26}, {1090, 912}}";
+		};
+	};
+	4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1088, 7980}}";
+			sepNavSelRange = "{9477, 69}";
+			sepNavVisRect = "{{0, 4016}, {1088, 214}}";
+			sepNavWindowFrame = "{{185, 26}, {1090, 912}}";
+		};
+	};
+	4BF8D2290834F07D00C94B91 /* JackAudioDriver.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {853, 1246}}";
+			sepNavSelRange = "{1446, 0}";
+			sepNavVisRect = "{{0, 447}, {853, 799}}";
+			sepNavWindowFrame = "{{262, 10}, {892, 928}}";
+		};
+	};
+	4BF8D22A0834F07D00C94B91 /* JackAudioDriver.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1106, 3220}}";
+			sepNavSelRange = "{2487, 168}";
+			sepNavVisRect = "{{0, 2456}, {1014, 764}}";
+			sepNavWindowFrame = "{{342, -12}, {1053, 893}}";
+		};
+	};
+	4BF8D2470834F20600C94B91 /* testSem.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1051, 2968}}";
+			sepNavSelRange = "{1319, 21}";
+			sepNavVisRect = "{{0, 0}, {1051, 783}}";
+			sepNavWindowFrame = "{{587, -88}, {1090, 912}}";
+		};
+	};
+	4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {997, 1540}}";
+			sepNavSelRange = "{3407, 13}";
+			sepNavVisRect = "{{0, 933}, {997, 607}}";
+			sepNavWindowFrame = "{{456, 47}, {1036, 736}}";
+		};
+	};
+	4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {845, 1148}}";
+			sepNavSelRange = "{1998, 0}";
+			sepNavVisRect = "{{0, 584}, {845, 564}}";
+			sepNavWindowFrame = "{{107, 156}, {884, 693}}";
+		};
+	};
+	4BFB297708AF44ED00D450D4 /* JackMachServerNotifyChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 770}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 33}, {925, 737}}";
+			sepNavWindowFrame = "{{84, 4}, {964, 866}}";
+		};
+	};
+	4BFB297808AF44ED00D450D4 /* JackMachServerChannel.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1036}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 299}, {925, 737}}";
+			sepNavWindowFrame = "{{15, 67}, {964, 866}}";
+		};
+	};
+	4BFB297908AF44ED00D450D4 /* JackMachServerChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {941, 2142}}";
+			sepNavSelRange = "{2503, 26}";
+			sepNavVisRect = "{{0, 1446}, {941, 696}}";
+			sepNavWindowFrame = "{{316, 50}, {980, 825}}";
+		};
+	};
+	4BFB298808AF450200D450D4 /* JackMachNotifyChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 910}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 173}, {925, 737}}";
+			sepNavWindowFrame = "{{61, 25}, {964, 866}}";
+		};
+	};
+	4BFB29AE08AF45FD00D450D4 /* JackMachClientChannel.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {962, 3332}}";
+			sepNavSelRange = "{2895, 0}";
+			sepNavVisRect = "{{0, 2590}, {941, 696}}";
+			sepNavWindowFrame = "{{414, 89}, {980, 825}}";
+		};
+	};
+	4BFB73F608AD291A00DB99B8 /* JackGlobals.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {842, 3962}}";
+			sepNavSelRange = "{2968, 5}";
+			sepNavVisRect = "{{0, 1118}, {842, 635}}";
+			sepNavWindowFrame = "{{77, 91}, {881, 764}}";
+		};
+	};
+	4BFB741E08AD2B9900DB99B8 /* JackMachThread.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1094, 2716}}";
+			sepNavSelRange = "{7527, 9}";
+			sepNavVisRect = "{{0, 2152}, {845, 564}}";
+			sepNavWindowFrame = "{{38, 219}, {884, 693}}";
+		};
+	};
+	4BFB741F08AD2B9900DB99B8 /* JackMachThread.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {925, 1708}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {925, 737}}";
+			sepNavWindowFrame = "{{15, 67}, {964, 866}}";
+		};
+	};
+}
