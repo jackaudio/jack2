@@ -1262,6 +1262,150 @@
 			target = 4BF2124508DADBB5008D17F1;
 			targetProxy = 4B67272108E4447D00CB805D;
 		};
+		4B6A825F0AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B646C310636CEE6003B5396;
+			remoteInfo = jack_metro;
+		};
+		4B6A82600AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B646C310636CEE6003B5396;
+			targetProxy = 4B6A825F0AAC399800EA7625;
+		};
+		4B6A82610AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B7D792E0637B848001E7115;
+			remoteInfo = jack_lsp;
+		};
+		4B6A82620AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B7D792E0637B848001E7115;
+			targetProxy = 4B6A82610AAC399800EA7625;
+		};
+		4B6A82630AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B89C81506382F5800464BF4;
+			remoteInfo = jack_connect;
+		};
+		4B6A82640AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B89C81506382F5800464BF4;
+			targetProxy = 4B6A82630AAC399800EA7625;
+		};
+		4B6A82650AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B9686230771CA08002D75D5;
+			remoteInfo = jack_disconnect;
+		};
+		4B6A82660AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B9686230771CA08002D75D5;
+			targetProxy = 4B6A82650AAC399800EA7625;
+		};
+		4B6A82670AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B1CBE2607994C6F0096ABE0;
+			remoteInfo = jack_freewheel;
+		};
+		4B6A82680AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B1CBE2607994C6F0096ABE0;
+			targetProxy = 4B6A82670AAC399800EA7625;
+		};
+		4B6A82690AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4BD81C7F07ACD3DE00ACB953;
+			remoteInfo = jack_external_metro;
+		};
+		4B6A826A0AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4BD81C7F07ACD3DE00ACB953;
+			targetProxy = 4B6A82690AAC399800EA7625;
+		};
+		4B6A826B0AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B420C8107733D7C00DDA57E;
+			remoteInfo = testAtomic;
+		};
+		4B6A826C0AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B420C8107733D7C00DDA57E;
+			targetProxy = 4B6A826B0AAC399800EA7625;
+		};
+		4B6A826D0AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B1CBD7B0799484F0096ABE0;
+			remoteInfo = testSem;
+		};
+		4B6A826E0AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B1CBD7B0799484F0096ABE0;
+			targetProxy = 4B6A826D0AAC399800EA7625;
+		};
+		4B6A826F0AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B50A111080917BA003F4C95;
+			remoteInfo = zombie;
+		};
+		4B6A82700AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4B50A111080917BA003F4C95;
+			targetProxy = 4B6A826F0AAC399800EA7625;
+		};
+		4B6A82710AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4BA577B308BF8BAB00F82DE1;
+			remoteInfo = synchroServer;
+		};
+		4B6A82720AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4BA577B308BF8BAB00F82DE1;
+			targetProxy = 4B6A82710AAC399800EA7625;
+		};
+		4B6A82730AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4BA577D908BF8E0600F82DE1;
+			remoteInfo = synchroClient;
+		};
+		4B6A82740AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4BA577D908BF8E0600F82DE1;
+			targetProxy = 4B6A82730AAC399800EA7625;
+		};
+		4B6A82750AAC399800EA7625 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4BBD13AA08C71A480079F7FF;
+			remoteInfo = synchroServerClient;
+		};
+		4B6A82760AAC399800EA7625 = {
+			isa = PBXTargetDependency;
+			target = 4BBD13AA08C71A480079F7FF;
+			targetProxy = 4B6A82750AAC399800EA7625;
+		};
 		4B6BEB4A07A6CCDC00A5DBDA = {
 			children = (
 				4BF8D23E0834F1C300C94B91,
@@ -2063,7 +2207,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = testSynchroClient.cpp;
-			path = ../common/testSynchroClient.cpp;
+			path = ../tests/testSynchroClient.cpp;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -2201,7 +2345,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = testSynchroServer.cpp;
-			path = ../common/testSynchroServer.cpp;
+			path = ../tests/testSynchroServer.cpp;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -2453,7 +2597,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = testSynchroServerClient.cpp;
-			path = ../common/testSynchroServerClient.cpp;
+			path = ../tests/testSynchroServerClient.cpp;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -2810,6 +2954,18 @@
 				4BF212AF08DADC73008D17F1,
 				4BFD0E2208DADFB000D838B8,
 				4B0C912908DAF35900AE19BE,
+				4B6A82600AAC399800EA7625,
+				4B6A82620AAC399800EA7625,
+				4B6A82640AAC399800EA7625,
+				4B6A82660AAC399800EA7625,
+				4B6A82680AAC399800EA7625,
+				4B6A826A0AAC399800EA7625,
+				4B6A826C0AAC399800EA7625,
+				4B6A826E0AAC399800EA7625,
+				4B6A82700AAC399800EA7625,
+				4B6A82720AAC399800EA7625,
+				4B6A82740AAC399800EA7625,
+				4B6A82760AAC399800EA7625,
 			);
 			isa = PBXAggregateTarget;
 			name = All;
@@ -3697,7 +3853,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = zombie.c;
-			path = ../common/zombie.c;
+			path = "../example-clients/zombie.c";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3712,7 +3868,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = lsp.c;
-			path = ../common/lsp.c;
+			path = "../example-clients/lsp.c";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3727,7 +3883,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = metro.c;
-			path = ../common/metro.c;
+			path = "../example-clients/metro.c";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3742,7 +3898,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = connect.c;
-			path = ../common/connect.c;
+			path = "../example-clients/connect.c";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3763,7 +3919,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = freewheel.c;
-			path = ../common/freewheel.c;
+			path = "../example-clients/freewheel.c";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3778,7 +3934,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = internal_metro.cpp;
-			path = ../common/internal_metro.cpp;
+			path = "../example-clients/internal_metro.cpp";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3793,7 +3949,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = external_metro.cpp;
-			path = ../common/external_metro.cpp;
+			path = "../example-clients/external_metro.cpp";
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -4747,7 +4903,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = testAtomic.cpp;
-			path = ../common/test/testAtomic.cpp;
+			path = ../tests/testAtomic.cpp;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -4780,7 +4936,7 @@
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.cpp.cpp;
 			name = testSem.cpp;
-			path = ../common/test/testSem.cpp;
+			path = ../tests/testSem.cpp;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
