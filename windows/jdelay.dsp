@@ -86,7 +86,7 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\common\jdelay.cpp
+SOURCE=..\tests\jdelay.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"

@@ -98,7 +98,7 @@ SOURCE=.\JackWinThread.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\testSynchroServerClient.cpp
+SOURCE=..\tests\testSynchroServerClient.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"

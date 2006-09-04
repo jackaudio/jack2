@@ -125,7 +125,7 @@ SOURCE=.\JackWinThread.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\testSynchroClient.cpp
+SOURCE=..\tests\testSynchroClient.cpp
 
 !IF  "$(CFG)" == "testSynchroClient - Win32 Release"
 
