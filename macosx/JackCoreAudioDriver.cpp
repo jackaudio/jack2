@@ -871,7 +871,7 @@ int JackCoreAudioDriver::Attach()
 
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {
-        fJackInputData->mBuffers[i].mData = GetOutputBuffer(i);
+        fJackInputData->mBuffers[i].mData = GetInputBuffer(i);
     }
 
     return 0;
@@ -923,11 +923,11 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t nframes)
     fEngineControl->fBufferSize = nframes;
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // In microsec
 
-    // Prepare buffers
+    // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {
         fJackInputData->mBuffers[i].mNumberChannels = 1;
         fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(float);
-        fJackInputData->mBuffers[i].mData = GetOutputBuffer(i);
+        fJackInputData->mBuffers[i].mData = GetInputBuffer(i);
     }
 
     return 0;
