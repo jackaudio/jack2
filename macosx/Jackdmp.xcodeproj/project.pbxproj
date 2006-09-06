@@ -259,6 +259,23 @@
 		4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXBuildStyle section */
+		4BEC9CDB0AAEA43A0088025A /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		4BEC9CDC0AAEA43A0088025A /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
 /* Begin PBXContainerItemProxy section */
 		4B699DB3097D421700A18468 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1725,6 +1742,12 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 4B699DD5097D427F00A18468 /* Build configuration list for PBXProject "Jackdmp" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				4BEC9CDB0AAEA43A0088025A /* Development */,
+				4BEC9CDC0AAEA43A0088025A /* Deployment */,
+			);
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* JackServer */;
 			projectDirPath = "";
