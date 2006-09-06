@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-09-06  Stephane Letz  <letz@grame.fr>
+
+	* Correct coreaudio driver (input was not working since 0.55 version).
+
 2006-09-04  Stephane Letz  <letz@grame.fr>
 
 	* Correct Windows VC++ projects.
