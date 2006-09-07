@@ -30,7 +30,7 @@ using namespace std;
 namespace Jack
 {
 
-HANDLE	JackClientPipeThread::fMutex = NULL;  // never released....
+HANDLE JackClientPipeThread::fMutex = NULL;  // never released....
 
 // fRefNum = 0 is used as a "running" state for the JackWinNamedPipeServerNotifyChannel object
 // fRefNum = -1 correspond to a not running client
@@ -70,12 +70,7 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
 bool JackClientPipeThread::Execute()
 {
     JackLog("JackClientPipeThread::Execute\n");
-
-	if (HandleRequest(fPipe) < 0) {
-		return false;
-	} else {
-		return true;
-	}
+	return (HandleRequest(fPipe) == 0);
 }
 
 int JackClientPipeThread::HandleRequest(JackWinNamedPipeClient* pipe)
