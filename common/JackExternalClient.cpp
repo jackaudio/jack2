@@ -49,7 +49,7 @@ int JackExternalClient::Open(const char* name, int refnum, int* shared_client)
     try {
 
         if (fChannel->Open(name) < 0) {
-            jack_error("Cannot connect to client name = %s port\n", name);
+            jack_error("Cannot connect to client name = %s\n", name);
             return -1;
         }
 

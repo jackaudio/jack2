@@ -43,12 +43,10 @@ void* JackPosixThread::ThreadHandler(void* arg)
 
     JackLog("ThreadHandler: start\n");
 
-    // If Init succeed start the thread loop
-    bool res = true;
-    while (obj->fRunning && res) {
-        res = runnable->Execute();
-        //pthread_testcancel();
-    }
+ 	// If Init succeed, start the thread loop
+    while ((obj->fRunning = runnable->Execute())) {
+		//pthread_testcancel();
+	}
 
     JackLog("ThreadHandler: exit\n");
     return 0;
@@ -135,6 +133,7 @@ int JackPosixThread::Kill()
         void* status;
         pthread_cancel(fThread);
         pthread_join(fThread, &status);
+		fRunning = false; 
         return 0;
     } else {
         return -1;

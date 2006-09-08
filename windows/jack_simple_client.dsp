@@ -100,6 +100,28 @@ SOURCE="..\example-clients\simple_client.c"
 # Begin Source File
 
 SOURCE=.\Release\libjackmp.lib
+
+!IF  "$(CFG)" == "jack_simple_client - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "jack_simple_client - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\Debug\libjackmp_debug.lib
+
+!IF  "$(CFG)" == "jack_simple_client - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "jack_simple_client - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Target
 # End Project

@@ -43,12 +43,9 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
 
     JackLog("ThreadHandler: start\n");
 
-    // If Init succeed start the thread loop
-    bool res = true;
-    while (obj->fRunning && res) {
-        res = runnable->Execute();
-    }
-
+    // If Init succeed, start the thread loop
+    while ((obj->fRunning = runnable->Execute())) {}
+  
     SetEvent(obj->fEvent);
     JackLog("ThreadHandler: exit\n");
     return 0;
@@ -157,6 +154,7 @@ int JackWinThread::Kill()
         TerminateThread(fThread, 0); /// TO CHECK : dangerous
         CloseHandle(fThread);
         CloseHandle(fEvent);
+		fRunning = false; 
         return 0;
     } else {
         return -1;

@@ -32,8 +32,7 @@ namespace Jack
 
 HANDLE JackClientPipeThread::fMutex = NULL;  // never released....
 
-// fRefNum = 0 is used as a "running" state for the JackWinNamedPipeServerNotifyChannel object
-// fRefNum = -1 correspond to a not running client
+// fRefNum = -1 correspond to already removed client
 
 JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
         : fPipe(pipe), fServer(NULL), fRefNum(0)
@@ -70,205 +69,205 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
 bool JackClientPipeThread::Execute()
 {
     JackLog("JackClientPipeThread::Execute\n");
-	return (HandleRequest(fPipe) == 0);
+	return (HandleRequest() == 0);
 }
 
-int JackClientPipeThread::HandleRequest(JackWinNamedPipeClient* pipe)
+int JackClientPipeThread::HandleRequest()
 {
     // Read header
     JackRequest header;
-    if (header.Read(pipe) < 0) {
-        jack_error("HandleRequest: cannot read header");
-		 // Lock the global mutex
-		if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED)
-			jack_error("JackClientPipeThread::HandleRequest: mutex wait error");
-		KillClient(fPipe);
-		// Unlock the global mutex
-		ReleaseMutex(fMutex);
-        return -1;
-    }
+	int res = header.Read(fPipe);
+	int ret = 0;
 
     // Lock the global mutex
     if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED)
         jack_error("JackClientPipeThread::HandleRequest: mutex wait error");
 
-    // Read data
-    switch (header.fType) {
+	if (res < 0) {
+		jack_error("HandleRequest: cannot read header");
+		KillClient();
+		ret = -1;
+	} else {
 
-        case JackRequest::kClientNew: {
-                JackLog("JackRequest::ClientNew\n");
-                JackClientNewRequest req;
-                JackClientNewResult res;
-                req.Read(pipe);
-                AddClient(pipe, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedPorts, &res.fResult);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kClientClose: {
-                JackLog("JackRequest::ClientClose\n");
-                JackClientCloseRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->ClientClose(req.fRefNum);
-                res.Write(pipe);
-                RemoveClient(pipe, req.fRefNum);
-                break;
-            }
-
-        case JackRequest::kActivateClient: {
-                JackActivateRequest req;
-                JackResult res;
-                JackLog("JackRequest::ActivateClient\n");
-                req.Read(pipe);
-                res.fResult = fServer->Activate(req.fRefNum);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kDeactivateClient: {
-                JackLog("JackRequest::DeactivateClient\n");
-                JackDeactivateRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->Deactivate(req.fRefNum);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kRegisterPort: {
-                JackLog("JackRequest::RegisterPort\n");
-                JackPortRegisterRequest req;
-                JackPortRegisterResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fFlags, req.fBufferSize, &res.fPortIndex);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kUnRegisterPort: {
-                JackLog("JackRequest::UnRegisterPort\n");
-                JackPortUnRegisterRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->PortUnRegister(req.fRefNum, req.fPortIndex);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kConnectNamePorts: {
-                JackLog("JackRequest::ConnectPorts\n");
-                JackPortConnectNameRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kDisconnectNamePorts: {
-                JackLog("JackRequest::DisconnectPorts\n");
-                JackPortDisconnectNameRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kConnectPorts: {
-                JackLog("JackRequest::ConnectPorts\n");
-                JackPortConnectRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kDisconnectPorts: {
-                JackLog("JackRequest::DisconnectPorts\n");
-                JackPortDisconnectRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kSetBufferSize: {
-                JackLog("JackRequest::SetBufferSize\n");
-                JackSetBufferSizeRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->SetBufferSize(req.fBufferSize);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kSetFreeWheel: {
-                JackLog("JackRequest::SetFreeWheel\n");
-                JackSetFreeWheelRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->SetFreewheel(req.fOnOff);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kReleaseTimebase: {
-                JackLog("JackRequest::kReleaseTimebase\n");
-                JackReleaseTimebaseRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->ReleaseTimebase(req.fRefNum);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kSetTimebaseCallback: {
-                JackLog("JackRequest::kSetTimebaseCallback\n");
-                JackSetTimebaseCallbackRequest req;
-                JackResult res;
-                req.Read(pipe);
-                res.fResult = fServer->GetEngine()->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
-                res.Write(pipe);
-                break;
-            }
-
-        case JackRequest::kNotification: {
-                JackLog("JackRequest::Notification\n");
-                JackClientNotificationRequest req;
-                req.Read(pipe);
-                fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
-                break;
-            }
-
-        default:
-            JackLog("Unknown request %ld\n", header.fType);
-            break;
-    }
+		// Read data
+		switch (header.fType) {
+			
+		case JackRequest::kClientNew: {
+			JackLog("JackRequest::ClientNew\n");
+			JackClientNewRequest req;
+			JackClientNewResult res;
+			if (req.Read(fPipe) == 0) 
+				AddClient(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedPorts, &res.fResult);	
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kClientClose: {
+			JackLog("JackRequest::ClientClose\n");
+			JackClientCloseRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->ClientClose(req.fRefNum);		
+			res.Write(fPipe);
+			RemoveClient(req.fRefNum);
+			break;
+		}
+			
+		case JackRequest::kActivateClient: {
+			JackActivateRequest req;
+			JackResult res;
+			JackLog("JackRequest::ActivateClient\n");
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->Activate(req.fRefNum);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kDeactivateClient: {
+			JackLog("JackRequest::DeactivateClient\n");
+			JackDeactivateRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->Deactivate(req.fRefNum);	
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kRegisterPort: {
+			JackLog("JackRequest::RegisterPort\n");
+			JackPortRegisterRequest req;
+			JackPortRegisterResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fFlags, req.fBufferSize, &res.fPortIndex);		
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kUnRegisterPort: {
+			JackLog("JackRequest::UnRegisterPort\n");
+			JackPortUnRegisterRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->PortUnRegister(req.fRefNum, req.fPortIndex);		
+			
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kConnectNamePorts: {
+			JackLog("JackRequest::ConnectPorts\n");
+			JackPortConnectNameRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);			
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kDisconnectNamePorts: {
+			JackLog("JackRequest::DisconnectPorts\n");
+			JackPortDisconnectNameRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kConnectPorts: {
+			JackLog("JackRequest::ConnectPorts\n");
+			JackPortConnectRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kDisconnectPorts: {
+			JackLog("JackRequest::DisconnectPorts\n");
+			JackPortDisconnectRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kSetBufferSize: {
+			JackLog("JackRequest::SetBufferSize\n");
+			JackSetBufferSizeRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->SetBufferSize(req.fBufferSize);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kSetFreeWheel: {
+			JackLog("JackRequest::SetFreeWheel\n");
+			JackSetFreeWheelRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->SetFreewheel(req.fOnOff);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kReleaseTimebase: {
+			JackLog("JackRequest::kReleaseTimebase\n");
+			JackReleaseTimebaseRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->ReleaseTimebase(req.fRefNum);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kSetTimebaseCallback: {
+			JackLog("JackRequest::kSetTimebaseCallback\n");
+			JackSetTimebaseCallbackRequest req;
+			JackResult res;
+			if (req.Read(fPipe) == 0) 
+				res.fResult = fServer->GetEngine()->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
+			res.Write(fPipe);
+			break;
+		}
+			
+		case JackRequest::kNotification: {
+			JackLog("JackRequest::Notification\n");
+			JackClientNotificationRequest req;
+			if (req.Read(fPipe) == 0) 
+				fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
+			break;
+		}
+			
+		default:
+			JackLog("Unknown request %ld\n", header.fType);
+			break;
+		}
+	}
 
     // Unlock the global mutex
     ReleaseMutex(fMutex);
-    return 0;
+    return ret;
 }
 
-void JackClientPipeThread::AddClient(JackWinNamedPipeClient* pipe, char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
 {
     JackLog("JackWinNamedPipeServerChannel::AddClient %s\n", name);
     fRefNum = -1;
     *result = fServer->GetEngine()->ClientNew(name, &fRefNum, shared_engine, shared_client, shared_ports);
 }
 
-void JackClientPipeThread::RemoveClient(JackWinNamedPipeClient* pipe, int refnum)
+void JackClientPipeThread::RemoveClient(int refnum)
 {
     JackLog("JackWinNamedPipeServerChannel::RemoveClient ref = %d\n", refnum);
     fRefNum = -1;
-    pipe->Close();
+    fPipe->Close();
 }
 
-void JackClientPipeThread::KillClient(JackWinNamedPipeClient* pipe)
+void JackClientPipeThread::KillClient()
 {
     JackLog("JackClientPipeThread::KillClient \n");
     JackLog("JackWinNamedPipeServerChannel::KillClient ref = %d\n", fRefNum);
@@ -282,7 +281,7 @@ void JackClientPipeThread::KillClient(JackWinNamedPipeClient* pipe)
     }
 
     fRefNum = -1;
-    pipe->Close();
+    fPipe->Close();
 }
 
 JackWinNamedPipeServerChannel::JackWinNamedPipeServerChannel()
@@ -361,22 +360,23 @@ bool JackWinNamedPipeServerChannel::Execute()
 
 void JackWinNamedPipeServerChannel::AddClient(JackWinNamedPipeClient* pipe)
 {
-    // Remove dead clients
+    // Remove dead (= not running anymore) clients.
     std::list<JackClientPipeThread*>::iterator it = fClientList.begin();
     JackClientPipeThread* client;
     while (it != fClientList.end()) {
         client = *it;
-        if (!client->IsRunning()) { // Dead client
+        if (client->IsRunning()) {
+			it++;         
+        } else {  
             JackLog("Remove client from list\n");
             it = fClientList.erase(it);
             delete(client);
-        } else {
-            it++;
         }
     }
 
     client = new JackClientPipeThread(pipe);
     client->Open(fServer);
+	// Here we are sure that the client is running (because it's thread is in "running" state).
     fClientList.push_back(client);
 }
 

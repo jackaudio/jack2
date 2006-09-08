@@ -32,7 +32,7 @@ int JackWinNamedPipeNotifyChannel::Open(const char* name)
 
     // Connect to client listen pipe
     if (fNotifyPipe.Connect(jack_client_dir, name, 0) < 0) {
-        jack_error("Cannot connect client socket");
+        jack_error("Cannot connect client pipe");
         return -1;
     }
     // TODO : use a time out for notifications

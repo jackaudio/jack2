@@ -344,7 +344,7 @@ int JackEngine::ClientNew(const char* name, int* ref, int* shared_engine, int* s
 // Used for external clients
 int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager, JackExternalClient* client)
 {
-    JackLog("JackEngine::ClientNew: name %s \n", name);
+    JackLog("JackEngine::ClientNew: name = %s \n", name);
     int refnum = fGraphManager->AllocateRefNum();
 
     if (refnum < 0) {
@@ -390,7 +390,7 @@ error:
 // Used for server driver clients
 int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
 {
-    JackLog("JackEngine::ClientInternalNew: name %s\n", name);
+    JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
     int refnum = fGraphManager->AllocateRefNum();
 
     if (refnum < 0) {
@@ -529,7 +529,7 @@ int JackEngine::PortRegister(int refnum, const char* name, unsigned int flags, u
 
 int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
-    JackLog("JackEngine::PortUnRegister ref =  %ld port_index = %ld\n", refnum, port_index);
+    JackLog("JackEngine::PortUnRegister ref = %ld port_index = %ld\n", refnum, port_index);
     assert(fClientTable[refnum]);
 
     if (fGraphManager->RemovePort(refnum, port_index) == 0) {
