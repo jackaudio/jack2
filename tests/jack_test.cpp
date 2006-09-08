@@ -763,7 +763,7 @@ if (jack_is_realtime(client1) == 1) {}
     old_buffer_size = jack_get_buffer_size(client1);
     Log("Testing BufferSize change & Callback...\n--> Current buffer size : %i.\n", old_buffer_size);
     linebuf = linecount;
-    if (jack_set_buffer_size(client1, old_buffer_size * factor) < 0) {
+    if (jack_set_buffer_size(client1, (jack_nframes_t)(old_buffer_size * factor)) < 0) {
         printf("!!! ERROR !!! jack_set_buffer_size fails !\n");
     }
     jack_sleep(1 * 1000);

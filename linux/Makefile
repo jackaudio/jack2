@@ -41,6 +41,8 @@ objects_linux_dummy := JackDummyDriver.o
 CFLAGS :=  -g -O3  -fPIC  -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
 CXXFLAGS :=  -g -O3  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
+#CFLAGS :=  -g   -fPIC  -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+#CXXFLAGS :=  -g   -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 # Use this line to compile with POSIX names semaphore
 #CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ $(addprefix -I, $(subprojects)) $(CXXFLAGS)
@@ -49,7 +51,7 @@ CXXFLAGS :=  -g -O3  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__  $(addprefix -I, $(s
 
 
 linux : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
-	synchroClient synchroServer synchroServerClient testSem
+	synchroClient synchroServer synchroServerClient testSem jack_test
 
 all : $(TARGET_LINUX_SERVER) $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY)
 
@@ -64,6 +66,9 @@ synchroServerClient: JackPosixSemaphore.o testSynchroServerClient.o JackPosixThr
 		
 testSem: JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o 
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o testSem
+
+jack_test: jack_test.o
+		$(CXX) $(CXXFLAGS) jack_test.o -ljackmp -o jack_test
 		
 
 $(TARGET_LINUX_SERVER_LIB) : $(objects_common_server_lib)
