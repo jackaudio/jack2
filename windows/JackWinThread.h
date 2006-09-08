@@ -44,13 +44,9 @@ class JackWinThread : public JackThread
 
     public:
 
-        JackWinThread(JackRunnableInterface* runnable)
-                : JackThread(runnable, 0, false, 0)
-        {}
-
-        virtual ~JackWinThread()
-        {}
-
+        JackWinThread(JackRunnableInterface* runnable);
+        virtual ~JackWinThread();
+   
         int Start();
         int StartSync();
         int Kill();

@@ -90,11 +90,6 @@ class JackThread
         {}
 
         virtual pthread_t GetThreadID() = 0;
-
-		bool IsRunning() 
-		{
-			return fRunning;
-		}
 };
 
 } // end of namespace

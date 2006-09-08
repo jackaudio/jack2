@@ -40,7 +40,7 @@ class JackClientPipeThread : public JackRunnableInterface
         int fRefNum;
 
         void AddClient(char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result);
-        void RemoveClient(int refnum);
+        void RemoveClient();
         void KillClient();
 
         static HANDLE fMutex;
@@ -61,7 +61,7 @@ class JackClientPipeThread : public JackRunnableInterface
 		// To be used for find out if the object can be deleted
         bool IsRunning()
         {
-            return fThread->IsRunning();
+            return (fRefNum >= 0);
         }
 };
 

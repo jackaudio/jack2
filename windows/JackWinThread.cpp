@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackWinThread.h"
 #include "JackError.h"
+#include <assert.h>
 
 namespace Jack
 {
@@ -44,67 +45,40 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
     JackLog("ThreadHandler: start\n");
 
     // If Init succeed, start the thread loop
-    while ((obj->fRunning = runnable->Execute())) {}
+    bool res = true;
+    while (obj->fRunning && res) {
+        res = runnable->Execute();
+    }
   
     SetEvent(obj->fEvent);
     JackLog("ThreadHandler: exit\n");
     return 0;
 }
 
+JackWinThread::JackWinThread(JackRunnableInterface* runnable) 
+	: JackThread(runnable, 0, false, 0)
+{
+	 fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	 fThread = NULL;
+	 assert(fEvent);
+}
+
+JackWinThread::~JackWinThread()
+{
+	CloseHandle(fEvent);
+}
+
 int JackWinThread::Start()
 {
-    DWORD id;
-
-    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (fEvent == NULL) {
-        jack_error("Cannot create event error = %d", GetLastError());
-        return -1;
-    }
-
-    fRunning = true;
-
-    if (fRealTime) {
-
-        JackLog("Create RT thread\n");
-        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
-
-        if (fThread == NULL) {
-            jack_error("Cannot create thread error = %d", GetLastError());
-            return -1;
-        }
-
-        if (!SetThreadPriority(fThread, THREAD_PRIORITY_TIME_CRITICAL)) {
-            jack_error("Cannot set priority class = %d", GetLastError());
-            return -1;
-        }
-
-        return 0;
-
-    } else {
-
-        JackLog("Create non RT thread\n");
-        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
-
-        if (fThread == NULL) {
-            jack_error("Cannot create thread error = %d", GetLastError());
-            return -1;
-        }
-
-        return 0;
-    }
+	fRunning = true;
+    StartSync():
 }
 
 int JackWinThread::StartSync()
 {
     DWORD id;
 
-    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (fEvent == NULL) {
-        jack_error("Cannot create event error = %d", GetLastError());
-        return -1;
-    }
-
-    if (fRealTime) {
+	if (fRealTime) {
 
         JackLog("Create RT thread\n");
         fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
@@ -153,7 +127,7 @@ int JackWinThread::Kill()
         JackLog("JackWinThread::Kill\n");
         TerminateThread(fThread, 0); /// TO CHECK : dangerous
         CloseHandle(fThread);
-        CloseHandle(fEvent);
+		fThread = NULL;
 		fRunning = false; 
         return 0;
     } else {
@@ -168,10 +142,9 @@ int JackWinThread::Stop()
         fRunning = false; // Request for the thread to stop
         WaitForSingleObject(fEvent, INFINITE);
         CloseHandle(fThread);
-        CloseHandle(fEvent);
+		fThread = NULL;
         return 0;
     } else {
-        CloseHandle(fEvent);
         return -1;
     }
 }
@@ -188,7 +161,6 @@ int JackWinThread::AcquireRealTime()
         JackLog("JackWinThread::AcquireRealTime OK\n");
         return 0;
     } else {
-        CloseHandle(fEvent);
         return -1;
     }
 }

@@ -53,7 +53,7 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
     fServer = server;
 
     // Start listening
-    if (fThread->Start() != 0){
+    if (fThread->Start() != 0) {
         jack_error("Cannot start Jack server listener\n");
         return -1;
     } else {
@@ -63,7 +63,9 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
 {
-    fThread->Kill();
+	fThread->Kill();
+	fPipe->Close();
+  	fRefNum = -1;
 }
 
 bool JackClientPipeThread::Execute()
@@ -109,7 +111,7 @@ int JackClientPipeThread::HandleRequest()
 			if (req.Read(fPipe) == 0) 
 				res.fResult = fServer->GetEngine()->ClientClose(req.fRefNum);		
 			res.Write(fPipe);
-			RemoveClient(req.fRefNum);
+			RemoveClient();
 			break;
 		}
 			
@@ -260,11 +262,10 @@ void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared
     *result = fServer->GetEngine()->ClientNew(name, &fRefNum, shared_engine, shared_client, shared_ports);
 }
 
-void JackClientPipeThread::RemoveClient(int refnum)
+void JackClientPipeThread::RemoveClient()
 {
-    JackLog("JackWinNamedPipeServerChannel::RemoveClient ref = %d\n", refnum);
-    fRefNum = -1;
-    fPipe->Close();
+    JackLog("JackWinNamedPipeServerChannel::RemoveClient ref = %d\n", fRefNum);
+    Close();
 }
 
 void JackClientPipeThread::KillClient()
@@ -280,8 +281,7 @@ void JackClientPipeThread::KillClient()
         fServer->Notify(fRefNum, JackNotifyChannelInterface::kDeadClient, 0);
     }
 
-    fRefNum = -1;
-    fPipe->Close();
+    Close();
 }
 
 JackWinNamedPipeServerChannel::JackWinNamedPipeServerChannel()
