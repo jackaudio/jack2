@@ -70,15 +70,58 @@ JackWinThread::~JackWinThread()
 
 int JackWinThread::Start()
 {
-	fRunning = true;
-    StartSync():
+    DWORD id;
+
+    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (fEvent == NULL) {
+        jack_error("Cannot create event error = %d", GetLastError());
+        return -1;
+    }
+
+    fRunning = true;
+
+    if (fRealTime) {
+
+        JackLog("Create RT thread\n");
+        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
+
+        if (fThread == NULL) {
+            jack_error("Cannot create thread error = %d", GetLastError());
+            return -1;
+        }
+
+        if (!SetThreadPriority(fThread, THREAD_PRIORITY_TIME_CRITICAL)) {
+            jack_error("Cannot set priority class = %d", GetLastError());
+            return -1;
+        }
+
+        return 0;
+
+    } else {
+
+        JackLog("Create non RT thread\n");
+        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
+
+        if (fThread == NULL) {
+            jack_error("Cannot create thread error = %d", GetLastError());
+            return -1;
+        }
+
+        return 0;
+    }
 }
 
 int JackWinThread::StartSync()
 {
     DWORD id;
 
-	if (fRealTime) {
+    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if (fEvent == NULL) {
+        jack_error("Cannot create event error = %d", GetLastError());
+        return -1;
+    }
+
+    if (fRealTime) {
 
         JackLog("Create RT thread\n");
         fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);

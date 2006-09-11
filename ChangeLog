@@ -5,6 +5,7 @@
 2006-09-11  Stephane Letz  <letz@grame.fr>
 
 	* Handling of LoopBack driver only when really needed.
+	* Correct crash bug when closing clients on Windows due to multi-threading synchronization issues.
 
 2006-09-06  Stephane Letz  <letz@grame.fr>
 
