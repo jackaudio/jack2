@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-09-11  Stephane Letz  <letz@grame.fr>
+
+	* Handling of LoopBack driver only when really needed.
+
 2006-09-06  Stephane Letz  <letz@grame.fr>
 
 	* Correct coreaudio driver (input was not working since 0.55 version).
