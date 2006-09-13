@@ -99,8 +99,13 @@ int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which
 
 int JackWinNamedPipeClient::Close()
 {
-    CloseHandle(fNamedPipe);
-    return 0;
+	if (fNamedPipe != INVALID_HANDLE_VALUE) {
+		CloseHandle(fNamedPipe);
+		fNamedPipe = INVALID_HANDLE_VALUE;
+		return 0;
+	} else {
+		return -1;
+	}
 }
 
 void JackWinNamedPipeClient::SetReadTimeOut(long sec)
@@ -297,9 +302,14 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 
 int JackWinNamedPipeServer::Close()
 {
-    DisconnectNamedPipe(fNamedPipe);
-    CloseHandle(fNamedPipe);
-    return 0;
+	if (fNamedPipe != INVALID_HANDLE_VALUE) {
+		DisconnectNamedPipe(fNamedPipe);
+		CloseHandle(fNamedPipe);
+		fNamedPipe = INVALID_HANDLE_VALUE;
+		return 0;
+	} else {
+		return -1;
+	}
 }
 
 // Server side

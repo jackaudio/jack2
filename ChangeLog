@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-09-13  Stephane Letz  <letz@grame.fr>
+
+	* Correct pipe destruction bug in JackWinNamedPipe class.
+
 2006-09-11  Stephane Letz  <letz@grame.fr>
 
 	* Handling of LoopBack driver only when really needed.

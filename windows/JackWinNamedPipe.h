@@ -38,7 +38,7 @@ class JackWinNamedPipe : public JackChannelTransaction
 
     public:
 
-        JackWinNamedPipe(): fNamedPipe(NULL)
+        JackWinNamedPipe(): fNamedPipe(INVALID_HANDLE_VALUE)
         {}
         JackWinNamedPipe(HANDLE pipe): fNamedPipe(pipe)
         {}
