@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
 
 	// Creates wait event
 	if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
-        printf("CreateEvent fails err = %ld", GetLastError());
+        printf("CreateEvent fails err = %ld\n", GetLastError());
         return 0;
     }
 
@@ -405,7 +405,7 @@ int main(int argc, char* argv[])
 	(void) signal(SIGINT, intrpt);
 
 	if ((res = WaitForSingleObject(waitEvent, INFINITE)) != WAIT_OBJECT_0) {
-        printf("WaitForSingleObject fails err = %ld", GetLastError());
+        printf("WaitForSingleObject fails err = %ld\n", GetLastError());
     }
 	
 	/*
