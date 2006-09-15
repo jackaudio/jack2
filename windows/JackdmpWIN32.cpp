@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <assert.h>
 #include <process.h>
 #include <getopt.h>
+#include <signal.h>
 
 #include "JackServer.h"
 #include "JackConstants.h" 
@@ -47,6 +48,8 @@ static int xverbose = 0;
 
 #define DEFAULT_TMP_DIR "/tmp"
 char *jack_tmpdir = DEFAULT_TMP_DIR;
+
+HANDLE waitEvent;
 
 void jack_print_driver_options (jack_driver_desc_t * desc, FILE *file);
 void jack_print_driver_param_usage (jack_driver_desc_t * desc, unsigned long param, FILE *file);
@@ -108,6 +111,13 @@ static int JackDelete()
     delete fServer;
     printf("Jackdmp: delete server\n");
     return 0;
+}
+
+static void intrpt(int signum)
+{
+    printf("jack main caught signal %d\n", signum);
+    (void) signal(SIGINT, SIG_DFL);
+	SetEvent(waitEvent);
 }
 
 /*
@@ -231,6 +241,12 @@ int main(int argc, char* argv[])
     int i;
     int rc;
     char c;
+
+	// Creates wait event
+	if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+        printf("CreateEvent fails err = %ld", GetLastError());
+        return 0;
+    }
 
     opterr = 0;
     while (!seen_driver &&
@@ -385,9 +401,17 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    printf("Type 'q' to quit\n");
+	
+	(void) signal(SIGINT, intrpt);
 
+	if ((res = WaitForSingleObject(waitEvent, INFINITE)) != WAIT_OBJECT_0) {
+        printf("WaitForSingleObject fails err = %ld", GetLastError());
+    }
+	
+	/*
+    printf("Type 'q' to quit\n");
     while ((c = getchar()) != 'q') {}
+	*/
 
     JackStop();
 
@@ -395,6 +419,7 @@ int main(int argc, char* argv[])
     //	jack_cleanup_files(server_name);
     jack_unregister_server(server_name);
 
+	CloseHandle(waitEvent);
     return 1;
 }
 
