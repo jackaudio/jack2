@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-09-16  Stephane Letz  <letz@grame.fr>
+
+	* Restore behaviour of LoopBack driver, which has to be opened in any case...
+
 2006-09-15  Stephane Letz  <letz@grame.fr>
 
 	* On Windows version, use signal to quit the server.

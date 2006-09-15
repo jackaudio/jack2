@@ -51,7 +51,7 @@ JackServer::JackServer(bool sync, long timeout, bool rt, long priority, long loo
     fSignal = JackGlobals::MakeInterProcessSync();
     fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl, fSignal, sync, timeout, rt, priority, verbose);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
-    fLoopbackDriver = (loopback > 0) ? new JackLoopbackDriver("loopback", fEngine, fSynchroTable) : NULL;
+    fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();
     fState = new JackConnectionManager();
     fFreewheel = false;
@@ -111,7 +111,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
     }
 
     // Before engine open
-    if (fLoopback > 0 && fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
+    if (fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
         jack_error("Cannot open driver");
         return -1;
     }
@@ -155,8 +155,7 @@ int JackServer::Close()
         fLoopbackDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
-	if (fLoopback > 0)
-		fLoopbackDriver->Close();
+    fLoopbackDriver->Close();
     fEngine->Close();
 
 #ifdef __APPLE__
