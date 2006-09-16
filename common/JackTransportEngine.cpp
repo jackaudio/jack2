@@ -117,7 +117,7 @@ void JackTransportEngine::MakeAllStarting(JackClientInterface** table)
     JackLog("MakeAllStarting\n");
 }
 
-void JackTransportEngine::CycleBegin(jack_nframes_t frame_rate, jack_time_t time) // really needed?? (woule be done in CycleEnd...)
+void JackTransportEngine::CycleBegin(jack_nframes_t frame_rate, jack_time_t time) // really needed?? (would be done in CycleEnd...)
 {
     jack_position_t* pending = WriteNextStateStart(1); // Update "pending" state
     pending->usecs = time;

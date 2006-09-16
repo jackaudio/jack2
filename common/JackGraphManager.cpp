@@ -276,8 +276,8 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
 {
     jack_port_id_t port_index;
 
-    // Look for first available port Port index start at 1, otherwise a port_index of 0 is "seen" as a NULL port by the external API...
-    for (port_index = 1; port_index < PORT_NUM; port_index++) {
+    // Available ports start at FIRST_AVAILABLE_PORT (= 1), otherwise a port_index of 0 is "seen" as a NULL port by the external API...
+    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
         JackPort* port = GetPort(port_index);
         if (!port->IsUsed()) {
             JackLog("JackGraphManager::AllocatePortAux port_index = %ld name = %s\n", port_index, port_name);
