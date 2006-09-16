@@ -38,29 +38,29 @@ void* ThreadHandler(void* arg)
 	char c;
 	printf("ThreadHandler\n");
 	try {
-	while (1) {
-		read(fFifo, &c, sizeof(c));
-		sleep (1);
-		//pthread_testcancel();
-    }
-	}catch (std::exception e) {}
+		while (1) {
+			read(fFifo, &c, sizeof(c));
+			sleep(1);
+			//pthread_testcancel();
+		}
+	} catch (std::exception e) {}
 }
 
 
-int main (int argc, char * const argv[])
+int main(int argc, char * const argv[])
 {
  	int res;
 	void* status;
 	struct stat statbuf;
 	
 	printf("Thread test\n");
-	std::set_terminate (__gnu_cxx::__verbose_terminate_handler);
+	std::set_terminate(__gnu_cxx::__verbose_terminate_handler);
 
 	sprintf(fName, "/tmp/fifo");
 
 	if (stat(fName, &statbuf)) {
 		if (errno == ENOENT) {
-			if (mkfifo(fName, 0666) < 0){
+			if (mkfifo(fName, 0666) < 0) {
 				printf("Cannot create inter-client FIFO [%s]\n", fName);
 				return 0;
 			}
@@ -85,7 +85,7 @@ int main (int argc, char * const argv[])
 		return 0;
 	}
 	
-	sleep (3);
+	sleep(3);
 	printf("Cancel Thread\n");
 	pthread_cancel(fThread);
 	pthread_join(fThread, &status);

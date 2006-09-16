@@ -61,8 +61,7 @@ struct ServerThread : public JackRunnableInterface {
     bool Execute()
     {
 		printf("Execute Server\n");
-   		for (int i = 0; i < ITER; i++)
-		{
+   		for (int i = 0; i < ITER; i++) {
 			fClientSem->Signal();
             fServerSem->Wait();
 		}
@@ -100,8 +99,7 @@ struct ClientThread : public JackRunnableInterface {
         fClientSem->Wait();
     	gettimeofday(&T0, 0); 
 		 
-		for (int i = 0; i < ITER; i++)
-		{
+		for (int i = 0; i < ITER; i++) {
 			fServerSem->Signal();
             fClientSem->Wait();
 		}
