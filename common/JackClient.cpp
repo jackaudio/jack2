@@ -209,11 +209,13 @@ int JackClient::Activate()
     if (IsActive())
         return 0;
 
+#ifdef WIN32
 	// Done first so that the RT thread then access an allocated synchro
 	if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(GetClientControl()->fName)) {
         jack_error("Cannot ConnectSemaphore %s client", GetClientControl()->fName);
         return -1;
     }
+#endif
 
 	if (StartThread() < 0)
         return -1;
@@ -249,11 +251,12 @@ int JackClient::Deactivate()
     JackLog("JackClient::Deactivate res = %ld \n", result);
     // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
     
-	// steph
+#ifdef WIN32
 	fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
 	fThread->Stop();
-
-	//fThread->Kill();
+#else
+	fThread->Kill();
+#endif
 
     return result;
 }

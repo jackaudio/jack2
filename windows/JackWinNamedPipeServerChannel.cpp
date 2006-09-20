@@ -161,7 +161,6 @@ int JackClientPipeThread::HandleRequest()
 			JackResult res;
 			if (req.Read(fPipe) == 0) 
 				res.fResult = fServer->GetEngine()->PortUnRegister(req.fRefNum, req.fPortIndex);		
-			
 			res.Write(fPipe);
 			break;
 		}
