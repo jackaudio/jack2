@@ -115,6 +115,7 @@ bool JackWinEvent::Disconnect()
 {
     if (fEvent) {
         JackLog("JackWinEvent::Disconnect %s\n", fName);
+		SetEvent(fEvent); // to "unlock" threads pending on the event
         CloseHandle(fEvent);
         fEvent = NULL;
         return true;

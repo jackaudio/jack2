@@ -206,6 +206,48 @@ static void jack_cleanup_files (const char *server_name)
 }
 */
 
+/*
+BOOL CtrlHandler( DWORD fdwCtrlType ) 
+{ 
+  switch( fdwCtrlType ) 
+  { 
+    // Handle the CTRL-C signal. 
+    case CTRL_C_EVENT: 
+      printf( "Ctrl-C event\n\n" );
+      Beep( 750, 300 ); 
+	  SetEvent(waitEvent);
+      return( TRUE );
+ 
+    // CTRL-CLOSE: confirm that the user wants to exit. 
+    case CTRL_CLOSE_EVENT: 
+      Beep( 600, 200 ); 
+      printf( "Ctrl-Close event\n\n" );
+	  SetEvent(waitEvent);
+      return( TRUE ); 
+ 
+    // Pass other signals to the next handler. 
+    case CTRL_BREAK_EVENT: 
+      Beep( 900, 200 ); 
+      printf( "Ctrl-Break event\n\n" );
+      return FALSE; 
+ 
+    case CTRL_LOGOFF_EVENT: 
+      Beep( 1000, 200 ); 
+      printf( "Ctrl-Logoff event\n\n" );
+      return FALSE; 
+ 
+    case CTRL_SHUTDOWN_EVENT: 
+      Beep( 750, 500 ); 
+      printf( "Ctrl-Shutdown event\n\n" );
+      return FALSE; 
+ 
+    default: 
+      return FALSE; 
+  } 
+} 
+ 
+*/
+
 int main(int argc, char* argv[])
 {
     jack_driver_desc_t * driver_desc;
@@ -324,19 +366,22 @@ int main(int argc, char* argv[])
 
     if (!seen_driver) {
         usage (stderr);
-        exit (1);
+        //exit (1);
+		return 0;
     }
 
     drivers = jack_drivers_load (drivers);
     if (!drivers) {
         fprintf (stderr, "jackdmp: no drivers found; exiting\n");
-        exit (1);
+        //exit (1);
+		return 0;
     }
 
     driver_desc = jack_find_driver_descriptor (drivers, driver_name);
     if (!driver_desc) {
         fprintf (stderr, "jackdmp: unknown driver '%s'\n", driver_name);
-        exit (1);
+        //exit (1);
+		return 0;
     }
 
     if (optind < argc) {
@@ -360,7 +405,8 @@ int main(int argc, char* argv[])
 
     if (jack_parse_driver_params (driver_desc, driver_nargs,
                                   driver_args, &driver_params)) {
-        exit (0);
+       // exit (0);
+		return 0;
     }
 
     //if (server_name == NULL)
@@ -372,13 +418,16 @@ int main(int argc, char* argv[])
     switch (rc) {
         case EEXIST:
             fprintf (stderr, "`%s' server already active\n", server_name);
-            exit (1);
+            //exit (1);
+			return 0;
         case ENOSPC:
             fprintf (stderr, "too many servers already active\n");
-            exit (2);
+            //exit (2);
+			return 0;
         case ENOMEM:
             fprintf (stderr, "no access to shm registry\n");
-            exit (3);
+            //exit (3);
+			return 0;
         default:
             if (xverbose)
                 fprintf (stderr, "server `%s' registered\n",
@@ -401,8 +450,19 @@ int main(int argc, char* argv[])
         return 0;
     }
 
+	/*
+	if( SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE ) ) 
+	{ 
+		printf( "\nThe Control Handler is installed.\n" ); 
+	} else {
+		printf( "\nERROR: Could not set control handler"); 
+	}
+	*/
+	
 	
 	(void) signal(SIGINT, intrpt);
+	(void) signal(SIGABRT, intrpt);
+	(void) signal(SIGTERM, intrpt);
 
 	if ((res = WaitForSingleObject(waitEvent, INFINITE)) != WAIT_OBJECT_0) {
         printf("WaitForSingleObject fails err = %ld\n", GetLastError());
@@ -412,6 +472,7 @@ int main(int argc, char* argv[])
     printf("Type 'q' to quit\n");
     while ((c = getchar()) != 'q') {}
 	*/
+	
 
     JackStop();
 

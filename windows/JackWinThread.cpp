@@ -167,9 +167,10 @@ int JackWinThread::StartSync()
 int JackWinThread::Kill()
 {
     if (fThread) { // If thread has been started
-        JackLog("JackWinThread::Kill\n");
-        TerminateThread(fThread, 0); /// TO CHECK : dangerous
+        TerminateThread(fThread, 0);
+		WaitForSingleObject(fThread, INFINITE);
         CloseHandle(fThread);
+		JackLog("JackWinThread::Kill 2\n");
 		fThread = NULL;
 		fRunning = false; 
         return 0;

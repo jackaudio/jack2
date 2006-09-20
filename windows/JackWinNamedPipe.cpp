@@ -285,7 +285,9 @@ bool JackWinNamedPipeServer::Accept()
 JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
-        return new JackWinNamedPipeClient(fNamedPipe);
+		JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe);
+		// Init the pipe to the default value
+        fNamedPipe = INVALID_HANDLE_VALUE;
     } else {
         switch (GetLastError()) {
 
@@ -302,6 +304,8 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 
 int JackWinNamedPipeServer::Close()
 {
+	JackLog("JackWinNamedPipeServer::Close\n");
+
 	if (fNamedPipe != INVALID_HANDLE_VALUE) {
 		DisconnectNamedPipe(fNamedPipe);
 		CloseHandle(fNamedPipe);

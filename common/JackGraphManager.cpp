@@ -747,8 +747,10 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
 
     do {
         cur_index = GetCurrentIndex();
-        if (matching_ports)
+        if (matching_ports) {
             free(matching_ports);
+			JackLog("JackGraphManager::GetPorts retry... \n");
+		}
         matching_ports = GetPortsAux(port_name_pattern, type_name_pattern, flags);
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read

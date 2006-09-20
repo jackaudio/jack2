@@ -42,7 +42,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LIBJACKMP_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "." /I "../common" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LIBJACKMP_EXPORTS" /D "__STDC__" /D "REGEX_MALLOC" /D "STDC_HEADERS" /D "__SMP__" /YX /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "." /I "../common" /I "../../../../pthreads-win32" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "LIBJACKMP_EXPORTS" /D "__STDC__" /D "REGEX_MALLOC" /D "STDC_HEADERS" /D "__SMP__" /YX /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
@@ -186,5 +186,9 @@ SOURCE=..\common\shm.c
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 # End Group
+# Begin Source File
+
+SOURCE="..\..\..\..\pthreads-win32\pthreadVC2.lib"
+# End Source File
 # End Target
 # End Project

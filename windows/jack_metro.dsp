@@ -108,6 +108,28 @@ SOURCE="..\example-clients\metro.c"
 # Begin Source File
 
 SOURCE=.\Release\libjackmp.lib
+
+!IF  "$(CFG)" == "jack_metro - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "jack_metro - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\Debug\libjackmp_debug.lib
+
+!IF  "$(CFG)" == "jack_metro - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "jack_metro - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Target
 # End Project

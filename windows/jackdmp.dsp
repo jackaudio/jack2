@@ -122,6 +122,15 @@ SOURCE=.\Release\libjackdmp.lib
 # Begin Source File
 
 SOURCE=.\Debug\libjackdmp_debug.lib
+
+!IF  "$(CFG)" == "jackdmp - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "jackdmp - Win32 Debug"
+
+!ENDIF 
+
 # End Source File
 # End Target
 # End Project

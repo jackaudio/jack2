@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-09-20  Stephane Letz  <letz@grame.fr>
+
+	* On Windows, avoid to use the unsafe Kill thread method. Use thread Stop instead and have blocked IO be unlocked.
+
 2006-09-16  Stephane Letz  <letz@grame.fr>
 
 	* Restore behaviour of LoopBack driver, which has to be opened in any case...
@@ -22,6 +26,7 @@
 2006-09-06  Stephane Letz  <letz@grame.fr>
 
 	* Correct coreaudio driver (input was not working since 0.55 version).
+	* Version for 0.58 release.
 
 2006-09-04  Stephane Letz  <letz@grame.fr>
 
@@ -29,4 +34,4 @@
 
 2006-09-03  Stephane Letz  <letz@grame.fr>
 
-	* First import of version 0.58 code
+	* First import of version 0.58 base code

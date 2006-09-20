@@ -189,7 +189,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
 
             case JackNotifyChannelInterface::kZombifyClient:
-                res = fThread->Kill();
+				//res = fThread->Kill(); Really neede ?? Unsafe in WIN32...
                 JackLog("JackClient::kZombifyClient name = %s ref = %ld \n", name, refnum);
                 ShutDown();
                 break;
@@ -209,7 +209,13 @@ int JackClient::Activate()
     if (IsActive())
         return 0;
 
-    if (StartThread() < 0)
+	// Done first so that the RT thread then access an allocated synchro
+	if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(GetClientControl()->fName)) {
+        jack_error("Cannot ConnectSemaphore %s client", GetClientControl()->fName);
+        return -1;
+    }
+
+	if (StartThread() < 0)
         return -1;
 
     int result = -1;
@@ -242,7 +248,13 @@ int JackClient::Deactivate()
 
     JackLog("JackClient::Deactivate res = %ld \n", result);
     // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
-    fThread->Kill();
+    
+	// steph
+	fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
+	fThread->Stop();
+
+	//fThread->Kill();
+
     return result;
 }
 

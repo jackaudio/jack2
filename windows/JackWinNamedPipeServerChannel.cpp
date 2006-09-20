@@ -44,6 +44,7 @@ JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
 
 JackClientPipeThread::~JackClientPipeThread()
 {
+	JackLog("JackClientPipeThread::~JackClientPipeThread\n");
     delete fPipe;
     delete fThread;
 }
@@ -63,9 +64,17 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
 {
+	JackLog("JackClientPipeThread::Close %x %ld\n", this, fRefNum);
+	/*
+		This would hang.. since Close will be followed by a delete, 
+		all ressources will be desallocated at the end.
+	*/
+
+	/*
 	fThread->Kill();
 	fPipe->Close();
-  	fRefNum = -1;
+	*/
+  	fRefNum = -1;	
 }
 
 bool JackClientPipeThread::Execute()
@@ -112,6 +121,7 @@ int JackClientPipeThread::HandleRequest()
 				res.fResult = fServer->GetEngine()->ClientClose(req.fRefNum);		
 			res.Write(fPipe);
 			RemoveClient();
+			ret = -1;
 			break;
 		}
 			
@@ -257,21 +267,20 @@ int JackClientPipeThread::HandleRequest()
 
 void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
 {
-    JackLog("JackWinNamedPipeServerChannel::AddClient %s\n", name);
+    JackLog("JackClientPipeThread::AddClient %s\n", name);
     fRefNum = -1;
     *result = fServer->GetEngine()->ClientNew(name, &fRefNum, shared_engine, shared_client, shared_ports);
 }
 
 void JackClientPipeThread::RemoveClient()
 {
-    JackLog("JackWinNamedPipeServerChannel::RemoveClient ref = %d\n", fRefNum);
+    JackLog("JackClientPipeThread::RemoveClient ref = %d\n", fRefNum);
     Close();
 }
 
 void JackClientPipeThread::KillClient()
 {
-    JackLog("JackClientPipeThread::KillClient \n");
-    JackLog("JackWinNamedPipeServerChannel::KillClient ref = %d\n", fRefNum);
+    JackLog("JackClientPipeThread::KillClient ref = %d\n", fRefNum);
 
     if (fRefNum == -1) {		// Correspond to an already removed client.
         JackLog("Kill a closed client\n");
@@ -291,6 +300,14 @@ JackWinNamedPipeServerChannel::JackWinNamedPipeServerChannel()
 
 JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
 {
+	std::list<JackClientPipeThread*>::iterator it;
+
+	for (it = fClientList.begin(); it !=  fClientList.end(); it++) {
+		JackClientPipeThread* client = *it;
+		client->Close();
+		delete client;
+	}
+
     delete fThread;
 }
 
@@ -321,8 +338,15 @@ error:
 
 void JackWinNamedPipeServerChannel::Close()
 {
-    fThread->Kill();
-    fRequestListenPipe.Close();
+	/*
+		This would hang the server... since we are quitting it, its not really problematic, 
+		all ressources will be desallocated at the end.
+	*/
+	
+	/*
+	fRequestListenPipe.Close();
+    fThread->Stop();
+	*/
 }
 
 bool JackWinNamedPipeServerChannel::Init()
@@ -363,14 +387,17 @@ void JackWinNamedPipeServerChannel::AddClient(JackWinNamedPipeClient* pipe)
     // Remove dead (= not running anymore) clients.
     std::list<JackClientPipeThread*>::iterator it = fClientList.begin();
     JackClientPipeThread* client;
-    while (it != fClientList.end()) {
+
+	JackLog("AddClient size  %ld\n", fClientList.size());
+
+    while (it != fClientList.end()) {		
         client = *it;
+		JackLog("Remove dead client = %x running =  %ld\n", client, client->IsRunning());
         if (client->IsRunning()) {
 			it++;         
         } else {  
-            JackLog("Remove client from list\n");
             it = fClientList.erase(it);
-            delete(client);
+            delete client;
         }
     }
 

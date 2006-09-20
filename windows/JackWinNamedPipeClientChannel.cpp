@@ -63,6 +63,8 @@ void JackWinNamedPipeClientChannel::Close()
 {
     fRequestPipe.Close();
     fNotificationListenPipe.Close();
+	// Here the thread will correctly stop when the pipe are closed
+	fThread->Stop();
 }
 
 int JackWinNamedPipeClientChannel::Start()
@@ -80,7 +82,7 @@ int JackWinNamedPipeClientChannel::Start()
 void JackWinNamedPipeClientChannel::Stop()
 {
     JackLog("JackWinNamedPipeClientChannel::Stop\n");
-    fThread->Kill();
+    //fThread->Kill(); Unsafe on WIN32...
 }
 
 void JackWinNamedPipeClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)
@@ -249,7 +251,8 @@ bool JackWinNamedPipeClientChannel::Execute()
     return true;
 
 error:
-    fClient->ShutDown();
+
+    //fClient->ShutDown(); needed ??
     return false;
 }
 
