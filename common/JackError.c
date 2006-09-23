@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include "JackError.h"
 
-int verbose = 0;
+int jack_verbose = 0;
 
 EXPORT void jack_error (const char *fmt, ...)
 {
@@ -38,7 +38,7 @@ EXPORT void jack_error (const char *fmt, ...)
 EXPORT void JackLog(char *fmt,...)
 {
 #ifdef PRINTDEBUG
-	if (verbose) {
+	if (jack_verbose) {
 		va_list ap;
 		va_start(ap, fmt);
 		fprintf(stderr,"Jack: ");

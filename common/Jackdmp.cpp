@@ -289,7 +289,7 @@ int main(int argc, char* argv[])
                 break;
 
             case 'v':
-                verbose = 1;
+                jack_verbose = 1;
                 break;
 
             case 's':
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
             fprintf (stderr, "no access to shm registry\n");
             exit (3);
         default:
-            if (verbose)
+            if (jack_verbose)
                 fprintf (stderr, "server `%s' registered\n",
                          server_name);
     }
@@ -448,7 +448,7 @@ int main(int argc, char* argv[])
     if (!realtime && client_timeout == 0)
         client_timeout = 500; /* 0.5 sec; usable when non realtime. */
 
-    int res = JackStart(driver_desc, driver_params, sync, client_timeout, realtime, realtime_priority, loopback, verbose);
+    int res = JackStart(driver_desc, driver_params, sync, client_timeout, realtime, realtime_priority, loopback, jack_verbose);
     if (res < 0) {
         jack_error("Cannot start server... exit");
         JackDelete();

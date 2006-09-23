@@ -90,7 +90,7 @@ int JackLibClient::Open(const char* name)
         JackLibGlobals::fGlobals->fEngineControl = shared_engine;
         JackLibGlobals::fGlobals->fGraphManager = shared_ports;
         fClientControl = shared_client;
-        verbose = GetEngineControl()->fVerbose;
+        jack_verbose = GetEngineControl()->fVerbose;
     } catch (int n) {
         jack_error("Map shared memory segments exception %d", n);
         goto error;

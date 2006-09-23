@@ -41,7 +41,7 @@ extern "C"
 
     EXPORT void JackLog(char *fmt, ...);
 
-    extern int verbose;
+    extern int jack_verbose;
 
 #ifdef __cplusplus
 }
