@@ -68,7 +68,7 @@ testSem: JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o testSem
 
 jack_test: jack_test.o
-		$(CXX) $(CXXFLAGS) jack_test.o -ljackmp -o jack_test
+		$(CXX) $(CXXFLAGS) jack_test.o -L. -ljackmp -o jack_test
 		
 
 $(TARGET_LINUX_SERVER_LIB) : $(objects_common_server_lib)
