@@ -32,7 +32,7 @@
 
 #define ITER 500000
 
-int verbose = 0;
+//int verbose = 0;
 
 using namespace Jack;
 

@@ -55,7 +55,7 @@
 #define SERVER "serveur3"
 #define CLIENT "client3"
 
-int verbose = 0;
+//int verbose = 0;
 
 using namespace Jack;
 

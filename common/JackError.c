@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include "JackError.h"
 
+int verbose = 0;
+
 EXPORT void jack_error (const char *fmt, ...)
 {
 	va_list ap;

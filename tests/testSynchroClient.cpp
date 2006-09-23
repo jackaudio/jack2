@@ -57,7 +57,7 @@
 
 using namespace Jack;
 
-int verbose = 0;
+//int verbose = 0;
 
 class Test2 : public JackRunnableInterface
 {

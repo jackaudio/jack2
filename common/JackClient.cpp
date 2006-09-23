@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <math.h>
 #include <string>
 
-int verbose = 0;
+//int verbose = 0;
 
 using namespace std;
 
