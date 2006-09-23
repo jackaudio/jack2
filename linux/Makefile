@@ -117,7 +117,7 @@ remove:
 clean :
 	rm -f *.o
 	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
-		synchroClient synchroServer synchroServerClient testSem
+		synchroClient synchroServer synchroServerClient testSem jack_test
 		
 depend :
 	#makedepend -w120 -Y -- $(CXXFLAGS) -- $(sources) 
