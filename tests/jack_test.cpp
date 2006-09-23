@@ -734,7 +734,7 @@ int main (int argc, char *argv[])
     jack_set_freewheel(client1, 0);
     jack_sleep(7 * 1000);
 
-if (jack_is_realtime(client1) == 1) {}
+	if (jack_is_realtime(client1) == 1) {}
     else {
         printf("\n!!! ERROR !!! freewheel mode fail to reactivate RT mode when exiting !\n");
         t_error = 1;
@@ -758,7 +758,6 @@ if (jack_is_realtime(client1) == 1) {}
      *
      */
 
-
     float factor = 0.5f;
     old_buffer_size = jack_get_buffer_size(client1);
     Log("Testing BufferSize change & Callback...\n--> Current buffer size : %i.\n", old_buffer_size);
@@ -777,7 +776,6 @@ if (jack_is_realtime(client1) == 1) {}
     jack_sleep(3 * 1000);
     jack_set_buffer_size(client1, old_buffer_size);
     cur_buffer_size = jack_get_buffer_size(client1);
-
 
     /**
      * Test the last regestered port to see if port_is_mine function the right value.
