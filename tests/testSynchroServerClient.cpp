@@ -56,8 +56,6 @@
 #define SERVER "serveur1"
 #define CLIENT "client1"
 
-//int verbose = 0;
-
 using namespace Jack;
 
 #ifdef WIN32

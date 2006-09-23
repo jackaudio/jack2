@@ -25,8 +25,6 @@
 
 using namespace Jack;
 
-//int verbose = 0;
-
 #define SIZE 1024
 
 struct TestState {

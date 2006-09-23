@@ -60,6 +60,7 @@ JackServer::JackServer(bool sync, long timeout, bool rt, long priority, long loo
     fDriverInfo = NULL;
     fAudioDriver = NULL;
     fInstance = this; // Unique instance
+	jack_verbose = verbose;
 }
 
 JackServer::~JackServer()

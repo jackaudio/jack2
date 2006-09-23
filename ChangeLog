@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-09-23  Stephane Letz  <letz@grame.fr>
+
+	* Rename global "verbose" in "jack_verbose" to avoid symbol clash with PureData.
+
 2006-09-20  Stephane Letz  <letz@grame.fr>
 
 	* On Windows, avoid to use the unsafe Kill thread method. Use thread Stop instead and have blocked IO be unlocked. 

@@ -43,7 +43,6 @@ JackEngine::JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngin
     fEngineControl->fRealTime = rt;
     fEngineControl->fPriority = priority;
     fEngineControl->fVerbose = ve;
-    //verbose = ve;
     fChannel = JackGlobals::MakeServerNotifyChannel();
     fTiming = new JackEngineTiming(fClientTable, fGraphManager, fEngineControl);
     fSignal = signal;
