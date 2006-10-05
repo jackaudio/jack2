@@ -4,7 +4,8 @@ sudo cp -r Panda.framework /Library/Frameworks
 sudo cp -r JackRouterMP.plugin /Library/Audio/Plug-Ins/HAL/
 
 sudo cp -r Jackmp.framework /Library/Frameworks/  
-sudo cp -r Jackdmp.framework /Library/Frameworks/    
+sudo cp -r Jackdmp.framework /Library/Frameworks/   
+sudo install -d /usr/local/bin 
 sudo cp jackdmp /usr/local/bin  
 
 sudo install -d  /usr/local/lib/jackmp 

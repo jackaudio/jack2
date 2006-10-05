@@ -528,6 +528,18 @@
 			refType = 3;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		4B1CEB420ABB17B700E4AD89 = {
+			containerPortal = 08FB7793FE84155DC02AAC07;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 4B646BED0636CC42003B5396;
+			remoteInfo = Jackmp.framework;
+		};
+		4B1CEB430ABB17B700E4AD89 = {
+			isa = PBXTargetDependency;
+			target = 4B646BED0636CC42003B5396;
+			targetProxy = 4B1CEB420ABB17B700E4AD89;
+		};
 		4B283863093607430079C47F = {
 			fileRef = 4B003A6008E2A87A0060EFDC;
 			isa = PBXBuildFile;
@@ -2875,6 +2887,7 @@
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
 			};
 			dependencies = (
+				4B1CEB430ABB17B700E4AD89,
 			);
 			isa = PBXToolTarget;
 			name = "jackdmp framework";
