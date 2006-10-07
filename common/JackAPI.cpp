@@ -208,7 +208,7 @@ static inline void WaitGraphChange()
     }
 }
 
-static void default_jack_error_callback (const char *desc)
+static void default_jack_error_callback(const char *desc)
 {
     fprintf(stderr, "%s\n", desc);
 }
