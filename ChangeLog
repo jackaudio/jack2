@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-10-06 Stephane Letz  <letz@grame.fr>
+
+	* Add a new cpu testing/loading client.
+
 2006-09-23  Stephane Letz  <letz@grame.fr>
 
 	* Rename global "verbose" in "jack_verbose" to avoid symbol clash with PureData.
