@@ -95,9 +95,9 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         virtual int Start();
         virtual int Stop();
 
-        virtual int SetBufferSize(jack_nframes_t nframes)
+        virtual int SetBufferSize(jack_nframes_t buffer_size)
         {
-            return fDriver->SetBufferSize(nframes);
+            return fDriver->SetBufferSize(buffer_size);
         }
 
         virtual void SetMaster(bool onoff)

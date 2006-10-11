@@ -70,7 +70,7 @@ class EXPORT JackDriverInterface
         virtual int Write() = 0;
         virtual int Start() = 0;
         virtual int Stop() = 0;
-        virtual int SetBufferSize(jack_nframes_t nframes) = 0;
+        virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;
 
         virtual int Process() = 0;
 
@@ -191,7 +191,7 @@ class EXPORT JackDriver : public JackDriverClient
             return 0;
         }
 
-        virtual int SetBufferSize(jack_nframes_t nframes)
+        virtual int SetBufferSize(jack_nframes_t buffer_size)
         {
             return 0;
         }

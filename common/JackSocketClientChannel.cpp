@@ -187,9 +187,9 @@ void JackSocketClientChannel::PortDisconnect(int refnum, jack_port_id_t src, jac
     ServerSyncCall(&req, &res, result);
 }
 
-void JackSocketClientChannel::SetBufferSize(jack_nframes_t nframes, int* result)
+void JackSocketClientChannel::SetBufferSize(jack_nframes_t buffer_size, int* result)
 {
-    JackSetBufferSizeRequest req(nframes);
+    JackSetBufferSizeRequest req(buffer_size);
     JackResult res;
     ServerSyncCall(&req, &res, result);
 }

@@ -109,7 +109,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int Deactivate();
 
         // Context
-        virtual int SetBufferSize(jack_nframes_t nframes);
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetFreeWheel(int onoff);
         virtual void ShutDown();
         virtual pthread_t GetThreadID();

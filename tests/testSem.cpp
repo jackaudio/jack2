@@ -194,7 +194,7 @@ int main (int argc, char * const argv[])
     }
 	*/
 	
-	 if (strcmp(argv[2], "server") == 0) {
+	if (strcmp(argv[2], "server") == 0) {
 		server(sem1);
     } else {
 		client(sem1);

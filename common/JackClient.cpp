@@ -462,10 +462,10 @@ int JackClient::PortIsMine(jack_port_id_t port_index)
 // Context management
 //--------------------
 
-int JackClient::SetBufferSize(jack_nframes_t nframes)
+int JackClient::SetBufferSize(jack_nframes_t buffer_size)
 {
     int result = -1;
-    fChannel->SetBufferSize(nframes, &result);
+    fChannel->SetBufferSize(buffer_size, &result);
     return result;
 }
 

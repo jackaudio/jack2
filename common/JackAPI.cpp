@@ -200,6 +200,11 @@ static inline bool CheckPort(jack_port_id_t port_index)
     return (port_index < PORT_NUM);
 }
 
+static inline bool CheckBufferSize(jack_nframes_t buffer_size)
+{
+    return (buffer_size <= BUFFER_SIZE_MAX);
+}
+
 static inline void WaitGraphChange()
 {
     if (GetGraphManager()->IsPendingChange()) {
@@ -478,14 +483,16 @@ EXPORT int jack_set_freewheel(jack_client_t* ext_client, int onoff)
     }
 }
 
-EXPORT int jack_set_buffer_size(jack_client_t* ext_client, jack_nframes_t nframes)
+EXPORT int jack_set_buffer_size(jack_client_t* ext_client, jack_nframes_t buffer_size)
 {
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_buffer_size called with a NULL client");
         return -1;
-    } else {
-        return client->SetBufferSize(nframes);
+    } else if (!CheckBufferSize(buffer_size)) {
+		return -1;
+	} else {
+        return client->SetBufferSize(buffer_size);
     }
 }
 

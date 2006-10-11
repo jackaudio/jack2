@@ -40,11 +40,11 @@ static void AssertPort(jack_port_id_t port_index)
     }
 }
 
-static void AssertBufferSize(jack_nframes_t frames)
+static void AssertBufferSize(jack_nframes_t buffer_size)
 {
-    if (frames > BUFFER_SIZE_MAX) {
-        JackLog("JackGraphManager::AssertBufferSize frames = %ld\n", frames);
-        assert(frames <= BUFFER_SIZE_MAX);
+    if (buffer_size > BUFFER_SIZE_MAX) {
+        JackLog("JackGraphManager::AssertBufferSize frames = %ld\n", buffer_size);
+        assert(buffer_size <= BUFFER_SIZE_MAX);
     }
 }
 
@@ -151,10 +151,10 @@ bool JackGraphManager::IsDirectConnection(int ref1, int ref2)
 }
 
 // RT
-void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t frames)
+void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buffer_size)
 {
     AssertPort(port_index);
-    AssertBufferSize(frames);
+    AssertBufferSize(buffer_size);
 
     JackConnectionManager* manager = ReadCurrentState();
     JackPort* port = GetPort(port_index);
@@ -167,7 +167,7 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t fram
 
     // Output port
     if (port->fFlags & JackPortIsOutput) {
-        return (port->fTied != NO_PORT) ? GetBuffer(port->fTied, frames) : GetBuffer(port_index);
+        return (port->fTied != NO_PORT) ? GetBuffer(port->fTied, buffer_size) : GetBuffer(port_index);
     }
 
     // Input port
@@ -175,11 +175,11 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t fram
 
     if (len == 0) {  // No connections: return a zero-filled buffer
         float* buffer = GetBuffer(port_index);
-        memset(buffer, 0, frames * sizeof(float)); // Clear buffer
+        memset(buffer, 0, buffer_size * sizeof(float)); // Clear buffer
         return buffer;
     } else if (len == 1) {	 // One connection: use zero-copy mode - just pass the buffer of the connected (output) port.
         assert(manager->GetPort(port_index, 0) != port_index); // Check recursion
-        return GetBuffer(manager->GetPort(port_index, 0), frames);
+        return GetBuffer(manager->GetPort(port_index, 0), buffer_size);
     } else {  // Multiple connections
         const jack_int_t* connections = manager->GetConnections(port_index);
         float* mixbuffer = GetBuffer(port_index);
@@ -189,14 +189,14 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t fram
         // Copy first buffer
         src_index = connections[0];
         AssertPort(src_index);
-        buffer = (float*)GetBuffer(src_index, frames);
-        memcpy(mixbuffer, buffer, frames * sizeof(float));
+        buffer = (float*)GetBuffer(src_index, buffer_size);
+        memcpy(mixbuffer, buffer, buffer_size * sizeof(float));
 
         // Mix remaining buffers
         for (int i = 1; (i < CONNECTION_NUM) && ((src_index = connections[i]) != EMPTY); i++) {
             AssertPort(src_index);
-            buffer = (float*)GetBuffer(src_index, frames);
-            JackPort::MixBuffer(mixbuffer, buffer, frames);
+            buffer = (float*)GetBuffer(src_index, buffer_size);
+            JackPort::MixBuffer(mixbuffer, buffer, buffer_size);
         }
         return mixbuffer;
     }

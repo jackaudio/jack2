@@ -88,9 +88,9 @@ class JackInternalClientChannel : public JackClientChannelInterface
             *result = fEngine->PortDisconnect(refnum, src, dst);
         }
 
-        void SetBufferSize(jack_nframes_t nframes, int* result)
+        void SetBufferSize(jack_nframes_t buffer_size, int* result)
         {
-            *result = fServer->SetBufferSize(nframes);
+            *result = fServer->SetBufferSize(buffer_size);
         }
         void SetFreewheel(int onoff, int* result)
         {

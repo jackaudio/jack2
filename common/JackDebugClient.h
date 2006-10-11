@@ -80,7 +80,7 @@ class JackDebugClient : public JackClient
         int Deactivate();
 
         // Context
-        int SetBufferSize(jack_nframes_t nframes);
+        int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreeWheel(int onoff);
         void ShutDown();
         pthread_t GetThreadID();

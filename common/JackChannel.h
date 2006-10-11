@@ -93,7 +93,7 @@ class JackClientChannelInterface
         virtual void PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
         {}
 
-        virtual void SetBufferSize(jack_nframes_t nframes, int* result)
+        virtual void SetBufferSize(jack_nframes_t buffer_size, int* result)
         {}
         virtual void SetFreewheel(int onoff, int* result)
         {}

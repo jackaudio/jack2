@@ -81,7 +81,7 @@ class JackPortAudioDriver : public JackAudioDriver
         int Read();
         int Write();
 
-        int SetBufferSize(jack_nframes_t nframes);
+        int SetBufferSize(jack_nframes_t buffer_size);
 
         void PrintState();
 };

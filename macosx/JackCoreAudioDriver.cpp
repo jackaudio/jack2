@@ -908,19 +908,19 @@ int JackCoreAudioDriver::Stop()
     return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
 }
 
-int JackCoreAudioDriver::SetBufferSize(jack_nframes_t nframes)
+int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     OSStatus err;
     UInt32 outSize = sizeof(UInt32);
 
-    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &nframes);
+    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
     if (err != noErr) {
-        jack_error("Cannot set buffer size %ld\n", nframes);
+        jack_error("Cannot set buffer size %ld", buffer_size);
         printError(err);
         return -1;
     }
 
-    fEngineControl->fBufferSize = nframes;
+    fEngineControl->fBufferSize = buffer_size;
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // In microsec
 
     // Input buffers do no change : prepare them only once

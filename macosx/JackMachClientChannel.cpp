@@ -184,9 +184,9 @@ void JackMachClientChannel::PortDisconnect(int refnum, jack_port_id_t src, jack_
     }
 }
 
-void JackMachClientChannel::SetBufferSize(jack_nframes_t nframes, int* result)
+void JackMachClientChannel::SetBufferSize(jack_nframes_t buffer_size, int* result)
 {
-    kern_return_t res = rpc_jack_set_buffer_size(fPrivatePort, nframes, result);
+    kern_return_t res = rpc_jack_set_buffer_size(fPrivatePort, buffer_size, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::SetBufferSize err = %s", mach_error_string(res));

@@ -328,9 +328,9 @@ int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 // Context management
 //--------------------
 
-int JackDebugClient::SetBufferSize(jack_nframes_t nframes)
+int JackDebugClient::SetBufferSize(jack_nframes_t buffer_size)
 {
-    return fClient->SetBufferSize(nframes);
+    return fClient->SetBufferSize(buffer_size);
 }
 
 int JackDebugClient::SetFreeWheel(int onoff)

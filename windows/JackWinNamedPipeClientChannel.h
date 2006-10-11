@@ -71,7 +71,7 @@ class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public 
         void PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
         void PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
 
-        void SetBufferSize(jack_nframes_t nframes, int* result);
+        void SetBufferSize(jack_nframes_t buffer_size, int* result);
         void SetFreewheel(int onoff, int* result);
 
         void ReleaseTimebase(int refnum, int* result);

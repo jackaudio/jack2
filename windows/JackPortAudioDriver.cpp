@@ -393,7 +393,7 @@ int JackPortAudioDriver::Stop()
     return (err == paNoError) ? 0 : -1;
 }
 
-int JackPortAudioDriver::SetBufferSize(jack_nframes_t nframes)
+int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     PaError err;
     PaStreamParameters inputParameters;
@@ -424,7 +424,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t nframes)
                         (fInputDevice == paNoDevice) ? 0 : &inputParameters,
                         (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
                         fEngineControl->fSampleRate,
-                        nframes,
+                        buffer_size,
                         paNoFlag,  // Clipping is on...
                         Render,
                         this);
@@ -433,7 +433,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t nframes)
         return -1;
     } else {
         // Only done when success
-        fEngineControl->fBufferSize = nframes;
+        fEngineControl->fBufferSize = buffer_size;
         fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // In microsec
         return 0;
     }
