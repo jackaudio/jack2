@@ -214,36 +214,6 @@ int JackServer::Deactivate(int refnum)
     return res;
 }
 
-/*
-int JackServer::SetBufferSize(jack_nframes_t nframes)
-{
-    JackLog("JackServer::SetBufferSize nframes = %ld\n", nframes);
-
-    if (nframes > BUFFER_SIZE_MAX)
-        return -1;
-
-    if (fAudioDriver->Stop() != 0) {
-        jack_error("Cannot stop audio driver");
-        return -1;
-    }
-
-    if (fAudioDriver->SetBufferSize(nframes) != 0) {
-        jack_error("Cannot SetBufferSize for audio driver");
-        return -1;
-    }
-
-    if (fFreewheelDriver->SetBufferSize(nframes) != 0) {
-        jack_error("Cannot SetBufferSize for freewheel driver");
-        return -1;
-    }
-
-    fEngine->NotifyBufferSize(nframes);
-
-    fEngineControl->fFrameTimer.Init();
-    return fAudioDriver->Start();
-}
-*/
-
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackLog("JackServer::SetBufferSize nframes = %ld\n", buffer_size);

@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-10-11 Stephane Letz  <letz@grame.fr>
+
+	* Correct server SetBufferSize in case of failure.
+
 2006-10-06 Stephane Letz  <letz@grame.fr>
 
 	* Add a new cpu testing/loading client.
