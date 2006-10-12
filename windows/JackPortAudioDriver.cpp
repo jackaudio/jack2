@@ -563,8 +563,8 @@ extern "C"
         desc->params[i].character = 'd';
         desc->params[i].type = JackDriverParamString;
         desc->params[i].value.ui = 128U;
-        strcpy(desc->params[i].value.str, "will take default CoreAudio device name");
-        strcpy(desc->params[i].short_desc, "CoreAudio device name");
+        strcpy(desc->params[i].value.str, "will take default PortAudio device name");
+        strcpy(desc->params[i].short_desc, "PortAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
@@ -588,7 +588,7 @@ extern "C"
         desc->params[i].character = 'l';
         desc->params[i].type = JackDriverParamBool;
         desc->params[i].value.i = TRUE;
-        strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
+        strcpy(desc->params[i].short_desc, "Display available PortAudio devices");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;
