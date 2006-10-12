@@ -4,7 +4,7 @@
 
 2006-10-11 Stephane Letz  <letz@grame.fr>
 
-	* Correct server SetBufferSize in case of failure.
+	* Correct server SetBufferSize in case of failure. Correct PortAudio driver help.
 
 2006-10-06 Stephane Letz  <letz@grame.fr>
 
