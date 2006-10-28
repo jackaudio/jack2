@@ -84,7 +84,7 @@ static void usage (FILE* file)
              "               [ --sync OR -S ]\n"
              "               [ --version OR -V ]\n"
              "         -d driver [ ... driver args ... ]\n"
-             "             where driver can be `alsa', `coreaudio' or `dummy'\n"
+             "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
              "       jackdmp -d driver --help\n"
              "             to display options for each driver\n\n");
 }
