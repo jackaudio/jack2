@@ -143,8 +143,7 @@ correctly mixed in the time window: callbackUsecs <==> Read <==> Write.
 
 void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions de fin
 {
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++)
-    {
+    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client && client->GetClientControl()->fActive) {
 			JackClientTiming* timing = fGraphManager->GetClientTiming(i);

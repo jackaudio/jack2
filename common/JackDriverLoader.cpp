@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define ADDON_DIR "jackmp"  // TO IMPROVE
 #else
 #include <dirent.h>
-#define ADDON_DIR "/usr/local/lib/jackmp"  // TO IMPROVE
+//#define ADDON_DIR "/usr/local/lib/jackmp"  // TO IMPROVE
 #endif
 
 static void
@@ -252,38 +252,42 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 #endif
 
     int err;
-    char* driver_dir;
-
+	/*
+	char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-        driver_dir = ADDON_DIR;
+		driver_dir = ADDON_DIR;
     }
-
+	*/
+	
+	char driver_dir[512];
+	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
+  
 #ifdef WIN32
     if (strcmp(ADDON_DIR, "") == 0) {
         char temp_driver_dir1[512];
         char temp_driver_dir2[512];
         GetCurrentDirectory(512, temp_driver_dir1);
-        sprintf (temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
+        sprintf(temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
         driver_dir = temp_driver_dir2;
     }
 #endif
 
-    filename = (char *)malloc (strlen (driver_dir) + 1 + strlen (sofile) + 1);
+    filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
     sprintf (filename, "%s/%s", driver_dir, sofile);
 
-    if ((dlhandle = LoadDriverModule (filename)) == NULL) {
+    if ((dlhandle = LoadDriverModule(filename)) == NULL) {
 #ifdef WIN32
         jack_error ("could not open driver .dll '%s': %ld\n", filename, GetLastError());
 #else
-        jack_error ("could not open driver .so '%s': %s\n", filename, dlerror ());
+        jack_error ("could not open driver .so '%s': %s\n", filename, dlerror());
 #endif
 
-        free (filename);
+        free(filename);
         return NULL;
     }
 
     so_get_descriptor = (JackDriverDescFunction)
-                        GetProc (dlhandle, "driver_get_descriptor");
+                        GetProc(dlhandle, "driver_get_descriptor");
 
 #ifdef WIN32
     if ((so_get_descriptor == NULL) && (dlerr = GetLastError()) != 0) {
@@ -293,24 +297,24 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
         fprintf(stderr, "%s\n", dlerr);
 #endif
 
-        UnloadDriverModule (dlhandle);
-        free (filename);
+        UnloadDriverModule(dlhandle);
+        free(filename);
         return NULL;
     }
 
     if ((descriptor = so_get_descriptor ()) == NULL) {
-        jack_error ("driver from '%s' returned NULL descriptor\n", filename);
-        UnloadDriverModule (dlhandle);
-        free (filename);
+        jack_error("driver from '%s' returned NULL descriptor\n", filename);
+        UnloadDriverModule(dlhandle);
+        free(filename);
         return NULL;
     }
 
 #ifdef WIN32
-    if ((err = UnloadDriverModule (dlhandle)) == 0) {
+    if ((err = UnloadDriverModule(dlhandle)) == 0) {
         jack_error ("error closing driver .so '%s': %ld\n", filename, GetLastError ());
     }
 #else
-    if ((err = UnloadDriverModule (dlhandle)) != 0) {
+    if ((err = UnloadDriverModule(dlhandle)) != 0) {
         jack_error ("error closing driver .so '%s': %s\n", filename, dlerror ());
     }
 #endif
@@ -319,17 +323,17 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
     for (node = drivers; node; node = jack_slist_next (node)) {
         other_descriptor = (jack_driver_desc_t *) node->data;
 
-        if (strcmp (descriptor->name, other_descriptor->name) == 0) {
-            jack_error ("the drivers in '%s' and '%s' both have the name '%s'; using the first\n",
+        if (strcmp(descriptor->name, other_descriptor->name) == 0) {
+            jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first\n",
                         other_descriptor->file, filename, other_descriptor->name);
             /* FIXME: delete the descriptor */
-            free (filename);
+            free(filename);
             return NULL;
         }
     }
 
-    strncpy (descriptor->file, filename, PATH_MAX);
-    free (filename);
+    strncpy(descriptor->file, filename, PATH_MAX);
+    free(filename);
     return descriptor;
 }
 
@@ -347,7 +351,7 @@ jack_drivers_load (JSList * drivers) {
 
     GetCurrentDirectory(512, driver_dir);
 
-    sprintf (dll_filename, "%s/%s", ADDON_DIR, "*.dll");
+    sprintf(dll_filename, "%s/%s", ADDON_DIR, "*.dll");
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
@@ -390,11 +394,15 @@ jack_drivers_load (JSList * drivers) {
     int err;
     JSList * driver_list = NULL;
     jack_driver_desc_t * desc;
-    char* driver_dir;
 
+	/*
+	char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         driver_dir = ADDON_DIR;
-    }
+	}
+	*/
+	char driver_dir[512];
+	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
 
     /* search through the driver_dir and add get descriptors
     from the .so files in it */
