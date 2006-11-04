@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2006-11-04 Stephane Letz  <letz@grame.fr>
+
+	* Use -D to setup ADDON_DIR on OSX and Linux.
+
 2006-10-11 Stephane Letz  <letz@grame.fr>
 
 	* Correct server SetBufferSize in case of failure. Correct PortAudio driver help.
