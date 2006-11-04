@@ -4,6 +4,8 @@ subprojects := ../common ../tests ../example-clients alsa
 
 prefix := /usr/local
 
+#prefix := /usr
+
 sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../tests/*.cpp)
 
 TARGET_LINUX_SERVER := jackdmp
@@ -39,13 +41,13 @@ objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o
 objects_linux_dummy := JackDummyDriver.o  
 
 CFLAGS :=  -g -O3  -fPIC  -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS :=  -g -O3  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+CXXFLAGS :=  -g -O3  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 #CFLAGS :=  -g   -fPIC  -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-#CXXFLAGS :=  -g   -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+#CXXFLAGS :=  -g   -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 # Use this line to compile with POSIX names semaphore
-#CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ $(addprefix -I, $(subprojects)) $(CXXFLAGS)
+#CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
 
 # Add the -D__CLIENTDEBUG__  flag to activate client validation
 
