@@ -1,10 +1,8 @@
-subprojects := ../common ../tests ../example-clients alsa 
 
-# WARNING:  installation works correctly only when done in /usr/local
-
+# Choose the installation location
 prefix := /usr/local
 
-#prefix := /usr
+subprojects := ../common ../tests ../example-clients alsa 
 
 sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../tests/*.cpp)
 
@@ -31,7 +29,7 @@ objects_common_server_lib := JackActivationCount.o JackAPI.o JackAudioDriver.o J
 
 objects_common_client_lib := JackActivationCount.o JackAPI.o JackClient.o JackConnectionManager.o ringbuffer.o \
 	JackError.o JackFrameTimer.o JackGlobalsClient.o JackGraphManager.o JackLibClient.o JackLibAPI.o JackPort.o JackPosixSemaphore.o JackFifo.o \
-	JackPosixThread.o JackShmMem.o shm.o JackSocket.o JackSocketClientChannel.o JackTime.o JackGlobals.o JackDebugClient.o JackTransportEngine.o \
+	JackPosixThread.o JackShmMem.o shm.o JackSocket.o JackSocketClientChannel.o JackTime.o JackGlobals.o JackDebugClient.o JackTransportEngine.o 
 	
 
 objects_linux_server := Jackdmp.o 
@@ -40,11 +38,11 @@ objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o
 
 objects_linux_dummy := JackDummyDriver.o  
 
-CFLAGS :=  -g -O3  -fPIC  -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS :=  -g -O3  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+CFLAGS := -g -O3 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
-#CFLAGS :=  -g   -fPIC  -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-#CXXFLAGS :=  -g   -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+#CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+#CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 # Use this line to compile with POSIX names semaphore
 #CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
