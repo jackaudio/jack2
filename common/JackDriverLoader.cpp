@@ -258,11 +258,9 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 		driver_dir = ADDON_DIR;
     }
 	*/
-	
-	char driver_dir[512];
-	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
   
 #ifdef WIN32
+	char* driver_dir = ADDON_DIR;
     if (strcmp(ADDON_DIR, "") == 0) {
         char temp_driver_dir1[512];
         char temp_driver_dir2[512];
@@ -270,6 +268,9 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
         sprintf(temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
         driver_dir = temp_driver_dir2;
     }
+#else
+	char driver_dir[512];
+	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
 #endif
 
     filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
