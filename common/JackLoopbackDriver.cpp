@@ -58,10 +58,8 @@ int JackLoopbackDriver::Process()
 
     // Loopback copy
     for (int i = 0; i < fCaptureChannels; i++) {
-        memcpy(fGraphManager->GetBuffer(fCapturePortList[i], fEngineControl->fBufferSize),
-               fGraphManager->GetBuffer(fPlaybackPortList[i], fEngineControl->fBufferSize),
-               sizeof(float) * fEngineControl->fBufferSize);
-    }
+        memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(float) * fEngineControl->fBufferSize);
+	}
 
     fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
     if (fEngineControl->fSyncMode) {
