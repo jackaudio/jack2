@@ -22,8 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackExports.h"
 #include <dlfcn.h>
 
-//using namespace Jack;
-
 #ifdef __cplusplus
 extern "C"
 {
