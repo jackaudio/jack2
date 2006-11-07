@@ -543,18 +543,18 @@ EXPORT int jack_set_graph_order_callback(jack_client_t* ext_client, JackGraphOrd
     }
 }
 
-EXPORT int jack_set_xrun_callback(jack_client_t* ext_client, JackXRunCallback callback, void* arg)
+EXPORT int jack_set_xrun_callback(jack_client_t* ext_client, JackXRunCallback xrun_callback, void* arg)
 {
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_xrun_callback called with a NULL client");
         return -1;
     } else {
-        return client->SetXRunCallback(callback, arg);
+        return client->SetXRunCallback(xrun_callback, arg);
     }
 }
 
-EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadInitCallback callback, void *arg)
+EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadInitCallback init_callback, void *arg)
 {
     JackClient* client = (JackClient*)ext_client;
     JackLog("jack_set_thread_init_callback ext_client %x client %x \n", ext_client, client);
@@ -562,7 +562,7 @@ EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadIn
         jack_error("jack_set_thread_init_callback called with a NULL client");
         return -1;
     } else {
-        return client->SetInitCallback(callback, arg);
+        return client->SetInitCallback(init_callback, arg);
     }
 }
 
@@ -892,7 +892,7 @@ EXPORT float jack_cpu_load(jack_client_t* ext_client)
     }
 }
 
-pthread_t EXPORT jack_client_thread_id(jack_client_t* ext_client)
+EXPORT pthread_t jack_client_thread_id(jack_client_t* ext_client)
 {
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
@@ -1052,19 +1052,19 @@ EXPORT void jack_set_transport_info(jack_client_t* ext_client, jack_transport_in
 
 // statistics.h
 
-EXPORT float jack_get_max_delayed_usecs(jack_client_t* client)
+EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
 {
     JackLog("jack_get_max_delayed_usecs: not yet implemented\n");
     return 0.f;
 }
 
-EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* client)
+EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* ext_client)
 {
     JackLog("jack_get_xrun_delayed_usecs: not yet implemented\n");
     return 0.f;
 }
 
-EXPORT void jack_reset_max_delayed_usecs(jack_client_t* client)
+EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 {
     JackLog("jack_reset_max_delayed_usecs: not yet implemented\n");
 }
@@ -1096,25 +1096,25 @@ EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 
 // intclient.h
 
-EXPORT char* jack_get_internal_client_name(jack_client_t* client, jack_intclient_t intclient)
+EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intclient_t intclient)
 {
     JackLog("jack_get_internal_client_name: not yet implemented\n");
     return "";
 }
 
-EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* client, const char* client_name, jack_status_t* status)
+EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, const char* client_name, jack_status_t* status)
 {
     JackLog("jack_internal_client_handle: not yet implemented\n");
     return 0;
 }
 
-EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
+EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
 {
     JackLog("jack_internal_client_load: not yet implemented\n");
     return 0;
 }
 
-EXPORT jack_status_t jack_internal_client_unload(jack_client_t* client, jack_intclient_t intclient)
+EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack_intclient_t intclient)
 {
     JackLog("jack_internal_client_unload: not yet implemented\n");
     return JackFailure;
