@@ -1009,7 +1009,6 @@
 				4BF8D1CE0834EF2200C94B91,
 				4BF8D1D60834EF2F00C94B91,
 				4BF8D1E80834EF6700C94B91,
-				4BF8D1EC0834EF7500C94B91,
 				4BF8D2050834EFD100C94B91,
 				4BF8D2060834EFD100C94B91,
 				4BF8D2350834F14400C94B91,
@@ -1028,6 +1027,8 @@
 				4B003AB408E2B2BA0060EFDC,
 				4B98AE040931D30C0091932A,
 				4B1880CB09A1DDF100154099,
+				4BCD4CF50B00A0F90091F8E8,
+				4BCD4CF90B00A15B0091F8E8,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2079,6 +2080,7 @@
 		};
 		4BA550F905E241D900569492 = {
 			children = (
+				4BCD4CF40B00A0F90091F8E8,
 				4B168CA4076A5333005B2802,
 				4BF8D1FB0834EFD100C94B91,
 				4BF8D1FC0834EFD100C94B91,
@@ -2660,6 +2662,27 @@
 			path = ../common/JackDummyDriver.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
+		};
+		4BCD4CF40B00A0F90091F8E8 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			name = JackAPIWrapper.cpp;
+			path = ../common/JackAPIWrapper.cpp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4BCD4CF50B00A0F90091F8E8 = {
+			fileRef = 4BCD4CF40B00A0F90091F8E8;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		4BCD4CF90B00A15B0091F8E8 = {
+			fileRef = 4BF8D1E90834EF7500C94B91;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		4BD561C708EEB910006BBC2A = {
 			fileEncoding = 30;
@@ -4552,12 +4575,6 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		4BF8D1EA0834EF7500C94B91 = {
-			fileRef = 4BF8D1E90834EF7500C94B91;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		4BF8D1EC0834EF7500C94B91 = {
 			fileRef = 4BF8D1E90834EF7500C94B91;
 			isa = PBXBuildFile;
 			settings = {

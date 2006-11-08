@@ -39,7 +39,7 @@ set_control_id (snd_ctl_elem_id_t *ctl, const char *name)
 {
 	snd_ctl_elem_id_set_name (ctl, name);
 	snd_ctl_elem_id_set_numid (ctl, 0);
-	snd_ctl_elem_id_set_interface (ctl, SND_CTL_ELEM_IFACE_PCM);
+	snd_ctl_elem_id_set_interface (ctl, SND_CTL_ELEM_IFACE_MIXER);
 	snd_ctl_elem_id_set_device (ctl, 0);
 	snd_ctl_elem_id_set_subdevice (ctl, 0);
 	snd_ctl_elem_id_set_index (ctl, 0);
@@ -142,7 +142,7 @@ hammerfall_check_sync (hammerfall_t *h, snd_ctl_elem_value_t *ctl)
 static int 
 hammerfall_set_input_monitor_mask (jack_hardware_t *hw, unsigned long mask)
 {
-	hammerfall_t *h = (hammerfall_t *) hw->private_hw;
+	hammerfall_t *h = (hammerfall_t *) hw->private;
 	snd_ctl_elem_value_t *ctl;
 	snd_ctl_elem_id_t *ctl_id;
 	int err;
@@ -170,7 +170,7 @@ hammerfall_set_input_monitor_mask (jack_hardware_t *hw, unsigned long mask)
 static int 
 hammerfall_change_sample_clock (jack_hardware_t *hw, SampleClockMode mode) 
 {
-	hammerfall_t *h = (hammerfall_t *) hw->private_hw;
+	hammerfall_t *h = (hammerfall_t *) hw->private;
 	snd_ctl_elem_value_t *ctl;
 	snd_ctl_elem_id_t *ctl_id;
 	int err;
@@ -203,7 +203,7 @@ static void
 hammerfall_release (jack_hardware_t *hw)
 
 {
-	hammerfall_t *h = (hammerfall_t *) hw->private_hw;
+	hammerfall_t *h = (hammerfall_t *) hw->private;
 	void *status;
 
 	if (h == 0) {
@@ -221,7 +221,7 @@ static void *
 hammerfall_monitor_controls (void *arg)
 {
 	jack_hardware_t *hw = (jack_hardware_t *) arg;
-	hammerfall_t *h = (hammerfall_t *) hw->private_hw;
+	hammerfall_t *h = (hammerfall_t *) hw->private;
 	snd_ctl_elem_id_t *switch_id[3];
 	snd_ctl_elem_value_t *sw[3];
 
@@ -279,7 +279,7 @@ jack_alsa_hammerfall_hw_new (alsa_driver_t *driver)
 
 	hw->capabilities = Cap_HardwareMonitoring|Cap_AutoSync|Cap_WordClock|Cap_ClockMaster|Cap_ClockLockReporting;
 	hw->input_monitor_mask = 0;
-	hw->private_hw = 0;
+	hw->private = 0;
 
 	hw->set_input_monitor_mask = hammerfall_set_input_monitor_mask;
 	hw->change_sample_clock = hammerfall_change_sample_clock;
@@ -299,7 +299,7 @@ jack_alsa_hammerfall_hw_new (alsa_driver_t *driver)
 	h->monitor_interval.tv_sec = 1;
 	h->monitor_interval.tv_nsec = 0;
 
-	hw->private_hw = h;
+	hw->private = h;
 
 #if 0
 	if (pthread_create (&h->monitor_thread, 0, hammerfall_monitor_controls, hw)) {

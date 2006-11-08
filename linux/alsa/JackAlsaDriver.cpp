@@ -47,9 +47,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "generic.h"
 #include "memops.h" 
-//#include "generic_hw.c"
-//#include "hdsp.c"
-//#include "hammerfall.c"
 
 namespace Jack
 {
@@ -252,28 +249,34 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
             }
 
             switch (driver->dither) {
-                case Rectangular:
-                    printf("Rectangular dithering at 16 bits\n");
-                    driver->write_via_copy = sample_move_dither_rect_d16_sS;
-                    break;
+				case Rectangular:
+				printf("Rectangular dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_rect_d16_sSs:
+					sample_move_dither_rect_d16_sS;
+				break;
 
-                case Triangular:
-                    printf("Triangular dithering at 16 bits\n");
-                    driver->write_via_copy = sample_move_dither_tri_d16_sS;
-                    break;
+				case Triangular:
+				printf("Triangular dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_tri_d16_sSs:
+					sample_move_dither_tri_d16_sS;
+				break;
 
-                case Shaped:
-                    printf("Noise-shaped dithering at 16 bits\n");
-                    driver->write_via_copy =
-                        sample_move_dither_shaped_d16_sS;
-                    break;
+				case Shaped:
+				printf("Noise-shaped dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_shaped_d16_sSs:
+					sample_move_dither_shaped_d16_sS;
+				break;
 
-                default:
-                    driver->write_via_copy = sample_move_d16_sS;
-                    break;
-            }
-            break;
-
+				default:
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_d16_sSs : sample_move_d16_sS;
+				break;
+			}
+			break;
+			
         case 3:
             if (driver->playback_interleaved) {
                 driver->channel_copy = memcpy_interleave_d24_s24;
@@ -282,28 +285,34 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
             }
 
             switch (driver->dither) {
-                case Rectangular:
-                    printf("Rectangular dithering at 16 bits\n");
-                    driver->write_via_copy = sample_move_dither_rect_d24_sS;
-                    break;
+				case Rectangular:
+				printf("Rectangular dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_rect_d24_sSs:
+					sample_move_dither_rect_d24_sS;
+				break;
 
-                case Triangular:
-                    printf("Triangular dithering at 16 bits\n");
-                    driver->write_via_copy = sample_move_dither_tri_d24_sS;
-                    break;
+				case Triangular:
+				printf("Triangular dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_tri_d24_sSs:
+					sample_move_dither_tri_d24_sS;
+				break;
 
-                case Shaped:
-                    printf("Noise-shaped dithering at 16 bits\n");
-                    driver->write_via_copy =
-                        sample_move_dither_shaped_d24_sS;
-                    break;
+				case Shaped:
+				printf("Noise-shaped dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_shaped_d24_sSs:
+					sample_move_dither_shaped_d24_sS;
+				break;
 
-                default:
-                    driver->write_via_copy = sample_move_d24_sS;
-                    break;
-            }
-            break;
-
+				default:
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_d24_sSs : sample_move_d24_sS;
+				break;
+			}
+			break;
+			
         case 4:
             if (driver->playback_interleaved) {
                 driver->channel_copy = memcpy_interleave_d32_s32;
@@ -312,41 +321,49 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
             }
 
             switch (driver->dither) {
-                case Rectangular:
-                    printf("Rectangular dithering at 16 bits\n");
-                    driver->write_via_copy =
-                        sample_move_dither_rect_d32u24_sS;
-                    break;
+				case Rectangular:
+				printf("Rectangular dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_rect_d32u24_sSs:
+					sample_move_dither_rect_d32u24_sS;
+				break;
 
-                case Triangular:
-                    printf("Triangular dithering at 16 bits\n");
-                    driver->write_via_copy =
-                        sample_move_dither_tri_d32u24_sS;
-                    break;
+				case Triangular:
+				printf("Triangular dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_tri_d32u24_sSs:
+					sample_move_dither_tri_d32u24_sS;
+				break;
 
-                case Shaped:
-                    printf("Noise-shaped dithering at 16 bits\n");
-                    driver->write_via_copy =
-                        sample_move_dither_shaped_d32u24_sS;
-                    break;
+				case Shaped:
+				printf("Noise-shaped dithering at 16 bits\n");
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_dither_shaped_d32u24_sSs:
+					sample_move_dither_shaped_d32u24_sS;
+				break;
 
-                default:
-                    driver->write_via_copy = sample_move_d32u24_sS;
-                    break;
-            }
-            break;
-    }
+				default:
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_d32u24_sSs : sample_move_d32u24_sS;
+				break;
+			}
+			break;
+	}
 
     switch (driver->capture_sample_bytes) {
-        case 2:
-            driver->read_via_copy = sample_move_dS_s16;
-            break;
-        case 3:
-            driver->read_via_copy = sample_move_dS_s24;
-            break;
-        case 4:
-            driver->read_via_copy = sample_move_dS_s32u24;
-            break;
+		case 2:
+			driver->read_via_copy = driver->quirk_bswap?
+				sample_move_dS_s16s : sample_move_dS_s16;
+			break;
+		case 3:
+			driver->read_via_copy = driver->quirk_bswap?
+				sample_move_dS_s24s : sample_move_dS_s24;
+			break;
+		case 4:
+			driver->read_via_copy = driver->quirk_bswap?
+				sample_move_dS_s32u24s : sample_move_dS_s32u24;
+			break;
+		}
     }
 }
 
@@ -361,241 +378,237 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
         unsigned long sample_width)
 {
     int err, format;
-    unsigned int frame_rate;
-    snd_pcm_uframes_t stop_th;
-    static struct {
-        char Name[16];
-        snd_pcm_format_t format;
-    }
-    formats[] = {
-                    {"32bit", SND_PCM_FORMAT_S32},
-                    {"24bit", SND_PCM_FORMAT_S24_3},
-                    {"16bit", SND_PCM_FORMAT_S16},
-                };
-#define NOFORMATS (sizeof(formats)/sizeof(formats[0]))
+	unsigned int frame_rate;
+	snd_pcm_uframes_t stop_th;
+	static struct {
+		char Name[32];
+		snd_pcm_format_t format;
+		int swapped;
+	} formats[] = {
+		{"32bit little-endian", SND_PCM_FORMAT_S32_LE, IS_LE},
+		{"32bit big-endian", SND_PCM_FORMAT_S32_BE, IS_BE},
+		{"24bit little-endian", SND_PCM_FORMAT_S24_3LE, IS_LE},
+		{"24bit big-endian", SND_PCM_FORMAT_S24_3BE, IS_BE},
+		{"16bit little-endian", SND_PCM_FORMAT_S16_LE, IS_LE},
+		{"16bit big-endian", SND_PCM_FORMAT_S16_BE, IS_BE},
+	};
+#define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
+#define FIRST_16BIT_FORMAT 4
 
-    if ((err = snd_pcm_hw_params_any (handle, hw_params)) < 0) {
-        jack_error ("ALSA: no playback configurations available (%s)",
-                    snd_strerror (err));
-        return -1;
-    }
+	if ((err = snd_pcm_hw_params_any (handle, hw_params)) < 0)  {
+		jack_error ("ALSA: no playback configurations available (%s)",
+			    snd_strerror (err));
+		return -1;
+	}
 
-    if ((err = snd_pcm_hw_params_set_periods_integer (handle, hw_params))
-            < 0) {
-        jack_error ("ALSA: cannot restrict period size to integral"
-                    " value.");
-        return -1;
-    }
+	if ((err = snd_pcm_hw_params_set_periods_integer (handle, hw_params))
+	    < 0) {
+		jack_error ("ALSA: cannot restrict period size to integral"
+			    " value.");
+		return -1;
+	}
 
-    if ((err = snd_pcm_hw_params_set_access (
-                   handle, hw_params, SND_PCM_ACCESS_MMAP_NONINTERLEAVED))
-            < 0) {
-        if ((err = snd_pcm_hw_params_set_access (
-                       handle, hw_params,
-                       SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0) {
-            if ((err = snd_pcm_hw_params_set_access (
-                           handle, hw_params,
-                           SND_PCM_ACCESS_MMAP_COMPLEX)) < 0) {
+	if ((err = snd_pcm_hw_params_set_access (handle, hw_params, SND_PCM_ACCESS_MMAP_NONINTERLEAVED)) < 0) {
+		if ((err = snd_pcm_hw_params_set_access (handle, hw_params, SND_PCM_ACCESS_MMAP_INTERLEAVED)) < 0) {
+			if ((err = snd_pcm_hw_params_set_access (
+				     handle, hw_params,
+				     SND_PCM_ACCESS_MMAP_COMPLEX)) < 0) {
+				jack_error ("ALSA: mmap-based access is not possible"
+					    " for the %s "
+					    "stream of this audio interface",
+					    stream_name);
+				return -1;
+			}
+		}
+	}
+	
+	format = (sample_width == 4) ? 0 : FIRST_16BIT_FORMAT;
 
-                jack_error ("ALSA: mmap-based access is not possible"
-                            " for the %s "
-                            "stream of this audio interface",
-                            stream_name);
-                return -1;
-            }
-        }
-    }
+	while (1) {
+		if ((err = snd_pcm_hw_params_set_format (
+			     handle, hw_params, formats[format].format)) < 0) {
 
-    format = sample_width == 4 ? 0 : NOFORMATS - 1;
-    while (1) {
-        if ((err = snd_pcm_hw_params_set_format (
-                       handle, hw_params, formats[format].format)) < 0) {
-            int failed_format = format;
-            if ((sample_width == 4
-                    ? format++ < NOFORMATS - 1
-                    : format-- > 0)) {
-                jack_error ("Note: audio device %s doesn't support a %s sample format"
-                            " so JACK will try a %s format instead", device_name,
-                            formats[failed_format].Name,
-                            formats[format].Name);
-            } else {
-                jack_error ("Sorry. The audio interface \"%s\""
-                            " doesn't support any of the"
-                            " hardware sample formats that"
-                            " JACK's alsa-driver can use.",
-                            device_name);
-                return -1;
-            }
-        } else
-            break;
-    }
+			if ((sample_width == 4
+			     ? format++ >= FIRST_16BIT_FORMAT
+			     : format-- <= 0)) {
+				jack_error ("Sorry. The audio interface \"%s\""
+					    " doesn't support any of the"
+					    " hardware sample formats that"
+					    " JACK's alsa-driver can use.",
+					    device_name);
+				return -1;
+			}
+		} else {
+			if (formats[format].swapped) {
+				driver->quirk_bswap = 1;
+			} else {
+				driver->quirk_bswap = 0;
+			}
+			jack_error ("ALSA: final selected sample format for %s: %s", stream_name, formats[format].Name);
+			break;
+		}
+	} 
 
-    frame_rate = driver->frame_rate ;
-    err = snd_pcm_hw_params_set_rate_near (handle, hw_params,
-                                           &frame_rate, NULL) ;
-    driver->frame_rate = frame_rate ;
-    if (err < 0) {
-        //jack_error ("ALSA: cannot set sample/frame rate to %"
-        //	    PRIu32 " for %s", driver->frame_rate,
-        //	    stream_name);
-        return -1;
-    }
-    if (!*nchns) {
-        /*if not user-specified, try to find the maximum
-         * number of channels */
-        unsigned int channels_max ;
-        err = snd_pcm_hw_params_get_channels_max (hw_params,
-                &channels_max);
-        *nchns = channels_max ;
+	frame_rate = driver->frame_rate ;
+	err = snd_pcm_hw_params_set_rate_near (handle, hw_params,
+					       &frame_rate, NULL) ;
+	driver->frame_rate = frame_rate ;
+	if (err < 0) {
+		jack_error ("ALSA: cannot set sample/frame rate to %"
+			    PRIu32 " for %s", driver->frame_rate,
+			    stream_name);
+		return -1;
+	}
+	if (!*nchns) {
+		/*if not user-specified, try to find the maximum
+		 * number of channels */
+		unsigned int channels_max ;
+		err = snd_pcm_hw_params_get_channels_max (hw_params,
+							  &channels_max);
+		*nchns = channels_max ;
 
-        if (*nchns > 1024) {
+		if (*nchns > 1024) { 
 
-            /* the hapless user is an unwitting victim of
-               the "default" ALSA PCM device, which can
-               support up to 16 million channels. since
-               they can't be bothered to set up a proper
-               default device, limit the number of
-               channels for them to a sane default.
-            */
+			/* the hapless user is an unwitting victim of
+			   the "default" ALSA PCM device, which can
+			   support up to 16 million channels. since
+			   they can't be bothered to set up a proper
+			   default device, limit the number of
+			   channels for them to a sane default.
+			*/
 
-            jack_error (
-                "You appear to be using the ALSA software \"plug\" layer, probably\n"
-                "a result of using the \"default\" ALSA device. This is less\n"
-                "efficient than it could be. Consider using a hardware device\n"
-                "instead rather than using the plug layer. Usually the name of the\n"
-                "hardware device that corresponds to the first sound card is hw:0\n"
-            );
-            *nchns = 2;
-        }
-    }
+			jack_error (
+"You appear to be using the ALSA software \"plug\" layer, probably\n"
+"a result of using the \"default\" ALSA device. This is less\n"
+"efficient than it could be. Consider using a hardware device\n"
+"instead rather than using the plug layer. Usually the name of the\n"
+"hardware device that corresponds to the first sound card is hw:0\n"
+				);
+			*nchns = 2;  
+		}
+	}				
 
-    if ((err = snd_pcm_hw_params_set_channels (handle, hw_params,
-               *nchns)) < 0) {
-        jack_error ("ALSA: cannot set channel count to %u for %s",
-                    *nchns, stream_name);
-        return -1;
-    }
+	if ((err = snd_pcm_hw_params_set_channels (handle, hw_params,
+						   *nchns)) < 0) {
+		jack_error ("ALSA: cannot set channel count to %u for %s",
+			    *nchns, stream_name);
+		return -1;
+	}
+	
+	if ((err = snd_pcm_hw_params_set_period_size (handle, hw_params,
+						      driver->frames_per_cycle,
+						      0))
+	    < 0) {
+		jack_error ("ALSA: cannot set period size to %" PRIu32
+			    " frames for %s", driver->frames_per_cycle,
+			    stream_name);
+		return -1;
+	}
 
-    if ((err = snd_pcm_hw_params_set_period_size (handle, hw_params,
-               driver->frames_per_cycle,
-               0))
-            < 0) {
-        // steph
-        //jack_error ("ALSA: cannot set period size to %" PRIu32
-        //	    " frames for %s", driver->frames_per_cycle,
-        //	    stream_name);
-        return -1;
-    }
+	*nperiodsp = driver->user_nperiods;
+	snd_pcm_hw_params_set_periods_min (handle, hw_params, nperiodsp, NULL);
+	if (*nperiodsp < driver->user_nperiods)
+		*nperiodsp = driver->user_nperiods;
+	if (snd_pcm_hw_params_set_periods_near (handle, hw_params,
+						nperiodsp, NULL) < 0) {
+		jack_error ("ALSA: cannot set number of periods to %u for %s",
+			    *nperiodsp, stream_name);
+		return -1;
+	}
 
-    *nperiodsp = driver->user_nperiods;
-    snd_pcm_hw_params_set_periods_min (handle, hw_params, nperiodsp, NULL);
-    if (*nperiodsp < driver->user_nperiods)
-        *nperiodsp = driver->user_nperiods;
-    if (snd_pcm_hw_params_set_periods_near (handle, hw_params,
-                                            nperiodsp, NULL) < 0) {
-        jack_error ("ALSA: cannot set number of periods to %u for %s",
-                    *nperiodsp, stream_name);
-        return -1;
-    }
+	if (*nperiodsp < driver->user_nperiods) {
+		jack_error ("ALSA: got smaller periods %u than %u for %s",
+			    *nperiodsp, (unsigned int) driver->user_nperiods,
+			    stream_name);
+		return -1;
+	}
+	jack_error ("ALSA: use %d periods for %s", *nperiodsp, stream_name);
+	
+	if (!jack_power_of_two(driver->frames_per_cycle)) {
+		jack_error("JACK: frames must be a power of two "
+			   "(64, 512, 1024, ...)\n");
+		return -1;
+	}
 
-    if (*nperiodsp < driver->user_nperiods) {
-        jack_error ("ALSA: got smaller periods %u than %u for %s",
-                    *nperiodsp, (unsigned int) driver->user_nperiods,
-                    stream_name);
-        return -1;
-    }
-    fprintf(stderr, "nperiods = %d for %s\n", *nperiodsp, stream_name);
+	if ((err = snd_pcm_hw_params_set_buffer_size (handle, hw_params,
+						      *nperiodsp *
+						      driver->frames_per_cycle))
+	    < 0) {
+		jack_error ("ALSA: cannot set buffer length to %" PRIu32
+			    " for %s",
+			    *nperiodsp * driver->frames_per_cycle,
+			    stream_name);
+		return -1;
+	}
 
-    // steph
-    /*
-    if (!jack_power_of_two(driver->frames_per_cycle)) {
-    	jack_error("JACK: frames must be a power of two "
-    		   "(64, 512, 1024, ...)\n");
-    	return -1;
-    }
-    */
+	if ((err = snd_pcm_hw_params (handle, hw_params)) < 0) {
+		jack_error ("ALSA: cannot set hardware parameters for %s",
+			    stream_name);
+		return -1;
+	}
 
-    if ((err = snd_pcm_hw_params_set_buffer_size (handle, hw_params,
-               *nperiodsp *
-               driver->frames_per_cycle))
-            < 0) {
-        /*
-        jack_error ("ALSA: cannot set buffer length to %" PRIu32
-          " for %s",
-          *nperiodsp * driver->frames_per_cycle,
-          stream_name);
-          */ 
-        return -1;
-    }
+	snd_pcm_sw_params_current (handle, sw_params);
 
-    if ((err = snd_pcm_hw_params (handle, hw_params)) < 0) {
-        jack_error ("ALSA: cannot set hardware parameters for %s",
-                    stream_name);
-        return -1;
-    }
+	if ((err = snd_pcm_sw_params_set_start_threshold (handle, sw_params,
+							  0U)) < 0) {
+		jack_error ("ALSA: cannot set start mode for %s", stream_name);
+		return -1;
+	}
 
-    snd_pcm_sw_params_current (handle, sw_params);
+	stop_th = *nperiodsp * driver->frames_per_cycle;
+	if (driver->soft_mode) {
+		stop_th = (snd_pcm_uframes_t)-1;
+	}
+	
+	if ((err = snd_pcm_sw_params_set_stop_threshold (
+		     handle, sw_params, stop_th)) < 0) {
+		jack_error ("ALSA: cannot set stop mode for %s",
+			    stream_name);
+		return -1;
+	}
 
-    if ((err = snd_pcm_sw_params_set_start_threshold (handle, sw_params,
-               0U)) < 0) {
-        jack_error ("ALSA: cannot set start mode for %s", stream_name);
-        return -1;
-    }
-
-    stop_th = *nperiodsp * driver->frames_per_cycle;
-    if (driver->soft_mode) {
-        stop_th = (snd_pcm_uframes_t) - 1;
-    }
-
-    if ((err = snd_pcm_sw_params_set_stop_threshold (
-                   handle, sw_params, stop_th)) < 0) {
-        jack_error ("ALSA: cannot set stop mode for %s",
-                    stream_name);
-        return -1;
-    }
-
-    if ((err = snd_pcm_sw_params_set_silence_threshold (
-                   handle, sw_params, 0)) < 0) {
-        jack_error ("ALSA: cannot set silence threshold for %s",
-                    stream_name);
-        return -1;
-    }
+	if ((err = snd_pcm_sw_params_set_silence_threshold (
+		     handle, sw_params, 0)) < 0) {
+		jack_error ("ALSA: cannot set silence threshold for %s",
+			    stream_name);
+		return -1;
+	}
 
 #if 0
-    fprintf (stderr, "set silence size to %lu * %lu = %lu\n",
-             driver->frames_per_cycle, *nperiodsp,
-             driver->frames_per_cycle * *nperiodsp);
+	fprintf (stderr, "set silence size to %lu * %lu = %lu\n",
+		 driver->frames_per_cycle, *nperiodsp,
+		 driver->frames_per_cycle * *nperiodsp);
 
-    if ((err = snd_pcm_sw_params_set_silence_size (
-                   handle, sw_params,
-                   driver->frames_per_cycle * *nperiodsp)) < 0) {
-        jack_error ("ALSA: cannot set silence size for %s",
-                    stream_name);
-        return -1;
-    }
+	if ((err = snd_pcm_sw_params_set_silence_size (
+		     handle, sw_params,
+		     driver->frames_per_cycle * *nperiodsp)) < 0) {
+		jack_error ("ALSA: cannot set silence size for %s",
+			    stream_name);
+		return -1;
+	}
 #endif
 
-    if (handle == driver->playback_handle)
-        err = snd_pcm_sw_params_set_avail_min (
-                  handle, sw_params,
-                  driver->frames_per_cycle
-                  * (*nperiodsp - driver->user_nperiods + 1));
-    else
-        err = snd_pcm_sw_params_set_avail_min (
-                  handle, sw_params, driver->frames_per_cycle);
+	if (handle == driver->playback_handle)
+		err = snd_pcm_sw_params_set_avail_min (
+			handle, sw_params,
+			driver->frames_per_cycle
+			* (*nperiodsp - driver->user_nperiods + 1));
+	else
+		err = snd_pcm_sw_params_set_avail_min (
+			handle, sw_params, driver->frames_per_cycle);
+			
+	if (err < 0) {
+		jack_error ("ALSA: cannot set avail min for %s", stream_name);
+		return -1;
+	}
 
-    if (err < 0) {
-        jack_error ("ALSA: cannot set avail min for %s", stream_name);
-        return -1;
-    }
+	if ((err = snd_pcm_sw_params (handle, sw_params)) < 0) {
+		jack_error ("ALSA: cannot set software parameters for %s\n",
+			    stream_name);
+		return -1;
+	}
 
-    if ((err = snd_pcm_sw_params (handle, sw_params)) < 0) {
-        jack_error ("ALSA: cannot set software parameters for %s\n",
-                    stream_name);
-        return -1;
-    }
-
-    return 0;
+	return 0;
 }
 
 int
@@ -760,10 +773,11 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
     if (driver->playback_handle) {
         switch (driver->playback_sample_format) {
             case SND_PCM_FORMAT_S32_LE:
-            case SND_PCM_FORMAT_S24_3:
-            case SND_PCM_FORMAT_S16_LE:
-            case SND_PCM_FORMAT_S32_BE:
-            case SND_PCM_FORMAT_S16_BE:
+			case SND_PCM_FORMAT_S24_3LE:
+			case SND_PCM_FORMAT_S24_3BE:
+			case SND_PCM_FORMAT_S16_LE:
+			case SND_PCM_FORMAT_S32_BE:
+			case SND_PCM_FORMAT_S16_BE:
                 break;
 
             default:
@@ -776,10 +790,11 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
     if (driver->capture_handle) {
         switch (driver->capture_sample_format) {
             case SND_PCM_FORMAT_S32_LE:
-            case SND_PCM_FORMAT_S24_3:
-            case SND_PCM_FORMAT_S16_LE:
-            case SND_PCM_FORMAT_S32_BE:
-            case SND_PCM_FORMAT_S16_BE:
+			case SND_PCM_FORMAT_S24_3LE:
+			case SND_PCM_FORMAT_S24_3BE:
+			case SND_PCM_FORMAT_S16_LE:
+			case SND_PCM_FORMAT_S32_BE:
+			case SND_PCM_FORMAT_S16_BE:
                 break;
 
             default:
@@ -798,15 +813,11 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
                         driver->alsa_name_playback);
             return -1;
         }
-        //driver->playback_interleave_skip = my_areas[0].step / 8; steph
         driver->interleave_unit =
             snd_pcm_format_physical_width (
                 driver->playback_sample_format) / 8;
     } else {
         driver->interleave_unit = 0;  /* NOT USED */
-        //driver->playback_interleave_skip = steph
-        //    snd_pcm_format_physical_width (
-        //         driver->playback_sample_format) / 8;
     }
 
     if (driver->capture_interleaved) {
@@ -818,13 +829,8 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
                         driver->alsa_name_capture);
             return -1;
         }
-        //driver->capture_interleave_skip = my_areas[0].step / 8; steph
-    } else {
-        //driver->capture_interleave_skip =
-        //    snd_pcm_format_physical_width (
-        //        driver->capture_sample_format) / 8;
-    }
-
+    } 
+	
     if (driver->playback_nchannels > driver->capture_nchannels) {
         driver->max_nchannels = driver->playback_nchannels;
         driver->user_nchannels = driver->capture_nchannels;
@@ -922,170 +928,170 @@ JackAlsaDriver::alsa_driver_get_channel_addresses (alsa_driver_t *driver,
         snd_pcm_uframes_t *capture_offset,
         snd_pcm_uframes_t *playback_offset)
 {
-    unsigned long err;
-    channel_t chn;
+	unsigned long err;
+	channel_t chn;
 
-    if (capture_avail) {
-        if ((err = snd_pcm_mmap_begin (
-                       driver->capture_handle, &driver->capture_areas,
-                       (snd_pcm_uframes_t *) capture_offset,
-                       (snd_pcm_uframes_t *) capture_avail)) < 0) {
-            jack_error ("ALSA: %s: mmap areas info error",
-                        driver->alsa_name_capture);
-            return -1;
-        }
+	if (capture_avail) {
+		if ((err = snd_pcm_mmap_begin (
+			     driver->capture_handle, &driver->capture_areas,
+			     (snd_pcm_uframes_t *) capture_offset, 
+			     (snd_pcm_uframes_t *) capture_avail)) < 0) {
+			jack_error ("ALSA: %s: mmap areas info error",
+				    driver->alsa_name_capture);
+			return -1;
+		}
+		
+		for (chn = 0; chn < driver->capture_nchannels; chn++) {
+			const snd_pcm_channel_area_t *a =
+				&driver->capture_areas[chn];
+			driver->capture_addr[chn] = (char *) a->addr
+				+ ((a->first + a->step * *capture_offset) / 8);
+			driver->capture_interleave_skip[chn] = (unsigned long ) (a->step / 8);
+		}
+	} 
 
-        for (chn = 0; chn < driver->capture_nchannels; chn++) {
-            const snd_pcm_channel_area_t *a =
-                &driver->capture_areas[chn];
-            driver->capture_addr[chn] = (char *) a->addr
-                                        + ((a->first + a->step * *capture_offset) / 8);
-            driver->capture_interleave_skip[chn] = (unsigned long ) (a->step / 8); // steph
-        }
-    }
-
-    if (playback_avail) {
-        if ((err = snd_pcm_mmap_begin (
-                       driver->playback_handle, &driver->playback_areas,
-                       (snd_pcm_uframes_t *) playback_offset,
-                       (snd_pcm_uframes_t *) playback_avail)) < 0) {
-            jack_error ("ALSA: %s: mmap areas info error ",
-                        driver->alsa_name_playback);
-            return -1;
-        }
-
-        for (chn = 0; chn < driver->playback_nchannels; chn++) {
-            const snd_pcm_channel_area_t *a =
-                &driver->playback_areas[chn];
-            driver->playback_addr[chn] = (char *) a->addr
-                                         + ((a->first + a->step * *playback_offset) / 8);
-            driver->playback_interleave_skip[chn] = (unsigned long ) (a->step / 8); // steph
-        }
-    }
-
-    return 0;
+	if (playback_avail) {
+		if ((err = snd_pcm_mmap_begin (
+			     driver->playback_handle, &driver->playback_areas, 
+			     (snd_pcm_uframes_t *) playback_offset, 
+			     (snd_pcm_uframes_t *) playback_avail)) < 0) {
+			jack_error ("ALSA: %s: mmap areas info error ",
+				    driver->alsa_name_playback);
+			return -1;
+		}
+		
+		for (chn = 0; chn < driver->playback_nchannels; chn++) {
+			const snd_pcm_channel_area_t *a =
+				&driver->playback_areas[chn];
+			driver->playback_addr[chn] = (char *) a->addr
+				+ ((a->first + a->step * *playback_offset) / 8);
+			driver->playback_interleave_skip[chn] = (unsigned long ) (a->step / 8);
+		}
+	} 
+	
+	return 0;
 }
 
 int
 JackAlsaDriver::alsa_driver_start (alsa_driver_t *driver)
 {
     int err;
-    snd_pcm_uframes_t poffset, pavail;
-    channel_t chn;
+	snd_pcm_uframes_t poffset, pavail;
+	channel_t chn;
 
-    driver->poll_last = 0;
-    driver->poll_next = 0;
+	driver->poll_last = 0;
+	driver->poll_next = 0;
 
-    if (driver->playback_handle) {
-        if ((err = snd_pcm_prepare (driver->playback_handle)) < 0) {
-            jack_error ("ALSA: prepare error for playback on "
-                        "\"%s\" (%s)", driver->alsa_name_playback,
-                        snd_strerror(err));
-            return -1;
-        }
-    }
+	if (driver->playback_handle) {
+		if ((err = snd_pcm_prepare (driver->playback_handle)) < 0) {
+			jack_error ("ALSA: prepare error for playback on "
+				    "\"%s\" (%s)", driver->alsa_name_playback,
+				    snd_strerror(err));
+			return -1;
+		}
+	}
 
-    if ((driver->capture_handle && driver->capture_and_playback_not_synced)
-            || !driver->playback_handle) {
-        if ((err = snd_pcm_prepare (driver->capture_handle)) < 0) {
-            jack_error ("ALSA: prepare error for capture on \"%s\""
-                        " (%s)", driver->alsa_name_capture,
-                        snd_strerror(err));
-            return -1;
-        }
-    }
+	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
+	    || !driver->playback_handle) {
+		if ((err = snd_pcm_prepare (driver->capture_handle)) < 0) {
+			jack_error ("ALSA: prepare error for capture on \"%s\""
+				    " (%s)", driver->alsa_name_capture,
+				    snd_strerror(err));
+			return -1;
+		}
+	}
 
-    if (driver->hw_monitoring) {
-        if (driver->input_monitor_mask || driver->all_monitor_in) {
-            if (driver->all_monitor_in) {
-                driver->hw->set_input_monitor_mask (driver->hw, ~0U);
-            } else {
-                driver->hw->set_input_monitor_mask (
-                    driver->hw, driver->input_monitor_mask);
-            }
-        } else {
-            driver->hw->set_input_monitor_mask (driver->hw,
-                                                driver->input_monitor_mask);
-        }
-    }
+	if (driver->hw_monitoring) {
+		if (driver->input_monitor_mask || driver->all_monitor_in) {
+			if (driver->all_monitor_in) {
+				driver->hw->set_input_monitor_mask (driver->hw, ~0U);
+			} else {
+				driver->hw->set_input_monitor_mask (
+					driver->hw, driver->input_monitor_mask);
+			}
+		} else {
+			driver->hw->set_input_monitor_mask (driver->hw,
+							    driver->input_monitor_mask);
+		}
+	}
 
-    if (driver->playback_handle) {
-        driver->playback_nfds =
-            snd_pcm_poll_descriptors_count (driver->playback_handle);
-    } else {
-        driver->playback_nfds = 0;
-    }
+	if (driver->playback_handle) {
+		driver->playback_nfds =
+			snd_pcm_poll_descriptors_count (driver->playback_handle);
+	} else {
+		driver->playback_nfds = 0;
+	}
 
-    if (driver->capture_handle) {
-        driver->capture_nfds =
-            snd_pcm_poll_descriptors_count (driver->capture_handle);
-    } else {
-        driver->capture_nfds = 0;
-    }
+	if (driver->capture_handle) {
+		driver->capture_nfds =
+			snd_pcm_poll_descriptors_count (driver->capture_handle);
+	} else {
+		driver->capture_nfds = 0;
+	}
 
-    if (driver->pfd) {
-        free (driver->pfd);
-    }
+	if (driver->pfd) {
+		free (driver->pfd);
+	}
 
-    driver->pfd = (struct pollfd *)
-                  malloc (sizeof (struct pollfd) *
-                          (driver->playback_nfds + driver->capture_nfds + 2));
+	driver->pfd = (struct pollfd *)
+		malloc (sizeof (struct pollfd) * 
+			(driver->playback_nfds + driver->capture_nfds + 2));
 
-    if (driver->playback_handle) {
-        /* fill playback buffer with zeroes, and mark
-           all fragments as having data.
-        */
+	if (driver->playback_handle) {
+		/* fill playback buffer with zeroes, and mark 
+		   all fragments as having data.
+		*/
+		
+		pavail = snd_pcm_avail_update (driver->playback_handle);
 
-        pavail = snd_pcm_avail_update (driver->playback_handle);
+		if (pavail !=
+		    driver->frames_per_cycle * driver->playback_nperiods) {
+			jack_error ("ALSA: full buffer not available at start");
+			return -1;
+		}
+	
+		if (alsa_driver_get_channel_addresses (driver,
+					0, &pavail, 0, &poffset)) {
+			return -1;
+		}
 
-        if (pavail !=
-                driver->frames_per_cycle * driver->playback_nperiods) {
-            jack_error ("ALSA: full buffer not available at start");
-            return -1;
-        }
+		/* XXX this is cheating. ALSA offers no guarantee that
+		   we can access the entire buffer at any one time. It
+		   works on most hardware tested so far, however, buts
+		   its a liability in the long run. I think that
+		   alsa-lib may have a better function for doing this
+		   here, where the goal is to silence the entire
+		   buffer.
+		*/
+		
+		for (chn = 0; chn < driver->playback_nchannels; chn++) {
+			alsa_driver_silence_on_channel (
+				driver, chn,
+				driver->user_nperiods
+				* driver->frames_per_cycle);
+		}
+		
+		snd_pcm_mmap_commit (driver->playback_handle, poffset,
+				     driver->user_nperiods
+				     * driver->frames_per_cycle);
+		
+		if ((err = snd_pcm_start (driver->playback_handle)) < 0) {
+			jack_error ("ALSA: could not start playback (%s)",
+				    snd_strerror (err));
+			return -1;
+		}
+	}
 
-        if (alsa_driver_get_channel_addresses (driver,
-                                               0, &pavail, 0, &poffset)) {
-            return -1;
-        }
-
-        /* XXX this is cheating. ALSA offers no guarantee that
-           we can access the entire buffer at any one time. It
-           works on most hardware tested so far, however, buts
-           its a liability in the long run. I think that
-           alsa-lib may have a better function for doing this
-           here, where the goal is to silence the entire
-           buffer.
-        */
-
-        for (chn = 0; chn < driver->playback_nchannels; chn++) {
-            alsa_driver_silence_on_channel (
-                driver, chn,
-                driver->user_nperiods
-                * driver->frames_per_cycle);
-        }
-
-        snd_pcm_mmap_commit (driver->playback_handle, poffset,
-                             driver->user_nperiods
-                             * driver->frames_per_cycle);
-
-        if ((err = snd_pcm_start (driver->playback_handle)) < 0) {
-            jack_error ("ALSA: could not start playback (%s)",
-                        snd_strerror (err));
-            return -1;
-        }
-    }
-
-    if ((driver->capture_handle && driver->capture_and_playback_not_synced)
-            || !driver->playback_handle) {
-        if ((err = snd_pcm_start (driver->capture_handle)) < 0) {
-            jack_error ("ALSA: could not start capture (%s)",
-                        snd_strerror (err));
-            return -1;
-        }
-    }
-
-    return 0;
+	if ((driver->capture_handle && driver->capture_and_playback_not_synced)
+	    || !driver->playback_handle) {
+		if ((err = snd_pcm_start (driver->capture_handle)) < 0) {
+			jack_error ("ALSA: could not start capture (%s)",
+				    snd_strerror (err));
+			return -1;
+		}
+	}
+			
+	return 0;
 }
 
 int
@@ -1145,6 +1151,374 @@ JackAlsaDriver::alsa_driver_stop (alsa_driver_t *driver)
     }
 
     return 0;
+}
+
+int
+JackAlsaDriver::alsa_driver_restart (alsa_driver_t *driver)
+{
+    // steph
+    /*
+    	if (driver->nt_stop((struct _jack_driver_nt *) driver))
+    	    return -1;
+    	return driver->nt_start((struct _jack_driver_nt *) driver);
+    */
+
+    if (Stop())
+        return -1;
+    return Start();
+}
+
+int
+JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
+{
+    snd_pcm_status_t *status;
+    int res;
+
+    jack_error("alsa_driver_xrun_recovery ");
+
+    snd_pcm_status_alloca(&status);
+
+    if (driver->capture_handle) {
+        if ((res = snd_pcm_status(driver->capture_handle, status))
+                < 0) {
+            jack_error("status error: %s", snd_strerror(res));
+        }
+    } else {
+        if ((res = snd_pcm_status(driver->playback_handle, status))
+                < 0) {
+            jack_error("status error: %s", snd_strerror(res));
+        }
+    }
+
+    if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
+            // && driver->process_count > XRUN_REPORT_DELAY) { // steph
+            && driver->process_count > 10) {
+        struct timeval now, diff, tstamp;
+        driver->xrun_count++;
+        gettimeofday(&now, 0);
+        snd_pcm_status_get_trigger_tstamp(status, &tstamp);
+        timersub(&now, &tstamp, &diff);
+        *delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
+
+        // steph: utiliser une version TR
+        jack_error("\n\n**** alsa_pcm: xrun of at least %.3f msecs\n\n", *delayed_usecs / 1000.0);
+    }
+
+    if (alsa_driver_restart (driver)) {
+        return -1;
+    }
+    return 0;
+}
+
+void
+JackAlsaDriver::alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
+        jack_nframes_t nframes)
+{
+    channel_t chn;
+    jack_nframes_t buffer_frames =
+        driver->frames_per_cycle * driver->playback_nperiods;
+
+    for (chn = 0; chn < driver->playback_nchannels; chn++) {
+        if (bitset_contains (driver->channels_not_done, chn)) {
+            if (driver->silent[chn] < buffer_frames) {
+                alsa_driver_silence_on_channel_no_mark (
+                    driver, chn, nframes);
+                driver->silent[chn] += nframes;
+            }
+        }
+    }
+}
+
+jack_nframes_t
+JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
+                                  *delayed_usecs)
+{
+    snd_pcm_sframes_t avail = 0;
+    snd_pcm_sframes_t capture_avail = 0;
+    snd_pcm_sframes_t playback_avail = 0;
+    int xrun_detected = FALSE;
+    int need_capture;
+    int need_playback;
+    unsigned int i;
+    jack_time_t poll_enter;
+    jack_time_t poll_ret = 0;
+
+    *status = -1;
+    *delayed_usecs = 0;
+
+    need_capture = driver->capture_handle ? 1 : 0;
+
+    if (extra_fd >= 0) {
+        need_playback = 0;
+    } else {
+        need_playback = driver->playback_handle ? 1 : 0;
+    }
+
+    // steph
+    // again:
+
+    while (need_playback || need_capture) {
+
+        unsigned int p_timed_out, c_timed_out;
+        unsigned int ci = 0;
+        unsigned int nfds;
+
+        nfds = 0;
+
+        if (need_playback) {
+            snd_pcm_poll_descriptors (driver->playback_handle,
+                                      &driver->pfd[0],
+                                      driver->playback_nfds);
+            nfds += driver->playback_nfds;
+        }
+
+        if (need_capture) {
+            snd_pcm_poll_descriptors (driver->capture_handle,
+                                      &driver->pfd[nfds],
+                                      driver->capture_nfds);
+            ci = nfds;
+            nfds += driver->capture_nfds;
+        }
+
+        /* ALSA doesn't set POLLERR in some versions of 0.9.X */
+
+        for (i = 0; i < nfds; i++) {
+            driver->pfd[i].events |= POLLERR;
+        }
+
+        if (extra_fd >= 0) {
+            driver->pfd[nfds].fd = extra_fd;
+            driver->pfd[nfds].events =
+                POLLIN | POLLERR | POLLHUP | POLLNVAL;
+            nfds++;
+        }
+
+        poll_enter = jack_get_microseconds ();
+
+        if (poll_enter > driver->poll_next) {
+            /*
+             * This processing cycle was delayed past the
+             * next due interrupt!  Do not account this as
+             * a wakeup delay:
+             */
+            driver->poll_next = 0;
+            driver->poll_late++;
+        }
+
+        if (poll (driver->pfd, nfds, driver->poll_timeout) < 0) {
+
+            if (errno == EINTR) {
+                printf ("poll interrupt\n");
+                // this happens mostly when run
+                // under gdb, or when exiting due to a signal
+                // steph
+                /*
+                if (under_gdb) {
+                	goto again;
+                }
+                */
+                *status = -2;
+                return 0;
+            }
+
+            jack_error ("ALSA: poll call failed (%s)",
+                        strerror (errno));
+            *status = -3;
+            return 0;
+
+        }
+
+        poll_ret = jack_get_microseconds ();
+        // steph
+        fLastWaitUst = poll_ret;
+
+        if (extra_fd < 0) {
+            if (driver->poll_next && poll_ret > driver->poll_next) {
+                *delayed_usecs = poll_ret - driver->poll_next;
+            }
+            driver->poll_last = poll_ret;
+            driver->poll_next = poll_ret + driver->period_usecs;
+
+            // steph
+            /*
+            driver->engine->transport_cycle_start (driver->engine, 
+            				       poll_ret);
+            */
+
+        }
+
+#ifdef DEBUG_WAKEUP
+        fprintf (stderr, "%" PRIu64 ": checked %d fds, %" PRIu64
+                 " usecs since poll entered\n", poll_ret, nfds,
+                 poll_ret - poll_enter);
+#endif
+
+        /* check to see if it was the extra FD that caused us
+         * to return from poll */
+
+        if (extra_fd >= 0) {
+
+            if (driver->pfd[nfds - 1].revents == 0) {
+                /* we timed out on the extra fd */
+
+                *status = -4;
+
+                // steph (cannot return negative value....)
+                // return -1;
+                return 0;
+            }
+
+            /* if POLLIN was the only bit set, we're OK */
+
+            *status = 0;
+            return (driver->pfd[nfds - 1].revents == POLLIN) ? 0 : -1;
+        }
+
+        p_timed_out = 0;
+
+        if (need_playback) {
+            for (i = 0; i < driver->playback_nfds; i++) {
+                if (driver->pfd[i].revents & POLLERR) {
+                    xrun_detected = TRUE;
+                }
+
+                if (driver->pfd[i].revents == 0) {
+                    p_timed_out++;
+#ifdef DEBUG_WAKEUP
+
+                    fprintf (stderr, "%" PRIu64
+                             " playback stream timed out\n",
+                             poll_ret);
+#endif
+
+                }
+            }
+
+            if (p_timed_out == 0) {
+                need_playback = 0;
+#ifdef DEBUG_WAKEUP
+
+                fprintf (stderr, "%" PRIu64
+                         " playback stream ready\n",
+                         poll_ret);
+#endif
+
+            }
+        }
+
+        c_timed_out = 0;
+
+        if (need_capture) {
+            for (i = ci; i < nfds; i++) {
+                if (driver->pfd[i].revents & POLLERR) {
+                    xrun_detected = TRUE;
+                }
+
+                if (driver->pfd[i].revents == 0) {
+                    c_timed_out++;
+#ifdef DEBUG_WAKEUP
+
+                    fprintf (stderr, "%" PRIu64
+                             " capture stream timed out\n",
+                             poll_ret);
+#endif
+
+                }
+            }
+
+            if (c_timed_out == 0) {
+                need_capture = 0;
+#ifdef DEBUG_WAKEUP
+
+                fprintf (stderr, "%" PRIu64
+                         " capture stream ready\n",
+                         poll_ret);
+#endif
+
+            }
+        }
+
+        if ((p_timed_out && (p_timed_out == driver->playback_nfds)) &&
+                (c_timed_out && (c_timed_out == driver->capture_nfds))) {
+            // steph
+            /*
+            jack_error ("ALSA: poll time out, polled for %" PRIu64
+            	    " usecs",
+            	    poll_ret - poll_enter);
+            */
+            *status = -5;
+            return 0;
+        }
+
+    }
+
+    if (driver->capture_handle) {
+        if ((capture_avail = snd_pcm_avail_update (
+                                 driver->capture_handle)) < 0) {
+            if (capture_avail == -EPIPE) {
+                xrun_detected = TRUE;
+            } else {
+                jack_error ("unknown ALSA avail_update return"
+                            " value (%u)", capture_avail);
+            }
+        }
+    } else {
+        /* odd, but see min() computation below */
+        capture_avail = INT_MAX;
+    }
+
+    if (driver->playback_handle) {
+        if ((playback_avail = snd_pcm_avail_update (
+                                  driver->playback_handle)) < 0) {
+            if (playback_avail == -EPIPE) {
+                xrun_detected = TRUE;
+            } else {
+                jack_error ("unknown ALSA avail_update return"
+                            " value (%u)", playback_avail);
+            }
+        }
+    } else {
+        /* odd, but see min() computation below */
+        playback_avail = INT_MAX;
+    }
+
+    if (xrun_detected) {
+        *status = alsa_driver_xrun_recovery (driver, delayed_usecs);
+        return 0;
+    }
+
+    *status = 0;
+    driver->last_wait_ust = poll_ret;
+
+    avail = capture_avail < playback_avail ? capture_avail : playback_avail;
+
+#ifdef DEBUG_WAKEUP
+
+    fprintf (stderr, "wakeup complete, avail = %lu, pavail = %lu "
+             "cavail = %lu\n",
+             avail, playback_avail, capture_avail);
+#endif
+
+    /* mark all channels not done for now. read/write will change this */
+
+    bitset_copy (driver->channels_not_done, driver->channels_done);
+
+    /* constrain the available count to the nearest (round down) number of
+       periods.
+    */
+
+    return avail - (avail % driver->frames_per_cycle);
+}
+
+int JackAlsaDriver::SetBufferSize(jack_nframes_t nframes)
+{
+    JackLog("JackAlsaDriver::SetBufferSize %ld\n", nframes);
+    fEngineControl->fBufferSize = nframes;
+    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
+
+    return alsa_driver_reset_parameters ((alsa_driver_t *)fDriver, nframes,
+                                         ((alsa_driver_t *)fDriver)->user_nperiods,
+                                         ((alsa_driver_t *)fDriver)->frame_rate);
 }
 
 int
@@ -1894,373 +2268,6 @@ int JackAlsaDriver::Write()
     return res;
 }
 
-int JackAlsaDriver::SetBufferSize(jack_nframes_t nframes)
-{
-    JackLog("JackAlsaDriver::SetBufferSize %ld\n", nframes);
-    fEngineControl->fBufferSize = nframes;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-
-    return alsa_driver_reset_parameters ((alsa_driver_t *)fDriver, nframes,
-                                         ((alsa_driver_t *)fDriver)->user_nperiods,
-                                         ((alsa_driver_t *)fDriver)->frame_rate);
-}
-
-void
-JackAlsaDriver::alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
-        jack_nframes_t nframes)
-{
-    channel_t chn;
-    jack_nframes_t buffer_frames =
-        driver->frames_per_cycle * driver->playback_nperiods;
-
-    for (chn = 0; chn < driver->playback_nchannels; chn++) {
-        if (bitset_contains (driver->channels_not_done, chn)) {
-            if (driver->silent[chn] < buffer_frames) {
-                alsa_driver_silence_on_channel_no_mark (
-                    driver, chn, nframes);
-                driver->silent[chn] += nframes;
-            }
-        }
-    }
-}
-
-jack_nframes_t
-JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
-                                  *delayed_usecs)
-{
-    snd_pcm_sframes_t avail = 0;
-    snd_pcm_sframes_t capture_avail = 0;
-    snd_pcm_sframes_t playback_avail = 0;
-    int xrun_detected = FALSE;
-    int need_capture;
-    int need_playback;
-    unsigned int i;
-    jack_time_t poll_enter;
-    jack_time_t poll_ret = 0;
-
-    *status = -1;
-    *delayed_usecs = 0;
-
-    need_capture = driver->capture_handle ? 1 : 0;
-
-    if (extra_fd >= 0) {
-        need_playback = 0;
-    } else {
-        need_playback = driver->playback_handle ? 1 : 0;
-    }
-
-    // steph
-    // again:
-
-    while (need_playback || need_capture) {
-
-        unsigned int p_timed_out, c_timed_out;
-        unsigned int ci = 0;
-        unsigned int nfds;
-
-        nfds = 0;
-
-        if (need_playback) {
-            snd_pcm_poll_descriptors (driver->playback_handle,
-                                      &driver->pfd[0],
-                                      driver->playback_nfds);
-            nfds += driver->playback_nfds;
-        }
-
-        if (need_capture) {
-            snd_pcm_poll_descriptors (driver->capture_handle,
-                                      &driver->pfd[nfds],
-                                      driver->capture_nfds);
-            ci = nfds;
-            nfds += driver->capture_nfds;
-        }
-
-        /* ALSA doesn't set POLLERR in some versions of 0.9.X */
-
-        for (i = 0; i < nfds; i++) {
-            driver->pfd[i].events |= POLLERR;
-        }
-
-        if (extra_fd >= 0) {
-            driver->pfd[nfds].fd = extra_fd;
-            driver->pfd[nfds].events =
-                POLLIN | POLLERR | POLLHUP | POLLNVAL;
-            nfds++;
-        }
-
-        poll_enter = jack_get_microseconds ();
-
-        if (poll_enter > driver->poll_next) {
-            /*
-             * This processing cycle was delayed past the
-             * next due interrupt!  Do not account this as
-             * a wakeup delay:
-             */
-            driver->poll_next = 0;
-            driver->poll_late++;
-        }
-
-        if (poll (driver->pfd, nfds, driver->poll_timeout) < 0) {
-
-            if (errno == EINTR) {
-                printf ("poll interrupt\n");
-                // this happens mostly when run
-                // under gdb, or when exiting due to a signal
-                // steph
-                /*
-                if (under_gdb) {
-                	goto again;
-                }
-                */
-                *status = -2;
-                return 0;
-            }
-
-            jack_error ("ALSA: poll call failed (%s)",
-                        strerror (errno));
-            *status = -3;
-            return 0;
-
-        }
-
-        poll_ret = jack_get_microseconds ();
-        // steph
-        fLastWaitUst = poll_ret;
-
-        if (extra_fd < 0) {
-            if (driver->poll_next && poll_ret > driver->poll_next) {
-                *delayed_usecs = poll_ret - driver->poll_next;
-            }
-            driver->poll_last = poll_ret;
-            driver->poll_next = poll_ret + driver->period_usecs;
-
-            // steph
-            /*
-            driver->engine->transport_cycle_start (driver->engine, 
-            				       poll_ret);
-            */
-
-        }
-
-#ifdef DEBUG_WAKEUP
-        fprintf (stderr, "%" PRIu64 ": checked %d fds, %" PRIu64
-                 " usecs since poll entered\n", poll_ret, nfds,
-                 poll_ret - poll_enter);
-#endif
-
-        /* check to see if it was the extra FD that caused us
-         * to return from poll */
-
-        if (extra_fd >= 0) {
-
-            if (driver->pfd[nfds - 1].revents == 0) {
-                /* we timed out on the extra fd */
-
-                *status = -4;
-
-                // steph (cannot return negative value....)
-                // return -1;
-                return 0;
-            }
-
-            /* if POLLIN was the only bit set, we're OK */
-
-            *status = 0;
-            return (driver->pfd[nfds - 1].revents == POLLIN) ? 0 : -1;
-        }
-
-        p_timed_out = 0;
-
-        if (need_playback) {
-            for (i = 0; i < driver->playback_nfds; i++) {
-                if (driver->pfd[i].revents & POLLERR) {
-                    xrun_detected = TRUE;
-                }
-
-                if (driver->pfd[i].revents == 0) {
-                    p_timed_out++;
-#ifdef DEBUG_WAKEUP
-
-                    fprintf (stderr, "%" PRIu64
-                             " playback stream timed out\n",
-                             poll_ret);
-#endif
-
-                }
-            }
-
-            if (p_timed_out == 0) {
-                need_playback = 0;
-#ifdef DEBUG_WAKEUP
-
-                fprintf (stderr, "%" PRIu64
-                         " playback stream ready\n",
-                         poll_ret);
-#endif
-
-            }
-        }
-
-        c_timed_out = 0;
-
-        if (need_capture) {
-            for (i = ci; i < nfds; i++) {
-                if (driver->pfd[i].revents & POLLERR) {
-                    xrun_detected = TRUE;
-                }
-
-                if (driver->pfd[i].revents == 0) {
-                    c_timed_out++;
-#ifdef DEBUG_WAKEUP
-
-                    fprintf (stderr, "%" PRIu64
-                             " capture stream timed out\n",
-                             poll_ret);
-#endif
-
-                }
-            }
-
-            if (c_timed_out == 0) {
-                need_capture = 0;
-#ifdef DEBUG_WAKEUP
-
-                fprintf (stderr, "%" PRIu64
-                         " capture stream ready\n",
-                         poll_ret);
-#endif
-
-            }
-        }
-
-        if ((p_timed_out && (p_timed_out == driver->playback_nfds)) &&
-                (c_timed_out && (c_timed_out == driver->capture_nfds))) {
-            // steph
-            /*
-            jack_error ("ALSA: poll time out, polled for %" PRIu64
-            	    " usecs",
-            	    poll_ret - poll_enter);
-            */
-            *status = -5;
-            return 0;
-        }
-
-    }
-
-    if (driver->capture_handle) {
-        if ((capture_avail = snd_pcm_avail_update (
-                                 driver->capture_handle)) < 0) {
-            if (capture_avail == -EPIPE) {
-                xrun_detected = TRUE;
-            } else {
-                jack_error ("unknown ALSA avail_update return"
-                            " value (%u)", capture_avail);
-            }
-        }
-    } else {
-        /* odd, but see min() computation below */
-        capture_avail = INT_MAX;
-    }
-
-    if (driver->playback_handle) {
-        if ((playback_avail = snd_pcm_avail_update (
-                                  driver->playback_handle)) < 0) {
-            if (playback_avail == -EPIPE) {
-                xrun_detected = TRUE;
-            } else {
-                jack_error ("unknown ALSA avail_update return"
-                            " value (%u)", playback_avail);
-            }
-        }
-    } else {
-        /* odd, but see min() computation below */
-        playback_avail = INT_MAX;
-    }
-
-    if (xrun_detected) {
-        *status = alsa_driver_xrun_recovery (driver, delayed_usecs);
-        return 0;
-    }
-
-    *status = 0;
-    driver->last_wait_ust = poll_ret;
-
-    avail = capture_avail < playback_avail ? capture_avail : playback_avail;
-
-#ifdef DEBUG_WAKEUP
-
-    fprintf (stderr, "wakeup complete, avail = %lu, pavail = %lu "
-             "cavail = %lu\n",
-             avail, playback_avail, capture_avail);
-#endif
-
-    /* mark all channels not done for now. read/write will change this */
-
-    bitset_copy (driver->channels_not_done, driver->channels_done);
-
-    /* constrain the available count to the nearest (round down) number of
-       periods.
-    */
-
-    return avail - (avail % driver->frames_per_cycle);
-}
-
-int
-JackAlsaDriver::alsa_driver_restart (alsa_driver_t *driver)
-{
-    // steph
-    /*
-    	if (driver->nt_stop((struct _jack_driver_nt *) driver))
-    	    return -1;
-    	return driver->nt_start((struct _jack_driver_nt *) driver);
-    */
-
-    if (Stop())
-        return -1;
-    return Start();
-}
-
-int
-JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
-{
-    snd_pcm_status_t *status;
-    int res;
-
-    jack_error("alsa_driver_xrun_recovery ");
-
-    snd_pcm_status_alloca(&status);
-
-    if (driver->capture_handle) {
-        if ((res = snd_pcm_status(driver->capture_handle, status))
-                < 0) {
-            jack_error("status error: %s", snd_strerror(res));
-        }
-    } else {
-        if ((res = snd_pcm_status(driver->playback_handle, status))
-                < 0) {
-            jack_error("status error: %s", snd_strerror(res));
-        }
-    }
-
-    if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
-            // && driver->process_count > XRUN_REPORT_DELAY) { // steph
-            && driver->process_count > 10) {
-        struct timeval now, diff, tstamp;
-        driver->xrun_count++;
-        gettimeofday(&now, 0);
-        snd_pcm_status_get_trigger_tstamp(status, &tstamp);
-        timersub(&now, &tstamp, &diff);
-        *delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
-
-        // steph: utiliser une version TR
-        jack_error("\n\n**** alsa_pcm: xrun of at least %.3f msecs\n\n", *delayed_usecs / 1000.0);
-    }
-
-    if (alsa_driver_restart (driver)) {
-        return -1;
-    }
-    return 0;
-}
 
 void
 JackAlsaDriver::jack_driver_init (jack_driver_t *driver)

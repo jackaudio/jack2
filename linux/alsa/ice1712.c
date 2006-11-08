@@ -34,7 +34,7 @@ static int
 ice1712_hw_monitor_toggle(jack_hardware_t *hw, int idx, int onoff)
 
 {
-        ice1712_t *h = (ice1712_t *) hw->private_hw;
+        ice1712_t *h = (ice1712_t *) hw->private;
 	snd_ctl_elem_value_t *val;
 	int err;
 	
@@ -66,7 +66,7 @@ ice1712_set_input_monitor_mask (jack_hardware_t *hw, unsigned long mask)
      
 {
 	int idx;
-	ice1712_t *h = (ice1712_t *) hw->private_hw;
+	ice1712_t *h = (ice1712_t *) hw->private;
 	
 	for (idx = 0; idx < 10; idx++) {
 		if (h->active_channels & (1<<idx)) {
@@ -88,7 +88,7 @@ ice1712_change_sample_clock (jack_hardware_t *hw, SampleClockMode mode)
 static void
 ice1712_release (jack_hardware_t *hw)
 {
-	ice1712_t *h = (ice1712_t *) hw->private_hw;
+	ice1712_t *h = (ice1712_t *) hw->private;
 	
 	if (h == 0)
 	return;
@@ -113,7 +113,7 @@ jack_alsa_ice1712_hw_new (alsa_driver_t *driver)
 
 	hw->capabilities = Cap_HardwareMonitoring;
 	hw->input_monitor_mask = 0;
-	hw->private_hw = 0;
+	hw->private = 0;
 
 	hw->set_input_monitor_mask = ice1712_set_input_monitor_mask;
 	hw->change_sample_clock = ice1712_change_sample_clock;
@@ -155,7 +155,7 @@ jack_alsa_ice1712_hw_new (alsa_driver_t *driver)
 	        h->active_channels |= 0x300U;
 	}
 	
-	hw->private_hw = h;
+	hw->private = h;
 
 	return hw;
 }
