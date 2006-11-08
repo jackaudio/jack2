@@ -182,7 +182,6 @@ extern "C"
 }
 #endif
 
-
 // Function definition
 
 typedef void* (*jack_port_get_buffer_fun_def)(jack_port_t* port, jack_nframes_t frames);
@@ -318,7 +317,6 @@ EXPORT void jack_on_shutdown(jack_client_t* ext_client, shutdown_fun callback, v
 {
     return jack_on_shutdown_fun(ext_client, callback, arg);
 }
-
 
 typedef int (*jack_set_process_callback_fun_def)(jack_client_t* ext_client, JackProcessCallback callback, void* arg);
 static jack_set_process_callback_fun_def jack_set_process_callback_fun = 0;
