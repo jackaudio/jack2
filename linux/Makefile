@@ -79,8 +79,8 @@ $(TARGET_LINUX_SERVER_LIB) : $(objects_common_server_lib)
 $(TARGET_LINUX_CLIENT_LIB) : $(objects_common_client_lib) $(objects_linux_lib)
 	$(CXX) $(CXXFLAGS) -shared $(objects_common_client_lib) $(objects_linux_lib) $(LIB_LINUX)  -o $(TARGET_LINUX_CLIENT_LIB)
 
-$(TARGET_LINUX_WRAPPER_LIB) : JackAPIWrapper.o
-	$(CXX) $(CXXFLAGS) -shared JackAPIWrapper.o -o $(TARGET_LINUX_WRAPPER_LIB)
+$(TARGET_LINUX_WRAPPER_LIB) : JackAPIWrapper.o ringbuffer.o
+	$(CXX) $(CXXFLAGS) -shared JackAPIWrapper.o ringbuffer.o -o $(TARGET_LINUX_WRAPPER_LIB)
 
 $(TARGET_LINUX_SERVER) : $(objects_linux_server)
 	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackdmp.so -o $(TARGET_LINUX_SERVER)
@@ -104,6 +104,20 @@ install:
 	cd $(prefix)/lib && rm -f libjack.so*
 	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so
 	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so.0
+	/sbin/ldconfig
+
+installw:
+	cp jackdmp $(prefix)/bin
+	cp libjackmp.so $(prefix)/lib
+	cp libjackdmp.so $(prefix)/lib
+	cp libjackwrapper.so $(prefix)/lib
+	install -d $(prefix)/lib/jackmp/
+	cp jack_alsa.so $(prefix)/lib/jackmp
+	cp jack_dummy.so $(prefix)/lib/jackmp
+	#cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
+	cd $(prefix)/lib && rm -f libjack.so*
+	cd $(prefix)/lib && ln -s libjackwrapper.so  libjack.so
+	cd $(prefix)/lib && ln -s libjackwrapper.so  libjack.so.0
 	/sbin/ldconfig
 
 
