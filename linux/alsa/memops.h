@@ -38,7 +38,6 @@ typedef struct {
     float rm1;
     unsigned int idx;
     float e[DITHER_BUF_SIZE];
-}
 } dither_state_t;
 
 #ifdef __cplusplus

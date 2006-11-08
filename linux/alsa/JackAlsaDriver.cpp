@@ -363,8 +363,7 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 			driver->read_via_copy = driver->quirk_bswap?
 				sample_move_dS_s32u24s : sample_move_dS_s32u24;
 			break;
-		}
-    }
+	}
 }
 
 int
@@ -454,9 +453,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 					       &frame_rate, NULL) ;
 	driver->frame_rate = frame_rate ;
 	if (err < 0) {
-		jack_error ("ALSA: cannot set sample/frame rate to %"
-			    PRIu32 " for %s", driver->frame_rate,
-			    stream_name);
+		jack_error ("ALSA: cannot set sample/frame rate to %ld for %s", driver->frame_rate, stream_name);
 		return -1;
 	}
 	if (!*nchns) {
@@ -499,9 +496,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 						      driver->frames_per_cycle,
 						      0))
 	    < 0) {
-		jack_error ("ALSA: cannot set period size to %" PRIu32
-			    " frames for %s", driver->frames_per_cycle,
-			    stream_name);
+		jack_error ("ALSA: cannot set period size to %ld frames for %s", driver->frames_per_cycle, stream_name);
 		return -1;
 	}
 
@@ -524,19 +519,18 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 	}
 	jack_error ("ALSA: use %d periods for %s", *nperiodsp, stream_name);
 	
+/*
 	if (!jack_power_of_two(driver->frames_per_cycle)) {
 		jack_error("JACK: frames must be a power of two "
 			   "(64, 512, 1024, ...)\n");
 		return -1;
 	}
-
+*/
 	if ((err = snd_pcm_hw_params_set_buffer_size (handle, hw_params,
 						      *nperiodsp *
 						      driver->frames_per_cycle))
 	    < 0) {
-		jack_error ("ALSA: cannot set buffer length to %" PRIu32
-			    " for %s",
-			    *nperiodsp * driver->frames_per_cycle,
+		jack_error ("ALSA: cannot set buffer length to %ld for %s", *nperiodsp * driver->frames_per_cycle,
 			    stream_name);
 		return -1;
 	}

@@ -89,7 +89,7 @@ set_control_id (snd_ctl_elem_id_t *ctl, const char *name)
 static int hdsp_set_mixer_gain(jack_hardware_t *hw, int input_channel,
 			       int output_channel, int gain)
 {
-	hdsp_t *h = (hdsp_t *) hw->private;
+	hdsp_t *h = (hdsp_t *) hw->private_hw;
 	snd_ctl_elem_value_t *ctl;
 	snd_ctl_elem_id_t *ctl_id;
 	int err;
@@ -194,7 +194,7 @@ static double hdsp_get_hardware_power (jack_port_t *port, jack_nframes_t frame)
 static void
 hdsp_release (jack_hardware_t *hw)
 {
-	hdsp_t *h = (hdsp_t *) hw->private;
+	hdsp_t *h = (hdsp_t *) hw->private_hw;
 
 	if (h != 0) {
 	  free (h);
@@ -204,7 +204,6 @@ hdsp_release (jack_hardware_t *hw)
 /* Mostly copied directly from hammerfall.c */
 jack_hardware_t *
 jack_alsa_hdsp_hw_new (alsa_driver_t *driver)
-
 {
 	jack_hardware_t *hw;
 	hdsp_t *h;
@@ -216,7 +215,7 @@ jack_alsa_hdsp_hw_new (alsa_driver_t *driver)
 	/* hw->capabilities = Cap_HardwareMonitoring|Cap_AutoSync|Cap_WordClock|Cap_ClockMaster|Cap_ClockLockReporting; */
 	hw->capabilities = Cap_HardwareMonitoring | Cap_HardwareMetering;
 	hw->input_monitor_mask = 0;
-	hw->private = 0;
+	hw->private_hw = 0;
 
 	hw->set_input_monitor_mask = hdsp_set_input_monitor_mask;
 	hw->change_sample_clock = hdsp_change_sample_clock;
@@ -226,7 +225,7 @@ jack_alsa_hdsp_hw_new (alsa_driver_t *driver)
 	
 	h = (hdsp_t *) malloc (sizeof (hdsp_t));
 	h->driver = driver;
-	hw->private = h;
+	hw->private_hw = h;
 
 	return hw;
 }

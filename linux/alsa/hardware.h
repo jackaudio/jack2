@@ -21,8 +21,6 @@
 #ifndef __jack_hardware_h__
 #define __jack_hardware_h__
 
-//#include <jack/types.h>
-
 #include "types.h"
 
 typedef	enum {
@@ -48,10 +46,8 @@ typedef int (*JackHardwareChangeSampleClockFunction)(struct _jack_hardware *, Sa
 typedef double (*JackHardwareGetHardwarePeak)(jack_port_t *port, jack_nframes_t frames);
 typedef double (*JackHardwareGetHardwarePower)(jack_port_t *port, jack_nframes_t frames);
 
-
 typedef struct _jack_hardware
 {
-
     unsigned long capabilities;
     unsigned long input_monitor_mask;
 
@@ -60,8 +56,7 @@ typedef struct _jack_hardware
     JackHardwareReleaseFunction release;
     JackHardwareGetHardwarePeak get_hardware_peak;
     JackHardwareGetHardwarePower get_hardware_power;
-    void *private_hw;
-
+ 	void *private_hw;
 }
 jack_hardware_t;
 
