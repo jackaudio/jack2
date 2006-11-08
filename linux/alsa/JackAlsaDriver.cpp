@@ -2066,7 +2066,6 @@ JackAlsaDriver::alsa_driver_new (char *name, char *playback_alsa_device,
     }
 
     driver->client = client;
-
     return (jack_driver_t *) driver;
 }
 
@@ -2267,7 +2266,6 @@ int JackAlsaDriver::Write()
     */ 
     return res;
 }
-
 
 void
 JackAlsaDriver::jack_driver_init (jack_driver_t *driver)
