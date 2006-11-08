@@ -180,7 +180,7 @@ extern "C"
             jack_status_t *status, ...);
     EXPORT jack_status_t jack_internal_client_unload (jack_client_t *client,
             jack_intclient_t intclient);
-
+			
 #ifdef __cplusplus
 }
 #endif

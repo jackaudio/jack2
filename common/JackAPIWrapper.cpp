@@ -750,7 +750,6 @@ EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, c
     return jack_internal_client_handle_fun(ext_client, client_name, status);
 }
 
-// to check
 typedef jack_intclient_t (*jack_internal_client_load_fun_def)(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...);
 static jack_internal_client_load_fun_def jack_internal_client_load_fun = 0;
 EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
@@ -770,11 +769,20 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 }
 
 // client
+static long gClientCount = 0;
+static void* gLibrary = 0;
+static bool init_library();
+static bool open_library();
+static void close_library();
 
 typedef jack_client_t * (*jack_client_open_fun_def)(const char *client_name, jack_options_t options, jack_status_t *status, ...);
 static jack_client_open_fun_def jack_client_open_fun = 0;
 EXPORT jack_client_t * jack_client_open(const char *client_name, jack_options_t options, jack_status_t *status, ...)
 {
+	// Library check...
+	if (!open_library()) 
+		return 0;
+		
 	va_list ap;
 	va_start(ap, status);
 	jack_client_t* res = jack_client_open_fun(client_name, options, status, ap);
@@ -786,6 +794,10 @@ typedef jack_client_t * (*jack_client_new_fun_def)(const char *client_name);
 static jack_client_new_fun_def jack_client_new_fun = 0;
 EXPORT jack_client_t * jack_client_new(const char *client_name)
 {
+	// Library check...
+	if (!open_library()) 
+		return 0;
+		
 	return jack_client_new_fun(client_name);
 }
 
@@ -793,100 +805,161 @@ typedef int (*jack_client_close_fun_def)(jack_client_t *client);
 static jack_client_close_fun_def jack_client_close_fun = 0;
 EXPORT int jack_client_close(jack_client_t *client)
 {
+	close_library();
 	return jack_client_close_fun(client);
 }
 
 // Library loader
-bool init_library(bool mp)
+static bool open_library()
 {
-	void* library = (mp) ? dlopen("libjackmp.so", RTLD_LAZY) : dlopen("libjack.so", RTLD_LAZY);	
-	
-	if (!library) {
-		printf ("Jack ibrary not found\n");
-		return false;
+	if (gClientCount++ == 0) {
+		return init_library();
+	} else {
+		return true;
 	}
+}
+
+static void close_library()
+{
+	if (--gClientCount == 0) {
+		dlclose(gLibrary);
+	} 
+}
+
+static bool check_client(void* library)
+{
+	jack_client_t* client = 0; 
 	
-	jack_port_get_buffer_fun = (jack_port_get_buffer_fun_def)dlsym(library, "jack_port_get_buffer");
-	jack_port_name_fun = (jack_port_name_fun_def)dlsym(library, "jack_port_name");
-	jack_port_short_name_fun = (jack_port_short_name_fun_def)dlsym(library, "jack_port_short_name");
-	jack_port_flags_fun = (jack_port_flags_fun_def)dlsym(library, "jack_port_flags");
-	jack_port_type_fun = (jack_port_type_fun_def)dlsym(library, "jack_port_type");
-	jack_port_connected_fun = (jack_port_connected_fun_def)dlsym(library, "jack_port_connected");
-	jack_port_connected_to_fun = (jack_port_connected_to_fun_def)dlsym(library, "jack_port_connected_to");
-	jack_port_tie_fun = (jack_port_tie_fun_def)dlsym(library, "jack_port_tie");
-	jack_port_untie_fun = (jack_port_untie_fun_def)dlsym(library, "jack_port_untie");
-	jack_port_get_latency_fun = (jack_port_get_latency_fun_def)dlsym(library, "jack_port_get_latency");
-	jack_port_set_latency_fun = (jack_port_set_latency_fun_def)dlsym(library, "jack_port_set_latency");
-	jack_recompute_total_latencies_fun = (jack_recompute_total_latencies_fun_def)dlsym(library, "jack_recompute_total_latencies");
-	jack_port_set_name_fun = (jack_port_set_name_fun_def)dlsym(library, "jack_port_set_name");
-	jack_port_request_monitor_fun = (jack_port_request_monitor_fun_def)dlsym(library, "jack_port_request_monitor");
-	jack_port_request_monitor_by_name_fun = (jack_port_request_monitor_by_name_fun_def)dlsym(library, "jack_port_request_monitor_by_name");
-	jack_port_ensure_monitor_fun = (jack_port_ensure_monitor_fun_def)dlsym(library, "jack_port_ensure_monitor");
-	jack_port_monitoring_input_fun = (jack_port_monitoring_input_fun_def)dlsym(library, "jack_port_monitoring_input_fun");
-	jack_is_realtime_fun = (jack_is_realtime_fun_def)dlsym(library, "jack_is_realtime");
-	jack_on_shutdown_fun = (jack_on_shutdown_fun_def)dlsym(library, "jack_on_shutdown");
-	jack_set_process_callback_fun = (jack_set_process_callback_fun_def)dlsym(library, "jack_set_process_callback");
-	jack_set_freewheel_fun = (jack_set_freewheel_fun_def)dlsym(library, "jack_set_freewheel");
-	jack_set_buffer_size_fun = (jack_set_buffer_size_fun_def)dlsym(library, "jack_set_buffer_size");
-	jack_set_buffer_size_callback_fun = (jack_set_buffer_size_callback_fun_def)dlsym(library, "jack_set_buffer_size_callback");
-	jack_set_sample_rate_callback_fun = (jack_set_sample_rate_callback_fun_def)dlsym(library, "jack_set_sample_rate_callback");
-	jack_set_port_registration_callback_fun = (jack_set_port_registration_callback_fun_def)dlsym(library, "jack_set_port_registration_callback");
-	jack_set_graph_order_callback_fun = (jack_set_graph_order_callback_fun_def)dlsym(library, "jack_set_graph_order_callback");
-	jack_set_xrun_callback_fun = (jack_set_xrun_callback_fun_def)dlsym(library, "jack_set_xrun_callback");
-	jack_set_thread_init_callback_fun = (jack_set_thread_init_callback_fun_def)dlsym(library, "jack_set_thread_init_callback");
-	jack_activate_fun = (jack_activate_fun_def)dlsym(library, "jack_activate");
-	jack_deactivate_fun = (jack_deactivate_fun_def)dlsym(library, "jack_deactivate");
-	jack_port_register_fun = (jack_port_register_fun_def)dlsym(library, "jack_port_register");
-	jack_port_unregister_fun = (jack_port_unregister_fun_def)dlsym(library, "jack_port_unregister");
-	jack_port_is_mine_fun = (jack_port_is_mine_fun_def)dlsym(library, "jack_port_is_mine");
-	jack_port_get_connections_fun = (jack_port_get_connections_fun_def)dlsym(library, "jack_port_get_connections");
-	jack_port_get_all_connections_fun = (jack_port_get_all_connections_fun_def)dlsym(library, "jack_port_get_all_connections_fun");
-	jack_port_lock_fun = (jack_port_lock_fun_def)dlsym(library, "jack_port_lock");
-	jack_port_unlock_fun = (jack_port_unlock_fun_def)dlsym(library, "jack_port_unlock");
-	jack_port_get_total_latency_fun = (jack_port_get_total_latency_fun_def)dlsym(library, "jack_port_get_total_latency");
-	jack_connect_fun = (jack_connect_fun_def)dlsym(library, "jack_connect");
-	jack_disconnect_fun = (jack_disconnect_fun_def)dlsym(library, "jack_disconnect");
-	jack_port_connect_fun = (jack_port_connect_fun_def)dlsym(library, "jack_port_connect");
-	jack_port_disconnect_fun = (jack_port_disconnect_fun_def)dlsym(library, "jack_port_disconnect");
-	jack_get_sample_rate_fun = (jack_get_sample_rate_fun_def)dlsym(library, "jack_get_sample_rate");
-	jack_get_buffer_size_fun = (jack_get_buffer_size_fun_def)dlsym(library, "jack_get_buffer_size");
-	jack_get_ports_fun = (jack_get_ports_fun_def)dlsym(library, "jack_get_ports");
-	jack_port_by_name_fun = (jack_port_by_name_fun_def)dlsym(library, "jack_port_by_name");
-	jack_port_by_id_fun = (jack_port_by_id_fun_def)dlsym(library, "jack_port_by_id");
-	jack_engine_takeover_timebase_fun = (jack_engine_takeover_timebase_fun_def)dlsym(library, "jack_engine_takeover_timebase");
-	jack_frames_since_cycle_start_fun = (jack_frames_since_cycle_start_fun_def)dlsym(library, "jack_frames_since_cycle_start");
-	jack_frame_time_fun = (jack_frame_time_fun_def)dlsym(library, "jack_frame_time_fun");
-	jack_last_frame_time_fun = (jack_last_frame_time_fun_def)dlsym(library, "jack_last_frame_time");
-	jack_cpu_load_fun = (jack_cpu_load_fun_def)dlsym(library, "jack_cpu_load");
-	jack_client_thread_id_fun = (jack_client_thread_id_fun_def)dlsym(library, "jack_client_thread_id");
-	jack_get_client_name_fun = (jack_get_client_name_fun_def)dlsym(library, "jack_get_client_name");
-	jack_port_name_size_fun = (jack_port_name_size_fun_def)dlsym(library, "jack_port_name_size");
-	jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(library, "jack_client_name_size");
-	jack_release_timebase_fun = (jack_release_timebase_fun_def)dlsym(library, "jack_release_timebase");
-	jack_set_sync_callback_fun = (jack_set_sync_callback_fun_def)dlsym(library, "jack_set_sync_callback");
-	jack_set_sync_timeout_fun = (jack_set_sync_timeout_fun_def)dlsym(library, "jack_set_sync_timeout");
-	jack_set_timebase_callback_fun = (jack_set_timebase_callback_fun_def)dlsym(library, "jack_set_timebase_callback");
-	jack_transport_locate_fun = (jack_transport_locate_fun_def)dlsym(library, "jack_transport_locate_fun");
-	jack_transport_query_fun = (jack_transport_query_fun_def)dlsym(library, "jack_transport_query");
-	jack_get_current_transport_frame_fun = (jack_get_current_transport_frame_fun_def)dlsym(library, "jack_get_current_transport_frame");
-	jack_transport_reposition_fun = (jack_transport_reposition_fun_def)dlsym(library, "jack_transport_reposition");
-	jack_transport_start_fun = (jack_transport_start_fun_def)dlsym(library, "jack_transport_start");
-	jack_transport_stop_fun = (jack_transport_stop_fun_def)dlsym(library, "jack_transport_stop");
-	jack_get_transport_info_fun = (jack_get_transport_info_fun_def)dlsym(library, "jack_get_transport_info");
-	jack_set_transport_info_fun = (jack_set_transport_info_fun_def)dlsym(library, "jack_set_transport_info");
-	jack_get_max_delayed_usecs_fun = (jack_get_max_delayed_usecs_fun_def)dlsym(library, "jack_get_max_delayed_usecs");
-	jack_get_xrun_delayed_usecs_fun = (jack_get_xrun_delayed_usecs_fun_def)dlsym(library, "jack_get_xrun_delayed_usecs");
-	jack_reset_max_delayed_usecs_fun = (jack_reset_max_delayed_usecs_fun_def)dlsym(library, "jack_reset_max_delayed_usecs");
-	jack_acquire_real_time_scheduling_fun = (jack_acquire_real_time_scheduling_fun_def)dlsym(library, "jack_acquire_real_time_scheduling");
-	jack_client_create_thread_fun = (jack_client_create_thread_fun_def)dlsym(library, "jack_client_create_thread");
-	jack_drop_real_time_scheduling_fun = (jack_drop_real_time_scheduling_fun_def)dlsym(library, "jack_drop_real_time_scheduling");
-	jack_get_internal_client_name_fun = (jack_get_internal_client_name_fun_def)dlsym(library, "jack_get_internal_client_name");
-	jack_internal_client_handle_fun = (jack_internal_client_handle_fun_def)dlsym(library, "jack_internal_client_handle");
-	jack_internal_client_load_fun = (jack_internal_client_load_fun_def)dlsym(library, "jack_internal_client_load");
-	jack_internal_client_unload_fun = (jack_internal_client_unload_fun_def)dlsym(library, "jack_internal_client_unload");
-	jack_client_open_fun = (jack_client_open_fun_def)dlsym(library, "jack_client_open");
+	// Get "new" and "close" entry points...
 	jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
 	jack_client_close_fun = (jack_client_close_fun_def)dlsym(library, "jack_client_close");
+		
+	// Try opening a client...
+	if ((client = jack_client_new_fun("dummy"))) { // jackd server is running....
+		jack_client_close_fun(client);
+		return true;
+	} else {
+		return false;
+	}
+}
 
+static bool init_library()
+{
+	void* jackLibrary = dlopen("libjack.so", RTLD_LAZY);
+	void* jackmpLibrary = dlopen("libjackmp.so", RTLD_LAZY);
+	
+	if (jackLibrary) {
+		
+		if (check_client(jackLibrary)) { // jackd is running...
+			gLibrary = jackLibrary;
+			if (jackmpLibrary) dlclose(jackmpLibrary);
+		} else if (check_client(jackmpLibrary)) { // jackdmp is running...
+			gLibrary = jackmpLibrary;
+			if (jackLibrary) dlclose(jackLibrary);
+		} else {
+			goto error;
+		}
+		
+	} else if (jackmpLibrary) { 
+	
+		if (check_client(jackmpLibrary)) { // jackd is running...
+			gLibrary = jackmpLibrary;
+		} else {
+			goto error;
+		}
+		
+	} else {
+		printf("Jack libraries not found, failure...\n");
+		goto error;
+	}
+	
+	// Load entry points...
+	jack_port_get_buffer_fun = (jack_port_get_buffer_fun_def)dlsym(gLibrary, "jack_port_get_buffer");
+	jack_port_name_fun = (jack_port_name_fun_def)dlsym(gLibrary, "jack_port_name");
+	jack_port_short_name_fun = (jack_port_short_name_fun_def)dlsym(gLibrary, "jack_port_short_name");
+	jack_port_flags_fun = (jack_port_flags_fun_def)dlsym(gLibrary, "jack_port_flags");
+	jack_port_type_fun = (jack_port_type_fun_def)dlsym(gLibrary, "jack_port_type");
+	jack_port_connected_fun = (jack_port_connected_fun_def)dlsym(gLibrary, "jack_port_connected");
+	jack_port_connected_to_fun = (jack_port_connected_to_fun_def)dlsym(gLibrary, "jack_port_connected_to");
+	jack_port_tie_fun = (jack_port_tie_fun_def)dlsym(gLibrary, "jack_port_tie");
+	jack_port_untie_fun = (jack_port_untie_fun_def)dlsym(gLibrary, "jack_port_untie");
+	jack_port_get_latency_fun = (jack_port_get_latency_fun_def)dlsym(gLibrary, "jack_port_get_latency");
+	jack_port_set_latency_fun = (jack_port_set_latency_fun_def)dlsym(gLibrary, "jack_port_set_latency");
+	jack_recompute_total_latencies_fun = (jack_recompute_total_latencies_fun_def)dlsym(gLibrary, "jack_recompute_total_latencies");
+	jack_port_set_name_fun = (jack_port_set_name_fun_def)dlsym(gLibrary, "jack_port_set_name");
+	jack_port_request_monitor_fun = (jack_port_request_monitor_fun_def)dlsym(gLibrary, "jack_port_request_monitor");
+	jack_port_request_monitor_by_name_fun = (jack_port_request_monitor_by_name_fun_def)dlsym(gLibrary, "jack_port_request_monitor_by_name");
+	jack_port_ensure_monitor_fun = (jack_port_ensure_monitor_fun_def)dlsym(gLibrary, "jack_port_ensure_monitor");
+	jack_port_monitoring_input_fun = (jack_port_monitoring_input_fun_def)dlsym(gLibrary, "jack_port_monitoring_input_fun");
+	jack_is_realtime_fun = (jack_is_realtime_fun_def)dlsym(gLibrary, "jack_is_realtime");
+	jack_on_shutdown_fun = (jack_on_shutdown_fun_def)dlsym(gLibrary, "jack_on_shutdown");
+	jack_set_process_callback_fun = (jack_set_process_callback_fun_def)dlsym(gLibrary, "jack_set_process_callback");
+	jack_set_freewheel_fun = (jack_set_freewheel_fun_def)dlsym(gLibrary, "jack_set_freewheel");
+	jack_set_buffer_size_fun = (jack_set_buffer_size_fun_def)dlsym(gLibrary, "jack_set_buffer_size");
+	jack_set_buffer_size_callback_fun = (jack_set_buffer_size_callback_fun_def)dlsym(gLibrary, "jack_set_buffer_size_callback");
+	jack_set_sample_rate_callback_fun = (jack_set_sample_rate_callback_fun_def)dlsym(gLibrary, "jack_set_sample_rate_callback");
+	jack_set_port_registration_callback_fun = (jack_set_port_registration_callback_fun_def)dlsym(gLibrary, "jack_set_port_registration_callback");
+	jack_set_graph_order_callback_fun = (jack_set_graph_order_callback_fun_def)dlsym(gLibrary, "jack_set_graph_order_callback");
+	jack_set_xrun_callback_fun = (jack_set_xrun_callback_fun_def)dlsym(gLibrary, "jack_set_xrun_callback");
+	jack_set_thread_init_callback_fun = (jack_set_thread_init_callback_fun_def)dlsym(gLibrary, "jack_set_thread_init_callback");
+	jack_activate_fun = (jack_activate_fun_def)dlsym(gLibrary, "jack_activate");
+	jack_deactivate_fun = (jack_deactivate_fun_def)dlsym(gLibrary, "jack_deactivate");
+	jack_port_register_fun = (jack_port_register_fun_def)dlsym(gLibrary, "jack_port_register");
+	jack_port_unregister_fun = (jack_port_unregister_fun_def)dlsym(gLibrary, "jack_port_unregister");
+	jack_port_is_mine_fun = (jack_port_is_mine_fun_def)dlsym(gLibrary, "jack_port_is_mine");
+	jack_port_get_connections_fun = (jack_port_get_connections_fun_def)dlsym(gLibrary, "jack_port_get_connections");
+	jack_port_get_all_connections_fun = (jack_port_get_all_connections_fun_def)dlsym(gLibrary, "jack_port_get_all_connections_fun");
+	jack_port_lock_fun = (jack_port_lock_fun_def)dlsym(gLibrary, "jack_port_lock");
+	jack_port_unlock_fun = (jack_port_unlock_fun_def)dlsym(gLibrary, "jack_port_unlock");
+	jack_port_get_total_latency_fun = (jack_port_get_total_latency_fun_def)dlsym(gLibrary, "jack_port_get_total_latency");
+	jack_connect_fun = (jack_connect_fun_def)dlsym(gLibrary, "jack_connect");
+	jack_disconnect_fun = (jack_disconnect_fun_def)dlsym(gLibrary, "jack_disconnect");
+	jack_port_connect_fun = (jack_port_connect_fun_def)dlsym(gLibrary, "jack_port_connect");
+	jack_port_disconnect_fun = (jack_port_disconnect_fun_def)dlsym(gLibrary, "jack_port_disconnect");
+	jack_get_sample_rate_fun = (jack_get_sample_rate_fun_def)dlsym(gLibrary, "jack_get_sample_rate");
+	jack_get_buffer_size_fun = (jack_get_buffer_size_fun_def)dlsym(gLibrary, "jack_get_buffer_size");
+	jack_get_ports_fun = (jack_get_ports_fun_def)dlsym(gLibrary, "jack_get_ports");
+	jack_port_by_name_fun = (jack_port_by_name_fun_def)dlsym(gLibrary, "jack_port_by_name");
+	jack_port_by_id_fun = (jack_port_by_id_fun_def)dlsym(gLibrary, "jack_port_by_id");
+	jack_engine_takeover_timebase_fun = (jack_engine_takeover_timebase_fun_def)dlsym(gLibrary, "jack_engine_takeover_timebase");
+	jack_frames_since_cycle_start_fun = (jack_frames_since_cycle_start_fun_def)dlsym(gLibrary, "jack_frames_since_cycle_start");
+	jack_frame_time_fun = (jack_frame_time_fun_def)dlsym(gLibrary, "jack_frame_time_fun");
+	jack_last_frame_time_fun = (jack_last_frame_time_fun_def)dlsym(gLibrary, "jack_last_frame_time");
+	jack_cpu_load_fun = (jack_cpu_load_fun_def)dlsym(gLibrary, "jack_cpu_load");
+	jack_client_thread_id_fun = (jack_client_thread_id_fun_def)dlsym(gLibrary, "jack_client_thread_id");
+	jack_get_client_name_fun = (jack_get_client_name_fun_def)dlsym(gLibrary, "jack_get_client_name");
+	jack_port_name_size_fun = (jack_port_name_size_fun_def)dlsym(gLibrary, "jack_port_name_size");
+	jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(gLibrary, "jack_client_name_size");
+	jack_release_timebase_fun = (jack_release_timebase_fun_def)dlsym(gLibrary, "jack_release_timebase");
+	jack_set_sync_callback_fun = (jack_set_sync_callback_fun_def)dlsym(gLibrary, "jack_set_sync_callback");
+	jack_set_sync_timeout_fun = (jack_set_sync_timeout_fun_def)dlsym(gLibrary, "jack_set_sync_timeout");
+	jack_set_timebase_callback_fun = (jack_set_timebase_callback_fun_def)dlsym(gLibrary, "jack_set_timebase_callback");
+	jack_transport_locate_fun = (jack_transport_locate_fun_def)dlsym(gLibrary, "jack_transport_locate_fun");
+	jack_transport_query_fun = (jack_transport_query_fun_def)dlsym(gLibrary, "jack_transport_query");
+	jack_get_current_transport_frame_fun = (jack_get_current_transport_frame_fun_def)dlsym(gLibrary, "jack_get_current_transport_frame");
+	jack_transport_reposition_fun = (jack_transport_reposition_fun_def)dlsym(gLibrary, "jack_transport_reposition");
+	jack_transport_start_fun = (jack_transport_start_fun_def)dlsym(gLibrary, "jack_transport_start");
+	jack_transport_stop_fun = (jack_transport_stop_fun_def)dlsym(gLibrary, "jack_transport_stop");
+	jack_get_transport_info_fun = (jack_get_transport_info_fun_def)dlsym(gLibrary, "jack_get_transport_info");
+	jack_set_transport_info_fun = (jack_set_transport_info_fun_def)dlsym(gLibrary, "jack_set_transport_info");
+	jack_get_max_delayed_usecs_fun = (jack_get_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_max_delayed_usecs");
+	jack_get_xrun_delayed_usecs_fun = (jack_get_xrun_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_xrun_delayed_usecs");
+	jack_reset_max_delayed_usecs_fun = (jack_reset_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_reset_max_delayed_usecs");
+	jack_acquire_real_time_scheduling_fun = (jack_acquire_real_time_scheduling_fun_def)dlsym(gLibrary, "jack_acquire_real_time_scheduling");
+	jack_client_create_thread_fun = (jack_client_create_thread_fun_def)dlsym(gLibrary, "jack_client_create_thread");
+	jack_drop_real_time_scheduling_fun = (jack_drop_real_time_scheduling_fun_def)dlsym(gLibrary, "jack_drop_real_time_scheduling");
+	jack_get_internal_client_name_fun = (jack_get_internal_client_name_fun_def)dlsym(gLibrary, "jack_get_internal_client_name");
+	jack_internal_client_handle_fun = (jack_internal_client_handle_fun_def)dlsym(gLibrary, "jack_internal_client_handle");
+	jack_internal_client_load_fun = (jack_internal_client_load_fun_def)dlsym(gLibrary, "jack_internal_client_load");
+	jack_internal_client_unload_fun = (jack_internal_client_unload_fun_def)dlsym(gLibrary, "jack_internal_client_unload");
+	jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
+	jack_client_new_fun = (jack_client_new_fun_def)dlsym(gLibrary, "jack_client_new");
+	jack_client_close_fun = (jack_client_close_fun_def)dlsym(gLibrary, "jack_client_close");
+	
 	return true;
+
+error:
+	if (jackLibrary) dlclose(jackLibrary);
+	if (jackmpLibrary) dlclose(jackmpLibrary);
+	return false;
 }
