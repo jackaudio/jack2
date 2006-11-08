@@ -12,6 +12,8 @@ TARGET_LINUX_SERVER_LIB := libjackdmp.so
 
 TARGET_LINUX_CLIENT_LIB := libjackmp.so
 
+TARGET_LINUX_WRAPPER_LIB := libjackwrapper.so
+
 TARGET_LINUX_ALSA := jack_alsa.so
 
 TARGET_LINUX_DUMMY := jack_dummy.so
@@ -77,6 +79,9 @@ $(TARGET_LINUX_SERVER_LIB) : $(objects_common_server_lib)
 $(TARGET_LINUX_CLIENT_LIB) : $(objects_common_client_lib) $(objects_linux_lib)
 	$(CXX) $(CXXFLAGS) -shared $(objects_common_client_lib) $(objects_linux_lib) $(LIB_LINUX)  -o $(TARGET_LINUX_CLIENT_LIB)
 
+$(TARGET_LINUX_WRAPPER_LIB) : JackAPIWrapper.o
+	$(CXX) $(CXXFLAGS) -shared JackAPIWrapper.o -o $(TARGET_LINUX_WRAPPER_LIB)
+
 $(TARGET_LINUX_SERVER) : $(objects_linux_server)
 	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackdmp.so -o $(TARGET_LINUX_SERVER)
 
@@ -116,7 +121,7 @@ remove:
 
 clean :
 	rm -f *.o
-	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
+	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
 		synchroClient synchroServer synchroServerClient testSem jack_test
 		
 depend :
