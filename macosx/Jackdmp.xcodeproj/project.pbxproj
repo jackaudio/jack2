@@ -15,6 +15,7 @@
 			dependencies = (
 				4B699DB4097D421700A18468 /* PBXTargetDependency */,
 				4B699DB6097D421700A18468 /* PBXTargetDependency */,
+				4BE50F9D0B01EEE500C05E63 /* PBXTargetDependency */,
 				4B699DB8097D421700A18468 /* PBXTargetDependency */,
 				4B699DBA097D421700A18468 /* PBXTargetDependency */,
 				4B699DBC097D421700A18468 /* PBXTargetDependency */,
@@ -251,6 +252,7 @@
 		4BD4B4D909BACD9600750C0F /* JackTransportEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */; };
 		4BD4B4E409BACEF300750C0F /* JackTransportEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */; };
 		4BD4B4E509BACEF300750C0F /* JackTransportEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */; };
+		4BE50F960B01EEC400C05E63 /* JackAPIWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */; };
 		4BE6C6AD0A3E0A65005A203A /* jack_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */; };
 		4BFA99600AAAEE5C009E916C /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21C0834F04800C94B91 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BFA99610AAAEE5E009E916C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21B0834F04800C94B91 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -310,6 +312,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B978DB10A31CF4A009E2DD1;
 			remoteInfo = "jack_portaudio Universal";
+		};
+		4BE50F9C0B01EEE500C05E63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
+			remoteInfo = "Jackwrapper.framework Universal";
 		};
 		4BE99D620AD7A19100C59091 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -491,6 +500,10 @@
 		4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTransportEngine.h; path = ../common/JackTransportEngine.h; sourceTree = SOURCE_ROOT; };
 		4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTransportEngine.cpp; path = ../common/JackTransportEngine.cpp; sourceTree = SOURCE_ROOT; };
 		4BD561C708EEB910006BBC2A /* JackSynchro.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackSynchro.h; path = ../common/JackSynchro.h; sourceTree = SOURCE_ROOT; };
+		4BE50F5F0B01E92900C05E63 /* JackWrapper.framework Universal-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "JackWrapper.framework Universal-Info.plist"; sourceTree = "<group>"; };
+		4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackAPIWrapper.cpp; path = ../common/JackAPIWrapper.cpp; sourceTree = SOURCE_ROOT; };
+		4BE50F8E0B01EE8000C05E63 /* Jackwrapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackwrapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
 		4BE6C6A30A3E096F005A203A /* jack_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jack_test.cpp; path = ../tests/jack_test.cpp; sourceTree = SOURCE_ROOT; };
 		4BE99D300AD7A04800C59091 /* jack_cpu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_cpu; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -709,6 +722,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BE50F8C0B01EE8000C05E63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4BE6C69D0A3E096F005A203A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -748,6 +768,8 @@
 				0249A662FF388D9811CA2CEA /* External Frameworks and Libraries */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				4B464301076CAC7700E5077C /* Jack-Info.plist */,
+				4BE50F5F0B01E92900C05E63 /* JackWrapper.framework Universal-Info.plist */,
+				4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */,
 			);
 			name = JackServer;
 			sourceTree = "<group>";
@@ -797,6 +819,7 @@
 				4BE6C6A30A3E096F005A203A /* jack_test */,
 				4BFA99A20AAAF3B0009E916C /* jdelay */,
 				4BE99D300AD7A04800C59091 /* jack_cpu */,
+				4BE50F8E0B01EE8000C05E63 /* Jackwrapper.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1032,6 +1055,7 @@
 				4B98AE010931D30C0091932A /* JackDebugClient.h */,
 				4B98AE000931D30C0091932A /* JackDebugClient.cpp */,
 				4BF8D1E90834EF7500C94B91 /* JackAPI.cpp */,
+				4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */,
 				4BD56D75079687EB006D44F9 /* Internal  */,
 				4BD56D73079687AD006D44F9 /* External */,
 				4BA550F905E241D900569492 /* Library */,
@@ -1344,6 +1368,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B978DED0A31D099009E2DD1 /* JackPortAudioDriver.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BE50F890B01EE8000C05E63 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1708,6 +1739,24 @@
 			productReference = 4B978DBB0A31CF4A009E2DD1 /* jack_portaudio.so */;
 			productType = "com.apple.product-type.library.dynamic";
 		};
+		4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BE50F900B01EE8100C05E63 /* Build configuration list for PBXNativeTarget "Jackwrapper.framework Universal" */;
+			buildPhases = (
+				4BE50F890B01EE8000C05E63 /* Headers */,
+				4BE50F8A0B01EE8000C05E63 /* Resources */,
+				4BE50F8B0B01EE8000C05E63 /* Sources */,
+				4BE50F8C0B01EE8000C05E63 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Jackwrapper.framework Universal";
+			productName = Jackwrapper;
+			productReference = 4BE50F8E0B01EE8000C05E63 /* Jackwrapper.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		4BE6C6910A3E096F005A203A /* jack_test Universal */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4BE6C69F0A3E096F005A203A /* Build configuration list for PBXNativeTarget "jack_test Universal" */;
@@ -1779,6 +1828,7 @@
 				4B699BA7097D421600A18468 /* jackdmp framework Universal */,
 				4B699C00097D421600A18468 /* Jackmp.framework Universal */,
 				4B699C4C097D421600A18468 /* Jackdmp.framework Universal */,
+				4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */,
 				4B699CB1097D421600A18468 /* jack_metro Universal */,
 				4B699CC1097D421600A18468 /* jack_lsp Universal */,
 				4B699CD1097D421600A18468 /* jack_connect Universal */,
@@ -1810,6 +1860,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B699C7C097D421600A18468 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BE50F8A0B01EE8000C05E63 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2188,6 +2245,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BE50F8B0B01EE8000C05E63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BE50F960B01EEC400C05E63 /* JackAPIWrapper.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4BE6C6950A3E096F005A203A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2249,6 +2314,11 @@
 			isa = PBXTargetDependency;
 			target = 4B978DB10A31CF4A009E2DD1 /* jack_portaudio Universal */;
 			targetProxy = 4B978E7F0A31D8B7009E2DD1 /* PBXContainerItemProxy */;
+		};
+		4BE50F9D0B01EEE500C05E63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
+			targetProxy = 4BE50F9C0B01EEE500C05E63 /* PBXContainerItemProxy */;
 		};
 		4BE99D630AD7A19100C59091 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2684,9 +2754,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = (
-					"-DUSE_POSIX_SHM",
-				);
+				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
@@ -2732,9 +2800,7 @@
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
-				OTHER_CFLAGS = (
-					"-DUSE_POSIX_SHM",
-				);
+				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
@@ -2778,9 +2844,7 @@
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
-				OTHER_CFLAGS = (
-					"-DUSE_POSIX_SHM",
-				);
+				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
@@ -4352,6 +4416,82 @@
 			};
 			name = Default;
 		};
+		4BE50F910B01EE8100C05E63 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = "Jackwrapper-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Jackwrapper;
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4BE50F920B01EE8100C05E63 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = "Jackwrapper-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Jackwrapper;
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4BE50F930B01EE8100C05E63 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = "Jackwrapper-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Frameworks";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = Jackwrapper;
+				ZERO_LINK = YES;
+			};
+			name = Default;
+		};
 		4BE6C6A00A3E096F005A203A /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4810,6 +4950,16 @@
 				4B978DB80A31CF4A009E2DD1 /* Development */,
 				4B978DB90A31CF4A009E2DD1 /* Deployment */,
 				4B978DBA0A31CF4A009E2DD1 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4BE50F900B01EE8100C05E63 /* Build configuration list for PBXNativeTarget "Jackwrapper.framework Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BE50F910B01EE8100C05E63 /* Development */,
+				4BE50F920B01EE8100C05E63 /* Deployment */,
+				4BE50F930B01EE8100C05E63 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
