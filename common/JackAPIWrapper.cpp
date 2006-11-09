@@ -859,7 +859,7 @@ static bool check_client(void* library)
 {
 	jack_client_t* client = 0; 
 
-	// Get "new" and "close" entry points...
+	// Get "new", "open" and "close" entry points...
 	jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
 	jack_client_close_fun = (jack_client_close_fun_def)dlsym(library, "jack_client_close");
 	jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
