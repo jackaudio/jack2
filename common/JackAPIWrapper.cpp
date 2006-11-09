@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <dlfcn.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <dirent.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -811,6 +812,33 @@ EXPORT int jack_client_close(jack_client_t *client)
 }
 
 // Library loader
+static bool get_jack_library_in_directory(char* dir_name, char* library_name)
+{
+	struct dirent * dir_entry;
+	DIR * dir_stream = opendir(dir_name);
+	if (!dir_stream)	
+		return false;
+	 
+	while ((dir_entry = readdir(dir_stream))) {
+		if (strncmp("libjack.0.0", dir_entry->d_name, 11) == 0) {
+            strcpy(library_name, dir_entry->d_name);
+			closedir(dir_stream);
+			return true;
+        }
+	}
+	closedir(dir_stream);
+	return false;
+}
+
+static bool get_jack_library(char* library_name)
+{
+	if (get_jack_library_in_directory("/usr/lib", library_name))
+		return true;
+	if (get_jack_library_in_directory("/usr/local/lib", library_name))
+		return true;
+	return false;
+}
+
 static bool open_library()
 {
 	if (gClientCount++ == 0) {
@@ -847,8 +875,8 @@ static bool check_client(void* library)
 
 static bool init_library()
 {
-	void* jackLibrary = dlopen("tmp_libjack.so.0.0.23", RTLD_LAZY);
-	//void* jackLibrary = 0;
+	char library_name[64];
+	void* jackLibrary = (get_jack_library(library_name)) ? dlopen(library_name, RTLD_LAZY) : 0;
 	void* jackmpLibrary = dlopen("libjackmp.so", RTLD_LAZY);
 	
 	if (jackLibrary) {
