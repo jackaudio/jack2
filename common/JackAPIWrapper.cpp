@@ -518,7 +518,7 @@ typedef jack_port_t* (*jack_port_by_name_fun_def)(jack_client_t* ext_client, con
 static jack_port_by_name_fun_def jack_port_by_name_fun = 0;
 EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* portname)
 {
-    return (*jack_port_by_name)(ext_client, portname);
+    return (*jack_port_by_name_fun)(ext_client, portname);
 }
 
 typedef jack_port_t* (*jack_port_by_id_fun_def)(const jack_client_t* ext_client, jack_port_id_t id);
@@ -821,7 +821,7 @@ static bool get_jack_library_in_directory(char* dir_name, char* library_name)
 		return false;
 	 
 	while ((dir_entry = readdir(dir_stream))) {
-		if (strncmp("libjack.0.0", dir_entry->d_name, 11) == 0) {
+		if (strncmp("libjack.so", dir_entry->d_name, 10) == 0) {
             strcpy(library_name, dir_entry->d_name);
 			closedir(dir_stream);
 			return true;
