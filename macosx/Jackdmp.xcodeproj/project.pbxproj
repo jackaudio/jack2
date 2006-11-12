@@ -500,7 +500,6 @@
 		4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTransportEngine.h; path = ../common/JackTransportEngine.h; sourceTree = SOURCE_ROOT; };
 		4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTransportEngine.cpp; path = ../common/JackTransportEngine.cpp; sourceTree = SOURCE_ROOT; };
 		4BD561C708EEB910006BBC2A /* JackSynchro.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackSynchro.h; path = ../common/JackSynchro.h; sourceTree = SOURCE_ROOT; };
-		4BE50F5F0B01E92900C05E63 /* JackWrapper.framework Universal-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "JackWrapper.framework Universal-Info.plist"; sourceTree = "<group>"; };
 		4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackAPIWrapper.cpp; path = ../common/JackAPIWrapper.cpp; sourceTree = SOURCE_ROOT; };
 		4BE50F8E0B01EE8000C05E63 /* Jackwrapper.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackwrapper.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
@@ -768,7 +767,6 @@
 				0249A662FF388D9811CA2CEA /* External Frameworks and Libraries */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				4B464301076CAC7700E5077C /* Jack-Info.plist */,
-				4BE50F5F0B01E92900C05E63 /* JackWrapper.framework Universal-Info.plist */,
 				4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */,
 			);
 			name = JackServer;
@@ -4419,6 +4417,10 @@
 		4BE50F910B01EE8100C05E63 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -4473,6 +4475,10 @@
 		4BE50F930B01EE8100C05E63 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
