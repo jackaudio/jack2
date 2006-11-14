@@ -169,7 +169,7 @@ main (int argc, char *argv[])
 		if (show_type) {
 			if (port) {
 				putc ('\t', stdout);
-				//fputs (port->type_info->type_name, stdout); 
+				fputs (jack_port_type (port), stdout);
 				putc ('\n', stdout);
 			}
 		}

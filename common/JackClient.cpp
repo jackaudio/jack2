@@ -28,6 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTransportEngine.h"
 #include <math.h>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -405,9 +406,7 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 int JackClient::PortUnRegister(jack_port_id_t port_index)
 {
     JackLog("JackClient::PortUnRegister port_index = %ld\n", port_index);
-    list<jack_port_id_t>::iterator it;
-    for (it = fPortList.begin(); it != fPortList.end() && *it != port_index; it++)
-        ;
+  	list<jack_port_id_t>::iterator it = find(fPortList.begin(), fPortList.end(), port_index);
 
     if (it != fPortList.end()) {
         fPortList.erase(it);
