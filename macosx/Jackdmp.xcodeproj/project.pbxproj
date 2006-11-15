@@ -4468,6 +4468,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
