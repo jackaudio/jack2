@@ -277,7 +277,7 @@ void JackClientPipeThread::RemoveClient()
 		Close();
 	*/
 	fRefNum = -1;
-	pipe->Close();
+	fPipe->Close();
 }
 
 void JackClientPipeThread::KillClient()
