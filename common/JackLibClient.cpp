@@ -98,6 +98,7 @@ int JackLibClient::Open(const char* name)
 
     SetupDriverSync(false);
 
+/* TODO : solve WIN32 thread Kill issue
 #ifndef WIN32
     // Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process    
 	if (!fSynchroTable[fClientControl->fRefNum]->Connect(name)) {
@@ -105,6 +106,12 @@ int JackLibClient::Open(const char* name)
         goto error;
     }
 #endif
+*/
+	// Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process    
+	if (!fSynchroTable[fClientControl->fRefNum]->Connect(name)) {
+        jack_error("Cannot ConnectSemaphore %s client", name);
+        goto error;
+    }
 
     JackLog("JackLibClient::Open name = %s refnum = %ld\n", name, fClientControl->fRefNum);
     return 0;

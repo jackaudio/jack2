@@ -188,8 +188,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
 
             case JackNotifyChannelInterface::kZombifyClient:
-				//res = fThread->Kill(); Really neede ?? Unsafe in WIN32...
-                JackLog("JackClient::kZombifyClient name = %s ref = %ld \n", name, refnum);
+	            JackLog("JackClient::kZombifyClient name = %s ref = %ld \n", name, refnum);
                 ShutDown();
                 break;
         }
@@ -208,6 +207,7 @@ int JackClient::Activate()
     if (IsActive())
         return 0;
 
+/* TODO : solve WIN32 thread Kill issue
 #ifdef WIN32
 	// Done first so that the RT thread then access an allocated synchro
 	if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(GetClientControl()->fName)) {
@@ -215,6 +215,7 @@ int JackClient::Activate()
         return -1;
     }
 #endif
+*/
 
 	if (StartThread() < 0)
         return -1;
@@ -249,14 +250,16 @@ int JackClient::Deactivate()
 
     JackLog("JackClient::Deactivate res = %ld \n", result);
     // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
-    
+
+/* TODO : solve WIN32 thread Kill issue    
 #ifdef WIN32
 	fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
 	fThread->Stop();
 #else
 	fThread->Kill();
 #endif
-
+*/
+	fThread->Kill();
     return result;
 }
 

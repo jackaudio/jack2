@@ -66,14 +66,13 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
 {
 	JackLog("JackClientPipeThread::Close %x %ld\n", this, fRefNum);
 	/*
+		TODO : solve WIN32 thread Kill issue
 		This would hang.. since Close will be followed by a delete, 
 		all ressources will be desallocated at the end.
 	*/
-
-	/*
+	
 	fThread->Kill();
 	fPipe->Close();
-	*/
   	fRefNum = -1;	
 }
 
@@ -274,7 +273,11 @@ void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared
 void JackClientPipeThread::RemoveClient()
 {
     JackLog("JackClientPipeThread::RemoveClient ref = %d\n", fRefNum);
-    Close();
+	 /* TODO : solve WIN32 thread Kill issue
+		Close();
+	*/
+	fRefNum = -1;
+	pipe->Close();
 }
 
 void JackClientPipeThread::KillClient()
@@ -337,15 +340,16 @@ error:
 
 void JackWinNamedPipeServerChannel::Close()
 {
-	/*
+	/* TODO : solve WIN32 thread Kill issue
 		This would hang the server... since we are quitting it, its not really problematic, 
 		all ressources will be desallocated at the end.
+		
+		fRequestListenPipe.Close();
+		fThread->Stop();
 	*/
 	
-	/*
+	fThread->Kill();
 	fRequestListenPipe.Close();
-    fThread->Stop();
-	*/
 }
 
 bool JackWinNamedPipeServerChannel::Init()

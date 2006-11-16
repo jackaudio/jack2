@@ -82,7 +82,7 @@ int JackWinNamedPipeClientChannel::Start()
 void JackWinNamedPipeClientChannel::Stop()
 {
     JackLog("JackWinNamedPipeClientChannel::Stop\n");
-    //fThread->Kill(); Unsafe on WIN32...
+    fThread->Kill();  // Unsafe on WIN32... TODO : solve WIN32 thread Kill issue
 }
 
 void JackWinNamedPipeClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)
