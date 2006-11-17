@@ -38,10 +38,11 @@ bool JackWinEvent::Signal()
 
     if (fFlush)
         return true;
-
+	
     if (!(res = SetEvent(fEvent))) {
         jack_error("JackWinEvent::Signal name = %s err = %ld", fName, GetLastError());
     }
+	
     return res;
 }
 
@@ -56,6 +57,7 @@ bool JackWinEvent::SignalAll()
     if (!(res = SetEvent(fEvent))) {
         jack_error("JackWinEvent::SignalAll name = %s err = %ld", fName, GetLastError());
     }
+	
     return res;
 }
 
@@ -64,7 +66,8 @@ bool JackWinEvent::Wait()
     DWORD res;
 
     if ((res = WaitForSingleObject(fEvent, INFINITE)) != WAIT_OBJECT_0) {
-        jack_error("JackWinEvent::Wait name = %s err = %ld", fName, GetLastError());
+        if (res == WAIT_TIMEOUT)
+			jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
     }
 
     return (res == WAIT_OBJECT_0);
@@ -75,7 +78,8 @@ bool JackWinEvent::TimedWait(long usec)
     DWORD res;
 
     if ((res = WaitForSingleObject(fEvent, usec / 1000)) != WAIT_OBJECT_0) {
-        jack_error("JackWinEvent::Wait name = %s err = %ld", fName, GetLastError());
+		if (res == WAIT_TIMEOUT)
+			jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
     }
 
     return (res == WAIT_OBJECT_0);
@@ -94,7 +98,7 @@ bool JackWinEvent::ConnectInput(const char* name)
     }
 
     if ((fEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, fName)) == NULL) {
-        jack_error("Connect: can't check in named event name = %s err = %ld", fName, GetLastError());
+		jack_error("Connect: can't check in named event name = %s err = %ld", fName, GetLastError());
         return false;
     } else {
         return true;
@@ -115,7 +119,6 @@ bool JackWinEvent::Disconnect()
 {
     if (fEvent) {
         JackLog("JackWinEvent::Disconnect %s\n", fName);
-		SetEvent(fEvent); // to "unlock" threads pending on the event
         CloseHandle(fEvent);
         fEvent = NULL;
         return true;
