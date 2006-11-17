@@ -275,7 +275,7 @@ void JackConnectionManager::ResetGraph(JackClientTiming* timing)
 */
 int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro** table, JackClientTiming* timing, long time_out_usec)
 {
-    int res;
+    bool res;
     if ((res = table[control->fRefNum]->TimedWait(time_out_usec))) {
 		timing[control->fRefNum].fStatus = Running;
 		timing[control->fRefNum].fAwakeAt = GetMicroSeconds();
