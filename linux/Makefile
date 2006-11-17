@@ -106,21 +106,6 @@ install:
 	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so.0
 	/sbin/ldconfig
 
-installw:
-	cp jackdmp $(prefix)/bin
-	cp libjackmp.so $(prefix)/lib
-	cp libjackdmp.so $(prefix)/lib
-	cp libjackwrapper.so $(prefix)/lib
-	install -d $(prefix)/lib/jackmp/
-	cp jack_alsa.so $(prefix)/lib/jackmp
-	cp jack_dummy.so $(prefix)/lib/jackmp
-	#cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
-	cd $(prefix)/lib && rm -f libjack.so*
-	cd $(prefix)/lib && ln -s libjackwrapper.so  libjack.so
-	cd $(prefix)/lib && ln -s libjackwrapper.so  libjack.so.0
-	/sbin/ldconfig
-
-
 # Remove jackdmp and tries to restore jack
 remove:
 	rm $(prefix)/bin/jackdmp
