@@ -186,8 +186,9 @@ int JackServer::Stop()
 
 int JackServer::Activate(int refnum)
 {
-    fGraphManager->DirectConnect(fFreewheelDriver->GetClientControl()->fRefNum, refnum);
-    fGraphManager->DirectConnect(refnum, fFreewheelDriver->GetClientControl()->fRefNum);
+	int fw_refnum = fFreewheelDriver->GetClientControl()->fRefNum;
+    fGraphManager->DirectConnect(fw_refnum, refnum);
+    fGraphManager->DirectConnect(refnum, fw_refnum);
     return fEngine->ClientActivate(refnum);
 }
 
@@ -196,17 +197,18 @@ int JackServer::Activate(int refnum)
 int JackServer::Deactivate(int refnum)
 {
     int res = fEngine->ClientDeactivate(refnum);
+	int fw_refnum = fFreewheelDriver->GetClientControl()->fRefNum;
 
     // Disconnect only when needed
-    if (fGraphManager->IsDirectConnection(fFreewheelDriver->GetClientControl()->fRefNum, refnum)) {
-        fGraphManager->DirectDisconnect(fFreewheelDriver->GetClientControl()->fRefNum, refnum);
+    if (fGraphManager->IsDirectConnection(refnum, fw_refnum)) {
+        fGraphManager->DirectDisconnect(refnum, fw_refnum);
     } else {
         JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
     }
 
-    // Disconnect only when needed
-    if (fGraphManager->IsDirectConnection(refnum, fFreewheelDriver->GetClientControl()->fRefNum)) {
-        fGraphManager->DirectDisconnect(refnum, fFreewheelDriver->GetClientControl()->fRefNum);
+	// Disconnect only when needed
+    if (fGraphManager->IsDirectConnection(fw_refnum, refnum)) {
+        fGraphManager->DirectDisconnect(fw_refnum, refnum);
     } else {
         JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
     }
