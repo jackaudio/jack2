@@ -65,9 +65,8 @@ bool JackWinEvent::Wait()
 {
     DWORD res;
 
-    if ((res = WaitForSingleObject(fEvent, INFINITE)) != WAIT_OBJECT_0) {
-        if (res == WAIT_TIMEOUT)
-			jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
+    if ((res = WaitForSingleObject(fEvent, INFINITE)) == WAIT_TIMEOUT) {
+        jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
     }
 
     return (res == WAIT_OBJECT_0);
@@ -77,9 +76,8 @@ bool JackWinEvent::TimedWait(long usec)
 {
     DWORD res;
 
-    if ((res = WaitForSingleObject(fEvent, usec / 1000)) != WAIT_OBJECT_0) {
-		if (res == WAIT_TIMEOUT)
-			jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
+    if ((res = WaitForSingleObject(fEvent, usec / 1000)) == WAIT_TIMEOUT) {
+		jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
     }
 
     return (res == WAIT_OBJECT_0);
