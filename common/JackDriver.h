@@ -78,7 +78,7 @@ class EXPORT JackDriverInterface
         virtual bool GetMaster() = 0;
         virtual void AddSlave(JackDriverInterface* slave) = 0;
         virtual void RemoveSlave(JackDriverInterface* slave) = 0;
-        virtual void ProcessSlaves() = 0;
+        virtual int ProcessSlaves() = 0;
 
         virtual bool IsRealTime() = 0;
 
@@ -112,7 +112,7 @@ class EXPORT JackDriverClient : public JackDriverClientInterface
         virtual bool GetMaster();
         virtual void AddSlave(JackDriverInterface* slave);
         virtual void RemoveSlave(JackDriverInterface* slave);
-        virtual void ProcessSlaves();
+        virtual int ProcessSlaves();
 };
 
 /*!

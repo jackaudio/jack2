@@ -117,9 +117,9 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         {
             fDriver->RemoveSlave(slave);
         }
-        virtual void ProcessSlaves()
+        virtual int ProcessSlaves()
         {
-            fDriver->ProcessSlaves();
+            return fDriver->ProcessSlaves();
         }
 
         virtual void PrintState()

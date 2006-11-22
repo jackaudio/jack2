@@ -2,6 +2,11 @@
   Jackdmp changes log
 ---------------------------
 
+2006-11-22 Stephane Letz  <letz@grame.fr>
+
+	* In synchronous mode, if the driver time out is reached, the server may get desynchronized (pending signal may arrive in later cycles),
+	 use a higher time out value use in driver, and warn the use of possible mis-behaviour in case of time out. 
+
 2006-11-08 Stephane Letz  <letz@grame.fr>
 
 	* Synchronize ALSA backend with jack one.

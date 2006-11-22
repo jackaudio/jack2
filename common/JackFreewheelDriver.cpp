@@ -37,8 +37,10 @@ int JackFreewheelDriver::Process()
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
         if (fEngineControl->fSyncMode) {
-            if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0)
+            if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) {
                 jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
+				return -1;			
+			}
         }
     }
     return 0;
