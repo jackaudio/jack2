@@ -100,11 +100,9 @@ int JackEngine::Close()
 
 bool JackEngine::Process(jack_time_t callback_usecs)
 {
-	bool res = true;
     // Transport
     fEngineControl->fTransport.CycleBegin(fEngineControl->fSampleRate, callback_usecs);
-
-    //JackLog("Process: callback_usecs %lld\n",callback_usecs/1000);
+	bool res = true;
 
     // Timing
     fEngineControl->fFrameTimer.IncFrameTime(fEngineControl->fBufferSize, callback_usecs, fEngineControl->fPeriodUsecs);
@@ -116,12 +114,10 @@ bool JackEngine::Process(jack_time_t callback_usecs)
         if (fGraphManager->RunNextGraph())	// True if the graph actually switched to a new state
             fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kGraphOrderCallback, 0);
         fSignal->SignalAll();				// Signal for threads waiting for next cycle
-		//jack_error("Process: finished!\n");
 		res = true;
     } else {
         JackLog("Process: graph not finished!\n");
-		//jack_error("Process: graph not finished!\n");
-        if (callback_usecs > fLastSwitchUsecs + fEngineControl->fTimeOutUsecs) {
+		if (callback_usecs > fLastSwitchUsecs + fEngineControl->fTimeOutUsecs) {
             JackLog("Process: switch to next state %ld\n", long(callback_usecs - fLastSwitchUsecs));
             //RemoveZombifiedClients(callback_usecs); TODO
             fLastSwitchUsecs = callback_usecs;
