@@ -198,8 +198,8 @@ int JackDriverClient::ProcessSlaves()
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if ((res = slave->Process()) < 0)
-			return res;
+        if (slave->Process() < 0)
+			res = -1;
     }
 	return res;
 }
