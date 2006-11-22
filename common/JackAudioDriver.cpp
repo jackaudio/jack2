@@ -191,17 +191,18 @@ int JackAudioDriver::ProcessSync()
 
     if (fIsMaster) {
 
-        fEngine->Process(fLastWaitUst); // fLastWaitUst is set in the "low level" layer
-        fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+        if (fEngine->Process(fLastWaitUst)) { // fLastWaitUst is set in the "low level" layer
+			fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+			if (ProcessSlaves() < 0) 
+				jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
+			if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) 
+				jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
+		} else { // Graph not finished: do not activate it
+			jack_error("JackAudioDriver::ProcessSync: error");
+		}
 
-        if (ProcessSlaves() < 0) 
-			jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
-
-        if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) 
-            jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
-	
-        if (Write() < 0)  // Write output buffers for the current cycle
-            jack_error("Process: write error");
+		if (Write() < 0)  // Write output buffers for the current cycle
+			jack_error("Process: write error");
 
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);

@@ -96,7 +96,7 @@ class JackEngine
         int SetTimebaseCallback(int refnum, int conditional);
 
         // Graph
-        void Process(jack_time_t callback_usecs);
+        bool Process(jack_time_t callback_usecs);
         void ZombifyClient(int refnum);
 
         // Notifications
