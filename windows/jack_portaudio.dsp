@@ -94,6 +94,10 @@ LINK32=link.exe
 
 SOURCE=.\JackPortAudioDriver.cpp
 # End Source File
+# Begin Source File
+
+SOURCE=.\resource.rc
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
