@@ -34,12 +34,10 @@
 #include <math.h>
 #include <assert.h>
 #include <stdarg.h>
-#ifndef WIN32
-#include <jack/jack.h>
-#else
+
 #include "jack.h"
 #include "transport.h"
-#endif
+
 
 #ifdef WIN32
 #define M_PI 3.151592653
