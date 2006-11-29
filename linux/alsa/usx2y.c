@@ -210,16 +210,19 @@ usx2y_driver_get_channel_addresses_capture (alsa_driver_t *driver,
 static int
 usx2y_driver_start (alsa_driver_t *driver)
 {
-	int err;
+	int err, i;
 	snd_pcm_uframes_t poffset, pavail;
 
 	usx2y_t *h = (usx2y_t *) driver->hw->private;
 
-	if (driver->capture_nchannels == 4) {
+	for (i = 0; i < driver->capture_nchannels; i++)
 		// US428 channels 3+4 are on a seperate 2 channel stream.
-		// ALSA thinks its 1 stream with 4 channels, so we have to hack here.
-		driver->capture_interleave_skip = 2 * driver->capture_sample_bytes;
-	}
+		// ALSA thinks its 1 stream with 4 channels.
+		driver->capture_interleave_skip[i] = 2 * driver->capture_sample_bytes;
+
+
+	driver->playback_interleave_skip[0] = 2 * driver->playback_sample_bytes;
+	driver->playback_interleave_skip[1] = 2 * driver->playback_sample_bytes;
 
 	driver->poll_last = 0;
 	driver->poll_next = 0;

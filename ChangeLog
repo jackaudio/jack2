@@ -6,6 +6,7 @@
 2006-11-29 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackWinEnvent::Allocate (handle the ERROR_ALREADY_EXISTS case). Correct JackEngine::ClientExternalNew.
+	* Karsten Wiese correction for ALSA usx2y driver.
 
 2006-11-22 Stephane Letz  <letz@grame.fr>
 
