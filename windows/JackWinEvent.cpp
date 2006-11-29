@@ -134,8 +134,12 @@ bool JackWinEvent::Allocate(const char* name, int value)
     if ((fEvent = CreateEvent(NULL, FALSE, FALSE, fName)) == NULL) {
         jack_error("Allocate: can't check in named event name = %s err = %ld", fName, GetLastError());
         return false;
-    } else {
-        return true;
+    } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		jack_error("Allocate: named event already exist name = %s", fName);
+		CloseHandle(fEvent);
+		return false;
+	} else {
+ 		return true;
     }
 }
 

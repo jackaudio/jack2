@@ -355,23 +355,23 @@ int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine
 
     if (!fSynchroTable[refnum]->Allocate(name, 0)) {
         jack_error("Cannot allocate synchro");
-        goto error;
+		goto error1;
     }
 
     if (client->Open(name, refnum, shared_client) < 0) {
         jack_error("Cannot open client");
-        goto error;
+        goto error1;
     }
 
     if (!fSignal->TimedWait(5 * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
-        goto error;
+        goto error2;
     }
 
     if (NotifyAddClient(client, name, refnum) < 0) {
         jack_error("Cannot notify add client");
-        goto error;
+        goto error2;
     }
 
     fClientTable[refnum] = client;
@@ -381,8 +381,11 @@ int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine
     *ref = refnum;
     return 0;
 
-error:
-    fGraphManager->ReleaseRefNum(refnum);
+error1:
+	fGraphManager->ReleaseRefNum(refnum);
+	return -1;
+
+error2:
     ClientCloseAux(refnum, client, false);
     client->Close();
     return -1;
