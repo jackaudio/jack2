@@ -67,6 +67,7 @@ int JackGraphManager::GetConnectionsNum(jack_port_id_t port_index)
 }
 
 // Server
+/*
 int JackGraphManager::AllocateRefNum()
 {
     JackConnectionManager* manager = WriteNextStateStart();
@@ -74,12 +75,22 @@ int JackGraphManager::AllocateRefNum()
     WriteNextStateStop();
     return res;
 }
+*/
 
 // Server
+/*
 void JackGraphManager::ReleaseRefNum(int refnum)
 {
     JackConnectionManager* manager = WriteNextStateStart();
     manager->ReleaseRefNum(refnum);
+    WriteNextStateStop();
+}
+*/
+
+void JackGraphManager::InitRefNum(int refnum)
+{
+    JackConnectionManager* manager = WriteNextStateStart();
+    manager->InitRefNum(refnum);
     WriteNextStateStop();
 }
 

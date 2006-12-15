@@ -82,9 +82,9 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         int DisconnectAll(jack_port_id_t port_index); 
 
         // Client management
-        int AllocateRefNum(); 
-        void ReleaseRefNum(int refnum); 
-
+        //int AllocateRefNum(); 
+        //void ReleaseRefNum(int refnum); 
+		
         bool IsDirectConnection(int ref1, int ref2); 
         void DirectConnect(int ref1, int ref2); 
         void DirectDisconnect(int ref1, int ref2); 
@@ -104,10 +104,11 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         bool RunNextGraph();  
         bool IsFinishedGraph();  
 
+		void InitRefNum(int refnum); 
         int ResumeRefNum(JackClientControl* control, JackSynchro** table);  
         int SuspendRefNum(JackClientControl* control, JackSynchro** table, long usecs); 
 		
-		JackClientTiming* GetClientTiming(int ref);
+		JackClientTiming* GetClientTiming(int refnum);
 		
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);

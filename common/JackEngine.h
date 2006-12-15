@@ -48,7 +48,7 @@ class JackEngine
         JackClientInterface* fClientTable[CLIENT_NUM];
         JackSynchro** fSynchroTable;
         JackServerNotifyChannelInterface* fChannel;              /*! To communicate between the RT thread and server */
-        JackEngineTiming* fTiming;
+        JackEngineTiming* fEngineTiming;
         JackSyncInterface* fSignal;
         jack_time_t fLastSwitchUsecs;
 
@@ -67,6 +67,7 @@ class JackEngine
 
         int Open();
         int Close();
+		int Allocate();
 
         // Client management
         bool ClientCheckName(const char* name);

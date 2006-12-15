@@ -39,7 +39,7 @@ JackConnectionManager::JackConnectionManager()
 
     JackLog("JackConnectionManager::InitClients\n");
     for (i = 0; i < CLIENT_NUM; i++) {
-        InitClient(i);
+        InitRefNum(i);
     }
 }
 
@@ -77,14 +77,6 @@ bool JackConnectionManager::IsLoopPathAux(int ref1, int ref2) const
             return false;
         }
     }
-}
-
-void JackConnectionManager::InitClient(int refnum)
-{
-    fInputPort[refnum].Init();
-    fOutputPort[refnum].Init();
-    fConnectionRef.Init(refnum);
-    fInputCounter[refnum].SetValue(0);
 }
 
 //--------------
@@ -237,6 +229,7 @@ const jack_int_t* JackConnectionManager::GetOutputPorts(int refnum)
 /*!
 \brief Return the first available refnum.
 */
+/*
 int JackConnectionManager::AllocateRefNum()
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
@@ -248,15 +241,30 @@ int JackConnectionManager::AllocateRefNum()
 
     return -1;
 }
-
+*/
 /*!
 \brief Release the refnum.
 */
+/*
 void JackConnectionManager::ReleaseRefNum(int refnum)
 {
     JackLog("JackConnectionManager::ReleaseRefNum ref = %ld\n", refnum);
     InitClient(refnum);
 }
+*/
+
+/*!
+\brief Release the refnum.
+*/
+
+void JackConnectionManager::InitRefNum(int refnum)
+{
+    fInputPort[refnum].Init();
+    fOutputPort[refnum].Init();
+    fConnectionRef.Init(refnum);
+    fInputCounter[refnum].SetValue(0);
+}
+
 
 /*!
 \brief Reset all clients activation.

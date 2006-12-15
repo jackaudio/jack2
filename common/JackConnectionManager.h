@@ -407,7 +407,7 @@ class JackConnectionManager
         JackLoopFeedback<CONNECTION_NUM> fLoopFeedback;					/*! Loop feedback connections */
 
         bool IsLoopPathAux(int ref1, int ref2) const;
-        void InitClient(int refnum);
+        //void InitClient(int refnum);
 
     public:
 
@@ -442,8 +442,9 @@ class JackConnectionManager
         const jack_int_t* GetOutputPorts(int refnum);
 
         // Client management
-        int AllocateRefNum();
-        void ReleaseRefNum(int refnum);
+        //int AllocateRefNum();
+        //void ReleaseRefNum(int refnum);
+		void InitRefNum(int refnum);
 
         int GetInputRefNum(jack_port_id_t port_index) const;
         int GetOutputRefNum(jack_port_id_t port_index) const;

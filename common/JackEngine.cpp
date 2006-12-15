@@ -44,18 +44,18 @@ JackEngine::JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngin
     fEngineControl->fPriority = priority;
     fEngineControl->fVerbose = ve;
     fChannel = JackGlobals::MakeServerNotifyChannel();
-    fTiming = new JackEngineTiming(fClientTable, fGraphManager, fEngineControl);
+    fEngineTiming = new JackEngineTiming(fClientTable, fGraphManager, fEngineControl);
     fSignal = signal;
     for (int i = 0; i < CLIENT_NUM; i++)
-        fClientTable[i] = 0;
-    fTiming->ClearTimeMeasures();
-    fTiming->ResetRollingUsecs();
+        fClientTable[i] = NULL;
+    fEngineTiming->ClearTimeMeasures();
+    fEngineTiming->ResetRollingUsecs();
 }
 
 JackEngine::~JackEngine()
 {
     delete fChannel;
-    delete fTiming;
+    delete fEngineTiming;
 }
 
 //-------------------
@@ -94,6 +94,18 @@ int JackEngine::Close()
     return 0;
 }
 
+int JackEngine::Allocate()
+{
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        if (!fClientTable[i]) {
+            JackLog("JackEngine::AllocateRefNum ref = %ld\n", i);
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 //------------------
 // Graph management
 //------------------
@@ -106,7 +118,7 @@ bool JackEngine::Process(jack_time_t callback_usecs)
 
     // Timing
     fEngineControl->fFrameTimer.IncFrameTime(fEngineControl->fBufferSize, callback_usecs, fEngineControl->fPeriodUsecs);
-    fTiming->UpdateTiming(callback_usecs);
+    fEngineTiming->UpdateTiming(callback_usecs);
 
     // Graph
     if (fGraphManager->IsFinishedGraph()) {
@@ -346,7 +358,8 @@ int JackEngine::ClientNew(const char* name, int* ref, int* shared_engine, int* s
 int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager, JackExternalClient* client)
 {
     JackLog("JackEngine::ClientNew: name = %s \n", name);
-    int refnum = fGraphManager->AllocateRefNum();
+    //int refnum = fGraphManager->AllocateRefNum();
+	int refnum = Allocate();
 
     if (refnum < 0) {
         jack_error("No more refnum available");
@@ -355,37 +368,40 @@ int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine
 
     if (!fSynchroTable[refnum]->Allocate(name, 0)) {
         jack_error("Cannot allocate synchro");
-		goto error1;
+		goto error;
     }
 
     if (client->Open(name, refnum, shared_client) < 0) {
         jack_error("Cannot open client");
-        goto error1;
+        goto error;
     }
 
     if (!fSignal->TimedWait(5 * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
-        goto error2;
+        goto error;
     }
 
     if (NotifyAddClient(client, name, refnum) < 0) {
         jack_error("Cannot notify add client");
-        goto error2;
+        goto error;
     }
 
     fClientTable[refnum] = client;
-    fTiming->ResetRollingUsecs();
+	fGraphManager->InitRefNum(refnum);
+    fEngineTiming->ResetRollingUsecs();
     *shared_engine = fEngineControl->GetShmIndex();
     *shared_graph_manager = fGraphManager->GetShmIndex();
     *ref = refnum;
     return 0;
 
+/*
 error1:
 	fGraphManager->ReleaseRefNum(refnum);
 	return -1;
+*/
 
-error2:
+error:
     ClientCloseAux(refnum, client, false);
     client->Close();
     return -1;
@@ -395,7 +411,8 @@ error2:
 int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
 {
     JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
-    int refnum = fGraphManager->AllocateRefNum();
+    //int refnum = fGraphManager->AllocateRefNum();
+	int refnum = Allocate();
 
     if (refnum < 0) {
         jack_error("No more refnum available");
@@ -413,14 +430,15 @@ int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl*
     }
 
     fClientTable[refnum] = client;
-    fTiming->ResetRollingUsecs();
+	fGraphManager->InitRefNum(refnum);
+    fEngineTiming->ResetRollingUsecs();
     *shared_engine = fEngineControl;
     *shared_manager = fGraphManager;
     *ref = refnum;
     return 0;
 
 error:
-    fGraphManager->ReleaseRefNum(refnum);
+   // fGraphManager->ReleaseRefNum(refnum);
     return -1;
 }
 
@@ -475,8 +493,9 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 
     // Cleanup...
     fSynchroTable[refnum]->Destroy();
-    fGraphManager->ReleaseRefNum(refnum);
-    fTiming->ResetRollingUsecs();
+    //fGraphManager->ReleaseRefNum(refnum);
+	
+    fEngineTiming->ResetRollingUsecs();
     return 0;
 }
 
@@ -641,7 +660,7 @@ void JackEngine::PrintState()
     }
 
     //fGraphManager->PrintState();
-    fTiming->PrintState();
+    fEngineTiming->PrintState();
 }
 
 } // end of namespace
