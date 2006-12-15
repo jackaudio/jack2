@@ -2,9 +2,13 @@
   Jackdmp changes log
 ---------------------------
 
+2006-12-15 Stephane Letz  <letz@grame.fr>
+
+	* Move client refnum management in JackEngine.
+
 2006-12-12 Stephane Letz  <letz@grame.fr>
 
-	* Fix memory leak in ringbuffer.c.
+	* Tom Szilagyi memory leak fix in ringbuffer.c.
 
 2006-11-29 Stephane Letz  <letz@grame.fr>
 

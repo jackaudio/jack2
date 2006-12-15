@@ -227,36 +227,8 @@ const jack_int_t* JackConnectionManager::GetOutputPorts(int refnum)
 }
 
 /*!
-\brief Return the first available refnum.
+\brief Init the refnum.
 */
-/*
-int JackConnectionManager::AllocateRefNum()
-{
-    for (int i = 0; i < CLIENT_NUM; i++) {
-        if (fInputPort[i].IsAvailable()) {
-            JackLog("JackConnectionManager::AllocateRefNum ref = %ld\n", i);
-            return i;
-        }
-    }
-
-    return -1;
-}
-*/
-/*!
-\brief Release the refnum.
-*/
-/*
-void JackConnectionManager::ReleaseRefNum(int refnum)
-{
-    JackLog("JackConnectionManager::ReleaseRefNum ref = %ld\n", refnum);
-    InitClient(refnum);
-}
-*/
-
-/*!
-\brief Release the refnum.
-*/
-
 void JackConnectionManager::InitRefNum(int refnum)
 {
     fInputPort[refnum].Init();
@@ -264,7 +236,6 @@ void JackConnectionManager::InitRefNum(int refnum)
     fConnectionRef.Init(refnum);
     fInputCounter[refnum].SetValue(0);
 }
-
 
 /*!
 \brief Reset all clients activation.

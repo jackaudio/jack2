@@ -81,10 +81,6 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         void DisconnectAllOutput(jack_port_id_t port_index); 
         int DisconnectAll(jack_port_id_t port_index); 
 
-        // Client management
-        //int AllocateRefNum(); 
-        //void ReleaseRefNum(int refnum); 
-		
         bool IsDirectConnection(int ref1, int ref2); 
         void DirectConnect(int ref1, int ref2); 
         void DirectDisconnect(int ref1, int ref2); 

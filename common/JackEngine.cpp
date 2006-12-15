@@ -358,7 +358,6 @@ int JackEngine::ClientNew(const char* name, int* ref, int* shared_engine, int* s
 int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager, JackExternalClient* client)
 {
     JackLog("JackEngine::ClientNew: name = %s \n", name);
-    //int refnum = fGraphManager->AllocateRefNum();
 	int refnum = Allocate();
 
     if (refnum < 0) {
@@ -395,12 +394,6 @@ int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine
     *ref = refnum;
     return 0;
 
-/*
-error1:
-	fGraphManager->ReleaseRefNum(refnum);
-	return -1;
-*/
-
 error:
     ClientCloseAux(refnum, client, false);
     client->Close();
@@ -411,7 +404,6 @@ error:
 int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
 {
     JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
-    //int refnum = fGraphManager->AllocateRefNum();
 	int refnum = Allocate();
 
     if (refnum < 0) {
@@ -421,12 +413,12 @@ int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl*
 
     if (!fSynchroTable[refnum]->Allocate(name, 0)) {
         jack_error("Cannot allocate synchro");
-        goto error;
+		return -1;
     }
 
     if (NotifyAddClient(client, name, refnum) < 0) {
         jack_error("Cannot notify add client");
-        goto error;
+		return -1;
     }
 
     fClientTable[refnum] = client;
@@ -436,10 +428,6 @@ int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl*
     *shared_manager = fGraphManager;
     *ref = refnum;
     return 0;
-
-error:
-   // fGraphManager->ReleaseRefNum(refnum);
-    return -1;
 }
 
 // Used for externall clients
@@ -493,8 +481,6 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 
     // Cleanup...
     fSynchroTable[refnum]->Destroy();
-    //fGraphManager->ReleaseRefNum(refnum);
-	
     fEngineTiming->ResetRollingUsecs();
     return 0;
 }
