@@ -112,12 +112,15 @@ int JackEngine::Allocate()
 
 bool JackEngine::Process(jack_time_t callback_usecs)
 {
-    // Transport
-    fEngineControl->fTransport.CycleBegin(fEngineControl->fSampleRate, callback_usecs);
 	bool res = true;
+	
+    // Transport
+    //fEngineControl->fTransport.CycleBegin(fEngineControl->fSampleRate, callback_usecs);
+	fEngineControl->CycleBegin(callback_usecs);
 
     // Timing
-    fEngineControl->fFrameTimer.IncFrameTime(fEngineControl->fBufferSize, callback_usecs, fEngineControl->fPeriodUsecs);
+    //fEngineControl->fFrameTimer.IncFrameTime(fEngineControl->fBufferSize, callback_usecs, fEngineControl->fPeriodUsecs);
+	fEngineControl->IncFrameTime(callback_usecs);
     fEngineTiming->UpdateTiming(callback_usecs);
 
     // Graph
@@ -147,7 +150,8 @@ bool JackEngine::Process(jack_time_t callback_usecs)
     }
 
     // Transport
-    fEngineControl->fTransport.CycleEnd(fClientTable, fEngineControl->fSampleRate, fEngineControl->fBufferSize);
+    //fEngineControl->fTransport.CycleEnd(fClientTable, fEngineControl->fSampleRate, fEngineControl->fBufferSize);
+	fEngineControl->CycleEnd(fClientTable);
 	return res;
 }
 
@@ -288,7 +292,8 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 void JackEngine::NotifyXRun(jack_time_t callback_usecs)
 {
     // Use the audio thread => request thread communication channel
-    fEngineControl->fFrameTimer.ResetFrameTime(fEngineControl->fSampleRate, callback_usecs, fEngineControl->fPeriodUsecs);
+    //fEngineControl->fFrameTimer.ResetFrameTime(fEngineControl->fSampleRate, callback_usecs, fEngineControl->fPeriodUsecs);
+	fEngineControl->ResetFrameTime(callback_usecs);
     fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kXRunCallback, 0);
 }
 

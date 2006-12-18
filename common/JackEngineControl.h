@@ -49,6 +49,32 @@ struct JackEngineControl : public JackShmMem
     JackTransportEngine fTransport;
     bool fSyncMode;
     bool fVerbose;
+	
+	void IncFrameTime(jack_time_t callback_usecs)
+	{
+		fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
+	}
+	
+	void ResetFrameTime(jack_time_t callback_usecs)
+	{
+		fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
+	}
+	
+	void ReadFrameTime(JackTimer* timer)
+	{
+		fFrameTimer.ReadFrameTime(timer);
+	}
+	
+	void CycleBegin(jack_time_t callback_usecs)
+	{
+		fTransport.CycleBegin(fSampleRate, callback_usecs);
+	}
+
+	void CycleEnd(JackClientInterface** table)
+	{
+		fTransport.CycleEnd(table, fSampleRate, fBufferSize);
+	}
+
 };
 
 
