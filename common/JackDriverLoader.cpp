@@ -18,6 +18,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackDriverLoader.h"
 #include "JackError.h"
 #include <getopt.h>

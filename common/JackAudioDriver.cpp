@@ -18,6 +18,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackAudioDriver.h"
 #include "JackTime.h"
 #include "JackError.h"
@@ -30,7 +34,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-
 
 JackAudioDriver::JackAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
         : JackDriver(name, engine, table),

@@ -17,6 +17,10 @@ Copyright (C) 2004-2006 Grame
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackWinNamedPipeServerChannel.h"
 #include "JackRequest.h"
 #include "JackServer.h"

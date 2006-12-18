@@ -18,6 +18,10 @@
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackThreadedDriver.h"
 #include "JackError.h"
 #include "JackGlobals.h"

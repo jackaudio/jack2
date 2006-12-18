@@ -17,6 +17,10 @@ This program is free software; you can redistribute it and/or modify
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackServerGlobals.h"
 #include "JackError.h"
 #include "shm.h"

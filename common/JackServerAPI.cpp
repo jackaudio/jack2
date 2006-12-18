@@ -18,6 +18,10 @@ This program is free software; you can redistribute it and/or modify
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackInternalClient.h"
 #include "JackGraphManager.h"
 #include "JackServer.h"

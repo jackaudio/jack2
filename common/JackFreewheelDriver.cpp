@@ -18,6 +18,10 @@
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #include "JackFreewheelDriver.h"
 #include "JackEngineControl.h"
 #include "JackEngine.h"
