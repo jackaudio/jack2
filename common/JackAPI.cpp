@@ -851,7 +851,6 @@ EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)
 EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_client)
 {
     JackTimer timer;
-    //GetEngineControl()->fFrameTimer.ReadFrameTime(&timer);
 	GetEngineControl()->ReadFrameTime(&timer);
     return (jack_nframes_t) floor((((float)GetEngineControl()->fSampleRate) / 1000000.0f) * (GetMicroSeconds() - timer.fCurrentCallback));
 }
@@ -864,8 +863,7 @@ EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
         return 0;
     } else {
         JackTimer timer;
-        //GetEngineControl()->fFrameTimer.ReadFrameTime(&timer);
-		GetEngineControl()->ReadFrameTime(&timer);
+  		GetEngineControl()->ReadFrameTime(&timer);
         if (timer.fInitialized) {
             return timer.fFrames +
                    (long) rint(((double) ((jack_time_t)(GetMicroSeconds() - timer.fCurrentWakeup)) /
@@ -879,7 +877,6 @@ EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
 EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 {
     JackTimer timer;
-	//GetEngineControl()->fFrameTimer.ReadFrameTime(&timer);
 	GetEngineControl()->ReadFrameTime(&timer);
     return timer.fFrames;
 }
