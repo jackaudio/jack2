@@ -17,6 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#ifdef WIN32 
+#pragma warning (disable : 4786)
+#endif
+
 #ifdef __APPLE__
 #include "JackMachThread.h"
 #endif
@@ -373,6 +377,7 @@ error:
 int JackPortAudioDriver::Close()
 {
     JackAudioDriver::Close();
+	JackLog("JackPortAudioDriver::Close\n");
     Pa_CloseStream(fStream);
     Pa_Terminate();
     return 0;
