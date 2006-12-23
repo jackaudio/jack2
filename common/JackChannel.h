@@ -67,7 +67,7 @@ class JackClientChannelInterface
         virtual void Stop()
         {}
 
-        virtual void ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+        virtual void ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
         {}
         virtual void ClientNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {}

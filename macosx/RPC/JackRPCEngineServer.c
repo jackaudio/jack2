@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Feb 13 17:58:24 2006
- * with a MiG generated Sun Mar 20 14:22:13 PST 2005 by root@b05.apple.com
+ * stub generated Sat Dec 23 15:21:20 2006
+ * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
  * OPTIONS: 
  */
 
@@ -317,7 +317,7 @@
 		NDR_record_t NDR;
 		int shared_engine;
 		int shared_client;
-		int shared_ports;
+		int shared_graph;
 		int result;
 	} __Reply__rpc_jack_client_new_t;
 #ifdef  __MigPackStructs
@@ -698,7 +698,7 @@ kern_return_t server_rpc_jack_client_new
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
-	int *shared_ports,
+	int *shared_graph,
 	int *result
 );
 
@@ -764,7 +764,7 @@ mig_internal novalue _Xrpc_jack_client_new
 #endif	/* UseStaticTemplates */
 
 
-	RetCode = server_rpc_jack_client_new(In0P->Head.msgh_request_port, In0P->client_name, &OutP->private_port.name, &OutP->shared_engine, &OutP->shared_client, &OutP->shared_ports, &OutP->result);
+	RetCode = server_rpc_jack_client_new(In0P->Head.msgh_request_port, In0P->client_name, &OutP->private_port.name, &OutP->shared_engine, &OutP->shared_client, &OutP->shared_graph, &OutP->result);
 	if (RetCode != KERN_SUCCESS) {
 		MIG_RETURN_ERROR(OutP, RetCode);
 	}

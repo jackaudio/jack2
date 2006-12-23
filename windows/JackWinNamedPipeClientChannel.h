@@ -56,7 +56,7 @@ class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public 
         int Start();
         void Stop();
 
-        void ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result);
+        void ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int* result);

@@ -63,7 +63,7 @@ JackLibClient::~JackLibClient()
 
 int JackLibClient::Open(const char* name)
 {
-    int shared_engine, shared_client, shared_ports, result;
+    int shared_engine, shared_client, shared_graph, result;
     JackLog("JackLibClient::Open %s\n", name);
 
     // Open server/client channel
@@ -79,7 +79,7 @@ int JackLibClient::Open(const char* name)
     }
 
     // Require new client
-    fChannel->ClientNew(name, &shared_engine, &shared_client, &shared_ports, &result);
+    fChannel->ClientNew(name, &shared_engine, &shared_client, &shared_graph, &result);
     if (result < 0) {
         jack_error("Cannot open %s client", name);
         goto error;
@@ -88,7 +88,7 @@ int JackLibClient::Open(const char* name)
     try {
         // Map shared memory segments
         JackLibGlobals::fGlobals->fEngineControl = shared_engine;
-        JackLibGlobals::fGlobals->fGraphManager = shared_ports;
+        JackLibGlobals::fGlobals->fGraphManager = shared_graph;
         fClientControl = shared_client;
         jack_verbose = GetEngineControl()->fVerbose;
     } catch (int n) {

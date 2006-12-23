@@ -34,7 +34,7 @@ routine rpc_jack_client_new(
 	out private_port : mach_port_make_send_t;
 	out shared_engine : int;
 	out shared_client : int;
-	out shared_ports : int;
+	out shared_graph : int;
 	out result : int);
 
 routine  rpc_jack_client_close(

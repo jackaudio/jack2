@@ -88,11 +88,11 @@ void JackSocketServerChannel::CreateClient()
     }
 }
 
-void JackSocketServerChannel::AddClient(int fd, char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+void JackSocketServerChannel::AddClient(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     JackLog("JackSocketServerChannel::AddClient\n");
     int refnum = -1;
-    *result = fServer->GetEngine()->ClientNew(name, &refnum, shared_engine, shared_client, shared_ports);
+    *result = fServer->GetEngine()->ClientNew(name, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
         fSocketTable[fd].first = refnum;
         fRebuild = true;
@@ -155,7 +155,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackClientNewRequest req;
                 JackClientNewResult res;
                 if (req.Read(socket) == 0)
-					AddClient(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedPorts, &res.fResult);
+					AddClient(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(socket);
                 break;
             }

@@ -58,7 +58,7 @@ class JackMachServerChannel : public JackServerChannelInterface, public JackRunn
         JackEngine* GetEngine();
         JackServer* GetServer();
 
-        void AddClient(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_ports, int* result);
+        void AddClient(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void RemoveClient(mach_port_t private_port, int refnum);
         void KillClient(mach_port_t private_port);
 

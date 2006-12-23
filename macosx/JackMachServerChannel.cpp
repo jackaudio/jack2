@@ -77,10 +77,10 @@ JackServer* JackMachServerChannel::GetServer()
     return fServer;
 }
 
-void JackMachServerChannel::AddClient(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+void JackMachServerChannel::AddClient(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     int refnum = -1;
-    *result = GetEngine()->ClientNew(name, &refnum, shared_engine, shared_client, shared_ports);
+    *result = GetEngine()->ClientNew(name, &refnum, shared_engine, shared_client, shared_graph);
 
     if (*result == 0) {
         mach_port_t port = fServerPort.AddPort();

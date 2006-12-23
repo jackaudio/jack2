@@ -56,7 +56,7 @@ kern_return_t rpc_jack_client_new
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
-	int *shared_ports,
+	int *shared_graph,
 	int *result
 );
 
@@ -511,7 +511,7 @@ union __RequestUnion__JackRPCEngine_subsystem {
 		NDR_record_t NDR;
 		int shared_engine;
 		int shared_client;
-		int shared_ports;
+		int shared_graph;
 		int result;
 	} __Reply__rpc_jack_client_new_t;
 #ifdef  __MigPackStructs

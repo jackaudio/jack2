@@ -47,7 +47,7 @@ class JackSocketServerChannel : public JackServerChannelInterface, public JackRu
 
         int HandleRequest(int fd);
         void CreateClient();
-        void AddClient(int fd, char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result);
+        void AddClient(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void RemoveClient(int fd, int refnum);
         void KillClient(int fd);
         void BuildPoolTable();

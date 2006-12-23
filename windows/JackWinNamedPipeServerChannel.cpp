@@ -267,11 +267,11 @@ int JackClientPipeThread::HandleRequest()
     return ret;
 }
 
-void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     JackLog("JackClientPipeThread::AddClient %s\n", name);
     fRefNum = -1;
-    *result = fServer->GetEngine()->ClientNew(name, &fRefNum, shared_engine, shared_client, shared_ports);
+    *result = fServer->GetEngine()->ClientNew(name, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
 void JackClientPipeThread::RemoveClient()

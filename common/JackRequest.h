@@ -150,14 +150,14 @@ struct JackClientNewResult : public JackResult
 
     int fSharedEngine;
     int fSharedClient;
-    int fSharedPorts;
+    int fSharedGraph;
     uint32_t fProtocolVersion;
 
     JackClientNewResult()
-		:fSharedEngine(-1), fSharedClient(-1), fSharedPorts(-1), fProtocolVersion(0)
+		:fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
     {}
     JackClientNewResult(int32_t status, int index1, int index2, int index3)
-         : JackResult(status), fSharedEngine(index1), fSharedClient(index2), fSharedPorts(index3), fProtocolVersion(0)
+         : JackResult(status), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
     {}
 
     virtual int Read(JackChannelTransaction* trans)

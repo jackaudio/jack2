@@ -112,14 +112,14 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
     }
 }
 
-void JackWinNamedPipeClientChannel::ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+void JackWinNamedPipeClientChannel::ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     JackClientNewRequest req(name);
     JackClientNewResult res;
     ServerSyncCall(&req, &res, result);
     *shared_engine = res.fSharedEngine;
     *shared_client = res.fSharedClient;
-    *shared_ports = res.fSharedPorts;
+    *shared_graph = res.fSharedGraph;
 }
 
 void JackWinNamedPipeClientChannel::ClientClose(int refnum, int* result)

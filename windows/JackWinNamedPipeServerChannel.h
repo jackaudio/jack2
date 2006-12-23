@@ -39,7 +39,7 @@ class JackClientPipeThread : public JackRunnableInterface
         JackThread*	fThread;
         int fRefNum;
 
-        void AddClient(char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result);
+        void AddClient(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void RemoveClient();
         void KillClient();
 

@@ -95,9 +95,9 @@ void JackMachClientChannel::Stop()
     fThread->Kill();
 }
 
-void JackMachClientChannel::ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_ports, int* result)
+void JackMachClientChannel::ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    kern_return_t res = rpc_jack_client_new(fServerPort.GetPort(), (char*)name, &fPrivatePort, shared_engine, shared_client, shared_ports, result);
+    kern_return_t res = rpc_jack_client_new(fServerPort.GetPort(), (char*)name, &fPrivatePort, shared_engine, shared_client, shared_graph, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientNew err = %s", mach_error_string(res));
