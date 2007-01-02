@@ -50,6 +50,11 @@ struct JackEngineControl : public JackShmMem
     bool fSyncMode;
     bool fVerbose;
 	
+	void InitFrameTime()
+	{
+		fFrameTimer.InitFrameTime();
+	}
+	
 	void IncFrameTime(jack_time_t callback_usecs)
 	{
 		fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);

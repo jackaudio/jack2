@@ -36,7 +36,7 @@ JackTimer::JackTimer()
     fSecondOrderIntegrator = 0.0f;
 }
 
-void JackFrameTimer::Init()
+void JackFrameTimer::InitFrameTime()
 {
     fFirstWakeUp = true;
 }
@@ -44,21 +44,11 @@ void JackFrameTimer::Init()
 void JackFrameTimer::IncFrameTime(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs)
 {
     if (fFirstWakeUp) {
-        InitFrameTime(callback_usecs, period_usecs);
+        InitFrameTimeAux(callback_usecs, period_usecs);
         fFirstWakeUp = false;
     } else {
         IncFrameTimeAux(nframes, callback_usecs, period_usecs);
     }
-}
-
-void JackFrameTimer::InitFrameTime(jack_time_t callback_usecs, jack_time_t period_usecs)
-{
-    JackTimer* timer = WriteNextStateStart();
-    timer->fSecondOrderIntegrator = 0.0f;
-    timer->fCurrentCallback = callback_usecs;
-    timer->fNextWakeUp = callback_usecs + period_usecs;
-    WriteNextStateStop();
-    TrySwitchState();
 }
 
 void JackFrameTimer::ResetFrameTime(jack_nframes_t frames_rate, jack_time_t callback_usecs, jack_time_t period_usecs)
@@ -75,20 +65,6 @@ void JackFrameTimer::ResetFrameTime(jack_nframes_t frames_rate, jack_time_t call
     }
 }
 
-void JackFrameTimer::IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs)
-{
-    JackTimer* timer = WriteNextStateStart();
-    float delta = (int64_t)callback_usecs - (int64_t)timer->fNextWakeUp;
-    timer->fCurrentWakeup = timer->fNextWakeUp;
-    timer->fCurrentCallback = callback_usecs;
-    timer->fFrames += nframes;
-    timer->fSecondOrderIntegrator += 0.5f * timer->fFilterCoefficient * delta;
-    timer->fNextWakeUp = timer->fCurrentWakeup + period_usecs + (int64_t) floorf((timer->fFilterCoefficient * (delta + timer->fSecondOrderIntegrator)));
-    timer->fInitialized = true;
-    WriteNextStateStop();
-    TrySwitchState();
-}
-
 /*
 	Use the state returned by ReadCurrentState and check that the state was not changed during the read operation.
 	The operation is lock-free since there is no intermediate state in the write operation that could cause the
@@ -103,6 +79,32 @@ void JackFrameTimer::ReadFrameTime(JackTimer* timer)
         memcpy(timer, ReadCurrentState(), sizeof(JackTimer));
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
+}
+
+// Internal
+
+void JackFrameTimer::InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t period_usecs)
+{
+    JackTimer* timer = WriteNextStateStart();
+    timer->fSecondOrderIntegrator = 0.0f;
+    timer->fCurrentCallback = callback_usecs;
+    timer->fNextWakeUp = callback_usecs + period_usecs;
+    WriteNextStateStop();
+    TrySwitchState();
+}
+
+void JackFrameTimer::IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs)
+{
+    JackTimer* timer = WriteNextStateStart();
+    float delta = (int64_t)callback_usecs - (int64_t)timer->fNextWakeUp;
+    timer->fCurrentWakeup = timer->fNextWakeUp;
+    timer->fCurrentCallback = callback_usecs;
+    timer->fFrames += nframes;
+    timer->fSecondOrderIntegrator += 0.5f * timer->fFilterCoefficient * delta;
+    timer->fNextWakeUp = timer->fCurrentWakeup + period_usecs + (int64_t) floorf((timer->fFilterCoefficient * (delta + timer->fSecondOrderIntegrator)));
+    timer->fInitialized = true;
+    WriteNextStateStop();
+    TrySwitchState();
 }
 
 } // end of namespace

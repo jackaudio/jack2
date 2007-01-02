@@ -60,6 +60,7 @@ class JackFrameTimer : public JackAtomicState<JackTimer>
 
         bool fFirstWakeUp;
         void IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs);
+		void InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t period_usecs);
 
     public:
 
@@ -68,8 +69,7 @@ class JackFrameTimer : public JackAtomicState<JackTimer>
         ~JackFrameTimer()
         {}
 
-        void Init();
-        void InitFrameTime(jack_time_t callback_usecs, jack_time_t period_usecs);
+        void InitFrameTime();
         void ResetFrameTime(jack_nframes_t frames_rate, jack_time_t callback_usecs, jack_time_t period_usecs);
         void IncFrameTime(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs);
         void ReadFrameTime(JackTimer* timer);
