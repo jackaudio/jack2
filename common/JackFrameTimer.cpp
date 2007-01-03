@@ -61,7 +61,7 @@ void JackFrameTimer::ResetFrameTime(jack_nframes_t frames_rate, jack_time_t call
         timer->fCurrentCallback = callback_usecs;
         timer->fNextWakeUp = callback_usecs + period_usecs;
         WriteNextStateStop();
-        TrySwitchState();
+        TrySwitchState(); // always succeed since there is only one writer
     }
 }
 
@@ -90,7 +90,7 @@ void JackFrameTimer::InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t pe
     timer->fCurrentCallback = callback_usecs;
     timer->fNextWakeUp = callback_usecs + period_usecs;
     WriteNextStateStop();
-    TrySwitchState();
+    TrySwitchState(); // always succeed since there is only one writer
 }
 
 void JackFrameTimer::IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs)
@@ -104,7 +104,7 @@ void JackFrameTimer::IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callbac
     timer->fNextWakeUp = timer->fCurrentWakeup + period_usecs + (int64_t) floorf((timer->fFilterCoefficient * (delta + timer->fSecondOrderIntegrator)));
     timer->fInitialized = true;
     WriteNextStateStop();
-    TrySwitchState();
+    TrySwitchState(); // always succeed since there is only one writer
 }
 
 } // end of namespace
