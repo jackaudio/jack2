@@ -111,7 +111,7 @@ int JackClientPipeThread::HandleRequest()
 			JackClientNewRequest req;
 			JackClientNewResult res;
 			if (req.Read(fPipe) == 0) 
-				AddClient(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedPorts, &res.fResult);	
+				AddClient(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);	
 			res.Write(fPipe);
 			break;
 		}
