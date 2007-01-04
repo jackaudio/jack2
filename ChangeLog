@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-01-04 Stephane Letz  <letz@grame.fr>
+
+	*  Add call to the init callback (set up using the jack_set_thread_init_callback API) in Real-Time and Notification threads. Define a new 'kActivateClient' notification. 
+
 2006-12-23 Stephane Letz  <letz@grame.fr>
 
 	* shared_ports renamed to shared_graph.

@@ -226,7 +226,7 @@ bool JackSocketClientChannel::Init()
         jack_error("JackSocketClientChannel: cannot establish notication socket");
         return false;
     } else {
-        return true;
+		return true;
     }
 }
 

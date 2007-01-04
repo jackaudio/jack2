@@ -143,7 +143,7 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
             if (strcmp(GetClientControl()->fName, name) != 0)
                 res = fSynchroTable[refnum]->Disconnect() ? 0 : -1;
             break;
-    }
+	}
 
     return res;
 }

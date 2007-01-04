@@ -117,7 +117,7 @@ void JackClient::SetupDriverSync(bool freewheel)
 
 int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value)
 {
-    return 0;
+ 	return 0;
 }
 
 int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value)
@@ -131,7 +131,12 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
         case JackNotifyChannelInterface::kRemoveClient:
             res = ClientNotifyImp(refnum, name, notify, sync, value);
             break;
-    }
+			
+		case JackNotifyChannelInterface::kActivateClient:
+			JackLog("JackClient::kActivateClient name = %s ref = %ld \n", name, refnum);
+			Init();
+			break;
+	}
 
     /*
     The current semantic is that notifications can only be received when the client has been activated,
@@ -191,7 +196,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 	            JackLog("JackClient::kZombifyClient name = %s ref = %ld \n", name, refnum);
                 ShutDown();
                 break;
-        }
+		}
     }
 
     return res;
@@ -279,7 +284,7 @@ bool JackClient::Init()
 {
     if (fInit) {
         JackLog("JackClient::Init calling client thread init callback\n");
-        fInit(fInitArg);
+		fInit(fInitArg);
     }
     return true;
 }

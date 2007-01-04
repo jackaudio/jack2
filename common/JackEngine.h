@@ -109,6 +109,7 @@ class JackEngine
         void NotifyBufferSize(jack_nframes_t nframes);
         void NotifyFreewheel(bool onoff);
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
+		void NotifyActivate(int refnum);
 
         void PrintState();
 };

@@ -138,15 +138,16 @@ class JackNotifyChannelInterface
         typedef enum {
             kAddClient = 0,
             kRemoveClient = 1,
-            kXRunCallback = 2,
-            kGraphOrderCallback = 3,
-            kBufferSizeCallback = 4,
-            kStartFreewheel = 5,
-            kStopFreewheel = 6,
-            kPortRegistrationOn = 7,
-            kPortRegistrationOff = 8,
-            kZombifyClient = 9,
-            kDeadClient = 10
+			kActivateClient = 2,
+            kXRunCallback = 3,
+            kGraphOrderCallback = 4,
+            kBufferSizeCallback = 5,
+            kStartFreewheel = 6,
+            kStopFreewheel = 7,
+            kPortRegistrationOn = 8,
+            kPortRegistrationOff = 9,
+            kZombifyClient = 10,
+            kDeadClient = 11
     } NotificationType;
 
 };

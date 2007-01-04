@@ -323,6 +323,11 @@ void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
     NotifyClients((onoff ? JackNotifyChannelInterface::kPortRegistrationOn : JackNotifyChannelInterface::kPortRegistrationOff), false, port_index);
 }
 
+void JackEngine::NotifyActivate(int refnum)
+{
+    NotifyClient(refnum, JackNotifyChannelInterface::kActivateClient, false, 0);
+}
+
 //-------------------
 // Client management
 //-------------------
@@ -497,6 +502,7 @@ int JackEngine::ClientActivate(int refnum)
 		JackLog("JackEngine::ClientActivate wait error ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
 		return -1;
 	} else {
+		NotifyActivate(refnum);
 		return 0;
 	}
 }

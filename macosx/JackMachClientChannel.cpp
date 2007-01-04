@@ -41,7 +41,7 @@ JackMachClientChannel::~JackMachClientChannel()
 
 // Server <===> client
 
-int JackMachClientChannel::Open(const char* name, JackClient* obj)
+int JackMachClientChannel::Open(const char* name, JackClient* client)
 {
     JackLog("JackMachClientChannel::Open name = %s\n", name);
 
@@ -60,7 +60,7 @@ int JackMachClientChannel::Open(const char* name, JackClient* obj)
         return -1;
     }
 
-    JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()] = obj;
+    JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()] = client;
     return 0;
 }
 

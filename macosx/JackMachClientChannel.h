@@ -48,7 +48,7 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
         JackMachClientChannel();
         virtual ~JackMachClientChannel();
 
-        int Open(const char* name, JackClient* obj);
+        int Open(const char* name, JackClient* client);
         void Close();
 
         int Start();
@@ -75,7 +75,8 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);
 
-        bool Execute();
+		// JackRunnableInterface interface
+		bool Execute();
 };
 
 
