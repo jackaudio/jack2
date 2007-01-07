@@ -4440,6 +4440,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = YES;
 			};
 			name = Development;
@@ -4495,6 +4496,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = YES;
 			};
 			name = Default;
