@@ -309,8 +309,8 @@ struct JackPortRegisterRequest : public JackRequest
     {
         //return trans->Read(&fRefNum, sizeof(JackPortRegisterRequest) - sizeof(JackRequest));
 		CheckRes(trans->Read(&fRefNum, sizeof(int)));
-		CheckRes(trans->Read(&fName, sizeof(JACK_PORT_NAME_SIZE + 1)));
-		CheckRes(trans->Read(&fPortType, sizeof(JACK_PORT_TYPE_SIZE + 1)));
+		CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fPortType, JACK_PORT_TYPE_SIZE + 1));
 		CheckRes(trans->Read(&fFlags, sizeof(unsigned int)));
 		CheckRes(trans->Read(&fBufferSize, sizeof(unsigned int)));
 		return 0;
@@ -321,8 +321,8 @@ struct JackPortRegisterRequest : public JackRequest
         //return trans->Write(this, sizeof(JackPortRegisterRequest));
 		CheckRes(JackRequest::Write(trans));
 		CheckRes(trans->Write(&fRefNum, sizeof(int)));
-		CheckRes(trans->Write(&fName, sizeof(JACK_PORT_NAME_SIZE + 1)));
-		CheckRes(trans->Write(&fPortType, sizeof(JACK_PORT_TYPE_SIZE + 1)));
+		CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Write(&fPortType, JACK_PORT_TYPE_SIZE + 1));
 		CheckRes(trans->Write(&fFlags, sizeof(unsigned int)));
 		CheckRes(trans->Write(&fBufferSize, sizeof(unsigned int)));
 		return 0;
