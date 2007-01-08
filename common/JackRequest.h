@@ -1,4 +1,5 @@
 
+
 /*
     Copyright (C) 2001 Paul Davis 
  
@@ -731,7 +732,7 @@ struct JackClientNotification
 		CheckRes(trans->Read(&fRefNum, sizeof(int)));
 		CheckRes(trans->Read(&fNotify, sizeof(int)));
 		CheckRes(trans->Read(&fValue, sizeof(int)));
-		CheckRes(trans->Read(&fValue, sizeof(fSync)));
+		CheckRes(trans->Read(&fSync, sizeof(int)));
 		return 0;
     }
 
@@ -742,7 +743,7 @@ struct JackClientNotification
 		CheckRes(trans->Write(&fRefNum, sizeof(int)));
 		CheckRes(trans->Write(&fNotify, sizeof(int)));
 		CheckRes(trans->Write(&fValue, sizeof(int)));
-		CheckRes(trans->Write(&fValue, sizeof(fSync)));
+		CheckRes(trans->Write(&fSync, sizeof(int)));
 		return 0;
     }
 
