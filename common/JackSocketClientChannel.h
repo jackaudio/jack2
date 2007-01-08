@@ -43,8 +43,8 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
         JackThread*	fThread;						// Thread to execute the event loop
         JackClient*	fClient;
 
-        //void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
-        //void ServerAsyncCall(JackRequest* req, JackResult* res, int* result);
+        void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
+        void ServerAsyncCall(JackRequest* req, JackResult* res, int* result);
 
     public:
 

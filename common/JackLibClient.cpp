@@ -114,6 +114,7 @@ int JackLibClient::Open(const char* name)
     }
 
     JackLog("JackLibClient::Open name = %s refnum = %ld\n", name, fClientControl->fRefNum);
+	
     return 0;
 
 error:

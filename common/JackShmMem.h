@@ -22,12 +22,74 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackShmMem__
 
 #include "shm.h"
-#include <new>  // GCC 4.0
 #include "JackError.h"
-#include <errno.h>
 
+#include <new>  // GCC 4.0
+#include <errno.h> 
+#include <stdlib.h>
+
+#ifdef WIN32
+	#include <windows.h>
+#else
+	#include <sys/types.h>
+	#include <sys/mman.h>
+#endif
+  
 namespace Jack
 {
+
+class JackLockMem
+{
+	private:
+
+		size_t fSize;
+		static size_t gSize;
+	
+	public:
+
+        void* operator new(size_t size)
+		{	
+			gSize = size;
+			return malloc(size);
+		}
+		
+        void operator delete(void* ptr, size_t size)
+		{	
+			free(ptr);
+		}
+
+        JackLockMem():fSize(gSize)
+        {}
+
+        virtual ~JackLockMem()
+        {
+			UnlockMemory();
+		}
+		
+		void LockMemory() 
+		{
+		#ifdef __APPLE __
+			mlock(ptr, size);
+		#elseif linux_
+			mlock(ptr, size);
+		#elseif WIN32
+			VirtualLock(ptr, size);
+		#endif
+		}
+		
+		void UnlockMemory() 
+		{
+		#ifdef __APPLE __
+			munlock(ptr, size);
+		#elseif linux_
+			munlock(ptr, size);
+		#elseif WIN32
+			VirtualUnlock(ptr, size);
+		#endif
+		}
+
+};
+
 
 /*!
 \brief The base class for shared memory management.

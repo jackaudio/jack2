@@ -155,7 +155,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackClientNewRequest req;
                 JackClientNewResult res;
                 if (req.Read(socket) == 0)
-					AddClient(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fHeader.fResult);
+					AddClient(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(socket);
                 break;
             }
@@ -196,7 +196,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackPortRegisterRequest req;
                 JackPortRegisterResult res;
                 if (req.Read(socket) == 0)
-					res.fHeader.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fFlags, req.fBufferSize, &res.fPortIndex);
+					res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fFlags, req.fBufferSize, &res.fPortIndex);
                 res.Write(socket);
                 break;
             }

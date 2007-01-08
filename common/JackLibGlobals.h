@@ -76,7 +76,7 @@ struct JackLibGlobals
             JackGlobals::InitClient();
             InitTime();
             fGlobals = new JackLibGlobals();
-        }
+	   }
     }
 
     static void Destroy()

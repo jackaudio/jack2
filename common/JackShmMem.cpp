@@ -29,6 +29,7 @@ unsigned long JackShmMem::fSegmentNum = 0;
 unsigned long JackShmMem::fSegmentCount = 0;
 
 jack_shm_info_t JackShmMem::gInfo;
+size_t JackLockMem::gSize = 0;
 
 void* JackShmMem::operator new(size_t size)
 {
