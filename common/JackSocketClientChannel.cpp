@@ -86,6 +86,7 @@ void JackSocketClientChannel::Stop()
     fThread->Kill();
 }
 
+/*
 void JackSocketClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)
 {
     if (req->Write(&fRequestSocket) < 0) {
@@ -112,12 +113,27 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
         *result = 0;
     }
 }
+*/
 
 void JackSocketClientChannel::ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     JackClientNewRequest req(name);
     JackClientNewResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fHeader.fResult;
     *shared_engine = res.fSharedEngine;
     *shared_client = res.fSharedClient;
     *shared_graph = res.fSharedGraph;
@@ -127,28 +143,73 @@ void JackSocketClientChannel::ClientClose(int refnum, int* result)
 {
     JackClientCloseRequest req(refnum);
     JackResult res;
-    ServerAsyncCall(&req, &res, result);
+    //ServerAsyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+    } else {
+        *result = 0;
+    }
 }
 
 void JackSocketClientChannel::ClientActivate(int refnum, int* result)
 {
     JackActivateRequest req(refnum);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::ClientDeactivate(int refnum, int* result)
 {
     JackDeactivateRequest req(refnum);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+	*result = res.fResult;
 }
 
 void JackSocketClientChannel::PortRegister(int refnum, const char* name, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
 {
     JackPortRegisterRequest req(refnum, name, "audio", flags, buffer_size);
     JackPortRegisterResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fHeader.fResult;
     *port_index = res.fPortIndex;
 }
 
@@ -156,63 +217,180 @@ void JackSocketClientChannel::PortUnRegister(int refnum, jack_port_id_t port_ind
 {
     JackPortUnRegisterRequest req(refnum, port_index);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::PortConnect(int refnum, const char* src, const char* dst, int* result)
 {
     JackPortConnectNameRequest req(refnum, src, dst);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::PortDisconnect(int refnum, const char* src, const char* dst, int* result)
 {
     JackPortDisconnectNameRequest req(refnum, src, dst);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
 {
     JackPortConnectRequest req(refnum, src, dst);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
 {
     JackPortDisconnectRequest req(refnum, src, dst);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::SetBufferSize(jack_nframes_t buffer_size, int* result)
 {
     JackSetBufferSizeRequest req(buffer_size);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::SetFreewheel(int onoff, int* result)
 {
     JackSetFreeWheelRequest req(onoff);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::ReleaseTimebase(int refnum, int* result)
 {
     JackReleaseTimebaseRequest req(refnum);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 void JackSocketClientChannel::SetTimebaseCallback(int refnum, int conditional, int* result)
 {
     JackSetTimebaseCallbackRequest req(refnum, conditional);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    //ServerSyncCall(&req, &res, result);
+	if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    if (res.Read(&fRequestSocket) < 0) {
+        jack_error("Could not read result type = %ld", req.fHeader.fType);
+        *result = -1;
+        return ;
+    }
+
+    *result = res.fResult;
 }
 
 bool JackSocketClientChannel::Init()
@@ -234,8 +412,6 @@ bool JackSocketClientChannel::Execute()
 {
     JackClientNotification event;
     JackResult res;
-
-    //fClient->Init(); // To be checked
 
     if (event.Read(fNotificationSocket) < 0) {
         fNotificationSocket->Close();

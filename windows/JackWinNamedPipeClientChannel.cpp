@@ -231,8 +231,6 @@ bool JackWinNamedPipeClientChannel::Execute()
     JackClientNotification event;
     JackResult res;
 
-    //fClient->Init(); // To be checked
-
     if (event.Read(&fNotificationListenPipe) < 0) {
         fNotificationListenPipe.Close();
         jack_error("JackWinNamedPipeClientChannel read fail");

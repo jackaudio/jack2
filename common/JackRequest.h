@@ -72,15 +72,15 @@ public:
     JackRequest(RequestType type): fType(type)
     {}
 
-    virtual ~JackRequest()
+  	~JackRequest()
     {}
 
-    virtual int Read(JackChannelTransaction* trans)
+ 	int Read(JackChannelTransaction* trans)
     {
         return trans->Read(this, sizeof(JackRequest));
     }
 
-    virtual int Write(JackChannelTransaction* trans)
+ 	int Write(JackChannelTransaction* trans)
     {
         return -1;
     }
@@ -118,14 +118,15 @@ struct JackResult
 \brief NewClient request.
 */
 
-struct JackClientNewRequest : public JackRequest
+struct JackClientNewRequest 
 {
 
+	JackRequest fHeader;	
     char fName[JACK_CLIENT_NAME_SIZE + 1];
 
     JackClientNewRequest()
     {}
-    JackClientNewRequest(const char* name): JackRequest(kClientNew)
+    JackClientNewRequest(const char* name): fHeader(JackRequest::kClientNew)
     {
         snprintf(fName, sizeof(fName), "%s", name);
     }
@@ -145,9 +146,10 @@ struct JackClientNewRequest : public JackRequest
 \brief NewClient result.
 */
 
-struct JackClientNewResult : public JackResult
+struct JackClientNewResult 
 {
 
+	JackResult fHeader;
     int fSharedEngine;
     int fSharedClient;
     int fSharedGraph;
@@ -157,10 +159,11 @@ struct JackClientNewResult : public JackResult
 		:fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
     {}
     JackClientNewResult(int32_t status, int index1, int index2, int index3)
-         : JackResult(status), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
+         : fHeader(status), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
     {}
 
-    virtual int Read(JackChannelTransaction* trans)
+    //virtual int Read(JackChannelTransaction* trans)
+	int Read(JackChannelTransaction* trans)
     {
         return trans->Read(this, sizeof(JackClientNewResult));
     }
@@ -175,14 +178,15 @@ struct JackClientNewResult : public JackResult
 \brief CloseClient request.
 */
 
-struct JackClientCloseRequest : public JackRequest
+struct JackClientCloseRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
 
     JackClientCloseRequest()
     {}
-    JackClientCloseRequest(int refnum): JackRequest(kClientClose), fRefNum(refnum)
+    JackClientCloseRequest(int refnum): fHeader(JackRequest::kClientClose), fRefNum(refnum)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -200,14 +204,15 @@ struct JackClientCloseRequest : public JackRequest
 \brief Activate request.
 */
 
-struct JackActivateRequest : public JackRequest
+struct JackActivateRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
 
     JackActivateRequest()
     {}
-    JackActivateRequest(int refnum): JackRequest(kActivateClient), fRefNum(refnum)
+    JackActivateRequest(int refnum): fHeader(JackRequest::kActivateClient), fRefNum(refnum)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -226,14 +231,15 @@ struct JackActivateRequest : public JackRequest
 \brief Deactivate request.
 */
 
-struct JackDeactivateRequest : public JackRequest
+struct JackDeactivateRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
 
     JackDeactivateRequest()
     {}
-    JackDeactivateRequest(int refnum): JackRequest(kDeactivateClient), fRefNum(refnum)
+    JackDeactivateRequest(int refnum): fHeader(JackRequest::kDeactivateClient), fRefNum(refnum)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -252,9 +258,10 @@ struct JackDeactivateRequest : public JackRequest
 \brief PortRegister request.
 */
 
-struct JackPortRegisterRequest : public JackRequest
+struct JackPortRegisterRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
     char fName[JACK_PORT_NAME_SIZE + 1];
     char fPortType[JACK_PORT_TYPE_SIZE + 1];
@@ -264,7 +271,7 @@ struct JackPortRegisterRequest : public JackRequest
     JackPortRegisterRequest()
     {}
     JackPortRegisterRequest(int refnum, const char* name, const char* port_type, unsigned int flags, unsigned int buffer_size)
-            : JackRequest(kRegisterPort), fRefNum(refnum), fFlags(flags), fBufferSize(buffer_size)
+            : fHeader(JackRequest::kRegisterPort), fRefNum(refnum), fFlags(flags), fBufferSize(buffer_size)
     {
         strcpy(fName, name);
         strcpy(fPortType, port_type);
@@ -285,15 +292,16 @@ struct JackPortRegisterRequest : public JackRequest
 \brief PortRegister result.
 */
 
-struct JackPortRegisterResult : public JackResult
+struct JackPortRegisterResult
 {
 
+	JackResult fHeader;
     jack_port_id_t fPortIndex;
 
     JackPortRegisterResult(): fPortIndex(NO_PORT)
     {}
 
-    virtual int Read(JackChannelTransaction* trans)
+    int Read(JackChannelTransaction* trans)
     {
         return trans->Read(this, sizeof(JackPortRegisterResult));
     }
@@ -308,15 +316,16 @@ struct JackPortRegisterResult : public JackResult
 \brief PortUnregister request.
 */
 
-struct JackPortUnRegisterRequest : public JackRequest
+struct JackPortUnRegisterRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
     int fPortIndex;
 
     JackPortUnRegisterRequest()
     {}
-    JackPortUnRegisterRequest(int refnum, int index): JackRequest(kUnRegisterPort), fRefNum(refnum), fPortIndex(index)
+    JackPortUnRegisterRequest(int refnum, int index): fHeader(JackRequest::kUnRegisterPort), fRefNum(refnum), fPortIndex(index)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -334,16 +343,17 @@ struct JackPortUnRegisterRequest : public JackRequest
 \brief PortConnectName request.
 */
 
-struct JackPortConnectNameRequest : public JackRequest
+struct JackPortConnectNameRequest
 {
-
+	
+	JackRequest fHeader;
     int fRefNum;
     char fSrc[JACK_PORT_NAME_SIZE + 1];
     char fDst[JACK_PORT_NAME_SIZE + 1];
 
     JackPortConnectNameRequest()
     {}
-    JackPortConnectNameRequest(int refnum, const char* src_name, const char* dst_name): JackRequest(kConnectNamePorts), fRefNum(refnum)
+    JackPortConnectNameRequest(int refnum, const char* src_name, const char* dst_name): fHeader(JackRequest::kConnectNamePorts), fRefNum(refnum)
     {
         strcpy(fSrc, src_name);
         strcpy(fDst, dst_name);
@@ -364,16 +374,17 @@ struct JackPortConnectNameRequest : public JackRequest
 \brief PortDisconnectName request.
 */
 
-struct JackPortDisconnectNameRequest : public JackRequest
+struct JackPortDisconnectNameRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
     char fSrc[JACK_PORT_NAME_SIZE + 1];
     char fDst[JACK_PORT_NAME_SIZE + 1];
 
     JackPortDisconnectNameRequest()
     {}
-    JackPortDisconnectNameRequest(int refnum, const char* src_name, const char* dst_name): JackRequest(kDisconnectNamePorts), fRefNum(refnum)
+    JackPortDisconnectNameRequest(int refnum, const char* src_name, const char* dst_name): fHeader(JackRequest::kDisconnectNamePorts), fRefNum(refnum)
     {
         strcpy(fSrc, src_name);
         strcpy(fDst, dst_name);
@@ -394,16 +405,17 @@ struct JackPortDisconnectNameRequest : public JackRequest
 \brief PortConnect request.
 */
 
-struct JackPortConnectRequest : public JackRequest
+struct JackPortConnectRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
     jack_port_id_t fSrc;
     jack_port_id_t fDst;
 
     JackPortConnectRequest()
     {}
-    JackPortConnectRequest(int refnum, jack_port_id_t src, jack_port_id_t dst): JackRequest(kConnectPorts), fRefNum(refnum), fSrc(src), fDst(dst)
+    JackPortConnectRequest(int refnum, jack_port_id_t src, jack_port_id_t dst): fHeader(JackRequest::kConnectPorts), fRefNum(refnum), fSrc(src), fDst(dst)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -422,16 +434,17 @@ struct JackPortConnectRequest : public JackRequest
 \brief PortDisconnect request.
 */
 
-struct JackPortDisconnectRequest : public JackRequest
+struct JackPortDisconnectRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
     jack_port_id_t fSrc;
     jack_port_id_t fDst;
 
     JackPortDisconnectRequest()
     {}
-    JackPortDisconnectRequest(int refnum, jack_port_id_t src, jack_port_id_t dst): JackRequest(kDisconnectPorts), fRefNum(refnum), fSrc(src), fDst(dst)
+    JackPortDisconnectRequest(int refnum, jack_port_id_t src, jack_port_id_t dst): fHeader(JackRequest::kDisconnectPorts), fRefNum(refnum), fSrc(src), fDst(dst)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -449,14 +462,15 @@ struct JackPortDisconnectRequest : public JackRequest
 \brief SetBufferSize request.
 */
 
-struct JackSetBufferSizeRequest : public JackRequest
+struct JackSetBufferSizeRequest
 {
 
+	JackRequest fHeader;
     jack_nframes_t fBufferSize;
 
     JackSetBufferSizeRequest()
     {}
-    JackSetBufferSizeRequest(jack_nframes_t buffer_size): JackRequest(kSetBufferSize), fBufferSize(buffer_size)
+    JackSetBufferSizeRequest(jack_nframes_t buffer_size): fHeader(JackRequest::kSetBufferSize), fBufferSize(buffer_size)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -474,14 +488,15 @@ struct JackSetBufferSizeRequest : public JackRequest
 \brief SetFreeWheel request.
 */
 
-struct JackSetFreeWheelRequest : public JackRequest
+struct JackSetFreeWheelRequest
 {
 
+	JackRequest fHeader;
     int fOnOff;
 
     JackSetFreeWheelRequest()
     {}
-    JackSetFreeWheelRequest(int onoff): JackRequest(kSetFreeWheel), fOnOff(onoff)
+    JackSetFreeWheelRequest(int onoff): fHeader(JackRequest::kSetFreeWheel), fOnOff(onoff)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -499,14 +514,15 @@ struct JackSetFreeWheelRequest : public JackRequest
 \brief ReleaseTimebase request.
 */
 
-struct JackReleaseTimebaseRequest : public JackRequest
+struct JackReleaseTimebaseRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
 
     JackReleaseTimebaseRequest()
     {}
-    JackReleaseTimebaseRequest(int refnum): JackRequest(kReleaseTimebase), fRefNum(refnum)
+    JackReleaseTimebaseRequest(int refnum): fHeader(JackRequest::kReleaseTimebase), fRefNum(refnum)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -525,15 +541,16 @@ struct JackReleaseTimebaseRequest : public JackRequest
 \brief SetTimebaseCallback request.
 */
 
-struct JackSetTimebaseCallbackRequest : public JackRequest
+struct JackSetTimebaseCallbackRequest
 {
 
+	JackRequest fHeader;
     int fRefNum;
     int fConditionnal;
 
     JackSetTimebaseCallbackRequest()
     {}
-    JackSetTimebaseCallbackRequest(int refnum, int conditional): JackRequest(kSetTimebaseCallback), fRefNum(refnum), fConditionnal(conditional)
+    JackSetTimebaseCallbackRequest(int refnum, int conditional): fHeader(JackRequest::kSetTimebaseCallback), fRefNum(refnum), fConditionnal(conditional)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -551,9 +568,10 @@ struct JackSetTimebaseCallbackRequest : public JackRequest
 \brief ClientNotification request.
 */
 
-struct JackClientNotificationRequest : public JackRequest
+struct JackClientNotificationRequest
 {
-
+	
+	JackRequest fHeader;
     int fRefNum;
     int fNotify;
     int fValue;
@@ -561,7 +579,7 @@ struct JackClientNotificationRequest : public JackRequest
     JackClientNotificationRequest()
     {}
     JackClientNotificationRequest(int refnum, int notify, int value)
-            : JackRequest(kNotification), fRefNum(refnum), fNotify(notify), fValue(value)
+            : fHeader(JackRequest::kNotification), fRefNum(refnum), fNotify(notify), fValue(value)
     {}
 
     int Read(JackChannelTransaction* trans)

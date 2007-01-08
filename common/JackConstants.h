@@ -24,7 +24,6 @@
 #define FORK_SERVER 1
 
 #define BUFFER_SIZE_MAX 8192
-#define SAMPLE_RATE 44100
 
 #define JACK_PORT_NAME_SIZE 256
 #define JACK_PORT_TYPE_SIZE 32
@@ -49,15 +48,13 @@
 #ifdef WIN32
 	#define jack_server_dir "server"
 	#define jack_client_dir "client"
+#elif __APPLE__
+	#define jack_server_dir "/tmp"
+	#define jack_client_dir "/tmp"
 #else
 	#define jack_server_dir "/dev/shm"
 	#define jack_client_dir "/dev/shm"
 #endif
-
-/*
-#define jack_server_dir "/mnt/ramfs"
-#define jack_client_dir "/mnt/ramfs"
-*/
 
 #define jack_server_entry "jackdmp_entry"
 #define jack_client_entry "jack_client"
