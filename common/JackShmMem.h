@@ -68,23 +68,23 @@ class JackLockMem
 		
 		void LockMemory() 
 		{
-		#ifdef __APPLE __
-			mlock(ptr, size);
-		#elseif linux_
-			mlock(ptr, size);
-		#elseif WIN32
-			VirtualLock(ptr, size);
+		#ifdef __APPLE__
+			mlock(this, fSize);
+		#elif linux_
+			mlock(this, fSize);
+		#elif WIN32
+			VirtualLock(this, fSize);
 		#endif
 		}
 		
 		void UnlockMemory() 
 		{
-		#ifdef __APPLE __
-			munlock(ptr, size);
-		#elseif linux_
-			munlock(ptr, size);
-		#elseif WIN32
-			VirtualUnlock(ptr, size);
+		#ifdef __APPLE__
+			munlock(this, fSize);
+		#elif linux_
+			munlock(this, fSize);
+		#elif WIN32
+			VirtualUnlock(this, fSize);
 		#endif
 		}
 
