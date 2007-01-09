@@ -30,6 +30,8 @@
 namespace Jack
 {
 
+#define CheckRes(res) {if (res < 0) return res;}
+
 /*!
 \brief Request from client to server.
 */
@@ -87,8 +89,6 @@ public:
     }
 
 };
-
-#define CheckRes(res) {if (res < 0) return res;}
 
 /*!
 \brief Result from the server.
@@ -181,7 +181,6 @@ struct JackClientNewResult : public JackResult
 		CheckRes(trans->Write(&fSharedClient, sizeof(int)));
 		CheckRes(trans->Write(&fSharedGraph, sizeof(int)));
 		CheckRes(trans->Write(&fProtocolVersion, sizeof(uint32_t)));
-		JackLog("JackClientNewResult::Write  result = %ld\n", fResult);
 		return 0;
     }
 };
