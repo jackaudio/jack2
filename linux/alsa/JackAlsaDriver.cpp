@@ -2164,7 +2164,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         return -1;
     }
 
-    fDriver = alsa_driver_new ("alsa_pcm", (char*)capture_driver_name, (char*)playback_driver_name,
+    fDriver = alsa_driver_new ("alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
                                NULL,
                                nframes,
                                user_nperiods,

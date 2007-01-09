@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-01-09 Stephane Letz  <letz@grame.fr>
+
+	* New server/client data transfer model. Fix a device name reversal in ALSA driver.
+
 2007-01-04 Stephane Letz  <letz@grame.fr>
 
 	*  Add call to the init callback (set up using the jack_set_thread_init_callback API) in Real-Time and Notification threads. Define a new 'kActivateClient' notification. 
