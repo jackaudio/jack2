@@ -71,7 +71,7 @@ int JackAudioDriver::Attach()
     unsigned long port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
     int i;
 
-    JackLog("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    JackLog("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(buf, sizeof(buf) - 1, "%s:%s:out%d", fClientControl->fName, fCaptureDriverName, i + 1);
@@ -82,7 +82,7 @@ int JackAudioDriver::Attach()
         port = fGraphManager->GetPort(port_index);
         port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
         fCapturePortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld \n", port_index);
+        JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld = \n", port_index);
     }
 
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -96,7 +96,7 @@ int JackAudioDriver::Attach()
         port = fGraphManager->GetPort(port_index);
         port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
+        JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld = \n", port_index);
 
         // Monitor ports
         if (fWithMonitorPorts) {
