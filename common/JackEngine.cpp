@@ -167,7 +167,7 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
             jack_time_t finished_date = timing->fFinishedAt;
            
             if (status != NotTriggered && status != Finished) {
-                jack_error("JackEngine::XRun: client = %s was not runned: state = %ld", client->GetClientControl()->fName, status);
+                jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
                 //fChannel->ClientNotify(i, kXRunCallback, 0); // Notify the failing client
                 fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kXRunCallback, 0);  // Notify all clients
             }
