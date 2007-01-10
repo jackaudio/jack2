@@ -1,6 +1,7 @@
 
 # Choose the installation location
 prefix := /usr/local
+prefix := ${DESTDIR}${prefix}
 
 subprojects := ../common ../tests ../example-clients alsa 
 
