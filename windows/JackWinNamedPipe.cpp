@@ -29,9 +29,7 @@ namespace Jack
 int JackWinNamedPipe::Read(void* data, int len)
 {
     DWORD read;
-    JackLog("JackWinNamedPipeClient::Read len = %ld\n", len);
     BOOL res = ReadFile(fNamedPipe, data, len, &read, NULL);
-    JackLog("JackWinNamedPipeClient::Read res = %ld read %ld\n", res, read);
     if (read != len) {
         jack_error("Cannot read named pipe err = %ld", GetLastError());
         return -1;
@@ -43,7 +41,6 @@ int JackWinNamedPipe::Read(void* data, int len)
 int JackWinNamedPipe::Write(void* data, int len)
 {
     DWORD written;
-    JackLog("JackWinNamedPipeClient::Write len = %ld\n", len);
     BOOL res = WriteFile(fNamedPipe, data, len, &written, NULL);
     if (written != len) {
         jack_error("Cannot write named pipe err = %ld", GetLastError());
