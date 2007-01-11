@@ -96,7 +96,7 @@ bool JackFifo::TimedWait(long usec)
     if (fPoll.revents & POLLIN) {
         return Wait();
     } else {
-        jack_error("JackFifo::TimedWait fails name = %s revents %ld ", fName, fPoll.revents);
+        jack_error("JackFifo::TimedWait name = %s usec = %ld revents %ld ", fName, usec, fPoll.revents);
         return false;
     }
 }

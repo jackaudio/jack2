@@ -78,7 +78,7 @@ bool JackMachSemaphore::TimedWait(long usec)
     time.tv_nsec = (usec % 1000000) * 1000;
     assert(fSemaphore > 0);
     if ((res = semaphore_timedwait(fSemaphore, time)) != KERN_SUCCESS) {
-        jack_error("JackMachSemaphore::TimedWait name = %s err = %s", fName, mach_error_string(res));
+        jack_error("JackMachSemaphore::TimedWait name = %s usec = %ld err = %s", fName, usec, mach_error_string(res));
     }
     return (res == KERN_SUCCESS);
 }
