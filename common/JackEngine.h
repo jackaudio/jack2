@@ -59,6 +59,8 @@ class JackEngine
         bool IsZombie(JackClientInterface* client, jack_time_t current_time);
         void RemoveZombifiedClients(jack_time_t current_time);
         void GetZombifiedClients(bool clients[CLIENT_NUM], jack_time_t current_time);
+		void ProcessNext(jack_time_t callback_usecs);
+		void ProcessCurrent(jack_time_t callback_usecs);
 
     public:
 
