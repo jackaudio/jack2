@@ -2567,6 +2567,7 @@ extern "C"
                     capture = TRUE;
                     if (strcmp (param->value.str, "none") != 0) {
                         capture_pcm_name = strdup (param->value.str);
+						printf("capture device  %s\n", capture_pcm_name);
                     }
                     break;
 
@@ -2574,6 +2575,7 @@ extern "C"
                     playback = TRUE;
                     if (strcmp (param->value.str, "none") != 0) {
                         playback_pcm_name = strdup (param->value.str);
+						printf("playback device  %s\n", playback_pcm_name);
                     }
                     break;
 
@@ -2585,6 +2587,8 @@ extern "C"
                 case 'd':
                     playback_pcm_name = strdup (param->value.str);
                     capture_pcm_name = strdup (param->value.str);
+					printf("playback device  %s\n", playback_pcm_name);
+					printf("capture device  %s\n", capture_pcm_name);
                     break;
 
                 case 'H':
@@ -2601,11 +2605,12 @@ extern "C"
 
                 case 'r':
                     srate = param->value.ui;
-                    fprintf (stderr, "apparent rate = %d\n", srate);
+					printf("apparent rate = %d\n", srate);
                     break;
 
                 case 'p':
                     frames_per_interrupt = param->value.ui;
+					printf("frames per period = %d\n", frames_per_interrupt);
                     break;
 
                 case 'n':
