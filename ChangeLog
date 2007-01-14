@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-01-14 Stephane Letz  <letz@grame.fr>
+
+	* Implement thread.h API.
+
 2007-01-09 Stephane Letz  <letz@grame.fr>
 
 	* New server/client data transfer model to fix a 64 bits system bug. Fix a device name reversal bug in ALSA driver.
