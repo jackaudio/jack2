@@ -26,6 +26,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackTime.h"
 #include "JackExports.h"
+#ifdef __APPLE__
+	#include "JackMachThread.h"
+#elif WIN32
+	#include "JackWinThread.h"
+#else
+	#include "JackPosixThread.h"
+#endif
 #include <math.h>
 
 using namespace Jack;
@@ -1073,8 +1080,13 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 {
-    JackLog("jack_acquire_real_time_scheduling: not yet implemented\n");
-    return -1;
+	#ifdef __APPLE__
+		return JackMachThread::AcquireRealTimeImp(thread, 0, 500 * 1000, 500 * 1000);
+	#elif WIN32
+		return JackWinThread::AcquireRealTimeImp(thread, priority);
+	#else
+		return JackPosixThread::AcquireRealTimeImp(thread, priority);
+	#endif	
 }
 
 EXPORT int jack_client_create_thread(jack_client_t* client,
@@ -1084,14 +1096,24 @@ EXPORT int jack_client_create_thread(jack_client_t* client,
                                      void *(*start_routine)(void*),
                                      void *arg)
 {
-    JackLog("jack_client_create_thread: not yet implemented\n");
-    return -1;
+	#ifdef __APPLE__
+		return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
+	#elif WIN32
+		return JackWinThread::StartImp(thread, priority, realtime, start_routine, arg);
+	#else
+		return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
+	#endif
 }
 
 EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 {
-    JackLog("jack_drop_real_time_scheduling: not yet implemented\n");
-    return -1;
+	#ifdef __APPLE__
+		return JackMachThread::DropRealTimeImp(thread);
+	#elif WIN32
+		return JackWinThread::DropRealTimeImp(thread);
+	#else
+		return JackPosixThread::DropRealTimeImp(thread);
+	#endif
 }
 
 // intclient.h

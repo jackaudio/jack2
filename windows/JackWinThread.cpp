@@ -70,27 +70,38 @@ JackWinThread::~JackWinThread()
 
 int JackWinThread::Start()
 {
-    DWORD id;
-
-    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (fEvent == NULL) {
         jack_error("Cannot create event error = %d", GetLastError());
         return -1;
     }
 
-    fRunning = true;
+	fRunning = true;
+	
+	// Check if the thread was correctly started
+	if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) { 
+		fRunning = false;
+		return -1;
+	} else {
+		return 0;
+	}
+}
 
-    if (fRealTime) {
+int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+{
+    DWORD id;
+
+    if (realtime) {
 
         JackLog("Create RT thread\n");
-        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
+        *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
 
-        if (fThread == NULL) {
+        if (*thread == NULL) {
             jack_error("Cannot create thread error = %d", GetLastError());
             return -1;
         }
 
-        if (!SetThreadPriority(fThread, THREAD_PRIORITY_TIME_CRITICAL)) {
+        if (!SetThreadPriority(*thread, THREAD_PRIORITY_TIME_CRITICAL)) {
             jack_error("Cannot set priority class = %d", GetLastError());
             return -1;
         }
@@ -100,7 +111,7 @@ int JackWinThread::Start()
     } else {
 
         JackLog("Create non RT thread\n");
-        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
+        *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
 
         if (fThread == NULL) {
             jack_error("Cannot create thread error = %d", GetLastError());
@@ -195,6 +206,7 @@ int JackWinThread::Stop()
 
 int JackWinThread::AcquireRealTime()
 {
+	/*
     JackLog("JackWinThread::AcquireRealTime\n");
 
     if (fThread) {
@@ -207,14 +219,33 @@ int JackWinThread::AcquireRealTime()
     } else {
         return -1;
     }
+	*/
+	return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
 }
 
 int JackWinThread::AcquireRealTime(int priority)
 {
-    JackLog("JackWinThread::AcquireRealTime priority = %ld\n", priority);
-    return AcquireRealTime();
+    //JackLog("JackWinThread::AcquireRealTime priority = %ld\n", priority);
+    //return AcquireRealTime();
+	
+	fPriority = priority;
+	return AcquireRealTime();
 }
 
+int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
+{
+    JackLog("JackWinThread::AcquireRealTime\n");
+
+	if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
+		JackLog("JackWinThread::AcquireRealTime OK\n");
+		return 0;
+	} else {
+		jack_error("Cannot set thread priority = %d", GetLastError());
+		return -1;
+	}
+}
+
+/*
 int JackWinThread::DropRealTime()
 {
     if (fThread) {
@@ -226,6 +257,21 @@ int JackWinThread::DropRealTime()
     } else {
         return -1;
     }
+}
+*/
+int JackWinThread::DropRealTime()
+{
+	return DropRealTime(fThread);
+}
+
+int JackWinThread::DropRealTime(pthread_t thread)
+{
+	if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
+		return 0;
+	} else {
+		jack_error("Cannot set thread priority = %d", GetLastError());
+		return -1;
+	}
 }
 
 pthread_t JackWinThread::GetThreadID()

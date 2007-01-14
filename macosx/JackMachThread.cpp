@@ -152,34 +152,33 @@ int JackMachThread::Kill()
     }
 }
 
-/*
 int JackMachThread::AcquireRealTime()
 {
     JackLog("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld\n",
             long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
-    return (fThread) ? SetThreadToPriority(fThread, 96, true, fPeriod, fComputation, fConstraint) : -1;
-}
-*/
 
-int JackMachThread::AcquireRealTime()
+	return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
+}
+
+int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
 {
-    JackLog("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld\n",
-            long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
-    if (fThread) {
-        SetThreadToPriority(fThread, 96, true, fPeriod, fComputation, fConstraint);
-        UInt64 fPeriod;
-        UInt64 fComputation;
-        UInt64 fConstraint;
-        GetParams(&fPeriod, &fComputation, &fConstraint);
-        return 0;
-    } else
-        return -1;
+	SetThreadToPriority(thread, 96, true, period, computation, constraint);
+	UInt64 int_period;
+	UInt64 int_computation;
+	UInt64 int_constraint;
+	GetParams(&int_period, &int_computation, &int_constraint);
+	return 0;
 }
 
 int JackMachThread::DropRealTime()
 {
-    //return (fThread) ? SetThreadToPriority(fThread, 31, false, 0, 0, 0) : -1;
-    return (fThread) ? SetThreadToPriority(fThread, 63, false, 0, 0, 0) : -1;
+    return (fThread) ? DropRealTimeImp(fThread) : -1;
+}
+
+int JackMachThread::DropRealTimeImp(pthread_t thread)
+{
+	SetThreadToPriority(thread, 63, false, 0, 0, 0);
+	return 0;
 }
 
 void JackMachThread::SetParams(UInt64 period, UInt64 computation, UInt64 constraint)

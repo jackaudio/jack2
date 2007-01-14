@@ -57,6 +57,11 @@ class JackWinThread : public JackThread
         int DropRealTime();
 
         pthread_t GetThreadID();
+		
+		static int AcquireRealTimeImp(pthread_t thread, int priority);
+		static int DropRealTimeImp(pthread_t thread);
+		static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+
 };
 
 } // end of namespace

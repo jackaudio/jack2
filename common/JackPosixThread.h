@@ -37,7 +37,6 @@ class JackPosixThread : public JackThread
     protected:
 
         pthread_t fThread;
-
         static void* ThreadHandler(void* arg);
 
     public:
@@ -65,6 +64,11 @@ class JackPosixThread : public JackThread
         virtual int DropRealTime();
 
         pthread_t GetThreadID();
+		
+		static int AcquireRealTimeImp(pthread_t thread, int priority);
+		static int DropRealTimeImp(pthread_t thread);
+		static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+
 };
 
 } // end of namespace

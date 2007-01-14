@@ -56,10 +56,22 @@ void* JackPosixThread::ThreadHandler(void* arg)
 
 int JackPosixThread::Start()
 {
-    int res;
-    fRunning = true;
+	fRunning = true;
+	
+	// Check if the thread was correctly started
+	if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) { 
+		fRunning = false;
+		return -1;
+	} else {
+		return 0;
+	}
+}
 
-    if (fRealTime) {
+int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
+{
+    int res;
+ 
+    if (realtime) {
 
         JackLog("Create RT thread\n");
 
@@ -98,14 +110,14 @@ int JackPosixThread::Start()
         }
 
         memset(&rt_param, 0, sizeof(rt_param));
-        rt_param.sched_priority = fPriority;
+        rt_param.sched_priority = priority;
 
         if ((res = pthread_attr_setschedparam(&attributes, &rt_param))) {
             jack_error("Cannot set scheduling priority for RT thread %d %s", res, strerror(errno));
             return -1;
         }
 
-        if ((res = pthread_create(&fThread, &attributes, ThreadHandler, this))) {
+        if ((res = pthread_create(thread, &attributes, start_routine, arg))) {
             jack_error("Cannot set create thread %d %s", res, strerror(errno));
             return -1;
         }
@@ -114,7 +126,7 @@ int JackPosixThread::Start()
     } else {
         JackLog("Create non RT thread\n");
 
-        if ((res = pthread_create(&fThread, 0, ThreadHandler, this))) {
+        if ((res = pthread_create(thread, 0, start_routine, arg))) {
             jack_error("Cannot set create thread %d %s", res, strerror(errno));
             return -1;
         }
@@ -159,18 +171,25 @@ int JackPosixThread::Stop()
 
 int JackPosixThread::AcquireRealTime()
 {
-    struct sched_param rtparam;
+ 	return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+}
+
+int JackPosixThread::AcquireRealTime(int priority)
+{
+	fPriority = priority;
+    return AcquireRealTime();
+}
+
+int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
+{
+   struct sched_param rtparam;
     int res;
-
-    if (!fThread)
-        return -1;
-
     memset(&rtparam, 0, sizeof(rtparam));
-    rtparam.sched_priority = fPriority;
+    rtparam.sched_priority = priority;
 
     //if ((res = pthread_setschedparam(fThread, SCHED_FIFO, &rtparam)) != 0) {
 
-    if ((res = pthread_setschedparam(fThread, SCHED_RR, &rtparam)) != 0) {
+    if ((res = pthread_setschedparam(thread, SCHED_RR, &rtparam)) != 0) {
         jack_error("Cannot use real-time scheduling (FIFO/%d) "
                    "(%d: %s)", rtparam.sched_priority, res,
                    strerror(res));
@@ -179,24 +198,19 @@ int JackPosixThread::AcquireRealTime()
     return 0;
 }
 
-int JackPosixThread::AcquireRealTime(int priority)
-{
-    fPriority = priority;
-    return AcquireRealTime();
-}
-
 int JackPosixThread::DropRealTime()
 {
-    struct sched_param rtparam;
+    return (fThread) ? DropRealTimeImp(fThread) : -1;
+}
+
+int JackPosixThread::DropRealTimeImp(pthread_t thread)
+{
+	struct sched_param rtparam;
     int res;
-
-    if (!fThread)
-        return -1;
-
     memset(&rtparam, 0, sizeof(rtparam));
     rtparam.sched_priority = 0;
 
-    if ((res = pthread_setschedparam(fThread, SCHED_OTHER, &rtparam)) != 0) {
+    if ((res = pthread_setschedparam(thread, SCHED_OTHER, &rtparam)) != 0) {
         jack_error("Cannot switch to normal scheduling priority(%s)\n", strerror(errno));
         return -1;
     }

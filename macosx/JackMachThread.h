@@ -114,6 +114,9 @@ class JackMachThread : public JackPosixThread
         void SetParams(UInt64 period, UInt64 computation, UInt64 constraint);
         static int GetParams(UInt64* period, UInt64* computation, UInt64* constraint);
         static int SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint);
+		
+		static int AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint);
+		static int DropRealTimeImp(pthread_t thread);
 };
 
 } // end of namespace
