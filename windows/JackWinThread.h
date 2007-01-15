@@ -28,6 +28,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+typedef DWORD  (WINAPI *ThreadCallback)(void *arg);
+
 /*!
 \brief Windows threads. 
 */
@@ -60,7 +62,7 @@ class JackWinThread : public JackThread
 		
 		static int AcquireRealTimeImp(pthread_t thread, int priority);
 		static int DropRealTimeImp(pthread_t thread);
-		static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+		static int StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg);
 
 };
 

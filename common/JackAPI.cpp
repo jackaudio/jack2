@@ -1099,7 +1099,7 @@ EXPORT int jack_client_create_thread(jack_client_t* client,
 	#ifdef __APPLE__
 		return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
 	#elif WIN32
-		return JackWinThread::StartImp(thread, priority, realtime, start_routine, arg);
+		return JackWinThread::StartImp(thread, priority, realtime, (ThreadCallback)start_routine, arg);
 	#else
 		return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
 	#endif

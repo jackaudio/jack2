@@ -87,7 +87,7 @@ int JackWinThread::Start()
 	}
 }
 
-int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg)
 {
     DWORD id;
 
@@ -113,7 +113,7 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, void*
         JackLog("Create non RT thread\n");
         *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
 
-        if (fThread == NULL) {
+        if (thread == NULL) {
             jack_error("Cannot create thread error = %d", GetLastError());
             return -1;
         }
@@ -261,10 +261,10 @@ int JackWinThread::DropRealTime()
 */
 int JackWinThread::DropRealTime()
 {
-	return DropRealTime(fThread);
+	return DropRealTimeImp(fThread);
 }
 
-int JackWinThread::DropRealTime(pthread_t thread)
+int JackWinThread::DropRealTimeImp(pthread_t thread)
 {
 	if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
 		return 0;
