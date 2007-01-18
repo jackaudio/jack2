@@ -111,7 +111,6 @@ void JackWinNamedPipeClient::SetReadTimeOut(long sec)
 void JackWinNamedPipeClient::SetWriteTimeOut(long sec)
 {}
 
-
 JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
         : JackWinNamedPipeClient(), fIOState(kIdle), fPendingIO(false)
 {

@@ -206,29 +206,12 @@ int JackWinThread::Stop()
 
 int JackWinThread::AcquireRealTime()
 {
-	/*
-    JackLog("JackWinThread::AcquireRealTime\n");
-
-    if (fThread) {
-        if (!SetThreadPriority(fThread, THREAD_PRIORITY_TIME_CRITICAL)) {
-            jack_error("Cannot set thread priority = %d", GetLastError());
-            return -1;
-        }
-        JackLog("JackWinThread::AcquireRealTime OK\n");
-        return 0;
-    } else {
-        return -1;
-    }
-	*/
 	return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
 }
 
 int JackWinThread::AcquireRealTime(int priority)
 {
-    //JackLog("JackWinThread::AcquireRealTime priority = %ld\n", priority);
-    //return AcquireRealTime();
-	
-	fPriority = priority;
+ 	fPriority = priority;
 	return AcquireRealTime();
 }
 
@@ -244,21 +227,6 @@ int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
 		return -1;
 	}
 }
-
-/*
-int JackWinThread::DropRealTime()
-{
-    if (fThread) {
-        if (!SetThreadPriority(fThread, THREAD_PRIORITY_NORMAL)) {
-            jack_error("Cannot set thread priority = %d", GetLastError());
-            return -1;
-        }
-        return 0;
-    } else {
-        return -1;
-    }
-}
-*/
 int JackWinThread::DropRealTime()
 {
 	return DropRealTimeImp(fThread);
