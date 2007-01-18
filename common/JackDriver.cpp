@@ -136,7 +136,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     strcpy(fPlaybackDriverName, playback_driver_name);
 
     fEngineControl->fPeriodUsecs = (jack_time_t)floor((((float)nframes) / (float)samplerate) * 1000000.0f);
-    if (fEngineControl->fTimeOutUsecs == 0)  /* usecs; if zero, use 10 period size. */
+    if (fEngineControl->fTimeOutUsecs == 0)  /* usecs; if zero, use 2 period size. */
         fEngineControl->fTimeOutUsecs = (jack_time_t)(2.f * fEngineControl->fPeriodUsecs);
 
     fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for sync
