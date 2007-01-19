@@ -123,7 +123,6 @@ int JackClientSocket::Close()
 int JackClientSocket::Read(void* data, int len)
 {
     int len1;
-    JackLog("JackClientSocket::Read len = %ld\n", len);
 
     if ((len1 = read(fSocket, data, len)) != len) {
         jack_error("Cannot read socket %d %d (%s)", len, len1, strerror(errno));

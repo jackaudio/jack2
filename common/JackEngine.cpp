@@ -486,7 +486,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     // Wait until next cycle to be sure client is not used anymore
     if (wait) {
         if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 2)) { // Must wait at least until a switch occurs in Process, even in case of graph end failure
-            JackLog("JackEngine::ClientCloseAux wait error ref = %ld \n", refnum);
+            jack_error("JackEngine::ClientCloseAux wait error ref = %ld", refnum);
         }
     }
 
@@ -507,7 +507,7 @@ int JackEngine::ClientActivate(int refnum)
 	JackLog("JackEngine::ClientActivate ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
 	// Wait for graph state change to be effective
 	if (!fSignal->TimedWait(fEngineControl->fPeriodUsecs * 10)) {
-		JackLog("JackEngine::ClientActivate wait error ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
+		jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 		return -1;
 	} else {
 		NotifyActivate(refnum);
@@ -526,7 +526,7 @@ int JackEngine::ClientDeactivate(int refnum)
 	fGraphManager->DisconnectAllPorts(refnum);
 	// Wait for graph state change to be effective
 	if (!fSignal->TimedWait(fEngineControl->fPeriodUsecs * 10)) {
-		JackLog("JackEngine::ClientDeactivate wait error ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
+		jack_error("JackEngine::ClientDeactivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 		return -1;
 	} else {
 		return 0;

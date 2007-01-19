@@ -305,9 +305,10 @@ void JackServer::Notify(int refnum, int notify, int value)
 
         case JackNotifyChannelInterface::kDeadClient:
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
-            Deactivate(refnum);
-            fEngine->ClientClose(refnum);
-            break;
+            if (Deactivate(refnum) < 0)
+				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!\n", refnum);
+			fEngine->ClientClose(refnum);
+			break;
     }
 }
 
