@@ -95,9 +95,7 @@ EXPORT void my_jack_internal_client_close(jack_client_t* ext_client)
     if (client == NULL) {
         jack_error("jack_internal_client_close called with a NULL client");
     } else {
-        int res = client->Deactivate();
-        JackLog("jack_internal_client_close Deactivate %ld", res);
-        res = client->Close();
+		client->Close();
         delete client;
         JackLog("jack_internal_client_close OK");
     }
