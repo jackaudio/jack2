@@ -76,8 +76,7 @@ JackDebugClient::~JackDebugClient()
 
 int JackDebugClient::Open(const char* name)
 {
-    int res;
-    res = fClient->Open(name);
+    int res = fClient->Open(name);
     char provstr[256];
     char buffer[256];
     time_t curtime;
@@ -146,8 +145,7 @@ int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int 
 int JackDebugClient::Activate()
 {
 	CheckClient();
-    int res;
-    res = fClient->Activate();
+    int res = fClient->Activate();
     fIsActivated++;
     if (fIsDeactivated)
         *fStream << "Client '" << fClientName << "' call activate a new time (it already call 'activate' previously)." << endl;
@@ -160,8 +158,7 @@ int JackDebugClient::Activate()
 int JackDebugClient::Deactivate()
 {
 	CheckClient();
-    int res;
-    res = fClient->Deactivate();
+    int res = fClient->Deactivate();
     fIsDeactivated++;
     if (fIsActivated == 0)
         *fStream << "Client '" << fClientName << "' deactivate while it hasn't been previoulsy activated !" << endl;
@@ -178,8 +175,7 @@ int JackDebugClient::Deactivate()
 int JackDebugClient::PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
 	CheckClient();
-    int res;
-    res = fClient->PortRegister(port_name, port_type, flags, buffer_size);
+    int res = fClient->PortRegister(port_name, port_type, flags, buffer_size);
     if (res <= 0) {
         *fStream << "Client '" << fClientName << "' try port register ('" << port_name << "') and server return error  " << res << " ." << endl;
     } else {
@@ -201,8 +197,7 @@ int JackDebugClient::PortRegister(const char* port_name, const char* port_type, 
 int JackDebugClient::PortUnRegister(jack_port_id_t port_index)
 {
 	CheckClient();
-    int res;
-    res = fClient->PortUnRegister(port_index);
+    int res = fClient->PortUnRegister(port_index);
     fOpenPortNumber--;
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
@@ -226,9 +221,8 @@ int JackDebugClient::PortConnect(const char* src, const char* dst)
 	CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! Trying to connect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
-    int res;
     int i;
-    res = fClient->PortConnect( src, dst);
+    int res = fClient->PortConnect( src, dst);
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
         if (strcmp(fPortList[i].name, src) == 0) {	// We found the last record in sources
             if (fPortList[i].IsUnregistrated != 0)
@@ -257,8 +251,7 @@ int JackDebugClient::PortDisconnect(const char* src, const char* dst)
 	CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! Trying to disconnect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
-    int res;
-    res = fClient->PortDisconnect( src, dst);
+    int res = fClient->PortDisconnect( src, dst);
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) { // We search the record into the history
         if (strcmp(fPortList[i].name, src) == 0) { // We found the record in sources
@@ -288,8 +281,7 @@ int JackDebugClient::PortConnect(jack_port_id_t src, jack_port_id_t dst)
 	CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! : Trying to connect port  " << src << " to  " << dst << " while the client has not been activated !" << endl;
-    int res;
-    res = fClient->PortConnect(src, dst);
+    int res = fClient->PortConnect(src, dst);
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
         if (fPortList[i].idport == src) {		// We found the record in sources
@@ -319,8 +311,7 @@ int JackDebugClient::PortDisconnect(jack_port_id_t src)
 	CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! : Trying to disconnect port  " << src << " while that client has not been activated !" << endl;
-    int res;
-    res = fClient->PortDisconnect(src);
+    int res = fClient->PortDisconnect(src);
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {		// We search the record into the history
         if (fPortList[i].idport == src) {				// We found the record in sources
