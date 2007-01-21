@@ -53,6 +53,7 @@ class JackDebugClient : public JackClient
         std::ofstream* fStream;
 
     protected:
+	
         PortFollower fPortList[MAX_PORT_HISTORY]; // Arbitrary value... To be tuned...
         int fTotalPortNumber;	// The total number of port opened and maybe closed. Historical view.
         int fOpenPortNumber;	// The current number of opened port.
@@ -64,7 +65,6 @@ class JackDebugClient : public JackClient
     public:
 
         JackDebugClient(JackClient *fTheClient);
-
         virtual ~JackDebugClient();
 
         virtual int Open(const char* name);
@@ -118,6 +118,8 @@ class JackDebugClient : public JackClient
         int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
         JackClientControl* GetClientControl() const;
+		
+		void CheckClient() const;
 
 };
 

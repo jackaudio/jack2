@@ -88,6 +88,12 @@ struct JackLibGlobals
             JackGlobals::Destroy();
         }
     }
+	
+	static void CheckContext()
+	{
+		if (!(fClientCount > 0 && fGlobals))
+			jack_error("Error !!! : client accessing an already desallocated library context");
+	}
 
 };
 

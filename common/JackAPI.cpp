@@ -35,6 +35,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 #include <math.h>
 
+#ifdef __CLIENTDEBUG__
+	#include "JackLibGlobals.h"
+#endif
+
 using namespace Jack;
 
 #ifdef __cplusplus
@@ -234,6 +238,9 @@ EXPORT void jack_set_error_function (void (*func)(const char *))
 
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_buffer called with an incorrect port %ld", myport);
@@ -245,6 +252,9 @@ EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
 
 EXPORT const char* jack_port_name(const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_name called with an incorrect port %ld", myport);
@@ -256,6 +266,9 @@ EXPORT const char* jack_port_name(const jack_port_t* port)
 
 EXPORT const char* jack_port_short_name(const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_short_name called with an incorrect port %ld", myport);
@@ -267,6 +280,9 @@ EXPORT const char* jack_port_short_name(const jack_port_t* port)
 
 EXPORT int jack_port_flags(const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_flags called with an incorrect port %ld", myport);
@@ -278,6 +294,9 @@ EXPORT int jack_port_flags(const jack_port_t* port)
 
 EXPORT const char* jack_port_type(const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_flags called an incorrect port %ld", myport);
@@ -289,6 +308,9 @@ EXPORT const char* jack_port_type(const jack_port_t* port)
 
 EXPORT int jack_port_connected(const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_connected called with an incorrect port %ld", myport);
@@ -301,6 +323,9 @@ EXPORT int jack_port_connected(const jack_port_t* port)
 
 EXPORT int jack_port_connected_to(const jack_port_t* port, const char* portname)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_connected_to called with an incorrect port %ld", myport);
@@ -316,6 +341,9 @@ EXPORT int jack_port_connected_to(const jack_port_t* port, const char* portname)
 
 EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t mysrc = (jack_port_id_t)src;
     if (!CheckPort(mysrc)) {
         jack_error("jack_port_tie called with a NULL src port");
@@ -335,6 +363,9 @@ EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
 
 EXPORT int jack_port_untie(jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_untie called with an incorrect port %ld", myport);
@@ -346,6 +377,9 @@ EXPORT int jack_port_untie(jack_port_t* port)
 
 EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_latency called with an incorrect port %ld", myport);
@@ -358,6 +392,9 @@ EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
 
 EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_latency called with an incorrect port %ld", myport);
@@ -374,6 +411,9 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
 
 EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_name called with an incorrect port %ld", myport);
@@ -388,6 +428,9 @@ EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 
 EXPORT int jack_port_request_monitor(jack_port_t* port, int onoff)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_request_monitor called with an incorrect port %ld", myport);
@@ -399,6 +442,9 @@ EXPORT int jack_port_request_monitor(jack_port_t* port, int onoff)
 
 EXPORT int jack_port_request_monitor_by_name(jack_client_t* ext_client, const char* port_name, int onoff)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_request_monitor_by_name called with a NULL client");
@@ -416,6 +462,9 @@ EXPORT int jack_port_request_monitor_by_name(jack_client_t* ext_client, const ch
 
 EXPORT int jack_port_ensure_monitor(jack_port_t* port, int onoff)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_ensure_monitor called with an incorrect port %ld", myport);
@@ -427,6 +476,9 @@ EXPORT int jack_port_ensure_monitor(jack_port_t* port, int onoff)
 
 EXPORT int jack_port_monitoring_input(jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_monitoring_input called with an incorrect port %ld", myport);
@@ -438,6 +490,9 @@ EXPORT int jack_port_monitoring_input(jack_port_t* port)
 
 EXPORT int jack_is_realtime(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_is_realtime called with a NULL client");
@@ -449,6 +504,9 @@ EXPORT int jack_is_realtime(jack_client_t* ext_client)
 
 EXPORT void jack_on_shutdown(jack_client_t* ext_client, void (*function)(void* arg), void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_on_shutdown called with a NULL client");
@@ -459,6 +517,9 @@ EXPORT void jack_on_shutdown(jack_client_t* ext_client, void (*function)(void* a
 
 EXPORT int jack_set_process_callback(jack_client_t* ext_client, JackProcessCallback callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_process_callback called with a NULL client");
@@ -470,6 +531,9 @@ EXPORT int jack_set_process_callback(jack_client_t* ext_client, JackProcessCallb
 
 EXPORT int jack_set_freewheel_callback(jack_client_t* ext_client, JackFreewheelCallback freewheel_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_freewheel_callback called with a NULL client");
@@ -481,6 +545,9 @@ EXPORT int jack_set_freewheel_callback(jack_client_t* ext_client, JackFreewheelC
 
 EXPORT int jack_set_freewheel(jack_client_t* ext_client, int onoff)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_freewheel called with a NULL client");
@@ -492,6 +559,9 @@ EXPORT int jack_set_freewheel(jack_client_t* ext_client, int onoff)
 
 EXPORT int jack_set_buffer_size(jack_client_t* ext_client, jack_nframes_t buffer_size)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_buffer_size called with a NULL client");
@@ -505,6 +575,9 @@ EXPORT int jack_set_buffer_size(jack_client_t* ext_client, jack_nframes_t buffer
 
 EXPORT int jack_set_buffer_size_callback(jack_client_t* ext_client, JackBufferSizeCallback bufsize_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_buffer_size_callback called with a NULL client");
@@ -516,6 +589,9 @@ EXPORT int jack_set_buffer_size_callback(jack_client_t* ext_client, JackBufferSi
 
 EXPORT int jack_set_sample_rate_callback(jack_client_t* ext_client, JackSampleRateCallback srate_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     JackLog("jack_set_sample_rate_callback ext_client %x client %x \n", ext_client, client);
     if (client == NULL) {
@@ -529,6 +605,9 @@ EXPORT int jack_set_sample_rate_callback(jack_client_t* ext_client, JackSampleRa
 
 EXPORT int jack_set_port_registration_callback(jack_client_t* ext_client, JackPortRegistrationCallback registration_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_port_registration_callback called with a NULL client");
@@ -540,6 +619,9 @@ EXPORT int jack_set_port_registration_callback(jack_client_t* ext_client, JackPo
 
 EXPORT int jack_set_graph_order_callback(jack_client_t* ext_client, JackGraphOrderCallback graph_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     JackLog("jack_set_graph_order_callback ext_client %x client %x \n", ext_client, client);
     if (client == NULL) {
@@ -552,6 +634,9 @@ EXPORT int jack_set_graph_order_callback(jack_client_t* ext_client, JackGraphOrd
 
 EXPORT int jack_set_xrun_callback(jack_client_t* ext_client, JackXRunCallback xrun_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_xrun_callback called with a NULL client");
@@ -563,6 +648,9 @@ EXPORT int jack_set_xrun_callback(jack_client_t* ext_client, JackXRunCallback xr
 
 EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadInitCallback init_callback, void *arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     JackLog("jack_set_thread_init_callback ext_client %x client %x \n", ext_client, client);
     if (client == NULL) {
@@ -575,6 +663,9 @@ EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadIn
 
 EXPORT int jack_activate(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_activate called with a NULL client");
@@ -586,6 +677,9 @@ EXPORT int jack_activate(jack_client_t* ext_client)
 
 EXPORT int jack_deactivate(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_deactivate called with a NULL client");
@@ -597,6 +691,9 @@ EXPORT int jack_deactivate(jack_client_t* ext_client)
 
 EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_register called with a NULL client");
@@ -611,6 +708,9 @@ EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char* po
 
 EXPORT int jack_port_unregister(jack_client_t* ext_client, jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_unregister called with a NULL client");
@@ -626,6 +726,9 @@ EXPORT int jack_port_unregister(jack_client_t* ext_client, jack_port_t* port)
 
 EXPORT int jack_port_is_mine(const jack_client_t* ext_client, const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_is_mine called with a NULL client");
@@ -641,6 +744,9 @@ EXPORT int jack_port_is_mine(const jack_client_t* ext_client, const jack_port_t*
 
 EXPORT const char** jack_port_get_connections(const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     jack_port_id_t myport = (jack_port_id_t)port;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_connections called with an incorrect port %ld", myport);
@@ -654,6 +760,9 @@ EXPORT const char** jack_port_get_connections(const jack_port_t* port)
 // Calling client does not need to "own" the port
 EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_client, const jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_get_all_connections called with a NULL client");
@@ -673,6 +782,9 @@ EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_clien
 // Does not use the client parameter
 EXPORT int jack_port_lock(jack_client_t* ext_client, jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_lock called with a NULL client");
@@ -691,6 +803,9 @@ EXPORT int jack_port_lock(jack_client_t* ext_client, jack_port_t* port)
 // Does not use the client parameter
 EXPORT int jack_port_unlock(jack_client_t* ext_client, jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_unlock called with a NULL client");
@@ -708,6 +823,9 @@ EXPORT int jack_port_unlock(jack_client_t* ext_client, jack_port_t* port)
 
 EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client, jack_port_t* port)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_get_total_latency called with a NULL client");
@@ -727,6 +845,9 @@ EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client, jac
 
 EXPORT int jack_connect(jack_client_t* ext_client, const char* src, const char* dst)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_connect called with a NULL client");
@@ -741,6 +862,9 @@ EXPORT int jack_connect(jack_client_t* ext_client, const char* src, const char* 
 
 EXPORT int jack_disconnect(jack_client_t* ext_client, const char* src, const char* dst)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_disconnect called with a NULL client");
@@ -755,6 +879,9 @@ EXPORT int jack_disconnect(jack_client_t* ext_client, const char* src, const cha
 
 EXPORT int jack_port_connect(jack_client_t* ext_client, jack_port_t* src, jack_port_t* dst)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_connect called with a NULL client");
@@ -775,6 +902,9 @@ EXPORT int jack_port_connect(jack_client_t* ext_client, jack_port_t* src, jack_p
 
 EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_port_disconnect called with a NULL client");
@@ -790,6 +920,9 @@ EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
 
 EXPORT jack_nframes_t jack_get_sample_rate(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_get_sample_rate called with a NULL client");
@@ -801,6 +934,9 @@ EXPORT jack_nframes_t jack_get_sample_rate(jack_client_t* ext_client)
 
 EXPORT jack_nframes_t jack_get_buffer_size(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_get_buffer_size called with a NULL client");
@@ -812,6 +948,9 @@ EXPORT jack_nframes_t jack_get_buffer_size(jack_client_t* ext_client)
 
 EXPORT const char** jack_get_ports(jack_client_t* ext_client, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_get_ports called with a NULL client");
@@ -822,6 +961,9 @@ EXPORT const char** jack_get_ports(jack_client_t* ext_client, const char* port_n
 
 EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* portname)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_get_ports called with a NULL client");
@@ -839,12 +981,18 @@ EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* por
 
 EXPORT jack_port_t* jack_port_by_id(const jack_client_t* ext_client, jack_port_id_t id)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     /* jack_port_t* type is actually the port index */
     return (jack_port_t*)id;
 }
 
 EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_engine_takeover_timebase called with a NULL client");
@@ -857,6 +1005,9 @@ EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)
 
 EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackTimer timer;
 	GetEngineControl()->ReadFrameTime(&timer);
     return (jack_nframes_t) floor((((float)GetEngineControl()->fSampleRate) / 1000000.0f) * (GetMicroSeconds() - timer.fCurrentCallback));
@@ -864,6 +1015,9 @@ EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_cli
 
 EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_frame_time called with a NULL client");
@@ -883,6 +1037,9 @@ EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
 
 EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackTimer timer;
 	GetEngineControl()->ReadFrameTime(&timer);
     return timer.fFrames;
@@ -890,6 +1047,9 @@ EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 
 EXPORT float jack_cpu_load(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_cpu_load called with a NULL client");
@@ -901,6 +1061,9 @@ EXPORT float jack_cpu_load(jack_client_t* ext_client)
 
 EXPORT pthread_t jack_client_thread_id(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_client_thread_id called with a NULL client");
@@ -912,6 +1075,9 @@ EXPORT pthread_t jack_client_thread_id(jack_client_t* ext_client)
 
 EXPORT char* jack_get_client_name (jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_get_client_name called with a NULL client");
@@ -935,6 +1101,9 @@ EXPORT int jack_port_name_size(void)
 
 EXPORT int jack_release_timebase(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_release_timebase called with a NULL client");
@@ -946,6 +1115,9 @@ EXPORT int jack_release_timebase(jack_client_t* ext_client)
 
 EXPORT int jack_set_sync_callback(jack_client_t* ext_client, JackSyncCallback sync_callback, void *arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_sync_callback called with a NULL client");
@@ -957,6 +1129,9 @@ EXPORT int jack_set_sync_callback(jack_client_t* ext_client, JackSyncCallback sy
 
 EXPORT int jack_set_sync_timeout(jack_client_t* ext_client, jack_time_t timeout)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_sync_timeout called with a NULL client");
@@ -968,6 +1143,9 @@ EXPORT int jack_set_sync_timeout(jack_client_t* ext_client, jack_time_t timeout)
 
 EXPORT int jack_set_timebase_callback(jack_client_t* ext_client, int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_set_timebase_callback called with a NULL client");
@@ -979,6 +1157,9 @@ EXPORT int jack_set_timebase_callback(jack_client_t* ext_client, int conditional
 
 EXPORT int jack_transport_locate(jack_client_t* ext_client, jack_nframes_t frame)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_transport_locate called with a NULL client");
@@ -990,6 +1171,9 @@ EXPORT int jack_transport_locate(jack_client_t* ext_client, jack_nframes_t frame
 
 EXPORT jack_transport_state_t jack_transport_query(const jack_client_t* ext_client, jack_position_t* pos)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_transport_query called with a NULL client");
@@ -1001,6 +1185,9 @@ EXPORT jack_transport_state_t jack_transport_query(const jack_client_t* ext_clie
 
 EXPORT jack_nframes_t jack_get_current_transport_frame(const jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_get_current_transport_frame called with a NULL client");
@@ -1012,6 +1199,9 @@ EXPORT jack_nframes_t jack_get_current_transport_frame(const jack_client_t* ext_
 
 EXPORT int jack_transport_reposition(jack_client_t* ext_client, jack_position_t* pos)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_transport_reposition called with a NULL client");
@@ -1023,6 +1213,9 @@ EXPORT int jack_transport_reposition(jack_client_t* ext_client, jack_position_t*
 
 EXPORT void jack_transport_start(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_transport_start called with a NULL client");
@@ -1033,6 +1226,9 @@ EXPORT void jack_transport_start(jack_client_t* ext_client)
 
 EXPORT void jack_transport_stop(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_transport_stop called with a NULL client");
@@ -1061,18 +1257,27 @@ EXPORT void jack_set_transport_info(jack_client_t* ext_client, jack_transport_in
 
 EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackLog("jack_get_max_delayed_usecs: not yet implemented\n");
     return 0.f;
 }
 
 EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackLog("jack_get_xrun_delayed_usecs: not yet implemented\n");
     return 0.f;
 }
 
 EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
     JackLog("jack_reset_max_delayed_usecs: not yet implemented\n");
 }
 

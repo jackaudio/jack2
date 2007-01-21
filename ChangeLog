@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-01-21 Stephane Letz  <letz@grame.fr>
+
+	* More client debug code: check if the client is still valid in every JackDebugClient method, check if the library context is still valid in every API call.
+
 2007-01-14 Stephane Letz  <letz@grame.fr>
 
 	* Implement thread.h API.
