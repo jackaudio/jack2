@@ -76,10 +76,10 @@ class JackCoreAudioDriver : public JackAudioDriver
                                         void* inClientData);
 
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
-                UInt32 inChannel,
-                Boolean	isInput,
-                AudioDevicePropertyID inPropertyID,
-                void* inClientData);
+													UInt32 inChannel,
+													Boolean	isInput,
+													AudioDevicePropertyID inPropertyID,
+													void* inClientData);
 
         OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
         OSStatus GetDefaultDevice(AudioDeviceID* id);
