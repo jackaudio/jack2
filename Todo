@@ -1,0 +1,5 @@
+---------------------
+  Jackdmp Todo list
+---------------------
+
+2007-01-22 Check the "dead" client removing code in the server: non running client may cause Desactivation and Close time out problems
