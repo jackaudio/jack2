@@ -2317,7 +2317,6 @@ void JackAlsaDriver::PrintState()
         port_index = fCapturePortList[i];
         JackPort* port = fGraphManager->GetPort(port_index);
         std::cout << port->GetName() << std::endl;
-        //if (fGraphManager->IsConnected(port_index)) {}
         if (fGraphManager->GetConnectionsNum(port_index)) {}
     }
 
@@ -2327,17 +2326,10 @@ void JackAlsaDriver::PrintState()
         port_index = fPlaybackPortList[i];
         JackPort* port = fGraphManager->GetPort(port_index);
         std::cout << port->GetName() << std::endl;
-        //if (fGraphManager->IsConnected(port_index)) {}
         if (fGraphManager->GetConnectionsNum(port_index)) {}
     }
 }
 
-/*
-JackDriver* DriverInit(JackGraphManager* manager)
-{
-    return new JackAlsaDriver("ALSA", manager);
-}
-*/
 } // end of namespace
 
 
@@ -2379,10 +2371,8 @@ extern "C"
         unsigned int i;
 
         desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-
         strcpy (desc->name, "alsa");
         desc->nparams = 17;
-
         params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
 
         i = 0;
@@ -2533,7 +2523,6 @@ extern "C"
         strcpy (params[i].long_desc, params[i].short_desc);
 
         desc->params = params;
-
         return desc;
     }
 
