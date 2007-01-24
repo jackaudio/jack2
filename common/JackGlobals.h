@@ -231,17 +231,17 @@ class JackGlobals
             JackLog("JackGlobals InitServer\n");
             if (!fInstance) {
 			
-#ifdef __APPLE__
+		#ifdef __APPLE__
                 fInstance = new JackFactoryOSXServer();
-#endif
+		#endif
 
-#ifdef WIN32
+		#ifdef WIN32
                fInstance = new JackFactoryWindowsServer();
-#endif
+		#endif
 
-#ifdef __linux__
+		#ifdef __linux__
                fInstance = new JackFactoryLinuxServer();
-#endif
+		#endif
 
             }
         }
@@ -251,17 +251,17 @@ class JackGlobals
             JackLog("JackGlobals InitClient\n");
             if (!fInstance) {
 			
-#ifdef __APPLE__
+		#ifdef __APPLE__
                 fInstance = new JackFactoryOSXClient();
-#endif
+		#endif
 
-#ifdef WIN32
+		#ifdef WIN32
                 fInstance = new JackFactoryWindowsClient();
-#endif
+		#endif
 
-#ifdef __linux__
+		#ifdef __linux__
                 fInstance = new JackFactoryLinuxClient();
-#endif
+		#endif
 
             }
         }

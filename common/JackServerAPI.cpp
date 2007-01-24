@@ -156,7 +156,6 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
         *status = (jack_status_t)0;
         return (jack_client_t*)client;
     }
-    return NULL;
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)
@@ -166,11 +165,12 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     if (client == NULL) {
         jack_error("jack_client_close called with a NULL client");
         return -1;
-    }
-    int res = client->Close();
-    delete client;
-    JackLog("jack_client_close OK\n");
-    JackServerGlobals::Destroy(); // jack library destruction
-    return res;
+    } else {
+		int res = client->Close();
+		delete client;
+		JackLog("jack_client_close OK\n");
+		JackServerGlobals::Destroy(); // jack library destruction
+		return res;
+	}
 }
 
