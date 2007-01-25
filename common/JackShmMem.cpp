@@ -29,7 +29,7 @@ unsigned long JackShmMem::fSegmentNum = 0;
 unsigned long JackShmMem::fSegmentCount = 0;
 
 jack_shm_info_t JackShmMem::gInfo;
-size_t JackLockMem::gSize = 0;
+size_t JackMem::gSize = 0;
 
 void* JackShmMem::operator new(size_t size)
 {
@@ -62,7 +62,9 @@ void* JackShmMem::operator new(size_t size)
     // It is unsafe to set object fields directly (may be overwritten during object initialization),
     // so use an intermediate global data
     gInfo.index = info.index;
+	gInfo.size = size;
     gInfo.attached_at = info.attached_at;
+	
     JackLog("JackShmMem::new index = %ld attached = %x size = %ld \n", info.index, info.attached_at, size);
     return obj;
 
@@ -88,6 +90,39 @@ void JackShmMem::operator delete(void* p, size_t size)
         jack_cleanup_shm();
     }
 }
+
+void LockMemoryImp(void* ptr, size_t size) 
+{
+#ifdef __APPLE__
+	int res = mlock(ptr, size);
+#elif linux_
+	int res = mlock(ptr, size);
+#elif WIN32
+	int res = VirtualLock(ptr, size);
+#endif
+	if (res != 0) {
+		jack_error("Cannot lock down memory area (%s)", strerror(errno));
+	} else {
+		JackLog("Succeeded in locking %u byte memory area\n", size);
+	}
+}
+
+void UnlockMemoryImp(void* ptr, size_t size) 
+{
+#ifdef __APPLE__
+	int res = munlock(ptr, size);
+#elif linux_
+	int res = munlock(ptr, size);
+#elif WIN32
+	int res = VirtualUnlock(ptr, size);
+#endif
+	if (res != 0) {
+		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+	} else {
+		JackLog("Succeeded in unlocking %u byte memory area\n", size);
+	}
+}
+
 
 } // end of namespace
 

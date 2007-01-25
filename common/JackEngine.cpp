@@ -33,7 +33,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackEngine::JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* control, JackSyncInterface* signal, bool sync, long time_out_ms, bool rt, long priority, bool ve)
+JackEngine::JackEngine(JackGraphManager* manager, 
+						JackSynchro** table, 
+						JackEngineControl* control,
+						JackSyncInterface* signal, 
+						bool sync, 
+						long time_out_ms, 
+						bool rt, 
+						long priority, 
+						bool ve)
 {
     fGraphManager = manager;
     fSynchroTable = table;

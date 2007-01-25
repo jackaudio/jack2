@@ -117,7 +117,8 @@ extern "C"
      */
     typedef struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
-        void	*attached_at; /* address where attached */
+		size_t size;
+        void *attached_at; /* address where attached */
     }
     jack_shm_info_t;
 

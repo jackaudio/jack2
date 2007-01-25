@@ -56,9 +56,6 @@ struct JackClientControl : public JackShmMem
         Init("", -1);
     }
 
-    virtual ~JackClientControl()
-    {}
-
     void Init(const char* name, int refnum)
     {
         strcpy(fName, name);

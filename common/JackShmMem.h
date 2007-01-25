@@ -38,7 +38,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-class JackLockMem
+void LockMemoryImp(void* ptr, size_t size);
+void UnlockMemoryImp(void* ptr, size_t size);
+
+class JackMem
 {
 	private:
 
@@ -50,7 +53,7 @@ class JackLockMem
         void* operator new(size_t size)
 		{	
 			gSize = size;
-			return malloc(size);
+			return calloc(1, size);
 		}
 		
         void operator delete(void* ptr, size_t size)
@@ -58,38 +61,25 @@ class JackLockMem
 			free(ptr);
 		}
 
-        JackLockMem():fSize(gSize)
+        JackMem():fSize(gSize)
         {}
 
-        virtual ~JackLockMem()
+        virtual ~JackMem()
         {
-			UnlockMemory();
+			UnlockMemoryImp(this, fSize);
 		}
 		
-		void LockMemory() 
+		void LockMemory()
 		{
-		#ifdef __APPLE__
-			mlock(this, fSize);
-		#elif linux_
-			mlock(this, fSize);
-		#elif WIN32
-			VirtualLock(this, fSize);
-		#endif
+			LockMemoryImp(this, fSize);
 		}
 		
-		void UnlockMemory() 
+		void UnlockMemory()
 		{
-		#ifdef __APPLE__
-			munlock(this, fSize);
-		#elif linux_
-			munlock(this, fSize);
-		#elif WIN32
-			VirtualUnlock(this, fSize);
-		#endif
+			UnlockMemoryImp(this, fSize);
 		}
 
 };
-
 
 /*!
 \brief The base class for shared memory management.
@@ -97,10 +87,10 @@ class JackLockMem
 A class which objects need to be allocated in shared memory derives from this class.
 */
 
-class JackShmMem
+class JackShmMem 
 {
 
-    private:
+    protected:
 
         jack_shm_info_t fInfo;
         static unsigned long fSegmentNum;
@@ -115,11 +105,14 @@ class JackShmMem
         JackShmMem()
         {
             fInfo.index = gInfo.index;
-            fInfo.attached_at = gInfo.attached_at;
-        }
+			fInfo.attached_at = gInfo.attached_at;
+			fInfo.size = gInfo.size;
+		}
 
         virtual ~JackShmMem()
-        {}
+        {
+			UnlockMemoryImp(this, fInfo.size);
+		}
 
         int GetShmIndex()
         {
@@ -130,6 +123,16 @@ class JackShmMem
         {
             return (char*)fInfo.attached_at;
         }
+		
+		void LockMemory()
+		{
+			LockMemoryImp(this, fInfo.size);
+		}
+		
+		void UnlockMemory()
+		{
+			UnlockMemoryImp(this, fInfo.size);
+		}
 
 };
 
