@@ -93,12 +93,10 @@ void JackShmMem::operator delete(void* p, size_t size)
 
 void LockMemoryImp(void* ptr, size_t size) 
 {
-#ifdef __APPLE__
+#ifdef WIN32
+	int res = VirtualLock(ptr, size);	
+#else
 	int res = mlock(ptr, size);
-#elif linux_
-	int res = mlock(ptr, size);
-#elif WIN32
-	int res = VirtualLock(ptr, size);
 #endif
 	if (res != 0) {
 		jack_error("Cannot lock down memory area (%s)", strerror(errno));
@@ -109,12 +107,10 @@ void LockMemoryImp(void* ptr, size_t size)
 
 void UnlockMemoryImp(void* ptr, size_t size) 
 {
-#ifdef __APPLE__
-	int res = munlock(ptr, size);
-#elif linux_
-	int res = munlock(ptr, size);
-#elif WIN32
+#ifdef WIN32
 	int res = VirtualUnlock(ptr, size);
+#else
+	int res = munlock(ptr, size);
 #endif
 	if (res != 0) {
 		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
