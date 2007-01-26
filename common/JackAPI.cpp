@@ -1351,6 +1351,8 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 
 // Automatic jack server launch
 
+#ifndef WIN32
+
 #define JACK_LOCATION
 #define JACK_DEFAULT_DRIVER
 
@@ -1501,3 +1503,4 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
 	return 0;
 }
 
+#endif
