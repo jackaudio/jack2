@@ -93,29 +93,19 @@ void JackShmMem::operator delete(void* p, size_t size)
 
 void LockMemoryImp(void* ptr, size_t size) 
 {
-#ifdef WIN32
-	int res = VirtualLock(ptr, size);	
-#else
-	int res = mlock(ptr, size);
-#endif
-	if (res != 0) {
-		jack_error("Cannot lock down memory area (%s)", strerror(errno));
+	if (CHECK_MLOCK(ptr, size)) {
+		JackLog("Succeeded in locking %u byte memory area\n", size);		
 	} else {
-		JackLog("Succeeded in locking %u byte memory area\n", size);
+		jack_error("Cannot lock down memory area (%s)", strerror(errno));
 	}
 }
 
 void UnlockMemoryImp(void* ptr, size_t size) 
 {
-#ifdef WIN32
-	int res = VirtualUnlock(ptr, size);
-#else
-	int res = munlock(ptr, size);
-#endif
-	if (res != 0) {
-		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+	if (CHECK_MUNLOCK(ptr, size)) {
+		JackLog("Succeeded in unlocking %u byte memory area\n", size);		
 	} else {
-		JackLog("Succeeded in unlocking %u byte memory area\n", size);
+		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
 	}
 }
 
