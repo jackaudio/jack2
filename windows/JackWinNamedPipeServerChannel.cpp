@@ -133,7 +133,8 @@ int JackClientPipeThread::HandleRequest()
 			JackResult res;
 			JackLog("JackRequest::ActivateClient\n");
 			if (req.Read(fPipe) == 0) 
-				res.fResult = fServer->Activate(req.fRefNum);
+				//res.fResult = fServer->Activate(req.fRefNum);
+				res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
 			res.Write(fPipe);
 			break;
 		}
@@ -143,7 +144,8 @@ int JackClientPipeThread::HandleRequest()
 			JackDeactivateRequest req;
 			JackResult res;
 			if (req.Read(fPipe) == 0) 
-				res.fResult = fServer->Deactivate(req.fRefNum);	
+				//res.fResult = fServer->Deactivate(req.fRefNum);	
+				res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum);
 			res.Write(fPipe);
 			break;
 		}
