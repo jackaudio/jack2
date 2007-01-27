@@ -11,6 +11,7 @@
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
+JackEngine.cpp
 
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
@@ -36,7 +37,7 @@ int JackFreewheelDriver::Process()
         fLastWaitUst = GetMicroSeconds();
         fEngine->Process(fLastWaitUst);
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
-        if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs * 20) < 0) // Wait for all clients to finish
+        if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, 10 * 1000000) < 0) // Wait for all clients to finish for 10 sec
             jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients

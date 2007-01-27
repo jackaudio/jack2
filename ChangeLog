@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-01-27 Stephane Letz  <letz@grame.fr>
+
+	* Uses a time out value of 10 sec in freewheel mode (like jack).
+
 2007-01-21 Stephane Letz  <letz@grame.fr>
 
 	* More client debug code: check if the client is still valid in every JackDebugClient method, check if the library context is still valid in every API call.
