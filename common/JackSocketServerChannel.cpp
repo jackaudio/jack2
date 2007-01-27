@@ -176,7 +176,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 JackLog("JackRequest::ActivateClient\n");
                 if (req.Read(socket) == 0)
-					res.fResult = fServer->Activate(req.fRefNum);
+					//res.fResult = fServer->Activate(req.fRefNum);
+					res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
                 res.Write(socket);
                 break;
             }
@@ -186,7 +187,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackDeactivateRequest req;
                 JackResult res;
                 if (req.Read(socket) == 0)
-					res.fResult = fServer->Deactivate(req.fRefNum);
+					//res.fResult = fServer->Deactivate(req.fRefNum);
+					res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum);
                 res.Write(socket);
                 break;
             }

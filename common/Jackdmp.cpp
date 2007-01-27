@@ -547,7 +547,7 @@ int main(int argc, char* argv[])
 
     int res = JackStart(sample_sate, buffer_size, chan_in, chan_out, name, audiodevice, sync, timeout, rt);
     if (res < 0) {
-        jack_error("Cannot start server... exit\n");
+        jack_error("Cannot start server... exit");
         JackDelete();
         return 0;
     }

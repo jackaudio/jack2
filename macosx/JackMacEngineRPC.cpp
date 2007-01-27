@@ -55,7 +55,8 @@ rpc_type server_rpc_jack_client_activate(mach_port_t private_port, int refnum, i
     JackLog("rpc_jack_client_activate\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    *result = channel->GetServer()->Activate(refnum);
+    //*result = channel->GetServer()->Activate(refnum);
+	*result = channel->GetEngine()->ClientActivate(refnum);
     return KERN_SUCCESS;
 }
 
@@ -64,7 +65,8 @@ rpc_type server_rpc_jack_client_deactivate(mach_port_t private_port, int refnum,
     JackLog("rpc_jack_client_deactivate\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    *result = channel->GetServer()->Deactivate(refnum);
+    //*result = channel->GetServer()->Deactivate(refnum);
+	*result = channel->GetEngine()->ClientDeactivate(refnum);
     return KERN_SUCCESS;
 }
 

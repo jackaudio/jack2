@@ -188,11 +188,11 @@ int JackServer::Stop()
     return fAudioDriver->Stop();
 }
 
+/*
 int JackServer::Activate(int refnum)
 {
-	int fw_refnum = fFreewheelDriver->GetClientControl()->fRefNum;
-    fGraphManager->DirectConnect(fw_refnum, refnum);
-    fGraphManager->DirectConnect(refnum, fw_refnum);
+	fGraphManager->DirectConnect(FREEWHEEL_DRIVER_REFNUM, refnum);
+    fGraphManager->DirectConnect(refnum, FREEWHEEL_DRIVER_REFNUM);
     return fEngine->ClientActivate(refnum);
 }
 
@@ -201,24 +201,34 @@ int JackServer::Activate(int refnum)
 int JackServer::Deactivate(int refnum)
 {
     int res = fEngine->ClientDeactivate(refnum);
-	int fw_refnum = fFreewheelDriver->GetClientControl()->fRefNum;
-
+	
     // Disconnect only when needed
-    if (fGraphManager->IsDirectConnection(refnum, fw_refnum)) {
-        fGraphManager->DirectDisconnect(refnum, fw_refnum);
+    if (fGraphManager->IsDirectConnection(refnum, FREEWHEEL_DRIVER_REFNUM)) {
+        fGraphManager->DirectDisconnect(refnum, FREEWHEEL_DRIVER_REFNUM);
     } else {
         JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
     }
 
 	// Disconnect only when needed
-    if (fGraphManager->IsDirectConnection(fw_refnum, refnum)) {
-        fGraphManager->DirectDisconnect(fw_refnum, refnum);
+    if (fGraphManager->IsDirectConnection(FREEWHEEL_DRIVER_REFNUM, refnum)) {
+        fGraphManager->DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, refnum);
     } else {
         JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
     }
 
     return res;
 }
+
+int JackServer::Activate(int refnum)
+{
+	return fEngine->ClientActivate(refnum);
+}
+
+int JackServer::Deactivate(int refnum)
+{
+	return  fEngine->ClientDeactivate(refnum);
+}
+*/
 
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
@@ -305,8 +315,10 @@ void JackServer::Notify(int refnum, int notify, int value)
 
         case JackNotifyChannelInterface::kDeadClient:
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
-            if (Deactivate(refnum) < 0)
-				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!\n", refnum);
+            //if (Deactivate(refnum) < 0)
+			//	jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
+			if (fEngine->ClientDeactivate(refnum) < 0)
+				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
 			fEngine->ClientClose(refnum);
 			break;
     }

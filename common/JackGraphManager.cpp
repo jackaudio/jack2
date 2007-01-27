@@ -193,6 +193,7 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     }
 }
 
+// Server
 int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // Client
 {
     AssertPort(port_index);
@@ -221,6 +222,7 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
     return 0;
 }
 
+// Server
 jack_nframes_t JackGraphManager::GetTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count)
 {
     const jack_int_t* connections = manager->GetConnections(port_index);
@@ -245,6 +247,7 @@ jack_nframes_t JackGraphManager::GetTotalLatencyAux(jack_port_id_t port_index, j
     return max_latency + latency;
 }
 
+// Server
 jack_nframes_t JackGraphManager::GetTotalLatency(jack_port_id_t port_index)
 {
     UInt16 cur_index;
@@ -293,6 +296,7 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
         } else {
             res = manager->AddInputPort(refnum, port_index);
         }
+		// Insertion failure
         if (res < 0) {
             JackPort* port = GetPort(port_index);
             assert(port);
@@ -415,6 +419,38 @@ int JackGraphManager::DisconnectAll(jack_port_id_t port_index)
         DisconnectAllInput(port_index);
     }
     return 0;
+}
+
+// Server
+void JackGraphManager::Activate(int refnum)
+{
+	DirectConnect(FREEWHEEL_DRIVER_REFNUM, refnum);
+    DirectConnect(refnum, FREEWHEEL_DRIVER_REFNUM);
+}
+
+/*
+	Disconnection from the FW must be done in last otherwise an intermediate "unconnected"
+	(thus unactivated) state may happen where the client is still checked for its end.
+*/
+
+// Server
+void JackGraphManager::Deactivate(int refnum)
+{
+	DisconnectAllPorts(refnum);
+	
+	// Disconnect only when needed
+    if (IsDirectConnection(refnum, FREEWHEEL_DRIVER_REFNUM)) {
+        DirectDisconnect(refnum, FREEWHEEL_DRIVER_REFNUM);
+    } else {
+        JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
+    }
+
+	// Disconnect only when needed
+    if (IsDirectConnection(FREEWHEEL_DRIVER_REFNUM, refnum)) {
+        DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, refnum);
+    } else {
+        JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
+    }
 }
 
 // Server
@@ -633,12 +669,14 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
     res[i] = NULL;
 }
 
-// Client
+
 /*
 	Use the state returned by ReadCurrentState and check that the state was not changed during the read operation.
 	The operation is lock-free since there is no intermediate state in the write operation that could cause the
 	read to loop forever.
 */
+
+// Client
 const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 {
     const char** res = (const char**)malloc(sizeof(char*) * (CONNECTION_NUM + 1));

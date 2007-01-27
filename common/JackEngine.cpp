@@ -137,7 +137,7 @@ bool JackEngine::Process(jack_time_t callback_usecs)
 {
 	bool res = true;
 	
-    // Transport
+    // Transport begin
  	fEngineControl->CycleBegin(callback_usecs);
 
     // Timing
@@ -162,7 +162,7 @@ bool JackEngine::Process(jack_time_t callback_usecs)
 		}
     }
 
-    // Transport
+    // Transport end
  	fEngineControl->CycleEnd(fClientTable);
 	return res;
 }
@@ -257,8 +257,9 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value)
 {
     JackClientInterface* client = fClientTable[refnum];
     // The client may be notified by the RT thread while closing
-    if (client && (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value) < 0)) {
-        jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
+    if (client) {
+		if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value) < 0)
+			jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
     } else {
         JackLog("JackEngine::NotifyClient: client not available anymore\n");
     }
@@ -280,10 +281,14 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
         if (old_client) {
-            if (old_client->ClientNotify(refnum, name, JackNotifyChannelInterface::kAddClient, true, 0) < 0)
-                return -1;
-            if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, JackNotifyChannelInterface::kAddClient, true, 0) < 0)
-                return -1;
+            if (old_client->ClientNotify(refnum, name, JackNotifyChannelInterface::kAddClient, true, 0) < 0) {
+                jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
+				return -1;
+			}
+			if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, JackNotifyChannelInterface::kAddClient, true, 0) < 0) {
+                jack_error("NotifyAddClient new_client fails name = %s", name);
+				return -1;
+			}
         }
     }
 
@@ -341,7 +346,7 @@ void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
 
 void JackEngine::NotifyActivate(int refnum)
 {
-    NotifyClient(refnum, JackNotifyChannelInterface::kActivateClient, false, 0);
+	NotifyClient(refnum, JackNotifyChannelInterface::kActivateClient, true, 0);
 }
 
 //-------------------
@@ -513,8 +518,10 @@ int JackEngine::ClientActivate(int refnum)
 	assert(fClientTable[refnum]);
         
 	JackLog("JackEngine::ClientActivate ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
+	fGraphManager->Activate(refnum);
+  	
 	// Wait for graph state change to be effective
-	if (!fSignal->TimedWait(fEngineControl->fPeriodUsecs * 10)) {
+	if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
 		jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 		return -1;
 	} else {
@@ -530,10 +537,12 @@ int JackEngine::ClientDeactivate(int refnum)
 	if (client == NULL) 
 	    return -1;
 
-	JackLog("JackEngine::ClientDeactivate ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
-	fGraphManager->DisconnectAllPorts(refnum);
+	JackLog("JackEngine::ClientDeactivate ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);	
+	fGraphManager->Deactivate(refnum);
+	fLastSwitchUsecs = 0; // Force switch will occur next cycle, even when called with "dead" clients
+		
 	// Wait for graph state change to be effective
-	if (!fSignal->TimedWait(fEngineControl->fPeriodUsecs * 10)) {
+	if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
 		jack_error("JackEngine::ClientDeactivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 		return -1;
 	} else {

@@ -88,6 +88,9 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         int RemovePort(int refnum, jack_port_id_t port_index); 
         void RemoveAllPorts(int refnum); 
         void DisconnectAllPorts(int refnum); 
+		
+		void Activate(int refnum);
+		void Deactivate(int refnum);
 
         int GetInputRefNum(jack_port_id_t port_index); 
         int GetOutputRefNum(jack_port_id_t port_index); 

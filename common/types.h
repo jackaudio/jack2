@@ -55,9 +55,6 @@ typedef uint32_t	jack_nframes_t;
 
 #ifdef WIN32
 typedef int64_t jack_time_t;
-//typedef double jack_time_t;
-//typedef uint64_t jack_time_t;
-
 #else
 typedef uint64_t jack_time_t;
 #endif

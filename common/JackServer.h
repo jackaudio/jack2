@@ -72,8 +72,8 @@ class EXPORT JackServer
         int Start();
         int Stop();
 
-        int Activate(int refnum);
-        int Deactivate(int refnum);
+        //int Activate(int refnum);
+        //int Deactivate(int refnum);
 
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
