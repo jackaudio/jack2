@@ -539,7 +539,7 @@ int JackEngine::ClientDeactivate(int refnum)
 
 	JackLog("JackEngine::ClientDeactivate ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);	
 	fGraphManager->Deactivate(refnum);
-	fLastSwitchUsecs = 0; // Force switch will occur next cycle, even when called with "dead" clients
+	fLastSwitchUsecs = 0; // Force switch to occur next cycle, even when called with "dead" clients
 		
 	// Wait for graph state change to be effective
 	if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
