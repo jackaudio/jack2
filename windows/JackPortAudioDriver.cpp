@@ -28,7 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "pa_asio.h"
 #include "JackDriverLoader.h"
 #include "driver_interface.h"
-
 #include "JackPortAudioDriver.h"
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
