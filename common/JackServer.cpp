@@ -188,48 +188,6 @@ int JackServer::Stop()
     return fAudioDriver->Stop();
 }
 
-/*
-int JackServer::Activate(int refnum)
-{
-	fGraphManager->DirectConnect(FREEWHEEL_DRIVER_REFNUM, refnum);
-    fGraphManager->DirectConnect(refnum, FREEWHEEL_DRIVER_REFNUM);
-    return fEngine->ClientActivate(refnum);
-}
-
-// Disconnection from the FW must be done in last otherwise an intermediate "unconnected"
-// (thus unactivated) state may happen where the client is still checked for its end.
-int JackServer::Deactivate(int refnum)
-{
-    int res = fEngine->ClientDeactivate(refnum);
-	
-    // Disconnect only when needed
-    if (fGraphManager->IsDirectConnection(refnum, FREEWHEEL_DRIVER_REFNUM)) {
-        fGraphManager->DirectDisconnect(refnum, FREEWHEEL_DRIVER_REFNUM);
-    } else {
-        JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
-    }
-
-	// Disconnect only when needed
-    if (fGraphManager->IsDirectConnection(FREEWHEEL_DRIVER_REFNUM, refnum)) {
-        fGraphManager->DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, refnum);
-    } else {
-        JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
-    }
-
-    return res;
-}
-
-int JackServer::Activate(int refnum)
-{
-	return fEngine->ClientActivate(refnum);
-}
-
-int JackServer::Deactivate(int refnum)
-{
-	return  fEngine->ClientDeactivate(refnum);
-}
-*/
-
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackLog("JackServer::SetBufferSize nframes = %ld\n", buffer_size);
@@ -245,7 +203,7 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 		fEngine->NotifyBufferSize(buffer_size);
 		fEngineControl->InitFrameTime();
 		return fAudioDriver->Start();
-	} else { // Failure: restore current value
+	} else { // Failure: try to restore current value
 		jack_error("Cannot SetBufferSize for audio driver, restore current value %ld", current_buffer_size);
 		fFreewheelDriver->SetBufferSize(current_buffer_size);
 		fEngineControl->InitFrameTime();
@@ -315,8 +273,6 @@ void JackServer::Notify(int refnum, int notify, int value)
 
         case JackNotifyChannelInterface::kDeadClient:
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
-            //if (Deactivate(refnum) < 0)
-			//	jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
 			if (fEngine->ClientDeactivate(refnum) < 0)
 				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
 			fEngine->ClientClose(refnum);

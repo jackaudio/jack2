@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-01-29 Stephane Letz  <letz@grame.fr>
+
+	* More robust activation/deactivation code, especially in case of client crash.
+
 2007-01-27 Stephane Letz  <letz@grame.fr>
 
 	* Uses a time out value of 10 sec in freewheel mode (like jack).

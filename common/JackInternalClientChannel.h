@@ -52,15 +52,14 @@ class JackInternalClientChannel : public JackClientChannelInterface
         {
             *result = fEngine->ClientInternalClose(refnum);
         }
+		
         void ClientActivate(int refnum, int* result)
         {
-            //*result = fServer->Activate(refnum);
-			*result = fEngine->ClientActivate(refnum);
+    		*result = fEngine->ClientActivate(refnum);
         }
         void ClientDeactivate(int refnum, int* result)
         {
-            //*result = fServer->Deactivate(refnum);
-			*result = fEngine->ClientDeactivate(refnum);
+     		*result = fEngine->ClientDeactivate(refnum);
         }
 
         void PortRegister(int refnum, const char* name, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
