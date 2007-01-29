@@ -92,7 +92,7 @@ void JackSocketServerChannel::AddClient(int fd, char* name, int* shared_engine, 
 {
     JackLog("JackSocketServerChannel::AddClient\n");
     int refnum = -1;
-    *result = fServer->GetEngine()->ClientNew(name, &refnum, shared_engine, shared_client, shared_graph);
+	*result = fServer->GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
         fSocketTable[fd].first = refnum;
         fRebuild = true;
@@ -150,10 +150,10 @@ int JackSocketServerChannel::HandleRequest(int fd)
     // Read data
     switch (header.fType) {
 
-        case JackRequest::kClientNew: {
-                JackLog("JackRequest::ClientNew\n");
-                JackClientNewRequest req;
-                JackClientNewResult res;
+        case JackRequest::kClientOpen: {
+                JackLog("JackRequest::ClientOpen\n");
+                JackClientOpenRequest req;
+                JackClientOpenResult res;
                 if (req.Read(socket) == 0)
 					AddClient(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(socket);
@@ -165,7 +165,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackClientCloseRequest req;
                 JackResult res;
                 if (req.Read(socket) == 0)
-					res.fResult = fServer->GetEngine()->ClientClose(req.fRefNum);
+					res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
                 res.Write(socket);
                 RemoveClient(fd, req.fRefNum);
                 break;
@@ -176,7 +176,6 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 JackLog("JackRequest::ActivateClient\n");
                 if (req.Read(socket) == 0)
-					//res.fResult = fServer->Activate(req.fRefNum);
 					res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
                 res.Write(socket);
                 break;
@@ -187,7 +186,6 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackDeactivateRequest req;
                 JackResult res;
                 if (req.Read(socket) == 0)
-					//res.fResult = fServer->Deactivate(req.fRefNum);
 					res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum);
                 res.Write(socket);
                 break;

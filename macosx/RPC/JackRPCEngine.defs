@@ -28,7 +28,7 @@ ServerPrefix server_;
 type client_name_t = c_string[128];
 type client_port_name_t = c_string[128];
 
-routine rpc_jack_client_new(
+routine rpc_jack_client_open(
 	server_port	: mach_port_t;
 	client_name	: client_name_t;
 	out private_port : mach_port_make_send_t;

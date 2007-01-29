@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Sat Dec 23 15:21:20 2006
+ * stub generated Tue Jan 30 00:00:52 2007
  * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
  * OPTIONS: 
  */
@@ -109,265 +109,265 @@
 
 #if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Reply__JackRPCEngine_subsystem__
-#if !defined(__MIG_check__Reply__rpc_jack_client_new_t__defined)
-#define __MIG_check__Reply__rpc_jack_client_new_t__defined
-#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
+#if !defined(__MIG_check__Reply__rpc_jack_client_open_t__defined)
+#define __MIG_check__Reply__rpc_jack_client_open_t__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
 #if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__int_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined */
 
 
-#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined
 #if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__int_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined */
 
 
-#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
 #if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__int_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined */
 
 
-#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined
 #if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__int_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__int_rep__int32_t__defined)
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined */
 
 
-#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
 #if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__char_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined */
 
 
-#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined
 #if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__char_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined */
 
 
-#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
 #if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__char_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined */
 
 
-#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined
 #if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__char_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__char_rep__int32_t__defined)
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined */
 
 
-#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
 #if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__float_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine(a, f) \
 	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined */
 
 
-#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined
 #if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__float_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client(a, f) \
 	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined */
 
 
-#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
 #if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__float_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph(a, f) \
 	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined */
 
 
-#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined
 #if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__float_rep__int((int *)(a), f)
 #elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
 #elif	defined(__NDR_convert__float_rep__int32_t__defined)
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined
-#define	__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result(a, f) \
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result(a, f) \
 	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined */
 
 
 
-mig_internal kern_return_t __MIG_check__Reply__rpc_jack_client_new_t(__Reply__rpc_jack_client_new_t *Out0P)
+mig_internal kern_return_t __MIG_check__Reply__rpc_jack_client_open_t(__Reply__rpc_jack_client_open_t *Out0P)
 {
 
-	typedef __Reply__rpc_jack_client_new_t __Reply;
+	typedef __Reply__rpc_jack_client_open_t __Reply;
 	boolean_t msgh_simple;
 #if	__MigTypeCheck
 	unsigned int msgh_size;
@@ -403,75 +403,75 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_client_new_t(__Reply__rp
 		{ return MIG_TYPE_ERROR; }
 #endif	/* __MigTypeCheck */
 
-#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined) || \
-	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined) || \
-	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined) || \
-	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined)
+#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined)
 	if (Out0P->NDR.int_rep != NDR_record.int_rep) {
-#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined)
-		__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine(&Out0P->shared_engine, Out0P->NDR.int_rep);
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_engine__defined */
-#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined)
-		__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client(&Out0P->shared_client, Out0P->NDR.int_rep);
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_client__defined */
-#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined)
-		__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph(&Out0P->shared_graph, Out0P->NDR.int_rep);
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__shared_graph__defined */
-#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined)
-		__NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result(&Out0P->result, Out0P->NDR.int_rep);
-#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_new_t__result__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine(&Out0P->shared_engine, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client(&Out0P->shared_client, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_client__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph(&Out0P->shared_graph, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_graph__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result(&Out0P->result, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_open_t__result__defined */
 	}
 #endif	/* defined(__NDR_convert__int_rep...) */
 
-#if	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined) || \
-	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined) || \
-	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined) || \
-	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined)
+#if	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined)
 	if (Out0P->NDR.char_rep != NDR_record.char_rep) {
-#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined)
-		__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine(&Out0P->shared_engine, Out0P->NDR.char_rep);
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_engine__defined */
-#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined)
-		__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client(&Out0P->shared_client, Out0P->NDR.char_rep);
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_client__defined */
-#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined)
-		__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph(&Out0P->shared_graph, Out0P->NDR.char_rep);
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__shared_graph__defined */
-#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined)
-		__NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result(&Out0P->result, Out0P->NDR.char_rep);
-#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_new_t__result__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine(&Out0P->shared_engine, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_engine__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client(&Out0P->shared_client, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_client__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph(&Out0P->shared_graph, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__shared_graph__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result(&Out0P->result, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_open_t__result__defined */
 	}
 #endif	/* defined(__NDR_convert__char_rep...) */
 
-#if	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined) || \
-	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined) || \
-	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined) || \
-	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined)
+#if	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined)
 	if (Out0P->NDR.float_rep != NDR_record.float_rep) {
-#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined)
-		__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine(&Out0P->shared_engine, Out0P->NDR.float_rep);
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_engine__defined */
-#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined)
-		__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client(&Out0P->shared_client, Out0P->NDR.float_rep);
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_client__defined */
-#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined)
-		__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph(&Out0P->shared_graph, Out0P->NDR.float_rep);
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__shared_graph__defined */
-#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined)
-		__NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result(&Out0P->result, Out0P->NDR.float_rep);
-#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_new_t__result__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine(&Out0P->shared_engine, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_engine__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client(&Out0P->shared_client, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_client__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph(&Out0P->shared_graph, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__shared_graph__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result(&Out0P->result, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_open_t__result__defined */
 	}
 #endif	/* defined(__NDR_convert__float_rep...) */
 
 	return MACH_MSG_SUCCESS;
 }
-#endif /* !defined(__MIG_check__Reply__rpc_jack_client_new_t__defined) */
+#endif /* !defined(__MIG_check__Reply__rpc_jack_client_open_t__defined) */
 #endif /* __MIG_check__Reply__JackRPCEngine_subsystem__ */
 #endif /* ( __MigTypeCheck || __NDR_convert__ ) */
 
 
-/* Routine rpc_jack_client_new */
-mig_external kern_return_t rpc_jack_client_new
+/* Routine rpc_jack_client_open */
+mig_external kern_return_t rpc_jack_client_open
 (
 	mach_port_t server_port,
 	client_name_t client_name,
@@ -552,11 +552,11 @@ mig_external kern_return_t rpc_jack_client_new
 
 	mach_msg_return_t msg_result;
 
-#ifdef	__MIG_check__Reply__rpc_jack_client_new_t__defined
+#ifdef	__MIG_check__Reply__rpc_jack_client_open_t__defined
 	kern_return_t check_result;
-#endif	/* __MIG_check__Reply__rpc_jack_client_new_t__defined */
+#endif	/* __MIG_check__Reply__rpc_jack_client_open_t__defined */
 
-	__DeclareSendRpc(1000, "rpc_jack_client_new")
+	__DeclareSendRpc(1000, "rpc_jack_client_open")
 
 	InP->NDR = NDR_record;
 
@@ -569,20 +569,20 @@ mig_external kern_return_t rpc_jack_client_new
 	InP->Head.msgh_reply_port = mig_get_reply_port();
 	InP->Head.msgh_id = 1000;
 
-	__BeforeSendRpc(1000, "rpc_jack_client_new")
+	__BeforeSendRpc(1000, "rpc_jack_client_open")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1000, "rpc_jack_client_new")
+	__AfterSendRpc(1000, "rpc_jack_client_open")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
 	}
 
 
-#if	defined(__MIG_check__Reply__rpc_jack_client_new_t__defined)
-	check_result = __MIG_check__Reply__rpc_jack_client_new_t((__Reply__rpc_jack_client_new_t *)Out0P);
+#if	defined(__MIG_check__Reply__rpc_jack_client_open_t__defined)
+	check_result = __MIG_check__Reply__rpc_jack_client_open_t((__Reply__rpc_jack_client_open_t *)Out0P);
 	if (check_result != MACH_MSG_SUCCESS)
 		{ return check_result; }
-#endif	/* defined(__MIG_check__Reply__rpc_jack_client_new_t__defined) */
+#endif	/* defined(__MIG_check__Reply__rpc_jack_client_open_t__defined) */
 
 	*private_port = Out0P->private_port.name;
 	*shared_engine = Out0P->shared_engine;

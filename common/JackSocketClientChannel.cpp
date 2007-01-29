@@ -113,10 +113,10 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
     }
 }
 
-void JackSocketClientChannel::ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackClientNewRequest req(name);
-    JackClientNewResult res;
+    JackClientOpenRequest req(name);
+    JackClientOpenResult res;
     ServerSyncCall(&req, &res, result);
     *shared_engine = res.fSharedEngine;
     *shared_client = res.fSharedClient;

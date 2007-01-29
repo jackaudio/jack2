@@ -59,7 +59,7 @@ public:
 
         kSetBufferSize = 20,
         kSetFreeWheel = 21,
-        kClientNew = 22,
+        kClientOpen = 22,
         kClientClose = 23,
         kConnectNamePorts = 24,
         kDisconnectNamePorts = 25,
@@ -121,14 +121,14 @@ struct JackResult
 \brief NewClient request.
 */
 
-struct JackClientNewRequest : public JackRequest
+struct JackClientOpenRequest : public JackRequest
 {
 
     char fName[JACK_CLIENT_NAME_SIZE + 1];
 
-    JackClientNewRequest()
+    JackClientOpenRequest()
     {}
-    JackClientNewRequest(const char* name): JackRequest(JackRequest::kClientNew)
+    JackClientOpenRequest(const char* name): JackRequest(JackRequest::kClientOpen)
     {
         snprintf(fName, sizeof(fName), "%s", name);
     }
@@ -149,7 +149,7 @@ struct JackClientNewRequest : public JackRequest
 \brief NewClient result.
 */
 
-struct JackClientNewResult : public JackResult
+struct JackClientOpenResult : public JackResult
 {
 
     int fSharedEngine;
@@ -157,10 +157,10 @@ struct JackClientNewResult : public JackResult
     int fSharedGraph;
     uint32_t fProtocolVersion;
 
-    JackClientNewResult()
+    JackClientOpenResult()
 		:fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
     {}
-    JackClientNewResult(int32_t status, int index1, int index2, int index3)
+    JackClientOpenResult(int32_t status, int index1, int index2, int index3)
          : JackResult(status), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
     {}
 

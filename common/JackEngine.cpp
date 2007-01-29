@@ -35,22 +35,12 @@ namespace Jack
 
 JackEngine::JackEngine(JackGraphManager* manager, 
 						JackSynchro** table, 
-						JackEngineControl* control,
-						bool sync, 
-						long time_out_ms, 
-						bool rt, 
-						long priority, 
-						bool ve)
+						JackEngineControl* control)
 {
     fGraphManager = manager;
     fSynchroTable = table;
     fEngineControl = control;
-    fEngineControl->fSyncMode = sync;
-    fEngineControl->fTimeOutUsecs = time_out_ms * 1000;
-    fEngineControl->fRealTime = rt;
-    fEngineControl->fPriority = priority;
-    fEngineControl->fVerbose = ve;
-    fChannel = JackGlobals::MakeServerNotifyChannel();
+	fChannel = JackGlobals::MakeServerNotifyChannel();
 	fSignal = JackGlobals::MakeInterProcessSync();
     fEngineTiming = new JackEngineTiming(fClientTable, fGraphManager, fEngineControl);
     for (int i = 0; i < CLIENT_NUM; i++)
@@ -366,32 +356,22 @@ bool JackEngine::ClientCheckName(const char* name)
 }
 
 // Used for external clients
-int JackEngine::ClientNew(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
-    if (ClientCheckName(name)) {
+    JackLog("JackEngine::ClientOpen: name = %s \n", name);
+	
+	if (ClientCheckName(name)) {
         jack_error("client %s already registered", name);
         return -1;
     }
-
-    JackExternalClient* client = new JackExternalClient();
-    if (ClientExternalNew(name, ref, shared_engine, shared_client, shared_graph_manager, client) < 0) {
-        delete client;
-        return -1;
-    }
-
-    return 0;
-}
-
-// Used for external clients
-int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager, JackExternalClient* client)
-{
-    JackLog("JackEngine::ClientNew: name = %s \n", name);
+	
 	int refnum = Allocate();
-
     if (refnum < 0) {
         jack_error("No more refnum available");
         return -1;
     }
+	
+	JackExternalClient* client = new JackExternalClient();
 
     if (!fSynchroTable[refnum]->Allocate(name, 0)) {
         jack_error("Cannot allocate synchro");
@@ -425,16 +405,22 @@ int JackEngine::ClientExternalNew(const char* name, int* ref, int* shared_engine
 error:
     ClientCloseAux(refnum, client, false);
     client->Close();
+	delete client;
     return -1;
 }
 
 // Used for server driver clients
-int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
+int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
 {
     JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
+	
+	if (ClientCheckName(name)) {
+        jack_error("client %s already registered", name);
+        return -1;
+    }
+	
 	int refnum = Allocate();
-
-    if (refnum < 0) {
+	if (refnum < 0) {
         jack_error("No more refnum available");
         return -1;
     }
@@ -459,7 +445,7 @@ int JackEngine::ClientInternalNew(const char* name, int* ref, JackEngineControl*
 }
 
 // Used for externall clients
-int JackEngine::ClientClose(int refnum)
+int JackEngine::ClientExternalClose(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
     if (client)	{

@@ -51,14 +51,13 @@ JackServer::JackServer(bool sync, long timeout, bool rt, long priority, long loo
     for (int i = 0; i < CLIENT_NUM; i++)
         fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
-    fEngineControl = new JackEngineControl();
-    fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl, sync, timeout, rt, priority, verbose);
+    fEngineControl = new JackEngineControl(sync, timeout, rt, priority, verbose);
+    fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();
     fState = new JackConnectionManager();
-    fFreewheel = false;
-    fSyncMode = sync;
+	fFreewheel = false;
     fLoopback = loopback;
     fDriverInfo = NULL;
     fAudioDriver = NULL;
@@ -272,7 +271,7 @@ void JackServer::Notify(int refnum, int notify, int value)
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
 			if (fEngine->ClientDeactivate(refnum) < 0)
 				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
-			fEngine->ClientClose(refnum);
+			fEngine->ClientExternalClose(refnum);
 			break;
     }
 }

@@ -72,7 +72,7 @@ int JackInternalClient::Open(const char* name)
     strcpy(fClientControl->fName, name);
 
     // Require new client
-    fChannel->ClientNew(name, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);
+    fChannel->ClientOpen(name, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);
     if (result < 0) {
         jack_error("Cannot open client name = %s", name);
         goto error;

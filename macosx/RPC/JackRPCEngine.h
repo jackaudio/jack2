@@ -43,13 +43,13 @@ __BeforeMigUserHeader
 __BEGIN_DECLS
 
 
-/* Routine rpc_jack_client_new */
+/* Routine rpc_jack_client_open */
 #ifdef	mig_external
 mig_external
 #else
 extern
 #endif	/* mig_external */
-kern_return_t rpc_jack_client_new
+kern_return_t rpc_jack_client_open
 (
 	mach_port_t server_port,
 	client_name_t client_name,
@@ -283,7 +283,7 @@ __END_DECLS
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
-	} __Request__rpc_jack_client_new_t;
+	} __Request__rpc_jack_client_open_t;
 #ifdef  __MigPackStructs
 #pragma pack()
 #endif
@@ -477,7 +477,7 @@ __END_DECLS
 #ifndef __RequestUnion__JackRPCEngine_subsystem__defined
 #define __RequestUnion__JackRPCEngine_subsystem__defined
 union __RequestUnion__JackRPCEngine_subsystem {
-	__Request__rpc_jack_client_new_t Request_rpc_jack_client_new;
+	__Request__rpc_jack_client_open_t Request_rpc_jack_client_open;
 	__Request__rpc_jack_client_close_t Request_rpc_jack_client_close;
 	__Request__rpc_jack_client_activate_t Request_rpc_jack_client_activate;
 	__Request__rpc_jack_client_deactivate_t Request_rpc_jack_client_deactivate;
@@ -513,7 +513,7 @@ union __RequestUnion__JackRPCEngine_subsystem {
 		int shared_client;
 		int shared_graph;
 		int result;
-	} __Reply__rpc_jack_client_new_t;
+	} __Reply__rpc_jack_client_open_t;
 #ifdef  __MigPackStructs
 #pragma pack()
 #endif
@@ -706,7 +706,7 @@ union __RequestUnion__JackRPCEngine_subsystem {
 #ifndef __ReplyUnion__JackRPCEngine_subsystem__defined
 #define __ReplyUnion__JackRPCEngine_subsystem__defined
 union __ReplyUnion__JackRPCEngine_subsystem {
-	__Reply__rpc_jack_client_new_t Reply_rpc_jack_client_new;
+	__Reply__rpc_jack_client_open_t Reply_rpc_jack_client_open;
 	__Reply__rpc_jack_client_close_t Reply_rpc_jack_client_close;
 	__Reply__rpc_jack_client_activate_t Reply_rpc_jack_client_activate;
 	__Reply__rpc_jack_client_deactivate_t Reply_rpc_jack_client_deactivate;
@@ -726,7 +726,7 @@ union __ReplyUnion__JackRPCEngine_subsystem {
 
 #ifndef subsystem_to_name_map_JackRPCEngine
 #define subsystem_to_name_map_JackRPCEngine \
-    { "rpc_jack_client_new", 1000 },\
+    { "rpc_jack_client_open", 1000 },\
     { "rpc_jack_client_close", 1001 },\
     { "rpc_jack_client_activate", 1002 },\
     { "rpc_jack_client_deactivate", 1003 },\

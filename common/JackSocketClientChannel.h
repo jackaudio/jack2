@@ -57,7 +57,7 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
         int Start();
         void Stop();
 
-        void ClientNew(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int* result);

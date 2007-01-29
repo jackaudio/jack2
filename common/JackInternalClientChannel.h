@@ -44,9 +44,9 @@ class JackInternalClientChannel : public JackClientChannelInterface
         virtual ~JackInternalClientChannel()
         {}
 
-        void ClientNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
+        void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {
-            *result = fEngine->ClientInternalNew(name, ref, shared_engine, shared_manager, client);
+            *result = fEngine->ClientInternalOpen(name, ref, shared_engine, shared_manager, client);
         }
         void ClientClose(int refnum, int* result)
         {

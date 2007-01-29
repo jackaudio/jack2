@@ -61,23 +61,23 @@ class JackEngine
         void GetZombifiedClients(bool clients[CLIENT_NUM], jack_time_t current_time);
 		void ProcessNext(jack_time_t callback_usecs);
 		void ProcessCurrent(jack_time_t callback_usecs);
+		bool ClientCheckName(const char* name);
+		int Allocate();
 
     public:
 
-        JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* control, bool sync, long time_out_ms, bool rt, long priority, bool verbose);
+        JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler);
         virtual ~JackEngine();
 
         int Open();
         int Close();
-		int Allocate();
+		
 
         // Client management
-        bool ClientCheckName(const char* name);
-        int ClientNew(const char* name, int* refnum, int* shared_engine, int* shared_client, int* shared_graph_manager);
-        int ClientExternalNew(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager, JackExternalClient* client);
-        int ClientInternalNew(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client);
+        int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
+        int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client);
 
-        int ClientClose(int refnum);
+        int ClientExternalClose(int refnum);
         int ClientInternalClose(int refnum);
         int ClientInternalCloseIm(int refnum);
 
