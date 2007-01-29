@@ -52,8 +52,7 @@ JackServer::JackServer(bool sync, long timeout, bool rt, long priority, long loo
         fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
     fEngineControl = new JackEngineControl();
-    fSignal = JackGlobals::MakeInterProcessSync();
-    fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl, fSignal, sync, timeout, rt, priority, verbose);
+    fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl, sync, timeout, rt, priority, verbose);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();
@@ -78,7 +77,6 @@ JackServer::~JackServer()
     delete fEngine;
     delete fChannel;
     delete fEngineControl;
-    delete fSignal;
     delete fState;
     if (fDriverInfo) {
         UnloadDriverModule(fDriverInfo->handle);
@@ -154,7 +152,6 @@ int JackServer::Close()
 {
     JackLog("JackServer::Close\n");
     fChannel->Close();
-    fSignal->Destroy(); // A REVOIR
     fAudioDriver->Detach();
     if (fLoopback > 0)
         fLoopbackDriver->Detach();

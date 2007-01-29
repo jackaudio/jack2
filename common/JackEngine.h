@@ -64,7 +64,7 @@ class JackEngine
 
     public:
 
-        JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* control, JackSyncInterface* signal, bool sync, long time_out_ms, bool rt, long priority, bool verbose);
+        JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* control, bool sync, long time_out_ms, bool rt, long priority, bool verbose);
         virtual ~JackEngine();
 
         int Open();

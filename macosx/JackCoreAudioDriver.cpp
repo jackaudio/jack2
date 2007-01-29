@@ -879,11 +879,10 @@ int JackCoreAudioDriver::Attach()
 
 int JackCoreAudioDriver::Start()
 {
-    OSStatus err;
     JackLog("JackCoreAudioDriver::Start\n");
     JackAudioDriver::Start();
 
-    err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
+    OSStatus err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
     if (err != noErr)
         return -1;
 

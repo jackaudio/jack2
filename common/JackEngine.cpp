@@ -36,7 +36,6 @@ namespace Jack
 JackEngine::JackEngine(JackGraphManager* manager, 
 						JackSynchro** table, 
 						JackEngineControl* control,
-						JackSyncInterface* signal, 
 						bool sync, 
 						long time_out_ms, 
 						bool rt, 
@@ -52,8 +51,8 @@ JackEngine::JackEngine(JackGraphManager* manager,
     fEngineControl->fPriority = priority;
     fEngineControl->fVerbose = ve;
     fChannel = JackGlobals::MakeServerNotifyChannel();
+	fSignal = JackGlobals::MakeInterProcessSync();
     fEngineTiming = new JackEngineTiming(fClientTable, fGraphManager, fEngineControl);
-    fSignal = signal;
     for (int i = 0; i < CLIENT_NUM; i++)
         fClientTable[i] = NULL;
     fEngineTiming->ClearTimeMeasures();
@@ -64,6 +63,7 @@ JackEngine::~JackEngine()
 {
     delete fChannel;
     delete fEngineTiming;
+	delete fSignal;
 }
 
 //-------------------
@@ -98,7 +98,8 @@ int JackEngine::Close()
             delete client;
         }
     }
-
+	
+	fSignal->Destroy();
     return 0;
 }
 
