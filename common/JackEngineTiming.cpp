@@ -24,7 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <math.h>
 #include <algorithm>
 #include <iostream> 
-//#include <fstream>
 #include <assert.h>
 
 namespace Jack
