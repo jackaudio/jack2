@@ -32,8 +32,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#include <windows.h>
 	#define CHECK_MLOCK(ptr, size) (VirtualLock((ptr), (size)) != 0)
 	#define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
-	#define CHECK_MLOCKALL()
-	#define CHECK_MUNLOCKALL()
+	#define CHECK_MLOCKALL()(false)
+	#define CHECK_MUNLOCKALL()(false)
 #else
 	#include <sys/types.h>
 	#include <sys/mman.h>
