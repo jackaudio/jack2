@@ -106,10 +106,10 @@ int JackClientPipeThread::HandleRequest()
 		// Read data
 		switch (header.fType) {
 			
-		case JackRequest::kClientNew: {
-			JackLog("JackRequest::ClientNew\n");
-			JackClientNewRequest req;
-			JackClientNewResult res;
+		case JackRequest::kClientOpen: {
+			JackLog("JackRequest::ClientOpen\n");
+			JackClientOpenRequest req;
+			JackClientOpenResult res;
 			if (req.Read(fPipe) == 0) 
 				AddClient(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);	
 			res.Write(fPipe);
@@ -121,7 +121,7 @@ int JackClientPipeThread::HandleRequest()
 			JackClientCloseRequest req;
 			JackResult res;
 			if (req.Read(fPipe) == 0) 
-				res.fResult = fServer->GetEngine()->ClientClose(req.fRefNum);		
+				res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);		
 			res.Write(fPipe);
 			RemoveClient();
 			ret = -1;
@@ -271,7 +271,7 @@ void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared
 {
     JackLog("JackClientPipeThread::AddClient %s\n", name);
     fRefNum = -1;
-    *result = fServer->GetEngine()->ClientNew(name, &fRefNum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
 void JackClientPipeThread::RemoveClient()
