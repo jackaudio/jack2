@@ -109,6 +109,24 @@ void UnlockMemoryImp(void* ptr, size_t size)
 	}
 }
 
+void LockAllMemory() 
+{
+	if (CHECK_MLOCKALL()) {
+		JackLog("Succeeded in locking all memory\n");		
+	} else {
+		jack_error("Cannot lock down memory area (%s)", strerror(errno));
+	}
+}
+
+void UnlockAllMemory() 
+{
+	if (CHECK_MUNLOCKALL()) {
+		JackLog("Succeeded in unlocking all memory\n");		
+	} else {
+		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+	}
+}
+
 
 } // end of namespace
 

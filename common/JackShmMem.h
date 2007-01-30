@@ -32,11 +32,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	#include <windows.h>
 	#define CHECK_MLOCK(ptr, size) (VirtualLock((ptr), (size)) != 0)
 	#define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
+	#define CHECK_MLOCKALL()
+	#define CHECK_MUNLOCKALL()
 #else
 	#include <sys/types.h>
 	#include <sys/mman.h>
-	#define CHECK_MLOCK(ptr, size) (munlock((ptr), (size)) == 0)
+	#define CHECK_MLOCK(ptr, size) (mlock((ptr), (size)) == 0)
 	#define CHECK_MUNLOCK(ptr, size) (munlock((ptr), (size)) == 0)
+	#define CHECK_MLOCKALL() (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
+	#define CHECK_MUNLOCKALL() (munlockall() == 0)
 #endif
   
 namespace Jack
