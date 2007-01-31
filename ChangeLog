@@ -7,7 +7,6 @@
 
 	* New LockAllMemory and UnlockAllMemory functions.
 
-
 2007-01-29 Stephane Letz  <letz@grame.fr>
 
 	* More robust activation/deactivation code, especially in case of client crash.
