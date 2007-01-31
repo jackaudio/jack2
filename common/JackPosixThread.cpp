@@ -116,6 +116,11 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
             jack_error("Cannot set scheduling priority for RT thread %d %s", res, strerror(errno));
             return -1;
         }
+		
+	   if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
+			jack_error("setting thread stack size%d %s", res, strerror(errno));
+			return -1;
+        }
 
         if ((res = pthread_create(thread, &attributes, start_routine, arg))) {
             jack_error("Cannot set create thread %d %s", res, strerror(errno));

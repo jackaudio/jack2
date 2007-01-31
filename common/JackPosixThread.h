@@ -27,6 +27,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+/* use 512KB stack per thread - the default is way too high to be feasible 
+ * with mlockall() on many systems */
+#define THREAD_STACK 524288
+
 /*!
 \brief The POSIX thread base class.
 */
