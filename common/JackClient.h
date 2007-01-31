@@ -123,7 +123,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int PortConnect(jack_port_id_t src, jack_port_id_t dst);
         virtual int PortDisconnect(jack_port_id_t src);
 
-        int PortIsMine(jack_port_id_t port_index);
+        virtual int PortIsMine(jack_port_id_t port_index);
 
         // Transport
         virtual int ReleaseTimebase();
