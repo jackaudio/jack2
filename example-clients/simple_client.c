@@ -6,12 +6,10 @@
 
 #include <stdio.h>
 #include <errno.h>
-//#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-//#include <jack/jack.h>
 #include "jack.h"
 
 jack_port_t *input_port;
@@ -46,35 +44,6 @@ volatile enum {
  * This client follows a simple rule: when the JACK transport is
  * running, copy the input port to the output.  When it stops, exit.
  */
-
-/*
-int
-process (jack_nframes_t nframes, void *arg)
-{
-	jack_default_audio_sample_t *in, *out;
-	jack_transport_state_t ts = jack_transport_query(client, NULL);
-	int i;
-
-	if (ts == JackTransportRolling) {
-
-		if (client_state == Init)
-			client_state = Run;
-
-		in = jack_port_get_buffer (input_port, nframes);
-		out = jack_port_get_buffer (output_port, nframes);
-		
-		memcpy (out, in,
-			sizeof (jack_default_audio_sample_t) * nframes);   
-
-	} else if (ts == JackTransportStopped) {
-
-		if (client_state == Run)
-			client_state = Exit;
-	}
-
-	return 0;      
-}
-*/
 
 int
 process (jack_nframes_t nframes, void *arg)
@@ -174,12 +143,6 @@ main (int argc, char *argv[])
 	*/
 
 	jack_on_shutdown (client, jack_shutdown, 0);
-
-	/* display the current sample rate. 
-	 */
-
-//	printf ("engine sample rate: %" PRIu32 "\n",
-//		jack_get_sample_rate (client));
 
 	/* create two ports */
 
