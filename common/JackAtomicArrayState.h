@@ -55,7 +55,7 @@ struct AtomicArrayCounter
 #define SwapIndex1(e, state) (((e).info.scounter.fByteVal[0] == state) ? 0 : state)
 
 /*!
-\brief A class to handle serveral states in a lock-free manner
+\brief A class to handle several states in a lock-free manner
  
 Requirement:
  
@@ -68,7 +68,7 @@ Requirement:
 	- a WriteStartState(int state) returns a "pending" state to be written into
 	- a WriteStartStop(int state) make the written "pending" state become "switchable"
 	
-	Different pending states can be written independantly and concurently.
+	Different pending states can be written independantly and concurrently.
 	
 	GetCurrentIndex() *must* return an increasing value to be able to check reading current state coherency
 	
