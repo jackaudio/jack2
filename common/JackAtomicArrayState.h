@@ -162,8 +162,8 @@ class JackAtomicArrayState
         }
 
         /*!
-              \brief Tries to switch to the next state and returns the new current state (either the same as before if case of switch failure or the new one)
-              */
+		\brief Tries to switch to the next state and returns the new current state (either the same as before if case of switch failure or the new one)
+		*/
 
         T* TrySwitchState(int state)
         {
@@ -202,8 +202,8 @@ class JackAtomicArrayState
         }
 
         /*!
-              \brief Start write operation : setup and returns the next state to update, check for recursive write calls.
-              */
+		\brief Start write operation : setup and returns the next state to update, check for recursive write calls.
+		*/
 
         T* WriteNextStateStart(int state)
         {
