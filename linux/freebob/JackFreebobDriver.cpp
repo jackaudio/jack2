@@ -679,7 +679,6 @@ JackFreebobDriver::freebob_driver_midi_finish (freebob_driver_midi_handle_t *m)
 
     for (i = 0;i < m->nb_input_ports;i++) {
         free(m->input_ports[i]);
-
     }
     free(m->input_ports);
 
