@@ -2,6 +2,13 @@
   Jackdmp changes log
 ---------------------------
 
+2007-02-05 Stephane Letz  <letz@grame.fr>
+	
+	*  Add Pieter Palmers FreeBob driver.
+
+2007-01-31 Stephane Letz  <letz@grame.fr>
+
+	* Use pthread_attr_setstacksize in JackPosixThread class.
 
 2007-01-30 Stephane Letz  <letz@grame.fr>
 

@@ -327,7 +327,7 @@ bool JackClient::Execute()
     // Process call
     if (IsActive()) {
         CallSyncCallback();
-        bool res = CallProcessCallback();
+        bool res = CallProcessCallback();  
         CallTimebaseCallback();
         if (!res)
             goto end;

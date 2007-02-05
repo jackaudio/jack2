@@ -3,7 +3,7 @@
 prefix := /usr/local
 prefix := ${DESTDIR}${prefix}
 
-subprojects := ../common ../tests ../example-clients alsa 
+subprojects := ../common ../tests ../example-clients alsa freebob
 
 sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../tests/*.cpp)
 
@@ -17,11 +17,13 @@ TARGET_LINUX_WRAPPER_LIB := libjackwrapper.so
 
 TARGET_LINUX_ALSA := jack_alsa.so
 
+TARGET_LINUX_FREEBOB := jack_freebob.so
+
 TARGET_LINUX_DUMMY := jack_dummy.so
 
 VPATH := $(subprojects)
 
-LIB_LINUX := -lpthread -lrt -lasound 
+LIB_LINUX := -lpthread -lrt -lasound
 
 
 objects_common_server_lib := JackActivationCount.o JackAPI.o JackAudioDriver.o JackClient.o JackConnectionManager.o \
@@ -39,6 +41,8 @@ objects_linux_server := Jackdmp.o
 
 objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o ice1712.o
 
+objects_linux_freebob := JackFreebobDriver.o
+
 objects_linux_dummy := JackDummyDriver.o  
 
 CFLAGS := -g -O3 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
@@ -53,10 +57,12 @@ CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix
 # Add the -D__CLIENTDEBUG__  flag to activate client validation
 
 
-linux : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
-	synchroClient synchroServer synchroServerClient testSem jack_test
+linux : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
+        $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
+        synchroClient synchroServer synchroServerClient testSem jack_test
 
-all : $(TARGET_LINUX_SERVER) $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY)
+all : $(TARGET_LINUX_SERVER) $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_ALSA) \
+      $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY)
 
 synchroClient: JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o 
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o synchroClient
@@ -89,6 +95,9 @@ $(TARGET_LINUX_SERVER) : $(objects_linux_server)
 $(TARGET_LINUX_ALSA) : $(objects_linux_alsa) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) libjackdmp.so  -o $(TARGET_LINUX_ALSA)
 
+$(TARGET_LINUX_FREEBOB) : $(objects_linux_freebob) 
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_freebob) $(LIB_LINUX) -lfreebob libjackdmp.so  -o $(TARGET_LINUX_FREEBOB)
+
 $(TARGET_LINUX_DUMMY) : $(objects_linux_dummy) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_dummy) $(LIB_LINUX) libjackdmp.so  -o $(TARGET_LINUX_DUMMY)
 
@@ -100,6 +109,7 @@ install:
 	cp libjackdmp.so $(prefix)/lib
 	install -d $(prefix)/lib/jackmp/
 	cp jack_alsa.so $(prefix)/lib/jackmp
+	cp jack_freebob.so $(prefix)/lib/jackmp
 	cp jack_dummy.so $(prefix)/lib/jackmp
 	cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
 	cd $(prefix)/lib && rm -f libjack.so*
@@ -108,6 +118,8 @@ install:
 	/sbin/ldconfig
 
 # Remove jackdmp and tries to restore jack
+uninstall: remove
+
 remove:
 	rm $(prefix)/bin/jackdmp
 	rm $(prefix)/lib/libjackmp.so
@@ -121,7 +133,7 @@ remove:
 
 clean :
 	rm -f *.o
-	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
+	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
 		synchroClient synchroServer synchroServerClient testSem jack_test
 		
 depend :
