@@ -421,14 +421,14 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 		}
 	}
 	
-	format = (sample_width == 4) ? 0 : FIRST_16BIT_FORMAT;
+	format = (sample_width == 4) ? 0 : NUMFORMATS - 1;
 
 	while (1) {
 		if ((err = snd_pcm_hw_params_set_format (
 			     handle, hw_params, formats[format].format)) < 0) {
 
 			if ((sample_width == 4
-			     ? format++ >= FIRST_16BIT_FORMAT
+			     ? format++ >= NUMFORMATS - 1
 			     : format-- <= 0)) {
 				jack_error ("Sorry. The audio interface \"%s\""
 					    " doesn't support any of the"
