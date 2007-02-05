@@ -65,8 +65,8 @@ Requirement:
 	
 	The TrySwitchState operation returns a "current" state (either the same if switch fails or the new one; one can know if the switch has succeeded)
 	
-	- a WriteStartState(int state) returns a "pending" state to be written into
-	- a WriteStartStop(int state) make the written "pending" state become "switchable"
+	- a WriteNextStartState(int state) returns a "pending" state to be written into
+	- a WriteNextStartStop(int state) make the written "pending" state become "switchable"
 	
 	Different pending states can be written independantly and concurrently.
 	
