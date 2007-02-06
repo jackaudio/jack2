@@ -63,7 +63,7 @@ Requirement:
 	- several possible "pending" state
 	- an TrySwitchState(int state) operation to atomically switch a "pending" to the "current" state (the pending becomes the current). 
 	
-	The TrySwitchState operation returns a "current" state (either the same if switch fails or the new one; one can know if the switch has succeeded)
+	The TrySwitchState operation returns a "current" state (either the same if switch fails or the new one, one can know if the switch has succeeded)
 	
 	- a WriteNextStartState(int state) returns a "pending" state to be written into
 	- a WriteNextStartStop(int state) make the written "pending" state become "switchable"
@@ -72,7 +72,7 @@ Requirement:
 	
 	GetCurrentIndex() *must* return an increasing value to be able to check reading current state coherency
 	
-	The fCounter is an array of indexes to access te current and 3 different "pending" states.
+	The fCounter is an array of indexes to access the current and 3 different "pending" states.
 	
 	¥ WriteNextStateStart(int index) must return a valid state to be written into, and must invalidate state "index" ==> cur state switch.
 	¥ WriteNextStateStop(int index) makes the "index" state become "switchable" with the current state.
@@ -113,8 +113,8 @@ class JackAtomicArrayState
                 *result = GetIndex1(new_val, state);
                 cur_index = GetIndex1(new_val, 0);
                 next_index = SwapIndex1(fCounter, state);
-                need_copy = (GetIndex1(new_val, state) == 0);  //  Written = false, switch just occured
-                SetIndex1(new_val, state, 0); // Written = false, invalidate state
+                need_copy = (GetIndex1(new_val, state) == 0);	// Written = false, switch just occured
+                SetIndex1(new_val, state, 0);					// Written = false, invalidate state
             } while (!CAS(Counter1(old_val), Counter1(new_val), (UInt32*)&fCounter));
             if (need_copy)
                 memcpy(&fState[next_index], &fState[cur_index], sizeof(T));
