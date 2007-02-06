@@ -1789,7 +1789,6 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
     free(driver->alsa_driver);
 
     alsa_driver_release_channel_dependent_memory (driver);
-    jack_driver_nt_finish ((jack_driver_nt_t *) driver);
     free (driver);
 }
 
@@ -2122,23 +2121,6 @@ int JackAlsaDriver::Attach()
     return 0;
 }
 
-int JackAlsaDriver::Detach()
-{
-    JackLog("JackAlsaDriver::Detach\n");
-
-    for (int i = 0; i < fCaptureChannels; i++) {
-	     fGraphManager->RemovePort(fClientControl->fRefNum, fCapturePortList[i]);
-    }
-
-    for (int i = 0; i < fPlaybackChannels; i++) {
-	    fGraphManager->RemovePort(fClientControl->fRefNum, fPlaybackPortList[i]);
-		if (fWithMonitorPorts) 
-			fGraphManager->RemovePort(fClientControl->fRefNum, fMonitorPortList[i]);
-    }
-
-    return 0;
-}
-
 int JackAlsaDriver::Open(jack_nframes_t nframes,
 						 jack_nframes_t user_nperiods,
                          jack_nframes_t samplerate,
@@ -2295,14 +2277,6 @@ JackAlsaDriver::jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_attach = 0;
     driver->nt_detach = 0;
     driver->nt_run_cycle = 0;
-
-    pthread_mutex_init (&driver->nt_run_lock, NULL);
-}
-
-void
-JackAlsaDriver::jack_driver_nt_finish(jack_driver_nt_t * driver)
-{
-    pthread_mutex_destroy (&driver->nt_run_lock);
 }
 
 void JackAlsaDriver::PrintState()

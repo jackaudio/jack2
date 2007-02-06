@@ -114,8 +114,7 @@ class JackAlsaDriver : public JackAudioDriver
         int alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs);
         void jack_driver_init (jack_driver_t *driver);
         void jack_driver_nt_init (jack_driver_nt_t * driver);
-        void jack_driver_nt_finish(jack_driver_nt_t * driver);
-
+ 
     public:
 
         JackAlsaDriver(const char* name, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, engine, table)
@@ -143,8 +142,7 @@ class JackAlsaDriver : public JackAudioDriver
 
         int Close();
         int Attach();
-		int Detach();
-
+	
         int Start();
         int Stop();
 

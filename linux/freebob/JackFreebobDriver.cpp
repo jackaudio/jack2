@@ -361,12 +361,7 @@ JackFreebobDriver::freebob_driver_new (char *name,
 void
 JackFreebobDriver::freebob_driver_delete (freebob_driver_t *driver)
 {
-    if (driver->dev) {
-        Detach();
-    }
-
-    jack_driver_nt_finish ((jack_driver_nt_t *) driver);
-    free (driver);
+	free (driver);
 }
 
 #ifdef FREEBOB_DRIVER_WITH_MIDI
@@ -716,7 +711,6 @@ int JackFreebobDriver::Attach()
     }
 
     // initialize the thread
-
     driver->dev = freebob_streaming_init(&driver->device_info, driver->device_options);
 
     if (!driver->dev) {
@@ -813,7 +807,6 @@ int JackFreebobDriver::Attach()
 int JackFreebobDriver::Detach()
 {
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;
-
     JackLog("JackFreebobDriver::Detach\n");
 
     // finish the libfreebob streaming
@@ -827,18 +820,7 @@ int JackFreebobDriver::Detach()
     driver->midi_handle = NULL;
 #endif
 
-    // unregister the ports
-    for (int i = 0; i < fCaptureChannels; i++) {
-        fGraphManager->RemovePort(fClientControl->fRefNum, fCapturePortList[i]);
-    }
-
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        fGraphManager->RemovePort(fClientControl->fRefNum, fPlaybackPortList[i]);
-        if (fWithMonitorPorts)
-            fGraphManager->RemovePort(fClientControl->fRefNum, fMonitorPortList[i]);
-    }
-
-    return 0;
+	return JackAudioDriver::Detach();  // Generic JackAudioDriver Detach
 }
 
 int JackFreebobDriver::Open(freebob_jack_settings_t *params)
@@ -887,7 +869,6 @@ int JackFreebobDriver::Read()
 
     /* Taken from freebob_driver_run_cycle */
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;
-
     int wait_status = 0;
     float delayed_usecs = 0.0;
 
@@ -974,14 +955,6 @@ JackFreebobDriver::jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_attach = 0;
     driver->nt_detach = 0;
     driver->nt_run_cycle = 0;
-
-    pthread_mutex_init (&driver->nt_run_lock, NULL);
-}
-
-void
-JackFreebobDriver::jack_driver_nt_finish(jack_driver_nt_t * driver)
-{
-    pthread_mutex_destroy (&driver->nt_run_lock);
 }
 
 void JackFreebobDriver::PrintState()
@@ -1011,12 +984,7 @@ void JackFreebobDriver::PrintState()
     }
 }
 
-/*
-JackDriver* DriverInit(JackGraphManager* manager)
-{
-    return new JackFreebobDriver("ALSA", manager);
-}
-*/
+
 } // end of namespace
 
 
