@@ -45,8 +45,11 @@ objects_linux_freebob := JackFreebobDriver.o
 
 objects_linux_dummy := JackDummyDriver.o  
 
-CFLAGS := -g -O3 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+CFLAGS := -g -03 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
+
+CXXFLAGS1 := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__CLIENTDEBUG__ -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+ 
 
 #CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
 #CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
@@ -56,13 +59,13 @@ CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix
 
 # Add the -D__CLIENTDEBUG__  flag to activate client validation
 
-
-linux : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
-        $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
+all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
+        $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
         synchroClient synchroServer synchroServerClient testSem jack_test
 
-all : $(TARGET_LINUX_SERVER) $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_ALSA) \
-      $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY)
+freebob : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
+        $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
+        synchroClient synchroServer synchroServerClient testSem jack_test
 
 synchroClient: JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o 
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o synchroClient
@@ -111,6 +114,7 @@ install:
 	cp jack_alsa.so $(prefix)/lib/jackmp
 	cp jack_freebob.so $(prefix)/lib/jackmp
 	cp jack_dummy.so $(prefix)/lib/jackmp
+	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/lib/jackmp || echo "freebob driver not installed"
 	cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
 	cd $(prefix)/lib && rm -f libjack.so*
 	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so
