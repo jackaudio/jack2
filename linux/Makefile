@@ -46,10 +46,7 @@ objects_linux_freebob := JackFreebobDriver.o
 objects_linux_dummy := JackDummyDriver.o  
 
 CFLAGS := -g -O3 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
-
-CXXFLAGS1 := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__CLIENTDEBUG__ -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
- 
+CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 #CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
 #CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
