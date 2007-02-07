@@ -45,8 +45,8 @@ objects_linux_freebob := JackFreebobDriver.o
 
 objects_linux_dummy := JackDummyDriver.o  
 
-CFLAGS := -g -03 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
+CFLAGS := -g -O3 -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
 
 CXXFLAGS1 := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__CLIENTDEBUG__ -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
  
@@ -55,7 +55,7 @@ CXXFLAGS1 := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__CLIENTDEBUG__ -D__SMP__ -DADDO
 #CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 # Use this line to compile with POSIX names semaphore
-#CXXFLAGS := -g -03 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
+#CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
 
 # Add the -D__CLIENTDEBUG__  flag to activate client validation
 
