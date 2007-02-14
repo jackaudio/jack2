@@ -53,9 +53,10 @@ class JackPort
         jack_port_id_t fTied;   // Locally tied source port
 
 	#ifdef WIN32
-        __declspec(align(16)) float fBuffer[BUFFER_SIZE_MAX];
+        //__declspec(align(16)) float fBuffer[BUFFER_SIZE_MAX];
+		float fBuffer[BUFFER_SIZE_MAX];
 	#elif __GNUC__
-		float fBuffer[BUFFER_SIZE_MAX] __attribute__((aligned(16)));;
+		float fBuffer[BUFFER_SIZE_MAX] __attribute__((aligned(16)));
 	#else
 		#warning Buffer will not be aligned on 16 bytes boundaries : vector based code (Altivec of SSE) may fail 
 		float fBuffer[BUFFER_SIZE_MAX];
