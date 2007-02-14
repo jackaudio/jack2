@@ -285,6 +285,8 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
         if (!GetInputDeviceFromName(capture_driver_uid, &fInputDevice, &in_max)) {
 			JackLog("JackPortAudioDriver::GetInputDeviceFromName cannot open %s\n", capture_driver_uid);
             fInputDevice = Pa_GetDefaultInputDevice();
+			if (fInputDevice == paNoDevice)
+				goto error;
             deviceInfo = Pa_GetDeviceInfo(fInputDevice);
             in_max = deviceInfo->maxInputChannels;
             capture_driver_uid = strdup(deviceInfo->name);
@@ -300,6 +302,8 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
         if (!GetOutputDeviceFromName(playback_driver_uid, &fOutputDevice, &out_max)) {
             JackLog("JackPortAudioDriver::GetOutputDeviceFromName cannot open %s\n", playback_driver_uid);
 			fOutputDevice = Pa_GetDefaultOutputDevice();
+			if (fOutputDevice == paNoDevice)
+				goto error;
             deviceInfo = Pa_GetDeviceInfo(fOutputDevice);
             out_max = deviceInfo->maxOutputChannels;
             playback_driver_uid = strdup(deviceInfo->name);
