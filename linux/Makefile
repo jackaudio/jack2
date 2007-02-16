@@ -109,7 +109,6 @@ install:
 	cp libjackdmp.so $(prefix)/lib
 	install -d $(prefix)/lib/jackmp/
 	cp jack_alsa.so $(prefix)/lib/jackmp
-	cp jack_freebob.so $(prefix)/lib/jackmp
 	cp jack_dummy.so $(prefix)/lib/jackmp
 	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/lib/jackmp || echo "freebob driver not installed"
 	cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."

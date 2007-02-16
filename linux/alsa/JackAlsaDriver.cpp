@@ -2215,8 +2215,8 @@ int JackAlsaDriver::Read()
         JackLog("ALSA XRun \n");
         //NotifyXRun(jack_get_microseconds());
         NotifyXRun(fLastWaitUst);
-        //return 0;
-        return -1;
+        return 0;
+        //return -1;
     }
 
     //fLastWaitUst = GetMicroSeconds(); // Take callback date here
