@@ -61,7 +61,7 @@ using namespace Jack;
 LARGE_INTEGER gFreq;
 long gQueryOverhead;
 
-static long elapsed (LARGE_INTEGER * t1, LARGE_INTEGER *t2)
+static long elapsed (LARGE_INTEGER* t1, LARGE_INTEGER* t2)
 {
     long high = t1->HighPart - t2->HighPart;
     double low = t1->LowPart - t2->LowPart;
@@ -106,7 +106,7 @@ class Test1 : public JackRunnableInterface
 	#ifdef WIN32
             LARGE_INTEGER t1, t2;
             BOOL r1, r2;
-            r1 = QueryPerformanceCounter (&t1);
+            r1 = QueryPerformanceCounter(&t1);
 	#else
            struct timeval T0, T1;
             clock_t time1, time2;
