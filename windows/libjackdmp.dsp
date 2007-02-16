@@ -241,10 +241,6 @@ SOURCE=.\resource.rc
 
 SOURCE=..\common\shm.c
 # End Source File
-# Begin Source File
-
-SOURCE="..\..\..\..\pthreads-win32\pthreadVC2.lib"
-# End Source File
 # End Group
 # Begin Group "Header Files"
 
