@@ -407,8 +407,7 @@ class JackConnectionManager
         JackLoopFeedback<CONNECTION_NUM> fLoopFeedback;					/*! Loop feedback connections */
 
         bool IsLoopPathAux(int ref1, int ref2) const;
-        //void InitClient(int refnum);
-
+  
     public:
 
         JackConnectionManager();
