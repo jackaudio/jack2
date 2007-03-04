@@ -478,7 +478,7 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
     JackConnectionManager* manager = WriteNextStateStart();
     JackLog("JackGraphManager::Connect port_src = %ld port_dst = %ld\n", port_src, port_dst);
     bool in_use_src = GetPort(port_src)->fInUse;
-    bool in_use_dst = GetPort(port_src)->fInUse;
+    bool in_use_dst = GetPort(port_dst)->fInUse;
     int res = 0;
 
     if (!in_use_src || !in_use_dst) {
@@ -502,7 +502,7 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
     }
     manager->Connect(port_dst, port_src);
     if (res < 0) {
-        jack_error("JackGraphManager::Connect failed port_src = %ld port_dst = %ld", port_dst, port_src);
+        jack_error("JackGraphManager::Connect failed port_dst = %ld port_src = %ld", port_dst, port_src);
         goto end;
     }
 
@@ -515,8 +515,6 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
 
 end:
     WriteNextStateStop();
-    if (res < 0)
-        jack_error("JackGraphManager::Connect failed port_src = %ld port_dst = %ld", port_dst, port_src);
     return res;
 }
 
@@ -526,7 +524,7 @@ int JackGraphManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_ds
     JackConnectionManager* manager = WriteNextStateStart();
     JackLog("JackGraphManager::Disconnect port_src = %ld port_dst = %ld\n", port_src, port_dst);
     bool in_use_src = GetPort(port_src)->fInUse;
-    bool in_use_dst = GetPort(port_src)->fInUse;
+    bool in_use_dst = GetPort(port_dst)->fInUse;
     int res = 0;
 
     if (!in_use_src || !in_use_dst) {
@@ -550,7 +548,7 @@ int JackGraphManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_ds
     }
     manager->Disconnect(port_dst, port_src);
     if (res < 0) {
-        jack_error("JackGraphManager::Disconnect failed port_src = %ld port_dst = %ld", port_dst, port_src);
+        jack_error("JackGraphManager::Disconnect failed port_dst = %ld port_src = %ld", port_dst, port_src);
         goto end;
     }
 
