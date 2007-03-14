@@ -2,4 +2,7 @@
   Jackdmp Todo list
 ---------------------
 
-2007-01-22 Check the "dead" client removing code in the server: non running client may cause Desactivation and Close time out problems
+2007-03-14 Add Paul dynamic jack server location code.
+
+2007-01-22 Check the "dead" client removing code in the server: non running client may cause Desactivation and Close time out problems.
+

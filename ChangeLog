@@ -6,6 +6,10 @@
 
 	* Dmitry Baikov patch for JackGraphManager.cpp.
 
+2007-02-19 Stephane Letz  <letz@grame.fr>
+	
+	* Correct back JackAlsaDriver::Read method. 
+
 2007-02-14 Stephane Letz  <letz@grame.fr>
 	
 	* Better error checking in PortAudio driver.
