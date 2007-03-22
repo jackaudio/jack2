@@ -379,7 +379,7 @@ jack_drivers_load (JSList * drivers) {
             driver_list = jack_slist_append (driver_list, desc);
         }
 
-    } while ((file = (HANDLE )FindNextFile(file, &filedata)) != 0);
+    } while (FindNextFile(file, &filedata));
 
     if (!driver_list) {
         jack_error ("could not find any drivers in %s!\n", driver_dir);
