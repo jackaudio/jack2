@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-04-01 Stephane Letz  <letz@grame.fr>
+
+	* Merge JackGraphManager Remove and Release method in a unique Release method.
+
 2007-03-04 Stephane Letz  <letz@grame.fr>
 
 	* Dmitry Baikov patch for JackGraphManager.cpp.

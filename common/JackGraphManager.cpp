@@ -310,14 +310,16 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
 }
 
 // Server
+/*
 void JackGraphManager::ReleasePort(jack_port_id_t port_index)
 {
     JackPort* port = GetPort(port_index);
     port->Release();
 }
+*/
 
 // Server
-int JackGraphManager::RemovePort(int refnum, jack_port_id_t port_index)
+int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
 {
     JackConnectionManager* manager = WriteNextStateStart();
     JackPort* port = GetPort(port_index);
@@ -331,6 +333,7 @@ int JackGraphManager::RemovePort(int refnum, jack_port_id_t port_index)
         res = manager->RemoveInputPort(refnum, port_index);
     }
 
+	port->Release();
     WriteNextStateStop();
     return res;
 }
@@ -345,15 +348,13 @@ void JackGraphManager::RemoveAllPorts(int refnum)
     // Warning : RemovePort shift port to left, thus we always remove the first port until the "input" table is empty
     const jack_int_t* input = manager->GetInputPorts(refnum);
     while ((port_index = input[0]) != EMPTY) {
-        RemovePort(refnum, port_index);
-        ReleasePort(port_index);
+        ReleasePort(refnum, port_index);
     }
 
     // Warning : RemovePort shift port to left, thus we always remove the first port until the "output" table is empty
     const jack_int_t* output = manager->GetOutputPorts(refnum);
     while ((port_index = output[0]) != EMPTY) {
-        RemovePort(refnum, port_index);
-        ReleasePort(port_index);
+        ReleasePort(refnum, port_index);
     }
 
     WriteNextStateStop();

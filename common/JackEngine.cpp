@@ -560,8 +560,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     JackLog("JackEngine::PortUnRegister ref = %ld port_index = %ld\n", refnum, port_index);
     assert(fClientTable[refnum]);
 
-    if (fGraphManager->RemovePort(refnum, port_index) == 0) {
-        fGraphManager->ReleasePort(port_index);
+    if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
         NotifyPortRegistation(port_index, false);
         return 0;
     } else {

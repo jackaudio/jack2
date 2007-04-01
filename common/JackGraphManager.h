@@ -58,7 +58,10 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
 
         // Ports management
         jack_port_id_t AllocatePort(int refnum, const char* port_name, JackPortFlags flags);  
-        void ReleasePort(jack_port_id_t port_index);	
+		int ReleasePort(int refnum, jack_port_id_t port_index); 
+        void RemoveAllPorts(int refnum); 
+        void DisconnectAllPorts(int refnum); 
+	
         JackPort* GetPort(jack_port_id_t index); 
         jack_port_id_t GetPort(const char* name); 
         jack_nframes_t GetTotalLatency(jack_port_id_t port_index); 
@@ -84,11 +87,7 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         bool IsDirectConnection(int ref1, int ref2); 
         void DirectConnect(int ref1, int ref2); 
         void DirectDisconnect(int ref1, int ref2); 
-
-        int RemovePort(int refnum, jack_port_id_t port_index); 
-        void RemoveAllPorts(int refnum); 
-        void DisconnectAllPorts(int refnum); 
-		
+	
 		void Activate(int refnum);
 		void Deactivate(int refnum);
 

@@ -122,13 +122,13 @@ int JackAudioDriver::Detach()
     JackLog("JackAudioDriver::Detach\n");
 
     for (i = 0; i < fCaptureChannels; i++) {
-        fGraphManager->RemovePort(fClientControl->fRefNum, fCapturePortList[i]);
+        fGraphManager->ReleasePort(fClientControl->fRefNum, fCapturePortList[i]);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
-        fGraphManager->RemovePort(fClientControl->fRefNum, fPlaybackPortList[i]);
+        fGraphManager->ReleasePort(fClientControl->fRefNum, fPlaybackPortList[i]);
         if (fWithMonitorPorts)
-            fGraphManager->RemovePort(fClientControl->fRefNum, fMonitorPortList[i]);
+            fGraphManager->ReleasePort(fClientControl->fRefNum, fMonitorPortList[i]);
     }
 
     return 0;
