@@ -310,15 +310,6 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
 }
 
 // Server
-/*
-void JackGraphManager::ReleasePort(jack_port_id_t port_index)
-{
-    JackPort* port = GetPort(port_index);
-    port->Release();
-}
-*/
-
-// Server
 int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
 {
     JackConnectionManager* manager = WriteNextStateStart();
