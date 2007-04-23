@@ -139,6 +139,9 @@ extern "C"
                                           jack_port_id_t port_id);
     EXPORT int jack_engine_takeover_timebase (jack_client_t *);
     EXPORT jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *);
+    EXPORT jack_time_t jack_get_time(const jack_client_t *client);
+    EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t time);
+    EXPORT jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t frames);
     EXPORT jack_nframes_t jack_frame_time (const jack_client_t *);
     EXPORT jack_nframes_t jack_last_frame_time (const jack_client_t *client);
     EXPORT float jack_cpu_load (jack_client_t *client);
@@ -193,7 +196,7 @@ extern "C"
             jack_status_t *status, ...);
     EXPORT jack_status_t jack_internal_client_unload (jack_client_t *client,
             jack_intclient_t intclient);
-			
+
 #ifdef __cplusplus
 }
 #endif
@@ -1015,26 +1018,58 @@ EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_cli
     return (jack_nframes_t) floor((((float)GetEngineControl()->fSampleRate) / 1000000.0f) * (GetMicroSeconds() - timer.fCurrentCallback));
 }
 
-EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
+EXPORT jack_time_t jack_get_time(jack_client_t *client)
+{
+    return GetMicroSeconds();
+}
+
+EXPORT jack_time_t jack_frames_to_time(const jack_client_t* ext_client, jack_nframes_t frames)
 {
 #ifdef __CLIENTDEBUG__
 	JackLibGlobals::CheckContext();
 #endif
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
-        jack_error("jack_frame_time called with a NULL client");
+        jack_error("jack_frames_to_time called with a NULL client");
+        return 0;
+    } else {
+        JackTimer timer;
+  		GetEngineControl()->ReadFrameTime(&timer);
+        if (timer.fInitialized) {
+            return timer.fCurrentWakeup +
+                   (long) rint(((double) ((frames - timer.fFrames)) *
+                                ((jack_time_t)(timer.fNextWakeUp - timer.fCurrentWakeup))) / GetEngineControl()->fBufferSize);
+        } else {
+            return 0;
+        }
+    }
+}
+
+EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_time_t time)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_time_to_frames called with a NULL client");
         return 0;
     } else {
         JackTimer timer;
   		GetEngineControl()->ReadFrameTime(&timer);
         if (timer.fInitialized) {
             return timer.fFrames +
-                   (long) rint(((double) ((jack_time_t)(GetMicroSeconds() - timer.fCurrentWakeup)) /
+                   (long) rint(((double) ((time - timer.fCurrentWakeup)) /
                                 ((jack_time_t)(timer.fNextWakeUp - timer.fCurrentWakeup))) * GetEngineControl()->fBufferSize);
         } else {
             return 0;
         }
     }
+}
+
+EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
+{
+    return jack_time_to_frames(ext_client, GetMicroSeconds());
 }
 
 EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)

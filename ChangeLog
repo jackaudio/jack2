@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-04-23 Stephane Letz  <letz@grame.fr>
+
+	* Dmitry Baikov jackmp-time patch: add jack_get_time, jack_time_to_frames, jack_frames_to_time.
+
 2007-04-01 Stephane Letz  <letz@grame.fr>
 
 	* Merge JackGraphManager Remove and Release method in a unique Release method.
