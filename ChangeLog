@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-04-27 Stephane Letz  <letz@grame.fr>
+
+	* Add missing -D__SMP__in OSX project.
+
 2007-04-23 Stephane Letz  <letz@grame.fr>
 
 	* Dmitry Baikov jackmp-time patch: add jack_get_time, jack_time_to_frames, jack_frames_to_time.

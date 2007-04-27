@@ -2476,8 +2476,14 @@
 					../common,
 					RPC,
 				);
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = (
+					"-DUSE_POSIX_SHM",
+					"-D__SMP__",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -2524,8 +2530,14 @@
 					../common,
 					RPC,
 				);
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = (
+					"-DUSE_POSIX_SHM",
+					"-D__SMP__",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -2570,8 +2582,14 @@
 					../common,
 					RPC,
 				);
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = (
+					"-DUSE_POSIX_SHM",
+					"-D__SMP__",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -2624,8 +2642,14 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = (
+					"-DUSE_POSIX_SHM",
+					"-D__SMP__",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -2666,8 +2690,14 @@
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = (
+					"-DUSE_POSIX_SHM",
+					"-D__SMP__",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -2706,8 +2736,14 @@
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = (
+					"-DUSE_POSIX_SHM",
+					"-D__SMP__",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -2752,8 +2788,12 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
+				OTHER_CFLAGS = (
+					"-D__SMP__",
+					"-DUSE_POSIX_SHM",
+				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
 				);
@@ -2798,8 +2838,12 @@
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
+				OTHER_CFLAGS = (
+					"-D__SMP__",
+					"-DUSE_POSIX_SHM",
+				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
 				);
@@ -2842,8 +2886,12 @@
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
-				OTHER_CFLAGS = "-DUSE_POSIX_SHM";
+				OTHER_CFLAGS = (
+					"-D__SMP__",
+					"-DUSE_POSIX_SHM",
+				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
 				);
