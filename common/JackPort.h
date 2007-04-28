@@ -58,9 +58,9 @@ class JackPort
         //__declspec(align(16)) float fBuffer[BUFFER_SIZE_MAX];
 		float fBuffer[BUFFER_SIZE_MAX];
 	#elif __GNUC__
-		float fBuffer[BUFFER_SIZE_MAX] __attribute__((aligned(16)));
+		float fBuffer[BUFFER_SIZE_MAX] __attribute__((aligned(64)));  // 16 alignment for vector code, 64 better for cache loads/stores
 	#else
-		#warning Buffer will not be aligned on 16 bytes boundaries : vector based code (Altivec of SSE) may fail 
+		#warning Buffer will not be aligned on 16 bytes boundaries : vector based code (Altivec of SSE) will fail 
 		float fBuffer[BUFFER_SIZE_MAX];
 	#endif
 
