@@ -475,9 +475,9 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
 
     if (!in_use_src || !in_use_dst) {
         if (!in_use_src)
-            jack_error("JackGraphManager::Connect: port_src not %ld used name = %s", port_src, GetPort(port_src)->fName);
+            jack_error("JackGraphManager::Connect: port_src = %ld not used name = %s", port_src, GetPort(port_src)->fName);
         if (!in_use_dst)
-            jack_error("JackGraphManager::Connect: port_dst not %ld used name = %s", port_dst, GetPort(port_dst)->fName);
+            jack_error("JackGraphManager::Connect: port_dst = %ld not used name = %s", port_dst, GetPort(port_dst)->fName);
         res = -1;
         goto end;
     }
@@ -521,9 +521,9 @@ int JackGraphManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_ds
 
     if (!in_use_src || !in_use_dst) {
         if (!in_use_src)
-            jack_error("JackGraphManager::Disconnect: port_src not %ld used name = %s", port_src, GetPort(port_src)->fName);
+            jack_error("JackGraphManager::Disconnect: port_src = %ld not used name = %s", port_src, GetPort(port_src)->fName);
         if (!in_use_dst)
-            jack_error("JackGraphManager::Disconnect: port_src not %ld used name = %s", port_dst, GetPort(port_dst)->fName);
+            jack_error("JackGraphManager::Disconnect: port_src = %ld not used name = %s", port_dst, GetPort(port_dst)->fName);
         res = -1;
         goto end;
     }
@@ -634,7 +634,7 @@ jack_port_id_t JackGraphManager::GetPort(const char* name)
 {
     for (int i = 0; i < PORT_NUM; i++) {
         JackPort* port = GetPort(i);
-        if (port->IsUsed() && strcmp(port->fName, name) == 0)
+        if (port->IsUsed() && port->NameEquals(name))
             return i;
     }
     return NO_PORT;

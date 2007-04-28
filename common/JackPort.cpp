@@ -184,6 +184,56 @@ int JackPort::SetName(const char* new_name)
     return 0;
 }
 
+bool JackPort::NameEquals(const char* target)
+{
+	return (strcmp(fName, target) == 0 
+		|| strcmp(fAlias1, target) == 0 
+		|| strcmp(fAlias2, target) == 0);
+}
+
+int JackPort::GetAliases(char* const aliases[2])
+{
+	int cnt = 0;
+	
+	if (fAlias1[0] != '\0') {
+		snprintf(aliases[0], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias1);
+		cnt++;
+	}
+
+	if (fAlias2[0] != '\0') {
+		snprintf(aliases[1], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias2);
+		cnt++;
+	}
+
+	return cnt;
+}
+
+int JackPort::SetAlias(const char* alias)
+{
+	if (fAlias1[0] == '\0') {
+		snprintf(fAlias1, sizeof(fAlias1), "%s", alias);
+	} else if (fAlias2[0] == '\0') {
+		snprintf(fAlias2, sizeof(fAlias2), "%s", alias);
+	} else {
+		return -1;
+	}
+
+	return 0;
+}
+
+int JackPort::UnsetAlias(const char* alias)
+{
+	if (strcmp(fAlias1, alias) == 0) {
+		fAlias1[0] = '\0';
+	} else if (strcmp(fAlias2, alias) == 0) {
+		fAlias2[0] = '\0';
+	} else {
+		return -1;
+	}
+
+	return 0;
+}
+
 void JackPort::MixBuffer(float* mixbuffer, float* buffer, jack_nframes_t frames)
 {
     jack_nframes_t frames_group = frames / 4;

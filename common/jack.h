@@ -585,6 +585,38 @@ extern "C"
      */
     int jack_port_set_name (jack_port_t *port, const char *port_name);
 
+	/**
+	 * Set @a alias as an alias for @a port.  May be called at any time.
+	 * If the alias is longer than jack_port_name_size(), it will be truncated.
+	 * 
+	 * After a successful call, and until JACK exits or
+	 * @function jack_port_unset_alias() is called, @alias may be
+	 * used as a alternate name for the port.
+	 *
+	 * Ports can have up to two aliases - if both are already 
+	 * set, this function will return an error.
+	 *
+	 * @return 0 on success, otherwise a non-zero error code.
+	 */
+	int jack_port_set_alias (jack_port_t *port, const char *alias);
+
+	/**
+	 * Remove @a alias as an alias for @a port.  May be called at any time.
+	 * 
+	 * After a successful call, @a alias can no longer be 
+	 * used as a alternate name for the port.
+	 *
+	 * @return 0 on success, otherwise a non-zero error code.
+	 */
+	int jack_port_unset_alias (jack_port_t *port, const char *alias);
+
+	/*
+	 * Get any aliases known for @port.
+	 *
+	 * @return the number of aliases discovered for the port
+	 */
+	int jack_port_get_aliases (const jack_port_t *port, char* const aliases[2]);
+
     /**
      * If @ref JackPortCanMonitor is set for this @a port, turn input
      * monitoring on or off.  Otherwise, do nothing.

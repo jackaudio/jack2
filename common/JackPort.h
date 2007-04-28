@@ -42,7 +42,9 @@ class JackPort
     private:
 
         enum JackPortFlags fFlags;
-        char fName[JACK_PORT_NAME_SIZE + 2];
+        char fName[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+		char fAlias1[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+		char fAlias2[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
         int fRefNum;
 
         jack_nframes_t fLatency;
@@ -75,7 +77,12 @@ class JackPort
         void Release();
         const char* GetName() const;
         const char* GetShortName() const;
-        int	SetName(const char * name);
+        int	SetName(const char* name);
+		
+		int GetAliases(char* const aliases[2]);
+		int SetAlias(const char* alias);
+		int UnsetAlias(const char* alias);
+		bool NameEquals(const char* target);
 
         int	Flags() const;
         const char* Type() const;

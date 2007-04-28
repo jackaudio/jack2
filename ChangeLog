@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-04-28 Stephane Letz  <letz@grame.fr>
+
+	* Add new jack_port_set_alias, jack_port_unset_alias and jack_port_get_aliases API.
+
 2007-04-27 Stephane Letz  <letz@grame.fr>
 
 	* Add missing -D__SMP__in OSX project.

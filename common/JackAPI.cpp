@@ -114,6 +114,9 @@ extern "C"
     EXPORT void jack_port_set_latency (jack_port_t *, jack_nframes_t);
     EXPORT int jack_recompute_total_latencies (jack_client_t*);
     EXPORT int jack_port_set_name (jack_port_t *port, const char *port_name);
+	EXPORT int jack_port_set_alias (jack_port_t *port, const char *alias);
+	EXPORT int jack_port_unset_alias (jack_port_t *port, const char *alias);
+	EXPORT int jack_port_get_aliases (const jack_port_t *port, char* const aliases[2]);
     EXPORT int jack_port_request_monitor (jack_port_t *port, int onoff);
     EXPORT int jack_port_request_monitor_by_name (jack_client_t *client,
             const char *port_name, int onoff);
@@ -428,6 +431,54 @@ EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
         return -1;
     } else {
         return GetGraphManager()->GetPort(myport)->SetName(name);
+    }
+}
+
+EXPORT int jack_port_set_alias(jack_port_t* port, const char* name)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    jack_port_id_t myport = (jack_port_id_t)port;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_set_alias called with an incorrect port %ld", myport);
+        return -1;
+    } else if (name == NULL) {
+        jack_error("jack_port_set_alias called with a NULL port name");
+        return -1;
+    } else {
+        return GetGraphManager()->GetPort(myport)->SetAlias(name);
+    }
+}
+
+EXPORT int jack_port_unset_alias(jack_port_t* port, const char* name)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    jack_port_id_t myport = (jack_port_id_t)port;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_unset_alias called with an incorrect port %ld", myport);
+        return -1;
+    } else if (name == NULL) {
+        jack_error("jack_port_unset_alias called with a NULL port name");
+        return -1;
+    } else {
+        return GetGraphManager()->GetPort(myport)->UnsetAlias(name);
+    }
+}
+
+EXPORT int jack_port_get_aliases(const jack_port_t* port, char* const aliases[2])
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    jack_port_id_t myport = (jack_port_id_t)port;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_get_aliases called with an incorrect port %ld", myport);
+        return -1;
+    } else {
+        return GetGraphManager()->GetPort(myport)->GetAliases(aliases);
     }
 }
 
