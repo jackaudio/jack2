@@ -138,7 +138,7 @@ extern "C"
                                          const char *type_name_pattern,
                                          unsigned long flags);
     EXPORT jack_port_t * jack_port_by_name (jack_client_t *, const char *port_name);
-    EXPORT jack_port_t * jack_port_by_id (jack_client_t *client,
+    EXPORT jack_port_t * jack_port_by_id (const jack_client_t *client,
                                           jack_port_id_t port_id);
     EXPORT int jack_engine_takeover_timebase (jack_client_t *);
     EXPORT jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *);

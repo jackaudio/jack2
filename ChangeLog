@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-05-03 Stephane Letz  <letz@grame.fr>
+
+	* Steven Chamberlain patch to fix jack_port_by_id export.
+
 2007-04-28 Stephane Letz  <letz@grame.fr>
 
 	* Add new jack_port_set_alias, jack_port_unset_alias and jack_port_get_aliases API.
