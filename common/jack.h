@@ -798,6 +798,26 @@ extern "C"
      */
     jack_nframes_t jack_last_frame_time (const jack_client_t *client);
 
+	/**
+	 * @return estimated time in microseconds of the specified frame time
+	 */
+	jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t);
+
+	/**
+	 * @return estimated time in frames for the specified system time.
+	 */
+	jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t);
+
+	/**
+	 * @return return JACK's current system time in microseconds,
+	 *         using JACK clock source. 
+	 * 
+	 * The value returned is guaranteed to be monotonic, but not linear.
+	 *
+	 * This function is a client version of @function jack_get_microseconds().
+	 */
+	jack_time_t jack_get_time();
+
     /**
      * @return the current CPU load estimated by JACK.  This is a running
      * average of the time it takes to execute a full process cycle for
