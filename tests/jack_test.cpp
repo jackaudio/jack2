@@ -639,6 +639,16 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! Can't register any port for the client !\n");
         exit(1);
     }
+	
+   /**
+     * Test port type of the just registered port.
+     *
+     */
+    if (strcmp(jack_port_type(output_port1), JACK_DEFAULT_AUDIO_TYPE) != 0) {
+        printf("!!! ERROR !!! jack_port_type returns an incorrect value!\n");
+	} else {
+		Log("Checking jack_port_type()... ok.\n");
+	}
 
     /**
      * Try to register another port with the same name...
@@ -678,7 +688,7 @@ int main (int argc, char *argv[])
             printf("!!! ERROR !!! functions jack_port_set_name seems to be invalid !\n");
             printf("Jack_port_name return '%s' whereas 'renamed-port#' was expected...\n");
         } else {
-            Log("checking jack_port_set_name... ok\n");
+            Log("Checking jack_port_set_name()... ok\n");
             jack_port_set_name (output_port1, "port");
         }
     } else {
@@ -973,7 +983,7 @@ int main (int argc, char *argv[])
      *
      */
     if (is_mine == 1) {
-        Log("Checking jack_port_is_mine... ok\n");
+        Log("Checking jack_port_is_mine()... ok\n");
     } else {
         printf("!!! ERROR !!! jack_port_is_mine() function seems to send non-valid datas !\n");
     }
@@ -1175,7 +1185,7 @@ int main (int argc, char *argv[])
 
     free (inports);
     if (connexions1 == NULL) {
-        Log("checking jack_port_get_connections for external client... ok\n");
+        Log("checking jack_port_get_connections() for external client... ok\n");
     } else {
         while ((connexions1[a] != NULL) && (connexions2[a] != NULL) && (t_error == 0)) {
             t_error = strcmp(connexions1[a], connexions2[a]);
@@ -1183,9 +1193,9 @@ int main (int argc, char *argv[])
         }
     }
     if (t_error == 0) {
-        Log("Checking jack_port_get_connections Vs jack_port_get_all_connections on PHY port... ok\n");
+        Log("Checking jack_port_get_connections() Vs jack_port_get_all_connections() on PHY port... ok\n");
     } else {
-        printf("!!! ERROR !!! while checking jack_port_get_connections Vs jack_port_get_all_connections on PHY port...\n");
+        printf("!!! ERROR !!! while checking jack_port_get_connections() Vs jack_port_get_all_connections() on PHY port...\n");
     }
 
     /**
@@ -1444,7 +1454,7 @@ int main (int argc, char *argv[])
         printf("!!! WARNING !!! port_name return something while the port have been unregistered !\n");
         printf("!!! Name of unregistered port : %s !\n", jack_port_name(output_port1b));
     } else {
-        Log("checking port_name() with a non valid port... ok\n");
+        Log("Checking jack_port_name() with a non valid port... ok\n");
     }
 
     if (jack_port_set_name(output_port1b, "new_name") == 0 ) {

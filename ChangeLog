@@ -4,7 +4,7 @@
 
 2007-05-04 Stephane Letz  <letz@grame.fr>
 
-	* Steven Chamberlain patch to fix jack_port_type.
+	* Steven Chamberlain patch to fix jack_port_type. Test for jack_port_type behaviour in jack_test.cpp tool.
 
 2007-05-03 Stephane Letz  <letz@grame.fr>
 
