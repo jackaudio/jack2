@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-05-04 Stephane Letz  <letz@grame.fr>
+
+	* Steven Chamberlain patch to fix jack_port_type.
+
 2007-05-03 Stephane Letz  <letz@grame.fr>
 
 	* Steven Chamberlain patch to fix jack_port_by_id export.

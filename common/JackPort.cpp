@@ -108,7 +108,7 @@ int JackPort::RequestMonitor(bool onoff)
     /**
     jackd.h 
      * If @ref JackPortCanMonitor is set for this @a port, turn input
-     * monitoring on or off.  Otherwise, do nothing.
+     * monitoring on or off. Otherwise, do nothing.
      
      if (!(fFlags & JackPortCanMonitor))
     	return -1;
@@ -128,7 +128,7 @@ int JackPort::EnsureMonitor(bool onoff)
     /**
     jackd.h 
         * If @ref JackPortCanMonitor is set for this @a port, turn input
-        * monitoring on or off.  Otherwise, do nothing.
+        * monitoring on or off. Otherwise, do nothing.
      
      if (!(fFlags & JackPortCanMonitor))
     	return -1;
@@ -173,7 +173,7 @@ int JackPort::Flags() const
 const char* JackPort::Type() const
 {
     // TO IMPROVE
-    return "Audio";
+    return JACK_DEFAULT_AUDIO_TYPE;
 }
 
 int JackPort::SetName(const char* new_name)
