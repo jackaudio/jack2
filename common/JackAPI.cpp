@@ -76,6 +76,9 @@ extern "C"
     EXPORT int jack_set_sample_rate_callback (jack_client_t *client,
             JackSampleRateCallback srate_callback,
             void *arg);
+	EXPORT int jack_set_client_registration_callback (jack_client_t *,
+						   JackClientRegistrationCallback
+						   registration_callback, void *arg);
     EXPORT int jack_set_port_registration_callback (jack_client_t *,
             JackPortRegistrationCallback
             registration_callback, void *arg);
@@ -649,13 +652,26 @@ EXPORT int jack_set_sample_rate_callback(jack_client_t* ext_client, JackSampleRa
 	JackLibGlobals::CheckContext();
 #endif
     JackClient* client = (JackClient*)ext_client;
-    JackLog("jack_set_sample_rate_callback ext_client %x client %x \n", ext_client, client);
     if (client == NULL) {
         jack_error("jack_set_sample_rate_callback called with a NULL client");
         return -1;
     } else {
         JackLog("jack_set_sample_rate_callback: deprecated\n");
         return -1;
+    }
+}
+
+EXPORT int jack_set_client_registration_callback(jack_client_t* ext_client, JackClientRegistrationCallback registration_callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_set_client_registration_callback called with a NULL client");
+        return -1;
+    } else {
+		return client->SetClientRegistrationCallback(registration_callback, arg);
     }
 }
 

@@ -309,6 +309,16 @@ extern "C"
                                        JackSampleRateCallback srate_callback,
                                        void *arg);
 
+	/**
+	 * Tell the JACK server to call @a registration_callback whenever a
+	 * port is registered or unregistered, passing @a arg as a parameter.
+	 *
+	 * @return 0 on success, otherwise a non-zero error code
+	 */
+	int jack_set_client_registration_callback (jack_client_t *,
+						   JackClientRegistrationCallback
+						   registration_callback, void *arg);
+
     /**
      * Tell the JACK server to call @a registration_callback whenever a
      * port is registered or unregistered, passing @a arg as a parameter.

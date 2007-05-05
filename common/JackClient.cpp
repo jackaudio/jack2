@@ -128,9 +128,12 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
     switch (notify) {
 
         case JackNotifyChannelInterface::kAddClient:
-        case JackNotifyChannelInterface::kRemoveClient:
             res = ClientNotifyImp(refnum, name, notify, sync, value);
-            break;
+			break;
+			
+	   case JackNotifyChannelInterface::kRemoveClient:
+            res = ClientNotifyImp(refnum, name, notify, sync, value);
+			break;
 			
 		case JackNotifyChannelInterface::kActivateClient:
 			JackLog("JackClient::kActivateClient name = %s ref = %ld \n", name, refnum);
@@ -145,6 +148,18 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
     if (IsActive()) {
 
         switch (notify) {
+		
+			case JackNotifyChannelInterface::kAddClient:
+				printf("ClientNotify  fName = %s name = %s\n", GetClientControl()->fName, name);
+				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
+					fClientRegistration(name, 1, fClientRegistrationArg);
+				break;
+			
+			case JackNotifyChannelInterface::kRemoveClient:
+				printf("ClientNotify  fName = %s name = %s\n", GetClientControl()->fName, name);
+				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
+					fClientRegistration(name, 0, fClientRegistrationArg);
+				break;
 
             case JackNotifyChannelInterface::kBufferSizeCallback:
                 JackLog("JackClient::kBufferSizeCallback buffer_size = %ld\n", value);
@@ -755,6 +770,18 @@ int JackClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void *arg
     } else {
         fBufferSizeArg = arg;
         fBufferSize = callback;
+        return 0;
+    }
+}
+
+int JackClient::SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+        fPortRegistrationArg = arg;
+        fClientRegistration = callback;
         return 0;
     }
 }

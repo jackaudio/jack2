@@ -58,6 +58,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackShutdownCallback fShutdown;
         JackThreadInitCallback fInit;
         JackBufferSizeCallback fBufferSize;
+		JackClientRegistrationCallback fClientRegistration;
         JackFreewheelCallback fFreewheel;
         JackPortRegistrationCallback fPortRegistration;
         JackTimebaseCallback fTimebase;
@@ -68,6 +69,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fShutdownArg;
         void* fInitArg;
         void* fBufferSizeArg;
+		void* fClientRegistrationArg;
         void* fFreewheelArg;
         void* fPortRegistrationArg;
         void* fTimebaseArg;
@@ -144,6 +146,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int SetInitCallback(JackThreadInitCallback callback, void* arg);
         virtual int SetGraphOrderCallback(JackGraphOrderCallback callback, void* arg);
         virtual int SetBufferSizeCallback(JackBufferSizeCallback callback, void* arg);
+		virtual int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
         virtual int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         virtual int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
 

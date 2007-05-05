@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-05-05 Stephane Letz  <letz@grame.fr>
+
+	* Add jack_set_client_registration_callback API.
+
 2007-05-04 Stephane Letz  <letz@grame.fr>
 
 	* Steven Chamberlain patch to fix jack_port_type. Test for jack_port_type behaviour in jack_test.cpp tool.

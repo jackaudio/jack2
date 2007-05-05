@@ -181,6 +181,17 @@ typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int, void *arg
 
 /**
  * Prototype for the client supplied function that is called 
+ * whenever a client is registered or unregistered.
+ *
+ * @param name a null-terminated string containing the client name 
+ * @param register non-zero if the client is being registered,
+ *                     zero if the client is being unregistered
+ * @param arg pointer to a client supplied structure
+ */ 
+typedef void (*JackClientRegistrationCallback)(const char* name, int register, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called 
  * whenever jackd starts or stops freewheeling.
  *
  * @param starting non-zero if we start starting to freewheel, zero otherwise

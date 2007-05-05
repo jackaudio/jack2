@@ -169,6 +169,11 @@ void Jack_Freewheel_Callback(int starting, void *arg)
     FW = starting;
 }
 
+void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
+{
+    Log("Client registration callback name = %s has been successfully called with value %i.(msg from callback)\n", name, val);
+}
+
 int Jack_Update_Buffer_Size(jack_nframes_t nframes, void *arg)
 {
     cur_buffer_size = jack_get_buffer_size(client1);
@@ -203,7 +208,7 @@ void Jack_Error_Callback(const char *msg)
     }
 }
 
-void jack_shutdown (void *arg)
+void jack_shutdown(void *arg)
 {
     printf("Jack_test has been kicked out by jackd !\n");
     exit (1);
@@ -600,6 +605,9 @@ int main (int argc, char *argv[])
     if (jack_set_port_registration_callback(client1, Jack_Port_Register, 0) != 0) {
         printf("Error when calling jack_set_port_registration_callback() !\n");
     }
+	if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
+		printf("Error when calling jack_set_client_registration_callback() !\n");
+	}
     jack_set_error_function (Jack_Error_Callback);
 
     /**
@@ -1025,7 +1033,8 @@ int main (int argc, char *argv[])
     }
 
     free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
-
+	
+	
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
