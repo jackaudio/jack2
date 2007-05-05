@@ -48,6 +48,7 @@ JackClient::JackClient(JackSynchro** table)
     fShutdown = NULL;
     fInit = NULL;
     fBufferSize = NULL;
+	fClientRegistration = NULL;
     fFreewheel = NULL;
     fPortRegistration = NULL;
     fSync = NULL;
@@ -58,6 +59,7 @@ JackClient::JackClient(JackSynchro** table)
     fInitArg = NULL;
     fBufferSizeArg = NULL;
     fFreewheelArg = NULL;
+    fClientRegistrationArg = NULL;
     fPortRegistrationArg = NULL;
     fSyncArg = NULL;
     fConditionnal = 0; // Temporary??
@@ -150,13 +152,13 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
         switch (notify) {
 		
 			case JackNotifyChannelInterface::kAddClient:
-				printf("ClientNotify  fName = %s name = %s\n", GetClientControl()->fName, name);
+				JackLog("JackClient::kAddClient fName = %s name = %s\n", GetClientControl()->fName, name);
 				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
 					fClientRegistration(name, 1, fClientRegistrationArg);
 				break;
 			
 			case JackNotifyChannelInterface::kRemoveClient:
-				printf("ClientNotify  fName = %s name = %s\n", GetClientControl()->fName, name);
+				JackLog("JackClient::kRemoveClient fName = %s name = %s\n", GetClientControl()->fName, name);
 				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
 					fClientRegistration(name, 0, fClientRegistrationArg);
 				break;
