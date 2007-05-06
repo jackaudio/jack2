@@ -468,6 +468,12 @@ int JackDebugClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void
     return fClient->SetBufferSizeCallback(callback, arg);
 }
 
+int JackDebugClient::SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg)
+{
+	CheckClient();
+    return fClient->SetClientRegistrationCallback(callback, arg);
+}
+
 int JackDebugClient::SetFreewheelCallback(JackFreewheelCallback callback, void *arg)
 {
 	CheckClient();

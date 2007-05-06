@@ -115,6 +115,7 @@ class JackDebugClient : public JackClient
         int SetInitCallback(JackThreadInitCallback callback, void* arg);
         int SetGraphOrderCallback(JackGraphOrderCallback callback, void* arg);
         int SetBufferSizeCallback(JackBufferSizeCallback callback, void* arg);
+		int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
         int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
         JackClientControl* GetClientControl() const;
