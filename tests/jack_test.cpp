@@ -165,13 +165,13 @@ void Jack_Thread_Init_Callback(void *arg)
 
 void Jack_Freewheel_Callback(int starting, void *arg)
 {
-    Log("Freewhell callback has been successfully called with value %i.(msg from callback)\n", starting);
+    Log("Freewhell callback has been successfully called with value %i. (msg from callback)\n", starting);
     FW = starting;
 }
 
 void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 {
-    Log("Client registration callback name = %s has been successfully called with value %i.(msg from callback)\n", name, val);
+    Log("Client registration callback name = %s has been successfully called with value %i. (msg from callback)\n", name, val);
 }
 
 int Jack_Update_Buffer_Size(jack_nframes_t nframes, void *arg)
@@ -345,7 +345,7 @@ int process2(jack_nframes_t nframes, void *arg)
     jack_default_audio_sample_t *out2;
     jack_default_audio_sample_t *in2;
 
-    if (process2_activated == 1) { // Réception du process1 pour comparer les données
+    if (process2_activated == 1) { // Reception du process1 pour comparer les donnees
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
         for (int p = 0; p < nframes;p++) {
             signal2[index2] = in2[p];
@@ -358,6 +358,7 @@ int process2(jack_nframes_t nframes, void *arg)
             }
         }
     }
+	
     if (process2_activated == 2) { // envoie de signal1 pour test tie mode et le récupère direct + latence de la boucle jack...
         out2 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port2, nframes);
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
@@ -375,8 +376,8 @@ int process2(jack_nframes_t nframes, void *arg)
                 index2++;
             }
         }
-
     }
+	
     if (process2_activated == 3) { // envoie de -signal1 pour sommation en oppo de phase par jack
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
 
@@ -393,6 +394,20 @@ int process2(jack_nframes_t nframes, void *arg)
     }
 
     return 0;
+}
+
+// To test callback exiting
+int process3(jack_nframes_t nframes, void *arg)
+{
+	static int process3_call = 0;
+	
+	if (process3_call++ > 10) {
+		Log("process3 callback : exiting...\n");
+		return -1;
+	} else {
+		Log("calling process3 callback : process3_call = %ld\n", process3_call);
+		return 0;
+	}
 }
 
 static void display_transport_state()
@@ -529,7 +544,7 @@ int main (int argc, char *argv[])
      * Register a client... 
      * 
      */
-    Log("Register a client using jack_client_open()...\n");
+	Log("Register a client using jack_client_open()...\n");
     client1 = jack_client_open(client_name1, jack_options, &status, server_name);
     if (client1 == NULL) {
         fprintf (stderr, "jack_client_open() failed, "
@@ -570,7 +585,7 @@ int main (int argc, char *argv[])
     /**
      * Test RT mode...
      * verify if the real time mode returned by jack match the optional argument defined when launching jack_test*/
-    if (jack_is_realtime(client1) == RT )
+    if (jack_is_realtime(client1) == RT)
         Log("Jackd is in realtime mode (RT = %i).\n", RT);
     else
         printf("!!! ERROR !!! Jackd is in a non-expected realtime mode (RT = %i).\n", RT);
@@ -608,7 +623,7 @@ int main (int argc, char *argv[])
 	if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
 		printf("Error when calling jack_set_client_registration_callback() !\n");
 	}
-    jack_set_error_function (Jack_Error_Callback);
+    jack_set_error_function(Jack_Error_Callback);
 
     /**
      * Create file for clock "frame time" analysis
@@ -1033,7 +1048,6 @@ int main (int argc, char *argv[])
     }
 
     free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
-	
 	
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1582,6 +1596,9 @@ int main (int argc, char *argv[])
      * Check a transport start with a "slow" client, simulating a delay around 1 sec before becoming ready.
      *
      */
+	Log("-----------------------------------------------------------\n");
+    Log("---------------------------TRANSPORT-----------------------\n");
+    Log("-----------------------------------------------------------\n");
 
     lineports = linecount;
 
@@ -1762,6 +1779,22 @@ int main (int argc, char *argv[])
         jack_sleep (1 * 1000);
         time_before_exit--;
     }
+	
+	 /**
+     * Checking callback exiting : when the return code is != 0, the client is desactivated.
+    */
+	Log("Testing calback exiting...\n");
+	if (jack_deactivate(client2) != 0) {
+        printf("!!! ERROR !!! jack_deactivate does not return 0 for client2 !\n");
+    }
+    if (jack_deactivate(client1) != 0) {
+        printf("!!! ERROR !!! jack_deactivate does not return 0 for client1 !\n");
+    }
+	
+	jack_set_process_callback(client1, process3, 0);
+	jack_activate(client1);
+	
+	jack_sleep(3 * 1000); 
 
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
