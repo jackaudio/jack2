@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-05-29 Stephane Letz  <letz@grame.fr>
+
+	* Add "callback exiting" and "jack_frame_time" tests in jack_test.
+
 2007-05-05 Stephane Letz  <letz@grame.fr>
 
 	* Add jack_set_client_registration_callback API.

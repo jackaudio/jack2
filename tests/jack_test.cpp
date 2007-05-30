@@ -410,6 +410,23 @@ int process3(jack_nframes_t nframes, void *arg)
 	}
 }
 
+int process4(jack_nframes_t nframes, void *arg)
+{
+	static jack_nframes_t last_time = jack_frame_time((jack_client_t*)arg);
+	static jack_nframes_t tolerance = cur_buffer_size * 0.1f;
+	
+	jack_nframes_t cur_time = jack_frame_time((jack_client_t*)arg);
+	jack_nframes_t delta_time = cur_time - last_time;
+	
+	Log("calling process4 callback : jack_frame_time = %ld delta_time = %ld\n", cur_time, delta_time);
+	if (delta_time > 0  && abs(delta_time - cur_buffer_size) > tolerance) {
+		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %ld, delta_time = %ld\n", cur_buffer_size, delta_time);
+	}
+	
+	last_time = cur_time;
+	return 0;
+}
+
 static void display_transport_state()
 {
     jack_transport_state_t ts;
@@ -608,21 +625,27 @@ int main (int argc, char *argv[])
     if (jack_set_buffer_size_callback(client1, Jack_Update_Buffer_Size, 0) != 0) {
         printf("Error when calling buffer_size_callback !\n");
     }
+	
     if (jack_set_graph_order_callback(client1, Jack_Graph_Order_Callback, 0) != 0) {
         printf("Error when calling Jack_Graph_Order_Callback() !\n");
     }
+	
     if (jack_set_xrun_callback(client1, Jack_XRun_Callback, 0 ) != 0) {
         printf("Error when calling jack_set_xrun_callback() !\n");
     }
+	
     if (jack_set_sample_rate_callback(client1, Jack_Sample_Rate_Callback, 0 ) != 0) {
         printf("Error when calling Jack_Sample_Rate_Callback() !\n");
     }
+	
     if (jack_set_port_registration_callback(client1, Jack_Port_Register, 0) != 0) {
         printf("Error when calling jack_set_port_registration_callback() !\n");
     }
+	
 	if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
 		printf("Error when calling jack_set_client_registration_callback() !\n");
 	}
+	
     jack_set_error_function(Jack_Error_Callback);
 
     /**
@@ -1780,10 +1803,6 @@ int main (int argc, char *argv[])
         time_before_exit--;
     }
 	
-	 /**
-     * Checking callback exiting : when the return code is != 0, the client is desactivated.
-    */
-	Log("Testing calback exiting...\n");
 	if (jack_deactivate(client2) != 0) {
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client2 !\n");
     }
@@ -1791,11 +1810,23 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client1 !\n");
     }
 	
+	/**
+     * Checking jack_frame_time.
+    */
+	Log("Testing jack_frame_time...\n");
+	jack_set_process_callback(client1, process4, client1);
+	jack_activate(client1);
+	jack_sleep(2 * 1000); 
+	
+	/**
+     * Checking callback exiting : when the return code is != 0, the client is desactivated.
+    */
+	Log("Testing callback exiting...\n");
+	jack_deactivate(client1);
 	jack_set_process_callback(client1, process3, 0);
 	jack_activate(client1);
-	
 	jack_sleep(3 * 1000); 
-
+	
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
