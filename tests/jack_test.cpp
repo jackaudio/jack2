@@ -413,7 +413,7 @@ int process3(jack_nframes_t nframes, void *arg)
 int process4(jack_nframes_t nframes, void *arg)
 {
 	static jack_nframes_t last_time = jack_frame_time((jack_client_t*)arg);
-	static jack_nframes_t tolerance = cur_buffer_size * 0.1f;
+	static jack_nframes_t tolerance = (jack_nframes_t)(cur_buffer_size * 0.1f);
 	
 	jack_nframes_t cur_time = jack_frame_time((jack_client_t*)arg);
 	jack_nframes_t delta_time = cur_time - last_time;
