@@ -113,7 +113,7 @@ void JackEngine::ProcessNext(jack_time_t callback_usecs)
 {
 	fLastSwitchUsecs = callback_usecs;
 	if (fGraphManager->RunNextGraph())	// True if the graph actually switched to a new state
-		fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kGraphOrderCallback, 0);
+		fChannel->ClientNotify(ALL_CLIENTS, kGraphOrderCallback, 0);
 	fSignal->SignalAll();				// Signal for threads waiting for next cycle
 }
 
@@ -176,12 +176,12 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
             if (status != NotTriggered && status != Finished) {
                 jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
                 //fChannel->ClientNotify(i, kXRunCallback, 0); // Notify the failing client
-                fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kXRunCallback, 0);  // Notify all clients
+                fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
             if (status == Finished && (long)(finished_date - callback_usecs) > 0) {
                 jack_error("JackEngine::XRun: client %s finished after current callback", client->GetClientControl()->fName);
                 //fChannel->ClientNotify(i, kXRunCallback, 0); // Notify the failing client
-                fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kXRunCallback, 0);  // Notify all clients
+                fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
         }
     }
@@ -230,14 +230,14 @@ void JackEngine::RemoveZombifiedClients(jack_time_t current_time)
             fGraphManager->DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, i);
             fGraphManager->DirectDisconnect(i, FREEWHEEL_DRIVER_REFNUM);
             fGraphManager->DisconnectAllPorts(i);
-            fChannel->ClientNotify(i, JackNotifyChannelInterface::kZombifyClient, 0); // Signal engine
+            fChannel->ClientNotify(i, kZombifyClient, 0); // Signal engine
         }
     }
 }
 
 void JackEngine::ZombifyClient(int refnum)
 {
-    NotifyClient(refnum, JackNotifyChannelInterface::kZombifyClient, false, 0);
+    NotifyClient(refnum, kZombifyClient, false, 0);
 }
 
 //---------------
@@ -272,11 +272,11 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
         if (old_client) {
-            if (old_client->ClientNotify(refnum, name, JackNotifyChannelInterface::kAddClient, true, 0) < 0) {
+            if (old_client->ClientNotify(refnum, name, kAddClient, true, 0) < 0) {
                 jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
 				return -1;
 			}
-			if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, JackNotifyChannelInterface::kAddClient, true, 0) < 0) {
+			if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, 0) < 0) {
                 jack_error("NotifyAddClient new_client fails name = %s", name);
 				return -1;
 			}
@@ -292,7 +292,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            client->ClientNotify(refnum, name, JackNotifyChannelInterface::kRemoveClient, true, 0);
+            client->ClientNotify(refnum, name, kRemoveClient, true, 0);
         }
     }
 }
@@ -302,42 +302,42 @@ void JackEngine::NotifyXRun(jack_time_t callback_usecs)
 {
     // Use the audio thread => request thread communication channel
 	fEngineControl->ResetFrameTime(callback_usecs);
-    fChannel->ClientNotify(ALL_CLIENTS, JackNotifyChannelInterface::kXRunCallback, 0);
+    fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);
 }
 
 void JackEngine::NotifyXRun(int refnum)
 {
     if (refnum == ALL_CLIENTS) {
-        NotifyClients(JackNotifyChannelInterface::kXRunCallback, false, 0);
+        NotifyClients(kXRunCallback, false, 0);
     } else {
-        NotifyClient(refnum, JackNotifyChannelInterface::kXRunCallback, false, 0);
+        NotifyClient(refnum, kXRunCallback, false, 0);
     }
 }
 
 void JackEngine::NotifyGraphReorder()
 {
-    NotifyClients(JackNotifyChannelInterface::kGraphOrderCallback, false, 0);
+    NotifyClients(kGraphOrderCallback, false, 0);
 }
 
 void JackEngine::NotifyBufferSize(jack_nframes_t nframes)
 {
-    NotifyClients(JackNotifyChannelInterface::kBufferSizeCallback, true, nframes);
+    NotifyClients(kBufferSizeCallback, true, nframes);
 }
 
 void JackEngine::NotifyFreewheel(bool onoff)
 {
     fEngineControl->fRealTime = !onoff;
-    NotifyClients((onoff ? JackNotifyChannelInterface::kStartFreewheel : JackNotifyChannelInterface::kStopFreewheel), true, 0);
+    NotifyClients((onoff ? kStartFreewheel : kStopFreewheel), true, 0);
 }
 
 void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
 {
-    NotifyClients((onoff ? JackNotifyChannelInterface::kPortRegistrationOn : JackNotifyChannelInterface::kPortRegistrationOff), false, port_index);
+    NotifyClients((onoff ? kPortRegistrationOn : kPortRegistrationOff), false, port_index);
 }
 
 void JackEngine::NotifyActivate(int refnum)
 {
-	NotifyClient(refnum, JackNotifyChannelInterface::kActivateClient, true, 0);
+	NotifyClient(refnum, kActivateClient, true, 0);
 }
 
 //-------------------

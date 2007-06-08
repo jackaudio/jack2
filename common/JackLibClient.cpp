@@ -133,13 +133,13 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
     // Done all time
     switch (notify) {
 
-        case JackNotifyChannelInterface::kAddClient:
+        case kAddClient:
             JackLog("JackClient::AddClient name = %s, ref = %ld \n", name, refnum);
             // the synchro must be usable in I/O mode when several clients live in the same process
             res = fSynchroTable[refnum]->Connect(name) ? 0 : -1;
             break;
 
-        case JackNotifyChannelInterface::kRemoveClient:
+        case kRemoveClient:
             JackLog("JackClient::RemoveClient name = %s, ref = %ld \n", name, refnum);
             if (strcmp(GetClientControl()->fName, name) != 0)
                 res = fSynchroTable[refnum]->Disconnect() ? 0 : -1;

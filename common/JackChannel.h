@@ -135,7 +135,8 @@ class JackNotifyChannelInterface
         virtual void ClientNotify(int refnum, const char* name, int notify, int sync, int value, int* result)
         {}
 
-        typedef enum {
+		/*
+        enum NotificationType {
             kAddClient = 0,
             kRemoveClient = 1,
 			kActivateClient = 2,
@@ -147,9 +148,10 @@ class JackNotifyChannelInterface
             kPortRegistrationOn = 8,
             kPortRegistrationOff = 9,
             kZombifyClient = 10,
-            kDeadClient = 11
-		} NotificationType;
-
+            kDeadClient = 11,
+			kMaxType
+		};
+		*/
 };
 
 /*!

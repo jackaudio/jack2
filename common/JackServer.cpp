@@ -255,19 +255,19 @@ void JackServer::Notify(int refnum, int notify, int value)
 {
     switch (notify) {
 
-        case JackNotifyChannelInterface::kGraphOrderCallback:
+        case kGraphOrderCallback:
             fEngine->NotifyGraphReorder();
             break;
 
-        case JackNotifyChannelInterface::kXRunCallback:
+        case kXRunCallback:
             fEngine->NotifyXRun(refnum);
             break;
 
-        case JackNotifyChannelInterface::kZombifyClient:
+        case kZombifyClient:
             fEngine->ZombifyClient(refnum);
             break;
 
-        case JackNotifyChannelInterface::kDeadClient:
+        case kDeadClient:
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
 			if (fEngine->ClientDeactivate(refnum) < 0)
 				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);

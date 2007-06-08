@@ -23,6 +23,7 @@ Copyright (C) 2004-2006 Grame
 #include "JackEngine.h"
 #include "JackGlobals.h"
 #include "JackClient.h"
+#include "JackNotification.h"
 #include <assert.h>
 
 using namespace std;
@@ -125,7 +126,7 @@ void JackSocketServerChannel::KillClient(int fd)
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
         jack_error("Client not opened");
     } else {
-        fServer->Notify(refnum, JackNotifyChannelInterface::kDeadClient, 0);
+        fServer->Notify(refnum, kDeadClient, 0);
     }
 
     fSocketTable.erase(fd);

@@ -129,15 +129,15 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
     // Done all time: redirected on subclass implementation JackLibClient and JackInternalClient
     switch (notify) {
 
-        case JackNotifyChannelInterface::kAddClient:
+        case kAddClient:
             res = ClientNotifyImp(refnum, name, notify, sync, value);
 			break;
 			
-	   case JackNotifyChannelInterface::kRemoveClient:
+	   case kRemoveClient:
             res = ClientNotifyImp(refnum, name, notify, sync, value);
 			break;
 			
-		case JackNotifyChannelInterface::kActivateClient:
+		case kActivateClient:
 			JackLog("JackClient::kActivateClient name = %s ref = %ld \n", name, refnum);
 			Init();
 			break;
@@ -151,31 +151,31 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
         switch (notify) {
 		
-			case JackNotifyChannelInterface::kAddClient:
+			case kAddClient:
 				JackLog("JackClient::kAddClient fName = %s name = %s\n", GetClientControl()->fName, name);
 				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
 					fClientRegistration(name, 1, fClientRegistrationArg);
 				break;
 			
-			case JackNotifyChannelInterface::kRemoveClient:
+			case kRemoveClient:
 				JackLog("JackClient::kRemoveClient fName = %s name = %s\n", GetClientControl()->fName, name);
 				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
 					fClientRegistration(name, 0, fClientRegistrationArg);
 				break;
 
-            case JackNotifyChannelInterface::kBufferSizeCallback:
+            case kBufferSizeCallback:
                 JackLog("JackClient::kBufferSizeCallback buffer_size = %ld\n", value);
                 if (fBufferSize)
                     res = fBufferSize(value, fBufferSizeArg);
                 break;
 
-            case JackNotifyChannelInterface::kGraphOrderCallback:
+            case kGraphOrderCallback:
                 JackLog("JackClient::kGraphOrderCallback\n");
                 if (fGraphOrder)
                     res = fGraphOrder(fGraphOrderArg);
                 break;
 
-            case JackNotifyChannelInterface::kStartFreewheel:
+            case kStartFreewheel:
                 JackLog("JackClient::kStartFreewheel\n");
                 SetupDriverSync(true);
                 fThread->DropRealTime();
@@ -183,7 +183,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     fFreewheel(1, fFreewheelArg);
                 break;
 
-            case JackNotifyChannelInterface::kStopFreewheel:
+            case kStopFreewheel:
                 JackLog("JackClient::kStopFreewheel\n");
                 SetupDriverSync(false);
                 if (fFreewheel)
@@ -191,25 +191,25 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 fThread->AcquireRealTime();
                 break;
 
-            case JackNotifyChannelInterface::kPortRegistrationOn:
+            case kPortRegistrationOn:
                 JackLog("JackClient::kPortRegistrationOn port_index = %ld\n", value);
                 if (fPortRegistration)
                     fPortRegistration(value, 1, fPortRegistrationArg);
                 break;
 
-            case JackNotifyChannelInterface::kPortRegistrationOff:
+            case kPortRegistrationOff:
                 JackLog("JackClient::kPortRegistrationOff port_index = %ld \n", value);
                 if (fPortRegistration)
                     fPortRegistration(value, 0, fPortRegistrationArg);
                 break;
 
-            case JackNotifyChannelInterface::kXRunCallback:
+            case kXRunCallback:
                 JackLog("JackClient::kXRunCallback\n");
                 if (fXrun)
                     res = fXrun(fXrunArg);
                 break;
 
-            case JackNotifyChannelInterface::kZombifyClient:
+            case kZombifyClient:
 	            JackLog("JackClient::kZombifyClient name = %s ref = %ld \n", name, refnum);
                 ShutDown();
                 break;
