@@ -148,7 +148,7 @@ class JackNotifyChannelInterface
             kPortRegistrationOff = 9,
             kZombifyClient = 10,
             kDeadClient = 11
-    } NotificationType;
+		} NotificationType;
 
 };
 
