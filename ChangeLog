@@ -2,6 +2,14 @@
   Jackdmp changes log
 ---------------------------
 
+2007-06-09 Stephane Letz  <letz@grame.fr>
+
+	* Checking in the server to avoid calling the clients if no callback are registered.
+
+2007-06-08 Stephane Letz  <letz@grame.fr>
+
+	* New JackNotication.h header in preparation for callback checking in the server.
+
 2007-05-29 Stephane Letz  <letz@grame.fr>
 
 	* Add "callback exiting" and "jack_frame_time" tests in jack_test.

@@ -23,6 +23,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackServer.h"
 #include "JackMachThread.h"
 #include "JackEngine.h"
+#include "JackNotification.h"
 
 using namespace std;
 
@@ -114,7 +115,7 @@ void JackMachServerChannel::KillClient(mach_port_t private_port)
     JackLog("JackMachServerChannel::KillClient\n");
     int refnum = fClientTable[private_port];
     assert(refnum > 0);
-    fServer->Notify(refnum, JackNotifyChannelInterface::kDeadClient, 0);
+    fServer->Notify(refnum, kDeadClient, 0);
     fClientTable.erase(private_port);
 
     // Hum, hum....

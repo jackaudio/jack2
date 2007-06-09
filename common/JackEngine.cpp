@@ -248,7 +248,7 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value)
 {
     JackClientInterface* client = fClientTable[refnum];
     // The client may be notified by the RT thread while closing
-    if (client) {
+    if (client && client->GetClientControl()->fCallback[event]) {
 		if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value) < 0)
 			jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
     } else {
@@ -260,7 +260,7 @@ void JackEngine::NotifyClients(int event, int sync, int value)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0)) {
+        if (client && client->GetClientControl()->fCallback[event] && (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0)) {
             jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
         }
     }
@@ -327,12 +327,12 @@ void JackEngine::NotifyBufferSize(jack_nframes_t nframes)
 void JackEngine::NotifyFreewheel(bool onoff)
 {
     fEngineControl->fRealTime = !onoff;
-    NotifyClients((onoff ? kStartFreewheel : kStopFreewheel), true, 0);
+    NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, 0);
 }
 
 void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
 {
-    NotifyClients((onoff ? kPortRegistrationOn : kPortRegistrationOff), false, port_index);
+    NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, port_index);
 }
 
 void JackEngine::NotifyActivate(int refnum)

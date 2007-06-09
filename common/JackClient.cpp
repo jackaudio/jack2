@@ -175,7 +175,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     res = fGraphOrder(fGraphOrderArg);
                 break;
 
-            case kStartFreewheel:
+            case kStartFreewheelCallback:
                 JackLog("JackClient::kStartFreewheel\n");
                 SetupDriverSync(true);
                 fThread->DropRealTime();
@@ -183,7 +183,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     fFreewheel(1, fFreewheelArg);
                 break;
 
-            case kStopFreewheel:
+            case kStopFreewheelCallback:
                 JackLog("JackClient::kStopFreewheel\n");
                 SetupDriverSync(false);
                 if (fFreewheel)
@@ -191,13 +191,13 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 fThread->AcquireRealTime();
                 break;
 
-            case kPortRegistrationOn:
+            case kPortRegistrationOnCallback:
                 JackLog("JackClient::kPortRegistrationOn port_index = %ld\n", value);
                 if (fPortRegistration)
                     fPortRegistration(value, 1, fPortRegistrationArg);
                 break;
 
-            case kPortRegistrationOff:
+            case kPortRegistrationOffCallback:
                 JackLog("JackClient::kPortRegistrationOff port_index = %ld \n", value);
                 if (fPortRegistration)
                     fPortRegistration(value, 0, fPortRegistrationArg);
@@ -732,6 +732,7 @@ int JackClient::SetXRunCallback(JackXRunCallback callback, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
+		GetClientControl()->fCallback[kXRunCallback] = (callback != NULL);
         fXrunArg = arg;
         fXrun = callback;
         return 0;
@@ -758,6 +759,7 @@ int JackClient::SetGraphOrderCallback(JackGraphOrderCallback callback, void *arg
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
+		GetClientControl()->fCallback[kGraphOrderCallback] = (callback != NULL);
         fGraphOrder = callback;
         fGraphOrderArg = arg;
         return 0;
@@ -770,6 +772,7 @@ int JackClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void *arg
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
+		GetClientControl()->fCallback[kBufferSizeCallback] = (callback != NULL);
         fBufferSizeArg = arg;
         fBufferSize = callback;
         return 0;
@@ -782,7 +785,8 @@ int JackClient::SetClientRegistrationCallback(JackClientRegistrationCallback cal
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-        fPortRegistrationArg = arg;
+		// kAddClient and kRemoveClient notifications must be delivered by the server in any case
+		fClientRegistrationArg = arg;
         fClientRegistration = callback;
         return 0;
     }
@@ -794,6 +798,8 @@ int JackClient::SetFreewheelCallback(JackFreewheelCallback callback, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
+		GetClientControl()->fCallback[kStartFreewheelCallback] = (callback != NULL);
+		GetClientControl()->fCallback[kStopFreewheelCallback] = (callback != NULL);
         fFreewheelArg = arg;
         fFreewheel = callback;
         return 0;
@@ -806,6 +812,8 @@ int JackClient::SetPortRegistrationCallback(JackPortRegistrationCallback callbac
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
+		GetClientControl()->fCallback[kPortRegistrationOnCallback] = (callback != NULL);
+		GetClientControl()->fCallback[kPortRegistrationOffCallback] = (callback != NULL);
         fPortRegistrationArg = arg;
         fPortRegistration = callback;
         return 0;

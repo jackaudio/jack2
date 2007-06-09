@@ -39,9 +39,7 @@ namespace Jack
 struct JackRequest
 {
 
-public:
-
-    typedef enum {
+    enum RequestType {
         kRegisterPort = 1,
         kUnRegisterPort = 2,
         kConnectPorts = 3,
@@ -65,7 +63,7 @@ public:
         kDisconnectNamePorts = 25,
 
         kNotification = 26
-    } RequestType;
+    };
 
     RequestType fType;
 

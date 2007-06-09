@@ -492,6 +492,7 @@
 		4B9B815C08AFA45000D05A28 /* JackRequest.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackRequest.h; path = ../common/JackRequest.h; sourceTree = SOURCE_ROOT; };
 		4BA577BC08BF8BE200F82DE1 /* testSynchroClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroClient.cpp; path = ../tests/testSynchroClient.cpp; sourceTree = SOURCE_ROOT; };
 		4BA577FB08BF8E4600F82DE1 /* testSynchroServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroServer.cpp; path = ../tests/testSynchroServer.cpp; sourceTree = SOURCE_ROOT; };
+		4BB371D40C1AD85A0050C1E4 /* JackNotification.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackNotification.h; path = ../common/JackNotification.h; sourceTree = SOURCE_ROOT; };
 		4BBD13CC08C71EB40079F7FF /* testSynchroServerClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroServerClient.cpp; path = ../tests/testSynchroServerClient.cpp; sourceTree = SOURCE_ROOT; };
 		4BC216880A444BDE00BDA09F /* JackServerGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServerGlobals.cpp; path = ../common/JackServerGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4BC2168D0A444BED00BDA09F /* JackServerGlobals.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackServerGlobals.h; path = ../common/JackServerGlobals.h; sourceTree = SOURCE_ROOT; };
@@ -1026,6 +1027,7 @@
 		4BA550FF05E2423600569492 /* Channels */ = {
 			isa = PBXGroup;
 			children = (
+				4BB371D40C1AD85A0050C1E4 /* JackNotification.h */,
 				4BF8D1AF0834EEC400C94B91 /* JackChannel.h */,
 				4BF8D1B30834EED500C94B91 /* JackInternalClientChannel.h */,
 				4BFB299908AF452300D450D4 /* Socket */,
