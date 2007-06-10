@@ -260,8 +260,9 @@ void JackEngine::NotifyClients(int event, int sync, int value)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && client->GetClientControl()->fCallback[event] && (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0)) {
-            jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
+        if (client && client->GetClientControl()->fCallback[event]) {
+			if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0) 
+				jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
         }
     }
 }

@@ -656,8 +656,8 @@ EXPORT int jack_set_sample_rate_callback(jack_client_t* ext_client, JackSampleRa
         jack_error("jack_set_sample_rate_callback called with a NULL client");
         return -1;
     } else {
-        JackLog("jack_set_sample_rate_callback: deprecated\n");
-        return -1;
+        jack_error("jack_set_sample_rate_callback: deprecated");
+        return 0;
     }
 }
 
@@ -1345,14 +1345,14 @@ EXPORT void jack_transport_stop(jack_client_t* ext_client)
 
 EXPORT void jack_get_transport_info(jack_client_t* ext_client, jack_transport_info_t* tinfo)
 {
-    JackLog("jack_get_transport_info : deprecated");
+    jack_error("jack_get_transport_info: deprecated");
     if (tinfo)
         memset(tinfo, 0, sizeof(jack_transport_info_t));
 }
 
 EXPORT void jack_set_transport_info(jack_client_t* ext_client, jack_transport_info_t* tinfo)
 {
-    JackLog("jack_set_transport_info : deprecated");
+    jack_error("jack_set_transport_info: deprecated");
     if (tinfo)
         memset(tinfo, 0, sizeof(jack_transport_info_t));
 }
