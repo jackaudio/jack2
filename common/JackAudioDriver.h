@@ -79,6 +79,9 @@ class EXPORT JackAudioDriver : public JackDriver
         virtual int Detach();
         virtual int Write();
 
+        // sets up fEngineControl and fGraphManager, always succeeds
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
+
         virtual void NotifyXRun(jack_time_t callback_usecs); // XRun notification sent by the driver
 
 };

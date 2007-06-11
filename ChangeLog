@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-06-11 Stephane Letz  <letz@grame.fr>
+
+	* Dmitry Baikov buffer size patch.
+
 2007-06-10 Stephane Letz  <letz@grame.fr>
 
 	* Correct deprecated jack_set_sample_rate_callback to return 0 instead of -1.

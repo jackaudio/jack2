@@ -45,6 +45,17 @@ JackAudioDriver::JackAudioDriver(const char* name, JackEngine* engine, JackSynch
 JackAudioDriver::~JackAudioDriver()
 {}
 
+// DB: This is here because audio driver is the only one, who can change buffer size.
+// It can be moved into JackDriver, but then it would be called twice
+// because of JackServer::SetBufferSize() implementation.
+// Initial values are set in JackDriver::Open(...). Yes it is a duplicate code (bad).
+int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
+{
+    fEngineControl->fBufferSize = buffer_size;
+    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
+    return 0;
+}
+
 int JackAudioDriver::Open(jack_nframes_t nframes,
                           jack_nframes_t samplerate,
                           int capturing,

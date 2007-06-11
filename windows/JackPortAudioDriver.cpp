@@ -440,10 +440,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
         jack_error("Pa_OpenStream error = %s\n", Pa_GetErrorText(err));
         return -1;
     } else {
-        // Only done when success
-        fEngineControl->fBufferSize = buffer_size;
-        fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // In microsec
-        return 0;
+        return JackAudioDriver::SetBufferSize(buffer_size); // never fails;
     }
 }
 

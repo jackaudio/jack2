@@ -919,8 +919,7 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
         return -1;
     }
 
-    fEngineControl->fBufferSize = buffer_size;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // In microsec
+	JackAudioDriver::SetBufferSize(buffer_size); // never fails
 
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {

@@ -1507,12 +1507,18 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 int JackAlsaDriver::SetBufferSize(jack_nframes_t nframes)
 {
     JackLog("JackAlsaDriver::SetBufferSize %ld\n", nframes);
-    fEngineControl->fBufferSize = nframes;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-
-    return alsa_driver_reset_parameters ((alsa_driver_t *)fDriver, nframes,
+    int res = alsa_driver_reset_parameters((alsa_driver_t *)fDriver, nframes,
                                          ((alsa_driver_t *)fDriver)->user_nperiods,
                                          ((alsa_driver_t *)fDriver)->frame_rate);
+
+    if (res == 0) // update fEngineControl and fGraphManager
+        JackAudioDriver::SetBufferSize(nframes); // never fails
+    else
+        alsa_driver_reset_parameters((alsa_driver_t *)fDriver, fEngineControl->fBufferSize,
+									((alsa_driver_t *)fDriver)->user_nperiods,
+									((alsa_driver_t *)fDriver)->frame_rate);
+
+    return res;
 }
 
 int

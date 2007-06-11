@@ -66,13 +66,6 @@ int JackDummyDriver::Process()
     return 0;
 }
 
-int JackDummyDriver::SetBufferSize(jack_nframes_t buffer_size)
-{
-    fEngineControl->fBufferSize = buffer_size;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // In microsec
-    return 0;
-}
-
 void JackDummyDriver::PrintState()
 {
     std::cout << "JackDummyDriver state" << std::endl;
