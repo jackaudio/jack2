@@ -22,6 +22,7 @@ Copyright (C) 2004-2006 Grame
 #endif
 
 #include "JackWinNamedPipeServerChannel.h"
+#include "JackNotification.h"
 #include "JackRequest.h"
 #include "JackServer.h"
 #include "JackEngine.h"
@@ -293,7 +294,7 @@ void JackClientPipeThread::KillClient()
 	} else if (fRefNum == 0) {  // Correspond to a still not opened client.
         JackLog("Kill a not opened client\n");  
     } else {
-        fServer->Notify(fRefNum, JackNotifyChannelInterface::kDeadClient, 0);
+        fServer->Notify(fRefNum, kDeadClient, 0);
     }
 
     Close();
