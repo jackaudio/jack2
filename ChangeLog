@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-07-20 Stephane Letz  <letz@grame.fr>
+
+	* Correct notification for kActivateClient event.
+
 2007-06-11 Stephane Letz  <letz@grame.fr>
 
 	* Dmitry Baikov buffer size patch.

@@ -25,7 +25,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackSynchro.h"
 #include "JackNotification.h"
-
 #include "transport_types.h"
 
 namespace Jack
@@ -64,6 +63,10 @@ struct JackClientControl : public JackShmMem
         strcpy(fName, name);
 		for (int i = 0; i < kMaxNotification; i++) 
 			fCallback[i] = false;
+		// Always activated
+		fCallback[kAddClient] = true;
+		fCallback[kRemoveClient] = true;
+		fCallback[kActivateClient] = true;
         fRefNum = refnum;
         fTransportState = JackTransportStopped;
         fZombie = false;

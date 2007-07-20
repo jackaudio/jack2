@@ -247,12 +247,15 @@ void JackEngine::ZombifyClient(int refnum)
 void JackEngine::NotifyClient(int refnum, int event, int sync, int value)
 {
     JackClientInterface* client = fClientTable[refnum];
+	
     // The client may be notified by the RT thread while closing
-    if (client && client->GetClientControl()->fCallback[event]) {
+    if (!client) {
+		JackLog("JackEngine::NotifyClient: client not available anymore\n");
+	} else if (client->GetClientControl()->fCallback[event]) {
 		if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value) < 0)
 			jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
     } else {
-        JackLog("JackEngine::NotifyClient: client not available anymore\n");
+        JackLog("JackEngine::NotifyClient: no callback for event = %ld\n", event);
     }
 }
 
@@ -260,10 +263,14 @@ void JackEngine::NotifyClients(int event, int sync, int value)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && client->GetClientControl()->fCallback[event]) {
-			if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0) 
-				jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
-        }
+		if (client) {
+			if (client->GetClientControl()->fCallback[event]) {
+				if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0) 
+					jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
+			} else {
+				JackLog("JackEngine::NotifyClients: no callback for event = %ld\n", event);
+			}
+		}
     }
 }
 
