@@ -501,7 +501,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     }
 
     // Notify running clients
-	if (client->GetClientControl())  // When called in erro cases, client may not be completrly allocated
+	if (client->GetClientControl())  // When called in error cases, client may not be completely allocated
 		NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
 
     // Cleanup...
