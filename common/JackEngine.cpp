@@ -483,7 +483,9 @@ int JackEngine::ClientInternalCloseIm(int refnum)
 
 int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wait)
 {
-    JackLog("JackEngine::ClientCloseAux ref = %ld name = %s\n", refnum, client->GetClientControl()->fName);
+    JackLog("JackEngine::ClientCloseAux ref = %ld name = %s\n", 
+			refnum, 
+			(client->GetClientControl()) ? client->GetClientControl()->fName : "No name");
 
     // Remove the client from the table
     fClientTable[refnum] = NULL;
@@ -499,7 +501,8 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     }
 
     // Notify running clients
-    NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
+	if (client->GetClientControl())  // When called in erro cases, client may not be completrly allocated
+		NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
 
     // Cleanup...
     fSynchroTable[refnum]->Destroy();

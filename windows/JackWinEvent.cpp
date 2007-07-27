@@ -137,6 +137,7 @@ bool JackWinEvent::Allocate(const char* name, int value)
     } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		jack_error("Allocate: named event already exist name = %s", fName);
 		CloseHandle(fEvent);
+		fEvent = NULL;
 		return false;
 	} else {
  		return true;
