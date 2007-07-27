@@ -132,8 +132,8 @@ class JackAtomicState
         }
 
         /*!
-              \brief Tries to switch to the next state and returns the new current state (either the same as before if case of switch failure or the new one)
-              */
+		\brief Tries to switch to the next state and returns the new current state (either the same as before if case of switch failure or the new one)
+		*/
         T* TrySwitchState()
         {
             AtomicCounter old_val;
