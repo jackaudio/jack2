@@ -48,7 +48,7 @@ class JackClientChannelInterface
         {}
 
         // Open the Server/Client connection
-        virtual int Open(const char* name, JackClient* obj)
+        virtual int Open(const char* name, JackClient* obj, jack_options_t options,  jack_status_t* status)
         {
             return 0;
         }
@@ -66,7 +66,9 @@ class JackClientChannelInterface
         // Stop listening for messages from the server
         virtual void Stop()
         {}
-
+		
+		virtual void ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
+        {}
         virtual void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
         {}
         virtual void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)

@@ -51,12 +51,13 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
         JackSocketClientChannel();
         virtual ~JackSocketClientChannel();
 
-        int Open(const char* name, JackClient* obj);
+        int Open(const char* name, JackClient* obj, jack_options_t options, jack_status_t* status);
         void Close();
 
         int Start();
         void Stop();
 
+		void ClientCheck(const char* name, char* name_res, int options, int* status, int* result);
         void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 

@@ -93,13 +93,13 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
     JackClient* client = new JackLibClient(GetSynchroTable());
 #endif
 
-    int res = client->Open(client_name);
+    int res = client->Open(client_name, options, status);
     if (res < 0) {
         delete client;
         JackLibGlobals::Destroy(); // jack library destruction
         return NULL;
     } else {
-        *status = (jack_status_t)0;
+        *status = (jack_status_t)0;	 // TO REMOVE
         return (jack_client_t*)client;
     }
 }

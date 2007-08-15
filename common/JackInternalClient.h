@@ -45,7 +45,7 @@ class JackInternalClient : public JackClient
         JackInternalClient(JackServer* server, JackSynchro** table);
         virtual ~JackInternalClient();
 
-        int Open(const char* name);
+        int Open(const char* name, jack_options_t options, jack_status_t* status);
 
         JackGraphManager* GetGraphManager() const;
         JackEngineControl* GetEngineControl() const;

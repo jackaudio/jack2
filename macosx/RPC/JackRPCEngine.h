@@ -26,7 +26,7 @@ typedef function_table_entry 	*function_table_t;
 #endif /* AUTOTEST */
 
 #ifndef	JackRPCEngine_MSG_COUNT
-#define	JackRPCEngine_MSG_COUNT	15
+#define	JackRPCEngine_MSG_COUNT	16
 #endif	/* JackRPCEngine_MSG_COUNT */
 
 #include <mach/std_types.h>
@@ -57,6 +57,22 @@ kern_return_t rpc_jack_client_open
 	int *shared_engine,
 	int *shared_client,
 	int *shared_graph,
+	int *result
+);
+
+/* Routine rpc_jack_client_check */
+#ifdef	mig_external
+mig_external
+#else
+extern
+#endif	/* mig_external */
+kern_return_t rpc_jack_client_check
+(
+	mach_port_t server_port,
+	client_name_t client_name,
+	client_name_t client_name_res,
+	int options,
+	int *status,
 	int *result
 );
 
@@ -294,6 +310,19 @@ __END_DECLS
 	typedef struct {
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
+		client_name_t client_name;
+		int options;
+	} __Request__rpc_jack_client_check_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
 		int refnum;
 	} __Request__rpc_jack_client_close_t;
 #ifdef  __MigPackStructs
@@ -478,6 +507,7 @@ __END_DECLS
 #define __RequestUnion__JackRPCEngine_subsystem__defined
 union __RequestUnion__JackRPCEngine_subsystem {
 	__Request__rpc_jack_client_open_t Request_rpc_jack_client_open;
+	__Request__rpc_jack_client_check_t Request_rpc_jack_client_check;
 	__Request__rpc_jack_client_close_t Request_rpc_jack_client_close;
 	__Request__rpc_jack_client_activate_t Request_rpc_jack_client_activate;
 	__Request__rpc_jack_client_deactivate_t Request_rpc_jack_client_deactivate;
@@ -514,6 +544,21 @@ union __RequestUnion__JackRPCEngine_subsystem {
 		int shared_graph;
 		int result;
 	} __Reply__rpc_jack_client_open_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		client_name_t client_name_res;
+		int status;
+		int result;
+	} __Reply__rpc_jack_client_check_t;
 #ifdef  __MigPackStructs
 #pragma pack()
 #endif
@@ -707,6 +752,7 @@ union __RequestUnion__JackRPCEngine_subsystem {
 #define __ReplyUnion__JackRPCEngine_subsystem__defined
 union __ReplyUnion__JackRPCEngine_subsystem {
 	__Reply__rpc_jack_client_open_t Reply_rpc_jack_client_open;
+	__Reply__rpc_jack_client_check_t Reply_rpc_jack_client_check;
 	__Reply__rpc_jack_client_close_t Reply_rpc_jack_client_close;
 	__Reply__rpc_jack_client_activate_t Reply_rpc_jack_client_activate;
 	__Reply__rpc_jack_client_deactivate_t Reply_rpc_jack_client_deactivate;
@@ -727,20 +773,21 @@ union __ReplyUnion__JackRPCEngine_subsystem {
 #ifndef subsystem_to_name_map_JackRPCEngine
 #define subsystem_to_name_map_JackRPCEngine \
     { "rpc_jack_client_open", 1000 },\
-    { "rpc_jack_client_close", 1001 },\
-    { "rpc_jack_client_activate", 1002 },\
-    { "rpc_jack_client_deactivate", 1003 },\
-    { "rpc_jack_port_register", 1004 },\
-    { "rpc_jack_port_unregister", 1005 },\
-    { "rpc_jack_port_connect", 1006 },\
-    { "rpc_jack_port_disconnect", 1007 },\
-    { "rpc_jack_port_connect_name", 1008 },\
-    { "rpc_jack_port_disconnect_name", 1009 },\
-    { "rpc_jack_set_buffer_size", 1010 },\
-    { "rpc_jack_set_freewheel", 1011 },\
-    { "rpc_jack_release_timebase", 1012 },\
-    { "rpc_jack_set_timebase_callback", 1013 },\
-    { "rpc_jack_client_rt_notify", 1014 }
+    { "rpc_jack_client_check", 1001 },\
+    { "rpc_jack_client_close", 1002 },\
+    { "rpc_jack_client_activate", 1003 },\
+    { "rpc_jack_client_deactivate", 1004 },\
+    { "rpc_jack_port_register", 1005 },\
+    { "rpc_jack_port_unregister", 1006 },\
+    { "rpc_jack_port_connect", 1007 },\
+    { "rpc_jack_port_disconnect", 1008 },\
+    { "rpc_jack_port_connect_name", 1009 },\
+    { "rpc_jack_port_disconnect_name", 1010 },\
+    { "rpc_jack_set_buffer_size", 1011 },\
+    { "rpc_jack_set_freewheel", 1012 },\
+    { "rpc_jack_release_timebase", 1013 },\
+    { "rpc_jack_set_timebase_callback", 1014 },\
+    { "rpc_jack_client_rt_notify", 1015 }
 #endif
 
 #ifdef __AfterMigUserHeader

@@ -61,13 +61,13 @@ JackLibClient::~JackLibClient()
     delete fChannel;
 }
 
-int JackLibClient::Open(const char* name)
+int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
     JackLog("JackLibClient::Open %s\n", name);
 
     // Open server/client channel
-    if (fChannel->Open(name, this) < 0) {
+    if (fChannel->Open(name, this, options, status) < 0) {
         jack_error("Cannot connect to the server");
         goto error;
     }

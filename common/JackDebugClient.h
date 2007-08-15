@@ -64,10 +64,10 @@ class JackDebugClient : public JackClient
 
     public:
 
-        JackDebugClient(JackClient *fTheClient);
+        JackDebugClient(JackClient* fTheClient);
         virtual ~JackDebugClient();
 
-        virtual int Open(const char* name);
+        virtual int Open(const char* name, jack_options_t options, jack_status_t* status);
         int Close();
 
         virtual JackGraphManager* GetGraphManager() const;

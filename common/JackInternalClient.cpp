@@ -65,11 +65,14 @@ JackInternalClient::~JackInternalClient()
     delete fChannel;
 }
 
-int JackInternalClient::Open(const char* name)
+int JackInternalClient::Open(const char* name, jack_options_t options, jack_status_t* status)
 {
     int result;
     JackLog("JackInternalClient::Open name = %s\n", name);
     strcpy(fClientControl->fName, name);
+	
+	// TODO
+	// check client name
 
     // Require new client
     fChannel->ClientOpen(name, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);

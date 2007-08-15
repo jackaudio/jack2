@@ -37,6 +37,14 @@ routine rpc_jack_client_open(
 	out shared_graph : int;
 	out result : int);
 
+routine rpc_jack_client_check(
+	server_port	: mach_port_t;
+	client_name	: client_name_t;
+	out client_name_res	: client_name_t;
+	options		: int;
+	out status	: int;
+	out result : int);
+
 routine  rpc_jack_client_close(
 	server_port	: mach_port_t;
 	refnum		: int;

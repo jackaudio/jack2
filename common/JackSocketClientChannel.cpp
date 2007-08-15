@@ -38,7 +38,7 @@ JackSocketClientChannel::~JackSocketClientChannel()
     delete fNotificationSocket;
 }
 
-int JackSocketClientChannel::Open(const char* name, JackClient* obj)
+int JackSocketClientChannel::Open(const char* name, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     JackLog("JackSocketClientChannel::Open name = %s\n", name);
 
@@ -111,6 +111,11 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
     } else {
         *result = 0;
     }
+}
+
+void JackSocketClientChannel::ClientCheck(const char* name,  char* name_res, int options, int* status, int* result)
+{
+
 }
 
 void JackSocketClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)

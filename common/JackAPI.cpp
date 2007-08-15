@@ -1507,7 +1507,7 @@ static void start_server_aux(const char *server_name)
 		command[result] = '\0';
 	}
 
-	argv = (char **) malloc (255);
+	argv = (char **)malloc(255);
   
 	while (1) {
 		/* insert -T and -nserver_name in front of arguments */
@@ -1517,8 +1517,8 @@ static void start_server_aux(const char *server_name)
 			if (server_name) {
 				size_t optlen = strlen ("-n");
 				char* buf = (char*)malloc(optlen + strlen (server_name) + 1);
-				strcpy (buf, "-n");
-				strcpy (buf+optlen, server_name);
+				strcpy(buf, "-n");
+				strcpy(buf+optlen, server_name);
 				argv[i++] = buf;
 			}
 		}
@@ -1538,7 +1538,7 @@ static void start_server_aux(const char *server_name)
 
 	/* If execv() succeeds, it does not return. There's no point
 	 * in calling jack_error() here in the child process. */
-	perror("exec of JACK server failed");
+	fprintf(stderr, "exec of JACK server (command = \"%s\") failed: %s\n", command, strerror(errno));
 }
 
 static int start_server(const char *server_name, jack_options_t options)

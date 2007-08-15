@@ -36,7 +36,7 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
     delete fThread;
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* name, JackClient* obj)
+int JackWinNamedPipeClientChannel::Open(const char* name, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     JackLog("JackWinNamedPipeClientChannel::Open name = %s\n", name);
 
@@ -110,6 +110,11 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
     } else {
         *result = 0;
     }
+}
+
+void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
+{
+
 }
 
 void JackWinNamedPipeClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
