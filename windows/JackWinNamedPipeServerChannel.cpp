@@ -111,9 +111,9 @@ int JackClientPipeThread::HandleRequest()
 			JackLog("JackRequest::kClientCheck\n");
 			JackClientCheckRequest req;
 			JackClientCheckResult res;
-			if (req.Read(socket) == 0)
+			if (req.Read(fPipe) == 0)
 				res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fOptions, &res.fStatus);
-			res.Write(socket);
+			res.Write(fPipe);
 			break;
 		}
 			

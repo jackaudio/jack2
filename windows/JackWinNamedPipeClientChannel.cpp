@@ -36,26 +36,36 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
     delete fThread;
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* name, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackWinNamedPipeClientChannel::Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
+	int result = 0;
     JackLog("JackWinNamedPipeClientChannel::Open name = %s\n", name);
 
+	/* 
+	16/08/07: was called before doing "fRequestPipe.Connect" .... still necessary?
     if (fNotificationListenPipe.Bind(jack_client_dir, name, 0) < 0) {
         jack_error("Cannot bind pipe");
         goto error;
     }
+	*/
 	
+    if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
+        jack_error("Cannot connect to server pipe");
+        goto error;
+    }
+
 	// Check name in server
 	ClientCheck(name, name_res, (int)options, (int*)status, &result);
     if (result < 0) {
         jack_error("Client name = %s conflits with another running client", name);
 		goto error;
     }
-
-    if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
-        jack_error("Cannot connect to server pipe");
+	
+	if (fNotificationListenPipe.Bind(jack_client_dir, name_res, 0) < 0) {
+        jack_error("Cannot bind pipe");
         goto error;
     }
+	
 
     fClient = obj;
     return 0;
