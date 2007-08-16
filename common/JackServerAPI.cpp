@@ -110,7 +110,6 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
     return jack_client_open(client_name, (jack_options_t)options, NULL);
 }
 
-// TO BE IMPLEMENTED PROPERLY
 EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t options, jack_status_t* status, ...)
 {
     va_list ap;				/* variable argument pointer */
