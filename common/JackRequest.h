@@ -135,18 +135,17 @@ struct JackClientCheckRequest : public JackRequest
 
     int Read(JackChannelTransaction* trans)
     {
-		CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
 		return trans->Read(&fOptions, sizeof(int));
     }
 
     int Write(JackChannelTransaction* trans)
     {
 		CheckRes(JackRequest::Write(trans));
-		CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
 		return trans->Write(&fOptions, sizeof(int));
     }
 };
-
 
 /*!
 \brief CheckClient result.
@@ -169,7 +168,7 @@ struct JackClientCheckResult : public JackResult
 	int Read(JackChannelTransaction* trans)
     {
  		CheckRes(JackResult::Read(trans));
-		CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
 		CheckRes(trans->Read(&fStatus, sizeof(int)));
 		return 0;
     }
@@ -177,12 +176,11 @@ struct JackClientCheckResult : public JackResult
     int Write(JackChannelTransaction* trans)
     {
  		CheckRes(JackResult::Write(trans));
-		CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
 		CheckRes(trans->Write(&fStatus, sizeof(int)));
 		return 0;
     }
 };
-
 
 /*!
 \brief NewClient request.
