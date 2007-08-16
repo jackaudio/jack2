@@ -68,16 +68,21 @@ JackInternalClient::~JackInternalClient()
 int JackInternalClient::Open(const char* name, jack_options_t options, jack_status_t* status)
 {
     int result;
+	char name_res[JACK_CLIENT_NAME_SIZE]; 
     JackLog("JackInternalClient::Open name = %s\n", name);
-    strcpy(fClientControl->fName, name);
+ 	
+	fChannel->ClientCheck(name, name_res, (int)options, (int*)status, &result);
+    if (result < 0) {
+        jack_error("Client name = %s conflits with another running client", name);
+        goto error;
+    }
 	
-	// TODO
-	// check client name
+	strcpy(fClientControl->fName, name_res);
 
     // Require new client
-    fChannel->ClientOpen(name, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);
+    fChannel->ClientOpen(name_res, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);
     if (result < 0) {
-        jack_error("Cannot open client name = %s", name);
+        jack_error("Cannot open client name = %s", name_res);
         goto error;
     }
 

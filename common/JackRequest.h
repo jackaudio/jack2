@@ -57,12 +57,13 @@ struct JackRequest
 
         kSetBufferSize = 20,
         kSetFreeWheel = 21,
-        kClientOpen = 22,
-        kClientClose = 23,
-        kConnectNamePorts = 24,
-        kDisconnectNamePorts = 25,
+		kClientCheck = 22,
+        kClientOpen = 23,
+        kClientClose = 24,
+        kConnectNamePorts = 25,
+        kDisconnectNamePorts = 26,
 
-        kNotification = 26
+        kNotification = 27
     };
 
     RequestType fType;
@@ -99,7 +100,7 @@ struct JackResult
 
     JackResult(): fResult( -1)
     {}
-    JackResult(int status): fResult(status)
+    JackResult(int result): fResult(result)
     {}
     virtual ~JackResult()
     {}
@@ -114,6 +115,74 @@ struct JackResult
 		return trans->Write(&fResult, sizeof(int));
     }
 };
+
+/*!
+\brief CheckClient request.
+*/
+
+struct JackClientCheckRequest : public JackRequest
+{
+
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+	int fOptions;
+
+    JackClientCheckRequest()
+    {}
+    JackClientCheckRequest(const char* name, int options): JackRequest(JackRequest::kClientCheck),fOptions(options)
+    {
+        snprintf(fName, sizeof(fName), "%s", name);
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+		CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+		return trans->Read(&fOptions, sizeof(int));
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+		CheckRes(JackRequest::Write(trans));
+		CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
+		return trans->Write(&fOptions, sizeof(int));
+    }
+};
+
+
+/*!
+\brief CheckClient result.
+*/
+
+struct JackClientCheckResult : public JackResult
+{
+
+	char fName[JACK_CLIENT_NAME_SIZE + 1];
+	int fStatus;
+
+    JackClientCheckResult():fStatus(0)
+    {}
+    JackClientCheckResult(int32_t result, const char* name, int status)
+         : JackResult(result), fStatus(status)
+    {
+		  snprintf(fName, sizeof(fName), "%s", name);
+	}
+
+	int Read(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Read(trans));
+		CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fStatus, sizeof(int)));
+		return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Write(trans));
+		CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Write(&fStatus, sizeof(int)));
+		return 0;
+    }
+};
+
 
 /*!
 \brief NewClient request.
@@ -158,8 +227,8 @@ struct JackClientOpenResult : public JackResult
     JackClientOpenResult()
 		:fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
     {}
-    JackClientOpenResult(int32_t status, int index1, int index2, int index3)
-         : JackResult(status), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
+    JackClientOpenResult(int32_t result, int index1, int index2, int index3)
+         : JackResult(result), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
     {}
 
    int Read(JackChannelTransaction* trans)

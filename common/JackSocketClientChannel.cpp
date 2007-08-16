@@ -38,16 +38,24 @@ JackSocketClientChannel::~JackSocketClientChannel()
     delete fNotificationSocket;
 }
 
-int JackSocketClientChannel::Open(const char* name, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackSocketClientChannel::Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
+	int result = 0;
     JackLog("JackSocketClientChannel::Open name = %s\n", name);
 
     if (fRequestSocket.Connect(jack_server_dir, 0) < 0) {
         jack_error("Cannot connect to server socket");
         goto error;
     }
+	
+	// Check name in server
+	ClientCheck(name, name_res, (int)options, (int*)status, &result);
+    if (result < 0) {
+        jack_error("Client name = %s conflits with another running client", name);
+		goto error;
+    }
 
-    if (fNotificationListenSocket.Bind(jack_client_dir, name, 0) < 0) {
+    if (fNotificationListenSocket.Bind(jack_client_dir, name_res, 0) < 0) {
         jack_error("Cannot bind socket");
         goto error;
     }
@@ -113,9 +121,13 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
     }
 }
 
-void JackSocketClientChannel::ClientCheck(const char* name,  char* name_res, int options, int* status, int* result)
+void JackSocketClientChannel::ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
 {
-
+	JackClientCheckRequest req(name, options);
+    JackClientCheckResult res;
+    ServerSyncCall(&req, &res, result);
+	*status = res.fStatus;
+	strcpy(name_res, res.fName);
 }
 
 void JackSocketClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)

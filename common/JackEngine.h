@@ -62,6 +62,7 @@ class JackEngine
 		void ProcessNext(jack_time_t callback_usecs);
 		void ProcessCurrent(jack_time_t callback_usecs);
 		bool ClientCheckName(const char* name);
+		bool GenerateUniqueName(char* name);
 		int Allocate();
 
     public:
@@ -74,6 +75,7 @@ class JackEngine
 		
 
         // Client management
+		int ClientCheck(const char* name, char* name_res, int options, int* status);
         int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client);
 

@@ -574,6 +574,7 @@ int main (int argc, char *argv[])
     if (status & JackServerStarted) {
         fprintf(stderr, "JACK server started\n");
     }
+	
     /**
      * try to register another one with the same name...
      *
@@ -584,6 +585,19 @@ int main (int argc, char *argv[])
         Log ("valid : a second client with the same name cannot be registered\n");
     } else {
         printf("!!! ERROR !!! Jackd server has accepted multiples client with the same name !");
+        jack_client_close(client2);
+    }
+	
+	/**
+     * try to register another one with the same name using jack_client_open ==> since JackUseExactName is not used, an new client should be opened...
+     *
+     */
+    Log("trying to register a new jackd client with name %s using jack_client_open()...\n", client_name1);
+    client2 = jack_client_open(client_name1, jack_options, &status, server_name);
+    if (client2 != NULL) {
+        Log ("valid : a second client with the same name can be registered (client automatic renaming)\n");
+    } else {
+        printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!");
         jack_client_close(client2);
     }
 

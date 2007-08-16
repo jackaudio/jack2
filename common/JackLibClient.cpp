@@ -65,9 +65,10 @@ int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t*
 {
     int shared_engine, shared_client, shared_graph, result;
     JackLog("JackLibClient::Open %s\n", name);
-
+	
     // Open server/client channel
-    if (fChannel->Open(name, this, options, status) < 0) {
+	char name_res[JACK_CLIENT_NAME_SIZE]; 
+    if (fChannel->Open(name, name_res, this, options, status) < 0) {
         jack_error("Cannot connect to the server");
         goto error;
     }
@@ -79,9 +80,9 @@ int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t*
     }
 
     // Require new client
-    fChannel->ClientOpen(name, &shared_engine, &shared_client, &shared_graph, &result);
+    fChannel->ClientOpen(name_res, &shared_engine, &shared_client, &shared_graph, &result);
     if (result < 0) {
-        jack_error("Cannot open %s client", name);
+        jack_error("Cannot open %s client", name_res);
         goto error;
     }
 

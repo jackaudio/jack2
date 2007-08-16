@@ -352,6 +352,62 @@ void JackEngine::NotifyActivate(int refnum)
 // Client management
 //-------------------
 
+int JackEngine::ClientCheck(const char* name, char* name_res, int options, int* status)
+{
+	strcpy(name_res, name);
+	
+	if (ClientCheckName(name)) {
+
+		*status |= JackNameNotUnique;
+
+		if (options & JackUseExactName) {
+			jack_error("cannot create new client; %s already exists", name);
+			*status |= JackFailure;
+			return -1;
+		}
+		
+		if (GenerateUniqueName(name_res)) {
+			*status |= JackFailure;
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+bool JackEngine::GenerateUniqueName(char* name)
+{
+	int tens, ones;
+	int length = strlen(name);
+
+	if (length > JACK_CLIENT_NAME_SIZE - 4) {
+		jack_error("%s exists and is too long to make unique", name);
+		return true;		/* failure */
+	}
+
+	/*  generate a unique name by appending "-01".."-99" */
+	name[length++] = '-';
+	tens = length++;
+	ones = length++;
+	name[tens] = '0';
+	name[ones] = '1';
+	name[length] = '\0';
+	
+	while (ClientCheckName(name)) {
+		if (name[ones] == '9') {
+			if (name[tens] == '9') {
+				jack_error("client %s has 99 extra instances already", name);
+				return true; /* give up */
+			}
+			name[tens]++;
+			name[ones] = '0';
+		} else {
+			name[ones]++;
+		}
+	}
+	return false;
+}
+
 bool JackEngine::ClientCheckName(const char* name)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
@@ -367,11 +423,6 @@ bool JackEngine::ClientCheckName(const char* name)
 int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
     JackLog("JackEngine::ClientOpen: name = %s \n", name);
-	
-	if (ClientCheckName(name)) {
-        jack_error("client %s already registered", name);
-        return -1;
-    }
 	
 	int refnum = Allocate();
     if (refnum < 0) {
@@ -421,11 +472,6 @@ error:
 int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
 {
     JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
-	
-	if (ClientCheckName(name)) {
-        jack_error("client %s already registered", name);
-        return -1;
-    }
 	
 	int refnum = Allocate();
 	if (refnum < 0) {

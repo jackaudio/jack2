@@ -99,7 +99,6 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
         JackLibGlobals::Destroy(); // jack library destruction
         return NULL;
     } else {
-        *status = (jack_status_t)0;	 // TO REMOVE
         return (jack_client_t*)client;
     }
 }

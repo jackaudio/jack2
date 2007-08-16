@@ -78,7 +78,12 @@ JackServer* JackMachServerChannel::GetServer()
     return fServer;
 }
 
-void JackMachServerChannel::AddClient(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackMachServerChannel::ClientCheck(char* name, char* name_res, int options, int* status, int* result)
+{
+	*result = GetEngine()->ClientCheck(name, name_res, options, status);
+}
+
+void JackMachServerChannel::ClientOpen(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     int refnum = -1;
 	*result = GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
@@ -98,7 +103,7 @@ void JackMachServerChannel::AddClient(char* name, mach_port_t* private_port, int
     }
 }
 
-void JackMachServerChannel::RemoveClient(mach_port_t private_port, int refnum)
+void JackMachServerChannel::ClientClose(mach_port_t private_port, int refnum)
 {
 	GetEngine()->ClientExternalClose(refnum);
     fClientTable.erase(private_port);
@@ -110,9 +115,9 @@ void JackMachServerChannel::RemoveClient(mach_port_t private_port, int refnum)
     }
 }
 
-void JackMachServerChannel::KillClient(mach_port_t private_port)
+void JackMachServerChannel::ClientKill(mach_port_t private_port)
 {
-    JackLog("JackMachServerChannel::KillClient\n");
+    JackLog("JackMachServerChannel::ClientKill\n");
     int refnum = fClientTable[private_port];
     assert(refnum > 0);
     fServer->Notify(refnum, kDeadClient, 0);
@@ -131,7 +136,7 @@ boolean_t JackMachServerChannel::MessageHandler(mach_msg_header_t* Request, mach
         JackLog("MACH_NOTIFY_NO_SENDERS %ld\n", Request->msgh_local_port);
         JackMachServerChannel* channel = JackMachServerChannel::fPortTable[Request->msgh_local_port];
         assert(channel);
-        channel->KillClient(Request->msgh_local_port);
+        channel->ClientKill(Request->msgh_local_port);
     } else {
         JackRPCEngine_server(Request, Reply);
     }

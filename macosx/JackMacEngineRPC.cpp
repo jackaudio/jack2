@@ -34,8 +34,9 @@ using namespace Jack;
 rpc_type server_rpc_jack_client_check(mach_port_t private_port, client_name_t name, client_name_t name_res, int options, int* status, int* result)
 {
     JackLog("rpc_jack_client_check\n");
-    // TODO
-    *result = 0;
+    JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
+    assert(channel);
+    channel->ClientCheck((char*)name, (char*)name_res, options, status, result);
     return KERN_SUCCESS;
 }
 
@@ -44,7 +45,7 @@ rpc_type server_rpc_jack_client_open(mach_port_t server_port, client_name_t name
     JackLog("rpc_jack_client_new %s\n", name);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[server_port];
     assert(channel);
-    channel->AddClient((char*)name, private_port, shared_engine, shared_client, shared_graph, result);
+    channel->ClientOpen((char*)name, private_port, shared_engine, shared_client, shared_graph, result);
     return KERN_SUCCESS;
 }
 
@@ -53,7 +54,7 @@ rpc_type server_rpc_jack_client_close(mach_port_t private_port, int refnum, int*
     JackLog("rpc_jack_client_close\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    channel->RemoveClient(private_port, refnum);
+    channel->ClientClose(private_port, refnum);
     *result = 0;
     return KERN_SUCCESS;
 }

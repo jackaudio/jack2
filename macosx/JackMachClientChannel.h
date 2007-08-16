@@ -48,13 +48,13 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
         JackMachClientChannel();
         virtual ~JackMachClientChannel();
 
-        int Open(const char* name, JackClient* client, jack_options_t options, jack_status_t* status);
+        int Open(const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status);
         void Close();
 
         int Start();
         void Stop();
 
-        void ClientCheck(const char* name,  char* name_res, int options, int* status, int* result);
+        void ClientCheck(const char* name, char* name_res, int options, int* status, int* result);
 		void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 

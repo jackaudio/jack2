@@ -41,7 +41,7 @@ JackMachClientChannel::~JackMachClientChannel()
 
 // Server <===> client
 
-int JackMachClientChannel::Open(const char* name, JackClient* client, jack_options_t options, jack_status_t* status)
+int JackMachClientChannel::Open(const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     JackLog("JackMachClientChannel::Open name = %s\n", name);
 
@@ -53,16 +53,15 @@ int JackMachClientChannel::Open(const char* name, JackClient* client, jack_optio
 	
 	// Check name in server
 	int result = 0;
-	char name_res[JACK_CLIENT_NAME_SIZE]; 
 	ClientCheck(name, name_res, (int)options, (int*)status, &result);
     if (result < 0) {
-        jack_error("Cannot check clientname");
+        jack_error("Client name = %s conflits with another running client", name);
 		return -1;
     }
 
     // Prepare local port using client name
     char buf[JACK_CLIENT_NAME_SIZE];
-    snprintf(buf, sizeof(buf) - 1, "%s:%s", jack_client_entry, name);
+    snprintf(buf, sizeof(buf) - 1, "%s:%s", jack_client_entry, name_res);
 
     if (!fClientPort.AllocatePort(buf, 16)) {
         jack_error("Cannot allocate client Mach port");
@@ -106,7 +105,7 @@ void JackMachClientChannel::Stop()
 
 void JackMachClientChannel::ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
 {
-	kern_return_t res = rpc_jack_client_check(fPrivatePort, (char*)name, name_res, options, status, result);
+	kern_return_t res = rpc_jack_client_check(fServerPort.GetPort(), (char*)name, name_res, options, status, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientCheck err = %s", mach_error_string(res));

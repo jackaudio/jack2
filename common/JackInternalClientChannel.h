@@ -43,7 +43,17 @@ class JackInternalClientChannel : public JackClientChannelInterface
         {}
         virtual ~JackInternalClientChannel()
         {}
+		
+		// Open the Server/Client connection
+        virtual int Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+        {
+            return 0;
+        }
 
+		void ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
+		{
+            *result = fEngine->ClientCheck(name, name_res, options, status);
+        }
         void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {
             *result = fEngine->ClientInternalOpen(name, ref, shared_engine, shared_manager, client);

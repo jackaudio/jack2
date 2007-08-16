@@ -89,9 +89,9 @@ void JackSocketServerChannel::CreateClient()
     }
 }
 
-void JackSocketServerChannel::AddClient(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketServerChannel::ClientAdd(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackLog("JackSocketServerChannel::AddClient\n");
+    JackLog("JackSocketServerChannel::ClientAdd\n");
     int refnum = -1;
 	*result = fServer->GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
@@ -102,26 +102,26 @@ void JackSocketServerChannel::AddClient(int fd, char* name, int* shared_engine, 
     }
 }
 
-void JackSocketServerChannel::RemoveClient(int fd, int refnum)
+void JackSocketServerChannel::ClientRemove(int fd, int refnum)
 {
     pair<int, JackClientSocket*> elem = fSocketTable[fd];
     JackClientSocket* socket = elem.second;
     assert(socket);
-    JackLog("JackSocketServerChannel::RemoveClient ref = %d\n", refnum);
+    JackLog("JackSocketServerChannel::ClientRemove ref = %d\n", refnum);
     fSocketTable.erase(fd);
     socket->Close();
     delete socket;
     fRebuild = true;
 }
 
-void JackSocketServerChannel::KillClient(int fd)
+void JackSocketServerChannel::ClientKill(int fd)
 {
     pair<int, JackClientSocket*> elem = fSocketTable[fd];
     JackClientSocket* socket = elem.second;
     int refnum = elem.first;
 
     assert(socket);
-    JackLog("JackSocketServerChannel::KillClient ref = %d\n", refnum);
+    JackLog("JackSocketServerChannel::ClientKill ref = %d\n", refnum);
 
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
         jack_error("Client not opened");
@@ -150,13 +150,23 @@ int JackSocketServerChannel::HandleRequest(int fd)
 
     // Read data
     switch (header.fType) {
+	
+		case JackRequest::kClientCheck: {
+                JackLog("JackRequest::kClientCheck\n");
+                JackClientCheckRequest req;
+                JackClientCheckResult res;
+                if (req.Read(socket) == 0)
+					 res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fOptions, &res.fStatus);
+                res.Write(socket);
+                break;
+            }
 
         case JackRequest::kClientOpen: {
                 JackLog("JackRequest::ClientOpen\n");
                 JackClientOpenRequest req;
                 JackClientOpenResult res;
                 if (req.Read(socket) == 0)
-					AddClient(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+					ClientAdd(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(socket);
                 break;
             }
@@ -168,7 +178,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
                 res.Write(socket);
-                RemoveClient(fd, req.fRefNum);
+                ClientRemove(fd, req.fRefNum);
                 break;
             }
 
@@ -347,11 +357,11 @@ bool JackSocketServerChannel::Execute()
             JackLog("fPollTable i = %ld fd = %ld\n", i, fd);
             if (fPollTable[i].revents & ~POLLIN) {
                 jack_error("Poll client error err = %s", strerror(errno));
-                KillClient(fd);
+                ClientKill(fd);
             } else if (fPollTable[i].revents & POLLIN) {
                 if (HandleRequest(fd) < 0) {
                     jack_error("Could not handle external client request");
-                    //RemoveClient(fd); TO CHECK
+                    //ClientRemove(fd); TO CHECK
                 }
             }
         }
