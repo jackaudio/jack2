@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-08-16 Stephane Letz  <letz@grame.fr>
+
+	* Automatic client renaming.
+
 2007-07-27 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackEngine::ClientCloseAux (when called from JackEngine::ClientExternalOpen). Correct JackWinEvent::Allocate.
