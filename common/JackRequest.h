@@ -158,7 +158,7 @@ struct JackClientCheckResult : public JackResult
 	char fName[JACK_CLIENT_NAME_SIZE + 1];
 	int fStatus;
 
-    JackClientCheckResult():fStatus(0)
+    JackClientCheckResult():JackResult(),fStatus(0)
     {}
     JackClientCheckResult(int32_t result, const char* name, int status)
          : JackResult(result), fStatus(status)
@@ -225,7 +225,7 @@ struct JackClientOpenResult : public JackResult
     uint32_t fProtocolVersion;
 
     JackClientOpenResult()
-		:fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
+		:JackResult(),fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
     {}
     JackClientOpenResult(int32_t result, int index1, int index2, int index3)
          : JackResult(result), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
@@ -385,7 +385,7 @@ struct JackPortRegisterResult : public JackResult
 
     jack_port_id_t fPortIndex;
 
-    JackPortRegisterResult(): fPortIndex(NO_PORT)
+    JackPortRegisterResult():JackResult(),fPortIndex(NO_PORT)
     {}
 
     int Read(JackChannelTransaction* trans)
