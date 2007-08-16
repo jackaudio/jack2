@@ -66,7 +66,7 @@ extern "C"
 
 using namespace Jack;
 
-EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, jack_options_t options, jack_status_t* status)
+EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name)
 {
     JackLog("jack_internal_client_new %s", client_name);
     if (client_name == NULL) {
@@ -79,7 +79,8 @@ EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, jack_
     JackClient* client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); // To improve...
 #endif
 
-    int res = client->Open(client_name, options, status);
+    jack_options_t options = JackUseExactName;
+    int res = client->Open(client_name, options, NULL);
     if (res < 0) {
         delete client;
         return NULL;
