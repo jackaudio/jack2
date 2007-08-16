@@ -44,6 +44,13 @@ int JackWinNamedPipeClientChannel::Open(const char* name, JackClient* obj, jack_
         jack_error("Cannot bind pipe");
         goto error;
     }
+	
+	// Check name in server
+	ClientCheck(name, name_res, (int)options, (int*)status, &result);
+    if (result < 0) {
+        jack_error("Client name = %s conflits with another running client", name);
+		goto error;
+    }
 
     if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
         jack_error("Cannot connect to server pipe");
@@ -114,7 +121,11 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
 
 void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
 {
-
+	JackClientCheckRequest req(name, options);
+    JackClientCheckResult res;
+    ServerSyncCall(&req, &res, result);
+	*status = res.fStatus;
+	strcpy(name_res, res.fName);
 }
 
 void JackWinNamedPipeClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)

@@ -39,9 +39,9 @@ class JackClientPipeThread : public JackRunnableInterface
         JackThread*	fThread;
         int fRefNum;
 
-        void AddClient(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        void RemoveClient();
-        void KillClient();
+        void ClientAdd(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientRemove();
+        void ClientKill();
 
         static HANDLE fMutex;
 
@@ -80,7 +80,7 @@ class JackWinNamedPipeServerChannel : public JackServerChannelInterface, public 
 
         std::list<JackClientPipeThread*> fClientList;
 
-        void AddClient(JackWinNamedPipeClient* pipe);
+        void ClientAdd(JackWinNamedPipeClient* pipe);
 
     public:
 

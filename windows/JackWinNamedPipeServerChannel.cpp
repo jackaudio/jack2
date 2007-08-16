@@ -100,19 +100,29 @@ int JackClientPipeThread::HandleRequest()
 
 	if (res < 0) {
 		jack_error("HandleRequest: cannot read header");
-		KillClient();
+		ClientKill();
 		ret = -1;
 	} else {
 
 		// Read data
 		switch (header.fType) {
+		
+		case JackRequest::kClientCheck: {
+			JackLog("JackRequest::kClientCheck\n");
+			JackClientCheckRequest req;
+			JackClientCheckResult res;
+			if (req.Read(socket) == 0)
+				res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fOptions, &res.fStatus);
+			res.Write(socket);
+			break;
+		}
 			
 		case JackRequest::kClientOpen: {
 			JackLog("JackRequest::ClientOpen\n");
 			JackClientOpenRequest req;
 			JackClientOpenResult res;
 			if (req.Read(fPipe) == 0) 
-				AddClient(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);	
+				ClientAdd(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);	
 			res.Write(fPipe);
 			break;
 		}
@@ -124,7 +134,7 @@ int JackClientPipeThread::HandleRequest()
 			if (req.Read(fPipe) == 0) 
 				res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);		
 			res.Write(fPipe);
-			RemoveClient();
+			ClientRemove();
 			ret = -1;
 			break;
 		}
@@ -268,16 +278,16 @@ int JackClientPipeThread::HandleRequest()
     return ret;
 }
 
-void JackClientPipeThread::AddClient(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackClientPipeThread::ClientAdd(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackLog("JackClientPipeThread::AddClient %s\n", name);
+    JackLog("JackClientPipeThread::ClientAdd %s\n", name);
     fRefNum = -1;
     *result = fServer->GetEngine()->ClientExternalOpen(name, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
-void JackClientPipeThread::RemoveClient()
+void JackClientPipeThread::ClientRemove()
 {
-    JackLog("JackClientPipeThread::RemoveClient ref = %d\n", fRefNum);
+    JackLog("JackClientPipeThread::ClientRemove ref = %d\n", fRefNum);
 	 /* TODO : solve WIN32 thread Kill issue
 		Close();
 	*/
@@ -285,9 +295,9 @@ void JackClientPipeThread::RemoveClient()
 	fPipe->Close();
 }
 
-void JackClientPipeThread::KillClient()
+void JackClientPipeThread::ClientKill()
 {
-    JackLog("JackClientPipeThread::KillClient ref = %d\n", fRefNum);
+    JackLog("JackClientPipeThread::ClientKill ref = %d\n", fRefNum);
 
     if (fRefNum == -1) {		// Correspond to an already removed client.
         JackLog("Kill a closed client\n");
@@ -367,7 +377,7 @@ bool JackWinNamedPipeServerChannel::Init()
         jack_error("JackWinNamedPipeServerChannel::Init : cannot connect pipe");
         return false;
     } else {
-        AddClient(pipe);
+        ClientAdd(pipe);
         return true;
     }
 }
@@ -386,17 +396,17 @@ bool JackWinNamedPipeServerChannel::Execute()
         return false;
     }
 
-    AddClient(pipe);
+    ClientAdd(pipe);
     return true;
 }
 
-void JackWinNamedPipeServerChannel::AddClient(JackWinNamedPipeClient* pipe)
+void JackWinNamedPipeServerChannel::ClientAdd(JackWinNamedPipeClient* pipe)
 {
     // Remove dead (= not running anymore) clients.
     std::list<JackClientPipeThread*>::iterator it = fClientList.begin();
     JackClientPipeThread* client;
 
-	JackLog("AddClient size  %ld\n", fClientList.size());
+	JackLog("ClientAdd size  %ld\n", fClientList.size());
 
     while (it != fClientList.end()) {		
         client = *it;
