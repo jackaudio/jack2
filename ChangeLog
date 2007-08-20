@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-08-21 Stephane Letz  <letz@grame.fr>
+
+	* Add "systemic" latencies management in CoreAudio driver.
+
 2007-08-16 Stephane Letz  <letz@grame.fr>
 
 	* Automatic client renaming.

@@ -823,9 +823,19 @@ int JackCoreAudioDriver::Attach()
             jack_error("Cannot register port for %s", buf);
             return -1;
         }
-
+		
+		size = sizeof(UInt32);
+		UInt32 value1 = 0;
+		UInt32 value2 = 0;
+		err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);	
+		if (err != noErr) 
+			JackLog("AudioDeviceGetProperty kAudioDevicePropertyLatency error \n");
+		err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);	
+		if (err != noErr) 
+			JackLog("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error \n");
+	
         port = fGraphManager->GetPort(port_index);
-        port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
+        port->SetLatency(fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency);
         fCapturePortList[i] = port_index;
     }
 
@@ -849,9 +859,19 @@ int JackCoreAudioDriver::Attach()
             jack_error("Cannot register port for %s", buf);
             return -1;
         }
+		
+		size = sizeof(UInt32);
+		UInt32 value1 = 0;
+		UInt32 value2 = 0;
+		err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);	
+		if (err != noErr) 
+			JackLog("AudioDeviceGetProperty kAudioDevicePropertyLatency error \n");
+		err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);	
+		if (err != noErr) 
+			JackLog("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error \n");
 
         port = fGraphManager->GetPort(port_index);
-        port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
+        port->SetLatency(fEngineControl->fBufferSize + value1 + value2 + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
 
         // Monitor ports
