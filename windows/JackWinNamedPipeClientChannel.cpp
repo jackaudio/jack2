@@ -36,6 +36,19 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
     delete fThread;
 }
 
+int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
+{
+	JackLog("JackWinNamedPipeClientChannel::ServerCheck = %s\n", server_name);
+	
+	// Connect to server
+    if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
+        jack_error("Cannot connect to server pipe");
+        return -1;
+    } else {
+		return 0;
+	}
+}
+
 int JackWinNamedPipeClientChannel::Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
 	int result = 0;

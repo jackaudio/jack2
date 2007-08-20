@@ -27,6 +27,7 @@ This program is free software; you can redistribute it and/or modify
 #include <map>
 #endif
 #include "JackGlobals.h"
+#include "JackGraphManager.h"
 #include "JackTime.h"
 #include <assert.h>
 

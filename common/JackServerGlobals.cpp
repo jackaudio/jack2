@@ -181,7 +181,6 @@ int JackServerGlobals::JackDelete()
 }
 
 // Temporary : to test
-
 JackServerGlobals::JackServerGlobals()
 {
     jack_driver_desc_t* driver_desc;
@@ -323,24 +322,24 @@ JackServerGlobals::JackServerGlobals()
         return ;
     }
 
-    driver_args = (char **) malloc (sizeof (char *) * driver_nargs);
+    driver_args = (char**) malloc(sizeof(char *) * driver_nargs);
     driver_args[0] = driver_name;
 
     for (i = 1; i < driver_nargs; i++) {
         driver_args[i] = argv[optind++];
     }
 
-    if (jack_parse_driver_params (driver_desc, driver_nargs,
+    if (jack_parse_driver_params(driver_desc, driver_nargs,
                                   driver_args, &driver_params)) {
         return ;
     }
 
 #ifndef WIN32
     if (server_name == NULL)
-        server_name = jack_default_server_name ();
+        server_name = jack_default_server_name();
 #endif
 
-    rc = jack_register_server (server_name);
+    rc = jack_register_server(server_name);
 
     /* clean up shared memory and files from any previous
     * instance of this server name */

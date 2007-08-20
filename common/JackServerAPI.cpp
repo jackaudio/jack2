@@ -28,7 +28,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackDebugClient.h"
 #include "JackServerGlobals.h"
 #include "JackError.h"
-#include "varargs.h"
+#include "JackServerLaunch.h"
 
 /*
 TODO: 
@@ -140,6 +140,14 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
     }
 
     JackServerGlobals::Init(); // jack server initialisation
+
+#ifndef WIN32
+	if (try_start_server(&va, options, status)) {
+		jack_error("jack server is not running or cannot be started");
+		JackServerGlobals::Destroy(); // jack library destruction
+		return 0;
+	}
+#endif	
 
 #ifdef __CLIENTDEBUG__
     JackClient* client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode

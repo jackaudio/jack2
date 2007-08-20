@@ -38,6 +38,20 @@ JackSocketClientChannel::~JackSocketClientChannel()
     delete fNotificationSocket;
 }
 
+int JackSocketClientChannel::ServerCheck(const char* server_name)
+{
+	JackLog("JackSocketClientChannel::ServerCheck = %s\n", server_name);
+	
+    // Connect to server
+    if (fRequestSocket.Connect(jack_server_dir, 0) < 0) {
+		jack_error("Cannot connect to server socket");
+		fRequestSocket.Close();
+        return -1;
+    } else {
+		return 0;
+	}
+}
+
 int JackSocketClientChannel::Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
 	int result = 0;

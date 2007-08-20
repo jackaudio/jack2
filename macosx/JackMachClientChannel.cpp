@@ -41,6 +41,19 @@ JackMachClientChannel::~JackMachClientChannel()
 
 // Server <===> client
 
+int JackMachClientChannel::ServerCheck(const char* server_name)
+{
+	JackLog("JackMachClientChannel::ServerCheck = %s\n", server_name);
+	
+    // Connect to server
+    if (!fServerPort.ConnectPort(jack_server_entry)) {
+        jack_error("Cannot connect to server Mach port");
+        return -1;
+    } else {
+		return 0;
+	}
+}
+
 int JackMachClientChannel::Open(const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     JackLog("JackMachClientChannel::Open name = %s\n", name);

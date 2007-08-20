@@ -43,6 +43,9 @@
 
 /* Begin PBXBuildFile section */
 		4B3F49080AD8503300491C6E /* jack_cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* jack_cpu.c */; };
+		4B44FAE60C7598370033A72C /* JackServerLaunch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */; };
+		4B44FAE70C7598370033A72C /* JackServerLaunch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */; };
+		4B44FAE80C7598370033A72C /* JackServerLaunch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */; };
 		4B60CE490AAABA31004956AA /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B60CE4A0AAABA31004956AA /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B699BAA097D421600A18468 /* Jackdmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */; };
@@ -442,6 +445,7 @@
 		4B395C9706AEF53800923527 /* JackCoreAudioDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JackCoreAudioDriver.h; sourceTree = SOURCE_ROOT; };
 		4B3F49070AD8503300491C6E /* jack_cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jack_cpu.c; path = ../tests/jack_cpu.c; sourceTree = SOURCE_ROOT; };
 		4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacEngineRPC.cpp; sourceTree = SOURCE_ROOT; };
+		4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServerLaunch.cpp; path = ../common/JackServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
 		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4B56880F08B5C8620022B32D /* JackFifo.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFifo.cpp; path = ../common/JackFifo.cpp; sourceTree = SOURCE_ROOT; };
 		4B56881008B5C8620022B32D /* JackFifo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFifo.h; path = ../common/JackFifo.h; sourceTree = SOURCE_ROOT; };
@@ -1056,6 +1060,7 @@
 				4B98AE000931D30C0091932A /* JackDebugClient.cpp */,
 				4BF8D1E90834EF7500C94B91 /* JackAPI.cpp */,
 				4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */,
+				4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */,
 				4BD56D75079687EB006D44F9 /* Internal  */,
 				4BD56D73079687AD006D44F9 /* External */,
 				4BA550F905E241D900569492 /* Library */,
@@ -2010,6 +2015,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B699BAA097D421600A18468 /* Jackdmp.cpp in Sources */,
+				4B44FAE60C7598370033A72C /* JackServerLaunch.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2046,6 +2052,7 @@
 				4B699C3F097D421600A18468 /* ringbuffer.c in Sources */,
 				4B699C40097D421600A18468 /* JackDebugClient.cpp in Sources */,
 				4BD4B4E409BACEF300750C0F /* JackTransportEngine.cpp in Sources */,
+				4B44FAE70C7598370033A72C /* JackServerLaunch.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2096,6 +2103,7 @@
 				4BD4B4D909BACD9600750C0F /* JackTransportEngine.cpp in Sources */,
 				4BC216850A444BAD00BDA09F /* JackServerAPI.cpp in Sources */,
 				4BC216890A444BDE00BDA09F /* JackServerGlobals.cpp in Sources */,
+				4B44FAE80C7598370033A72C /* JackServerLaunch.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
