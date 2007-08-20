@@ -4,7 +4,7 @@
 
 2007-08-21 Stephane Letz  <letz@grame.fr>
 
-	* Automatic server launch.
+	* Automatic server launch. Removes uneeded 'volatile' for JackTransportEngine::fWriteCounter.
 
 2007-08-20 Stephane Letz  <letz@grame.fr>
 

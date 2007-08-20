@@ -63,7 +63,7 @@ class JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         int fSyncTimeLeft;
         int fTimeBaseMaster;
         bool fPendingPos;
-        volatile SInt32 fWriteCounter;
+        SInt32 fWriteCounter;
 
         bool CheckOneSynching(JackClientInterface** table);
         bool CheckAllRolling(JackClientInterface** table);
