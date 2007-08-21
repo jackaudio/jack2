@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Jackmp</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Jackdmp 0.62, @03-07 Paul Davis, Grame</string>
+	<string>Jackdmp 0.65, @03-07 Paul Davis, Grame</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.grame.Jackmp</string>
 	<key>CFBundleInfoDictionaryVersion</key>
