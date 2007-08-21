@@ -109,12 +109,12 @@ class JackInternalClientChannel : public JackClientChannelInterface
         }
 
         // A FINIR
-        virtual void ReleaseTimebase(int refnum, int* result)
+        void ReleaseTimebase(int refnum, int* result)
         {
             *result = fEngine->ReleaseTimebase(refnum);
         }
 
-        virtual void SetTimebaseCallback(int refnum, int conditional, int* result)
+        void SetTimebaseCallback(int refnum, int conditional, int* result)
         {
             *result = fEngine->SetTimebaseCallback(refnum, conditional);
         }
