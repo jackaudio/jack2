@@ -2074,7 +2074,7 @@ int JackAlsaDriver::Attach()
     int port_index;
     unsigned long port_flags;
 
-    char buf[JACK_PORT_NAME_SIZE];
+    char buf[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 
     port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
 

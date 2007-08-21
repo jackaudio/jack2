@@ -78,7 +78,7 @@ int JackAudioDriver::Attach()
 {
     JackPort* port;
     jack_port_id_t port_index;
-    char buf[JACK_PORT_NAME_SIZE];
+    char buf[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     unsigned long port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
     int i;
 
@@ -222,6 +222,27 @@ int JackAudioDriver::ProcessSync()
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     }
     return 0;
+}
+
+void JackAudioDriver::RenamePorts()
+{
+	JackPort* port;
+	char buf[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+	int i;
+	
+	for (i = 0; i < fCaptureChannels; i++) {
+		port = fGraphManager->GetPort(fCapturePortList[i]);
+		port->SetAlias(port->GetName());
+		snprintf(buf, sizeof(buf) - 1, "system:capture_%d", i + 1);
+		port->SetFullName(buf);
+    }
+
+    for (i = 0; i < fPlaybackChannels; i++) {
+		port = fGraphManager->GetPort(fPlaybackPortList[i]);
+		port->SetAlias(port->GetName());
+		snprintf(buf, sizeof(buf) - 1, "system:playback_%d", i + 1);
+		port->SetFullName(buf);
+    }
 }
 
 void JackAudioDriver::NotifyXRun(jack_time_t callback_usecs)

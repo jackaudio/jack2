@@ -44,8 +44,11 @@ class JackFreewheelDriver : public JackDriver
         {
             return false;
         }
-
-        int Process();
+		
+		void RenamePorts()
+		{}
+		
+		int Process();
 };
 
 } // end of namespace

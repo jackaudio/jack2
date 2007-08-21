@@ -82,6 +82,11 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         {
             return fDriver->Detach();
         }
+		
+		virtual void RenamePorts()
+		{
+            fDriver->RenamePorts();
+        }
 
         virtual int Read()
         {

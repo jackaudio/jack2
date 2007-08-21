@@ -78,6 +78,7 @@ class JackPort
         const char* GetName() const;
         const char* GetShortName() const;
         int	SetName(const char* name);
+		int SetFullName(const char* new_name);
 		
 		int GetAliases(char* const aliases[2]);
 		int SetAlias(const char* alias);

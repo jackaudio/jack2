@@ -65,9 +65,12 @@ class EXPORT JackDriverInterface
 
         virtual int Attach() = 0;
         virtual int Detach() = 0;
+		
+		virtual void RenamePorts() = 0;
 
         virtual int Read() = 0;
         virtual int Write() = 0;
+		
         virtual int Start() = 0;
         virtual int Stop() = 0;
         virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;

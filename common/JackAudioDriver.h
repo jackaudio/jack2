@@ -55,6 +55,8 @@ class EXPORT JackAudioDriver : public JackDriver
 
         int ProcessAsync();
         int ProcessSync();
+		
+		void RenamePorts();
 
     public:
 

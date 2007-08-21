@@ -800,7 +800,7 @@ int JackCoreAudioDriver::Attach()
     UInt32 size;
     Boolean isWritable;
     char channel_name[64];
-    char buf[JACK_PORT_NAME_SIZE];
+    char buf[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     unsigned long port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
 
     JackLog("JackCoreAudioDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);

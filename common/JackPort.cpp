@@ -52,6 +52,8 @@ void JackPort::Release()
     fLocked = false;
     fLatency = 0;
     fTied = NO_PORT;
+	fAlias1[0] = '\0';
+	fAlias2[0] = '\0';
 }
 
 bool JackPort::IsUsed() const
@@ -181,6 +183,13 @@ int JackPort::SetName(const char* new_name)
     char* colon = strchr(fName, ':');
     int len = sizeof(fName) - ((int) (colon - fName)) - 2;
     snprintf(colon + 1, len, "%s", new_name);
+    return 0;
+}
+
+int JackPort::SetFullName(const char* new_name)
+{
+	assert(strlen(new_name) < JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE);
+	strcpy(fName, new_name);
     return 0;
 }
 
