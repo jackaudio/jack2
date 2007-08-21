@@ -21,6 +21,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackPort.h"
 #include "JackError.h"
 #include <stdio.h>
+#include <assert.h>
 
 namespace Jack
 {
