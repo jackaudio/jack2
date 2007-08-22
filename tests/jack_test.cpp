@@ -211,7 +211,7 @@ void Jack_Error_Callback(const char *msg)
 void jack_shutdown(void *arg)
 {
     printf("Jack_test has been kicked out by jackd !\n");
-    exit (1);
+    exit(1);
 }
 
 void Jack_Port_Register(jack_port_id_t port, int mode, void *arg)

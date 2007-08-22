@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-08-22 Stephane Letz  <letz@grame.fr>
+
+	* Fix a bug in JackLibClient::Open introduced when adding automatic client renaming.
+
 2007-08-21 Stephane Letz  <letz@grame.fr>
 
 	* Fix backend port alias management (renaming in system:xxx).

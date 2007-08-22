@@ -109,13 +109,12 @@ int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t*
 #endif
 */
 	// Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process    
-	if (!fSynchroTable[fClientControl->fRefNum]->Connect(name)) {
-        jack_error("Cannot ConnectSemaphore %s client", name);
+	if (!fSynchroTable[fClientControl->fRefNum]->Connect(name_res)) {
+        jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
 
-    JackLog("JackLibClient::Open name = %s refnum = %ld\n", name, fClientControl->fRefNum);
-	
+    JackLog("JackLibClient::Open name = %s refnum = %ld\n", name_res, fClientControl->fRefNum);	
     return 0;
 
 error:
