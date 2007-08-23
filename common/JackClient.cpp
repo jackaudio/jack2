@@ -372,8 +372,8 @@ end:
     // Hum... not sure about this, the following "close" code is called in the RT thread...
     int result;
     fThread->DropRealTime();
+	GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    Close();  // Not sure...
     return false;
 
 error:

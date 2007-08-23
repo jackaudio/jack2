@@ -114,7 +114,7 @@ int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t*
         goto error;
     }
 
-    JackLog("JackLibClient::Open name = %s refnum = %ld\n", name_res, fClientControl->fRefNum);	
+    JackLog("JackLibClient::Open name = %s refnum = %ld\n", name_res, fClientControl->fRefNum);
     return 0;
 
 error:

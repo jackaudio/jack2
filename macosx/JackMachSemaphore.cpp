@@ -171,6 +171,7 @@ bool JackMachSemaphore::Disconnect()
 {
 	if (fSemaphore > 0) {
 		JackLog("JackMachSemaphore::Disconnect name = %s\n", fName);
+		fSemaphore = 0;
 	}
     // Nothing to do
     return true;

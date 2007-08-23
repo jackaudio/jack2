@@ -73,9 +73,7 @@ class JackMem
         {}
 
         virtual ~JackMem()
-        {
-			UnlockMemoryImp(this, fSize);
-		}
+        {}
 		
 		void LockMemory()
 		{
@@ -118,9 +116,7 @@ class JackShmMem
 		}
 
         virtual ~JackShmMem()
-        {
-			UnlockMemoryImp(this, fInfo.size);
-		}
+        {}
 
         int GetShmIndex()
         {

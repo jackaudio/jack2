@@ -596,9 +596,9 @@ int main (int argc, char *argv[])
     client2 = jack_client_open(client_name1, jack_options, &status, server_name);
     if (client2 != NULL) {
         Log ("valid : a second client with the same name can be registered (client automatic renaming)\n");
+		jack_client_close(client2);
     } else {
         printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!");
-        jack_client_close(client2);
     }
 
     /**
