@@ -4,7 +4,7 @@
 
 2007-08-23 Stephane Letz  <letz@grame.fr>
 
-	* Fix a bug in jack_test. Correct JackShmMem destructor. Correct and case in JackClient::Execute. Correct JackMachSemaphore::Disconnect.
+	* Fix a bug in jack_test. Correct JackShmMem destructor. Correct end case in JackClient::Execute. Correct JackMachSemaphore::Disconnect.
 
 2007-08-22 Stephane Letz  <letz@grame.fr>
 
