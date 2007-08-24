@@ -54,15 +54,20 @@ class JackEngine
 
         int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
         void CheckXRun(jack_time_t callback_usecs);
+		
         int NotifyAddClient(JackClientInterface* new_client, const char* name, int refnum);
         void NotifyRemoveClient(const char* name, int refnum);
+		
         bool IsZombie(JackClientInterface* client, jack_time_t current_time);
         void RemoveZombifiedClients(jack_time_t current_time);
         void GetZombifiedClients(bool clients[CLIENT_NUM], jack_time_t current_time);
+		
 		void ProcessNext(jack_time_t callback_usecs);
 		void ProcessCurrent(jack_time_t callback_usecs);
+		
 		bool ClientCheckName(const char* name);
 		bool GenerateUniqueName(char* name);
+		
 		int AllocateRefnum();
 		void ReleaseRefnum(int ref);
 
