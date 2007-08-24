@@ -21,6 +21,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fstream>
 #include <assert.h>
 
+#ifndef WIN32
+#include <sys/types.h>
+#include <signal.h>
+#endif
+
 #include "JackEngine.h"
 #include "JackExternalClient.h"
 #include "JackEngineControl.h"
