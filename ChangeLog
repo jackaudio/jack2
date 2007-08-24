@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-08-24 Stephane Letz  <letz@grame.fr>
+
+	* Implement server temporary (-T) mode.
+
 2007-08-23 Stephane Letz  <letz@grame.fr>
 
 	* Fix a bug in jack_test. Correct JackShmMem destructor. Correct end case in JackClient::Execute. Correct JackMachSemaphore::Disconnect.

@@ -61,7 +61,7 @@ class EXPORT JackServer
 
     public:
 
-        JackServer(bool sync, long timeout, bool rt, long priority, long loopback, bool verbose);
+        JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose);
         virtual ~JackServer();
 
         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);

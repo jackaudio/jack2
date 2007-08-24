@@ -47,7 +47,7 @@ struct JackServerGlobals
 
     static void Init();
     static void Destroy();
-    static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int time_out_ms, int rt, int priority, int loopback, int verbose);
+    static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose);
     static int JackStop();
     static int JackDelete();
 };

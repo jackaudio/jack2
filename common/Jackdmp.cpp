@@ -101,10 +101,10 @@ static void DoNothingHandler(int sig)
     write(1, buf, strlen(buf));
 }
 
-static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int time_out_ms, int rt, int priority, int loopback, int verbose)
+static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
 {
     JackLog("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
-    fServer = new JackServer(sync, time_out_ms, rt, priority, loopback, verbose);
+    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose);
     int res = fServer->Open(driver_desc, driver_params);
     return (res < 0) ? res : fServer->Start();
 }
@@ -448,7 +448,7 @@ int main(int argc, char* argv[])
     if (!realtime && client_timeout == 0)
         client_timeout = 500; /* 0.5 sec; usable when non realtime. */
 
-    int res = JackStart(driver_desc, driver_params, sync, client_timeout, realtime, realtime_priority, loopback, jack_verbose);
+    int res = JackStart(driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, jack_verbose);
     if (res < 0) {
         jack_error("Cannot start server... exit");
         JackDelete();

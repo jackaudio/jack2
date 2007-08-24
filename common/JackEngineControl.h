@@ -39,6 +39,7 @@ struct JackEngineControl : public JackShmMem
     jack_nframes_t fSampleRate;
     float fCPULoad;
 	bool fSyncMode;
+	bool fTemporary;
     jack_time_t fPeriodUsecs;
     jack_time_t fTimeOutUsecs;
 	bool fRealTime;
@@ -50,8 +51,9 @@ struct JackEngineControl : public JackShmMem
     JackTransportEngine fTransport;
     bool fVerbose;
 	
-	JackEngineControl(bool sync, long timeout, bool rt, long priority, bool verbose)
+	JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose)
 					:fSyncMode(sync), 
+					fTemporary(temporary),
 					fTimeOutUsecs(timeout * 1000), 
 					fRealTime(rt), 
 					fPriority(priority), 

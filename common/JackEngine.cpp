@@ -93,7 +93,7 @@ int JackEngine::Close()
     return 0;
 }
 
-int JackEngine::Allocate()
+int JackEngine::AllocateRefnum()
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         if (!fClientTable[i]) {
@@ -101,8 +101,28 @@ int JackEngine::Allocate()
             return i;
         }
     }
-
     return -1;
+}
+
+void JackEngine::ReleaseRefnum(int ref)
+{
+	fClientTable[ref] = NULL;
+	int i;
+	
+	if (fEngineControl->fTemporary) {
+		for (i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+			if (fClientTable[i]) 
+				break;
+		}
+		if (i == CLIENT_NUM) {
+			// last client and temporay case: quit the server
+			JackLog("JackEngine::ReleaseRefnum server quit\n");
+			fEngineControl->fTemporary = false;
+		#ifndef WIN32
+			kill(getpid(), SIGINT);
+		#endif
+		}
+	}
 }
 
 //------------------
@@ -424,7 +444,7 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
 {
     JackLog("JackEngine::ClientOpen: name = %s \n", name);
 	
-	int refnum = Allocate();
+	int refnum = AllocateRefnum();
     if (refnum < 0) {
         jack_error("No more refnum available");
         return -1;
@@ -473,7 +493,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
 {
     JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
 	
-	int refnum = Allocate();
+	int refnum = AllocateRefnum();
 	if (refnum < 0) {
         jack_error("No more refnum available");
         return -1;
@@ -534,7 +554,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 			(client->GetClientControl()) ? client->GetClientControl()->fName : "No name");
 
     // Remove the client from the table
-    fClientTable[refnum] = NULL;
+  	ReleaseRefnum(refnum);
 
     // Remove ports
     fGraphManager->RemoveAllPorts(refnum);

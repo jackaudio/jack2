@@ -63,7 +63,8 @@ class JackEngine
 		void ProcessCurrent(jack_time_t callback_usecs);
 		bool ClientCheckName(const char* name);
 		bool GenerateUniqueName(char* name);
-		int Allocate();
+		int AllocateRefnum();
+		void ReleaseRefnum(int ref);
 
     public:
 

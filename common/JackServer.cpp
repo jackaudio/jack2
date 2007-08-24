@@ -45,13 +45,13 @@ namespace Jack
 
 JackServer* JackServer::fInstance = NULL;
 
-JackServer::JackServer(bool sync, long timeout, bool rt, long priority, long loopback, bool verbose)
+JackServer::JackServer(bool sync,  bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose)
 {
     JackGlobals::InitServer();
     for (int i = 0; i < CLIENT_NUM; i++)
         fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
-    fEngineControl = new JackEngineControl(sync, timeout, rt, priority, verbose);
+    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose);
     fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
