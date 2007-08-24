@@ -55,12 +55,12 @@ static sigset_t signals;
 #define DEFAULT_TMP_DIR "/tmp"
 char* jack_tmpdir = DEFAULT_TMP_DIR;
 
-static void silent_jack_error_callback (const char *desc)
+static void silent_jack_error_callback(const char *desc)
 {}
 
 static void copyright(FILE* file)
 {
-    fprintf (file, "jackdmp " VERSION "\n"
+    fprintf(file, "jackdmp " VERSION "\n"
              "Copyright 2001-2005 Paul Davis and others.\n"
              "Copyright 2004-2007 Grame.\n"
              "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
@@ -68,10 +68,10 @@ static void copyright(FILE* file)
              "under certain conditions; see the file COPYING for details\n");
 }
 
-static void usage (FILE* file)
+static void usage(FILE* file)
 {
-    copyright (file);
-    fprintf (file, "\n"
+    copyright(file);
+    fprintf(file, "\n"
              "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
              "               [ --name OR -n server-name ]\n"
              // "               [ --no-mlock OR -m ]\n"
@@ -82,6 +82,7 @@ static void usage (FILE* file)
              "               [ --verbose OR -v ]\n"
              "               [ --silent OR -s ]\n"
              "               [ --sync OR -S ]\n"
+			 "               [ --temporaray OR -T ]\n"
              "               [ --version OR -V ]\n"
              "         -d driver [ ... driver args ... ]\n"
              "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
@@ -97,7 +98,7 @@ static void DoNothingHandler(int sig)
        another signal.
     */
     char buf[64];
-    snprintf(buf, sizeof(buf), "received signal %d during shutdown (ignored)\n", sig);
+    snprintf(buf, sizeof(buf), "received signal %d during shutdown(ignored)\n", sig);
     write(1, buf, strlen(buf));
 }
 
@@ -150,8 +151,8 @@ static char* jack_user_dir(void)
 
     /* format the path name on the first call */
     if (user_dir[0] == '\0') {
-        snprintf (user_dir, sizeof (user_dir), "%s/jack-%d",
-                  jack_tmpdir, getuid ());
+        snprintf(user_dir, sizeof(user_dir), "%s/jack-%d",
+                  jack_tmpdir, getuid());
     }
 
     return user_dir;
@@ -165,19 +166,19 @@ static char* get_jack_server_dir(const char* toto)
 
     // format the path name on the first call
     if (server_dir[0] == '\0') {
-        snprintf (server_dir, sizeof (server_dir), "%s/%s",
-                  jack_user_dir (), server_name);
+        snprintf(server_dir, sizeof(server_dir), "%s/%s",
+                  jack_user_dir(), server_name);
     }
 
     return server_dir;
 }
 
 static void
-jack_cleanup_files (const char *server_name)
+jack_cleanup_files(const char *server_name)
 {
     DIR *dir;
     struct dirent *dirent;
-    char *dir_name = get_jack_server_dir (server_name);
+    char *dir_name = get_jack_server_dir(server_name);
 
     /* On termination, we remove all files that jackd creates so
      * subsequent attempts to start jackd will not believe that an
@@ -196,42 +197,42 @@ jack_cleanup_files (const char *server_name)
      */
 
     /* nothing to do if the server directory does not exist */
-    if ((dir = opendir (dir_name)) == NULL) {
+    if ((dir = opendir(dir_name)) == NULL) {
         return ;
     }
 
     /* unlink all the files in this directory, they are mine */
-    while ((dirent = readdir (dir)) != NULL) {
+    while ((dirent = readdir(dir)) != NULL) {
 
         char fullpath[PATH_MAX];
 
-        if ((strcmp (dirent->d_name, ".") == 0)
-                || (strcmp (dirent->d_name, "..") == 0)) {
+        if ((strcmp(dirent->d_name, ".") == 0)
+                || (strcmp(dirent->d_name, "..") == 0)) {
             continue;
         }
 
-        snprintf (fullpath, sizeof (fullpath), "%s/%s",
+        snprintf(fullpath, sizeof(fullpath), "%s/%s",
                   dir_name, dirent->d_name);
 
-        if (unlink (fullpath)) {
-            jack_error ("cannot unlink `%s' (%s)", fullpath,
-                        strerror (errno));
+        if (unlink(fullpath)) {
+            jack_error("cannot unlink `%s' (%s)", fullpath,
+                        strerror(errno));
         }
     }
 
-    closedir (dir);
+    closedir(dir);
 
     /* now, delete the per-server subdirectory, itself */
-    if (rmdir (dir_name)) {
-        jack_error ("cannot remove `%s' (%s)", dir_name,
-                    strerror (errno));
+    if (rmdir(dir_name)) {
+        jack_error("cannot remove `%s' (%s)", dir_name,
+                    strerror(errno));
     }
 
     /* finally, delete the per-user subdirectory, if empty */
-    if (rmdir (jack_user_dir ())) {
+    if (rmdir(jack_user_dir())) {
         if (errno != ENOTEMPTY) {
-            jack_error ("cannot remove `%s' (%s)",
-                        jack_user_dir (), strerror (errno));
+            jack_error("cannot remove `%s' (%s)",
+                        jack_user_dir(), strerror(errno));
         }
     }
 }
@@ -361,20 +362,20 @@ int main(int argc, char* argv[])
     */
 
     if (!seen_driver) {
-        usage (stderr);
-        exit (1);
+        usage(stderr);
+        exit(1);
     }
 
-    drivers = jack_drivers_load (drivers);
+    drivers = jack_drivers_load(drivers);
     if (!drivers) {
-        fprintf (stderr, "jackdmp: no drivers found; exiting\n");
-        exit (1);
+        fprintf(stderr, "jackdmp: no drivers found; exiting\n");
+        exit(1);
     }
 
-    driver_desc = jack_find_driver_descriptor (drivers, driver_name);
+    driver_desc = jack_find_driver_descriptor(drivers, driver_name);
     if (!driver_desc) {
-        fprintf (stderr, "jackdmp: unknown driver '%s'\n", driver_name);
-        exit (1);
+        fprintf(stderr, "jackdmp: unknown driver '%s'\n", driver_name);
+        exit(1);
     }
 
     if (optind < argc) {
@@ -384,42 +385,42 @@ int main(int argc, char* argv[])
     }
 
     if (driver_nargs == 0) {
-        fprintf (stderr, "No driver specified ... hmm. JACK won't do"
+        fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                  " anything when run like this.\n");
         return -1;
     }
 
-    driver_args = (char **) malloc (sizeof (char *) * driver_nargs);
+    driver_args = (char **) malloc(sizeof(char *) * driver_nargs);
     driver_args[0] = driver_name;
 
     for (i = 1; i < driver_nargs; i++) {
         driver_args[i] = argv[optind++];
     }
 
-    if (jack_parse_driver_params (driver_desc, driver_nargs,
+    if (jack_parse_driver_params(driver_desc, driver_nargs,
                                   driver_args, &driver_params)) {
-        exit (0);
+        exit(0);
     }
 
     if (server_name == NULL)
-        server_name = jack_default_server_name ();
+        server_name = jack_default_server_name();
 
-    copyright (stdout);
+    copyright(stdout);
 
-    rc = jack_register_server (server_name);
+    rc = jack_register_server(server_name);
     switch (rc) {
         case EEXIST:
-            fprintf (stderr, "`%s' server already active\n", server_name);
-            exit (1);
+            fprintf(stderr, "`%s' server already active\n", server_name);
+            exit(1);
         case ENOSPC:
-            fprintf (stderr, "too many servers already active\n");
-            exit (2);
+            fprintf(stderr, "too many servers already active\n");
+            exit(2);
         case ENOMEM:
-            fprintf (stderr, "no access to shm registry\n");
-            exit (3);
+            fprintf(stderr, "no access to shm registry\n");
+            exit(3);
         default:
             if (jack_verbose)
-                fprintf (stderr, "server `%s' registered\n",
+                fprintf(stderr, "server `%s' registered\n",
                          server_name);
     }
 
