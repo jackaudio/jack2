@@ -107,9 +107,9 @@ int JackEngine::AllocateRefnum()
 void JackEngine::ReleaseRefnum(int ref)
 {
 	fClientTable[ref] = NULL;
-	int i;
 	
 	if (fEngineControl->fTemporary) {
+		int i;
 		for (i = REAL_REFNUM; i < CLIENT_NUM; i++) {
 			if (fClientTable[i]) 
 				break;
