@@ -65,9 +65,7 @@ class EXPORT JackDriverInterface
 
         virtual int Attach() = 0;
         virtual int Detach() = 0;
-		
-		virtual void RenamePorts() = 0;
-
+	
         virtual int Read() = 0;
         virtual int Write() = 0;
 		

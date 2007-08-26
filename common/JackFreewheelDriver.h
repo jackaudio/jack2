@@ -45,9 +45,6 @@ class JackFreewheelDriver : public JackDriver
             return false;
         }
 		
-		void RenamePorts()
-		{}
-		
 		int Process();
 };
 

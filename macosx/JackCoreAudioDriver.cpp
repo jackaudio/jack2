@@ -835,6 +835,7 @@ int JackCoreAudioDriver::Attach()
 			JackLog("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error \n");
 	
         port = fGraphManager->GetPort(port_index);
+		port->Rename("system:capture_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency);
         fCapturePortList[i] = port_index;
     }
@@ -870,7 +871,8 @@ int JackCoreAudioDriver::Attach()
 		if (err != noErr) 
 			JackLog("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error \n");
 
-        port = fGraphManager->GetPort(port_index);
+	    port = fGraphManager->GetPort(port_index);
+		port->Rename("system:playback_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + value1 + value2 + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
 

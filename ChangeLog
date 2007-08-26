@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-08-26 Stephane Letz  <letz@grame.fr>
+
+	* Make "Rename" a method of JackPort class, call it from driver Attach method.
+
 2007-08-24 Stephane Letz  <letz@grame.fr>
 
 	* Implement server temporary (-T) mode.

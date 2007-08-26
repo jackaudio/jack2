@@ -187,11 +187,10 @@ int JackPort::SetName(const char* new_name)
     return 0;
 }
 
-int JackPort::SetFullName(const char* new_name)
+void JackPort::Rename(const char* name, int index)
 {
-	assert(strlen(new_name) < JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE);
-	strcpy(fName, new_name);
-    return 0;
+	SetAlias(GetName());
+	snprintf(fName, sizeof(fName) - 1, name, index);
 }
 
 bool JackPort::NameEquals(const char* target)

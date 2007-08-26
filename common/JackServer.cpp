@@ -123,8 +123,6 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         return -1;
     }
 	
-	fAudioDriver->RenamePorts();
-
     if (fLoopback > 0 && fLoopbackDriver->Attach() != 0) {
         jack_error("Cannot attach loopback driver");
         return -1;
