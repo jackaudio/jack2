@@ -5,11 +5,11 @@ Copyright (C) 2004-2006 Grame
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+(at your option) any later version.
+
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
@@ -90,8 +90,8 @@ int JackAudioDriver::Attach()
             jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-	    port = fGraphManager->GetPort(port_index);
-		port->Rename("system:capture_%d", i + 1);
+	port = fGraphManager->GetPort(port_index);
+	port->Rename("system:capture_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
         fCapturePortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld = \n", port_index);
@@ -105,12 +105,12 @@ int JackAudioDriver::Attach()
             jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-	    port = fGraphManager->GetPort(port_index);
-		port->Rename("system:playback_%d", i + 1);
+	port = fGraphManager->GetPort(port_index);
+	port->Rename("system:playback_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld = \n", port_index);
-
+	
         // Monitor ports
         if (fWithMonitorPorts) {
             JackLog("Create monitor port \n");

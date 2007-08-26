@@ -124,7 +124,7 @@ struct JackClientCheckRequest : public JackRequest
 {
 
     char fName[JACK_CLIENT_NAME_SIZE + 1];
-	int fOptions;
+    int fOptions;
 
     JackClientCheckRequest()
     {}
@@ -453,7 +453,7 @@ struct JackPortConnectNameRequest : public JackRequest
     {
 		CheckRes(trans->Read(&fRefNum, sizeof(int)));
 		CheckRes(trans->Read(&fSrc, JACK_PORT_NAME_SIZE + 1));
-		CheckRes(trans->Read(&fDst,JACK_PORT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fDst, JACK_PORT_NAME_SIZE + 1));
 		return 0;
 
     }

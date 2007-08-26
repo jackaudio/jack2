@@ -2081,7 +2081,7 @@ int JackAlsaDriver::Attach()
     assert(fCaptureChannels < PORT_NUM);
     assert(fPlaybackChannels < PORT_NUM);
 	
-	alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
+    alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
 
     JackLog("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
@@ -2092,6 +2092,7 @@ int JackAlsaDriver::Attach()
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
+	port->Rename("system:capture_%d", i + 1);
         port->SetLatency(alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency);
         fCapturePortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld \n", port_index);
@@ -2106,22 +2107,23 @@ int JackAlsaDriver::Attach()
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
+	port->Rename("system:playback_%d", i + 1);
         port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) + alsa_driver->playback_frame_latency);
         fPlaybackPortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
 		
-		// Monitor ports
-		if (fWithMonitorPorts) {
-			JackLog("Create monitor port \n");
-			snprintf(buf, sizeof(buf) - 1, "%s:monitor_%lu",fClientControl->fName, i + 1);
-			if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JackPortIsOutput)) == NO_PORT) {
-				jack_error ("ALSA: cannot register monitor port for %s", buf);
-			} else {
-				port = fGraphManager->GetPort(port_index);
-				port->SetLatency(alsa_driver->frames_per_cycle);
-				fMonitorPortList[i] = port_index;
-			}
+	// Monitor ports
+	if (fWithMonitorPorts) {
+		JackLog("Create monitor port \n");
+		snprintf(buf, sizeof(buf) - 1, "%s:monitor_%lu",fClientControl->fName, i + 1);
+		if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JackPortIsOutput)) == NO_PORT) {
+			jack_error ("ALSA: cannot register monitor port for %s", buf);
+		} else {
+			port = fGraphManager->GetPort(port_index);
+			port->SetLatency(alsa_driver->frames_per_cycle);
+			fMonitorPortList[i] = port_index;
 		}
+	}
     }
 
     return 0;
