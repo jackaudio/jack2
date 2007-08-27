@@ -2092,7 +2092,7 @@ int JackAlsaDriver::Attach()
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
-	port->Rename("system:capture_%d", i + 1);
+	    port->Rename("system:capture_%d", i + 1);
         port->SetLatency(alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency);
         fCapturePortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld \n", port_index);
@@ -2107,7 +2107,7 @@ int JackAlsaDriver::Attach()
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
-	port->Rename("system:playback_%d", i + 1);
+	    port->Rename("system:playback_%d", i + 1);
         port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) + alsa_driver->playback_frame_latency);
         fPlaybackPortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
