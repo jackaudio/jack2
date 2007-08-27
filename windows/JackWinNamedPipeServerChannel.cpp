@@ -112,7 +112,7 @@ int JackClientPipeThread::HandleRequest()
 			JackClientCheckRequest req;
 			JackClientCheckResult res;
 			if (req.Read(fPipe) == 0)
-				res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fOptions, &res.fStatus);
+				res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
 			res.Write(fPipe);
 			break;
 		}

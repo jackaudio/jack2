@@ -68,7 +68,7 @@ int JackWinNamedPipeClientChannel::Open(const char* name, char* name_res, JackCl
     }
 
 	// Check name in server
-	ClientCheck(name, name_res, (int)options, (int*)status, &result);
+	ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
         jack_error("Client name = %s conflits with another running client", name);
 		goto error;
