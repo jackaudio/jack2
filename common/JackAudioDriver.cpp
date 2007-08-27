@@ -90,8 +90,8 @@ int JackAudioDriver::Attach()
             jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-	port = fGraphManager->GetPort(port_index);
-	port->Rename("system:capture_%d", i + 1);
+	    port = fGraphManager->GetPort(port_index);
+	    port->Rename("system:capture_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
         fCapturePortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld = \n", port_index);
@@ -105,8 +105,8 @@ int JackAudioDriver::Attach()
             jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
-	port = fGraphManager->GetPort(port_index);
-	port->Rename("system:playback_%d", i + 1);
+	    port = fGraphManager->GetPort(port_index);
+	    port->Rename("system:playback_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld = \n", port_index);
