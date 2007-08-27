@@ -153,10 +153,10 @@ static int start_server(const char* server_name, jack_options_t options)
 	return 0;			/* (probably) successful */
 }
 
-int server_connect(char* name)
+int server_connect(char* server_name)
 {
 	JackClientChannelInterface* channel = JackGlobals::MakeClientChannel();
-	int res = channel->ServerCheck(name);
+	int res = channel->ServerCheck(server_name);
 	delete channel;
 	return res;
 }

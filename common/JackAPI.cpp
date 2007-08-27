@@ -1070,7 +1070,7 @@ EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)
         jack_error("jack_engine_takeover_timebase called with a NULL client");
         return -1;
     } else {
-        jack_error("jack_engine_takeover_timebase : not yet implemented\n");
+        jack_error("jack_engine_takeover_timebase: deprecated\n");
         return 0;
     }
 }
