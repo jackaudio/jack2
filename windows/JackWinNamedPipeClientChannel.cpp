@@ -142,9 +142,9 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
     }
 }
 
-void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
+void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
 {
-	JackClientCheckRequest req(name, options);
+	JackClientCheckRequest req(name, protocol, options);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
 	*status = res.fStatus;

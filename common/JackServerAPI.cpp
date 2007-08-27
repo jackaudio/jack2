@@ -159,6 +159,8 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
+		int my_status1 = (JackFailure|JackServerError);
+        *status = (jack_status_t)my_status1;
         return NULL;
     } else {
         return (jack_client_t*)client;

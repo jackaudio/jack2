@@ -377,9 +377,15 @@ void JackEngine::NotifyActivate(int refnum)
 // Client management
 //-------------------
 
-int JackEngine::ClientCheck(const char* name, char* name_res, int options, int* status)
+int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status)
 {
 	strcpy(name_res, name);
+	
+	if (protocol != JACK_PROTOCOL_VERSION) {
+		*status |= (JackFailure|JackVersionError);
+		jack_error ("JACK protocol mismatch (%d vs %d)", protocol, JACK_PROTOCOL_VERSION);
+		return -1;
+	}
 	
 	if (ClientCheckName(name)) {
 

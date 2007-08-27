@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Wed Aug 15 17:00:32 2007
+ * stub generated Mon Aug 27 17:58:23 2007
  * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
  * OPTIONS: 
  */
@@ -904,6 +904,7 @@ mig_external kern_return_t rpc_jack_client_check
 	mach_port_t server_port,
 	client_name_t client_name,
 	client_name_t client_name_res,
+	int protocol,
 	int options,
 	int *status,
 	int *result
@@ -918,6 +919,7 @@ mig_external kern_return_t rpc_jack_client_check
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
+		int protocol;
 		int options;
 	} Request;
 #ifdef  __MigPackStructs
@@ -981,6 +983,8 @@ mig_external kern_return_t rpc_jack_client_check
 	InP->NDR = NDR_record;
 
 	(void) mig_strncpy(InP->client_name, client_name, 128);
+
+	InP->protocol = protocol;
 
 	InP->options = options;
 

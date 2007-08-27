@@ -71,9 +71,13 @@ int JackInternalClient::Open(const char* name, jack_options_t options, jack_stat
 	char name_res[JACK_CLIENT_NAME_SIZE]; 
     JackLog("JackInternalClient::Open name = %s\n", name);
  	
-	fChannel->ClientCheck(name, name_res, (int)options, (int*)status, &result);
+	fChannel->ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
-        jack_error("Client name = %s conflits with another running client", name);
+		int status1 = *status;
+        if (status1 & JackVersionError)
+			jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
+        else
+			jack_error("Client name = %s conflits with another running client", name);
         goto error;
     }
 	

@@ -59,7 +59,7 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
 		
 		int ServerCheck(const char* server_name);
 
-		void ClientCheck(const char* name, char* name_res, int options, int* status, int* result);
+		void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
         void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 

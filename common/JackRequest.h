@@ -124,11 +124,12 @@ struct JackClientCheckRequest : public JackRequest
 {
 
     char fName[JACK_CLIENT_NAME_SIZE + 1];
+	int fProtocol;
     int fOptions;
 
     JackClientCheckRequest()
     {}
-    JackClientCheckRequest(const char* name, int options): JackRequest(JackRequest::kClientCheck),fOptions(options)
+    JackClientCheckRequest(const char* name,int protocol, int options): JackRequest(JackRequest::kClientCheck),fProtocol(protocol),fOptions(options)
     {
         snprintf(fName, sizeof(fName), "%s", name);
     }
@@ -136,6 +137,7 @@ struct JackClientCheckRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
 		CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fProtocol, sizeof(int)));
 		return trans->Read(&fOptions, sizeof(int));
     }
 
@@ -143,6 +145,7 @@ struct JackClientCheckRequest : public JackRequest
     {
 		CheckRes(JackRequest::Write(trans));
 		CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+		CheckRes(trans->Write(&fProtocol, sizeof(int)));
 		return trans->Write(&fOptions, sizeof(int));
     }
 };

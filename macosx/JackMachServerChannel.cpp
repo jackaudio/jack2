@@ -78,9 +78,9 @@ JackServer* JackMachServerChannel::GetServer()
     return fServer;
 }
 
-void JackMachServerChannel::ClientCheck(char* name, char* name_res, int options, int* status, int* result)
+void JackMachServerChannel::ClientCheck(char* name, char* name_res, int protocol, int options, int* status, int* result)
 {
-	*result = GetEngine()->ClientCheck(name, name_res, options, status);
+	*result = GetEngine()->ClientCheck(name, name_res, protocol, options, status);
 }
 
 void JackMachServerChannel::ClientOpen(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)

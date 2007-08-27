@@ -60,3 +60,5 @@
 #define jack_client_entry "jack_client"
 
 #define ALL_CLIENTS -1 // for notification
+
+#define JACK_PROTOCOL_VERSION 1

@@ -31,12 +31,12 @@ using namespace Jack;
 
 #define rpc_type kern_return_t // for astyle
 
-rpc_type server_rpc_jack_client_check(mach_port_t private_port, client_name_t name, client_name_t name_res, int options, int* status, int* result)
+rpc_type server_rpc_jack_client_check(mach_port_t private_port, client_name_t name, client_name_t name_res, int protocol, int options, int* status, int* result)
 {
     JackLog("rpc_jack_client_check\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    channel->ClientCheck((char*)name, (char*)name_res, options, status, result);
+    channel->ClientCheck((char*)name, (char*)name_res, protocol, options, status, result);
     return KERN_SUCCESS;
 }
 

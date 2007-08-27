@@ -104,6 +104,8 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
     if (res < 0) {
         delete client;
         JackLibGlobals::Destroy(); // jack library destruction
+		int my_status1 = (JackFailure|JackServerError);
+        *status = (jack_status_t)my_status1;
         return NULL;
     } else {
         return (jack_client_t*)client;

@@ -71,6 +71,7 @@ kern_return_t rpc_jack_client_check
 	mach_port_t server_port,
 	client_name_t client_name,
 	client_name_t client_name_res,
+	int protocol,
 	int options,
 	int *status,
 	int *result
@@ -311,6 +312,7 @@ __END_DECLS
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
+		int protocol;
 		int options;
 	} __Request__rpc_jack_client_check_t;
 #ifdef  __MigPackStructs

@@ -66,9 +66,13 @@ int JackMachClientChannel::Open(const char* name, char* name_res, JackClient* cl
 	
 	// Check name in server
 	int result = 0;
-	ClientCheck(name, name_res, (int)options, (int*)status, &result);
+	ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
-        jack_error("Client name = %s conflits with another running client", name);
+		int status1 = *status;
+        if (status1 & JackVersionError)
+			jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
+        else
+			jack_error("Client name = %s conflits with another running client", name);
 		return -1;
     }
 
@@ -116,9 +120,9 @@ void JackMachClientChannel::Stop()
     fThread->Kill();
 }
 
-void JackMachClientChannel::ClientCheck(const char* name, char* name_res, int options, int* status, int* result)
+void JackMachClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
 {
-	kern_return_t res = rpc_jack_client_check(fServerPort.GetPort(), (char*)name, name_res, options, status, result);
+	kern_return_t res = rpc_jack_client_check(fServerPort.GetPort(), (char*)name, name_res, protocol, options, status, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientCheck err = %s", mach_error_string(res));

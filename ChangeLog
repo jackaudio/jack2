@@ -2,6 +2,10 @@
   Jackdmp changes log
 ---------------------------
 
+2007-08-27 Stephane Letz  <letz@grame.fr>
+
+	* Server/library protocol checking implementation.
+
 2007-08-26 Stephane Letz  <letz@grame.fr>
 
 	* Make "Rename" a method of JackPort class, call it from driver Attach method.
