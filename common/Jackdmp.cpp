@@ -82,7 +82,7 @@ static void usage(FILE* file)
              "               [ --verbose OR -v ]\n"
              "               [ --silent OR -s ]\n"
              "               [ --sync OR -S ]\n"
-			 "               [ --temporaray OR -T ]\n"
+			 "               [ --temporary OR -T ]\n"
              "               [ --version OR -V ]\n"
              "         -d driver [ ... driver args ... ]\n"
              "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
