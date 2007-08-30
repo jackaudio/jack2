@@ -73,7 +73,7 @@ static void usage(FILE* file)
     copyright(file);
     fprintf(file, "\n"
              "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
-             "               [ --name OR -n server-name ]\n"
+             // "               [ --name OR -n server-name ]\n"
              // "               [ --no-mlock OR -m ]\n"
              // "               [ --unlock OR -u ]\n"
              "               [ --timeout OR -t client-timeout-in-msecs ]\n"
