@@ -51,9 +51,13 @@
 #elif __APPLE__
 	#define jack_server_dir "/tmp"
 	#define jack_client_dir "/tmp"
+	#define JACK_LOCATION  "/usr/local/bin"
+	#define JACK_DEFAULT_DRIVER "coreaudio"
 #else
 	#define jack_server_dir "/dev/shm"
 	#define jack_client_dir "/dev/shm"
+	#define JACK_LOCATION  "/usr/local/bin"
+	#define JACK_DEFAULT_DRIVER "alsa"
 #endif
 
 #define jack_server_entry "jackdmp_entry"

@@ -26,16 +26,6 @@ using namespace Jack;
 
 #ifndef WIN32
 
-#ifdef __APPLE__
-#define JACK_LOCATION  "/usr/local/bin"
-#define JACK_DEFAULT_DRIVER "coreaudio"
-#endif
-
-#ifdef __linux__
-#define JACK_LOCATION  "/usr/local/bin"
-#define JACK_DEFAULT_DRIVER "alsa"
-#endif
-
 /* Exec the JACK server in this process.  Does not return. */
 static void start_server_aux(const char* server_name)
 {
