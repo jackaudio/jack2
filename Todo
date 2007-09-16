@@ -2,6 +2,8 @@
   Jackdmp Todo list
 ---------------------
 
+2007-03-14 Check JackGraphManager::GetPortsAux after MIDI branch merge.
+
 2007-03-14 Add Paul dynamic jack server location code.
 
 2007-01-22 Check the "dead" client removing code in the server: non running client may cause Desactivation and Close time out problems.
