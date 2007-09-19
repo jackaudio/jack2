@@ -53,6 +53,7 @@ void JackPort::Release()
     fLocked = false;
     fLatency = 0;
     fTied = NO_PORT;
+	strcpy(fName, "untitled");
 	fAlias1[0] = '\0';
 	fAlias2[0] = '\0';
 }
