@@ -19,7 +19,7 @@
 
 #define PRINTDEBUG
 
-#define VERSION "0.66"
+#define VERSION "0.67"
 
 #define FORK_SERVER 1
 
