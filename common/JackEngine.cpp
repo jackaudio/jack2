@@ -379,6 +379,8 @@ void JackEngine::NotifyActivate(int refnum)
 
 int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status)
 {
+	// Clear status
+	*status = 0;
 	strcpy(name_res, name);
 	
 	if (protocol != JACK_PROTOCOL_VERSION) {

@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-02 Stephane Letz  <letz@grame.fr>
+
+	* Correct jack_client_open "status" management.
+
 2007-08-27 Stephane Letz  <letz@grame.fr>
 
 	* Server/library protocol checking implementation.
