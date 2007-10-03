@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-03 Stephane Letz  <letz@grame.fr>
+
+	* Rename server_name from "default" to "jackdmp_default" to avoid conflict with regular jackd server.
+
 2007-10-02 Stephane Letz  <letz@grame.fr>
 
 	* Correct jack_client_open "status" management.

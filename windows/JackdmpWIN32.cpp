@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 using namespace Jack;
 
 static JackServer* fServer;
-static char *server_name = "default";
+static char *server_name = "jackdmp_default";
 static int realtime_priority = 10;
 static int do_mlock = 1;
 static unsigned int port_max = 128;
