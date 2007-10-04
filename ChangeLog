@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-04 Stephane Letz  <letz@grame.fr>
+
+	* Fix a resource leak issue in JackCoreAudioDriver::Close(). Better implement "jack_client_open" when linking a client with the server library.
+
 2007-10-03 Stephane Letz  <letz@grame.fr>
 
 	* Rename server_name from "default" to "jackdmp_default" to avoid conflict with regular jackd server.

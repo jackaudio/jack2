@@ -70,7 +70,7 @@ int JackDriver::Open()
 {
     int refnum = -1;
 
-	if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this) != 0) {
+	if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for audio driver");
         return -1;
     }
@@ -107,7 +107,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     JackLog("JackDriver::Open playback_driver_name = %s\n", playback_driver_name);
     int refnum = -1;
 
-    if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this) != 0) {
+    if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for audio driver");
         return -1;
     }

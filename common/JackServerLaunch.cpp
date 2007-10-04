@@ -63,6 +63,7 @@ static void start_server_aux(const char* server_name)
 		if (strlen(arguments) > 0) {
 			good = 1;
 		}
+		fclose(fp);
 	}
 
 	if (!good) {
@@ -70,7 +71,7 @@ static void start_server_aux(const char* server_name)
 		strncpy(arguments, JACK_LOCATION "/jackdmp -T -d "JACK_DEFAULT_DRIVER, 255);
 	} else {
 		result = strcspn(arguments, " ");
-		command = (char*)malloc(result+1);
+		command = (char*)malloc(result + 1);
 		strncpy(command, arguments, result);
 		command[result] = '\0';
 	}
@@ -86,7 +87,7 @@ static void start_server_aux(const char* server_name)
 				size_t optlen = strlen("-n");
 				char* buf = (char*)malloc(optlen + strlen(server_name) + 1);
 				strcpy(buf, "-n");
-				strcpy(buf+optlen, server_name);
+				strcpy(buf + optlen, server_name);
 				argv[i++] = buf;
 			}
 		}

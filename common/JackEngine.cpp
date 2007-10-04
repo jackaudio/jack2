@@ -502,7 +502,7 @@ error:
 }
 
 // Used for server driver clients
-int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client)
+int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)
 {
     JackLog("JackEngine::ClientInternalNew: name = %s\n", name);
 	
@@ -514,6 +514,12 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
 
     if (!fSynchroTable[refnum]->Allocate(name, 0)) {
         jack_error("Cannot allocate synchro");
+		return -1;
+    }
+	
+	if (wait && !fSignal->TimedWait(5 * 1000000)) {
+        // Failure if RT thread is not running (problem with the driver...)
+        jack_error("Driver is not running");
 		return -1;
     }
 

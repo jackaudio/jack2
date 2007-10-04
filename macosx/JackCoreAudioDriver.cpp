@@ -781,11 +781,13 @@ error:
 
 int JackCoreAudioDriver::Close()
 {
+	JackLog("JackCoreAudioDriver::Close\n");
     JackAudioDriver::Close();
     // Possibly (if MeasureCallback has not been called)
     AudioDeviceStop(fDeviceID, MeasureCallback);
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
+	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
     free(fJackInputData);
     AudioUnitUninitialize(fAUHAL);
     CloseComponent(fAUHAL);

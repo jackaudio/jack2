@@ -249,8 +249,7 @@ int main(int argc, char* argv[])
     jack_driver_desc_t* driver_desc;
     const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:";
     struct option long_options[] = {
-                                       { "driver", 1, 0, 'd'
-                                       },
+                                       { "driver", 1, 0, 'd' },
                                        { "verbose", 0, 0, 'v' },
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },

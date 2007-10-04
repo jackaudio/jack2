@@ -139,16 +139,12 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
         return NULL;
     }
 
-    JackServerGlobals::Init(); // jack server initialisation
-
-#ifndef WIN32
-	if (try_start_server(&va, options, status)) {
-		jack_error("jack server is not running or cannot be started");
-		JackServerGlobals::Destroy(); // jack library destruction
-		return 0;
+    if (!JackServerGlobals::Init()) { // jack server initialisation
+		int my_status1 = (JackFailure | JackServerError);
+        *status = (jack_status_t)my_status1;
+		return NULL;
 	}
-#endif	
-
+		  
 #ifdef __CLIENTDEBUG__
     JackClient* client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
 #else
@@ -159,7 +155,7 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
-		int my_status1 = (JackFailure|JackServerError);
+		int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     } else {
@@ -178,7 +174,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
 		int res = client->Close();
 		delete client;
 		JackLog("jack_client_close OK\n");
-		JackServerGlobals::Destroy(); // jack library destruction
+		JackServerGlobals::Destroy();	// jack server destruction
 		return res;
 	}
 }
