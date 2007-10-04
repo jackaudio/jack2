@@ -30,16 +30,6 @@ This program is free software; you can redistribute it and/or modify
 #include "JackError.h"
 #include "JackServerLaunch.h"
 
-/*
-TODO: 
- 
-- implement the "jack_client_new", "jack_client_open", "jack_client_close" API so that we can provide a libjackdmp shared library
-to be used by clients for direct access.
- 
-- automatic launch of the jack server with the first client open, automatic close when the last client exit. Use of a jackd.rsc configuration file.
- 
-*/
-
 #ifdef WIN32
 	#define	EXPORT __declspec(dllexport)
 #else
