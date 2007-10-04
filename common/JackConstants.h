@@ -66,3 +66,5 @@
 #define ALL_CLIENTS -1 // for notification
 
 #define JACK_PROTOCOL_VERSION 1
+
+#define DRIVER_OPEN_TIMEOUT 5   // in sec

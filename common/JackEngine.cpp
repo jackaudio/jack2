@@ -475,7 +475,7 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
         goto error;
     }
 
-    if (!fSignal->TimedWait(5 * 1000000)) {
+    if (!fSignal->TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
         goto error;
@@ -517,7 +517,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
 		return -1;
     }
 	
-	if (wait && !fSignal->TimedWait(5 * 1000000)) {
+	if (wait && !fSignal->TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
 		return -1;
