@@ -249,7 +249,6 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 #ifdef DEBUG
         //driver->fLogFile->Capture(AudioGetCurrentHostTime() - AudioConvertNanosToHostTime(LOG_SAMPLE_DURATION * 1000000), AudioGetCurrentHostTime(), true, "Captured Latency Log for I/O Cycle Overload\n");
 #endif
-
         driver->NotifyXRun(GetMicroSeconds());
     }
     return noErr;
@@ -278,12 +277,10 @@ OSStatus JackCoreAudioDriver::GetDefaultDevice(AudioDeviceID* id)
     AudioDeviceID inDefault;
     AudioDeviceID outDefault;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
-                                        &theSize, &inDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice, &theSize, &inDefault)) != noErr)
         return res;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-                                        &theSize, &outDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &theSize, &outDefault)) != noErr)
         return res;
 
     JackLog("GetDefaultDevice: input = %ld output = %ld\n", inDefault, outDefault);
@@ -304,8 +301,7 @@ OSStatus JackCoreAudioDriver::GetDefaultInputDevice(AudioDeviceID* id)
     UInt32 theSize = sizeof(UInt32);
     AudioDeviceID inDefault;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice,
-                                        &theSize, &inDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultInputDevice, &theSize, &inDefault)) != noErr)
         return res;
 
     JackLog("GetDefaultInputDevice: input = %ld \n", inDefault);
@@ -319,8 +315,7 @@ OSStatus JackCoreAudioDriver::GetDefaultOutputDevice(AudioDeviceID* id)
     UInt32 theSize = sizeof(UInt32);
     AudioDeviceID outDefault;
 
-    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice,
-                                        &theSize, &outDefault)) != noErr)
+    if ((res = AudioHardwareGetProperty(kAudioHardwarePropertyDefaultOutputDevice, &theSize, &outDefault)) != noErr)
         return res;
 
     JackLog("GetDefaultOutputDevice: output = %ld\n", outDefault);
