@@ -57,8 +57,7 @@ static char* jack_user_dir(void)
 
     /* format the path name on the first call */
     if (user_dir[0] == '\0') {
-        snprintf(user_dir, sizeof (user_dir), "%s/jack-%d",
-                  jack_tmpdir, getuid ());
+        snprintf(user_dir, sizeof(user_dir), "%s/jack-%d", jack_tmpdir, getuid());
     }
 
     return user_dir;
