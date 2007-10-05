@@ -288,7 +288,7 @@ jack_server_initialize_shm (void)
 	rc = jack_access_registry (&registry_info);
 
 	switch (rc) {
-	case ENOENT:			/* registry does not exist */
+	case ENOENT:		/* registry does not exist */
 		rc = jack_create_registry (&registry_info);
 		break;
 	case 0:				/* existing registry */

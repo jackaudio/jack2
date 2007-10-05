@@ -419,8 +419,7 @@ int main(int argc, char* argv[])
             exit(3);
         default:
             if (jack_verbose)
-                fprintf(stderr, "server `%s' registered\n",
-                         server_name);
+                fprintf(stderr, "server `%s' registered\n", server_name);
     }
 
     /* clean up shared memory and files from any previous
