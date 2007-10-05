@@ -32,7 +32,7 @@ This program is free software; you can redistribute it and/or modify
 
 #define DEFAULT_TMP_DIR "/tmp"
 static char* jack_tmpdir = DEFAULT_TMP_DIR;
-static char* server_name = "jackdmp_default";
+static char* server_name = NULL;
 
 namespace Jack
 {
@@ -44,9 +44,9 @@ JackServer* JackServerGlobals::fServer = NULL;
 
 static char* jack_default_server_name(void)
 {
-    char *server_name;
+    char* server_name;
     if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
-        server_name = "default";
+        server_name = "jackdmp_default";
     return server_name;
 }
 
@@ -209,7 +209,6 @@ bool JackServerGlobals::Init()
 		JSList* driver_params;
 		int driver_nargs = 1;
 		JSList* drivers = NULL;
-		char* server_name = NULL;
 		int show_version = 0;
 		int sync = 0;
 		int rc, i;
@@ -357,6 +356,20 @@ bool JackServerGlobals::Init()
 	#endif
 
 		rc = jack_register_server(server_name);
+		switch (rc) {
+			case EEXIST:
+				fprintf(stderr, "`%s' server already active\n", server_name);
+				goto error;
+			case ENOSPC:
+				fprintf(stderr, "too many servers already active\n");
+				goto error;
+			case ENOMEM:
+				fprintf(stderr, "no access to shm registry\n");
+				goto error;
+			default:
+				if (jack_verbose)
+					fprintf(stderr, "server `%s' registered\n", server_name);
+		}
 
 		/* clean up shared memory and files from any previous instance of this server name */
 		jack_cleanup_shm();

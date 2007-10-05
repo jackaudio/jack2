@@ -15,6 +15,10 @@ Tom Szilagyi
 
 2007-10-04 Stephane Letz  <letz@grame.fr>
 
+	* Correct "jack_register_server".
+
+2007-10-04 Stephane Letz  <letz@grame.fr>
+
 	* Fix a resource leak issue in JackCoreAudioDriver::Close(). Better implement "jack_client_open" when linking a client with the server library.
 
 2007-10-03 Stephane Letz  <letz@grame.fr>

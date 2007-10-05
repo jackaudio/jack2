@@ -138,7 +138,7 @@ static void FilterSIGPIPE()
 
 static char* jack_default_server_name(void)
 {
-    char *server_name;
+    char* server_name;
     if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
         server_name = "jackdmp_default";
     return server_name;

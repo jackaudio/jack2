@@ -101,16 +101,16 @@ static jack_shm_registry_t *jack_shm_registry = NULL;
 static char jack_shm_server_prefix[JACK_SERVER_NAME_SIZE] = "";
 
 /* jack_shm_lock_registry() serializes updates to the shared memory
- * segment JACK uses to keep track of the SHM segements allocated to
+ * segment JACK uses to keep track of the SHM segments allocated to
  * all its processes, including multiple servers.
  *
  * This is not a high-contention lock, but it does need to work across
- * multiple processes.  High transaction rates and realtime safety are
- * not required.  Any solution needs to at least be portable to POSIX
+ * multiple processes. High transaction rates and realtime safety are
+ * not required. Any solution needs to at least be portable to POSIX
  * and POSIX-like systems.
  *
  * We must be particularly careful to ensure that the lock be released
- * if the owning process terminates abnormally.  Otherwise, a segfault
+ * if the owning process terminates abnormally. Otherwise, a segfault
  * or kill -9 at the wrong moment could prevent JACK from ever running
  * again on that machine until after a reboot.
  */
@@ -148,7 +148,7 @@ semaphore_init ()
 	struct sembuf sbuf;
 	int create_flags = IPC_CREAT | IPC_EXCL
 		| S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
-
+		
 	/* Get semaphore ID associated with this key. */
 	if ((semid = semget(semkey, 0, 0)) == -1) {
 
@@ -213,7 +213,7 @@ jack_shm_init_registry ()
 	memset (jack_shm_header, 0, JACK_SHM_REGISTRY_SIZE);
 
 	jack_shm_header->magic = JACK_SHM_MAGIC;
-	//jack_shm_header->protocol = jack_protocol_version;  // steph
+	//jack_shm_header->protocol = JACK_PROTOCOL_VERSION; 
 	jack_shm_header->type = jack_shmtype;
 	jack_shm_header->size = JACK_SHM_REGISTRY_SIZE;
 	jack_shm_header->hdr_len = sizeof (jack_shm_header_t);
@@ -230,7 +230,7 @@ jack_shm_validate_registry ()
 	/* registry must be locked */
 
 	if ((jack_shm_header->magic == JACK_SHM_MAGIC)
-	    //&& (jack_shm_header->protocol == jack_protocol_version) // steph
+	    //&& (jack_shm_header->protocol == JACK_PROTOCOL_VERSION) 
 	    && (jack_shm_header->type == jack_shmtype)
 	    && (jack_shm_header->size == JACK_SHM_REGISTRY_SIZE)
 	    && (jack_shm_header->hdr_len == sizeof (jack_shm_header_t))
@@ -432,7 +432,7 @@ jack_release_shm_info (jack_shm_registry_index_t index)
 EXPORT int
 jack_register_server (const char *server_name)
 {
-	int i;
+	int i, res = 0;
 
 #ifdef WIN32
 	int	my_pid = _getpid();
@@ -457,13 +457,16 @@ jack_register_server (const char *server_name)
 			     JACK_SERVER_NAME_SIZE) != 0)
 			continue;	/* no match */
 
-		if (jack_shm_header->server[i].pid == my_pid)
-			return 0;	/* it's me */
+		if (jack_shm_header->server[i].pid == my_pid){
+			res = 0; /* it's me */
+			goto unlock;
+		}
 
 		/* see if server still exists */
 	#ifndef WIN32 // steph TO CHECK
-		if (kill (jack_shm_header->server[i].pid, 0) == 0) {
-			return EEXIST;	/* other server running */
+		if (kill (jack_shm_header->server[i].pid, 0) == 0)  {
+			res = EEXIST;	/* other server running */
+			goto unlock;
 		}
 	#endif
 
@@ -478,15 +481,19 @@ jack_register_server (const char *server_name)
 			break;
 	}
 
-	if (i >= MAX_SERVERS)
-		return ENOSPC;		/* out of space */
+	if (i >= MAX_SERVERS){
+		res = ENOSPC;		/* out of space */
+		goto unlock;
+	}
+
 
 	/* claim it */
 	jack_shm_header->server[i].pid = my_pid;
 	strncpy (jack_shm_header->server[i].name,
 		 jack_shm_server_prefix,
 		 JACK_SERVER_NAME_SIZE);
-
+		 
+ unlock:
 	jack_shm_unlock_registry ();
 	return 0;
 }
