@@ -957,36 +957,7 @@ JackFreebobDriver::jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_run_cycle = 0;
 }
 
-void JackFreebobDriver::PrintState()
-{
-    std::cout << "JackFreebobDriver State" << std::endl;
-
-    int port_index;
-
-    std::cout << "Input ports" << std::endl;
-
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        port_index = fCapturePortList[i];
-        JackPort* port = fGraphManager->GetPort(port_index);
-        std::cout << port->GetName() << std::endl;
-        //if (fGraphManager->IsConnected(port_index)) {}
-        if (fGraphManager->GetConnectionsNum(port_index)) {}
-    }
-
-    std::cout << "Output ports" << std::endl;
-
-    for (int i = 0; i < fCaptureChannels; i++) {
-        port_index = fPlaybackPortList[i];
-        JackPort* port = fGraphManager->GetPort(port_index);
-        std::cout << port->GetName() << std::endl;
-        //if (fGraphManager->IsConnected(port_index)) {}
-        if (fGraphManager->GetConnectionsNum(port_index)) {}
-    }
-}
-
-
 } // end of namespace
-
 
 #ifdef __cplusplus
 extern "C"

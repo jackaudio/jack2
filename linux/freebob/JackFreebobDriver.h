@@ -88,8 +88,6 @@ class JackFreebobDriver : public JackAudioDriver
         int Write();
 
         int SetBufferSize(jack_nframes_t nframes);
-
-        void PrintState();
 };
 
 } // end of namespace
