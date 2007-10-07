@@ -86,9 +86,8 @@ class JackEngine
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
 
         int ClientExternalClose(int refnum);
-        int ClientInternalClose(int refnum);
-        int ClientInternalCloseIm(int refnum);
-
+        int ClientInternalClose(int refnum, bool wait);
+    
         int ClientActivate(int refnum);
         int ClientDeactivate(int refnum);
 

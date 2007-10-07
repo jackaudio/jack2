@@ -148,7 +148,7 @@ int JackDriver::Close()
     JackLog("JackDriver::Close\n");
     fGraphManager->DirectDisconnect(fClientControl->fRefNum, fClientControl->fRefNum); // Disconnect driver from itself for sync
     fClientControl->fActive = false;
-    return fEngine->ClientInternalCloseIm(fClientControl->fRefNum);
+    return fEngine->ClientInternalClose(fClientControl->fRefNum, false);
 }
 
 bool JackDriver::IsRealTime()

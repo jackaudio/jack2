@@ -15,7 +15,7 @@ Tom Szilagyi
 
 2007-10-07 Stephane Letz  <letz@grame.fr>
 
-	* Add missing timestamps.c and timestamps.h files. Correctly export public headers in OSX frameworks.
+	* Add missing timestamps.c and timestamps.h files. Correctly export public headers in OSX frameworks. Suppress JackEngine::ClientInternalCloseIm method.
 
 2007-10-04 Stephane Letz  <letz@grame.fr>
 

@@ -552,18 +552,11 @@ int JackEngine::ClientExternalClose(int refnum)
     }
 }
 
-// Used for server internal clients
-int JackEngine::ClientInternalClose(int refnum)
+// Used for server internal clients or drivers when the RT thread is stopped
+int JackEngine::ClientInternalClose(int refnum, bool wait)
 {
     JackClientInterface* client = fClientTable[refnum];
-    return (client)	? ClientCloseAux(refnum, client, true) : -1;
-}
-
-// Used for drivers that close when the RT thread is stopped
-int JackEngine::ClientInternalCloseIm(int refnum)
-{
-    JackClientInterface* client = fClientTable[refnum];
-    return (client)	? ClientCloseAux(refnum, client, false) : -1;
+    return (client)	? ClientCloseAux(refnum, client, wait) : -1;
 }
 
 int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wait)
