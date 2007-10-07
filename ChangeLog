@@ -19,7 +19,7 @@ Tom Szilagyi
 
 2007-10-04 Stephane Letz  <letz@grame.fr>
 
-	* Correct "jack_register_server".
+	* Correct "jack_register_server" in shm.c.
 
 2007-10-04 Stephane Letz  <letz@grame.fr>
 
