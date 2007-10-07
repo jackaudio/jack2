@@ -25,7 +25,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackDriver.h"
 
-
 #ifdef WIN32
 
 #include <windows.h>
