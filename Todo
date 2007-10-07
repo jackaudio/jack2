@@ -2,6 +2,8 @@
   Jackdmp Todo list
 ---------------------
 
+2007-10-07 Before doing an official package, check all public headers
+
 2007-03-14 Check JackGraphManager::GetPortsAux after MIDI branch merge.
 
 2007-03-14 Add Paul dynamic jack server location code.

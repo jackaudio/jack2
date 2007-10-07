@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-07 Stephane Letz  <letz@grame.fr>
+
+	* Add missing timestamps.c and timestamps.h files. Correctly export public headers in OSX frameworks.
+
 2007-10-04 Stephane Letz  <letz@grame.fr>
 
 	* Correct "jack_register_server".

@@ -30,11 +30,12 @@ objects_common_server_lib := JackActivationCount.o JackAPI.o JackAudioDriver.o J
 	JackDriver.o JackEngine.o JackEngineTiming.o JackError.o JackExternalClient.o JackFrameTimer.o \
 	JackFreewheelDriver.o JackGlobalsServer.o JackGraphManager.o JackInternalClient.o JackPort.o JackPosixSemaphore.o JackPosixThread.o JackFifo.o  JackLoopbackDriver.o\
 	JackServer.o JackShmMem.o JackThreadedDriver.o shm.o JackSocket.o JackSocketServerChannel.o  JackSocketNotifyChannel.o \
-	JackSocketServerNotifyChannel.o JackTime.o JackServerAPI.o JackGlobals.o JackDriverLoader.o internal_metro.o JackDebugClient.o  JackTransportEngine.o JackServerGlobals.o JackServerLaunch.o
+	JackSocketServerNotifyChannel.o JackTime.o JackServerAPI.o JackGlobals.o JackDriverLoader.o internal_metro.o JackDebugClient.o  \
+	JackTransportEngine.o JackServerGlobals.o JackServerLaunch.o timestamps.o
 
 objects_common_client_lib := JackActivationCount.o JackAPI.o JackClient.o JackConnectionManager.o ringbuffer.o  JackServerLaunch.o\
 	JackError.o JackFrameTimer.o JackGlobalsClient.o JackGraphManager.o JackLibClient.o JackLibAPI.o JackPort.o JackPosixSemaphore.o JackFifo.o \
-	JackPosixThread.o JackShmMem.o shm.o JackSocket.o JackSocketClientChannel.o JackTime.o JackGlobals.o JackDebugClient.o JackTransportEngine.o 
+	JackPosixThread.o JackShmMem.o shm.o JackSocket.o JackSocketClientChannel.o JackTime.o JackGlobals.o JackDebugClient.o JackTransportEngine.o timestamps.o
 	
 
 objects_linux_server := Jackdmp.o 

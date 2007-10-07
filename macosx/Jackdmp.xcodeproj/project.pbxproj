@@ -257,6 +257,20 @@
 		4BD4B4E509BACEF300750C0F /* JackTransportEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */; };
 		4BE50F960B01EEC400C05E63 /* JackAPIWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */; };
 		4BE6C6AD0A3E0A65005A203A /* jack_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */; };
+		4BF5202B0CB8CF610037470E /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202A0CB8CF610037470E /* intclient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF5202C0CB8CF610037470E /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202A0CB8CF610037470E /* intclient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF5202D0CB8CF610037470E /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202A0CB8CF610037470E /* intclient.h */; };
+		4BF520300CB8CF7E0037470E /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202E0CB8CF7E0037470E /* statistics.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF520310CB8CF7E0037470E /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202F0CB8CF7E0037470E /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF520320CB8CF7E0037470E /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202E0CB8CF7E0037470E /* statistics.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF520330CB8CF7E0037470E /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202F0CB8CF7E0037470E /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF520340CB8CF7E0037470E /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202E0CB8CF7E0037470E /* statistics.h */; };
+		4BF520350CB8CF7E0037470E /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202F0CB8CF7E0037470E /* thread.h */; };
+		4BF520530CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
+		4BF520540CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
+		4BF520590CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF5205A0CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BF5205B0CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; };
 		4BFA99600AAAEE5C009E916C /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21C0834F04800C94B91 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BFA99610AAAEE5E009E916C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21B0834F04800C94B91 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BFA99620AAAEE72009E916C /* jack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D2170834F03500C94B91 /* jack.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -514,6 +528,11 @@
 		4BEE0B2C08ACBB9F00D22B43 /* JackPosixSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackPosixSemaphore.cpp; path = ../common/JackPosixSemaphore.cpp; sourceTree = SOURCE_ROOT; };
 		4BEE0B2D08ACBB9F00D22B43 /* JackPosixSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackPosixSemaphore.h; path = ../common/JackPosixSemaphore.h; sourceTree = SOURCE_ROOT; };
 		4BF3937C0626BF3600CC67FA /* JackMacLibClientRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacLibClientRPC.cpp; sourceTree = SOURCE_ROOT; };
+		4BF5202A0CB8CF610037470E /* intclient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = intclient.h; path = ../common/intclient.h; sourceTree = SOURCE_ROOT; };
+		4BF5202E0CB8CF7E0037470E /* statistics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = statistics.h; path = ../common/statistics.h; sourceTree = SOURCE_ROOT; };
+		4BF5202F0CB8CF7E0037470E /* thread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = thread.h; path = ../common/thread.h; sourceTree = SOURCE_ROOT; };
+		4BF520520CB8D0E80037470E /* timestamps.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = timestamps.c; path = ../common/timestamps.c; sourceTree = SOURCE_ROOT; };
+		4BF520580CB8D1010037470E /* timestamps.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = timestamps.h; path = ../common/timestamps.h; sourceTree = SOURCE_ROOT; };
 		4BF6C1D508ACE64C001E2013 /* JackMachSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachSemaphore.cpp; sourceTree = SOURCE_ROOT; };
 		4BF6C1D608ACE64C001E2013 /* JackMachSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JackMachSemaphore.h; sourceTree = SOURCE_ROOT; };
 		4BF70ACA0908EE95008B75AD /* JackLoopbackDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackLoopbackDriver.cpp; path = ../common/JackLoopbackDriver.cpp; sourceTree = SOURCE_ROOT; };
@@ -901,6 +920,9 @@
 		4B9B627005E60A9E001E19AA /* Server */ = {
 			isa = PBXGroup;
 			children = (
+				4BF5202E0CB8CF7E0037470E /* statistics.h */,
+				4BF5202F0CB8CF7E0037470E /* thread.h */,
+				4BF5202A0CB8CF610037470E /* intclient.h */,
 				4BF8D2170834F03500C94B91 /* jack.h */,
 				4BF8D21B0834F04800C94B91 /* types.h */,
 				4BF8D21C0834F04800C94B91 /* transport.h */,
@@ -1061,6 +1083,8 @@
 				4BF8D1E90834EF7500C94B91 /* JackAPI.cpp */,
 				4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */,
 				4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */,
+				4BF520580CB8D1010037470E /* timestamps.h */,
+				4BF520520CB8D0E80037470E /* timestamps.c */,
 				4BD56D75079687EB006D44F9 /* Internal  */,
 				4BD56D73079687AD006D44F9 /* External */,
 				4BA550F905E241D900569492 /* Library */,
@@ -1197,6 +1221,10 @@
 				4BFA99600AAAEE5C009E916C /* transport.h in Headers */,
 				4BFA99610AAAEE5E009E916C /* types.h in Headers */,
 				4BFA99620AAAEE72009E916C /* jack.h in Headers */,
+				4BF5202B0CB8CF610037470E /* intclient.h in Headers */,
+				4BF520300CB8CF7E0037470E /* statistics.h in Headers */,
+				4BF520310CB8CF7E0037470E /* thread.h in Headers */,
+				4BF520590CB8D1010037470E /* timestamps.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1255,6 +1283,10 @@
 				4BFA99730AAAF025009E916C /* jack.h in Headers */,
 				4BFA99740AAAF02D009E916C /* transport.h in Headers */,
 				4BFA99750AAAF030009E916C /* types.h in Headers */,
+				4BF5202C0CB8CF610037470E /* intclient.h in Headers */,
+				4BF520320CB8CF7E0037470E /* statistics.h in Headers */,
+				4BF520330CB8CF7E0037470E /* thread.h in Headers */,
+				4BF5205A0CB8D1010037470E /* timestamps.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1380,6 +1412,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BF5202D0CB8CF610037470E /* intclient.h in Headers */,
+				4BF520340CB8CF7E0037470E /* statistics.h in Headers */,
+				4BF520350CB8CF7E0037470E /* thread.h in Headers */,
+				4BF5205B0CB8D1010037470E /* timestamps.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2053,6 +2089,7 @@
 				4B699C40097D421600A18468 /* JackDebugClient.cpp in Sources */,
 				4BD4B4E409BACEF300750C0F /* JackTransportEngine.cpp in Sources */,
 				4B44FAE70C7598370033A72C /* JackServerLaunch.cpp in Sources */,
+				4BF520530CB8D0E80037470E /* timestamps.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2104,6 +2141,7 @@
 				4BC216850A444BAD00BDA09F /* JackServerAPI.cpp in Sources */,
 				4BC216890A444BDE00BDA09F /* JackServerGlobals.cpp in Sources */,
 				4B44FAE80C7598370033A72C /* JackServerLaunch.cpp in Sources */,
+				4BF520540CB8D0E80037470E /* timestamps.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
