@@ -214,7 +214,6 @@ jack_ringbuffer_peek (jack_ringbuffer_t * rb, char *dest, size_t cnt)
   return to_read;
 }
 
-
 /* The copying data writer.  Copy at most `cnt' bytes to `rb' from
    `src'.  Returns the actual number of bytes copied. */
 
