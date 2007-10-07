@@ -47,8 +47,7 @@ struct JackPthreadCondArray : public JackShmMem
     JackPthreadCondArray();
     virtual ~JackPthreadCondArray()
     {}
-}
-;
+};
 
 /*!
 \brief Inter process synchronization using pthread condition variables.
@@ -79,7 +78,6 @@ class JackPthreadCond : public JackSynchro
         bool ConnectInput(const char* name);
         bool ConnectOutput(const char* name);
         bool Disconnect();
-
 };
 
 class JackPthreadCondServer : public JackPthreadCond
