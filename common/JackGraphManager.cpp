@@ -659,7 +659,6 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
     res[i] = NULL;
 }
 
-
 /*
 	Use the state returned by ReadCurrentState and check that the state was not changed during the read operation.
 	The operation is lock-free since there is no intermediate state in the write operation that could cause the
@@ -703,8 +702,7 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
 
     for (int i = 0; i < PORT_NUM; i++) {
         matching = true;
-
-        JackPort* port = GetPort(i);
+		JackPort* port = GetPort(i);
 
         if (port->IsUsed()) {
 
