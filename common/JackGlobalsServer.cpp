@@ -167,8 +167,8 @@ JackServerNotifyChannelInterface* JackFactoryLinuxServer::MakeServerNotifyChanne
 JackClientChannelInterface* JackFactoryLinuxServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryLinuxServer::MakeNotifyChannel()
 {
     return new JackSocketNotifyChannel();
@@ -204,8 +204,8 @@ JackServerNotifyChannelInterface* JackFactoryLinuxServer::MakeServerNotifyChanne
 JackClientChannelInterface* JackFactoryLinuxServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryLinuxServer::MakeNotifyChannel()
 {
     return new JackSocketNotifyChannel();
@@ -284,8 +284,8 @@ JackServerNotifyChannelInterface* JackFactoryOSXServer::MakeServerNotifyChannel(
 JackClientChannelInterface* JackFactoryOSXServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryOSXServer::MakeNotifyChannel()
 {
     return new JackSocketNotifyChannel();
@@ -322,8 +322,8 @@ JackServerNotifyChannelInterface* JackFactoryOSXServer::MakeServerNotifyChannel(
 JackClientChannelInterface* JackFactoryOSXServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryOSXServer::MakeNotifyChannel()
 {
     return new JackSocketNotifyChannel();
@@ -360,8 +360,8 @@ JackServerNotifyChannelInterface* JackFactoryOSXServer::MakeServerNotifyChannel(
 JackClientChannelInterface* JackFactoryOSXServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryOSXServer::MakeNotifyChannel()
 {
     return new JackMachNotifyChannel();
@@ -398,8 +398,8 @@ JackServerNotifyChannelInterface* JackFactoryOSXServer::MakeServerNotifyChannel(
 JackClientChannelInterface* JackFactoryOSXServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryOSXServer::MakeNotifyChannel()
 {
     return new JackMachNotifyChannel();
@@ -436,8 +436,8 @@ JackServerNotifyChannelInterface* JackFactoryOSXServer::MakeServerNotifyChannel(
 JackClientChannelInterface* JackFactoryOSXServer::MakeClientChannel()
 {
     return NULL;
-}
-// Not used
+} // Not used
+
 JackNotifyChannelInterface* JackFactoryOSXServer::MakeNotifyChannel()
 {
     return new JackSocketNotifyChannel();
