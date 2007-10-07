@@ -116,8 +116,6 @@ class JackCoreAudioDriver : public JackAudioDriver
         int Write();
 
         int SetBufferSize(jack_nframes_t buffer_size);
-
-        void PrintState();
 };
 
 } // end of namespace

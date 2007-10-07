@@ -122,11 +122,6 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
             return fDriver->ProcessSlaves();
         }
 
-        virtual void PrintState()
-        {
-            fDriver->PrintState();
-        }
-
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value)
         {
             return fDriver->ClientNotify(refnum, name, notify, sync, value);

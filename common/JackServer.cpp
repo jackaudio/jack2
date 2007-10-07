@@ -296,11 +296,5 @@ JackGraphManager* JackServer::GetGraphManager()
     return fGraphManager;
 }
 
-void JackServer::PrintState()
-{
-    fAudioDriver->PrintState();
-    fEngine->PrintState();
-}
-
 } // end of namespace
 

@@ -82,8 +82,6 @@ class EXPORT JackDriverInterface
         virtual int ProcessSlaves() = 0;
 
         virtual bool IsRealTime() = 0;
-
-        virtual void PrintState() = 0;
 };
 
 /*!
@@ -200,9 +198,6 @@ class EXPORT JackDriver : public JackDriverClient
         void NotifyXRun(jack_time_t callback_usecs); // XRun notification sent by the driver
 
         virtual bool IsRealTime();
-
-        virtual void PrintState()
-        {}
 
         int ClientNotify(int refnum, const char* name, int notify, int sync, int value)
         {

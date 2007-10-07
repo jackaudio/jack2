@@ -59,7 +59,6 @@ class JackDummyDriver : public JackAudioDriver
                  jack_nframes_t playback_latency);
 
         int Process();
-        void PrintState();
 };
 
 } // end of namespace

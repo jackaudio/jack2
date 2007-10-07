@@ -96,7 +96,6 @@ class JackEngineTiming
         void ResetRollingUsecs();
 
         void ClearTimeMeasures();
-        void PrintState();
 };
 
 } // end of namespace

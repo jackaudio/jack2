@@ -950,31 +950,6 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     return 0;
 }
 
-void JackCoreAudioDriver::PrintState()
-{
-    std::cout << "JackCoreAudioDriver state" << std::endl;
-
-    jack_port_id_t port_index;
-
-    std::cout << "Input ports" << std::endl;
-
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        port_index = fCapturePortList[i];
-        JackPort* port = fGraphManager->GetPort(port_index);
-        std::cout << port->GetName() << std::endl;
-        if (fGraphManager->GetConnectionsNum(port_index)) {}
-    }
-
-    std::cout << "Output ports" << std::endl;
-
-    for (int i = 0; i < fCaptureChannels; i++) {
-        port_index = fPlaybackPortList[i];
-        JackPort* port = fGraphManager->GetPort(port_index);
-        std::cout << port->GetName() << std::endl;
-        if (fGraphManager->GetConnectionsNum(port_index)) {}
-    }
-}
-
 } // end of namespace
 
 

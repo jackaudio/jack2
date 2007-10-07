@@ -120,8 +120,6 @@ class JackEngine
         void NotifyFreewheel(bool onoff);
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
 		void NotifyActivate(int refnum);
-
-        void PrintState();
 };
 
 

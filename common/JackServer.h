@@ -79,8 +79,6 @@ class EXPORT JackServer
         JackSynchro** GetSynchroTable();
         JackGraphManager* GetGraphManager();
 
-        void PrintState();
-
         static JackServer* fInstance; // Unique instance
 };
 

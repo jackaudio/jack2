@@ -745,23 +745,5 @@ int JackEngine::SetTimebaseCallback(int refnum, int conditional)
     return fEngineControl->fTransport.SetTimebase(refnum, conditional);
 }
 
-//-----------
-// Debugging
-//-----------
-
-void JackEngine::PrintState()
-{
-    std::cout << "Engine State" << std::endl;
-
-    for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
-        if (client)
-            std::cout << "Client : " << client->GetClientControl()->fName << " : " << i << std::endl;
-    }
-
-    //fGraphManager->PrintState();
-    fEngineTiming->PrintState();
-}
-
 } // end of namespace
 

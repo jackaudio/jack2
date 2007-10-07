@@ -237,8 +237,6 @@ jack_cleanup_files(const char *server_name)
     }
 }
 
-#ifdef FORK_SERVER
-
 int main(int argc, char* argv[])
 {
     int sig;
@@ -518,51 +516,3 @@ int main(int argc, char* argv[])
 
     return 1;
 }
-
-#else
-
-int main(int argc, char* argv[])
-{
-    char c;
-    long sample_sate = lopt(argv, "-r", 44100);
-    long buffer_size = lopt(argv, "-p", 512);
-    long chan_in = lopt(argv, "-i", 2);
-    long chan_out = lopt(argv, "-o", 2);
-    long audiodevice = lopt(argv, "-I", -1);
-    long sync = lopt(argv, "-s", 0);
-    long timeout = lopt(argv, "-t", 100 * 1000);
-    const char* name = flag(argv, "-n", "Built-in Audio");
-    long rt = lopt(argv, "-R", 0);
-    verbose = lopt(argv, "-v", 0);
-
-    copyright(stdout);
-    usage(stdout);
-
-    FilterSIGPIPE();
-
-    printf("jackdmp: sample_sate = %ld buffer_size = %ld chan_in = %ld chan_out = %ld name = %s sync-mode = %ld\n",
-           sample_sate, buffer_size, chan_in, chan_out, name, sync);
-    assert(buffer_size <= BUFFER_SIZE_MAX);
-
-    int res = JackStart(sample_sate, buffer_size, chan_in, chan_out, name, audiodevice, sync, timeout, rt);
-    if (res < 0) {
-        jack_error("Cannot start server... exit");
-        JackDelete();
-        return 0;
-    }
-
-    while (((c = getchar()) != 'q')) {
-
-        switch (c) {
-
-            case 's':
-                fServer->PrintState();
-                break;
-        }
-    }
-
-    JackStop();
-    return 0;
-}
-
-#endif

@@ -43,7 +43,6 @@ class JackLoopbackDriver : public JackAudioDriver
         {}
 
 		int Process();
-        void PrintState();
 };
 
 } // end of namespace
