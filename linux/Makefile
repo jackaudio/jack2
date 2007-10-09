@@ -113,9 +113,11 @@ install:
 	cp jack_dummy.so $(prefix)/lib/jackmp
 	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/lib/jackmp || echo "freebob driver not installed"
 	cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
+	cd $(prefix)/bin && [ -f jackd ]  && mv -f jackd tmp_jackd 
 	cd $(prefix)/lib && rm -f libjack.so*
 	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so
 	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so.0
+	cd $(prefix)/bin && ln -s jackdmp jackd
 	/sbin/ldconfig
 
 # Remove jackdmp and tries to restore jack
@@ -129,6 +131,7 @@ remove:
 	cd $(prefix)/lib && rm -f libjack.so*
 	cd $(prefix)/lib && [ -f tmp_libjack.so.0.0.23 ] && mv -f tmp_libjack.so.0.0.23 libjack.so.0.0.23 \
 	&& ln -s libjack.so.0.0.23  libjack.so && ln -s libjack.so.0.0.23  libjack.so.0 || echo "Jack not restored"
+	cd $(prefix)/bin && [ -f tmp_jackd ] && mv -f tmp_jackd jackd
 	/sbin/ldconfig
 
 

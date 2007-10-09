@@ -1,13 +1,15 @@
-# Remove jackdmp and tries to restore jack
-
+# Remove jackdmp resources
 sudo rm -r "/usr/local/lib/jackmp"
 sudo rm "/usr/local/bin/jackdmp"
+sudo rm -r "/usr/local/lib/jackd"
 sudo rm "/usr/local/lib/libjackmp.dylib"
 sudo rm -r "/Library/Frameworks/Jackmp.framework"
 sudo rm -r "/Library/Frameworks/Jackdmp.framework"
 sudo rm -r "/Library/Audio/Plug-Ins/HAL/JackRouterMP.plugin"
 
+# Tries to restore jack
 cd /usr/local/lib && sudo rm -r libjack.0.dylib
 cd /usr/local/lib && [ -f tmp_libjack.0.dylib ] && sudo  mv -f tmp_libjack.0.dylib libjack.0.dylib
 cd /usr/local/lib && ln -s libjack.0.dylib libjack.dylib
+cd /usr/local/bin && [ -f tmp_jackd ] && sudo  mv -f tmp_jackd jackd
 

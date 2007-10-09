@@ -220,15 +220,15 @@ bool JackServerGlobals::Init()
 		int argc = 0;
 		char* argv[32];
 		
-		snprintf(filename, 255, "%s/.jackdmprc", getenv("HOME"));
+		snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
 		fp = fopen(filename, "r");
 
 		if (!fp) {
-			fp = fopen("/etc/jackdmprc", "r");
+			fp = fopen("/etc/jackdrc", "r");
 		}
 		// if still not found, check old config name for backwards compatability 
 		if (!fp) {
-			fp = fopen("/etc/jackdmp.conf", "r");
+			fp = fopen("/etc/jackd.conf", "r");
 		}
 
 		argc = 0;
@@ -355,7 +355,7 @@ bool JackServerGlobals::Init()
 			server_name = jack_default_server_name();
 	#endif
 
-		rc = jack_register_server(server_name);
+		rc = jack_register_server(server_name, false);
 		switch (rc) {
 			case EEXIST:
 				fprintf(stderr, "`%s' server already active\n", server_name);

@@ -134,7 +134,7 @@ extern "C"
 
     /* here beginneth the API */
 
-    EXPORT extern int jack_register_server (const char *server_name);
+    EXPORT extern int jack_register_server (const char *server_name, int new_registry);
     EXPORT extern void jack_unregister_server (const char *server_name);
 
     extern int jack_initialize_shm (const char *server_name);

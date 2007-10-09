@@ -41,15 +41,15 @@ static void start_server_aux(const char* server_name)
 	int good = 0;
 	int ret;
 	
-	snprintf(filename, 255, "%s/.jackdmprc", getenv("HOME"));
+	snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
 	fp = fopen(filename, "r");
 
 	if (!fp) {
-		fp = fopen("/etc/jackdmprc", "r");
+		fp = fopen("/etc/jackdrc", "r");
 	}
 	/* if still not found, check old config name for backwards compatability */
 	if (!fp) {
-		fp = fopen("/etc/jackdmp.conf", "r");
+		fp = fopen("/etc/jackd.conf", "r");
 	}
 
 	if (fp) {
@@ -67,8 +67,8 @@ static void start_server_aux(const char* server_name)
 	}
 
 	if (!good) {
-		command = JACK_LOCATION "/jackdmp";
-		strncpy(arguments, JACK_LOCATION "/jackdmp -T -d "JACK_DEFAULT_DRIVER, 255);
+		command = JACK_LOCATION "/jackd";
+		strncpy(arguments, JACK_LOCATION "/jackd -T -d "JACK_DEFAULT_DRIVER, 255);
 	} else {
 		result = strcspn(arguments, " ");
 		command = (char*)malloc(result + 1);
@@ -97,7 +97,7 @@ static void start_server_aux(const char* server_name)
 			break;
 		}
 		argv[i] = (char*)malloc(result + 1);
-		strncpy(argv[i], arguments+pos, result);
+		strncpy(argv[i], arguments + pos, result);
 		argv[i][result] = '\0';
 		pos += result + 1;
 		++i;

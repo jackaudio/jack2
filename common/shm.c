@@ -276,7 +276,7 @@ jack_set_server_prefix (const char *server_name)
  * returns: 0 if successful
  */
 static int
-jack_server_initialize_shm (void)
+jack_server_initialize_shm (int new_registry)
 {
 	int rc;
 
@@ -286,6 +286,11 @@ jack_server_initialize_shm (void)
 	jack_shm_lock_registry ();
 
 	rc = jack_access_registry (&registry_info);
+	
+	if (new_registry) {
+		jack_remove_shm (&registry_id);
+		rc = ENOENT;
+	}
 
 	switch (rc) {
 	case ENOENT:		/* registry does not exist */
@@ -430,7 +435,7 @@ jack_release_shm_info (jack_shm_registry_index_t index)
  *	   ENOMEM if unable to access shared memory registry
  */
 EXPORT int
-jack_register_server (const char *server_name)
+jack_register_server (const char *server_name, int new_registry)
 {
 	int i, res = 0;
 
@@ -442,7 +447,7 @@ jack_register_server (const char *server_name)
 
 	jack_set_server_prefix (server_name);
 
-	if (jack_server_initialize_shm ())
+	if (jack_server_initialize_shm (new_registry))
 		return ENOMEM;
 
 	jack_shm_lock_registry ();
@@ -770,7 +775,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	 * registry index for uniqueness and ignore the shm_name
 	 * parameter.  Bah!
 	 */
-	snprintf (name, sizeof (name), "/jack-%d", registry->index);
+	snprintf (name, sizeof (name), "/jackmp-%d", registry->index);
 
 	if (strlen (name) >= sizeof (registry->id)) {
 		jack_error ("shm segment name too long %s", name);

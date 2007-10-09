@@ -13,6 +13,11 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-08 Stephane Letz  <letz@grame.fr>
+
+	* Use .jackdrc file (instead of .jackdmprc). Install script now creates a link "jackd ==> jackdmp" so that automatic launch can work correctly. 
+	* Paul Davis patch for -r (--replace-registry) feature.
+
 2007-10-07 Stephane Letz  <letz@grame.fr>
 
 	* Add missing timestamps.c and timestamps.h files. Correctly export public headers in OSX frameworks. Suppress JackEngine::ClientInternalCloseIm method.

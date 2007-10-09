@@ -80,6 +80,7 @@ static void usage(FILE* file)
              "               [ --loopback OR -L loopback-port-number ]\n"
              // "               [ --port-max OR -p maximum-number-of-ports]\n"
              "               [ --verbose OR -v ]\n"
+			 "               [ --replace-registry OR -r ]\n"
              "               [ --silent OR -s ]\n"
              "               [ --sync OR -S ]\n"
 			 "               [ --temporary OR -T ]\n"
@@ -245,7 +246,7 @@ int main(int argc, char* argv[])
     int waiting;
 
     jack_driver_desc_t* driver_desc;
-    const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:";
+    const char *options = "-ad:P:uvrshVRL:STFl:t:mn:p:";
     struct option long_options[] = {
                                        { "driver", 1, 0, 'd' },
                                        { "verbose", 0, 0, 'v' },
@@ -255,6 +256,7 @@ int main(int argc, char* argv[])
                                        { "name", 0, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
+									   { "replace-registry", 0, 0, 'r' },
                                        { "loopback", 0, 0, 'L' },
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
@@ -272,6 +274,7 @@ int main(int argc, char* argv[])
     JSList* driver_params;
     int driver_nargs = 1;
     int show_version = 0;
+	int replace_registry = 0;
     int sync = 0;
     int rc, i;
 
@@ -313,7 +316,11 @@ int main(int argc, char* argv[])
             case 'P':
                 realtime_priority = atoi(optarg);
                 break;
-
+			
+			case 'r':
+				replace_registry = 1;
+				break;
+				
             case 'R':
                 realtime = 1;
                 break;
@@ -404,7 +411,7 @@ int main(int argc, char* argv[])
 
     copyright(stdout);
 
-    rc = jack_register_server(server_name);
+    rc = jack_register_server(server_name, replace_registry);
     switch (rc) {
         case EEXIST:
             fprintf(stderr, "`%s' server already active\n", server_name);
