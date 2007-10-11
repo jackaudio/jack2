@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Aug 27 17:58:23 2007
+ * stub generated Thu Oct 11 16:40:18 2007
  * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
  * OPTIONS: 
  */
@@ -4467,6 +4467,1534 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
     }
 }
 
+#if ( __MigTypeCheck || __NDR_convert__ )
+#if __MIG_check__Reply__JackRPCEngine_subsystem__
+#if !defined(__MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined)
+#define __MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__kern_return_t((kern_return_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode(a, f) \
+	__NDR_convert__int_rep__kern_return_t((kern_return_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__client_name_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__client_name_t((client_name_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__client_name_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__int_rep__client_name_t((client_name_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__string__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__string(a, f, 128)
+#elif	defined(__NDR_convert__int_rep__string__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__int_rep__string(a, f, 128)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined */
+
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__client_name_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__client_name_t((client_name_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__client_name_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__char_rep__client_name_t((client_name_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__string__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__string(a, f, 128)
+#elif	defined(__NDR_convert__char_rep__string__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__char_rep__string(a, f, 128)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined */
+
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__client_name_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__client_name_t((client_name_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__client_name_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__float_rep__client_name_t((client_name_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__string__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__string(a, f, 128)
+#elif	defined(__NDR_convert__float_rep__string__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
+	__NDR_convert__float_rep__string(a, f, 128)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined */
+
+
+
+mig_internal kern_return_t __MIG_check__Reply__rpc_jack_get_internal_clientname_t(__Reply__rpc_jack_get_internal_clientname_t *Out0P)
+{
+
+	typedef __Reply__rpc_jack_get_internal_clientname_t __Reply;
+#if	__MigTypeCheck
+	unsigned int msgh_size;
+#endif	/* __MigTypeCheck */
+	if (Out0P->Head.msgh_id != 1115) {
+	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
+		{ return MIG_SERVER_DIED; }
+	    else
+		{ return MIG_REPLY_MISMATCH; }
+	}
+
+#if	__MigTypeCheck
+	msgh_size = Out0P->Head.msgh_size;
+
+	if ((Out0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	    ((msgh_size != (mach_msg_size_t)sizeof(__Reply)) &&
+	     (msgh_size != (mach_msg_size_t)sizeof(mig_reply_error_t) ||
+	      Out0P->RetCode == KERN_SUCCESS)))
+		{ return MIG_TYPE_ERROR ; }
+#endif	/* __MigTypeCheck */
+
+	if (Out0P->RetCode != KERN_SUCCESS) {
+#ifdef	__NDR_convert__mig_reply_error_t__defined
+		__NDR_convert__mig_reply_error_t((mig_reply_error_t *)Out0P);
+#endif	/* __NDR_convert__mig_reply_error_t__defined */
+		return ((mig_reply_error_t *)Out0P)->RetCode;
+	}
+
+#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined)
+	if (Out0P->NDR.int_rep != NDR_record.int_rep) {
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode(&Out0P->RetCode, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__RetCode__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(&Out0P->client_name_res, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result(&Out0P->result, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__int_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined)
+	if (Out0P->NDR.char_rep != NDR_record.char_rep) {
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(&Out0P->client_name_res, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result(&Out0P->result, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__char_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined)
+	if (Out0P->NDR.float_rep != NDR_record.float_rep) {
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(&Out0P->client_name_res, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result(&Out0P->result, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__float_rep...) */
+
+	return MACH_MSG_SUCCESS;
+}
+#endif /* !defined(__MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined) */
+#endif /* __MIG_check__Reply__JackRPCEngine_subsystem__ */
+#endif /* ( __MigTypeCheck || __NDR_convert__ ) */
+
+
+/* Routine rpc_jack_get_internal_clientname */
+mig_external kern_return_t rpc_jack_get_internal_clientname
+(
+	mach_port_t server_port,
+	int refnum,
+	int int_ref,
+	client_name_t client_name_res,
+	int *result
+)
+{
+    {
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		int int_ref;
+	} Request;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		client_name_t client_name_res;
+		int result;
+		mach_msg_trailer_t trailer;
+	} Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		client_name_t client_name_res;
+		int result;
+	} __Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+	/*
+	 * typedef struct {
+	 * 	mach_msg_header_t Head;
+	 * 	NDR_record_t NDR;
+	 * 	kern_return_t RetCode;
+	 * } mig_reply_error_t;
+	 */
+
+	union {
+		Request In;
+		Reply Out;
+	} Mess;
+
+	Request *InP = &Mess.In;
+	Reply *Out0P = &Mess.Out;
+
+	mach_msg_return_t msg_result;
+
+#ifdef	__MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined
+	kern_return_t check_result;
+#endif	/* __MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined */
+
+	__DeclareSendRpc(1015, "rpc_jack_get_internal_clientname")
+
+	InP->NDR = NDR_record;
+
+	InP->refnum = refnum;
+
+	InP->int_ref = int_ref;
+
+	InP->Head.msgh_bits =
+		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
+	/* msgh_size passed as argument */
+	InP->Head.msgh_request_port = server_port;
+	InP->Head.msgh_reply_port = mig_get_reply_port();
+	InP->Head.msgh_id = 1015;
+
+	__BeforeSendRpc(1015, "rpc_jack_get_internal_clientname")
+	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
+	__AfterSendRpc(1015, "rpc_jack_get_internal_clientname")
+	if (msg_result != MACH_MSG_SUCCESS) {
+		__MachMsgErrorWithoutTimeout(msg_result);
+		{ return msg_result; }
+	}
+
+
+#if	defined(__MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined)
+	check_result = __MIG_check__Reply__rpc_jack_get_internal_clientname_t((__Reply__rpc_jack_get_internal_clientname_t *)Out0P);
+	if (check_result != MACH_MSG_SUCCESS)
+		{ return check_result; }
+#endif	/* defined(__MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined) */
+
+	(void) mig_strncpy(client_name_res, Out0P->client_name_res, 128);
+
+	*result = Out0P->result;
+
+	return KERN_SUCCESS;
+    }
+}
+
+#if ( __MigTypeCheck || __NDR_convert__ )
+#if __MIG_check__Reply__JackRPCEngine_subsystem__
+#if !defined(__MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined)
+#define __MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__kern_return_t((kern_return_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode(a, f) \
+	__NDR_convert__int_rep__kern_return_t((kern_return_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined */
+
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined */
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined */
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined */
+
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined */
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined */
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined */
+
+
+
+mig_internal kern_return_t __MIG_check__Reply__rpc_jack_internal_clienthandle_t(__Reply__rpc_jack_internal_clienthandle_t *Out0P)
+{
+
+	typedef __Reply__rpc_jack_internal_clienthandle_t __Reply;
+#if	__MigTypeCheck
+	unsigned int msgh_size;
+#endif	/* __MigTypeCheck */
+	if (Out0P->Head.msgh_id != 1116) {
+	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
+		{ return MIG_SERVER_DIED; }
+	    else
+		{ return MIG_REPLY_MISMATCH; }
+	}
+
+#if	__MigTypeCheck
+	msgh_size = Out0P->Head.msgh_size;
+
+	if ((Out0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	    ((msgh_size != (mach_msg_size_t)sizeof(__Reply)) &&
+	     (msgh_size != (mach_msg_size_t)sizeof(mig_reply_error_t) ||
+	      Out0P->RetCode == KERN_SUCCESS)))
+		{ return MIG_TYPE_ERROR ; }
+#endif	/* __MigTypeCheck */
+
+	if (Out0P->RetCode != KERN_SUCCESS) {
+#ifdef	__NDR_convert__mig_reply_error_t__defined
+		__NDR_convert__mig_reply_error_t((mig_reply_error_t *)Out0P);
+#endif	/* __NDR_convert__mig_reply_error_t__defined */
+		return ((mig_reply_error_t *)Out0P)->RetCode;
+	}
+
+#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined)
+	if (Out0P->NDR.int_rep != NDR_record.int_rep) {
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode(&Out0P->RetCode, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__RetCode__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(&Out0P->int_ref, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status(&Out0P->status, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result(&Out0P->result, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__int_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined)
+	if (Out0P->NDR.char_rep != NDR_record.char_rep) {
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(&Out0P->int_ref, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status(&Out0P->status, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result(&Out0P->result, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__char_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined)
+	if (Out0P->NDR.float_rep != NDR_record.float_rep) {
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref(&Out0P->int_ref, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__int_ref__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status(&Out0P->status, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__status__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result(&Out0P->result, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clienthandle_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__float_rep...) */
+
+	return MACH_MSG_SUCCESS;
+}
+#endif /* !defined(__MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined) */
+#endif /* __MIG_check__Reply__JackRPCEngine_subsystem__ */
+#endif /* ( __MigTypeCheck || __NDR_convert__ ) */
+
+
+/* Routine rpc_jack_internal_clienthandle */
+mig_external kern_return_t rpc_jack_internal_clienthandle
+(
+	mach_port_t server_port,
+	int refnum,
+	client_name_t client_name,
+	int *int_ref,
+	int *status,
+	int *result
+)
+{
+    {
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		client_name_t client_name;
+	} Request;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int int_ref;
+		int status;
+		int result;
+		mach_msg_trailer_t trailer;
+	} Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int int_ref;
+		int status;
+		int result;
+	} __Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+	/*
+	 * typedef struct {
+	 * 	mach_msg_header_t Head;
+	 * 	NDR_record_t NDR;
+	 * 	kern_return_t RetCode;
+	 * } mig_reply_error_t;
+	 */
+
+	union {
+		Request In;
+		Reply Out;
+	} Mess;
+
+	Request *InP = &Mess.In;
+	Reply *Out0P = &Mess.Out;
+
+	mach_msg_return_t msg_result;
+
+#ifdef	__MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined
+	kern_return_t check_result;
+#endif	/* __MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined */
+
+	__DeclareSendRpc(1016, "rpc_jack_internal_clienthandle")
+
+	InP->NDR = NDR_record;
+
+	InP->refnum = refnum;
+
+	(void) mig_strncpy(InP->client_name, client_name, 128);
+
+	InP->Head.msgh_bits =
+		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
+	/* msgh_size passed as argument */
+	InP->Head.msgh_request_port = server_port;
+	InP->Head.msgh_reply_port = mig_get_reply_port();
+	InP->Head.msgh_id = 1016;
+
+	__BeforeSendRpc(1016, "rpc_jack_internal_clienthandle")
+	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
+	__AfterSendRpc(1016, "rpc_jack_internal_clienthandle")
+	if (msg_result != MACH_MSG_SUCCESS) {
+		__MachMsgErrorWithoutTimeout(msg_result);
+		{ return msg_result; }
+	}
+
+
+#if	defined(__MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined)
+	check_result = __MIG_check__Reply__rpc_jack_internal_clienthandle_t((__Reply__rpc_jack_internal_clienthandle_t *)Out0P);
+	if (check_result != MACH_MSG_SUCCESS)
+		{ return check_result; }
+#endif	/* defined(__MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined) */
+
+	*int_ref = Out0P->int_ref;
+
+	*status = Out0P->status;
+
+	*result = Out0P->result;
+
+	return KERN_SUCCESS;
+    }
+}
+
+#if ( __MigTypeCheck || __NDR_convert__ )
+#if __MIG_check__Reply__JackRPCEngine_subsystem__
+#if !defined(__MIG_check__Reply__rpc_jack_internal_clientload_t__defined)
+#define __MIG_check__Reply__rpc_jack_internal_clientload_t__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__kern_return_t((kern_return_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode(a, f) \
+	__NDR_convert__int_rep__kern_return_t((kern_return_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined */
+
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined */
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined */
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined */
+
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined */
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined */
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined */
+
+
+
+mig_internal kern_return_t __MIG_check__Reply__rpc_jack_internal_clientload_t(__Reply__rpc_jack_internal_clientload_t *Out0P)
+{
+
+	typedef __Reply__rpc_jack_internal_clientload_t __Reply;
+#if	__MigTypeCheck
+	unsigned int msgh_size;
+#endif	/* __MigTypeCheck */
+	if (Out0P->Head.msgh_id != 1117) {
+	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
+		{ return MIG_SERVER_DIED; }
+	    else
+		{ return MIG_REPLY_MISMATCH; }
+	}
+
+#if	__MigTypeCheck
+	msgh_size = Out0P->Head.msgh_size;
+
+	if ((Out0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	    ((msgh_size != (mach_msg_size_t)sizeof(__Reply)) &&
+	     (msgh_size != (mach_msg_size_t)sizeof(mig_reply_error_t) ||
+	      Out0P->RetCode == KERN_SUCCESS)))
+		{ return MIG_TYPE_ERROR ; }
+#endif	/* __MigTypeCheck */
+
+	if (Out0P->RetCode != KERN_SUCCESS) {
+#ifdef	__NDR_convert__mig_reply_error_t__defined
+		__NDR_convert__mig_reply_error_t((mig_reply_error_t *)Out0P);
+#endif	/* __NDR_convert__mig_reply_error_t__defined */
+		return ((mig_reply_error_t *)Out0P)->RetCode;
+	}
+
+#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined)
+	if (Out0P->NDR.int_rep != NDR_record.int_rep) {
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode(&Out0P->RetCode, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__RetCode__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status(&Out0P->status, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__status__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref(&Out0P->int_ref, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result(&Out0P->result, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientload_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__int_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined)
+	if (Out0P->NDR.char_rep != NDR_record.char_rep) {
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status(&Out0P->status, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__status__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref(&Out0P->int_ref, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result(&Out0P->result, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientload_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__char_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined)
+	if (Out0P->NDR.float_rep != NDR_record.float_rep) {
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status(&Out0P->status, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__status__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref(&Out0P->int_ref, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__int_ref__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result(&Out0P->result, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientload_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__float_rep...) */
+
+	return MACH_MSG_SUCCESS;
+}
+#endif /* !defined(__MIG_check__Reply__rpc_jack_internal_clientload_t__defined) */
+#endif /* __MIG_check__Reply__JackRPCEngine_subsystem__ */
+#endif /* ( __MigTypeCheck || __NDR_convert__ ) */
+
+
+/* Routine rpc_jack_internal_clientload */
+mig_external kern_return_t rpc_jack_internal_clientload
+(
+	mach_port_t server_port,
+	int refnum,
+	client_name_t client_name,
+	so_name_t so_name,
+	objet_data_t objet_data,
+	int options,
+	int *status,
+	int *int_ref,
+	int *result
+)
+{
+    {
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		client_name_t client_name;
+		so_name_t so_name;
+		objet_data_t objet_data;
+		int options;
+	} Request;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int status;
+		int int_ref;
+		int result;
+		mach_msg_trailer_t trailer;
+	} Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int status;
+		int int_ref;
+		int result;
+	} __Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+	/*
+	 * typedef struct {
+	 * 	mach_msg_header_t Head;
+	 * 	NDR_record_t NDR;
+	 * 	kern_return_t RetCode;
+	 * } mig_reply_error_t;
+	 */
+
+	union {
+		Request In;
+		Reply Out;
+	} Mess;
+
+	Request *InP = &Mess.In;
+	Reply *Out0P = &Mess.Out;
+
+	mach_msg_return_t msg_result;
+
+#ifdef	__MIG_check__Reply__rpc_jack_internal_clientload_t__defined
+	kern_return_t check_result;
+#endif	/* __MIG_check__Reply__rpc_jack_internal_clientload_t__defined */
+
+	__DeclareSendRpc(1017, "rpc_jack_internal_clientload")
+
+	InP->NDR = NDR_record;
+
+	InP->refnum = refnum;
+
+	(void) mig_strncpy(InP->client_name, client_name, 128);
+
+	(void) mig_strncpy(InP->so_name, so_name, 1024);
+
+	(void) mig_strncpy(InP->objet_data, objet_data, 1024);
+
+	InP->options = options;
+
+	InP->Head.msgh_bits =
+		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
+	/* msgh_size passed as argument */
+	InP->Head.msgh_request_port = server_port;
+	InP->Head.msgh_reply_port = mig_get_reply_port();
+	InP->Head.msgh_id = 1017;
+
+	__BeforeSendRpc(1017, "rpc_jack_internal_clientload")
+	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
+	__AfterSendRpc(1017, "rpc_jack_internal_clientload")
+	if (msg_result != MACH_MSG_SUCCESS) {
+		__MachMsgErrorWithoutTimeout(msg_result);
+		{ return msg_result; }
+	}
+
+
+#if	defined(__MIG_check__Reply__rpc_jack_internal_clientload_t__defined)
+	check_result = __MIG_check__Reply__rpc_jack_internal_clientload_t((__Reply__rpc_jack_internal_clientload_t *)Out0P);
+	if (check_result != MACH_MSG_SUCCESS)
+		{ return check_result; }
+#endif	/* defined(__MIG_check__Reply__rpc_jack_internal_clientload_t__defined) */
+
+	*status = Out0P->status;
+
+	*int_ref = Out0P->int_ref;
+
+	*result = Out0P->result;
+
+	return KERN_SUCCESS;
+    }
+}
+
+#if ( __MigTypeCheck || __NDR_convert__ )
+#if __MIG_check__Reply__JackRPCEngine_subsystem__
+#if !defined(__MIG_check__Reply__rpc_jack_internal_clientunload_t__defined)
+#define __MIG_check__Reply__rpc_jack_internal_clientunload_t__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__kern_return_t((kern_return_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode(a, f) \
+	__NDR_convert__int_rep__kern_return_t((kern_return_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined */
+
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined */
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined */
+
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined */
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined */
+
+
+
+mig_internal kern_return_t __MIG_check__Reply__rpc_jack_internal_clientunload_t(__Reply__rpc_jack_internal_clientunload_t *Out0P)
+{
+
+	typedef __Reply__rpc_jack_internal_clientunload_t __Reply;
+#if	__MigTypeCheck
+	unsigned int msgh_size;
+#endif	/* __MigTypeCheck */
+	if (Out0P->Head.msgh_id != 1118) {
+	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
+		{ return MIG_SERVER_DIED; }
+	    else
+		{ return MIG_REPLY_MISMATCH; }
+	}
+
+#if	__MigTypeCheck
+	msgh_size = Out0P->Head.msgh_size;
+
+	if ((Out0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	    ((msgh_size != (mach_msg_size_t)sizeof(__Reply)) &&
+	     (msgh_size != (mach_msg_size_t)sizeof(mig_reply_error_t) ||
+	      Out0P->RetCode == KERN_SUCCESS)))
+		{ return MIG_TYPE_ERROR ; }
+#endif	/* __MigTypeCheck */
+
+	if (Out0P->RetCode != KERN_SUCCESS) {
+#ifdef	__NDR_convert__mig_reply_error_t__defined
+		__NDR_convert__mig_reply_error_t((mig_reply_error_t *)Out0P);
+#endif	/* __NDR_convert__mig_reply_error_t__defined */
+		return ((mig_reply_error_t *)Out0P)->RetCode;
+	}
+
+#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined)
+	if (Out0P->NDR.int_rep != NDR_record.int_rep) {
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode(&Out0P->RetCode, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__RetCode__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status(&Out0P->status, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__status__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result(&Out0P->result, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_internal_clientunload_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__int_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined) || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined)
+	if (Out0P->NDR.char_rep != NDR_record.char_rep) {
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status(&Out0P->status, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__status__defined */
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result(&Out0P->result, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_internal_clientunload_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__char_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined) || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined)
+	if (Out0P->NDR.float_rep != NDR_record.float_rep) {
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status(&Out0P->status, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__status__defined */
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result(&Out0P->result, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_internal_clientunload_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__float_rep...) */
+
+	return MACH_MSG_SUCCESS;
+}
+#endif /* !defined(__MIG_check__Reply__rpc_jack_internal_clientunload_t__defined) */
+#endif /* __MIG_check__Reply__JackRPCEngine_subsystem__ */
+#endif /* ( __MigTypeCheck || __NDR_convert__ ) */
+
+
+/* Routine rpc_jack_internal_clientunload */
+mig_external kern_return_t rpc_jack_internal_clientunload
+(
+	mach_port_t server_port,
+	int refnum,
+	int int_ref,
+	int *status,
+	int *result
+)
+{
+    {
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		int int_ref;
+	} Request;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int status;
+		int result;
+		mach_msg_trailer_t trailer;
+	} Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int status;
+		int result;
+	} __Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+	/*
+	 * typedef struct {
+	 * 	mach_msg_header_t Head;
+	 * 	NDR_record_t NDR;
+	 * 	kern_return_t RetCode;
+	 * } mig_reply_error_t;
+	 */
+
+	union {
+		Request In;
+		Reply Out;
+	} Mess;
+
+	Request *InP = &Mess.In;
+	Reply *Out0P = &Mess.Out;
+
+	mach_msg_return_t msg_result;
+
+#ifdef	__MIG_check__Reply__rpc_jack_internal_clientunload_t__defined
+	kern_return_t check_result;
+#endif	/* __MIG_check__Reply__rpc_jack_internal_clientunload_t__defined */
+
+	__DeclareSendRpc(1018, "rpc_jack_internal_clientunload")
+
+	InP->NDR = NDR_record;
+
+	InP->refnum = refnum;
+
+	InP->int_ref = int_ref;
+
+	InP->Head.msgh_bits =
+		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
+	/* msgh_size passed as argument */
+	InP->Head.msgh_request_port = server_port;
+	InP->Head.msgh_reply_port = mig_get_reply_port();
+	InP->Head.msgh_id = 1018;
+
+	__BeforeSendRpc(1018, "rpc_jack_internal_clientunload")
+	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
+	__AfterSendRpc(1018, "rpc_jack_internal_clientunload")
+	if (msg_result != MACH_MSG_SUCCESS) {
+		__MachMsgErrorWithoutTimeout(msg_result);
+		{ return msg_result; }
+	}
+
+
+#if	defined(__MIG_check__Reply__rpc_jack_internal_clientunload_t__defined)
+	check_result = __MIG_check__Reply__rpc_jack_internal_clientunload_t((__Reply__rpc_jack_internal_clientunload_t *)Out0P);
+	if (check_result != MACH_MSG_SUCCESS)
+		{ return check_result; }
+#endif	/* defined(__MIG_check__Reply__rpc_jack_internal_clientunload_t__defined) */
+
+	*status = Out0P->status;
+
+	*result = Out0P->result;
+
+	return KERN_SUCCESS;
+    }
+}
+
 /* SimpleRoutine rpc_jack_client_rt_notify */
 mig_external kern_return_t rpc_jack_client_rt_notify
 (
@@ -4512,7 +6040,7 @@ mig_external kern_return_t rpc_jack_client_rt_notify
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_client_rt_notify_t__defined */
 
-	__DeclareSendSimple(1015, "rpc_jack_client_rt_notify")
+	__DeclareSendSimple(1019, "rpc_jack_client_rt_notify")
 
 	InP->NDR = NDR_record;
 
@@ -4527,11 +6055,11 @@ mig_external kern_return_t rpc_jack_client_rt_notify
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = client_port;
 	InP->Head.msgh_reply_port = MACH_PORT_NULL;
-	InP->Head.msgh_id = 1015;
+	InP->Head.msgh_id = 1019;
 
-	__BeforeSendSimple(1015, "rpc_jack_client_rt_notify")
+	__BeforeSendSimple(1019, "rpc_jack_client_rt_notify")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_SEND_TIMEOUT|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), 0, MACH_PORT_NULL, timeout, MACH_PORT_NULL);
-	__AfterSendSimple(1015, "rpc_jack_client_rt_notify")
+	__AfterSendSimple(1019, "rpc_jack_client_rt_notify")
 		return msg_result;
 	return KERN_SUCCESS;
     }

@@ -28,6 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackEngine.h"
 #include "JackExternalClient.h"
+#include "JackInternalClient.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackEngineTiming.h"
@@ -88,7 +89,6 @@ int JackEngine::Close()
         JackClientInterface* client = fClientTable[i];
         if (client) {
             JackLog("JackEngine::Close remaining client %ld\n", i);
-            ClientCloseAux(i, client, false);
             client->Close();
             delete client;
         }
@@ -373,6 +373,53 @@ void JackEngine::NotifyActivate(int refnum)
 	NotifyClient(refnum, kActivateClient, true, 0);
 }
 
+//----------------------------
+// Loadable client management
+//----------------------------
+
+int JackEngine::GetInternalClientName(int int_ref, char* name_res)
+{
+	JackClientInterface* client = fClientTable[int_ref];
+	if (client) {
+		strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
+		return 0;
+	} else {
+		return -1;
+	}
+}
+
+int JackEngine::InternalClientHandle(const char* client_name, int* status, int* int_ref)
+{
+	// Clear status
+	*status = 0;
+	
+	for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client && dynamic_cast<JackLoadableInternalClient*>(client) && (strcmp(client->GetClientControl()->fName, client_name) == 0)) {
+			JackLog("InternalClientHandle found client name = %s ref = %ld\n",  client_name, i);
+			*int_ref = i;
+			return 0;
+		}
+    }
+	
+	*status |= (JackNoSuchClient | JackFailure);
+	return -1;
+}
+
+int JackEngine::InternalClientUnload(int refnum, int* status)
+{
+	JackClientInterface* client = fClientTable[refnum];
+	if (client) {
+		int res = client->Close();
+		delete client;
+		*status = 0;
+		return res;
+	} else {
+		*status = (JackNoSuchClient | JackFailure);
+        return -1;
+    }
+}
+
 //-------------------
 // Client management
 //-------------------
@@ -384,8 +431,8 @@ int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int 
 	strcpy(name_res, name);
 	
 	if (protocol != JACK_PROTOCOL_VERSION) {
-		*status |= (JackFailure|JackVersionError);
-		jack_error ("JACK protocol mismatch (%d vs %d)", protocol, JACK_PROTOCOL_VERSION);
+		*status |= (JackFailure | JackVersionError);
+		jack_error("JACK protocol mismatch (%d vs %d)", protocol, JACK_PROTOCOL_VERSION);
 		return -1;
 	}
 	

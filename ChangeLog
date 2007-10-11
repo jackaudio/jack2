@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-11 Stephane Letz  <letz@grame.fr>
+
+	* Internal loadable client implementation (in progress).
+
 2007-10-08 Stephane Letz  <letz@grame.fr>
 
 	* Use .jackdrc file (instead of .jackdmprc). Install script now creates a link "jackd ==> jackdmp" so that automatic launch can work correctly. 

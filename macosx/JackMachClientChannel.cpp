@@ -254,6 +254,42 @@ void JackMachClientChannel::SetTimebaseCallback(int refnum, int conditional, int
     }
 }
 
+void JackMachClientChannel::GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
+{
+    kern_return_t res = rpc_jack_get_internal_clientname(fPrivatePort, refnum, int_ref, name_res, result);
+    if (res != KERN_SUCCESS) {
+        *result = -1;
+        jack_error("JackMachClientChannel::GetInternalClientName err = %s", mach_error_string(res));
+    }
+}
+
+void JackMachClientChannel::InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
+{
+    kern_return_t res = rpc_jack_internal_clienthandle(fPrivatePort, refnum, (char*)client_name, status, int_ref, result);
+    if (res != KERN_SUCCESS) {
+        *result = -1;
+        jack_error("JackMachClientChannel::InternalClientHandle err = %s", mach_error_string(res));
+    }
+}
+
+void JackMachClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+{
+    kern_return_t res = rpc_jack_internal_clientload(fPrivatePort, refnum, (char*)client_name, (char*)so_name, (char*)objet_data, options, status, int_ref, result);
+    if (res != KERN_SUCCESS) {
+        *result = -1;
+        jack_error("JackMachClientChannel::InternalClientLoad err = %s", mach_error_string(res));
+    }
+}
+
+void JackMachClientChannel::InternalClientUnload(int refnum, int int_ref, int* status, int* result)
+{
+    kern_return_t res = rpc_jack_internal_clientunload(fPrivatePort, refnum, int_ref, status, result);
+    if (res != KERN_SUCCESS) {
+        *result = -1;
+        jack_error("JackMachClientChannel::InternalClientUnload err = %s", mach_error_string(res));
+    }
+}
+
 bool JackMachClientChannel::Execute()
 {
     kern_return_t res;

@@ -116,5 +116,51 @@ JackClientControl* JackInternalClient::GetClientControl() const
     return fClientControl;
 }
 
+JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data)
+	:JackInternalClient(server, table)
+{
+	char path_to_so[PATH_MAX + 1];
+	//snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.so", so_name);
+	snprintf(path_to_so, sizeof(path_to_so), so_name);
+	snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
+	fHandle = LoadJackModule(path_to_so);
+	
+	printf("path_to_so %s\n", path_to_so);
+	
+	if (fHandle == 0) {
+		jack_error("error loading %s", so_name);
+		throw -1;
+	}
+
+	fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
+	if (!fInitialize) {
+		UnloadJackModule(fHandle);
+		jack_error("symbol jack_initialize cannot be found in %s", so_name);
+		throw -1;
+	}
+
+	fFinish = (FinishCallback)GetJackProc(fHandle, "jack_finish");
+	if (!fFinish) {
+		UnloadJackModule(fHandle);
+		jack_error("symbol jack_finish cannot be found in %s", so_name);
+		throw -1;
+	}
+}
+
+JackLoadableInternalClient::~JackLoadableInternalClient()
+{
+	if (fFinish) 
+		fFinish(fProcessArg);
+	UnloadJackModule(fHandle);
+}
+
+int JackLoadableInternalClient::Open(const char* name, jack_options_t options, jack_status_t* status)
+{
+	int res = JackInternalClient::Open(name, options, status);
+	if (res == 0) 
+		fInitialize((jack_client_t*)this, fObjectData);
+	return res;
+}
+
 } // end of namespace
 

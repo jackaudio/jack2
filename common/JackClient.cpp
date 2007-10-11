@@ -820,5 +820,61 @@ int JackClient::SetPortRegistrationCallback(JackPortRegistrationCallback callbac
     }
 }
 
+//------------------
+// Internal clients
+//------------------
+
+char* JackClient::GetInternalClientName(int ref)
+{
+	// TODO	
+	return "";
+}
+
+int JackClient::InternalClientHandle(const char* client_name, jack_status_t* status)
+{
+	int int_ref, result = -1;
+	fChannel->InternalClientHandle(GetClientControl()->fRefNum, client_name, (int*)status, &int_ref, &result);
+	return int_ref;
+}
+
+int JackClient::InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va)
+{
+	if (strlen(client_name) >= JACK_CLIENT_NAME_SIZE) {
+		jack_error ("\"%s\" is too long for a JACK client name.\n"
+			    "Please use %lu characters or less.",
+			    client_name, JACK_CLIENT_NAME_SIZE);
+		return 0;
+	}
+
+	if (va->load_name && (strlen(va->load_name) >= PATH_MAX)) {
+		jack_error("\"%s\" is too long for a shared object name.\n"
+			     "Please use %lu characters or less.",
+			    va->load_name, PATH_MAX);
+		int my_status1 = *status | (JackFailure | JackInvalidOption);
+		*status = (jack_status_t)my_status1;
+		return 0;
+	}
+
+	if (va->load_init && (strlen(va->load_init) >= JACK_LOAD_INIT_LIMIT)) {
+		jack_error ("\"%s\" is too long for internal client init "
+			    "string.\nPlease use %lu characters or less.",
+			    va->load_init, JACK_LOAD_INIT_LIMIT);
+		int my_status1 = *status | (JackFailure | JackInvalidOption);
+		*status = (jack_status_t)my_status1;
+		return 0;
+	}
+	
+	int int_ref, result = -1;
+	fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, &result);
+	return int_ref;
+}
+
+void JackClient::InternalClientUnload(int ref, jack_status_t* status)
+{
+	int result = -1;
+	fChannel->InternalClientUnload(GetClientControl()->fRefNum, ref, (int*)status, &result);
+}
+
+
 } // end of namespace
 

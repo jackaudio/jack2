@@ -458,6 +458,14 @@ int main(int argc, char* argv[])
         JackDelete();
         return 0;
     }
+	
+	/*
+	jack_client_t* c1 = my_jack_internal_client_new("c1", "inprocess.so", "untitled");
+	jack_client_t* c2 = my_jack_internal_client_new("c2", "inprocess.so", "untitled");
+	jack_client_t* c3 = my_jack_internal_client_new("c3", "inprocess.so", "untitled");
+	jack_client_t* c4 = my_jack_internal_client_new("c4", "inprocess.so", "untitled");
+	jack_client_t* c5 = my_jack_internal_client_new("c5", "inprocess.so", "untitled");
+	*/
 
     /*
     For testing purpose...
@@ -514,7 +522,15 @@ int main(int argc, char* argv[])
         // bugs that cause segfaults etc. during shutdown.
         sigprocmask(SIG_UNBLOCK, &signals, 0);
     }
-
+	
+	/*
+	my_jack_internal_client_close(c1);
+	my_jack_internal_client_close(c2);
+	my_jack_internal_client_close(c3);
+	my_jack_internal_client_close(c4);
+	my_jack_internal_client_close(c5);
+	*/
+	
     JackStop();
 
     jack_cleanup_shm();

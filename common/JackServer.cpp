@@ -35,6 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackSyncInterface.h"
 #include "JackGraphManager.h"
+#include "JackInternalClient.h"
 
 #ifdef __APPLE_
 #include <CoreFoundation/CFNotificationCenter.h>
@@ -169,6 +170,29 @@ int JackServer::Close()
 #endif
 
     return 0;
+}
+
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
+{
+	try {
+		// Clear status
+		*status = 0;
+		JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data); 
+		assert(client);
+		int res = client->Open(client_name, (jack_options_t)options, (jack_status_t*)status);
+		if (res < 0) {
+			delete client;
+			*int_ref = 0;
+		} else {
+			*int_ref = client->GetClientControl()->fRefNum;
+		}
+	} catch (...) {
+		int my_status1 = *status | JackFailure;
+		*status = (jack_status_t)my_status1;
+		*int_ref = 0;
+	}
+	
+	return 0;
 }
 
 int JackServer::Start()

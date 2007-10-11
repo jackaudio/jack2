@@ -26,7 +26,7 @@ typedef function_table_entry 	*function_table_t;
 #endif /* AUTOTEST */
 
 #ifndef	JackRPCEngine_MSG_COUNT
-#define	JackRPCEngine_MSG_COUNT	16
+#define	JackRPCEngine_MSG_COUNT	20
 #endif	/* JackRPCEngine_MSG_COUNT */
 
 #include <mach/std_types.h>
@@ -257,6 +257,71 @@ kern_return_t rpc_jack_set_timebase_callback
 	mach_port_t server_port,
 	int refnum,
 	int conditional,
+	int *result
+);
+
+/* Routine rpc_jack_get_internal_clientname */
+#ifdef	mig_external
+mig_external
+#else
+extern
+#endif	/* mig_external */
+kern_return_t rpc_jack_get_internal_clientname
+(
+	mach_port_t server_port,
+	int refnum,
+	int int_ref,
+	client_name_t client_name_res,
+	int *result
+);
+
+/* Routine rpc_jack_internal_clienthandle */
+#ifdef	mig_external
+mig_external
+#else
+extern
+#endif	/* mig_external */
+kern_return_t rpc_jack_internal_clienthandle
+(
+	mach_port_t server_port,
+	int refnum,
+	client_name_t client_name,
+	int *int_ref,
+	int *status,
+	int *result
+);
+
+/* Routine rpc_jack_internal_clientload */
+#ifdef	mig_external
+mig_external
+#else
+extern
+#endif	/* mig_external */
+kern_return_t rpc_jack_internal_clientload
+(
+	mach_port_t server_port,
+	int refnum,
+	client_name_t client_name,
+	so_name_t so_name,
+	objet_data_t objet_data,
+	int options,
+	int *status,
+	int *int_ref,
+	int *result
+);
+
+/* Routine rpc_jack_internal_clientunload */
+#ifdef	mig_external
+mig_external
+#else
+extern
+#endif	/* mig_external */
+kern_return_t rpc_jack_internal_clientunload
+(
+	mach_port_t server_port,
+	int refnum,
+	int int_ref,
+	int *status,
 	int *result
 );
 
@@ -495,6 +560,61 @@ __END_DECLS
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		int refnum;
+		int int_ref;
+	} __Request__rpc_jack_get_internal_clientname_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		client_name_t client_name;
+	} __Request__rpc_jack_internal_clienthandle_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		client_name_t client_name;
+		so_name_t so_name;
+		objet_data_t objet_data;
+		int options;
+	} __Request__rpc_jack_internal_clientload_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		int int_ref;
+	} __Request__rpc_jack_internal_clientunload_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
 		int notify;
 		int value;
 	} __Request__rpc_jack_client_rt_notify_t;
@@ -523,6 +643,10 @@ union __RequestUnion__JackRPCEngine_subsystem {
 	__Request__rpc_jack_set_freewheel_t Request_rpc_jack_set_freewheel;
 	__Request__rpc_jack_release_timebase_t Request_rpc_jack_release_timebase;
 	__Request__rpc_jack_set_timebase_callback_t Request_rpc_jack_set_timebase_callback;
+	__Request__rpc_jack_get_internal_clientname_t Request_rpc_jack_get_internal_clientname;
+	__Request__rpc_jack_internal_clienthandle_t Request_rpc_jack_internal_clienthandle;
+	__Request__rpc_jack_internal_clientload_t Request_rpc_jack_internal_clientload;
+	__Request__rpc_jack_internal_clientunload_t Request_rpc_jack_internal_clientunload;
 	__Request__rpc_jack_client_rt_notify_t Request_rpc_jack_client_rt_notify;
 };
 #endif /* !__RequestUnion__JackRPCEngine_subsystem__defined */
@@ -742,6 +866,64 @@ union __RequestUnion__JackRPCEngine_subsystem {
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		kern_return_t RetCode;
+		client_name_t client_name_res;
+		int result;
+	} __Reply__rpc_jack_get_internal_clientname_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int int_ref;
+		int status;
+		int result;
+	} __Reply__rpc_jack_internal_clienthandle_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int status;
+		int int_ref;
+		int result;
+	} __Reply__rpc_jack_internal_clientload_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int status;
+		int result;
+	} __Reply__rpc_jack_internal_clientunload_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
 	} __Reply__rpc_jack_client_rt_notify_t;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -768,6 +950,10 @@ union __ReplyUnion__JackRPCEngine_subsystem {
 	__Reply__rpc_jack_set_freewheel_t Reply_rpc_jack_set_freewheel;
 	__Reply__rpc_jack_release_timebase_t Reply_rpc_jack_release_timebase;
 	__Reply__rpc_jack_set_timebase_callback_t Reply_rpc_jack_set_timebase_callback;
+	__Reply__rpc_jack_get_internal_clientname_t Reply_rpc_jack_get_internal_clientname;
+	__Reply__rpc_jack_internal_clienthandle_t Reply_rpc_jack_internal_clienthandle;
+	__Reply__rpc_jack_internal_clientload_t Reply_rpc_jack_internal_clientload;
+	__Reply__rpc_jack_internal_clientunload_t Reply_rpc_jack_internal_clientunload;
 	__Reply__rpc_jack_client_rt_notify_t Reply_rpc_jack_client_rt_notify;
 };
 #endif /* !__RequestUnion__JackRPCEngine_subsystem__defined */
@@ -789,7 +975,11 @@ union __ReplyUnion__JackRPCEngine_subsystem {
     { "rpc_jack_set_freewheel", 1012 },\
     { "rpc_jack_release_timebase", 1013 },\
     { "rpc_jack_set_timebase_callback", 1014 },\
-    { "rpc_jack_client_rt_notify", 1015 }
+    { "rpc_jack_get_internal_clientname", 1015 },\
+    { "rpc_jack_internal_clienthandle", 1016 },\
+    { "rpc_jack_internal_clientload", 1017 },\
+    { "rpc_jack_internal_clientunload", 1018 },\
+    { "rpc_jack_client_rt_notify", 1019 }
 #endif
 
 #ifdef __AfterMigUserHeader

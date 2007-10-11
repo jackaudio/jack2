@@ -27,6 +27,8 @@ ServerPrefix server_;
 
 type client_name_t = c_string[128];
 type client_port_name_t = c_string[128];
+type so_name_t = c_string[1024];
+type objet_data_t = c_string[1024];
 
 routine rpc_jack_client_open(
 	server_port	: mach_port_t;
@@ -123,6 +125,39 @@ routine rpc_jack_set_timebase_callback(
 	server_port	: mach_port_t;
 	refnum		: int;
 	conditional	: int;
+	out result 	: int);
+	
+routine rpc_jack_get_internal_clientname(
+	server_port	: mach_port_t;
+	refnum		: int;
+	int_ref		: int;
+	out client_name_res	: client_name_t;
+	out result 	: int);
+	
+routine rpc_jack_internal_clienthandle(
+	server_port	: mach_port_t;
+	refnum		: int;
+	client_name	: client_name_t;
+	out int_ref : int;
+	out status	: int;
+	out result : int);
+	
+routine rpc_jack_internal_clientload(
+	server_port	: mach_port_t;
+	refnum		: int;
+	client_name	: client_name_t;
+	so_name		: so_name_t;
+	objet_data	: objet_data_t;
+	options		: int;
+	out status	: int;
+	out int_ref : int;
+	out result	: int);
+	
+routine rpc_jack_internal_clientunload(
+	server_port	: mach_port_t;
+	refnum		: int;
+	int_ref		: int;
+	out status	: int;
 	out result 	: int);
 
 simpleroutine rpc_jack_client_rt_notify(

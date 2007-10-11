@@ -1422,27 +1422,85 @@ EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 }
 
 // intclient.h
+
 EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intclient_t intclient)
 {
-    JackLog("jack_get_internal_client_name: not yet implemented\n");
-    return "";
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_get_internal_client_name called with a NULL client");
+		return "";
+    } else {
+        return client->GetInternalClientName(intclient);
+    }
 }
 
 EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, const char* client_name, jack_status_t* status)
 {
-    JackLog("jack_internal_client_handle: not yet implemented\n");
-    return 0;
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_internal_client_handle called with a NULL client");
+		return 0;
+    } else {
+		jack_status_t my_status;
+		if (status == NULL)		/* no status from caller? */
+			status = &my_status;	/* use local status word */
+		*status = (jack_status_t)0;
+        return client->InternalClientHandle(client_name, status);
+    }
 }
 
 EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
 {
-    JackLog("jack_internal_client_load: not yet implemented\n");
-    return 0;
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_internal_client_load called with a NULL client");
+		return 0;
+    } else {
+		va_list ap;
+		jack_varargs_t va;
+		jack_status_t my_status;
+		
+		if (status == NULL)			/* no status from caller? */
+			status = &my_status;	/* use local status word */
+		*status = (jack_status_t)0;
+
+		/* validate parameters */
+		if ((options & ~JackLoadOptions)) {
+			int my_status1 = *status | (JackFailure | JackInvalidOption);
+			*status = (jack_status_t)my_status1;
+			return 0;
+		}
+		
+		/* parse variable arguments */
+		va_start(ap, status);
+		jack_varargs_parse(options, ap, &va);
+		va_end(ap);
+	
+        return client->InternalClientLoad(client_name, options, status, &va);
+    }
 }
 
 EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack_intclient_t intclient)
 {
-    JackLog("jack_internal_client_unload: not yet implemented\n");
-    return JackFailure;
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_internal_client_unload called with a NULL client");
+		return (jack_status_t)(JackNoSuchClient | JackFailure);
+    } else {
+		jack_status_t my_status;
+        client->InternalClientUnload(intclient, &my_status);
+		return my_status;
+    }
 }
-

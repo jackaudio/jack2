@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackSynchro.h"
 #include "types.h"
 #include "transport_types.h"
+#include "varargs.h"
 #include <list>
 
 namespace Jack
@@ -149,6 +150,12 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		virtual int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
         virtual int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         virtual int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
+		
+		// Internal clients
+		virtual char* GetInternalClientName(int ref);
+		virtual int InternalClientHandle(const char* client_name, jack_status_t* status);
+		virtual int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
+		virtual void InternalClientUnload(int ref, jack_status_t* status);
 
         // JackRunnableInterface interface
         bool Init();

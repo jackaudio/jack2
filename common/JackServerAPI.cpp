@@ -41,7 +41,7 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name);
+    EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data);
     EXPORT void my_jack_internal_client_close(jack_client_t* ext_client);
 
     EXPORT jack_client_t * jack_client_open (const char *client_name,
@@ -56,21 +56,30 @@ extern "C"
 
 using namespace Jack;
 
-EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name)
+EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data)
 {
+	jack_status_t my_status = (jack_status_t)0;
+
     JackLog("jack_internal_client_new %s", client_name);
     if (client_name == NULL) {
         jack_error("jack_internal_client_new called with a NULL client_name");
         return NULL;
     }
-#ifdef __CLIENTDEBUG__
-    JackClient* client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
-#else
-    JackClient* client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); // To improve...
-#endif
+	
+	JackClient* client;
+	
+	try {
+	#ifdef __CLIENTDEBUG__
+		client = new JackDebugClient(new JackLoadableInternalClient(JackServer::fInstance, GetSynchroTable(), dll_name, object_data)); // Debug mode
+	#else
+		client = new JackLoadableInternalClient(JackServer::fInstance, GetSynchroTable(), dll_name, object_data); // To improve...
+	#endif
+	} catch (...) {  // Allocation or dynamic code loading failure
+		return NULL;
+	}
 
     jack_options_t options = JackUseExactName;
-    int res = client->Open(client_name, options, NULL);
+    int res = client->Open(client_name, options, &my_status);
     if (res < 0) {
         delete client;
         return NULL;

@@ -78,8 +78,7 @@ class JackEngine
 
         int Open();
         int Close();
-		
-
+	
         // Client management
 		int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
         int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
@@ -90,6 +89,11 @@ class JackEngine
     
         int ClientActivate(int refnum);
         int ClientDeactivate(int refnum);
+		
+		// Internal lient management
+		int GetInternalClientName(int int_ref, char* name_res);
+		int InternalClientHandle(const char* client_name, int* status, int* int_ref);
+		int InternalClientUnload(int refnum, int* status);
 
         // Port management
         int PortRegister(int refnum, const char* name, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index);

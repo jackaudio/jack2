@@ -73,7 +73,9 @@ class EXPORT JackServer
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
         void Notify(int refnum, int notify, int value);
-
+		
+		int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
+	
         JackEngine* GetEngine();
         JackEngineControl* GetEngineControl();
         JackSynchro** GetSynchroTable();

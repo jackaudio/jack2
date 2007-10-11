@@ -55,6 +55,51 @@ class JackInternalClient : public JackClient
         static JackEngineControl* fEngineControl;	/*! Shared engine cotrol */
 };
 
+/*!
+\brief Loadable internal clients in the server.
+*/
+
+#ifdef WIN32
+
+#include <windows.h>
+#define HANDLE HINSTANCE 
+#define LoadJackModule(name) LoadLibrary((name));
+#define UnloadJackModule(handle) FreeLibrary((handle));  
+#define GetJackProc(handle, name) GetProcAddress((handle), (name));
+
+#else
+
+#include <dlfcn.h>
+#define HANDLE void* 
+#define LoadJackModule(name) dlopen((name), RTLD_NOW | RTLD_LOCAL);
+#define UnloadJackModule(handle) dlclose((handle));
+#define GetJackProc(handle, name) dlsym((handle), (name));
+
+#endif
+
+typedef int (*InitializeCallback)(jack_client_t*, const char*);
+typedef void (*FinishCallback)(void *);
+
+class JackLoadableInternalClient : public JackInternalClient
+{
+
+    private:
+	
+		HANDLE fHandle;
+		InitializeCallback fInitialize;
+		FinishCallback fFinish;		
+		char fObjectData[JACK_LOAD_INIT_LIMIT];
+
+    public:
+
+        JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data);
+	    virtual ~JackLoadableInternalClient();
+		
+		int Open(const char* name, jack_options_t options, jack_status_t* status);
+
+};
+
+
 } // end of namespace
 
 #endif

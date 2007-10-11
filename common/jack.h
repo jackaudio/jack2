@@ -152,7 +152,7 @@ extern "C"
                                   const char *load_name,
                                   const char *load_init);
 
-    jack_client_t* my_jack_internal_client_new(const char* client_name);
+    jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data);
 
     /**
      * Remove an internal client from a JACK server.

@@ -35,7 +35,7 @@ extern "C"
     EXPORT int jack_internal_client_new (const char *client_name,
                                          const char *load_name,
                                          const char *load_init);
-    EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name);
+    EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data);
     EXPORT void jack_internal_client_close (const char *client_name);
     EXPORT void my_jack_internal_client_close (jack_client_t* client);
     EXPORT int jack_is_realtime (jack_client_t *client);

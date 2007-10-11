@@ -179,6 +179,46 @@ rpc_type server_rpc_jack_set_timebase_callback(mach_port_t private_port, int ref
     return KERN_SUCCESS;
 }
 
+//------------------
+// Internal clients
+//------------------
+
+rpc_type server_rpc_jack_get_internal_clientname(mach_port_t private_port, int refnum, int int_ref, client_name_t name_res, int* result)
+{
+	JackLog("server_rpc_jack_get_internal_clientname\n");
+    JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
+    assert(channel);
+	//*result = channel->GetServer()->GetEngine()->GetInternalClientName(int_ref, (char*)name_res);
+	return KERN_SUCCESS;
+}
+
+rpc_type server_rpc_jack_internal_clienthandle(mach_port_t private_port, int refnum, client_name_t client_name, int* status, int* int_ref, int* result)
+{
+	JackLog("server_rpc_jack_internal_clienthandle\n");
+    JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
+    assert(channel);
+	*result = channel->GetServer()->GetEngine()->InternalClientHandle(client_name, status, int_ref);
+	return KERN_SUCCESS;
+}
+
+rpc_type server_rpc_jack_internal_clientload(mach_port_t private_port, int refnum, client_name_t client_name, so_name_t so_name, objet_data_t objet_data, int options, int* status, int* int_ref, int* result)
+{
+ 	JackLog("server_rpc_jack_internal_clientload\n");
+    JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
+	assert(channel);
+	*result = channel->GetServer()->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status);
+	return KERN_SUCCESS;
+}
+
+rpc_type server_rpc_jack_internal_clientunload(mach_port_t private_port, int refnum, int int_ref, int* status, int* result)
+{
+    JackLog("server_rpc_jack_internal_clientunload\n");
+    JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
+    assert(channel);
+	*result = channel->GetServer()->GetEngine()->InternalClientUnload(int_ref, status);
+	return KERN_SUCCESS;
+}
+
 //-----------------
 // RT notification
 //-----------------
