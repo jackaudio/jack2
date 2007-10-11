@@ -62,10 +62,6 @@ JackEngine::~JackEngine()
 	delete fSignal;
 }
 
-//-------------------
-// Client management
-//-------------------
-
 int JackEngine::Open()
 {
     JackLog("JackEngine::Open\n");
@@ -97,6 +93,10 @@ int JackEngine::Close()
 	fSignal->Destroy();
     return 0;
 }
+
+//-----------------------------
+// Client ressource management
+//-----------------------------
 
 int JackEngine::AllocateRefnum()
 {
