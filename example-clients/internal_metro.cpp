@@ -57,7 +57,7 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
         client_name = (char *) malloc (9 * sizeof (char));
         strcpy (client_name, "metro");
     }
-    if ((client = my_jack_internal_client_new (client_name)) == 0) {
+    if ((client = jack_client_new (client_name)) == 0) {
         fprintf (stderr, "jack server not running?\n");
         return ;
     }
@@ -119,5 +119,5 @@ InternalMetro::~InternalMetro()
     jack_deactivate(client);
     jack_port_unregister(client, input_port);
     jack_port_unregister(client, output_port);
-    my_jack_internal_client_close(client);
+    jack_client_close(client);
 }
