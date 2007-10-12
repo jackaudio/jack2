@@ -1422,7 +1422,6 @@ EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 }
 
 // intclient.h
-
 EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intclient_t intclient)
 {
 #ifdef __CLIENTDEBUG__
