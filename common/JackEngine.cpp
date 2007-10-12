@@ -84,7 +84,8 @@ int JackEngine::Close()
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            JackLog("JackEngine::Close remaining client %ld\n", i);
+	        JackLog("JackEngine::Close remaining client %ld\n", i);
+			fClientTable[i] = NULL;
             client->Close();
             delete client;
         }
