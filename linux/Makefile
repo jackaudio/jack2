@@ -59,7 +59,7 @@ CXXFLAGS := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"
 
 all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
-        synchroClient synchroServer synchroServerClient testSem jack_test
+        synchroClient synchroServer synchroServerClient testSem jack_test inprocess jack_load jack_unload
 
 freebob : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
@@ -79,8 +79,16 @@ testSem: JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o
 
 jack_test: jack_test.o
 		$(CXX) $(CXXFLAGS) jack_test.o -L. -ljackmp -o jack_test
-		
 
+inprocess: inprocess.o
+		$(CXX) $(CXXFLAGS) inprocess.o -L. -ljackmp -o inprocess.so
+
+jack_load: ipload.o
+		$(CXX) $(CXXFLAGS) ipload.o -L. -ljackmp -o jack_load
+
+jack_unload: ipunload.o
+		$(CXX) $(CXXFLAGS) ipunload.o -L. -ljackmp -o jack_unload
+		
 $(TARGET_LINUX_SERVER_LIB) : $(objects_common_server_lib)
 	$(CXX) $(CXXFLAGS) -shared $(objects_common_server_lib) $(LIB_LINUX) -o $(TARGET_LINUX_SERVER_LIB)
 
@@ -133,7 +141,6 @@ remove:
 	&& ln -s libjack.so.0.0.23  libjack.so && ln -s libjack.so.0.0.23  libjack.so.0 || echo "Jack not restored"
 	cd $(prefix)/bin && [ -f tmp_jackd ] && mv -f tmp_jackd jackd
 	/sbin/ldconfig
-
 
 clean :
 	rm -f *.o
