@@ -723,14 +723,14 @@ struct JackGetInternalClientNameRequest : public JackRequest
 \brief GetInternalClient result.
 */
 
-struct JackGetInternalClientResult : public JackResult
+struct JackGetInternalClientNameResult : public JackResult
 {
 
 	char fName[JACK_CLIENT_NAME_SIZE + 1];
 
-    JackGetInternalClientResult():JackResult()
+    JackGetInternalClientNameResult():JackResult()
     {}
-    JackGetInternalClientResult(int32_t result, const char* name)
+    JackGetInternalClientNameResult(int32_t result, const char* name)
          : JackResult(result)
     {
 		  snprintf(fName, sizeof(fName), "%s", name);

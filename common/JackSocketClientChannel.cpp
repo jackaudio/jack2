@@ -253,7 +253,7 @@ void JackSocketClientChannel::SetTimebaseCallback(int refnum, int conditional, i
 void JackSocketClientChannel::GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
 {
     JackGetInternalClientNameRequest req(refnum, int_ref);
-    JackGetInternalClientResult res;
+    JackGetInternalClientNameResult res;
     ServerSyncCall(&req, &res, result);
 	strcpy(name_res, res.fName);
 }

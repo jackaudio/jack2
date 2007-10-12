@@ -301,6 +301,46 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 res.Write(socket);
                 break;
             }
+			
+		case JackRequest::kGetInternalClientName: {
+                JackLog("JackRequest::kGetInternalClientName\n");
+                JackGetInternalClientNameRequest req;
+                JackGetInternalClientNameResult res;
+                if (req.Read(socket) == 0)
+					res.fResult = fServer->GetEngine()->GetInternalClientName(req.fIntRefNum, res.fName);
+                res.Write(socket);
+                break;
+            }
+			
+		case JackRequest::kInternalClientHandle: {
+                JackLog("JackRequest::kInternalClientHandle\n");
+                JackInternalClientHandleRequest req;
+                JackInternalClientHandleResult res;
+                if (req.Read(socket) == 0)
+					res.fResult = fServer->GetEngine()->InternalClientHandle(req.fName, &res.fStatus, &res.fIntRefNum);
+                res.Write(socket);
+                break;
+            }
+			
+		case JackRequest::kInternalClientLoad: {
+                JackLog("JackRequest::kInternalClientLoad\n");
+                JackInternalClientLoadRequest req;
+                JackInternalClientLoadResult res;
+                if (req.Read(socket) == 0)
+					res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus);
+                res.Write(socket);
+                break;
+            }
+			
+		case JackRequest::kInternalClientUnload: {
+                JackLog("JackRequest::kInternalClientUnload\n");
+                JackInternalClientUnloadRequest req;
+                JackInternalClientUnloadResult res;
+                if (req.Read(socket) == 0)
+					res.fResult = fServer->GetEngine()->InternalClientUnload(req.fIntRefNum, &res.fStatus);
+                res.Write(socket);
+                break;
+            }
 
         case JackRequest::kNotification: {
                 JackLog("JackRequest::Notification\n");
