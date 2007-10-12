@@ -80,7 +80,12 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
 
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);
-
+		
+		void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result);
+        void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result);
+        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result);
+        void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
+  
         // JackRunnableInterface interface
         bool Init();
         bool Execute();

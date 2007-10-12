@@ -188,7 +188,7 @@ rpc_type server_rpc_jack_get_internal_clientname(mach_port_t private_port, int r
 	JackLog("server_rpc_jack_get_internal_clientname\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-	//*result = channel->GetServer()->GetEngine()->GetInternalClientName(int_ref, (char*)name_res);
+	*result = channel->GetServer()->GetEngine()->GetInternalClientName(int_ref, (char*)name_res);
 	return KERN_SUCCESS;
 }
 

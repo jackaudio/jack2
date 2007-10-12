@@ -151,6 +151,12 @@ main (int argc, char *argv[])
 	}
 
 	fprintf (stdout, "%s is running.\n", load_name);
+	
+	char* name = jack_get_internal_client_name(client, intclient);
+	if (name) {
+		printf("client name = %s\n", name);
+		free(name);
+	}
 
 	if (wait_opt) {
 		/* define a signal handler to unload the client, then

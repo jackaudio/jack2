@@ -62,8 +62,12 @@ struct JackRequest
         kClientClose = 24,
         kConnectNamePorts = 25,
         kDisconnectNamePorts = 26,
+		kGetInternalClientName = 27,
+		kInternalClientHandle = 28,
+		kInternalClientLoad = 29,
+		kInternalClientUnload = 30,
 
-        kNotification = 27
+        kNotification = 31
     };
 
     RequestType fType;
@@ -129,7 +133,7 @@ struct JackClientCheckRequest : public JackRequest
 
     JackClientCheckRequest()
     {}
-    JackClientCheckRequest(const char* name,int protocol, int options): JackRequest(JackRequest::kClientCheck),fProtocol(protocol),fOptions(options)
+    JackClientCheckRequest(const char* name, int protocol, int options): JackRequest(JackRequest::kClientCheck),fProtocol(protocol),fOptions(options)
     {
         snprintf(fName, sizeof(fName), "%s", name);
     }
@@ -682,6 +686,272 @@ struct JackSetTimebaseCallbackRequest : public JackRequest
  		CheckRes(JackRequest::Write(trans));
 		CheckRes(trans->Write(&fRefNum, sizeof(int)));
 		return trans->Write(&fConditionnal, sizeof(int));
+    }
+};
+
+/*!
+\brief GetInternalClientName request.
+*/
+
+struct JackGetInternalClientNameRequest : public JackRequest
+{
+
+ 	int fRefNum;
+    int fIntRefNum;
+
+    JackGetInternalClientNameRequest()
+    {}
+    JackGetInternalClientNameRequest(int refnum, int int_ref)
+		: JackRequest(JackRequest::kGetInternalClientName),fRefNum(refnum),fIntRefNum(int_ref)
+    {}
+
+    int Read(JackChannelTransaction* trans)
+    {
+		CheckRes(trans->Read(&fRefNum, sizeof(int)));
+		return trans->Read(&fIntRefNum, sizeof(int));
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+		CheckRes(JackRequest::Write(trans));
+		CheckRes(trans->Write(&fRefNum, sizeof(int)));
+		return trans->Write(&fIntRefNum, sizeof(int));
+    }
+};
+
+/*!
+\brief GetInternalClient result.
+*/
+
+struct JackGetInternalClientResult : public JackResult
+{
+
+	char fName[JACK_CLIENT_NAME_SIZE + 1];
+
+    JackGetInternalClientResult():JackResult()
+    {}
+    JackGetInternalClientResult(int32_t result, const char* name)
+         : JackResult(result)
+    {
+		  snprintf(fName, sizeof(fName), "%s", name);
+	}
+
+	int Read(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Read(trans));
+		CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+		return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Write(trans));
+		CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+		return 0;
+    }
+};
+
+/*!
+\brief InternalClientHandle request.
+*/
+
+struct JackInternalClientHandleRequest : public JackRequest
+{
+
+ 	int fRefNum;
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+
+    JackInternalClientHandleRequest()
+    {}
+    JackInternalClientHandleRequest(int refnum, const char* client_name)
+		: JackRequest(JackRequest::kInternalClientHandle),fRefNum(refnum)
+    {
+		snprintf(fName, sizeof(fName), "%s", client_name);
+	}
+
+    int Read(JackChannelTransaction* trans)
+    {
+		CheckRes(trans->Read(&fRefNum, sizeof(int)));
+		return trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1);
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+		CheckRes(JackRequest::Write(trans));
+		CheckRes(trans->Write(&fRefNum, sizeof(int)));
+		return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
+    }
+};
+
+/*!
+\brief InternalClientHandle result.
+*/
+
+struct JackInternalClientHandleResult : public JackResult
+{
+
+	int fStatus;
+	int fIntRefNum;
+
+    JackInternalClientHandleResult():JackResult()
+    {}
+    JackInternalClientHandleResult(int32_t result, int status, int int_ref)
+         : JackResult(result),fStatus(status),fIntRefNum(int_ref)
+    {}
+
+	int Read(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Read(trans));
+		CheckRes(trans->Read(&fStatus, sizeof(int)));
+		CheckRes(trans->Read(&fIntRefNum, sizeof(int)));
+		return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Write(trans));
+		CheckRes(trans->Write(&fStatus, sizeof(int)));
+		CheckRes(trans->Write(&fIntRefNum, sizeof(int)));
+		return 0;
+    }
+};
+
+/*!
+\brief InternalClientLoad request.
+*/
+
+struct JackInternalClientLoadRequest : public JackRequest
+{
+
+	#define MAX_PATH 256
+	
+ 	int fRefNum;
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+	char fDllName[MAX_PATH + 1];
+	char fLoadInitName[JACK_LOAD_INIT_LIMIT + 1];
+	int fOptions;
+
+    JackInternalClientLoadRequest()
+    {}
+    JackInternalClientLoadRequest(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options)
+		: JackRequest(JackRequest::kInternalClientLoad),fRefNum(refnum),fOptions(options)
+    {
+		snprintf(fName, sizeof(fName), "%s", client_name);
+		snprintf(fDllName, sizeof(fDllName), "%s", so_name);
+		snprintf(fLoadInitName, sizeof(fLoadInitName), "%s", objet_data);
+	}
+
+    int Read(JackChannelTransaction* trans)
+    {
+		CheckRes(trans->Read(&fRefNum, sizeof(int)));
+		CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+		CheckRes(trans->Read(&fDllName, MAX_PATH + 1));
+		CheckRes(trans->Read(&fLoadInitName, JACK_LOAD_INIT_LIMIT + 1));
+		return trans->Read(&fOptions, sizeof(int));
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+		CheckRes(JackRequest::Write(trans));
+		CheckRes(trans->Write(&fRefNum, sizeof(int)));
+		CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+		CheckRes(trans->Write(&fDllName, MAX_PATH + 1));
+		CheckRes(trans->Write(&fLoadInitName, JACK_LOAD_INIT_LIMIT + 1));
+		return trans->Write(&fOptions, sizeof(int));
+    }
+};
+
+/*!
+\brief InternalClientLoad result.
+*/
+
+struct JackInternalClientLoadResult : public JackResult
+{
+
+	int fStatus;
+	int fIntRefNum;
+
+    JackInternalClientLoadResult():JackResult()
+    {}
+    JackInternalClientLoadResult(int32_t result, int status, int int_ref)
+         : JackResult(result),fStatus(status),fIntRefNum(int_ref)
+    {}
+
+	int Read(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Read(trans));
+		CheckRes(trans->Read(&fStatus, sizeof(int)));
+		CheckRes(trans->Read(&fIntRefNum, sizeof(int)));
+		return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Write(trans));
+		CheckRes(trans->Write(&fStatus, sizeof(int)));
+		CheckRes(trans->Write(&fIntRefNum, sizeof(int)));
+		return 0;
+    }
+};
+
+/*!
+\brief InternalClientUnload request.
+*/
+
+struct JackInternalClientUnloadRequest : public JackRequest
+{
+
+ 	int fRefNum;
+    int fIntRefNum;
+
+    JackInternalClientUnloadRequest()
+    {}
+    JackInternalClientUnloadRequest(int refnum, int int_ref)
+		: JackRequest(JackRequest::kInternalClientUnload),fRefNum(refnum),fIntRefNum(int_ref)
+    {}
+
+    int Read(JackChannelTransaction* trans)
+    {
+		CheckRes(trans->Read(&fRefNum, sizeof(int)));
+		return trans->Read(&fIntRefNum, sizeof(int));
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+		CheckRes(JackRequest::Write(trans));
+		CheckRes(trans->Write(&fRefNum, sizeof(int)));
+		return trans->Write(&fIntRefNum, sizeof(int));
+    }
+};
+
+
+/*!
+\brief InternalClientLoad result.
+*/
+
+struct JackInternalClientUnloadResult : public JackResult
+{
+
+	int fStatus;
+
+    JackInternalClientUnloadResult():JackResult()
+    {}
+    JackInternalClientUnloadResult(int32_t result, int status)
+         : JackResult(result),fStatus(status)
+    {}
+
+	int Read(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Read(trans));
+		CheckRes(trans->Read(&fStatus, sizeof(int)));
+		return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+ 		CheckRes(JackResult::Write(trans));
+		CheckRes(trans->Write(&fStatus, sizeof(int)));
+		return 0;
     }
 };
 

@@ -377,9 +377,10 @@ void JackEngine::NotifyActivate(int refnum)
 // Loadable client management
 //----------------------------
 
-int JackEngine::GetInternalClientName(int int_ref, char* name_res)
+int JackEngine::GetInternalClientName(int refnum, char* name_res)
 {
-	JackClientInterface* client = fClientTable[int_ref];
+	assert(refnum >= 0 && refnum < CLIENT_NUM);
+	JackClientInterface* client = fClientTable[refnum];
 	if (client) {
 		strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
 		return 0;
@@ -408,6 +409,7 @@ int JackEngine::InternalClientHandle(const char* client_name, int* status, int* 
 
 int JackEngine::InternalClientUnload(int refnum, int* status)
 {
+	assert(refnum >= 0 && refnum < CLIENT_NUM);
 	JackClientInterface* client = fClientTable[refnum];
 	if (client) {
 		int res = client->Close();

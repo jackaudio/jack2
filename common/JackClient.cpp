@@ -826,8 +826,17 @@ int JackClient::SetPortRegistrationCallback(JackPortRegistrationCallback callbac
 
 char* JackClient::GetInternalClientName(int ref)
 {
-	// TODO	
-	return "";
+	char name_res[JACK_CLIENT_NAME_SIZE]; 
+	int result = -1;
+	fChannel->GetInternalClientName(GetClientControl()->fRefNum, ref, name_res, &result);
+	
+	if (result < 0) {
+		return NULL;
+	} else {
+		char* name = (char*)malloc(strlen(name_res));
+		strcpy(name, name_res);
+		return name;
+	}
 }
 
 int JackClient::InternalClientHandle(const char* client_name, jack_status_t* status)

@@ -250,6 +250,40 @@ void JackSocketClientChannel::SetTimebaseCallback(int refnum, int conditional, i
     ServerSyncCall(&req, &res, result);
 }
 
+void JackSocketClientChannel::GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
+{
+    JackGetInternalClientNameRequest req(refnum, int_ref);
+    JackGetInternalClientResult res;
+    ServerSyncCall(&req, &res, result);
+	strcpy(name_res, res.fName);
+}
+
+void JackSocketClientChannel::InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
+{
+    JackInternalClientHandleRequest req(refnum, client_name);
+    JackInternalClientHandleResult res;
+    ServerSyncCall(&req, &res, result);
+	*int_ref = res.fIntRefNum;
+	*status = res.fStatus;
+}
+
+void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+{
+    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options);
+    JackInternalClientLoadResult res;
+    ServerSyncCall(&req, &res, result);
+	*int_ref = res.fIntRefNum;
+	*status = res.fStatus;
+}
+
+void JackSocketClientChannel::InternalClientUnload(int refnum, int int_ref, int* status, int* result)
+{
+    JackInternalClientUnloadRequest req(refnum, int_ref);
+    JackInternalClientUnloadResult res;
+    ServerSyncCall(&req, &res, result);
+	*status = res.fStatus;
+}
+
 bool JackSocketClientChannel::Init()
 {
     JackLog("JackSocketClientChannel::Init \n");

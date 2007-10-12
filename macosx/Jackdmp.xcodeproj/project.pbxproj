@@ -340,14 +340,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4BA692A60CBE4BC700EAD520 /* jack_load Universal */;
+			remoteGlobalIDString = 4BA692A60CBE4BC700EAD520;
 			remoteInfo = "jack_load Universal";
 		};
 		4BA693EA0CBE5BBA00EAD520 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4BA692CA0CBE4C9000EAD520 /* jack_unload Universal */;
+			remoteGlobalIDString = 4BA692CA0CBE4C9000EAD520;
 			remoteInfo = "jack_unload Universal";
 		};
 		4BD624D20CBCF55700DE782F /* PBXContainerItemProxy */ = {
