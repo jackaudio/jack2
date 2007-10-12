@@ -81,7 +81,7 @@ jack_test: jack_test.o
 		$(CXX) $(CXXFLAGS) jack_test.o -L. -ljackmp -o jack_test
 
 inprocess: inprocess.o
-		$(CXX) $(CXXFLAGS) inprocess.o -L. -ljackmp -o inprocess.so
+		$(CXX) $(CXXFLAGS) -shared inprocess.o -L. -ljackmp -o inprocess.so
 
 jack_load: ipload.o
 		$(CXX) $(CXXFLAGS) ipload.o -L. -ljackmp -o jack_load
