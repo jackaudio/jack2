@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackChannel.h"
 #include "JackTransportEngine.h"
+#include "driver_interface.h"
 #include <math.h>
 #include <string>
 #include <algorithm>
