@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-16 Stephane Letz  <letz@grame.fr>
+
+	* Internal loadable client implementation, winpipe version added. 
+
 2007-10-12 Stephane Letz  <letz@grame.fr>
 
 	* Internal loadable client implementation, socket version added. 
