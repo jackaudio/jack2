@@ -125,7 +125,7 @@ JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackS
 	snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
 	fHandle = LoadJackModule(path_to_so);
 	
-	printf("path_to_so %s\n", path_to_so);
+	JackLog("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s\n", path_to_so);
 	
 	if (fHandle == 0) {
 		jack_error("error loading %s", so_name);
