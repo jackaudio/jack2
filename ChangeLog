@@ -15,7 +15,7 @@ Tom Szilagyi
 
 2007-10-16 Stephane Letz  <letz@grame.fr>
 
-	* Reorganize jack hearders. 
+	* Reorganize jack headers. Improve Linux install/remove scripts.
 
 2007-10-16 Stephane Letz  <letz@grame.fr>
 
