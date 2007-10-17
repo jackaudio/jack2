@@ -2,7 +2,7 @@
   Jackdmp Todo list
 ---------------------
 
-2007-10-17 Optimize activation call graph with multiple clients in a process:
+2007-10-17 Optimize activation call graph with multiple clients in a process
 
 Andrzej Szombierski recently did interesting test to measure jack client activation speed in different context: jack client opened in separated processes, multiple jack clients running in the server, multiple jack clients running in a same separated process, this using jackd or jackdmp.
 
@@ -28,7 +28,7 @@ Also having multiple clients in a same process (jack server or separated process
 
 (and this would be done recursively following a sequential path in the graph until no more client in the same process is found)
 
-There is still an issue if a client uses the "Fons special" ((-:  new jack_thread_wait API, where a client explicitly gives control back to libjack... I still don't have a clear idea if this optimization path could still be done.
+There is still an issue if a client uses the "Fons special" ((-: new jack_thread_wait API, where a client explicitly gives control back to libjack... I still don't have a clear idea if this optimization path could still be done.
 
 Even if the "multiple clients" way is not really used in existing applications, is it a desirable feature to have at some point?
 
