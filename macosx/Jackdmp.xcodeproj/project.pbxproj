@@ -288,7 +288,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
+			remoteGlobalIDString = 4BE50F8D0B01EE8000C05E63;
 			remoteInfo = "Jackwrapper.framework Universal";
 		};
 		4B699DB3097D421700A18468 /* PBXContainerItemProxy */ = {
@@ -2740,7 +2740,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jackdmp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -2794,7 +2794,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jackdmp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -2846,7 +2846,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jackdmp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -2905,7 +2905,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = YES;
@@ -2956,7 +2956,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = NO;
@@ -3005,7 +3005,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 			};
@@ -3062,7 +3062,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackdmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = YES;
@@ -3115,7 +3115,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackdmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = NO;
@@ -3166,7 +3166,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackdmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 			};
@@ -3196,7 +3196,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3228,7 +3228,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3258,7 +3258,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3290,7 +3290,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_lsp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3320,7 +3320,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_lsp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3348,7 +3348,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_lsp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3379,7 +3379,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_connect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				SYMROOT = build;
 				WARNING_CFLAGS = (
@@ -3409,7 +3409,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_connect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				SYMROOT = build;
 				WARNING_CFLAGS = (
@@ -3437,7 +3437,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_connect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				SYMROOT = build;
 				WARNING_CFLAGS = (
@@ -3469,7 +3469,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_disconnect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3498,7 +3498,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_disconnect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3525,7 +3525,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_disconnect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3558,7 +3558,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_freewheel;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3589,7 +3589,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_freewheel;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3618,7 +3618,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_freewheel;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3653,7 +3653,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_external_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3686,7 +3686,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_external_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3717,7 +3717,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_external_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3752,7 +3752,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testAtomic;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3786,7 +3786,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testAtomic;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3818,7 +3818,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testAtomic;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3850,7 +3850,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testSem;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3881,7 +3881,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testSem;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3910,7 +3910,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testSem;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3942,7 +3942,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = zombie;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3972,7 +3972,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = zombie;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4000,7 +4000,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = zombie;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4036,7 +4036,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServer;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4070,7 +4070,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServer;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4102,7 +4102,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServer;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4138,7 +4138,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4172,7 +4172,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4204,7 +4204,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4240,7 +4240,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServerClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4274,7 +4274,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServerClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4306,7 +4306,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServerClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4355,7 +4355,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_coreaudio;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4401,7 +4401,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_coreaudio;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4445,7 +4445,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_coreaudio;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4492,7 +4492,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_dummy;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4536,7 +4536,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_dummy;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4578,7 +4578,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_dummy;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4647,7 +4647,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_portaudio;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4695,7 +4695,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_portaudio;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4741,7 +4741,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_portaudio;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4772,7 +4772,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_load;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4802,7 +4802,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_load;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4830,7 +4830,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_load;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4861,7 +4861,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_unload;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4891,7 +4891,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_unload;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4919,7 +4919,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_unload;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4969,7 +4969,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5016,7 +5016,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5061,7 +5061,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5098,7 +5098,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				ZERO_LINK = YES;
 			};
 			name = Development;
@@ -5128,7 +5128,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
@@ -5156,7 +5156,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				ZERO_LINK = YES;
 			};
 			name = Default;
@@ -5182,7 +5182,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_test;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5212,7 +5212,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_test;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5240,7 +5240,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_test;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5271,7 +5271,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_cpu;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5301,7 +5301,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_cpu;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5329,7 +5329,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_cpu;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5361,7 +5361,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jdelay;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5391,7 +5391,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jdelay;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5419,7 +5419,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jdelay;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = "";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk/;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
