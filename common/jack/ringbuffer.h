@@ -16,7 +16,6 @@
   along with this program; if not, write to the Free Software 
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-  $Id: ringbuffer.h,v 1.2.2.1 2006/06/20 14:44:00 letz Exp $
 */
 
 #ifndef _RINGBUFFER_H
