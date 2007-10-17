@@ -2,6 +2,37 @@
   Jackdmp Todo list
 ---------------------
 
+2007-10-17 Optimize activation call graph with multiple clients in a process:
+
+Andrzej Szombierski recently did interesting test to measure jack client activation speed in different context: jack client opened in separated processes, multiple jack clients running in the server, multiple jack clients running in a same separated process, this using jackd or jackdmp.
+
+jackd:
+
+- multiple jack clients in the server: fast because *direct function call* to the client process callback is done bypassing the fifo based activation system
+- jack clients in separated processes: slower using the fifo based activation system
+- multiple jack clients in a separated process: slower using the fifo based activation system
+
+jackdmp:
+
+- multiple jack clients in the server: slower using the fifo based activation system
+- jack clients in separated processes: slower using the fifo based activation system
+- multiple jack clients in a separated process: slower using the fifo based activation system
+
+So basically jackdmp use the same fifo based activated system in all cases, and jackd does some optimization in the "multiple jack clients in the server" case.
+
+Also having multiple clients in a same process (jack server or separated process) is not so common, it may still be interesting to be able to optimize the activation path with sequential clients in a same process (server or separated). I am thinking in a method that could be done in jackdmp data-flow model: since the activation path is "computed on the fly" when following links between clients, the step where a client activates all its output could be reworked a little with something like:
+
+- find one of the client in the output client list that is in the same process
+- activate all other output clients using the normal fifo based system
+- *direct* call the client process callback
+
+(and this would be done recursively following a sequential path in the graph until no more client in the same process is found)
+
+There is still an issue if a client uses the "Fons special" ((-:  new jack_thread_wait API, where a client explicitly gives control back to libjack... I still don't have a clear idea if this optimization path could still be done.
+
+Even if the "multiple clients" way is not really used in existing applications, is it a desirable feature to have at some point?
+
+
 2007-10-07 Before doing an official package, check all public headers
 
 2007-03-14 Check JackGraphManager::GetPortsAux after MIDI branch merge.
