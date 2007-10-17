@@ -17,7 +17,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "types.h"
+//#include "types.h"
+#include "jack/types.h"
 #include "varargs.h"
 
 int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* status);

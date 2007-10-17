@@ -1,9 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#include "jack.h"
-#include "intclient.h"
+#include <jack/jack.h>
+#include <jack/intclient.h>
 
 int
 main (int argc, char *argv[])

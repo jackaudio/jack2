@@ -109,8 +109,8 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
     }
 
     if (jack_activate (client)) {
-        fprintf (stderr, "cannot activate client");
-        return ;
+        fprintf(stderr, "cannot activate client");
+        return;
     }
 }
 

@@ -25,8 +25,7 @@
 #include <math.h>
 #include <getopt.h>
 #include <string.h>
-
-#include "jack.h"
+#include <jack/jack.h>
 
 typedef jack_default_audio_sample_t sample_t;
 

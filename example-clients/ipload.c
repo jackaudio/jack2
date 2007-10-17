@@ -4,9 +4,8 @@
 #include <signal.h>
 #include <unistd.h>
 #include <getopt.h>
-
-#include "jack.h"
-#include "intclient.h"
+#include <jack/jack.h>
+#include <jack/intclient.h>
 
 jack_client_t *client;
 jack_intclient_t intclient;

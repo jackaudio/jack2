@@ -26,8 +26,7 @@ extern "C"
 {
 #endif
 
-//#include <jack/types.h>
-#include "types.h"
+#include <jack/types.h>
 
     /**
      * @return the maximum delay reported by the backend since

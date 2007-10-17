@@ -5,8 +5,7 @@
 #endif
 #include <string.h>
 #include <getopt.h>
-
-#include "jack.h"
+#include <jack/jack.h>
 
 char * my_name;
 

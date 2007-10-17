@@ -15,7 +15,7 @@
 			dependencies = (
 				4B699DB4097D421700A18468 /* PBXTargetDependency */,
 				4B699DB6097D421700A18468 /* PBXTargetDependency */,
-				4BE50F9D0B01EEE500C05E63 /* PBXTargetDependency */,
+				4B1C1AC00CC61597005F551E /* PBXTargetDependency */,
 				4B699DB8097D421700A18468 /* PBXTargetDependency */,
 				4B699DBA097D421700A18468 /* PBXTargetDependency */,
 				4B699DBC097D421700A18468 /* PBXTargetDependency */,
@@ -81,7 +81,6 @@
 		4B699C1C097D421600A18468 /* JackSocketNotifyChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441A08AF54930094983C /* JackSocketNotifyChannel.h */; };
 		4B699C1D097D421600A18468 /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441B08AF54930094983C /* JackSocketServerChannel.h */; };
 		4B699C1E097D421600A18468 /* JackFifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B56881008B5C8620022B32D /* JackFifo.h */; };
-		4B699C1F097D421600A18468 /* ringbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B003AB108E2B2BA0060EFDC /* ringbuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B699C20097D421600A18468 /* JackSynchro.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD561C708EEB910006BBC2A /* JackSynchro.h */; };
 		4B699C21097D421600A18468 /* JackDebugClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B98AE010931D30C0091932A /* JackDebugClient.h */; };
 		4B699C22097D421600A18468 /* JackConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B66A8580934964500A89560 /* JackConstants.h */; };
@@ -138,7 +137,6 @@
 		4B699C64097D421600A18468 /* JackSocketNotifyChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441A08AF54930094983C /* JackSocketNotifyChannel.h */; };
 		4B699C65097D421600A18468 /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441B08AF54930094983C /* JackSocketServerChannel.h */; };
 		4B699C66097D421600A18468 /* JackFifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B56881008B5C8620022B32D /* JackFifo.h */; };
-		4B699C67097D421600A18468 /* ringbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B003AB108E2B2BA0060EFDC /* ringbuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B699C68097D421600A18468 /* JackSynchro.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD561C708EEB910006BBC2A /* JackSynchro.h */; };
 		4B699C69097D421600A18468 /* JackAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D2290834F07D00C94B91 /* JackAudioDriver.h */; };
 		4B699C6A097D421600A18468 /* JackFreewheelDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1B90834EEF100C94B91 /* JackFreewheelDriver.h */; };
@@ -249,6 +247,18 @@
 		4B699D9B097D421700A18468 /* JackCoreAudioDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B395C9606AEF53800923527 /* JackCoreAudioDriver.cpp */; };
 		4B699DA8097D421700A18468 /* JackDummyDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3988A08B3CF6C00B6F371 /* JackDummyDriver.h */; };
 		4B699DAA097D421700A18468 /* JackDummyDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */; };
+		4B6C73800CC60A7F001AFFD4 /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C73790CC60A6D001AFFD4 /* intclient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73810CC60A7F001AFFD4 /* jack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737A0CC60A6D001AFFD4 /* jack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73820CC60A7F001AFFD4 /* ringbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737B0CC60A6D001AFFD4 /* ringbuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73830CC60A80001AFFD4 /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737C0CC60A6D001AFFD4 /* statistics.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73840CC60A80001AFFD4 /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737D0CC60A6D001AFFD4 /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73850CC60A81001AFFD4 /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737E0CC60A6D001AFFD4 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73860CC60A83001AFFD4 /* jack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737A0CC60A6D001AFFD4 /* jack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73870CC60A84001AFFD4 /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C73790CC60A6D001AFFD4 /* intclient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73880CC60A84001AFFD4 /* ringbuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737B0CC60A6D001AFFD4 /* ringbuffer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C73890CC60A85001AFFD4 /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737C0CC60A6D001AFFD4 /* statistics.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C738A0CC60A85001AFFD4 /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737D0CC60A6D001AFFD4 /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B6C738B0CC60A86001AFFD4 /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737E0CC60A6D001AFFD4 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B978DED0A31D099009E2DD1 /* JackPortAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B978DEB0A31D099009E2DD1 /* JackPortAudioDriver.h */; };
 		4B978DEE0A31D099009E2DD1 /* JackPortAudioDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B978DEC0A31D099009E2DD1 /* JackPortAudioDriver.cpp */; };
 		4BA692B30CBE4C2D00EAD520 /* ipload.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BA692B20CBE4C2D00EAD520 /* ipload.c */; };
@@ -261,32 +271,26 @@
 		4BD4B4E409BACEF300750C0F /* JackTransportEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */; };
 		4BD4B4E509BACEF300750C0F /* JackTransportEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */; };
 		4BD6240D0CBCF16600DE782F /* inprocess.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BD6240C0CBCF16600DE782F /* inprocess.c */; };
+		4BE3225A0CC611EF00AFA640 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737F0CC60A6D001AFFD4 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BE3225B0CC611F500AFA640 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737F0CC60A6D001AFFD4 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BE50F960B01EEC400C05E63 /* JackAPIWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */; };
 		4BE6C6AD0A3E0A65005A203A /* jack_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */; };
-		4BF5202B0CB8CF610037470E /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202A0CB8CF610037470E /* intclient.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BF5202C0CB8CF610037470E /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202A0CB8CF610037470E /* intclient.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BF5202D0CB8CF610037470E /* intclient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202A0CB8CF610037470E /* intclient.h */; };
-		4BF520300CB8CF7E0037470E /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202E0CB8CF7E0037470E /* statistics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BF520310CB8CF7E0037470E /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202F0CB8CF7E0037470E /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BF520320CB8CF7E0037470E /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202E0CB8CF7E0037470E /* statistics.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BF520330CB8CF7E0037470E /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202F0CB8CF7E0037470E /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BF520340CB8CF7E0037470E /* statistics.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202E0CB8CF7E0037470E /* statistics.h */; };
-		4BF520350CB8CF7E0037470E /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF5202F0CB8CF7E0037470E /* thread.h */; };
 		4BF520530CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
 		4BF520540CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
 		4BF520590CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BF5205A0CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BF5205B0CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; };
-		4BFA99600AAAEE5C009E916C /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21C0834F04800C94B91 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BFA99610AAAEE5E009E916C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21B0834F04800C94B91 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BFA99620AAAEE72009E916C /* jack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D2170834F03500C94B91 /* jack.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BFA99730AAAF025009E916C /* jack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D2170834F03500C94B91 /* jack.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BFA99740AAAF02D009E916C /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21C0834F04800C94B91 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		4BFA99750AAAF030009E916C /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D21B0834F04800C94B91 /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4B1C1ABF0CC61597005F551E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
+			remoteInfo = "Jackwrapper.framework Universal";
+		};
 		4B699DB3097D421700A18468 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -356,13 +360,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4BD623ED0CBCF0F000DE782F;
 			remoteInfo = inprocess;
-		};
-		4BE50F9C0B01EEE500C05E63 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4BE50F8D0B01EE8000C05E63;
-			remoteInfo = "Jackwrapper.framework Universal";
 		};
 		4BE99D620AD7A19100C59091 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -474,7 +471,6 @@
 /* Begin PBXFileReference section */
 		4B003A6008E2A87A0060EFDC /* JackError.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = JackError.c; path = ../common/JackError.c; sourceTree = SOURCE_ROOT; };
 		4B003AB008E2B2BA0060EFDC /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ringbuffer.c; path = ../common/ringbuffer.c; sourceTree = SOURCE_ROOT; };
-		4B003AB108E2B2BA0060EFDC /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ringbuffer.h; path = ../common/ringbuffer.h; sourceTree = SOURCE_ROOT; };
 		4B123D3308B3954300540632 /* JackGlobalsClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobalsClient.cpp; path = ../common/JackGlobalsClient.cpp; sourceTree = SOURCE_ROOT; };
 		4B123D3608B3954A00540632 /* JackGlobalsServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobalsServer.cpp; path = ../common/JackGlobalsServer.cpp; sourceTree = SOURCE_ROOT; };
 		4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
@@ -508,6 +504,13 @@
 		4B699D91097D421700A18468 /* synchroServerClient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = synchroServerClient; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B699DA1097D421700A18468 /* jack_coreaudio.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_coreaudio.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B699DB0097D421700A18468 /* jack_dummy.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_dummy.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B6C73790CC60A6D001AFFD4 /* intclient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = intclient.h; path = ../common/jack/intclient.h; sourceTree = SOURCE_ROOT; };
+		4B6C737A0CC60A6D001AFFD4 /* jack.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = jack.h; path = ../common/jack/jack.h; sourceTree = SOURCE_ROOT; };
+		4B6C737B0CC60A6D001AFFD4 /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ringbuffer.h; path = ../common/jack/ringbuffer.h; sourceTree = SOURCE_ROOT; };
+		4B6C737C0CC60A6D001AFFD4 /* statistics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = statistics.h; path = ../common/jack/statistics.h; sourceTree = SOURCE_ROOT; };
+		4B6C737D0CC60A6D001AFFD4 /* thread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = thread.h; path = ../common/jack/thread.h; sourceTree = SOURCE_ROOT; };
+		4B6C737E0CC60A6D001AFFD4 /* transport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = transport.h; path = ../common/jack/transport.h; sourceTree = SOURCE_ROOT; };
+		4B6C737F0CC60A6D001AFFD4 /* types.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../common/jack/types.h; sourceTree = SOURCE_ROOT; };
 		4B799AD607899652003F3F15 /* JackMachPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachPort.cpp; sourceTree = "<group>"; };
 		4B799AD707899652003F3F15 /* JackMachPort.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JackMachPort.h; sourceTree = "<group>"; };
 		4B869B3D08C8D21C001CF041 /* driver_interface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = driver_interface.h; path = ../common/driver_interface.h; sourceTree = SOURCE_ROOT; };
@@ -560,9 +563,6 @@
 		4BEE0B2C08ACBB9F00D22B43 /* JackPosixSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackPosixSemaphore.cpp; path = ../common/JackPosixSemaphore.cpp; sourceTree = SOURCE_ROOT; };
 		4BEE0B2D08ACBB9F00D22B43 /* JackPosixSemaphore.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackPosixSemaphore.h; path = ../common/JackPosixSemaphore.h; sourceTree = SOURCE_ROOT; };
 		4BF3937C0626BF3600CC67FA /* JackMacLibClientRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacLibClientRPC.cpp; sourceTree = SOURCE_ROOT; };
-		4BF5202A0CB8CF610037470E /* intclient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = intclient.h; path = ../common/intclient.h; sourceTree = SOURCE_ROOT; };
-		4BF5202E0CB8CF7E0037470E /* statistics.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = statistics.h; path = ../common/statistics.h; sourceTree = SOURCE_ROOT; };
-		4BF5202F0CB8CF7E0037470E /* thread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = thread.h; path = ../common/thread.h; sourceTree = SOURCE_ROOT; };
 		4BF520520CB8D0E80037470E /* timestamps.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = timestamps.c; path = ../common/timestamps.c; sourceTree = SOURCE_ROOT; };
 		4BF520580CB8D1010037470E /* timestamps.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = timestamps.h; path = ../common/timestamps.h; sourceTree = SOURCE_ROOT; };
 		4BF6C1D508ACE64C001E2013 /* JackMachSemaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachSemaphore.cpp; sourceTree = SOURCE_ROOT; };
@@ -621,10 +621,7 @@
 		4BF8D2100834F01C00C94B91 /* JackEngineTiming.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackEngineTiming.h; path = ../common/JackEngineTiming.h; sourceTree = SOURCE_ROOT; };
 		4BF8D2130834F02800C94B91 /* JackEngine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackEngine.h; path = ../common/JackEngine.h; sourceTree = SOURCE_ROOT; };
 		4BF8D2140834F02800C94B91 /* JackEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackEngine.cpp; path = ../common/JackEngine.cpp; sourceTree = SOURCE_ROOT; };
-		4BF8D2170834F03500C94B91 /* jack.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = jack.h; path = ../common/jack.h; sourceTree = SOURCE_ROOT; };
 		4BF8D2190834F03D00C94B91 /* JackEngineControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackEngineControl.h; path = ../common/JackEngineControl.h; sourceTree = SOURCE_ROOT; };
-		4BF8D21B0834F04800C94B91 /* types.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../common/types.h; sourceTree = SOURCE_ROOT; };
-		4BF8D21C0834F04800C94B91 /* transport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = transport.h; path = ../common/transport.h; sourceTree = SOURCE_ROOT; };
 		4BF8D2210834F05C00C94B91 /* JackServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServer.cpp; path = ../common/JackServer.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8D2220834F05C00C94B91 /* JackServer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackServer.h; path = ../common/JackServer.h; sourceTree = SOURCE_ROOT; };
 		4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Jackdmp.cpp; path = ../common/Jackdmp.cpp; sourceTree = SOURCE_ROOT; };
@@ -962,11 +959,25 @@
 			name = Tests;
 			sourceTree = "<group>";
 		};
+		4B6C73780CC60A6D001AFFD4 /* jack */ = {
+			isa = PBXGroup;
+			children = (
+				4B6C73790CC60A6D001AFFD4 /* intclient.h */,
+				4B6C737A0CC60A6D001AFFD4 /* jack.h */,
+				4B6C737B0CC60A6D001AFFD4 /* ringbuffer.h */,
+				4B6C737C0CC60A6D001AFFD4 /* statistics.h */,
+				4B6C737D0CC60A6D001AFFD4 /* thread.h */,
+				4B6C737E0CC60A6D001AFFD4 /* transport.h */,
+				4B6C737F0CC60A6D001AFFD4 /* types.h */,
+			);
+			name = jack;
+			path = ../common/jack;
+			sourceTree = SOURCE_ROOT;
+		};
 		4B765CC805ECE17900571F78 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
 				4B003AB008E2B2BA0060EFDC /* ringbuffer.c */,
-				4B003AB108E2B2BA0060EFDC /* ringbuffer.h */,
 				4B003A6008E2A87A0060EFDC /* JackError.c */,
 				4BF8D1770834EE4800C94B91 /* JackError.h */,
 				4BF8D1830834EE5800C94B91 /* JackTime.h */,
@@ -978,12 +989,7 @@
 		4B9B627005E60A9E001E19AA /* Server */ = {
 			isa = PBXGroup;
 			children = (
-				4BF5202E0CB8CF7E0037470E /* statistics.h */,
-				4BF5202F0CB8CF7E0037470E /* thread.h */,
-				4BF5202A0CB8CF610037470E /* intclient.h */,
-				4BF8D2170834F03500C94B91 /* jack.h */,
-				4BF8D21B0834F04800C94B91 /* types.h */,
-				4BF8D21C0834F04800C94B91 /* transport.h */,
+				4B6C73780CC60A6D001AFFD4 /* jack */,
 				4B66A8580934964500A89560 /* JackConstants.h */,
 				4BFB73F608AD291A00DB99B8 /* JackGlobals.h */,
 				4B2C28F908DAD01E00249230 /* JackGlobals.cpp */,
@@ -1271,18 +1277,18 @@
 				4B699C1C097D421600A18468 /* JackSocketNotifyChannel.h in Headers */,
 				4B699C1D097D421600A18468 /* JackSocketServerChannel.h in Headers */,
 				4B699C1E097D421600A18468 /* JackFifo.h in Headers */,
-				4B699C1F097D421600A18468 /* ringbuffer.h in Headers */,
 				4B699C20097D421600A18468 /* JackSynchro.h in Headers */,
 				4B699C21097D421600A18468 /* JackDebugClient.h in Headers */,
 				4B699C22097D421600A18468 /* JackConstants.h in Headers */,
 				4BD4B4E509BACEF300750C0F /* JackTransportEngine.h in Headers */,
-				4BFA99600AAAEE5C009E916C /* transport.h in Headers */,
-				4BFA99610AAAEE5E009E916C /* types.h in Headers */,
-				4BFA99620AAAEE72009E916C /* jack.h in Headers */,
-				4BF5202B0CB8CF610037470E /* intclient.h in Headers */,
-				4BF520300CB8CF7E0037470E /* statistics.h in Headers */,
-				4BF520310CB8CF7E0037470E /* thread.h in Headers */,
 				4BF520590CB8D1010037470E /* timestamps.h in Headers */,
+				4B6C73800CC60A7F001AFFD4 /* intclient.h in Headers */,
+				4B6C73810CC60A7F001AFFD4 /* jack.h in Headers */,
+				4B6C73820CC60A7F001AFFD4 /* ringbuffer.h in Headers */,
+				4B6C73830CC60A80001AFFD4 /* statistics.h in Headers */,
+				4B6C73840CC60A80001AFFD4 /* thread.h in Headers */,
+				4B6C73850CC60A81001AFFD4 /* transport.h in Headers */,
+				4BE3225A0CC611EF00AFA640 /* types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1315,7 +1321,6 @@
 				4B699C64097D421600A18468 /* JackSocketNotifyChannel.h in Headers */,
 				4B699C65097D421600A18468 /* JackSocketServerChannel.h in Headers */,
 				4B699C66097D421600A18468 /* JackFifo.h in Headers */,
-				4B699C67097D421600A18468 /* ringbuffer.h in Headers */,
 				4B699C68097D421600A18468 /* JackSynchro.h in Headers */,
 				4B699C69097D421600A18468 /* JackAudioDriver.h in Headers */,
 				4B699C6A097D421600A18468 /* JackFreewheelDriver.h in Headers */,
@@ -1338,13 +1343,14 @@
 				4B699C7B097D421600A18468 /* JackConstants.h in Headers */,
 				4BD4B4D809BACD9600750C0F /* JackTransportEngine.h in Headers */,
 				4BC2168E0A444BED00BDA09F /* JackServerGlobals.h in Headers */,
-				4BFA99730AAAF025009E916C /* jack.h in Headers */,
-				4BFA99740AAAF02D009E916C /* transport.h in Headers */,
-				4BFA99750AAAF030009E916C /* types.h in Headers */,
-				4BF5202C0CB8CF610037470E /* intclient.h in Headers */,
-				4BF520320CB8CF7E0037470E /* statistics.h in Headers */,
-				4BF520330CB8CF7E0037470E /* thread.h in Headers */,
 				4BF5205A0CB8D1010037470E /* timestamps.h in Headers */,
+				4B6C73860CC60A83001AFFD4 /* jack.h in Headers */,
+				4B6C73870CC60A84001AFFD4 /* intclient.h in Headers */,
+				4B6C73880CC60A84001AFFD4 /* ringbuffer.h in Headers */,
+				4B6C73890CC60A85001AFFD4 /* statistics.h in Headers */,
+				4B6C738A0CC60A85001AFFD4 /* thread.h in Headers */,
+				4B6C738B0CC60A86001AFFD4 /* transport.h in Headers */,
+				4BE3225B0CC611F500AFA640 /* types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1491,9 +1497,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BF5202D0CB8CF610037470E /* intclient.h in Headers */,
-				4BF520340CB8CF7E0037470E /* statistics.h in Headers */,
-				4BF520350CB8CF7E0037470E /* thread.h in Headers */,
 				4BF5205B0CB8D1010037470E /* timestamps.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2501,6 +2504,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4B1C1AC00CC61597005F551E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
+			targetProxy = 4B1C1ABF0CC61597005F551E /* PBXContainerItemProxy */;
+		};
 		4B699DB4097D421700A18468 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4B699C4C097D421600A18468 /* Jackdmp.framework Universal */;
@@ -2550,11 +2558,6 @@
 			isa = PBXTargetDependency;
 			target = 4BD623ED0CBCF0F000DE782F /* inprocess */;
 			targetProxy = 4BD624D20CBCF55700DE782F /* PBXContainerItemProxy */;
-		};
-		4BE50F9D0B01EEE500C05E63 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
-			targetProxy = 4BE50F9C0B01EEE500C05E63 /* PBXContainerItemProxy */;
 		};
 		4BE99D630AD7A19100C59091 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2737,7 +2740,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jackdmp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -2791,7 +2794,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jackdmp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -2843,7 +2846,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jackdmp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -2875,7 +2878,10 @@
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
-				HEADER_SEARCH_PATHS = RPC;
+				HEADER_SEARCH_PATHS = (
+					RPC,
+					../common/jack,
+				);
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
@@ -2899,7 +2905,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = YES;
@@ -2924,7 +2930,10 @@
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
-				HEADER_SEARCH_PATHS = RPC;
+				HEADER_SEARCH_PATHS = (
+					RPC,
+					../common/jack,
+				);
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
@@ -2947,7 +2956,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = NO;
@@ -2970,7 +2979,10 @@
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
-				HEADER_SEARCH_PATHS = RPC;
+				HEADER_SEARCH_PATHS = (
+					RPC,
+					../common/jack,
+				);
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
@@ -2993,7 +3005,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 			};
@@ -3021,7 +3033,10 @@
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
-				HEADER_SEARCH_PATHS = RPC;
+				HEADER_SEARCH_PATHS = (
+					RPC,
+					../common/jack,
+				);
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
@@ -3047,7 +3062,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackdmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = YES;
@@ -3072,7 +3087,10 @@
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
-				HEADER_SEARCH_PATHS = RPC;
+				HEADER_SEARCH_PATHS = (
+					RPC,
+					../common/jack,
+				);
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
@@ -3097,7 +3115,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackdmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				ZERO_LINK = NO;
@@ -3120,7 +3138,10 @@
 				GCC_WARN_FOUR_CHARACTER_CONSTANTS = NO;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
-				HEADER_SEARCH_PATHS = RPC;
+				HEADER_SEARCH_PATHS = (
+					RPC,
+					../common/jack,
+				);
 				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
@@ -3145,7 +3166,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Jackdmp;
 				REZ_EXECUTABLE = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 			};
@@ -3154,13 +3175,17 @@
 		4B699CB8097D421600A18468 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3171,7 +3196,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3185,10 +3210,14 @@
 		4B699CB9097D421600A18468 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3199,7 +3228,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3213,8 +3242,12 @@
 		4B699CBA097D421600A18468 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = ppc;
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3225,7 +3258,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3248,6 +3281,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3256,7 +3290,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_lsp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3277,6 +3311,7 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3285,7 +3320,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_lsp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3304,6 +3339,7 @@
 					i386,
 				);
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3312,7 +3348,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_lsp;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3334,6 +3370,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3342,7 +3379,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_connect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				SYMROOT = build;
 				WARNING_CFLAGS = (
@@ -3363,6 +3400,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3371,7 +3409,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_connect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				SYMROOT = build;
 				WARNING_CFLAGS = (
@@ -3390,6 +3428,7 @@
 					ppc,
 					i386,
 				);
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3398,7 +3437,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_connect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				SYMROOT = build;
 				WARNING_CFLAGS = (
@@ -3421,6 +3460,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3429,7 +3469,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_disconnect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3449,6 +3489,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3457,7 +3498,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_disconnect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3475,6 +3516,7 @@
 					ppc,
 					i386,
 				);
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3483,7 +3525,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_disconnect;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3505,6 +3547,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3515,7 +3558,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_freewheel;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3535,6 +3578,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3545,7 +3589,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_freewheel;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3563,6 +3607,7 @@
 					ppc,
 					i386,
 				);
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3573,7 +3618,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_freewheel;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3596,6 +3641,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3607,7 +3653,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_external_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3628,6 +3674,7 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3639,7 +3686,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_external_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3658,6 +3705,7 @@
 					i386,
 				);
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3669,7 +3717,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_external_metro;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3704,7 +3752,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testAtomic;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3738,7 +3786,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testAtomic;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3770,7 +3818,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testAtomic;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3802,7 +3850,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testSem;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3833,7 +3881,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testSem;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3862,7 +3910,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = testSem;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3884,6 +3932,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3893,7 +3942,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = zombie;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3913,6 +3962,7 @@
 				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3922,7 +3972,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = zombie;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3940,6 +3990,7 @@
 					ppc,
 					i386,
 				);
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3949,7 +4000,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = zombie;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -3985,7 +4036,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServer;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4019,7 +4070,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServer;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4051,7 +4102,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServer;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4087,7 +4138,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4121,7 +4172,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4153,7 +4204,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4189,7 +4240,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServerClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4223,7 +4274,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServerClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4255,7 +4306,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = synchroServerClient;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4304,7 +4355,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_coreaudio;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4350,7 +4401,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_coreaudio;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4394,7 +4445,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_coreaudio;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4441,7 +4492,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_dummy;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4485,7 +4536,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_dummy;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4527,7 +4578,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_dummy;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4596,7 +4647,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_portaudio;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4644,7 +4695,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_portaudio;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4690,7 +4741,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = jack_portaudio;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4712,6 +4763,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -4720,7 +4772,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_load;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4741,6 +4793,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -4749,7 +4802,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_load;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4768,6 +4821,7 @@
 					i386,
 				);
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -4776,7 +4830,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_load;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4798,6 +4852,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -4806,7 +4861,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_unload;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4827,6 +4882,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -4835,7 +4891,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_unload;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4854,6 +4910,7 @@
 					i386,
 				);
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -4862,7 +4919,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_unload;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4890,6 +4947,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = ../common;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
@@ -4911,7 +4969,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4937,6 +4995,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = ../common;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
@@ -4957,7 +5016,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -4981,6 +5040,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = ../common;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
@@ -5001,7 +5061,7 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5029,6 +5089,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = ../common/jack;
 				INFOPLIST_FILE = "Jackwrapper-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				OTHER_LDFLAGS = (
@@ -5037,7 +5098,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				ZERO_LINK = YES;
 			};
 			name = Development;
@@ -5058,6 +5119,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = ../common/jack;
 				INFOPLIST_FILE = "Jackwrapper-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				OTHER_LDFLAGS = (
@@ -5066,7 +5128,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				ZERO_LINK = NO;
 			};
 			name = Deployment;
@@ -5085,6 +5147,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = ../common/jack;
 				INFOPLIST_FILE = "Jackwrapper-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				OTHER_LDFLAGS = (
@@ -5093,7 +5156,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = Jackwrapper;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				ZERO_LINK = YES;
 			};
 			name = Default;
@@ -5110,6 +5173,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5118,7 +5182,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_test;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5139,6 +5203,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5147,7 +5212,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_test;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5166,6 +5231,7 @@
 					i386,
 				);
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5174,7 +5240,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_test;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5196,6 +5262,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5204,7 +5271,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_cpu;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5225,6 +5292,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5233,7 +5301,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_cpu;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5252,6 +5320,7 @@
 					i386,
 				);
 				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5260,7 +5329,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_cpu;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5283,6 +5352,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5291,7 +5361,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jdelay;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5312,6 +5382,7 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5320,7 +5391,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jdelay;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",
@@ -5339,6 +5410,7 @@
 					i386,
 				);
 				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5347,7 +5419,7 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jdelay;
 				REZ_EXECUTABLE = YES;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
 					"-Wmost",

@@ -27,7 +27,8 @@ extern "C"
 {
 #endif
 
-#include "types.h"
+//#include "types.h"
+#include <jack/types.h>
 
     /**
      * Transport states.

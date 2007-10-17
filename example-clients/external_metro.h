@@ -33,10 +33,8 @@ extern "C"
 #include <math.h>
 #include <getopt.h>
 #include <string.h>
-
-#include "jack.h"
-#include "transport.h"
-
+#include <jack/jack.h>
+#include <jack/transport.h>
 
     typedef jack_default_audio_sample_t sample_t;
 

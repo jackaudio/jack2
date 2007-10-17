@@ -26,9 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
-
-#include "jack.h"
+#include <jack/jack.h>
 
 jack_port_t *input_port;
 jack_port_t *output_port;

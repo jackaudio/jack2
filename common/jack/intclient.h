@@ -26,8 +26,7 @@ extern "C"
 {
 #endif
 
-//#include <jack/types.h>
-#include "types.h"
+#include <jack/types.h>
 
     /**
      * Get an internal client's name.  This is useful when @ref

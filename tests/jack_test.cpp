@@ -34,9 +34,8 @@
 #include <math.h>
 #include <assert.h>
 #include <stdarg.h>
-
-#include "jack.h"
-#include "transport.h"
+#include <jack/jack.h>
+#include <jack/transport.h>
 
 
 #ifdef WIN32

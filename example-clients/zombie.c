@@ -23,8 +23,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-
-#include "jack.h"
+#include <jack/jack.h>
 
 int running = 1;
 int count = 0;

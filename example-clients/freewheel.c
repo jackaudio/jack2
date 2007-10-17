@@ -24,8 +24,8 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include "jack.h"
-#include "transport.h"
+#include <jack/jack.h>
+#include <jack/transport.h>
 
 char *package;				/* program name */
 jack_client_t *client;

@@ -23,14 +23,14 @@
 
 #ifdef WIN32
 	#include <windows.h>
-typedef char int8_t;
-typedef unsigned char uint8_t;
-typedef short int16_t;
-typedef unsigned short uint16_t;
-typedef long int32_t;
-typedef unsigned long uint32_t;
-typedef LONGLONG int64_t;
-typedef ULONGLONG uint64_t;
+	typedef char int8_t;
+	typedef unsigned char uint8_t;
+	typedef short int16_t;
+	typedef unsigned short uint16_t;
+	typedef long int32_t;
+	typedef unsigned long uint32_t;
+	typedef LONGLONG int64_t;
+	typedef ULONGLONG uint64_t;
 #else
 	#include <inttypes.h>
 #endif
@@ -187,7 +187,7 @@ typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int, void *arg
  *                     zero if the client is being unregistered
  * @param arg pointer to a client supplied structure
  */ 
-typedef void (*JackClientRegistrationCallback)(const char* name, int register, void *arg);
+typedef void (*JackClientRegistrationCallback)(const char* name, int val, void *arg);
 
 /**
  * Prototype for the client supplied function that is called 
