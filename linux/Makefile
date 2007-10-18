@@ -126,7 +126,7 @@ install:
 	cd $(prefix)/$(libdir) && rm -f libjack.so*
 	cd $(prefix)/$(libdir) && ln -s libjackmp.so  libjack.so
 	cd $(prefix)/$(libdir) && ln -s libjackmp.so  libjack.so.0
-	cd $(prefix)/$(libdir) && ln -s jackdmp jackd
+	cd $(prefix)/bin && ln -s jackdmp jackd
 	/sbin/ldconfig
 
 # Remove jackdmp and tries to restore jack
