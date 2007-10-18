@@ -3048,9 +3048,12 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
-					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -3101,9 +3104,12 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
-					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -3152,9 +3158,12 @@
 				OTHER_CPLUSPLUSFLAGS = (
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
-					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
