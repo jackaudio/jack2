@@ -2,6 +2,7 @@
 # Choose the installation location
 prefix := /usr/local
 prefix := ${DESTDIR}${prefix}
+libdir := lib
 
 subprojects := ../common ../common/jack ../tests ../example-clients alsa freebob
 
@@ -114,18 +115,18 @@ $(TARGET_LINUX_DUMMY) : $(objects_linux_dummy)
 # Install jackdmp and overwrite jack installation
 install:
 	cp jackdmp $(prefix)/bin
-	cp libjackmp.so $(prefix)/lib
-	cp libjackdmp.so $(prefix)/lib
-	install -d $(prefix)/lib/jackmp/
-	cp jack_alsa.so $(prefix)/lib/jackmp
-	cp jack_dummy.so $(prefix)/lib/jackmp
-	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/lib/jackmp || echo "freebob driver not installed"
-	cd $(prefix)/lib && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
+	cp libjackmp.so $(prefix)/$(libdir)
+	cp libjackdmp.so $(prefix)/$(libdir)
+	install -d $(prefix)/$(libdir)/jackmp/
+	cp jack_alsa.so $(prefix)/$(libdir)/jackmp
+	cp jack_dummy.so $(prefix)/$(libdir)/jackmp
+	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/$(libdir)/jackmp || echo "freebob driver not installed"
+	cd $(prefix)/$(libdir) && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "Jack not found, continue..."
 	cd $(prefix)/bin && [ -f jackd ]  && mv -f jackd tmp_jackd || echo "jackd server not found" 
-	cd $(prefix)/lib && rm -f libjack.so*
-	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so
-	cd $(prefix)/lib && ln -s libjackmp.so  libjack.so.0
-	cd $(prefix)/bin && ln -s jackdmp jackd
+	cd $(prefix)/$(libdir) && rm -f libjack.so*
+	cd $(prefix)/$(libdir) && ln -s libjackmp.so  libjack.so
+	cd $(prefix)/$(libdir) && ln -s libjackmp.so  libjack.so.0
+	cd $(prefix)/$(libdir) && ln -s jackdmp jackd
 	/sbin/ldconfig
 
 # Remove jackdmp and tries to restore jack
@@ -133,11 +134,11 @@ uninstall: remove
 
 remove:
 	rm $(prefix)/bin/jackdmp
-	rm $(prefix)/lib/libjackmp.so
-	rm $(prefix)/lib/libjackdmp.so
-	rm -r $(prefix)/lib/jackmp
-	cd $(prefix)/lib && rm -f libjack.so*
-	cd $(prefix)/lib && [ -f tmp_libjack.so.0.0.23 ] && mv -f tmp_libjack.so.0.0.23 libjack.so.0.0.23 \
+	rm $(prefix)/$(libdir)/libjackmp.so
+	rm $(prefix)/$(libdir)/libjackdmp.so
+	rm -r $(prefix)/$(libdir)/jackmp
+	cd $(prefix)/$(libdir) && rm -f libjack.so*
+	cd $(prefix)/$(libdir) && [ -f tmp_libjack.so.0.0.23 ] && mv -f tmp_libjack.so.0.0.23 libjack.so.0.0.23 \
 	&& ln -s libjack.so.0.0.23  libjack.so && ln -s libjack.so.0.0.23  libjack.so.0 || echo "libjack not restored"
 	cd $(prefix)/bin && [ -f tmp_jackd ] && mv -f tmp_jackd jackd || echo "jackd server not restored"
 	/sbin/ldconfig

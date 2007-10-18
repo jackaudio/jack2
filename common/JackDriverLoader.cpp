@@ -274,7 +274,11 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
     }
 #else
 	char driver_dir[512];
-	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
+	#ifdef _X86_64
+		snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib64/jackmp", ADDON_DIR);
+	#else
+		snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
+	#endif
 #endif
 
     filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
@@ -407,7 +411,12 @@ jack_drivers_load (JSList * drivers) {
 	}
 	*/
 	char driver_dir[512];
+
+#ifdef _X86_64
+	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib64/jackmp", ADDON_DIR);
+#else
 	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/lib/jackmp", ADDON_DIR);
+#endif
 
     /* search through the driver_dir and add get descriptors
     from the .so files in it */
