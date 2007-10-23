@@ -1386,7 +1386,7 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 {
 	#ifdef __APPLE__
-		return JackMachThread::AcquireRealTimeImp(thread, 0, 500 * 1000, 500 * 1000);
+		return JackMachThread::AcquireRealTimeImp(thread, GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
 	#elif WIN32
 		return JackWinThread::AcquireRealTimeImp(thread, priority);
 	#else
