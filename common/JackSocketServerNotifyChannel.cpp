@@ -27,10 +27,7 @@ namespace Jack
 
 int JackSocketServerNotifyChannel::Open(const char* server_name)
 {
-	char jack_server_dir_name[512];
-	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s_%s", jack_server_dir, server_name);
-
-    if (fRequestSocket.Connect(jack_server_dir_name, 0) < 0) {
+    if (fRequestSocket.Connect(jack_server_dir, 0) < 0) {
         jack_error("Cannot connect to server socket");
         return -1;
     } else {
