@@ -53,13 +53,10 @@ extern "C"
         jack_varargs_init (va);
 
         if ((options & JackServerName)) {
-			printf("jack_varargs_parse :JackServerName\n");
-            char *sn = va_arg(ap, char *);
-            if (sn) {
-				printf("jack_varargs_parse : FOUND SERVER NAME %s\n", sn);
-                va->server_name = sn;
-			}
-        }
+		   char *sn = va_arg(ap, char *);
+            if (sn) 
+				va->server_name = sn;
+	    }
         if ((options & JackLoadName))
             va->load_name = va_arg(ap, char *);
         if ((options & JackLoadInit))

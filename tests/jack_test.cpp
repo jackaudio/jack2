@@ -463,9 +463,8 @@ int main (int argc, char *argv[])
 {
     const char **inports; // array of PHY input/output
     const char **outports; // array of PHY input/outputs
-    //const char *server_name = NULL;
-	const char *server_name = "titititi";
-    const char **connexions1;
+    const char *server_name = NULL;
+	const char **connexions1;
     const char **connexions2;
     jack_status_t status;
     char portname[128] = "port";
@@ -481,8 +480,7 @@ int main (int argc, char *argv[])
     const char *options = "kRnqvt:";
     float ratio;		// for speed calculation in freewheel mode
     jack_options_t jack_options = JackNullOption; 
-	//jack_options_t jack_options = JackServerName;
-    struct option long_options[] = {
+	 struct option long_options[] = {
                                        {"realtime", 0, 0, 'R'},
                                        {"non-realtime", 0, 0, 'n'},
                                        {"time", 0, 0, 't'},

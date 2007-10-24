@@ -56,7 +56,7 @@ static inline bool CheckPort(jack_port_id_t port_index)
     return (port_index < PORT_NUM);
 }
 
-static jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t options, jack_status_t* status, ...)
+EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t options, jack_status_t* status, ...)
 {
     va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
@@ -74,9 +74,11 @@ static jack_client_t* jack_client_open_aux(const char* client_name, jack_options
     }
 
     /* parse variable arguments */
+	
     va_start(ap, status);
     jack_varargs_parse(options, ap, &va);
     va_end(ap);
+	
 	
     JackLog("jack_client_open %s\n", client_name);
     if (client_name == NULL) {
@@ -118,16 +120,7 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
     if (getenv("JACK_START_SERVER") == NULL)
         options |= JackNoStartServer;
 
-    return jack_client_open_aux(client_name, (jack_options_t)options, NULL);
-}
-
-EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t options, jack_status_t* status, ...)
-{
-    va_list ap;
-	va_start(ap, status);
-	jack_client_t* res = jack_client_open_aux(client_name, options, status, ap);
-	va_end(ap);
-	return res;
+    return jack_client_open(client_name, (jack_options_t)options, NULL);
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)

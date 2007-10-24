@@ -15,7 +15,7 @@ Tom Szilagyi
 
 2007-10-24 Stephane Letz  <letz@grame.fr>
 
-	* Implementation of server_name setting (-n) in progress.
+	* Implementation of server_name setting (-n).
 
 2007-10-23 Stephane Letz  <letz@grame.fr>
 
