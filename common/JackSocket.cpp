@@ -226,7 +226,7 @@ int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation
     struct sockaddr_un addr;
 
     if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error ("Cannot create server socket (%s)", strerror(errno));
+        jack_error("Cannot create server socket (%s)", strerror(errno));
         return -1;
     }
 
