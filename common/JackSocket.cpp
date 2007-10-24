@@ -189,8 +189,8 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     addr.sun_family = AF_UNIX;
 
     // TO CORRECT: always reuse the same name for now...
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
-    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%s", dir, name);
+    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
+	strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
     /*
     if (access(addr.sun_path, F_OK) == 0) {
     	goto error;
@@ -243,8 +243,8 @@ int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation
     */
 
     // TO CORRECT: always reuse the same name for now...
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%d", dir, which);
     snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%d", dir, which);
+	strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
     /*
     if (access(addr.sun_path, F_OK) == 0) {
     	goto error;
