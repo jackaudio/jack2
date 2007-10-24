@@ -48,7 +48,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
     JackLog("JackSocketServerChannel::Open \n");
 	char jack_server_dir_name[512];
-	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s/%s", jack_server_dir, server_name);
+	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s_%s", jack_server_dir, server_name);
 
     fServer = server;
 

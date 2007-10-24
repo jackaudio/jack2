@@ -42,10 +42,10 @@ int JackSocketClientChannel::ServerCheck(const char* server_name)
 {
 	JackLog("JackSocketClientChannel::ServerCheck = %s\n", server_name);
 	char jack_server_dir_name[512];
-	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s/%s", jack_server_dir, server_name);
+	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s_%s", jack_server_dir, server_name);
 	
     // Connect to server
-    if (fRequestSocket.Connect(jack_server_dir, 0) < 0) {
+    if (fRequestSocket.Connect(jack_server_dir_name, 0) < 0) {
 		jack_error("Cannot connect to server socket");
 		fRequestSocket.Close();
         return -1;
@@ -59,7 +59,7 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, cha
 	int result = 0;
     JackLog("JackSocketClientChannel::Open name = %s\n", name);
 	char jack_server_dir_name[512];
-	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s/%s", jack_server_dir, server_name);
+	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s_%s", jack_server_dir, server_name);
 
     if (fRequestSocket.Connect(jack_server_dir_name, 0) < 0) {
         jack_error("Cannot connect to server socket");
