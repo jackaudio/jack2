@@ -50,7 +50,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 	fServer = server;
 
     // Prepare request socket
-    if (fRequestListenSocket.Bind(jack_server_dir, 0) < 0) {
+    if (fRequestListenSocket.Bind(jack_server_dir, server_name, 0) < 0) {
         JackLog("JackSocketServerChannel::Open : cannot create result listen socket\n");
         return -1;
     }

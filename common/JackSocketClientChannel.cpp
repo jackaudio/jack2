@@ -43,7 +43,7 @@ int JackSocketClientChannel::ServerCheck(const char* server_name)
 	JackLog("JackSocketClientChannel::ServerCheck = %s\n", server_name);
 		
     // Connect to server
-    if (fRequestSocket.Connect(jack_server_dir, 0) < 0) {
+    if (fRequestSocket.Connect(jack_server_dir, server_name, 0) < 0) {
 		jack_error("Cannot connect to server socket");
 		fRequestSocket.Close();
         return -1;

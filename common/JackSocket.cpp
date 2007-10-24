@@ -57,8 +57,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
     addr.sun_family = AF_UNIX;
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s", dir, name);
-
+    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
     JackLog("Connect: addr.sun_path %s\n", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -88,7 +87,6 @@ int JackClientSocket::Connect(const char* dir, int which)
 
     addr.sun_family = AF_UNIX;
     snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%d", dir, which);
-
     JackLog("Connect: addr.sun_path %s\n", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -191,7 +189,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     addr.sun_family = AF_UNIX;
 
     // TO CORRECT: always reuse the same name for now...
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s", dir, name);
+    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
     snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%s", dir, name);
     /*
     if (access(addr.sun_path, F_OK) == 0) {
