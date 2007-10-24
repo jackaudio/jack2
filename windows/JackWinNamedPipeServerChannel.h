@@ -77,6 +77,7 @@ class JackWinNamedPipeServerChannel : public JackServerChannelInterface, public 
         JackWinNamedPipeServer fRequestListenPipe;	// Pipe to create request socket for the client
         JackServer*	fServer;
         JackThread*	fThread;						// Thread to execute the event loop
+		char fServerName[64];
 
         std::list<JackClientPipeThread*> fClientList;
 

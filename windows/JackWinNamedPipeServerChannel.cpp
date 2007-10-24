@@ -373,6 +373,7 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
     JackLog("JackWinNamedPipeServerChannel::Open \n");
 
     fServer = server;
+	snprintf(fServerName, sizeof(fServerName), server_name);
 
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object
     if (fRequestListenPipe.Bind(jack_server_dir, server_name, 0) < 0) {
@@ -426,7 +427,7 @@ bool JackWinNamedPipeServerChannel::Execute()
 {
     JackWinNamedPipeClient* pipe;
 
-    if (fRequestListenPipe.Bind(jack_server_dir, 0) < 0) {
+    if (fRequestListenPipe.Bind(jack_server_dir, fServerName, 0) < 0) {
         jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
         return false;
     }

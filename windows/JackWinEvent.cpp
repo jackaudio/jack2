@@ -84,7 +84,7 @@ bool JackWinEvent::TimedWait(long usec)
 }
 
 // Client side : get the published semaphore from server
-bool JackWinEvent::ConnectInput(const char* server_name, const char* name)
+bool JackWinEvent::ConnectInput(const char* name, const char* server_name)
 {
     BuildName(name, server_name, fName);
     JackLog("JackWinEvent::Connect %s\n", fName);
@@ -103,14 +103,14 @@ bool JackWinEvent::ConnectInput(const char* server_name, const char* name)
     }
 }
 
-bool JackWinEvent::Connect(const char* server_name, const char* name)
+bool JackWinEvent::Connect(const char* name, const char* server_name)
 {
-    return ConnectInput(server_name, name);
+    return ConnectInput(name, server_name);
 }
 
-bool JackWinEvent::ConnectOutput(const char* server_name, const char* name)
+bool JackWinEvent::ConnectOutput(const char* name, const char* server_name)
 {
-    return ConnectInput(server_name, name);
+    return ConnectInput(name, server_name);
 }
 
 bool JackWinEvent::Disconnect()
