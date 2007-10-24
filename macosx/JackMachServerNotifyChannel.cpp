@@ -24,11 +24,13 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-int JackMachServerNotifyChannel::Open()
+int JackMachServerNotifyChannel::Open(const char* server_name)
 {
     JackLog("JackMachServerChannel::Open\n");
+	char jack_server_entry_name[512];
+	snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 
-    if (!fClientPort.ConnectPort(jack_server_entry)) {
+    if (!fClientPort.ConnectPort(jack_server_entry_name)) {
         jack_error("Cannot connect to server port");
         return -1;
     } else {

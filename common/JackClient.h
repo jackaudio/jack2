@@ -76,6 +76,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fTimebaseArg;
         void* fSyncArg;
         int fConditionnal;
+		char fServerName[64];
 
         JackThread*	fThread;    /*! Thread to execute the Process function */
         JackClientChannelInterface* fChannel;
@@ -99,7 +100,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackClient(JackSynchro** table);
         virtual ~JackClient();
 
-        virtual int Open(const char* name, jack_options_t options, jack_status_t* status) = 0;
+        virtual int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status) = 0;
         virtual int Close();
 
         virtual JackGraphManager* GetGraphManager() const = 0;

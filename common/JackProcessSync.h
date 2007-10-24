@@ -137,7 +137,7 @@ class JackInterProcessSync : public JackSyncInterface
 
         bool Allocate(const char* name)
         {
-            return fSynchro->Allocate(name, 0);
+            return fSynchro->Allocate(name, "", 0);
         }
 
         void Destroy()
@@ -147,7 +147,7 @@ class JackInterProcessSync : public JackSyncInterface
 
         bool Connect(const char* name)
         {
-            return fSynchro->Connect(name);
+            return fSynchro->Connect(name, "");
         }
 
         bool TimedWait(long usec)

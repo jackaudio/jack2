@@ -100,7 +100,6 @@ class JackShmMem
 
         jack_shm_info_t fInfo;
         static unsigned long fSegmentNum;
-        static unsigned long fSegmentCount;
         static jack_shm_info_t gInfo;
 
     public:
@@ -152,11 +151,11 @@ class JackShmReadWritePtr
 
         jack_shm_info_t fInfo;
 
-        void Init(int index)
+        void Init(int index, const char* server_name = "default")
         {
             if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmReadWritePtr::Init %ld %ld\n", index, fInfo.index);
-                if (jack_initialize_shm_client() < 0)
+                if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
@@ -174,9 +173,9 @@ class JackShmReadWritePtr
             fInfo.attached_at = NULL;
         }
 
-        JackShmReadWritePtr(int index)
+        JackShmReadWritePtr(int index, const char* server_name)
         {
-            Init(index);
+            Init(index, server_name);
         }
 
         virtual ~JackShmReadWritePtr()
@@ -203,6 +202,11 @@ class JackShmReadWritePtr
             Init(index);
             return *this;
         }
+		
+		void SetShmIndex(int index, const char* server_name)
+        {
+            Init(index, server_name);
+        }
 
         int GetShmIndex()
         {
@@ -227,11 +231,11 @@ class JackShmReadWritePtr1
 
         jack_shm_info_t fInfo;
 
-        void Init(int index)
+        void Init(int index, const char* server_name = "default")
         {
             if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmReadWritePtr1::Init %ld %ld\n", index, fInfo.index);
-                if (jack_initialize_shm_client() < 0)
+                if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
@@ -255,9 +259,9 @@ class JackShmReadWritePtr1
             fInfo.attached_at = NULL;
         }
 
-        JackShmReadWritePtr1(int index)
+        JackShmReadWritePtr1(int index, const char* server_name)
         {
-            Init(index);
+            Init(index, server_name);
         }
 
         virtual ~JackShmReadWritePtr1()
@@ -284,6 +288,11 @@ class JackShmReadWritePtr1
             Init(index);
             return *this;
         }
+		
+		void SetShmIndex(int index, const char* server_name)
+        {
+            Init(index, server_name);
+		}
 
         int GetShmIndex()
         {
@@ -308,11 +317,11 @@ class JackShmReadPtr
 
         jack_shm_info_t fInfo;
 
-        void Init(int index)
+        void Init(int index, const char* server_name = "default")
         {
             if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmPtrRead::Init %ld %ld\n", index, fInfo.index);
-                if (jack_initialize_shm_client() < 0)
+                if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm_read(&fInfo)) {
@@ -330,9 +339,9 @@ class JackShmReadPtr
             fInfo.attached_at = NULL;
         }
 
-        JackShmReadPtr(int index)
+        JackShmReadPtr(int index, const char* server_name)
         {
-            Init(index);
+            Init(index, server_name);
         }
 
         virtual ~JackShmReadPtr()
@@ -358,6 +367,11 @@ class JackShmReadPtr
         {
             Init(index);
             return *this;
+        }
+		
+		void SetShmIndex(int index, const char* server_name)
+        {
+            Init(index, server_name);
         }
 
         int GetShmIndex()

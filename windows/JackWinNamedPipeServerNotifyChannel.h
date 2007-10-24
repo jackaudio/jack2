@@ -43,7 +43,7 @@ class JackWinNamedPipeServerNotifyChannel : public JackServerNotifyChannelInterf
         virtual ~JackWinNamedPipeServerNotifyChannel()
         {}
 
-        int Open();
+        int Open(const char* server_name);
         void Close();
 
         void ClientNotify(int refnum, int notify, int value);

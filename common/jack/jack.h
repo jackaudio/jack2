@@ -146,16 +146,12 @@ extern "C"
                                   const char *load_name,
                                   const char *load_init);
 
-    jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data);
-
     /**
      * Remove an internal client from a JACK server.
      *
      * @deprecated Please use jack_internal_client_load().
      */
     void jack_internal_client_close (const char *client_name);
-
-    void my_jack_internal_client_close (jack_client_t* client);
 
     /**
      * @param client pointer to JACK client structure.

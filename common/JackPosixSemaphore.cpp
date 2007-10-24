@@ -26,9 +26,9 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-void JackPosixSemaphore::BuildName(const char* name, char* res)
+void JackPosixSemaphore::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "%s/jack_sem.%s", jack_client_dir, name);
+    sprintf(res, "%s/jack_sem.%s_%s", jack_client_dir, server_name, name);
 }
 
 bool JackPosixSemaphore::Signal()
@@ -123,9 +123,9 @@ bool JackPosixSemaphore::TimedWait(long usec)
 }
 
 // Server side : publish the semaphore in the global namespace
-bool JackPosixSemaphore::Allocate(const char* name, int value)
+bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int value)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     JackLog("JackPosixSemaphore::Allocate name = %s val = %ld\n", fName, value);
 
     if ((fSemaphore = sem_open(fName, O_CREAT, 0777, value)) == (sem_t*)SEM_FAILED) {
@@ -137,9 +137,9 @@ bool JackPosixSemaphore::Allocate(const char* name, int value)
 }
 
 // Client side : get the published semaphore from server
-bool JackPosixSemaphore::ConnectInput(const char* name)
+bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     JackLog("JackPosixSemaphore::Connect %s\n", fName);
 
     // Temporary...
@@ -159,14 +159,14 @@ bool JackPosixSemaphore::ConnectInput(const char* name)
     }
 }
 
-bool JackPosixSemaphore::Connect(const char* name)
+bool JackPosixSemaphore::Connect(const char* name, const char* server_name)
 {
-    return ConnectInput(name);
+    return ConnectInput(name, server_name);
 }
 
-bool JackPosixSemaphore::ConnectOutput(const char* name)
+bool JackPosixSemaphore::ConnectOutput(const char* name, const char* server_name)
 {
-    return ConnectInput(name);
+    return ConnectInput(name, server_name);
 }
 
 bool JackPosixSemaphore::Disconnect()

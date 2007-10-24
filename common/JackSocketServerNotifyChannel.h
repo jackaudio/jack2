@@ -43,7 +43,7 @@ class JackSocketServerNotifyChannel : public JackServerNotifyChannelInterface
         virtual ~JackSocketServerNotifyChannel()
         {}
 
-        int Open();
+        int Open(const char* server_name);
         void Close();
 
         void ClientNotify(int refnum, int notify, int value);

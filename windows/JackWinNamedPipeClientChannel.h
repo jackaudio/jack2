@@ -50,7 +50,7 @@ class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public 
         JackWinNamedPipeClientChannel();
         virtual ~JackWinNamedPipeClientChannel();
 
-        int Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status);
         void Close();
 
         int Start();

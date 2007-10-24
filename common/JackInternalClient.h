@@ -45,7 +45,7 @@ class JackInternalClient : public JackClient
         JackInternalClient(JackServer* server, JackSynchro** table);
         virtual ~JackInternalClient();
 
-        int Open(const char* name, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
         JackGraphManager* GetGraphManager() const;
         JackEngineControl* GetEngineControl() const;
@@ -95,7 +95,7 @@ class JackLoadableInternalClient : public JackInternalClient
         JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data);
 	    virtual ~JackLoadableInternalClient();
 		
-		int Open(const char* name, jack_options_t options, jack_status_t* status);
+		int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
 };
 

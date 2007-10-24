@@ -44,7 +44,7 @@ class JackMachServerNotifyChannel : public JackServerNotifyChannelInterface
         virtual ~JackMachServerNotifyChannel()
         {}
 
-        int Open();         // Open the Server/Client connection
+        int Open(const char* server_name);         // Open the Server/Client connection
         void Close();       // Close the Server/Client connection
 
         void ClientNotify(int refnum, int notify, int value);

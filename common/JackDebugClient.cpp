@@ -74,9 +74,9 @@ JackDebugClient::~JackDebugClient()
     delete fClient;
 }
 
-int JackDebugClient::Open(const char* name, jack_options_t options, jack_status_t* status)
+int JackDebugClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
-    int res = fClient->Open(name, options, status);
+    int res = fClient->Open(server_name, name, options, status);
     char provstr[256];
     char buffer[256];
     time_t curtime;

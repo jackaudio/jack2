@@ -42,8 +42,8 @@ struct ServerThread : public JackRunnableInterface {
 	
 	ServerThread()
 	{
-        fServerSem->Allocate("JackSemServer", 0);
-        fClientSem->Allocate("JackSemClient", 0);
+        fServerSem->Allocate("JackSemServer", "default", 0);
+        fClientSem->Allocate("JackSemClient", "default", 0);
 		//fThread = new JackMachThread(this);
 		fThread->SetParams(0, 500*1000, 500*1000);
         fThread->Start();
@@ -76,8 +76,8 @@ struct ClientThread : public JackRunnableInterface {
 	
 	ClientThread()
 	{
-        fServerSem->Connect("JackSemServer");
-        fClientSem->Connect("JackSemClient");
+        fServerSem->Connect("JackSemServer", "default");
+        fClientSem->Connect("JackSemClient", "default");
 		//fThread = new JackMachThread(this);
 		fThread->SetParams(0, 500*1000, 500*1000);
 		fThread->Start();
@@ -114,7 +114,7 @@ void server(JackSynchro* sem)
 	char c;
 	printf("server\n");
 	
-	sem->Allocate("JackSem", 0);
+	sem->Allocate("JackSem", "default", 0);
 	
 	while (((c = getchar()) != 'q')) {
 	
@@ -141,7 +141,7 @@ void client(JackSynchro* sem)
 	char c;
 	printf("client\n");
 	
-	sem->Connect("JackSem");
+	sem->Connect("JackSem", "default");
 	
 	while (((c = getchar()) != 'q')) {
 	

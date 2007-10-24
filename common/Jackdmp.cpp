@@ -73,7 +73,7 @@ static void usage(FILE* file)
     copyright(file);
     fprintf(file, "\n"
              "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
-             // "               [ --name OR -n server-name ]\n"
+			 "               [ --name OR -n server-name ]\n"
              // "               [ --no-mlock OR -m ]\n"
              // "               [ --unlock OR -u ]\n"
              "               [ --timeout OR -t client-timeout-in-msecs ]\n"
@@ -103,10 +103,10 @@ static void DoNothingHandler(int sig)
     write(1, buf, strlen(buf));
 }
 
-static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
+static int JackStart(const char* server_name, jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
 {
     JackLog("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
-    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose);
+    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
     int res = fServer->Open(driver_desc, driver_params);
     return (res < 0) ? res : fServer->Start();
 }
@@ -141,7 +141,7 @@ static char* jack_default_server_name(void)
 {
     char* server_name;
     if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
-        server_name = "jackdmp_default";
+        server_name = "default";
     return server_name;
 }
 
@@ -452,7 +452,7 @@ int main(int argc, char* argv[])
     if (!realtime && client_timeout == 0)
         client_timeout = 500; /* 0.5 sec; usable when non realtime. */
 
-    int res = JackStart(driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, jack_verbose);
+    int res = JackStart(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, jack_verbose);
     if (res < 0) {
         jack_error("Cannot start server... exit");
         JackDelete();
@@ -460,14 +460,6 @@ int main(int argc, char* argv[])
     }
 	
 	/*
-	jack_client_t* c1 = my_jack_internal_client_new("c1", "inprocess.so", "untitled");
-	jack_client_t* c2 = my_jack_internal_client_new("c2", "inprocess.so", "untitled");
-	jack_client_t* c3 = my_jack_internal_client_new("c3", "inprocess.so", "untitled");
-	jack_client_t* c4 = my_jack_internal_client_new("c4", "inprocess.so", "untitled");
-	jack_client_t* c5 = my_jack_internal_client_new("c5", "inprocess.so", "untitled");
-	*/
-
-    /*
     For testing purpose...
     InternalMetro* client1  = new InternalMetro(1200, 0.4, 20, 80, "metro1");
     InternalMetro* client2  = new InternalMetro(600, 0.4, 20, 150, "metro2");
@@ -523,15 +515,7 @@ int main(int argc, char* argv[])
         sigprocmask(SIG_UNBLOCK, &signals, 0);
     }
 	
-	/*
-	my_jack_internal_client_close(c1);
-	my_jack_internal_client_close(c2);
-	my_jack_internal_client_close(c3);
-	my_jack_internal_client_close(c4);
-	my_jack_internal_client_close(c5);
-	*/
-	
-    JackStop();
+	JackStop();
 
     jack_cleanup_shm();
     jack_cleanup_files(server_name);

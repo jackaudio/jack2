@@ -15,7 +15,6 @@
 *  along with this program; if not, write to the Free Software 
 *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *
-*  $Id: varargs.h,v 1.3 2005/11/23 11:24:00 letz Exp $
 */
 
 #ifndef __jack_varargs_h__
@@ -54,9 +53,12 @@ extern "C"
         jack_varargs_init (va);
 
         if ((options & JackServerName)) {
+			printf("jack_varargs_parse :JackServerName\n");
             char *sn = va_arg(ap, char *);
-            if (sn)
+            if (sn) {
+				printf("jack_varargs_parse : FOUND SERVER NAME %s\n", sn);
                 va->server_name = sn;
+			}
         }
         if ((options & JackLoadName))
             va->load_name = va_arg(ap, char *);

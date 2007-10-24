@@ -48,7 +48,7 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
         JackMachClientChannel();
         virtual ~JackMachClientChannel();
 
-        int Open(const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status);
         void Close();
 
         int Start();

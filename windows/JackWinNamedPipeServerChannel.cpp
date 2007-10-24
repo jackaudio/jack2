@@ -54,7 +54,7 @@ JackClientPipeThread::~JackClientPipeThread()
     delete fThread;
 }
 
-int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
+int JackClientPipeThread::Open(const char* server_name, JackServer* server)	// Open the Server/Client connection
 {
     fServer = server;
 

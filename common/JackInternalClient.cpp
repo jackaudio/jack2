@@ -65,11 +65,13 @@ JackInternalClient::~JackInternalClient()
     delete fChannel;
 }
 
-int JackInternalClient::Open(const char* name, jack_options_t options, jack_status_t* status)
+int JackInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int result;
 	char name_res[JACK_CLIENT_NAME_SIZE]; 
     JackLog("JackInternalClient::Open name = %s\n", name);
+	
+	snprintf(fServerName, sizeof(fServerName), server_name);
  	
 	fChannel->ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
@@ -154,9 +156,9 @@ JackLoadableInternalClient::~JackLoadableInternalClient()
 	UnloadJackModule(fHandle);
 }
 
-int JackLoadableInternalClient::Open(const char* name, jack_options_t options, jack_status_t* status)
+int JackLoadableInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
-	int res = JackInternalClient::Open(name, options, status);
+	int res = JackInternalClient::Open(server_name, name, options, status);
 	if (res == 0) 
 		fInitialize((jack_client_t*)this, fObjectData);
 	return res;

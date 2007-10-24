@@ -52,7 +52,7 @@ class JackMachServerChannel : public JackServerChannelInterface, public JackRunn
         JackMachServerChannel();
         virtual ~JackMachServerChannel();
 
-        int Open(JackServer* server);	// Open the Server/Client connection
+        int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();                   // Close the Server/Client connection
 
         JackEngine* GetEngine();

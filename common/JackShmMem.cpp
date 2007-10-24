@@ -26,8 +26,6 @@ namespace Jack
 {
 
 unsigned long JackShmMem::fSegmentNum = 0;
-unsigned long JackShmMem::fSegmentCount = 0;
-
 jack_shm_info_t JackShmMem::gInfo;
 size_t JackMem::gSize = 0;
 
@@ -38,14 +36,6 @@ void* JackShmMem::operator new(size_t size)
     char name[64];
 
     snprintf(name, sizeof(name), "/jack_shared%ld", JackShmMem::fSegmentNum++);
-
-    if (JackShmMem::fSegmentCount++ == 0) {
-        JackLog("jack_initialize_shm\n");
-        if (jack_initialize_shm_server() < 0) {
-            jack_error("cannot initialize shm", strerror(errno));
-            goto error;
-        }
-    }
 
     if (jack_shmalloc(name, size, &info)) {
         jack_error("cannot create shared memory segment of size = %d", size, strerror(errno));
@@ -84,11 +74,6 @@ void JackShmMem::operator delete(void* p, size_t size)
 
     jack_release_shm(&info);
     jack_destroy_shm(&info);
-
-    if (--JackShmMem::fSegmentCount == 0) {
-        JackLog("jack_cleanup_shm\n");
-        jack_cleanup_shm();
-    }
 }
 
 void LockMemoryImp(void* ptr, size_t size) 

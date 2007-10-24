@@ -25,7 +25,7 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-int JackWinNamedPipeServerNotifyChannel::Open()
+int JackWinNamedPipeServerNotifyChannel::Open(const char* server_name)
 {
     if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
         jack_error("Cannot connect to server pipe");

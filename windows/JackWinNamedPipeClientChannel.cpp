@@ -49,7 +49,7 @@ int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 	}
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
 	int result = 0;
     JackLog("JackWinNamedPipeClientChannel::Open name = %s\n", name);

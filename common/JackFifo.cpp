@@ -29,9 +29,9 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-void JackFifo::BuildName(const char* name, char* res)
+void JackFifo::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "%s/jack_fifo.%s", jack_client_dir, name);
+    sprintf(res, "%s/jack_fifo.%s_%s", jack_client_dir, server_name, name);
 }
 
 bool JackFifo::Signal()
@@ -103,10 +103,10 @@ bool JackFifo::TimedWait(long usec)
 #endif
 
 // Server side
-bool JackFifo::Allocate(const char* name, int value)
+bool JackFifo::Allocate(const char* name, const char* server_name, int value)
 {
     struct stat statbuf;
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
 
     JackLog("JackFifo::Allocate name = %s\n", fName);
 
@@ -138,9 +138,9 @@ bool JackFifo::Allocate(const char* name, int value)
 }
 
 // Client side
-bool JackFifo::ConnectAux(const char* name, int access)
+bool JackFifo::ConnectAux(const char* name, const char* server_name, int access)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     JackLog("JackFifo::ConnectAux name = %s\n", fName);
 
     // Temporary...
@@ -159,19 +159,19 @@ bool JackFifo::ConnectAux(const char* name, int access)
     }
 }
 
-bool JackFifo::Connect(const char* name)
+bool JackFifo::Connect(const char* name, const char* server_name)
 {
-    return ConnectAux(name, O_RDWR);
+    return ConnectAux(name, server_name, O_RDWR);
 }
 
-bool JackFifo::ConnectOutput(const char* name)
+bool JackFifo::ConnectOutput(const char* name, const char* server_name)
 {
-    return ConnectAux(name, O_WRONLY | O_NONBLOCK);
+    return ConnectAux(name, server_name, O_WRONLY | O_NONBLOCK);
 }
 
-bool JackFifo::ConnectInput(const char* name)
+bool JackFifo::ConnectInput(const char* name, const char* server_name)
 {
-    return ConnectAux(name, O_RDONLY);
+    return ConnectAux(name, server_name, O_RDONLY);
 }
 
 bool JackFifo::Disconnect()

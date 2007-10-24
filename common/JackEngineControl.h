@@ -47,18 +47,22 @@ struct JackEngineControl : public JackShmMem
     UInt64 fPeriod;
     UInt64 fComputation;
     UInt64 fConstraint;
+	char fServerName[64];
     JackFrameTimer fFrameTimer;
     JackTransportEngine fTransport;
     bool fVerbose;
 	
-	JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose)
+	JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, const char* server_name)
 					:fSyncMode(sync), 
 					fTemporary(temporary),
 					fTimeOutUsecs(timeout * 1000), 
 					fRealTime(rt), 
 					fPriority(priority), 
 					fVerbose(verbose)
-	{}
+					
+	{
+		snprintf(fServerName, sizeof(fServerName), server_name);
+	}
 	
 	void InitFrameTime()
 	{

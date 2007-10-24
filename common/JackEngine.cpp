@@ -67,7 +67,7 @@ int JackEngine::Open()
     JackLog("JackEngine::Open\n");
 
     // Open audio thread => request thread communication channel
-    if (fChannel->Open() < 0) {
+    if (fChannel->Open(fEngineControl->fServerName) < 0) {
         jack_error("Cannot connect to server");
         return -1;
     } else {
@@ -515,7 +515,7 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
 	
 	JackExternalClient* client = new JackExternalClient();
 
-    if (!fSynchroTable[refnum]->Allocate(name, 0)) {
+    if (!fSynchroTable[refnum]->Allocate(name, fEngineControl->fServerName, 0)) {
         jack_error("Cannot allocate synchro");
 		goto error;
     }
@@ -562,7 +562,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
         return -1;
     }
 
-    if (!fSynchroTable[refnum]->Allocate(name, 0)) {
+    if (!fSynchroTable[refnum]->Allocate(name, fEngineControl->fServerName, 0)) {
         jack_error("Cannot allocate synchro");
 		return -1;
     }

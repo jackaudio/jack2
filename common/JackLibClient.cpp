@@ -61,14 +61,16 @@ JackLibClient::~JackLibClient()
     delete fChannel;
 }
 
-int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t* status)
+int JackLibClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
     JackLog("JackLibClient::Open %s\n", name);
 	
+	snprintf(fServerName, sizeof(fServerName), server_name);
+	
     // Open server/client channel
 	char name_res[JACK_CLIENT_NAME_SIZE]; 
-    if (fChannel->Open(name, name_res, this, options, status) < 0) {
+    if (fChannel->Open(server_name, name, name_res, this, options, status) < 0) {
         jack_error("Cannot connect to the server");
         goto error;
     }
@@ -88,9 +90,9 @@ int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t*
 
     try {
         // Map shared memory segments
-        JackLibGlobals::fGlobals->fEngineControl = shared_engine;
-        JackLibGlobals::fGlobals->fGraphManager = shared_graph;
-        fClientControl = shared_client;
+		JackLibGlobals::fGlobals->fEngineControl.SetShmIndex(shared_engine, fServerName);
+        JackLibGlobals::fGlobals->fGraphManager.SetShmIndex(shared_graph, fServerName);
+        fClientControl.SetShmIndex(shared_client, fServerName);
         jack_verbose = GetEngineControl()->fVerbose;
     } catch (int n) {
         jack_error("Map shared memory segments exception %d", n);
@@ -109,7 +111,7 @@ int JackLibClient::Open(const char* name, jack_options_t options, jack_status_t*
 #endif
 */
 	// Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process    
-	if (!fSynchroTable[fClientControl->fRefNum]->Connect(name_res)) {
+	if (!fSynchroTable[fClientControl->fRefNum]->Connect(name_res, fServerName)) {
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
@@ -135,8 +137,8 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
 
         case kAddClient:
             JackLog("JackClient::AddClient name = %s, ref = %ld \n", name, refnum);
-            // the synchro must be usable in I/O mode when several clients live in the same process
-            res = fSynchroTable[refnum]->Connect(name) ? 0 : -1;
+	        // the synchro must be usable in I/O mode when several clients live in the same process
+            res = fSynchroTable[refnum]->Connect(name, fServerName) ? 0 : -1;
             break;
 
         case kRemoveClient:

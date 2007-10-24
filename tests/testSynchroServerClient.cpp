@@ -233,10 +233,10 @@ int main(int ac, char *av [])
     }
 #endif
 
-    sem1->Allocate(SERVER, 0);
-    sem2->Allocate(CLIENT, 0);
-    sem3->ConnectOutput(SERVER);
-    sem4->ConnectInput(CLIENT);
+    sem1->Allocate(SERVER, "default", 0);
+    sem2->Allocate(CLIENT, "default", 0);
+    sem3->ConnectOutput(SERVER, "default");
+    sem4->ConnectInput(CLIENT, "default");
 
     // run test in RT thread
     obj1 = new Test1(sem1, sem2);

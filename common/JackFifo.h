@@ -40,11 +40,11 @@ class JackFifo : public JackSynchro
         int fFifo;
         pollfd fPoll;
 
-        bool ConnectAux(const char* name, int access);
+        bool ConnectAux(const char* name, const char* server_name, int access);
 
     protected:
 
-        void BuildName(const char* name, char* res);
+        void BuildName(const char* name, const char* server_name, char* res);
 
     public:
 
@@ -58,10 +58,10 @@ class JackFifo : public JackSynchro
         bool Wait();
         bool TimedWait(long usec);
 
-        bool Allocate(const char* name, int value);
-        bool Connect(const char* name);
-        bool ConnectInput(const char* name);
-        bool ConnectOutput(const char* name);
+        bool Allocate(const char* name, const char* server_name, int value);
+        bool Connect(const char* name, const char* server_name);
+        bool ConnectInput(const char* name, const char* server_name);
+        bool ConnectOutput(const char* name, const char* server_name);
         bool Disconnect();
         void Destroy();
 };

@@ -352,18 +352,6 @@ jack_initialize_shm (const char *server_name)
 }
 
 
-// steph
-
-int jack_initialize_shm_server()
-{
-	return jack_initialize_shm("default");
-}
-
-int jack_initialize_shm_client()
-{
-	return jack_initialize_shm("default");
-}
-
 char* jack_shm_addr (jack_shm_info_t* si) 
 {
 	return (char*)si->attached_at;  

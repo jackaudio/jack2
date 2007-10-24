@@ -25,9 +25,12 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-int JackSocketServerNotifyChannel::Open()
+int JackSocketServerNotifyChannel::Open(const char* server_name)
 {
-    if (fRequestSocket.Connect(jack_server_dir, 0) < 0) {
+	char jack_server_dir_name[512];
+	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s/%s", jack_server_dir, server_name);
+
+    if (fRequestSocket.Connect(jack_server_dir_name, 0) < 0) {
         jack_error("Cannot connect to server socket");
         return -1;
     } else {

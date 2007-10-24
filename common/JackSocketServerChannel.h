@@ -57,7 +57,7 @@ class JackSocketServerChannel : public JackServerChannelInterface, public JackRu
         JackSocketServerChannel();
         virtual ~JackSocketServerChannel();
 
-        int Open(JackServer* server);	// Open the Server/Client connection
+        int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();					// Close the Server/Client connection
 
         // JackRunnableInterface interface

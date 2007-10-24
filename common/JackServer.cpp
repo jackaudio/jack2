@@ -46,13 +46,13 @@ namespace Jack
 
 JackServer* JackServer::fInstance = NULL;
 
-JackServer::JackServer(bool sync,  bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose)
+JackServer::JackServer(bool sync,  bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
 {
     JackGlobals::InitServer();
     for (int i = 0; i < CLIENT_NUM; i++)
         fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
-    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose);
+    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
     fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
@@ -89,7 +89,7 @@ JackServer::~JackServer()
 
 int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
-    if (fChannel->Open(this) < 0) {
+    if (fChannel->Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
         return -1;
     }
@@ -179,7 +179,7 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
 		*status = 0;
 		JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data); 
 		assert(client);
-		int res = client->Open(client_name, (jack_options_t)options, (jack_status_t*)status);
+		int res = client->Open("unused", client_name, (jack_options_t)options, (jack_status_t*)status);
 		if (res < 0) {
 			delete client;
 			*int_ref = 0;

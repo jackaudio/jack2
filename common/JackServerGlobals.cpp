@@ -46,7 +46,7 @@ static char* jack_default_server_name(void)
 {
     char* server_name;
     if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
-        server_name = "jackdmp_default";
+        server_name = "default";
     return server_name;
 }
 
@@ -141,10 +141,10 @@ jack_cleanup_files(const char *server_name)
 
 #endif
 
-int JackServerGlobals::JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
+int JackServerGlobals::JackStart(const char* server_name, jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
 {
     JackLog("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
-	fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose);
+	fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
     int res = fServer->Open(driver_desc, driver_params);
     return (res < 0) ? res : fServer->Start();
 }
@@ -384,7 +384,7 @@ bool JackServerGlobals::Init()
 			free(argv[i]);
 		}
 		
-		int res = JackStart(driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux);
+		int res = JackStart(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux);
 		if (res < 0) {
 			jack_error("Cannot start server... exit");
 			JackDelete();

@@ -39,7 +39,7 @@ class JackSynchro
         char fName[SYNC_MAX_NAME_SIZE];
         bool fFlush; // If true, signal are "flushed" : used for drivers that do no consume the signal
 
-        virtual void BuildName(const char* name, char* res)
+        virtual void BuildName(const char* name, const char* server_name, char* res)
         {}
 
     public:
@@ -65,19 +65,19 @@ class JackSynchro
         {
             return true;
         }
-        virtual bool Allocate(const char* name, int value)
+        virtual bool Allocate(const char* name, const char* server_name, int value)
         {
             return true;
         }
-        virtual bool Connect(const char* name)
+        virtual bool Connect(const char* name, const char* server_name)
         {
             return true;
         }
-        virtual bool ConnectInput(const char* name)
+        virtual bool ConnectInput(const char* name, const char* server_name)
         {
             return true;
         }
-        virtual bool ConnectOutput(const char* name)
+        virtual bool ConnectOutput(const char* name, const char* server_name)
         {
             return true;
         }

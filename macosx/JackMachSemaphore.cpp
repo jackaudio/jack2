@@ -27,9 +27,9 @@ namespace Jack
 
 mach_port_t JackMachSemaphore::fBootPort = 0;
 
-void JackMachSemaphore::BuildName(const char* name, char* res)
+void JackMachSemaphore::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "jack_mach_sem.%s", name);
+    sprintf(res, "jack_mach_sem.%s_%s", server_name, name);
 }
 
 bool JackMachSemaphore::Signal()
@@ -84,9 +84,9 @@ bool JackMachSemaphore::TimedWait(long usec)
 }
 
 // Server side : publish the semaphore in the global namespace
-bool JackMachSemaphore::Allocate(const char* name, int value)
+bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int value)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     mach_port_t task = mach_task_self();
     kern_return_t res;
 
@@ -128,9 +128,9 @@ bool JackMachSemaphore::Allocate(const char* name, int value)
 }
 
 // Client side : get the published semaphore from server
-bool JackMachSemaphore::ConnectInput(const char* name)
+bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     kern_return_t res;
 
     // Temporary...  A REVOIR
@@ -157,14 +157,14 @@ bool JackMachSemaphore::ConnectInput(const char* name)
     return true;
 }
 
-bool JackMachSemaphore::Connect(const char* name)
+bool JackMachSemaphore::Connect(const char* name, const char* server_name)
 {
-    return ConnectInput(name);
+    return ConnectInput(name, server_name);
 }
 
-bool JackMachSemaphore::ConnectOutput(const char* name)
+bool JackMachSemaphore::ConnectOutput(const char* name, const char* server_name)
 {
-    return ConnectInput(name);
+    return ConnectInput(name, server_name);
 }
 
 bool JackMachSemaphore::Disconnect()

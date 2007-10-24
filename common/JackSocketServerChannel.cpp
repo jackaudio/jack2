@@ -44,13 +44,16 @@ JackSocketServerChannel::~JackSocketServerChannel()
     delete[] fPollTable;
 }
 
-int JackSocketServerChannel::Open(JackServer* server)
+int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
     JackLog("JackSocketServerChannel::Open \n");
+	char jack_server_dir_name[512];
+	snprintf(jack_server_dir_name, sizeof(jack_server_dir_name), "%s/%s", jack_server_dir, server_name);
+
     fServer = server;
 
     // Prepare request socket
-    if (fRequestListenSocket.Bind(jack_server_dir, 0) < 0) {
+    if (fRequestListenSocket.Bind(jack_server_dir_name, 0) < 0) {
         JackLog("JackSocketServerChannel::Open : cannot create result listen socket\n");
         return -1;
     }

@@ -48,7 +48,7 @@ class JackClientChannelInterface
         {}
 
         // Open the Server/Client connection
-        virtual int Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+        virtual int Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
         {
             return 0;
         }
@@ -170,7 +170,7 @@ class JackServerChannelInterface
         {}
 
         // Open the Server/Client connection
-        virtual int Open(JackServer* server)
+        virtual int Open(const char* server_name, JackServer* server)
         {
             return 0;
         }
@@ -194,7 +194,7 @@ class JackServerNotifyChannelInterface
         {}
 
         // Open the Server RT/Server connection
-        virtual int Open()
+        virtual int Open(const char* server_name)
         {
             return 0;
         }

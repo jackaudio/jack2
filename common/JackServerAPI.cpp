@@ -41,9 +41,6 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data);
-    EXPORT void my_jack_internal_client_close(jack_client_t* ext_client);
-
     EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
@@ -55,51 +52,6 @@ extern "C"
 #endif
 
 using namespace Jack;
-
-EXPORT jack_client_t* my_jack_internal_client_new(const char* client_name, const char* dll_name, const char* object_data)
-{
-	jack_status_t my_status = (jack_status_t)0;
-
-    JackLog("jack_internal_client_new %s", client_name);
-    if (client_name == NULL) {
-        jack_error("jack_internal_client_new called with a NULL client_name");
-        return NULL;
-    }
-	
-	JackClient* client;
-	
-	try {
-	#ifdef __CLIENTDEBUG__
-		client = new JackDebugClient(new JackLoadableInternalClient(JackServer::fInstance, GetSynchroTable(), dll_name, object_data)); // Debug mode
-	#else
-		client = new JackLoadableInternalClient(JackServer::fInstance, GetSynchroTable(), dll_name, object_data); // To improve...
-	#endif
-	} catch (...) {  // Allocation or dynamic code loading failure
-		return NULL;
-	}
-
-    jack_options_t options = JackUseExactName;
-    int res = client->Open(client_name, options, &my_status);
-    if (res < 0) {
-        delete client;
-        return NULL;
-    } else {
-        return (jack_client_t*)client;
-    }
-}
-
-EXPORT void my_jack_internal_client_close(jack_client_t* ext_client)
-{
-    JackLog("jack_internal_client_close");
-    JackClient* client = (JackClient*)ext_client;
-    if (client == NULL) {
-        jack_error("jack_internal_client_close called with a NULL client");
-    } else {
-		client->Close();
-        delete client;
-        JackLog("jack_internal_client_close OK");
-    }
-}
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
@@ -150,7 +102,7 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
     JackClient* client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); // To improve...
 #endif
 
-    int res = client->Open(client_name, options, status);
+    int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
