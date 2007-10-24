@@ -41,7 +41,7 @@ int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 	JackLog("JackWinNamedPipeClientChannel::ServerCheck = %s\n", server_name);
 	
 	// Connect to server
-    if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
+    if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server pipe");
         return -1;
     } else {
@@ -62,7 +62,7 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     }
 	*/
 	
-    if (fRequestPipe.Connect(jack_server_dir, 0) < 0) {
+    if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server pipe");
         goto error;
     }

@@ -26,9 +26,9 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-void JackWinEvent::BuildName(const char* name, char* res)
+void JackWinEvent::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "jack_pipe.%s", name);
+    sprintf(res, "jack_pipe.%s_%s", server_name, name);
 }
 
 bool JackWinEvent::Signal()
@@ -84,9 +84,9 @@ bool JackWinEvent::TimedWait(long usec)
 }
 
 // Client side : get the published semaphore from server
-bool JackWinEvent::ConnectInput(const char* name)
+bool JackWinEvent::ConnectInput(const char* server_name, const char* name)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     JackLog("JackWinEvent::Connect %s\n", fName);
 
     // Temporary...
@@ -103,14 +103,14 @@ bool JackWinEvent::ConnectInput(const char* name)
     }
 }
 
-bool JackWinEvent::Connect(const char* name)
+bool JackWinEvent::Connect(const char* server_name, const char* name)
 {
-    return ConnectInput(name);
+    return ConnectInput(server_name, name);
 }
 
-bool JackWinEvent::ConnectOutput(const char* name)
+bool JackWinEvent::ConnectOutput(const char* server_name, const char* name)
 {
-    return ConnectInput(name);
+    return ConnectInput(server_name, name);
 }
 
 bool JackWinEvent::Disconnect()
@@ -125,9 +125,9 @@ bool JackWinEvent::Disconnect()
     }
 }
 
-bool JackWinEvent::Allocate(const char* name, int value)
+bool JackWinEvent::Allocate(const char* name, const char* server_name, int value)
 {
-    BuildName(name, fName);
+    BuildName(name, server_name, fName);
     JackLog("JackWinEvent::Allocate name = %s val = %ld\n", fName, value);
 
     /* create an auto reset event */

@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 using namespace Jack;
 
 static JackServer* fServer;
-static char *server_name = "jackdmp_default";
+static char *server_name = "default";
 static int realtime_priority = 10;
 static int do_mlock = 1;
 static unsigned int port_max = 128;
@@ -89,10 +89,10 @@ static void usage (FILE *file)
              "             to display options for each driver\n\n");
 }
 
-static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int time_out_ms, int rt, int priority, int loopback, int verbose)
+static int JackStart(jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int time_out_ms, int rt, int priority, int loopback, int verbose, const char* server_name)
 {
     printf("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
-    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose);
+    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
     int res = fServer->Open(driver_desc, driver_params);
     return (res < 0) ? res : fServer->Start();
 }
@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
     if (!realtime && client_timeout == 0)
         client_timeout = 500; /* 0.5 sec; usable when non realtime. */
 
-    int res = JackStart(driver_desc, driver_params, sync, client_timeout, realtime, realtime_priority, loopback, xverbose);
+    int res = JackStart(driver_desc, driver_params, sync, client_timeout, realtime, realtime_priority, loopback, xverbose, server_name);
     if (res < 0) {
         printf("Cannot start server... exit\n");
         JackDelete();

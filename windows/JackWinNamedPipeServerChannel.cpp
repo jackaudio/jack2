@@ -54,7 +54,7 @@ JackClientPipeThread::~JackClientPipeThread()
     delete fThread;
 }
 
-int JackClientPipeThread::Open(const char* server_name, JackServer* server)	// Open the Server/Client connection
+int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
 {
     fServer = server;
 
@@ -368,14 +368,14 @@ JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
     delete fThread;
 }
 
-int JackWinNamedPipeServerChannel::Open(JackServer* server)
+int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* server)
 {
     JackLog("JackWinNamedPipeServerChannel::Open \n");
 
     fServer = server;
 
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object
-    if (fRequestListenPipe.Bind(jack_server_dir, 0) < 0) {
+    if (fRequestListenPipe.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
         return false;
     }

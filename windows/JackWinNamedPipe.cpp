@@ -74,7 +74,7 @@ int JackWinNamedPipeClient::Connect(const char* dir, int which)
 
 int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which)
 {
-    sprintf(fName, "\\\\.\\pipe\\%s_jack_%s", dir, name);
+    sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
     JackLog("Connect: fName %s\n", fName);
 
     fNamedPipe = CreateFile(fName, 			 // pipe name
@@ -243,8 +243,8 @@ int JackWinNamedPipeServer::Bind(const char* dir, int which)
 
 int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
 {
-    sprintf(fName, "\\\\.\\pipe\\%s_jack_%s", dir, name);
-    JackLog("Bind: fName %s\n", fName);
+    sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
+	JackLog("Bind: fName %s\n", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX,  // read/write access
@@ -284,6 +284,7 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 		JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe);
 		// Init the pipe to the default value
         fNamedPipe = INVALID_HANDLE_VALUE;
+		return client;
     } else {
         switch (GetLastError()) {
 
@@ -338,7 +339,7 @@ int JackWinAsyncNamedPipeServer::Bind(const char* dir, int which)
 
 int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int which)
 {
-    sprintf(fName, "\\\\.\\pipe\\%s_jack_%s", dir, name);
+    sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
     JackLog("Bind: fName %s\n", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
