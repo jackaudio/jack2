@@ -135,7 +135,7 @@ SOURCE=..\common\JackEngine.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\JackEngineTiming.cpp
+SOURCE=..\common\JackEngineControl.cpp
 # End Source File
 # Begin Source File
 

@@ -111,6 +111,10 @@ SOURCE=..\common\JackConnectionManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackEngineControl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackError.c
 # End Source File
 # Begin Source File
