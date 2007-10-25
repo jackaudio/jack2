@@ -297,7 +297,7 @@ EXPORT int jack_port_flags(const jack_port_t* port)
         jack_error("jack_port_flags called with an incorrect port %ld", myport);
         return -1;
     } else {
-        return GetGraphManager()->GetPort(myport)->Flags();
+        return GetGraphManager()->GetPort(myport)->GetFlags();
     }
 }
 
@@ -311,7 +311,7 @@ EXPORT const char* jack_port_type(const jack_port_t* port)
         jack_error("jack_port_flags called an incorrect port %ld", myport);
         return NULL;
     } else {
-        return GetGraphManager()->GetPort(myport)->Type();
+        return GetGraphManager()->GetPort(myport)->GetType();
     }
 }
 

@@ -612,12 +612,12 @@ int JackGraphManager::CheckPorts(jack_port_id_t port_src, jack_port_id_t port_ds
     JackPort* src = GetPort(port_src);
     JackPort* dst = GetPort(port_dst);
 
-    if ((dst->Flags() & JackPortIsInput) == 0) {
+    if ((dst->fFlags & JackPortIsInput) == 0) {
         jack_error("Destination port in attempted (dis)connection of %s and %s is not an input port", src->fName, dst->fName);
         return -1;
     }
 
-    if ((src->Flags() & JackPortIsOutput) == 0) {
+    if ((src->fFlags & JackPortIsOutput) == 0) {
         jack_error("Source port in attempted (dis)connection of %s and %s is not an output port", src->fName, dst->fName);
         return -1;
     }
@@ -736,23 +736,12 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
             }
 
             if (matching && port_name_pattern && port_name_pattern[0]) {
-                if (regexec(&port_regex, port->fName, 0, NULL, 0)) {
+                if (regexec(&port_regex, port->GetName(), 0, NULL, 0)) {
                     matching = false;
                 }
             }
-
-            /*
-            if (matching && type_name_pattern && type_name_pattern[0]) {
-                jack_port_type_id_t ptid = psp[i].ptype_id;
-                if (regexec (&type_regex,engine->port_types[ptid].type_name,0, NULL, 0)) {
-                    matching = false;
-                }
-            } 
-            */
-
-            // TO BE IMPROVED
-            if (matching && type_name_pattern && type_name_pattern[0]) {
-                if (regexec(&type_regex, JACK_DEFAULT_AUDIO_TYPE, 0, NULL, 0)) {
+			if (matching && type_name_pattern && type_name_pattern[0]) {
+                if (regexec(&type_regex, port->GetType(), 0, NULL, 0)) {
                     matching = false;
                 }
             }

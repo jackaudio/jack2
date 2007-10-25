@@ -181,12 +181,12 @@ const char* JackPort::GetShortName() const
     return strchr(fName, ':') + 1;
 }
 
-int JackPort::Flags() const
+int JackPort::GetFlags() const
 {
     return fFlags;
 }
 
-const char* JackPort::Type() const
+const char* JackPort::GetType() const
 {
     const JackPortType* type = GetPortType(fTypeId);
     return type->name;

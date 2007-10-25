@@ -88,8 +88,8 @@ class JackPort
 		int UnsetAlias(const char* alias);
 		bool NameEquals(const char* target);
 
-        int	Flags() const;
-        const char* Type() const;
+        int	GetFlags() const;
+        const char* GetType() const;
 
         int Lock();
         int Unlock();
