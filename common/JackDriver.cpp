@@ -129,6 +129,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     if (fEngineControl->fTimeOutUsecs == 0)  /* usecs; if zero, use 2 period size. */
         fEngineControl->fTimeOutUsecs = (jack_time_t)(2.f * fEngineControl->fPeriodUsecs);
 
+    fGraphManager->SetBufferSize(nframes);
     fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for sync
 
     /*

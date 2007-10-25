@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Oct 11 16:40:18 2007
+ * stub generated Thu Oct 25 10:49:38 2007
  * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
  * OPTIONS: 
  */
@@ -2017,6 +2017,7 @@ mig_external kern_return_t rpc_jack_port_register
 	mach_port_t server_port,
 	int refnum,
 	client_port_name_t name,
+	client_port_type_t port_type,
 	unsigned flags,
 	unsigned buffer_size,
 	unsigned *port_index,
@@ -2033,6 +2034,7 @@ mig_external kern_return_t rpc_jack_port_register
 		NDR_record_t NDR;
 		int refnum;
 		client_port_name_t name;
+		client_port_type_t port_type;
 		unsigned flags;
 		unsigned buffer_size;
 	} Request;
@@ -2097,6 +2099,8 @@ mig_external kern_return_t rpc_jack_port_register
 	InP->refnum = refnum;
 
 	(void) mig_strncpy(InP->name, name, 128);
+
+	(void) mig_strncpy(InP->port_type, port_type, 128);
 
 	InP->flags = flags;
 

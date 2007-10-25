@@ -53,6 +53,7 @@ int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     fEngineControl->fBufferSize = buffer_size;
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
+    fGraphManager->SetBufferSize(buffer_size);
     return 0;
 }
 
@@ -86,7 +87,7 @@ int JackAudioDriver::Attach()
 
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(buf, sizeof(buf) - 1, "%s:%s:out%d", fClientControl->fName, fCaptureDriverName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, (JackPortFlags)port_flags)) == NO_PORT) {
+        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
@@ -101,7 +102,7 @@ int JackAudioDriver::Attach()
 
     for (i = 0; i < fPlaybackChannels; i++) {
         snprintf(buf, sizeof(buf) - 1, "%s:%s:in%d", fClientControl->fName, fPlaybackDriverName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, (JackPortFlags)port_flags)) == NO_PORT) {
+        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", buf);
             return -1;
         }
@@ -115,7 +116,7 @@ int JackAudioDriver::Attach()
         if (fWithMonitorPorts) {
             JackLog("Create monitor port \n");
             snprintf(buf, sizeof(buf) - 1, "%s:%s:monitor_%u", fClientControl->fName, fPlaybackDriverName, i + 1);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JackPortIsOutput)) == NO_PORT) {
+            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", buf);
                 return -1;
             } else {

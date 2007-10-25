@@ -207,7 +207,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackPortRegisterRequest req;
                 JackPortRegisterResult res;
                 if (req.Read(socket) == 0)
-					res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fFlags, req.fBufferSize, &res.fPortIndex);
+					res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fPortType, req.fFlags, req.fBufferSize, &res.fPortIndex);
                 res.Write(socket);
                 break;
             }

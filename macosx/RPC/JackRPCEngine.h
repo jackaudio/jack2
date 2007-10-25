@@ -127,6 +127,7 @@ kern_return_t rpc_jack_port_register
 	mach_port_t server_port,
 	int refnum,
 	client_port_name_t name,
+	client_port_type_t port_type,
 	unsigned flags,
 	unsigned buffer_size,
 	unsigned *port_index,
@@ -428,6 +429,7 @@ __END_DECLS
 		NDR_record_t NDR;
 		int refnum;
 		client_port_name_t name;
+		client_port_type_t port_type;
 		unsigned flags;
 		unsigned buffer_size;
 	} __Request__rpc_jack_port_register_t;

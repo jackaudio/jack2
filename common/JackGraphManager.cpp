@@ -165,31 +165,26 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     jack_int_t len = manager->Connections(port_index);
 
     if (len == 0) {  // No connections: return a zero-filled buffer
-        float* buffer = GetBuffer(port_index);
-        memset(buffer, 0, buffer_size * sizeof(float)); // Clear buffer
-        return buffer;
+        port->ClearBuffer(buffer_size);
+        return port->GetBuffer();
     } else if (len == 1) {	 // One connection: use zero-copy mode - just pass the buffer of the connected (output) port.
         assert(manager->GetPort(port_index, 0) != port_index); // Check recursion
         return GetBuffer(manager->GetPort(port_index, 0), buffer_size);
     } else {  // Multiple connections
+        
         const jack_int_t* connections = manager->GetConnections(port_index);
-        float* mixbuffer = GetBuffer(port_index);
-        jack_port_id_t src_index;
-        float* buffer;
-
-        // Copy first buffer
-        src_index = connections[0];
-        AssertPort(src_index);
-        buffer = (float*)GetBuffer(src_index, buffer_size);
-        memcpy(mixbuffer, buffer, buffer_size * sizeof(float));
-
-        // Mix remaining buffers
-        for (int i = 1; (i < CONNECTION_NUM) && ((src_index = connections[i]) != EMPTY); i++) {
+		void* buffers[CONNECTION_NUM];
+		jack_port_id_t src_index;
+		int i;
+     	
+		for (i = 0; (i < CONNECTION_NUM) && ((src_index = connections[i]) != EMPTY); i++) {
             AssertPort(src_index);
-            buffer = (float*)GetBuffer(src_index, buffer_size);
-            JackPort::MixBuffer(mixbuffer, buffer, buffer_size);
+			buffers[i] = GetBuffer(src_index, buffer_size);
         }
-        return mixbuffer;
+		
+		JackPort* port = GetPort(port_index);
+		port->MixBuffers(buffers, i, buffer_size);
+        return port->GetBuffer();
     }
 }
 
@@ -202,7 +197,7 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
     /**
     jackd.h 
         * If @ref JackPortCanMonitor is set for this @a port, turn input
-        * monitoring on or off.  Otherwise, do nothing.
+        * monitoring on or off. Otherwise, do nothing.
      
      if (!(fFlags & JackPortCanMonitor))
     	return -1;
@@ -266,7 +261,7 @@ jack_nframes_t JackGraphManager::GetTotalLatency(jack_port_id_t port_index)
 }
 
 // Server
-jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_name, JackPortFlags flags)
+jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
     jack_port_id_t port_index;
 
@@ -274,8 +269,9 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
     for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
         JackPort* port = GetPort(port_index);
         if (!port->IsUsed()) {
-            JackLog("JackGraphManager::AllocatePortAux port_index = %ld name = %s\n", port_index, port_name);
-            port->Allocate(refnum, port_name, flags);
+            JackLog("JackGraphManager::AllocatePortAux port_index = %ld name = %s type = %s\n", port_index, port_name, port_type);
+            if (!port->Allocate(refnum, port_name, port_type, flags))
+				return NO_PORT;
             break;
         }
     }
@@ -284,12 +280,19 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
 }
 
 // Server
-jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name, JackPortFlags flags)
+jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
+	JackLock lock(this);
     JackConnectionManager* manager = WriteNextStateStart();
-    jack_port_id_t port_index = AllocatePortAux(refnum, port_name, flags);
+    jack_port_id_t port_index = AllocatePortAux(refnum, port_name, port_type, flags);
+
+    assert(fBufferSize != 0);
 
     if (port_index != NO_PORT) {
+        JackPort* port = GetPort(port_index);
+        assert(port);
+        port->ClearBuffer(fBufferSize);
+
         int res;
         if (flags & JackPortIsOutput) {
             res = manager->AddOutputPort(refnum, port_index);
@@ -298,8 +301,6 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
         }
 		// Insertion failure
         if (res < 0) {
-            JackPort* port = GetPort(port_index);
-            assert(port);
             port->Release();
             port_index = NO_PORT;
         }
@@ -310,8 +311,25 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
 }
 
 // Server
+void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
+{
+    JackLock lock(this);
+    JackLog("JackGraphManager::SetBufferSize size = %ld\n", (long int)buffer_size);
+    jack_port_id_t port_index;
+
+    fBufferSize = buffer_size;
+
+    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
+        JackPort* port = GetPort(port_index);
+        if (port->IsUsed())
+            port->ClearBuffer(fBufferSize);
+    }
+}
+
+// Server
 int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
 {
+	JackLock lock(this);
     JackConnectionManager* manager = WriteNextStateStart();
     JackPort* port = GetPort(port_index);
     int res;
@@ -469,17 +487,22 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
     JackConnectionManager* manager = WriteNextStateStart();
     JackLog("JackGraphManager::Connect port_src = %ld port_dst = %ld\n", port_src, port_dst);
-    bool in_use_src = GetPort(port_src)->fInUse;
-    bool in_use_dst = GetPort(port_dst)->fInUse;
+    JackPort* src = GetPort(port_src);
+    JackPort* dst = GetPort(port_dst);
     int res = 0;
 
-    if (!in_use_src || !in_use_dst) {
-        if (!in_use_src)
+    if (!src->fInUse || !dst->fInUse) {
+        if (!src->fInUse)
             jack_error("JackGraphManager::Connect: port_src = %ld not used name = %s", port_src, GetPort(port_src)->fName);
-        if (!in_use_dst)
+        if (!dst->fInUse)
             jack_error("JackGraphManager::Connect: port_dst = %ld not used name = %s", port_dst, GetPort(port_dst)->fName);
         res = -1;
         goto end;
+    }
+    if (src->fTypeId != dst->fTypeId) {
+		jack_error("JackGraphManager::Connect: different port types: port_src = %ld port_dst = %ld", port_src, port_dst);
+	    res = -1;
+	    goto end;
     }
     if (manager->IsConnected(port_src, port_dst)) {
         jack_error("JackGraphManager::Connect already connected port_src = %ld port_dst = %ld", port_src, port_dst);

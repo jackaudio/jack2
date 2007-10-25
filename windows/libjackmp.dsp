@@ -99,6 +99,10 @@ SOURCE=..\common\JackAPI.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackAudioPort.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackClient.cpp
 # End Source File
 # Begin Source File
@@ -135,7 +139,19 @@ SOURCE=..\common\JackLibClient.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackMidiAPI.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackMidiPort.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackPort.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackPortType.cpp
 # End Source File
 # Begin Source File
 

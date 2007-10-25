@@ -164,7 +164,7 @@ int JackClientPipeThread::HandleRequest()
 			JackPortRegisterRequest req;
 			JackPortRegisterResult res;
 			if (req.Read(fPipe) == 0) 
-				res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fFlags, req.fBufferSize, &res.fPortIndex);		
+				res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fPortType, req.fFlags, req.fBufferSize, &res.fPortIndex);		
 			res.Write(fPipe);
 			break;
 		}

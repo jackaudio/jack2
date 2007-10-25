@@ -220,7 +220,7 @@ class JackAtomicState
         	UInt16 cur_index;
 			UInt16 next_index = GetCurrentIndex();
         	do {
-			cur_index = next_index; 
+				cur_index = next_index; 
         		state = ReadCurrentState();
         		
         		......

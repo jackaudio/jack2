@@ -182,9 +182,9 @@ void JackWinNamedPipeClientChannel::ClientDeactivate(int refnum, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
-void JackWinNamedPipeClientChannel::PortRegister(int refnum, const char* name, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
+void JackWinNamedPipeClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
 {
-    JackPortRegisterRequest req(refnum, name, "audio", flags, buffer_size);
+    JackPortRegisterRequest req(refnum, name, type, flags, buffer_size);
     JackPortRegisterResult res;
     ServerSyncCall(&req, &res, result);
     *port_index = res.fPortIndex;

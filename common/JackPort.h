@@ -41,6 +41,7 @@ class JackPort
 
     private:
 
+        int fTypeId;
         enum JackPortFlags fFlags;
         char fName[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 		char fAlias1[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
@@ -66,14 +67,16 @@ class JackPort
 
         bool IsUsed() const;
 		
-		static void MixBuffer(float* mixbuffer, float* buffer, jack_nframes_t frames);
+		// RT
+        void ClearBuffer(jack_nframes_t frames);
+        void MixBuffers(void** src_buffers, int src_count, jack_nframes_t frames);
 
     public:
 
         JackPort();
         virtual ~JackPort();
 
-        void Allocate(int refnum, const char* port_name, JackPortFlags flags);
+        bool Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void Release();
         const char* GetName() const;
         const char* GetShortName() const;

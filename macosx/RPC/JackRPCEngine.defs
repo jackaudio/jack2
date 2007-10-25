@@ -27,6 +27,7 @@ ServerPrefix server_;
 
 type client_name_t = c_string[128];
 type client_port_name_t = c_string[128];
+type client_port_type_t = c_string[128];
 type so_name_t = c_string[1024];
 type objet_data_t = c_string[1024];
 
@@ -67,6 +68,7 @@ routine rpc_jack_port_register(
 	server_port	: mach_port_t;
 	refnum		: int;
 	name		: client_port_name_t;
+	port_type	: client_port_type_t;
 	flags		: unsigned;
 	buffer_size : unsigned;
 	out port_index : unsigned;

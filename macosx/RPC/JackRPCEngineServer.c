@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Oct 11 16:40:18 2007
+ * stub generated Thu Oct 25 10:49:38 2007
  * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
  * OPTIONS: 
  */
@@ -174,6 +174,7 @@
 		NDR_record_t NDR;
 		int refnum;
 		client_port_name_t name;
+		client_port_type_t port_type;
 		unsigned flags;
 		unsigned buffer_size;
 	} __Request__rpc_jack_port_register_t;
@@ -1830,6 +1831,26 @@ mig_internal novalue _Xrpc_jack_client_deactivate
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_port_register_t__name__defined */
 
+#ifndef __NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__client_port_type_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__client_port_type_t((client_port_type_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__client_port_type_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__int_rep__client_port_type_t((client_port_type_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__string__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__string(a, f, 128)
+#elif	defined(__NDR_convert__int_rep__string__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__int_rep__string(a, f, 128)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined */
+
 #ifndef __NDR_convert__int_rep__Request__rpc_jack_port_register_t__flags__defined
 #if	defined(__NDR_convert__int_rep__JackRPCEngine__unsigned__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_port_register_t__flags__defined
@@ -1909,6 +1930,26 @@ mig_internal novalue _Xrpc_jack_client_deactivate
 	__NDR_convert__char_rep__string(a, f, 128)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_port_register_t__name__defined */
+
+#ifndef __NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__client_port_type_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__client_port_type_t((client_port_type_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__client_port_type_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__char_rep__client_port_type_t((client_port_type_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__string__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__string(a, f, 128)
+#elif	defined(__NDR_convert__char_rep__string__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__char_rep__string(a, f, 128)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined */
 
 #ifndef __NDR_convert__char_rep__Request__rpc_jack_port_register_t__flags__defined
 #if	defined(__NDR_convert__char_rep__JackRPCEngine__unsigned__defined)
@@ -1990,6 +2031,26 @@ mig_internal novalue _Xrpc_jack_client_deactivate
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_register_t__name__defined */
 
+#ifndef __NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__client_port_type_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__client_port_type_t((client_port_type_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__client_port_type_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__float_rep__client_port_type_t((client_port_type_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__string__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__string(a, f, 128)
+#elif	defined(__NDR_convert__float_rep__string__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type(a, f) \
+	__NDR_convert__float_rep__string(a, f, 128)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined */
+
 #ifndef __NDR_convert__float_rep__Request__rpc_jack_port_register_t__flags__defined
 #if	defined(__NDR_convert__float_rep__JackRPCEngine__unsigned__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_port_register_t__flags__defined
@@ -2043,6 +2104,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Requ
 
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__refnum__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__name__defined) || \
+	defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__flags__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__buffer_size__defined)
 	if (In0P->NDR.int_rep != NDR_record.int_rep) {
@@ -2052,6 +2114,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Requ
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__name__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_port_register_t__name(&In0P->name, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_port_register_t__name__defined */
+#if defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined)
+		__NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type(&In0P->port_type, In0P->NDR.int_rep);
+#endif	/* __NDR_convert__int_rep__Request__rpc_jack_port_register_t__port_type__defined */
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__flags__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_port_register_t__flags(&In0P->flags, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_port_register_t__flags__defined */
@@ -2063,6 +2128,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Requ
 
 #if	defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__refnum__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__name__defined) || \
+	defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__flags__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__buffer_size__defined)
 	if (In0P->NDR.char_rep != NDR_record.char_rep) {
@@ -2072,6 +2138,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Requ
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__name__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_port_register_t__name(&In0P->name, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_port_register_t__name__defined */
+#if defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined)
+		__NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type(&In0P->port_type, In0P->NDR.char_rep);
+#endif	/* __NDR_convert__char_rep__Request__rpc_jack_port_register_t__port_type__defined */
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_port_register_t__flags__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_port_register_t__flags(&In0P->flags, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_port_register_t__flags__defined */
@@ -2083,6 +2152,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Requ
 
 #if	defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__refnum__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__name__defined) || \
+	defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__flags__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__buffer_size__defined)
 	if (In0P->NDR.float_rep != NDR_record.float_rep) {
@@ -2092,6 +2162,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Requ
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__name__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_port_register_t__name(&In0P->name, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_port_register_t__name__defined */
+#if defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined)
+		__NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type(&In0P->port_type, In0P->NDR.float_rep);
+#endif	/* __NDR_convert__float_rep__Request__rpc_jack_port_register_t__port_type__defined */
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_port_register_t__flags__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_port_register_t__flags(&In0P->flags, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_port_register_t__flags__defined */
@@ -2119,6 +2192,7 @@ kern_return_t server_rpc_jack_port_register
 	mach_port_t server_port,
 	int refnum,
 	client_port_name_t name,
+	client_port_type_t port_type,
 	unsigned flags,
 	unsigned buffer_size,
 	unsigned *port_index,
@@ -2138,6 +2212,7 @@ mig_internal novalue _Xrpc_jack_port_register
 		NDR_record_t NDR;
 		int refnum;
 		client_port_name_t name;
+		client_port_type_t port_type;
 		unsigned flags;
 		unsigned buffer_size;
 		mach_msg_trailer_t trailer;
@@ -2171,7 +2246,7 @@ mig_internal novalue _Xrpc_jack_port_register
 		{ MIG_RETURN_ERROR(OutP, check_result); }
 #endif	/* defined(__MIG_check__Request__rpc_jack_port_register_t__defined) */
 
-	OutP->RetCode = server_rpc_jack_port_register(In0P->Head.msgh_request_port, In0P->refnum, In0P->name, In0P->flags, In0P->buffer_size, &OutP->port_index, &OutP->result);
+	OutP->RetCode = server_rpc_jack_port_register(In0P->Head.msgh_request_port, In0P->refnum, In0P->name, In0P->port_type, In0P->flags, In0P->buffer_size, &OutP->port_index, &OutP->result);
 	if (OutP->RetCode != KERN_SUCCESS) {
 		MIG_RETURN_ERROR(OutP, OutP->RetCode);
 	}
@@ -6058,7 +6133,7 @@ const struct server_JackRPCEngine_subsystem {
           { (mig_impl_routine_t) 0,
             (mig_stub_routine_t) _Xrpc_jack_client_deactivate, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_deactivate_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_register, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_register_t)},
+            (mig_stub_routine_t) _Xrpc_jack_port_register, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_register_t)},
           { (mig_impl_routine_t) 0,
             (mig_stub_routine_t) _Xrpc_jack_port_unregister, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_unregister_t)},
           { (mig_impl_routine_t) 0,

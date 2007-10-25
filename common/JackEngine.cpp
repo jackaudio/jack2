@@ -680,12 +680,12 @@ int JackEngine::ClientDeactivate(int refnum)
 // Port management
 //-----------------
 
-int JackEngine::PortRegister(int refnum, const char* name, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index)
+int JackEngine::PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index)
 {
-    JackLog("JackEngine::PortRegister ref = %ld name = %s flags = %d buffer_size = %d\n", refnum, name, flags, buffer_size);
+    JackLog("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d\n", refnum, name, type, flags, buffer_size);
     assert(fClientTable[refnum]);
 
-    *port_index = fGraphManager->AllocatePort(refnum, name, (JackPortFlags)flags);
+    *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags);
     if (*port_index != NO_PORT) {
         NotifyPortRegistation(*port_index, true);
         return 0;

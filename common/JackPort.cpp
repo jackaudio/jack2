@@ -20,8 +20,10 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackPort.h"
 #include "JackError.h"
+#include "JackPortType.h"
 #include <stdio.h>
 #include <assert.h>
+
 
 namespace Jack
 {
@@ -33,20 +35,31 @@ JackPort::JackPort()
 JackPort::~JackPort()
 {}
 
-void JackPort::Allocate(int refnum, const char* port_name, JackPortFlags flags)
+bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
+    int id = GetPortTypeId(port_type);
+    if (id < 0)
+    	return false;
+    fTypeId = id;
     fFlags = flags;
     fRefNum = refnum;
     strcpy(fName, port_name);
-    memset(fBuffer, 0, BUFFER_SIZE_MAX * sizeof(float));
     fInUse = true;
     fLocked = false;
     fLatency = 0;
     fTied = NO_PORT;
+    // DB: At this point we do not know current buffer size in frames,
+    // but every time buffer will be returned to any user,
+    // it will be called with either ClearBuffer or MixBuffers
+    // with correct current buffer size.
+    // So it is safe to init with 0 here.
+    ClearBuffer(0);
+    return true;
 }
 
 void JackPort::Release()
 {
+    fTypeId = 0;
     fFlags = JackPortIsInput;
     fRefNum = -1;
     fInUse = false;
@@ -175,8 +188,8 @@ int JackPort::Flags() const
 
 const char* JackPort::Type() const
 {
-    // TO IMPROVE
-    return JACK_DEFAULT_AUDIO_TYPE;
+    const JackPortType* type = GetPortType(fTypeId);
+    return type->name;
 }
 
 int JackPort::SetName(const char* new_name)
@@ -243,46 +256,16 @@ int JackPort::UnsetAlias(const char* alias)
 	return 0;
 }
 
-void JackPort::MixBuffer(float* mixbuffer, float* buffer, jack_nframes_t frames)
+void JackPort::ClearBuffer(jack_nframes_t frames)
 {
-    jack_nframes_t frames_group = frames / 4;
-    frames = frames % 4;
+    const JackPortType* type = GetPortType(fTypeId);
+    (type->init)(fBuffer, BUFFER_SIZE_MAX * sizeof(float), frames);
+}
 
-    while (frames_group > 0) {
-        register float mixFloat1 = *mixbuffer;
-        register float sourceFloat1 = *buffer;
-        register float mixFloat2 = *(mixbuffer + 1);
-        register float sourceFloat2 = *(buffer + 1);
-        register float mixFloat3 = *(mixbuffer + 2);
-        register float sourceFloat3 = *(buffer + 2);
-        register float mixFloat4 = *(mixbuffer + 3);
-        register float sourceFloat4 = *(buffer + 3);
-
-        buffer += 4;
-        frames_group--;
-
-        mixFloat1 += sourceFloat1;
-        mixFloat2 += sourceFloat2;
-        mixFloat3 += sourceFloat3;
-        mixFloat4 += sourceFloat4;
-
-        *mixbuffer = mixFloat1;
-        *(mixbuffer + 1) = mixFloat2;
-        *(mixbuffer + 2) = mixFloat3;
-        *(mixbuffer + 3) = mixFloat4;
-
-        mixbuffer += 4;
-    }
-
-    while (frames > 0) {
-        register float mixFloat1 = *mixbuffer;
-        register float sourceFloat1 = *buffer;
-        buffer++;
-        frames--;
-        mixFloat1 += sourceFloat1;
-        *mixbuffer = mixFloat1;
-        mixbuffer++;
-    }
+void JackPort::MixBuffers(void** src_buffers, int src_count, jack_nframes_t buffer_size)
+{
+    const JackPortType* type = GetPortType(fTypeId);
+    (type->mixdown)(fBuffer, src_buffers, src_count, buffer_size);
 }
 
 } // end of namespace

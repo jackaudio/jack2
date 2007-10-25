@@ -26,6 +26,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackConstants.h"
 #include "JackConnectionManager.h"
 #include "JackAtomicState.h"
+#include "JackMutex.h"
 
 namespace Jack
 {
@@ -34,15 +35,16 @@ namespace Jack
 \brief Graph manager: contains the connection manager and the port array.
 */
 
-class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
+class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>, public JackLockAble
 {
 
     private:
 
         JackPort fPortArray[PORT_NUM];   
 		JackClientTiming fClientTiming[CLIENT_NUM];
+        jack_nframes_t fBufferSize;
 
-        jack_port_id_t AllocatePortAux(int refnum, const char* port_name, JackPortFlags flags);
+        jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void GetConnectionsAux(JackConnectionManager* manager, const char** res, jack_port_id_t port_index);
         const char** GetPortsAux(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
         float* GetBuffer(jack_port_id_t port_index);
@@ -51,13 +53,15 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
 
     public:
 
-        JackGraphManager()
+        JackGraphManager() : fBufferSize(0)
         {}
         virtual ~JackGraphManager()
         {}
 
+        void SetBufferSize(jack_nframes_t buffer_size);
+
         // Ports management
-        jack_port_id_t AllocatePort(int refnum, const char* port_name, JackPortFlags flags);  
+        jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);  
 		int ReleasePort(int refnum, jack_port_id_t port_index); 
 	    void RemoveAllPorts(int refnum); 
         void DisconnectAllPorts(int refnum); 

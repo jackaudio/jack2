@@ -111,6 +111,10 @@ SOURCE=..\common\JackAudioDriver.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackAudioPort.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackClient.cpp
 # End Source File
 # Begin Source File
@@ -171,7 +175,19 @@ SOURCE=..\common\JackLoopbackDriver.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackMidiAPI.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackMidiPort.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackPort.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackPortType.cpp
 # End Source File
 # Begin Source File
 
@@ -245,6 +261,10 @@ SOURCE=..\common\shm.c
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=..\common\JackMidiPort.h
+# End Source File
 # End Group
 # Begin Group "Resource Files"
 

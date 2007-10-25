@@ -436,12 +436,14 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
                         paNoFlag,  // Clipping is on...
                         Render,
                         this);
+						
     if (err != paNoError) {
         jack_error("Pa_OpenStream error = %s\n", Pa_GetErrorText(err));
         return -1;
     } else {
-        return JackAudioDriver::SetBufferSize(buffer_size); // never fails;
-    }
+        // Only done when success
+		return JackAudioDriver::SetBufferSize(buffer_size); // never fails
+     }
 }
 
 } // end of namespace

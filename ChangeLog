@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-25 Stephane Letz  <letz@grame.fr>
+
+	* Merge of Dmitry Baikov MIDI branch.
+
 2007-10-24 Stephane Letz  <letz@grame.fr>
 
 	* Implementation of server_name setting (-n).
@@ -131,6 +135,10 @@ Tom Szilagyi
 
 	* Add "callback exiting" and "jack_frame_time" tests in jack_test.
 
+2007-05-09 Stephane Letz  <letz@grame.fr>
+
+	* Add a mutex in JackGraphManager AllocatePort/ReleasePort methods.
+
 2007-05-05 Stephane Letz  <letz@grame.fr>
 
 	* Add jack_set_client_registration_callback API.
@@ -155,13 +163,38 @@ Tom Szilagyi
 
 	* Dmitry Baikov jackmp-time patch: add jack_get_time, jack_time_to_frames, jack_frames_to_time.
 
+2007-04-03 Stephane Letz  <letz@grame.fr>
+
+	* Dmitry Baikov remove-nframes patch.
+
+2007-04-02 Stephane Letz  <letz@grame.fr>
+
+	* Dmitry Baikov lost-event patch.
+
 2007-04-01 Stephane Letz  <letz@grame.fr>
 
 	* Merge JackGraphManager Remove and Release method in a unique Release method.
 
+2007-03-12 Stephane Letz  <letz@grame.fr>
+ 
+	* Bug fix in JackMidiBuffer::MaxEventSize().
+
+2007-03-09 Stephane Letz  <letz@grame.fr>
+ 
+	* Dmitry Baikov MIDI patch phase 2.
+
+2007-03-08 Stephane Letz  <letz@grame.fr>
+ 
+	* Dmitry Baikov jackmp-port-clear patch.
+
+2007-03-06 Stephane Letz  <letz@grame.fr>
+
+	* Dmitry Baikov MIDI patch phase 1.
+
 2007-03-04 Stephane Letz  <letz@grame.fr>
 
 	* Dmitry Baikov patch for JackGraphManager.cpp.
+	* Dmitry Baikov MIDI patch phase 0.
 
 2007-02-19 Stephane Letz  <letz@grame.fr>
 	
