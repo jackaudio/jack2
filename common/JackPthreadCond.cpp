@@ -18,6 +18,7 @@ This program is free software; you can redistribute it and/or modify
 */
 
 #include "JackPthreadCond.h"
+#include "JackConstants.h"
 #include "JackError.h"
 
 namespace Jack
