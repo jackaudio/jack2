@@ -244,6 +244,7 @@ bool JackServerGlobals::Init()
 		}
 		
 		/*
+		For testing
 		int argc = 15;
 		char* argv[] = {"jackdmp", "-R", "-v", "-d", "coreaudio", "-p", "512", "-d", "~:Aggregate:0", "-r", "48000", "-i", "2", "-o", "2" };
 		*/
