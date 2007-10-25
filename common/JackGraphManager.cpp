@@ -261,6 +261,22 @@ jack_nframes_t JackGraphManager::GetTotalLatency(jack_port_id_t port_index)
 }
 
 // Server
+void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
+{
+    JackLock lock(this);
+    JackLog("JackGraphManager::SetBufferSize size = %ld\n", (long int)buffer_size);
+    jack_port_id_t port_index;
+
+    fBufferSize = buffer_size;
+
+    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
+        JackPort* port = GetPort(port_index);
+        if (port->IsUsed())
+            port->ClearBuffer(fBufferSize);
+    }
+}
+
+// Server
 jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
     jack_port_id_t port_index;
@@ -308,22 +324,6 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
 
     WriteNextStateStop();
     return port_index;
-}
-
-// Server
-void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
-{
-    JackLock lock(this);
-    JackLog("JackGraphManager::SetBufferSize size = %ld\n", (long int)buffer_size);
-    jack_port_id_t port_index;
-
-    fBufferSize = buffer_size;
-
-    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
-        JackPort* port = GetPort(port_index);
-        if (port->IsUsed())
-            port->ClearBuffer(fBufferSize);
-    }
 }
 
 // Server
