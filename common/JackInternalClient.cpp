@@ -22,10 +22,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #pragma warning (disable : 4786)
 #endif
 
+#include "JackGraphManager.h"
 #include "JackInternalClient.h"
 #include "JackEngine.h"
 #include "JackServer.h"
-#include "JackGraphManager.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackInternalClientChannel.h"

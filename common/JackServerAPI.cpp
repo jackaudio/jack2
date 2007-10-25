@@ -22,8 +22,8 @@ This program is free software; you can redistribute it and/or modify
 #pragma warning (disable : 4786)
 #endif
 
-#include "JackInternalClient.h"
 #include "JackGraphManager.h"
+#include "JackInternalClient.h"
 #include "JackServer.h"
 #include "JackDebugClient.h"
 #include "JackServerGlobals.h"
