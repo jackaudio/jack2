@@ -1506,7 +1506,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 
 int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackLog("JackAlsaDriver::SetBufferSize %ld\n", nframes);
+    JackLog("JackAlsaDriver::SetBufferSize %ld\n", buffer_size);
     int res = alsa_driver_reset_parameters((alsa_driver_t *)fDriver, buffer_size,
                                          ((alsa_driver_t *)fDriver)->user_nperiods,
                                          ((alsa_driver_t *)fDriver)->frame_rate);
