@@ -65,14 +65,12 @@ jack_time_t GetMicroSeconds(void)
 jack_time_t GetMhz(void)
 {
 	FILE *f = fopen("/proc/cpuinfo", "r");
-	if (f == 0)
-	{
+	if (f == 0) {
 		perror("can't open /proc/cpuinfo\n");
 		exit(1);
 	}
 
-	for ( ; ; )
-	{
+	for (;;) {
 		jack_time_t mhz;
 		int ret;
 		char buf[1000];
@@ -97,8 +95,7 @@ jack_time_t GetMhz(void)
 #else /* MIPS, ARM, alpha */
 		ret = sscanf(buf, "BogoMIPS        : %" SCNu64, &mhz);
 #endif 
-		if (ret == 1)
-		{
+		if (ret == 1) {
 			fclose(f);
 			return (jack_time_t)mhz;
 		}
