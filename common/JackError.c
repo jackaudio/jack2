@@ -24,7 +24,7 @@
 
 int jack_verbose = 0;
 
-EXPORT void jack_error (const char *fmt, ...)
+EXPORT void jack_error(const char *fmt, ...)
 {
 	va_list ap;
 	char buffer[300];
@@ -37,7 +37,6 @@ EXPORT void jack_error (const char *fmt, ...)
 
 EXPORT void JackLog(char *fmt,...)
 {
-#ifdef PRINTDEBUG
 	if (jack_verbose) {
 		va_list ap;
 		va_start(ap, fmt);
@@ -45,6 +44,5 @@ EXPORT void JackLog(char *fmt,...)
 		vfprintf(stderr, fmt, ap);
 		va_end(ap);
 	}
-#endif
 }
 

@@ -15,7 +15,9 @@ Tom Szilagyi
 
 2007-10-25 Stephane Letz  <letz@grame.fr>
 
-	* Merge of Dmitry Baikov MIDI branch. Correct JackGraphManager::GetPortsAux to use port type.
+	* Merge of Dmitry Baikov MIDI branch. 
+	* Correct JackGraphManager::GetPortsAux to use port type.
+	* Remove JackEngineTiming class: code moved in JackEngineControl.
 
 2007-10-24 Stephane Letz  <letz@grame.fr>
 

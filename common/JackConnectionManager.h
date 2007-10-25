@@ -27,21 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-#define NO_PORT   0xFFFE
-
-#define EMPTY   0xFFFD
-#define FREE	0xFFFC
-
-typedef uint16_t jack_int_t;  // Internal type for ports and refnum
-
 struct JackClientControl;
-
-typedef enum {
-    NotTriggered,
-    Triggered,
-    Running,
-    Finished,
-} jack_client_state_t;
 
 /*!
 \brief Utility class.

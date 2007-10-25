@@ -26,9 +26,8 @@ VPATH := $(subprojects)
 
 LIB_LINUX := -lpthread -lrt -lasound
 
-
 objects_common_server_lib := JackActivationCount.o JackAPI.o JackAudioDriver.o JackClient.o JackConnectionManager.o \
-	JackDriver.o JackEngine.o JackEngineTiming.o JackError.o JackExternalClient.o JackFrameTimer.o \
+	JackDriver.o JackEngine.o JackEngineControl.o JackError.o JackExternalClient.o JackFrameTimer.o \
 	JackFreewheelDriver.o JackGlobalsServer.o JackGraphManager.o JackInternalClient.o JackPort.o JackPosixSemaphore.o JackPosixThread.o JackFifo.o  JackLoopbackDriver.o\
 	JackPortType.o JackAudioPort.o JackMidiPort.o \
 	JackServer.o JackShmMem.o JackThreadedDriver.o shm.o JackSocket.o JackSocketServerChannel.o  JackSocketNotifyChannel.o \
@@ -40,7 +39,6 @@ objects_common_client_lib := JackActivationCount.o JackAPI.o JackClient.o JackCo
 	JackPortType.o JackAudioPort.o JackMidiPort.o JackMidiAPI.o \
 	JackPosixThread.o JackShmMem.o shm.o JackSocket.o JackSocketClientChannel.o JackTime.o JackGlobals.o JackDebugClient.o JackTransportEngine.o timestamps.o
 	
-
 objects_linux_server := Jackdmp.o 
 
 objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o ice1712.o

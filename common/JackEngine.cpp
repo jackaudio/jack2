@@ -31,7 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackInternalClient.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
-#include "JackEngineTiming.h"
 #include "JackGlobals.h"
 #include "JackChannel.h"
 #include "JackSyncInterface.h"
@@ -48,17 +47,13 @@ JackEngine::JackEngine(JackGraphManager* manager,
     fEngineControl = control;
 	fChannel = JackGlobals::MakeServerNotifyChannel();
 	fSignal = JackGlobals::MakeInterProcessSync();
-    fEngineTiming = new JackEngineTiming(fClientTable, fGraphManager, fEngineControl);
     for (int i = 0; i < CLIENT_NUM; i++)
         fClientTable[i] = NULL;
-    fEngineTiming->ClearTimeMeasures();
-    fEngineTiming->ResetRollingUsecs();
 }
 
 JackEngine::~JackEngine()
 {
     delete fChannel;
-    delete fEngineTiming;
 	delete fSignal;
 }
 
@@ -154,14 +149,10 @@ bool JackEngine::Process(jack_time_t callback_usecs)
 {
 	bool res = true;
 	
-    // Transport begin
- 	fEngineControl->CycleBegin(callback_usecs);
+    // Cycle  begin
+ 	fEngineControl->CycleBegin(fClientTable, fGraphManager, callback_usecs);
 
-    // Timing
- 	fEngineControl->IncFrameTime(callback_usecs);
-    fEngineTiming->UpdateTiming(callback_usecs);
-
-    // Graph
+	// Graph
     if (fGraphManager->IsFinishedGraph()) {
         ProcessNext(callback_usecs);
 		res = true;
@@ -179,7 +170,7 @@ bool JackEngine::Process(jack_time_t callback_usecs)
 		}
     }
 
-    // Transport end
+    // Cycle end
  	fEngineControl->CycleEnd(fClientTable);
 	return res;
 }
@@ -538,7 +529,7 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
 
     fClientTable[refnum] = client;
 	fGraphManager->InitRefNum(refnum);
-    fEngineTiming->ResetRollingUsecs();
+	fEngineControl->ResetRollingUsecs();
     *shared_engine = fEngineControl->GetShmIndex();
     *shared_graph_manager = fGraphManager->GetShmIndex();
     *ref = refnum;
@@ -580,7 +571,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
 
     fClientTable[refnum] = client;
 	fGraphManager->InitRefNum(refnum);
-    fEngineTiming->ResetRollingUsecs();
+  	fEngineControl->ResetRollingUsecs();
     *shared_engine = fEngineControl;
     *shared_manager = fGraphManager;
     *ref = refnum;
@@ -634,7 +625,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 
     // Cleanup...
     fSynchroTable[refnum]->Destroy();
-    fEngineTiming->ResetRollingUsecs();
+	fEngineControl->ResetRollingUsecs();
     return 0;
 }
 

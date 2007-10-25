@@ -31,7 +31,6 @@ namespace Jack
 class JackClientInterface;
 struct JackEngineControl;
 class JackServerNotifyChannelInterface;
-class JackEngineTiming;
 class JackExternalClient;
 class JackSyncInterface;
 
@@ -48,7 +47,6 @@ class JackEngine
         JackClientInterface* fClientTable[CLIENT_NUM];
         JackSynchro** fSynchroTable;
         JackServerNotifyChannelInterface* fChannel;              /*! To communicate between the RT thread and server */
-        JackEngineTiming* fEngineTiming;
         JackSyncInterface* fSignal;
         jack_time_t fLastSwitchUsecs;
 

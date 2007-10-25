@@ -17,7 +17,11 @@
 
 */
 
-#define PRINTDEBUG
+#ifndef __JackConstants__
+#define __JackConstants__
+
+namespace Jack
+{
 
 #define VERSION "0.68"
 
@@ -68,3 +72,21 @@
 #define JACK_PROTOCOL_VERSION 1
 
 #define DRIVER_OPEN_TIMEOUT 5   // in sec
+
+#define NO_PORT   0xFFFE
+
+#define EMPTY   0xFFFD
+#define FREE	0xFFFC
+
+typedef uint16_t jack_int_t;  // Internal type for ports and refnum
+
+typedef enum {
+    NotTriggered,
+    Triggered,
+    Running,
+    Finished,
+} jack_client_state_t;
+
+} // end of namespace
+
+#endif

@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2004-2006 Grame  
+Copyright (C) 2003 Paul Davis
+Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,50 +18,59 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackEngineTiming.h"
-#include "JackClientInterface.h"
 #include "JackEngineControl.h"
+#include "JackGraphManager.h"
 #include "JackClientControl.h"
-#include <math.h>
-#include <algorithm>
-#include <iostream> 
-#include <assert.h>
 
 namespace Jack
 {
 
+void JackEngineControl::CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs)
+{
+	// Transport
+	fTransport.CycleBegin(fSampleRate, callback_usecs);
+	
+	// Timer
+	fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
+	
+	// Timing
+	GetTimeMeasure(table, manager, callback_usecs);
+    CalcCPULoad(table, manager);
+}
+
+void JackEngineControl::CycleEnd(JackClientInterface** table)
+{
+	fTransport.CycleEnd(table, fSampleRate, fBufferSize);
+}
+
+void JackEngineControl::InitFrameTime()
+{
+	fFrameTimer.InitFrameTime();
+}
+
+void JackEngineControl::ResetFrameTime(jack_time_t callback_usecs)
+{
+	fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
+}
+
+void JackEngineControl::ReadFrameTime(JackTimer* timer)
+{
+	fFrameTimer.ReadFrameTime(timer);
+}
+
+// Private
 inline jack_time_t MAX(jack_time_t a, jack_time_t b)
 {
     return (a < b) ? b : a;
 }
 
-JackEngineTiming::JackEngineTiming(JackClientInterface** table, JackGraphManager* manager, JackEngineControl* control)
-{
-    fClientTable = table;
-    fGraphManager = manager;
-    fEngineControl = control;
-    fLastTime = 0;
-    fCurTime = 0;
-    fProcessTime = 0;
-    fLastProcessTime = 0;
-    fSpareUsecs = 0;
-    fMaxUsecs = 0;
-    fAudioCycle = 0;
-}
-
-void JackEngineTiming::UpdateTiming(jack_time_t callback_usecs)
-{
-    GetTimeMeasure(callback_usecs);
-    CalcCPULoad();
-}
-
-void JackEngineTiming::CalcCPULoad()
+void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManager* manager)
 {
     jack_time_t lastCycleEnd = fLastProcessTime;
 
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
-		JackClientTiming* timing = fGraphManager->GetClientTiming(i);
+        JackClientInterface* client = table[i];
+		JackClientTiming* timing = manager->GetClientTiming(i);
 		if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
             lastCycleEnd = MAX(lastCycleEnd, timing->fFinishedAt);
         }
@@ -85,27 +95,26 @@ void JackEngineTiming::CalcCPULoad()
         }
 
         fMaxUsecs = MAX(fMaxUsecs, maxUsecs);
-        fSpareUsecs = jack_time_t((maxUsecs < fEngineControl->fPeriodUsecs) ? fEngineControl->fPeriodUsecs - maxUsecs : 0);
-        fEngineControl->fCPULoad
-        = ((1.0f - (float(fSpareUsecs) / float(fEngineControl->fPeriodUsecs))) * 50.0f + (fEngineControl->fCPULoad * 0.5f));
+        fSpareUsecs = jack_time_t((maxUsecs < fPeriodUsecs) ? fPeriodUsecs - maxUsecs : 0);
+        fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
     }
 }
 
-void JackEngineTiming::ResetRollingUsecs()
+void JackEngineControl::ResetRollingUsecs()
 {
     memset(fRollingClientUsecs, 0, sizeof(fRollingClientUsecs));
     fRollingClientUsecsIndex = 0;
     fRollingClientUsecsCnt = 0;
     fSpareUsecs = 0;
-    fRollingInterval = (int)floor((JACK_ENGINE_ROLLING_INTERVAL * 1000.0f) / fEngineControl->fPeriodUsecs);
+    fRollingInterval = (int)floor((JACK_ENGINE_ROLLING_INTERVAL * 1000.f) / fPeriodUsecs);
 }
 
-void JackEngineTiming::GetTimeMeasure(jack_time_t callbackUsecs)
+void JackEngineControl::GetTimeMeasure(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs)
 {
     int pos = (++fAudioCycle) % TIME_POINTS;
 
     fLastTime = fCurTime;
-    fCurTime = callbackUsecs;
+    fCurTime = callback_usecs;
 
     fLastProcessTime = fProcessTime;
     fProcessTime = GetMicroSeconds();
@@ -115,8 +124,8 @@ void JackEngineTiming::GetTimeMeasure(jack_time_t callbackUsecs)
         fMeasure[pos].fAudioCycle = fAudioCycle;
 
         for (int i = 0; i < CLIENT_NUM; i++) {
-            JackClientInterface* client = fClientTable[i];
-			JackClientTiming* timing = fGraphManager->GetClientTiming(i);
+            JackClientInterface* client = table[i];
+			JackClientTiming* timing = manager->GetClientTiming(i);
             if (client && client->GetClientControl()->fActive) {
 			    fMeasure[pos].fClientTable[i].fRefNum = i;
                 fMeasure[pos].fClientTable[i].fSignaledAt = timing->fSignaledAt;
@@ -128,7 +137,7 @@ void JackEngineTiming::GetTimeMeasure(jack_time_t callbackUsecs)
     }
 }
 
-void JackEngineTiming::ClearTimeMeasures()
+void JackEngineControl::ClearTimeMeasures()
 {
     for (int i = 0; i < TIME_POINTS; i++) {
         for (int j = 0; j < CLIENT_NUM; j++) {
@@ -141,6 +150,4 @@ void JackEngineTiming::ClearTimeMeasures()
     fLastTime = fCurTime = 0;
 }
 
-
 } // end of namespace
-
