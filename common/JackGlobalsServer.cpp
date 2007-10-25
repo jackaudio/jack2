@@ -71,7 +71,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDummyDriver.h"
 #include "JackAudioDriver.h"
 
-
 using namespace std;
 
 namespace Jack
