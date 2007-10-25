@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
 #include "JackClientControl.h"
+#include <math.h>
 
 namespace Jack
 {
