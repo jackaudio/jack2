@@ -59,11 +59,8 @@ int JackThreadedDriver::Start()
 
     if (fDriver->IsRealTime()) {
         JackLog("JackThreadedDriver::Start IsRealTime\n");
-        // Will do "something" on OSX only...
-        // fThread->SetParams(fDriver->fEngineControl->fPeriod, fDriver->fEngineControl->fComputation, fDriver->fEngineControl->fConstraint);
-        if (fThread->AcquireRealTime(GetEngineControl()->fPriority) < 0) {
+        if (fThread->AcquireRealTime(GetEngineControl()->fPriority) < 0) 
             jack_error("AcquireRealTime error");
-        }
     }
 
     return 0;
