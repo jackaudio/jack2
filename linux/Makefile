@@ -36,7 +36,7 @@ objects_common_server_lib := JackActivationCount.o JackAPI.o JackAudioDriver.o J
 
 objects_common_client_lib := JackActivationCount.o JackAPI.o JackClient.o JackConnectionManager.o ringbuffer.o  JackServerLaunch.o\
 	JackError.o JackFrameTimer.o JackGlobalsClient.o JackGraphManager.o JackLibClient.o JackLibAPI.o JackPort.o JackPosixSemaphore.o JackFifo.o \
-	JackPortType.o JackAudioPort.o JackMidiPort.o JackMidiAPI.o \
+	JackPortType.o JackAudioPort.o JackMidiPort.o JackMidiAPI.o JackEngineControl.o \
 	JackPosixThread.o JackShmMem.o shm.o JackSocket.o JackSocketClientChannel.o JackTime.o JackGlobals.o JackDebugClient.o JackTransportEngine.o timestamps.o
 	
 objects_linux_server := Jackdmp.o 
