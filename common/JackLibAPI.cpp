@@ -102,7 +102,7 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
 	if (jack_debug && strcmp(jack_debug, "on") == 0)
 		client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
 	else
-		client = new JackLibClient(GetSynchroTable()); // Debug mode
+		client = new JackLibClient(GetSynchroTable()); 
 #else
 	client = new JackLibClient(GetSynchroTable());
 #endif 

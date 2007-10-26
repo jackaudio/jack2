@@ -102,7 +102,7 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
 	if (jack_debug && strcmp(jack_debug, "on") == 0)
 		client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
 	else
-		client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); // Debug mode
+		client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); 
 #else
 	client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
 #endif 
