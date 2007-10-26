@@ -26,11 +26,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include <getopt.h>
 
-#ifdef WIN32
-#define ADDON_DIR "jackmp"  // TO IMPROVE
-#else
+#ifndef WIN32 
 #include <dirent.h>
-//#define ADDON_DIR "/usr/local/lib/jackmp"  // TO IMPROVE
 #endif
 
 static void
@@ -53,8 +50,7 @@ jack_print_driver_options (jack_driver_desc_t * desc, FILE *file)
                 sprintf (arg_default, "%c", desc->params[i].value.c);
                 break;
             case JackDriverParamString:
-                if (desc->params[i].value.str &&
-                        strcmp (desc->params[i].value.str, "") != 0)
+                if (desc->params[i].value.str && strcmp (desc->params[i].value.str, "") != 0)
                     sprintf (arg_default, "%s", desc->params[i].value.str);
                 else
                     sprintf (arg_default, "none");
@@ -77,7 +73,6 @@ jack_print_driver_param_usage (jack_driver_desc_t * desc, unsigned long param, F
 {
     fprintf (file, "Usage information for the '%s' parameter for driver '%s':\n",
              desc->params[param].name, desc->name);
-
     fprintf (file, "%s\n", desc->params[param].long_desc);
 }
 
@@ -115,7 +110,7 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
         printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
         jack_print_driver_options (desc, stdout);
         return 1;
-    }
+	}
 
     /* set up the stuff for getopt */
     options = (char*)calloc (desc->nparams * 3 + 1, sizeof (char));
@@ -125,7 +120,6 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
     for (i = 0; i < desc->nparams; i++) {
         sprintf (options_ptr, "%c::", desc->params[i].character);
         options_ptr += 3;
-
         long_options[i].name = desc->params[i].name;
         long_options[i].flag = NULL;
         long_options[i].val = desc->params[i].character;

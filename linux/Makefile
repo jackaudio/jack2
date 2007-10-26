@@ -48,13 +48,13 @@ objects_linux_freebob := JackFreebobDriver.o
 objects_linux_dummy := JackDummyDriver.o  
 
 CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+CXXFLAGS := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)\bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 #CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-#CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+#CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)\bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 # Use this line to compile with POSIX names semaphore
-#CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
+#CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)\bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS)
 
 all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \

@@ -54,15 +54,14 @@ namespace Jack
 #ifdef WIN32
 	#define jack_server_dir "server"
 	#define jack_client_dir "client"
+	#define ADDON_DIR "jackmp"
 #elif __APPLE__
 	#define jack_server_dir "/tmp"
 	#define jack_client_dir "/tmp"
-	#define JACK_LOCATION  "/usr/local/bin"
 	#define JACK_DEFAULT_DRIVER "coreaudio"
 #else
 	#define jack_server_dir "/dev/shm"
 	#define jack_client_dir "/dev/shm"
-	#define JACK_LOCATION  "/usr/local/bin"
 	#define JACK_DEFAULT_DRIVER "alsa"
 #endif
 
@@ -71,7 +70,7 @@ namespace Jack
 
 #define ALL_CLIENTS -1 // for notification
 
-#define JACK_PROTOCOL_VERSION 1
+#define JACK_PROTOCOL_VERSION 2
 
 #define DRIVER_OPEN_TIMEOUT 5   // in sec
 

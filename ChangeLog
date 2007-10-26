@@ -19,6 +19,7 @@ Tom Szilagyi
 	* Cleanup old zombification code. 
 	* Linux Makefile now install jack headers.
 	* Use of JACK_CLIENT_DEBUG environment variable to activate debug client mode.
+	* Definition of JACK_LOCATION variable using -D in the Makefile.
 
 2007-10-25 Stephane Letz  <letz@grame.fr>
 
