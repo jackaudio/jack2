@@ -81,6 +81,5 @@ main (int argc, char *argv[])
 	}
 
 	jack_client_close(client);
-
 	return 0;
 }

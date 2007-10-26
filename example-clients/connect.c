@@ -36,7 +36,6 @@ int connecting, disconnecting;
 
 int
 main (int argc, char *argv[])
-
 {
 	jack_client_t* client = NULL;
 	char *my_name = strrchr(argv[0], '/');
@@ -56,8 +55,7 @@ main (int argc, char *argv[])
 		connecting = TRUE;
 	} else {
 		fprintf(stderr, "ERROR! client should be called jack_connect or jack_disconnect. client is called %s\n", my_name);
-		//return 1;
-		goto error;
+		return 1;
 	}
 	
 	printf("connecting %ld\n",connecting);
@@ -66,24 +64,20 @@ main (int argc, char *argv[])
 		fprintf (stderr, "usage: %s <src_port> <dst_port>\n", my_name);
 		fprintf(stderr, "The source port must be an output port of the source client.\n");
 		fprintf (stderr, "The destination port must be an input port of the destination client.\n");
-		//return 1;
-		goto error;
+		return 1;
 	}
 
 	/* try to become a client of the JACK server */
 
 	if ((client = jack_client_new (my_name)) == 0) {
 		fprintf (stderr, "jack server not running?\n");
-		//return 1;
-		goto error;
+		return 1;
 	}
 
 	/* display the current sample rate. once the client is activated 
 	   (see below), you should rely on your own sample rate
 	   callback (see above) for this value.
 	*/
-
-//	printf ("engine sample rate: %" PRIu32 "\n",jack_get_sample_rate (client));
 
 	/* find the two ports */
 
@@ -107,33 +101,25 @@ main (int argc, char *argv[])
 	   the client is activated (this may change in the future).
 	*/
 
-    /* jack_port_connect not yet implemented
-	if (jack_port_connect(client, input_port, output_port)) {
-		fprintf (stderr, "cannot connect ports\n");
-	}
-    */
-	if (connecting) {
-        printf("connecting %s %s\n",jack_port_name(input_port), jack_port_name(output_port));
-         
+ 	if (connecting) {
 		if (jack_connect(client, jack_port_name(input_port), jack_port_name(output_port))) {
 			fprintf (stderr, "cannot connect ports\n");
 			goto error;
         }
 	}
 	if (disconnecting) {
-        printf("disconnecting %s %s\n",jack_port_name(input_port), jack_port_name(output_port));
-        
-		if (jack_disconnect(client, jack_port_name(input_port), jack_port_name(output_port))) {
+     	if (jack_disconnect(client, jack_port_name(input_port), jack_port_name(output_port))) {
 			fprintf (stderr, "cannot disconnect ports\n");
             goto error;
         }
 	}
-    //jack_deactivate (client);
+    jack_deactivate (client);
 	jack_client_close (client);
 	return 0;
     
 error:
-    if (client) jack_client_close (client);
+    if (client) 
+		jack_client_close (client);
     return 1;
 }
 
