@@ -160,8 +160,7 @@ bool JackEngine::Process(jack_time_t callback_usecs)
         JackLog("Process: graph not finished!\n");
 		if (callback_usecs > fLastSwitchUsecs + fEngineControl->fTimeOutUsecs) {
             JackLog("Process: switch to next state delta = %ld\n", long(callback_usecs - fLastSwitchUsecs));
-			//RemoveZombifiedClients(callback_usecs); TODO
-            ProcessNext(callback_usecs);
+			ProcessNext(callback_usecs);
 			res = true;
         } else {
             JackLog("Process: waiting to switch delta = %ld\n", long(callback_usecs - fLastSwitchUsecs));
@@ -192,69 +191,15 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
            
             if (status != NotTriggered && status != Finished) {
                 jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
-                //fChannel->ClientNotify(i, kXRunCallback, 0); // Notify the failing client
                 fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
+			
             if (status == Finished && (long)(finished_date - callback_usecs) > 0) {
                 jack_error("JackEngine::XRun: client %s finished after current callback", client->GetClientControl()->fName);
-                //fChannel->ClientNotify(i, kXRunCallback, 0); // Notify the failing client
                 fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
         }
     }
-}
-
-//---------------
-// Zombification
-//---------------
-
-bool JackEngine::IsZombie(JackClientInterface* client, jack_time_t current_time)
-{
-	return ((current_time - fGraphManager->GetClientTiming(client->GetClientControl()->fRefNum)->fFinishedAt) > 2 * fEngineControl->fTimeOutUsecs);  // A VERIFIER
-}
-
-// TODO : check what happens with looped sub-graph....
-void JackEngine::GetZombifiedClients(bool zombi_clients[CLIENT_NUM], jack_time_t current_time)
-{
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
-        JackClientInterface* client1 = fClientTable[i];
-        if (client1 && IsZombie(client1, current_time)) {
-            JackLog("JackEngine::GetZombifiedClients: %s\n", client1->GetClientControl()->fName);
-            zombi_clients[i] = true; // Assume client is dead
-            // If another dead client is connected to the scanned one, then the scanned one is not the first of the dead subgraph
-            for (int j = REAL_REFNUM; j < CLIENT_NUM; j++) {
-                JackClientInterface* client2 = fClientTable[j];
-                if (client2 && IsZombie(client2, current_time) && fGraphManager->IsDirectConnection(j, i)) {
-                    zombi_clients[i] = false;
-                    break;
-                }
-            }
-        } else {
-            zombi_clients[i] = false;
-        }
-    }
-}
-
-void JackEngine::RemoveZombifiedClients(jack_time_t current_time)
-{
-    bool zombi_clients[CLIENT_NUM];
-    GetZombifiedClients(zombi_clients, current_time);
-
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
-        if (zombi_clients[i] && !fClientTable[i]->GetClientControl()->fZombie) {
-            fClientTable[i]->GetClientControl()->fZombie = true;
-            JackLog("RemoveZombifiedCients: name = %s\n", fClientTable[i]->GetClientControl()->fName);
-            fGraphManager->DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, i);
-            fGraphManager->DirectDisconnect(i, FREEWHEEL_DRIVER_REFNUM);
-            fGraphManager->DisconnectAllPorts(i);
-            fChannel->ClientNotify(i, kZombifyClient, 0); // Signal engine
-        }
-    }
-}
-
-void JackEngine::ZombifyClient(int refnum)
-{
-    NotifyClient(refnum, kZombifyClient, false, 0);
 }
 
 //---------------

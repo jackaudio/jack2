@@ -16,6 +16,7 @@ Tom Szilagyi
 2007-10-26 Stephane Letz  <letz@grame.fr>
 
 	* Add midiseq and midisine examples. 
+	* Cleanup old zombification code. 
 
 2007-10-25 Stephane Letz  <letz@grame.fr>
 

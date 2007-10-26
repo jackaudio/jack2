@@ -40,7 +40,6 @@ struct JackClientControl : public JackShmMem
 	bool fCallback[kMaxNotification];
   	volatile jack_transport_state_t fTransportState;
 	int fRefNum;
-	bool fZombie;
 	bool fActive;
 
     JackClientControl(const char* name, int refnum)
@@ -69,7 +68,6 @@ struct JackClientControl : public JackShmMem
 		fCallback[kActivateClient] = true;
         fRefNum = refnum;
         fTransportState = JackTransportStopped;
-        fZombie = false;
         fActive = false;
     }
 

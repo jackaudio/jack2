@@ -480,7 +480,7 @@ int main (int argc, char *argv[])
     const char *options = "kRnqvt:";
     float ratio;		// for speed calculation in freewheel mode
     jack_options_t jack_options = JackNullOption; 
-	 struct option long_options[] = {
+	struct option long_options[] = {
                                        {"realtime", 0, 0, 'R'},
                                        {"non-realtime", 0, 0, 'n'},
                                        {"time", 0, 0, 't'},

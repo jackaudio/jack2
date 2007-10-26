@@ -55,11 +55,7 @@ class JackEngine
 		
         int NotifyAddClient(JackClientInterface* new_client, const char* name, int refnum);
         void NotifyRemoveClient(const char* name, int refnum);
-		
-        bool IsZombie(JackClientInterface* client, jack_time_t current_time);
-        void RemoveZombifiedClients(jack_time_t current_time);
-        void GetZombifiedClients(bool clients[CLIENT_NUM], jack_time_t current_time);
-		
+			
 		void ProcessNext(jack_time_t callback_usecs);
 		void ProcessCurrent(jack_time_t callback_usecs);
 		
@@ -109,8 +105,7 @@ class JackEngine
 
         // Graph
         bool Process(jack_time_t callback_usecs);
-        void ZombifyClient(int refnum);
-
+   
         // Notifications
         void NotifyClient(int refnum, int event, int sync, int value);
         void NotifyClients(int event, int sync, int value);

@@ -33,8 +33,7 @@ namespace Jack
 		kStopFreewheelCallback = 7,
 		kPortRegistrationOnCallback = 8,
 		kPortRegistrationOffCallback = 9,
-		kZombifyClient = 10,
-		kDeadClient = 11,
+		kDeadClient = 10,
 		kMaxNotification
 	};
 

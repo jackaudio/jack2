@@ -210,10 +210,6 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     res = fXrun(fXrunArg);
                 break;
 
-            case kZombifyClient:
-	            JackLog("JackClient::kZombifyClient name = %s ref = %ld \n", name, refnum);
-                ShutDown();
-                break;
 		}
     }
 

@@ -287,10 +287,6 @@ void JackServer::Notify(int refnum, int notify, int value)
             fEngine->NotifyXRun(refnum);
             break;
 
-        case kZombifyClient:
-            fEngine->ZombifyClient(refnum);
-            break;
-
         case kDeadClient:
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
 			if (fEngine->ClientDeactivate(refnum) < 0)
