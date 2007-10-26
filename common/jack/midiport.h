@@ -45,10 +45,12 @@ typedef struct _jack_midi_event
 /* Get number of events in a port buffer.
  *
  * @param port_buffer Port buffer from which to retrieve event.
+ * @param nframes Number of valid frames this cycle.
  * @return number of events inside @a port_buffer
  */
 jack_nframes_t
-jack_midi_get_event_count(void*          port_buffer);
+jack_midi_get_event_count(void*          port_buffer,
+                        jack_nframes_t nframes);
 
 
 /** Get a MIDI event from an event port buffer.
@@ -60,12 +62,14 @@ jack_midi_get_event_count(void*          port_buffer);
  * @param event Event structure to store retrieved event in.
  * @param port_buffer Port buffer from which to retrieve event.
  * @param event_index Index of event to retrieve.
+ * @param nframes Number of valid frames this cycle.
  * @return 0 on success, ENODATA if buffer is empty.
  */
 int
 jack_midi_event_get(jack_midi_event_t *event,
                     void              *port_buffer,
-                    jack_nframes_t     event_index);
+                    jack_nframes_t     event_index,
+                    jack_nframes_t     nframes);
 
 
 /** Clear an event buffer.
@@ -75,9 +79,11 @@ jack_midi_event_get(jack_midi_event_t *event,
  * function may not be called on an input port's buffer.
  *
  * @param port_buffer Port buffer to clear (must be an output port buffer).
+ * @param nframes Number of valid frames this cycle.
  */
 void
-jack_midi_clear_buffer(void           *port_buffer);
+jack_midi_clear_buffer(void           *port_buffer,
+                       jack_nframes_t  nframes);
 
 
 /** Get the size of the largest event that can be stored by the port.
@@ -86,9 +92,10 @@ jack_midi_clear_buffer(void           *port_buffer);
  * events already stored in the port.
  *
  * @param port_buffer Port buffer to check size of.
+ * @param nframes Number of valid frames this cycle.
  */
 size_t
-jack_midi_max_event_size(void* port_buffer);
+jack_midi_max_event_size(void* port_buffer, jack_nframes_t nframes);
 
 
 /** Allocate space for an event to be written to an event port buffer.
@@ -103,13 +110,15 @@ jack_midi_max_event_size(void* port_buffer);
  * @param port_buffer Buffer to write event to.
  * @param time Sample offset of event.
  * @param data_size Length of event's raw data in bytes.
+ * @param nframes Number of valid frames this event.
  * @return Pointer to the beginning of the reserved event's data buffer, or
  * NULL on error (ie not enough space).
  */
 jack_midi_data_t*
 jack_midi_event_reserve(void           *port_buffer,
                         jack_nframes_t  time, 
-                        size_t          data_size);
+                        size_t          data_size,
+                        jack_nframes_t  nframes);
 
 
 /** Write an event into an event port buffer.
@@ -122,13 +131,15 @@ jack_midi_event_reserve(void           *port_buffer,
  * @param time Sample offset of event.
  * @param data Message data to be written.
  * @param data_size Length of @a data in bytes.
+ * @param nframes Number of valid frames this event.
  * @return 0 on success, ENOBUFS if there's not enough space in buffer for event.
  */
 int
 jack_midi_event_write(void                   *port_buffer,
                       jack_nframes_t          time,
                       const jack_midi_data_t *data,
-                      size_t                  data_size);
+                      size_t                  data_size,
+                      jack_nframes_t          nframes);
 
 
 /** Get the number of events that could not be written to @a port_buffer.
@@ -137,10 +148,12 @@ jack_midi_event_write(void                   *port_buffer,
  * Currently the only way this can happen is if events are lost on port mixdown.
  *
  * @param port_buffer Port to receive count for.
+ * @param nframes Number of valid frames this cycle.
  * @returns Number of events that could not be written to @a port_buffer.
  */
 jack_nframes_t
-jack_midi_get_lost_event_count(void           *port_buffer);
+jack_midi_get_lost_event_count(void           *port_buffer,
+                               jack_nframes_t  nframes);
 
 
 #ifdef __cplusplus

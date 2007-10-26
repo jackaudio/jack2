@@ -45,7 +45,7 @@ int process(jack_nframes_t nframes, void *arg)
 	int i,j;
 	void* port_buf = jack_port_get_buffer(output_port, nframes);
 	unsigned char* buffer;
-	jack_midi_clear_buffer(port_buf);
+	jack_midi_clear_buffer(port_buf, nframes);
 	/*memset(buffer, 0, nframes*sizeof(jack_default_audio_sample_t));*/
 
 	for(i=0; i<nframes; i++)
@@ -54,7 +54,7 @@ int process(jack_nframes_t nframes, void *arg)
 		{
 			if(note_starts[j] == loop_index)
 			{
-				buffer = jack_midi_event_reserve(port_buf, i, 3);
+				buffer = jack_midi_event_reserve(port_buf, i, 3, nframes);
 /*				printf("wrote a note on, port buffer = 0x%x, event buffer = 0x%x\n", port_buf, buffer);*/
 				buffer[2] = 64;		/* velocity */
 				buffer[1] = note_frqs[j];
@@ -62,7 +62,7 @@ int process(jack_nframes_t nframes, void *arg)
 			}
 			else if(note_starts[j] + note_lengths[j] == loop_index)
 			{
-				buffer = jack_midi_event_reserve(port_buf, i, 3);
+				buffer = jack_midi_event_reserve(port_buf, i, 3, nframes);
 /*				printf("wrote a note off, port buffer = 0x%x, event buffer = 0x%x\n", port_buf, buffer);*/
 				buffer[2] = 64;		/* velocity */
 				buffer[1] = note_frqs[j];

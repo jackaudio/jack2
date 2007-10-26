@@ -520,9 +520,6 @@
 		4B5A1BBD0CD1CC110005BF74 /* midiseq.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = midiseq.c; path = "../example-clients/midiseq.c"; sourceTree = SOURCE_ROOT; };
 		4B5A1BDA0CD1CCE10005BF74 /* jack_midisine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_midisine; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B5A1BDC0CD1CD420005BF74 /* midisine.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = midisine.c; path = "../example-clients/midisine.c"; sourceTree = SOURCE_ROOT; };
-		4B5A1D3C0CD1F4990005BF74 /* FadeConnect.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = FadeConnect.cpp; path = "../example-clients/FadeConnect.cpp"; sourceTree = SOURCE_ROOT; };
-		4B5A1D3D0CD1F4990005BF74 /* FadeConnect.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FadeConnect.h; path = "../example-clients/FadeConnect.h"; sourceTree = SOURCE_ROOT; };
-		4B5A1D700CD1F63F0005BF74 /* fade_connect.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fade_connect.cpp; path = "../example-clients/fade_connect.cpp"; sourceTree = SOURCE_ROOT; };
 		4B60CE480AAABA31004956AA /* connect.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = connect.c; path = "../example-clients/connect.c"; sourceTree = SOURCE_ROOT; };
 		4B66A8580934964500A89560 /* JackConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackConstants.h; path = ../common/JackConstants.h; sourceTree = SOURCE_ROOT; };
 		4B699BB1097D421600A18468 /* jackdmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jackdmp; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -962,9 +959,6 @@
 		4B03383E0797E19900686131 /* Simple clients */ = {
 			isa = PBXGroup;
 			children = (
-				4B5A1D700CD1F63F0005BF74 /* fade_connect.cpp */,
-				4B5A1D3C0CD1F4990005BF74 /* FadeConnect.cpp */,
-				4B5A1D3D0CD1F4990005BF74 /* FadeConnect.h */,
 				4B5A1BDC0CD1CD420005BF74 /* midisine.c */,
 				4B5A1BBD0CD1CC110005BF74 /* midiseq.c */,
 				4BA692D60CBE4CC600EAD520 /* ipunload.c */,
