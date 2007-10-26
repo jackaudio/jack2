@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-26 Stephane Letz  <letz@grame.fr>
+
+	* Add midiseq and midisine examples. 
+
 2007-10-25 Stephane Letz  <letz@grame.fr>
 
 	* Merge of Dmitry Baikov MIDI branch. 

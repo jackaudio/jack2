@@ -200,9 +200,10 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
  * Used for the type argument of jack_port_register() for default
- * audio ports.
+ * audio ports and midi ports.
  */
 #define JACK_DEFAULT_AUDIO_TYPE "32 bit float mono audio"
+#define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
 
 /**
  * For convenience, use this typedef if you want to be able to change
