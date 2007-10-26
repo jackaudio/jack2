@@ -215,11 +215,11 @@ int JackAudioDriver::ProcessSync()
 			if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) 
 				jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
 		} else { // Graph not finished: do not activate it
-			jack_error("JackAudioDriver::ProcessSync: error");
+			jack_error("ProcessSync: error");
 		}
 
 		if (Write() < 0)  // Write output buffers for the current cycle
-			jack_error("Process: write error");
+			jack_error("ProcessSync: write error");
 
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
