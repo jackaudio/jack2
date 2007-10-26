@@ -140,6 +140,7 @@ remove:
 	rm $(prefix)/$(libdir)/libjackmp.so
 	rm $(prefix)/$(libdir)/libjackdmp.so
 	rm -r $(prefix)/$(libdir)/jackmp
+	rm -r $(prefix)/include/jack
 	cd $(prefix)/$(libdir) && rm -f libjack.so*
 	cd $(prefix)/bin && [ -f tmp_jackd ] && mv -f tmp_jackd jackd || echo "jackd server not restored, continue.."
 	cd $(prefix)/$(libdir) && [ -f tmp_libjack.so.0.0.23 ] && mv -f tmp_libjack.so.0.0.23 libjack.so.0.0.23 \
