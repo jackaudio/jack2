@@ -441,7 +441,7 @@ void JackDebugClient::OnShutdown(JackShutdownCallback callback, void *arg)
 int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 {
 	CheckClient();
-    return fClient->SetProcessCallback( callback, arg);
+    return fClient->SetProcessCallback(callback, arg);
 }
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)

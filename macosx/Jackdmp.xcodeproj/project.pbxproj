@@ -53,6 +53,8 @@
 		4B44FAE80C7598370033A72C /* JackServerLaunch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */; };
 		4B5A1BBE0CD1CC110005BF74 /* midiseq.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A1BBD0CD1CC110005BF74 /* midiseq.c */; };
 		4B5A1BDD0CD1CD420005BF74 /* midisine.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A1BDC0CD1CD420005BF74 /* midisine.c */; };
+		4B5DB9830CD2429A00EBA5EE /* JackDebugClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B98AE000931D30C0091932A /* JackDebugClient.cpp */; };
+		4B5DB9840CD2429B00EBA5EE /* JackDebugClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B98AE010931D30C0091932A /* JackDebugClient.h */; };
 		4B60CE490AAABA31004956AA /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B60CE4A0AAABA31004956AA /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B699BAA097D421600A18468 /* Jackdmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */; };
@@ -1441,6 +1443,7 @@
 				4BAB95BB0B9E20B800A0C723 /* JackPortType.h in Headers */,
 				4B80D7EB0BA0D17400F035BB /* JackMidiPort.h in Headers */,
 				4B6B9EF70CD095970051EE5A /* midiport.h in Headers */,
+				4B5DB9840CD2429B00EBA5EE /* JackDebugClient.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2464,6 +2467,7 @@
 				4B80D7EC0BA0D17400F035BB /* JackMidiPort.cpp in Sources */,
 				4B80D7ED0BA0D17400F035BB /* JackMidiAPI.cpp in Sources */,
 				4B6F7AEE0CD0CDBD00F48A9D /* JackEngineControl.cpp in Sources */,
+				4B5DB9830CD2429A00EBA5EE /* JackDebugClient.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

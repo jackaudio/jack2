@@ -56,8 +56,6 @@ CXXFLAGS := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"
 # Use this line to compile with POSIX names semaphore
 #CXXFLAGS := -g -O3 -fPIC -DSOCKET_RPC_POSIX_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\"  $(addprefix -I, $(subprojects)) $(CXXFLAGS)
 
-# Add the -D__CLIENTDEBUG__  flag to activate client validation
-
 all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
         synchroClient synchroServer synchroServerClient testSem jack_test inprocess jack_load jack_unload

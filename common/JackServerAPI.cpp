@@ -67,6 +67,7 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
     va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
+	JackClient* client;
 
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */
@@ -95,12 +96,16 @@ EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t o
         *status = (jack_status_t)my_status1;
 		return NULL;
 	}
-		  
-#ifdef __CLIENTDEBUG__
-    JackClient* client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
+
+#ifndef WIN32
+	char* jack_debug = getenv("JACK_CLIENT_DEBUG");
+	if (jack_debug && strcmp(jack_debug, "on") == 0)
+		client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
+	else
+		client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); // Debug mode
 #else
-    JackClient* client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); // To improve...
-#endif
+	client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
+#endif 
 
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {

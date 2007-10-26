@@ -18,6 +18,7 @@ Tom Szilagyi
 	* Add midiseq and midisine examples. 
 	* Cleanup old zombification code. 
 	* Linux Makefile now install jack headers.
+	* Use of JACK_CLIENT_DEBUG environment variable to activate debug client mode.
 
 2007-10-25 Stephane Letz  <letz@grame.fr>
 
