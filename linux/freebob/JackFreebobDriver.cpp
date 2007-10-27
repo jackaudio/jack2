@@ -53,10 +53,6 @@ int
 JackFreebobDriver::freebob_driver_read (freebob_driver_t * driver, jack_nframes_t nframes)
 {
     jack_default_audio_sample_t* buf = NULL;
-// 	channel_t chn;
-// 	JSList *node;
-// 	jack_port_t* port;
-
     freebob_sample_t nullbuffer[nframes];
     void *addr_of_nullbuffer = (void *)nullbuffer;
 
@@ -111,8 +107,7 @@ JackFreebobDriver::freebob_driver_write (freebob_driver_t * driver, jack_nframes
     channel_t chn;
     JSList *node;
     jack_default_audio_sample_t* buf = NULL;
-
-    jack_port_t *port;
+	jack_port_t *port;
 
     freebob_streaming_stream_type stream_type;
 
@@ -122,9 +117,7 @@ JackFreebobDriver::freebob_driver_write (freebob_driver_t * driver, jack_nframes
     memset(&nullbuffer, 0, nframes*sizeof(freebob_sample_t));
 
     printEnter();
-
     driver->process_count++;
-
     assert(driver->dev);
 
     // make sure all buffers output silence if not connected
@@ -147,11 +140,9 @@ JackFreebobDriver::freebob_driver_write (freebob_driver_t * driver, jack_nframes
             // Ouput ports
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
                 buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[i], nframes);
-
-                if (!buf) {
+				if (!buf) {
                     buf = (jack_default_audio_sample_t *)addr_of_nullbuffer;
                 }
-
                 freebob_streaming_set_playback_stream_buffer(driver->dev, i, (char *)(buf), freebob_buffer_type_float);
             }
         }
@@ -316,7 +307,7 @@ JackFreebobDriver::freebob_driver_new (char *name,
     	driver->write        = (JackDriverReadFunction)       freebob_driver_write;
     	driver->read         = (JackDriverReadFunction)       freebob_driver_read;
     	driver->nt_bufsize   = (JackDriverNTBufSizeFunction)  freebob_driver_bufsize;
-    	*/
+	*/
 
     /* copy command line parameter contents to the driver structure */
     memcpy(&driver->settings, params, sizeof(freebob_jack_settings_t));
@@ -398,8 +389,7 @@ JackFreebobDriver::freebob_driver_midi_queue_thread(void *arg)
 
             if (!port) {
                 printError(" Could not find target port for event: dst=%d src=%d", ev->dest.port, ev->source.port);
-
-                break;
+				break;
             }
 
             // decode it to the work buffer
@@ -418,7 +408,6 @@ JackFreebobDriver::freebob_driver_midi_queue_thread(void *arg)
                     printError(" Midi send buffer overrun");
                 }
             }
-
         }
 
         // sleep for some time
@@ -444,9 +433,7 @@ JackFreebobDriver::freebob_driver_midi_dequeue_thread (void *arg)
 
         for (i = 0;i < m->nb_input_ports;i++) {
             unsigned int buff[64];
-
-            freebob_midi_port_t *port = m->input_ports[i];
-
+			freebob_midi_port_t *port = m->input_ports[i];
             if (!port) {
                 printError(" something went wrong when setting up the midi input port map (%d)", i);
             }
@@ -477,15 +464,12 @@ JackFreebobDriver::freebob_driver_midi_dequeue_thread (void *arg)
 freebob_driver_midi_handle_t *
 JackFreebobDriver::freebob_driver_midi_init(freebob_driver_t *driver)
 {
-// 	int err;
-
     char buf[256];
     channel_t chn;
     int nchannels;
     int i = 0;
 
     freebob_device_t *dev = driver->dev;
-
     assert(dev);
 
     freebob_driver_midi_handle_t *m = calloc(1, sizeof(freebob_driver_midi_handle_t));
@@ -504,7 +488,6 @@ JackFreebobDriver::freebob_driver_midi_init(freebob_driver_t *driver)
 
     // find out the number of midi in/out ports we need to setup
     nchannels = freebob_streaming_get_nb_capture_streams(dev);
-
     m->nb_input_ports = 0;
 
     for (chn = 0; chn < nchannels; chn++) {
@@ -593,7 +576,6 @@ JackFreebobDriver::freebob_driver_midi_init(freebob_driver_t *driver)
             m->output_ports[i]->seq_port_nr = snd_seq_create_simple_port(m->seq_handle, buf,
                                               SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
                                               SND_SEQ_PORT_TYPE_MIDI_GENERIC);
-
 
             if (m->output_ports[i]->seq_port_nr < 0) {
                 printError("Could not create seq port");
@@ -761,7 +743,7 @@ int JackFreebobDriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency(driver->period_size + driver->capture_frame_latency);
             fCapturePortList[i] = port_index;
-            JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld \n", port_index);
+            JackLog("JackFreebobDriver::Attach fCapturePortList[i] %ld \n", port_index);
             driver->capture_nchannels_audio++;
         }
     }
@@ -788,7 +770,7 @@ int JackFreebobDriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency);
             fPlaybackPortList[i] = port_index;
-            JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
+            JackLog("JackFreebobDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
             driver->playback_nchannels_audio++;
         }
     }
