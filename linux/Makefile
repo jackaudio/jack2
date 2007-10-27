@@ -1,3 +1,4 @@
+# Type "make" or "make all" to compile ALSA driver, and "make freebob" to compile FREEBOB driver.
 
 # Choose the installation location
 prefix := /usr/local
@@ -62,7 +63,7 @@ all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPP
 
 freebob : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
-        synchroClient synchroServer synchroServerClient testSem jack_test
+        synchroClient synchroServer synchroServerClient testSem jack_test inprocess jack_load jack_unload
 
 synchroClient: JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o 
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o synchroClient
