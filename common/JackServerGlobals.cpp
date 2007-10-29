@@ -65,20 +65,20 @@ static char* jack_user_dir(void)
 
 /* returns the name of the per-server subdirectory of jack_user_dir() */
 
-static char* get_jack_server_dir(const char* toto)
+static char* get_jack_server_dir(const char* server_name)
 {
     static char server_dir[PATH_MAX] = "";
 
     // format the path name on the first call
     if (server_dir[0] == '\0') {
-        snprintf(server_dir, sizeof (server_dir), "%s/%s", jack_user_dir(), server_name);
+        snprintf(server_dir, sizeof(server_dir), "%s/%s", jack_user_dir(), server_name);
     }
 
     return server_dir;
 }
 
 static void
-jack_cleanup_files(const char *server_name)
+jack_cleanup_files(const char* server_name)
 {
     DIR *dir;
     struct dirent *dirent;
@@ -340,7 +340,7 @@ bool JackServerGlobals::Init()
 			goto error;
 		}
 
-		driver_args = (char**)malloc(sizeof(char *) * driver_nargs);
+		driver_args = (char**)malloc(sizeof(char*) * driver_nargs);
 		driver_args[0] = driver_name;
 
 		for (i = 1; i < driver_nargs; i++) {
