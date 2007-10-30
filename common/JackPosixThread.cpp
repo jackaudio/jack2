@@ -47,7 +47,6 @@ void* JackPosixThread::ThreadHandler(void* arg)
 	bool res = true;
     while (obj->fRunning && res) {
         res = runnable->Execute();
-        //pthread_testcancel();
     }
 
     JackLog("ThreadHandler: exit\n");
