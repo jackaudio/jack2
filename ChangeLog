@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-10-30 Stephane Letz  <letz@grame.fr>
+
+	* Fix a bug in freewheel management in async mode: drivers now receive the kStartFreewheelCallback and kStopFreewheelCallback notifications.
+
 2007-10-26 Stephane Letz  <letz@grame.fr>
 
 	* Add midiseq and midisine examples. 

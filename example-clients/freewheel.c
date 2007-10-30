@@ -61,7 +61,7 @@ void parse_arguments(int argc, char *argv[])
 int 
 main (int argc, char *argv[])
 {
-	parse_arguments (argc, argv);
+	//parse_arguments (argc, argv);
 
 	/* become a JACK client */
 	if ((client = jack_client_new ("freewheel1")) == 0) {
@@ -69,16 +69,24 @@ main (int argc, char *argv[])
 		exit(1);
 	}
 
+	/*
 	signal (SIGQUIT, signal_handler);
 	signal (SIGTERM, signal_handler);
 	signal (SIGHUP, signal_handler);
 	signal (SIGINT, signal_handler);
-
+	*/
 	jack_on_shutdown (client, jack_shutdown, 0);
-
+	
+	/*
 	if (jack_set_freewheel (client, onoff)) {
 		fprintf (stderr, "failed to reset freewheel mode\n");
 	}
+	*/
+	
+	jack_set_freewheel (client, 1);
+	sleep(5);
+	jack_set_freewheel (client, 0);
+	sleep(5);
 
 	jack_client_close(client);
 	return 0;

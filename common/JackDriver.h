@@ -199,10 +199,9 @@ class EXPORT JackDriver : public JackDriverClient
 
         virtual bool IsRealTime();
 
-        int ClientNotify(int refnum, const char* name, int notify, int sync, int value)
-        {
-            return 0;
-        }
+        int ClientNotify(int refnum, const char* name, int notify, int sync, int value);
+	
+		void SetupDriverSync(int ref, bool freewheel);
 
 };
 

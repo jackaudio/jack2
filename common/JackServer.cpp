@@ -257,7 +257,7 @@ int JackServer::SetFreewheel(bool onoff)
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
             fEngineControl->InitFrameTime();
-            return fAudioDriver->Start();
+			return fAudioDriver->Start();
         }
     } else {
         if (onoff) {
@@ -267,7 +267,7 @@ int JackServer::SetFreewheel(bool onoff)
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(true);
-            return fFreewheelDriver->Start();
+			return fFreewheelDriver->Start();
         } else {
             return -1;
         }

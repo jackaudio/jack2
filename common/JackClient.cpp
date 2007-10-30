@@ -94,21 +94,20 @@ pthread_t JackClient::GetThreadID()
 }
 
 /*!
-\brief
-	In ASYNC mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
+	In "async" mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
 	The synchronization primitives for drivers are setup in "flush" mode that to not keep unneeded activations.
-	Drivers synchro are setup in "flush" mode if server is ASYNC and NOT freewheel.
+	Drivers synchro are setup in "flush" mode if server is "async" and NOT freewheel.
 */
 void JackClient::SetupDriverSync(bool freewheel)
 {
     if (!freewheel && !GetEngineControl()->fSyncMode) {
         JackLog("JackClient::SetupDriverSync driver sem in flush mode\n");
-        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
+		fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(true);
         fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(true);
     } else {
         JackLog("JackClient::SetupDriverSync driver sem in normal mode\n");
-        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(false);
+		fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(false);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(false);
         fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(false);
     }

@@ -76,18 +76,9 @@ int JackDriver::Open()
     }
 
     fClientControl->fRefNum = refnum;
-    fClientControl->fActive = true;
-    fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for sync
-
-    /*
-    	In ASYNC mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
-    	The synchronization primitives for drivers are setup in "flush" mode that to not keep unneeded activations.
-    */
-    if (!fEngineControl->fSyncMode) {
-        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
-        fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(true);
-        fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(true);
-    }
+    fClientControl->fActive = true;	
+	fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
+	SetupDriverSync(fClientControl->fRefNum, false);
     return 0;
 }
 
@@ -113,7 +104,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     }
 
     fClientControl->fRefNum = refnum;
-    fClientControl->fActive = true;
+    fClientControl->fActive = true;	
     fEngineControl->fBufferSize = nframes;
     fEngineControl->fSampleRate = samplerate;
     fCaptureLatency = capture_latency;
@@ -130,17 +121,8 @@ int JackDriver::Open(jack_nframes_t nframes,
         fEngineControl->fTimeOutUsecs = (jack_time_t)(2.f * fEngineControl->fPeriodUsecs);
 
     fGraphManager->SetBufferSize(nframes);
-    fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for sync
-
-    /*
-    	In ASYNC mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
-    	The synchronization primitives for drivers are setup in "flush" mode that to not keep unneeded activations.
-    */
-    if (!fEngineControl->fSyncMode) {
-        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
-        fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(true);
-        fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(true);
-    }
+    fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
+	SetupDriverSync(fClientControl->fRefNum, false);
     return 0;
 }
 
@@ -150,6 +132,40 @@ int JackDriver::Close()
     fGraphManager->DirectDisconnect(fClientControl->fRefNum, fClientControl->fRefNum); // Disconnect driver from itself for sync
     fClientControl->fActive = false;
     return fEngine->ClientInternalClose(fClientControl->fRefNum, false);
+}
+
+/*!
+	In "async" mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
+	The synchronization primitives for drivers are setup in "flush" mode that to not keep unneeded activations.
+	Drivers synchro are setup in "flush" mode if server is "async" and NOT freewheel.
+*/
+void JackDriver::SetupDriverSync(int ref, bool freewheel)
+{
+	if (!freewheel && !fEngineControl->fSyncMode) {
+        JackLog("JackDriver::SetupDriverSync driver sem in flush mode\n");
+        fSynchroTable[ref]->SetFlush(true);
+    } else {
+        JackLog("JackDriver::SetupDriverSync driver sem in normal mode\n");
+        fSynchroTable[ref]->SetFlush(false);
+	}
+}
+
+int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value)
+{
+	switch (notify) {
+	
+		case kStartFreewheelCallback:
+			JackLog("JackDriver::kStartFreewheel\n");
+			SetupDriverSync(fClientControl->fRefNum, true);
+			break;
+	
+		case kStopFreewheelCallback:
+			JackLog("JackDriver::kStopFreewheel\n");
+			SetupDriverSync(fClientControl->fRefNum, false);
+			break;
+	}
+
+	return 0;
 }
 
 bool JackDriver::IsRealTime()

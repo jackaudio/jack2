@@ -66,7 +66,10 @@ struct JackClientControl : public JackShmMem
 		fCallback[kAddClient] = true;
 		fCallback[kRemoveClient] = true;
 		fCallback[kActivateClient] = true;
-        fRefNum = refnum;
+		// So that driver synchro are corectly setup in "flush" or "normal" mode 
+		fCallback[kStartFreewheelCallback] = true;
+		fCallback[kStopFreewheelCallback] = true;
+		fRefNum = refnum;
         fTransportState = JackTransportStopped;
         fActive = false;
     }
