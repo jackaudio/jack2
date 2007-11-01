@@ -33,6 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "jslist.h"
 #include "JackError.h"
+#include "JackTools.h"
 #include "shm.h"
 #include "jack.h"
 
@@ -49,11 +50,7 @@ static int temporary = 0;
 static int client_timeout = 0; /* msecs; if zero, use period size. */
 static int do_unlock = 0;
 static JSList* drivers = NULL;
-
 static sigset_t signals;
-
-#define DEFAULT_TMP_DIR "/tmp"
-char* jack_tmpdir = DEFAULT_TMP_DIR;
 
 static void silent_jack_error_callback(const char *desc)
 {}
@@ -135,107 +132,6 @@ static void FilterSIGPIPE()
     sigaddset(&set, SIGPIPE);
     //sigprocmask(SIG_BLOCK, &set, 0);
     pthread_sigmask(SIG_BLOCK, &set, 0);
-}
-
-static char* jack_default_server_name(void)
-{
-    char* server_name;
-    if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
-        server_name = "default";
-    return server_name;
-}
-
-/* returns the name of the per-user subdirectory of jack_tmpdir */
-static char* jack_user_dir(void)
-{
-    static char user_dir[PATH_MAX] = "";
-
-    /* format the path name on the first call */
-    if (user_dir[0] == '\0') {
-        snprintf(user_dir, sizeof(user_dir), "%s/jack-%d",
-                  jack_tmpdir, getuid());
-    }
-
-    return user_dir;
-}
-
-/* returns the name of the per-server subdirectory of jack_user_dir() */
-
-static char* get_jack_server_dir(const char* toto)
-{
-    static char server_dir[PATH_MAX] = "";
-
-    // format the path name on the first call
-    if (server_dir[0] == '\0') {
-        snprintf(server_dir, sizeof(server_dir), "%s/%s",
-                  jack_user_dir(), server_name);
-    }
-
-    return server_dir;
-}
-
-static void
-jack_cleanup_files(const char *server_name)
-{
-    DIR *dir;
-    struct dirent *dirent;
-    char *dir_name = get_jack_server_dir(server_name);
-
-    /* On termination, we remove all files that jackd creates so
-     * subsequent attempts to start jackd will not believe that an
-     * instance is already running.  If the server crashes or is
-     * terminated with SIGKILL, this is not possible.  So, cleanup
-     * is also attempted when jackd starts.
-     *
-     * There are several tricky issues.  First, the previous JACK
-     * server may have run for a different user ID, so its files
-     * may be inaccessible.  This is handled by using a separate
-     * JACK_TMP_DIR subdirectory for each user.  Second, there may
-     * be other servers running with different names.  Each gets
-     * its own subdirectory within the per-user directory.  The
-     * current process has already registered as `server_name', so
-     * we know there is no other server actively using that name.
-     */
-
-    /* nothing to do if the server directory does not exist */
-    if ((dir = opendir(dir_name)) == NULL) {
-        return ;
-    }
-
-    /* unlink all the files in this directory, they are mine */
-    while ((dirent = readdir(dir)) != NULL) {
-
-        char fullpath[PATH_MAX];
-
-        if ((strcmp(dirent->d_name, ".") == 0)
-                || (strcmp(dirent->d_name, "..") == 0)) {
-            continue;
-        }
-
-        snprintf(fullpath, sizeof(fullpath), "%s/%s",
-                  dir_name, dirent->d_name);
-
-        if (unlink(fullpath)) {
-            jack_error("cannot unlink `%s' (%s)", fullpath,
-                        strerror(errno));
-        }
-    }
-
-    closedir(dir);
-
-    /* now, delete the per-server subdirectory, itself */
-    if (rmdir(dir_name)) {
-        jack_error("cannot remove `%s' (%s)", dir_name,
-                    strerror(errno));
-    }
-
-    /* finally, delete the per-user subdirectory, if empty */
-    if (rmdir(jack_user_dir())) {
-        if (errno != ENOTEMPTY) {
-            jack_error("cannot remove `%s' (%s)",
-                        jack_user_dir(), strerror(errno));
-        }
-    }
 }
 
 int main(int argc, char* argv[])
@@ -407,7 +303,7 @@ int main(int argc, char* argv[])
     }
 
     if (server_name == NULL)
-        server_name = jack_default_server_name();
+        server_name = JackTools::DefaultServerName();
 
     copyright(stdout);
 
@@ -430,7 +326,7 @@ int main(int argc, char* argv[])
     /* clean up shared memory and files from any previous
      * instance of this server name */
     jack_cleanup_shm();
-    jack_cleanup_files(server_name);
+    JackTools::CleanupFiles(server_name);
 
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
@@ -518,7 +414,7 @@ int main(int argc, char* argv[])
 	JackStop();
 
     jack_cleanup_shm();
-    jack_cleanup_files(server_name);
+    JackTools::CleanupFiles(server_name);
     jack_unregister_server(server_name);
 
     return 1;

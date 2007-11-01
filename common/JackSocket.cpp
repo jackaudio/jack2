@@ -200,9 +200,6 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     JackLog("Bind: addr.sun_path %s\n", addr.sun_path);
     unlink(fName); // Security...
 
-    JackLog("Bind: addr.sun_path %s\n", addr.sun_path);
-    unlink(fName); // Security...
-
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot bind server to socket (%s)", strerror(errno));
         goto error;

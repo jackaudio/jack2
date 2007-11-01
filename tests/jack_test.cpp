@@ -1561,7 +1561,7 @@ int main (int argc, char *argv[])
         jack_connect(client1, jack_port_name(output_port1), jack_port_name(input_port2));
         jack_connect(client1, outports[0], jack_port_name(input_port1));
         jack_connect(client2, jack_port_name(output_port2), inports[0]);
-        jack_port_set_latency (output_port2, 256);
+        jack_port_set_latency(output_port2, 256);
         jack_recompute_total_latencies(client1);
 
         if ((jack_port_get_latency (output_port1) != 0) ||
@@ -1577,12 +1577,12 @@ int main (int argc, char *argv[])
             printf("!!! WARNING !!! get_latency functions may have a problem : bad value returned !\n");
             printf("!!! get_latency(output_port1) : %i (must be 0)\n", jack_port_get_latency (output_port1) );
             printf("!!! get_total_latency(output_port1) : %i (must be 0)\n", jack_port_get_total_latency(client1, output_port1));
-            printf("!!! get_latency(PHY[0]) : %i (must be external latency : %i)\n", jack_port_get_latency (jack_port_by_name(client1, inports[0])), ext_latency);
+            printf("!!! get_latency(PHY[0]) : %i (must be external latency : %i)\n", jack_port_get_latency(jack_port_by_name(client1, inports[0])), ext_latency);
             printf("!!! get_total_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) , (ext_latency + 256));
             printf("!!! get_total_latency(output_port2) : %i (must be %i)\n", jack_port_get_total_latency(client1, output_port2), (ext_latency + 256));
             printf("!!! get_total_latency(input_port2) : %i (must be 0)\n", jack_port_get_total_latency(client1, input_port2));
             printf("!!! get_total_latency(input_port1) : %i (must be %i)\n", jack_port_get_total_latency(client1, input_port1), ext_latency);
-            printf("!!! get_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_latency (jack_port_by_name(client1, outports[0])), ext_latency);
+            printf("!!! get_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_latency(jack_port_by_name(client1, outports[0])), ext_latency);
             printf("!!! get_total_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, outports[0])), ext_latency);
 
         } else {
@@ -1594,10 +1594,10 @@ int main (int argc, char *argv[])
         jack_port_disconnect(client1, input_port1);
         jack_port_disconnect(client1, input_port2);
         Log("Checking a parallel model with 2 clients...\n");
-        jack_connect(client2, outports[0], jack_port_name(input_port1) );
-        jack_connect(client2, outports[0], jack_port_name(input_port2) );
-        jack_connect(client2, jack_port_name(output_port1), inports[0] );
-        jack_connect(client2, jack_port_name(output_port2), inports[0] );
+        jack_connect(client2, outports[0], jack_port_name(input_port1));
+        jack_connect(client2, outports[0], jack_port_name(input_port2));
+        jack_connect(client2, jack_port_name(output_port1), inports[0]);
+        jack_connect(client2, jack_port_name(output_port2), inports[0]);
         jack_port_set_latency (output_port1, 256);
         jack_port_set_latency (output_port2, 512);
         jack_recompute_total_latencies(client1);

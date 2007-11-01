@@ -523,7 +523,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
     return 0;
 }
 
-// Used for externall clients
+// Used for external clients
 int JackEngine::ClientExternalClose(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
