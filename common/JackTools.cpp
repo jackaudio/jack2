@@ -19,6 +19,7 @@
 
 #include "JackTools.h"
 #include "JackError.h"
+#include <stdlib.h>
 
 namespace Jack
 {
