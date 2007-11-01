@@ -13,6 +13,7 @@
 /*
  * Copyright (C) 2003 Paul Davis
  * Copyright (C) 2004 Jack O'Quin
+ * Copyright (C) 2006-2007 Grame
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +29,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: shm.c,v 1.8.2.16 2006/08/28 10:10:16 letz Exp $
  */
  
 #ifdef WIN32
