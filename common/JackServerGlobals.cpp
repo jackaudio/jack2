@@ -39,8 +39,16 @@ namespace Jack
 long JackServerGlobals::fClientCount = 0;
 JackServer* JackServerGlobals::fServer = NULL;
 
-
-int JackServerGlobals::JackStart(const char* server_name, jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
+int JackServerGlobals::JackStart(const char* server_name, 
+								jack_driver_desc_t* driver_desc, 
+								JSList* driver_params, 
+								int sync, 
+								int temporary, 
+								int time_out_ms, 
+								int rt, 
+								int priority, 
+								int loopback, 
+								int verbose)
 {
     JackLog("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
 	fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);

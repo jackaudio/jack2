@@ -24,7 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_parse.h"
 #include "JackDriverLoader.h"
 #include "JackServer.h"
-
 #include <assert.h>
 
 namespace Jack
