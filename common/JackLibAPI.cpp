@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackLibGlobals.h"
 #include "JackGlobals.h"
 #include "JackServerLaunch.h"
+#include "JackTools.h"
 
 using namespace Jack;
 
@@ -56,12 +57,15 @@ static inline bool CheckPort(jack_port_id_t port_index)
     return (port_index < PORT_NUM);
 }
 
-EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t options, jack_status_t* status, ...)
+EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
     va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
 	JackClient* client;
+	char client_name[JACK_CLIENT_NAME_SIZE];
+	
+	JackTools::RewriteName(ext_client_name, client_name); 
 
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */

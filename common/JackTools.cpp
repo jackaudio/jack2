@@ -140,5 +140,47 @@ void JackTools::CleanupFiles(const char* server_name)
 	}
 }
 
+int JackTools::GetTmpdir()
+{
+	FILE* in;
+	size_t len;
+	char buf[PATH_MAX + 2]; /* allow tmpdir to live anywhere, plus newline, plus null */
+
+	if ((in = popen("jackd -l", "r")) == NULL) {
+		return -1;
+	}
+
+	if (fgets(buf, sizeof(buf), in) == NULL) {
+		fclose(in);
+		return -1;
+	}
+
+	len = strlen(buf);
+
+	if (buf[len - 1] != '\n') {
+		/* didn't get a whole line */
+		fclose(in);
+		return -1;
+	}
+
+	jack_tmpdir = (char *)malloc(len);
+	memcpy(jack_tmpdir, buf, len - 1);
+	jack_tmpdir[len - 1] = '\0';
+	
+	fclose(in);
+	return 0;
+}
+
+void JackTools::RewriteName(const char* name, char* new_name)
+{
+	int i;
+	for (i = 0; i < strlen(name); i++) {
+		if ((name[i] == '/') || (name[i] == '\\'))
+			new_name[i] = '_';
+		else
+			new_name[i] = name[i];
+	}	
+	new_name[i] = '\0';
+}
 
 }

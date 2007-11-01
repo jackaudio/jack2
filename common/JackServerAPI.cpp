@@ -29,6 +29,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackServerGlobals.h"
 #include "JackError.h"
 #include "JackServerLaunch.h"
+#include "JackTools.h"
 
 #ifdef WIN32
 	#define	EXPORT __declspec(dllexport)
@@ -62,12 +63,15 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
     return jack_client_open(client_name, (jack_options_t)options, NULL);
 }
 
-EXPORT jack_client_t* jack_client_open(const char* client_name, jack_options_t options, jack_status_t* status, ...)
+EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
     va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
 	JackClient* client;
+	char client_name[JACK_CLIENT_NAME_SIZE];
+	
+	JackTools::RewriteName(ext_client_name, client_name); 
 
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */
