@@ -145,38 +145,6 @@ int JackClientSocket::Write(void* data, int len)
     }
 }
 
-/*
-void
-jack_cleanup_files ()
-{
-	DIR *dir;
-	struct dirent *dirent;
- 
-	// its important that we remove all files that jackd creates
-	//   because otherwise subsequent attempts to start jackd will
-	//   believe that an instance is already running.
-	
- 
-	if ((dir = opendir (jack_server_dir)) == NULL) {
-		fprintf (stderr, "jack(%d): cannot open jack FIFO directory "
-			 "(%s)\n", getpid(), strerror (errno));
-		return;
-	}
- 
-	while ((dirent = readdir (dir)) != NULL) {
-		if (strncmp (dirent->d_name, "jack-", 5) == 0 ||
-		    strncmp (dirent->d_name, "jack_", 5) == 0) {
-			char fullpath[PATH_MAX+1];
-			snprintf (fullpath, sizeof (fullpath), "%s/%s",
-				  jack_server_dir, dirent->d_name);
-			unlink (fullpath);
-		} 
-	}
- 
-	closedir (dir);
-}
-*/
-
 int JackServerSocket::Bind(const char* dir, const char* name, int which) // A revoir : utilisation de "which"
 {
     struct sockaddr_un addr;

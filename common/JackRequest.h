@@ -51,10 +51,8 @@ struct JackRequest
         kSetClientCapabilities = 9,
         kGetPortConnections = 10,
         kGetPortNConnections = 11,
-
         kReleaseTimebase = 12,
         kSetTimebaseCallback = 13,
-
         kSetBufferSize = 20,
         kSetFreeWheel = 21,
 		kClientCheck = 22,
@@ -66,7 +64,6 @@ struct JackRequest
 		kInternalClientHandle = 28,
 		kInternalClientLoad = 29,
 		kInternalClientUnload = 30,
-
         kNotification = 31
     };
 
