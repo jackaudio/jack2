@@ -194,6 +194,11 @@ class EXPORT JackDriver : public JackDriverClient
         {
             return 0;
         }
+		
+		virtual int SetSampleRate(jack_nframes_t sample_rate)
+		{
+            return 0;
+        }
 
         void NotifyXRun(jack_time_t callback_usecs); // XRun notification sent by the driver
 
