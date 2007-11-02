@@ -128,7 +128,7 @@ bool JackWinSemaphore::Allocate(const char* name, const char* server_name, int v
     JackLog("JackWinSemaphore::Allocate name = %s val = %ld\n", fName, value);
 
 	if ((fSemaphore = CreateSemaphore(NULL, value, 32767, fName)) == NULL) {
-        jack_error("Allocate: can't check in named event name = %s err = %ld", fName, GetLastError());
+        jack_error("Allocate: can't check in named semaphore name = %s err = %ld", fName, GetLastError());
         return false;
     } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		jack_error("Allocate: named semaphore already exist name = %s", fName);
