@@ -13,6 +13,10 @@ Tom Szilagyi
   Jackdmp changes log
 ---------------------------
 
+2007-11-01 Stephane Letz  <letz@grame.fr>
+
+	* Correct ALSA driver Attach method: internal driver may have changed the buffer_size and sample_rate values.
+
 2007-10-31 Stephane Letz  <letz@grame.fr>
 
 	* Server and user directory related code moved in a JackTools file.

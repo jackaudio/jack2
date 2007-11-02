@@ -2074,15 +2074,21 @@ int JackAlsaDriver::Attach()
     JackPort* port;
     int port_index;
     unsigned long port_flags;
-
     char buf[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-
-    port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
 
     assert(fCaptureChannels < PORT_NUM);
     assert(fPlaybackChannels < PORT_NUM);
 	
+    port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
+
     alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
+	
+	if (alsa_driver->has_hw_monitoring) 
+		port_flags |= JackPortCanMonitor;
+		
+	// ALSA driver may have changed the values
+	JackAudioDriver::SetBufferSize(alsa_driver->frames_per_cycle);
+	JackAudioDriver::SetSampleRate(alsa_driver->frame_rate);
 
     JackLog("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 

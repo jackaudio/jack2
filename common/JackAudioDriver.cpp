@@ -57,6 +57,13 @@ int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     return 0;
 }
 
+int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
+{
+    fEngineControl->fSampleRate = sample_rate;
+    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
+    return 0;
+}
+
 int JackAudioDriver::Open(jack_nframes_t nframes,
                           jack_nframes_t samplerate,
                           int capturing,
