@@ -17,8 +17,8 @@ This program is free software; you can redistribute it and/or modify
 
 */
 
-#ifndef __JackWinEvent__
-#define __JackWinEvent__
+#ifndef __JackWinSemaphore__
+#define __JackWinSemaphore__
 
 #include "JackSynchro.h"
 #include <windows.h>
@@ -28,18 +28,16 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-//http://bob.developpez.com/tutapiwin/article_56.php
-
 /*!
-\brief Inter process synchronization using system wide events.
+\brief Inter process synchronization using system wide semaphore.
 */
 
-class JackWinEvent : public JackSynchro
+class JackWinSemaphore : public JackSynchro
 {
 
     private:
 
-        HANDLE fEvent;
+        HANDLE fSemaphore;
 
     protected:
 
@@ -47,9 +45,9 @@ class JackWinEvent : public JackSynchro
 
     public:
 
-        JackWinEvent(): JackSynchro(), fEvent(NULL)
+        JackWinSemaphore(): JackSynchro(), fSemaphore(NULL)
         {}
-        virtual ~JackWinEvent()
+        virtual ~JackWinSemaphore()
         {}
 
         bool Signal();
