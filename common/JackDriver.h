@@ -72,6 +72,7 @@ class EXPORT JackDriverInterface
         virtual int Start() = 0;
         virtual int Stop() = 0;
         virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;
+		virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
 
         virtual int Process() = 0;
 

@@ -99,6 +99,11 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         {
             return fDriver->SetBufferSize(buffer_size);
         }
+		
+		virtual int SetSampleRate(jack_nframes_t sample_rate)
+        {
+            return fDriver->SetSampleRate(sample_rate);
+        }
 
         virtual void SetMaster(bool onoff)
         {
