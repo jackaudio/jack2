@@ -42,7 +42,6 @@ extern "C"
     EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-    EXPORT jack_client_t * jack_client_new (const char *client_name);
     EXPORT int jack_client_close (jack_client_t *client);
 
 #ifdef __cplusplus
@@ -51,11 +50,6 @@ extern "C"
 
 JackLibGlobals* JackLibGlobals::fGlobals = NULL;
 long JackLibGlobals::fClientCount = 0;
-
-static inline bool CheckPort(jack_port_id_t port_index)
-{
-    return (port_index < PORT_NUM);
-}
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
@@ -79,7 +73,6 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     }
 
     /* parse variable arguments */
-	
     va_start(ap, status);
     jack_varargs_parse(options, ap, &va);
     va_end(ap);
@@ -121,15 +114,6 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     } else {
         return (jack_client_t*)client;
     }
-}
-
-EXPORT jack_client_t* jack_client_new(const char* client_name)
-{
-    int options = JackUseExactName;
-    if (getenv("JACK_START_SERVER") == NULL)
-        options |= JackNoStartServer;
-
-    return jack_client_open(client_name, (jack_options_t)options, NULL);
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)

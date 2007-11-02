@@ -45,7 +45,6 @@ extern "C"
     EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-    EXPORT jack_client_t * jack_client_new (const char *client_name);
     EXPORT int jack_client_close (jack_client_t *client);
 
 #ifdef __cplusplus
@@ -53,15 +52,6 @@ extern "C"
 #endif
 
 using namespace Jack;
-
-EXPORT jack_client_t* jack_client_new(const char* client_name)
-{
-    int options = JackUseExactName;
-    if (getenv("JACK_START_SERVER") == NULL)
-        options |= JackNoStartServer;
-
-    return jack_client_open(client_name, (jack_options_t)options, NULL);
-}
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
