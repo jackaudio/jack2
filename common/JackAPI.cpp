@@ -1212,6 +1212,11 @@ EXPORT int jack_port_name_size(void)
     return JACK_PORT_NAME_SIZE;
 }
 
+EXPORT int jack_port_type_size(void)
+{
+	return JACK_PORT_TYPE_SIZE;
+}
+
 // transport.h
 EXPORT int jack_release_timebase(jack_client_t* ext_client)
 {
@@ -1433,6 +1438,19 @@ EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 }
 
 // intclient.h
+EXPORT int jack_internal_client_new (const char *client_name,
+									const char *load_name,
+									const char *load_init)
+{
+	jack_error("jack_internal_client_new: deprecated");
+	return -1;
+}
+
+EXPORT void jack_internal_client_close (const char *client_name)
+{
+	jack_error("jack_internal_client_close: deprecated");
+}
+
 EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intclient_t intclient)
 {
 #ifdef __CLIENTDEBUG__

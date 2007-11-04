@@ -14,6 +14,10 @@ Andrzej Szombierski
   Jackdmp changes log
 ---------------------------
 
+2007-11-04 Stephane Letz  <letz@grame.fr>
+
+	* Add an implementation for obsolete jack_internal_client_new and .jack_internal_client_close. Add missing jack_port_type_size.
+
 2007-11-02 Stephane Letz  <letz@grame.fr>
 
 	* Correct ALSA driver Attach method: internal driver may have changed the buffer_size and sample_rate values.
