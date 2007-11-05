@@ -9,6 +9,7 @@ Thibault LeMeur
 Pieter Palmers
 Tom Szilagyi
 Andrzej Szombierski 
+Kjetil S.Matheussen
 
 ---------------------------
   Jackdmp changes log
@@ -17,6 +18,7 @@ Andrzej Szombierski
 2007-11-05 Stephane Letz  <letz@grame.fr>
 
 	* Use of JackWinSemaphore instead of JackWinEvent for inter-process synchronization.
+	* Correct types.h for use with MINGW on Windows.
 
 2007-11-04 Stephane Letz  <letz@grame.fr>
 

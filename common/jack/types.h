@@ -22,17 +22,21 @@
 #define __jack_types_h__
 
 #ifdef WIN32
-	#include <windows.h>
-	typedef char int8_t;
-	typedef unsigned char uint8_t;
-	typedef short int16_t;
-	typedef unsigned short uint16_t;
-	typedef long int32_t;
-	typedef unsigned long uint32_t;
-	typedef LONGLONG int64_t;
-	typedef ULONGLONG uint64_t;
+#include <windows.h>
+#ifndef __MINGW32__
+typedef long int32_t;
+typedef unsigned long uint32_t;
 #else
-	#include <inttypes.h>
+#include <stdint.h>
+#endif
+typedef char int8_t;
+typedef unsigned char uint8_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef LONGLONG int64_t;
+typedef ULONGLONG uint64_t;
+#else
+#include <inttypes.h>
 #endif
 
 typedef int32_t jack_shmsize_t;
