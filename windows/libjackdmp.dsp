@@ -215,11 +215,11 @@ SOURCE=..\common\JackTime.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\JackTransportEngine.cpp
+SOURCE=..\common\JackTools.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\JackWinEvent.cpp
+SOURCE=..\common\JackTransportEngine.cpp
 # End Source File
 # Begin Source File
 
@@ -240,6 +240,10 @@ SOURCE=.\JackWinNamedPipeServerChannel.cpp
 # Begin Source File
 
 SOURCE=.\JackWinNamedPipeServerNotifyChannel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\JackWinSemaphore.cpp
 # End Source File
 # Begin Source File
 

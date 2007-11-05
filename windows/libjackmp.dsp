@@ -167,11 +167,11 @@ SOURCE=..\common\JackTime.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\JackTransportEngine.cpp
+SOURCE=..\common\JackTools.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\JackWinEvent.cpp
+SOURCE=..\common\JackTransportEngine.cpp
 # End Source File
 # Begin Source File
 
@@ -180,6 +180,10 @@ SOURCE=.\JackWinNamedPipe.cpp
 # Begin Source File
 
 SOURCE=.\JackWinNamedPipeClientChannel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\JackWinSemaphore.cpp
 # End Source File
 # Begin Source File
 

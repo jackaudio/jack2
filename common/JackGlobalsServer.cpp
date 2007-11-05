@@ -51,6 +51,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackWinNamedPipeServerChannel.h"
 #include "JackWinNamedPipeClientChannel.h"
 #include "JackWinEvent.h"
+#include "JackWinSemaphore.h"
 #include "JackWinThread.h"
 #endif
 
@@ -79,7 +80,7 @@ namespace Jack
 #ifdef WIN32
 JackSynchro* JackFactoryWindowsServer::MakeSynchro()
 {
-    return new JackWinEvent();
+	return new JackWinSemaphore();
 }
 
 JackServerNotifyChannelInterface* JackFactoryWindowsServer::MakeServerNotifyChannel()

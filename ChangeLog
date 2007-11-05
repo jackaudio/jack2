@@ -14,6 +14,10 @@ Andrzej Szombierski
   Jackdmp changes log
 ---------------------------
 
+2007-11-05 Stephane Letz  <letz@grame.fr>
+
+	* Use of JackWinSemaphore instead of JackWinEvent for inter-process synchronization.
+
 2007-11-04 Stephane Letz  <letz@grame.fr>
 
 	* Add an implementation for obsolete jack_internal_client_new and .jack_internal_client_close. Add missing jack_port_type_size.

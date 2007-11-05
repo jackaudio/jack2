@@ -21,6 +21,10 @@
 #include "JackError.h"
 #include <stdlib.h>
 
+#ifdef WIN32
+#include <process.h>
+#endif
+
 namespace Jack
 {
 
@@ -39,8 +43,8 @@ int JackTools::GetPID()
 int JackTools::GetUID() 
 {
 #ifdef WIN32
-	//return  _getpid();
-	#error "No getuid function available"
+	return  _getpid();
+	//#error "No getuid function available"
 #else
 	 return getuid();
 #endif
@@ -55,6 +59,29 @@ char* JackTools::DefaultServerName()
 }
 
 /* returns the name of the per-user subdirectory of jack_tmpdir */
+#ifdef WIN32
+
+char* JackTools::UserDir()
+{
+	return "";
+}
+
+char* JackTools::ServerDir(const char* server_name, char* server_dir)
+{
+	return "";
+}
+
+void JackTools::CleanupFiles(const char* server_name)
+{
+
+}
+
+int JackTools::GetTmpdir()
+{
+	return 0;
+}
+
+#else
 char* JackTools::UserDir()
 {
 	static char user_dir[PATH_MAX + 1] = "";
@@ -170,6 +197,7 @@ int JackTools::GetTmpdir()
 	fclose(in);
 	return 0;
 }
+#endif
 
 void JackTools::RewriteName(const char* name, char* new_name)
 {
@@ -182,5 +210,6 @@ void JackTools::RewriteName(const char* name, char* new_name)
 	}	
 	new_name[i] = '\0';
 }
+
 
 }
