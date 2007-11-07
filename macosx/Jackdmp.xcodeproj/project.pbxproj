@@ -2130,9 +2130,11 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 4B699DD5097D427F00A18468 /* Build configuration list for PBXProject "Jackdmp" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* JackServer */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				4B699B26097D421600A18468 /* All Universal */,
 				4B699BA7097D421600A18468 /* jackdmp framework Universal */,
@@ -3159,8 +3161,6 @@
 					"-framework",
 					Jackdmp,
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					CoreServices,
@@ -3294,8 +3294,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -3328,8 +3328,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 				);
@@ -3495,8 +3493,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 				);
@@ -4265,8 +4261,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 				);
 				OTHER_REZFLAGS = "";
@@ -4450,8 +4444,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					CoreServices,
@@ -4552,8 +4544,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					CoreServices,
@@ -4653,8 +4643,6 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -4780,8 +4768,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -4915,8 +4901,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -5075,13 +5059,13 @@
 					"-framework",
 					Jackdmp,
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					AudioUnit,
 					"-framework",
 					CoreServices,
+					"-framework",
+					AudioToolbox,
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
@@ -5395,8 +5379,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
