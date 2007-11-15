@@ -37,6 +37,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "shm.h"
 #include "jack.h"
 
+#ifdef __APPLE_
+#include <CoreFoundation/CFNotificationCenter.h>
+#endif
+
 using namespace Jack;
 
 static JackServer* fServer;
@@ -354,6 +358,15 @@ int main(int argc, char* argv[])
         JackDelete();
         return 0;
     }
+
+#ifdef __APPLE__
+    // Send notification to be used in the Jack Router
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
+                                         CFSTR("com.grame.jackserver.start"),
+                                         CFSTR("com.grame.jackserver"),
+                                         NULL,
+                                         true);
+#endif
 	
 	/*
     For testing purpose...
@@ -416,6 +429,15 @@ int main(int argc, char* argv[])
     jack_cleanup_shm();
     JackTools::CleanupFiles(server_name);
     jack_unregister_server(server_name);
+
+#ifdef __APPLE__
+    // Send notification to be used in the Jack Router
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
+                                         CFSTR("com.grame.jackserver.stop"),
+                                         CFSTR("com.grame.jackserver"),
+                                         NULL,
+                                         true);
+#endif
 
     return 1;
 }

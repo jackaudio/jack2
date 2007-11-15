@@ -37,10 +37,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGraphManager.h"
 #include "JackInternalClient.h"
 
-#ifdef __APPLE_
-#include <CoreFoundation/CFNotificationCenter.h>
-#endif
-
 namespace Jack
 {
 
@@ -135,16 +131,6 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         fAudioDriver->AddSlave(fLoopbackDriver);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
     InitTime();
-
-#ifdef __APPLE__
-    // Send notification to be used in the Jack Router
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
-                                         CFSTR("com.grame.jackserver.start"),
-                                         CFSTR("com.grame.jackserver"),
-                                         NULL,
-                                         true);
-#endif
-
     return 0;
 }
 
@@ -159,16 +145,6 @@ int JackServer::Close()
     fFreewheelDriver->Close();
     fLoopbackDriver->Close();
     fEngine->Close();
-
-#ifdef __APPLE__
-    // Send notification to be used in the Jack Router
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
-                                         CFSTR("com.grame.jackserver.stop"),
-                                         CFSTR("com.grame.jackserver"),
-                                         NULL,
-                                         true);
-#endif
-
     return 0;
 }
 

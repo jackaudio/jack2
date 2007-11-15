@@ -15,6 +15,10 @@ Kjetil S.Matheussen
   Jackdmp changes log
 ---------------------------
 
+2007-11-15 Stephane Letz  <letz@grame.fr>
+
+	* Move OSX start/stop notification mechanism in Jackdmp.cpp.
+
 2007-11-05 Stephane Letz  <letz@grame.fr>
 
 	* Use of JackWinSemaphore instead of JackWinEvent for inter-process synchronization.
