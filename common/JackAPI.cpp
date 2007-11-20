@@ -221,7 +221,7 @@ inline double rint(double nr)
 
 static inline bool CheckPort(jack_port_id_t port_index)
 {
-    return (port_index < PORT_NUM);
+    return (port_index > 0 && port_index < PORT_NUM);
 }
 
 static inline bool CheckBufferSize(jack_nframes_t buffer_size)
