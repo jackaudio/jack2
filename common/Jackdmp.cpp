@@ -361,11 +361,11 @@ int main(int argc, char* argv[])
 
 #ifdef __APPLE__
     // Send notification to be used in the Jack Router
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
-                                         CFSTR("com.grame.jackserver.start"),
-                                         CFSTR("com.grame.jackserver"),
-                                         NULL,
-                                         true);
+    CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
+													CFSTR("com.grame.jackserver.start"),
+													CFSTR("com.grame.jackserver"),
+													NULL,
+													kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
 #endif
 	
 	/*
@@ -432,11 +432,11 @@ int main(int argc, char* argv[])
 
 #ifdef __APPLE__
     // Send notification to be used in the Jack Router
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDistributedCenter(),
-                                         CFSTR("com.grame.jackserver.stop"),
-                                         CFSTR("com.grame.jackserver"),
-                                         NULL,
-                                         true);
+    CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
+													CFSTR("com.grame.jackserver.stop"),
+													CFSTR("com.grame.jackserver"),
+													NULL,
+													kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
 #endif
 
     return 1;
