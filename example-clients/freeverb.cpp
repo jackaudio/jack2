@@ -11,9 +11,8 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <jack/jack.h>
 
-//#include <libgen.h>
-#include "jack.h"
 #include <windows.h>
 
 // g++ -O3 -lm -lsndfile  myfx.cpp
