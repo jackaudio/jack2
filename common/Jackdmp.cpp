@@ -360,12 +360,14 @@ int main(int argc, char* argv[])
     }
 
 #ifdef __APPLE__
-    // Send notification to be used in the Jack Router
+	CFStringRef ref = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
+    // Send notification to be used in the JackRouter plugin
     CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
 													CFSTR("com.grame.jackserver.start"),
-													CFSTR("com.grame.jackserver"),
+													ref,
 													NULL,
 													kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+	CFRelease(ref);
 #endif
 	
 	/*
@@ -431,12 +433,14 @@ int main(int argc, char* argv[])
     jack_unregister_server(server_name);
 
 #ifdef __APPLE__
-    // Send notification to be used in the Jack Router
+	CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
+    // Send notification to be used in the JackRouter plugin
     CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
 													CFSTR("com.grame.jackserver.stop"),
-													CFSTR("com.grame.jackserver"),
+													ref1,
 													NULL,
 													kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+	CFRelease(ref1);
 #endif
 
     return 1;

@@ -3097,6 +3097,7 @@
 					../common,
 					RPC,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",
@@ -3202,6 +3203,7 @@
 					../common,
 					RPC,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DUSE_POSIX_SHM",
 					"-D__SMP__",

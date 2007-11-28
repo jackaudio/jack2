@@ -15,6 +15,9 @@ Kjetil S.Matheussen
   Jackdmp changes log
 ---------------------------
 
+2007-11-28 Stephane Letz  <letz@grame.fr>
+	* On OSX, use jack server name in notification system.
+
 2007-11-21 Stephane Letz  <letz@grame.fr>
 
 	* On OSX, use CFNotificationCenterPostNotificationWithOptions with kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions for server ==> JackRouter plugin notification.
