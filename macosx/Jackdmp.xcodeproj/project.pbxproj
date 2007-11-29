@@ -3110,8 +3110,6 @@
 					"-framework",
 					Jackdmp,
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					CoreServices,
@@ -3281,8 +3279,6 @@
 					"-framework",
 					Carbon,
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 				);
 				OTHER_REZFLAGS = "";
@@ -3443,8 +3439,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 				);
@@ -4244,8 +4238,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 				);
 				OTHER_REZFLAGS = "";
@@ -4426,8 +4418,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					CoreServices,
@@ -4527,8 +4517,6 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					AudioToolBox,
-					"-framework",
 					CoreAudio,
 					"-framework",
 					CoreServices,
@@ -4627,8 +4615,6 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -4741,8 +4727,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -4877,8 +4861,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -5032,7 +5014,7 @@
 					"-framework",
 					Jackdmp,
 					"-framework",
-					AudioToolBox,
+					AudioToolbox,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -5356,8 +5338,6 @@
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
-					"-framework",
-					AudioToolBox,
 					"-framework",
 					CoreAudio,
 					"-framework",
