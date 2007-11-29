@@ -117,7 +117,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     strcpy(fPlaybackDriverName, playback_driver_name);
 
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    if (fEngineControl->fTimeOutUsecs == 0)  /* if zero [-t (timeout) was not used], use 2 period size */
+    if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
 
     fGraphManager->SetBufferSize(nframes);

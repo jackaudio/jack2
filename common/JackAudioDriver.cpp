@@ -30,7 +30,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackEngine.h"
-#include "JackTools.h"
 #include <assert.h>
 
 namespace Jack
@@ -50,20 +49,18 @@ int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     fEngineControl->fBufferSize = buffer_size;
 	fGraphManager->SetBufferSize(buffer_size);	
-	float new_val = 1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize;			// in microsec
-	if (JackTools::EqualFloat(2.f * fEngineControl->fPeriodUsecs, fEngineControl->fTimeOutUsecs))	// -t (timeout) was not used, see JackDriver::Open...
-		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * new_val);
-	fEngineControl->fPeriodUsecs = jack_time_t(new_val); 
+	fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec		
+	if (!fEngineControl->fTimeOut)
+		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
     return 0;
 }
 
 int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
 {
     fEngineControl->fSampleRate = sample_rate;
-	float new_val = 1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize;			// in microsec
-	if (JackTools::EqualFloat(2.f * fEngineControl->fPeriodUsecs, fEngineControl->fTimeOutUsecs))	// -t (timeout) was not used, see JackDriver::Open...
-		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * new_val);
-    fEngineControl->fPeriodUsecs = jack_time_t(new_val); 
+	fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec		
+	if (!fEngineControl->fTimeOut)
+		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
     return 0;
 }
 

@@ -73,6 +73,7 @@ struct JackEngineControl : public JackShmMem
 	bool fTemporary;
     jack_time_t fPeriodUsecs;
     jack_time_t fTimeOutUsecs;
+	bool fTimeOut;
 	bool fRealTime;
 	int32_t fPriority;
 	char fServerName[64];
@@ -106,6 +107,7 @@ struct JackEngineControl : public JackShmMem
 	{
 		fSyncMode = sync;
 		fTemporary = temporary;
+		fTimeOut = (timeout > 0);
 		fTimeOutUsecs = timeout * 1000;
 		fRealTime = rt;
 		fPriority = priority;

@@ -42,12 +42,7 @@ namespace Jack
 		static void CleanupFiles(const char* server_name);
 		static int GetTmpdir();
 		static void RewriteName(const char* name, char* new_name);
-		
-		static bool inline EqualFloat(float a, float b)
-		{
-			return (fabs(a - b) < 0.00001f);
-		}
-
+	
 	};
 }
 
