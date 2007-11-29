@@ -30,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackEngine.h"
+#include "JackTools.h"
 #include <assert.h>
 
 namespace Jack
@@ -45,22 +46,24 @@ JackAudioDriver::JackAudioDriver(const char* name, JackEngine* engine, JackSynch
 JackAudioDriver::~JackAudioDriver()
 {}
 
-// DB: This is here because audio driver is the only one, who can change buffer size.
-// It can be moved into JackDriver, but then it would be called twice
-// because of JackServer::SetBufferSize() implementation.
-// Initial values are set in JackDriver::Open(...). Yes it is a duplicate code (bad).
 int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     fEngineControl->fBufferSize = buffer_size;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
-    fGraphManager->SetBufferSize(buffer_size);
+	fGraphManager->SetBufferSize(buffer_size);	
+	float new_val = 1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize;			// in microsec
+	if (JackTools::EqualFloat(2.f * fEngineControl->fPeriodUsecs, fEngineControl->fTimeOutUsecs))	// -t (timeout) was not used, see JackDriver::Open...
+		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * new_val);
+	fEngineControl->fPeriodUsecs = jack_time_t(new_val); 
     return 0;
 }
 
 int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
 {
     fEngineControl->fSampleRate = sample_rate;
-    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize); // in microsec
+	float new_val = 1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize;			// in microsec
+	if (JackTools::EqualFloat(2.f * fEngineControl->fPeriodUsecs, fEngineControl->fTimeOutUsecs))	// -t (timeout) was not used, see JackDriver::Open...
+		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * new_val);
+    fEngineControl->fPeriodUsecs = jack_time_t(new_val); 
     return 0;
 }
 

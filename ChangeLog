@@ -16,6 +16,9 @@ Kjetil S.Matheussen
 ---------------------------
 
 2007-11-28 Stephane Letz  <letz@grame.fr>
+	* Correct fPeriodUsecs computation in JackAudioDriver::SetBufferSize and JackAudioDriver::SetSampleRate. 
+
+2007-11-28 Stephane Letz  <letz@grame.fr>
 	* On OSX, use jack server name in notification system.
 
 2007-11-21 Stephane Letz  <letz@grame.fr>
