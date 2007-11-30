@@ -15,7 +15,12 @@ Kjetil S.Matheussen
   Jackdmp changes log
 ---------------------------
 
-2007-11-28 Stephane Letz  <letz@grame.fr>
+2007-11-30 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackMachNotifyChannel::ClientNotify.
+
+2007-11-29 Stephane Letz  <letz@grame.fr>
+
 	* Correct fPeriodUsecs computation in JackAudioDriver::SetBufferSize and JackAudioDriver::SetSampleRate. 
 
 2007-11-28 Stephane Letz  <letz@grame.fr>

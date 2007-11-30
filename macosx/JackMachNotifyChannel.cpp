@@ -50,13 +50,15 @@ void JackMachNotifyChannel::Close()
 
 void JackMachNotifyChannel::ClientNotify(int refnum, const char* name, int notify, int sync, int value, int* result)
 {
-    *result = 0;
     kern_return_t res = (sync)
                         ? rpc_jack_client_sync_notify(fClientPort.GetPort(), refnum, (char*)name, notify, value, result)
                         : rpc_jack_client_async_notify(fClientPort.GetPort(), refnum, (char*)name, notify, value);
-    if (res != KERN_SUCCESS) {
-        jack_error("JackMachNotifyChannel::ClientNotify: name = %s notify = %ld err = %s", name, notify, mach_error_string(res));
-    }
+    if (res == KERN_SUCCESS) {
+        *result = 0;
+    } else {
+		jack_error("JackMachNotifyChannel::ClientNotify: name = %s notify = %ld err = %s", name, notify, mach_error_string(res));
+		*result = -1;
+	}
 }
 
 } // end of namespace

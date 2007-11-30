@@ -56,7 +56,7 @@ void JackSocketNotifyChannel::ClientNotify(int refnum, const char* name, int not
         jack_error("Could not write notification");
         fNotifySocket.Close();
         *result = -1;
-        return ;
+        return;
     }
 
     // Read the result in "synchronous" mode only
