@@ -102,6 +102,12 @@ static void printError(OSStatus err)
         case kAudioDevicePermissionsError:
             JackLog("error code : kAudioDevicePermissionsError\n");
             break;
+		case kAudioHardwareBadObjectError:
+            JackLog("error code : kAudioHardwareBadObjectError\n");
+            break;
+			case kAudioHardwareUnsupportedOperationError:
+            JackLog("error code : kAudioHardwareUnsupportedOperationError\n");
+            break;
         default:
             JackLog("error code : unknown\n");
             break;
@@ -404,7 +410,9 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
     ComponentResult err1;
     UInt32 outSize;
     UInt32 enableIO;
-    AudioStreamBasicDescription srcFormat, dstFormat, sampleRate;
+    AudioStreamBasicDescription srcFormat, dstFormat;
+	Float64 sampleRate;
+
     long in_nChannels = 0;
     long out_nChannels = 0;
     char capture_driver_name[256];
@@ -525,46 +533,24 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
     }
 
     // Set sample rate
-    if (capturing && inchannels > 0) {
-        outSize = sizeof(AudioStreamBasicDescription);
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyStreamFormat, &outSize, &sampleRate);
-        if (err != noErr) {
-            jack_error("Cannot get current sample rate");
-            printError(err);
-            return -1;
-        }
+	outSize =  sizeof(Float64);
+	err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
+	if (err != noErr) {
+		jack_error("Cannot get current sample rate");
+		printError(err);
+		return -1;
+	}
 
-        if (samplerate != (unsigned long)sampleRate.mSampleRate) {
-            sampleRate.mSampleRate = (Float64)samplerate;
-            err = AudioDeviceSetProperty(fDeviceID, NULL, 0, true, kAudioDevicePropertyStreamFormat, outSize, &sampleRate);
-            if (err != noErr) {
-                jack_error("Cannot set sample rate = %ld", samplerate);
-                printError(err);
-                return -1;
-            }
-        }
-    }
-
-    if (playing && outchannels > 0) {
-        outSize = sizeof(AudioStreamBasicDescription);
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyStreamFormat, &outSize, &sampleRate);
-        if (err != noErr) {
-            jack_error("Cannot get current sample rate");
-            printError(err);
-            return -1;
-        }
-
-        if (samplerate != (unsigned long)sampleRate.mSampleRate) {
-            sampleRate.mSampleRate = (Float64)samplerate;
-            err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyStreamFormat, outSize, &sampleRate);
-            if (err != noErr) {
-                jack_error("Cannot set sample rate = %ld", samplerate);
-                printError(err);
-                return -1;
-            }
-        }
-    }
-
+	if (samplerate != (jack_nframes_t)sampleRate) {
+		sampleRate = (Float64)samplerate;
+		err = AudioDeviceSetProperty(fDeviceID, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, outSize, &sampleRate);
+		if (err != noErr) {
+			jack_error("Cannot set sample rate = %ld", samplerate);
+			printError(err);
+			return -1;
+		}
+	}
+ 
     // AUHAL
     ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
     Component HALOutput = FindNextComponent(NULL, &cd);

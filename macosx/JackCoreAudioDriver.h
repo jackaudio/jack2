@@ -36,6 +36,13 @@ namespace Jack
 
 //#define IO_CPU 1
 
+typedef	UInt8	CAAudioHardwareDeviceSectionID;
+#define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
+#define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
+#define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
+#define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
+
+
 /*!
 \brief The CoreAudio driver.
  
