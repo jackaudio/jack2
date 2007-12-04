@@ -15,6 +15,10 @@ Kjetil S.Matheussen
   Jackdmp changes log
 ---------------------------
 
+2007-12-04 Stephane Letz  <letz@grame.fr>
+
+	* Add a sample_rate change listener in CoreAudio driver.
+
 2007-12-03 Stephane Letz  <letz@grame.fr>
 
 	* Correct bug in CoreAudio driver sample rate management.

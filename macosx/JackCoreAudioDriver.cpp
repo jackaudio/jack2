@@ -250,13 +250,32 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         void* inClientData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
-    if (inPropertyID == kAudioDeviceProcessorOverload) {
-        JackLog("JackCoreAudioDriver::NotificationCallback kAudioDeviceProcessorOverload\n");
-#ifdef DEBUG
-        //driver->fLogFile->Capture(AudioGetCurrentHostTime() - AudioConvertNanosToHostTime(LOG_SAMPLE_DURATION * 1000000), AudioGetCurrentHostTime(), true, "Captured Latency Log for I/O Cycle Overload\n");
-#endif
-        driver->NotifyXRun(GetMicroSeconds());
-    }
+	switch (inPropertyID) {
+	
+		case kAudioDeviceProcessorOverload:
+			JackLog("JackCoreAudioDriver::NotificationCallback kAudioDeviceProcessorOverload\n");
+		#ifdef DEBUG
+			//driver->fLogFile->Capture(AudioGetCurrentHostTime() - AudioConvertNanosToHostTime(LOG_SAMPLE_DURATION * 1000000), AudioGetCurrentHostTime(), true, "Captured Latency Log for I/O Cycle Overload\n");
+		#endif
+			driver->NotifyXRun(GetMicroSeconds());
+			break;
+			
+		case kAudioDevicePropertyNominalSampleRate: {
+			UInt32 outSize =  sizeof(Float64);
+			Float64 sampleRate;
+			OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
+			if (err != noErr) {
+				jack_error("Cannot get current sample rate");
+				printError(err);
+				return kAudioHardwareUnsupportedOperationError;
+			}
+			JackLog("JackCoreAudioDriver::NotificationCallback kAudioDevicePropertyNominalSampleRate %ld\n", long(sampleRate));
+			if (jack_nframes_t(sampleRate) != driver->fEngineControl->fSampleRate) {
+				jack_error("Critical error : new %ld sample rate, engine will not run correctly anymore", long(sampleRate));
+			}
+			break;
+		}
+	}
     return noErr;
 }
 
@@ -735,12 +754,18 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
         printError(err1);
         goto error;
     }
+	
+	err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyNominalSampleRate");
+        printError(err1);
+        goto error;
+    }
 
     fDriverOutputData = 0;
 
 #if IO_CPU
-
-    outSize = sizeof(float);
+   outSize = sizeof(float);
     iousage = 0.4f;
     err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyIOCycleUsage, outSize, &iousage);
     if (err != noErr) {
@@ -769,6 +794,7 @@ int JackCoreAudioDriver::Close()
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
 	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
+	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
     free(fJackInputData);
     AudioUnitUninitialize(fAUHAL);
     CloseComponent(fAUHAL);
