@@ -271,7 +271,8 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 			}
 			JackLog("JackCoreAudioDriver::NotificationCallback kAudioDevicePropertyNominalSampleRate %ld\n", long(sampleRate));
 			if (jack_nframes_t(sampleRate) != driver->fEngineControl->fSampleRate) {
-				jack_error("Critical error : new %ld sample rate, engine will not run correctly anymore", long(sampleRate));
+				AudioUnitUninitialize(driver->fAUHAL);
+				jack_error("Critical error: new %ld sample rate, coreaudio driver is stopped", long(sampleRate));
 			}
 			break;
 		}
