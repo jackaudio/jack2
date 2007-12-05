@@ -746,7 +746,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
 	if (err1 != noErr) {
 		jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
 		printError(err1);
-		goto error;
 	}
 
 	JackLog("Setup AUHAL output stream converter SR = %ld\n", samplerate);
@@ -763,7 +762,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
 	if (err1 != noErr) {
 		jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
 		printError(err1);
-		goto error;
 	}
 	
     // Setup callbacks
