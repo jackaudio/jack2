@@ -61,7 +61,7 @@ JackFreebobDriver::freebob_driver_read (freebob_driver_t * driver, jack_nframes_
     printEnter();
 
     // make sure all buffers have a valid buffer if not connected
-    for (int i = 0; i < driver->capture_nchannels; i++) {
+    for (unsigned int i = 0; i < driver->capture_nchannels; i++) {
         stream_type = freebob_streaming_get_playback_stream_type(driver->dev, i);
         if (stream_type == freebob_stream_type_audio) {
             freebob_streaming_set_playback_stream_buffer(driver->dev, i,
@@ -104,10 +104,7 @@ JackFreebobDriver::freebob_driver_read (freebob_driver_t * driver, jack_nframes_
 int
 JackFreebobDriver::freebob_driver_write (freebob_driver_t * driver, jack_nframes_t nframes)
 {
-    channel_t chn;
-    JSList *node;
     jack_default_audio_sample_t* buf = NULL;
-	jack_port_t *port;
 
     freebob_streaming_stream_type stream_type;
 
@@ -121,7 +118,7 @@ JackFreebobDriver::freebob_driver_write (freebob_driver_t * driver, jack_nframes
     assert(driver->dev);
 
     // make sure all buffers output silence if not connected
-    for (int i = 0; i < driver->playback_nchannels; i++) {
+    for (unsigned int i = 0; i < driver->playback_nchannels; i++) {
         stream_type = freebob_streaming_get_playback_stream_type(driver->dev, i);
         if (stream_type == freebob_stream_type_audio) {
             freebob_streaming_set_playback_stream_buffer(driver->dev, i,
@@ -736,7 +733,9 @@ int JackFreebobDriver::Attach()
         } else {
             printMessage ("Registering capture port %s", buf);
 
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, (JackPortFlags)port_flags)) == NO_PORT) {
+            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
+                                                          JACK_DEFAULT_AUDIO_TYPE,
+                                                          (JackPortFlags)port_flags)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -754,7 +753,7 @@ int JackFreebobDriver::Attach()
     driver->playback_nchannels = freebob_streaming_get_nb_playback_streams(driver->dev);
     driver->playback_nchannels_audio = 0;
 
-    for (int i = 0; i < driver->playback_nchannels; i++) {
+    for (unsigned int i = 0; i < driver->playback_nchannels; i++) {
 
         freebob_streaming_get_playback_stream_name(driver->dev, i, portname, sizeof(portname) - 1);
         snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl->fName, portname);
@@ -763,7 +762,9 @@ int JackFreebobDriver::Attach()
             printMessage ("Don't register playback port %s", buf);
         } else {
             printMessage ("Registering playback port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, (JackPortFlags)port_flags)) == NO_PORT) {
+            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
+                                                          JACK_DEFAULT_AUDIO_TYPE,
+                                                          (JackPortFlags)port_flags)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -888,17 +889,7 @@ int JackFreebobDriver::Read()
 int JackFreebobDriver::Write()
 {
     printEnter();
-
-    //JackLog("write\n");
     int res = freebob_driver_write((freebob_driver_t *)fDriver, fEngineControl->fBufferSize);
-    jack_time_t write_time = GetMicroSeconds();
-
-    /*
-    if (write_time > (fLastWaitUst - fDelayedUst) + fEngineControl->fPeriodUsecs) {
-    	JackLog("FreeBoB write XRun \n");
-    	NotifyXRun(write_time);
-    }
-    */
     printExit();
     return res;
 }
@@ -1052,8 +1043,6 @@ extern "C"
     }
 
     Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngine* engine, Jack::JackSynchro** table, const JSList* params) {
-        jack_driver_t *driver;
-
         unsigned int port = 0;
         unsigned int node_id = -1;
         int nbitems;

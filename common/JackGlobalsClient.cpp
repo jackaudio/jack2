@@ -49,7 +49,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 // LINUX
 #ifdef __linux__
-#include "JackAlsaDriver.h"
+#include "linux/alsa/JackAlsaDriver.h"
 #include "JackProcessSync.h"
 #include "JackSocketServerNotifyChannel.h"
 #include "JackSocketNotifyChannel.h"

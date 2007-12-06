@@ -1,11 +1,11 @@
 # Type "make" or "make all" to compile ALSA driver, and "make freebob" to compile FREEBOB driver.
 
 # Choose the installation location
-prefix := /usr/local
+prefix := /usr
 prefix := ${DESTDIR}${prefix}
 libdir := lib
 
-subprojects := ../common ../common/jack ../tests ../example-clients alsa freebob
+subprojects := ../common ../common/jack ../tests ../example-clients alsa freebob firewire
 
 sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../tests/*.cpp)
 
@@ -20,6 +20,8 @@ TARGET_LINUX_WRAPPER_LIB := libjackwrapper.so
 TARGET_LINUX_ALSA := jack_alsa.so
 
 TARGET_LINUX_FREEBOB := jack_freebob.so
+
+TARGET_LINUX_FIREWIRE := jack_firewire.so
 
 TARGET_LINUX_DUMMY := jack_dummy.so
 
@@ -46,6 +48,8 @@ objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o
 
 objects_linux_freebob := JackFreebobDriver.o
 
+objects_linux_firewire := JackFFADODriver.o
+
 objects_linux_dummy := JackDummyDriver.o  
 
 CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
@@ -64,6 +68,10 @@ all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPP
 freebob : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
         synchroClient synchroServer synchroServerClient testSem jack_test inprocess jack_load jack_unload
+
+firewire : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
+        $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FIREWIRE) $(TARGET_LINUX_DUMMY) \
+        synchroClient synchroServer synchroServerClient testSem jack_test
 
 synchroClient: JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o 
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroClient.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o synchroClient
@@ -107,6 +115,9 @@ $(TARGET_LINUX_ALSA) : $(objects_linux_alsa)
 $(TARGET_LINUX_FREEBOB) : $(objects_linux_freebob) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_freebob) $(LIB_LINUX) -lfreebob libjackdmp.so  -o $(TARGET_LINUX_FREEBOB)
 
+$(TARGET_LINUX_FIREWIRE) : $(objects_linux_firewire) 
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_firewire) $(LIB_LINUX) -lffado libjackdmp.so  -o $(TARGET_LINUX_FIREWIRE)
+
 $(TARGET_LINUX_DUMMY) : $(objects_linux_dummy) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_dummy) $(LIB_LINUX) libjackdmp.so  -o $(TARGET_LINUX_DUMMY)
 
@@ -120,6 +131,7 @@ install:
 	cp jack_alsa.so $(prefix)/$(libdir)/jackmp
 	cp jack_dummy.so $(prefix)/$(libdir)/jackmp
 	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/$(libdir)/jackmp || echo "freebob driver not installed"
+	[ -f jack_firewire.so ]  && cp jack_firewire.so $(prefix)/$(libdir)/jackmp || echo "firewire driver not installed"
 	cd $(prefix)/bin && [ -f jackd ]  && mv -f jackd tmp_jackd || echo "jackd server not found, continue..."
 	cd $(prefix)/$(libdir) && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "libjack not found, continue..."
 	cd $(prefix)/include &&  [ -d jack ] && mv -f jack tmp_jack || echo "jack headers not found, continue..."
@@ -149,7 +161,7 @@ remove:
 
 clean :
 	rm -f *.o
-	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
+	rm -f $(TARGET_LINUX_SERVER)  $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_FIREWIRE) $(TARGET_LINUX_DUMMY) \
 	synchroClient synchroServer synchroServerClient testSem jack_test jack_load jack_unload inprocess.so	
 depend :
 	#makedepend -w120 -Y -- $(CXXFLAGS) -- $(sources) 

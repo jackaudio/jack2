@@ -10,10 +10,15 @@ Pieter Palmers
 Tom Szilagyi
 Andrzej Szombierski 
 Kjetil S.Matheussen
+Pieter Palmers
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2007-12-06 Stephane Letz  <letz@grame.fr>
+
+	* Pieter Palmers FFADO driver and scons based build.
 
 2007-12-05 Stephane Letz  <letz@grame.fr>
 
