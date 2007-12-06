@@ -22,7 +22,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #pragma warning (disable : 4786)
 #endif
 
+#ifdef __linux__
 #include "config.h"
+#endif
 
 #include "JackDriverLoader.h"
 #include "JackError.h"
