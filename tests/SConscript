@@ -1,0 +1,104 @@
+#
+# Copyright (C) 2007 Arnold Krille
+# Copyright (C) 2007 Pieter Palmers
+#
+# This file originates from FFADO (www.ffado.org)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+from string import Template
+
+Import( 'env' )
+
+# paths where include files can be found
+env.AppendUnique( CPPPATH=["#/", "#/common"] )
+
+#
+# Define the source files
+#
+
+test_programs = {
+    "synchroClient" : "testSynchroClient.cpp #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
+    "synchroServer" : "testSynchroServer.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
+    "synchroServerClient" : "testSynchroServerClient.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp  #/common/JackPthreadCond.cpp",
+    "testSem" : "testSem.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
+    "jack_test" : "jack_test.cpp",
+}
+
+#
+# Start building
+#
+
+# build the tests
+testenv = env.Copy()
+testenv.PrependUnique( LIBPATH=env['build_base'] )
+testenv.PrependUnique( LIBS="jackmp" )
+
+for test_program in test_programs.keys():
+    testenv.Program(target=test_program, 
+                    source=env.Split( test_programs[test_program] ) )
+#
+# Copyright (C) 2007 Arnold Krille
+# Copyright (C) 2007 Pieter Palmers
+#
+# This file originates from FFADO (www.ffado.org)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+from string import Template
+
+Import( 'env' )
+
+# paths where include files can be found
+env.AppendUnique( CPPPATH=["#/", "#/common"] )
+
+#
+# Define the source files
+#
+
+test_programs = {
+    "synchroClient" : "testSynchroClient.cpp #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
+    "synchroServer" : "testSynchroServer.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
+    "synchroServerClient" : "testSynchroServerClient.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp  #/common/JackPthreadCond.cpp",
+    "testSem" : "testSem.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
+    "jack_test" : "jack_test.cpp",
+}
+
+#
+# Start building
+#
+
+# build the tests
+testenv = env.Copy()
+testenv.PrependUnique( LIBPATH=env['build_base'] )
+testenv.PrependUnique( LIBS="jackmp" )
+
+for test_program in test_programs.keys():
+    testenv.Program(target=test_program, 
+                    source=env.Split( test_programs[test_program] ) )

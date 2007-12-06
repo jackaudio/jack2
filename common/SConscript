@@ -1,0 +1,313 @@
+#
+# Copyright (C) 2007 Arnold Krille
+# Copyright (C) 2007 Pieter Palmers
+#
+# This file originally was part of FFADO
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+import glob
+from string import Template
+
+Import( 'env' )
+
+# paths where include files can be found
+env.AppendUnique( CPPPATH=["#/", "#/common", "#/common/jack"] )
+
+#
+# Define the source files
+#
+
+srcfiles_common_serverlib = env.Split( '\
+     JackActivationCount.cpp JackAPI.cpp JackAudioDriver.cpp JackClient.cpp JackConnectionManager.cpp \
+     JackDriver.cpp JackEngine.cpp JackEngineControl.cpp JackError.c JackExternalClient.cpp JackFrameTimer.cpp \
+     JackFreewheelDriver.cpp JackGlobalsServer.cpp JackGraphManager.cpp JackInternalClient.cpp JackPort.cpp JackPosixSemaphore.cpp \
+         JackPosixThread.cpp JackFifo.cpp  JackLoopbackDriver.cpp JackPortType.cpp JackAudioPort.cpp JackMidiPort.cpp \
+     JackServer.cpp JackShmMem.cpp JackThreadedDriver.cpp shm.c JackSocket.cpp JackSocketServerChannel.cpp  JackSocketNotifyChannel.cpp \
+     JackSocketServerNotifyChannel.cpp JackTime.c JackServerAPI.cpp JackGlobals.cpp JackDriverLoader.cpp JackDebugClient.cpp  \
+     JackTransportEngine.cpp JackServerGlobals.cpp JackServerLaunch.cpp timestamps.c JackTools.cpp \
+    ')
+
+# FIXME: this is not pretty
+srcfiles_common_serverlib.append('#/example-clients/internal_metro.cpp')
+
+srcfiles_common_clientlib = env.Split( '\
+     JackActivationCount.cpp JackAPI.cpp JackClient.cpp JackConnectionManager.cpp ringbuffer.c  JackServerLaunch.cpp\
+     JackError.c JackFrameTimer.cpp JackGlobalsClient.cpp JackGraphManager.cpp JackLibClient.cpp JackLibAPI.cpp JackPort.cpp JackPosixSemaphore.cpp  \
+     JackFifo.cpp JackPortType.cpp JackAudioPort.cpp JackMidiPort.cpp JackMidiAPI.cpp JackEngineControl.cpp JackPosixThread.cpp JackShmMem.cpp \
+     shm.c JackSocket.cpp JackSocketClientChannel.cpp JackTime.c JackGlobals.cpp JackDebugClient.cpp JackTransportEngine.cpp timestamps.c JackTools.cpp \
+    ')
+
+srcfiles_common_wrapperlib = ['JackAPIWrapper.cpp', 'ringbuffer.c']
+
+jack_headers = env.Split( 'intclient.h  jack.h  midiport.h  ringbuffer.h \
+                           statistics.h  thread.h  transport.h  types.h')
+
+#
+# Start building
+#
+
+#pkgconfig = env.ScanReplace( "libjackmp.pc.in" )
+#env.Install( env['libdir'] + '/pkgconfig', pkgconfig )
+
+env.AppendUnique( LIBS=["rt", "pthread"] )
+
+# build the common stuff
+clientlib = env.SharedLibrary( "jackmp", srcfiles_common_clientlib )
+env.Install( "$libdir", clientlib )
+serverlib = env.SharedLibrary( "jackdmp", srcfiles_common_serverlib )
+env.Install( "$libdir", serverlib )
+wrapperlib = env.SharedLibrary( "jackwrapper", srcfiles_common_wrapperlib )
+env.Install( "$libdir", wrapperlib )
+
+
+# install the headers
+#if env['JACK_FLAGS']:
+    #jack_include_dir = env['JACK_INCLUDEDIR']
+    #if 'install' in COMMAND_LINE_TARGETS and os.path.isdir( jack_include_dir ):
+        #if env.GetOption('clean'):
+            #pass
+        #else:
+            #jack_old_includes_dir = env['includedir'] + '/jack_up'
+            #print "moving old jack includes to %s..." % jack_old_includes_dir
+            #env.Command(jack_old_includes_dir, jack_include_dir, Move("$TARGET", "$SOURCE"))
+
+for header in jack_headers:
+    env.Alias("install", env.Install( env['includedir'] + '/jack', 'jack/' + header ))
+
+
+# install the libs
+env.Alias("install", env.Install(env['libdir'], serverlib))
+env.Alias("install", env.Install(env['libdir'], clientlib))
+env.Alias("install", env.Install(env['libdir'], wrapperlib))
+#jack_libdir = env['JACK_LIBDIR']
+#libjackdmp_location = env['libdir'] + '/libjackmp.so'
+#if 'install' in COMMAND_LINE_TARGETS and os.path.isdir( jack_libdir ):
+
+    #if env.GetOption('clean'):
+        ##note: is this executed before the actual uninstall?
+        #lib_files = glob.glob(jack_libdir + '/libjack.so.*.up')
+        #for old_name in lib_files:
+            #new_name = old_name[:-3]
+            #print "restoring old jack lib %s to %s..." % (old_name, new_name)
+            #env.Command(Delete(new_name))
+            #env.Command(new_name, old_name, Move("$TARGET", "$SOURCE"))
+    #else:
+        #lib_files = glob.glob(jack_libdir + '/libjack.so.*')
+        #env.Alias("install", env.Install(env['libdir'], serverlib))
+        #env.Alias("install", env.Install(env['libdir'], clientlib))
+
+        #for old_name in lib_files:
+            #new_name = old_name + '.up'
+            #print "moving old jack lib %s to %s..." % (old_name, new_name)
+            #env.Command(new_name, old_name, Move("$TARGET", "$SOURCE"))
+            #print " linking to %s..." % (libjackdmp_location)
+            #env.Command(old_name, libjackdmp_location, "ln -s $TARGET $SOURCE")
+#
+# Copyright (C) 2007 Arnold Krille
+# Copyright (C) 2007 Pieter Palmers
+#
+# This file originally was part of FFADO
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+import glob
+from string import Template
+
+Import( 'env' )
+
+# paths where include files can be found
+env.AppendUnique( CPPPATH=["#/", "#/common", "#/common/jack"] )
+
+#
+# Define the source files
+#
+
+srcfiles_common_serverlib = env.Split( '\
+     JackActivationCount.cpp JackAPI.cpp JackAudioDriver.cpp JackClient.cpp JackConnectionManager.cpp \
+     JackDriver.cpp JackEngine.cpp JackEngineControl.cpp JackError.c JackExternalClient.cpp JackFrameTimer.cpp \
+     JackFreewheelDriver.cpp JackGlobalsServer.cpp JackGraphManager.cpp JackInternalClient.cpp JackPort.cpp JackPosixSemaphore.cpp \
+         JackPosixThread.cpp JackFifo.cpp  JackLoopbackDriver.cpp JackPortType.cpp JackAudioPort.cpp JackMidiPort.cpp \
+     JackServer.cpp JackShmMem.cpp JackThreadedDriver.cpp shm.c JackSocket.cpp JackSocketServerChannel.cpp  JackSocketNotifyChannel.cpp \
+     JackSocketServerNotifyChannel.cpp JackTime.c JackServerAPI.cpp JackGlobals.cpp JackDriverLoader.cpp JackDebugClient.cpp  \
+     JackTransportEngine.cpp JackServerGlobals.cpp JackServerLaunch.cpp timestamps.c JackTools.cpp \
+    ')
+
+# FIXME: this is not pretty
+srcfiles_common_serverlib.append('#/example-clients/internal_metro.cpp')
+
+srcfiles_common_clientlib = env.Split( '\
+     JackActivationCount.cpp JackAPI.cpp JackClient.cpp JackConnectionManager.cpp ringbuffer.c  JackServerLaunch.cpp\
+     JackError.c JackFrameTimer.cpp JackGlobalsClient.cpp JackGraphManager.cpp JackLibClient.cpp JackLibAPI.cpp JackPort.cpp JackPosixSemaphore.cpp  \
+     JackFifo.cpp JackPortType.cpp JackAudioPort.cpp JackMidiPort.cpp JackMidiAPI.cpp JackEngineControl.cpp JackPosixThread.cpp JackShmMem.cpp \
+     shm.c JackSocket.cpp JackSocketClientChannel.cpp JackTime.c JackGlobals.cpp JackDebugClient.cpp JackTransportEngine.cpp timestamps.c JackTools.cpp \
+    ')
+
+srcfiles_common_wrapperlib = ['JackAPIWrapper.cpp', 'ringbuffer.c']
+
+jack_headers = env.Split( 'intclient.h  jack.h  midiport.h  ringbuffer.h \
+                           statistics.h  thread.h  transport.h  types.h')
+
+#
+# Start building
+#
+
+#pkgconfig = env.ScanReplace( "libjackmp.pc.in" )
+#env.Install( env['libdir'] + '/pkgconfig', pkgconfig )
+
+env.AppendUnique( LIBS=["rt", "pthread"] )
+
+# build the common stuff
+clientlib = env.SharedLibrary( "jackmp", srcfiles_common_clientlib )
+env.Install( "$libdir", clientlib )
+serverlib = env.SharedLibrary( "jackdmp", srcfiles_common_serverlib )
+env.Install( "$libdir", serverlib )
+wrapperlib = env.SharedLibrary( "jackwrapper", srcfiles_common_wrapperlib )
+env.Install( "$libdir", wrapperlib )
+
+
+# install the headers
+#if env['JACK_FLAGS']:
+    #jack_include_dir = env['JACK_INCLUDEDIR']
+    #if 'install' in COMMAND_LINE_TARGETS and os.path.isdir( jack_include_dir ):
+        #if env.GetOption('clean'):
+            #pass
+        #else:
+            #jack_old_includes_dir = env['includedir'] + '/jack_up'
+            #print "moving old jack includes to %s..." % jack_old_includes_dir
+            #env.Command(jack_old_includes_dir, jack_include_dir, Move("$TARGET", "$SOURCE"))
+
+for header in jack_headers:
+    env.Alias("install", env.Install( env['includedir'] + '/jack', 'jack/' + header ))
+
+
+# install the libs
+env.Alias("install", env.Install(env['libdir'], serverlib))
+env.Alias("install", env.Install(env['libdir'], clientlib))
+env.Alias("install", env.Install(env['libdir'], wrapperlib))
+#jack_libdir = env['JACK_LIBDIR']
+#libjackdmp_location = env['libdir'] + '/libjackmp.so'
+#if 'install' in COMMAND_LINE_TARGETS and os.path.isdir( jack_libdir ):
+
+    #if env.GetOption('clean'):
+        ##note: is this executed before the actual uninstall?
+        #lib_files = glob.glob(jack_libdir + '/libjack.so.*.up')
+        #for old_name in lib_files:
+            #new_name = old_name[:-3]
+            #print "restoring old jack lib %s to %s..." % (old_name, new_name)
+            #env.Command(Delete(new_name))
+            #env.Command(new_name, old_name, Move("$TARGET", "$SOURCE"))
+    #else:
+        #lib_files = glob.glob(jack_libdir + '/libjack.so.*')
+        #env.Alias("install", env.Install(env['libdir'], serverlib))
+        #env.Alias("install", env.Install(env['libdir'], clientlib))
+
+        #for old_name in lib_files:
+            #new_name = old_name + '.up'
+            #print "moving old jack lib %s to %s..." % (old_name, new_name)
+            #env.Command(new_name, old_name, Move("$TARGET", "$SOURCE"))
+            #print " linking to %s..." % (libjackdmp_location)
+            #env.Command(old_name, libjackdmp_location, "ln -s $TARGET $SOURCE")
+# -*- python -*-
+
+import os
+import os.path
+import glob
+#Import('env')
+
+#CPPPATH = ['macosx', 'common']
+
+objects_common_server_lib=Split("""
+JackActivationCount.cpp
+JackAPI.cpp
+JackAudioDriver.cpp
+JackClient.cpp
+JackConnectionManager.cpp
+JackDriver.cpp
+JackEngine.cpp
+JackEngineTiming.cpp
+JackError.cpp
+JackExternalClient.cpp
+JackFrameTimer.cpp
+JackFreewheelDriver.o
+JackGlobalsServer.cpp
+JackGraphManager.cpp
+JackInternalClient.cpp
+JackPort.cpp
+JackPosixSemaphore.cpp
+JackPosixThread.cpp
+JackFifo.cpp 
+JackLoopbackDriver.cpp
+JackServer.cpp
+JackShmMem.cpp
+JackThreadedDriver.cpp
+shm.c
+JackSocket.cpp
+JackSocketServerChannel.cpp 
+JackSocketNotifyChannel.cpp
+JackSocketServerNotifyChannel.cpp
+JackTime.cpp
+JackServerAPI.cpp
+JackGlobals.cpp
+JackDriverLoader.cpp
+internal_metro.cpp
+JackDebugClient.cpp 
+JackTransportEngine.cpp
+JackServerGlobals.o
+""")
+
+objects_common_client_lib =Split("""
+JackActivationCount.cpp
+JackAPI.cpp
+JackClient.cpp
+JackConnectionManager.cpp
+ringbuffer.cpp
+JackError.cpp
+JackFrameTimer.cpp
+JackGlobalsClient.cpp
+JackGraphManager.cpp
+JackLibClient.cpp
+JackLibAPI.cpp
+JackPort.cpp
+JackPosixSemaphore.cpp
+JackFifo.cpp
+JackPosixThread.cpp
+JackShmMem.cpp
+shm.c
+JackSocket.cpp
+JackSocketClientChannel.cpp
+JackTime.cpp
+JackGlobals.cpp
+JackDebugClient.cpp
+JackTransportEngine.cpp
+""")
+
+
+SharedLibrary('libjackdmp', objects_common_server_lib, CPPPATH = ['.','../macosx','jack'], CXXFLAGS=["-O3"])
+SharedLibrary('libjackmp', objects_common_client_lib, CPPPATH = ['.','../macosx','jack'], CXXFLAGS=["-O3"])
