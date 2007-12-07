@@ -16,6 +16,10 @@ Pieter Palmers
   Jackdmp changes log
 ---------------------------
 
+2007-12-07 Stephane Letz  <letz@grame.fr>
+
+	* Pieter Palmers second new build system: scons and Makefile based build.
+
 2007-12-06 Stephane Letz  <letz@grame.fr>
 
 	* Pieter Palmers FFADO driver and scons based build.
