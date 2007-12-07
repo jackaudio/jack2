@@ -5,7 +5,7 @@ prefix := /usr
 prefix := ${DESTDIR}${prefix}
 libdir := lib
 
-subprojects := ../common ../common/jack ../tests ../example-clients alsa freebob firewire
+subprojects :=  ../common ../common/jack ../tests ../example-clients alsa freebob firewire ../linux ..
 
 sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(wildcard ../tests/*.cpp)
 
@@ -120,7 +120,6 @@ $(TARGET_LINUX_FIREWIRE) : $(objects_linux_firewire)
 
 $(TARGET_LINUX_DUMMY) : $(objects_linux_dummy) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_dummy) $(LIB_LINUX) libjackdmp.so  -o $(TARGET_LINUX_DUMMY)
-
 
 # Install jackdmp and overwrite jack installation
 install:

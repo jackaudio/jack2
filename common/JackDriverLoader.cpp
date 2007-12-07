@@ -23,7 +23,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #ifdef __linux__
+#ifndef ADDON_DIR
 #include "config.h"
+#endif
 #endif
 
 #include "JackDriverLoader.h"

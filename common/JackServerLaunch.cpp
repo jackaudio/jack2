@@ -18,8 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifdef __linux__ 
+#ifdef __linux__
+#ifndef ADDON_DIR
 #include "config.h"
+#endif
 #endif
 
 #include "JackChannel.h"
