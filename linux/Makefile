@@ -1,7 +1,7 @@
 # Type "make" or "make all" to compile ALSA driver, and "make freebob" to compile FREEBOB driver.
 
 # Choose the installation location
-prefix := /usr
+prefix := /usr/local
 prefix := ${DESTDIR}${prefix}
 libdir := lib
 
