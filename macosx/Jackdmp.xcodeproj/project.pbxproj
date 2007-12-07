@@ -624,7 +624,6 @@
 		4BF8D1690834EDE600C94B91 /* lsp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = lsp.c; path = "..//example-clients/lsp.c"; sourceTree = SOURCE_ROOT; };
 		4BF8D16B0834EDF000C94B91 /* metro.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = metro.c; path = "../example-clients/metro.c"; sourceTree = SOURCE_ROOT; };
 		4BF8D1710834EE0F00C94B91 /* freewheel.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = freewheel.c; path = "../example-clients/freewheel.c"; sourceTree = SOURCE_ROOT; };
-		4BF8D1730834EE2800C94B91 /* internal_metro.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = internal_metro.cpp; path = "../example-clients/internal_metro.cpp"; sourceTree = SOURCE_ROOT; };
 		4BF8D1750834EE3600C94B91 /* external_metro.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = external_metro.cpp; path = "../example-clients/external_metro.cpp"; sourceTree = SOURCE_ROOT; };
 		4BF8D1770834EE4800C94B91 /* JackError.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackError.h; path = ../common/JackError.h; sourceTree = SOURCE_ROOT; };
 		4BF8D1830834EE5800C94B91 /* JackTime.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTime.h; path = ../common/JackTime.h; sourceTree = SOURCE_ROOT; };
@@ -975,7 +974,6 @@
 				4BF8D1690834EDE600C94B91 /* lsp.c */,
 				4BF8D16B0834EDF000C94B91 /* metro.c */,
 				4BF8D1710834EE0F00C94B91 /* freewheel.c */,
-				4BF8D1730834EE2800C94B91 /* internal_metro.cpp */,
 				4BF8D1750834EE3600C94B91 /* external_metro.cpp */,
 			);
 			name = "Simple clients";

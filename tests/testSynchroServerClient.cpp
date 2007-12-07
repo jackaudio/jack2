@@ -47,7 +47,6 @@
 #ifdef linux
 	#include "JackPosixThread.h"
 	#include "JackPosixSemaphore.h"
-	#include "JackPthreadCond.h"
 	#include "JackFifo.h"
 #endif
 
@@ -224,14 +223,7 @@ int main(int ac, char *av [])
         sem4 = new JackFifo();
     }
 
-    if (strcmp(av[1], "-p") == 0) {
-        printf("Fifo\n");
-        sem1 = new JackPthreadCondServer();
-        sem2 = new JackPthreadCondServer();
-        sem3 = new JackPthreadCondClient(0);
-        sem4 = new JackPthreadCondClient(0);
-    }
-#endif
+ #endif
 
     sem1->Allocate(SERVER, "default", 0);
     sem2->Allocate(CLIENT, "default", 0);
