@@ -283,11 +283,9 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 			
 		case kAudioDevicePropertyNominalSampleRate: {
 			OSStatus err;
-			/*
 			err = AudioOutputUnitStop(driver->fAUHAL);
 			if (err != noErr)
 				jack_error("Error calling AudioOutputUnitStop");
-			*/
 				
 			UInt32 outSize =  sizeof(Float64);
 			Float64 sampleRate;
@@ -326,11 +324,9 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 				jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
 				printError(err);
 			}
-			/*	
 			err = AudioOutputUnitStart(driver->fAUHAL);
 			if (err != noErr)
 				jack_error("Error calling AudioOutputUnitStart");
-			*/
 			break;
 		}
 	}

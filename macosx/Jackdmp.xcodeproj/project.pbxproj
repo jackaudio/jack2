@@ -3273,8 +3273,10 @@
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -3330,8 +3332,10 @@
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -3379,8 +3383,10 @@
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
