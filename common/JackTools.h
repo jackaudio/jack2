@@ -28,6 +28,10 @@
 	#include <dirent.h>
 #endif
 
+#ifdef __APPLE__
+	#include <sys/syslimits.h>
+#endif
+
 namespace Jack
 {
 

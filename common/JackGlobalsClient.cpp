@@ -334,10 +334,6 @@ JackThread* JackFactoryOSXClient::MakeThread(JackRunnableInterface* runnable)
     return new JackMachThread(runnable, PTHREAD_CANCEL_ASYNCHRONOUS);
 }
 
-JackThread* JackFactoryOSXClient::MakeThread(JackRunnableInterface* runnable, int priority)
-{
-    return new JackMachThread(runnable, false, priority, PTHREAD_CANCEL_ASYNCHRONOUS);
-}
 #endif
 
 #if defined(MACH_RPC_FIFO_SEMA) 

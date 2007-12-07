@@ -1,0 +1,17 @@
+/* config.h.in. */
+#ifndef CONFIG_H
+#define CONFIG_H
+
+/* Name of package */
+#define PACKAGE $PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#define PACKAGE_BUGREPORT "<jack-devel@jackaudio.org>"
+
+#define ADDON_DIR "$ADDON_DIR"
+
+#define LIB_DIR "$LIB_DIR"
+
+#define JACK_LOCATION "$JACK_LOCATION"
+
+#endif // CONFIG_H
