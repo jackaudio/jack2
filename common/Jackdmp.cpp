@@ -370,20 +370,6 @@ int main(int argc, char* argv[])
 	CFRelease(ref);
 #endif
 	
-	/*
-    For testing purpose...
-    InternalMetro* client1  = new InternalMetro(1200, 0.4, 20, 80, "metro1");
-    InternalMetro* client2  = new InternalMetro(600, 0.4, 20, 150, "metro2");
-    InternalMetro* client3  = new InternalMetro(1000, 0.4, 20, 110, "metro3");
-    InternalMetro* client4  = new InternalMetro(1200, 0.4, 20, 80, "metro4");
-    InternalMetro* client5  = new InternalMetro(1500, 0.4, 20, 60, "metro5");
-    InternalMetro* client6  = new InternalMetro(1200, 0.4, 20, 84, "metro6");
-    InternalMetro* client7  = new InternalMetro(600, 0.4, 20, 160, "metro7");
-    InternalMetro* client8  = new InternalMetro(1000, 0.4, 20, 113, "metro8");
-    InternalMetro* client9  = new InternalMetro(1200, 0.4, 20, 84, "metro9");
-    InternalMetro* client10  = new InternalMetro(1500, 0.4, 20, 70, "metro10");
-    */
-
     // install a do-nothing handler because otherwise pthreads
     // behaviour is undefined when we enter sigwait.
 

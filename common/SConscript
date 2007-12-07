@@ -44,9 +44,6 @@ srcfiles_common_serverlib = env.Split( '\
      JackTransportEngine.cpp JackServerGlobals.cpp JackServerLaunch.cpp timestamps.c JackTools.cpp \
     ')
 
-# FIXME: this is not pretty
-srcfiles_common_serverlib.append('#/example-clients/internal_metro.cpp')
-
 srcfiles_common_clientlib = env.Split( '\
      JackActivationCount.cpp JackAPI.cpp JackClient.cpp JackConnectionManager.cpp ringbuffer.c  JackServerLaunch.cpp\
      JackError.c JackFrameTimer.cpp JackGlobalsClient.cpp JackGraphManager.cpp JackLibClient.cpp JackLibAPI.cpp JackPort.cpp JackPosixSemaphore.cpp  \
