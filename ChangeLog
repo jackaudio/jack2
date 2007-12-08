@@ -11,10 +11,15 @@ Tom Szilagyi
 Andrzej Szombierski 
 Kjetil S.Matheussen
 Pieter Palmers
+Tim Blechmann
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2007-12-08 Stephane Letz  <letz@grame.fr>
+
+	* Tim Blechmann scons patch.
 
 2007-12-07 Stephane Letz  <letz@grame.fr>
 

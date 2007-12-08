@@ -164,7 +164,7 @@ install the needed packages (remember to also install the *-devel packages)
     # Optional checks follow:
     #
     if build_for_linux and env['ENABLE_ALSA']:
-        env['ALSA_FLAGS'] = conf.GetPKGFlags( 'ALSA', '1.0.0' )
+        env['ALSA_FLAGS'] = conf.GetPKGFlags( 'alsa', '1.0.0' )
         if env['ALSA_FLAGS'] == 0:
             print " Disabling 'alsa' backend since no useful ALSA installation found."
             env['ENABLE_ALSA'] = False
@@ -187,10 +187,8 @@ if env['DEBUG']:
     print "Doing a DEBUG build"
     # -Werror could be added to, which would force the devs to really remove all the warnings :-)
     env.AppendUnique( CCFLAGS=["-DDEBUG","-Wall","-g"] )
-    env.AppendUnique( CFLAGS=["-DDEBUG","-Wall","-g"] )
 else:
     env.AppendUnique( CCFLAGS=["-O3","-DNDEBUG"] )
-    env.AppendUnique( CFLAGS=["-O3","-DNDEBUG"] )
 
 env.AppendUnique( CCFLAGS=["-fPIC", "-DSOCKET_RPC_FIFO_SEMA", "-D__SMP__"] )
 env.AppendUnique( CFLAGS=["-fPIC", "-DUSE_POSIX_SHM"] )
