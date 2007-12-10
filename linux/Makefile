@@ -80,7 +80,7 @@ synchroServer: JackPosixSemaphore.o testSynchroServer.o JackPosixThread.o JackEr
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroServer.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o synchroServer
 
 synchroServerClient: JackPosixSemaphore.o testSynchroServerClient.o JackPosixThread.o JackError.o JackFifo.o JackShmMem.o shm.o
-		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroServerClient.o JackPosixThread.o JackError.o JackFifo.o JackShmMem.o shm.o  $(LIB_LINUX) -o synchroServerClient
+		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSynchroServerClient.o JackPosixThread.o JackError.o JackFifo.o JackShmMem.o shm.o $(LIB_LINUX) -o synchroServerClient
 		
 testSem: JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o 
 		$(CXX) $(CXXFLAGS) JackPosixSemaphore.o testSem.o JackPosixThread.o JackError.o JackFifo.o $(LIB_LINUX) -o testSem

@@ -36,7 +36,7 @@ int JackTools::GetPID()
 #ifdef WIN32
 	return  _getpid();
 #else
-	 return getpid();
+	return getpid();
 #endif
 }
 
@@ -46,7 +46,7 @@ int JackTools::GetUID()
 	return  _getpid();
 	//#error "No getuid function available"
 #else
-	 return getuid();
+	return getuid();
 #endif
 }
 
@@ -104,7 +104,7 @@ char* JackTools::ServerDir(const char* server_name, char* server_dir)
 	/* format the path name into the suppled server_dir char array,
 	 * assuming that server_dir is at least as large as PATH_MAX+1 */
 
-	snprintf(server_dir, PATH_MAX  + 1, "%s/%s", UserDir(), server_name);
+	snprintf(server_dir, PATH_MAX + 1, "%s/%s", UserDir(), server_name);
 	return server_dir;
 }
 
