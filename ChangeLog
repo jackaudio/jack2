@@ -19,7 +19,7 @@ Tim Blechmann
 
 2007-12-11 Stephane Letz  <letz@grame.fr>
 
-	* Change string management for proper compilation with gcc 4.2.2.
+	* Change string management for proper compilation with gcc 4.2.2. JackLog cleanup.
 
 2007-12-08 Stephane Letz  <letz@grame.fr>
 

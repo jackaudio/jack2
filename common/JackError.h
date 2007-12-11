@@ -39,6 +39,8 @@ extern "C"
     EXPORT void JackLog(const char *fmt, ...);
 
     extern int jack_verbose;
+	
+	extern void (*jack_error_callback)(const char *desc);
 
 #ifdef __cplusplus
 }

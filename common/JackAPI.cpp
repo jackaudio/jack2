@@ -237,13 +237,6 @@ static inline void WaitGraphChange()
     }
 }
 
-static void default_jack_error_callback(const char *desc)
-{
-    fprintf(stderr, "%s\n", desc);
-}
-
-void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
-
 EXPORT void jack_set_error_function (void (*func)(const char *))
 {
     jack_error_callback = func;

@@ -30,8 +30,7 @@ EXPORT void jack_error(const char *fmt, ...)
 	char buffer[300];
 	va_start(ap, fmt);
 	vsnprintf(buffer, sizeof(buffer), fmt, ap);
-	//jack_error_callback(buffer);
-	fprintf(stderr, "%s\n", buffer);
+	jack_error_callback(buffer);
 	va_end(ap);
 }
 
@@ -45,4 +44,11 @@ EXPORT void JackLog(const char *fmt,...)
 		va_end(ap);
 	}
 }
+
+static void default_jack_error_callback(const char *desc)
+{
+    fprintf(stderr, "%s\n", desc);
+}
+
+void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
 
