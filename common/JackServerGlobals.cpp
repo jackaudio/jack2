@@ -260,7 +260,7 @@ bool JackServerGlobals::Init()
 
 	#ifndef WIN32
 		if (server_name == NULL)
-			server_name = JackTools::DefaultServerName();
+			server_name = (char*)JackTools::DefaultServerName();
 	#endif
 
 		rc = jack_register_server(server_name, false);

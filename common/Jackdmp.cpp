@@ -307,7 +307,7 @@ int main(int argc, char* argv[])
     }
 
     if (server_name == NULL)
-        server_name = JackTools::DefaultServerName();
+        server_name = (char*)JackTools::DefaultServerName();
 
     copyright(stdout);
 

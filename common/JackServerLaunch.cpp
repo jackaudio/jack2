@@ -71,7 +71,7 @@ static void start_server_aux(const char* server_name)
 	}
 
 	if (!good) {
-		command = JACK_LOCATION "/jackd";
+		command = (char*)(JACK_LOCATION "/jackd");
 		strncpy(arguments, JACK_LOCATION "/jackd -T -d "JACK_DEFAULT_DRIVER, 255);
 	} else {
 		result = strcspn(arguments, " ");

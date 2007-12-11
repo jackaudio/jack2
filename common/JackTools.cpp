@@ -29,7 +29,7 @@ namespace Jack
 {
 
 #define DEFAULT_TMP_DIR "/tmp"
-char* jack_tmpdir = DEFAULT_TMP_DIR;
+char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
 
 int JackTools::GetPID() 
 {
@@ -50,9 +50,9 @@ int JackTools::GetUID()
 #endif
 }
 
-char* JackTools::DefaultServerName()
+const char* JackTools::DefaultServerName()
 {
-    char* server_name;
+    const char* server_name;
     if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
         server_name = "default";
     return server_name;

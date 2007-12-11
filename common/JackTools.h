@@ -42,7 +42,7 @@ namespace Jack
 		
 		static char* UserDir();
 		static char* ServerDir(const char* server_name, char* server_dir);
-		static char* DefaultServerName();
+		static const char* DefaultServerName();
 		static void CleanupFiles(const char* server_name);
 		static int GetTmpdir();
 		static void RewriteName(const char* name, char* new_name);
