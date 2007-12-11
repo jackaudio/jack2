@@ -36,8 +36,8 @@ extern "C"
     }
     jack_varargs_t;
 
-    static char* jack_default_server_name (void) {
-        char *server_name;
+    static const char* jack_default_server_name (void) {
+        const char *server_name;
         if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
             server_name = "default";
         return server_name;
@@ -45,7 +45,7 @@ extern "C"
 
     static inline void jack_varargs_init (jack_varargs_t *va) {
         memset (va, 0, sizeof(jack_varargs_t));
-        va->server_name = jack_default_server_name();
+        va->server_name = (char*)jack_default_server_name();
     }
 
     static inline void jack_varargs_parse (jack_options_t options, va_list ap, jack_varargs_t *va) {

@@ -139,7 +139,7 @@ void usage()
     exit(1);
 }
 
-void Log(char *fmt, ...)
+void Log(const char *fmt, ...)
 {
     if (verbose_mode) {
         va_list ap;

@@ -812,7 +812,7 @@ EXPORT int jack_client_close(jack_client_t *client)
 }
 
 // Library loader
-static bool get_jack_library_in_directory(char* dir_name, char* library_name)
+static bool get_jack_library_in_directory(const char* dir_name, char* library_name)
 {
 	struct dirent * dir_entry;
 	DIR * dir_stream = opendir(dir_name);
