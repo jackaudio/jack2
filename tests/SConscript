@@ -33,7 +33,7 @@ env.AppendUnique( CPPPATH=["#/", "#/common"] )
 test_programs = {
     "synchroClient" : "testSynchroClient.cpp #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
     "synchroServer" : "testSynchroServer.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
-    "synchroServerClient" : "testSynchroServerClient.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp  #/common/JackPthreadCond.cpp",
+    "synchroServerClient" : "testSynchroServerClient.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
     "testSem" : "testSem.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
     "jack_test" : "jack_test.cpp",
 }
