@@ -78,7 +78,7 @@ class JackAlsaDriver : public JackAudioDriver
                                                snd_pcm_uframes_t *capture_offset,
                                                snd_pcm_uframes_t *playback_offset);
 
-        jack_driver_t * alsa_driver_new(char *name, char *playback_alsa_device,
+        jack_driver_t * alsa_driver_new(const char *name, char *playback_alsa_device,
                                         char *capture_alsa_device,
                                         jack_client_t *client,
                                         jack_nframes_t frames_per_cycle,
