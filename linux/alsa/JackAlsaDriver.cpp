@@ -2494,8 +2494,8 @@ extern "C"
         jack_nframes_t srate = 48000;
         jack_nframes_t frames_per_interrupt = 1024;
         unsigned long user_nperiods = 2;
-        char *playback_pcm_name = "hw:0";
-        char *capture_pcm_name = "hw:0";
+        const char *playback_pcm_name = "hw:0";
+        const char *capture_pcm_name = "hw:0";
         int hw_monitoring = FALSE;
         int hw_metering = FALSE;
         int capture = FALSE;

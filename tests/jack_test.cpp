@@ -469,7 +469,7 @@ int main (int argc, char *argv[])
     jack_status_t status;
     char portname[128] = "port";
     char filename[128] = "framefile.ext";
-    char *nullportname = "";
+    const char *nullportname = "";
     int option_index;
     int opt;
     int a = 0;			// working number for in/out port (PHY)...

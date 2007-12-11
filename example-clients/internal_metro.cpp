@@ -48,7 +48,7 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
     int i, attack_length, decay_length;
     double *amp;
     int attack_percent = 1, decay_percent = 10;
-    char *bpm_string = "bpm";
+    const char *bpm_string = "bpm";
 
     offset = 0;
 
