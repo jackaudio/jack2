@@ -36,7 +36,7 @@ extern "C"
 
     EXPORT void jack_error(const char *fmt, ...);
 
-    EXPORT void JackLog(char *fmt, ...);
+    EXPORT void JackLog(const char *fmt, ...);
 
     extern int jack_verbose;
 

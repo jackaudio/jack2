@@ -35,7 +35,7 @@ EXPORT void jack_error(const char *fmt, ...)
 	va_end(ap);
 }
 
-EXPORT void JackLog(char *fmt,...)
+EXPORT void JackLog(const char *fmt,...)
 {
 	if (jack_verbose) {
 		va_list ap;
