@@ -1800,7 +1800,7 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
 }
 
 jack_driver_t *
-JackAlsaDriver::alsa_driver_new (char *name, char *playback_alsa_device,
+JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
                                  char *capture_alsa_device,
                                  jack_client_t *client,
                                  jack_nframes_t frames_per_cycle,
