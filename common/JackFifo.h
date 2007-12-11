@@ -20,6 +20,7 @@ This program is free software; you can redistribute it and/or modify
 #ifndef __JackFifo__
 #define __JackFifo__
 
+
 #include "JackSynchro.h"
 #include <assert.h>
 #include <stdio.h>
