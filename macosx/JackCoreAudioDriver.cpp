@@ -162,30 +162,6 @@ error:
     return err;
 }
 
-#if IO_CPU
-
-OSStatus JackCoreAudioDriver::Render(void *inRefCon,
-                                     AudioUnitRenderActionFlags *ioActionFlags,
-                                     const AudioTimeStamp *inTimeStamp,
-                                     UInt32 inBusNumber,
-                                     UInt32 inNumberFrames,
-                                     AudioBufferList *ioData)
-{
-    JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inRefCon;
-    driver->fLastWaitUst = GetMicroSeconds(); // Take callback date here
-    memcpy(&driver->fActionFags, ioActionFlags, sizeof(AudioUnitRenderActionFlags));
-    memcpy(&driver->fCurrentTime, inTimeStamp, sizeof(AudioTimeStamp));
-    driver->fDriverOutputData = ioData;
-    float delta;
-    OSStatus res = driver->Process();
-    if ((delta = float(GetMicroSeconds() - driver->fLastWaitUst) / float(driver->fEngineControl->fPeriodUsecs)) > 0.1) {
-        JackLog("IO CPU %f\n", delta);
-    }
-    return res;
-}
-
-#else
-
 OSStatus JackCoreAudioDriver::Render(void *inRefCon,
                                      AudioUnitRenderActionFlags *ioActionFlags,
                                      const AudioTimeStamp *inTimeStamp,
@@ -195,17 +171,15 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
 {
 	JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inRefCon;
     driver->fLastWaitUst = GetMicroSeconds(); // Take callback date here
-    memcpy(&driver->fActionFags, ioActionFlags, sizeof(AudioUnitRenderActionFlags));
-    memcpy(&driver->fCurrentTime, inTimeStamp, sizeof(AudioTimeStamp));
-    driver->fDriverOutputData = ioData;
+	driver->fActionFags = ioActionFlags;
+	driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
+	driver->fDriverOutputData = ioData;
     return driver->Process();
 }
 
-#endif
-
 int JackCoreAudioDriver::Read()
 {
-    AudioUnitRender(fAUHAL, &fActionFags, &fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
+	AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
     return 0;
 }
 
@@ -832,16 +806,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
     }
 	
     fDriverOutputData = 0;
-
-#if IO_CPU
-   outSize = sizeof(float);
-    iousage = 0.4f;
-    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyIOCycleUsage, outSize, &iousage);
-    if (err != noErr) {
-        jack_error("Error calling AudioDeviceSetProperty kAudioDevicePropertyIOCycleUsage");
-        printError(err);
-    }
-#endif
 
     // Core driver may have changed the in/out values
     fCaptureChannels = inchannels;

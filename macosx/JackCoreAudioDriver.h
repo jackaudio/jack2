@@ -34,14 +34,11 @@ namespace Jack
 #define kVersion 102
 #define LOG_SAMPLE_DURATION 3	// in millisecond
 
-//#define IO_CPU 1
-
 typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
 #define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
-
 
 /*!
 \brief The CoreAudio driver.
@@ -65,8 +62,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         AudioDeviceID fDeviceID;
 
-        AudioUnitRenderActionFlags fActionFags;
-        AudioTimeStamp fCurrentTime;
+        AudioUnitRenderActionFlags* fActionFags;
+        AudioTimeStamp* fCurrentTime;
 		
 		bool fState;
 

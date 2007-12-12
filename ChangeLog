@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2007-12-12 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup in CoreAudio driver.
+
 2007-12-11 Stephane Letz  <letz@grame.fr>
 
 	* Change string management for proper compilation with gcc 4.2.2. JackLog cleanup.
