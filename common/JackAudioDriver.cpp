@@ -192,10 +192,12 @@ int JackAudioDriver::ProcessAsync()
     }
 
     if (fIsMaster) {
-        fEngine->Process(fLastWaitUst); // fLastWaitUst is set in the "low level" layer
+        if (!fEngine->Process(fLastWaitUst)) // fLastWaitUst is set in the "low level" layer
+			jack_error("JackAudioDriver::ProcessAsync Process error");
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
-        ProcessSlaves();
-    } else {
+		if (ProcessSlaves() < 0) 
+			jack_error("JackAudioDriver::ProcessAsync ProcessSlaves error");
+	} else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     }
     return 0;
