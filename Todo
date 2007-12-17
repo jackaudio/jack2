@@ -2,6 +2,8 @@
   Jackdmp Todo list
 ---------------------
 
+2007-12-16 Dynamic backend switch, so that audio backend can be switch off and replaced by the dummy backend.
+
 2007-10-17 Optimize activation call graph with multiple clients in a process
 
 Andrzej Szombierski recently did interesting test to measure jack client activation speed in different context: jack client opened in separated processes, multiple jack clients running in the server, multiple jack clients running in a same separated process, this using jackd or jackdmp.
