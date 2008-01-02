@@ -21,7 +21,7 @@
 import os
 from string import Template
 
-platform = ARGUMENTS.get('OS', Platform())
+platform = ARGUMENTS.get('OS', str(Platform()))
 
 build_dir = ARGUMENTS.get('BUILDDIR', "")
 if build_dir:

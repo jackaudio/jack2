@@ -759,6 +759,13 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
         matching_ports = NULL;
     }
 
+    if (port_name_pattern && port_name_pattern[0]) {
+        regfree(&port_regex);
+    }
+    if (type_name_pattern && type_name_pattern[0]) {
+        regfree(&type_regex);
+    }
+
     return matching_ports;
 }
 
