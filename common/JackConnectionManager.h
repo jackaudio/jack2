@@ -397,7 +397,7 @@ class JackConnectionManager
     public:
 
         JackConnectionManager();
-        virtual ~JackConnectionManager();
+        ~JackConnectionManager();
 
         // Connections management
         int Connect(jack_port_id_t port_src, jack_port_id_t port_dst);

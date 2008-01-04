@@ -155,7 +155,7 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
 //----------------------------------------------------------------
 // CAS functions
 //----------------------------------------------------------------
-inline char CAS (volatile UInt32 value, UInt32 newvalue, volatile void * addr)
+inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
 {
     register char c;
     __asm {

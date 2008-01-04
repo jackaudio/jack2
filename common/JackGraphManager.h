@@ -55,7 +55,7 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
 
         JackGraphManager() : fBufferSize(0)
         {}
-        virtual ~JackGraphManager()
+        ~JackGraphManager()
         {}
 
         void SetBufferSize(jack_nframes_t buffer_size);
