@@ -95,7 +95,8 @@ class JackAlsaDriver : public JackAudioDriver
                                         int user_playback_nchnls,
                                         int shorts_first,
                                         jack_nframes_t capture_latency,
-                                        jack_nframes_t playback_latency
+                                        jack_nframes_t playback_latency,
+					alsa_midi_t *midi
                                        );
 
         void alsa_driver_delete(alsa_driver_t *driver);
@@ -138,10 +139,12 @@ class JackAlsaDriver : public JackAudioDriver
 				 const char* capture_driver_name,
 				 const char* playback_driver_name,
 				 jack_nframes_t capture_latency,
-				 jack_nframes_t playback_latency);
+				 jack_nframes_t playback_latency,
+				 const char* midi_driver_name);
 
         int Close();
         int Attach();
+        int Detach();
 	
         int Start();
         int Stop();
@@ -150,6 +153,20 @@ class JackAlsaDriver : public JackAudioDriver
         int Write();
 
         int SetBufferSize(jack_nframes_t nframes);
+
+
+    // jack api emulation for the midi driver
+ 
+    int is_realtime() const;
+    int create_thread(pthread_t *thread, int prio, int rt, void *(*start_func)(void*), void *arg);
+ 
+    int port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size);
+    int port_unregister(int port);
+    void* port_get_buffer(int port, jack_nframes_t nframes);
+ 
+    jack_nframes_t get_sample_rate() const;
+    jack_nframes_t frame_time() const;
+    jack_nframes_t last_frame_time() const;
 };
 
 } // end of namespace

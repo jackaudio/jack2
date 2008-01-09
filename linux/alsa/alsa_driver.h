@@ -37,6 +37,8 @@
 #include "driver.h"
 #include "memops.h"
 
+#include "alsa_midi.h"
+
 typedef void (*ReadCopyFunction)  (jack_default_audio_sample_t *dst, char *src,
 				   unsigned long src_bytes,
 				   unsigned long src_skip_bytes);
@@ -138,6 +140,9 @@ typedef struct _alsa_driver {
     int poll_late;
     int xrun_count;
     int process_count;
+    
+    alsa_midi_t *midi;
+    int xrun_recovery;
 
 } alsa_driver_t;
 

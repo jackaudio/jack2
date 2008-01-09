@@ -44,7 +44,9 @@ objects_common_client_lib := JackActivationCount.o JackAPI.o JackClient.o JackCo
 	
 objects_linux_server := Jackdmp.o 
 
-objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o ice1712.o
+objects_linux_alsamidi := alsa_rawmidi.o alsa_seqmidi.o alsa_midi_jackmp.o
+
+objects_linux_alsa := JackAlsaDriver.o memops.o generic_hw.o hdsp.o hammerfall.o ice1712.o $(objects_linux_alsamidi)
 
 objects_linux_freebob := JackFreebobDriver.o
 
@@ -52,8 +54,8 @@ objects_linux_firewire := JackFFADODriver.o
 
 objects_linux_dummy := JackDummyDriver.o  
 
-CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS := -g  -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)/bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+CFLAGS := -g -fPIC -DJACKMP -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+CXXFLAGS := -g  -fPIC -DJACKMP -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)/bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 #CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
 #CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)/bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
@@ -110,7 +112,7 @@ $(TARGET_LINUX_SERVER) : $(objects_linux_server)
 	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackdmp.so -o $(TARGET_LINUX_SERVER)
 
 $(TARGET_LINUX_ALSA) : $(objects_linux_alsa) 
-	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) libjackdmp.so  -o $(TARGET_LINUX_ALSA)
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) ringbuffer.o libjackmp.so libjackdmp.so  -o $(TARGET_LINUX_ALSA)
 
 $(TARGET_LINUX_FREEBOB) : $(objects_linux_freebob) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_freebob) $(LIB_LINUX) -lfreebob libjackdmp.so  -o $(TARGET_LINUX_FREEBOB)

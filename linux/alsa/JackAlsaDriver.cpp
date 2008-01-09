@@ -48,6 +48,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "generic.h"
 #include "memops.h" 
 
+#include "JackPosixThread.h"
+
 namespace Jack
 {
 
@@ -1030,6 +1032,9 @@ JackAlsaDriver::alsa_driver_start (alsa_driver_t *driver)
 	driver->pfd = (struct pollfd *)
 		malloc (sizeof (struct pollfd) * 
 			(driver->playback_nfds + driver->capture_nfds + 2));
+			
+	if (driver->midi && !driver->xrun_recovery)
+		(driver->midi->start)(driver->midi);
 
 	if (driver->playback_handle) {
 		/* fill playback buffer with zeroes, and mark 
@@ -1143,6 +1148,9 @@ JackAlsaDriver::alsa_driver_stop (alsa_driver_t *driver)
     if (driver->hw_monitoring) {
         driver->hw->set_input_monitor_mask (driver->hw, 0);
     }
+    
+    if (driver->midi && !driver->xrun_recovery)
+	(driver->midi->stop)(driver->midi);
 
     return 0;
 }
@@ -1157,9 +1165,12 @@ JackAlsaDriver::alsa_driver_restart (alsa_driver_t *driver)
     	return driver->nt_start((struct _jack_driver_nt *) driver);
     */
 
-    if (Stop())
-        return -1;
-    return Start();
+    driver->xrun_recovery = 1;
+    int res = Stop();
+    if (!res)
+    	res = Start();
+    driver->xrun_recovery = 0;
+    return res;
 }
 
 int
@@ -1547,6 +1558,9 @@ JackAlsaDriver::alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
     if (nframes > driver->frames_per_cycle) {
         return -1;
     }
+    
+    if (driver->midi)
+	(driver->midi->read)(driver->midi, nframes);
 
     nread = 0;
     contiguous = 0;
@@ -1635,6 +1649,9 @@ JackAlsaDriver::alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes
     if (nframes > driver->frames_per_cycle) {
         return -1;
     }
+    
+    if (driver->midi)
+	(driver->midi->write)(driver->midi, nframes);
 
     nwritten = 0;
     contiguous = 0;
@@ -1747,6 +1764,9 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
 {
     JSList *node;
 
+    if (driver->midi)
+	(driver->midi->destroy)(driver->midi);
+
     for (node = driver->clock_sync_listeners; node;
             node = jack_slist_next (node)) {
         free (node->data);
@@ -1817,7 +1837,8 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
                                  int user_playback_nchnls,
                                  int shorts_first,
                                  jack_nframes_t capture_latency,
-                                 jack_nframes_t playback_latency
+                                 jack_nframes_t playback_latency,
+				 alsa_midi_t *midi
                                 )
 {
     int err;
@@ -1840,6 +1861,9 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
     driver = (alsa_driver_t *) calloc (1, sizeof (alsa_driver_t));
 
     jack_driver_nt_init ((jack_driver_nt_t *) driver);
+    
+    driver->midi = midi;
+    driver->xrun_recovery = 0;
 
     //driver->nt_attach = (JackDriverNTAttachFunction) alsa_driver_attach;
     //driver->nt_detach = (JackDriverNTDetachFunction) alsa_driver_detach;
@@ -2133,7 +2157,22 @@ int JackAlsaDriver::Attach()
 		}
 	}
 
+    if (alsa_driver->midi) {
+        int err = (alsa_driver->midi->attach)(alsa_driver->midi);
+        if (err)
+            jack_error ("ALSA: cannot attach MIDI: %d", err);
+    }
+
     return 0;
+}
+
+int JackAlsaDriver::Detach()
+{
+    alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
+    if (alsa_driver->midi)
+        (alsa_driver->midi->detach)(alsa_driver->midi);
+
+    return JackDriver::Detach();
 }
 
 int JackAlsaDriver::Open(jack_nframes_t nframes,
@@ -2152,7 +2191,8 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                          const char* capture_driver_name,
 						 const char* playback_driver_name,
 						 jack_nframes_t capture_latency,
-						 jack_nframes_t playback_latency)
+						 jack_nframes_t playback_latency,
+						 const char* midi_driver_name)
 {
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, 
@@ -2160,6 +2200,12 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
 		capture_latency, playback_latency) != 0) {
         return -1;
     }
+    
+    alsa_midi_t *midi = 0;
+    if (strcmp(midi_driver_name, "seq") == 0)
+		midi = alsa_seqmidi_new((jack_client_t*)this, 0);
+    else if (strcmp(midi_driver_name, "raw") == 0)
+		midi = alsa_rawmidi_new((jack_client_t*)this);
 
     fDriver = alsa_driver_new ("alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
                                NULL,
@@ -2177,7 +2223,8 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
                                outchannels,
                                shorts_first,
                                capture_latency,
-                               playback_latency);
+                               playback_latency,
+							   midi);
     if (fDriver) {
         // ALSA driver may have changed the in/out values
         fCaptureChannels = ((alsa_driver_t *)fDriver)->capture_nchannels;
@@ -2294,6 +2341,57 @@ JackAlsaDriver::jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_run_cycle = 0;
 }
 
+
+int JackAlsaDriver::is_realtime() const
+{
+	return fEngineControl->fRealTime;
+}
+
+int JackAlsaDriver::create_thread(pthread_t *thread, int priority, int realtime, void *(*start_routine)(void*), void *arg)
+{
+	return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
+}
+
+int JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size)
+{
+	return fGraphManager->AllocatePort(fClientControl->fRefNum, port_name, port_type, (JackPortFlags) flags);
+}
+
+int JackAlsaDriver::port_unregister(int port)
+{
+	fGraphManager->ReleasePort(fClientControl->fRefNum, port);
+	return 0;
+}
+
+void* JackAlsaDriver::port_get_buffer(int port, jack_nframes_t nframes)
+{
+	return fGraphManager->GetBuffer(port, nframes);
+}
+
+jack_nframes_t JackAlsaDriver::get_sample_rate() const
+{
+	return fEngineControl->fSampleRate;
+}
+
+jack_nframes_t JackAlsaDriver::frame_time() const
+{
+	JackTimer timer;
+	fEngineControl->ReadFrameTime(&timer);
+    if (timer.fInitialized) {
+		return timer.fFrames +
+			(long) rint(((double) ((GetMicroSeconds() - timer.fCurrentWakeup)) /
+								((jack_time_t)(timer.fNextWakeUp - timer.fCurrentWakeup))) * fEngineControl->fBufferSize);
+	} else
+		return 0;
+}
+
+jack_nframes_t JackAlsaDriver::last_frame_time() const
+{
+    JackTimer timer;
+	fEngineControl->ReadFrameTime(&timer);
+    return timer.fFrames;
+}
+
 } // end of namespace
 
 
@@ -2336,7 +2434,7 @@ extern "C"
 
         desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
         strcpy (desc->name, "alsa");
-        desc->nparams = 17;
+        desc->nparams = 18;
         params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
 
         i = 0;
@@ -2486,6 +2584,14 @@ extern "C"
         strcpy (params[i].short_desc, "Extra output latency");
         strcpy (params[i].long_desc, params[i].short_desc);
 
+        i++;
+        strcpy (params[i].name, "midi-driver");
+        params[i].character = 'X';
+        params[i].type = JackDriverParamString;
+        strcpy (params[i].value.str, "none");
+        strcpy (params[i].short_desc, "ALSA MIDI driver name");
+        strcpy (params[i].long_desc, params[i].short_desc);
+
         desc->params = params;
         return desc;
     }
@@ -2510,6 +2616,7 @@ extern "C"
         jack_nframes_t systemic_output_latency = 0;
         const JSList * node;
         const jack_driver_param_t * param;
+	char *midi_driver = "none";
 
         for (node = params; node; node = jack_slist_next (node)) {
             param = (const jack_driver_param_t *) node->data;
@@ -2601,6 +2708,10 @@ extern "C"
                 case 'O':
                     systemic_output_latency = param->value.ui;
                     break;
+		    
+		case 'X':
+		    midi_driver = strdup(param->value.str);
+		    break;
 
             }
         }
@@ -2616,7 +2727,7 @@ extern "C"
 		// Special open for ALSA driver...
         if (alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor, 
 			user_capture_nchnls, user_playback_nchnls, shorts_first, capture_pcm_name, playback_pcm_name,
-			systemic_input_latency, systemic_output_latency) == 0) {
+			systemic_input_latency, systemic_output_latency, midi_driver) == 0) {
             return threaded_driver;
         } else {
             delete threaded_driver; // Delete the decorated driver

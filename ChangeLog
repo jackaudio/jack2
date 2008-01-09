@@ -19,6 +19,10 @@ Tim Blechmann
 
 2008-01-03 Stephane Letz  <letz@grame.fr>
 
+	*  Dmitry Baikov MIDI patch : alsa_seqmidi and alsa_rammidi drivers.
+
+2008-01-03 Stephane Letz  <letz@grame.fr>
+
 	* Tim Blechmann patch for JackGraphManager::GetPortsAux memory leak, Tim Blechmann patch for scons install.
 
 2007-12-12 Stephane Letz  <letz@grame.fr>
