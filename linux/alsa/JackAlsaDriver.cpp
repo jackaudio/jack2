@@ -57,6 +57,9 @@ typedef long AudioDeviceID;
 
 #define jack_get_microseconds GetMicroSeconds
 
+/* Delay (in process calls) before jackd will report an xrun */
+#define XRUN_REPORT_DELAY 0
+
 void
 JackAlsaDriver::alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver)
 {
@@ -1196,8 +1199,7 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
     }
 
     if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
-            // && driver->process_count > XRUN_REPORT_DELAY) { // steph
-            && driver->process_count > 10) {
+            && driver->process_count > XRUN_REPORT_DELAY) {
         struct timeval now, diff, tstamp;
         driver->xrun_count++;
         gettimeofday(&now, 0);
