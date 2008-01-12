@@ -46,12 +46,13 @@ class JackSocketServerChannel : public JackServerChannelInterface, public JackRu
         std::map<int, std::pair<int, JackClientSocket*> > fSocketTable;
 
         int HandleRequest(int fd);
-        void CreateClient();
+		void BuildPoolTable();
+		
+        void ClientCreate();
         void ClientAdd(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientRemove(int fd, int refnum);
         void ClientKill(int fd);
-        void BuildPoolTable();
-
+   
     public:
 
         JackSocketServerChannel();

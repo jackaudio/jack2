@@ -77,9 +77,9 @@ void JackSocketServerChannel::Close()
     fRequestListenSocket.Close();
 }
 
-void JackSocketServerChannel::CreateClient()
+void JackSocketServerChannel::ClientCreate()
 {
-    JackLog("JackSocketServerChannel::CreateClient socket\n");
+    JackLog("JackSocketServerChannel::ClientCreate socket\n");
     JackClientSocket* socket = fRequestListenSocket.Accept();
     if (socket) {
         fSocketTable[socket->GetFd()] = make_pair( -1, socket);
@@ -413,7 +413,7 @@ bool JackSocketServerChannel::Execute()
         }
 
         if (fPollTable[0].revents & POLLIN) {
-            CreateClient();
+            ClientCreate();
         }
     }
 
