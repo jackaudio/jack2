@@ -45,18 +45,18 @@ struct JackServerGlobals
 
     static bool Init();
     static void Destroy();
-    static int JackStart(const char* server_name, 
-						jack_driver_desc_t* driver_desc, 
-						JSList* driver_params, 
-						int sync, 
-						int temporary, 
-						int time_out_ms, 
-						int rt, 
-						int priority, 
-						int loopback, 
-						int verbose);
-    static int JackStop();
-    static int JackDelete();
+    static int Start(const char* server_name, 
+					jack_driver_desc_t* driver_desc, 
+					JSList* driver_params, 
+					int sync, 
+					int temporary, 
+					int time_out_ms, 
+					int rt, 
+					int priority, 
+					int loopback, 
+					int verbose);
+    static int Stop();
+    static int Delete();
 };
 
 } // end of namespace

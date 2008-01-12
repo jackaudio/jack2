@@ -39,7 +39,7 @@ namespace Jack
 long JackServerGlobals::fClientCount = 0;
 JackServer* JackServerGlobals::fServer = NULL;
 
-int JackServerGlobals::JackStart(const char* server_name, 
+int JackServerGlobals::Start(const char* server_name, 
 								jack_driver_desc_t* driver_desc, 
 								JSList* driver_params, 
 								int sync, 
@@ -56,7 +56,7 @@ int JackServerGlobals::JackStart(const char* server_name,
     return (res < 0) ? res : fServer->Start();
 }
 
-int JackServerGlobals::JackStop()
+int JackServerGlobals::Stop()
 {
     fServer->Stop();
     fServer->Close();
@@ -66,7 +66,7 @@ int JackServerGlobals::JackStop()
     return 0;
 }
 
-int JackServerGlobals::JackDelete()
+int JackServerGlobals::Delete()
 {
     delete fServer;
     JackLog("Jackdmp: delete server\n");
@@ -292,10 +292,10 @@ bool JackServerGlobals::Init()
 			free(argv[i]);
 		}
 		
-		int res = JackStart(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux);
+		int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux);
 		if (res < 0) {
 			jack_error("Cannot start server... exit");
-			JackDelete();
+			Delete();
 			jack_cleanup_shm();
 		#ifndef WIN32
 			JackTools::CleanupFiles(server_name);
@@ -316,7 +316,7 @@ void JackServerGlobals::Destroy()
 {
     if (--fClientCount == 0) {
         JackLog("JackServerGlobals Destroy\n");
-		JackStop();
+		Stop();
 		jack_cleanup_shm();
 	#ifndef WIN32
 		JackTools::CleanupFiles(server_name);
