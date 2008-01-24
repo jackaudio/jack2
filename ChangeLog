@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-01-24 Stephane Letz  <letz@grame.fr>
+
+	*  CoreAudio driver improvement: detect and notify abnormal situations (stopped driver in case of SR change...)
+
 2008-01-03 Stephane Letz  <letz@grame.fr>
 
 	*  Dmitry Baikov MIDI patch : alsa_seqmidi and alsa_rammidi drivers.

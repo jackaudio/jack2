@@ -237,6 +237,8 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
 	return noErr;
 }
 
+// A better implementation would try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
+
 OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         UInt32 inChannel,
         Boolean	isInput,
@@ -248,21 +250,43 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 	switch (inPropertyID) {
 	
 		case kAudioDeviceProcessorOverload:
-			JackLog("JackCoreAudioDriver::NotificationCallback kAudioDeviceProcessorOverload\n");
+			JackLog("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload\n");
 		#ifdef DEBUG
 			//driver->fLogFile->Capture(AudioGetCurrentHostTime() - AudioConvertNanosToHostTime(LOG_SAMPLE_DURATION * 1000000), AudioGetCurrentHostTime(), true, "Captured Latency Log for I/O Cycle Overload\n");
 		#endif
 			driver->NotifyXRun(GetMicroSeconds());
 			break;
 			
+		case kAudioDevicePropertyDeviceIsRunning: {
+			UInt32 outSize = sizeof(UInt32);
+			driver->fStopTime = CFAbsoluteTimeGetCurrent();
+			OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyDeviceIsRunning, &outSize, &driver->fRunning);
+			JackLog("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyDeviceIsRunning  res = %ld\n", driver->fRunning);
+			if (err != noErr) {
+				jack_error("Cannot getkAudioDevicePropertyDeviceIsRunning");
+				printError(err);
+			}
+			break;
+		}
+		
+		case kAudioDevicePropertyStreamConfiguration:
+			JackLog("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyStreamConfiguration \n");
+			//JackLog("GetTotalNumberChannels input = %ld\n", GetTotalNumberChannels(driver->fDeviceID, true));
+			//JackLog("GetTotalNumberChannels output = %ld\n", GetTotalNumberChannels(driver->fDeviceID, false));
+			break;
+			
 		case kAudioDevicePropertyNominalSampleRate: {
+			
 			OSStatus err;
+			UInt32 outSize =  sizeof(Float64);
+			Float64 sampleRate;
+			
+			return noErr; // for now
+			
 			err = AudioOutputUnitStop(driver->fAUHAL);
 			if (err != noErr)
 				jack_error("Error calling AudioOutputUnitStop");
 				
-			UInt32 outSize =  sizeof(Float64);
-			Float64 sampleRate;
 			AudioStreamBasicDescription srcFormat, dstFormat;
 			err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
 			if (err != noErr) {
@@ -270,16 +294,60 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 				printError(err);
 				return kAudioHardwareUnsupportedOperationError;
 			}
-			JackLog("JackCoreAudioDriver::NotificationCallback kAudioDevicePropertyNominalSampleRate %ld\n", long(sampleRate));
+			JackLog("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyNominalSampleRate %ld\n", long(sampleRate));
+			
+				
+			if (sampleRate != driver->fEngineControl->fSampleRate) {
+			
+				// To get SR change notification
+				/*
+				driver->fState = false;
+				err = AudioDeviceAddPropertyListener(driver->fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback, driver);
+				if (err != noErr) {
+					jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyNominalSampleRate");
+					printError(err);
+					return kAudioHardwareUnsupportedOperationError;
+				}
+				*/
+				
+				//sampleRate = driver->fEngineControl->fSampleRate;
+				err = AudioDeviceSetProperty(driver->fDeviceID, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, outSize, &sampleRate);
+				if (err != noErr) {
+					jack_error("Cannot set sample rate = %ld", sampleRate);
+					printError(err);
+					return kAudioHardwareUnsupportedOperationError;
+				}
+				
+				
+				JackLog("JackCoreAudioDriver::DeviceNotificationCallback sampleRate %ld\n", driver->fEngineControl->fSampleRate);
+				
+				/*
+				// Waiting for SR change notification
+				int count = 0;
+				while (!driver->fState && count++ < 100) {
+					usleep(100000);
+					JackLog("Wait count = %ld\n", count);
+				}
+				
+				// Remove SR change notification
+				AudioDeviceRemovePropertyListener(driver->fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback);
+				*/
+			}
+			
+			/*
+			// Update SR for input
+			
+			//Float64 sampleRate = driver->fEngineControl->fSampleRate;
 			outSize = sizeof(AudioStreamBasicDescription);
 			
-			// Update SR for input
 			err = AudioUnitGetProperty(driver->fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &srcFormat, &outSize);
 			if (err != noErr) {
 				jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
 				printError(err);
 			}
+			
 			srcFormat.mSampleRate = sampleRate;
+			//srcFormat.mSampleRate = driver->fEngineControl->fSampleRate;
 			err = AudioUnitSetProperty(driver->fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &srcFormat, outSize);
 			if (err != noErr) {
 				jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
@@ -293,11 +361,14 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 				printError(err);
 			}
 			dstFormat.mSampleRate = sampleRate;
+			//dstFormat.mSampleRate = driver->fEngineControl->fSampleRate;
 			err = AudioUnitSetProperty(driver->fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &dstFormat, outSize);
 			if (err != noErr) {
 				jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
 				printError(err);
 			}
+			*/
+			
 			err = AudioOutputUnitStart(driver->fAUHAL);
 			if (err != noErr)
 				jack_error("Error calling AudioOutputUnitStart");
@@ -384,54 +455,35 @@ OSStatus JackCoreAudioDriver::GetDeviceNameFromID(AudioDeviceID id, char* name)
 
 OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, long* channelCount, bool isInput)
 {
-    OSStatus	err = noErr;
+    OSStatus err = noErr;
     UInt32	outSize;
     Boolean	outWritable;
-    AudioBufferList*	bufferList = 0;
-    AudioStreamID*	streamList = 0;
-    int	i, numStream;
-
-    err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreams, &outSize, &outWritable);
-    if (err == noErr) {
-        streamList = (AudioStreamID*)malloc(outSize);
-        numStream = outSize / sizeof(AudioStreamID);
-        JackLog("GetTotalChannels device stream number = %ld numStream = %ld\n", device, numStream);
-        err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreams, &outSize, streamList);
-        if (err == noErr) {
-            AudioStreamBasicDescription streamDesc;
-            outSize = sizeof(AudioStreamBasicDescription);
-            for (i = 0; i < numStream; i++) {
-                err = AudioStreamGetProperty(streamList[i], 0, kAudioDevicePropertyStreamFormat, &outSize, &streamDesc);
-                JackLog("GetTotalChannels streamDesc mFormatFlags = %ld mChannelsPerFrame = %ld\n", streamDesc.mFormatFlags, streamDesc.mChannelsPerFrame);
-            }
-        }
-    }
-
+    AudioBufferList* bufferList = 0;
+  	
     *channelCount = 0;
     err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, &outWritable);
     if (err == noErr) {
         bufferList = (AudioBufferList*)malloc(outSize);
         err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, bufferList);
         if (err == noErr) {
-            for (i = 0; i < bufferList->mNumberBuffers; i++)
+            for (unsigned int i = 0; i < bufferList->mNumberBuffers; i++)
                 *channelCount += bufferList->mBuffers[i].mNumberChannels;
         }
+		
+		if (bufferList)
+			free(bufferList);
     }
-
-    if (streamList)
-        free(streamList);
-    if (bufferList)
-        free(bufferList);
 
     return err;
 }
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
-        : JackAudioDriver(name, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false)
+        : JackAudioDriver(name, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fStopTime(0), fRunning(true)
 {
 #ifdef DEBUG
     //fLogFile = new CALatencyLog("jackmp_latency", ".txt");
 #endif
+	fThread = JackGlobals::MakeThread(this);
 }
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
@@ -439,6 +491,28 @@ JackCoreAudioDriver::~JackCoreAudioDriver()
 #ifdef DEBUG
     //delete fLogFile;
 #endif
+	fThread->Kill();
+	delete fThread;
+}
+
+bool JackCoreAudioDriver::Execute()
+{
+	while (true) {
+		JackLog("Check device running...\n");
+		if (!fRunning && CFAbsoluteTimeGetCurrent() > fStopTime + 3.0) {
+			jack_error("Critical error : device not running anymore...");
+			// Send notification to be used in JackPilot or JackRouter plugin 
+			CFStringRef ref = CFStringCreateWithCString(NULL, fEngineControl->fServerName, kCFStringEncodingMacRoman);
+			CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
+															CFSTR("com.grame.jackserver.stop"),
+															ref,
+															NULL,
+															kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+			CFRelease(ref);
+		}
+		usleep(2000000);
+	}
+	return false;
 }
 
 int JackCoreAudioDriver::Open(jack_nframes_t nframes,
@@ -529,7 +603,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0) {
         return -1;
     }
-
+		
     if (capturing) {
         err = GetTotalChannels(fDeviceID, &in_nChannels, true);
         if (err != noErr) {
@@ -805,7 +879,30 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
         goto error;
     }
 	
+	err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyDeviceIsRunning");
+        printError(err1);
+        goto error;
+    }
+	
+	err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyStreamConfiguration");
+        printError(err1);
+        goto error;
+    }
+
+	err = AudioDeviceAddPropertyListener(fDeviceID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyStreamConfiguration");
+        printError(err1);
+        goto error;
+    }
+
     fDriverOutputData = 0;
+	// Start checking thread...
+	fThread->Start();
 
     // Core driver may have changed the in/out values
     fCaptureChannels = inchannels;
@@ -828,9 +925,15 @@ int JackCoreAudioDriver::Close()
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
 	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
 	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
+	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback);
+	AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback);
+	AudioDeviceRemovePropertyListener(fDeviceID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback);
+	
     free(fJackInputData);
     AudioUnitUninitialize(fAUHAL);
     CloseComponent(fAUHAL);
+	// Kill checking thread...
+	fThread->Kill();
     return 0;
 }
 

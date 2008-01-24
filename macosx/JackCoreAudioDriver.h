@@ -25,6 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <AudioUnit/AudioUnit.h>
 #include "JackAudioDriver.h"
 #include "JackTime.h"
+#include "JackThread.h"
 
 #include "/Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h"
 
@@ -46,7 +47,7 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 \todo hardware monitoring
 */
 
-class JackCoreAudioDriver : public JackAudioDriver
+class JackCoreAudioDriver : public JackAudioDriver,  public JackRunnableInterface
 {
 
     private:
@@ -66,7 +67,10 @@ class JackCoreAudioDriver : public JackAudioDriver
         AudioTimeStamp* fCurrentTime;
 		
 		bool fState;
-
+		CFAbsoluteTime fStopTime;
+		UInt32 fRunning;
+		JackThread*	fThread;  
+	
         static	OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
@@ -130,6 +134,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         int Write();
 
         int SetBufferSize(jack_nframes_t buffer_size);
+		
+		bool Execute();
 };
 
 } // end of namespace
