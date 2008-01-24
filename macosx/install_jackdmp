@@ -2,7 +2,7 @@
 
 # Plug-ins
 sudo cp -r Panda.framework /Library/Frameworks
-sudo cp -r JackRouterMP.plugin /Library/Audio/Plug-Ins/HAL/
+sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
 
 # Copy libraries and exe
 sudo cp -r Jackmp.framework /Library/Frameworks/  

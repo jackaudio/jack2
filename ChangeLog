@@ -19,7 +19,7 @@ Tim Blechmann
 
 2008-01-24 Stephane Letz  <letz@grame.fr>
 
-	*  CoreAudio driver improvement: detect and notify abnormal situations (stopped driver in case of SR change...)
+	*  CoreAudio driver improvement: detect and notify abnormal situations (stopped driver in case of SR change...).
 
 2008-01-03 Stephane Letz  <letz@grame.fr>
 
