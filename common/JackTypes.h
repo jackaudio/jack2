@@ -21,6 +21,23 @@
 #ifndef __JackTypes__
 #define __JackTypes__
 
+typedef unsigned short UInt16;
+#if __LP64__
+typedef unsigned int UInt32;
+typedef signed int   SInt32;
+#else
+typedef unsigned long UInt32;
+typedef signed long   SInt32;
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+typedef ULONGLONG UInt64;
+#else
+typedef unsigned long long UInt64;
+#endif
+
+
 namespace Jack
 {
 

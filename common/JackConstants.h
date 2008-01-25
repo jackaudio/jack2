@@ -85,12 +85,14 @@ namespace Jack
 
 typedef uint16_t jack_int_t;  // Internal type for ports and refnum
 
+/*
 typedef enum {
     NotTriggered,
     Triggered,
     Running,
     Finished,
 } jack_client_state_t;
+*/
 
 } // end of namespace
 

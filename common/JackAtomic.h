@@ -20,13 +20,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackAtomic__
 #define __JackAtomic__
 
+#include "JackTypes.h"
+
+/*
 typedef unsigned short UInt16;
 #if __LP64__
-typedef unsigned int       UInt32;
-typedef signed int         SInt32;
+typedef unsigned int UInt32;
+typedef signed int   SInt32;
 #else
-typedef unsigned long      UInt32;
-typedef signed long        SInt32;
+typedef unsigned long UInt32;
+typedef signed long   SInt32;
 #endif
 
 #ifdef WIN32
@@ -35,6 +38,7 @@ typedef ULONGLONG UInt64;
 #else
 typedef unsigned long long UInt64;
 #endif
+*/
 
 #if defined(__APPLE__)
 
