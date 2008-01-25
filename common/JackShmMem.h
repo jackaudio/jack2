@@ -99,7 +99,7 @@ class JackShmMem
     protected:
 
         jack_shm_info_t fInfo;
-        static unsigned long fSegmentNum;
+		static unsigned int fSegmentNum;
         static jack_shm_info_t gInfo;
 
     public:
@@ -153,16 +153,16 @@ class JackShmReadWritePtr
 
         void Init(int index, const char* server_name = "default")
         {
-            if (fInfo.index < 0 && index >= 0) {
+			if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmReadWritePtr::Init %ld %ld\n", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
-                    throw - 1;
+                    throw -1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
                     //jack_error("cannot attach shared memory segment", strerror(errno));
-                    throw - 2;
+                    throw -2;
                 }
-            }
+			}
         }
 
     public:
@@ -189,12 +189,12 @@ class JackShmReadWritePtr
 
         T* operator->() const
         {
-            return (T*)fInfo.attached_at;
+	        return (T*)fInfo.attached_at;
         }
 
         operator T*() const
         {
-            return (T*)fInfo.attached_at;
+			return (T*)fInfo.attached_at;
         }
 
         JackShmReadWritePtr& operator=(int index)
@@ -215,7 +215,7 @@ class JackShmReadWritePtr
 
         T* GetShmAddress()
         {
-            return (T*)fInfo.attached_at;
+	         return (T*)fInfo.attached_at;
         }
 };
 
@@ -236,13 +236,13 @@ class JackShmReadWritePtr1
             if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmReadWritePtr1::Init %ld %ld\n", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
-                    throw - 1;
+                    throw -1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
                     //jack_error("cannot attach shared memory segment", strerror(errno));
-                    throw - 2;
+                    throw -2;
                 }
-                /*
+				/*
                 nobody else needs to access this shared memory any more, so
                 destroy it. because we have our own attachment to it, it won't
                 vanish till we exit (and release it).
@@ -275,7 +275,7 @@ class JackShmReadWritePtr1
 
         T* operator->() const
         {
-            return (T*)fInfo.attached_at;
+			return (T*)fInfo.attached_at;
         }
 
         operator T*() const
@@ -301,7 +301,7 @@ class JackShmReadWritePtr1
 
         T* GetShmAddress()
         {
-            return (T*)fInfo.attached_at;
+			return (T*)fInfo.attached_at;
         }
 };
 
@@ -374,14 +374,14 @@ class JackShmReadPtr
             Init(index, server_name);
         }
 
-        int GetShmIndex()
+        int GetShmIndex() 
         {
             return fInfo.index;
         }
 
         T* GetShmAddress()
         {
-            return (T*)fInfo.attached_at;
+			return (T*)fInfo.attached_at;
         }
 
 };

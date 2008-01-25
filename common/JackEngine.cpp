@@ -369,6 +369,8 @@ int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int 
 	*status = 0;
 	strcpy(name_res, name);
 	
+	JackLog("Check protocol client  %ld server = %ld\n", protocol, JACK_PROTOCOL_VERSION);
+	
 	if (protocol != JACK_PROTOCOL_VERSION) {
 		*status |= (JackFailure | JackVersionError);
 		jack_error("JACK protocol mismatch (%d vs %d)", protocol, JACK_PROTOCOL_VERSION);
@@ -616,7 +618,7 @@ int JackEngine::ClientDeactivate(int refnum)
 // Port management
 //-----------------
 
-int JackEngine::PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index)
+int JackEngine::PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index)
 {
     JackLog("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d\n", refnum, name, type, flags, buffer_size);
     assert(fClientTable[refnum]);

@@ -37,8 +37,8 @@ class JackActivationCount
 
     private:
 
-        long fValue;
-        long fCount;
+		SInt32 fValue;
+        SInt32 fCount;
 
     public:
 

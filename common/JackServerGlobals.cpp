@@ -36,7 +36,8 @@ static char* server_name = NULL;
 namespace Jack
 {
 
-long JackServerGlobals::fClientCount = 0;
+//long JackServerGlobals::fClientCount = 0;
+unsigned int JackServerGlobals::fClientCount = 0;
 JackServer* JackServerGlobals::fServer = NULL;
 
 int JackServerGlobals::Start(const char* server_name, 

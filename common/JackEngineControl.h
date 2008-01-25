@@ -42,7 +42,7 @@ class JackGraphManager;
 
 struct JackTimingMeasureClient
 {
-    int fRefNum;
+	int fRefNum;
     jack_time_t	fSignaledAt;
     jack_time_t	fAwakeAt;
     jack_time_t	fFinishedAt;
@@ -55,7 +55,7 @@ struct JackTimingMeasureClient
 
 struct JackTimingMeasure
 {
-    long fAudioCycle;
+	unsigned int fAudioCycle;
     jack_time_t fEngineTime;
     JackTimingMeasureClient fClientTable[CLIENT_NUM];
 };
@@ -75,7 +75,7 @@ struct JackEngineControl : public JackShmMem
     jack_time_t fTimeOutUsecs;
 	bool fTimeOut;
 	bool fRealTime;
-	int32_t fPriority;
+	int fPriority;
 	char fServerName[64];
     JackTransportEngine fTransport;
     bool fVerbose;
@@ -88,7 +88,7 @@ struct JackEngineControl : public JackShmMem
 	jack_time_t fLastProcessTime;
 	jack_time_t fSpareUsecs;
 	jack_time_t fMaxUsecs;
-	uint32_t fAudioCycle;
+	unsigned int fAudioCycle;
 	jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
 	int	fRollingClientUsecsCnt;
 	int	fRollingClientUsecsIndex;

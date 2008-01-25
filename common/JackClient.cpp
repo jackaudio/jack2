@@ -412,7 +412,7 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
     JackLog("JackClient::PortRegister ref = %ld  name = %s type = %s\n", GetClientControl()->fRefNum, name.c_str(), port_type);
 
     int result = -1;
-    jack_port_id_t port_index = NO_PORT;
+    unsigned int port_index = NO_PORT;
     fChannel->PortRegister(GetClientControl()->fRefNum, name.c_str(), port_type, flags, buffer_size, &port_index, &result);
     JackLog("JackClient::PortRegister port_index = %ld \n", port_index);
 

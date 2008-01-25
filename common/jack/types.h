@@ -91,7 +91,7 @@ typedef struct _jack_client jack_client_t;
  *  Ports have unique ids. A port registration callback is the only
  *  place you ever need to know their value.
  */
-#if defined(__x86_64__)
+#if defined(__x86_64__) || defined(__ppc64__)
 typedef uint64_t jack_port_id_t;
 #else
 typedef uint32_t jack_port_id_t;

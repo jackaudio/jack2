@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Oct 25 10:49:38 2007
- * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
+ * stub generated Thu Jan  3 14:42:41 2008
+ * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
  * OPTIONS: 
  */
 
@@ -742,7 +742,7 @@ mig_internal novalue _Xrpc_jack_client_rt_notify
 	(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
 
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_open_t__defined)
 #define __MIG_check__Request__rpc_jack_client_open_t__defined
@@ -807,7 +807,7 @@ mig_internal novalue _Xrpc_jack_client_rt_notify
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_open_t(__Request__rpc_jack_client_open_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_open_t(__attribute__((__unused__)) __Request__rpc_jack_client_open_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_open_t __Request;
@@ -941,7 +941,7 @@ mig_internal novalue _Xrpc_jack_client_open
 	__AfterRcvRpc(1000, "rpc_jack_client_open")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_check_t__defined)
 #define __MIG_check__Request__rpc_jack_client_check_t__defined
@@ -1126,7 +1126,7 @@ mig_internal novalue _Xrpc_jack_client_open
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_check_t__options__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_check_t(__Request__rpc_jack_client_check_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_check_t(__attribute__((__unused__)) __Request__rpc_jack_client_check_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_check_t __Request;
@@ -1265,7 +1265,7 @@ mig_internal novalue _Xrpc_jack_client_check
 	__AfterRcvRpc(1001, "rpc_jack_client_check")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_close_t__defined)
 #define __MIG_check__Request__rpc_jack_client_close_t__defined
@@ -1330,7 +1330,7 @@ mig_internal novalue _Xrpc_jack_client_check
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_close_t__refnum__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_close_t(__Request__rpc_jack_client_close_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_close_t(__attribute__((__unused__)) __Request__rpc_jack_client_close_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_close_t __Request;
@@ -1439,7 +1439,7 @@ mig_internal novalue _Xrpc_jack_client_close
 	__AfterRcvRpc(1002, "rpc_jack_client_close")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_activate_t__defined)
 #define __MIG_check__Request__rpc_jack_client_activate_t__defined
@@ -1504,7 +1504,7 @@ mig_internal novalue _Xrpc_jack_client_close
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_activate_t__refnum__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_activate_t(__Request__rpc_jack_client_activate_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_activate_t(__attribute__((__unused__)) __Request__rpc_jack_client_activate_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_activate_t __Request;
@@ -1613,7 +1613,7 @@ mig_internal novalue _Xrpc_jack_client_activate
 	__AfterRcvRpc(1003, "rpc_jack_client_activate")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_deactivate_t__defined)
 #define __MIG_check__Request__rpc_jack_client_deactivate_t__defined
@@ -1678,7 +1678,7 @@ mig_internal novalue _Xrpc_jack_client_activate
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_deactivate_t__refnum__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_deactivate_t(__Request__rpc_jack_client_deactivate_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_deactivate_t(__attribute__((__unused__)) __Request__rpc_jack_client_deactivate_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_deactivate_t __Request;
@@ -1787,7 +1787,7 @@ mig_internal novalue _Xrpc_jack_client_deactivate
 	__AfterRcvRpc(1004, "rpc_jack_client_deactivate")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_port_register_t__defined)
 #define __MIG_check__Request__rpc_jack_port_register_t__defined
@@ -2092,7 +2092,7 @@ mig_internal novalue _Xrpc_jack_client_deactivate
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_register_t__buffer_size__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__Request__rpc_jack_port_register_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__attribute__((__unused__)) __Request__rpc_jack_port_register_t *In0P)
 {
 
 	typedef __Request__rpc_jack_port_register_t __Request;
@@ -2258,7 +2258,7 @@ mig_internal novalue _Xrpc_jack_port_register
 	__AfterRcvRpc(1005, "rpc_jack_port_register")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_port_unregister_t__defined)
 #define __MIG_check__Request__rpc_jack_port_unregister_t__defined
@@ -2383,7 +2383,7 @@ mig_internal novalue _Xrpc_jack_port_register
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_unregister_t__port__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_unregister_t(__Request__rpc_jack_port_unregister_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_unregister_t(__attribute__((__unused__)) __Request__rpc_jack_port_unregister_t *In0P)
 {
 
 	typedef __Request__rpc_jack_port_unregister_t __Request;
@@ -2506,7 +2506,7 @@ mig_internal novalue _Xrpc_jack_port_unregister
 	__AfterRcvRpc(1006, "rpc_jack_port_unregister")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_port_connect_t__defined)
 #define __MIG_check__Request__rpc_jack_port_connect_t__defined
@@ -2691,7 +2691,7 @@ mig_internal novalue _Xrpc_jack_port_unregister
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_connect_t__dst__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_connect_t(__Request__rpc_jack_port_connect_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_connect_t(__attribute__((__unused__)) __Request__rpc_jack_port_connect_t *In0P)
 {
 
 	typedef __Request__rpc_jack_port_connect_t __Request;
@@ -2828,7 +2828,7 @@ mig_internal novalue _Xrpc_jack_port_connect
 	__AfterRcvRpc(1007, "rpc_jack_port_connect")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_port_disconnect_t__defined)
 #define __MIG_check__Request__rpc_jack_port_disconnect_t__defined
@@ -3013,7 +3013,7 @@ mig_internal novalue _Xrpc_jack_port_connect
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_disconnect_t__dst__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_disconnect_t(__Request__rpc_jack_port_disconnect_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_disconnect_t(__attribute__((__unused__)) __Request__rpc_jack_port_disconnect_t *In0P)
 {
 
 	typedef __Request__rpc_jack_port_disconnect_t __Request;
@@ -3150,7 +3150,7 @@ mig_internal novalue _Xrpc_jack_port_disconnect
 	__AfterRcvRpc(1008, "rpc_jack_port_disconnect")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_port_connect_name_t__defined)
 #define __MIG_check__Request__rpc_jack_port_connect_name_t__defined
@@ -3335,7 +3335,7 @@ mig_internal novalue _Xrpc_jack_port_disconnect
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_connect_name_t__dst__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_connect_name_t(__Request__rpc_jack_port_connect_name_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_connect_name_t(__attribute__((__unused__)) __Request__rpc_jack_port_connect_name_t *In0P)
 {
 
 	typedef __Request__rpc_jack_port_connect_name_t __Request;
@@ -3472,7 +3472,7 @@ mig_internal novalue _Xrpc_jack_port_connect_name
 	__AfterRcvRpc(1009, "rpc_jack_port_connect_name")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_port_disconnect_name_t__defined)
 #define __MIG_check__Request__rpc_jack_port_disconnect_name_t__defined
@@ -3657,7 +3657,7 @@ mig_internal novalue _Xrpc_jack_port_connect_name
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_port_disconnect_name_t__dst__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_disconnect_name_t(__Request__rpc_jack_port_disconnect_name_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_disconnect_name_t(__attribute__((__unused__)) __Request__rpc_jack_port_disconnect_name_t *In0P)
 {
 
 	typedef __Request__rpc_jack_port_disconnect_name_t __Request;
@@ -3794,7 +3794,7 @@ mig_internal novalue _Xrpc_jack_port_disconnect_name
 	__AfterRcvRpc(1010, "rpc_jack_port_disconnect_name")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_set_buffer_size_t__defined)
 #define __MIG_check__Request__rpc_jack_set_buffer_size_t__defined
@@ -3859,7 +3859,7 @@ mig_internal novalue _Xrpc_jack_port_disconnect_name
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_set_buffer_size_t__buffer_size__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_set_buffer_size_t(__Request__rpc_jack_set_buffer_size_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_set_buffer_size_t(__attribute__((__unused__)) __Request__rpc_jack_set_buffer_size_t *In0P)
 {
 
 	typedef __Request__rpc_jack_set_buffer_size_t __Request;
@@ -3968,7 +3968,7 @@ mig_internal novalue _Xrpc_jack_set_buffer_size
 	__AfterRcvRpc(1011, "rpc_jack_set_buffer_size")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_set_freewheel_t__defined)
 #define __MIG_check__Request__rpc_jack_set_freewheel_t__defined
@@ -4033,7 +4033,7 @@ mig_internal novalue _Xrpc_jack_set_buffer_size
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_set_freewheel_t__onoff__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_set_freewheel_t(__Request__rpc_jack_set_freewheel_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_set_freewheel_t(__attribute__((__unused__)) __Request__rpc_jack_set_freewheel_t *In0P)
 {
 
 	typedef __Request__rpc_jack_set_freewheel_t __Request;
@@ -4142,7 +4142,7 @@ mig_internal novalue _Xrpc_jack_set_freewheel
 	__AfterRcvRpc(1012, "rpc_jack_set_freewheel")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_release_timebase_t__defined)
 #define __MIG_check__Request__rpc_jack_release_timebase_t__defined
@@ -4207,7 +4207,7 @@ mig_internal novalue _Xrpc_jack_set_freewheel
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_release_timebase_t__refnum__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_release_timebase_t(__Request__rpc_jack_release_timebase_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_release_timebase_t(__attribute__((__unused__)) __Request__rpc_jack_release_timebase_t *In0P)
 {
 
 	typedef __Request__rpc_jack_release_timebase_t __Request;
@@ -4316,7 +4316,7 @@ mig_internal novalue _Xrpc_jack_release_timebase
 	__AfterRcvRpc(1013, "rpc_jack_release_timebase")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_set_timebase_callback_t__defined)
 #define __MIG_check__Request__rpc_jack_set_timebase_callback_t__defined
@@ -4441,7 +4441,7 @@ mig_internal novalue _Xrpc_jack_release_timebase
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_set_timebase_callback_t__conditional__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_set_timebase_callback_t(__Request__rpc_jack_set_timebase_callback_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_set_timebase_callback_t(__attribute__((__unused__)) __Request__rpc_jack_set_timebase_callback_t *In0P)
 {
 
 	typedef __Request__rpc_jack_set_timebase_callback_t __Request;
@@ -4564,7 +4564,7 @@ mig_internal novalue _Xrpc_jack_set_timebase_callback
 	__AfterRcvRpc(1014, "rpc_jack_set_timebase_callback")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_get_internal_clientname_t__defined)
 #define __MIG_check__Request__rpc_jack_get_internal_clientname_t__defined
@@ -4689,7 +4689,7 @@ mig_internal novalue _Xrpc_jack_set_timebase_callback
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_get_internal_clientname_t__int_ref__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_get_internal_clientname_t(__Request__rpc_jack_get_internal_clientname_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_get_internal_clientname_t(__attribute__((__unused__)) __Request__rpc_jack_get_internal_clientname_t *In0P)
 {
 
 	typedef __Request__rpc_jack_get_internal_clientname_t __Request;
@@ -4813,7 +4813,7 @@ mig_internal novalue _Xrpc_jack_get_internal_clientname
 	__AfterRcvRpc(1015, "rpc_jack_get_internal_clientname")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_internal_clienthandle_t__defined)
 #define __MIG_check__Request__rpc_jack_internal_clienthandle_t__defined
@@ -4938,7 +4938,7 @@ mig_internal novalue _Xrpc_jack_get_internal_clientname
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_internal_clienthandle_t__client_name__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clienthandle_t(__Request__rpc_jack_internal_clienthandle_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clienthandle_t(__attribute__((__unused__)) __Request__rpc_jack_internal_clienthandle_t *In0P)
 {
 
 	typedef __Request__rpc_jack_internal_clienthandle_t __Request;
@@ -5063,7 +5063,7 @@ mig_internal novalue _Xrpc_jack_internal_clienthandle
 	__AfterRcvRpc(1016, "rpc_jack_internal_clienthandle")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_internal_clientload_t__defined)
 #define __MIG_check__Request__rpc_jack_internal_clientload_t__defined
@@ -5368,7 +5368,7 @@ mig_internal novalue _Xrpc_jack_internal_clienthandle
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_internal_clientload_t__options__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clientload_t(__Request__rpc_jack_internal_clientload_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clientload_t(__attribute__((__unused__)) __Request__rpc_jack_internal_clientload_t *In0P)
 {
 
 	typedef __Request__rpc_jack_internal_clientload_t __Request;
@@ -5535,7 +5535,7 @@ mig_internal novalue _Xrpc_jack_internal_clientload
 	__AfterRcvRpc(1017, "rpc_jack_internal_clientload")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_internal_clientunload_t__defined)
 #define __MIG_check__Request__rpc_jack_internal_clientunload_t__defined
@@ -5660,7 +5660,7 @@ mig_internal novalue _Xrpc_jack_internal_clientload
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_internal_clientunload_t__int_ref__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clientunload_t(__Request__rpc_jack_internal_clientunload_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clientunload_t(__attribute__((__unused__)) __Request__rpc_jack_internal_clientunload_t *In0P)
 {
 
 	typedef __Request__rpc_jack_internal_clientunload_t __Request;
@@ -5784,7 +5784,7 @@ mig_internal novalue _Xrpc_jack_internal_clientunload
 	__AfterRcvRpc(1018, "rpc_jack_internal_clientunload")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_rt_notify_t__defined)
 #define __MIG_check__Request__rpc_jack_client_rt_notify_t__defined
@@ -5969,7 +5969,7 @@ mig_internal novalue _Xrpc_jack_internal_clientunload
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_rt_notify_t__value__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_rt_notify_t(__Request__rpc_jack_client_rt_notify_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_rt_notify_t(__attribute__((__unused__)) __Request__rpc_jack_client_rt_notify_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_rt_notify_t __Request;

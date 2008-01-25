@@ -81,7 +81,7 @@ rpc_type server_rpc_jack_client_deactivate(mach_port_t private_port, int refnum,
 // Port management
 //-----------------
 
-rpc_type server_rpc_jack_port_register(mach_port_t private_port, int refnum, client_port_name_t name, client_port_type_t type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
+rpc_type server_rpc_jack_port_register(mach_port_t private_port, int refnum, client_port_name_t name, client_port_type_t type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
 {
     JackLog("rpc_jack_port_register %ld %s\n", refnum, name);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];

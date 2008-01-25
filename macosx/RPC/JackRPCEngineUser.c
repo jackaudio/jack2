@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Oct 25 10:49:38 2007
- * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
+ * stub generated Thu Jan  3 14:42:41 2008
+ * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCEngine_subsystem__ 1
@@ -482,7 +482,6 @@ mig_external kern_return_t rpc_jack_client_open
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -594,7 +593,6 @@ mig_external kern_return_t rpc_jack_client_open
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -910,7 +908,6 @@ mig_external kern_return_t rpc_jack_client_check
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -1017,7 +1014,6 @@ mig_external kern_return_t rpc_jack_client_check
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -1179,7 +1175,6 @@ mig_external kern_return_t rpc_jack_client_close
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -1272,7 +1267,6 @@ mig_external kern_return_t rpc_jack_client_close
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -1434,7 +1428,6 @@ mig_external kern_return_t rpc_jack_client_activate
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -1527,7 +1520,6 @@ mig_external kern_return_t rpc_jack_client_activate
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -1689,7 +1681,6 @@ mig_external kern_return_t rpc_jack_client_deactivate
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -1782,7 +1773,6 @@ mig_external kern_return_t rpc_jack_client_deactivate
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -2024,7 +2014,6 @@ mig_external kern_return_t rpc_jack_port_register
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -2133,7 +2122,6 @@ mig_external kern_return_t rpc_jack_port_register
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -2296,7 +2284,6 @@ mig_external kern_return_t rpc_jack_port_unregister
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -2392,7 +2379,6 @@ mig_external kern_return_t rpc_jack_port_unregister
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -2556,7 +2542,6 @@ mig_external kern_return_t rpc_jack_port_connect
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -2655,7 +2640,6 @@ mig_external kern_return_t rpc_jack_port_connect
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -2819,7 +2803,6 @@ mig_external kern_return_t rpc_jack_port_disconnect
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -2918,7 +2901,6 @@ mig_external kern_return_t rpc_jack_port_disconnect
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -3082,7 +3064,6 @@ mig_external kern_return_t rpc_jack_port_connect_name
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -3181,7 +3162,6 @@ mig_external kern_return_t rpc_jack_port_connect_name
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -3345,7 +3325,6 @@ mig_external kern_return_t rpc_jack_port_disconnect_name
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -3444,7 +3423,6 @@ mig_external kern_return_t rpc_jack_port_disconnect_name
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -3606,7 +3584,6 @@ mig_external kern_return_t rpc_jack_set_buffer_size
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -3699,7 +3676,6 @@ mig_external kern_return_t rpc_jack_set_buffer_size
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -3861,7 +3837,6 @@ mig_external kern_return_t rpc_jack_set_freewheel
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -3954,7 +3929,6 @@ mig_external kern_return_t rpc_jack_set_freewheel
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -4116,7 +4090,6 @@ mig_external kern_return_t rpc_jack_release_timebase
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -4209,7 +4182,6 @@ mig_external kern_return_t rpc_jack_release_timebase
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -4372,7 +4344,6 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -4468,7 +4439,6 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -4707,7 +4677,6 @@ mig_external kern_return_t rpc_jack_get_internal_clientname
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -4807,7 +4776,6 @@ mig_external kern_return_t rpc_jack_get_internal_clientname
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -5122,7 +5090,6 @@ mig_external kern_return_t rpc_jack_internal_clienthandle
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -5226,7 +5193,6 @@ mig_external kern_return_t rpc_jack_internal_clienthandle
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -5544,7 +5510,6 @@ mig_external kern_return_t rpc_jack_internal_clientload
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -5657,7 +5622,6 @@ mig_external kern_return_t rpc_jack_internal_clientload
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 #if ( __MigTypeCheck || __NDR_convert__ )
@@ -5896,7 +5860,6 @@ mig_external kern_return_t rpc_jack_internal_clientunload
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -5996,7 +5959,6 @@ mig_external kern_return_t rpc_jack_internal_clientunload
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 /* SimpleRoutine rpc_jack_client_rt_notify */
@@ -6009,7 +5971,6 @@ mig_external kern_return_t rpc_jack_client_rt_notify
 	int timeout
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -6064,7 +6025,9 @@ mig_external kern_return_t rpc_jack_client_rt_notify
 	__BeforeSendSimple(1019, "rpc_jack_client_rt_notify")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_SEND_TIMEOUT|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), 0, MACH_PORT_NULL, timeout, MACH_PORT_NULL);
 	__AfterSendSimple(1019, "rpc_jack_client_rt_notify")
-		return msg_result;
-	return KERN_SUCCESS;
-    }
+
+	if (msg_result == MACH_SEND_TIMED_OUT) {
+	}
+
+	return msg_result;
 }

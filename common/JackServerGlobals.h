@@ -37,7 +37,7 @@ class JackClient;
 
 struct JackServerGlobals
 {
-    static long fClientCount;
+ 	static unsigned int fClientCount;
     static JackServer* fServer;
 
     JackServerGlobals();

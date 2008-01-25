@@ -72,7 +72,7 @@ class JackInternalClientChannel : public JackClientChannelInterface
      		*result = fEngine->ClientDeactivate(refnum);
         }
 
-        void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
+        void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
         {
             *result = fEngine->PortRegister(refnum, name, type, flags, buffer_size, port_index);
         }

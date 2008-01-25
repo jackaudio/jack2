@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Oct 25 10:49:38 2007
- * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
+ * stub generated Thu Jan  3 14:42:41 2008
+ * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
  * OPTIONS: 
  */
 
@@ -186,7 +186,7 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 	(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
 
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCClient_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_sync_notify_t__defined)
 #define __MIG_check__Request__rpc_jack_client_sync_notify_t__defined
@@ -431,7 +431,7 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(__Request__rpc_jack_client_sync_notify_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(__attribute__((__unused__)) __Request__rpc_jack_client_sync_notify_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_sync_notify_t __Request;
@@ -582,7 +582,7 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 	__AfterRcvRpc(1000, "rpc_jack_client_sync_notify")
 }
 
-#if (__MigTypeCheck || __NDR_convert__ )
+#if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Request__JackRPCClient_subsystem__
 #if !defined(__MIG_check__Request__rpc_jack_client_async_notify_t__defined)
 #define __MIG_check__Request__rpc_jack_client_async_notify_t__defined
@@ -827,7 +827,7 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value__defined */
 
 
-mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(__Request__rpc_jack_client_async_notify_t *In0P)
+mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(__attribute__((__unused__)) __Request__rpc_jack_client_async_notify_t *In0P)
 {
 
 	typedef __Request__rpc_jack_client_async_notify_t __Request;

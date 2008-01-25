@@ -385,7 +385,7 @@ struct JackPortRegisterRequest : public JackRequest
 struct JackPortRegisterResult : public JackResult
 {
 
-    jack_port_id_t fPortIndex;
+    unsigned int fPortIndex;
 
     JackPortRegisterResult():JackResult(),fPortIndex(NO_PORT)
     {}

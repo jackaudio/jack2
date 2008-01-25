@@ -169,9 +169,9 @@ void JackMachClientChannel::ClientDeactivate(int refnum, int* result)
     }
 }
 
-void JackMachClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
+void JackMachClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
 {
-    kern_return_t res = rpc_jack_port_register(fPrivatePort, refnum, (char*)name, (char*)type, flags, buffer_size, port_index, result);
+	kern_return_t res = rpc_jack_port_register(fPrivatePort, refnum, (char*)name, (char*)type, flags, buffer_size, port_index, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::PortRegister err = %s", mach_error_string(res));

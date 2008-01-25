@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Oct 25 10:49:38 2007
- * with a MiG generated Mon Sep 11 19:11:05 PDT 2006 by root@b09.apple.com
+ * stub generated Thu Jan  3 14:42:41 2008
+ * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCClient_subsystem__ 1
@@ -269,7 +269,6 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 	int *result
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -356,6 +355,10 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 	__BeforeSendRpc(1000, "rpc_jack_client_sync_notify")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_SEND_TIMEOUT|MACH_RCV_TIMEOUT|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, 5000, MACH_PORT_NULL);
 	__AfterSendRpc(1000, "rpc_jack_client_sync_notify")
+
+	if (msg_result == MACH_SEND_TIMED_OUT) {
+	}
+
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithTimeout(msg_result);
 		{ return msg_result; }
@@ -371,7 +374,6 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 	*result = Out0P->result;
 
 	return KERN_SUCCESS;
-    }
 }
 
 /* SimpleRoutine rpc_jack_client_async_notify */
@@ -384,7 +386,6 @@ mig_external kern_return_t rpc_jack_client_async_notify
 	int value
 )
 {
-    {
 
 #ifdef  __MigPackStructs
 #pragma pack(4)
@@ -442,7 +443,9 @@ mig_external kern_return_t rpc_jack_client_async_notify
 	__BeforeSendSimple(1001, "rpc_jack_client_async_notify")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_SEND_TIMEOUT|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), 0, MACH_PORT_NULL, 5000, MACH_PORT_NULL);
 	__AfterSendSimple(1001, "rpc_jack_client_async_notify")
-		return msg_result;
-	return KERN_SUCCESS;
-    }
+
+	if (msg_result == MACH_SEND_TIMED_OUT) {
+	}
+
+	return msg_result;
 }

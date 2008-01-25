@@ -49,7 +49,7 @@ struct JackLibGlobals
     std::map<mach_port_t, JackClient*> fClientTable;        /*! Client table */
 #endif
 
-    static long fClientCount;
+ 	static int fClientCount;
     static JackLibGlobals* fGlobals;
 
     JackLibGlobals()
