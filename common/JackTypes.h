@@ -37,7 +37,6 @@ typedef ULONGLONG UInt64;
 typedef unsigned long long UInt64;
 #endif
 
-
 namespace Jack
 {
 

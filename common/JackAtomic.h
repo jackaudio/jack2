@@ -22,24 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackTypes.h"
 
-/*
-typedef unsigned short UInt16;
-#if __LP64__
-typedef unsigned int UInt32;
-typedef signed int   SInt32;
-#else
-typedef unsigned long UInt32;
-typedef signed long   SInt32;
-#endif
-
-#ifdef WIN32
-#include <windows.h>
-typedef ULONGLONG UInt64;
-#else
-typedef unsigned long long UInt64;
-#endif
-*/
-
 #if defined(__APPLE__)
 
 #if defined(__ppc__) || defined(__ppc64__)

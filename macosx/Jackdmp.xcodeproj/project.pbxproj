@@ -5213,7 +5213,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jack-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OPTIMIZATION_CFLAGS = "-O0";
@@ -5274,7 +5274,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jack-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -5328,7 +5328,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jack-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
@@ -5388,7 +5388,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jack-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OPTIMIZATION_CFLAGS = "-O0";
@@ -5450,7 +5450,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jack-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -5505,7 +5505,7 @@
 					RPC,
 					../common/jack,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jack-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LIBRARY_SEARCH_PATHS = /usr/lib/gcc/darwin/3.3;
 				OTHER_CFLAGS = (
@@ -5562,7 +5562,7 @@
 					../common/jack,
 					../common,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jackwrapper-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -5597,7 +5597,7 @@
 					../common/jack,
 					../common,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jackwrapper-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_LDFLAGS = (
@@ -5631,7 +5631,7 @@
 					../common/jack,
 					../common,
 				);
-				INFOPLIST_FILE = "/Volumes/Document1/Developpement/ProjectsCVS/JackCVS/jackmp-svn/trunk/jackmp 64bits/macosx/Jackwrapper-Info.plist";
+				INFOPLIST_FILE = "Jack-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -8593,8 +8593,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
 				);
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
@@ -8651,8 +8651,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -8710,8 +8710,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
 				);
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DYLIB_COMPATIBILITY_VERSION = 1;
