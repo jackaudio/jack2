@@ -61,7 +61,7 @@ static void copyright(FILE* file)
 {
     fprintf (file, "jackdmp " VERSION "\n"
              "Copyright 2001-2005 Paul Davis and others.\n"
-             "Copyright 2004-2007 Grame.\n"
+             "Copyright 2004-2008 Grame.\n"
              "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
              "This is free software, and you are welcome to redistribute it\n"
              "under certain conditions; see the file COPYING for details\n");
