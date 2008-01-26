@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackClient.h"
 #include <list>
+#include <fstream>
 
 namespace Jack
 {
