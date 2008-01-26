@@ -247,8 +247,8 @@ int JackPortAudioDriver::Write()
 
 int JackPortAudioDriver::Open(jack_nframes_t nframes,
                               jack_nframes_t samplerate,
-                              int capturing,
-                              int playing,
+                              bool capturing,
+                              bool playing,
                               int inchannels,
                               int outchannels,
                               bool monitor,

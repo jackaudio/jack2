@@ -63,8 +63,8 @@ class JackPortAudioDriver : public JackAudioDriver
 
         int Open(jack_nframes_t frames_per_cycle,
                  jack_nframes_t rate,
-                 int capturing,
-                 int playing,
+                 bool capturing,
+                 bool playing,
                  int chan_in,
                  int chan_out,
                  bool monitor,

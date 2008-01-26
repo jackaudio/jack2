@@ -53,8 +53,8 @@ class EXPORT JackDriverInterface
 
         virtual int Open(jack_nframes_t nframes,
                          jack_nframes_t samplerate,
-                         int capturing,
-                         int playing,
+                         bool capturing,
+                         bool playing,
                          int inchannels,
                          int outchannels,
                          bool monitor,
@@ -147,8 +147,8 @@ class EXPORT JackDriver : public JackDriverClient
 
         virtual int Open(jack_nframes_t nframes,
                          jack_nframes_t samplerate,
-                         int capturing,
-                         int playing,
+                         bool capturing,
+                         bool playing,
                          int inchannels,
                          int outchannels,
                          bool monitor,
