@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackLoopbackDriver__
 
 #include "JackAudioDriver.h"
-#include "JackTime.h"
 
 namespace Jack
 {
