@@ -22,7 +22,7 @@
 #ifndef __JackRequest__
 #define __JackRequest__
 
-#include "JackPort.h"
+#include "JackConstants.h"
 #include "JackChannelTransaction.h"
 #include "JackError.h"
 #include <stdio.h>
