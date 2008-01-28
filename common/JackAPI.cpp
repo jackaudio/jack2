@@ -426,6 +426,18 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client, jack_port_t
 	JackLibGlobals::CheckContext();
 #endif
 
+	JackClient* client = (JackClient*)ext_client;
+	jack_port_id_t myport = (jack_port_id_t)port;
+    if (client == NULL) {
+        jack_error("jack_recompute_total_latencies called with a NULL client");
+        return -1;
+    } else if (!CheckPort(myport)) {
+        jack_error("jack_recompute_total_latencies called with a NULL port");
+        return -1;
+    } else {
+  		// TODO
+    }
+
     // The latency computation is done each time jack_port_get_total_latency is called
     return 0;
 }
@@ -435,6 +447,14 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
 	JackLibGlobals::CheckContext();
 #endif
+
+	JackClient* client = (JackClient*)ext_client;
+	if (client == NULL) {
+        jack_error("jack_recompute_total_latencies called with a NULL client");
+        return -1;
+    } else {
+  		// TODO
+    }
 
     // The latency computation is done each time jack_port_get_total_latency is called
     return 0;
