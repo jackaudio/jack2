@@ -310,7 +310,7 @@ bool JackSocketClientChannel::Execute()
         goto error;
     }
 
-    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fValue);
+    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fValue1, event.fValue2);
 
     if (event.fSync) {
         if (res.Write(fNotificationSocket) < 0) {

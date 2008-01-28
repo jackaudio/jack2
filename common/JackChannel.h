@@ -150,7 +150,7 @@ class JackNotifyChannelInterface
         /*
         The "sync" parameter allows to choose between "synchronous" and "asynchronous" notification
         */
-        virtual void ClientNotify(int refnum, const char* name, int notify, int sync, int value, int* result)
+        virtual void ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2, int* result)
         {}
 
 };
@@ -202,7 +202,7 @@ class JackServerNotifyChannelInterface
         virtual void Close()
         {}
 
-        virtual void ClientNotify(int refnum, int notify, int value)
+        virtual void ClientNotify(int refnum, int notify, int value1, int value2)
         {}
 
 };

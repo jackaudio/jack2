@@ -55,7 +55,8 @@ kern_return_t rpc_jack_client_sync_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
-	int value,
+	int value1,
+	int value2,
 	int *result
 );
 
@@ -71,7 +72,8 @@ kern_return_t rpc_jack_client_async_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
-	int value
+	int value1,
+	int value2
 );
 
 __END_DECLS
@@ -101,7 +103,8 @@ __END_DECLS
 		int refnum;
 		client_name_t client_name;
 		int notify;
-		int value;
+		int value1;
+		int value2;
 	} __Request__rpc_jack_client_sync_notify_t;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -116,7 +119,8 @@ __END_DECLS
 		int refnum;
 		client_name_t client_name;
 		int notify;
-		int value;
+		int value1;
+		int value2;
 	} __Request__rpc_jack_client_async_notify_t;
 #ifdef  __MigPackStructs
 #pragma pack()

@@ -127,9 +127,9 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
             return fDriver->ProcessSlaves();
         }
 
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value)
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
         {
-            return fDriver->ClientNotify(refnum, name, notify, sync, value);
+            return fDriver->ClientNotify(refnum, name, notify, sync, value1, value2);
         }
 
         virtual JackClientControl* GetClientControl() const

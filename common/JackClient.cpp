@@ -52,6 +52,7 @@ JackClient::JackClient(JackSynchro** table)
 	fClientRegistration = NULL;
     fFreewheel = NULL;
     fPortRegistration = NULL;
+	fPortConnect = NULL;
     fSync = NULL;
     fProcessArg = NULL;
     fGraphOrderArg = NULL;
@@ -62,6 +63,7 @@ JackClient::JackClient(JackSynchro** table)
     fFreewheelArg = NULL;
     fClientRegistrationArg = NULL;
     fPortRegistrationArg = NULL;
+	fPortConnectArg = NULL;
     fSyncArg = NULL;
     fConditionnal = 0; // Temporary??
 }
@@ -117,12 +119,12 @@ void JackClient::SetupDriverSync(bool freewheel)
 \brief Notification received from the server.
 */
 
-int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value)
+int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value)
 {
  	return 0;
 }
 
-int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value)
+int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
     int res = 0;
 
@@ -130,11 +132,11 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
     switch (notify) {
 
         case kAddClient:
-            res = ClientNotifyImp(refnum, name, notify, sync, value);
+            res = ClientNotifyImp(refnum, name, notify, sync, value1, value2);
 			break;
 			
 	   case kRemoveClient:
-            res = ClientNotifyImp(refnum, name, notify, sync, value);
+            res = ClientNotifyImp(refnum, name, notify, sync, value1, value2);
 			break;
 			
 		case kActivateClient:
@@ -164,9 +166,9 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 				break;
 
             case kBufferSizeCallback:
-                JackLog("JackClient::kBufferSizeCallback buffer_size = %ld\n", value);
+                JackLog("JackClient::kBufferSizeCallback buffer_size = %ld\n", value1);
                 if (fBufferSize)
-                    res = fBufferSize(value, fBufferSizeArg);
+                    res = fBufferSize(value1, fBufferSizeArg);
                 break;
 
             case kGraphOrderCallback:
@@ -192,15 +194,15 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
 
             case kPortRegistrationOnCallback:
-                JackLog("JackClient::kPortRegistrationOn port_index = %ld\n", value);
+                JackLog("JackClient::kPortRegistrationOn port_index = %ld\n", value1);
                 if (fPortRegistration)
-                    fPortRegistration(value, 1, fPortRegistrationArg);
+                    fPortRegistration(value1, 1, fPortRegistrationArg);
                 break;
 
             case kPortRegistrationOffCallback:
-                JackLog("JackClient::kPortRegistrationOff port_index = %ld \n", value);
+                JackLog("JackClient::kPortRegistrationOff port_index = %ld \n", value1);
                 if (fPortRegistration)
-                    fPortRegistration(value, 0, fPortRegistrationArg);
+                    fPortRegistration(value1, 0, fPortRegistrationArg);
                 break;
 
             case kXRunCallback:
@@ -812,6 +814,20 @@ int JackClient::SetPortRegistrationCallback(JackPortRegistrationCallback callbac
 		GetClientControl()->fCallback[kPortRegistrationOffCallback] = (callback != NULL);
         fPortRegistrationArg = arg;
         fPortRegistration = callback;
+        return 0;
+    }
+}
+
+int JackClient::SetPortConnectCallback(JackPortConnectCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+		GetClientControl()->fCallback[kPortConnectCallback] = (callback != NULL);
+		GetClientControl()->fCallback[kPortDisconnectCallback] = (callback != NULL);
+        fPortConnectArg = arg;
+        fPortConnect = callback;
         return 0;
     }
 }

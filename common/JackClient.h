@@ -62,8 +62,10 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		JackClientRegistrationCallback fClientRegistration;
         JackFreewheelCallback fFreewheel;
         JackPortRegistrationCallback fPortRegistration;
+		JackPortConnectCallback fPortConnect;
         JackTimebaseCallback fTimebase;
         JackSyncCallback fSync;
+		
         void* fProcessArg;
         void* fGraphOrderArg;
         void* fXrunArg;
@@ -73,6 +75,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		void* fClientRegistrationArg;
         void* fFreewheelArg;
         void* fPortRegistrationArg;
+		void* fPortConnectArg;
         void* fTimebaseArg;
         void* fSyncArg;
         int fConditionnal;
@@ -92,7 +95,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void CallTimebaseCallback();
         int RequestNewPos(jack_position_t* pos);
 
-        virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value);
+        virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value);
 
     public:
 
@@ -107,7 +110,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual JackEngineControl* GetEngineControl() const = 0;
 
         // Notifications
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value);
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
 
         virtual int Activate();
         virtual int Deactivate();
@@ -151,7 +154,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		virtual int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
         virtual int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         virtual int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
-		
+		virtual int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
+	
 		// Internal clients
 		virtual char* GetInternalClientName(int ref);
 		virtual int InternalClientHandle(const char* client_name, jack_status_t* status);

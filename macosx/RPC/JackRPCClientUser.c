@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Jan  3 14:42:41 2008
+ * stub generated Mon Jan 28 15:04:07 2008
  * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
  * OPTIONS: 
  */
@@ -265,7 +265,8 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
-	int value,
+	int value1,
+	int value2,
 	int *result
 )
 {
@@ -279,7 +280,8 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 		int refnum;
 		client_name_t client_name;
 		int notify;
-		int value;
+		int value1;
+		int value2;
 	} Request;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -343,7 +345,9 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 
 	InP->notify = notify;
 
-	InP->value = value;
+	InP->value1 = value1;
+
+	InP->value2 = value2;
 
 	InP->Head.msgh_bits =
 		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
@@ -383,7 +387,8 @@ mig_external kern_return_t rpc_jack_client_async_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
-	int value
+	int value1,
+	int value2
 )
 {
 
@@ -396,7 +401,8 @@ mig_external kern_return_t rpc_jack_client_async_notify
 		int refnum;
 		client_name_t client_name;
 		int notify;
-		int value;
+		int value1;
+		int value2;
 	} Request;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -431,7 +437,9 @@ mig_external kern_return_t rpc_jack_client_async_notify
 
 	InP->notify = notify;
 
-	InP->value = value;
+	InP->value1 = value1;
+
+	InP->value2 = value2;
 
 	InP->Head.msgh_bits =
 		MACH_MSGH_BITS(19, 0);

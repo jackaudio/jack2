@@ -64,7 +64,10 @@ class JackEngine
 		
 		int AllocateRefnum();
 		void ReleaseRefnum(int ref);
-
+		
+		void NotifyClient(int refnum, int event, int sync, int value1, int value2);
+        void NotifyClients(int event, int sync, int value1, int value2);
+   
     public:
 
         JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler);
@@ -84,7 +87,7 @@ class JackEngine
         int ClientActivate(int refnum);
         int ClientDeactivate(int refnum);
 		
-		// Internal lient management
+		// Internal client management
 		int GetInternalClientName(int int_ref, char* name_res);
 		int InternalClientHandle(const char* client_name, int* status, int* int_ref);
 		int InternalClientUnload(int refnum, int* status);
@@ -106,15 +109,14 @@ class JackEngine
         // Graph
         bool Process(jack_time_t callback_usecs);
    
-        // Notifications
-        void NotifyClient(int refnum, int event, int sync, int value);
-        void NotifyClients(int event, int sync, int value);
-        void NotifyXRun(jack_time_t callback_usecs);
+		// Notifications
+		void NotifyXRun(jack_time_t callback_usecs);
         void NotifyXRun(int refnum);
         void NotifyGraphReorder();
         void NotifyBufferSize(jack_nframes_t nframes);
         void NotifyFreewheel(bool onoff);
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
+		void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
 		void NotifyActivate(int refnum);
 };
 

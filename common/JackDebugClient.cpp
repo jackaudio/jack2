@@ -136,10 +136,10 @@ JackEngineControl* JackDebugClient::GetEngineControl() const
 \brief Notification received from the server.
 */
 
-int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value)
+int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
 	CheckClient();
-    return fClient->ClientNotify( refnum, name, notify, sync, value);
+    return fClient->ClientNotify( refnum, name, notify, sync, value1, value2);
 }
 
 int JackDebugClient::Activate()
@@ -484,6 +484,12 @@ int JackDebugClient::SetPortRegistrationCallback(JackPortRegistrationCallback ca
 {
 	CheckClient();
     return fClient->SetPortRegistrationCallback(callback, arg);
+}
+
+int JackDebugClient::SetPortConnectCallback(JackPortConnectCallback callback, void *arg)
+{
+	CheckClient();
+    return fClient->SetPortConnectCallback(callback, arg);
 }
 
 JackClientControl* JackDebugClient::GetClientControl() const

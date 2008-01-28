@@ -134,7 +134,7 @@ void JackEngine::ProcessNext(jack_time_t callback_usecs)
 {
 	fLastSwitchUsecs = callback_usecs;
 	if (fGraphManager->RunNextGraph())	// True if the graph actually switched to a new state
-		fChannel->ClientNotify(ALL_CLIENTS, kGraphOrderCallback, 0);
+		fChannel->ClientNotify(ALL_CLIENTS, kGraphOrderCallback, 0, 0);
 	fSignal->SignalAll();				// Signal for threads waiting for next cycle
 }
 
@@ -191,12 +191,12 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
            
             if (status != NotTriggered && status != Finished) {
                 jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
-                fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
+                fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0, 0);  // Notify all clients
             }
 			
             if (status == Finished && (long)(finished_date - callback_usecs) > 0) {
                 jack_error("JackEngine::XRun: client %s finished after current callback", client->GetClientControl()->fName);
-                fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
+                fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0, 0);  // Notify all clients
             }
         }
     }
@@ -206,7 +206,7 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
 // Notifications
 //---------------
 
-void JackEngine::NotifyClient(int refnum, int event, int sync, int value)
+void JackEngine::NotifyClient(int refnum, int event, int sync, int value1, int value2)
 {
     JackClientInterface* client = fClientTable[refnum];
 	
@@ -214,21 +214,21 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value)
     if (!client) {
 		JackLog("JackEngine::NotifyClient: client not available anymore\n");
 	} else if (client->GetClientControl()->fCallback[event]) {
-		if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value) < 0)
-			jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
+		if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
+			jack_error("NotifyClient fails name = %s event = %ld = val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
     } else {
         JackLog("JackEngine::NotifyClient: no callback for event = %ld\n", event);
     }
 }
 
-void JackEngine::NotifyClients(int event, int sync, int value)
+void JackEngine::NotifyClients(int event, int sync, int value1, int value2)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
 		if (client) {
 			if (client->GetClientControl()->fCallback[event]) {
-				if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value) < 0) 
-					jack_error("NotifyClient fails name = %s event = %ld = val = %ld", client->GetClientControl()->fName, event, value);
+				if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value1, value2) < 0) 
+					jack_error("NotifyClient fails name = %s event = %ld = val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
 			} else {
 				JackLog("JackEngine::NotifyClients: no callback for event = %ld\n", event);
 			}
@@ -242,11 +242,11 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
         if (old_client) {
-            if (old_client->ClientNotify(refnum, name, kAddClient, true, 0) < 0) {
+            if (old_client->ClientNotify(refnum, name, kAddClient, true, 0, 0) < 0) {
                 jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
 				return -1;
 			}
-			if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, 0) < 0) {
+			if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, 0, 0) < 0) {
                 jack_error("NotifyAddClient new_client fails name = %s", name);
 				return -1;
 			}
@@ -262,7 +262,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            client->ClientNotify(refnum, name, kRemoveClient, true, 0);
+            client->ClientNotify(refnum, name, kRemoveClient, true, 0, 0);
         }
     }
 }
@@ -272,42 +272,47 @@ void JackEngine::NotifyXRun(jack_time_t callback_usecs)
 {
     // Use the audio thread => request thread communication channel
 	fEngineControl->ResetFrameTime(callback_usecs);
-    fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0);
+    fChannel->ClientNotify(ALL_CLIENTS, kXRunCallback, 0, 0);
 }
 
 void JackEngine::NotifyXRun(int refnum)
 {
     if (refnum == ALL_CLIENTS) {
-        NotifyClients(kXRunCallback, false, 0);
+        NotifyClients(kXRunCallback, false, 0, 0);
     } else {
-        NotifyClient(refnum, kXRunCallback, false, 0);
+        NotifyClient(refnum, kXRunCallback, false, 0, 0);
     }
 }
 
 void JackEngine::NotifyGraphReorder()
 {
-    NotifyClients(kGraphOrderCallback, false, 0);
+    NotifyClients(kGraphOrderCallback, false, 0, 0);
 }
 
 void JackEngine::NotifyBufferSize(jack_nframes_t nframes)
 {
-    NotifyClients(kBufferSizeCallback, true, nframes);
+    NotifyClients(kBufferSizeCallback, true, nframes, 0);
 }
 
 void JackEngine::NotifyFreewheel(bool onoff)
 {
     fEngineControl->fRealTime = !onoff;
-    NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, 0);
+    NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, 0, 0);
 }
 
 void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
 {
-    NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, port_index);
+    NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, port_index, 0);
+}
+
+void JackEngine::NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff)
+{
+    NotifyClients((onoff ? kPortConnectCallback : kPortDisconnectCallback), false, src, dst);
 }
 
 void JackEngine::NotifyActivate(int refnum)
 {
-	NotifyClient(refnum, kActivateClient, true, 0);
+	NotifyClient(refnum, kActivateClient, true, 0, 0);
 }
 
 //----------------------------
@@ -693,8 +698,11 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
                    " \"%s\" is not active", client->GetClientControl()->fName);
         return -1;
     }
-
-    return fGraphManager->Connect(src, dst);
+	
+	int res = fGraphManager->Connect(src, dst);
+	if (res == 0) 
+		NotifyPortConnect(src, dst, true);
+	return res;
 }
 
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
@@ -702,12 +710,35 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
     JackLog("JackEngine::PortDisconnect src = %d dst = %d\n", src, dst);
 
     if (dst == ALL_PORTS) {
-        return fGraphManager->DisconnectAll(src);
+		/*
+		jack_int_t connections[CONNECTION_NUM];
+		JackPort* port = fGraphManager->GetPort(src);
+		
+		fGraphManager->GetConnections(src, connections);
+		if (fGraphManager->DisconnectAll(src) < 0)
+			return -1;
+		
+		if (port->fFlags & JackPortIsOutput) {
+			for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
+				NotifyPortConnect(src, connections[i], false);
+			}
+		} else {
+			for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
+				NotifyPortConnect(connections[i], src, false);
+			}
+		}
+		*/
+		if (fGraphManager->DisconnectAll(src) < 0)
+			return -1;
+		return 0;
+	} else if (fGraphManager->CheckPorts(src, dst) < 0) {
+		return -1;
+	} else if (fGraphManager->Disconnect(src, dst) == 0) {
+		NotifyPortConnect(src, dst, false);
+		return 0;
     } else {
-        return (fGraphManager->CheckPorts(src, dst) < 0)
-               ? -1
-               : fGraphManager->Disconnect(src, dst);
-    }
+		return -1;
+	}
 }
 
 //----------------------

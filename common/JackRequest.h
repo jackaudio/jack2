@@ -997,13 +997,14 @@ struct JackClientNotification
     char fName[JACK_CLIENT_NAME_SIZE + 1];
     int fRefNum;
     int fNotify;
-    int fValue;
+    int fValue1;
+	int fValue2;
     int fSync;
 
-    JackClientNotification(): fNotify( -1), fValue( -1)
+    JackClientNotification(): fNotify(-1), fValue1(-1), fValue2(-1)
     {}
-    JackClientNotification(const char* name, int refnum, int notify, int sync, int value)
-            : fRefNum(refnum), fNotify(notify), fValue(value), fSync(sync)
+    JackClientNotification(const char* name, int refnum, int notify, int sync, int value1, int value2)
+            : fRefNum(refnum), fNotify(notify), fValue1(value1), fValue2(value2), fSync(sync)
     {
         snprintf(fName, sizeof(fName), "%s", name);
     }
@@ -1013,7 +1014,8 @@ struct JackClientNotification
 		CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
 		CheckRes(trans->Read(&fRefNum, sizeof(int)));
 		CheckRes(trans->Read(&fNotify, sizeof(int)));
-		CheckRes(trans->Read(&fValue, sizeof(int)));
+		CheckRes(trans->Read(&fValue1, sizeof(int)));
+		CheckRes(trans->Read(&fValue2, sizeof(int)));
 		CheckRes(trans->Read(&fSync, sizeof(int)));
 		return 0;
     }
@@ -1023,7 +1025,8 @@ struct JackClientNotification
   		CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
 		CheckRes(trans->Write(&fRefNum, sizeof(int)));
 		CheckRes(trans->Write(&fNotify, sizeof(int)));
-		CheckRes(trans->Write(&fValue, sizeof(int)));
+		CheckRes(trans->Write(&fValue1, sizeof(int)));
+		CheckRes(trans->Write(&fValue2, sizeof(int)));
 		CheckRes(trans->Write(&fSync, sizeof(int)));
 		return 0;
     }

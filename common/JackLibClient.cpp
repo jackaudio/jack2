@@ -128,7 +128,7 @@ error:
 // Notifications received from the server
 // TODO this should be done once for all clients in the process, when a shared notification channel
 // will be shared by all clients...
-int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value)
+int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
     int res = 0;
 

@@ -32,7 +32,8 @@ routine rpc_jack_client_sync_notify(
 	refnum		: int;
 	client_name	: client_name_t;
 	notify		: int;
-	value		: int;
+	value1		: int;
+	value2		: int;
     out result : int);
 
 simpleroutine rpc_jack_client_async_notify(
@@ -40,4 +41,5 @@ simpleroutine rpc_jack_client_async_notify(
 	refnum		: int;
 	client_name	: client_name_t;
 	notify		: int;
-	value		: int);
+	value1		: int;
+	value2		: int);

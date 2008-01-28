@@ -36,11 +36,11 @@ JackExternalClient::~JackExternalClient()
     delete fChannel;
 }
 
-int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value)
+int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
     int result = -1;
     JackLog("JackExternalClient::ClientNotify ref = %ld name = %s notify = %ld\n", refnum, name, notify);
-    fChannel->ClientNotify(refnum, name, notify, sync, value, &result);
+    fChannel->ClientNotify(refnum, name, notify, sync, value1, value2, &result);
     return result;
 }
 

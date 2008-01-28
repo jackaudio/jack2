@@ -84,6 +84,9 @@ extern "C"
     EXPORT int jack_set_port_registration_callback (jack_client_t *,
             JackPortRegistrationCallback
             registration_callback, void *arg);
+	EXPORT int jack_set_port_connect_callback (jack_client_t *,
+				    JackPortConnectCallback
+				    connect_callback, void *arg);
     EXPORT int jack_set_graph_order_callback (jack_client_t *,
             JackGraphOrderCallback graph_callback,
             void *);
@@ -112,9 +115,10 @@ extern "C"
     EXPORT int jack_port_tie (jack_port_t *src, jack_port_t *dst);
     EXPORT int jack_port_untie (jack_port_t *port);
     EXPORT jack_nframes_t jack_port_get_latency (jack_port_t *port);
-    EXPORT jack_nframes_t jack_port_get_total_latency (jack_client_t *,
+	EXPORT jack_nframes_t jack_port_get_total_latency (jack_client_t *,
             jack_port_t *port);
     EXPORT void jack_port_set_latency (jack_port_t *, jack_nframes_t);
+	EXPORT int jack_recompute_total_latency (jack_client_t*, jack_port_t* port);
     EXPORT int jack_recompute_total_latencies (jack_client_t*);
     EXPORT int jack_port_set_name (jack_port_t *port, const char *port_name);
 	EXPORT int jack_port_set_alias (jack_port_t *port, const char *alias);
@@ -242,11 +246,11 @@ EXPORT void jack_set_error_function (void (*func)(const char *))
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
+	jack_error("jack_client_new: deprecated");
     int options = JackUseExactName;
     if (getenv("JACK_START_SERVER") == NULL)
         options |= JackNoStartServer;
-
-    return jack_client_open(client_name, (jack_options_t)options, NULL);
+	return jack_client_open(client_name, (jack_options_t)options, NULL);
 }
 
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
@@ -416,8 +420,22 @@ EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
     }
 }
 
+EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client, jack_port_t* port)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+
+    // The latency computation is done each time jack_port_get_total_latency is called
+    return 0;
+}
+
 EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+
     // The latency computation is done each time jack_port_get_total_latency is called
     return 0;
 }
@@ -688,6 +706,20 @@ EXPORT int jack_set_port_registration_callback(jack_client_t* ext_client, JackPo
         return -1;
     } else {
         return client->SetPortRegistrationCallback(registration_callback, arg);
+    }
+}
+
+EXPORT int jack_set_port_connect_callback(jack_client_t* ext_client, JackPortConnectCallback portconnect_callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_set_port_connect_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->SetPortConnectCallback(portconnect_callback, arg);
     }
 }
 

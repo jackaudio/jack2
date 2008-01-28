@@ -397,7 +397,7 @@ void JackGraphManager::DisconnectAllInput(jack_port_id_t port_index)
 
     for (int i = 0; i < PORT_NUM; i++) {
         if (manager->IsConnected(i, port_index)) {
-            JackLog("JackGraphManager::Disconnect i = %ld  port_index = %ld\n", i, port_index);
+			JackLog("JackGraphManager::Disconnect i = %ld  port_index = %ld\n", i, port_index);
             Disconnect(i, port_index);
         }
     }
@@ -411,8 +411,8 @@ void JackGraphManager::DisconnectAllOutput(jack_port_id_t port_index)
     JackConnectionManager* manager = WriteNextStateStart();
 
     const jack_int_t* connections = manager->GetConnections(port_index);
-    while (connections[0] != EMPTY) {
-        Disconnect(port_index, connections[0]); // Warning : Disconnect shift port to left
+	while (connections[0] != EMPTY) {
+		Disconnect(port_index, connections[0]); // Warning : Disconnect shift port to left
     }
     WriteNextStateStop();
 }
@@ -424,11 +424,18 @@ int JackGraphManager::DisconnectAll(jack_port_id_t port_index)
 
     JackPort* port = GetPort(port_index);
     if (port->fFlags & JackPortIsOutput) {
-        DisconnectAllOutput(port_index);
+		DisconnectAllOutput(port_index);
     } else {
-        DisconnectAllInput(port_index);
+		DisconnectAllInput(port_index);
     }
     return 0;
+}
+
+// Server
+void JackGraphManager::GetConnections(jack_port_id_t port_index, jack_int_t* res)
+{
+	const jack_int_t* connections = ReadCurrentState()->GetConnections(port_index);
+	memcpy(res, connections, sizeof(jack_int_t) * CONNECTION_NUM);
 }
 
 // Server

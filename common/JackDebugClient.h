@@ -75,7 +75,7 @@ class JackDebugClient : public JackClient
         virtual JackEngineControl* GetEngineControl() const;
 
         // Notifications
-        int ClientNotify(int refnum, const char* name, int notify, int sync, int value);
+        int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
 
         int Activate();
         int Deactivate();
@@ -119,6 +119,8 @@ class JackDebugClient : public JackClient
 		int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
         int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
+		int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
+		
         JackClientControl* GetClientControl() const;
 		
 		void CheckClient() const;

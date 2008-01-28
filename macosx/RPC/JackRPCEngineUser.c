@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Thu Jan  3 14:42:41 2008
+ * stub generated Mon Jan 28 15:04:07 2008
  * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
  * OPTIONS: 
  */

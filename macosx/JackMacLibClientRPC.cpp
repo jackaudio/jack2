@@ -27,21 +27,21 @@ using namespace Jack;
 
 #define rpc_type kern_return_t  // for astyle
 
-rpc_type rpc_jack_client_sync_notify(mach_port_t client_port, int refnum, client_name_t name, int notify, int value, int* result)
+rpc_type rpc_jack_client_sync_notify(mach_port_t client_port, int refnum, client_name_t name, int notify, int value1, int value2, int* result)
 {
-    JackLog("rpc_jack_client_sync_notify ref = %ld name = %s notify = %ld value = %ld \n", refnum, name, notify, value);
+    JackLog("rpc_jack_client_sync_notify ref = %ld name = %s notify = %ld val1 = %ld val2 = %ld\n", refnum, name, notify, value1, value2);
     JackClient* client = JackLibGlobals::fGlobals->fClientTable[client_port];
     assert(client);
-    *result = client->ClientNotify(refnum, name, notify, true, value);
+    *result = client->ClientNotify(refnum, name, notify, true, value1, value2);
     return KERN_SUCCESS;
 }
 
-rpc_type rpc_jack_client_async_notify(mach_port_t client_port, int refnum, client_name_t name, int notify, int value)
+rpc_type rpc_jack_client_async_notify(mach_port_t client_port, int refnum, client_name_t name, int notify,  int value1, int value2)
 {
-    JackLog("rpc_jack_client_async_notify ref = %ld name = %s notify = %ld value = %ld \n", refnum, name, notify, value);
+    JackLog("rpc_jack_client_async_notify ref = %ld name = %s notify = %ld val1 = %ld val2 = %ld\n", refnum, name, notify, value1, value2);
     JackClient* client = JackLibGlobals::fGlobals->fClientTable[client_port];
     assert(client);
-    client->ClientNotify(refnum, name, notify, false, value);
+    client->ClientNotify(refnum, name, notify, false, value1, value2);
     return KERN_SUCCESS;
 }
 

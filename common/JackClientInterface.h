@@ -44,7 +44,7 @@ class EXPORT JackClientInterface
 
         virtual int Close() = 0;
 
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value) = 0;
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2) = 0;
 
         virtual JackClientControl* GetClientControl() const = 0;
 };
