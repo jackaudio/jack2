@@ -116,7 +116,7 @@ int midi_unpack_buf(midi_unpack_t *buf, const unsigned char *data, int len, void
 					jack_midi_data_t temp[3] = { 0x80, 0, 0x40 };
 					temp[0] |= buf->data[0] & 0x0F;
 					temp[1] = buf->data[1];
-					jack_midi_event_write(jack_port_buf, time, temp, 3, 0);
+					jack_midi_event_write(jack_port_buf, time, temp, 3);
 				} else
 					jack_midi_event_write(jack_port_buf, time, &buf->data[0], buf->pos);
 				//printf("midi_unpack: written %d-byte event\n", buf->pos);
