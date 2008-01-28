@@ -19,6 +19,7 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackMachServerNotifyChannel.h"
 #include "JackRPCEngineUser.c"
+#include "JackConstants.h"
 #include "JackError.h"
 
 namespace Jack

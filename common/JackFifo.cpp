@@ -19,7 +19,7 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackFifo.h"
 #include "JackError.h"
-#include "JackChannel.h"
+#include "JackConstants.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
