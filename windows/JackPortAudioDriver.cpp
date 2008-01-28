@@ -21,19 +21,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #pragma warning (disable : 4786)
 #endif
 
-#ifdef __APPLE__
-#include "JackMachThread.h"
-#endif
-
 #include "pa_asio.h"
 #include "JackDriverLoader.h"
 #include "driver_interface.h"
 #include "JackPortAudioDriver.h"
 #include "JackEngineControl.h"
-#include "JackGraphManager.h"
 #include "JackError.h"
-#include "JackClientControl.h"
-#include "JackGlobals.h"
+#include "JackTime.h"
 #include <iostream>
 
 namespace Jack

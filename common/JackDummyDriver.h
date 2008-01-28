@@ -22,8 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackDummyDriver__
 
 #include "JackAudioDriver.h"
-#include "JackThreadedDriver.h"
-#include "JackTime.h"
 
 namespace Jack
 {
