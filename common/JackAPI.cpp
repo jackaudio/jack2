@@ -338,21 +338,27 @@ EXPORT int jack_port_connected(const jack_port_t* port)
     }
 }
 
-EXPORT int jack_port_connected_to(const jack_port_t* port, const char* portname)
+EXPORT int jack_port_connected_to(const jack_port_t* port, const char* port_name)
 {
 #ifdef __CLIENTDEBUG__
 	JackLibGlobals::CheckContext();
 #endif
-    jack_port_id_t myport = (jack_port_id_t)port;
-    if (!CheckPort(myport)) {
-        jack_error("jack_port_connected_to called with an incorrect port %ld", myport);
+    jack_port_id_t src = (jack_port_id_t)port;
+    if (!CheckPort(src)) {
+        jack_error("jack_port_connected_to called with an incorrect port %ld", src);
         return -1;
-    } else if (portname == NULL) {
+    } else if (port_name == NULL) {
         jack_error("jack_port_connected_to called with a NULL port name");
         return -1;
     } else {
         WaitGraphChange();
-        return GetGraphManager()->ConnectedTo(myport, portname);
+		jack_port_id_t dst = GetGraphManager()->GetPort(port_name);
+		if (dst == NO_PORT) {
+			jack_error("Unknown destination port port_name = %s", port_name);
+			return 0;
+		} else {
+			return GetGraphManager()->IsConnected(src, dst);
+		}
     }
 }
 

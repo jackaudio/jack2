@@ -21,6 +21,7 @@ Tim Blechmann
 
 	* Updated API to match jack 0.109.0 version (in progress). Correct checking thread in CoreAudio driver.
 	* Port connection callback.
+	* Cleanup jack_port_connected_to implementation.
 
 2008-01-25 Stephane Letz  <letz@grame.fr>
 

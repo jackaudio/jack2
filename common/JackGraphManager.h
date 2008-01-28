@@ -74,11 +74,11 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         // Connections management
         int Connect(jack_port_id_t src_index, jack_port_id_t dst_index);  
         int Disconnect(jack_port_id_t src_index, jack_port_id_t dst_index); 
+		int IsConnected(jack_port_id_t port_src, jack_port_id_t port_dst); 
         int GetConnectionsNum(jack_port_id_t port_index); 
-
-        int ConnectedTo(jack_port_id_t port_src, const char* port_name); 
+    
         const char** GetConnections(jack_port_id_t port_index); 
-		void GetConnections(jack_port_id_t port_index, jack_int_t* connections);
+		void GetConnections(jack_port_id_t port_index, jack_int_t* connections);  // TODO
 	    const char** GetPorts(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
 
         int CheckPorts(const char* src, const char* dst, jack_port_id_t* src_index, jack_port_id_t* dst_index); 

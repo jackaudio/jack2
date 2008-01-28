@@ -587,18 +587,10 @@ end:
 }
 
 // Client
-int JackGraphManager::ConnectedTo(jack_port_id_t port_src, const char* port_name)
+int JackGraphManager::IsConnected(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
-    JackLog("JackGraphManager::ConnectedTo port_src = %ld port_name = %s\n", port_src, port_name);
     JackConnectionManager* manager = ReadCurrentState();
-    jack_port_id_t port_dst;
-
-    if ((port_dst = GetPort(port_name)) == NO_PORT) {
-        jack_error("Unknown destination port port_name = %s", port_name);
-        return 0;
-    } else {
-        return manager->IsConnected(port_src, port_dst);
-    }
+	return manager->IsConnected(port_src, port_dst);
 }
 
 // Server
