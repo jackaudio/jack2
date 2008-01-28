@@ -728,9 +728,7 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 			}
 		}
 		*/
-		if (fGraphManager->DisconnectAll(src) < 0)
-			return -1;
-		return 0;
+		return fGraphManager->DisconnectAll(src);
 	} else if (fGraphManager->CheckPorts(src, dst) < 0) {
 		return -1;
 	} else if (fGraphManager->Disconnect(src, dst) == 0) {

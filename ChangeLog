@@ -19,7 +19,7 @@ Tim Blechmann
 
 2008-01-28 Stephane Letz  <letz@grame.fr>
 
-	* Updated API to match jack 0.109.0 version (in progress). Correct issue in CoreAudio driver.
+	* Updated API to match jack 0.109.0 version (in progress). Correct checking thread in CoreAudio driver.
 	* Port connection callback.
 
 2008-01-25 Stephane Letz  <letz@grame.fr>
