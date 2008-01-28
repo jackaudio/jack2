@@ -71,9 +71,9 @@ namespace Jack
 #define ALL_CLIENTS -1 // for notification
 
 #if defined(__ppc64__) || defined(__x86_64__)
-	#define JACK_PROTOCOL_VERSION 3
+	#define JACK_PROTOCOL_VERSION 4
 #else
-	#define JACK_PROTOCOL_VERSION 2
+	#define JACK_PROTOCOL_VERSION 3
 #endif
 
 #define DRIVER_OPEN_TIMEOUT 5   // in sec

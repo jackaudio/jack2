@@ -49,18 +49,18 @@ int process(jack_nframes_t nframes, void *arg)
 	jack_default_audio_sample_t *out = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port, nframes);
 	jack_midi_event_t in_event;
 	jack_nframes_t event_index = 0;
-	jack_nframes_t event_count = jack_midi_get_event_count(port_buf, nframes);
+	jack_nframes_t event_count = jack_midi_get_event_count(port_buf);
 	if(event_count > 1)
 	{
 		printf(" midisine: have %d events\n", event_count);
 		for(i=0; i<event_count; i++)
 		{
-			jack_midi_event_get(&in_event, port_buf, i, nframes);
+			jack_midi_event_get(&in_event, port_buf, i);
 			printf("    event %d time is %d. 1st byte is 0x%x\n", i, in_event.time, *(in_event.buffer));
 		}
 /*		printf("1st byte of 1st event addr is %p\n", in_events[0].buffer);*/
 	}
-	jack_midi_event_get(&in_event, port_buf, 0, nframes);
+	jack_midi_event_get(&in_event, port_buf, 0);
 	for(i=0; i<nframes; i++)
 	{
 		if((in_event.time == i) && (event_index < event_count))
@@ -79,7 +79,7 @@ int process(jack_nframes_t nframes, void *arg)
 			}
 			event_index++;
 			if(event_index < event_count)
-				jack_midi_event_get(&in_event, port_buf, event_index, nframes);
+				jack_midi_event_get(&in_event, port_buf, event_index);
 		}
 		ramp += note_frqs[note];
 		ramp = (ramp > 1.0) ? ramp - 2.0 : ramp;

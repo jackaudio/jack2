@@ -111,8 +111,6 @@ extern "C"
             const jack_port_t *port);
     EXPORT int jack_port_tie (jack_port_t *src, jack_port_t *dst);
     EXPORT int jack_port_untie (jack_port_t *port);
-    EXPORT int jack_port_lock (jack_client_t *, jack_port_t *);
-    EXPORT int jack_port_unlock (jack_client_t *, jack_port_t *);
     EXPORT jack_nframes_t jack_port_get_latency (jack_port_t *port);
     EXPORT jack_nframes_t jack_port_get_total_latency (jack_client_t *,
             jack_port_t *port);
@@ -852,48 +850,6 @@ EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_clien
     } else {
         WaitGraphChange();
         return GetGraphManager()->GetConnections(myport);
-    }
-}
-
-// Does not use the client parameter
-EXPORT int jack_port_lock(jack_client_t* ext_client, jack_port_t* port)
-{
-#ifdef __CLIENTDEBUG__
-	JackLibGlobals::CheckContext();
-#endif
-    JackClient* client = (JackClient*)ext_client;
-    if (client == NULL) {
-        jack_error("jack_port_lock called with a NULL client");
-        return -1;
-    }
-
-    jack_port_id_t myport = (jack_port_id_t)port;
-    if (!CheckPort(myport)) {
-        jack_error("jack_port_lock called with an incorrect port %ld", myport);
-        return -1;
-    } else {
-        return (myport && client->PortIsMine(myport)) ? GetGraphManager()->GetPort(myport)->Lock() : -1;
-    }
-}
-
-// Does not use the client parameter
-EXPORT int jack_port_unlock(jack_client_t* ext_client, jack_port_t* port)
-{
-#ifdef __CLIENTDEBUG__
-	JackLibGlobals::CheckContext();
-#endif
-    JackClient* client = (JackClient*)ext_client;
-    if (client == NULL) {
-        jack_error("jack_port_unlock called with a NULL client");
-        return -1;
-    }
-
-    jack_port_id_t myport = (jack_port_id_t)port;
-    if (!CheckPort(myport)) {
-        jack_error("jack_port_unlock called with an incorrect port %ld", myport);
-        return -1;
-    } else {
-        return (myport && client->PortIsMine(myport)) ? GetGraphManager()->GetPort(myport)->Unlock() : -1;
     }
 }
 

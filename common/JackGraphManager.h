@@ -82,8 +82,7 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
 
         int CheckPorts(const char* src, const char* dst, jack_port_id_t* src_index, jack_port_id_t* dst_index); 
         int CheckPorts(jack_port_id_t port_src, jack_port_id_t port_dst); 
-        int CheckPort(jack_port_id_t port_index); 
-
+     
         void DisconnectAllInput(jack_port_id_t port_index); 
         void DisconnectAllOutput(jack_port_id_t port_index); 
         int DisconnectAll(jack_port_id_t port_index); 

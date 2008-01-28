@@ -901,8 +901,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
     }
 
     fDriverOutputData = 0;
-	// Start checking thread...
-	fThread->Start();
 
     // Core driver may have changed the in/out values
     fCaptureChannels = inchannels;
@@ -932,9 +930,7 @@ int JackCoreAudioDriver::Close()
     free(fJackInputData);
     AudioUnitUninitialize(fAUHAL);
     CloseComponent(fAUHAL);
-	// Kill checking thread...
-	fThread->Kill();
-    return 0;
+	return 0;
 }
 
 int JackCoreAudioDriver::Attach()
@@ -1062,8 +1058,11 @@ int JackCoreAudioDriver::Start()
         printError(err);
         return -1;
     }
-
-    return 0;
+	
+	// Start checking thread...
+	fRunning = true;
+	fThread->Start();
+	return 0;
 }
 
 int JackCoreAudioDriver::Stop()
@@ -1071,6 +1070,9 @@ int JackCoreAudioDriver::Stop()
     AudioDeviceStop(fDeviceID, MeasureCallback);
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
     JackLog("JackCoreAudioDriver::Stop\n");
+	// Kill checking thread...
+	fThread->Kill();
+	fRunning = false;
     return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
 }
 

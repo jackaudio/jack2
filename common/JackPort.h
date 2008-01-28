@@ -52,7 +52,6 @@ class JackPort
         uint8_t fMonitorRequests;
 
         bool fInUse;
-        bool fLocked;
         jack_port_id_t fTied;   // Locally tied source port
 
 	#ifdef WIN32
@@ -91,10 +90,7 @@ class JackPort
         int	GetFlags() const;
         const char* GetType() const;
 
-        int Lock();
-        int Unlock();
-
-        int Tie(jack_port_id_t port_index);
+		int Tie(jack_port_id_t port_index);
         int UnTie();
 
         jack_nframes_t GetLatency() const;

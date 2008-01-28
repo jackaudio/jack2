@@ -1256,54 +1256,12 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! while checking jack_port_get_connections() Vs jack_port_get_all_connections() on PHY port...\n");
     }
 
-    /**
-     * Test port locking function
-     * Check the validity of the lock...
-     *
-     */
-    Log("Testing connections locks between clients...\n");
-    if (jack_disconnect(client1, jack_port_name(output_port1), jack_port_name(input_port1)) != 0) {
+	if (jack_disconnect(client1, jack_port_name(output_port1), jack_port_name(input_port1)) != 0) {
         printf("!!! ERROR !!! while client1 intenting to disconnect ports...\n");
     }
-
-    if (jack_port_lock(client2, output_port2) != 0) {
-        printf("Error while calling port_lock... jack_lock will not be checked !\n");
-    } else {
-        Log("Locking port 'out2'...ok\n");
-        if (jack_disconnect(client2, jack_port_name(output_port2), jack_port_name(input_port1)) != 0) {
-            Log("Checking lock status with disconnect... ok\n");
-        } else {
-            printf("!!! ERRROR !!! Jack_lock didn't lock port_connections with disconnect!\n");
-        }
-        if (jack_port_disconnect(client1, output_port2) != 0) {
-            Log("Checking lock status with port_disconnect... ok\n");
-        } else {
-            printf("!!! ERRROR !!! Jack_lock didn't lock port_connections with port_disconnect!\n");
-        }
-        if (jack_connect(client2, jack_port_name(output_port2), jack_port_name(input_port2)) != 0) {
-            Log("Checking lock status with connect... ok\n");
-        } else {
-            printf("!!! ERRROR !!! Jack_lock didn't lock port_connections with connect!\n");
-            jack_disconnect(client2, jack_port_name(output_port2), jack_port_name(input_port2));
-        }
-        if (jack_port_unlock(client1, output_port2) != 0) {
-            Log("Checking unlock by another client... ok\n");
-        } else {
-            printf("!!! ERROR !!! a client can unlock a port locked previously by another client... \n");
-        }
-        if (jack_port_unlock(client2, output_port2) != 0) {
-            printf("Error while calling port_unlock... \n");
-        }
-        if (jack_port_lock(client2, output_port1) != 0) {
-            Log("Checking lock of port of an other client... ok\n");
-        } else {
-            printf("!!! ERROR !!! a port can be locked by a non-owner client !\n");
-            jack_port_unlock(client2, output_port1);
-        }
+    if (jack_disconnect(client1, jack_port_name(output_port2), jack_port_name(input_port1)) != 0) {
+        printf("!!! ERROR !!! while client1 intenting to disconnect ports...\n");
     }
-
-    jack_disconnect(client1, jack_port_name(output_port2), jack_port_name(input_port1));
-
     // No links should subsist now...
 
     /**

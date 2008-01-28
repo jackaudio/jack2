@@ -87,8 +87,6 @@ extern "C"
             const jack_port_t *port);
     EXPORT int jack_port_tie (jack_port_t *src, jack_port_t *dst);
     EXPORT int jack_port_untie (jack_port_t *port);
-    EXPORT int jack_port_lock (jack_client_t *, jack_port_t *);
-    EXPORT int jack_port_unlock (jack_client_t *, jack_port_t *);
     EXPORT jack_nframes_t jack_port_get_latency (jack_port_t *port);
     EXPORT jack_nframes_t jack_port_get_total_latency (jack_client_t *,
             jack_port_t *port);
@@ -439,22 +437,6 @@ static jack_port_get_all_connections_fun_def jack_port_get_all_connections_fun =
 EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_client, const jack_port_t* port)
 {
     return (*jack_port_get_all_connections_fun)(ext_client, port);
-}
-
-// Does not use the client parameter
-typedef int (*jack_port_lock_fun_def)(jack_client_t* ext_client, jack_port_t* port);
-static jack_port_lock_fun_def jack_port_lock_fun = 0;
-EXPORT int jack_port_lock(jack_client_t* ext_client, jack_port_t* port)
-{
-    return (*jack_port_lock_fun)(ext_client, port);
-}
-
-// Does not use the client parameter
-typedef int (*jack_port_unlock_fun_def)(jack_client_t* ext_client, jack_port_t* port);
-static jack_port_unlock_fun_def jack_port_unlock_fun = 0;
-EXPORT int jack_port_ununlock(jack_client_t* ext_client, jack_port_t* port)
-{
-    return (*jack_port_unlock_fun)(ext_client, port);
 }
 
 typedef jack_nframes_t (*jack_port_get_total_latency_fun_def)(jack_client_t* ext_client, jack_port_t* port);
@@ -941,8 +923,6 @@ static bool init_library()
 	jack_port_is_mine_fun = (jack_port_is_mine_fun_def)dlsym(gLibrary, "jack_port_is_mine");
 	jack_port_get_connections_fun = (jack_port_get_connections_fun_def)dlsym(gLibrary, "jack_port_get_connections");
 	jack_port_get_all_connections_fun = (jack_port_get_all_connections_fun_def)dlsym(gLibrary, "jack_port_get_all_connections_fun");
-	jack_port_lock_fun = (jack_port_lock_fun_def)dlsym(gLibrary, "jack_port_lock");
-	jack_port_unlock_fun = (jack_port_unlock_fun_def)dlsym(gLibrary, "jack_port_unlock");
 	jack_port_get_total_latency_fun = (jack_port_get_total_latency_fun_def)dlsym(gLibrary, "jack_port_get_total_latency");
 	jack_connect_fun = (jack_connect_fun_def)dlsym(gLibrary, "jack_connect");
 	jack_disconnect_fun = (jack_disconnect_fun_def)dlsym(gLibrary, "jack_disconnect");

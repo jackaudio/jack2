@@ -29,7 +29,7 @@ namespace Jack
 {
 
 JackPort::JackPort()
-        : fFlags(JackPortIsInput), fRefNum( -1), fLatency(0), fMonitorRequests(0), fInUse(false), fLocked(false), fTied(NO_PORT)
+        : fFlags(JackPortIsInput), fRefNum( -1), fLatency(0), fMonitorRequests(0), fInUse(false), fTied(NO_PORT)
 {}
 
 JackPort::~JackPort()
@@ -45,7 +45,6 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
     fRefNum = refnum;
     strcpy(fName, port_name);
     fInUse = true;
-    fLocked = false;
     fLatency = 0;
     fTied = NO_PORT;
     // DB: At this point we do not know current buffer size in frames,
@@ -63,7 +62,6 @@ void JackPort::Release()
     fFlags = JackPortIsInput;
     fRefNum = -1;
     fInUse = false;
-    fLocked = false;
     fLatency = 0;
     fTied = NO_PORT;
 	fAlias1[0] = '\0';
@@ -83,18 +81,6 @@ float* JackPort::GetBuffer()
 int JackPort::GetRefNum() const
 {
     return fRefNum;
-}
-
-int JackPort::Lock()
-{
-    fLocked = true;
-    return 0;
-}
-
-int JackPort::Unlock()
-{
-    fLocked = false;
-    return 0;
 }
 
 jack_nframes_t JackPort::GetLatency() const

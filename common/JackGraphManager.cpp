@@ -595,18 +595,6 @@ int JackGraphManager::ConnectedTo(jack_port_id_t port_src, const char* port_name
 }
 
 // Server
-int JackGraphManager::CheckPort(jack_port_id_t port_index)
-{
-    JackPort* port = GetPort(port_index);
-
-    if (port->fLocked) {
-        jack_error("Port %s is locked against connection changes", port->fName);
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
 int JackGraphManager::CheckPorts(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
     JackPort* src = GetPort(port_src);
@@ -619,16 +607,6 @@ int JackGraphManager::CheckPorts(jack_port_id_t port_src, jack_port_id_t port_ds
 
     if ((src->fFlags & JackPortIsOutput) == 0) {
         jack_error("Source port in attempted (dis)connection of %s and %s is not an output port", src->fName, dst->fName);
-        return -1;
-    }
-
-    if (src->fLocked) {
-        jack_error("Source port %s is locked against connection changes", src->fName);
-        return -1;
-    }
-
-    if (dst->fLocked) {
-        jack_error("Destination port %s is locked against connection changes", dst->fName);
         return -1;
     }
 

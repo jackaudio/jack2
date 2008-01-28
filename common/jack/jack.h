@@ -78,26 +78,10 @@ extern "C"
                                       jack_status_t *status, ...);
 
     /**
-     * Attempt to become an external client of the Jack server.
-     *
-     * JACK is evolving a mechanism for automatically starting the server
-     * when needed.  As a transition, jack_client_new() only does this
-     * when \$JACK_START_SERVER is defined in the environment of the
-     * calling process.  In the future this will become normal behavior.
-     * For full control of this feature, use jack_client_open(), instead.
-     * In either case, defining \$JACK_NO_START_SERVER disables this
-     * feature.
-     *
-     * @param client_name of at most jack_client_name_size() characters.
-     * If this name is already in use, the request fails.
-     *
-     * @return Opaque client handle if successful, otherwise NULL.
-     *
-     * @note Failure generally means that the JACK server is not running.
-     * If there was some other problem, it will be reported via the @ref
-     * jack_error_callback mechanism.  Use jack_client_open() and check
-     * the @a status parameter for more detailed information.
-     */
+	* \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
+	*  NEW JACK CLIENTS
+	*
+	*/
     jack_client_t * jack_client_new (const char *client_name);
 
     /**
@@ -201,7 +185,19 @@ extern "C"
     int jack_set_process_callback (jack_client_t *client,
                                    JackProcessCallback process_callback,
                                    void *arg);
-
+	/**
+	* Block until this JACK client should process data.
+	* 
+	* The @a status argument typically indicates the result
+	* of some recent data processing.
+	* 
+	* @param client - pointer to a JACK client structure
+	* @param status - if non-zero, calling thread should exit
+	*
+	* @return the number of frames of data to process
+	*/
+	jack_nframes_t jack_thread_wait (jack_client_t*, int status);
+	
     /**
      * Tell JACK to call @a thread_init_callback once just after
      * the creation of the thread in which all other callbacks 
@@ -318,6 +314,16 @@ extern "C"
     int jack_set_port_registration_callback (jack_client_t *,
             JackPortRegistrationCallback
             registration_callback, void *arg);
+			
+	/**
+	* Tell the JACK server to call @a connect_callback whenever a
+	* port is connected or disconnected, passing @a arg as a parameter.
+	*
+	* @return 0 on success, otherwise a non-zero error code
+	*/
+	int jack_set_port_connect_callback (jack_client_t *,
+				    JackPortConnectCallback
+				    connect_callback, void *arg);
 
     /**
      * Tell the JACK server to call @a graph_callback whenever the
@@ -523,23 +529,7 @@ extern "C"
      */
     int jack_port_untie (jack_port_t *port);
 
-    /**
-     * A client may call this function to prevent other objects
-     * from changing the connection status of a port. The port
-     * must be owned by the calling client.
-     *
-     * @return 0 on success, otherwise a non-zero error code
-     */
-    int jack_port_lock (jack_client_t *, jack_port_t *);
-
-    /**
-     * This allows other objects to change the connection status of a port.
-     *
-     * @return 0 on success, otherwise a non-zero error code
-     */
-    int jack_port_unlock (jack_client_t *, jack_port_t *);
-
-    /**
+     /**
      * @return the time (in frames) between data being available or
      * delivered at/to a port, and the time at which it arrived at or is
      * delivered to the "other side" of the port.  E.g. for a physical
@@ -571,9 +561,32 @@ extern "C"
      */
     void jack_port_set_latency (jack_port_t *, jack_nframes_t);
 
-    /**
-     *
-     */
+	/**
+	* Request a complete recomputation of a port's total latency. This
+	* can be called by a client that has just changed the internal
+	* latency of its port using @function jack_port_set_latency
+	* and wants to ensure that all signal pathways in the graph
+	* are updated with respect to the values that will be returned
+	* by @function jack_port_get_total_latency. 
+	* 
+	* @return zero for successful execution of the request. non-zero
+	*         otherwise.
+	*/
+	int jack_recompute_total_latency (jack_client_t*, jack_port_t* port);
+
+   /**
+	* Request a complete recomputation of all port latencies. This
+	* can be called by a client that has just changed the internal
+	* latency of its port using @function jack_port_set_latency
+	* and wants to ensure that all signal pathways in the graph
+	* are updated with respect to the values that will be returned
+	* by @function jack_port_get_total_latency. It allows a client 
+	* to change multiple port latencies without triggering a 
+	* recompute for each change.
+	* 
+	* @return zero for successful execution of the request. non-zero
+	*         otherwise.
+	*/
     int jack_recompute_total_latencies (jack_client_t*);
 
     /**
