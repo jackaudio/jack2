@@ -762,7 +762,7 @@ void jack_process(midi_stream_t *str, jack_nframes_t nframes)
 
 		proc.buffer = jack_port_get_buffer(port->jack, nframes);
 		if (str->mode == POLLIN)
-			jack_midi_clear_buffer(proc.buffer, 0);
+			jack_midi_clear_buffer(proc.buffer);
 
 		if (port->state == PORT_REMOVED_FROM_MIDI) {
 			port->state = PORT_REMOVED_FROM_JACK; // this signals to scan thread
@@ -1070,7 +1070,7 @@ static
 void do_jack_output(process_jack_t *proc)
 {
 	output_port_t *port = (output_port_t*) proc->port;
-	int nevents = jack_midi_get_event_count(proc->buffer, 0);
+	int nevents = jack_midi_get_event_count(proc->buffer);
 	int i;
 	if (nevents)
 		debug_log("jack_out: %d events in %s\n", nevents, port->base.name);
@@ -1078,7 +1078,7 @@ void do_jack_output(process_jack_t *proc)
 		jack_midi_event_t event;
 		event_head_t hdr;
 
-		jack_midi_event_get(&event, proc->buffer, i, 0);
+		jack_midi_event_get(&event, proc->buffer, i);
 
 		if (jack_ringbuffer_write_space(port->base.data_ring) < event.size || jack_ringbuffer_write_space(port->base.event_ring) < sizeof(hdr)) {
 			debug_log("jack_out: output buffer overflow on %s\n", port->base.name);

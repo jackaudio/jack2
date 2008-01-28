@@ -74,7 +74,7 @@ int midi_unpack_buf(midi_unpack_t *buf, const unsigned char *data, int len, void
 		const unsigned char byte = data[i];
 		if (byte >= 0xF8) // system realtime
 		{
-			jack_midi_event_write(jack_port_buf, time, &data[i], 1, 0);
+			jack_midi_event_write(jack_port_buf, time, &data[i], 1);
 			//printf("midi_unpack: written system relatime event\n");
 			//midi_input_write(in, &data[i], 1);
 		}
@@ -118,7 +118,7 @@ int midi_unpack_buf(midi_unpack_t *buf, const unsigned char *data, int len, void
 					temp[1] = buf->data[1];
 					jack_midi_event_write(jack_port_buf, time, temp, 3, 0);
 				} else
-					jack_midi_event_write(jack_port_buf, time, &buf->data[0], buf->pos, 0);
+					jack_midi_event_write(jack_port_buf, time, &buf->data[0], buf->pos);
 				//printf("midi_unpack: written %d-byte event\n", buf->pos);
 				//midi_input_write(in, &buf->data[0], buf->pos);
 			}
