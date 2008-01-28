@@ -650,7 +650,7 @@ void jack_process(alsa_seqmidi_t *self, struct process_info *info)
 			port_t *port = *pport;
 			port->jack_buf = jack_port_get_buffer(port->jack_port, info->nframes);
 			if (info->dir == PORT_INPUT)
-				jack_midi_clear_buffer(port->jack_buf, 0);
+				jack_midi_clear_buffer(port->jack_buf);
 
 			if (!port->is_dead)
 				(*process)(self, port, info);
@@ -685,7 +685,7 @@ void do_jack_input(alsa_seqmidi_t *self, port_t *port, struct process_info *info
 			time = 0;
 		else if (time >= info->nframes)
 			time = info->nframes - 1;
-		buf = jack_midi_event_reserve(port->jack_buf, (jack_nframes_t)time, ev.size, 0);
+		buf = jack_midi_event_reserve(port->jack_buf, (jack_nframes_t)time, ev.size);
 		if (buf)
 			jack_ringbuffer_read(port->early_events, (char*)buf, ev.size);
 		else
@@ -766,7 +766,7 @@ void input_event(alsa_seqmidi_t *self, snd_seq_event_t *alsa_event, struct proce
 	else if (event_frame >= info->nframes)
 		event_frame = info->nframes - 1;
 
-	jack_midi_event_write(port->jack_buf, event_frame, data, size, 0);
+	jack_midi_event_write(port->jack_buf, event_frame, data, size);
 }
 
 static
@@ -799,7 +799,7 @@ static
 void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* info)
 {
 	stream_t *str = &self->stream[info->dir];
-	int nevents = jack_midi_get_event_count(port->jack_buf, 0);
+	int nevents = jack_midi_get_event_count(port->jack_buf);
 	int i;
 	for (i=0; i<nevents; ++i) {
 		jack_midi_event_t jack_event;
@@ -809,7 +809,7 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		snd_seq_real_time_t out_rt;
 		int err;
 
-		jack_midi_event_get(&jack_event, port->jack_buf, i, 0);
+		jack_midi_event_get(&jack_event, port->jack_buf, i);
 
 		snd_seq_ev_clear(&alsa_event);
 		snd_midi_event_reset_encode(str->codec);
