@@ -119,7 +119,7 @@ void JackClient::SetupDriverSync(bool freewheel)
 \brief Notification received from the server.
 */
 
-int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value)
+int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
  	return 0;
 }
@@ -204,13 +204,24 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 if (fPortRegistration)
                     fPortRegistration(value1, 0, fPortRegistrationArg);
                 break;
+				
+			case kPortConnectCallback:
+                JackLog("JackClient::kPortConnectCallback src = %ld dst = %ld\n", value1, value2);
+                if (fPortConnect)
+                    fPortConnect(value1, value2, 1, fPortConnectArg);
+                break;
+				
+			case kPortDisconnectCallback:
+                JackLog("JackClient::kPortDisconnectCallback src = %ld dst = %ld\n", value1, value2);
+                if (fPortConnect)
+                    fPortConnect(value1, value2, 0, fPortConnectArg);
+                break;
 
             case kXRunCallback:
                 JackLog("JackClient::kXRunCallback\n");
                 if (fXrun)
                     res = fXrun(fXrunArg);
                 break;
-
 		}
     }
 

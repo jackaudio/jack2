@@ -221,12 +221,11 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
 jack_nframes_t JackGraphManager::ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count)
 {
     const jack_int_t* connections = manager->GetConnections(port_index);
-    jack_nframes_t latency = GetPort(port_index)->GetLatency();
     jack_nframes_t max_latency = 0;
     jack_port_id_t dst_index;
 
     if (hop_count > 8)
-        return latency;
+        return GetPort(port_index)->GetLatency();
 	
     for (int i = 0; (i < CONNECTION_NUM) && ((dst_index = connections[i]) != EMPTY); i++) {
         if (src_port_index != dst_index) {
@@ -239,7 +238,7 @@ jack_nframes_t JackGraphManager::ComputeTotalLatencyAux(jack_port_id_t port_inde
         }
     }
 	
-    return max_latency + latency;
+    return max_latency + GetPort(port_index)->GetLatency();
 }
 
 // Client
