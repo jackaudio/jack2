@@ -217,8 +217,8 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
     return 0;
 }
 
-// Server
-jack_nframes_t JackGraphManager::GetTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count)
+// Client
+jack_nframes_t JackGraphManager::ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count)
 {
     const jack_int_t* connections = manager->GetConnections(port_index);
     jack_nframes_t latency = GetPort(port_index)->GetLatency();
@@ -227,37 +227,49 @@ jack_nframes_t JackGraphManager::GetTotalLatencyAux(jack_port_id_t port_index, j
 
     if (hop_count > 8)
         return latency;
-
+	
     for (int i = 0; (i < CONNECTION_NUM) && ((dst_index = connections[i]) != EMPTY); i++) {
         if (src_port_index != dst_index) {
-            AssertPort(dst_index);
+	        AssertPort(dst_index);
             JackPort* dst_port = GetPort(dst_index);
             jack_nframes_t this_latency = (dst_port->fFlags & JackPortIsTerminal)
                                           ? dst_port->GetLatency()
-                                          : GetTotalLatencyAux(dst_index, port_index, manager, hop_count + 1);
+                                          : ComputeTotalLatencyAux(dst_index, port_index, manager, hop_count + 1);
             max_latency = MAX(max_latency, this_latency);
         }
     }
-
+	
     return max_latency + latency;
 }
 
-// Server
-jack_nframes_t JackGraphManager::GetTotalLatency(jack_port_id_t port_index)
+// Client
+int JackGraphManager::ComputeTotalLatency(jack_port_id_t port_index)
 {
     UInt16 cur_index;
     UInt16 next_index;
-    jack_nframes_t total_latency;
+	JackPort* port = GetPort(port_index);
     AssertPort(port_index);
-    JackLog("JackGraphManager::GetTotalLatency port_index = %ld\n", port_index);
-
+  
     do {
         cur_index = GetCurrentIndex();
-        total_latency = GetTotalLatencyAux(port_index, port_index, ReadCurrentState(), 0);
+        port->fTotalLatency = ComputeTotalLatencyAux(port_index, port_index, ReadCurrentState(), 0);
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
+	
+	JackLog("JackGraphManager::GetTotalLatency port_index = %ld total latency = %ld\n", port_index, port->fTotalLatency);
+	return 0;
+}
 
-    return total_latency;
+// Client
+int JackGraphManager::ComputeTotalLatencies()
+{
+	jack_port_id_t port_index;
+	for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
+        JackPort* port = GetPort(port_index);
+        if (port->IsUsed()) 
+			ComputeTotalLatency(port_index);
+	}
+	return 0;
 }
 
 // Server
@@ -265,14 +277,12 @@ void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackLock lock(this);
     JackLog("JackGraphManager::SetBufferSize size = %ld\n", (long int)buffer_size);
-    jack_port_id_t port_index;
-
-    fBufferSize = buffer_size;
-
+   
+	jack_port_id_t port_index;
     for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
         JackPort* port = GetPort(port_index);
         if (port->IsUsed())
-            port->ClearBuffer(fBufferSize);
+            port->ClearBuffer(buffer_size);
     }
 }
 
@@ -296,18 +306,16 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
 }
 
 // Server
-jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
+jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size)
 {
 	JackLock lock(this);
     JackConnectionManager* manager = WriteNextStateStart();
     jack_port_id_t port_index = AllocatePortAux(refnum, port_name, port_type, flags);
 
-    assert(fBufferSize != 0);
-
     if (port_index != NO_PORT) {
         JackPort* port = GetPort(port_index);
         assert(port);
-        port->ClearBuffer(fBufferSize);
+        port->ClearBuffer(buffer_size);
 
         int res;
         if (flags & JackPortIsOutput) {

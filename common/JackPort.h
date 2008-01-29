@@ -49,6 +49,7 @@ class JackPort
         int fRefNum;
 
         jack_nframes_t fLatency;
+		jack_nframes_t fTotalLatency;
         uint8_t fMonitorRequests;
 
         bool fInUse;
@@ -94,6 +95,7 @@ class JackPort
         int UnTie();
 
         jack_nframes_t GetLatency() const;
+		jack_nframes_t GetTotalLatency() const;
         void SetLatency(jack_nframes_t latency);
 
         int RequestMonitor(bool onoff);

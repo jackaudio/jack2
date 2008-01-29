@@ -42,18 +42,17 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
 
         JackPort fPortArray[PORT_NUM];   
 		JackClientTiming fClientTiming[CLIENT_NUM];
-        jack_nframes_t fBufferSize;
-
+    
         jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void GetConnectionsAux(JackConnectionManager* manager, const char** res, jack_port_id_t port_index);
         const char** GetPortsAux(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
         float* GetBuffer(jack_port_id_t port_index);
         void* GetBufferAux(JackConnectionManager* manager, jack_port_id_t port_index, jack_nframes_t frames);
-        jack_nframes_t GetTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count);
+        jack_nframes_t ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count);
 
     public:
 
-        JackGraphManager() : fBufferSize(0)
+        JackGraphManager()
         {}
         ~JackGraphManager()
         {}
@@ -61,14 +60,15 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         void SetBufferSize(jack_nframes_t buffer_size);
 
         // Ports management
-        jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);  
+        jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size);  
 		int ReleasePort(int refnum, jack_port_id_t port_index); 
 	    void RemoveAllPorts(int refnum); 
         void DisconnectAllPorts(int refnum); 
 	
         JackPort* GetPort(jack_port_id_t index); 
         jack_port_id_t GetPort(const char* name); 
-        jack_nframes_t GetTotalLatency(jack_port_id_t port_index); 
+        int ComputeTotalLatency(jack_port_id_t port_index); 
+		int ComputeTotalLatencies(); 
         int RequestMonitor(jack_port_id_t port_index, bool onoff); 
 
         // Connections management

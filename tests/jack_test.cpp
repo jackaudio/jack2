@@ -104,7 +104,8 @@ jack_position_t request_pos;
 int silent_error = 0;	// jack silent mode
 int verbose_mode = 0;
 int transport_mode = 1;
-int ext_latency = 0;	// test latency for PHY devices
+jack_nframes_t input_ext_latency = 0;	// test latency for PHY devices
+jack_nframes_t output_ext_latency = 0;	// test latency for PHY devices
 
 int sync_called = 0;
 int starting_state = 1;
@@ -1509,8 +1510,9 @@ int main (int argc, char *argv[])
     inports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
     outports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
     if (inports[0] != NULL) {
-        ext_latency = jack_port_get_latency (jack_port_by_name(client1, inports[0]));
-        if (ext_latency != jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0]))) {
+        output_ext_latency = jack_port_get_latency (jack_port_by_name(client1, inports[0]));  // from client to out driver (which has "inputs" ports..)
+		input_ext_latency = jack_port_get_latency (jack_port_by_name(client1, outports[0]));  // from in driver (which has "output" ports..) to client 
+        if (output_ext_latency != jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0]))) {
             t_error = 1;
             printf("!!! ERROR !!! get_latency & get_all_latency for a PHY device (unconnected) didn't return the same value !\n");
         }
@@ -1524,24 +1526,24 @@ int main (int argc, char *argv[])
 
         if ((jack_port_get_latency (output_port1) != 0) ||
                 (jack_port_get_total_latency(client1, output_port1) != 0) ||
-                (jack_port_get_latency (jack_port_by_name(client1, inports[0])) != (ext_latency)) ||
-                (jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) != (ext_latency + 256)) ||
-                (jack_port_get_total_latency(client1, output_port2) != (ext_latency + 256)) ||
+                (jack_port_get_latency (jack_port_by_name(client1, inports[0])) != (output_ext_latency)) ||
+                (jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) != (output_ext_latency + 256)) ||
+                (jack_port_get_total_latency(client1, output_port2) != (output_ext_latency + 256)) ||
                 (jack_port_get_total_latency(client1, input_port2) != 0) ||
-                (jack_port_get_total_latency(client1, input_port1) != ext_latency) ||
-                (jack_port_get_latency (jack_port_by_name(client1, outports[0])) != ext_latency) ||
-                (jack_port_get_total_latency(client1, jack_port_by_name(client1, outports[0])) != ext_latency)
+                (jack_port_get_total_latency(client1, input_port1) != input_ext_latency) ||
+                (jack_port_get_latency (jack_port_by_name(client1, outports[0])) != input_ext_latency) ||
+                (jack_port_get_total_latency(client1, jack_port_by_name(client1, outports[0])) != input_ext_latency)
            ) {
             printf("!!! WARNING !!! get_latency functions may have a problem : bad value returned !\n");
-            printf("!!! get_latency(output_port1) : %i (must be 0)\n", jack_port_get_latency (output_port1) );
+            printf("!!! get_latency(output_port1) : %i (must be 0)\n", jack_port_get_latency(output_port1));
             printf("!!! get_total_latency(output_port1) : %i (must be 0)\n", jack_port_get_total_latency(client1, output_port1));
-            printf("!!! get_latency(PHY[0]) : %i (must be external latency : %i)\n", jack_port_get_latency(jack_port_by_name(client1, inports[0])), ext_latency);
-            printf("!!! get_total_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) , (ext_latency + 256));
-            printf("!!! get_total_latency(output_port2) : %i (must be %i)\n", jack_port_get_total_latency(client1, output_port2), (ext_latency + 256));
+            printf("!!! get_latency(PHY[0]) : %i (must be external latency : %i)\n", jack_port_get_latency(jack_port_by_name(client1, inports[0])), output_ext_latency);
+            printf("!!! get_total_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) , (output_ext_latency + 256));
+            printf("!!! get_total_latency(output_port2) : %i (must be %i)\n", jack_port_get_total_latency(client1, output_port2), (output_ext_latency + 256));
             printf("!!! get_total_latency(input_port2) : %i (must be 0)\n", jack_port_get_total_latency(client1, input_port2));
-            printf("!!! get_total_latency(input_port1) : %i (must be %i)\n", jack_port_get_total_latency(client1, input_port1), ext_latency);
-            printf("!!! get_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_latency(jack_port_by_name(client1, outports[0])), ext_latency);
-            printf("!!! get_total_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, outports[0])), ext_latency);
+            printf("!!! get_total_latency(input_port1) : %i (must be %i)\n", jack_port_get_total_latency(client1, input_port1), input_ext_latency);
+            printf("!!! get_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_latency(jack_port_by_name(client1, outports[0])), input_ext_latency);
+            printf("!!! get_total_latency(PHY[0]) : %i (must be %i)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, outports[0])), input_ext_latency);
 
         } else {
             Log("get_latency & get_total_latency seems quite ok...\n");
@@ -1556,18 +1558,24 @@ int main (int argc, char *argv[])
         jack_connect(client2, outports[0], jack_port_name(input_port2));
         jack_connect(client2, jack_port_name(output_port1), inports[0]);
         jack_connect(client2, jack_port_name(output_port2), inports[0]);
-        jack_port_set_latency (output_port1, 256);
-        jack_port_set_latency (output_port2, 512);
+        jack_port_set_latency(output_port1, 256);
+        jack_port_set_latency(output_port2, 512);
         jack_recompute_total_latencies(client1);
 
-        if ((jack_port_get_latency (output_port1) != 256 ) ||
-                (jack_port_get_total_latency(client1, output_port1) != (256 + ext_latency)) ||
-                (jack_port_get_latency (output_port2) != 512) ||
-                (jack_port_get_total_latency(client1, output_port2) != (512 + ext_latency)) ||
-                (jack_port_get_latency (jack_port_by_name(client1, inports[0])) != ext_latency) ||
-                (jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) != (512 + ext_latency))
+        if ((jack_port_get_latency(output_port1) != 256 ) ||
+			(jack_port_get_total_latency(client1, output_port1) != (256 + output_ext_latency)) ||
+			(jack_port_get_latency(output_port2) != 512) ||
+			(jack_port_get_total_latency(client1, output_port2) != (512 + output_ext_latency)) ||
+			(jack_port_get_latency(jack_port_by_name(client1, inports[0])) != output_ext_latency) ||
+			(jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])) != (512 + output_ext_latency))
            ) {
             printf("!!! WARNING !!! get_latency functions may have a problem : bad value returned !\n");
+			printf("!!! get_latency(output_port1) : %i (must be 256)\n", jack_port_get_latency(output_port1));
+			printf("!!! get_total_latency(output_port1) : %i (must be 256 + output_ext_latency)\n", jack_port_get_total_latency(client1, output_port1));
+			printf("!!! get_latency(output_port2) : %i (must 512)\n", jack_port_get_latency(output_port2));
+			printf("!!! get_total_latency(output_port2) : %i (must 512 + output_ext_latency)\n", jack_port_get_total_latency(client1, output_port2));
+			printf("!!! get_latency(inports[0])) : %i (must output_ext_latency)\n", jack_port_get_latency(jack_port_by_name(client1, inports[0])));
+			printf("!!! get_total_latency(inports[0]) : %i (must 512 + output_ext_latency)\n", jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0])));
         } else {
             Log("get_latency & get_total_latency seems quite ok...\n");
         }

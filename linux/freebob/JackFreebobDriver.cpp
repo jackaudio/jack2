@@ -735,7 +735,8 @@ int JackFreebobDriver::Attach()
 
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
                                                           JACK_DEFAULT_AUDIO_TYPE,
-                                                          (JackPortFlags)port_flags)) == NO_PORT) {
+                                                          (JackPortFlags)port_flags,
+														  fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -764,7 +765,8 @@ int JackFreebobDriver::Attach()
             printMessage ("Registering playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
                                                           JACK_DEFAULT_AUDIO_TYPE,
-                                                          (JackPortFlags)port_flags)) == NO_PORT) {
+                                                          (JackPortFlags)port_flags,
+														  fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }

@@ -426,7 +426,7 @@ EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
     }
 }
 
-EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client, jack_port_t* port)
+EXPORT int jack_recompute_total_latency(jack_client_t* ext_client, jack_port_t* port)
 {
 #ifdef __CLIENTDEBUG__
 	JackLibGlobals::CheckContext();
@@ -441,11 +441,9 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client, jack_port_t
         jack_error("jack_recompute_total_latencies called with a NULL port");
         return -1;
     } else {
-  		// TODO
+		WaitGraphChange();
+  		return GetGraphManager()->ComputeTotalLatency(myport);
     }
-
-    // The latency computation is done each time jack_port_get_total_latency is called
-    return 0;
 }
 
 EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
@@ -459,11 +457,9 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
         jack_error("jack_recompute_total_latencies called with a NULL client");
         return -1;
     } else {
-  		// TODO
+		WaitGraphChange();
+  		return GetGraphManager()->ComputeTotalLatencies();
     }
-
-    // The latency computation is done each time jack_port_get_total_latency is called
-    return 0;
 }
 
 EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
@@ -927,9 +923,8 @@ EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client, jac
         jack_error("jack_port_get_total_latency called with an incorrect port %ld", myport);
         return 0;
     } else {
-        // The latency computation is done each time
-        WaitGraphChange();
-        return GetGraphManager()->GetTotalLatency(myport);
+		WaitGraphChange();
+        return GetGraphManager()->GetPort(myport)->GetTotalLatency();
     }
 }
 
