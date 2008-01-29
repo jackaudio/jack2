@@ -297,7 +297,7 @@ int process1(jack_nframes_t nframes, void *arg)
     activated++; // counter of callback activation
     if (process1_activated == 1) {
         out1 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port1, nframes);
-        for (int p = 0; p < nframes;p++) {
+        for (jack_nframes_t p = 0; p < nframes; p++) {
             out1[p] = signal1[index1];
             index1++;
             if (index1 == 48000)
@@ -307,7 +307,7 @@ int process1(jack_nframes_t nframes, void *arg)
     if (process1_activated == 3) {
         out1 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port1, nframes);
         out1b = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port1b, nframes);
-        for (int p = 0; p < nframes;p++) {
+        for (jack_nframes_t p = 0; p < nframes; p++) {
             out1[p] = signal1[index1];
             if (index2 != 0) {
                 out1b[p] = ( -1 * signal1[index1]);
@@ -354,7 +354,7 @@ int process2(jack_nframes_t nframes, void *arg)
 
     if (process2_activated == 1) { // Reception du process1 pour comparer les donnees
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
-        for (int p = 0; p < nframes;p++) {
+        for (int p = 0; p < nframes; p++) {
             signal2[index2] = in2[p];
             if (index2 == 95999) {
                 process2_activated = 0;
@@ -370,7 +370,7 @@ int process2(jack_nframes_t nframes, void *arg)
         out2 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port2, nframes);
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
 
-        for (int p = 0; p < nframes;p++) {
+        for (int p = 0; p < nframes; p++) {
             out2[p] = signal1[index1];
             index1++;
             if (index1 == 48000)
