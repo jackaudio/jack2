@@ -117,6 +117,8 @@ int linefw = 0;
 int lineports = 0;
 int linecl2 = 0;
 
+int client_register = 0;
+
 /**
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -172,6 +174,10 @@ void Jack_Freewheel_Callback(int starting, void *arg)
 void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 {
     Log("Client registration callback name = %s has been successfully called with value %i. (msg from callback)\n", name, val);
+	if (val)
+		client_register++;
+	else
+		client_register--;
 }
 
 int Jack_Update_Buffer_Size(jack_nframes_t nframes, void *arg)
@@ -250,6 +256,7 @@ int Jack_Sync_Callback(jack_transport_state_t state, jack_position_t *pos, void 
 
     return res;
 }
+
 
 /**
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -583,7 +590,7 @@ int main (int argc, char *argv[])
     if (client2 == NULL) {
         Log ("valid : a second client with the same name cannot be registered\n");
     } else {
-        printf("!!! ERROR !!! Jackd server has accepted multiples client with the same name !");
+        printf("!!! ERROR !!! Jackd server has accepted multiples client with the same name !\n");
         jack_client_close(client2);
     }
 	
@@ -597,9 +604,9 @@ int main (int argc, char *argv[])
         Log ("valid : a second client with the same name can be registered (client automatic renaming)\n");
 		jack_client_close(client2);
     } else {
-        printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!");
+        printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!\n");
     }
-
+	
     /**
      * testing client name...
      * Verify that the name sended at registration and the one returned by jack server is the same...
@@ -670,7 +677,7 @@ int main (int argc, char *argv[])
     file = fopen(filename, "w");
     if (file == NULL) {
         fprintf(stderr, "Erreur dans l'ouverture du fichier log framefile.dat");
-        exit( -1);
+        exit(-1);
     }
 
     /**
@@ -1108,6 +1115,11 @@ int main (int argc, char *argv[])
         }
         exit(1);
     }
+	
+	// Check client registration callback
+	sleep(1);
+	if (client_register == 0)
+		printf("!!! ERROR !!! Client registration callback not called!\n");
 
     /**
      * Register callback for this client.
