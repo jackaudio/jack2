@@ -50,7 +50,7 @@ void JackSocketServerNotifyChannel::ClientNotify(int refnum, int notify, int val
 {
     JackClientNotificationRequest req(refnum, notify, value);
     if (req.Write(&fRequestSocket) < 0) {
-        jack_error("Could not write request type = %ld", req.fType);
+        jack_error("Could not write request ref = %ld notify = %ld", refnum, notify);
     }
 }
 

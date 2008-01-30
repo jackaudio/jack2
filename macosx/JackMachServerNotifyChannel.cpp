@@ -48,7 +48,7 @@ void JackMachServerNotifyChannel::ClientNotify(int refnum, int notify, int value
 {
     kern_return_t res = rpc_jack_client_rt_notify(fClientPort.GetPort(), refnum, notify, value, 0);
     if (res != KERN_SUCCESS) {
-        jack_error("JackMachServerNotifyChannel::ClientNotify: ref = %ld notify = %ld err = %s", refnum, notify, mach_error_string(res));
+  		jack_error("Could not write request ref = %ld notify = %ld err = %s", refnum, notify, mach_error_string(res));
     }
 }
 
