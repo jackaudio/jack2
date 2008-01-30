@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2001 Paul Davis 
-    Copyright (C) 2004 Karsten Wiese, Rui Nuno Capela
+    Copyright (C) 2005 Karsten Wiese, Rui Nuno Capela
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-    $Id: usx2y.c,v 1.2 2005/09/29 14:51:59 letz Exp $
 */
 
 //#include <jack/hardware.h>
@@ -232,6 +231,9 @@ usx2y_driver_start (alsa_driver_t *driver)
 		return -1;
 	}
 
+	if (driver->midi && !driver->xrun_recovery)
+		(driver->midi->start)(driver->midi);
+
 	if (driver->playback_handle) {
 /* 		int i, j; */
 /* 		char buffer[2000]; */
@@ -382,6 +384,9 @@ usx2y_driver_stop (alsa_driver_t *driver)
 
 	munmap(h->hwdep_pcm_shm, sizeof(snd_usX2Y_hwdep_pcm_shm_t));
 
+	if (driver->midi && !driver->xrun_recovery)
+		(driver->midi->stop)(driver->midi);
+
 	return 0;
 }
 
@@ -484,6 +489,9 @@ usx2y_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 		return 0;
 	}
 
+    if (driver->midi)
+        (driver->midi->read)(driver->midi, nframes);
+
 	nread = 0;
 
 	if (snd_pcm_mmap_begin (driver->capture_handle,
@@ -557,6 +565,9 @@ usx2y_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 	if (!driver->playback_handle || driver->engine->freewheeling) {
 		return 0;
 	}
+
+    if (driver->midi)
+        (driver->midi->write)(driver->midi, nframes);
 
 	nwritten = 0;
 

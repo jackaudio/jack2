@@ -201,6 +201,20 @@ void JackPort::Rename(const char* name, int index)
 
 bool JackPort::NameEquals(const char* target)
 {
+	char buf[JACK_PORT_NAME_SIZE + 1];
+
+	/* this nasty, nasty kludge is here because between 0.109.0 and 0.109.1,
+	   the ALSA audio backend had the name "ALSA", whereas as before and
+	   after it, it was called "alsa_pcm". this stops breakage for
+	   any setups that have saved "alsa_pcm" or "ALSA" in their connection
+	   state.
+	*/
+
+	if (strncmp(target, "ALSA:capture", 12) == 0 || strncmp(target, "ALSA:playback", 13) == 0) {
+		snprintf(buf, sizeof(buf), "alsa_pcm%s", target + 4);
+		target = buf;
+	}
+	
 	return (strcmp(fName, target) == 0 
 		|| strcmp(fAlias1, target) == 0 
 		|| strcmp(fAlias2, target) == 0);
