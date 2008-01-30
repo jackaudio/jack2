@@ -20,6 +20,7 @@ Tim Blechmann
 2008-01-30 Stephane Letz  <letz@grame.fr>
 	
 	* Latest jack_lsp code from jack SVN.
+	* Update in usx2y.c and JackPort.cpp to match jackd 0.109.2.
 
 2008-01-29 Stephane Letz  <letz@grame.fr>
 	
