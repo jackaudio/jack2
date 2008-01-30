@@ -5,6 +5,9 @@
 #endif
 #include <string.h>
 #include <getopt.h>
+
+//#include <config.h>
+
 #include <jack/jack.h>
 
 char * my_name;
@@ -12,17 +15,18 @@ char * my_name;
 void
 show_version (void)
 {
-	//fprintf (stderr, "%s: JACK Audio Connection Kit version " VERSION "\n",
-	//my_name);
+	//fprintf (stderr, "%s: JACK Audio Connection Kit version " VERSION "\n", my_name);
 }
 
 void
 show_usage (void)
 {
 	show_version ();
-	fprintf (stderr, "\nUsage: %s [options]\n", my_name);
-	fprintf (stderr, "List active Jack ports, and optionally display extra information.\n\n");
+	fprintf (stderr, "\nUsage: %s [options] [filter string]\n", my_name);
+	fprintf (stderr, "List active Jack ports, and optionally display extra information.\n");
+	fprintf (stderr, "Optionally filter ports which match ALL strings provided after any options.\n\n");
 	fprintf (stderr, "Display options:\n");
+	fprintf (stderr, "        -A, --aliases         List aliases for each port\n");
 	fprintf (stderr, "        -c, --connections     List connections to/from each port\n");
 	fprintf (stderr, "        -l, --latency         Display per-port latency in frames at each port\n");
 	fprintf (stderr, "        -L, --latency         Display total latency in frames at each port\n");
@@ -31,7 +35,7 @@ show_usage (void)
 	fprintf (stderr, "        -t, --type            Display port type\n");
 	fprintf (stderr, "        -h, --help            Display this help message\n");
 	fprintf (stderr, "        --version             Output version information and exit\n\n");
-	fprintf (stderr, "For more information see http://jackit.sourceforge.net/\n");
+	fprintf (stderr, "For more information see http://jackaudio.org/\n");
 }
 
 int
@@ -40,7 +44,9 @@ main (int argc, char *argv[])
 	jack_client_t *client;
 	jack_status_t status;
 	const char **ports, **connections;
-	unsigned int i, j;
+	unsigned int i, j, k;
+	int skip_port;
+	int show_aliases = 0;
 	int show_con = 0;
 	int show_port_latency = 0;
 	int show_total_latency = 0;
@@ -48,9 +54,10 @@ main (int argc, char *argv[])
 	int show_type = 0;
 	int c;
 	int option_index;
-	jack_port_t *port;
-
+	char* aliases[2];
+	
 	struct option long_options[] = {
+		{ "aliases", 0, 0, 'A' },
 		{ "connections", 0, 0, 'c' },
 		{ "port-latency", 0, 0, 'l' },
 		{ "total-latency", 0, 0, 'L' },
@@ -68,8 +75,13 @@ main (int argc, char *argv[])
 		my_name ++;
 	}
 
-	while ((c = getopt_long (argc, argv, "clLphvt", long_options, &option_index)) >= 0) {
+	while ((c = getopt_long (argc, argv, "AclLphvt", long_options, &option_index)) >= 0) {
 		switch (c) {
+		case 'A':
+			aliases[0] = (char *) malloc (jack_port_name_size());
+			aliases[1] = (char *) malloc (jack_port_name_size());
+			show_aliases = 1;
+			break;
 		case 'c':
 			show_con = 1;
 			break;
@@ -119,10 +131,29 @@ main (int argc, char *argv[])
 	ports = jack_get_ports (client, NULL, NULL, 0);
 
 	for (i = 0; ports[i]; ++i) {
+		// skip over any that don't match ALL of the strings presented at command line
+		skip_port = 0;
+		for(k=optind; k < argc; k++){
+			if(strstr(ports[i], argv[k]) == NULL ){
+				skip_port = 1;
+			}
+		}
+		if(skip_port) continue;
+
 		printf ("%s\n", ports[i]);
 
-		port = jack_port_by_name (client, ports[i]);
+		jack_port_t *port = jack_port_by_name (client, ports[i]);
 
+		if (show_aliases) {
+			int cnt;
+			int i;
+
+			cnt = jack_port_get_aliases (port, aliases);
+			for (i = 0; i < cnt; ++i) {
+				printf ("   %s\n", aliases[i]);
+			}
+		}
+				
 		if (show_con) {
 			if ((connections = jack_port_get_all_connections (client, jack_port_by_name(client, ports[i]))) != 0) {
 				for (j = 0; connections[j]; j++) {
@@ -133,13 +164,13 @@ main (int argc, char *argv[])
 		}
 		if (show_port_latency) {
 			if (port) {
-				printf ("	port latency = %ld frames\n",
+				printf ("	port latency = %" PRIu32 " frames\n",
 					jack_port_get_latency (port));
 			}
 		}
 		if (show_total_latency) {
 			if (port) {
-				printf ("	total latency =  %ld frames\n",
+				printf ("	total latency = %" PRIu32 " frames\n",
 					jack_port_get_total_latency (client, port));
 			}
 		}

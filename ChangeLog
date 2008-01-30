@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-01-30 Stephane Letz  <letz@grame.fr>
+	
+	* Latest jack_lsp code from jack SVN.
+
 2008-01-29 Stephane Letz  <letz@grame.fr>
 	
 	* Implement jack_recompute_total_latency and jack_recompute_total_latencies.
