@@ -25,7 +25,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <AudioUnit/AudioUnit.h>
 #include "JackAudioDriver.h"
 #include "JackTime.h"
-#include "JackThread.h"
 
 #include "/Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h"
 
@@ -47,7 +46,7 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 \todo hardware monitoring
 */
 
-class JackCoreAudioDriver : public JackAudioDriver,  public JackRunnableInterface
+class JackCoreAudioDriver : public JackAudioDriver
 {
 
     private:
@@ -67,9 +66,18 @@ class JackCoreAudioDriver : public JackAudioDriver,  public JackRunnableInterfac
         AudioTimeStamp* fCurrentTime;
 		
 		bool fState;
-		CFAbsoluteTime fStopTime;
-		UInt32 fRunning;
-		JackThread*	fThread;  
+		
+		/// Intitial state
+		int fCapturing;
+		int fPlaying;
+		
+		int fInChannels;
+		int fOutChannels;
+		
+		char fCaptureUID[256];
+		char fPlaybackUID[256];
+		
+		bool fMonitor;
 	
         static	OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
@@ -104,7 +112,40 @@ class JackCoreAudioDriver : public JackAudioDriver,  public JackRunnableInterfac
         OSStatus GetDefaultInputDevice(AudioDeviceID* id);
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
-        OSStatus GetTotalChannels(AudioDeviceID device, long* channelCount, bool isInput);
+        OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
+		
+		// Setup
+		int SetupDevices(const char* capture_driver_uid, 
+						 const char* playback_driver_uid, 
+						 char* capture_driver_name,  
+						 char* playback_driver_name);
+						 
+		int SetupChannels(int capturing, 
+						int playing, 
+						int& inchannels, 
+						int& outchannels, 
+						int& in_nChannels, 
+						int& out_nChannels,
+						bool strict);
+						
+		int SetupBuffers(int inchannels, int outchannels);
+		void DisposeBuffers();
+
+		int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
+		
+		int OpenAUHAL(int capturing, 
+						int playing, 
+						int inchannels, 
+						int outchannels, 
+						int in_nChannels, 
+						int out_nChannels, 
+						jack_nframes_t nframes,
+						jack_nframes_t samplerate,
+						bool strict);
+		void CloseAUHAL();
+		
+		int AddListeners();
+		void RemoveListeners();
 
     public:
 
@@ -122,8 +163,7 @@ class JackCoreAudioDriver : public JackAudioDriver,  public JackRunnableInterfac
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency);
-
-        int Close();
+		int Close();
 
         int Attach();
 
@@ -134,8 +174,6 @@ class JackCoreAudioDriver : public JackAudioDriver,  public JackRunnableInterfac
         int Write();
 
         int SetBufferSize(jack_nframes_t buffer_size);
-		
-		bool Execute();
 };
 
 } // end of namespace

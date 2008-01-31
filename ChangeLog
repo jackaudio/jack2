@@ -17,10 +17,13 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-01-31 Stephane Letz  <letz@grame.fr>
+
+	* Remove checking thread in CoreAudio driver, better device state change recovery strategy: the driver is stopped and restarted.
+
 2008-01-28 Stephane Letz  <letz@grame.fr>
 
-	* Updated API to match jack 0.109.0 version (in progress). Correct checking thread in CoreAudio driver.
-	* Port connection callback.
+	* Correct checking thread in CoreAudio driver.
 
 2008-01-24 Stephane Letz  <letz@grame.fr>
 
