@@ -3,7 +3,7 @@
  *
  * @brief This simple client demonstrates the use of "jack_thread_wait" function in a multi-threaded context.
  
-  A set of n threads (the jack process thread + (n - 1) helper threads) are used to work on a global queue of tasks.
+  A set of threads (the jack process thread + n helper threads) are used to work on a global queue of tasks.
   The last finishing thread gives control back to libjack using the "jack_thread_wait" function. Other threads suspend
   on a condition variable and are resumed next cycle by the libjack suspended thread.
 */
