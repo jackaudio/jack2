@@ -247,5 +247,12 @@ pthread_t JackWinThread::GetThreadID()
     return fThread;
 }
 
+void JackWinThread::Terminate()
+{
+	TerminateThread(fThread, 0);
+	WaitForSingleObject(fThread, INFINITE);
+	CloseHandle(fThread);
+}
+
 } // end of namespace
 

@@ -53,6 +53,7 @@ class JackWinThread : public JackThread
         int StartSync();
         int Kill();
         int Stop();
+		void Terminate();
 
         int AcquireRealTime();
         int AcquireRealTime(int priority) ;

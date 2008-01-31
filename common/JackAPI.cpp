@@ -64,7 +64,8 @@ extern "C"
     EXPORT int jack_set_process_callback (jack_client_t *client,
                                           JackProcessCallback process_callback,
                                           void *arg);
-    EXPORT int jack_set_thread_init_callback (jack_client_t *client,
+    EXPORT jack_nframes_t jack_thread_wait(jack_client_t *client, int status);
+	EXPORT int jack_set_thread_init_callback (jack_client_t *client,
             JackThreadInitCallback thread_init_callback,
             void *arg);
     EXPORT int jack_set_freewheel_callback (jack_client_t *client,
@@ -627,6 +628,20 @@ EXPORT int jack_set_process_callback(jack_client_t* ext_client, JackProcessCallb
         return -1;
     } else {
         return client->SetProcessCallback(callback, arg);
+    }
+}
+
+EXPORT jack_nframes_t jack_thread_wait(jack_client_t* ext_client, int status)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_thread_wait called with a NULL client");
+		return -1;
+    } else {
+        return client->Wait(status);
     }
 }
 

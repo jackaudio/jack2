@@ -62,6 +62,7 @@ class JackPosixThread : public JackThread
         virtual int StartSync();
         virtual int Kill();
         virtual int Stop();
+		virtual void Terminate();
 
         virtual int AcquireRealTime();
         virtual int AcquireRealTime(int priority);

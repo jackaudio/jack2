@@ -226,5 +226,11 @@ pthread_t JackPosixThread::GetThreadID()
     return fThread;
 }
 
+void JackPosixThread::Terminate()
+{
+	JackLog("JackPosixThread::Terminate\n");
+	pthread_exit(0);
+}
+
 } // end of namespace
 

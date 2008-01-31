@@ -90,12 +90,20 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void SetupDriverSync(bool freewheel);
         bool IsActive();
 
-        bool CallProcessCallback();
         void CallSyncCallback();
         void CallTimebaseCallback();
         int RequestNewPos(jack_position_t* pos);
 
         virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value);
+		
+		// Fons Adriaensen thread model
+		inline bool WaitFirstSync();
+		inline void ExecuteThread();
+		inline bool WaitSync();
+		inline void SignalSync();
+		inline int CallProcessCallback();
+		inline int End();
+		inline int Error();
 
     public:
 
@@ -161,6 +169,9 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		virtual int InternalClientHandle(const char* client_name, jack_status_t* status);
 		virtual int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
 		virtual void InternalClientUnload(int ref, jack_status_t* status);
+		
+		// Fons Adriaensen thread model
+		virtual jack_nframes_t Wait(int status);
 
         // JackRunnableInterface interface
         bool Init();

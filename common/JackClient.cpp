@@ -298,11 +298,13 @@ int JackClient::Deactivate()
 // RT thread management
 //----------------------
 
+/*
 bool JackClient::CallProcessCallback()
 {
     return (fProcess == NULL) ? true : (fProcess(GetEngineControl()->fBufferSize, fProcessArg) == 0);
 }
 
+*/
 /*!
 \brief Called once when the thread starts.
 */
@@ -342,6 +344,7 @@ int JackClient::StartThread()
 /*!
 \brief RT thread.
 */
+/*
 bool JackClient::Execute()
 {
     // Suspend itself: wait on the input synchro
@@ -391,6 +394,107 @@ error:
     fThread->DropRealTime();
     ShutDown();
     return false;
+}
+*/
+////
+
+bool JackClient::Execute()
+{
+	if (WaitFirstSync())
+		ExecuteThread();
+	return false; // Never reached
+}
+
+inline bool JackClient::WaitFirstSync()
+{
+	while (true) {
+		// Start first cycle
+		WaitSync();
+		if (IsActive()) {
+			CallSyncCallback();
+			// Finish first cycle
+			if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
+				return false;
+			return true;
+		} else {
+			JackLog("Process called for an inactive client\n");
+		}
+		SignalSync();
+	}
+	return false; // Never reached
+}
+
+inline void JackClient::ExecuteThread()
+{
+	while (true) { 
+		if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
+			return;
+	}
+}
+
+inline int JackClient::End()
+{
+	JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
+	int result;
+	// Hum... not sure about this, the following "close" code is called in the RT thread...
+	fThread->DropRealTime();
+	GetClientControl()->fActive = false;
+	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
+    fThread->Terminate();
+	return 0; // Never reached
+}
+
+inline int JackClient::Error()
+{
+	jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
+	// Hum... not sure about this, the following "close" code is called in the RT thread...
+    fThread->DropRealTime();
+    ShutDown();
+	fThread->Terminate();
+	return 0; // Never reached
+}
+
+jack_nframes_t JackClient::Wait(int status)
+{
+	if (status == 0)
+		CallTimebaseCallback();
+	SignalSync();
+	if (status != 0) 
+		goto end;
+	if (!WaitSync()) 
+		goto error;
+	CallSyncCallback();
+	return GetEngineControl()->fBufferSize;
+	
+end:
+	return End();
+	
+error:
+	return Error();
+}
+
+inline int JackClient::CallProcessCallback()
+{
+	return (fProcess != NULL) ? fProcess(GetEngineControl()->fBufferSize, fProcessArg) : 0;
+}
+
+inline bool JackClient::WaitSync()
+{
+	// Suspend itself: wait on the input synchro
+    if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, 0x7FFFFFFF) < 0) {
+       jack_error("SuspendRefNum error");
+		return false;
+	} else {
+		return true;
+	}
+}
+
+inline void JackClient::SignalSync()
+{
+	// Resume: signal output clients connected to the running client
+    if (GetGraphManager()->ResumeRefNum(GetClientControl(), fSynchroTable) < 0) {
+        jack_error("ResumeRefNum error");
+    }
 }
 
 //-----------------

@@ -81,6 +81,7 @@ class JackThread
         virtual int StartSync() = 0;
         virtual int Kill() = 0;
         virtual int Stop() = 0;
+		virtual void Terminate() = 0;
 
         virtual int AcquireRealTime() = 0;
         virtual int AcquireRealTime(int priority) = 0;
