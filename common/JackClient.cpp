@@ -298,13 +298,6 @@ int JackClient::Deactivate()
 // RT thread management
 //----------------------
 
-/*
-bool JackClient::CallProcessCallback()
-{
-    return (fProcess == NULL) ? true : (fProcess(GetEngineControl()->fBufferSize, fProcessArg) == 0);
-}
-
-*/
 /*!
 \brief Called once when the thread starts.
 */
@@ -344,60 +337,6 @@ int JackClient::StartThread()
 /*!
 \brief RT thread.
 */
-/*
-bool JackClient::Execute()
-{
-    // Suspend itself: wait on the input synchro
-    if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, 0x7FFFFFFF) < 0) {
-        jack_error("SuspendRefNum error");
-        goto error;
-    }
-
-    // Process call
-    if (IsActive()) {
-        CallSyncCallback();
-        bool res = CallProcessCallback();  
-        CallTimebaseCallback();
-        if (!res)
-            goto end;
-    } else {
-        JackLog("Process called for an inactive client\n");
-        // Happens if client is still not activated (connected to the FW)
-        // or still runs while being desactivated by the server
-    }
-
-    // Resume: signal output clients connected to the running client
-    if (GetGraphManager()->ResumeRefNum(GetClientControl(), fSynchroTable) < 0) {
-        jack_error("ResumeRefNum error");
-    }
-
-    return true;
-
-end:
-    JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
-
-    // Continue graph execution for this cycle
-    if (GetGraphManager()->ResumeRefNum(GetClientControl(), fSynchroTable) < 0) {
-        jack_error("ResumeRefNum error");
-    }
-
-    // Hum... not sure about this, the following "close" code is called in the RT thread...
-    int result;
-    fThread->DropRealTime();
-	GetClientControl()->fActive = false;
-    fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    return false;
-
-error:
-    jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
-    // Hum... not sure about this, the following "close" code is called in the RT thread...
-    fThread->DropRealTime();
-    ShutDown();
-    return false;
-}
-*/
-////
-
 bool JackClient::Execute()
 {
 	if (WaitFirstSync())
@@ -432,45 +371,17 @@ inline void JackClient::ExecuteThread()
 	}
 }
 
-inline int JackClient::End()
-{
-	JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
-	int result;
-	// Hum... not sure about this, the following "close" code is called in the RT thread...
-	fThread->DropRealTime();
-	GetClientControl()->fActive = false;
-	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    fThread->Terminate();
-	return 0; // Never reached
-}
-
-inline int JackClient::Error()
-{
-	jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
-	// Hum... not sure about this, the following "close" code is called in the RT thread...
-    fThread->DropRealTime();
-    ShutDown();
-	fThread->Terminate();
-	return 0; // Never reached
-}
-
 jack_nframes_t JackClient::Wait(int status)
 {
 	if (status == 0)
 		CallTimebaseCallback();
 	SignalSync();
 	if (status != 0) 
-		goto end;
+		return End();
 	if (!WaitSync()) 
-		goto error;
+		return Error();
 	CallSyncCallback();
 	return GetEngineControl()->fBufferSize;
-	
-end:
-	return End();
-	
-error:
-	return Error();
 }
 
 inline int JackClient::CallProcessCallback()
@@ -495,6 +406,28 @@ inline void JackClient::SignalSync()
     if (GetGraphManager()->ResumeRefNum(GetClientControl(), fSynchroTable) < 0) {
         jack_error("ResumeRefNum error");
     }
+}
+
+inline int JackClient::End()
+{
+	JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
+	int result;
+	// Hum... not sure about this, the following "close" code is called in the RT thread...
+	fThread->DropRealTime();
+	GetClientControl()->fActive = false;
+	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
+    fThread->Terminate();
+	return 0; // Never reached
+}
+
+inline int JackClient::Error()
+{
+	jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
+	// Hum... not sure about this, the following "close" code is called in the RT thread...
+    fThread->DropRealTime();
+    ShutDown();
+	fThread->Terminate();
+	return 0; // Never reached
 }
 
 //-----------------
