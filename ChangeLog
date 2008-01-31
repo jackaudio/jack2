@@ -22,6 +22,7 @@ Tim Blechmann
 	* Remove checking thread in CoreAudio driver, better device state change recovery strategy: the driver is stopped and restarted.
 	* jack_thread_wait implementation.
 	* Add jack_thread_wait client example.
+	* Add jack_mp_thread_wait client example.
 
 2008-01-30 Stephane Letz  <letz@grame.fr>
 	
