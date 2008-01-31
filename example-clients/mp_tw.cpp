@@ -19,9 +19,6 @@
 
 #include <jack/jack.h>
 #include <jack/thread.h>
-
-//#include "jack.h"
-//#include "thread.h"
 #include <math.h>
  
 #include "JackAtomic.h"

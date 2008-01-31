@@ -30,6 +30,7 @@
 				4B35C6940D4733B9000DE7AE /* PBXTargetDependency */,
 				4B35C6960D4733B9000DE7AE /* PBXTargetDependency */,
 				4B0A29300D5210C4002EFF74 /* PBXTargetDependency */,
+				4B0A2A700D524B01002EFF74 /* PBXTargetDependency */,
 				4B35C6980D4733B9000DE7AE /* PBXTargetDependency */,
 				4B35C69A0D4733B9000DE7AE /* PBXTargetDependency */,
 				4B35C69C0D4733B9000DE7AE /* PBXTargetDependency */,
@@ -70,6 +71,7 @@
 				4BA693E90CBE5BBA00EAD520 /* PBXTargetDependency */,
 				4BA693EB0CBE5BBA00EAD520 /* PBXTargetDependency */,
 				4B0A28F40D520D11002EFF74 /* PBXTargetDependency */,
+				4B0A2A6E0D524AF2002EFF74 /* PBXTargetDependency */,
 				4BFA99AC0AAAF41D009E916C /* PBXTargetDependency */,
 				4BFA99500AAAED90009E916C /* PBXTargetDependency */,
 				4BFA99520AAAED90009E916C /* PBXTargetDependency */,
@@ -88,6 +90,7 @@
 		4B0A28ED0D520852002EFF74 /* tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A28EC0D520852002EFF74 /* tw.c */; };
 		4B0A29260D52108E002EFF74 /* tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A28EC0D520852002EFF74 /* tw.c */; };
 		4B0A29830D523269002EFF74 /* mp_tw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A29820D523269002EFF74 /* mp_tw.cpp */; };
+		4B0A2A5E0D524AB2002EFF74 /* mp_tw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A29820D523269002EFF74 /* mp_tw.cpp */; };
 		4B35C41E0D4731D1000DE7AE /* Jackdmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */; };
 		4B35C4290D4731D1000DE7AE /* JackMachPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B799AD707899652003F3F15 /* JackMachPort.h */; };
 		4B35C42A0D4731D1000DE7AE /* JackError.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1770834EE4800C94B91 /* JackError.h */; };
@@ -615,6 +618,20 @@
 			remoteGlobalIDString = 4B0A29230D52108E002EFF74 /* jack_thread_wait 64 bits */;
 			remoteInfo = "jack_thread_wait 64 bits";
 		};
+		4B0A2A6D0D524AF2002EFF74 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B0A29630D5231DC002EFF74 /* jack_mp_thread_wait */;
+			remoteInfo = jack_mp_thread_wait;
+		};
+		4B0A2A6F0D524B01002EFF74 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B0A2A5B0D524AB2002EFF74 /* jack_mp_thread_wait 64 bits */;
+			remoteInfo = "jack_mp_thread_wait 64 bits";
+		};
 		4B1C1ABF0CC61597005F551E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1010,6 +1027,7 @@
 		4B0A292D0D52108E002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B0A296D0D5231DC002EFF74 /* jack_mp_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_mp_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B0A29820D523269002EFF74 /* mp_tw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mp_tw.cpp; path = "../example-clients/mp_tw.cpp"; sourceTree = SOURCE_ROOT; };
+		4B0A2A650D524AB2002EFF74 /* jack_mp_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_mp_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B123D3308B3954300540632 /* JackGlobalsClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobalsClient.cpp; path = ../common/JackGlobalsClient.cpp; sourceTree = SOURCE_ROOT; };
 		4B123D3608B3954A00540632 /* JackGlobalsServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobalsServer.cpp; path = ../common/JackGlobalsServer.cpp; sourceTree = SOURCE_ROOT; };
 		4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
@@ -1240,6 +1258,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B0A29670D5231DC002EFF74 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B0A2A5F0D524AB2002EFF74 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1728,6 +1753,7 @@
 				4B0A28E60D52073D002EFF74 /* jack_thread_wait */,
 				4B0A292D0D52108E002EFF74 /* jack_thread_wait */,
 				4B0A296D0D5231DC002EFF74 /* jack_mp_thread_wait */,
+				4B0A2A650D524AB2002EFF74 /* jack_mp_thread_wait */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2096,6 +2122,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B0A29640D5231DC002EFF74 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B0A2A5C0D524AB2002EFF74 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2772,6 +2805,25 @@
 			productInstallPath = /usr/local/bin;
 			productName = testSem;
 			productReference = 4B0A296D0D5231DC002EFF74 /* jack_mp_thread_wait */;
+			productType = "com.apple.product-type.tool";
+		};
+		4B0A2A5B0D524AB2002EFF74 /* jack_mp_thread_wait 64 bits */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B0A2A610D524AB2002EFF74 /* Build configuration list for PBXNativeTarget "jack_mp_thread_wait 64 bits" */;
+			buildPhases = (
+				4B0A2A5C0D524AB2002EFF74 /* Headers */,
+				4B0A2A5D0D524AB2002EFF74 /* Sources */,
+				4B0A2A5F0D524AB2002EFF74 /* Frameworks */,
+				4B0A2A600D524AB2002EFF74 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "jack_mp_thread_wait 64 bits";
+			productInstallPath = /usr/local/bin;
+			productName = testSem;
+			productReference = 4B0A2A650D524AB2002EFF74 /* jack_mp_thread_wait */;
 			productType = "com.apple.product-type.tool";
 		};
 		4B35C41B0D4731D1000DE7AE /* jackdmp framework 64bits */ = {
@@ -3848,6 +3900,7 @@
 				4B35C5C00D4731D2000DE7AE /* jack_load 64 bits */,
 				4B35C5CC0D4731D2000DE7AE /* jack_unload 64 bits */,
 				4B0A29230D52108E002EFF74 /* jack_thread_wait 64 bits */,
+				4B0A2A5B0D524AB2002EFF74 /* jack_mp_thread_wait 64 bits */,
 				4B35C5D80D4731D2000DE7AE /* synchroServer 64 bits */,
 				4B35C5EC0D4731D2000DE7AE /* synchroClient 64 bits */,
 				4B35C6000D4731D2000DE7AE /* synchroServerClient 64 bits */,
@@ -3920,6 +3973,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B0A29680D5231DC002EFF74 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B0A2A600D524AB2002EFF74 /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4258,6 +4318,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B0A29830D523269002EFF74 /* mp_tw.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B0A2A5D0D524AB2002EFF74 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B0A2A5E0D524AB2002EFF74 /* mp_tw.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4928,6 +4996,16 @@
 			target = 4B0A29230D52108E002EFF74 /* jack_thread_wait 64 bits */;
 			targetProxy = 4B0A292F0D5210C4002EFF74 /* PBXContainerItemProxy */;
 		};
+		4B0A2A6E0D524AF2002EFF74 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B0A29630D5231DC002EFF74 /* jack_mp_thread_wait */;
+			targetProxy = 4B0A2A6D0D524AF2002EFF74 /* PBXContainerItemProxy */;
+		};
+		4B0A2A700D524B01002EFF74 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B0A2A5B0D524AB2002EFF74 /* jack_mp_thread_wait 64 bits */;
+			targetProxy = 4B0A2A6F0D524B01002EFF74 /* PBXContainerItemProxy */;
+		};
 		4B1C1AC00CC61597005F551E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4BE50F8D0B01EE8000C05E63 /* Jackwrapper.framework Universal */;
@@ -5461,6 +5539,102 @@
 				ARCHS = (
 					i386,
 					ppc,
+				);
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_mp_thread_wait;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
+		4B0A2A620D524AB2002EFF74 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+					ppc64,
+					x86_64,
+				);
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_mp_thread_wait;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4B0A2A630D524AB2002EFF74 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+					ppc64,
+					x86_64,
+				);
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_mp_thread_wait;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4B0A2A640D524AB2002EFF74 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+					ppc64,
+					x86_64,
 				);
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = ../common;
@@ -11681,6 +11855,16 @@
 				4B0A296A0D5231DC002EFF74 /* Development */,
 				4B0A296B0D5231DC002EFF74 /* Deployment */,
 				4B0A296C0D5231DC002EFF74 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4B0A2A610D524AB2002EFF74 /* Build configuration list for PBXNativeTarget "jack_mp_thread_wait 64 bits" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B0A2A620D524AB2002EFF74 /* Development */,
+				4B0A2A630D524AB2002EFF74 /* Deployment */,
+				4B0A2A640D524AB2002EFF74 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
