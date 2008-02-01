@@ -68,8 +68,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 		bool fState;
 		
 		/// Intitial state
-		int fCapturing;
-		int fPlaying;
+		bool fCapturing;
+		bool fPlaying;
 		
 		int fInChannels;
 		int fOutChannels;
@@ -120,8 +120,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 						 char* capture_driver_name,  
 						 char* playback_driver_name);
 						 
-		int SetupChannels(int capturing, 
-						int playing, 
+		int SetupChannels(bool capturing, 
+						bool playing, 
 						int& inchannels, 
 						int& outchannels, 
 						int& in_nChannels, 
@@ -133,8 +133,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 
 		int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
 		
-		int OpenAUHAL(int capturing, 
-						int playing, 
+		int OpenAUHAL(bool capturing, 
+						bool playing, 
 						int inchannels, 
 						int outchannels, 
 						int in_nChannels, 

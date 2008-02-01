@@ -499,7 +499,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
 	return 0;
 }
 
-int JackCoreAudioDriver::SetupChannels(int capturing, int playing, int& inchannels, int& outchannels, int& in_nChannels, int& out_nChannels, bool strict)
+int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchannels, int& outchannels, int& in_nChannels, int& out_nChannels, bool strict)
 {
 	OSStatus err = noErr;
 	
@@ -602,8 +602,8 @@ int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, ja
 	return 0;
 }
 
-int JackCoreAudioDriver::OpenAUHAL(int capturing, 
-								int playing, 
+int JackCoreAudioDriver::OpenAUHAL(bool capturing, 
+								bool playing, 
 								int inchannels, 
 								int outchannels, 
 								int in_nChannels, 
@@ -615,6 +615,8 @@ int JackCoreAudioDriver::OpenAUHAL(int capturing,
 	ComponentResult err1;
     UInt32 enableIO;
     AudioStreamBasicDescription srcFormat, dstFormat;
+	
+	JackLog("OpenAUHAL capturing = %ld playing = %ld playing = %ld outchannels = %ld in_nChannels = %ld out_nChannels = %ld \n", capturing, playing, inchannels, inchannels, in_nChannels, out_nChannels);
 	
 	 // AUHAL
     ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
