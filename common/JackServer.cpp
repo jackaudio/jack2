@@ -53,8 +53,7 @@ JackServer::JackServer(bool sync,  bool temporary, long timeout, bool rt, long p
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();
-    fConnectionState = new JackConnectionManager();
-	fFreewheel = false;
+ 	fFreewheel = false;
     fLoopback = loopback;
     fDriverInfo = NULL;
     fAudioDriver = NULL;
@@ -73,7 +72,6 @@ JackServer::~JackServer()
     delete fEngine;
     delete fChannel;
     delete fEngineControl;
-    delete fConnectionState;
     if (fDriverInfo) {
         UnloadDriverModule(fDriverInfo->handle);
         free(fDriverInfo);
@@ -229,7 +227,7 @@ int JackServer::SetFreewheel(bool onoff)
         } else {
             fFreewheel = false;
             fFreewheelDriver->Stop();
-            fGraphManager->Restore(fConnectionState);   // Restore previous connection state
+            fGraphManager->Restore(&fConnectionState);   // Restore previous connection state
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
             fEngineControl->InitFrameTime();
@@ -239,7 +237,7 @@ int JackServer::SetFreewheel(bool onoff)
         if (onoff) {
             fFreewheel = true;
             fAudioDriver->Stop();
-            fGraphManager->Save(fConnectionState);     // Save connection state
+            fGraphManager->Save(&fConnectionState);     // Save connection state
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(true);

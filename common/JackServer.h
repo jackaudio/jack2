@@ -24,13 +24,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackExports.h"
 #include "driver_interface.h"
 #include "JackDriverLoader.h"
+#include "JackConnectionManager.h"
 #include "jslist.h"
 
 namespace Jack
 {
 
 class JackGraphManager;
-class JackConnectionManager;
 class JackDriverClientInterface;
 class JackServerChannelInterface;
 class JackSyncInterface;
@@ -54,7 +54,8 @@ class EXPORT JackServer
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
         JackServerChannelInterface* fChannel;
-        JackConnectionManager* fConnectionState;
+        //JackConnectionManager* fConnectionState;
+		JackConnectionManager fConnectionState;
         JackSynchro* fSynchroTable[CLIENT_NUM];        
         bool fFreewheel;
         long fLoopback;
