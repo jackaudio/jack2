@@ -55,6 +55,7 @@ main (int argc, char *argv[])
 	int c;
 	int option_index;
 	char* aliases[2];
+	jack_port_t *port;
 	
 	struct option long_options[] = {
 		{ "aliases", 0, 0, 'A' },
@@ -130,10 +131,12 @@ main (int argc, char *argv[])
 
 	ports = jack_get_ports (client, NULL, NULL, 0);
 
+	//jack_port_t *port;
+
 	for (i = 0; ports[i]; ++i) {
 		// skip over any that don't match ALL of the strings presented at command line
 		skip_port = 0;
-		for(k=optind; k < argc; k++){
+		for(k = optind; k < argc; k++){
 			if(strstr(ports[i], argv[k]) == NULL ){
 				skip_port = 1;
 			}
@@ -142,7 +145,7 @@ main (int argc, char *argv[])
 
 		printf ("%s\n", ports[i]);
 
-		jack_port_t *port = jack_port_by_name (client, ports[i]);
+		port = jack_port_by_name (client, ports[i]);
 
 		if (show_aliases) {
 			int cnt;
@@ -164,13 +167,13 @@ main (int argc, char *argv[])
 		}
 		if (show_port_latency) {
 			if (port) {
-				printf ("	port latency = %" PRIu32 " frames\n",
+				printf ("	port latency = %ld frames\n",
 					jack_port_get_latency (port));
 			}
 		}
 		if (show_total_latency) {
 			if (port) {
-				printf ("	total latency = %" PRIu32 " frames\n",
+				printf ("	total latency = %ld frames\n",
 					jack_port_get_total_latency (client, port));
 			}
 		}
