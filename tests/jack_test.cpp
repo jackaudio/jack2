@@ -1571,18 +1571,10 @@ int main (int argc, char *argv[])
         }
 
         jack_port_disconnect(client1, output_port1);
-		//jack_sleep(1000);
-		//printf("Wait\n");
-        jack_port_disconnect(client1, output_port2);
-		//jack_sleep(1000);
-		//printf("Wait\n");
-        jack_port_disconnect(client1, input_port1);
-		//jack_sleep(1000);
-		//printf("Wait\n");
-        jack_port_disconnect(client1, input_port2);
-		//jack_sleep(1000);
-		//printf("Wait\n");
-        Log("Checking a parallel model with 2 clients...\n");
+	    jack_port_disconnect(client1, output_port2);
+		jack_port_disconnect(client1, input_port1);
+	    jack_port_disconnect(client1, input_port2);
+	    Log("Checking a parallel model with 2 clients...\n");
         jack_connect(client2, outports[0], jack_port_name(input_port1));
         jack_connect(client2, outports[0], jack_port_name(input_port2));
         jack_connect(client2, jack_port_name(output_port1), inports[0]);
