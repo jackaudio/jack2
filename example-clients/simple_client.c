@@ -10,7 +10,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "jack.h"
+#include <jack/jack.h>
 
 jack_port_t *input_port;
 jack_port_t *output_port1, *output_port2;
@@ -28,6 +28,13 @@ typedef struct
     int right_phase;
 }
 paTestData;
+
+static int Jack_Graph_Order_Callback(void *arg)
+{
+	static int reorder = 0;
+    printf("Jack_Graph_Order_Callback count = %ld\n", reorder++);
+    return 0;
+}
 
 
 /* a simple state machine for this client */
@@ -161,6 +168,11 @@ main (int argc, char *argv[])
 		fprintf(stderr, "no more JACK ports available\n");
 		exit (1);
 	}
+
+	if (jack_set_graph_order_callback(client, Jack_Graph_Order_Callback, 0) != 0) {
+        printf("Error when calling Jack_Graph_Order_Callback() !\n");
+    }
+
 
 	/* Tell the JACK server that we are ready to roll.  Our
 	 * process() callback will start running now. */
