@@ -225,6 +225,11 @@ void Jack_Port_Register(jack_port_id_t port, int mode, void *arg)
     port_callback_reg++;
 }
 
+void Jack_Port_Connect(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
+{
+	Log("PortConnect src = %ld dst = %ld  onoff = %ld (msg from callback)\n", a, b, connect);
+}
+
 int Jack_Sync_Callback(jack_transport_state_t state, jack_position_t *pos, void *arg)
 {
     int res = 0;
@@ -662,6 +667,10 @@ int main (int argc, char *argv[])
         printf("Error when calling jack_set_port_registration_callback() !\n");
     }
 	
+    if (jack_set_port_connect_callback(client1, Jack_Port_Connect, 0) != 0) {
+        printf("Error when calling jack_set_port_connect_callback() !\n");
+    }
+	
 	if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
 		printf("Error when calling jack_set_client_registration_callback() !\n");
 	}
@@ -767,9 +776,9 @@ int main (int argc, char *argv[])
      */
     if (jack_activate(client1) < 0) {
         printf ("Fatal error : cannot activate client1\n");
-        exit (1);
+        exit(1);
     }
-
+	
     /**
      * Test if init callback initThread have been called.
      *
@@ -1117,7 +1126,7 @@ int main (int argc, char *argv[])
     }
 	
 	// Check client registration callback
-	sleep(1);
+	jack_sleep(1000);
 	if (client_register == 0)
 		printf("!!! ERROR !!! Client registration callback not called!\n");
 
@@ -1599,6 +1608,8 @@ int main (int argc, char *argv[])
     jack_port_disconnect(client1, input_port2);
     jack_port_disconnect(client1, output_port1);
     jack_port_disconnect(client1, output_port2);
+	
+	jack_sleep(1000);
 
     free(inports);
     free(outports);
@@ -1825,7 +1836,7 @@ int main (int argc, char *argv[])
     *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
     *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-     */
+	*/
 
     if (jack_deactivate(client2) != 0) {
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client2 !\n");

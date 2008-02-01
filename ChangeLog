@@ -20,6 +20,7 @@ Tim Blechmann
 2008-02-01 Stephane Letz  <letz@grame.fr>
 
 	* Move transport related methods from JackEngine to JackServer.
+	* Finish port connection callback server side implementation.
 
 2008-01-31 Stephane Letz  <letz@grame.fr>
 
