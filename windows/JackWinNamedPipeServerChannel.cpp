@@ -104,8 +104,6 @@ int JackClientPipeThread::HandleRequest()
 		ret = -1;
 	} else {
 
-		JackLog("JackClientPipeThread::HandleRequest fType = %ld\n", header.fType);
-
 		// Read data
 		switch (header.fType) {
 		
