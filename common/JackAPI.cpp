@@ -639,7 +639,7 @@ EXPORT jack_nframes_t jack_thread_wait(jack_client_t* ext_client, int status)
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_thread_wait called with a NULL client");
-		return -1;
+		return 0;
     } else {
         return client->Wait(status);
     }

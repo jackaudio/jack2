@@ -272,7 +272,7 @@ JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
     printError("Buffer size change requested but not supported!!!");
 
     /*
-     driver->period_size = nframes; 
+	driver->period_size = nframes; 
     driver->period_usecs =
     	(jack_time_t) floor ((((float) nframes) / driver->sample_rate)
     			     * 1000000.0f);
