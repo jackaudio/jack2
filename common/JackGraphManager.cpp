@@ -441,8 +441,10 @@ int JackGraphManager::DisconnectAll(jack_port_id_t port_index)
 // Server
 void JackGraphManager::GetConnections(jack_port_id_t port_index, jack_int_t* res)
 {
-	const jack_int_t* connections = ReadCurrentState()->GetConnections(port_index);
+	JackConnectionManager* manager = WriteNextStateStart();
+	const jack_int_t* connections = manager->GetConnections(port_index);
 	memcpy(res, connections, sizeof(jack_int_t) * CONNECTION_NUM);
+	WriteNextStateStop();
 }
 
 // Server

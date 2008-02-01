@@ -713,7 +713,7 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
     JackLog("JackEngine::PortDisconnect src = %d dst = %d\n", src, dst);
-
+	
     if (dst == ALL_PORTS) {
 		
 		jack_int_t connections[CONNECTION_NUM];
@@ -723,12 +723,12 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 		JackPort* port = fGraphManager->GetPort(src);
 		if (port->GetFlags() & JackPortIsOutput) {
 			for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
-				JackLog("NotifyPortConnect src = %ld dst = %ld\n false", src, connections[i]);
+				JackLog("NotifyPortConnect src = %ld dst = %ld false\n", src, connections[i]);
 				NotifyPortConnect(src, connections[i], false);
 			}
 		} else {
 			for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
-				JackLog("NotifyPortConnect src = %ld dst = %ld\n false", connections[i], src);
+				JackLog("NotifyPortConnect src = %ld dst = %ld false\n", connections[i], src);
 				NotifyPortConnect(connections[i], src, false);
 			}
 		}
