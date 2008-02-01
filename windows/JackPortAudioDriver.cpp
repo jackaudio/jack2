@@ -29,6 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackTime.h"
 #include <iostream>
+#include <assert.h>
 
 namespace Jack
 {

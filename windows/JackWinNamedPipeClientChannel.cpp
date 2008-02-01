@@ -182,7 +182,7 @@ void JackWinNamedPipeClientChannel::ClientDeactivate(int refnum, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
-void JackWinNamedPipeClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result)
+void JackWinNamedPipeClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
 {
     JackPortRegisterRequest req(refnum, name, type, flags, buffer_size);
     JackPortRegisterResult res;
@@ -310,7 +310,7 @@ bool JackWinNamedPipeClientChannel::Execute()
         goto error;
     }
 
-    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fValue);
+    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fValue1, event.fValue2);
 
     if (event.fSync) {
         if (res.Write(&fNotificationListenPipe) < 0) {
