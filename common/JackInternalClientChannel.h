@@ -108,15 +108,14 @@ class JackInternalClientChannel : public JackClientChannelInterface
             *result = fServer->SetFreewheel(onoff);
         }
 
-        // A FINIR
-        void ReleaseTimebase(int refnum, int* result)
+		void ReleaseTimebase(int refnum, int* result)
         {
-            *result = fEngine->ReleaseTimebase(refnum);
+            *result = fServer->ReleaseTimebase(refnum);
         }
 
         void SetTimebaseCallback(int refnum, int conditional, int* result)
         {
-            *result = fEngine->SetTimebaseCallback(refnum, conditional);
+            *result = fServer->SetTimebaseCallback(refnum, conditional);
         }
 
 };

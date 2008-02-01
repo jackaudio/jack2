@@ -102,10 +102,6 @@ class JackEngine
         int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
         int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
 
-        // Transport management
-        int ReleaseTimebase(int refnum);
-        int SetTimebaseCallback(int refnum, int conditional);
-
         // Graph
         bool Process(jack_time_t callback_usecs);
    

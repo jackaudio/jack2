@@ -75,7 +75,12 @@ class EXPORT JackServer
         void Notify(int refnum, int notify, int value);
 		
 		int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
+		
+		 // Transport management
+        int ReleaseTimebase(int refnum);
+        int SetTimebaseCallback(int refnum, int conditional);
 	
+		// Object access
         JackEngine* GetEngine();
         JackEngineControl* GetEngineControl();
         JackSynchro** GetSynchroTable();

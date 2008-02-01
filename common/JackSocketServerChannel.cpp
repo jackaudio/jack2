@@ -287,7 +287,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackReleaseTimebaseRequest req;
                 JackResult res;
                 if (req.Read(socket) == 0)
-					res.fResult = fServer->GetEngine()->ReleaseTimebase(req.fRefNum);
+					res.fResult = fServer->ReleaseTimebase(req.fRefNum);
                 res.Write(socket);
                 break;
             }
@@ -297,7 +297,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackSetTimebaseCallbackRequest req;
                 JackResult res;
                 if (req.Read(socket) == 0)
-					res.fResult = fServer->GetEngine()->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
+					res.fResult = fServer->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
                 res.Write(socket);
                 break;
             }

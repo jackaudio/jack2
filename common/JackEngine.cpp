@@ -739,19 +739,6 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 	}
 }
 
-//----------------------
-// Transport management
-//----------------------
-
-int JackEngine::ReleaseTimebase(int refnum)
-{
-    return fEngineControl->fTransport.ResetTimebase(refnum);
-}
-
-int JackEngine::SetTimebaseCallback(int refnum, int conditional)
-{
-    return fEngineControl->fTransport.SetTimebase(refnum, conditional);
-}
 
 } // end of namespace
 

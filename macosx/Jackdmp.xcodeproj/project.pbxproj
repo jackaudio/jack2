@@ -608,28 +608,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B0A28DC0D52073D002EFF74 /* jack_thread_wait */;
+			remoteGlobalIDString = 4B0A28DC0D52073D002EFF74;
 			remoteInfo = jack_thread_wait;
 		};
 		4B0A292F0D5210C4002EFF74 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B0A29230D52108E002EFF74 /* jack_thread_wait 64 bits */;
+			remoteGlobalIDString = 4B0A29230D52108E002EFF74;
 			remoteInfo = "jack_thread_wait 64 bits";
 		};
 		4B0A2A6D0D524AF2002EFF74 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B0A29630D5231DC002EFF74 /* jack_mp_thread_wait */;
+			remoteGlobalIDString = 4B0A29630D5231DC002EFF74;
 			remoteInfo = jack_mp_thread_wait;
 		};
 		4B0A2A6F0D524B01002EFF74 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B0A2A5B0D524AB2002EFF74 /* jack_mp_thread_wait 64 bits */;
+			remoteGlobalIDString = 4B0A2A5B0D524AB2002EFF74;
 			remoteInfo = "jack_mp_thread_wait 64 bits";
 		};
 		4B1C1ABF0CC61597005F551E /* PBXContainerItemProxy */ = {

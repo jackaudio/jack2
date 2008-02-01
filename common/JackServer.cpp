@@ -272,6 +272,20 @@ void JackServer::Notify(int refnum, int notify, int value)
     }
 }
 
+//----------------------
+// Transport management
+//----------------------
+
+int JackServer::ReleaseTimebase(int refnum)
+{
+    return fEngineControl->fTransport.ResetTimebase(refnum);
+}
+
+int JackServer::SetTimebaseCallback(int refnum, int conditional)
+{
+    return fEngineControl->fTransport.SetTimebase(refnum, conditional);
+}
+
 JackEngine* JackServer::GetEngine()
 {
     return fEngine;

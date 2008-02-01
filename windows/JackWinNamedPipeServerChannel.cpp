@@ -244,7 +244,7 @@ int JackClientPipeThread::HandleRequest()
 			JackReleaseTimebaseRequest req;
 			JackResult res;
 			if (req.Read(fPipe) == 0) 
-				res.fResult = fServer->GetEngine()->ReleaseTimebase(req.fRefNum);
+				res.fResult = fServer->ReleaseTimebase(req.fRefNum);
 			res.Write(fPipe);
 			break;
 		}
@@ -254,7 +254,7 @@ int JackClientPipeThread::HandleRequest()
 			JackSetTimebaseCallbackRequest req;
 			JackResult res;
 			if (req.Read(fPipe) == 0) 
-				res.fResult = fServer->GetEngine()->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
+				res.fResult = fServer->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
 			res.Write(fPipe);
 			break;
 		}

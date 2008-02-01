@@ -166,7 +166,7 @@ rpc_type server_rpc_jack_release_timebase(mach_port_t private_port, int refnum, 
     JackLog("server_rpc_jack_release_timebase\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    *result = channel->GetServer()->GetEngine()->ReleaseTimebase(refnum);
+    *result = channel->GetServer()->ReleaseTimebase(refnum);
     return KERN_SUCCESS;
 }
 
@@ -175,7 +175,7 @@ rpc_type server_rpc_jack_set_timebase_callback(mach_port_t private_port, int ref
     JackLog("server_rpc_jack_set_timebase_callback\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    *result = channel->GetServer()->GetEngine()->SetTimebaseCallback(refnum, conditional);
+    *result = channel->GetServer()->SetTimebaseCallback(refnum, conditional);
     return KERN_SUCCESS;
 }
 
