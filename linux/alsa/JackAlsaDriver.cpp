@@ -2618,7 +2618,7 @@ extern "C"
         jack_nframes_t systemic_output_latency = 0;
         const JSList * node;
         const jack_driver_param_t * param;
-		char *midi_driver = "none";
+		const char *midi_driver = "none";
 
         for (node = params; node; node = jack_slist_next (node)) {
             param = (const jack_driver_param_t *) node->data;

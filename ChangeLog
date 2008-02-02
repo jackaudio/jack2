@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-02-02 Stephane Letz  <letz@grame.fr>
+
+	* Tim Blechmann patches.
+
 2008-02-01 Stephane Letz  <letz@grame.fr>
 
 	* Move transport related methods from JackEngine to JackServer.

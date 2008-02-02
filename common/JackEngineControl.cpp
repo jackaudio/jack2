@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
 #include "JackClientControl.h"
+#include <algorithm>
 #include <math.h>
 
 namespace Jack
@@ -60,10 +61,16 @@ void JackEngineControl::ReadFrameTime(JackTimer* timer)
 }
 
 // Private
+/*
+#ifdef WIN32
 inline jack_time_t MAX(jack_time_t a, jack_time_t b)
 {
     return (a < b) ? b : a;
 }
+#else
+
+#endif
+*/
 
 void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManager* manager)
 {
@@ -73,7 +80,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManage
         JackClientInterface* client = table[i];
 		JackClientTiming* timing = manager->GetClientTiming(i);
 		if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
-            lastCycleEnd = MAX(lastCycleEnd, timing->fFinishedAt);
+            lastCycleEnd = std::max(lastCycleEnd, timing->fFinishedAt);
         }
     }
 
@@ -92,10 +99,10 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManage
 
         jack_time_t maxUsecs = 0;
         for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++) {
-            maxUsecs = MAX(fRollingClientUsecs[i], maxUsecs);
+            maxUsecs = std::max(fRollingClientUsecs[i], maxUsecs);
         }
 
-        fMaxUsecs = MAX(fMaxUsecs, maxUsecs);
+        fMaxUsecs = std::max(fMaxUsecs, maxUsecs);
         fSpareUsecs = jack_time_t((maxUsecs < fPeriodUsecs) ? fPeriodUsecs - maxUsecs : 0);
         fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
     }
