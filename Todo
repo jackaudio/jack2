@@ -22,7 +22,7 @@ jackdmp:
 
 So basically jackdmp use the same fifo based activated system in all cases, and jackd does some optimization in the "multiple jack clients in the server" case.
 
-Also having multiple clients in a same process (jack server or separated process) is not so common, it may still be interesting to be able to optimize the activation path with sequential clients in a same process (server or separated). I am thinking in a method that could be done in jackdmp data-flow model: since the activation path is "computed on the fly" when following links between clients, the step where a client activates all its output could be reworked a little with something like:
+Also having multiple clients in a same process (jack server or separated process) is not so common, it may still be interesting to be able to optimize the activation path with sequential clients in a same process (server or separated). I am thinking in a method that could be done in jackdmp data-flow model : since the activation path is "computed on the fly" when following links between clients, the step where a client activates all its output could be reworked a little with something like :
 
 - find one of the client in the output client list that is in the same process
 - activate all other output clients using the normal fifo based system
@@ -41,5 +41,5 @@ Even if the "multiple clients" way is not really used in existing applications, 
 
 2007-03-14 Add Paul dynamic jack server location code.
 
-2007-01-22 Check the "dead" client removing code in the server: non running client may cause Desactivation and Close time out problems.
+2007-01-22 Check the "dead" client removing code in the server : non running client may cause Desactivation and Close time out problems.
 
