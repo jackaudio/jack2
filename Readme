@@ -31,7 +31,7 @@ make
 
 (WARNING : this will install everything needed in /usr/local in place of a regular jack installation so that jack applications will use jackdmp)
 
-You may define variables for special purpose, like
+You may define variables for special purpose, like :
 
 make prefix=/usr  to compile and install everything in /usr location instead of /usr/local or
 make libdir=lib64 on a 64 bits system so that libraries are installed at the proper location.
