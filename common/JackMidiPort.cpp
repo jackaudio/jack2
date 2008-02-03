@@ -86,7 +86,7 @@ static void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nfra
  */
 static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes)
 {
-    JackMidiBuffer* mix = (JackMidiBuffer*)mixbuffer;
+    JackMidiBuffer* mix = static_cast<JackMidiBuffer*>(mixbuffer);
     if (!mix->IsValid()) {
         jack_error("MIDI: invalid mix buffer");
         return;
@@ -95,7 +95,7 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
 
     int event_count = 0;
     for (int i = 0; i < src_count; ++i) {
-        JackMidiBuffer* buf = (JackMidiBuffer*)src_buffers[i];
+        JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);
         if (!buf->IsValid())
             return;
         buf->mix_index = 0;
@@ -110,7 +110,7 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
 
         // find the earliest event
         for (int i = 0; i < src_count; ++i) {
-            JackMidiBuffer* buf = (JackMidiBuffer*)src_buffers[i];
+            JackMidiBuffer* buf = static_cast<JackMidiBuffer*>(src_buffers[i]);
             if (buf->mix_index >= buf->event_count)
                 continue;
             JackMidiEvent* e = &buf->events[buf->mix_index];
@@ -119,7 +119,7 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
                 next_buf = buf;
             }
         }
-        assert (next_event != 0);
+        assert(next_event != 0);
 
         // write the event
         jack_midi_data_t* dest = mix->ReserveEvent(next_event->time, next_event->size);
