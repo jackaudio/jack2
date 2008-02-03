@@ -21,6 +21,12 @@ This program is free software; you can redistribute it and/or modify
 #include "JackPortType.h"
 #include <string.h>
 
+#if defined (__APPLE__)
+	#include <Accelerate/Accelerate.h>
+#elif defined (__SSE__)
+	#include <xmmintrin.h>
+#endif
+
 namespace Jack
 {
 
@@ -31,10 +37,23 @@ static void AudioBufferInit(void* buffer, size_t buffer_size, jack_nframes_t)
 
 static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_t frames)
 {
+#ifdef __APPLE__
+	// It seems that a vector mult only operation does not exist...
+	float gain = 1.0f;
+	vDSP_vsma(buffer, 1, &gain, mixbuffer, 1, mixbuffer, 1, frames);
+#else
     jack_nframes_t frames_group = frames / 4;
     frames = frames % 4;
 
     while (frames_group > 0) {
+#ifdef __SSE__
+        __m128 vec = _mm_add_ps(_mm_load_ps(mixbuffer), _mm_load_ps(buffer));
+        _mm_store_ps(mixbuffer, vec);
+
+        mixbuffer += 4;
+        buffer += 4;
+        frames_group--;
+#else
         register float mixFloat1 = *mixbuffer;
         register float sourceFloat1 = *buffer;
         register float mixFloat2 = *(mixbuffer + 1);
@@ -58,6 +77,7 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
         *(mixbuffer + 3) = mixFloat4;
 
         mixbuffer += 4;
+#endif
     }
 
     while (frames > 0) {
@@ -69,6 +89,7 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
         *mixbuffer = mixFloat1;
         mixbuffer++;
     }
+#endif
 }
 
 static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes)
@@ -81,7 +102,7 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
 	// Mix remaining buffers
     for (int i = 1; i < src_count; ++i) {
         buffer = src_buffers[i];
-        MixAudioBuffer((float*)mixbuffer, (float*)buffer, nframes);
+        MixAudioBuffer(static_cast<float*>(mixbuffer), static_cast<float*>(buffer), nframes);
     }
 }
 

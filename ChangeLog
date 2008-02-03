@@ -20,6 +20,7 @@ Tim Blechmann
 2008-02-03 Stephane Letz  <letz@grame.fr>
 
 	* Add "Readme" file from package in src folder.
+	* Tim Blechmann sse optimization patch for JackaudioPort::MixAudioBuffer, use of Apple Accelerate framework on OSX.
 
 2008-02-02 Stephane Letz  <letz@grame.fr>
 
