@@ -61,7 +61,7 @@ void JackEngineControl::ReadFrameTime(JackTimer* timer)
 }
 
 // Private
-/*
+
 #ifdef WIN32
 inline jack_time_t MAX(jack_time_t a, jack_time_t b)
 {
@@ -69,8 +69,10 @@ inline jack_time_t MAX(jack_time_t a, jack_time_t b)
 }
 #else
 
+#define MAX(a,b) std::max((a),(b))
+
 #endif
-*/
+
 
 void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManager* manager)
 {
@@ -80,7 +82,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManage
         JackClientInterface* client = table[i];
 		JackClientTiming* timing = manager->GetClientTiming(i);
 		if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
-            lastCycleEnd = std::max(lastCycleEnd, timing->fFinishedAt);
+            lastCycleEnd = MAX(lastCycleEnd, timing->fFinishedAt);
         }
     }
 
@@ -99,10 +101,10 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManage
 
         jack_time_t maxUsecs = 0;
         for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++) {
-            maxUsecs = std::max(fRollingClientUsecs[i], maxUsecs);
+            maxUsecs = MAX(fRollingClientUsecs[i], maxUsecs);
         }
 
-        fMaxUsecs = std::max(fMaxUsecs, maxUsecs);
+        fMaxUsecs = MAX(fMaxUsecs, maxUsecs);
         fSpareUsecs = jack_time_t((maxUsecs < fPeriodUsecs) ? fPeriodUsecs - maxUsecs : 0);
         fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
     }
