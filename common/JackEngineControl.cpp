@@ -61,18 +61,14 @@ void JackEngineControl::ReadFrameTime(JackTimer* timer)
 }
 
 // Private
-
 #ifdef WIN32
 inline jack_time_t MAX(jack_time_t a, jack_time_t b)
 {
     return (a < b) ? b : a;
 }
 #else
-
 #define MAX(a,b) std::max((a),(b))
-
 #endif
-
 
 void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManager* manager)
 {
