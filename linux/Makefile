@@ -134,7 +134,7 @@ install:
 	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/$(libdir)/jackmp || echo "freebob driver not installed"
 	[ -f jack_firewire.so ]  && cp jack_firewire.so $(prefix)/$(libdir)/jackmp || echo "firewire driver not installed"
 	cd $(prefix)/bin && [ -f jackd ]  && mv -f jackd tmp_jackd || echo "jackd server not found, continue..."
-	cd $(prefix)/$(libdir) && [ -f libjack.so.0.0.23 ] && mv -f libjack.so.0.0.23 tmp_libjack.so.0.0.23 || echo "libjack not found, continue..."
+	cd $(prefix)/$(libdir) && [ -f libjack.so.0.0.28 ] && mv -f libjack.so.0.0.28 tmp_libjack.so.0.0.28 || echo "libjack not found, continue..."
 	cd $(prefix)/include &&  [ -d jack ] && mv -f jack tmp_jack || echo "jack headers not found, continue..."
 	install -d $(prefix)/include/jack/
 	cp ../common/jack/*.h $(prefix)/include/jack/
@@ -155,8 +155,8 @@ remove:
 	rm -r $(prefix)/include/jack
 	cd $(prefix)/$(libdir) && rm -f libjack.so*
 	cd $(prefix)/bin && [ -f tmp_jackd ] && mv -f tmp_jackd jackd || echo "jackd server not restored, continue.."
-	cd $(prefix)/$(libdir) && [ -f tmp_libjack.so.0.0.23 ] && mv -f tmp_libjack.so.0.0.23 libjack.so.0.0.23 \
-	&& ln -s libjack.so.0.0.23  libjack.so && ln -s libjack.so.0.0.23  libjack.so.0 || echo "libjack not restored, continue.."
+	cd $(prefix)/$(libdir) && [ -f tmp_libjack.so.0.0.28 ] && mv -f tmp_libjack.so.0.0.28 libjack.so.0.0.28 \
+	&& ln -s libjack.so.0.0.28  libjack.so && ln -s libjack.so.0.0.28  libjack.so.0 || echo "libjack not restored, continue.."
 	cd $(prefix)/include && [ -d tmp_jack ] && mv -f tmp_jack jack || echo "jack headers not restored, continue..."
 	/sbin/ldconfig
 
