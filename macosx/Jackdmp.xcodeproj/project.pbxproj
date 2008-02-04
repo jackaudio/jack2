@@ -111,16 +111,10 @@
 		4B35C4390D4731D1000DE7AE /* JackLibClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1FC0834EFD100C94B91 /* JackLibClient.h */; };
 		4B35C43A0D4731D1000DE7AE /* JackConnectionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1C30834EF1400C94B91 /* JackConnectionManager.h */; };
 		4B35C43B0D4731D1000DE7AE /* JackFrameTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */; };
-		4B35C43C0D4731D1000DE7AE /* JackPosixSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BEE0B2D08ACBB9F00D22B43 /* JackPosixSemaphore.h */; };
 		4B35C43D0D4731D1000DE7AE /* JackMachSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF6C1D608ACE64C001E2013 /* JackMachSemaphore.h */; };
 		4B35C43E0D4731D1000DE7AE /* JackGlobals.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BFB73F608AD291A00DB99B8 /* JackGlobals.h */; };
 		4B35C43F0D4731D1000DE7AE /* JackMachThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BFB741F08AD2B9900DB99B8 /* JackMachThread.h */; };
 		4B35C4400D4731D1000DE7AE /* JackMachClientChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BFB298708AF450200D450D4 /* JackMachClientChannel.h */; };
-		4B35C4410D4731D1000DE7AE /* JackSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97440D08AF54590094983C /* JackSocket.h */; };
-		4B35C4420D4731D1000DE7AE /* JackSocketClientChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441408AF546F0094983C /* JackSocketClientChannel.h */; };
-		4B35C4430D4731D1000DE7AE /* JackSocketNotifyChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441A08AF54930094983C /* JackSocketNotifyChannel.h */; };
-		4B35C4440D4731D1000DE7AE /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441B08AF54930094983C /* JackSocketServerChannel.h */; };
-		4B35C4450D4731D1000DE7AE /* JackFifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B56881008B5C8620022B32D /* JackFifo.h */; };
 		4B35C4460D4731D1000DE7AE /* JackSynchro.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD561C708EEB910006BBC2A /* JackSynchro.h */; };
 		4B35C4470D4731D1000DE7AE /* JackDebugClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B98AE010931D30C0091932A /* JackDebugClient.h */; };
 		4B35C4480D4731D1000DE7AE /* JackConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B66A8580934964500A89560 /* JackConstants.h */; };
@@ -152,15 +146,11 @@
 		4B35C4640D4731D1000DE7AE /* JackLibAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1FE0834EFD100C94B91 /* JackLibAPI.cpp */; };
 		4B35C4650D4731D1000DE7AE /* JackConnectionManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1C40834EF1400C94B91 /* JackConnectionManager.cpp */; };
 		4B35C4660D4731D1000DE7AE /* JackFrameTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */; };
-		4B35C4670D4731D1000DE7AE /* JackPosixSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BEE0B2C08ACBB9F00D22B43 /* JackPosixSemaphore.cpp */; };
 		4B35C4680D4731D1000DE7AE /* JackMachSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6C1D508ACE64C001E2013 /* JackMachSemaphore.cpp */; };
 		4B35C4690D4731D1000DE7AE /* JackMachThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFB741E08AD2B9900DB99B8 /* JackMachThread.cpp */; };
 		4B35C46A0D4731D1000DE7AE /* JackMachClientChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFB29AE08AF45FD00D450D4 /* JackMachClientChannel.cpp */; };
-		4B35C46B0D4731D1000DE7AE /* JackSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B97440C08AF54590094983C /* JackSocket.cpp */; };
-		4B35C46C0D4731D1000DE7AE /* JackSocketClientChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B97441508AF546F0094983C /* JackSocketClientChannel.cpp */; };
 		4B35C46D0D4731D1000DE7AE /* JackTime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF773AA08B3414500149912 /* JackTime.c */; };
 		4B35C46E0D4731D1000DE7AE /* JackGlobalsClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B123D3308B3954300540632 /* JackGlobalsClient.cpp */; };
-		4B35C46F0D4731D1000DE7AE /* JackFifo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B56880F08B5C8620022B32D /* JackFifo.cpp */; };
 		4B35C4700D4731D1000DE7AE /* JackGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B2C28F908DAD01E00249230 /* JackGlobals.cpp */; };
 		4B35C4710D4731D1000DE7AE /* JackError.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B003A6008E2A87A0060EFDC /* JackError.c */; };
 		4B35C4720D4731D1000DE7AE /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B003AB008E2B2BA0060EFDC /* ringbuffer.c */; };
@@ -374,16 +364,10 @@
 		4B699C12097D421600A18468 /* JackLibClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1FC0834EFD100C94B91 /* JackLibClient.h */; };
 		4B699C13097D421600A18468 /* JackConnectionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1C30834EF1400C94B91 /* JackConnectionManager.h */; };
 		4B699C14097D421600A18468 /* JackFrameTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */; };
-		4B699C15097D421600A18468 /* JackPosixSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BEE0B2D08ACBB9F00D22B43 /* JackPosixSemaphore.h */; };
 		4B699C16097D421600A18468 /* JackMachSemaphore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF6C1D608ACE64C001E2013 /* JackMachSemaphore.h */; };
 		4B699C17097D421600A18468 /* JackGlobals.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BFB73F608AD291A00DB99B8 /* JackGlobals.h */; };
 		4B699C18097D421600A18468 /* JackMachThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BFB741F08AD2B9900DB99B8 /* JackMachThread.h */; };
 		4B699C19097D421600A18468 /* JackMachClientChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BFB298708AF450200D450D4 /* JackMachClientChannel.h */; };
-		4B699C1A097D421600A18468 /* JackSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97440D08AF54590094983C /* JackSocket.h */; };
-		4B699C1B097D421600A18468 /* JackSocketClientChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441408AF546F0094983C /* JackSocketClientChannel.h */; };
-		4B699C1C097D421600A18468 /* JackSocketNotifyChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441A08AF54930094983C /* JackSocketNotifyChannel.h */; };
-		4B699C1D097D421600A18468 /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B97441B08AF54930094983C /* JackSocketServerChannel.h */; };
-		4B699C1E097D421600A18468 /* JackFifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B56881008B5C8620022B32D /* JackFifo.h */; };
 		4B699C20097D421600A18468 /* JackSynchro.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BD561C708EEB910006BBC2A /* JackSynchro.h */; };
 		4B699C21097D421600A18468 /* JackDebugClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B98AE010931D30C0091932A /* JackDebugClient.h */; };
 		4B699C22097D421600A18468 /* JackConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B66A8580934964500A89560 /* JackConstants.h */; };
@@ -402,15 +386,11 @@
 		4B699C31097D421600A18468 /* JackLibAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1FE0834EFD100C94B91 /* JackLibAPI.cpp */; };
 		4B699C32097D421600A18468 /* JackConnectionManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1C40834EF1400C94B91 /* JackConnectionManager.cpp */; };
 		4B699C33097D421600A18468 /* JackFrameTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */; };
-		4B699C34097D421600A18468 /* JackPosixSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BEE0B2C08ACBB9F00D22B43 /* JackPosixSemaphore.cpp */; };
 		4B699C35097D421600A18468 /* JackMachSemaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF6C1D508ACE64C001E2013 /* JackMachSemaphore.cpp */; };
 		4B699C36097D421600A18468 /* JackMachThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFB741E08AD2B9900DB99B8 /* JackMachThread.cpp */; };
 		4B699C37097D421600A18468 /* JackMachClientChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFB29AE08AF45FD00D450D4 /* JackMachClientChannel.cpp */; };
-		4B699C38097D421600A18468 /* JackSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B97440C08AF54590094983C /* JackSocket.cpp */; };
-		4B699C39097D421600A18468 /* JackSocketClientChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B97441508AF546F0094983C /* JackSocketClientChannel.cpp */; };
 		4B699C3A097D421600A18468 /* JackTime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF773AA08B3414500149912 /* JackTime.c */; };
 		4B699C3B097D421600A18468 /* JackGlobalsClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B123D3308B3954300540632 /* JackGlobalsClient.cpp */; };
-		4B699C3C097D421600A18468 /* JackFifo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B56880F08B5C8620022B32D /* JackFifo.cpp */; };
 		4B699C3D097D421600A18468 /* JackGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B2C28F908DAD01E00249230 /* JackGlobals.cpp */; };
 		4B699C3E097D421600A18468 /* JackError.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B003A6008E2A87A0060EFDC /* JackError.c */; };
 		4B699C3F097D421600A18468 /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B003AB008E2B2BA0060EFDC /* ringbuffer.c */; };
@@ -2177,16 +2157,10 @@
 				4B35C4390D4731D1000DE7AE /* JackLibClient.h in Headers */,
 				4B35C43A0D4731D1000DE7AE /* JackConnectionManager.h in Headers */,
 				4B35C43B0D4731D1000DE7AE /* JackFrameTimer.h in Headers */,
-				4B35C43C0D4731D1000DE7AE /* JackPosixSemaphore.h in Headers */,
 				4B35C43D0D4731D1000DE7AE /* JackMachSemaphore.h in Headers */,
 				4B35C43E0D4731D1000DE7AE /* JackGlobals.h in Headers */,
 				4B35C43F0D4731D1000DE7AE /* JackMachThread.h in Headers */,
 				4B35C4400D4731D1000DE7AE /* JackMachClientChannel.h in Headers */,
-				4B35C4410D4731D1000DE7AE /* JackSocket.h in Headers */,
-				4B35C4420D4731D1000DE7AE /* JackSocketClientChannel.h in Headers */,
-				4B35C4430D4731D1000DE7AE /* JackSocketNotifyChannel.h in Headers */,
-				4B35C4440D4731D1000DE7AE /* JackSocketServerChannel.h in Headers */,
-				4B35C4450D4731D1000DE7AE /* JackFifo.h in Headers */,
 				4B35C4460D4731D1000DE7AE /* JackSynchro.h in Headers */,
 				4B35C4470D4731D1000DE7AE /* JackDebugClient.h in Headers */,
 				4B35C4480D4731D1000DE7AE /* JackConstants.h in Headers */,
@@ -2497,16 +2471,10 @@
 				4B699C12097D421600A18468 /* JackLibClient.h in Headers */,
 				4B699C13097D421600A18468 /* JackConnectionManager.h in Headers */,
 				4B699C14097D421600A18468 /* JackFrameTimer.h in Headers */,
-				4B699C15097D421600A18468 /* JackPosixSemaphore.h in Headers */,
 				4B699C16097D421600A18468 /* JackMachSemaphore.h in Headers */,
 				4B699C17097D421600A18468 /* JackGlobals.h in Headers */,
 				4B699C18097D421600A18468 /* JackMachThread.h in Headers */,
 				4B699C19097D421600A18468 /* JackMachClientChannel.h in Headers */,
-				4B699C1A097D421600A18468 /* JackSocket.h in Headers */,
-				4B699C1B097D421600A18468 /* JackSocketClientChannel.h in Headers */,
-				4B699C1C097D421600A18468 /* JackSocketNotifyChannel.h in Headers */,
-				4B699C1D097D421600A18468 /* JackSocketServerChannel.h in Headers */,
-				4B699C1E097D421600A18468 /* JackFifo.h in Headers */,
 				4B699C20097D421600A18468 /* JackSynchro.h in Headers */,
 				4B699C21097D421600A18468 /* JackDebugClient.h in Headers */,
 				4B699C22097D421600A18468 /* JackConstants.h in Headers */,
@@ -4368,15 +4336,11 @@
 				4B35C4640D4731D1000DE7AE /* JackLibAPI.cpp in Sources */,
 				4B35C4650D4731D1000DE7AE /* JackConnectionManager.cpp in Sources */,
 				4B35C4660D4731D1000DE7AE /* JackFrameTimer.cpp in Sources */,
-				4B35C4670D4731D1000DE7AE /* JackPosixSemaphore.cpp in Sources */,
 				4B35C4680D4731D1000DE7AE /* JackMachSemaphore.cpp in Sources */,
 				4B35C4690D4731D1000DE7AE /* JackMachThread.cpp in Sources */,
 				4B35C46A0D4731D1000DE7AE /* JackMachClientChannel.cpp in Sources */,
-				4B35C46B0D4731D1000DE7AE /* JackSocket.cpp in Sources */,
-				4B35C46C0D4731D1000DE7AE /* JackSocketClientChannel.cpp in Sources */,
 				4B35C46D0D4731D1000DE7AE /* JackTime.c in Sources */,
 				4B35C46E0D4731D1000DE7AE /* JackGlobalsClient.cpp in Sources */,
-				4B35C46F0D4731D1000DE7AE /* JackFifo.cpp in Sources */,
 				4B35C4700D4731D1000DE7AE /* JackGlobals.cpp in Sources */,
 				4B35C4710D4731D1000DE7AE /* JackError.c in Sources */,
 				4B35C4720D4731D1000DE7AE /* ringbuffer.c in Sources */,
@@ -4711,15 +4675,11 @@
 				4B699C31097D421600A18468 /* JackLibAPI.cpp in Sources */,
 				4B699C32097D421600A18468 /* JackConnectionManager.cpp in Sources */,
 				4B699C33097D421600A18468 /* JackFrameTimer.cpp in Sources */,
-				4B699C34097D421600A18468 /* JackPosixSemaphore.cpp in Sources */,
 				4B699C35097D421600A18468 /* JackMachSemaphore.cpp in Sources */,
 				4B699C36097D421600A18468 /* JackMachThread.cpp in Sources */,
 				4B699C37097D421600A18468 /* JackMachClientChannel.cpp in Sources */,
-				4B699C38097D421600A18468 /* JackSocket.cpp in Sources */,
-				4B699C39097D421600A18468 /* JackSocketClientChannel.cpp in Sources */,
 				4B699C3A097D421600A18468 /* JackTime.c in Sources */,
 				4B699C3B097D421600A18468 /* JackGlobalsClient.cpp in Sources */,
-				4B699C3C097D421600A18468 /* JackFifo.cpp in Sources */,
 				4B699C3D097D421600A18468 /* JackGlobals.cpp in Sources */,
 				4B699C3E097D421600A18468 /* JackError.c in Sources */,
 				4B699C3F097D421600A18468 /* ringbuffer.c in Sources */,
