@@ -31,6 +31,9 @@ make
 
 (WARNING : this will install everything needed in /usr/local in place of a regular jack installation so that jack applications will use jackdmp)
 
+Freebob driver can be compiled with : make freebob
+FFADO driver can be compiled with : make firewire
+
 You may define variables for special purpose, like :
 
 make prefix=/usr  to compile and install everything in /usr location instead of /usr/local or

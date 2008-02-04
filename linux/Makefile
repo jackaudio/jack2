@@ -1,4 +1,4 @@
-# Type "make" or "make all" to compile ALSA driver, and "make freebob" to compile FREEBOB driver.
+# Type "make" or "make all" to compile ALSA driver, "make freebob" to compile FREEBOB driver and "make firewire" to compile FFADO driver.
 
 # Choose the installation location
 prefix := /usr/local
