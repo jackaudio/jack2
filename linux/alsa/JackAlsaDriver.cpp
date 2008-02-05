@@ -122,7 +122,7 @@ JackAlsaDriver::alsa_driver_check_card_type (alsa_driver_t *driver)
         char tmp[5];
         strncpy(tmp, strstr(driver->alsa_name_playback, "hw"), 4);
         tmp[4] = '\0';
-        printf("control device %s\n", tmp);
+        JackLog("control device %s\n", tmp);
         ctl_name = strdup(tmp);
     } else {
         ctl_name = strdup(driver->alsa_name_playback);
@@ -255,21 +255,21 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
             switch (driver->dither) {
 				case Rectangular:
-				printf("Rectangular dithering at 16 bits\n");
+				JackLog("Rectangular dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_rect_d16_sSs:
 					sample_move_dither_rect_d16_sS;
 				break;
 
 				case Triangular:
-				printf("Triangular dithering at 16 bits\n");
+				JackLog("Triangular dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_tri_d16_sSs:
 					sample_move_dither_tri_d16_sS;
 				break;
 
 				case Shaped:
-				printf("Noise-shaped dithering at 16 bits\n");
+				JackLog("Noise-shaped dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_shaped_d16_sSs:
 					sample_move_dither_shaped_d16_sS;
@@ -291,21 +291,21 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
             switch (driver->dither) {
 				case Rectangular:
-				printf("Rectangular dithering at 16 bits\n");
+				JackLog("Rectangular dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_rect_d24_sSs:
 					sample_move_dither_rect_d24_sS;
 				break;
 
 				case Triangular:
-				printf("Triangular dithering at 16 bits\n");
+				JackLog("Triangular dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_tri_d24_sSs:
 					sample_move_dither_tri_d24_sS;
 				break;
 
 				case Shaped:
-				printf("Noise-shaped dithering at 16 bits\n");
+				JackLog("Noise-shaped dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_shaped_d24_sSs:
 					sample_move_dither_shaped_d24_sS;
@@ -327,21 +327,21 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
             switch (driver->dither) {
 				case Rectangular:
-				printf("Rectangular dithering at 16 bits\n");
+				JackLog("Rectangular dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_rect_d32u24_sSs:
 					sample_move_dither_rect_d32u24_sS;
 				break;
 
 				case Triangular:
-				printf("Triangular dithering at 16 bits\n");
+				JackLog("Triangular dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_tri_d32u24_sSs:
 					sample_move_dither_tri_d32u24_sS;
 				break;
 
 				case Shaped:
-				printf("Noise-shaped dithering at 16 bits\n");
+				JackLog("Noise-shaped dithering at 16 bits\n");
 				driver->write_via_copy = driver->quirk_bswap?
 					sample_move_dither_shaped_d32u24_sSs:
 					sample_move_dither_shaped_d32u24_sS;
@@ -1315,7 +1315,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
         if (poll (driver->pfd, nfds, driver->poll_timeout) < 0) {
 
             if (errno == EINTR) {
-                printf ("poll interrupt\n");
+                JackLog ("poll interrupt\n");
                 // this happens mostly when run
                 // under gdb, or when exiting due to a signal
                 // steph
@@ -1840,8 +1840,7 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
                                  int shorts_first,
                                  jack_nframes_t capture_latency,
                                  jack_nframes_t playback_latency,
-				 alsa_midi_t *midi
-                                )
+								 alsa_midi_t *midi)
 {
     int err;
 
@@ -2629,7 +2628,7 @@ extern "C"
                     capture = TRUE;
                     if (strcmp (param->value.str, "none") != 0) {
                         capture_pcm_name = strdup (param->value.str);
-						printf("capture device %s\n", capture_pcm_name);
+						JackLog("capture device %s\n", capture_pcm_name);
                     }
                     break;
 
@@ -2637,7 +2636,7 @@ extern "C"
                     playback = TRUE;
                     if (strcmp (param->value.str, "none") != 0) {
                         playback_pcm_name = strdup (param->value.str);
-						printf("playback device %s\n", playback_pcm_name);
+						JackLog("playback device %s\n", playback_pcm_name);
                     }
                     break;
 
@@ -2649,8 +2648,8 @@ extern "C"
                 case 'd':
                     playback_pcm_name = strdup (param->value.str);
                     capture_pcm_name = strdup (param->value.str);
-					printf("playback device %s\n", playback_pcm_name);
-					printf("capture device %s\n", capture_pcm_name);
+					JackLog("playback device %s\n", playback_pcm_name);
+					JackLog("capture device %s\n", capture_pcm_name);
                     break;
 
                 case 'H':
@@ -2667,12 +2666,12 @@ extern "C"
 
                 case 'r':
                     srate = param->value.ui;
-					printf("apparent rate = %d\n", srate);
+					JackLog("apparent rate = %d\n", srate);
                     break;
 
                 case 'p':
                     frames_per_interrupt = param->value.ui;
-					printf("frames per period = %d\n", frames_per_interrupt);
+					JackLog("frames per period = %d\n", frames_per_interrupt);
                     break;
 
                 case 'n':

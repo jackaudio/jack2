@@ -1014,7 +1014,6 @@
 		4B0A2A650D524AB2002EFF74 /* jack_mp_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_mp_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B123D3308B3954300540632 /* JackGlobalsClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobalsClient.cpp; path = ../common/JackGlobalsClient.cpp; sourceTree = SOURCE_ROOT; };
 		4B123D3608B3954A00540632 /* JackGlobalsServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobalsServer.cpp; path = ../common/JackGlobalsServer.cpp; sourceTree = SOURCE_ROOT; };
-		4B18CCEF0D537817008413EE /* jackctl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jackctl.cpp; path = ../common/jackctl.cpp; sourceTree = SOURCE_ROOT; };
 		4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4B35C4250D4731D1000DE7AE /* jackdmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jackdmp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C4830D4731D1000DE7AE /* Jackmp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackmp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1844,7 +1843,6 @@
 			isa = PBXGroup;
 			children = (
 				4B6C73780CC60A6D001AFFD4 /* jack */,
-				4B18CCEF0D537817008413EE /* jackctl.cpp */,
 				4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */,
 				4BE4CC000CDA153400CCF5BB /* JackTools.h */,
 				4B66A8580934964500A89560 /* JackConstants.h */,
