@@ -498,5 +498,36 @@ JackClientControl* JackDebugClient::GetClientControl() const
     return fClient->GetClientControl();
 }
 
+// Internal clients
+char* JackDebugClient::GetInternalClientName(int ref)
+{
+	CheckClient();
+    return fClient->GetInternalClientName(ref);
+}
+
+int JackDebugClient::InternalClientHandle(const char* client_name, jack_status_t* status)
+{
+	CheckClient();
+    return fClient->InternalClientHandle(client_name, status);
+}
+
+int JackDebugClient::InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va)
+{
+	CheckClient();
+    return fClient->InternalClientLoad(client_name, options, status, va);
+}
+
+void JackDebugClient::InternalClientUnload(int ref, jack_status_t* status)
+{
+	CheckClient();
+    fClient->InternalClientUnload(ref, status);
+}
+		
+jack_nframes_t JackDebugClient::Wait(int status)
+{
+	CheckClient();
+    return fClient->Wait(status);
+}
+
 } // end of namespace
 

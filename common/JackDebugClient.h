@@ -121,6 +121,15 @@ class JackDebugClient : public JackClient
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
 		int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
 		
+		// Internal clients
+		char* GetInternalClientName(int ref);
+		int InternalClientHandle(const char* client_name, jack_status_t* status);
+		int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
+		void InternalClientUnload(int ref, jack_status_t* status);
+		
+		// Fons Adriaensen thread model
+		jack_nframes_t Wait(int status);
+		
         JackClientControl* GetClientControl() const;
 		
 		void CheckClient() const;
