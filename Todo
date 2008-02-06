@@ -2,9 +2,13 @@
   Jackdmp Todo list
 ---------------------
 
-2007-12-16 Dynamic backend switch, so that audio backend can be switch off and replaced by the dummy backend.
+2008-02-05 : Hierarchical model: having several client graph running simultaneously (Fons) with a "link" between them (AKA NetJack)
 
-2007-10-17 Optimize activation call graph with multiple clients in a process
+2008-01-15 : Server control API (Nedko Arnoudov): would help to develop external control applications (DBUS or OSC based...)
+
+2007-12-16 : Dynamic backend switch, so that audio backend can be switch off and replaced by the dummy backend.
+
+2007-10-17 : Optimize activation call graph with multiple clients in a process
 
 Andrzej Szombierski recently did interesting test to measure jack client activation speed in different context: jack client opened in separated processes, multiple jack clients running in the server, multiple jack clients running in a same separated process, this using jackd or jackdmp.
 
@@ -34,12 +38,11 @@ There is still an issue if a client uses the "Fons special" ((-: new jack_thread
 
 Even if the "multiple clients" way is not really used in existing applications, is it a desirable feature to have at some point?
 
+2007-10-07 : Before doing an official package, check all public headers
 
-2007-10-07 Before doing an official package, check all public headers
+2007-03-14 : Check JackGraphManager::GetPortsAux after MIDI branch merge.
 
-2007-03-14 Check JackGraphManager::GetPortsAux after MIDI branch merge.
+2007-03-14 : Add Paul dynamic jack server location code.
 
-2007-03-14 Add Paul dynamic jack server location code.
-
-2007-01-22 Check the "dead" client removing code in the server : non running client may cause Desactivation and Close time out problems.
+2007-01-22 : Check the "dead" client removing code in the server : non running client may cause Desactivation and Close time out problems.
 
