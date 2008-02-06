@@ -157,7 +157,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackClientCheckResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kClientCheck write error name = %s", req.fName);
                 break;
             }
 
@@ -167,7 +168,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackClientOpenResult res;
                 if (req.Read(socket) == 0)
 					ClientAdd(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
-                res.Write(socket);
+				if (res.Write(socket) < 0)
+					jack_error("JackRequest::kClientOpen write error name = %s", req.fName);
                 break;
             }
 
@@ -177,7 +179,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
-                res.Write(socket);
+				if (res.Write(socket) < 0)
+					jack_error("JackRequest::kClientClose write error ref = %d", req.fRefNum);
                 ClientRemove(fd, req.fRefNum);
                 break;
             }
@@ -188,7 +191,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackLog("JackRequest::ActivateClient\n");
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
-                res.Write(socket);
+				if (res.Write(socket) < 0)
+					jack_error("JackRequest::kActivateClient write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -198,7 +202,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->ClientDeactivate(req.fRefNum);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kDeactivateClient write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -208,7 +213,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackPortRegisterResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->PortRegister(req.fRefNum, req.fName, req.fPortType, req.fFlags, req.fBufferSize, &res.fPortIndex);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kRegisterPort write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -218,7 +224,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->PortUnRegister(req.fRefNum, req.fPortIndex);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kUnRegisterPort write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -228,7 +235,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kConnectNamePorts write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -238,7 +246,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kDisconnectNamePorts write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -248,7 +257,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->PortConnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kConnectPorts write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -258,7 +268,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->PortDisconnect(req.fRefNum, req.fSrc, req.fDst);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kDisconnectPorts write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -268,7 +279,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->SetBufferSize(req.fBufferSize);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kSetBufferSize write error");
                 break;
             }
 
@@ -278,7 +290,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->SetFreewheel(req.fOnOff);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kSetFreeWheel write error");
                 break;
             }
 
@@ -288,7 +301,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->ReleaseTimebase(req.fRefNum);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kReleaseTimebase write error ref = %d", req.fRefNum);
                 break;
             }
 
@@ -298,7 +312,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->SetTimebaseCallback(req.fRefNum, req.fConditionnal);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kSetTimebaseCallback write error ref = %d", req.fRefNum);
                 break;
             }
 			
@@ -308,7 +323,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackGetInternalClientNameResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->GetInternalClientName(req.fIntRefNum, res.fName);
-                res.Write(socket);
+               if (res.Write(socket) < 0)
+					jack_error("JackRequest::kGetInternalClientName write error ref = %d", req.fRefNum);
                 break;
             }
 			
@@ -318,7 +334,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackInternalClientHandleResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->InternalClientHandle(req.fName, &res.fStatus, &res.fIntRefNum);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kInternalClientHandle write error ref = %d", req.fRefNum);
                 break;
             }
 			
@@ -328,7 +345,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackInternalClientLoadResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus);
-                res.Write(socket);
+				if (res.Write(socket) < 0)
+					jack_error("JackRequest::kInternalClientLoad write error name = %s", req.fName);
                 break;
             }
 			
@@ -338,7 +356,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackInternalClientUnloadResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->InternalClientUnload(req.fIntRefNum, &res.fStatus);
-                res.Write(socket);
+                if (res.Write(socket) < 0)
+					jack_error("JackRequest::kInternalClientUnload write error ref = %d", req.fRefNum);
                 break;
             }
 

@@ -2,6 +2,8 @@
   Jackdmp Todo list
 ---------------------
 
+2008-02-06 : Do a "fork-exec" for the server (deamon..)
+
 2008-02-05 : Hierarchical model: having several client graph running simultaneously (Fons) with a "link" between them (AKA NetJack)
 
 2008-01-15 : Server control API (Nedko Arnoudov): would help to develop external control applications (DBUS or OSC based...)

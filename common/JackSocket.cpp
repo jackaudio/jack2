@@ -33,7 +33,7 @@ void JackClientSocket::SetReadTimeOut(long sec)
     timout.tv_sec = sec;
     timout.tv_usec = 0;
     if (setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timout, sizeof(timeval)) < 0) {
-        JackLog("setsockopt SO_RCVTIMEO fd = %ld err = (%s)\n", fSocket, strerror(errno));
+        JackLog("setsockopt SO_RCVTIMEO fd = %ld err = %s\n", fSocket, strerror(errno));
     }
 }
 
@@ -43,7 +43,7 @@ void JackClientSocket::SetWriteTimeOut(long sec)
     timout.tv_sec = sec ;
     timout.tv_usec = 0;
     if (setsockopt(fSocket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timout, sizeof(timeval)) < 0) {
-        JackLog("setsockopt SO_SNDTIMEO fd = %ld err = (%s)\n", fSocket, strerror(errno));
+        JackLog("setsockopt SO_SNDTIMEO fd = %ld err = %s\n", fSocket, strerror(errno));
     }
 }
 
@@ -52,7 +52,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     struct sockaddr_un addr;
 
     if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error("Cannot create socket (%s)", strerror(errno));
+        jack_error("Cannot create socket err = %s", strerror(errno));
         return -1;
     }
 
@@ -61,7 +61,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     JackLog("Connect: addr.sun_path %s\n", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        jack_error("Cannot connect to server socket (%s)", strerror(errno));
+        jack_error("Cannot connect to server socket err = %s", strerror(errno));
         close(fSocket);
         return -1;
     }
@@ -81,7 +81,7 @@ int JackClientSocket::Connect(const char* dir, int which)
     struct sockaddr_un addr;
 
     if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error("Cannot create socket (%s)", strerror(errno));
+        jack_error("Cannot create socket err = %s", strerror(errno));
         return -1;
     }
 
@@ -90,7 +90,7 @@ int JackClientSocket::Connect(const char* dir, int which)
     JackLog("Connect: addr.sun_path %s\n", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        jack_error("Cannot connect to server socket (%s)", strerror(errno));
+        jack_error("Cannot connect to server socket err = %s", strerror(errno));
         close(fSocket);
         return -1;
     }
@@ -123,7 +123,7 @@ int JackClientSocket::Read(void* data, int len)
     int len1;
 
     if ((len1 = read(fSocket, data, len)) != len) {
-        jack_error("Cannot read socket %d %d (%s)", len, len1, strerror(errno));
+        jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
         if (errno == EWOULDBLOCK) {
             JackLog("JackClientSocket::Read time out\n");
             return 0;
@@ -138,7 +138,7 @@ int JackClientSocket::Read(void* data, int len)
 int JackClientSocket::Write(void* data, int len)
 {
     if (write(fSocket, data, len) != len) {
-        jack_error("Cannot write socket fd %ld (%s)", fSocket, strerror(errno));
+        jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
         return -1;
     } else {
         return 0;
@@ -150,7 +150,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     struct sockaddr_un addr;
 
     if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error("Cannot create server socket (%s)", strerror(errno));
+        jack_error("Cannot create server socket err = %s", strerror(errno));
         return -1;
     }
 
@@ -169,12 +169,12 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     unlink(fName); // Security...
 
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        jack_error("Cannot bind server to socket (%s)", strerror(errno));
+        jack_error("Cannot bind server to socket err = %s", strerror(errno));
         goto error;
     }
 
     if (listen(fSocket, 1) < 0) {
-        jack_error("Cannot enable listen on server socket (%s)", strerror(errno));
+        jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
         goto error;
     }
 
@@ -191,7 +191,7 @@ int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation
     struct sockaddr_un addr;
 
     if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error("Cannot create server socket (%s)", strerror(errno));
+        jack_error("Cannot create server socket err = %s", strerror(errno));
         return -1;
     }
 
@@ -220,12 +220,12 @@ int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation
     unlink(fName); // Security...
 
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        jack_error("Cannot bind server to socket (%s)", strerror(errno));
+        jack_error("Cannot bind server to socket err = %s", strerror(errno));
         goto error;
     }
 
     if (listen(fSocket, 1) < 0) {
-        jack_error("Cannot enable listen on server socket (%s)", strerror(errno));
+        jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
         goto error;
     }
 
@@ -247,7 +247,7 @@ JackClientSocket* JackServerSocket::Accept()
 
     int fd = accept(fSocket, (struct sockaddr*) & client_addr, &client_addrlen);
     if (fd < 0) {
-        jack_error("Cannot accept new connection (%s)", strerror(errno));
+        jack_error("Cannot accept new connection err = %s", strerror(errno));
         return 0;
     } else {
         return new JackClientSocket(fd);
