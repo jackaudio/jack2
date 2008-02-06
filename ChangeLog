@@ -20,6 +20,7 @@ Tim Blechmann
 2008-02-03 Stephane Letz  <letz@grame.fr>
 		
 	* Reduce WaitGraphChange wait value.
+	* Remove use of assert in JackFifo, JackMachSemaphore, and JackPosixSemaphore: print an error instead.
 
 2008-02-03 Stephane Letz  <letz@grame.fr>
 

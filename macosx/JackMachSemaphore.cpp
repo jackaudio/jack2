@@ -20,7 +20,6 @@ This program is free software; you can redistribute it and/or modify
 #include "JackMachSemaphore.h"
 #include "JackError.h"
 #include <stdio.h>
-#include <assert.h>
 
 namespace Jack
 {
@@ -35,7 +34,11 @@ void JackMachSemaphore::BuildName(const char* name, const char* server_name, cha
 bool JackMachSemaphore::Signal()
 {
     kern_return_t res;
-    assert(fSemaphore > 0);
+ 	
+	if (!fSemaphore) {
+		jack_error("JackMachSemaphore::Signal name = %s already desallocated!!", fName);
+		return false;
+	}
 
     if (fFlush)
         return true;
@@ -49,7 +52,11 @@ bool JackMachSemaphore::Signal()
 bool JackMachSemaphore::SignalAll()
 {
     kern_return_t res;
-    assert(fSemaphore > 0);
+	
+    if (!fSemaphore) {
+		jack_error("JackMachSemaphore::SignalAll name = %s already desallocated!!", fName);
+		return false;
+	}
 
     if (fFlush)
         return true;
@@ -63,7 +70,12 @@ bool JackMachSemaphore::SignalAll()
 bool JackMachSemaphore::Wait()
 {
     kern_return_t res;
-    assert(fSemaphore > 0);
+	
+    if (!fSemaphore) {
+		jack_error("JackMachSemaphore::Wait name = %s already desallocated!!", fName);
+		return false;
+	}
+	
     if ((res = semaphore_wait(fSemaphore)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::Wait name = %s err = %s", fName, mach_error_string(res));
     }
@@ -76,7 +88,12 @@ bool JackMachSemaphore::TimedWait(long usec)
     mach_timespec time;
     time.tv_sec = usec / 1000000;
     time.tv_nsec = (usec % 1000000) * 1000;
-    assert(fSemaphore > 0);
+	
+	if (!fSemaphore) {
+		jack_error("JackMachSemaphore::TimedWait name = %s already desallocated!!", fName);
+		return false;
+	}
+
     if ((res = semaphore_timedwait(fSemaphore, time)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::TimedWait name = %s usec = %ld err = %s", fName, usec, mach_error_string(res));
     }

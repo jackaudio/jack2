@@ -34,7 +34,11 @@ void JackPosixSemaphore::BuildName(const char* name, const char* server_name, ch
 bool JackPosixSemaphore::Signal()
 {
     int res;
-    assert(fSemaphore);
+  
+	if (!fSemaphore) {
+		jack_error("JackPosixSemaphore::Signal name = %s already desallocated!!", fName);
+		return false;
+	}
 
     if (fFlush)
         return true;
@@ -48,7 +52,11 @@ bool JackPosixSemaphore::Signal()
 bool JackPosixSemaphore::SignalAll()
 {
     int res;
-    assert(fSemaphore);
+	
+    if (!fSemaphore) {
+		jack_error("JackPosixSemaphore::SignalAll name = %s already desallocated!!", fName);
+		return false;
+	}
 
     if (fFlush)
         return true;
@@ -63,7 +71,12 @@ bool JackPosixSemaphore::SignalAll()
 bool JackPosixSemaphore::Wait()
 {
     int res;
-	assert(fSemaphore);
+	
+	if (!fSemaphore) {
+		jack_error("JackPosixSemaphore::Wait name = %s already desallocated!!", fName);
+		return false;
+	}
+
     if ((res = sem_wait(fSemaphore)) != 0) {
         jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
     }
@@ -92,7 +105,11 @@ bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
 	int res;
 	struct timeval now;
 	timespec time;
-	assert(fSemaphore);
+	
+	if (!fSemaphore) {
+		jack_error("JackPosixSemaphore::TimedWait name = %s already desallocated!!", fName);
+		return false;
+	}
 	gettimeofday(&now, 0);
 	time.tv_sec = now.tv_sec + usec / 1000000;
 	time.tv_nsec = (now.tv_usec + (usec % 1000000)) * 1000;

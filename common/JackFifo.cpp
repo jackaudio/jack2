@@ -24,7 +24,6 @@ This program is free software; you can redistribute it and/or modify
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <assert.h>
 
 namespace Jack
 {
@@ -38,8 +37,12 @@ bool JackFifo::Signal()
 {
     bool res;
     char c = 0;
-    assert(fFifo >= 0);
-
+	
+	if (fFifo < 0) {
+		jack_error("JackFifo::Signal name = %s already desallocated!!", fName);
+		return false;
+	}
+  
     if (fFlush)
         return true;
 
@@ -53,7 +56,11 @@ bool JackFifo::SignalAll()
 {
     bool res;
     char c = 0;
-    assert(fFifo >= 0);
+	
+	if (fFifo < 0) {
+		jack_error("JackFifo::SignalAll name = %s already desallocated!!", fName);
+		return false;
+	}
 
     if (fFlush)
         return true;
@@ -68,7 +75,11 @@ bool JackFifo::Wait()
 {
     bool res;
     char c;
-    assert(fFifo >= 0);
+	
+    if (fFifo < 0) {
+		jack_error("JackFifo::Wait name = %s already desallocated!!", fName);
+		return false;
+	}
 
     if ((res = (read(fFifo, &c, sizeof(c)) != sizeof(c)))) {
         jack_error("JackFifo::Wait name = %s err = %s", fName, strerror(errno));
