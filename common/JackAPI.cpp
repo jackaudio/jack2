@@ -236,7 +236,7 @@ static inline void WaitGraphChange()
 {
     if (GetGraphManager()->IsPendingChange()) {
         JackLog("WaitGraphChange...\n");
-        JackSleep(GetEngineControl()->fPeriodUsecs * 2);
+        JackSleep(GetEngineControl()->fPeriodUsecs * 1.1f);
     }
 }
 
