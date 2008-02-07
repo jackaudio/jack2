@@ -2,15 +2,22 @@
   Jackdmp Todo list
 ---------------------
 
+2008-02-07 : Pipelining idea:
+
+- cut the driver buffer size in n slices : clients see the divided value, server deal with the driver value, some clients may want to keep the driver buffer size (non pipelining)
+- new jack_set_buffer_divisor/jack_get_buffer_divisor and jack_set_pipelining/jack_get_pipelining API
+- jack_set_buffer_size changes the driver buffer size, jack_get_buffer_size get the divided value
+- buffer_size callback notify the divided value for pipelining clients
+
 2008-02-06 : Do a "fork-exec" for the server (deamon..)
 
-2008-02-05 : Hierarchical model: having several client graph running simultaneously (Fons) with a "link" between them (AKA NetJack)
+2008-02-05 : Hierarchical model : having several client graph running simultaneously (Fons) with a "link" between them (AKA NetJack)
 
 2008-01-15 : Server control API (Nedko Arnoudov): would help to develop external control applications (DBUS or OSC based...)
 
 2007-12-16 : Dynamic backend switch, so that audio backend can be switch off and replaced by the dummy backend.
 
-2007-10-17 : Optimize activation call graph with multiple clients in a process
+2007-10-17 : Optimize activation call graph with multiple clients in a same process
 
 Andrzej Szombierski recently did interesting test to measure jack client activation speed in different context: jack client opened in separated processes, multiple jack clients running in the server, multiple jack clients running in a same separated process, this using jackd or jackdmp.
 

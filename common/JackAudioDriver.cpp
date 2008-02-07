@@ -102,7 +102,7 @@ int JackAudioDriver::Attach()
 	    port->Rename("system:capture_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
         fCapturePortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld = \n", port_index);
+        JackLog("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld\n", port_index);
     }
 
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -117,7 +117,7 @@ int JackAudioDriver::Attach()
 	    port->Rename("system:playback_%d", i + 1);
         port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld = \n", port_index);
+        JackLog("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld\n", port_index);
 	
         // Monitor ports
         if (fWithMonitorPorts) {
