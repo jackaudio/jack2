@@ -124,7 +124,7 @@ void JackSocketServerChannel::ClientKill(int fd)
     JackLog("JackSocketServerChannel::ClientKill ref = %d\n", refnum);
 
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
-        jack_error("Client not opened");
+        JackLog("Client was not opened : probably correspond to server_check\n");
     } else {
         fServer->Notify(refnum, kDeadClient, 0);
     }

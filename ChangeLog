@@ -17,7 +17,11 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
-2008-02-03 Stephane Letz  <letz@grame.fr>
+2008-02-07 Stephane Letz  <letz@grame.fr>
+		
+	* Correct "server_connect": close the communication channel.
+
+2008-02-05 Stephane Letz  <letz@grame.fr>
 		
 	* Reduce WaitGraphChange wait value.
 	* Remove use of assert in JackFifo, JackMachSemaphore, and JackPosixSemaphore: print an error instead.

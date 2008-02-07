@@ -152,6 +152,7 @@ int server_connect(char* server_name)
 {
 	JackClientChannelInterface* channel = JackGlobals::MakeClientChannel();
 	int res = channel->ServerCheck(server_name);
+	channel->Close();
 	delete channel;
 	return res;
 }
