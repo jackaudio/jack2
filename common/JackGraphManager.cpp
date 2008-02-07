@@ -694,7 +694,6 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 // Client
 const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
-    const char** matching_ports;
     unsigned long match_cnt = 0;
     regex_t port_regex;
     regex_t type_regex;
@@ -707,7 +706,7 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
         regcomp(&type_regex, type_name_pattern, REG_EXTENDED | REG_NOSUB);
     }
 
-    matching_ports = (const char**)malloc(sizeof(char*) * PORT_NUM);
+	const char** matching_ports = (const char**)malloc(sizeof(char*) * PORT_NUM);
 
     for (int i = 0; i < PORT_NUM; i++) {
         matching = true;
