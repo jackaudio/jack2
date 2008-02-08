@@ -29,20 +29,23 @@ namespace Jack
 // Used for external C API (JackAPI.cpp)
 JackGraphManager* GetGraphManager()
 {
-    assert(JackLibGlobals::fGlobals->fGraphManager);
-    return JackLibGlobals::fGlobals->fGraphManager;
+	if (JackLibGlobals::fGlobals)
+		return JackLibGlobals::fGlobals->fGraphManager;
+	else
+		return NULL;
 }
 
 JackEngineControl* GetEngineControl()
 {
-    assert(JackLibGlobals::fGlobals->fEngineControl);
-    return JackLibGlobals::fGlobals->fEngineControl;
+  	if (JackLibGlobals::fGlobals)
+		return JackLibGlobals::fGlobals->fEngineControl;
+	else
+		return NULL;
 }
 
 JackSynchro** GetSynchroTable()
 {
-    assert(JackLibGlobals::fGlobals);
-    return JackLibGlobals::fGlobals->fSynchroTable;
+    return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
 }
 
 //-------------------
