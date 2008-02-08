@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-02-08 Stephane Letz  <letz@grame.fr>
+		
+	* More robust external API.
+
 2008-02-07 Stephane Letz  <letz@grame.fr>
 		
 	* Correct "server_connect": close the communication channel.
