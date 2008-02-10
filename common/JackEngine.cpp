@@ -140,7 +140,7 @@ void JackEngine::ProcessNext(jack_time_t callback_usecs)
 
 void JackEngine::ProcessCurrent(jack_time_t callback_usecs)
 {
-	if (callback_usecs < fLastSwitchUsecs + 2 * fEngineControl->fPeriodUsecs) // Signal XRun only for the first failling cycle
+	if (callback_usecs < fLastSwitchUsecs + 2 * fEngineControl->fPeriodUsecs) // Signal XRun only for the first failing cycle
 		CheckXRun(callback_usecs);
 	fGraphManager->RunCurrentGraph();
 }

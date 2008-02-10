@@ -298,7 +298,7 @@ EXPORT const char* jack_port_short_name(const jack_port_t* port)
         return NULL;
     } else {
 		JackGraphManager* manager = GetGraphManager();
-        return (manager ? GetGraphManager()->GetPort(myport)->GetShortName() : NULL);
+        return (manager ? manager->GetPort(myport)->GetShortName() : NULL);
     }
 }
 
@@ -313,7 +313,7 @@ EXPORT int jack_port_flags(const jack_port_t* port)
         return -1;
     } else {
 		JackGraphManager* manager = GetGraphManager();
-        return (manager ? GetGraphManager()->GetPort(myport)->GetFlags() : -1);
+        return (manager ? manager->GetPort(myport)->GetFlags() : -1);
     }
 }
 
@@ -328,7 +328,7 @@ EXPORT const char* jack_port_type(const jack_port_t* port)
         return NULL;
     } else {
 		JackGraphManager* manager = GetGraphManager();
-        return (manager ? GetGraphManager()->GetPort(myport)->GetType() : NULL);
+        return (manager ? manager->GetPort(myport)->GetType() : NULL);
     }
 }
 
@@ -344,7 +344,7 @@ EXPORT int jack_port_connected(const jack_port_t* port)
     } else {
         WaitGraphChange();
 		JackGraphManager* manager = GetGraphManager();
-        return (manager ? GetGraphManager()->GetConnectionsNum(myport) : -1);
+        return (manager ? manager->GetConnectionsNum(myport) : -1);
     }
 }
 
@@ -363,7 +363,7 @@ EXPORT int jack_port_connected_to(const jack_port_t* port, const char* port_name
     } else {
         WaitGraphChange();
 		JackGraphManager* manager = GetGraphManager();
-		jack_port_id_t dst = (manager ? GetGraphManager()->GetPort(port_name) : NO_PORT);
+		jack_port_id_t dst = (manager ? manager->GetPort(port_name) : NO_PORT);
 		if (dst == NO_PORT) {
 			jack_error("Unknown destination port port_name = %s", port_name);
 			return 0;
