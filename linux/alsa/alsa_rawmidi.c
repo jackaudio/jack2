@@ -421,7 +421,7 @@ void midi_port_init(const alsa_rawmidi_t *midi, midi_port_t *port, snd_rawmidi_i
 }
 
 static
-inline int midi_port_open_jack(const alsa_rawmidi_t *midi, midi_port_t *port, int type, const char *alias)
+inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type, const char *alias)
 {
 	char name[64];
 	
@@ -434,7 +434,7 @@ inline int midi_port_open_jack(const alsa_rawmidi_t *midi, midi_port_t *port, in
 		type | JackPortIsPhysical|JackPortIsTerminal, 0);
 		
 	if (port->jack) 
-		jack_port_set_alias(port->jack_port,alias);
+		jack_port_set_alias(port->jack, alias);
 	return port->jack == NULL;
 }
 
