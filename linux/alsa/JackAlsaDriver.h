@@ -163,6 +163,7 @@ class JackAlsaDriver : public JackAudioDriver
     int port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size);
     int port_unregister(int port);
     void* port_get_buffer(int port, jack_nframes_t nframes);
+	int port_set_alias(int port, const char* name);
  
     jack_nframes_t get_sample_rate() const;
     jack_nframes_t frame_time() const;

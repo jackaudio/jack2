@@ -106,6 +106,8 @@ typedef struct alsa_seqmidi {
 	stream_t stream[2];
 
 	char alsa_name[32];
+	int midi_in_cnt;
+	int midi_out_cnt;
 } alsa_seqmidi_t;
 
 struct alsa_midi_event {
@@ -225,6 +227,8 @@ alsa_midi_t* alsa_seqmidi_new(jack_client_t *client, const char* alsa_name)
 	stream_init(self, PORT_INPUT);
 	stream_init(self, PORT_OUTPUT);
 
+	self->midi_in_cnt = 0;
+	self->midi_out_cnt = 0;
 	self->ops.destroy = alsa_seqmidi_delete;
 	self->ops.attach = alsa_seqmidi_attach;
 	self->ops.detach = alsa_seqmidi_detach;
@@ -455,25 +459,34 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	port_t *port;
 	char *c;
 	int err;
+	char name[64];
 
 	port = calloc(1, sizeof(port_t));
 	if (!port)
 		return NULL;
 
 	port->remote = addr;
-
+	
+	if (port_type[type].jack_caps & JackPortIsOutput)
+		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++self->midi_in_cnt);
+	else 
+		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++self->midi_out_cnt);
+	
 	snprintf(port->name, sizeof(port->name), "%s-%d-%d-%s",
 		port_type[type].name, addr.client, addr.port, snd_seq_port_info_get_name(info));
-
+	
 	// replace all offending characters by -
 	for (c = port->name; *c; ++c)
 		if (!isalnum(*c))
 			*c = '-';
 
 	port->jack_port = jack_port_register(self->jack,
-		port->name, JACK_DEFAULT_MIDI_TYPE, port_type[type].jack_caps, 0);
+		name, JACK_DEFAULT_MIDI_TYPE, port_type[type].jack_caps, 0);
+
 	if (!port->jack_port)
 		goto failed;
+		
+	jack_port_set_alias(port->jack_port, port->name);
 
 	if (type == PORT_INPUT)
 		err = alsa_connect_from(self, port->remote.client, port->remote.port);

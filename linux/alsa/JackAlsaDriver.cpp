@@ -2369,6 +2369,11 @@ void* JackAlsaDriver::port_get_buffer(int port, jack_nframes_t nframes)
 	return fGraphManager->GetBuffer(port, nframes);
 }
 
+int  JackAlsaDriver::port_set_alias(int port, const char* name)
+{
+	return fGraphManager->GetPort(port)->SetAlias(name);
+}
+
 jack_nframes_t JackAlsaDriver::get_sample_rate() const
 {
 	return fEngineControl->fSampleRate;

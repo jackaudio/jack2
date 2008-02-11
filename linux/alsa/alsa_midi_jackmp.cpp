@@ -44,6 +44,12 @@ void* JACK_port_get_buffer(jack_port_t *port, jack_nframes_t nframes)
 	return real->driver->port_get_buffer(real->port_id, nframes);
 }
 
+int JACK_port_set_alias(jack_port_t *port, const char* name)
+{
+	fake_port_t* real = (fake_port_t*)port;
+	return real->driver->port_set_alias(real->port_id, name);
+}
+
 jack_nframes_t JACK_get_sample_rate(jack_client_t *client)
 {
 	return ((JackAlsaDriver*)client)->get_sample_rate();

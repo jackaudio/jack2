@@ -193,12 +193,6 @@ int JackPort::SetName(const char* new_name)
     return 0;
 }
 
-void JackPort::Rename(const char* name, int index)
-{
-	SetAlias(GetName());
-	snprintf(fName, sizeof(fName) - 1, name, index);
-}
-
 bool JackPort::NameEquals(const char* target)
 {
 	char buf[JACK_PORT_NAME_SIZE + 1];

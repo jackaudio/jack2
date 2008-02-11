@@ -176,6 +176,8 @@ struct alsa_rawmidi_t {
 
 	midi_stream_t in;
 	midi_stream_t out;
+	int midi_in_cnt;
+	int midi_out_cnt;
 };
 
 static int input_port_init(alsa_rawmidi_t *midi, midi_port_t *port);
@@ -264,6 +266,8 @@ alsa_midi_t* alsa_rawmidi_new(jack_client_t *jack)
 	midi->ops.stop = alsa_rawmidi_stop;
 	midi->ops.read = alsa_rawmidi_read;
 	midi->ops.write = alsa_rawmidi_write;
+	midi->midi_in_cnt = 0;
+	midi->midi_out_cnt = 0;
 
 	return &midi->ops;
  fail_3:
@@ -417,10 +421,20 @@ void midi_port_init(const alsa_rawmidi_t *midi, midi_port_t *port, snd_rawmidi_i
 }
 
 static
-inline int midi_port_open_jack(const alsa_rawmidi_t *midi, midi_port_t *port, int type, const char *name)
+inline int midi_port_open_jack(const alsa_rawmidi_t *midi, midi_port_t *port, int type, const char *alias)
 {
+	char name[64];
+	
+	if (type & JackPortIsOutput)
+		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++midi->midi_in_cnt);
+	else 
+		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++midi->midi_out_cnt);
+
 	port->jack = jack_port_register(midi->client, name, JACK_DEFAULT_MIDI_TYPE,
 		type | JackPortIsPhysical|JackPortIsTerminal, 0);
+		
+	if (port->jack) 
+		jack_port_set_alias(port->jack_port,alias);
 	return port->jack == NULL;
 }
 

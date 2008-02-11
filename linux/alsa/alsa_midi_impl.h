@@ -34,6 +34,7 @@ int JACK_client_create_thread(jack_client_t *client, pthread_t *thread, int prio
 jack_port_t* JACK_port_register(jack_client_t *client, const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size);
 int JACK_port_unregister(jack_client_t *, jack_port_t*);
 void* JACK_port_get_buffer(jack_port_t*, jack_nframes_t);
+int JACK_port_set_alias(jack_port_t* port, const char* name);
 
 jack_nframes_t JACK_get_sample_rate(jack_client_t *);
 jack_nframes_t JACK_frame_time(jack_client_t *);
@@ -45,6 +46,7 @@ jack_nframes_t JACK_last_frame_time(jack_client_t *);
 #define jack_port_register JACK_port_register
 #define jack_port_unregister JACK_port_unregister
 #define jack_port_get_buffer JACK_port_get_buffer
+#define jack_port_set_alias JACK_port_set_alias
 
 #define jack_get_sample_rate JACK_get_sample_rate
 #define jack_frame_time JACK_frame_time
