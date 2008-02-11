@@ -2099,7 +2099,8 @@ int JackAlsaDriver::Attach()
     JackPort* port;
     int port_index;
     unsigned long port_flags;
-    char buf[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+	char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+	char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 
     assert(fCaptureChannels < PORT_NUM);
     assert(fPlaybackChannels < PORT_NUM);
@@ -2118,13 +2119,14 @@ int JackAlsaDriver::Attach()
     JackLog("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
-        snprintf(buf, sizeof(buf) - 1, "%s:capture_%u", fClientControl->fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
-            jack_error("driver: cannot register port for %s", buf);
+        snprintf(alias, sizeof(alias) - 1, "%s:capture_%u", fClientControl->fName, i + 1);
+		snprintf(name, sizeof(name) - 1, "system:capture_%d", i + 1);
+        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+            jack_error("driver: cannot register port for %s", name);
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
-	    port->Rename("system:capture_%d", i + 1);
+		port->SetAlias(alias);
         port->SetLatency(alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency);
         fCapturePortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld \n", port_index);
@@ -2133,13 +2135,14 @@ int JackAlsaDriver::Attach()
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
 
     for (int i = 0; i < fPlaybackChannels; i++) {
-        snprintf(buf, sizeof(buf) - 1, "%s:playback_%u", fClientControl->fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
-            jack_error("driver: cannot register port for %s", buf);
+        snprintf(alias, sizeof(alias) - 1, "%s:playback_%u", fClientControl->fName, i + 1);
+		snprintf(name, sizeof(name) - 1, "system:playback_%d", i + 1);
+        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+            jack_error("driver: cannot register port for %s", name);
             return -1;
         }
         port = fGraphManager->GetPort(port_index);
-	    port->Rename("system:playback_%d", i + 1);
+	    port->SetAlias(alias);
         port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) + alsa_driver->playback_frame_latency);
         fPlaybackPortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
@@ -2147,9 +2150,9 @@ int JackAlsaDriver::Attach()
 		// Monitor ports
 		if (fWithMonitorPorts) {
 			JackLog("Create monitor port \n");
-			snprintf(buf, sizeof(buf) - 1, "%s:monitor_%lu",fClientControl->fName, i + 1);
-			if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
-				jack_error ("ALSA: cannot register monitor port for %s", buf);
+			snprintf(name, sizeof(name) - 1, "%s:monitor_%lu",fClientControl->fName, i + 1);
+			if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
+				jack_error ("ALSA: cannot register monitor port for %s", name);
 			} else {
 				port = fGraphManager->GetPort(port_index);
 				port->SetLatency(alsa_driver->frames_per_cycle);
