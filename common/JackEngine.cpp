@@ -562,20 +562,20 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
   	ReleaseRefnum(refnum);
 
     // Remove ports : notiy unregister then remove all ports
-	jack_int_t input[PORT_NUM_FOR_CLIENT];
-	fGraphManager->GetInputPorts(refnum, input);
+	jack_int_t ports[PORT_NUM_FOR_CLIENT];
+	
+	fGraphManager->GetInputPorts(refnum, ports);
 	for (int i = 0; i < PORT_NUM_FOR_CLIENT; i++) {
-		if (input[i] != EMPTY) 
-			NotifyPortRegistation(input[i], false);
+		if (ports[i] != EMPTY) 
+			NotifyPortRegistation(ports[i], false);
 		else 
 			break;
 	}	
 	
-	jack_int_t output[PORT_NUM_FOR_CLIENT];
-	fGraphManager->GetInputPorts(refnum, output);
+	fGraphManager->GetInputPorts(refnum, ports);
 	for (int i = 0; i < PORT_NUM_FOR_CLIENT; i++) {
-		if (output[i] != EMPTY) 
-			NotifyPortRegistation(output[i], false);
+		if (ports[i] != EMPTY) 
+			NotifyPortRegistation(ports[i], false);
 		else 
 			break;
 	}
