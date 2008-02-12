@@ -411,8 +411,8 @@ inline void JackClient::SignalSync()
 inline int JackClient::End()
 {
 	JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
-	int result;
 	// Hum... not sure about this, the following "close" code is called in the RT thread...
+	int result;
 	fThread->DropRealTime();
 	GetClientControl()->fActive = false;
 	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
@@ -424,7 +424,10 @@ inline int JackClient::Error()
 {
 	jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
 	// Hum... not sure about this, the following "close" code is called in the RT thread...
+	int result;
     fThread->DropRealTime();
+	GetClientControl()->fActive = false;
+	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     ShutDown();
 	fThread->Terminate();
 	return 0; // Never reached

@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-02-12 Stephane Letz  <letz@grame.fr>
+		
+	* Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly. Thanks Esben Stien for helping finding this bug.
+
 2008-02-11 Stephane Letz  <letz@grame.fr>
 		
 	* Use SetAlias for port naming. Use jackd midi port naming scheme.
