@@ -19,7 +19,9 @@ Tim Blechmann
 
 2008-02-12 Stephane Letz  <letz@grame.fr>
 		
-	* Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly. Thanks Esben Stien for helping finding this bug.
+	* Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly. 
+	* Notify ports unregistration in JackEngine::ClientCloseAux.
+	* Thanks Esben Stien for helping finding these bugs.
 
 2008-02-11 Stephane Letz  <letz@grame.fr>
 		

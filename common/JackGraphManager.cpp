@@ -354,6 +354,22 @@ int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
     return res;
 }
 
+void JackGraphManager::GetInputPorts(int refnum, jack_int_t* res)
+{
+	JackConnectionManager* manager = WriteNextStateStart();
+	const jack_int_t* input = manager->GetInputPorts(refnum);
+	memcpy(res, input, sizeof(jack_int_t) * PORT_NUM_FOR_CLIENT);
+	WriteNextStateStop();
+}
+
+void JackGraphManager::GetOutputPorts(int refnum, jack_int_t* res)
+{
+	JackConnectionManager* manager = WriteNextStateStart();
+	const jack_int_t* output = manager->GetOutputPorts(refnum);
+	memcpy(res, output, sizeof(jack_int_t) * PORT_NUM_FOR_CLIENT);
+	WriteNextStateStop();
+}
+
 // Server
 void JackGraphManager::RemoveAllPorts(int refnum)
 {

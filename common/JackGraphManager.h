@@ -62,6 +62,8 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         // Ports management
         jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size);  
 		int ReleasePort(int refnum, jack_port_id_t port_index); 
+		void GetInputPorts(int refnum, jack_int_t* res);
+		void GetOutputPorts(int refnum, jack_int_t* res);
 	    void RemoveAllPorts(int refnum); 
         void DisconnectAllPorts(int refnum); 
 	
