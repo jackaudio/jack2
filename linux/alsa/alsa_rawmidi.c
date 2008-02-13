@@ -737,7 +737,6 @@ void* scan_thread(void *arg)
 	return NULL;
 }
 
-
 /* 
  * ------------------------------- Input/Output  ------------------------------
  */
@@ -970,8 +969,7 @@ int input_port_init(alsa_rawmidi_t *midi, midi_port_t *port)
 
 static
 void input_port_close(alsa_rawmidi_t *midi, midi_port_t *port)
-{
-}
+{}
 
 /*
  * Jack-level input.
@@ -1077,8 +1075,7 @@ static int output_port_init(alsa_rawmidi_t *midi, midi_port_t *port)
 }
 
 static void output_port_close(alsa_rawmidi_t *midi, midi_port_t *port)
-{
-}
+{}
 
 static
 void do_jack_output(process_jack_t *proc)
