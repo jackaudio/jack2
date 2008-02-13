@@ -439,7 +439,7 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 }
 
 static
-int midi_port_open(const alsa_rawmidi_t *midi, midi_port_t *port)
+int midi_port_open(alsa_rawmidi_t *midi, midi_port_t *port)
 {
 	int err;
 	int type;
