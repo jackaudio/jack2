@@ -85,6 +85,12 @@ process_audio (jack_nframes_t nframes, void *arg)
 	return 0;
 }
 
+void Jack_Port_Register(jack_port_id_t port, int mode, void *arg)
+{
+  printf("Jack_Port_Register port = %ld mode = %ld\n", port, mode);
+}
+
+
 /*
 int
 process (jack_nframes_t nframes, void *arg)
@@ -258,6 +264,12 @@ main (int argc, char *argv[])
 	for (i = tone_length; i < (int) wave_length; i++) {
 		wave[i] = 0;
 	}
+	
+	
+    if (jack_set_port_registration_callback(client, Jack_Port_Register, 0) != 0) {
+        printf("Error when calling jack_set_port_registration_callback() !\n");
+    }
+
 	
     if (jack_activate (client)) {
 		fprintf (stderr, "cannot activate client");

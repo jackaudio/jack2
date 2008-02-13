@@ -572,7 +572,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 			break;
 	}	
 	
-	fGraphManager->GetInputPorts(refnum, ports);
+	fGraphManager->GetOutputPorts(refnum, ports);
 	for (int i = 0; i < PORT_NUM_FOR_CLIENT; i++) {
 		if (ports[i] != EMPTY) 
 			NotifyPortRegistation(ports[i], false);
