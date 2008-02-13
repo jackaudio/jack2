@@ -45,7 +45,7 @@ extern "C"
     /* This should only be called ONCE per process. */
     extern void InitTime();
 
-    static inline void JackSleep(long usec) 
+    static inline void JackSleep(int usec) 
 	{
         usleep(usec);
     }
@@ -60,7 +60,7 @@ extern "C"
 
     extern void InitTime();
 
-    static void JackSleep(long usec) 
+    static void JackSleep(int usec) 
 	{
         Sleep(usec / 1000);
     }

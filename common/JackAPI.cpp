@@ -239,7 +239,7 @@ static inline void WaitGraphChange()
 	
     if (manager && control && manager->IsPendingChange()) {
         JackLog("WaitGraphChange...\n");
-        JackSleep(control->fPeriodUsecs * 1.1f);
+        JackSleep(int(control->fPeriodUsecs * 1.1f));
     }
 }
 
