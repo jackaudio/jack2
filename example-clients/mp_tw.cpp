@@ -78,6 +78,7 @@ static void resume_all_threads(void *arg)
 static void suspend_jack_thread(void *arg) 
 {
 	jack_thread_wait(client, 0);
+	resume_all_threads(arg);
 }
  
 static void suspend_worker_thread(void *arg) 
@@ -95,7 +96,6 @@ static void * worker_aux_thread(void *arg)
  
 		if (val == 1) {  // Last thread
 			suspend_jack_thread(arg);
-			resume_all_threads(arg);
 		} else if (val < 1) {	
 			suspend_worker_thread(arg);
 		} else {
