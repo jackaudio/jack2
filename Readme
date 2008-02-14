@@ -81,6 +81,8 @@ The package contains :
  - the source code with an XCode project
  - the component needed to use CoreAudio applications with Jack (the JackRouter Jack/CoreAudio bridge)
 
+Starting with 0.70 version, the OSX project can compile 32/64 bits binaries for PPC and Intel machines. On a 64 bits machine, using the "jackdmp" in a terminal will start the 64 bits version. Using the "arch" command possibly allows to force starting in 32 bits (see man arch). The JackPilot and JackRouter binaries are now also released as 32/64 bits versions for PPC and Intel machines. By default the JackPilot application will start in 32 bits mode (even on a 64 bits machine) and launch the 32 bits jackdmp. Unchecking the "Launch in 32 bits mode" box in the JackPilot info (GetInfo = %I in the Finder...) allows to start JackPilot in 64 bits then launch the 64 bits jackdmp version. Very few audio applications are already 64 bits aware: Apple AU Lab (included in Developer tools) can be launched in 64 bit, here again by unchecking the "Launch in 32 bits mode" box in the AU Lab info.
+
 WARNING !! WARNING !! 
 
 Users of the "official" JackOSX package (found at www.jackosx.com) MUST uninstall JackOSX (using the script located in /Applications/Jack) before installing and testing jackdmp. The "official" JackOSX package can then be re-installed by using the JackOSX installer again. 
