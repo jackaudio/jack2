@@ -83,8 +83,6 @@ namespace Jack
 #define EMPTY   0xFFFD
 #define FREE	0xFFFC
 
-typedef uint16_t jack_int_t;  // Internal type for ports and refnum
-
 } // end of namespace
 
 #endif

@@ -388,7 +388,6 @@ int main(int argc, char* argv[])
 
     while (waiting) {
         sigwait(&signals, &sig);
-
         fprintf(stderr, "jack main caught signal %d\n", sig);
 
         switch (sig) {
