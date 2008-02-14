@@ -28,8 +28,8 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,7,0,0
- PRODUCTVERSION 0,7,0,0
+ FILEVERSION 0,7,1,0
+ PRODUCTVERSION 0,7,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -47,14 +47,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
             VALUE "FileDescription", "Jackmp library for Windows\0"
-            VALUE "FileVersion", "0, 7, 0, 0\0"
+            VALUE "FileVersion", "0, 7, 1, 0\0"
             VALUE "InternalName", "libjackmp\0"
             VALUE "LegalCopyright", "Copyright Grame © 2006-2008\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "libjackmp.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "libjackmp\0"
-            VALUE "ProductVersion", "0, 7, 0, 0\0"
+            VALUE "ProductVersion", "0, 7, 1, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
