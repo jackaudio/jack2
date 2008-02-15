@@ -376,7 +376,6 @@ inline void JackClient::ExecuteThread()
 	}
 }
 
-/*
 jack_nframes_t JackClient::Wait(int status)
 {
 	if (status == 0)
@@ -388,6 +387,13 @@ jack_nframes_t JackClient::Wait(int status)
 		return Error();
 	CallSyncCallback();
 	return GetEngineControl()->fBufferSize;
+}
+
+/*
+jack_nframes_t JackClient::Wait(int status)
+{
+	CycleSignal(status);
+	return CycleWait();
 }
 */
 
@@ -408,13 +414,6 @@ void JackClient::CycleSignal(int status)
 	if (status != 0) 
 		End();
 }
-
-jack_nframes_t JackClient::Wait(int status)
-{
-	CycleSignal(status);
-	return CycleWait();
-}
-
 
 inline int JackClient::CallProcessCallback()
 {
