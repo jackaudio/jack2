@@ -198,6 +198,11 @@ extern "C"
 	*/
 	jack_nframes_t jack_thread_wait (jack_client_t*, int status);
 	
+	
+	
+	jack_nframes_t jack_cycle_wait (jack_client_t*);
+	void jack_cycle_signal (jack_client_t*, int status);
+	
     /**
      * Tell JACK to call @a thread_init_callback once just after
      * the creation of the thread in which all other callbacks 

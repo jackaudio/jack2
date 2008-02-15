@@ -37,6 +37,8 @@ typedef ULONGLONG UInt64;
 typedef unsigned long long UInt64;
 #endif
 
+#include <stdint.h>
+
 typedef uint16_t jack_int_t;  // Internal type for ports and refnum
 
 namespace Jack

@@ -39,7 +39,7 @@ class JackEngine;
 /*!
 \brief Factory description
  
-\totdo possibly use in a dynamic way to test different communication/synchro implementations.
+\todo possibly use in a dynamic way to test different communication/synchro implementations.
 */
 
 class JackFactoryImpl

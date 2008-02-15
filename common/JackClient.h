@@ -172,6 +172,10 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		
 		// Fons Adriaensen thread model
 		virtual jack_nframes_t Wait(int status);
+		
+		virtual jack_nframes_t CycleWait();
+		void CycleSignal(int status);
+		bool fWait;
 
         // JackRunnableInterface interface
         bool Init();

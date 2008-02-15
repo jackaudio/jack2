@@ -66,6 +66,7 @@ JackClient::JackClient(JackSynchro** table)
 	fPortConnectArg = NULL;
     fSyncArg = NULL;
     fConditionnal = 0; // Temporary??
+	fWait = false;
 }
 
 JackClient::~JackClient()
@@ -248,8 +249,10 @@ int JackClient::Activate()
 #endif
 */
 
-	if (StartThread() < 0)
-        return -1;
+	if (fProcess || !fWait) {  // Start thread only of process cb has been setup
+		if (StartThread() < 0)
+			return -1;
+	}
 
     int result = -1;
     fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
@@ -290,7 +293,9 @@ int JackClient::Deactivate()
 	fThread->Kill();
 #endif
 */
-	fThread->Kill();
+	//if (fProcess || fWait) {  // Kill thread only of process cb has been setup
+		fThread->Kill();
+	//}
     return result;
 }
 
@@ -371,6 +376,7 @@ inline void JackClient::ExecuteThread()
 	}
 }
 
+/*
 jack_nframes_t JackClient::Wait(int status)
 {
 	if (status == 0)
@@ -383,6 +389,32 @@ jack_nframes_t JackClient::Wait(int status)
 	CallSyncCallback();
 	return GetEngineControl()->fBufferSize;
 }
+*/
+
+jack_nframes_t JackClient::CycleWait()
+{
+	fWait = true;
+	if (!WaitSync()) 
+		return Error();
+	CallSyncCallback();
+	return GetEngineControl()->fBufferSize;
+}
+
+void JackClient::CycleSignal(int status)
+{
+	if (status == 0)
+		CallTimebaseCallback();
+	SignalSync();
+	if (status != 0) 
+		End();
+}
+
+jack_nframes_t JackClient::Wait(int status)
+{
+	CycleSignal(status);
+	return CycleWait();
+}
+
 
 inline int JackClient::CallProcessCallback()
 {
