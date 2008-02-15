@@ -198,8 +198,7 @@ extern "C"
 	*/
 	jack_nframes_t jack_thread_wait (jack_client_t*, int status);
 	
-	
-	
+	// experimental...
 	jack_nframes_t jack_cycle_wait (jack_client_t*);
 	void jack_cycle_signal (jack_client_t*, int status);
 	
