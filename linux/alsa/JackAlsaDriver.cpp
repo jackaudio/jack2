@@ -2367,9 +2367,12 @@ int JackAlsaDriver::port_register(const char *port_name, const char *port_type, 
 
 int JackAlsaDriver::port_unregister(int port_index)
 {
-	fGraphManager->ReleasePort(fClientControl->fRefNum, port_index);
-	fEngine->NotifyPortRegistation(port_index, false);
-	return 0;
+	if (fGraphManager->ReleasePort(fClientControl->fRefNum, port_index) == 0) {
+		fEngine->NotifyPortRegistation(port_index, false);
+		return 0;
+	} else {
+        return -1;
+    }
 }
 
 void* JackAlsaDriver::port_get_buffer(int port, jack_nframes_t nframes)
