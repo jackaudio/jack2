@@ -39,6 +39,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
+#include "JackEngine.h"
 
 #include "hammerfall.h"
 #include "hdsp.h"
