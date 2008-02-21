@@ -2362,7 +2362,7 @@ int JackAlsaDriver::port_register(const char *port_name, const char *port_type, 
 	int port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, port_name, port_type, (JackPortFlags) flags, fEngineControl->fBufferSize);
 	if (port_index != NO_PORT) 
         fEngine->NotifyPortRegistation(port_index, true);
-	return port;
+	return port_index;
 }
 
 int JackAlsaDriver::port_unregister(int port_index)
