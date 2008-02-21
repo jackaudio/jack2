@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-02-21 Stephane Letz  <letz@grame.fr>
+		
+	* Add port register/unregister notification in JackAlsaDriver.
+
 2008-02-12 Stephane Letz  <letz@grame.fr>
 		
 	* Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly. 
