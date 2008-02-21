@@ -2359,7 +2359,7 @@ int JackAlsaDriver::create_thread(pthread_t *thread, int priority, int realtime,
 int JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size)
 {
 	int port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, port_name, port_type, (JackPortFlags) flags, fEngineControl->fBufferSize);
-	if (port != NO_PORT) 
+	if (port_index != NO_PORT) 
         fEngine->NotifyPortRegistation(port_index, true);
 	return port;
 }
