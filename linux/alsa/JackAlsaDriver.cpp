@@ -2358,12 +2358,16 @@ int JackAlsaDriver::create_thread(pthread_t *thread, int priority, int realtime,
 
 int JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size)
 {
-	return fGraphManager->AllocatePort(fClientControl->fRefNum, port_name, port_type, (JackPortFlags) flags, fEngineControl->fBufferSize);
+	int port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, port_name, port_type, (JackPortFlags) flags, fEngineControl->fBufferSize);
+	if (port != NO_PORT) 
+        fEngine->NotifyPortRegistation(port_index, true);
+	return port;
 }
 
-int JackAlsaDriver::port_unregister(int port)
+int JackAlsaDriver::port_unregister(int port_index)
 {
-	fGraphManager->ReleasePort(fClientControl->fRefNum, port);
+	fGraphManager->ReleasePort(fClientControl->fRefNum, port_index);
+	fEngine->NotifyPortRegistation(port_index, false);
 	return 0;
 }
 
