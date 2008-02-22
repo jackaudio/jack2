@@ -201,7 +201,7 @@ int JackTools::GetTmpdir()
 
 void JackTools::RewriteName(const char* name, char* new_name)
 {
-	int i;
+	size_t i;
 	for (i = 0; i < strlen(name); i++) {
 		if ((name[i] == '/') || (name[i] == '\\'))
 			new_name[i] = '_';
