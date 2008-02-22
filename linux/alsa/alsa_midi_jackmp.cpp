@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2006,2007 Dmitry S. Baikov <c0ff@konstruktiv.org>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+ */
+
 #include "JackAlsaDriver.h"
 #include "JackPort.h"
 #include "alsa_midi_impl.h"
@@ -24,16 +42,17 @@ jack_port_t* JACK_port_register(jack_client_t *client, const char *port_name, co
 {
 	JackAlsaDriver *driver = (JackAlsaDriver*)client;
 	int port_id = driver->port_register(port_name, port_type, flags, buffer_size);
-	if (port_id == NO_PORT)
+	if (port_id == NO_PORT) {
 	    return 0;
-	else
+	} else {
 	    return (jack_port_t*) new fake_port_t(driver, port_id);
+	}
 }
 
 int JACK_port_unregister(jack_client_t *client, jack_port_t *port)
 {
 	fake_port_t* real = (fake_port_t*)port;
-	int res = 0; //real->driver->port_unregister(real->port_id);
+	int res = real->driver->port_unregister(real->port_id);
 	delete real;
 	return res;
 }
