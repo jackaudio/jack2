@@ -48,13 +48,16 @@ _process (jack_nframes_t nframes)
 		
 	} else if (ts == JackTransportStopped) {
 		
-		if (client_state == Run)
+		if (client_state == Run) {
 			client_state = Exit;
+			return -1;  // to stop the thread
+		}
 	}
 
 	return 0;      
 }
 
+/*
 int
 process (jack_nframes_t nframes, void* arg)
 {
@@ -62,6 +65,22 @@ process (jack_nframes_t nframes, void* arg)
 
 	while ((nframes = jack_thread_wait (client, _process (nframes))) != 0);
 
+	return 0;
+}
+*/
+
+int
+process (jack_nframes_t nframes, void* arg)
+{
+	jack_client_t* client = (jack_client_t*) arg;
+	
+	do {
+		int status = _process(nframes);
+		jack_cycle_signal (client, status);
+		// possibly do something else after signaling next clients in the graph
+		nframes = jack_cycle_wait (client);
+	} while (nframes != 0);
+	
 	return 0;
 }
 
