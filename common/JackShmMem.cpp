@@ -35,7 +35,7 @@ void* JackShmMem::operator new(size_t size)
     JackShmMem* obj;
     char name[64];
 
-    snprintf(name, sizeof(name), "/jack_shared%ld", JackShmMem::fSegmentNum++);
+    snprintf(name, sizeof(name), "/jack_shared%d", JackShmMem::fSegmentNum++);
 
     if (jack_shmalloc(name, size, &info)) {
         jack_error("cannot create shared memory segment of size = %d", size, strerror(errno));
