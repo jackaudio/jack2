@@ -251,9 +251,6 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 	
 		case kAudioDeviceProcessorOverload:
 			JackLog("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload\n");
-		#ifdef DEBUG
-			//driver->fLogFile->Capture(AudioGetCurrentHostTime() - AudioConvertNanosToHostTime(LOG_SAMPLE_DURATION * 1000000), AudioGetCurrentHostTime(), true, "Captured Latency Log for I/O Cycle Overload\n");
-		#endif
 			driver->NotifyXRun(GetMicroSeconds());
 			break;
 			
@@ -423,18 +420,10 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int* channe
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
         : JackAudioDriver(name, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false)
-{
-#ifdef DEBUG
-    //fLogFile = new CALatencyLog("jackmp_latency", ".txt");
-#endif
-}
+{}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
-{
-#ifdef DEBUG
-    //delete fLogFile;
-#endif
-}
+{}
 
 int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char* playback_driver_uid, char* capture_driver_name, char* playback_driver_name)
 {

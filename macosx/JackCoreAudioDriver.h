@@ -26,13 +26,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAudioDriver.h"
 #include "JackTime.h"
 
-#include "/Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h"
-
 namespace Jack
 {
 
 #define kVersion 102
-#define LOG_SAMPLE_DURATION 3	// in millisecond
 
 typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
@@ -51,11 +48,7 @@ class JackCoreAudioDriver : public JackAudioDriver
 
     private:
 	
-	#ifdef DEBUG
-        //CALatencyLog* fLogFile;
-	#endif
-
-        AudioUnit fAUHAL;
+		AudioUnit fAUHAL;
 
         AudioBufferList* fJackInputData;
         AudioBufferList* fDriverOutputData;
