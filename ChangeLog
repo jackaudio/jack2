@@ -17,6 +17,10 @@ Tim Blechmann
   Jackdmp changes log
 ---------------------------
 
+2008-02-25 Stephane Letz  <letz@grame.fr>
+		
+	* Correct Linux makefile.
+
 2008-02-22 Stephane Letz  <letz@grame.fr>
 		
 	* Correct JACK_port_unregister.
