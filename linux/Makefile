@@ -32,10 +32,10 @@ LIB_LINUX := -lpthread -lrt -lasound
 objects_common_server_lib := JackActivationCount.o JackAPI.o JackAudioDriver.o JackClient.o JackConnectionManager.o \
 	                     JackDriver.o JackEngine.o JackEngineControl.o JackError.o JackExternalClient.o JackFrameTimer.o \
 	                     JackFreewheelDriver.o JackGlobalsServer.o JackGraphManager.o JackInternalClient.o JackPort.o JackPosixSemaphore.o \
-                             JackPosixThread.o JackFifo.o  JackLoopbackDriver.o JackPortType.o JackAudioPort.o JackMidiPort.o \
+                             JackPosixThread.o JackFifo.o  JackLoopbackDriver.o JackPortType.o JackAudioPort.o JackMidiPort.o JackMidiAPI.o \
 	                     JackServer.o JackShmMem.o JackThreadedDriver.o shm.o JackSocket.o JackSocketServerChannel.o  JackSocketNotifyChannel.o \
 	                     JackSocketServerNotifyChannel.o JackTime.o JackServerAPI.o JackGlobals.o JackDriverLoader.o internal_metro.o JackDebugClient.o  \
-	                     JackTransportEngine.o JackServerGlobals.o JackServerLaunch.o timestamps.o JackTools.o
+	                     JackTransportEngine.o JackServerGlobals.o JackServerLaunch.o timestamps.o JackTools.o ringbuffer.o
 
 objects_common_client_lib := JackActivationCount.o JackAPI.o JackClient.o JackConnectionManager.o ringbuffer.o  JackServerLaunch.o\
 	                     JackError.o JackFrameTimer.o JackGlobalsClient.o JackGraphManager.o JackLibClient.o JackLibAPI.o JackPort.o JackPosixSemaphore.o  \
@@ -112,7 +112,7 @@ $(TARGET_LINUX_SERVER) : $(objects_linux_server)
 	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackdmp.so -o $(TARGET_LINUX_SERVER)
 
 $(TARGET_LINUX_ALSA) : $(objects_linux_alsa) 
-	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) ringbuffer.o libjackmp.so libjackdmp.so  -o $(TARGET_LINUX_ALSA)
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) libjackmp.so libjackdmp.so  -o $(TARGET_LINUX_ALSA)
 
 $(TARGET_LINUX_FREEBOB) : $(objects_linux_freebob) 
 	$(CXX) $(CXXFLAGS) -shared $(objects_linux_freebob) $(LIB_LINUX) -lfreebob libjackdmp.so  -o $(TARGET_LINUX_FREEBOB)
