@@ -58,13 +58,6 @@ class JackFFADODriver : public JackAudioDriver
         ffado_driver_t *ffado_driver_new (char *name, ffado_jack_settings_t *params);
         void ffado_driver_delete (ffado_driver_t *driver);
 
-#ifdef FREEBOB_DRIVER_WITH_MIDI
-        ffado_driver_midi_handle_t *ffado_driver_midi_init(ffado_driver_t *driver);
-        void ffado_driver_midi_finish (ffado_driver_midi_handle_t *m);
-        int ffado_driver_midi_start (ffado_driver_midi_handle_t *m);
-        int ffado_driver_midi_stop (ffado_driver_midi_handle_t *m);
-#endif
-
         void jack_driver_init (jack_driver_t *driver);
         void jack_driver_nt_init (jack_driver_nt_t * driver);
  

@@ -38,10 +38,10 @@ srcfiles_common_serverlib = env.Split( '\
      JackActivationCount.cpp JackAPI.cpp JackAudioDriver.cpp JackClient.cpp JackConnectionManager.cpp \
      JackDriver.cpp JackEngine.cpp JackEngineControl.cpp JackError.c JackExternalClient.cpp JackFrameTimer.cpp \
      JackFreewheelDriver.cpp JackGlobalsServer.cpp JackGraphManager.cpp JackInternalClient.cpp JackPort.cpp JackPosixSemaphore.cpp \
-         JackPosixThread.cpp JackFifo.cpp  JackLoopbackDriver.cpp JackPortType.cpp JackAudioPort.cpp JackMidiPort.cpp \
+         JackPosixThread.cpp JackFifo.cpp  JackLoopbackDriver.cpp JackPortType.cpp JackAudioPort.cpp JackMidiPort.cpp JackMidiAPI.cpp \
      JackServer.cpp JackShmMem.cpp JackThreadedDriver.cpp shm.c JackSocket.cpp JackSocketServerChannel.cpp  JackSocketNotifyChannel.cpp \
      JackSocketServerNotifyChannel.cpp JackTime.c JackServerAPI.cpp JackGlobals.cpp JackDriverLoader.cpp JackDebugClient.cpp  \
-     JackTransportEngine.cpp JackServerGlobals.cpp JackServerLaunch.cpp timestamps.c JackTools.cpp \
+     JackTransportEngine.cpp JackServerGlobals.cpp JackServerLaunch.cpp timestamps.c JackTools.cpp ringbuffer.c \
     ')
 
 srcfiles_common_clientlib = env.Split( '\

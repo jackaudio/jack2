@@ -19,7 +19,7 @@ Tim Blechmann
 
 2008-02-25 Stephane Letz  <letz@grame.fr>
 		
-	* Correct Linux makefile.
+	* Correct Linux makefile. Pieter Palmers FFADO patch.
 
 2008-02-22 Stephane Letz  <letz@grame.fr>
 		

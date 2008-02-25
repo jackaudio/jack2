@@ -176,7 +176,7 @@ install the needed packages (remember to also install the *-devel packages)
             env['ENABLE_FREEBOB'] = False
 
     if build_for_linux and env['ENABLE_FIREWIRE']:
-        env['FFADO_FLAGS'] = conf.GetPKGFlags( 'libffado', '1.999.7' )
+        env['FFADO_FLAGS'] = conf.GetPKGFlags( 'libffado', '1.999.14' )
         if env['FFADO_FLAGS'] == 0:
             print " Disabling 'firewire' backend since no useful FFADO installation found."
             env['ENABLE_FIREWIRE'] = False

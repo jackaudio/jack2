@@ -1,14 +1,14 @@
-/* ffado_driver.h
+/*
+ *   FireWire Backend for Jack
+ *   using FFADO
+ *   FFADO = Firewire (pro-)audio for linux
  *
- *   FreeBob Backend for Jack
- *   FreeBob = Firewire (pro-)audio for linux
+ *   http://www.ffado.org
+ *   http://www.jackaudio.org
  *
- *   adapted for jackmp
+ *   Copyright (C) 2005-2007 Pieter Palmers
  *
- *   http://freebob.sf.net
- *   http://jackit.sf.net
- *
- *   Copyright (C) 2005,2006,2007 Pieter Palmers <pieterpalmers@users.sourceforge.net>
+ *   adapted for JackMP by Pieter Palmers
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -25,16 +25,13 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*
+/* 
  * Main Jack driver entry routines
  *
- */
-
+ */ 
+ 
 #ifndef __JACK_FFADO_DRIVER_H__
 #define __JACK_FFADO_DRIVER_H__
-
-// #define FFADO_DRIVER_WITH_MIDI
-// #define DEBUG_ENABLED
 
 #include <libffado/ffado.h>
 
@@ -53,10 +50,12 @@
 #include <driver.h>
 #include <types.h>
 
-#ifdef FFADO_DRIVER_WITH_MIDI
-#include <JackPosixThread.h>
-#include <alsa/asoundlib.h>
-#endif
+#include <assert.h>
+#include <jack/midiport.h>
+// #include "JackPort.h"
+// #include "JackMidiPort.h"
+#include <../alsa/midi_pack.h>
+#include <../alsa/midi_unpack.h>
 
 // debug print control flags
 #define DEBUG_LEVEL_BUFFERS           	(1<<0)
@@ -70,58 +69,46 @@
 #define DEBUG_LEVEL_STARTUP				(1<<17)
 #define DEBUG_LEVEL_THREADS				(1<<18)
 
+//#define DEBUG_ENABLED
 #ifdef DEBUG_ENABLED
 
-// default debug level
-#define DEBUG_LEVEL (  DEBUG_LEVEL_RUN_CYCLE | \
+	// default debug level
+	#define DEBUG_LEVEL (  DEBUG_LEVEL_RUN_CYCLE | \
 	(DEBUG_LEVEL_XRUN_RECOVERY)| DEBUG_LEVEL_STARTUP | DEBUG_LEVEL_WAIT | DEBUG_LEVEL_PACKETCOUNTER)
 
-#warning Building debug build!
+	#warning Building debug build!
 
-#define printMessage(format, args...) jack_error( "FFADO MSG: %s:%d (%s): " format,  __FILE__, __LINE__, __FUNCTION__, ##args )
-#define printError(format, args...) jack_error( "FFADO ERR: %s:%d (%s): " format,  __FILE__, __LINE__, __FUNCTION__, ##args )
-
-/*	#define printEnter() jack_error( "FBDRV ENTERS: %s (%s)", __FUNCTION__,  __FILE__)
-	#define printExit() jack_error( "FBDRV EXITS: %s (%s)", __FUNCTION__,  __FILE__)*/
-#define printEnter()
-#define printExit()
-
-#define debugError(format, args...) jack_error( "FFADO ERR: %s:%d (%s): " format,  __FILE__, __LINE__, __FUNCTION__, ##args )
-#define debugPrint(Level, format, args...) if(DEBUG_LEVEL & (Level))  jack_error("DEBUG %s:%d (%s) :"  format, __FILE__, __LINE__, __FUNCTION__, ##args );
-#define debugPrintShort(Level, format, args...) if(DEBUG_LEVEL & (Level))  jack_error( format,##args );
-#define debugPrintWithTimeStamp(Level, format, args...) if(DEBUG_LEVEL & (Level)) jack_error( "%16lu: "format, debugGetCurrentUTime(),##args );
-#define SEGFAULT int *test=NULL;	*test=1;
+	#define printMessage(format, args...) jack_error( "firewire MSG: %s:%d (%s): " format,  __FILE__, __LINE__, __FUNCTION__, ##args )
+	#define printError(format, args...) jack_error( "firewire ERR: %s:%d (%s): " format,  __FILE__, __LINE__, __FUNCTION__, ##args )
+	
+	#define printEnter() jack_error( "FWDRV ENTERS: %s (%s)\n", __FUNCTION__,  __FILE__)
+	#define printExit() jack_error( "FWDRV EXITS: %s (%s)\n", __FUNCTION__,  __FILE__)
+	#define printEnter() 
+	#define printExit() 
+	
+	#define debugError(format, args...) jack_error( "firewire ERR: %s:%d (%s): " format,  __FILE__, __LINE__, __FUNCTION__, ##args )
+	#define debugPrint(Level, format, args...) if(DEBUG_LEVEL & (Level))  jack_error("DEBUG %s:%d (%s) :"  format, __FILE__, __LINE__, __FUNCTION__, ##args );
+	#define debugPrintShort(Level, format, args...) if(DEBUG_LEVEL & (Level))  jack_error( format,##args );
+	#define debugPrintWithTimeStamp(Level, format, args...) if(DEBUG_LEVEL & (Level)) jack_error( "%16lu: "format, debugGetCurrentUTime(),##args );
+	#define SEGFAULT int *test=NULL;	*test=1;
 #else
-#define DEBUG_LEVEL
-
-#define printMessage(format, args...) if(g_verbose) \
-	                                         jack_error("FFADO MSG: " format, ##args )
-#define printError(format, args...)   jack_error("FFADO ERR: " format, ##args )
-
-#define printEnter()
-#define printExit()
-
-#define debugError(format, args...)
-#define debugPrint(Level, format, args...)
-#define debugPrintShort(Level, format, args...)
-#define debugPrintWithTimeStamp(Level, format, args...)
+	#define DEBUG_LEVEL
+	
+	#define printMessage(format, args...) if(g_verbose) \
+	                                         jack_error("firewire MSG: " format, ##args )
+	#define printError(format, args...)   jack_error("firewire ERR: " format, ##args )
+	
+	#define printEnter() 
+	#define printExit() 
+	
+	#define debugError(format, args...) 
+	#define debugPrint(Level, format, args...) 
+	#define debugPrintShort(Level, format, args...)	
+	#define debugPrintWithTimeStamp(Level, format, args...)
 #endif
 
 // thread priority setup
 #define FFADO_RT_PRIORITY_PACKETIZER_RELATIVE	5
-
-#ifdef FFADO_DRIVER_WITH_MIDI
-
-#define ALSA_SEQ_BUFF_SIZE 1024
-#define MIDI_TRANSMIT_BUFFER_SIZE 1024
-#define MIDI_THREAD_SLEEP_TIME_USECS 100
-// midi priority should be higher than the audio priority in order to
-// make sure events are not only delivered on period boundarys
-// but I think it should be smaller than the packetizer thread in order not
-// to lose any packets
-#define FFADO_RT_PRIORITY_MIDI_RELATIVE 	4
-
-#endif
 
 typedef struct _ffado_driver ffado_driver_t;
 
@@ -130,109 +117,91 @@ typedef struct _ffado_driver ffado_driver_t;
  */
 
 typedef struct _ffado_jack_settings ffado_jack_settings_t;
-struct _ffado_jack_settings
-{
+struct _ffado_jack_settings {
+    int verbose_level;
+
     int period_size_set;
     jack_nframes_t period_size;
-
+    
     int sample_rate_set;
     int sample_rate;
-
+    
     int buffer_size_set;
     jack_nframes_t buffer_size;
 
     int playback_ports;
     int capture_ports;
-
-    int verbose_level;
-
+    
     jack_nframes_t capture_frame_latency;
     jack_nframes_t playback_frame_latency;
-
-    ffado_handle_t fb_handle;
+    
+    int slave_mode;
+    int snoop_mode;
+    
+    char *device_info;
 };
 
-#ifdef FFADO_DRIVER_WITH_MIDI
-
-typedef struct
+typedef struct _ffado_capture_channel
 {
-    int stream_nr;
-    int seq_port_nr;
-    snd_midi_event_t *parser;
-    snd_seq_t *seq_handle;
-}
-ffado_midi_port_t;
+    ffado_streaming_stream_type stream_type;
+    midi_unpack_t midi_unpack;
+    uint32_t *midi_buffer;
+} ffado_capture_channel_t;
 
-typedef struct _ffado_driver_midi_handle
+#define MIDI_OVERFLOW_BUFFER_SIZE 4
+typedef struct _ffado_playback_channel
 {
-    ffado_device_t *dev;
-    ffado_driver_t *driver;
+    ffado_streaming_stream_type stream_type;
+    midi_pack_t midi_pack;
+    uint32_t *midi_buffer;
+    // to hold the midi bytes that couldn't be transferred
+    // during the previous period
+    char overflow_buffer[MIDI_OVERFLOW_BUFFER_SIZE];
+    unsigned int nb_overflow_bytes;
+} ffado_playback_channel_t;
 
-    snd_seq_t *seq_handle;
-
-    pthread_t queue_thread;
-    pthread_t dequeue_thread;
-    int queue_thread_realtime;
-    int queue_thread_priority;
-
-    int nb_input_ports;
-    int nb_output_ports;
-
-    ffado_midi_port_t **input_ports;
-    ffado_midi_port_t **output_ports;
-
-    ffado_midi_port_t **input_stream_port_map;
-    int *output_port_stream_map;
-}
-ffado_driver_midi_handle_t;
-
-#endif
 /*
  * JACK driver structure
  */
-
 struct _ffado_driver
 {
-    JACK_DRIVER_NT_DECL
+	JACK_DRIVER_NT_DECL;
+	
+	jack_nframes_t  sample_rate;
+	jack_nframes_t  period_size;
+	unsigned long   wait_time;
 
-    jack_nframes_t  sample_rate;
-    jack_nframes_t  period_size;
-    unsigned long   wait_time;
+    jack_time_t                   wait_last;
+    jack_time_t                   wait_next;
+	int wait_late;
+	
+	jack_client_t  *client;
+	
+	int		xrun_detected;
+	int		xrun_count;
+	
+	int process_count;
+	
+	/* settings from the command line */
+	ffado_jack_settings_t settings;
+	
+	/* the firewire virtual device */
+	ffado_device_t *dev;
+	
+    channel_t                     playback_nchannels;
+    channel_t                     capture_nchannels;
 
-    jack_time_t wait_last;
-    jack_time_t wait_next;
-    int wait_late;
-
-    jack_client_t  *client;
-
-    int	xrun_detected;
-    int	xrun_count;
-
-    int process_count;
-
-    /* settings from the command line */
-    ffado_jack_settings_t settings;
-
-    /* the freebob virtual device */
-    ffado_device_t *dev;
-
-    JSList  *capture_ports;
-    JSList  *playback_ports;
-    JSList   *monitor_ports;
-    unsigned long  playback_nchannels;
-    unsigned long  capture_nchannels;
-    unsigned long  playback_nchannels_audio;
-    unsigned long  capture_nchannels_audio;
-
+    ffado_playback_channel_t *playback_channels;
+    ffado_capture_channel_t  *capture_channels;
+    ffado_sample_t *nullbuffer;
+    ffado_sample_t *scratchbuffer;
+	
     jack_nframes_t  playback_frame_latency;
-    jack_nframes_t  capture_frame_latency;
+	jack_nframes_t  capture_frame_latency;
+    	
+	ffado_device_info_t device_info;
+	ffado_options_t device_options;
 
-    ffado_device_info_t device_info;
-    ffado_options_t device_options;
-
-#ifdef FFADO_DRIVER_WITH_MIDI
-    ffado_driver_midi_handle_t *midi_handle;
-#endif
 };
 
 #endif /* __JACK_FFADO_DRIVER_H__ */
