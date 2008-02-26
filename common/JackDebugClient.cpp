@@ -18,7 +18,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackDebugClient.h"
+#include "JackEngineControl.h"
 #include "JackError.h"
+#include "JackTime.h"
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -438,10 +440,24 @@ void JackDebugClient::OnShutdown(JackShutdownCallback callback, void *arg)
     fClient->OnShutdown(callback, arg);
 }
 
+int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
+{
+	JackDebugClient* client = (JackDebugClient*)arg;
+	jack_time_t t1 = GetMicroSeconds(); 
+	int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
+	jack_time_t t2 = GetMicroSeconds(); 
+	long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
+	if (delta > 0) 
+		*client->fStream << "!!! ERROR !!! : XRun of " << delta << " us" << endl;
+	return res;
+}
+
 int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 {
 	CheckClient();
-    return fClient->SetProcessCallback(callback, arg);
+	fProcessTimeCallback = callback;
+	fProcessTimeCallbackArg = arg;
+	return  fClient->SetProcessCallback(TimeCallback, this);
 }
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)

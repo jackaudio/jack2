@@ -50,7 +50,8 @@ typedef void (*JackShutdownCallback)(void *arg);
 
 class JackClient : public JackClientInterface, public JackRunnableInterface
 {
-
+	friend class JackDebugClient;
+	
     protected:
 
         JackProcessCallback fProcess;

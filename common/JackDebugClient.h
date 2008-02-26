@@ -45,23 +45,22 @@ PortFollower;
 /*!
 \brief A "decorator" debug client to validate API use.
 */
-
+ 
 class JackDebugClient : public JackClient
 {
-    private:
-
-        JackClient* fClient;
-        std::ofstream* fStream;
-
     protected:
 	
-        PortFollower fPortList[MAX_PORT_HISTORY]; // Arbitrary value... To be tuned...
+		JackClient* fClient;
+        std::ofstream* fStream;
+	      PortFollower fPortList[MAX_PORT_HISTORY]; // Arbitrary value... To be tuned...
         int fTotalPortNumber;	// The total number of port opened and maybe closed. Historical view.
         int fOpenPortNumber;	// The current number of opened port.
         int fIsActivated;
         int fIsDeactivated;
         int fIsClosed;
         char fClientName[JACK_CLIENT_NAME_SIZE];
+		JackProcessCallback fProcessTimeCallback;
+		void* fProcessTimeCallbackArg;
 
     public:
 
@@ -131,9 +130,9 @@ class JackDebugClient : public JackClient
 		jack_nframes_t Wait(int status);
 		
         JackClientControl* GetClientControl() const;
-		
 		void CheckClient() const;
-
+		
+		static int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg);
 };
 
 
