@@ -99,7 +99,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
         //if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_FIFO))) {
 
         if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_RR))) {
-            jack_error("Cannot set FIFO scheduling class for RT thread  %d %s", res, strerror(errno));
+            jack_error("Cannot set RR scheduling class for RT thread  %d %s", res, strerror(errno));
             return -1;
         }
 		
@@ -189,7 +189,7 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
     //if ((res = pthread_setschedparam(fThread, SCHED_FIFO, &rtparam)) != 0) {
 
     if ((res = pthread_setschedparam(thread, SCHED_RR, &rtparam)) != 0) {
-        jack_error("Cannot use real-time scheduling (FIFO/%d) "
+        jack_error("Cannot use real-time scheduling (RR/%d) "
                    "(%d: %s)", rtparam.sched_priority, res,
                    strerror(res));
         return -1;
