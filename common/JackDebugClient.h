@@ -132,7 +132,7 @@ class JackDebugClient : public JackClient
         JackClientControl* GetClientControl() const;
 		void CheckClient() const;
 		
-		static int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg);
+		static int TimeCallback(jack_nframes_t nframes, void *arg);
 };
 
 
