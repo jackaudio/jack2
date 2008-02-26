@@ -102,13 +102,8 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
             jack_error("Cannot set FIFO scheduling class for RT thread  %d %s", res, strerror(errno));
             return -1;
         }
-
-        if ((res = pthread_attr_setscope(&attributes, PTHREAD_SCOPE_SYSTEM))) {
-            jack_error("Cannot set scheduling scope for RT thread %d %s", res, strerror(errno));
-            return -1;
-        }
-	
-        memset(&rt_param, 0, sizeof(rt_param));
+		
+		memset(&rt_param, 0, sizeof(rt_param));
         rt_param.sched_priority = priority;
 
         if ((res = pthread_attr_setschedparam(&attributes, &rt_param))) {
