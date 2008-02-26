@@ -65,8 +65,9 @@ JackClient::JackClient(JackSynchro** table)
     fPortRegistrationArg = NULL;
 	fPortConnectArg = NULL;
     fSyncArg = NULL;
+	fThreadFun = NULL;
+	fThreadFunArg = NULL;
     fConditionnal = 0; // Temporary??
-	fWait = false;
 }
 
 JackClient::~JackClient()
@@ -249,10 +250,8 @@ int JackClient::Activate()
 #endif
 */
 
-	if (fProcess || !fWait) {  // Start thread only of process cb has been setup
-		if (StartThread() < 0)
-			return -1;
-	}
+	if (StartThread() < 0)
+		return -1;
 
     int result = -1;
     fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
@@ -293,9 +292,7 @@ int JackClient::Deactivate()
 	fThread->Kill();
 #endif
 */
-	//if (fProcess || fWait) {  // Kill thread only of process cb has been setup
-		fThread->Kill();
-	//}
+	fThread->Kill();
     return result;
 }
 
@@ -344,8 +341,12 @@ int JackClient::StartThread()
 */
 bool JackClient::Execute()
 {
-	if (WaitFirstSync())
-		ExecuteThread();
+	if (fThreadFun) {
+		fThreadFun(fThreadFunArg);
+	} else {
+		if (WaitFirstSync())
+			ExecuteThread();
+	}
 	return false; // Never reached
 }
 
@@ -399,11 +400,22 @@ jack_nframes_t JackClient::Wait(int status)
 
 jack_nframes_t JackClient::CycleWait()
 {
-	fWait = true;
 	if (!WaitSync()) 
 		return Error();
 	CallSyncCallback();
 	return GetEngineControl()->fBufferSize;
+}
+
+int JackClient::SetProcessThread(JackRTThread fun, void *arg)
+{
+	if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+		fThreadFun = fun;
+        fThreadFunArg = arg;
+        return 0;
+    }
 }
 
 void JackClient::CycleSignal(int status)

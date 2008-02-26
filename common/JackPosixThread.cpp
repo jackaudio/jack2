@@ -107,7 +107,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
             jack_error("Cannot set scheduling scope for RT thread %d %s", res, strerror(errno));
             return -1;
         }
-
+	
         memset(&rt_param, 0, sizeof(rt_param));
         rt_param.sched_priority = priority;
 
@@ -116,7 +116,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
             return -1;
         }
 		
-	   if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
+		if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
 			jack_error("setting thread stack size%d %s", res, strerror(errno));
 			return -1;
         }

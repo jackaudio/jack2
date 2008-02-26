@@ -69,6 +69,7 @@ extern "C"
 	// new 
 	EXPORT jack_nframes_t jack_cycle_wait (jack_client_t*);
 	EXPORT void jack_cycle_signal (jack_client_t*, int status);
+	EXPORT int jack_set_process_thread(jack_client_t* client, JackRTThread fun, void *arg);
  
 	EXPORT int jack_set_thread_init_callback (jack_client_t *client,
             JackThreadInitCallback thread_init_callback,
@@ -701,8 +702,22 @@ EXPORT void jack_cycle_signal(jack_client_t* ext_client, int status)
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_cycle_signal called with a NULL client");
-   } else {
+	} else {
         client->CycleSignal(status);
+    }
+}
+
+EXPORT int jack_set_process_thread(jack_client_t* ext_client, JackRTThread fun, void *arg)
+{
+#ifdef __CLIENTDEBUG__
+	JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_set_process_thread called with a NULL client");
+		return -1;
+	} else {
+        return client->SetProcessThread(fun, arg);
     }
 }
 

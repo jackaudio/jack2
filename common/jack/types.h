@@ -214,6 +214,9 @@ typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int 
  */
 typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
+
+typedef void *(*JackRTThread)(void* arg);
+
 /**
  * Used for the type argument of jack_port_register() for default
  * audio ports and midi ports.
