@@ -54,8 +54,8 @@ objects_linux_firewire := JackFFADODriver.o
 
 objects_linux_dummy := JackDummyDriver.o  
 
-CFLAGS := -g -fPIC -DJACKMP -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
-CXXFLAGS := -g  -fPIC -DJACKMP -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)/bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
+CFLAGS := -g -O3 -fPIC -DJACKMP -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
+CXXFLAGS := -g -O3 -fPIC -DJACKMP -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)/bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
 
 #CFLAGS := -g -fPIC -DUSE_POSIX_SHM $(addprefix -I, $(subprojects)) $(CFLAGS)
 #CXXFLAGS := -g -fPIC -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\"$(prefix)\" -DLIB_DIR=\"$(libdir)\" -DJACK_LOCATION=\"$(prefix)/bin\" $(addprefix -I, $(subprojects)) $(CXXFLAGS) 
