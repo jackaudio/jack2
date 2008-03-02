@@ -156,7 +156,7 @@ extern "C"
                                           jack_port_id_t port_id);
     EXPORT int jack_engine_takeover_timebase (jack_client_t *);
     EXPORT jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *);
-    EXPORT jack_time_t jack_get_time(const jack_client_t *client);
+    EXPORT jack_time_t jack_get_time();
     EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t time);
     EXPORT jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t frames);
     EXPORT jack_nframes_t jack_frame_time (const jack_client_t *);
@@ -1201,7 +1201,7 @@ EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_cli
     return (jack_nframes_t) floor((((float)control->fSampleRate) / 1000000.0f) * (GetMicroSeconds() - timer.fCurrentCallback));
 }
 
-EXPORT jack_time_t jack_get_time(jack_client_t *client)
+EXPORT jack_time_t jack_get_time()
 {
     return GetMicroSeconds();
 }
