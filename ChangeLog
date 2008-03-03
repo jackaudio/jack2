@@ -20,6 +20,7 @@ Tim Blechmann
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		
 	* Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall.
+	* Better documentation in jack.h.
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		

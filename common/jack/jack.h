@@ -226,7 +226,11 @@ extern "C"
      * arg as the second argument. The first argument to the
      * callback will be non-zero if JACK is entering freewheel
      * mode, and zero otherwise.
-     *
+	 *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
+	 *
      * @return 0 on success, otherwise a non-zero error code.
      */
     int jack_set_freewheel_callback (jack_client_t *client,
@@ -281,6 +285,10 @@ extern "C"
      * buffer that will be passed to the @a process_callback is about to
      * change.  Clients that depend on knowing the buffer size must supply
      * a @a bufsize_callback before activating themselves.
+	 *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
      *
      * @param client pointer to JACK client structure.
      * @param bufsize_callback function to call when the buffer size changes.
@@ -296,6 +304,10 @@ extern "C"
      * Tell the Jack server to call @a srate_callback whenever the system
      * sample rate changes.
      *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
+     *
      * @return 0 on success, otherwise a non-zero error code
      */
     int jack_set_sample_rate_callback (jack_client_t *client,
@@ -306,6 +318,10 @@ extern "C"
 	 * Tell the JACK server to call @a registration_callback whenever a
 	 * port is registered or unregistered, passing @a arg as a parameter.
 	 *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
+     *
 	 * @return 0 on success, otherwise a non-zero error code
 	 */
 	int jack_set_client_registration_callback (jack_client_t *,
@@ -316,18 +332,26 @@ extern "C"
      * Tell the JACK server to call @a registration_callback whenever a
      * port is registered or unregistered, passing @a arg as a parameter.
      *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
+     *
      * @return 0 on success, otherwise a non-zero error code
      */
     int jack_set_port_registration_callback (jack_client_t *,
             JackPortRegistrationCallback
             registration_callback, void *arg);
 			
-	/**
-	* Tell the JACK server to call @a connect_callback whenever a
-	* port is connected or disconnected, passing @a arg as a parameter.
-	*
-	* @return 0 on success, otherwise a non-zero error code
-	*/
+	 /**
+	 * Tell the JACK server to call @a connect_callback whenever a
+	 * port is connected or disconnected, passing @a arg as a parameter.
+	 *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
+     *
+	 * @return 0 on success, otherwise a non-zero error code
+	 */
 	int jack_set_port_connect_callback (jack_client_t *,
 				    JackPortConnectCallback
 				    connect_callback, void *arg);
@@ -335,6 +359,10 @@ extern "C"
     /**
      * Tell the JACK server to call @a graph_callback whenever the
      * processing graph is reordered, passing @a arg as a parameter.
+     *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
      *
      * @return 0 on success, otherwise a non-zero error code
      */
@@ -345,6 +373,10 @@ extern "C"
     /**
      * Tell the JACK server to call @a xrun_callback whenever there is a
      * xrun, passing @a arg as a parameter.
+     *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
      *
      * @return 0 on success, otherwise a non-zero error code
      */
