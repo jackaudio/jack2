@@ -415,7 +415,7 @@ bool JackSocketServerChannel::Execute()
             int fd = fPollTable[i].fd;
             JackLog("fPollTable i = %ld fd = %ld\n", i, fd);
             if (fPollTable[i].revents & ~POLLIN) {
-                jack_error("Poll client error err = %s", strerror(errno));
+                JackLog("Poll client error err = %s\n", strerror(errno));
                 ClientKill(fd);
             } else if (fPollTable[i].revents & POLLIN) {
                 if (HandleRequest(fd) < 0) {

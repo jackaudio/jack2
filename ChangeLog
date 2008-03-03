@@ -19,6 +19,10 @@ Tim Blechmann
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		
+	* Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall.
+
+2008-03-02 Stephane Letz  <letz@grame.fr>
+		
 	* Correct jack_get_time propotype.
 
 2008-02-25 Stephane Letz  <letz@grame.fr>
