@@ -12,6 +12,7 @@ Andrzej Szombierski
 Kjetil S.Matheussen
 Pieter Palmers
 Tim Blechmann
+Marc-Olivier Barre
 
 ---------------------------
   Jackdmp changes log
@@ -21,6 +22,7 @@ Tim Blechmann
 		
 	* Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall.
 	* Better documentation in jack.h.
+	* Marc-Olivier Barre Scons patch.
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		
