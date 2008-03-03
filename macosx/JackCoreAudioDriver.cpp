@@ -1216,7 +1216,7 @@ extern "C"
         desc->params[i].character = 'I';
         desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.i = 0;
-        strcpy(desc->params[i].short_desc, "Extra input latency");
+        strcpy(desc->params[i].short_desc, "Extra input latency (frames)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
@@ -1224,7 +1224,7 @@ extern "C"
         desc->params[i].character = 'O';
         desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.i = 0;
-        strcpy(desc->params[i].short_desc, "Extra output latency");
+        strcpy(desc->params[i].short_desc, "Extra output latency (frames)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
