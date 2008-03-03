@@ -2590,7 +2590,7 @@ extern "C"
         params[i].character = 'I';
         params[i].type = JackDriverParamUInt;
         params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Extra input latency");
+        strcpy (params[i].short_desc, "Extra input latency (frames)");
         strcpy (params[i].long_desc, params[i].short_desc);
 
         i++;
@@ -2598,7 +2598,7 @@ extern "C"
         params[i].character = 'O';
         params[i].type = JackDriverParamUInt;
         params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Extra output latency");
+        strcpy (params[i].short_desc, "Extra output latency (frames)");
         strcpy (params[i].long_desc, params[i].short_desc);
 
         i++;
@@ -2606,8 +2606,12 @@ extern "C"
         params[i].character = 'X';
         params[i].type = JackDriverParamString;
         strcpy (params[i].value.str, "none");
-        strcpy (params[i].short_desc, "ALSA MIDI driver name");
-        strcpy (params[i].long_desc, params[i].short_desc);
+        strcpy (params[i].short_desc, "ALSA MIDI driver name (seq|raw)");
+        strcpy (params[i].long_desc,
+		"ALSA MIDI driver:\n"
+		" none - no MIDI driver\n"
+		" seq - ALSA Sequencer driver\n"
+		" raw - ALSA RawMIDI driver\n");
 
         desc->params = params;
         return desc;
