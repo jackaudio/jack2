@@ -586,7 +586,7 @@ typedef jack_nframes_t (*jack_time_to_frames_fun_def)(const jack_client_t* ext_c
 static jack_time_to_frames_fun_def jack_time_to_frames_fun = 0;
 EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_time_t time)
 {
-    return (*jack_time_to_frames_fun)(ext_client);
+    return (*jack_time_to_frames_fun)(ext_client, time);
 }
 
 typedef jack_nframes_t (*jack_frame_time_fun_def)(const jack_client_t* ext_client);
