@@ -113,26 +113,26 @@ SOURCE=.\portaudio.lib
 # End Source File
 # Begin Source File
 
-SOURCE=.\Release\libjackdmp.lib
+SOURCE=.\Debug\libjackservermp_debug.lib
 
 !IF  "$(CFG)" == "jack_portaudio - Win32 Release"
 
-!ELSEIF  "$(CFG)" == "jack_portaudio - Win32 Debug"
-
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "jack_portaudio - Win32 Debug"
 
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
-SOURCE=.\Debug\libjackdmp_debug.lib
+SOURCE=.\Release\libjackservermp.lib
 
 !IF  "$(CFG)" == "jack_portaudio - Win32 Release"
 
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "jack_portaudio - Win32 Debug"
+
+# PROP Exclude_From_Build 1
 
 !ENDIF 
 

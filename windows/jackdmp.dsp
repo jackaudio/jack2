@@ -108,7 +108,7 @@ SOURCE=.\JackdmpWIN32.cpp
 # End Group
 # Begin Source File
 
-SOURCE=.\Release\libjackdmp.lib
+SOURCE=.\Release\libjackservermp.lib
 
 !IF  "$(CFG)" == "jackdmp - Win32 Release"
 
@@ -121,7 +121,7 @@ SOURCE=.\Release\libjackdmp.lib
 # End Source File
 # Begin Source File
 
-SOURCE=.\Debug\libjackdmp_debug.lib
+SOURCE=.\Debug\libjackservermp_debug.lib
 
 !IF  "$(CFG)" == "jackdmp - Win32 Release"
 

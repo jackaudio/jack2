@@ -99,19 +99,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "jdelay"=".\jdelay\jdelay.dsp" - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "libjackdmp"=".\libjackdmp.dsp" - Package Owner=<4>
+Project: "jdelay"="..\..\..\..\Jackdmp\src_win32\windows\jdelay.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -124,6 +112,18 @@ Package=<4>
 ###############################################################################
 
 Project: "libjackmp"=".\libjackmp.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "libjackservermp"=".\libjackservermp.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
