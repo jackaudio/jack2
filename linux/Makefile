@@ -11,7 +11,7 @@ sources := $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard ../common/*.cpp) $(w
 
 TARGET_LINUX_SERVER := jackdmp
 
-TARGET_LINUX_SERVER_LIB := libjackdmp.so
+TARGET_LINUX_SERVER_LIB := libjackservermp.so
 
 TARGET_LINUX_CLIENT_LIB := libjackmp.so
 
@@ -109,19 +109,19 @@ $(TARGET_LINUX_WRAPPER_LIB) : JackAPIWrapper.o ringbuffer.o
 	$(CXX) $(CXXFLAGS) -shared JackAPIWrapper.o ringbuffer.o -o $(TARGET_LINUX_WRAPPER_LIB)
 
 $(TARGET_LINUX_SERVER) : $(objects_linux_server)
-	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackdmp.so -o $(TARGET_LINUX_SERVER)
+	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackservermp.so -o $(TARGET_LINUX_SERVER)
 
 $(TARGET_LINUX_ALSA) : $(objects_linux_alsa) 
-	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) libjackmp.so libjackdmp.so  -o $(TARGET_LINUX_ALSA)
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_alsa) $(LIB_LINUX) libjackmp.so libjackservermp.so  -o $(TARGET_LINUX_ALSA)
 
 $(TARGET_LINUX_FREEBOB) : $(objects_linux_freebob) 
-	$(CXX) $(CXXFLAGS) -shared $(objects_linux_freebob) $(LIB_LINUX) -lfreebob libjackdmp.so  -o $(TARGET_LINUX_FREEBOB)
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_freebob) $(LIB_LINUX) -lfreebob libjackservermp.so  -o $(TARGET_LINUX_FREEBOB)
 
 $(TARGET_LINUX_FIREWIRE) : $(objects_linux_firewire) 
-	$(CXX) $(CXXFLAGS) -shared $(objects_linux_firewire) $(LIB_LINUX) -lffado libjackdmp.so  -o $(TARGET_LINUX_FIREWIRE)
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_firewire) $(LIB_LINUX) -lffado libjackservermp.so  -o $(TARGET_LINUX_FIREWIRE)
 
 $(TARGET_LINUX_DUMMY) : $(objects_linux_dummy) 
-	$(CXX) $(CXXFLAGS) -shared $(objects_linux_dummy) $(LIB_LINUX) libjackdmp.so  -o $(TARGET_LINUX_DUMMY)
+	$(CXX) $(CXXFLAGS) -shared $(objects_linux_dummy) $(LIB_LINUX) libjackservermp.so  -o $(TARGET_LINUX_DUMMY)
 
 # Install jackdmp and overwrite jack installation
 install:

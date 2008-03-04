@@ -18,6 +18,10 @@ Marc-Olivier Barre
   Jackdmp changes log
 ---------------------------
 
+2008-03-05 Stephane Letz  <letz@grame.fr>
+		
+	* libjackdmp.so renamed to libjackservermp.so and same for OSX framework.
+
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		
 	* Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall.
