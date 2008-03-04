@@ -22,12 +22,13 @@ Marc-Olivier Barre
 		
 	* libjackdmp.so renamed to libjackservermp.so and same for OSX framework.
 	* tw1.c example added (new thread model).
+	* Marc-Olivier Barre scons patch (2).
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		
 	* Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall.
 	* Better documentation in jack.h.
-	* Marc-Olivier Barre Scons patch.
+	* Marc-Olivier Barre scons patch.
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		

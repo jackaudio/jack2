@@ -52,7 +52,6 @@ opts.AddOptions(
     PathOption( "BINDIR", "Overwrite the directory where apps are installed to.", "$PREFIX/bin", PathOption.PathAccept ),
     PathOption( "LIBDIR", "Overwrite the directory where libs are installed to.", "$PREFIX/lib", PathOption.PathAccept ),
     PathOption( "INCLUDEDIR", "Overwrite the directory where headers are installed to.", "$PREFIX/include", PathOption.PathAccept ),
-    PathOption( "SHAREDIR", "Overwrite the directory where misc shared files are installed to.", "$PREFIX/share/jackmp", PathOption.PathAccept ),
     BoolOption( "ENABLE_ALSA", "Enable/Disable the ALSA backend.", True ),
     BoolOption( "ENABLE_FREEBOB", "Enable/Disable the FreeBoB backend.", True ),
     BoolOption( "ENABLE_FIREWIRE", "Enable/Disable the FireWire backend.", True ),
@@ -64,22 +63,21 @@ opts.AddOptions(
     )
 
 ## Load the builders in config
-buildenv={}
+buildenv = os.environ
 if os.environ.has_key('PATH'):
-    buildenv['PATH']=os.environ['PATH']
+    buildenv['PATH'] = os.environ['PATH']
 else:
-    buildenv['PATH']=''
+    buildenv['PATH'] = ''
 
 if os.environ.has_key('PKG_CONFIG_PATH'):
-    buildenv['PKG_CONFIG_PATH']=os.environ['PKG_CONFIG_PATH']
+    buildenv['PKG_CONFIG_PATH'] = os.environ['PKG_CONFIG_PATH']
 else:
-    buildenv['PKG_CONFIG_PATH']=''
+    buildenv['PKG_CONFIG_PATH'] = ''
 
 if os.environ.has_key('LD_LIBRARY_PATH'):
-    buildenv['LD_LIBRARY_PATH']=os.environ['LD_LIBRARY_PATH']
+    buildenv['LD_LIBRARY_PATH'] = os.environ['LD_LIBRARY_PATH']
 else:
-    buildenv['LD_LIBRARY_PATH']=''
-
+    buildenv['LD_LIBRARY_PATH'] = ''
 
 env = Environment( tools=['default','scanreplace','pkgconfig', 'doxygen'], toolpath=['admin'],
                    ENV=buildenv, PLATFORM = platform, options=opts )
@@ -200,11 +198,9 @@ env['prefix'] = Template( os.path.join( env['PREFIX'] ) ).safe_substitute( env )
 env['bindir'] = Template( os.path.join( env['BINDIR'] ) ).safe_substitute( env )
 env['libdir'] = Template( os.path.join( env['LIBDIR'] ) ).safe_substitute( env )
 env['includedir'] = Template( os.path.join( env['INCLUDEDIR'] ) ).safe_substitute( env )
-env['sharedir'] = Template( os.path.join( env['SHAREDIR'] ) ).safe_substitute( env )
 
 env.Alias( "install", env['libdir'] )
 env.Alias( "install", env['includedir'] )
-env.Alias( "install", env['sharedir'] )
 env.Alias( "install", env['bindir'] )
 
 # for config.h.in

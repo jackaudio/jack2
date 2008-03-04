@@ -32,8 +32,15 @@ env.AppendUnique( CPPPATH=["#/", "#/common", "#/common/jack", "#/linux"] )
 
 srcfiles_linux_server = ['#/common/Jackdmp.cpp']
 
-srcfiles_linux_alsa = env.Split( '\
-    JackAlsaDriver.cpp memops.c generic_hw.c hdsp.c hammerfall.c ice1712.c')
+srcfiles_linux_alsa = [
+    'JackAlsaDriver.cpp',
+    'memops.c',
+    'generic_hw.c',
+    'hdsp.c',
+    'hammerfall.c',
+    'ice1712.c'
+    ]
+
 for i in range(len(srcfiles_linux_alsa)):
     srcfiles_linux_alsa[i] = 'alsa/%s' % srcfiles_linux_alsa[i]
 
@@ -45,13 +52,10 @@ srcfiles_linux_dummy = ['#/common/JackDummyDriver.cpp']
 # Start building
 #
 
-#pkgconfig = env.ScanReplace( "libjackmp.pc.in" )
-#env.Install( env['libdir'] + '/pkgconfig', pkgconfig )
-
 # build the server and its backends
 serverenv = env.Copy()
 serverenv.PrependUnique( LIBPATH=env['build_base'] )
-serverenv.PrependUnique( LIBS=["jackdmp", "dl"] )
+serverenv.PrependUnique( LIBS=["jackservermp", "dl"] )
 
 server = serverenv.Program("jackdmp", srcfiles_linux_server)
 serverenv.Install( env['bindir'], server )

@@ -51,7 +51,7 @@ example_client_libs = {
 # link extra libs?
 extra_libs = {}
 for example_client_program in example_client_programs.keys():
-    extra_libs[example_client_program] = ["jackdmp", "dl"]
+    extra_libs[example_client_program] = ["jackservermp", "dl"]
 
 # special cases
 extra_libs["jack_load"] = ["jackmp"]
@@ -59,7 +59,7 @@ extra_libs["jack_unload"] = ["jackmp"]
 
 env['HAS_READLINE']=True
 if env['HAS_READLINE']:
-    extra_libs["jack_transport"] = ["readline", "jackdmp", "dl"]
+    extra_libs["jack_transport"] = ["readline", "jackservermp", "dl"]
     example_client_programs["jack_transport"] = "transport.c"
 
 #
