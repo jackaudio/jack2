@@ -114,7 +114,7 @@ The binary elements are :
 
 - jackdmp.exe : the jack server
 
-- libjackdmp.dll (and associated libjackdmp.lib library) : the server code, shared by the jackdmp server and drivers.
+- libjackservermp.dll (and associated libjackservermp.lib library) : the server code, shared by the jackdmp server and drivers.
 
 - libjackmp.dll (and associated libjackmp.lib library) : the jack library code, to be linked against by clients.
 
