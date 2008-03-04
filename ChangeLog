@@ -21,6 +21,7 @@ Marc-Olivier Barre
 2008-03-05 Stephane Letz  <letz@grame.fr>
 		
 	* libjackdmp.so renamed to libjackservermp.so and same for OSX framework.
+	* tw1.c example added (new thread model).
 
 2008-03-02 Stephane Letz  <letz@grame.fr>
 		

@@ -203,7 +203,7 @@ extern "C"
 	
 	void jack_cycle_signal (jack_client_t* client, int status);
 	
-	int jack_set_process_thread(jack_client_t* client, JackRTThread fun, void *arg);
+	int jack_set_process_thread(jack_client_t* client, JackThreadCallback fun, void *arg);
 	
     /**
      * Tell JACK to call @a thread_init_callback once just after

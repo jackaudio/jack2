@@ -406,7 +406,7 @@ jack_nframes_t JackClient::CycleWait()
 	return GetEngineControl()->fBufferSize;
 }
 
-int JackClient::SetProcessThread(JackRTThread fun, void *arg)
+int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
 {
 	if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");

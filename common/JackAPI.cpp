@@ -69,7 +69,7 @@ extern "C"
 	// new 
 	EXPORT jack_nframes_t jack_cycle_wait (jack_client_t*);
 	EXPORT void jack_cycle_signal (jack_client_t*, int status);
-	EXPORT int jack_set_process_thread(jack_client_t* client, JackRTThread fun, void *arg);
+	EXPORT int jack_set_process_thread(jack_client_t* client, JackThreadCallback fun, void *arg);
  
 	EXPORT int jack_set_thread_init_callback (jack_client_t *client,
             JackThreadInitCallback thread_init_callback,
@@ -707,7 +707,7 @@ EXPORT void jack_cycle_signal(jack_client_t* ext_client, int status)
     }
 }
 
-EXPORT int jack_set_process_thread(jack_client_t* ext_client, JackRTThread fun, void *arg)
+EXPORT int jack_set_process_thread(jack_client_t* ext_client, JackThreadCallback fun, void *arg)
 {
 #ifdef __CLIENTDEBUG__
 	JackLibGlobals::CheckContext();

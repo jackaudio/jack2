@@ -66,7 +66,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		JackPortConnectCallback fPortConnect;
         JackTimebaseCallback fTimebase;
         JackSyncCallback fSync;
-		JackRTThread fThreadFun;
+		JackThreadCallback fThreadFun;
 		
         void* fProcessArg;
         void* fGraphOrderArg;
@@ -178,7 +178,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 		
 		virtual jack_nframes_t CycleWait();
 		void CycleSignal(int status);
-		int SetProcessThread(JackRTThread fun, void *arg);
+		int SetProcessThread(JackThreadCallback fun, void *arg);
 
         // JackRunnableInterface interface
         bool Init();
