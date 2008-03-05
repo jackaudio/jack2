@@ -18,6 +18,11 @@ Marc-Olivier Barre
   Jackdmp changes log
 ---------------------------
 
+2008-03-06 Stephane Letz  <letz@grame.fr>
+		
+	* Fix JackSocketClientChannel::ClientClose: async call from the client and server does not need to write any reply. 
+	* Correct port notification: 2 notifications have to be sent (src, dst) and (dst, src)...
+
 2008-03-05 Stephane Letz  <letz@grame.fr>
 		
 	* libjackdmp.so renamed to libjackservermp.so and same for OSX framework.

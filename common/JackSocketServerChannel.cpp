@@ -179,9 +179,8 @@ int JackSocketServerChannel::HandleRequest(int fd)
                 JackResult res;
                 if (req.Read(socket) == 0)
 					res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
-				if (res.Write(socket) < 0)
-					jack_error("JackRequest::kClientClose write error ref = %d", req.fRefNum);
-                ClientRemove(fd, req.fRefNum);
+				// No write: client is actually doing an "ServerAsyncCall", and not interested by the result
+				ClientRemove(fd, req.fRefNum);
                 break;
             }
 

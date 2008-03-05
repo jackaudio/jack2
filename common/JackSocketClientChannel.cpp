@@ -162,7 +162,7 @@ void JackSocketClientChannel::ClientClose(int refnum, int* result)
 {
     JackClientCloseRequest req(refnum);
     JackResult res;
-    ServerSyncCall(&req, &res, result);
+    ServerAsyncCall(&req, &res, result);
 }
 
 void JackSocketClientChannel::ClientActivate(int refnum, int* result)
