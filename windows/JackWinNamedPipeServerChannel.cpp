@@ -133,7 +133,7 @@ int JackClientPipeThread::HandleRequest()
 			JackResult res;
 			if (req.Read(fPipe) == 0) 
 				res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);		
-			res.Write(fPipe);
+			// No write: client is actually doing an "ServerAsyncCall", and not interested by the result
 			ClientRemove();
 			ret = -1;
 			break;
