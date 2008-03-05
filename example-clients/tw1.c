@@ -129,7 +129,6 @@ main (int argc, char *argv[])
 	const char *server_name = NULL;
 	jack_options_t options = JackNullOption;
 	jack_status_t status;
-	//pthread_t thread;
 
 	if (argc >= 2) {		/* client name specified? */
 		client_name = argv[1];
