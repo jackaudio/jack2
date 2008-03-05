@@ -168,12 +168,6 @@ main (int argc, char *argv[])
 	/* create RT thread
 	*/
 
-	/*
-	if (jack_client_create_thread(client, &thread, 90, 1, jack_thread, client) < 0) 
-		exit(1);
-	jack_acquire_real_time_scheduling (thread, 90);
-	*/
-	
 	if (jack_set_process_thread(client, jack_thread, client) < 0) 
 		exit(1);
 
