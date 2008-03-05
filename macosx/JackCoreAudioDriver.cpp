@@ -28,7 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include <iostream>
 
-#define IO_CPU 1
+#define IO_CPU 0
 
 namespace Jack
 {
@@ -848,7 +848,6 @@ int JackCoreAudioDriver::AddListeners()
         return -1;
     }
 
-/*
 #if IO_CPU
 	if (!fEngineControl->fSyncMode) {
 		UInt32 outSize = sizeof(float);
@@ -860,7 +859,7 @@ int JackCoreAudioDriver::AddListeners()
 		}
 	}
 #endif
-*/
+
 	return 0;
 }
 
