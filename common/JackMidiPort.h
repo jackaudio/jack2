@@ -31,9 +31,9 @@ typedef unsigned char jack_midi_data_t;
 /** A Jack MIDI event. */
 struct jack_midi_event_t
 {
-	jack_nframes_t    time;   /**< Sample index at which event is valid */
-	size_t            size;   /**< Number of bytes of data in \a buffer */
-	jack_midi_data_t *buffer; /**< Raw MIDI data */
+    jack_nframes_t    time;   /**< Sample index at which event is valid */
+    size_t            size;   /**< Number of bytes of data in \a buffer */
+    jack_midi_data_t *buffer; /**< Raw MIDI data */
 };
 
 /** A Jack MIDI port type. */
@@ -84,7 +84,10 @@ struct JackMidiBuffer
 
     JackMidiEvent events[0];
 
-    int IsValid() const { return magic == MAGIC; }
+    int IsValid() const
+    {
+        return magic == MAGIC;
+    }
     void Reset(jack_nframes_t nframes);
     jack_shmsize_t MaxEventSize() const;
 

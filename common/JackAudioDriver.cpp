@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -48,19 +48,19 @@ JackAudioDriver::~JackAudioDriver()
 int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     fEngineControl->fBufferSize = buffer_size;
-	fGraphManager->SetBufferSize(buffer_size);	
-	fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec		
-	if (!fEngineControl->fTimeOut)
-		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
+    fGraphManager->SetBufferSize(buffer_size);
+    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
+    if (!fEngineControl->fTimeOut)
+        fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
     return 0;
 }
 
 int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
 {
     fEngineControl->fSampleRate = sample_rate;
-	fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec		
-	if (!fEngineControl->fTimeOut)
-		fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
+    fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
+    if (!fEngineControl->fTimeOut)
+        fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
     return 0;
 }
 
@@ -87,7 +87,7 @@ int JackAudioDriver::Attach()
     JackPort* port;
     jack_port_id_t port_index;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-	char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     unsigned long port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
     int i;
 
@@ -95,13 +95,13 @@ int JackAudioDriver::Attach()
 
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fClientControl->fName, fCaptureDriverName, i + 1);
-		snprintf(name, sizeof(name) - 1, "system:capture_%d", i + 1);
+        snprintf(name, sizeof(name) - 1, "system:capture_%d", i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
-	    port = fGraphManager->GetPort(port_index);
-	    port->SetAlias(alias);
+        port = fGraphManager->GetPort(port_index);
+        port->SetAlias(alias);
         port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
         fCapturePortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld\n", port_index);
@@ -111,17 +111,17 @@ int JackAudioDriver::Attach()
 
     for (i = 0; i < fPlaybackChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fClientControl->fName, fPlaybackDriverName, i + 1);
-		snprintf(name, sizeof(name) - 1, "system:playback_%d", i + 1);
+        snprintf(name, sizeof(name) - 1, "system:playback_%d", i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
-	    port = fGraphManager->GetPort(port_index);
-		port->SetAlias(alias);
+        port = fGraphManager->GetPort(port_index);
+        port->SetAlias(alias);
         port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
         JackLog("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld\n", port_index);
-	
+
         // Monitor ports
         if (fWithMonitorPorts) {
             JackLog("Create monitor port \n");
@@ -162,7 +162,7 @@ int JackAudioDriver::Write()
 {
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
-      		float* buffer = GetOutputBuffer(i);
+            float* buffer = GetOutputBuffer(i);
             int size = sizeof(float) * fEngineControl->fBufferSize;
             // Monitor ports
             if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0)
@@ -196,11 +196,11 @@ int JackAudioDriver::ProcessAsync()
 
     if (fIsMaster) {
         if (!fEngine->Process(fLastWaitUst)) // fLastWaitUst is set in the "low level" layer
-			jack_error("JackAudioDriver::ProcessAsync Process error");
+            jack_error("JackAudioDriver::ProcessAsync Process error");
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
-		if (ProcessSlaves() < 0) 
-			jack_error("JackAudioDriver::ProcessAsync ProcessSlaves error");
-	} else {
+        if (ProcessSlaves() < 0)
+            jack_error("JackAudioDriver::ProcessAsync ProcessSlaves error");
+    } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     }
     return 0;
@@ -221,17 +221,17 @@ int JackAudioDriver::ProcessSync()
     if (fIsMaster) {
 
         if (fEngine->Process(fLastWaitUst)) { // fLastWaitUst is set in the "low level" layer
-			fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
-			if (ProcessSlaves() < 0) 
-				jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
-			if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) 
-				jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
-		} else { // Graph not finished: do not activate it
-			jack_error("ProcessSync: error");
-		}
+            fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+            if (ProcessSlaves() < 0)
+                jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
+            if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0)
+                jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
+        } else { // Graph not finished: do not activate it
+            jack_error("ProcessSync: error");
+        }
 
-		if (Write() < 0)  // Write output buffers for the current cycle
-			jack_error("ProcessSync: write error");
+        if (Write() < 0)  // Write output buffers for the current cycle
+            jack_error("ProcessSync: write error");
 
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);

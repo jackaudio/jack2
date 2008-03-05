@@ -1,18 +1,18 @@
 /*
 *  Copyright (C) 2004 Jack O'Quin
-*  
+*
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU Lesser General Public License as published by
 *  the Free Software Foundation; either version 2.1 of the License, or
 *  (at your option) any later version.
-*  
+*
 *  This program is distributed in the hope that it will be useful,
 *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *  GNU Lesser General Public License for more details.
-*  
+*
 *  You should have received a copy of the GNU Lesser General Public License
-*  along with this program; if not, write to the Free Software 
+*  along with this program; if not, write to the Free Software
 *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 *
 */
@@ -53,10 +53,10 @@ extern "C"
         jack_varargs_init (va);
 
         if ((options & JackServerName)) {
-		   char *sn = va_arg(ap, char *);
-            if (sn) 
-				va->server_name = sn;
-	    }
+            char *sn = va_arg(ap, char *);
+            if (sn)
+                va->server_name = sn;
+        }
         if ((options & JackLoadName))
             va->load_name = va_arg(ap, char *);
         if ((options & JackLoadInit))

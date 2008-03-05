@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2006 Grame  
+Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@ void JackWinNamedPipeServerNotifyChannel::Close()
 }
 
 /*
-The requirement is that the Notification from RT thread can be delivered... not sure using a pipe is adequate here... 
-Can the write operation block? 
-A non blocking write operation shoud be used : check if write can succeed, and ignore the notification otherwise 
+The requirement is that the Notification from RT thread can be delivered... not sure using a pipe is adequate here...
+Can the write operation block?
+A non blocking write operation shoud be used : check if write can succeed, and ignore the notification otherwise
 (since its mainly used for XRun, ignoring a notification is OK, successive XRun will come...)
 */
 void JackWinNamedPipeServerNotifyChannel::ClientNotify(int refnum, int notify, int value)

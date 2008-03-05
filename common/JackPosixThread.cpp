@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -43,8 +43,8 @@ void* JackPosixThread::ThreadHandler(void* arg)
 
     JackLog("ThreadHandler: start\n");
 
- 	// If Init succeed, start the thread loop
-	bool res = true;
+    // If Init succeed, start the thread loop
+    bool res = true;
     while (obj->fRunning && res) {
         res = runnable->Execute();
     }
@@ -55,21 +55,21 @@ void* JackPosixThread::ThreadHandler(void* arg)
 
 int JackPosixThread::Start()
 {
-	fRunning = true;
-	
-	// Check if the thread was correctly started
-	if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) { 
-		fRunning = false;
-		return -1;
-	} else {
-		return 0;
-	}
+    fRunning = true;
+
+    // Check if the thread was correctly started
+    if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
+        fRunning = false;
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
 {
     int res;
- 
+
     if (realtime) {
 
         JackLog("Create RT thread\n");
@@ -80,17 +80,17 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
         pthread_attr_t attributes;
         struct sched_param rt_param;
         pthread_attr_init(&attributes);
-		
-		if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
+
+        if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
             jack_error("Cannot request explicit scheduling for RT thread  %d %s", res, strerror(errno));
             return -1;
         }
-		
+
         if ((res = pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_JOINABLE))) {
             jack_error("Cannot request joinable thread creation for RT thread  %d %s", res, strerror(errno));
             return -1;
         }
-		
+
         if ((res = pthread_attr_setscope(&attributes, PTHREAD_SCOPE_SYSTEM))) {
             jack_error("Cannot set scheduling scope for RT thread %d %s", res, strerror(errno));
             return -1;
@@ -102,18 +102,18 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
             jack_error("Cannot set RR scheduling class for RT thread  %d %s", res, strerror(errno));
             return -1;
         }
-		
-		memset(&rt_param, 0, sizeof(rt_param));
+
+        memset(&rt_param, 0, sizeof(rt_param));
         rt_param.sched_priority = priority;
 
         if ((res = pthread_attr_setschedparam(&attributes, &rt_param))) {
             jack_error("Cannot set scheduling priority for RT thread %d %s", res, strerror(errno));
             return -1;
         }
-		
-		if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
-			jack_error("setting thread stack size%d %s", res, strerror(errno));
-			return -1;
+
+        if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
+            jack_error("setting thread stack size%d %s", res, strerror(errno));
+            return -1;
         }
 
         if ((res = pthread_create(thread, &attributes, start_routine, arg))) {
@@ -146,8 +146,8 @@ int JackPosixThread::Kill()
         void* status;
         pthread_cancel(fThread);
         pthread_join(fThread, &status);
-		fRunning = false; 
-		fThread = (pthread_t)NULL;
+        fRunning = false;
+        fThread = (pthread_t)NULL;
         return 0;
     } else {
         return -1;
@@ -161,7 +161,7 @@ int JackPosixThread::Stop()
         void* status;
         fRunning = false; // Request for the thread to stop
         pthread_join(fThread, &status);
-		fThread = (pthread_t)NULL;
+        fThread = (pthread_t)NULL;
         return 0;
     } else {
         return -1;
@@ -170,18 +170,18 @@ int JackPosixThread::Stop()
 
 int JackPosixThread::AcquireRealTime()
 {
- 	return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+    return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
 }
 
 int JackPosixThread::AcquireRealTime(int priority)
 {
-	fPriority = priority;
+    fPriority = priority;
     return AcquireRealTime();
 }
 
 int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
 {
-   struct sched_param rtparam;
+    struct sched_param rtparam;
     int res;
     memset(&rtparam, 0, sizeof(rtparam));
     rtparam.sched_priority = priority;
@@ -204,7 +204,7 @@ int JackPosixThread::DropRealTime()
 
 int JackPosixThread::DropRealTimeImp(pthread_t thread)
 {
-	struct sched_param rtparam;
+    struct sched_param rtparam;
     int res;
     memset(&rtparam, 0, sizeof(rtparam));
     rtparam.sched_priority = 0;
@@ -223,8 +223,8 @@ pthread_t JackPosixThread::GetThreadID()
 
 void JackPosixThread::Terminate()
 {
-	JackLog("JackPosixThread::Terminate\n");
-	pthread_exit(0);
+    JackLog("JackPosixThread::Terminate\n");
+    pthread_exit(0);
 }
 
 } // end of namespace

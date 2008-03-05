@@ -50,8 +50,8 @@ class JackFFADODriver : public JackAudioDriver
         int ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nframes);
         int ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nframes);
         jack_nframes_t ffado_driver_wait (ffado_driver_t *driver,
-                                            int extra_fd, int *status,
-                                            float *delayed_usecs);
+                                          int extra_fd, int *status,
+                                          float *delayed_usecs);
         int ffado_driver_start (ffado_driver_t *driver);
         int ffado_driver_stop (ffado_driver_t *driver);
         int ffado_driver_restart (ffado_driver_t *driver);
@@ -60,7 +60,7 @@ class JackFFADODriver : public JackAudioDriver
 
         void jack_driver_init (jack_driver_t *driver);
         void jack_driver_nt_init (jack_driver_nt_t * driver);
- 
+
     public:
 
         JackFFADODriver(const char* name, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, engine, table)

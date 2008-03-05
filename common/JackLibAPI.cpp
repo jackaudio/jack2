@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -29,9 +29,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 using namespace Jack;
 
 #ifdef WIN32
-	#define	EXPORT __declspec(dllexport)
+#define	EXPORT __declspec(dllexport)
 #else
-	#define	EXPORT
+#define	EXPORT
 #endif
 
 #ifdef __cplusplus
@@ -56,10 +56,10 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
-	JackClient* client;
-	char client_name[JACK_CLIENT_NAME_SIZE];
-	
-	JackTools::RewriteName(ext_client_name, client_name); 
+    JackClient* client;
+    char client_name[JACK_CLIENT_NAME_SIZE];
+
+    JackTools::RewriteName(ext_client_name, client_name);
 
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */
@@ -76,8 +76,8 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     va_start(ap, status);
     jack_varargs_parse(options, ap, &va);
     va_end(ap);
-	
-	
+
+
     JackLog("jack_client_open %s\n", client_name);
     if (client_name == NULL) {
         jack_error("jack_client_new called with a NULL client_name");
@@ -85,30 +85,30 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     }
 
     JackLibGlobals::Init(); // jack library initialisation
-	
-#ifndef WIN32
-	if (try_start_server(&va, options, status)) {
-		jack_error("jack server is not running or cannot be started");
-		JackLibGlobals::Destroy(); // jack library destruction
-		return 0;
-	}
-#endif	
 
 #ifndef WIN32
-	char* jack_debug = getenv("JACK_CLIENT_DEBUG");
-	if (jack_debug && strcmp(jack_debug, "on") == 0)
-		client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
-	else
-		client = new JackLibClient(GetSynchroTable()); 
+    if (try_start_server(&va, options, status)) {
+        jack_error("jack server is not running or cannot be started");
+        JackLibGlobals::Destroy(); // jack library destruction
+        return 0;
+    }
+#endif
+
+#ifndef WIN32
+    char* jack_debug = getenv("JACK_CLIENT_DEBUG");
+    if (jack_debug && strcmp(jack_debug, "on") == 0)
+        client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
+    else
+        client = new JackLibClient(GetSynchroTable());
 #else
-	client = new JackLibClient(GetSynchroTable());
-#endif 
+    client = new JackLibClient(GetSynchroTable());
+#endif
 
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {
         delete client;
         JackLibGlobals::Destroy(); // jack library destruction
-		int my_status1 = (JackFailure|JackServerError);
+        int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     } else {
@@ -124,12 +124,12 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
         jack_error("jack_client_close called with a NULL client");
         return -1;
     } else {
-		int res = client->Close();
-		delete client;
-		JackLog("jack_client_close OK\n");
-		JackLibGlobals::Destroy(); // jack library destruction
-		return res;
-	}
+        int res = client->Close();
+        delete client;
+        JackLog("jack_client_close OK\n");
+        JackLibGlobals::Destroy(); // jack library destruction
+        return res;
+    }
 }
 
 

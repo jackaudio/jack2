@@ -43,7 +43,7 @@ extern "C"
     typedef char	shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
-#else 
+#else
     /* System V SHM */
     typedef int	jack_shm_id_t;
 #endif /* SHM type */
@@ -117,7 +117,7 @@ extern "C"
      */
     typedef struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
-		size_t size;
+        size_t size;
         void *attached_at; /* address where attached */
     }
     jack_shm_info_t;

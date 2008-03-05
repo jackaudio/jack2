@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -55,8 +55,8 @@ class EXPORT JackServer
         JackGraphManager* fGraphManager;
         JackServerChannelInterface* fChannel;
         //JackConnectionManager* fConnectionState;
-		JackConnectionManager fConnectionState;
-        JackSynchro* fSynchroTable[CLIENT_NUM];        
+        JackConnectionManager fConnectionState;
+        JackSynchro* fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
         long fLoopback;
 
@@ -66,7 +66,7 @@ class EXPORT JackServer
         virtual ~JackServer();
 
         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);
-		int Close();
+        int Close();
 
         int Start();
         int Stop();
@@ -74,14 +74,14 @@ class EXPORT JackServer
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
         void Notify(int refnum, int notify, int value);
-		
-		int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
-		
-		 // Transport management
+
+        int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
+
+        // Transport management
         int ReleaseTimebase(int refnum);
         int SetTimebaseCallback(int refnum, int conditional);
-	
-		// Object access
+
+        // Object access
         JackEngine* GetEngine();
         JackEngineControl* GetEngineControl();
         JackSynchro** GetSynchroTable();

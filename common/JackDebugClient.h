@@ -45,22 +45,22 @@ PortFollower;
 /*!
 \brief A "decorator" debug client to validate API use.
 */
- 
+
 class JackDebugClient : public JackClient
 {
     protected:
-	
-		JackClient* fClient;
+
+        JackClient* fClient;
         std::ofstream* fStream;
-	      PortFollower fPortList[MAX_PORT_HISTORY]; // Arbitrary value... To be tuned...
+        PortFollower fPortList[MAX_PORT_HISTORY]; // Arbitrary value... To be tuned...
         int fTotalPortNumber;	// The total number of port opened and maybe closed. Historical view.
         int fOpenPortNumber;	// The current number of opened port.
         int fIsActivated;
         int fIsDeactivated;
         int fIsClosed;
         char fClientName[JACK_CLIENT_NAME_SIZE];
-		JackProcessCallback fProcessTimeCallback;
-		void* fProcessTimeCallbackArg;
+        JackProcessCallback fProcessTimeCallback;
+        void* fProcessTimeCallbackArg;
 
     public:
 
@@ -115,24 +115,24 @@ class JackDebugClient : public JackClient
         int SetInitCallback(JackThreadInitCallback callback, void* arg);
         int SetGraphOrderCallback(JackGraphOrderCallback callback, void* arg);
         int SetBufferSizeCallback(JackBufferSizeCallback callback, void* arg);
-		int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
+        int SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg);
         int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
-		int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
-		
-		// Internal clients
-		char* GetInternalClientName(int ref);
-		int InternalClientHandle(const char* client_name, jack_status_t* status);
-		int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
-		void InternalClientUnload(int ref, jack_status_t* status);
-		
-		// Fons Adriaensen thread model
-		jack_nframes_t Wait(int status);
-		
+        int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
+
+        // Internal clients
+        char* GetInternalClientName(int ref);
+        int InternalClientHandle(const char* client_name, jack_status_t* status);
+        int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
+        void InternalClientUnload(int ref, jack_status_t* status);
+
+        // Fons Adriaensen thread model
+        jack_nframes_t Wait(int status);
+
         JackClientControl* GetClientControl() const;
-		void CheckClient() const;
-		
-		static int TimeCallback(jack_nframes_t nframes, void *arg);
+        void CheckClient() const;
+
+        static int TimeCallback(jack_nframes_t nframes, void *arg);
 };
 
 

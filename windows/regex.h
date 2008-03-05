@@ -28,7 +28,7 @@ extern "C"
     /* POSIX says that <sys/types.h> must be included (by the caller) before
        <regex.h>.  */
 
-#ifdef VMS 
+#ifdef VMS
     /* VMS doesn't have `size_t' in <sys/types.h>, even though POSIX says it
        should be there.  */
 #include <stddef.h>
@@ -143,7 +143,7 @@ extern "C"
     
     /* Define combinations of the above bits for the standard possibilities.
        (The [[[ comments delimit what gets put into the Texinfo file, so
-       don't delete them!)  */ 
+       don't delete them!)  */
     /* [[[begin syntaxes]]] */
 #define RE_SYNTAX_EMACS 0
 
@@ -201,7 +201,7 @@ extern "C"
   (_RE_SYNTAX_POSIX_COMMON  | RE_CONTEXT_INDEP_ANCHORS			\
    | RE_CONTEXT_INVALID_OPS | RE_NO_BK_BRACES				\
    | RE_NO_BK_PARENS        | RE_NO_BK_REFS				\
-   | RE_NO_BK_VBAR	    | RE_UNMATCHED_RIGHT_PAREN_ORD) 
+   | RE_NO_BK_VBAR	    | RE_UNMATCHED_RIGHT_PAREN_ORD)
     /* [[[end syntaxes]]] */
     
     /* Maximum number of duplicates an interval can allow.  Some systems
@@ -248,8 +248,7 @@ extern "C"
 
     /* If any error codes are removed, changed, or added, update the
        `re_error_msg' table in regex.c.  */
-    typedef enum
-    {
+    typedef enum {
         REG_NOERROR = 0, 	/* Success.  */
         REG_NOMATCH, 		/* Didn't find a match (for regexec).  */
 
@@ -272,7 +271,8 @@ extern "C"
         REG_EEND, 		/* Premature end.  */
         REG_ESIZE, 		/* Compiled pattern bigger than 2^16 bytes.  */
         REG_ERPAREN		/* Unmatched ) or \); not returned from regcomp.  */
-    } reg_errcode_t;
+    }
+    reg_errcode_t;
     
     /* This data structure represents a compiled pattern.  Before calling
        the pattern compiler, the fields `buffer', `allocated', `fastmap',

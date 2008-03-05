@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -25,24 +25,24 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 
 #include <new>  // GCC 4.0
-#include <errno.h> 
+#include <errno.h>
 #include <stdlib.h>
 
 #ifdef WIN32
-	#include <windows.h>
-	#define CHECK_MLOCK(ptr, size) (VirtualLock((ptr), (size)) != 0)
-	#define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
-	#define CHECK_MLOCKALL()(false)
-	#define CHECK_MUNLOCKALL()(false)
+#include <windows.h>
+#define CHECK_MLOCK(ptr, size) (VirtualLock((ptr), (size)) != 0)
+#define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
+#define CHECK_MLOCKALL()(false)
+#define CHECK_MUNLOCKALL()(false)
 #else
-	#include <sys/types.h>
-	#include <sys/mman.h>
-	#define CHECK_MLOCK(ptr, size) (mlock((ptr), (size)) == 0)
-	#define CHECK_MUNLOCK(ptr, size) (munlock((ptr), (size)) == 0)
-	#define CHECK_MLOCKALL() (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
-	#define CHECK_MUNLOCKALL() (munlockall() == 0)
+#include <sys/types.h>
+#include <sys/mman.h>
+#define CHECK_MLOCK(ptr, size) (mlock((ptr), (size)) == 0)
+#define CHECK_MUNLOCK(ptr, size) (munlock((ptr), (size)) == 0)
+#define CHECK_MLOCKALL() (mlockall(MCL_CURRENT | MCL_FUTURE) == 0)
+#define CHECK_MUNLOCKALL() (munlockall() == 0)
 #endif
-  
+
 namespace Jack
 {
 
@@ -51,55 +51,55 @@ void UnlockMemoryImp(void* ptr, size_t size);
 
 class JackMem
 {
-	private:
+    private:
 
-		size_t fSize;
-		static size_t gSize;
-	
-	public:
+        size_t fSize;
+        static size_t gSize;
+
+    public:
 
         void* operator new(size_t size)
-		{	
-			gSize = size;
-			return calloc(1, size);
-		}
-		
-        void operator delete(void* ptr, size_t size)
-		{	
-			free(ptr);
-		}
+        {
+            gSize = size;
+            return calloc(1, size);
+        }
 
-        JackMem():fSize(gSize)
+        void operator delete(void* ptr, size_t size)
+        {
+            free(ptr);
+        }
+
+        JackMem(): fSize(gSize)
         {}
 
         virtual ~JackMem()
         {}
-		
-		void LockMemory()
-		{
-			LockMemoryImp(this, fSize);
-		}
-		
-		void UnlockMemory()
-		{
-			UnlockMemoryImp(this, fSize);
-		}
+
+        void LockMemory()
+        {
+            LockMemoryImp(this, fSize);
+        }
+
+        void UnlockMemory()
+        {
+            UnlockMemoryImp(this, fSize);
+        }
 
 };
 
 /*!
 \brief The base class for shared memory management.
- 
+
 A class which objects need to be allocated in shared memory derives from this class.
 */
 
-class JackShmMem 
+class JackShmMem
 {
 
     protected:
 
         jack_shm_info_t fInfo;
-		static unsigned int fSegmentNum;
+        static unsigned int fSegmentNum;
         static jack_shm_info_t gInfo;
 
     public:
@@ -110,9 +110,9 @@ class JackShmMem
         JackShmMem()
         {
             fInfo.index = gInfo.index;
-			fInfo.attached_at = gInfo.attached_at;
-			fInfo.size = gInfo.size;
-		}
+            fInfo.attached_at = gInfo.attached_at;
+            fInfo.size = gInfo.size;
+        }
 
         virtual ~JackShmMem()
         {}
@@ -126,16 +126,16 @@ class JackShmMem
         {
             return (char*)fInfo.attached_at;
         }
-		
-		void LockMemory()
-		{
-			LockMemoryImp(this, fInfo.size);
-		}
-		
-		void UnlockMemory()
-		{
-			UnlockMemoryImp(this, fInfo.size);
-		}
+
+        void LockMemory()
+        {
+            LockMemoryImp(this, fInfo.size);
+        }
+
+        void UnlockMemory()
+        {
+            UnlockMemoryImp(this, fInfo.size);
+        }
 
 };
 
@@ -153,16 +153,16 @@ class JackShmReadWritePtr
 
         void Init(int index, const char* server_name = "default")
         {
-			if (fInfo.index < 0 && index >= 0) {
+            if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmReadWritePtr::Init %ld %ld\n", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
-                    throw -1;
+                    throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
                     //jack_error("cannot attach shared memory segment", strerror(errno));
-                    throw -2;
+                    throw - 2;
                 }
-			}
+            }
         }
 
     public:
@@ -189,12 +189,12 @@ class JackShmReadWritePtr
 
         T* operator->() const
         {
-	        return (T*)fInfo.attached_at;
+            return (T*)fInfo.attached_at;
         }
 
         operator T*() const
         {
-			return (T*)fInfo.attached_at;
+            return (T*)fInfo.attached_at;
         }
 
         JackShmReadWritePtr& operator=(int index)
@@ -202,8 +202,8 @@ class JackShmReadWritePtr
             Init(index);
             return *this;
         }
-		
-		void SetShmIndex(int index, const char* server_name)
+
+        void SetShmIndex(int index, const char* server_name)
         {
             Init(index, server_name);
         }
@@ -215,7 +215,7 @@ class JackShmReadWritePtr
 
         T* GetShmAddress()
         {
-	         return (T*)fInfo.attached_at;
+            return (T*)fInfo.attached_at;
         }
 };
 
@@ -236,17 +236,17 @@ class JackShmReadWritePtr1
             if (fInfo.index < 0 && index >= 0) {
                 JackLog("JackShmReadWritePtr1::Init %ld %ld\n", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
-                    throw -1;
+                    throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
                     //jack_error("cannot attach shared memory segment", strerror(errno));
-                    throw -2;
+                    throw - 2;
                 }
-				/*
-                nobody else needs to access this shared memory any more, so
-                destroy it. because we have our own attachment to it, it won't
-                vanish till we exit (and release it).
-                */
+                /*
+                            nobody else needs to access this shared memory any more, so
+                            destroy it. because we have our own attachment to it, it won't
+                            vanish till we exit (and release it).
+                            */
                 jack_destroy_shm(&fInfo);
             }
         }
@@ -275,7 +275,7 @@ class JackShmReadWritePtr1
 
         T* operator->() const
         {
-			return (T*)fInfo.attached_at;
+            return (T*)fInfo.attached_at;
         }
 
         operator T*() const
@@ -288,11 +288,11 @@ class JackShmReadWritePtr1
             Init(index);
             return *this;
         }
-		
-		void SetShmIndex(int index, const char* server_name)
+
+        void SetShmIndex(int index, const char* server_name)
         {
             Init(index, server_name);
-		}
+        }
 
         int GetShmIndex()
         {
@@ -301,7 +301,7 @@ class JackShmReadWritePtr1
 
         T* GetShmAddress()
         {
-			return (T*)fInfo.attached_at;
+            return (T*)fInfo.attached_at;
         }
 };
 
@@ -368,20 +368,20 @@ class JackShmReadPtr
             Init(index);
             return *this;
         }
-		
-		void SetShmIndex(int index, const char* server_name)
+
+        void SetShmIndex(int index, const char* server_name)
         {
             Init(index, server_name);
         }
 
-        int GetShmIndex() 
+        int GetShmIndex()
         {
             return fInfo.index;
         }
 
         T* GetShmAddress()
         {
-			return (T*)fInfo.attached_at;
+            return (T*)fInfo.attached_at;
         }
 
 };

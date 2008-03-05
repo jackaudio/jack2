@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -65,14 +65,14 @@ class EXPORT JackDriverInterface
 
         virtual int Attach() = 0;
         virtual int Detach() = 0;
-	
+
         virtual int Read() = 0;
         virtual int Write() = 0;
-		
+
         virtual int Start() = 0;
         virtual int Stop() = 0;
         virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;
-		virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
+        virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
 
         virtual int Process() = 0;
 
@@ -90,7 +90,7 @@ class EXPORT JackDriverInterface
 */
 
 class EXPORT JackDriverClientInterface : public JackDriverInterface, public JackClientInterface
-{};
+    {};
 
 /*!
 \brief The base class for drivers clients.
@@ -195,9 +195,9 @@ class EXPORT JackDriver : public JackDriverClient
         {
             return 0;
         }
-		
-		virtual int SetSampleRate(jack_nframes_t sample_rate)
-		{
+
+        virtual int SetSampleRate(jack_nframes_t sample_rate)
+        {
             return 0;
         }
 
@@ -206,8 +206,8 @@ class EXPORT JackDriver : public JackDriverClient
         virtual bool IsRealTime();
 
         int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
-	
-		void SetupDriverSync(int ref, bool freewheel);
+
+        void SetupDriverSync(int ref, bool freewheel);
 
 };
 

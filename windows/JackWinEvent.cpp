@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2005 Grame  
+Copyright (C) 2004-2005 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,11 +38,11 @@ bool JackWinEvent::Signal()
 
     if (fFlush)
         return true;
-	
+
     if (!(res = SetEvent(fEvent))) {
         jack_error("JackWinEvent::Signal name = %s err = %ld", fName, GetLastError());
     }
-	
+
     return res;
 }
 
@@ -57,7 +57,7 @@ bool JackWinEvent::SignalAll()
     if (!(res = SetEvent(fEvent))) {
         jack_error("JackWinEvent::SignalAll name = %s err = %ld", fName, GetLastError());
     }
-	
+
     return res;
 }
 
@@ -77,7 +77,7 @@ bool JackWinEvent::TimedWait(long usec)
     DWORD res;
 
     if ((res = WaitForSingleObject(fEvent, usec / 1000)) == WAIT_TIMEOUT) {
-		jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
+        jack_error("JackWinEvent::TimedWait name = %s time_out", fName);
     }
 
     return (res == WAIT_OBJECT_0);
@@ -96,7 +96,7 @@ bool JackWinEvent::ConnectInput(const char* name, const char* server_name)
     }
 
     if ((fEvent = OpenEvent(EVENT_ALL_ACCESS, FALSE, fName)) == NULL) {
-		jack_error("Connect: can't check in named event name = %s err = %ld", fName, GetLastError());
+        jack_error("Connect: can't check in named event name = %s err = %ld", fName, GetLastError());
         return false;
     } else {
         return true;
@@ -135,19 +135,19 @@ bool JackWinEvent::Allocate(const char* name, const char* server_name, int value
         jack_error("Allocate: can't check in named event name = %s err = %ld", fName, GetLastError());
         return false;
     } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		jack_error("Allocate: named event already exist name = %s", fName);
-		CloseHandle(fEvent);
-		fEvent = NULL;
-		return false;
-	} else {
- 		return true;
+        jack_error("Allocate: named event already exist name = %s", fName);
+        CloseHandle(fEvent);
+        fEvent = NULL;
+        return false;
+    } else {
+        return true;
     }
 }
 
 void JackWinEvent::Destroy()
 {
     if (fEvent != NULL) {
-		JackLog("JackWinEvent::Destroy %s\n", fName);
+        JackLog("JackWinEvent::Destroy %s\n", fName);
         CloseHandle(fEvent);
         fEvent = NULL;
     } else {

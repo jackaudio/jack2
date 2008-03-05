@@ -1,18 +1,18 @@
 /*
-Copyright (C) 2004-2006 Grame  
-  
+Copyright (C) 2004-2006 Grame
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU Lesser General Public License for more details.
-  
+
   You should have received a copy of the GNU Lesser General Public License
-  along with this program; if not, write to the Free Software 
+  along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -38,47 +38,47 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
 
 int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 {
-	JackLog("JackWinNamedPipeClientChannel::ServerCheck = %s\n", server_name);
-	
-	// Connect to server
+    JackLog("JackWinNamedPipeClientChannel::ServerCheck = %s\n", server_name);
+
+    // Connect to server
     if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server pipe");
         return -1;
     } else {
-		return 0;
-	}
+        return 0;
+    }
 }
 
 int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
-	int result = 0;
+    int result = 0;
     JackLog("JackWinNamedPipeClientChannel::Open name = %s\n", name);
 
-	/* 
-	16/08/07: was called before doing "fRequestPipe.Connect" .... still necessary?
-    if (fNotificationListenPipe.Bind(jack_client_dir, name, 0) < 0) {
-        jack_error("Cannot bind pipe");
-        goto error;
-    }
-	*/
-	
+    /*
+    16/08/07: was called before doing "fRequestPipe.Connect" .... still necessary?
+       if (fNotificationListenPipe.Bind(jack_client_dir, name, 0) < 0) {
+           jack_error("Cannot bind pipe");
+           goto error;
+       }
+    */
+
     if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server pipe");
         goto error;
     }
 
-	// Check name in server
-	ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    // Check name in server
+    ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
         jack_error("Client name = %s conflits with another running client", name);
-		goto error;
+        goto error;
     }
-	
-	if (fNotificationListenPipe.Bind(jack_client_dir, name_res, 0) < 0) {
+
+    if (fNotificationListenPipe.Bind(jack_client_dir, name_res, 0) < 0) {
         jack_error("Cannot bind pipe");
         goto error;
     }
-	
+
 
     fClient = obj;
     return 0;
@@ -93,20 +93,20 @@ void JackWinNamedPipeClientChannel::Close()
 {
     fRequestPipe.Close();
     fNotificationListenPipe.Close();
-	// Here the thread will correctly stop when the pipe are closed
-	fThread->Stop();
+    // Here the thread will correctly stop when the pipe are closed
+    fThread->Stop();
 }
 
 int JackWinNamedPipeClientChannel::Start()
 {
     JackLog("JackWinNamedPipeClientChannel::Start\n");
-	
+
     if (fThread->Start() != 0) {
         jack_error("Cannot start Jack client listener");
         return -1;
     } else {
         return 0;
-    }	
+    }
 }
 
 void JackWinNamedPipeClientChannel::Stop()
@@ -144,11 +144,11 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
 
 void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
 {
-	JackClientCheckRequest req(name, protocol, options);
+    JackClientCheckRequest req(name, protocol, options);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
-	*status = res.fStatus;
-	strcpy(name_res, res.fName);
+    *status = res.fStatus;
+    strcpy(name_res, res.fName);
 }
 
 void JackWinNamedPipeClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
@@ -258,7 +258,7 @@ void JackWinNamedPipeClientChannel::GetInternalClientName(int refnum, int int_re
     JackGetInternalClientNameRequest req(refnum, int_ref);
     JackGetInternalClientNameResult res;
     ServerSyncCall(&req, &res, result);
-	strcpy(name_res, res.fName);
+    strcpy(name_res, res.fName);
 }
 
 void JackWinNamedPipeClientChannel::InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
@@ -266,8 +266,8 @@ void JackWinNamedPipeClientChannel::InternalClientHandle(int refnum, const char*
     JackInternalClientHandleRequest req(refnum, client_name);
     JackInternalClientHandleResult res;
     ServerSyncCall(&req, &res, result);
-	*int_ref = res.fIntRefNum;
-	*status = res.fStatus;
+    *int_ref = res.fIntRefNum;
+    *status = res.fStatus;
 }
 
 void JackWinNamedPipeClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
@@ -275,8 +275,8 @@ void JackWinNamedPipeClientChannel::InternalClientLoad(int refnum, const char* c
     JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options);
     JackInternalClientLoadResult res;
     ServerSyncCall(&req, &res, result);
-	*int_ref = res.fIntRefNum;
-	*status = res.fStatus;
+    *int_ref = res.fIntRefNum;
+    *status = res.fStatus;
 }
 
 void JackWinNamedPipeClientChannel::InternalClientUnload(int refnum, int int_ref, int* status, int* result)
@@ -284,7 +284,7 @@ void JackWinNamedPipeClientChannel::InternalClientUnload(int refnum, int int_ref
     JackInternalClientUnloadRequest req(refnum, int_ref);
     JackInternalClientUnloadResult res;
     ServerSyncCall(&req, &res, result);
-	*status = res.fStatus;
+    *status = res.fStatus;
 }
 
 bool JackWinNamedPipeClientChannel::Init()
@@ -295,7 +295,7 @@ bool JackWinNamedPipeClientChannel::Init()
         jack_error("JackWinNamedPipeClientChannel: cannot establish notification pipe");
         return false;
     } else {
-		return true;
+        return true;
     }
 }
 

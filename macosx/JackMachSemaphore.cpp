@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ void JackMachSemaphore::BuildName(const char* name, const char* server_name, cha
 bool JackMachSemaphore::Signal()
 {
     kern_return_t res;
- 	
-	if (!fSemaphore) {
-		jack_error("JackMachSemaphore::Signal name = %s already desallocated!!", fName);
-		return false;
-	}
+
+    if (!fSemaphore) {
+        jack_error("JackMachSemaphore::Signal name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if (fFlush)
         return true;
@@ -52,11 +52,11 @@ bool JackMachSemaphore::Signal()
 bool JackMachSemaphore::SignalAll()
 {
     kern_return_t res;
-	
+
     if (!fSemaphore) {
-		jack_error("JackMachSemaphore::SignalAll name = %s already desallocated!!", fName);
-		return false;
-	}
+        jack_error("JackMachSemaphore::SignalAll name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if (fFlush)
         return true;
@@ -70,12 +70,12 @@ bool JackMachSemaphore::SignalAll()
 bool JackMachSemaphore::Wait()
 {
     kern_return_t res;
-	
+
     if (!fSemaphore) {
-		jack_error("JackMachSemaphore::Wait name = %s already desallocated!!", fName);
-		return false;
-	}
-	
+        jack_error("JackMachSemaphore::Wait name = %s already desallocated!!", fName);
+        return false;
+    }
+
     if ((res = semaphore_wait(fSemaphore)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::Wait name = %s err = %s", fName, mach_error_string(res));
     }
@@ -88,11 +88,11 @@ bool JackMachSemaphore::TimedWait(long usec)
     mach_timespec time;
     time.tv_sec = usec / 1000000;
     time.tv_nsec = (usec % 1000000) * 1000;
-	
-	if (!fSemaphore) {
-		jack_error("JackMachSemaphore::TimedWait name = %s already desallocated!!", fName);
-		return false;
-	}
+
+    if (!fSemaphore) {
+        jack_error("JackMachSemaphore::TimedWait name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if ((res = semaphore_timedwait(fSemaphore, time)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::TimedWait name = %s usec = %ld err = %s", fName, usec, mach_error_string(res));
@@ -186,10 +186,10 @@ bool JackMachSemaphore::ConnectOutput(const char* name, const char* server_name)
 
 bool JackMachSemaphore::Disconnect()
 {
-	if (fSemaphore > 0) {
-		JackLog("JackMachSemaphore::Disconnect name = %s\n", fName);
-		fSemaphore = 0;
-	}
+    if (fSemaphore > 0) {
+        JackLog("JackMachSemaphore::Disconnect name = %s\n", fName);
+        fSemaphore = 0;
+    }
     // Nothing to do
     return true;
 }

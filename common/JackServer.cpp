@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -53,12 +53,12 @@ JackServer::JackServer(bool sync,  bool temporary, long timeout, bool rt, long p
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();
- 	fFreewheel = false;
+    fFreewheel = false;
     fLoopback = loopback;
     fDriverInfo = NULL;
     fAudioDriver = NULL;
     fInstance = this; // Unique instance
-	jack_verbose = verbose;
+    jack_verbose = verbose;
 }
 
 JackServer::~JackServer()
@@ -117,7 +117,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         jack_error("Cannot attach audio driver");
         return -1;
     }
-	
+
     if (fLoopback > 0 && fLoopbackDriver->Attach() != 0) {
         jack_error("Cannot attach loopback driver");
         return -1;
@@ -148,25 +148,25 @@ int JackServer::Close()
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
 {
-	try {
-		// Clear status
-		*status = 0;
-		JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data); 
-		assert(client);
-		int res = client->Open("unused", client_name, (jack_options_t)options, (jack_status_t*)status);
-		if (res < 0) {
-			delete client;
-			*int_ref = 0;
-		} else {
-			*int_ref = client->GetClientControl()->fRefNum;
-		}
-	} catch (...) {
-		int my_status1 = *status | JackFailure;
-		*status = (jack_status_t)my_status1;
-		*int_ref = 0;
-	}
-	
-	return 0;
+    try {
+        // Clear status
+        *status = 0;
+        JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
+        assert(client);
+        int res = client->Open("unused", client_name, (jack_options_t)options, (jack_status_t*)status);
+        if (res < 0) {
+            delete client;
+            *int_ref = 0;
+        } else {
+            *int_ref = client->GetClientControl()->fRefNum;
+        }
+    } catch (...) {
+        int my_status1 = *status | JackFailure;
+        *status = (jack_status_t)my_status1;
+        *int_ref = 0;
+    }
+
+    return 0;
 }
 
 int JackServer::Start()
@@ -185,7 +185,7 @@ int JackServer::Stop()
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackLog("JackServer::SetBufferSize nframes = %ld\n", buffer_size);
-	jack_nframes_t current_buffer_size = fEngineControl->fBufferSize;
+    jack_nframes_t current_buffer_size = fEngineControl->fBufferSize;
 
     if (fAudioDriver->Stop() != 0) {
         jack_error("Cannot stop audio driver");
@@ -193,27 +193,27 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
     }
 
     if (fAudioDriver->SetBufferSize(buffer_size) == 0) {
-		fFreewheelDriver->SetBufferSize(buffer_size);
-		fEngine->NotifyBufferSize(buffer_size);
-		fEngineControl->InitFrameTime();
-		return fAudioDriver->Start();
-	} else { // Failure: try to restore current value
-		jack_error("Cannot SetBufferSize for audio driver, restore current value %ld", current_buffer_size);
-		fFreewheelDriver->SetBufferSize(current_buffer_size);
-		fEngineControl->InitFrameTime();
-		return fAudioDriver->Start();
-	}
+        fFreewheelDriver->SetBufferSize(buffer_size);
+        fEngine->NotifyBufferSize(buffer_size);
+        fEngineControl->InitFrameTime();
+        return fAudioDriver->Start();
+    } else { // Failure: try to restore current value
+        jack_error("Cannot SetBufferSize for audio driver, restore current value %ld", current_buffer_size);
+        fFreewheelDriver->SetBufferSize(current_buffer_size);
+        fEngineControl->InitFrameTime();
+        return fAudioDriver->Start();
+    }
 }
 
 /*
 Freewheel mode is implemented by switching from the (audio + freewheel) driver to the freewheel driver only:
- 
+
     - "global" connection state is saved
     - all audio driver ports are deconnected, thus there is no more dependancies with the audio driver
     - the freewheel driver will be synchronized with the end of graph execution : all clients are connected to the freewheel driver
     - the freewheel driver becomes the "master"
-    
-Normal mode is restored with the connections state valid before freewheel mode was done. Thus one consider that 
+
+Normal mode is restored with the connections state valid before freewheel mode was done. Thus one consider that
 no graph state change can be done during freewheel mode.
 */
 
@@ -231,7 +231,7 @@ int JackServer::SetFreewheel(bool onoff)
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
             fEngineControl->InitFrameTime();
-			return fAudioDriver->Start();
+            return fAudioDriver->Start();
         }
     } else {
         if (onoff) {
@@ -241,7 +241,7 @@ int JackServer::SetFreewheel(bool onoff)
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(true);
-			return fFreewheelDriver->Start();
+            return fFreewheelDriver->Start();
         } else {
             return -1;
         }
@@ -263,10 +263,10 @@ void JackServer::Notify(int refnum, int notify, int value)
 
         case kDeadClient:
             JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
-			if (fEngine->ClientDeactivate(refnum) < 0)
-				jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
-			fEngine->ClientExternalClose(refnum);
-			break;
+            if (fEngine->ClientDeactivate(refnum) < 0)
+                jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
+            fEngine->ClientExternalClose(refnum);
+            break;
     }
 }
 

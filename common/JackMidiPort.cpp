@@ -131,10 +131,11 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     mix->lost_events += event_count - events_done;
 }
 
-const JackPortType gMidiPortType = {
-	JACK_DEFAULT_MIDI_TYPE,
-	MidiBufferInit,
-	MidiBufferMixdown
-};
+const JackPortType gMidiPortType =
+    {
+        JACK_DEFAULT_MIDI_TYPE,
+        MidiBufferInit,
+        MidiBufferMixdown
+    };
 
 } // namespace Jack

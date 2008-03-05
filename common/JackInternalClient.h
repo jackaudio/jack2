@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -62,15 +62,15 @@ class JackInternalClient : public JackClient
 #ifdef WIN32
 
 #include <windows.h>
-#define HANDLE HINSTANCE 
+#define HANDLE HINSTANCE
 #define LoadJackModule(name) LoadLibrary((name));
-#define UnloadJackModule(handle) FreeLibrary((handle));  
+#define UnloadJackModule(handle) FreeLibrary((handle));
 #define GetJackProc(handle, name) GetProcAddress((handle), (name));
 
 #else
 
 #include <dlfcn.h>
-#define HANDLE void* 
+#define HANDLE void*
 #define LoadJackModule(name) dlopen((name), RTLD_NOW | RTLD_LOCAL);
 #define UnloadJackModule(handle) dlclose((handle));
 #define GetJackProc(handle, name) dlsym((handle), (name));
@@ -84,18 +84,18 @@ class JackLoadableInternalClient : public JackInternalClient
 {
 
     private:
-	
-		HANDLE fHandle;
-		InitializeCallback fInitialize;
-		FinishCallback fFinish;		
-		char fObjectData[JACK_LOAD_INIT_LIMIT];
+
+        HANDLE fHandle;
+        InitializeCallback fInitialize;
+        FinishCallback fFinish;
+        char fObjectData[JACK_LOAD_INIT_LIMIT];
 
     public:
 
         JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data);
-	    virtual ~JackLoadableInternalClient();
-		
-		int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
+        virtual ~JackLoadableInternalClient();
+
+        int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
 };
 

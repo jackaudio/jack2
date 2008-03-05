@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -41,7 +41,7 @@ class JackLoopbackDriver : public JackAudioDriver
         virtual ~JackLoopbackDriver()
         {}
 
-		int Process();
+        int Process();
 };
 
 } // end of namespace

@@ -29,35 +29,35 @@ namespace Jack
 
 void JackEngineControl::CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs)
 {
-	// Transport
-	fTransport.CycleBegin(fSampleRate, callback_usecs);
-	
-	// Timer
-	fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
-	
-	// Timing
-	GetTimeMeasure(table, manager, callback_usecs);
+    // Transport
+    fTransport.CycleBegin(fSampleRate, callback_usecs);
+
+    // Timer
+    fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
+
+    // Timing
+    GetTimeMeasure(table, manager, callback_usecs);
     CalcCPULoad(table, manager);
 }
 
 void JackEngineControl::CycleEnd(JackClientInterface** table)
 {
-	fTransport.CycleEnd(table, fSampleRate, fBufferSize);
+    fTransport.CycleEnd(table, fSampleRate, fBufferSize);
 }
 
 void JackEngineControl::InitFrameTime()
 {
-	fFrameTimer.InitFrameTime();
+    fFrameTimer.InitFrameTime();
 }
 
 void JackEngineControl::ResetFrameTime(jack_time_t callback_usecs)
 {
-	fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
+    fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
 }
 
 void JackEngineControl::ReadFrameTime(JackTimer* timer)
 {
-	fFrameTimer.ReadFrameTime(timer);
+    fFrameTimer.ReadFrameTime(timer);
 }
 
 // Private
@@ -76,8 +76,8 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManage
 
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
-		JackClientTiming* timing = manager->GetClientTiming(i);
-		if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
+        JackClientTiming* timing = manager->GetClientTiming(i);
+        if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
             lastCycleEnd = MAX(lastCycleEnd, timing->fFinishedAt);
         }
     }
@@ -131,9 +131,9 @@ void JackEngineControl::GetTimeMeasure(JackClientInterface** table, JackGraphMan
 
         for (int i = 0; i < CLIENT_NUM; i++) {
             JackClientInterface* client = table[i];
-			JackClientTiming* timing = manager->GetClientTiming(i);
+            JackClientTiming* timing = manager->GetClientTiming(i);
             if (client && client->GetClientControl()->fActive) {
-			    fMeasure[pos].fClientTable[i].fRefNum = i;
+                fMeasure[pos].fClientTable[i].fRefNum = i;
                 fMeasure[pos].fClientTable[i].fSignaledAt = timing->fSignaledAt;
                 fMeasure[pos].fClientTable[i].fAwakeAt = timing->fAwakeAt;
                 fMeasure[pos].fClientTable[i].fFinishedAt = timing->fFinishedAt;

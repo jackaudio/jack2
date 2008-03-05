@@ -1,7 +1,7 @@
 /*
   Copyright (C) 2001 Paul Davis
   Code derived from various headers from the Linux kernel
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -34,7 +34,7 @@
  * We only use the low 32 bits, and we'd simply better make sure
  * that we reschedule before that wraps. Scheduling at least every
  * four billion cycles just basically sounds like a good idea,
- * regardless of how fast the machine is. 
+ * regardless of how fast the machine is.
  */
 
 #ifdef __linux__

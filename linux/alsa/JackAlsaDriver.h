@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -96,7 +96,7 @@ class JackAlsaDriver : public JackAudioDriver
                                         int shorts_first,
                                         jack_nframes_t capture_latency,
                                         jack_nframes_t playback_latency,
-					alsa_midi_t *midi
+                                        alsa_midi_t *midi
                                        );
 
         void alsa_driver_delete(alsa_driver_t *driver);
@@ -115,7 +115,7 @@ class JackAlsaDriver : public JackAudioDriver
         int alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs);
         void jack_driver_init (jack_driver_t *driver);
         void jack_driver_nt_init (jack_driver_nt_t * driver);
- 
+
     public:
 
         JackAlsaDriver(const char* name, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, engine, table)
@@ -124,28 +124,28 @@ class JackAlsaDriver : public JackAudioDriver
         {}
 
         int Open(jack_nframes_t nframes,
-				 jack_nframes_t user_nperiods,
-				 jack_nframes_t samplerate,
-				 bool hw_monitoring,
-				 bool hw_metering,
-				 bool capturing,
-				 bool playing,
-				 DitherAlgorithm dither,
-				 bool soft_mode, 
-				 bool monitor,
-				 int inchannels,
-				 int outchannels,
-				 bool shorts_first,
-				 const char* capture_driver_name,
-				 const char* playback_driver_name,
-				 jack_nframes_t capture_latency,
-				 jack_nframes_t playback_latency,
-				 const char* midi_driver_name);
+                 jack_nframes_t user_nperiods,
+                 jack_nframes_t samplerate,
+                 bool hw_monitoring,
+                 bool hw_metering,
+                 bool capturing,
+                 bool playing,
+                 DitherAlgorithm dither,
+                 bool soft_mode,
+                 bool monitor,
+                 int inchannels,
+                 int outchannels,
+                 bool shorts_first,
+                 const char* capture_driver_name,
+                 const char* playback_driver_name,
+                 jack_nframes_t capture_latency,
+                 jack_nframes_t playback_latency,
+                 const char* midi_driver_name);
 
         int Close();
         int Attach();
         int Detach();
-	
+
         int Start();
         int Stop();
 
@@ -155,19 +155,19 @@ class JackAlsaDriver : public JackAudioDriver
         int SetBufferSize(jack_nframes_t nframes);
 
 
-    // jack api emulation for the midi driver
- 
-    int is_realtime() const;
-    int create_thread(pthread_t *thread, int prio, int rt, void *(*start_func)(void*), void *arg);
- 
-    int port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size);
-    int port_unregister(int port);
-    void* port_get_buffer(int port, jack_nframes_t nframes);
-	int port_set_alias(int port, const char* name);
- 
-    jack_nframes_t get_sample_rate() const;
-    jack_nframes_t frame_time() const;
-    jack_nframes_t last_frame_time() const;
+        // jack api emulation for the midi driver
+
+        int is_realtime() const;
+        int create_thread(pthread_t *thread, int prio, int rt, void *(*start_func)(void*), void *arg);
+
+        int port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size);
+        int port_unregister(int port);
+        void* port_get_buffer(int port, jack_nframes_t nframes);
+        int port_set_alias(int port, const char* name);
+
+        jack_nframes_t get_sample_rate() const;
+        jack_nframes_t frame_time() const;
+        jack_nframes_t last_frame_time() const;
 };
 
 } // end of namespace

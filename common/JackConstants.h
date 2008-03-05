@@ -52,17 +52,17 @@ namespace Jack
 #define SOCKET_TIME_OUT 5
 
 #ifdef WIN32
-	#define jack_server_dir "server"
-	#define jack_client_dir "client"
-	#define ADDON_DIR "jackmp"
+#define jack_server_dir "server"
+#define jack_client_dir "client"
+#define ADDON_DIR "jackmp"
 #elif __APPLE__
-	#define jack_server_dir "/tmp"
-	#define jack_client_dir "/tmp"
-	#define JACK_DEFAULT_DRIVER "coreaudio"
+#define jack_server_dir "/tmp"
+#define jack_client_dir "/tmp"
+#define JACK_DEFAULT_DRIVER "coreaudio"
 #else
-	#define jack_server_dir "/dev/shm"
-	#define jack_client_dir "/dev/shm"
-	#define JACK_DEFAULT_DRIVER "alsa"
+#define jack_server_dir "/dev/shm"
+#define jack_client_dir "/dev/shm"
+#define JACK_DEFAULT_DRIVER "alsa"
 #endif
 
 #define jack_server_entry "jackdmp_entry"
@@ -71,9 +71,9 @@ namespace Jack
 #define ALL_CLIENTS -1 // for notification
 
 #if defined(__ppc64__) || defined(__x86_64__)
-	#define JACK_PROTOCOL_VERSION 4
+#define JACK_PROTOCOL_VERSION 4
 #else
-	#define JACK_PROTOCOL_VERSION 3
+#define JACK_PROTOCOL_VERSION 3
 #endif
 
 #define DRIVER_OPEN_TIMEOUT 5   // in sec

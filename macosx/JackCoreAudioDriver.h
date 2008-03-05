@@ -39,7 +39,7 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 
 /*!
 \brief The CoreAudio driver.
- 
+
 \todo hardware monitoring
 */
 
@@ -47,8 +47,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 {
 
     private:
-	
-		AudioUnit fAUHAL;
+
+        AudioUnit fAUHAL;
 
         AudioBufferList* fJackInputData;
         AudioBufferList* fDriverOutputData;
@@ -57,21 +57,21 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;
-		
-		bool fState;
-		
-		/// Intitial state
-		bool fCapturing;
-		bool fPlaying;
-		
-		int fInChannels;
-		int fOutChannels;
-		
-		char fCaptureUID[256];
-		char fPlaybackUID[256];
-		
-		bool fMonitor;
-	
+
+        bool fState;
+
+        /// Intitial state
+        bool fCapturing;
+        bool fPlaying;
+
+        int fInChannels;
+        int fOutChannels;
+
+        char fCaptureUID[256];
+        char fPlaybackUID[256];
+
+        bool fMonitor;
+
         static	OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
@@ -88,57 +88,57 @@ class JackCoreAudioDriver : public JackAudioDriver
                                         void* inClientData);
 
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
-													UInt32 inChannel,
-													Boolean	isInput,
-													AudioDevicePropertyID inPropertyID,
-													void* inClientData);
-													
-													
-		static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
-												UInt32 inChannel,
-												Boolean	isInput,
-												AudioDevicePropertyID inPropertyID,
-												void* inClientData);											
-													
+                UInt32 inChannel,
+                Boolean	isInput,
+                AudioDevicePropertyID inPropertyID,
+                void* inClientData);
+
+
+        static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
+                                               UInt32 inChannel,
+                                               Boolean	isInput,
+                                               AudioDevicePropertyID inPropertyID,
+                                               void* inClientData);
+
         OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
         OSStatus GetDefaultDevice(AudioDeviceID* id);
         OSStatus GetDefaultInputDevice(AudioDeviceID* id);
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
         OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
-		
-		// Setup
-		int SetupDevices(const char* capture_driver_uid, 
-						 const char* playback_driver_uid, 
-						 char* capture_driver_name,  
-						 char* playback_driver_name);
-						 
-		int SetupChannels(bool capturing, 
-						bool playing, 
-						int& inchannels, 
-						int& outchannels, 
-						int& in_nChannels, 
-						int& out_nChannels,
-						bool strict);
-						
-		int SetupBuffers(int inchannels, int outchannels);
-		void DisposeBuffers();
 
-		int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
-		
-		int OpenAUHAL(bool capturing, 
-						bool playing, 
-						int inchannels, 
-						int outchannels, 
-						int in_nChannels, 
-						int out_nChannels, 
-						jack_nframes_t nframes,
-						jack_nframes_t samplerate,
-						bool strict);
-		void CloseAUHAL();
-		
-		int AddListeners();
-		void RemoveListeners();
+        // Setup
+        int SetupDevices(const char* capture_driver_uid,
+                         const char* playback_driver_uid,
+                         char* capture_driver_name,
+                         char* playback_driver_name);
+
+        int SetupChannels(bool capturing,
+                          bool playing,
+                          int& inchannels,
+                          int& outchannels,
+                          int& in_nChannels,
+                          int& out_nChannels,
+                          bool strict);
+
+        int SetupBuffers(int inchannels, int outchannels);
+        void DisposeBuffers();
+
+        int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
+
+        int OpenAUHAL(bool capturing,
+                      bool playing,
+                      int inchannels,
+                      int outchannels,
+                      int in_nChannels,
+                      int out_nChannels,
+                      jack_nframes_t nframes,
+                      jack_nframes_t samplerate,
+                      bool strict);
+        void CloseAUHAL();
+
+        int AddListeners();
+        void RemoveListeners();
 
     public:
 
@@ -156,7 +156,7 @@ class JackCoreAudioDriver : public JackAudioDriver
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency);
-		int Close();
+        int Close();
 
         int Attach();
 

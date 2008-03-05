@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -80,7 +80,7 @@ namespace Jack
 #ifdef WIN32
 JackSynchro* JackFactoryWindowsServer::MakeSynchro()
 {
-	return new JackWinSemaphore();
+    return new JackWinSemaphore();
 }
 
 JackServerNotifyChannelInterface* JackFactoryWindowsServer::MakeServerNotifyChannel()
@@ -231,7 +231,7 @@ JackThread* JackFactoryLinuxServer::MakeThread(JackRunnableInterface* runnable)
 
 #if defined(__APPLE__)
 
-#if defined(MACH_RPC_MACH_SEMA) 
+#if defined(MACH_RPC_MACH_SEMA)
 // Mach RPC + Mach Semaphore
 JackSynchro* JackFactoryOSXServer::MakeSynchro()
 {
@@ -269,7 +269,7 @@ JackThread* JackFactoryOSXServer::MakeThread(JackRunnableInterface* runnable)
 }
 #endif
 
-#if defined(SOCKET_RPC_POSIX_SEMA) 
+#if defined(SOCKET_RPC_POSIX_SEMA)
 // Socket RPC + Posix Semaphore
 JackSynchro* JackFactoryOSXServer::MakeSynchro()
 {
@@ -307,7 +307,7 @@ JackThread* JackFactoryOSXServer::MakeThread(JackRunnableInterface* runnable)
 }
 #endif
 
-#if defined(SOCKET_RPC_FIFO_SEMA) 
+#if defined(SOCKET_RPC_FIFO_SEMA)
 // Socket RPC + Fifo Semaphore
 JackSynchro* JackFactoryOSXServer::MakeSynchro()
 {
@@ -345,7 +345,7 @@ JackThread* JackFactoryOSXServer::MakeThread(JackRunnableInterface* runnable)
 }
 #endif
 
-#if defined(MACH_RPC_FIFO_SEMA) 
+#if defined(MACH_RPC_FIFO_SEMA)
 // Mach RPC + Fifo Semaphore
 JackSynchro* JackFactoryOSXServer::MakeSynchro()
 {
@@ -383,7 +383,7 @@ JackThread* JackFactoryOSXServer::MakeThread(JackRunnableInterface* runnable)
 }
 #endif
 
-#if defined(MACH_RPC_POSIX_SEMA) 
+#if defined(MACH_RPC_POSIX_SEMA)
 // Mach RPC + Posix Semaphore
 JackSynchro* JackFactoryOSXServer::MakeSynchro()
 {
@@ -421,7 +421,7 @@ JackThread* JackFactoryOSXServer::MakeThread(JackRunnableInterface* runnable)
 }
 #endif
 
-#if defined(SOCKET_RPC_MACH_SEMA) 
+#if defined(SOCKET_RPC_MACH_SEMA)
 // Socket RPC + Mac Semaphore
 JackSynchro* JackFactoryOSXServer::MakeSynchro()
 {

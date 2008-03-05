@@ -1,19 +1,19 @@
 /*
   Copyright (C) 2002 Paul Davis
   Copyright (C) 2003 Jack O'Quin
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU Lesser General Public License for more details.
-  
+
   You should have received a copy of the GNU Lesser General Public License
-  along with this program; if not, write to the Free Software 
+  along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
   $Id: transport_types.h,v 1.1.2.2 2006/06/20 14:44:00 letz Exp $
@@ -86,7 +86,7 @@ extern "C"
         /* JackPositionTimecode fields:	(EXPERIMENTAL: could change) */
         double	frame_time;	/**< current time in seconds */
         double	next_time;	/**< next sequential frame_time
-                					     (unless repositioned) */
+                        					     (unless repositioned) */
 
         /* For binary compatibility, new fields should be allocated from
          * this padding area with new valid bits controlling access, so

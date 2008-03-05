@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -38,14 +38,14 @@ int JackLoopbackDriver::Process()
     // Loopback copy
     for (int i = 0; i < fCaptureChannels; i++) {
         memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(float) * fEngineControl->fBufferSize);
-	}
+    }
 
     fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
     if (fEngineControl->fSyncMode) {
         if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) {
             jack_error("JackLoopbackDriver::ProcessSync SuspendRefNum error");
-			return -1;
-		}
+            return -1;
+        }
     }
     return 0;
 }

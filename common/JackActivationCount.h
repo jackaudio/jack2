@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,12 +38,12 @@ class JackActivationCount
 
     private:
 
-		SInt32 fValue;
+        SInt32 fValue;
         SInt32 fCount;
 
     public:
 
-       JackActivationCount(): fValue(0), fCount(0)
+        JackActivationCount(): fValue(0), fCount(0)
         {}
         virtual ~JackActivationCount()
         {}

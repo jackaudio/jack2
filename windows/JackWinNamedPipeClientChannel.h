@@ -1,18 +1,18 @@
 /*
-Copyright (C) 2004-2006 Grame  
-  
+Copyright (C) 2004-2006 Grame
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU Lesser General Public License for more details.
-  
+
   You should have received a copy of the GNU Lesser General Public License
-  along with this program; if not, write to the Free Software 
+  along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -55,11 +55,11 @@ class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public 
 
         int Start();
         void Stop();
-		
-		int ServerCheck(const char* server_name);
+
+        int ServerCheck(const char* server_name);
 
         void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
-		void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int* result);
@@ -80,11 +80,11 @@ class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public 
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);
 
-		void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result);
+        void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result);
         void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result);
-      	virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result);
-      	virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
-    
+        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result);
+        virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
+
         // JackRunnableInterface interface
         bool Init();
         bool Execute();

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTransportEngine.h"
 #include "JackClientControl.h"
 #include "JackError.h"
-#include "JackTime.h" 
+#include "JackTime.h"
 #include <assert.h>
 #include <stdlib.h>
 

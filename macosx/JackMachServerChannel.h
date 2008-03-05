@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class JackMachServerChannel : public JackServerChannelInterface, public JackRunn
         JackEngine* GetEngine();
         JackServer* GetServer();
 
-		void ClientCheck(char* name, char* name_res, int protocol, int options, int* status, int* result);
+        void ClientCheck(char* name, char* name_res, int protocol, int options, int* status, int* result);
         void ClientOpen(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(mach_port_t private_port, int refnum);
         void ClientKill(mach_port_t private_port);

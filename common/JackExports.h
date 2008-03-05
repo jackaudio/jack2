@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2005 Grame  
+Copyright (C) 2004-2005 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ This program is free software; you can redistribute it and/or modify
 #define __JackExports__
 
 #ifdef WIN32
-	#define	EXPORT __declspec(dllexport)
+#define	EXPORT __declspec(dllexport)
 #else
-	#define	EXPORT
+#define	EXPORT
 #endif
 
 #endif

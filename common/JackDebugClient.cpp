@@ -113,25 +113,25 @@ int JackDebugClient::Close()
 void JackDebugClient::CheckClient() const
 {
     if (fIsClosed > 0)  {
-		*fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed !" << endl;
-		*fStream << "This is likely to cause crash !'" << endl;
-	}
+        *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed !" << endl;
+        *fStream << "This is likely to cause crash !'" << endl;
+    }
 }
 
 pthread_t JackDebugClient::GetThreadID()
 {
-	CheckClient();
+    CheckClient();
     return fClient->GetThreadID();
 }
 
 JackGraphManager* JackDebugClient::GetGraphManager() const
 {
-	CheckClient();
+    CheckClient();
     return fClient->GetGraphManager();
 }
 JackEngineControl* JackDebugClient::GetEngineControl() const
 {
-	CheckClient();
+    CheckClient();
     return fClient->GetEngineControl();
 }
 /*!
@@ -140,13 +140,13 @@ JackEngineControl* JackDebugClient::GetEngineControl() const
 
 int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
-	CheckClient();
+    CheckClient();
     return fClient->ClientNotify( refnum, name, notify, sync, value1, value2);
 }
 
 int JackDebugClient::Activate()
 {
-	CheckClient();
+    CheckClient();
     int res = fClient->Activate();
     fIsActivated++;
     if (fIsDeactivated)
@@ -159,7 +159,7 @@ int JackDebugClient::Activate()
 
 int JackDebugClient::Deactivate()
 {
-	CheckClient();
+    CheckClient();
     int res = fClient->Deactivate();
     fIsDeactivated++;
     if (fIsActivated == 0)
@@ -176,7 +176,7 @@ int JackDebugClient::Deactivate()
 
 int JackDebugClient::PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
-	CheckClient();
+    CheckClient();
     int res = fClient->PortRegister(port_name, port_type, flags, buffer_size);
     if (res <= 0) {
         *fStream << "Client '" << fClientName << "' try port register ('" << port_name << "') and server return error  " << res << " ." << endl;
@@ -198,7 +198,7 @@ int JackDebugClient::PortRegister(const char* port_name, const char* port_type, 
 
 int JackDebugClient::PortUnRegister(jack_port_id_t port_index)
 {
-	CheckClient();
+    CheckClient();
     int res = fClient->PortUnRegister(port_index);
     fOpenPortNumber--;
     int i;
@@ -220,7 +220,7 @@ int JackDebugClient::PortUnRegister(jack_port_id_t port_index)
 
 int JackDebugClient::PortConnect(const char* src, const char* dst)
 {
-	CheckClient();
+    CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! Trying to connect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
     int i;
@@ -250,7 +250,7 @@ int JackDebugClient::PortConnect(const char* src, const char* dst)
 
 int JackDebugClient::PortDisconnect(const char* src, const char* dst)
 {
-	CheckClient();
+    CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! Trying to disconnect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
     int res = fClient->PortDisconnect( src, dst);
@@ -279,8 +279,8 @@ int JackDebugClient::PortDisconnect(const char* src, const char* dst)
 }
 
 int JackDebugClient::PortConnect(jack_port_id_t src, jack_port_id_t dst)
-{	
-	CheckClient();
+{
+    CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! : Trying to connect port  " << src << " to  " << dst << " while the client has not been activated !" << endl;
     int res = fClient->PortConnect(src, dst);
@@ -310,7 +310,7 @@ int JackDebugClient::PortConnect(jack_port_id_t src, jack_port_id_t dst)
 
 int JackDebugClient::PortDisconnect(jack_port_id_t src)
 {
-	CheckClient();
+    CheckClient();
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! : Trying to disconnect port  " << src << " while that client has not been activated !" << endl;
     int res = fClient->PortDisconnect(src);
@@ -334,7 +334,7 @@ int JackDebugClient::PortDisconnect(jack_port_id_t src)
 
 int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 {
-	CheckClient();
+    CheckClient();
     return fClient->PortIsMine(port_index);
 }
 
@@ -344,13 +344,13 @@ int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 
 int JackDebugClient::SetBufferSize(jack_nframes_t buffer_size)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetBufferSize(buffer_size);
 }
 
 int JackDebugClient::SetFreeWheel(int onoff)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetFreeWheel(onoff);
 }
 
@@ -372,61 +372,61 @@ void JackDebugClient::ShutDown()
 
 int JackDebugClient::ReleaseTimebase()
 {
-	CheckClient();
+    CheckClient();
     return fClient->ReleaseTimebase();
 }
 
 int JackDebugClient::SetSyncCallback(JackSyncCallback sync_callback, void* arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetSyncCallback(sync_callback, arg);
 }
 
 int JackDebugClient::SetSyncTimeout(jack_time_t timeout)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetSyncTimeout(timeout);
 }
 
 int JackDebugClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetTimebaseCallback( conditional, timebase_callback, arg);
 }
 
 int JackDebugClient::TransportLocate(jack_nframes_t frame)
 {
-	CheckClient();
+    CheckClient();
     return fClient->TransportLocate(frame);
 }
 
 jack_transport_state_t JackDebugClient::TransportQuery(jack_position_t* pos)
 {
-	CheckClient();
+    CheckClient();
     return fClient->TransportQuery(pos);
 }
 
 jack_nframes_t JackDebugClient::GetCurrentTransportFrame()
 {
-	CheckClient();
+    CheckClient();
     return fClient->GetCurrentTransportFrame();
 }
 
 int JackDebugClient::TransportReposition(jack_position_t* pos)
 {
-	CheckClient();
+    CheckClient();
     return fClient->TransportReposition(pos);
 }
 
 void JackDebugClient::TransportStart()
 {
-	CheckClient();
+    CheckClient();
     fClient->TransportStart();
 }
 
 void JackDebugClient::TransportStop()
 {
-	CheckClient();
+    CheckClient();
     fClient->TransportStop();
 }
 
@@ -436,112 +436,112 @@ void JackDebugClient::TransportStop()
 
 void JackDebugClient::OnShutdown(JackShutdownCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     fClient->OnShutdown(callback, arg);
 }
 
 int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
 {
-	JackDebugClient* client = (JackDebugClient*)arg;
-	jack_time_t t1 = GetMicroSeconds(); 
-	int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
-	jack_time_t t2 = GetMicroSeconds(); 
-	long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
-	if (delta > 0) 
-		*client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
-	return res;
+    JackDebugClient* client = (JackDebugClient*)arg;
+    jack_time_t t1 = GetMicroSeconds();
+    int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
+    jack_time_t t2 = GetMicroSeconds();
+    long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
+    if (delta > 0)
+        *client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
+    return res;
 }
 
 int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 {
-	CheckClient();
-	fProcessTimeCallback = callback;
-	fProcessTimeCallbackArg = arg;
-	return  fClient->SetProcessCallback(TimeCallback, this);
+    CheckClient();
+    fProcessTimeCallback = callback;
+    fProcessTimeCallbackArg = arg;
+    return  fClient->SetProcessCallback(TimeCallback, this);
 }
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetXRunCallback(callback, arg);
 }
 
 int JackDebugClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetInitCallback(callback, arg);
 }
 
 int JackDebugClient::SetGraphOrderCallback(JackGraphOrderCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetGraphOrderCallback(callback, arg);
 }
 
 int JackDebugClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetBufferSizeCallback(callback, arg);
 }
 
 int JackDebugClient::SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetClientRegistrationCallback(callback, arg);
 }
 
 int JackDebugClient::SetFreewheelCallback(JackFreewheelCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetFreewheelCallback(callback, arg);
 }
 
 int JackDebugClient::SetPortRegistrationCallback(JackPortRegistrationCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetPortRegistrationCallback(callback, arg);
 }
 
 int JackDebugClient::SetPortConnectCallback(JackPortConnectCallback callback, void *arg)
 {
-	CheckClient();
+    CheckClient();
     return fClient->SetPortConnectCallback(callback, arg);
 }
 
 JackClientControl* JackDebugClient::GetClientControl() const
 {
-	CheckClient();
+    CheckClient();
     return fClient->GetClientControl();
 }
 
 // Internal clients
 char* JackDebugClient::GetInternalClientName(int ref)
 {
-	CheckClient();
+    CheckClient();
     return fClient->GetInternalClientName(ref);
 }
 
 int JackDebugClient::InternalClientHandle(const char* client_name, jack_status_t* status)
 {
-	CheckClient();
+    CheckClient();
     return fClient->InternalClientHandle(client_name, status);
 }
 
 int JackDebugClient::InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va)
 {
-	CheckClient();
+    CheckClient();
     return fClient->InternalClientLoad(client_name, options, status, va);
 }
 
 void JackDebugClient::InternalClientUnload(int ref, jack_status_t* status)
 {
-	CheckClient();
+    CheckClient();
     fClient->InternalClientUnload(ref, status);
 }
-		
+
 jack_nframes_t JackDebugClient::Wait(int status)
 {
-	CheckClient();
+    CheckClient();
     return fClient->Wait(status);
 }
 

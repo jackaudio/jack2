@@ -18,7 +18,7 @@ This program is free software; you can redistribute it and/or modify
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -32,9 +32,9 @@ This program is free software; you can redistribute it and/or modify
 #include "JackTools.h"
 
 #ifdef WIN32
-	#define	EXPORT __declspec(dllexport)
+#define	EXPORT __declspec(dllexport)
 #else
-	#define	EXPORT
+#define	EXPORT
 #endif
 
 #ifdef __cplusplus
@@ -58,10 +58,10 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
-	JackClient* client;
-	char client_name[JACK_CLIENT_NAME_SIZE];
-	
-	JackTools::RewriteName(ext_client_name, client_name); 
+    JackClient* client;
+    char client_name[JACK_CLIENT_NAME_SIZE];
+
+    JackTools::RewriteName(ext_client_name, client_name);
 
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */
@@ -86,26 +86,26 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     }
 
     if (!JackServerGlobals::Init()) { // jack server initialisation
-		int my_status1 = (JackFailure | JackServerError);
+        int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
-		return NULL;
-	}
+        return NULL;
+    }
 
 #ifndef WIN32
-	char* jack_debug = getenv("JACK_CLIENT_DEBUG");
-	if (jack_debug && strcmp(jack_debug, "on") == 0)
-		client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
-	else
-		client = new JackInternalClient(JackServer::fInstance, GetSynchroTable()); 
+    char* jack_debug = getenv("JACK_CLIENT_DEBUG");
+    if (jack_debug && strcmp(jack_debug, "on") == 0)
+        client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
+    else
+        client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
 #else
-	client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
-#endif 
+    client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
+#endif
 
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
-		int my_status1 = (JackFailure | JackServerError);
+        int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     } else {
@@ -121,11 +121,11 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
         jack_error("jack_client_close called with a NULL client");
         return -1;
     } else {
-		int res = client->Close();
-		delete client;
-		JackLog("jack_client_close OK\n");
-		JackServerGlobals::Destroy();	// jack server destruction
-		return res;
-	}
+        int res = client->Close();
+        delete client;
+        JackLog("jack_client_close OK\n");
+        JackServerGlobals::Destroy();	// jack server destruction
+        return res;
+    }
 }
 

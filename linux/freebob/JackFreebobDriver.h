@@ -67,7 +67,7 @@ class JackFreebobDriver : public JackAudioDriver
 
         void jack_driver_init (jack_driver_t *driver);
         void jack_driver_nt_init (jack_driver_nt_t * driver);
- 
+
     public:
 
         JackFreebobDriver(const char* name, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, engine, table)

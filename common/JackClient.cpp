@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -49,10 +49,10 @@ JackClient::JackClient(JackSynchro** table)
     fShutdown = NULL;
     fInit = NULL;
     fBufferSize = NULL;
-	fClientRegistration = NULL;
+    fClientRegistration = NULL;
     fFreewheel = NULL;
     fPortRegistration = NULL;
-	fPortConnect = NULL;
+    fPortConnect = NULL;
     fSync = NULL;
     fProcessArg = NULL;
     fGraphOrderArg = NULL;
@@ -63,10 +63,10 @@ JackClient::JackClient(JackSynchro** table)
     fFreewheelArg = NULL;
     fClientRegistrationArg = NULL;
     fPortRegistrationArg = NULL;
-	fPortConnectArg = NULL;
+    fPortConnectArg = NULL;
     fSyncArg = NULL;
-	fThreadFun = NULL;
-	fThreadFunArg = NULL;
+    fThreadFun = NULL;
+    fThreadFunArg = NULL;
     fConditionnal = 0; // Temporary??
 }
 
@@ -106,12 +106,12 @@ void JackClient::SetupDriverSync(bool freewheel)
 {
     if (!freewheel && !GetEngineControl()->fSyncMode) {
         JackLog("JackClient::SetupDriverSync driver sem in flush mode\n");
-		fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
+        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(true);
         fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(true);
     } else {
         JackLog("JackClient::SetupDriverSync driver sem in normal mode\n");
-		fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(false);
+        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(false);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(false);
         fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(false);
     }
@@ -123,7 +123,7 @@ void JackClient::SetupDriverSync(bool freewheel)
 
 int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
- 	return 0;
+    return 0;
 }
 
 int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
@@ -135,17 +135,17 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
         case kAddClient:
             res = ClientNotifyImp(refnum, name, notify, sync, value1, value2);
-			break;
-			
-	   case kRemoveClient:
+            break;
+
+        case kRemoveClient:
             res = ClientNotifyImp(refnum, name, notify, sync, value1, value2);
-			break;
-			
-		case kActivateClient:
-			JackLog("JackClient::kActivateClient name = %s ref = %ld \n", name, refnum);
-			Init();
-			break;
-	}
+            break;
+
+        case kActivateClient:
+            JackLog("JackClient::kActivateClient name = %s ref = %ld \n", name, refnum);
+            Init();
+            break;
+    }
 
     /*
     The current semantic is that notifications can only be received when the client has been activated,
@@ -154,18 +154,18 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
     if (IsActive()) {
 
         switch (notify) {
-		
-			case kAddClient:
-				JackLog("JackClient::kAddClient fName = %s name = %s\n", GetClientControl()->fName, name);
-				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
-					fClientRegistration(name, 1, fClientRegistrationArg);
-				break;
-			
-			case kRemoveClient:
-				JackLog("JackClient::kRemoveClient fName = %s name = %s\n", GetClientControl()->fName, name);
-				if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
-					fClientRegistration(name, 0, fClientRegistrationArg);
-				break;
+
+            case kAddClient:
+                JackLog("JackClient::kAddClient fName = %s name = %s\n", GetClientControl()->fName, name);
+                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
+                    fClientRegistration(name, 1, fClientRegistrationArg);
+                break;
+
+            case kRemoveClient:
+                JackLog("JackClient::kRemoveClient fName = %s name = %s\n", GetClientControl()->fName, name);
+                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
+                    fClientRegistration(name, 0, fClientRegistrationArg);
+                break;
 
             case kBufferSizeCallback:
                 JackLog("JackClient::kBufferSizeCallback buffer_size = %ld\n", value1);
@@ -206,14 +206,14 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 if (fPortRegistration)
                     fPortRegistration(value1, 0, fPortRegistrationArg);
                 break;
-				
-			case kPortConnectCallback:
+
+            case kPortConnectCallback:
                 JackLog("JackClient::kPortConnectCallback src = %ld dst = %ld\n", value1, value2);
                 if (fPortConnect)
                     fPortConnect(value1, value2, 1, fPortConnectArg);
                 break;
-				
-			case kPortDisconnectCallback:
+
+            case kPortDisconnectCallback:
                 JackLog("JackClient::kPortDisconnectCallback src = %ld dst = %ld\n", value1, value2);
                 if (fPortConnect)
                     fPortConnect(value1, value2, 0, fPortConnectArg);
@@ -224,14 +224,14 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 if (fXrun)
                     res = fXrun(fXrunArg);
                 break;
-		}
+        }
     }
 
     return res;
 }
 
 /*!
-\brief We need to start thread before activating in the server, otherwise the FW driver 
+\brief We need to start thread before activating in the server, otherwise the FW driver
 	   connected to the client may not be activated.
 */
 int JackClient::Activate()
@@ -240,18 +240,18 @@ int JackClient::Activate()
     if (IsActive())
         return 0;
 
-/* TODO : solve WIN32 thread Kill issue
-#ifdef WIN32
-	// Done first so that the RT thread then access an allocated synchro
-	if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(GetClientControl()->fName)) {
-        jack_error("Cannot ConnectSemaphore %s client", GetClientControl()->fName);
-        return -1;
-    }
-#endif
-*/
+    /* TODO : solve WIN32 thread Kill issue
+    #ifdef WIN32
+    	// Done first so that the RT thread then access an allocated synchro
+    	if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(GetClientControl()->fName)) {
+            jack_error("Cannot ConnectSemaphore %s client", GetClientControl()->fName);
+            return -1;
+        }
+    #endif
+    */
 
-	if (StartThread() < 0)
-		return -1;
+    if (StartThread() < 0)
+        return -1;
 
     int result = -1;
     fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
@@ -284,15 +284,15 @@ int JackClient::Deactivate()
     JackLog("JackClient::Deactivate res = %ld \n", result);
     // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
 
-/* TODO : solve WIN32 thread Kill issue    
-#ifdef WIN32
-	fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
-	fThread->Stop();
-#else
-	fThread->Kill();
-#endif
-*/
-	fThread->Kill();
+    /* TODO : solve WIN32 thread Kill issue
+    #ifdef WIN32
+    	fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
+    	fThread->Stop();
+    #else
+    	fThread->Kill();
+    #endif
+    */
+    fThread->Kill();
     return result;
 }
 
@@ -307,7 +307,7 @@ bool JackClient::Init()
 {
     if (fInit) {
         JackLog("JackClient::Init calling client thread init callback\n");
-		fInit(fInitArg);
+        fInit(fInitArg);
     }
     return true;
 }
@@ -341,53 +341,53 @@ int JackClient::StartThread()
 */
 bool JackClient::Execute()
 {
-	if (fThreadFun) {
-		fThreadFun(fThreadFunArg);
-	} else {
-		if (WaitFirstSync())
-			ExecuteThread();
-	}
-	return false; // Never reached
+    if (fThreadFun) {
+        fThreadFun(fThreadFunArg);
+    } else {
+        if (WaitFirstSync())
+            ExecuteThread();
+    }
+    return false; // Never reached
 }
 
 inline bool JackClient::WaitFirstSync()
 {
-	while (true) {
-		// Start first cycle
-		WaitSync();
-		if (IsActive()) {
-			CallSyncCallback();
-			// Finish first cycle
-			if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
-				return false;
-			return true;
-		} else {
-			JackLog("Process called for an inactive client\n");
-		}
-		SignalSync();
-	}
-	return false; // Never reached
+    while (true) {
+        // Start first cycle
+        WaitSync();
+        if (IsActive()) {
+            CallSyncCallback();
+            // Finish first cycle
+            if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
+                return false;
+            return true;
+        } else {
+            JackLog("Process called for an inactive client\n");
+        }
+        SignalSync();
+    }
+    return false; // Never reached
 }
 
 inline void JackClient::ExecuteThread()
 {
-	while (true) { 
-		if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
-			return;
-	}
+    while (true) {
+        if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
+            return;
+    }
 }
 
 jack_nframes_t JackClient::Wait(int status)
 {
-	if (status == 0)
-		CallTimebaseCallback();
-	SignalSync();
-	if (status != 0) 
-		return End();
-	if (!WaitSync()) 
-		return Error();
-	CallSyncCallback();
-	return GetEngineControl()->fBufferSize;
+    if (status == 0)
+        CallTimebaseCallback();
+    SignalSync();
+    if (status != 0)
+        return End();
+    if (!WaitSync())
+        return Error();
+    CallSyncCallback();
+    return GetEngineControl()->fBufferSize;
 }
 
 /*
@@ -400,19 +400,19 @@ jack_nframes_t JackClient::Wait(int status)
 
 jack_nframes_t JackClient::CycleWait()
 {
-	if (!WaitSync()) 
-		return Error();
-	CallSyncCallback();
-	return GetEngineControl()->fBufferSize;
+    if (!WaitSync())
+        return Error();
+    CallSyncCallback();
+    return GetEngineControl()->fBufferSize;
 }
 
 int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
 {
-	if (IsActive()) {
+    if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		fThreadFun = fun;
+        fThreadFun = fun;
         fThreadFunArg = arg;
         return 0;
     }
@@ -420,32 +420,32 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
 
 void JackClient::CycleSignal(int status)
 {
-	if (status == 0)
-		CallTimebaseCallback();
-	SignalSync();
-	if (status != 0) 
-		End();
+    if (status == 0)
+        CallTimebaseCallback();
+    SignalSync();
+    if (status != 0)
+        End();
 }
 
 inline int JackClient::CallProcessCallback()
 {
-	return (fProcess != NULL) ? fProcess(GetEngineControl()->fBufferSize, fProcessArg) : 0;
+    return (fProcess != NULL) ? fProcess(GetEngineControl()->fBufferSize, fProcessArg) : 0;
 }
 
 inline bool JackClient::WaitSync()
 {
-	// Suspend itself: wait on the input synchro
+    // Suspend itself: wait on the input synchro
     if (GetGraphManager()->SuspendRefNum(GetClientControl(), fSynchroTable, 0x7FFFFFFF) < 0) {
-       jack_error("SuspendRefNum error");
-		return false;
-	} else {
-		return true;
-	}
+        jack_error("SuspendRefNum error");
+        return false;
+    } else {
+        return true;
+    }
 }
 
 inline void JackClient::SignalSync()
 {
-	// Resume: signal output clients connected to the running client
+    // Resume: signal output clients connected to the running client
     if (GetGraphManager()->ResumeRefNum(GetClientControl(), fSynchroTable) < 0) {
         jack_error("ResumeRefNum error");
     }
@@ -453,27 +453,27 @@ inline void JackClient::SignalSync()
 
 inline int JackClient::End()
 {
-	JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
-	// Hum... not sure about this, the following "close" code is called in the RT thread...
-	int result;
-	fThread->DropRealTime();
-	GetClientControl()->fActive = false;
-	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
+    JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
+    // Hum... not sure about this, the following "close" code is called in the RT thread...
+    int result;
+    fThread->DropRealTime();
+    GetClientControl()->fActive = false;
+    fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     fThread->Terminate();
-	return 0; // Never reached
+    return 0; // Never reached
 }
 
 inline int JackClient::Error()
 {
-	jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
-	// Hum... not sure about this, the following "close" code is called in the RT thread...
-	int result;
+    jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
+    // Hum... not sure about this, the following "close" code is called in the RT thread...
+    int result;
     fThread->DropRealTime();
-	GetClientControl()->fActive = false;
-	fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
+    GetClientControl()->fActive = false;
+    fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     ShutDown();
-	fThread->Terminate();
-	return 0; // Never reached
+    fThread->Terminate();
+    return 0; // Never reached
 }
 
 //-----------------
@@ -523,7 +523,7 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 int JackClient::PortUnRegister(jack_port_id_t port_index)
 {
     JackLog("JackClient::PortUnRegister port_index = %ld\n", port_index);
-  	list<jack_port_id_t>::iterator it = find(fPortList.begin(), fPortList.end(), port_index);
+    list<jack_port_id_t>::iterator it = find(fPortList.begin(), fPortList.end(), port_index);
 
     if (it != fPortList.end()) {
         fPortList.erase(it);
@@ -824,7 +824,7 @@ int JackClient::SetXRunCallback(JackXRunCallback callback, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		GetClientControl()->fCallback[kXRunCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kXRunCallback] = (callback != NULL);
         fXrunArg = arg;
         fXrun = callback;
         return 0;
@@ -851,7 +851,7 @@ int JackClient::SetGraphOrderCallback(JackGraphOrderCallback callback, void *arg
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		GetClientControl()->fCallback[kGraphOrderCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kGraphOrderCallback] = (callback != NULL);
         fGraphOrder = callback;
         fGraphOrderArg = arg;
         return 0;
@@ -864,7 +864,7 @@ int JackClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void *arg
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		GetClientControl()->fCallback[kBufferSizeCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kBufferSizeCallback] = (callback != NULL);
         fBufferSizeArg = arg;
         fBufferSize = callback;
         return 0;
@@ -877,8 +877,8 @@ int JackClient::SetClientRegistrationCallback(JackClientRegistrationCallback cal
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		// kAddClient and kRemoveClient notifications must be delivered by the server in any case
-		fClientRegistrationArg = arg;
+        // kAddClient and kRemoveClient notifications must be delivered by the server in any case
+        fClientRegistrationArg = arg;
         fClientRegistration = callback;
         return 0;
     }
@@ -890,8 +890,8 @@ int JackClient::SetFreewheelCallback(JackFreewheelCallback callback, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		GetClientControl()->fCallback[kStartFreewheelCallback] = (callback != NULL);
-		GetClientControl()->fCallback[kStopFreewheelCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kStartFreewheelCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kStopFreewheelCallback] = (callback != NULL);
         fFreewheelArg = arg;
         fFreewheel = callback;
         return 0;
@@ -904,8 +904,8 @@ int JackClient::SetPortRegistrationCallback(JackPortRegistrationCallback callbac
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		GetClientControl()->fCallback[kPortRegistrationOnCallback] = (callback != NULL);
-		GetClientControl()->fCallback[kPortRegistrationOffCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kPortRegistrationOnCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kPortRegistrationOffCallback] = (callback != NULL);
         fPortRegistrationArg = arg;
         fPortRegistration = callback;
         return 0;
@@ -918,8 +918,8 @@ int JackClient::SetPortConnectCallback(JackPortConnectCallback callback, void *a
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-		GetClientControl()->fCallback[kPortConnectCallback] = (callback != NULL);
-		GetClientControl()->fCallback[kPortDisconnectCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kPortConnectCallback] = (callback != NULL);
+        GetClientControl()->fCallback[kPortDisconnectCallback] = (callback != NULL);
         fPortConnectArg = arg;
         fPortConnect = callback;
         return 0;
@@ -932,62 +932,62 @@ int JackClient::SetPortConnectCallback(JackPortConnectCallback callback, void *a
 
 char* JackClient::GetInternalClientName(int ref)
 {
-	char name_res[JACK_CLIENT_NAME_SIZE]; 
-	int result = -1;
-	fChannel->GetInternalClientName(GetClientControl()->fRefNum, ref, name_res, &result);
-	
-	if (result < 0) {
-		return NULL;
-	} else {
-		char* name = (char*)malloc(strlen(name_res));
-		strcpy(name, name_res);
-		return name;
-	}
+    char name_res[JACK_CLIENT_NAME_SIZE];
+    int result = -1;
+    fChannel->GetInternalClientName(GetClientControl()->fRefNum, ref, name_res, &result);
+
+    if (result < 0) {
+        return NULL;
+    } else {
+        char* name = (char*)malloc(strlen(name_res));
+        strcpy(name, name_res);
+        return name;
+    }
 }
 
 int JackClient::InternalClientHandle(const char* client_name, jack_status_t* status)
 {
-	int int_ref, result = -1;
-	fChannel->InternalClientHandle(GetClientControl()->fRefNum, client_name, (int*)status, &int_ref, &result);
-	return int_ref;
+    int int_ref, result = -1;
+    fChannel->InternalClientHandle(GetClientControl()->fRefNum, client_name, (int*)status, &int_ref, &result);
+    return int_ref;
 }
 
 int JackClient::InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va)
 {
-	if (strlen(client_name) >= JACK_CLIENT_NAME_SIZE) {
-		jack_error ("\"%s\" is too long for a JACK client name.\n"
-			    "Please use %lu characters or less.",
-			    client_name, JACK_CLIENT_NAME_SIZE);
-		return 0;
-	}
+    if (strlen(client_name) >= JACK_CLIENT_NAME_SIZE) {
+        jack_error ("\"%s\" is too long for a JACK client name.\n"
+                    "Please use %lu characters or less.",
+                    client_name, JACK_CLIENT_NAME_SIZE);
+        return 0;
+    }
 
-	if (va->load_name && (strlen(va->load_name) >= PATH_MAX)) {
-		jack_error("\"%s\" is too long for a shared object name.\n"
-			     "Please use %lu characters or less.",
-			    va->load_name, PATH_MAX);
-		int my_status1 = *status | (JackFailure | JackInvalidOption);
-		*status = (jack_status_t)my_status1;
-		return 0;
-	}
+    if (va->load_name && (strlen(va->load_name) >= PATH_MAX)) {
+        jack_error("\"%s\" is too long for a shared object name.\n"
+                   "Please use %lu characters or less.",
+                   va->load_name, PATH_MAX);
+        int my_status1 = *status | (JackFailure | JackInvalidOption);
+        *status = (jack_status_t)my_status1;
+        return 0;
+    }
 
-	if (va->load_init && (strlen(va->load_init) >= JACK_LOAD_INIT_LIMIT)) {
-		jack_error ("\"%s\" is too long for internal client init "
-			    "string.\nPlease use %lu characters or less.",
-			    va->load_init, JACK_LOAD_INIT_LIMIT);
-		int my_status1 = *status | (JackFailure | JackInvalidOption);
-		*status = (jack_status_t)my_status1;
-		return 0;
-	}
-	
-	int int_ref, result = -1;
-	fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, &result);
-	return int_ref;
+    if (va->load_init && (strlen(va->load_init) >= JACK_LOAD_INIT_LIMIT)) {
+        jack_error ("\"%s\" is too long for internal client init "
+                    "string.\nPlease use %lu characters or less.",
+                    va->load_init, JACK_LOAD_INIT_LIMIT);
+        int my_status1 = *status | (JackFailure | JackInvalidOption);
+        *status = (jack_status_t)my_status1;
+        return 0;
+    }
+
+    int int_ref, result = -1;
+    fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, &result);
+    return int_ref;
 }
 
 void JackClient::InternalClientUnload(int ref, jack_status_t* status)
 {
-	int result = -1;
-	fChannel->InternalClientUnload(GetClientControl()->fRefNum, ref, (int*)status, &result);
+    int result = -1;
+    fChannel->InternalClientUnload(GetClientControl()->fRefNum, ref, (int*)status, &result);
 }
 
 

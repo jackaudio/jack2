@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -70,15 +70,15 @@ int JackDriver::Open()
 {
     int refnum = -1;
 
-	if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
+    if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for audio driver");
         return -1;
     }
 
     fClientControl->fRefNum = refnum;
-    fClientControl->fActive = true;	
-	fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
-	SetupDriverSync(fClientControl->fRefNum, false);
+    fClientControl->fActive = true;
+    fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
+    SetupDriverSync(fClientControl->fRefNum, false);
     return 0;
 }
 
@@ -104,7 +104,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     }
 
     fClientControl->fRefNum = refnum;
-    fClientControl->fActive = true;	
+    fClientControl->fActive = true;
     fEngineControl->fBufferSize = nframes;
     fEngineControl->fSampleRate = samplerate;
     fCaptureLatency = capture_latency;
@@ -122,7 +122,7 @@ int JackDriver::Open(jack_nframes_t nframes,
 
     fGraphManager->SetBufferSize(nframes);
     fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
-	SetupDriverSync(fClientControl->fRefNum, false);
+    SetupDriverSync(fClientControl->fRefNum, false);
     return 0;
 }
 
@@ -141,31 +141,31 @@ int JackDriver::Close()
 */
 void JackDriver::SetupDriverSync(int ref, bool freewheel)
 {
-	if (!freewheel && !fEngineControl->fSyncMode) {
+    if (!freewheel && !fEngineControl->fSyncMode) {
         JackLog("JackDriver::SetupDriverSync driver sem in flush mode\n");
         fSynchroTable[ref]->SetFlush(true);
     } else {
         JackLog("JackDriver::SetupDriverSync driver sem in normal mode\n");
         fSynchroTable[ref]->SetFlush(false);
-	}
+    }
 }
 
 int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
-	switch (notify) {
-	
-		case kStartFreewheelCallback:
-			JackLog("JackDriver::kStartFreewheel\n");
-			SetupDriverSync(fClientControl->fRefNum, true);
-			break;
-	
-		case kStopFreewheelCallback:
-			JackLog("JackDriver::kStopFreewheel\n");
-			SetupDriverSync(fClientControl->fRefNum, false);
-			break;
-	}
+    switch (notify) {
 
-	return 0;
+        case kStartFreewheelCallback:
+            JackLog("JackDriver::kStartFreewheel\n");
+            SetupDriverSync(fClientControl->fRefNum, true);
+            break;
+
+        case kStopFreewheelCallback:
+            JackLog("JackDriver::kStopFreewheel\n");
+            SetupDriverSync(fClientControl->fRefNum, false);
+            break;
+    }
+
+    return 0;
 }
 
 bool JackDriver::IsRealTime()
@@ -205,14 +205,14 @@ void JackDriverClient::RemoveSlave(JackDriverInterface* slave)
 
 int JackDriverClient::ProcessSlaves()
 {
-	int res = 0;
+    int res = 0;
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
         if (slave->Process() < 0)
-			res = -1;
+            res = -1;
     }
-	return res;
+    return res;
 }
 
 } // end of namespace

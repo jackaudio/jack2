@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2006 Grame  
+Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -96,13 +96,13 @@ int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which
 
 int JackWinNamedPipeClient::Close()
 {
-	if (fNamedPipe != INVALID_HANDLE_VALUE) {
-		CloseHandle(fNamedPipe);
-		fNamedPipe = INVALID_HANDLE_VALUE;
-		return 0;
-	} else {
-		return -1;
-	}
+    if (fNamedPipe != INVALID_HANDLE_VALUE) {
+        CloseHandle(fNamedPipe);
+        fNamedPipe = INVALID_HANDLE_VALUE;
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 void JackWinNamedPipeClient::SetReadTimeOut(long sec)
@@ -244,7 +244,7 @@ int JackWinNamedPipeServer::Bind(const char* dir, int which)
 int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-	JackLog("Bind: fName %s\n", fName);
+    JackLog("Bind: fName %s\n", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX,  // read/write access
@@ -281,10 +281,10 @@ bool JackWinNamedPipeServer::Accept()
 JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {
-		JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe);
-		// Init the pipe to the default value
+        JackWinNamedPipeClient* client = new JackWinNamedPipeClient(fNamedPipe);
+        // Init the pipe to the default value
         fNamedPipe = INVALID_HANDLE_VALUE;
-		return client;
+        return client;
     } else {
         switch (GetLastError()) {
 
@@ -301,16 +301,16 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 
 int JackWinNamedPipeServer::Close()
 {
-	JackLog("JackWinNamedPipeServer::Close\n");
+    JackLog("JackWinNamedPipeServer::Close\n");
 
-	if (fNamedPipe != INVALID_HANDLE_VALUE) {
-		DisconnectNamedPipe(fNamedPipe);
-		CloseHandle(fNamedPipe);
-		fNamedPipe = INVALID_HANDLE_VALUE;
-		return 0;
-	} else {
-		return -1;
-	}
+    if (fNamedPipe != INVALID_HANDLE_VALUE) {
+        DisconnectNamedPipe(fNamedPipe);
+        CloseHandle(fNamedPipe);
+        fNamedPipe = INVALID_HANDLE_VALUE;
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 // Server side

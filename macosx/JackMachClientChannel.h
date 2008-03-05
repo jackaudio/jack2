@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -53,11 +53,11 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
 
         int Start();
         void Stop();
-		
-		int ServerCheck(const char* server_name);
-    
+
+        int ServerCheck(const char* server_name);
+
         void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
-		void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int* result);
@@ -77,14 +77,14 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
 
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);
-		
-		void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result);
-		void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result);
-		void InternalClientLoad(int refnum, const char* client_name,  const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result);
-		void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
-    
-		// JackRunnableInterface interface
-		bool Execute();
+
+        void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result);
+        void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result);
+        void InternalClientLoad(int refnum, const char* client_name,  const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result);
+        void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
+
+        // JackRunnableInterface interface
+        bool Execute();
 };
 
 

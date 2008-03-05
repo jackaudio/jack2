@@ -25,20 +25,21 @@
 #include "types.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-int JACK_is_realtime(jack_client_t *client);
-int JACK_client_create_thread(jack_client_t *client, pthread_t *thread, int priority, int realtime, void *(*start_routine)(void*), void *arg);
+    int JACK_is_realtime(jack_client_t *client);
+    int JACK_client_create_thread(jack_client_t *client, pthread_t *thread, int priority, int realtime, void *(*start_routine)(void*), void *arg);
 
-jack_port_t* JACK_port_register(jack_client_t *client, const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size);
-int JACK_port_unregister(jack_client_t *, jack_port_t*);
-void* JACK_port_get_buffer(jack_port_t*, jack_nframes_t);
-int JACK_port_set_alias(jack_port_t* port, const char* name);
+    jack_port_t* JACK_port_register(jack_client_t *client, const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size);
+    int JACK_port_unregister(jack_client_t *, jack_port_t*);
+    void* JACK_port_get_buffer(jack_port_t*, jack_nframes_t);
+    int JACK_port_set_alias(jack_port_t* port, const char* name);
 
-jack_nframes_t JACK_get_sample_rate(jack_client_t *);
-jack_nframes_t JACK_frame_time(jack_client_t *);
-jack_nframes_t JACK_last_frame_time(jack_client_t *);
+    jack_nframes_t JACK_get_sample_rate(jack_client_t *);
+    jack_nframes_t JACK_frame_time(jack_client_t *);
+    jack_nframes_t JACK_last_frame_time(jack_client_t *);
 
 #define jack_is_realtime JACK_is_realtime
 #define jack_client_create_thread JACK_client_create_thread

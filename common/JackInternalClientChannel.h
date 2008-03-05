@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,15 +43,15 @@ class JackInternalClientChannel : public JackClientChannelInterface
         {}
         virtual ~JackInternalClientChannel()
         {}
-		
-		// Open the Server/Client connection
+
+        // Open the Server/Client connection
         virtual int Open(const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
         {
             return 0;
         }
 
-		void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
-		{
+        void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+        {
             *result = fEngine->ClientCheck(name, name_res, protocol, options, status);
         }
         void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
@@ -62,14 +62,14 @@ class JackInternalClientChannel : public JackClientChannelInterface
         {
             *result = fEngine->ClientInternalClose(refnum, true);
         }
-		
+
         void ClientActivate(int refnum, int* result)
         {
-    		*result = fEngine->ClientActivate(refnum);
+            *result = fEngine->ClientActivate(refnum);
         }
         void ClientDeactivate(int refnum, int* result)
         {
-     		*result = fEngine->ClientDeactivate(refnum);
+            *result = fEngine->ClientDeactivate(refnum);
         }
 
         void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
@@ -108,7 +108,7 @@ class JackInternalClientChannel : public JackClientChannelInterface
             *result = fServer->SetFreewheel(onoff);
         }
 
-		void ReleaseTimebase(int refnum, int* result)
+        void ReleaseTimebase(int refnum, int* result)
         {
             *result = fServer->ReleaseTimebase(refnum);
         }

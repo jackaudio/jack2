@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -77,7 +77,7 @@ bool JackPortAudioDriver::GetInputDeviceFromName(const char* name, PaDeviceIndex
             *in_max = deviceInfo->maxInputChannels;
             return true;
         }
-	}
+    }
 
     return false;
 }
@@ -155,7 +155,7 @@ static void DisplayDeviceNames()
         */
 
 #ifdef WIN32
-#ifndef PA_NO_ASIO 
+#ifndef PA_NO_ASIO
         /* ASIO specific latency information */
         if (Pa_GetHostApiInfo(deviceInfo->hostApi)->type == paASIO) {
             long minLatency, maxLatency, preferredLatency, granularity;
@@ -278,10 +278,10 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
 
     if (capturing) {
         if (!GetInputDeviceFromName(capture_driver_uid, &fInputDevice, &in_max)) {
-			JackLog("JackPortAudioDriver::GetInputDeviceFromName cannot open %s\n", capture_driver_uid);
+            JackLog("JackPortAudioDriver::GetInputDeviceFromName cannot open %s\n", capture_driver_uid);
             fInputDevice = Pa_GetDefaultInputDevice();
-			if (fInputDevice == paNoDevice)
-				goto error;
+            if (fInputDevice == paNoDevice)
+                goto error;
             deviceInfo = Pa_GetDeviceInfo(fInputDevice);
             in_max = deviceInfo->maxInputChannels;
             capture_driver_uid = strdup(deviceInfo->name);
@@ -296,9 +296,9 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
     if (playing) {
         if (!GetOutputDeviceFromName(playback_driver_uid, &fOutputDevice, &out_max)) {
             JackLog("JackPortAudioDriver::GetOutputDeviceFromName cannot open %s\n", playback_driver_uid);
-			fOutputDevice = Pa_GetDefaultOutputDevice();
-			if (fOutputDevice == paNoDevice)
-				goto error;
+            fOutputDevice = Pa_GetDefaultOutputDevice();
+            if (fOutputDevice == paNoDevice)
+                goto error;
             deviceInfo = Pa_GetDeviceInfo(fOutputDevice);
             out_max = deviceInfo->maxOutputChannels;
             playback_driver_uid = strdup(deviceInfo->name);
@@ -375,7 +375,7 @@ error:
 int JackPortAudioDriver::Close()
 {
     JackAudioDriver::Close();
-	JackLog("JackPortAudioDriver::Close\n");
+    JackLog("JackPortAudioDriver::Close\n");
     Pa_CloseStream(fStream);
     Pa_Terminate();
     return 0;
@@ -431,14 +431,14 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
                         paNoFlag,  // Clipping is on...
                         Render,
                         this);
-						
+
     if (err != paNoError) {
         jack_error("Pa_OpenStream error = %s\n", Pa_GetErrorText(err));
         return -1;
     } else {
         // Only done when success
-		return JackAudioDriver::SetBufferSize(buffer_size); // never fails
-     }
+        return JackAudioDriver::SetBufferSize(buffer_size); // never fails
+    }
 }
 
 } // end of namespace

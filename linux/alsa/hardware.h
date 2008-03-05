@@ -1,6 +1,6 @@
 /*
    Copyright (C) 2001 Paul Davis
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -56,7 +56,7 @@ typedef struct _jack_hardware
     JackHardwareReleaseFunction release;
     JackHardwareGetHardwarePeak get_hardware_peak;
     JackHardwareGetHardwarePower get_hardware_power;
- 	void *private_hw;
+    void *private_hw;
 }
 jack_hardware_t;
 

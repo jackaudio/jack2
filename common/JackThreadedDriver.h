@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2001 Paul Davis 
+ Copyright (C) 2001 Paul Davis
  Copyright (C) 2004-2008 Grame
 
  This program is free software; you can redistribute it and/or modify
@@ -82,8 +82,8 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         {
             return fDriver->Detach();
         }
-		
-		virtual int Read()
+
+        virtual int Read()
         {
             return fDriver->Read();
         }
@@ -99,8 +99,8 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         {
             return fDriver->SetBufferSize(buffer_size);
         }
-		
-		virtual int SetSampleRate(jack_nframes_t sample_rate)
+
+        virtual int SetSampleRate(jack_nframes_t sample_rate)
         {
             return fDriver->SetSampleRate(sample_rate);
         }

@@ -24,27 +24,31 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-static const JackPortType* port_types[] = {
-    &gAudioPortType,
-    &gMidiPortType,
-};
+static const JackPortType* port_types[] =
+    {
+        &gAudioPortType,
+        &gMidiPortType,
+    };
 
-enum { PORT_TYPES_MAX = sizeof(port_types)/sizeof(port_types[0]) };
+enum
+{
+    PORT_TYPES_MAX = sizeof(port_types) / sizeof(port_types[0])
+};
 
 int GetPortTypeId(const char* port_type)
 {
     for (int i = 0; i < PORT_TYPES_MAX; ++i) {
         const JackPortType* type = port_types[i];
-		assert(type != 0);
+        assert(type != 0);
         if (strcmp(port_type, type->name) == 0)
-			return i;
+            return i;
     }
     return -1;
 }
 
 const JackPortType* GetPortType(int type_id)
 {
-	assert(type_id >= 0 && type_id <= PORT_TYPES_MAX);
+    assert(type_id >= 0 && type_id <= PORT_TYPES_MAX);
     const JackPortType* type = port_types[type_id];
     assert(type != 0);
     return type;

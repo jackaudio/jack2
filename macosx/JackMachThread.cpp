@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -157,17 +157,17 @@ int JackMachThread::AcquireRealTime()
     JackLog("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld\n",
             long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
 
-	return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
+    return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
 }
 
 int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
 {
-	SetThreadToPriority(thread, 96, true, period, computation, constraint);
-	UInt64 int_period;
-	UInt64 int_computation;
-	UInt64 int_constraint;
-	GetParams(&int_period, &int_computation, &int_constraint);
-	return 0;
+    SetThreadToPriority(thread, 96, true, period, computation, constraint);
+    UInt64 int_period;
+    UInt64 int_computation;
+    UInt64 int_constraint;
+    GetParams(&int_period, &int_computation, &int_constraint);
+    return 0;
 }
 
 int JackMachThread::DropRealTime()
@@ -177,8 +177,8 @@ int JackMachThread::DropRealTime()
 
 int JackMachThread::DropRealTimeImp(pthread_t thread)
 {
-	SetThreadToPriority(thread, 63, false, 0, 0, 0);
-	return 0;
+    SetThreadToPriority(thread, 63, false, 0, 0, 0);
+    return 0;
 }
 
 void JackMachThread::SetParams(UInt64 period, UInt64 computation, UInt64 constraint)

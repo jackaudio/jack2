@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 
 #include "JackServer.h"
-#include "JackConstants.h" 
+#include "JackConstants.h"
 #include "driver_interface.h"
 #include "JackDriverLoader.h"
 #include "shm.h"
@@ -79,7 +79,7 @@ static void usage (FILE *file)
              "               [ --loopback OR -L loopback-port-number ]\n"
              // "               [ --port-max OR -p maximum-number-of-ports]\n"
              "               [ --verbose OR -v ]\n"
-			 "               [ --replace-registry OR -r ]\n"
+             "               [ --replace-registry OR -r ]\n"
              "               [ --silent OR -s ]\n"
              "               [ --sync OR -S ]\n"
              "               [ --version OR -V ]\n"
@@ -118,7 +118,7 @@ static void intrpt(int signum)
 {
     printf("jack main caught signal %d\n", signum);
     (void) signal(SIGINT, SIG_DFL);
-	SetEvent(waitEvent);
+    SetEvent(waitEvent);
 }
 
 /*
@@ -129,75 +129,75 @@ static char* jack_default_server_name(void)
 		server_name = "default";
 	return server_name;
 }
- 
-// returns the name of the per-user subdirectory of jack_tmpdir 
+
+// returns the name of the per-user subdirectory of jack_tmpdir
 static char* jack_user_dir(void)
 {
 	static char user_dir[PATH_MAX] = "";
- 
-	// format the path name on the first call 
+
+	// format the path name on the first call
 	if (user_dir[0] == '\0') {
 		snprintf (user_dir, sizeof (user_dir), "%s/jack-%d",
 			  jack_tmpdir, _getuid ());
 	}
- 
+
 	return user_dir;
 }
- 
-// returns the name of the per-server subdirectory of jack_user_dir() 
- 
+
+// returns the name of the per-server subdirectory of jack_user_dir()
+
 static char* get_jack_server_dir(const char * toto)
 {
 	static char server_dir[PATH_MAX] = "";
- 
-	// format the path name on the first call 
+
+	// format the path name on the first call
 	if (server_dir[0] == '\0') {
 		snprintf (server_dir, sizeof (server_dir), "%s/%s",
 			  jack_user_dir (), server_name);
 	}
- 
+
 	return server_dir;
 }
- 
+
 static void jack_cleanup_files (const char *server_name)
 {
 	DIR *dir;
 	struct dirent *dirent;
 	char *dir_name = get_jack_server_dir (server_name);
- 
-	// nothing to do if the server directory does not exist 
+
+	// nothing to do if the server directory does not exist
 	if ((dir = opendir (dir_name)) == NULL) {
 		return;
 	}
- 
-	// unlink all the files in this directory, they are mine 
+
+	// unlink all the files in this directory, they are mine
 	while ((dirent = readdir (dir)) != NULL) {
- 
+
 		char fullpath[PATH_MAX];
- 
+
 		if ((strcmp (dirent->d_name, ".") == 0)
 		    || (strcmp (dirent->d_name, "..") == 0)) {
 			continue;
 		}
- 
+
 		snprintf (fullpath, sizeof (fullpath), "%s/%s",
 			  dir_name, dirent->d_name);
- 
+
 		if (unlink (fullpath)) {
 			jack_error ("cannot unlink `%s' (%s)", fullpath,
 				    strerror (errno));
 		}
-	} 
- 
+	}
+
 	closedir (dir);
- 
-	// now, delete the per-server subdirectory, itself 
+
+	// now, delete the per-server subdirectory, itself
 	if (rmdir (dir_name)) {
  		jack_error ("cannot remove `%s' (%s)", dir_name,
 			    strerror (errno));
 	}
- 
-	// finally, delete the per-user subdirectory, if empty 
+
+	// finally, delete the per-user subdirectory, if empty
 	if (rmdir (jack_user_dir ())) {
 		if (errno != ENOTEMPTY) {
 			jack_error ("cannot remove `%s' (%s)",
@@ -208,45 +208,45 @@ static void jack_cleanup_files (const char *server_name)
 */
 
 /*
-BOOL CtrlHandler( DWORD fdwCtrlType ) 
-{ 
-  switch( fdwCtrlType ) 
-  { 
-    // Handle the CTRL-C signal. 
-    case CTRL_C_EVENT: 
+BOOL CtrlHandler( DWORD fdwCtrlType )
+{
+  switch( fdwCtrlType )
+  {
+    // Handle the CTRL-C signal.
+    case CTRL_C_EVENT:
       printf( "Ctrl-C event\n\n" );
-      Beep( 750, 300 ); 
+      Beep( 750, 300 );
 	  SetEvent(waitEvent);
       return( TRUE );
- 
-    // CTRL-CLOSE: confirm that the user wants to exit. 
-    case CTRL_CLOSE_EVENT: 
-      Beep( 600, 200 ); 
+
+    // CTRL-CLOSE: confirm that the user wants to exit.
+    case CTRL_CLOSE_EVENT:
+      Beep( 600, 200 );
       printf( "Ctrl-Close event\n\n" );
 	  SetEvent(waitEvent);
-      return( TRUE ); 
- 
-    // Pass other signals to the next handler. 
-    case CTRL_BREAK_EVENT: 
-      Beep( 900, 200 ); 
+      return( TRUE );
+
+    // Pass other signals to the next handler.
+    case CTRL_BREAK_EVENT:
+      Beep( 900, 200 );
       printf( "Ctrl-Break event\n\n" );
-      return FALSE; 
- 
-    case CTRL_LOGOFF_EVENT: 
-      Beep( 1000, 200 ); 
+      return FALSE;
+
+    case CTRL_LOGOFF_EVENT:
+      Beep( 1000, 200 );
       printf( "Ctrl-Logoff event\n\n" );
-      return FALSE; 
- 
-    case CTRL_SHUTDOWN_EVENT: 
-      Beep( 750, 500 ); 
+      return FALSE;
+
+    case CTRL_SHUTDOWN_EVENT:
+      Beep( 750, 500 );
       printf( "Ctrl-Shutdown event\n\n" );
-      return FALSE; 
- 
-    default: 
-      return FALSE; 
-  } 
-} 
- 
+      return FALSE;
+
+    default:
+      return FALSE;
+  }
+}
+
 */
 
 int main(int argc, char* argv[])
@@ -263,7 +263,7 @@ int main(int argc, char* argv[])
                                        { "name", 0, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
-									   { "replace-registry", 0, 0, 'r' },
+                                       { "replace-registry", 0, 0, 'r' },
                                        { "loopback", 0, 0, 'L' },
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
@@ -281,14 +281,14 @@ int main(int argc, char* argv[])
     JSList * driver_params;
     int driver_nargs = 1;
     int show_version = 0;
-	int replace_registry = 0;
+    int replace_registry = 0;
     int sync = 0;
     int i;
     int rc;
     char c;
 
-	// Creates wait event
-	if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+    // Creates wait event
+    if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
         printf("CreateEvent fails err = %ld\n", GetLastError());
         return 0;
     }
@@ -332,10 +332,10 @@ int main(int argc, char* argv[])
             case 'P':
                 realtime_priority = atoi(optarg);
                 break;
-				
-			case 'r':
-				replace_registry = 1;
-				break;
+
+            case 'r':
+                replace_registry = 1;
+                break;
 
             case 'R':
                 realtime = 1;
@@ -374,21 +374,21 @@ int main(int argc, char* argv[])
     if (!seen_driver) {
         usage (stderr);
         //exit (1);
-		return 0;
+        return 0;
     }
 
     drivers = jack_drivers_load (drivers);
     if (!drivers) {
         fprintf (stderr, "jackdmp: no drivers found; exiting\n");
         //exit (1);
-		return 0;
+        return 0;
     }
 
     driver_desc = jack_find_driver_descriptor (drivers, driver_name);
     if (!driver_desc) {
         fprintf (stderr, "jackdmp: unknown driver '%s'\n", driver_name);
         //exit (1);
-		return 0;
+        return 0;
     }
 
     if (optind < argc) {
@@ -412,8 +412,8 @@ int main(int argc, char* argv[])
 
     if (jack_parse_driver_params (driver_desc, driver_nargs,
                                   driver_args, &driver_params)) {
-       // exit (0);
-		return 0;
+        // exit (0);
+        return 0;
     }
 
     //if (server_name == NULL)
@@ -426,15 +426,15 @@ int main(int argc, char* argv[])
         case EEXIST:
             fprintf (stderr, "`%s' server already active\n", server_name);
             //exit (1);
-			return 0;
+            return 0;
         case ENOSPC:
             fprintf (stderr, "too many servers already active\n");
             //exit (2);
-			return 0;
+            return 0;
         case ENOMEM:
             fprintf (stderr, "no access to shm registry\n");
             //exit (3);
-			return 0;
+            return 0;
         default:
             if (xverbose)
                 fprintf (stderr, "server `%s' registered\n",
@@ -457,29 +457,29 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-	/*
-	if( SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE ) ) 
-	{ 
-		printf( "\nThe Control Handler is installed.\n" ); 
-	} else {
-		printf( "\nERROR: Could not set control handler"); 
-	}
-	*/
-	
-	
-	(void) signal(SIGINT, intrpt);
-	(void) signal(SIGABRT, intrpt);
-	(void) signal(SIGTERM, intrpt);
+    /*
+    if( SetConsoleCtrlHandler( (PHANDLER_ROUTINE) CtrlHandler, TRUE ) ) 
+    { 
+    	printf( "\nThe Control Handler is installed.\n" ); 
+    } else {
+    	printf( "\nERROR: Could not set control handler"); 
+    }
+    */
 
-	if ((res = WaitForSingleObject(waitEvent, INFINITE)) != WAIT_OBJECT_0) {
+
+    (void) signal(SIGINT, intrpt);
+    (void) signal(SIGABRT, intrpt);
+    (void) signal(SIGTERM, intrpt);
+
+    if ((res = WaitForSingleObject(waitEvent, INFINITE)) != WAIT_OBJECT_0) {
         printf("WaitForSingleObject fails err = %ld\n", GetLastError());
     }
-	
-	/*
-    printf("Type 'q' to quit\n");
-    while ((c = getchar()) != 'q') {}
-	*/
-	
+
+    /*
+       printf("Type 'q' to quit\n");
+       while ((c = getchar()) != 'q') {}
+    */
+
 
     JackStop();
 
@@ -487,7 +487,7 @@ int main(int argc, char* argv[])
     //	jack_cleanup_files(server_name);
     jack_unregister_server(server_name);
 
-	CloseHandle(waitEvent);
+    CloseHandle(waitEvent);
     return 1;
 }
 

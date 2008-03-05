@@ -1,5 +1,5 @@
 #ifndef PA_ASIO_H
-#define PA_ASIO_H 
+#define PA_ASIO_H
 /*
  * $Id: pa_asio.h,v 1.1.2.2 2006/06/20 14:44:48 letz Exp $
  * PortAudio Portable Real-Time Audio Library

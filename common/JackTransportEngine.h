@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -37,17 +37,17 @@ typedef enum {
 
 /*!
 \brief The client transport structure.
- 
+
 We have:
- 
+
 	- a "current" position
 	- a "pending" position prepared by the server at each cycle
 	- a "request" position wanted by a client
-	
+
 	At the beginning of a cycle the server needs to select a new current position. When a request and a pending position are available,
-	the resquest takes precedence on the pending one. The server atomically switches to the new position. 
+	the resquest takes precedence on the pending one. The server atomically switches to the new position.
 	The current position can be read by clients.
-	
+
 	We use a JackAtomicArrayState pattern that allows to manage several "next" states independantly.
 */
 

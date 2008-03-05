@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ namespace Jack
 typedef DWORD  (WINAPI *ThreadCallback)(void *arg);
 
 /*!
-\brief Windows threads. 
+\brief Windows threads.
 */
 
 class JackWinThread : public JackThread
@@ -48,22 +48,22 @@ class JackWinThread : public JackThread
 
         JackWinThread(JackRunnableInterface* runnable);
         virtual ~JackWinThread();
-   
+
         int Start();
         int StartSync();
         int Kill();
         int Stop();
-		void Terminate();
+        void Terminate();
 
         int AcquireRealTime();
         int AcquireRealTime(int priority) ;
         int DropRealTime();
 
         pthread_t GetThreadID();
-		
-		static int AcquireRealTimeImp(pthread_t thread, int priority);
-		static int DropRealTimeImp(pthread_t thread);
-		static int StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg);
+
+        static int AcquireRealTimeImp(pthread_t thread, int priority);
+        static int DropRealTimeImp(pthread_t thread);
+        static int StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg);
 
 };
 

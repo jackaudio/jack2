@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,41 +43,41 @@ JackMachClientChannel::~JackMachClientChannel()
 
 int JackMachClientChannel::ServerCheck(const char* server_name)
 {
-	JackLog("JackMachClientChannel::ServerCheck = %s\n", server_name);
-	char jack_server_entry_name[512];
-	snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
-	
+    JackLog("JackMachClientChannel::ServerCheck = %s\n", server_name);
+    char jack_server_entry_name[512];
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+
     // Connect to server
     if (!fServerPort.ConnectPort(jack_server_entry_name)) {
         jack_error("Cannot connect to server Mach port");
         return -1;
     } else {
-		return 0;
-	}
+        return 0;
+    }
 }
 
 int JackMachClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
     JackLog("JackMachClientChannel::Open name = %s\n", name);
-	char jack_server_entry_name[512];
-	snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+    char jack_server_entry_name[512];
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 
     // Connect to server
     if (!fServerPort.ConnectPort(jack_server_entry_name)) {
         jack_error("Cannot connect to server Mach port");
         return -1;
     }
-	
-	// Check name in server
-	int result = 0;
-	ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+
+    // Check name in server
+    int result = 0;
+    ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
-		int status1 = *status;
+        int status1 = *status;
         if (status1 & JackVersionError)
-			jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
+            jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
         else
-			jack_error("Client name = %s conflits with another running client", name);
-		return -1;
+            jack_error("Client name = %s conflits with another running client", name);
+        return -1;
     }
 
     // Prepare local port using client name
@@ -126,7 +126,7 @@ void JackMachClientChannel::Stop()
 
 void JackMachClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
 {
-	kern_return_t res = rpc_jack_client_check(fServerPort.GetPort(), (char*)name, name_res, protocol, options, status, result);
+    kern_return_t res = rpc_jack_client_check(fServerPort.GetPort(), (char*)name, name_res, protocol, options, status, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientCheck err = %s", mach_error_string(res));
@@ -171,7 +171,7 @@ void JackMachClientChannel::ClientDeactivate(int refnum, int* result)
 
 void JackMachClientChannel::PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
 {
-	kern_return_t res = rpc_jack_port_register(fPrivatePort, refnum, (char*)name, (char*)type, flags, buffer_size, port_index, result);
+    kern_return_t res = rpc_jack_port_register(fPrivatePort, refnum, (char*)name, (char*)type, flags, buffer_size, port_index, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::PortRegister err = %s", mach_error_string(res));

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class JackEngine;
 
 /*!
 \brief Factory description
- 
+
 \todo possibly use in a dynamic way to test different communication/synchro implementations.
 */
 
@@ -230,18 +230,18 @@ class JackGlobals
         {
             JackLog("JackGlobals InitServer\n");
             if (!fInstance) {
-			
-		#ifdef __APPLE__
+
+#ifdef __APPLE__
                 fInstance = new JackFactoryOSXServer();
-		#endif
+#endif
 
-		#ifdef WIN32
-               fInstance = new JackFactoryWindowsServer();
-		#endif
+#ifdef WIN32
+                fInstance = new JackFactoryWindowsServer();
+#endif
 
-		#ifdef __linux__
-               fInstance = new JackFactoryLinuxServer();
-		#endif
+#ifdef __linux__
+                fInstance = new JackFactoryLinuxServer();
+#endif
 
             }
         }
@@ -250,18 +250,18 @@ class JackGlobals
         {
             JackLog("JackGlobals InitClient\n");
             if (!fInstance) {
-			
-		#ifdef __APPLE__
+
+#ifdef __APPLE__
                 fInstance = new JackFactoryOSXClient();
-		#endif
+#endif
 
-		#ifdef WIN32
+#ifdef WIN32
                 fInstance = new JackFactoryWindowsClient();
-		#endif
+#endif
 
-		#ifdef __linux__
+#ifdef __linux__
                 fInstance = new JackFactoryLinuxClient();
-		#endif
+#endif
 
             }
         }

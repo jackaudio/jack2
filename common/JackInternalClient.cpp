@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
@@ -68,22 +68,22 @@ JackInternalClient::~JackInternalClient()
 int JackInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int result;
-	char name_res[JACK_CLIENT_NAME_SIZE]; 
+    char name_res[JACK_CLIENT_NAME_SIZE];
     JackLog("JackInternalClient::Open name = %s\n", name);
-	
-	snprintf(fServerName, sizeof(fServerName), server_name);
- 	
-	fChannel->ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+
+    snprintf(fServerName, sizeof(fServerName), server_name);
+
+    fChannel->ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
-		int status1 = *status;
+        int status1 = *status;
         if (status1 & JackVersionError)
-			jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
+            jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
         else
-			jack_error("Client name = %s conflits with another running client", name);
+            jack_error("Client name = %s conflits with another running client", name);
         goto error;
     }
-	
-	strcpy(fClientControl->fName, name_res);
+
+    strcpy(fClientControl->fName, name_res);
 
     // Require new client
     fChannel->ClientOpen(name_res, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);
@@ -119,49 +119,49 @@ JackClientControl* JackInternalClient::GetClientControl() const
 }
 
 JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data)
-	:JackInternalClient(server, table)
+        : JackInternalClient(server, table)
 {
-	char path_to_so[PATH_MAX + 1];
-	//snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.so", so_name);
-	snprintf(path_to_so, sizeof(path_to_so), so_name);
-	snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
-	fHandle = LoadJackModule(path_to_so);
-	
-	JackLog("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s\n", path_to_so);
-	
-	if (fHandle == 0) {
-		jack_error("error loading %s", so_name);
-		throw -1;
-	}
+    char path_to_so[PATH_MAX + 1];
+    //snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.so", so_name);
+    snprintf(path_to_so, sizeof(path_to_so), so_name);
+    snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
+    fHandle = LoadJackModule(path_to_so);
 
-	fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
-	if (!fInitialize) {
-		UnloadJackModule(fHandle);
-		jack_error("symbol jack_initialize cannot be found in %s", so_name);
-		throw -1;
-	}
+    JackLog("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s\n", path_to_so);
 
-	fFinish = (FinishCallback)GetJackProc(fHandle, "jack_finish");
-	if (!fFinish) {
-		UnloadJackModule(fHandle);
-		jack_error("symbol jack_finish cannot be found in %s", so_name);
-		throw -1;
-	}
+    if (fHandle == 0) {
+        jack_error("error loading %s", so_name);
+        throw - 1;
+    }
+
+    fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
+    if (!fInitialize) {
+        UnloadJackModule(fHandle);
+        jack_error("symbol jack_initialize cannot be found in %s", so_name);
+        throw - 1;
+    }
+
+    fFinish = (FinishCallback)GetJackProc(fHandle, "jack_finish");
+    if (!fFinish) {
+        UnloadJackModule(fHandle);
+        jack_error("symbol jack_finish cannot be found in %s", so_name);
+        throw - 1;
+    }
 }
 
 JackLoadableInternalClient::~JackLoadableInternalClient()
 {
-	if (fFinish) 
-		fFinish(fProcessArg);
-	UnloadJackModule(fHandle);
+    if (fFinish)
+        fFinish(fProcessArg);
+    UnloadJackModule(fHandle);
 }
 
 int JackLoadableInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
-	int res = JackInternalClient::Open(server_name, name, options, status);
-	if (res == 0) 
-		fInitialize((jack_client_t*)this, fObjectData);
-	return res;
+    int res = JackInternalClient::Open(server_name, name, options, status);
+    if (res == 0)
+        fInitialize((jack_client_t*)this, fObjectData);
+    return res;
 }
 
 } // end of namespace

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ JackMachServerChannel::~JackMachServerChannel()
 int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 {
     JackLog("JackMachServerChannel::Open\n");
-	char jack_server_entry_name[512];
-	snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+    char jack_server_entry_name[512];
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 
     if (!fServerPort.AllocatePort(jack_server_entry_name, 16)) { // 16 is the max possible value
         jack_error("Cannot check in Jack server");
@@ -82,13 +82,13 @@ JackServer* JackMachServerChannel::GetServer()
 
 void JackMachServerChannel::ClientCheck(char* name, char* name_res, int protocol, int options, int* status, int* result)
 {
-	*result = GetEngine()->ClientCheck(name, name_res, protocol, options, status);
+    *result = GetEngine()->ClientCheck(name, name_res, protocol, options, status);
 }
 
 void JackMachServerChannel::ClientOpen(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     int refnum = -1;
-	*result = GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
+    *result = GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
 
     if (*result == 0) {
         mach_port_t port = fServerPort.AddPort();
@@ -107,7 +107,7 @@ void JackMachServerChannel::ClientOpen(char* name, mach_port_t* private_port, in
 
 void JackMachServerChannel::ClientClose(mach_port_t private_port, int refnum)
 {
-	GetEngine()->ClientExternalClose(refnum);
+    GetEngine()->ClientExternalClose(refnum);
     fClientTable.erase(private_port);
 
     // Hum, hum....

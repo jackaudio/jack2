@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-/* use 512KB stack per thread - the default is way too high to be feasible 
+/* use 512KB stack per thread - the default is way too high to be feasible
  * with mlockall() on many systems */
 #define THREAD_STACK 524288
 
@@ -62,17 +62,17 @@ class JackPosixThread : public JackThread
         virtual int StartSync();
         virtual int Kill();
         virtual int Stop();
-		virtual void Terminate();
+        virtual void Terminate();
 
         virtual int AcquireRealTime();
         virtual int AcquireRealTime(int priority);
         virtual int DropRealTime();
 
         pthread_t GetThreadID();
-		
-		static int AcquireRealTimeImp(pthread_t thread, int priority);
-		static int DropRealTimeImp(pthread_t thread);
-		static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+
+        static int AcquireRealTimeImp(pthread_t thread, int priority);
+        static int DropRealTimeImp(pthread_t thread);
+        static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
 
 };
 

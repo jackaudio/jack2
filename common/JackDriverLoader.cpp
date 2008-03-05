@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2005 Paul Davis
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifdef WIN32 
+#ifdef WIN32
 #pragma warning (disable : 4786)
 #endif
 
-#ifndef WIN32 
+#ifndef WIN32
 #ifndef ADDON_DIR
 #include "config.h"
 #endif
@@ -32,7 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include <getopt.h>
 
-#ifndef WIN32 
+#ifndef WIN32
 #include <dirent.h>
 #endif
 
@@ -116,7 +116,7 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
         printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
         jack_print_driver_options (desc, stdout);
         return 1;
-	}
+    }
 
     /* set up the stuff for getopt */
     options = (char*)calloc (desc->nparams * 3 + 1, sizeof (char));
@@ -186,7 +186,7 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
                                         strcasecmp ("no", optarg) == 0 ||
                                         strcasecmp ("0", optarg) == 0 ||
                                         strcasecmp ("(null)", optarg) == 0 ) {
-                    */ 
+                    */
                     // steph
                     if (strcmp ("false", optarg) == 0 ||
                             strcmp ("off", optarg) == 0 ||
@@ -256,15 +256,15 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 #endif
 
     int err;
-	/*
-	char* driver_dir;
-    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-		driver_dir = ADDON_DIR;
-    }
-	*/
-  
+    /*
+    char* driver_dir;
+       if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+    	driver_dir = ADDON_DIR;
+       }
+    */
+
 #ifdef WIN32
-	char* driver_dir = ADDON_DIR;
+    char* driver_dir = ADDON_DIR;
     if (strcmp(ADDON_DIR, "") == 0) {
         char temp_driver_dir1[512];
         char temp_driver_dir2[512];
@@ -273,8 +273,8 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
         driver_dir = temp_driver_dir2;
     }
 #else
-	char driver_dir[512];
-	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/%s/jackmp", ADDON_DIR, LIB_DIR);
+    char driver_dir[512];
+    snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/%s/jackmp", ADDON_DIR, LIB_DIR);
 #endif
 
     filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
@@ -330,7 +330,7 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 
         if (strcmp(descriptor->name, other_descriptor->name) == 0) {
             jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first\n",
-                        other_descriptor->file, filename, other_descriptor->name);
+                       other_descriptor->file, filename, other_descriptor->name);
             /* FIXME: delete the descriptor */
             free(filename);
             return NULL;
@@ -400,15 +400,15 @@ jack_drivers_load (JSList * drivers) {
     JSList * driver_list = NULL;
     jack_driver_desc_t * desc;
 
-	/*
-	char* driver_dir;
+    /*
+    char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-        driver_dir = ADDON_DIR;
-	}
-	*/
-	char driver_dir[512];
-	snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/%s/jackmp", ADDON_DIR, LIB_DIR);
-	
+    driver_dir = ADDON_DIR;
+    }
+    */
+    char driver_dir[512];
+    snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/%s/jackmp", ADDON_DIR, LIB_DIR);
+
     /* search through the driver_dir and add get descriptors
     from the .so files in it */
     dir_stream = opendir (driver_dir);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -37,12 +37,12 @@ bool JackFifo::Signal()
 {
     bool res;
     char c = 0;
-	
-	if (fFifo < 0) {
-		jack_error("JackFifo::Signal name = %s already desallocated!!", fName);
-		return false;
-	}
-  
+
+    if (fFifo < 0) {
+        jack_error("JackFifo::Signal name = %s already desallocated!!", fName);
+        return false;
+    }
+
     if (fFlush)
         return true;
 
@@ -56,11 +56,11 @@ bool JackFifo::SignalAll()
 {
     bool res;
     char c = 0;
-	
-	if (fFifo < 0) {
-		jack_error("JackFifo::SignalAll name = %s already desallocated!!", fName);
-		return false;
-	}
+
+    if (fFifo < 0) {
+        jack_error("JackFifo::SignalAll name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if (fFlush)
         return true;
@@ -75,11 +75,11 @@ bool JackFifo::Wait()
 {
     bool res;
     char c;
-	
+
     if (fFifo < 0) {
-		jack_error("JackFifo::Wait name = %s already desallocated!!", fName);
-		return false;
-	}
+        jack_error("JackFifo::Wait name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if ((res = (read(fFifo, &c, sizeof(c)) != sizeof(c)))) {
         jack_error("JackFifo::Wait name = %s err = %s", fName, strerror(errno));
@@ -93,7 +93,7 @@ bool JackFifo::TimedWait(long usec)
 {
     return Wait();
 }
-#else 
+#else
 // Does not work on OSX ??
 bool JackFifo::TimedWait(long usec)
 {

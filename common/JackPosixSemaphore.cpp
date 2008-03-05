@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,11 +34,11 @@ void JackPosixSemaphore::BuildName(const char* name, const char* server_name, ch
 bool JackPosixSemaphore::Signal()
 {
     int res;
-  
-	if (!fSemaphore) {
-		jack_error("JackPosixSemaphore::Signal name = %s already desallocated!!", fName);
-		return false;
-	}
+
+    if (!fSemaphore) {
+        jack_error("JackPosixSemaphore::Signal name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if (fFlush)
         return true;
@@ -52,11 +52,11 @@ bool JackPosixSemaphore::Signal()
 bool JackPosixSemaphore::SignalAll()
 {
     int res;
-	
+
     if (!fSemaphore) {
-		jack_error("JackPosixSemaphore::SignalAll name = %s already desallocated!!", fName);
-		return false;
-	}
+        jack_error("JackPosixSemaphore::SignalAll name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if (fFlush)
         return true;
@@ -71,7 +71,7 @@ bool JackPosixSemaphore::SignalAll()
 bool JackPosixSemaphore::Wait()
 {
     int res;
-	
+
 	if (!fSemaphore) {
 		jack_error("JackPosixSemaphore::Wait name = %s already desallocated!!", fName);
 		return false;
@@ -99,13 +99,13 @@ bool JackPosixSemaphore::Wait()
 
 /*
 #ifdef __linux__
- 
+
 bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
 {
 	int res;
 	struct timeval now;
 	timespec time;
-	
+
 	if (!fSemaphore) {
 		jack_error("JackPosixSemaphore::TimedWait name = %s already desallocated!!", fName);
 		return false;
@@ -113,7 +113,7 @@ bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
 	gettimeofday(&now, 0);
 	time.tv_sec = now.tv_sec + usec / 1000000;
 	time.tv_nsec = (now.tv_usec + (usec % 1000000)) * 1000;
-	
+
     if ((res = sem_timedwait(fSemaphore, &time)) != 0) {
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
 		JackLog("now %ld %ld \n", now.tv_sec, now.tv_usec);
@@ -121,15 +121,15 @@ bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
 	}
     return (res == 0);
 }
- 
-#else 
+
+#else
 #warning "JackPosixSemaphore::TimedWait is not supported: Jack in SYNC mode with JackPosixSemaphore will not run properly !!"
- 
+
 bool JackPosixSemaphore::TimedWait(long usec)
 {
 	return Wait();
 }
-#endif 
+#endif
 */
 
 #warning JackPosixSemaphore::TimedWait not available : synchronous mode may not work correctly if POSIX semaphore are used

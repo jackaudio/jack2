@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -62,34 +62,34 @@ static void silent_jack_error_callback(const char *desc)
 static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"
-             "Copyright 2001-2005 Paul Davis and others.\n"
-             "Copyright 2004-2008 Grame.\n"
-             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
-             "This is free software, and you are welcome to redistribute it\n"
-             "under certain conditions; see the file COPYING for details\n");
+            "Copyright 2001-2005 Paul Davis and others.\n"
+            "Copyright 2004-2008 Grame.\n"
+            "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
+            "This is free software, and you are welcome to redistribute it\n"
+            "under certain conditions; see the file COPYING for details\n");
 }
 
 static void usage(FILE* file)
 {
     copyright(file);
     fprintf(file, "\n"
-             "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
-			 "               [ --name OR -n server-name ]\n"
-             // "               [ --no-mlock OR -m ]\n"
-             // "               [ --unlock OR -u ]\n"
-             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
-             "               [ --loopback OR -L loopback-port-number ]\n"
-             // "               [ --port-max OR -p maximum-number-of-ports]\n"
-             "               [ --verbose OR -v ]\n"
-			 "               [ --replace-registry OR -r ]\n"
-             "               [ --silent OR -s ]\n"
-             "               [ --sync OR -S ]\n"
-			 "               [ --temporary OR -T ]\n"
-             "               [ --version OR -V ]\n"
-             "         -d driver [ ... driver args ... ]\n"
-             "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
-             "       jackdmp -d driver --help\n"
-             "             to display options for each driver\n\n");
+            "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
+            "               [ --name OR -n server-name ]\n"
+            // "               [ --no-mlock OR -m ]\n"
+            // "               [ --unlock OR -u ]\n"
+            "               [ --timeout OR -t client-timeout-in-msecs ]\n"
+            "               [ --loopback OR -L loopback-port-number ]\n"
+            // "               [ --port-max OR -p maximum-number-of-ports]\n"
+            "               [ --verbose OR -v ]\n"
+            "               [ --replace-registry OR -r ]\n"
+            "               [ --silent OR -s ]\n"
+            "               [ --sync OR -S ]\n"
+            "               [ --temporary OR -T ]\n"
+            "               [ --version OR -V ]\n"
+            "         -d driver [ ... driver args ... ]\n"
+            "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
+            "       jackdmp -d driver --help\n"
+            "             to display options for each driver\n\n");
 }
 
 
@@ -148,7 +148,8 @@ int main(int argc, char* argv[])
     jack_driver_desc_t* driver_desc;
     const char *options = "-ad:P:uvrshVRL:STFl:t:mn:p:";
     struct option long_options[] = {
-                                       { "driver", 1, 0, 'd' },
+                                       { "driver", 1, 0, 'd'
+                                       },
                                        { "verbose", 0, 0, 'v' },
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
@@ -156,7 +157,7 @@ int main(int argc, char* argv[])
                                        { "name", 0, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
-									   { "replace-registry", 0, 0, 'r' },
+                                       { "replace-registry", 0, 0, 'r' },
                                        { "loopback", 0, 0, 'L' },
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
@@ -174,7 +175,7 @@ int main(int argc, char* argv[])
     JSList* driver_params;
     int driver_nargs = 1;
     int show_version = 0;
-	int replace_registry = 0;
+    int replace_registry = 0;
     int sync = 0;
     int rc, i;
 
@@ -216,11 +217,11 @@ int main(int argc, char* argv[])
             case 'P':
                 realtime_priority = atoi(optarg);
                 break;
-			
-			case 'r':
-				replace_registry = 1;
-				break;
-				
+
+            case 'r':
+                replace_registry = 1;
+                break;
+
             case 'R':
                 realtime = 1;
                 break;
@@ -290,7 +291,7 @@ int main(int argc, char* argv[])
 
     if (driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
-                 " anything when run like this.\n");
+                " anything when run like this.\n");
         return -1;
     }
 
@@ -302,7 +303,7 @@ int main(int argc, char* argv[])
     }
 
     if (jack_parse_driver_params(driver_desc, driver_nargs,
-                                  driver_args, &driver_params)) {
+                                 driver_args, &driver_params)) {
         exit(0);
     }
 
@@ -360,16 +361,16 @@ int main(int argc, char* argv[])
     }
 
 #ifdef __APPLE__
-	CFStringRef ref = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
+    CFStringRef ref = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
     // Send notification to be used in the JackRouter plugin
     CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
-													CFSTR("com.grame.jackserver.start"),
-													ref,
-													NULL,
-													kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
-	CFRelease(ref);
+            CFSTR("com.grame.jackserver.start"),
+            ref,
+            NULL,
+            kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+    CFRelease(ref);
 #endif
-	
+
     // install a do-nothing handler because otherwise pthreads
     // behaviour is undefined when we enter sigwait.
 
@@ -410,22 +411,22 @@ int main(int argc, char* argv[])
         // bugs that cause segfaults etc. during shutdown.
         sigprocmask(SIG_UNBLOCK, &signals, 0);
     }
-	
-	JackStop();
+
+    JackStop();
 
     jack_cleanup_shm();
     JackTools::CleanupFiles(server_name);
     jack_unregister_server(server_name);
 
 #ifdef __APPLE__
-	CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
+    CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
     // Send notification to be used in the JackRouter plugin
     CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
-													CFSTR("com.grame.jackserver.stop"),
-													ref1,
-													NULL,
-													kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
-	CFRelease(ref1);
+            CFSTR("com.grame.jackserver.stop"),
+            ref1,
+            NULL,
+            kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+    CFRelease(ref1);
 #endif
 
     return 1;

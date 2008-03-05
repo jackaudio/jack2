@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ extern "C"
 #endif
 
 #ifdef WIN32
-	#define vsnprintf _vsnprintf
-	#define snprintf _snprintf
+#define vsnprintf _vsnprintf
+#define snprintf _snprintf
 #endif
 
     EXPORT void jack_error(const char *fmt, ...);
@@ -39,8 +39,8 @@ extern "C"
     EXPORT void JackLog(const char *fmt, ...);
 
     extern int jack_verbose;
-	
-	extern void (*jack_error_callback)(const char *desc);
+
+    extern void (*jack_error_callback)(const char *desc);
 
 #ifdef __cplusplus
 }

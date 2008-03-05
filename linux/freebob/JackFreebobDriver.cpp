@@ -137,7 +137,7 @@ JackFreebobDriver::freebob_driver_write (freebob_driver_t * driver, jack_nframes
             // Ouput ports
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
                 buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[i], nframes);
-				if (!buf) {
+                if (!buf) {
                     buf = (jack_default_audio_sample_t *)addr_of_nullbuffer;
                 }
                 freebob_streaming_set_playback_stream_buffer(driver->dev, i, (char *)(buf), freebob_buffer_type_float);
@@ -304,7 +304,7 @@ JackFreebobDriver::freebob_driver_new (char *name,
     	driver->write        = (JackDriverReadFunction)       freebob_driver_write;
     	driver->read         = (JackDriverReadFunction)       freebob_driver_read;
     	driver->nt_bufsize   = (JackDriverNTBufSizeFunction)  freebob_driver_bufsize;
-	*/
+    */
 
     /* copy command line parameter contents to the driver structure */
     memcpy(&driver->settings, params, sizeof(freebob_jack_settings_t));
@@ -349,7 +349,7 @@ JackFreebobDriver::freebob_driver_new (char *name,
 void
 JackFreebobDriver::freebob_driver_delete (freebob_driver_t *driver)
 {
-	free (driver);
+    free (driver);
 }
 
 #ifdef FREEBOB_DRIVER_WITH_MIDI
@@ -386,7 +386,7 @@ JackFreebobDriver::freebob_driver_midi_queue_thread(void *arg)
 
             if (!port) {
                 printError(" Could not find target port for event: dst=%d src=%d", ev->dest.port, ev->source.port);
-				break;
+                break;
             }
 
             // decode it to the work buffer
@@ -430,7 +430,7 @@ JackFreebobDriver::freebob_driver_midi_dequeue_thread (void *arg)
 
         for (i = 0;i < m->nb_input_ports;i++) {
             unsigned int buff[64];
-			freebob_midi_port_t *port = m->input_ports[i];
+            freebob_midi_port_t *port = m->input_ports[i];
             if (!port) {
                 printError(" something went wrong when setting up the midi input port map (%d)", i);
             }
@@ -734,9 +734,9 @@ int JackFreebobDriver::Attach()
             printMessage ("Registering capture port %s", buf);
 
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
-                                                          JACK_DEFAULT_AUDIO_TYPE,
-                                                          (JackPortFlags)port_flags,
-														  fEngineControl->fBufferSize)) == NO_PORT) {
+                              JACK_DEFAULT_AUDIO_TYPE,
+                              (JackPortFlags)port_flags,
+                              fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -764,9 +764,9 @@ int JackFreebobDriver::Attach()
         } else {
             printMessage ("Registering playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
-                                                          JACK_DEFAULT_AUDIO_TYPE,
-                                                          (JackPortFlags)port_flags,
-														  fEngineControl->fBufferSize)) == NO_PORT) {
+                              JACK_DEFAULT_AUDIO_TYPE,
+                              (JackPortFlags)port_flags,
+                              fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -805,7 +805,7 @@ int JackFreebobDriver::Detach()
     driver->midi_handle = NULL;
 #endif
 
-	return JackAudioDriver::Detach();  // Generic JackAudioDriver Detach
+    return JackAudioDriver::Detach();  // Generic JackAudioDriver Detach
 }
 
 int JackFreebobDriver::Open(freebob_jack_settings_t *params)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ rpc_type server_rpc_jack_client_activate(mach_port_t private_port, int refnum, i
     JackLog("rpc_jack_client_activate\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-	*result = channel->GetEngine()->ClientActivate(refnum);
+    *result = channel->GetEngine()->ClientActivate(refnum);
     return KERN_SUCCESS;
 }
 
@@ -73,7 +73,7 @@ rpc_type server_rpc_jack_client_deactivate(mach_port_t private_port, int refnum,
     JackLog("rpc_jack_client_deactivate\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-	*result = channel->GetEngine()->ClientDeactivate(refnum);
+    *result = channel->GetEngine()->ClientDeactivate(refnum);
     return KERN_SUCCESS;
 }
 
@@ -185,29 +185,29 @@ rpc_type server_rpc_jack_set_timebase_callback(mach_port_t private_port, int ref
 
 rpc_type server_rpc_jack_get_internal_clientname(mach_port_t private_port, int refnum, int int_ref, client_name_t name_res, int* result)
 {
-	JackLog("server_rpc_jack_get_internal_clientname\n");
+    JackLog("server_rpc_jack_get_internal_clientname\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-	*result = channel->GetServer()->GetEngine()->GetInternalClientName(int_ref, (char*)name_res);
-	return KERN_SUCCESS;
+    *result = channel->GetServer()->GetEngine()->GetInternalClientName(int_ref, (char*)name_res);
+    return KERN_SUCCESS;
 }
 
 rpc_type server_rpc_jack_internal_clienthandle(mach_port_t private_port, int refnum, client_name_t client_name, int* status, int* int_ref, int* result)
 {
-	JackLog("server_rpc_jack_internal_clienthandle\n");
+    JackLog("server_rpc_jack_internal_clienthandle\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-	*result = channel->GetServer()->GetEngine()->InternalClientHandle(client_name, status, int_ref);
-	return KERN_SUCCESS;
+    *result = channel->GetServer()->GetEngine()->InternalClientHandle(client_name, status, int_ref);
+    return KERN_SUCCESS;
 }
 
 rpc_type server_rpc_jack_internal_clientload(mach_port_t private_port, int refnum, client_name_t client_name, so_name_t so_name, objet_data_t objet_data, int options, int* status, int* int_ref, int* result)
 {
- 	JackLog("server_rpc_jack_internal_clientload\n");
+    JackLog("server_rpc_jack_internal_clientload\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
-	assert(channel);
-	*result = channel->GetServer()->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status);
-	return KERN_SUCCESS;
+    assert(channel);
+    *result = channel->GetServer()->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status);
+    return KERN_SUCCESS;
 }
 
 rpc_type server_rpc_jack_internal_clientunload(mach_port_t private_port, int refnum, int int_ref, int* status, int* result)
@@ -215,8 +215,8 @@ rpc_type server_rpc_jack_internal_clientunload(mach_port_t private_port, int ref
     JackLog("server_rpc_jack_internal_clientunload\n");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-	*result = channel->GetServer()->GetEngine()->InternalClientUnload(int_ref, status);
-	return KERN_SUCCESS;
+    *result = channel->GetServer()->GetEngine()->InternalClientUnload(int_ref, status);
+    return KERN_SUCCESS;
 }
 
 //-----------------

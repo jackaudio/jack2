@@ -40,27 +40,27 @@ class JackASIODriver : public JackAudioDriver
 
     private:
 
-		PaStream* fStream;
-		float** fInputBuffer;
-		float** fOutputBuffer;
-		PaDeviceIndex fInputDevice;
-		PaDeviceIndex fOutputDevice;
+        PaStream* fStream;
+        float** fInputBuffer;
+        float** fOutputBuffer;
+        PaDeviceIndex fInputDevice;
+        PaDeviceIndex fOutputDevice;
 
-		static int Render(const void* inputBuffer, void* outputBuffer,
-							unsigned long framesPerBuffer,
-							const PaStreamCallbackTimeInfo* timeInfo,
-							PaStreamCallbackFlags statusFlags,
-							void* userData);
+        static int Render(const void* inputBuffer, void* outputBuffer,
+                          unsigned long framesPerBuffer,
+                          const PaStreamCallbackTimeInfo* timeInfo,
+                          PaStreamCallbackFlags statusFlags,
+                          void* userData);
 
     public:
 
         JackASIODriver(const char* name, JackEngine* engine, JackSynchro** table)
-			: JackAudioDriver(name, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
-			fInputDevice(paNoDevice), fOutputDevice(paNoDevice)
-		{}
+                : JackAudioDriver(name, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
+                fInputDevice(paNoDevice), fOutputDevice(paNoDevice)
+        {}
 
         virtual ~JackASIODriver()
-		{}
+        {}
 
         int Open(jack_nframes_t frames_per_cycle,
                  jack_nframes_t rate,
@@ -68,11 +68,11 @@ class JackASIODriver : public JackAudioDriver
                  int playing,
                  int chan_in,
                  int chan_out,
-				 bool monitor,
+                 bool monitor,
                  const char* capture_driver_name,
-				 const char* playback_driver_name,
-				 jack_nframes_t capture_latency,
-				 jack_nframes_t playback_latency);
+                 const char* playback_driver_name,
+                 jack_nframes_t capture_latency,
+                 jack_nframes_t playback_latency);
 
         int Close();
 

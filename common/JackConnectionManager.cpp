@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -245,7 +245,7 @@ void JackConnectionManager::ResetGraph(JackClientTiming* timing)
     // Reset activation counter : must be done *before* starting to resume clients
     for (int i = 0; i < CLIENT_NUM; i++) {
         fInputCounter[i].Reset();
-		timing[i].fStatus = NotTriggered;
+        timing[i].fStatus = NotTriggered;
     }
 }
 
@@ -256,8 +256,8 @@ int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro
 {
     bool res;
     if ((res = table[control->fRefNum]->TimedWait(time_out_usec))) {
-		timing[control->fRefNum].fStatus = Running;
-		timing[control->fRefNum].fAwakeAt = GetMicroSeconds();
+        timing[control->fRefNum].fStatus = Running;
+        timing[control->fRefNum].fAwakeAt = GetMicroSeconds();
     }
     return (res) ? 0 : -1;
 }
@@ -267,22 +267,22 @@ int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro
 */
 int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro** table, JackClientTiming* timing)
 {
-	jack_time_t current_date = GetMicroSeconds(); 
+    jack_time_t current_date = GetMicroSeconds();
     const jack_int_t* outputRef = fConnectionRef.GetItems(control->fRefNum);
-	int res = 0;
+    int res = 0;
 
     // Update state and timestamp of current client
-	timing[control->fRefNum].fStatus = Finished;
-	timing[control->fRefNum].fFinishedAt = current_date;
+    timing[control->fRefNum].fStatus = Finished;
+    timing[control->fRefNum].fFinishedAt = current_date;
 
     for (int i = 0; i < CLIENT_NUM; i++) {
-	
+
         // Signal connected clients or drivers
         if (outputRef[i] > 0) {
-		
-			// Update state and timestamp of destination clients
-			timing[i].fStatus = Triggered;
-			timing[i].fSignaledAt = current_date;
+
+            // Update state and timestamp of destination clients
+            timing[i].fStatus = Triggered;
+            timing[i].fSignaledAt = current_date;
 
             if (!fInputCounter[i].Signal(table[i], control)) {
                 JackLog("JackConnectionManager::ResumeRefNum error: ref = %ld output = %ld \n", control->fRefNum, i);

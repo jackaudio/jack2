@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -65,13 +65,13 @@ class JackClientChannelInterface
         // Stop listening for messages from the server
         virtual void Stop()
         {}
-		
-		virtual int ServerCheck(const char* server_name)
+
+        virtual int ServerCheck(const char* server_name)
         {
-			return -1;
-		}
-		
-		virtual void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+            return -1;
+        }
+
+        virtual void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
         {}
         virtual void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
         {}
@@ -109,17 +109,17 @@ class JackClientChannelInterface
 
         virtual void SetTimebaseCallback(int refnum, int conditional, int* result)
         {}
-		
-		virtual void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
+
+        virtual void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
         {}
 
-		virtual void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
+        virtual void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
         {}
 
-		virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
         {}
-		
-		virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
+
+        virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
 };
 

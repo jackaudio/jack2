@@ -27,7 +27,8 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-struct JackPortType {
+struct JackPortType
+{
     const char* name;
     void (*init)(void* buffer, size_t buffer_size, jack_nframes_t nframes);
     void (*mixdown)(void *mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes);

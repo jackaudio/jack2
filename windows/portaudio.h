@@ -1,6 +1,6 @@
 
 #ifndef PORTAUDIO_H
-#define PORTAUDIO_H 
+#define PORTAUDIO_H
 /*
  * $Id: portaudio.h,v 1.1.2.2 2006/06/20 14:44:48 letz Exp $
  * PortAudio Portable Real-Time Audio Library
@@ -61,8 +61,7 @@ extern "C"
     */
 
     typedef int PaError;
-    typedef enum PaErrorCode
-    {
+    typedef enum PaErrorCode {
         paNoError = 0,
 
         paNotInitialized = -10000,
@@ -94,7 +93,8 @@ extern "C"
         paCanNotWriteToAnInputOnlyStream,      /**< @todo review error code name */
         paIncompatibleStreamHostApi,
         paBadBufferPtr
-    } PaErrorCode;
+    }
+    PaErrorCode;
 
 
     /** Translate the supplied PortAudio error code into a human readable
@@ -213,8 +213,7 @@ extern "C"
      
      @see PaHostApiInfo
     */
-    typedef enum PaHostApiTypeId
-    {
+    typedef enum PaHostApiTypeId {
         paInDevelopment = 0,  /* use while developing support for a new host API */
         paDirectSound = 1,
         paMME = 2,
@@ -228,7 +227,8 @@ extern "C"
         paWDMKS = 11,
         paJACK = 12,
         paWASAPI = 13
-    } PaHostApiTypeId;
+    }
+    PaHostApiTypeId;
 
 
     /** A structure containing information about a particular host API. */
@@ -393,7 +393,7 @@ extern "C"
     /** The type used to represent monotonic time in seconds that can be used
      for syncronisation. The type is used for the outTime argument to the
      PaStreamCallback and as the result of Pa_GetStreamTime().
-         
+        
      @see PaStreamCallback, Pa_GetStreamTime
     */
     typedef double PaTime;
@@ -696,11 +696,11 @@ extern "C"
      Functions of type PaStreamCallback are implemented by PortAudio clients.
      They consume, process or generate audio in response to requests from an
      active PortAudio stream.
-         
+        
      @param input and @param output are arrays of interleaved samples,
      the format, packing and number of channels used by the buffers are
      determined by parameters to Pa_OpenStream().
-         
+        
      @param frameCount The number of sample frames to be processed by
      the stream callback.
      
@@ -745,10 +745,10 @@ extern "C"
 
 
     /** Opens a stream for either input, output or both.
-         
+        
      @param stream The address of a PaStream pointer which will receive
      a pointer to the newly opened stream.
-         
+        
      @param inputParameters A structure that describes the input parameters used by
      the opened stream. See PaStreamParameters for a description of these parameters.
      inputParameters must be NULL for output-only streams.
@@ -759,7 +759,7 @@ extern "C"
      
      @param sampleRate The desired sampleRate. For full-duplex streams it is the
      sample rate for both input and output
-         
+        
      @param framesPerBuffer The number of frames passed to the stream callback
      function, or the preferred block granularity for a blocking read/write stream.
      The special value paFramesPerBufferUnspecified (0) may be used to request that
@@ -775,7 +775,7 @@ extern "C"
      @param streamFlags Flags which modify the behaviour of the streaming process.
      This parameter may contain a combination of flags ORed together. Some flags may
      only be relevant to certain buffer formats.
-         
+        
      @param streamCallback A pointer to a client supplied function that is responsible
      for processing and filling input and output buffers. If this parameter is NULL
      the stream will be opened in 'blocking read/write' mode. In blocking mode,
@@ -788,7 +788,7 @@ extern "C"
      function. It could for example, contain a pointer to instance data necessary
      for processing the audio buffers. This parameter is ignored if streamCallback
      is NULL.
-         
+        
      @return
      Upon success Pa_OpenStream() returns paNoError and places a pointer to a
      valid PaStream in the stream argument. The stream is inactive (stopped).
@@ -997,7 +997,7 @@ extern "C"
     /** Determine the current time for the stream according to the same clock used
      to generate buffer timestamps. This time may be used for syncronising other
      events to the audio stream, for example synchronizing audio to MIDI.
-                                            
+        
      @return The stream's current time in seconds, or 0 if an error occurred.
      
      @see PaTime, PaStreamCallback
@@ -1012,7 +1012,7 @@ extern "C"
      
      This function may be called from the stream callback function or the
      application.
-         
+        
      @return
      A floating point value, typically between 0.0 and 1.0, where 1.0 indicates
      that the stream callback is consuming the maximum number of CPU cycles possible

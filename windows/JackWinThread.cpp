@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -49,42 +49,42 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
     while (obj->fRunning && res) {
         res = runnable->Execute();
     }
-  
+
     SetEvent(obj->fEvent);
     JackLog("ThreadHandler: exit\n");
     return 0;
 }
 
-JackWinThread::JackWinThread(JackRunnableInterface* runnable) 
-	: JackThread(runnable, 0, false, 0)
+JackWinThread::JackWinThread(JackRunnableInterface* runnable)
+        : JackThread(runnable, 0, false, 0)
 {
-	 fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	 fThread = NULL;
-	 assert(fEvent);
+    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    fThread = NULL;
+    assert(fEvent);
 }
 
 JackWinThread::~JackWinThread()
 {
-	CloseHandle(fEvent);
+    CloseHandle(fEvent);
 }
 
 int JackWinThread::Start()
 {
-	fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (fEvent == NULL) {
         jack_error("Cannot create event error = %d", GetLastError());
         return -1;
     }
 
-	fRunning = true;
-	
-	// Check if the thread was correctly started
-	if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) { 
-		fRunning = false;
-		return -1;
-	} else {
-		return 0;
-	}
+    fRunning = true;
+
+    // Check if the thread was correctly started
+    if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
+        fRunning = false;
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg)
@@ -179,11 +179,11 @@ int JackWinThread::Kill()
 {
     if (fThread) { // If thread has been started
         TerminateThread(fThread, 0);
-		WaitForSingleObject(fThread, INFINITE);
+        WaitForSingleObject(fThread, INFINITE);
         CloseHandle(fThread);
-		JackLog("JackWinThread::Kill 2\n");
-		fThread = NULL;
-		fRunning = false; 
+        JackLog("JackWinThread::Kill 2\n");
+        fThread = NULL;
+        fRunning = false;
         return 0;
     } else {
         return -1;
@@ -197,7 +197,7 @@ int JackWinThread::Stop()
         fRunning = false; // Request for the thread to stop
         WaitForSingleObject(fEvent, INFINITE);
         CloseHandle(fThread);
-		fThread = NULL;
+        fThread = NULL;
         return 0;
     } else {
         return -1;
@@ -206,40 +206,40 @@ int JackWinThread::Stop()
 
 int JackWinThread::AcquireRealTime()
 {
-	return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+    return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
 }
 
 int JackWinThread::AcquireRealTime(int priority)
 {
- 	fPriority = priority;
-	return AcquireRealTime();
+    fPriority = priority;
+    return AcquireRealTime();
 }
 
 int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
 {
     JackLog("JackWinThread::AcquireRealTime\n");
 
-	if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
-		JackLog("JackWinThread::AcquireRealTime OK\n");
-		return 0;
-	} else {
-		jack_error("Cannot set thread priority = %d", GetLastError());
-		return -1;
-	}
+    if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
+        JackLog("JackWinThread::AcquireRealTime OK\n");
+        return 0;
+    } else {
+        jack_error("Cannot set thread priority = %d", GetLastError());
+        return -1;
+    }
 }
 int JackWinThread::DropRealTime()
 {
-	return DropRealTimeImp(fThread);
+    return DropRealTimeImp(fThread);
 }
 
 int JackWinThread::DropRealTimeImp(pthread_t thread)
 {
-	if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
-		return 0;
-	} else {
-		jack_error("Cannot set thread priority = %d", GetLastError());
-		return -1;
-	}
+    if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
+        return 0;
+    } else {
+        jack_error("Cannot set thread priority = %d", GetLastError());
+        return -1;
+    }
 }
 
 pthread_t JackWinThread::GetThreadID()
@@ -249,9 +249,9 @@ pthread_t JackWinThread::GetThreadID()
 
 void JackWinThread::Terminate()
 {
-	TerminateThread(fThread, 0);
-	WaitForSingleObject(fThread, INFINITE);
-	CloseHandle(fThread);
+    TerminateThread(fThread, 0);
+    WaitForSingleObject(fThread, INFINITE);
+    CloseHandle(fThread);
 }
 
 } // end of namespace

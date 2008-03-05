@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ namespace Jack
 {
 
 /*!
-\brief Counter for CAS 
+\brief Counter for CAS
 */
 
 struct AtomicCounter
@@ -132,8 +132,8 @@ class JackAtomicState
         }
 
         /*!
-		\brief Tries to switch to the next state and returns the new current state (either the same as before if case of switch failure or the new one)
-		*/
+        \brief Tries to switch to the next state and returns the new current state (either the same as before if case of switch failure or the new one)
+        */
         T* TrySwitchState()
         {
             AtomicCounter old_val;
@@ -218,15 +218,15 @@ class JackAtomicState
         {
         	T* state;
         	UInt16 cur_index;
-			UInt16 next_index = GetCurrentIndex();
+        UInt16 next_index = GetCurrentIndex();
         	do {
-				cur_index = next_index; 
+        cur_index = next_index; 
         		state = ReadCurrentState();
         		
         		......
         		......
-                       
-				next_index = GetCurrentIndex();
+                
+        next_index = GetCurrentIndex();
         	} while (cur_index != next_index);
         }
         */

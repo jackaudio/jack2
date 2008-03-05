@@ -19,28 +19,30 @@
 #ifndef __jack_midi_pack_h__
 #define __jack_midi_pack_h__
 
-typedef struct {
-	int running_status;
-} midi_pack_t;
+typedef struct
+{
+    int running_status;
+}
+midi_pack_t;
 
 static inline
 void midi_pack_reset(midi_pack_t *p)
 {
-	p->running_status = 0;
+    p->running_status = 0;
 }
 
 static
 void midi_pack_event(midi_pack_t *p, jack_midi_event_t *e)
 {
-	if (e->buffer[0] >= 0x80 && e->buffer[0] < 0xF0) { // Voice Message
-		if (e->buffer[0] == p->running_status) {
-			e->buffer++;
-			e->size--;
-		} else
-			p->running_status = e->buffer[0];
-	} else if (e->buffer[0] < 0xF8) { // not System Realtime
-		p->running_status = 0;
-	}
+    if (e->buffer[0] >= 0x80 && e->buffer[0] < 0xF0) { // Voice Message
+        if (e->buffer[0] == p->running_status) {
+            e->buffer++;
+            e->size--;
+        } else
+            p->running_status = e->buffer[0];
+    } else if (e->buffer[0] < 0xF8) { // not System Realtime
+        p->running_status = 0;
+    }
 }
 
 #endif /* __jack_midi_pack_h__ */

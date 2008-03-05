@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -47,11 +47,11 @@ struct JackTimer
     JackTimer();
     ~JackTimer()
     {}
-	
+
 };
 
 /*!
-\brief A class using the JackAtomicState to manage jack time. 
+\brief A class using the JackAtomicState to manage jack time.
 */
 
 class JackFrameTimer : public JackAtomicState<JackTimer>
@@ -60,7 +60,7 @@ class JackFrameTimer : public JackAtomicState<JackTimer>
 
         bool fFirstWakeUp;
         void IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs);
-		void InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t period_usecs);
+        void InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t period_usecs);
 
     public:
 

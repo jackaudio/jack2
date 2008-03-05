@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ class JackFixedArray
             fCounter = 0;
         }
 
-        bool AddItem(jack_int_t index) 
+        bool AddItem(jack_int_t index)
         {
             for (int i = 0; i < SIZE; i++) {
                 if (fTable[i] == EMPTY) {
@@ -92,7 +92,7 @@ class JackFixedArray
             return false;
         }
 
-        jack_int_t GetItem(jack_int_t index) const 
+        jack_int_t GetItem(jack_int_t index) const
         {
             return (index < SIZE) ? fTable[index] : EMPTY;
         }
@@ -145,7 +145,7 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
             fUsed = false;
         }
 
-        bool IsAvailable() 
+        bool IsAvailable()
         {
             if (fUsed) {
                 return false;
@@ -358,25 +358,25 @@ struct JackClientTiming
     jack_time_t fSignaledAt;
     jack_time_t fAwakeAt;
     jack_time_t fFinishedAt;
-	jack_client_state_t fStatus;
-	
-	JackClientTiming():fSignaledAt(0), fAwakeAt(0), fFinishedAt(0), fStatus(NotTriggered)
+    jack_client_state_t fStatus;
+
+    JackClientTiming(): fSignaledAt(0), fAwakeAt(0), fFinishedAt(0), fStatus(NotTriggered)
     {}
-	~JackClientTiming()
+    ~JackClientTiming()
     {}
 };
 
 /*!
 \brief Connection manager.
- 
+
 <UL>
 <LI>The <B>fConnection</B> array contains the list (array line) of connected ports for a given port.
 <LI>The <B>fConnectionCount</B> array contains the number of connected ports to a given port.
 <LI>The <B>fInputPort</B> array contains the list (array line) of input connected  ports for a given client.
 <LI>The <B>fOutputPort</B> array contains the list (array line) of ouput connected  ports for a given client.
-<LI>The <B>fConnectionRef</B> array contains the number of ports connected between two clients. 
-<LI>The <B>fInputRef</B> array contains the number of input clients connected to a given client. 
-<LI>The <B>fInputCounter</B> array contains the number of input clients connected to a given for activation purpose. 
+<LI>The <B>fConnectionRef</B> array contains the number of ports connected between two clients.
+<LI>The <B>fInputRef</B> array contains the number of input clients connected to a given client.
+<LI>The <B>fInputCounter</B> array contains the number of input clients connected to a given for activation purpose.
 </UL>
 */
 
@@ -393,7 +393,7 @@ class JackConnectionManager
         JackLoopFeedback<CONNECTION_NUM> fLoopFeedback;					/*! Loop feedback connections */
 
         bool IsLoopPathAux(int ref1, int ref2) const;
-  
+
     public:
 
         JackConnectionManager();
@@ -427,8 +427,8 @@ class JackConnectionManager
         const jack_int_t* GetOutputPorts(int refnum);
 
         // Client management
- 		void InitRefNum(int refnum);
-		int GetInputRefNum(jack_port_id_t port_index) const;
+        void InitRefNum(int refnum);
+        int GetInputRefNum(jack_port_id_t port_index) const;
         int GetOutputRefNum(jack_port_id_t port_index) const;
 
         // Connect/Disconnect 2 refnum "directly"

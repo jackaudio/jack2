@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005 Grame  
+Copyright (C) 2005 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class JackClient;
 
 struct JackServerGlobals
 {
- 	static unsigned int fClientCount;
+    static unsigned int fClientCount;
     static JackServer* fServer;
 
     JackServerGlobals();
@@ -45,16 +45,16 @@ struct JackServerGlobals
 
     static bool Init();
     static void Destroy();
-    static int Start(const char* server_name, 
-					jack_driver_desc_t* driver_desc, 
-					JSList* driver_params, 
-					int sync, 
-					int temporary, 
-					int time_out_ms, 
-					int rt, 
-					int priority, 
-					int loopback, 
-					int verbose);
+    static int Start(const char* server_name,
+                     jack_driver_desc_t* driver_desc,
+                     JSList* driver_params,
+                     int sync,
+                     int temporary,
+                     int time_out_ms,
+                     int rt,
+                     int priority,
+                     int loopback,
+                     int verbose);
     static int Stop();
     static int Delete();
 };

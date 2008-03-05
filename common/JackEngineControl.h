@@ -42,7 +42,7 @@ class JackGraphManager;
 
 struct JackTimingMeasureClient
 {
-	int fRefNum;
+    int fRefNum;
     jack_time_t	fSignaledAt;
     jack_time_t	fAwakeAt;
     jack_time_t	fFinishedAt;
@@ -55,7 +55,7 @@ struct JackTimingMeasureClient
 
 struct JackTimingMeasure
 {
-	unsigned int fAudioCycle;
+    unsigned int fAudioCycle;
     jack_time_t fEngineTime;
     JackTimingMeasureClient fClientTable[CLIENT_NUM];
 };
@@ -66,81 +66,81 @@ struct JackTimingMeasure
 
 struct JackEngineControl : public JackShmMem
 {
-	// Shared state
+    // Shared state
     jack_nframes_t fBufferSize;
     jack_nframes_t fSampleRate;
-	bool fSyncMode;
-	bool fTemporary;
+    bool fSyncMode;
+    bool fTemporary;
     jack_time_t fPeriodUsecs;
     jack_time_t fTimeOutUsecs;
-	bool fTimeOut;
-	bool fRealTime;
-	int fPriority;
-	char fServerName[64];
+    bool fTimeOut;
+    bool fRealTime;
+    int fPriority;
+    char fServerName[64];
     JackTransportEngine fTransport;
     bool fVerbose;
-	
-	// Timing
-	JackTimingMeasure fMeasure[TIME_POINTS];
-	jack_time_t fLastTime;
-	jack_time_t fCurTime;
-	jack_time_t fProcessTime;
-	jack_time_t fLastProcessTime;
-	jack_time_t fSpareUsecs;
-	jack_time_t fMaxUsecs;
-	unsigned int fAudioCycle;
-	jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
-	int	fRollingClientUsecsCnt;
-	int	fRollingClientUsecsIndex;
-	int	fRollingInterval;
-	float fCPULoad;
-	
-	// Fos OSX thread
+
+    // Timing
+    JackTimingMeasure fMeasure[TIME_POINTS];
+    jack_time_t fLastTime;
+    jack_time_t fCurTime;
+    jack_time_t fProcessTime;
+    jack_time_t fLastProcessTime;
+    jack_time_t fSpareUsecs;
+    jack_time_t fMaxUsecs;
+    unsigned int fAudioCycle;
+    jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
+    int	fRollingClientUsecsCnt;
+    int	fRollingClientUsecsIndex;
+    int	fRollingInterval;
+    float fCPULoad;
+
+    // Fos OSX thread
     UInt64 fPeriod;
     UInt64 fComputation;
     UInt64 fConstraint;
-	
-	// Timer
-	JackFrameTimer fFrameTimer;
 
-	JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, const char* server_name)
-	{
-		fSyncMode = sync;
-		fTemporary = temporary;
-		fTimeOut = (timeout > 0);
-		fTimeOutUsecs = timeout * 1000;
-		fRealTime = rt;
-		fPriority = priority;
-		fVerbose = verbose;
-		fLastTime = 0;
-		fCurTime = 0;
-		fProcessTime = 0;
-		fLastProcessTime = 0;
-		fSpareUsecs = 0;
-		fMaxUsecs = 0;
-		fAudioCycle = 0;
-		ClearTimeMeasures();
-		ResetRollingUsecs();
-		snprintf(fServerName, sizeof(fServerName), server_name);
-	}
-	~JackEngineControl()
-	{}
-	
-	// Cycle
-	void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
-	void CycleEnd(JackClientInterface** table);
-	
-	// Timer
-	void InitFrameTime();
-	void ResetFrameTime(jack_time_t callback_usecs);
-	void ReadFrameTime(JackTimer* timer);
+    // Timer
+    JackFrameTimer fFrameTimer;
 
-	// Private
-	void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager);
-	void GetTimeMeasure(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
-	void ClearTimeMeasures();
-	void ResetRollingUsecs();
-	
+    JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, const char* server_name)
+    {
+        fSyncMode = sync;
+        fTemporary = temporary;
+        fTimeOut = (timeout > 0);
+        fTimeOutUsecs = timeout * 1000;
+        fRealTime = rt;
+        fPriority = priority;
+        fVerbose = verbose;
+        fLastTime = 0;
+        fCurTime = 0;
+        fProcessTime = 0;
+        fLastProcessTime = 0;
+        fSpareUsecs = 0;
+        fMaxUsecs = 0;
+        fAudioCycle = 0;
+        ClearTimeMeasures();
+        ResetRollingUsecs();
+        snprintf(fServerName, sizeof(fServerName), server_name);
+    }
+    ~JackEngineControl()
+    {}
+
+    // Cycle
+    void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
+    void CycleEnd(JackClientInterface** table);
+
+    // Timer
+    void InitFrameTime();
+    void ResetFrameTime(jack_time_t callback_usecs);
+    void ReadFrameTime(JackTimer* timer);
+
+    // Private
+    void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager);
+    void GetTimeMeasure(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
+    void ClearTimeMeasures();
+    void ResetRollingUsecs();
+
 };
 
 } // end of namespace

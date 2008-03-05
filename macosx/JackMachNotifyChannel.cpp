@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -56,9 +56,9 @@ void JackMachNotifyChannel::ClientNotify(int refnum, const char* name, int notif
     if (res == KERN_SUCCESS) {
         *result = 0;
     } else {
-		jack_error("JackMachNotifyChannel::ClientNotify: name = %s notify = %ld err = %s", name, notify, mach_error_string(res));
-		*result = -1;
-	}
+        jack_error("JackMachNotifyChannel::ClientNotify: name = %s notify = %ld err = %s", name, notify, mach_error_string(res));
+        *result = -1;
+    }
 }
 
 } // end of namespace

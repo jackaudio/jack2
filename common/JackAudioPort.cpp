@@ -22,9 +22,9 @@ This program is free software; you can redistribute it and/or modify
 #include <string.h>
 
 #if defined (__APPLE__)
-	#include <Accelerate/Accelerate.h>
+#include <Accelerate/Accelerate.h>
 #elif defined (__SSE__)
-	#include <xmmintrin.h>
+#include <xmmintrin.h>
 #endif
 
 namespace Jack
@@ -38,9 +38,9 @@ static void AudioBufferInit(void* buffer, size_t buffer_size, jack_nframes_t)
 static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_t frames)
 {
 #ifdef __APPLE__
-	// It seems that a vector mult only operation does not exist...
-	float gain = 1.0f;
-	vDSP_vsma(buffer, 1, &gain, mixbuffer, 1, mixbuffer, 1, frames);
+    // It seems that a vector mult only operation does not exist...
+    float gain = 1.0f;
+    vDSP_vsma(buffer, 1, &gain, mixbuffer, 1, mixbuffer, 1, frames);
 #else
     jack_nframes_t frames_group = frames / 4;
     frames = frames % 4;
@@ -54,29 +54,29 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
         buffer += 4;
         frames_group--;
 #else
-        register float mixFloat1 = *mixbuffer;
-        register float sourceFloat1 = *buffer;
-        register float mixFloat2 = *(mixbuffer + 1);
-        register float sourceFloat2 = *(buffer + 1);
-        register float mixFloat3 = *(mixbuffer + 2);
-        register float sourceFloat3 = *(buffer + 2);
-        register float mixFloat4 = *(mixbuffer + 3);
-        register float sourceFloat4 = *(buffer + 3);
+    register float mixFloat1 = *mixbuffer;
+    register float sourceFloat1 = *buffer;
+    register float mixFloat2 = *(mixbuffer + 1);
+    register float sourceFloat2 = *(buffer + 1);
+    register float mixFloat3 = *(mixbuffer + 2);
+    register float sourceFloat3 = *(buffer + 2);
+    register float mixFloat4 = *(mixbuffer + 3);
+    register float sourceFloat4 = *(buffer + 3);
 
-        buffer += 4;
-        frames_group--;
+    buffer += 4;
+    frames_group--;
 
-        mixFloat1 += sourceFloat1;
-        mixFloat2 += sourceFloat2;
-        mixFloat3 += sourceFloat3;
-        mixFloat4 += sourceFloat4;
+    mixFloat1 += sourceFloat1;
+    mixFloat2 += sourceFloat2;
+    mixFloat3 += sourceFloat3;
+    mixFloat4 += sourceFloat4;
 
-        *mixbuffer = mixFloat1;
-        *(mixbuffer + 1) = mixFloat2;
-        *(mixbuffer + 2) = mixFloat3;
-        *(mixbuffer + 3) = mixFloat4;
+    *mixbuffer = mixFloat1;
+    *(mixbuffer + 1) = mixFloat2;
+    *(mixbuffer + 2) = mixFloat3;
+    *(mixbuffer + 3) = mixFloat4;
 
-        mixbuffer += 4;
+    mixbuffer += 4;
 #endif
     }
 
@@ -99,18 +99,19 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     // Copy first buffer
     memcpy(mixbuffer, src_buffers[0], nframes * sizeof(float));
 
-	// Mix remaining buffers
+    // Mix remaining buffers
     for (int i = 1; i < src_count; ++i) {
         buffer = src_buffers[i];
         MixAudioBuffer(static_cast<float*>(mixbuffer), static_cast<float*>(buffer), nframes);
     }
 }
 
-const JackPortType gAudioPortType = {
-    JACK_DEFAULT_AUDIO_TYPE,
-    AudioBufferInit,
-    AudioBufferMixdown
-};
+const JackPortType gAudioPortType =
+    {
+        JACK_DEFAULT_AUDIO_TYPE,
+        AudioBufferInit,
+        AudioBufferMixdown
+    };
 
 } // namespace Jack
 

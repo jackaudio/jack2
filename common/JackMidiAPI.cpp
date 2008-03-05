@@ -28,23 +28,24 @@ This program is free software; you can redistribute it and/or modify
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
     EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer);
 
     EXPORT int jack_midi_event_get(jack_midi_event_t* event,
-        void* port_buffer, jack_nframes_t event_index);
+                                   void* port_buffer, jack_nframes_t event_index);
 
     EXPORT void jack_midi_clear_buffer(void* port_buffer);
 
     EXPORT size_t jack_midi_max_event_size(void* port_buffer);
 
     EXPORT jack_midi_data_t* jack_midi_event_reserve(void* port_buffer,
-        jack_nframes_t time, size_t data_size);
+            jack_nframes_t time, size_t data_size);
 
     EXPORT int jack_midi_event_write(void* port_buffer,
-        jack_nframes_t time, const jack_midi_data_t* data, size_t data_size);
+                                     jack_nframes_t time, const jack_midi_data_t* data, size_t data_size);
 
     EXPORT jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer);
 
@@ -108,7 +109,7 @@ jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t time
 
 EXPORT
 int jack_midi_event_write(void* port_buffer,
-        jack_nframes_t time, const jack_midi_data_t* data, size_t data_size)
+                          jack_nframes_t time, const jack_midi_data_t* data, size_t data_size)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
     if (!buf && !buf->IsValid())
@@ -127,6 +128,6 @@ jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
     if (buf && buf->IsValid())
-        return buf->lost_events; 
+        return buf->lost_events;
     return 0;
 }

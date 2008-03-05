@@ -59,7 +59,7 @@ extern "C"
 
     extern int optopt;
 
-#ifndef __need_getopt 
+#ifndef __need_getopt
     /* Describe the long-named options requested by the application.
        The LONG_OPTIONS argument to getopt_long or getopt_long_only is a vector
        of `struct option' terminated by an element containing a name which is
@@ -128,7 +128,7 @@ extern "C"
        `getopt'.  */
 
 #if defined __STDC__ && __STDC__
-# ifdef __GNU_LIBRARY__ 
+# ifdef __GNU_LIBRARY__
     /* Many other libraries have conflicting prototypes for getopt, with
        differences in the consts, in stdlib.h.  To avoid compilation
        errors, only prototype getopt for the GNU C library.  */

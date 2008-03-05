@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001 Paul Davis 
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -52,9 +52,9 @@ void* JackShmMem::operator new(size_t size)
     // It is unsafe to set object fields directly (may be overwritten during object initialization),
     // so use an intermediate global data
     gInfo.index = info.index;
-	gInfo.size = size;
+    gInfo.size = size;
     gInfo.attached_at = info.attached_at;
-	
+
     JackLog("JackShmMem::new index = %ld attached = %x size = %ld \n", info.index, info.attached_at, size);
     return obj;
 
@@ -76,40 +76,40 @@ void JackShmMem::operator delete(void* p, size_t size)
     jack_destroy_shm(&info);
 }
 
-void LockMemoryImp(void* ptr, size_t size) 
+void LockMemoryImp(void* ptr, size_t size)
 {
-	if (CHECK_MLOCK(ptr, size)) {
-		JackLog("Succeeded in locking %u byte memory area\n", size);		
-	} else {
-		jack_error("Cannot lock down memory area (%s)", strerror(errno));
-	}
+    if (CHECK_MLOCK(ptr, size)) {
+        JackLog("Succeeded in locking %u byte memory area\n", size);
+    } else {
+        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+    }
 }
 
-void UnlockMemoryImp(void* ptr, size_t size) 
+void UnlockMemoryImp(void* ptr, size_t size)
 {
-	if (CHECK_MUNLOCK(ptr, size)) {
-		JackLog("Succeeded in unlocking %u byte memory area\n", size);		
-	} else {
-		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
-	}
+    if (CHECK_MUNLOCK(ptr, size)) {
+        JackLog("Succeeded in unlocking %u byte memory area\n", size);
+    } else {
+        jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+    }
 }
 
-void LockAllMemory() 
+void LockAllMemory()
 {
-	if (CHECK_MLOCKALL()) {
-		JackLog("Succeeded in locking all memory\n");		
-	} else {
-		jack_error("Cannot lock down memory area (%s)", strerror(errno));
-	}
+    if (CHECK_MLOCKALL()) {
+        JackLog("Succeeded in locking all memory\n");
+    } else {
+        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+    }
 }
 
-void UnlockAllMemory() 
+void UnlockAllMemory()
 {
-	if (CHECK_MUNLOCKALL()) {
-		JackLog("Succeeded in unlocking all memory\n");		
-	} else {
-		jack_error("Cannot unlock down memory area (%s)", strerror(errno));
-	}
+    if (CHECK_MUNLOCKALL()) {
+        JackLog("Succeeded in unlocking all memory\n");
+    } else {
+        jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+    }
 }
 
 

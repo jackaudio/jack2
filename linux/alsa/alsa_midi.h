@@ -20,22 +20,23 @@
 #define __jack_alsa_midi_h__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct alsa_midi_t alsa_midi_t;
-struct alsa_midi_t {
-	void (*destroy)(alsa_midi_t *amidi);
-	int (*attach)(alsa_midi_t *amidi);
-	int (*detach)(alsa_midi_t *amidi);
-	int (*start)(alsa_midi_t *amidi);
-	int (*stop)(alsa_midi_t *amidi);
-	void (*read)(alsa_midi_t *amidi, jack_nframes_t nframes);
-	void (*write)(alsa_midi_t *amidi, jack_nframes_t nframes);
-};
+    typedef struct alsa_midi_t alsa_midi_t;
+    struct alsa_midi_t {
+        void (*destroy)(alsa_midi_t *amidi);
+        int (*attach)(alsa_midi_t *amidi);
+        int (*detach)(alsa_midi_t *amidi);
+        int (*start)(alsa_midi_t *amidi);
+        int (*stop)(alsa_midi_t *amidi);
+        void (*read)(alsa_midi_t *amidi, jack_nframes_t nframes);
+        void (*write)(alsa_midi_t *amidi, jack_nframes_t nframes);
+    };
 
-alsa_midi_t* alsa_rawmidi_new(jack_client_t *jack);
-alsa_midi_t* alsa_seqmidi_new(jack_client_t *jack, const char* alsa_name);
+    alsa_midi_t* alsa_rawmidi_new(jack_client_t *jack);
+    alsa_midi_t* alsa_seqmidi_new(jack_client_t *jack, const char* alsa_name);
 
 #ifdef __cplusplus
 } // extern "C"

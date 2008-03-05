@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2001 Paul Davis 
+   Copyright (C) 2001 Paul Davis
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -65,7 +65,7 @@ typedef int	(*JackDriverBufSizeFunction)(struct _jack_driver *,
         jack_nframes_t nframes);
 /*
    Call sequence summary:
- 
+
      1) engine loads driver via runtime dynamic linking
 	 - calls jack_driver_load
 	 - we call dlsym for "driver_initialize" and execute it
@@ -79,7 +79,7 @@ typedef int	(*JackDriverBufSizeFunction)(struct _jack_driver *,
      5) engine stops driver
      6) engine detaches from driver
      7) engine calls driver `finish' routine
- 
+
      Note that stop/start may be called multiple times in the event of an
      error return from the `wait' function.
 */
@@ -248,7 +248,7 @@ void jack_driver_unload (jack_driver_t *);
 
 /*
    Call sequence summary:
- 
+
      1) engine loads driver via runtime dynamic linking
 	 - calls jack_driver_load
 	 - we call dlsym for "driver_initialize" and execute it
@@ -262,11 +262,11 @@ void jack_driver_unload (jack_driver_t *);
      5) nt layer stops driver
      6) nt layer detaches driver
      7) engine calls driver `finish' routine which calls jack_driver_nt_finish
- 
+
      Note that stop/start may be called multiple times in the event of an
      error return from the `wait' function.
- 
- 
+
+
 */
 
 struct _jack_driver_nt;

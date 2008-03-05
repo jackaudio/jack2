@@ -22,11 +22,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackThread__
 
 #ifdef WIN32
-	#include <windows.h>
+#include <windows.h>
 typedef HANDLE pthread_t;
 typedef ULONGLONG UInt64;
 #else
-	#include <pthread.h>
+#include <pthread.h>
 typedef unsigned long long UInt64;
 #endif
 
@@ -81,7 +81,7 @@ class JackThread
         virtual int StartSync() = 0;
         virtual int Kill() = 0;
         virtual int Stop() = 0;
-		virtual void Terminate() = 0;
+        virtual void Terminate() = 0;
 
         virtual int AcquireRealTime() = 0;
         virtual int AcquireRealTime(int priority) = 0;

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2005 Grame  
+Copyright (C) 2004-2005 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ bool JackWinSemaphore::Signal()
 
     if (fFlush)
         return true;
-	
+
     if (!(res = ReleaseSemaphore(fSemaphore, 1, NULL))) {
         jack_error("JackWinSemaphore::Signal name = %s err = %ld", fName, GetLastError());
     }
-	
+
     return res;
 }
 
@@ -51,10 +51,10 @@ bool JackWinSemaphore::SignalAll()
     if (fFlush)
         return true;
 
-	if (!(res = ReleaseSemaphore(fSemaphore, 1, NULL))) {
+    if (!(res = ReleaseSemaphore(fSemaphore, 1, NULL))) {
         jack_error("JackWinSemaphore::SignalAll name = %s err = %ld", fName, GetLastError());
     }
-	
+
     return res;
 }
 
@@ -74,7 +74,7 @@ bool JackWinSemaphore::TimedWait(long usec)
     DWORD res;
 
     if ((res = WaitForSingleObject(fSemaphore, usec / 1000)) == WAIT_TIMEOUT) {
-		jack_error("JackWinSemaphore::TimedWait name = %s time_out", fName);
+        jack_error("JackWinSemaphore::TimedWait name = %s time_out", fName);
     }
 
     return (res == WAIT_OBJECT_0);
@@ -92,8 +92,8 @@ bool JackWinSemaphore::ConnectInput(const char* name, const char* server_name)
         return true;
     }
 
-	if ((fSemaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS , FALSE, fName)) == NULL) {
-		jack_error("Connect: can't check in named event name = %s err = %ld", fName, GetLastError());
+    if ((fSemaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS , FALSE, fName)) == NULL) {
+        jack_error("Connect: can't check in named event name = %s err = %ld", fName, GetLastError());
         return false;
     } else {
         return true;
@@ -127,23 +127,23 @@ bool JackWinSemaphore::Allocate(const char* name, const char* server_name, int v
     BuildName(name, server_name, fName);
     JackLog("JackWinSemaphore::Allocate name = %s val = %ld\n", fName, value);
 
-	if ((fSemaphore = CreateSemaphore(NULL, value, 32767, fName)) == NULL) {
+    if ((fSemaphore = CreateSemaphore(NULL, value, 32767, fName)) == NULL) {
         jack_error("Allocate: can't check in named semaphore name = %s err = %ld", fName, GetLastError());
         return false;
     } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
-		jack_error("Allocate: named semaphore already exist name = %s", fName);
-		CloseHandle(fSemaphore);
-		fSemaphore = NULL;
-		return false;
-	} else {
- 		return true;
+        jack_error("Allocate: named semaphore already exist name = %s", fName);
+        CloseHandle(fSemaphore);
+        fSemaphore = NULL;
+        return false;
+    } else {
+        return true;
     }
 }
 
 void JackWinSemaphore::Destroy()
 {
     if (fSemaphore != NULL) {
-		JackLog("JackWinSemaphore::Destroy %s\n", fName);
+        JackLog("JackWinSemaphore::Destroy %s\n", fName);
         CloseHandle(fSemaphore);
         fSemaphore = NULL;
     } else {

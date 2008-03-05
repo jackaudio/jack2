@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame  
+Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@ namespace Jack
 bool JackActivationCount::Signal(JackSynchro* synchro, JackClientControl* control)
 {
     if (fValue == 0) {
-		// Transfer activation to next clients
+        // Transfer activation to next clients
         jack_error("JackActivationCount::Signal value = 0 ref = %ld", control->fRefNum);
         return synchro->Signal();
     } else if (DEC_ATOMIC(&fValue) == 1) {
-		return synchro->Signal();
+        return synchro->Signal();
     } else {
         return true;
     }

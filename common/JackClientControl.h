@@ -31,16 +31,16 @@ namespace Jack
 {
 
 /*!
-\brief Client control in shared memory. 
+\brief Client control in shared memory.
 */
 
 struct JackClientControl : public JackShmMem
 {
     char fName[JACK_CLIENT_NAME_SIZE + 1];
-	bool fCallback[kMaxNotification];
-  	volatile jack_transport_state_t fTransportState;
-	int fRefNum;
-	bool fActive;
+    bool fCallback[kMaxNotification];
+    volatile jack_transport_state_t fTransportState;
+    int fRefNum;
+    bool fActive;
 
     JackClientControl(const char* name, int refnum)
     {
@@ -60,16 +60,16 @@ struct JackClientControl : public JackShmMem
     void Init(const char* name, int refnum)
     {
         strcpy(fName, name);
-		for (int i = 0; i < kMaxNotification; i++) 
-			fCallback[i] = false;
-		// Always activated
-		fCallback[kAddClient] = true;
-		fCallback[kRemoveClient] = true;
-		fCallback[kActivateClient] = true;
-		// So that driver synchro are correctly setup in "flush" or "normal" mode 
-		fCallback[kStartFreewheelCallback] = true;
-		fCallback[kStopFreewheelCallback] = true;
-		fRefNum = refnum;
+        for (int i = 0; i < kMaxNotification; i++)
+            fCallback[i] = false;
+        // Always activated
+        fCallback[kAddClient] = true;
+        fCallback[kRemoveClient] = true;
+        fCallback[kActivateClient] = true;
+        // So that driver synchro are correctly setup in "flush" or "normal" mode
+        fCallback[kStartFreewheelCallback] = true;
+        fCallback[kStopFreewheelCallback] = true;
+        fRefNum = refnum;
         fTransportState = JackTransportStopped;
         fActive = false;
     }

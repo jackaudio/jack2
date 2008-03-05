@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005 Grame  
+Copyright (C) 2005 Grame
 
 This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ struct JackLibGlobals
     std::map<mach_port_t, JackClient*> fClientTable;        /*! Client table */
 #endif
 
- 	static int fClientCount;
+    static int fClientCount;
     static JackLibGlobals* fGlobals;
 
     JackLibGlobals()
@@ -77,7 +77,7 @@ struct JackLibGlobals
             JackGlobals::InitClient();
             InitTime();
             fGlobals = new JackLibGlobals();
-	   }
+        }
     }
 
     static void Destroy()
@@ -89,13 +89,13 @@ struct JackLibGlobals
             JackGlobals::Destroy();
         }
     }
-	
-	static void CheckContext()
-	{
-		if (!(fClientCount > 0 && fGlobals)) {
-			jack_error("Error !!! : client accessing an already desallocated library context");
-		}
-	}
+
+    static void CheckContext()
+    {
+        if (!(fClientCount > 0 && fGlobals)) {
+            jack_error("Error !!! : client accessing an already desallocated library context");
+        }
+    }
 
 };
 

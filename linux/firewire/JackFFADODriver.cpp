@@ -60,25 +60,25 @@ JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nfra
     printEnter();
     for (chn = 0; chn < driver->capture_nchannels; chn++) {
         // if nothing connected, don't process
-        if(fGraphManager->GetConnectionsNum(fCapturePortList[chn]) == 0) {
-            buf=(jack_default_audio_sample_t*)driver->scratchbuffer;
+        if (fGraphManager->GetConnectionsNum(fCapturePortList[chn]) == 0) {
+            buf = (jack_default_audio_sample_t*)driver->scratchbuffer;
             // we always have to specify a valid buffer
             ffado_streaming_set_capture_stream_buffer(driver->dev, chn, (char *)(buf));
             // notify the streaming system that it can (but doesn't have to) skip
             // this channel
             ffado_streaming_capture_stream_onoff(driver->dev, chn, 0);
         } else {
-            if(driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
+            if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
                 buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[chn],  nframes);
 
                 /* if the returned buffer is invalid, use the dummy buffer */
-                if(!buf) buf=(jack_default_audio_sample_t*)driver->scratchbuffer;
-    
+                if (!buf) buf = (jack_default_audio_sample_t*)driver->scratchbuffer;
+
                 ffado_streaming_set_capture_stream_buffer(driver->dev, chn, (char *)(buf));
                 ffado_streaming_capture_stream_onoff(driver->dev, chn, 1);
             } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-                ffado_streaming_set_capture_stream_buffer(driver->dev, chn, 
-                                                        (char *)(driver->capture_channels[chn].midi_buffer));
+                ffado_streaming_set_capture_stream_buffer(driver->dev, chn,
+                        (char *)(driver->capture_channels[chn].midi_buffer));
                 ffado_streaming_capture_stream_onoff(driver->dev, chn, 1);
             } else { // always have a valid buffer
                 ffado_streaming_set_capture_stream_buffer(driver->dev, chn, (char *)(driver->scratchbuffer));
@@ -102,18 +102,18 @@ JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nfra
             jack_midi_clear_buffer(buf);
 
             /* if the returned buffer is invalid, discard the midi data */
-            if(!buf) continue;
+            if (!buf) continue;
             /* else unpack
                note that libffado guarantees that midi bytes are on 8-byte aligned indexes
              */
-            for(i=0; i<nframes; i+=8) {
-                if(midi_buffer[i] & 0xFF000000) {
-                    done=midi_unpack_buf(midi_unpack, (unsigned char *)(midi_buffer+i), 1, buf, i);
+            for (i = 0; i < nframes; i += 8) {
+                if (midi_buffer[i] & 0xFF000000) {
+                    done = midi_unpack_buf(midi_unpack, (unsigned char *)(midi_buffer + i), 1, buf, i);
                     if (done != 1) {
                         printError("buffer overflow in channel %d\n", chn);
                         break;
                     }
-                    
+
                     printMessage("MIDI IN: %08X (i=%d)", midi_buffer[i], i);
                 }
             }
@@ -134,18 +134,18 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
     driver->process_count++;
 
     for (chn = 0; chn < driver->playback_nchannels; chn++) {
-        if(fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) == 0) {
-            buf=(jack_default_audio_sample_t*)driver->nullbuffer;
+        if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) == 0) {
+            buf = (jack_default_audio_sample_t*)driver->nullbuffer;
             // we always have to specify a valid buffer
             ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(buf));
             // notify the streaming system that it can (but doesn't have to) skip
             // this channel
             ffado_streaming_playback_stream_onoff(driver->dev, chn, 0);
         } else {
-            if(driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
+            if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
                 buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], nframes);
                 /* use the silent buffer if there is no valid jack buffer */
-                if(!buf) buf=(jack_default_audio_sample_t*)driver->nullbuffer;
+                if (!buf) buf = (jack_default_audio_sample_t*)driver->nullbuffer;
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(buf));
 
             } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
@@ -154,65 +154,65 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                 midi_pack_t *midi_pack = &driver->playback_channels[chn].midi_pack;
                 uint32_t *midi_buffer = driver->playback_channels[chn].midi_buffer;
                 buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], nframes);
-                int min_next_pos=0;
+                int min_next_pos = 0;
 
                 memset(midi_buffer, 0, nframes * sizeof(uint32_t));
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(midi_buffer));
 
                 /* if the returned buffer is invalid, continue */
-                if(!buf) {
+                if (!buf) {
                     ffado_streaming_playback_stream_onoff(driver->dev, chn, 0);
                     continue;
                 }
                 ffado_streaming_playback_stream_onoff(driver->dev, chn, 1);
 
                 // check if we still have to process bytes from the previous period
-                if(driver->playback_channels[chn].nb_overflow_bytes) {
+                if (driver->playback_channels[chn].nb_overflow_bytes) {
                     printMessage("have to process %d bytes from previous period", driver->playback_channels[chn].nb_overflow_bytes);
                 }
-                for (i=0; i<driver->playback_channels[chn].nb_overflow_bytes; ++i) {
+                for (i = 0; i < driver->playback_channels[chn].nb_overflow_bytes; ++i) {
                     midi_buffer[min_next_pos] = 0x01000000 | (driver->playback_channels[chn].overflow_buffer[i] & 0xFF);
                     min_next_pos += 8;
                 }
-                driver->playback_channels[chn].nb_overflow_bytes=0;
+                driver->playback_channels[chn].nb_overflow_bytes = 0;
 
                 // process the events in this period
                 nevents = jack_midi_get_event_count(buf);
                 //if (nevents)
                 //  printMessage("MIDI: %d events in ch %d", nevents, chn);
-    
-                for (i=0; i<nevents; ++i) {
+
+                for (i = 0; i < nevents; ++i) {
                     int j;
                     jack_midi_event_t event;
                     jack_midi_event_get(&event, buf, i);
-    
+
                     midi_pack_event(midi_pack, &event);
-                    
+
                     // floor the initial position to be a multiple of 8
                     int pos = event.time & 0xFFFFFFF8;
-                    for(j = 0; j < event.size; j++) {
+                    for (j = 0; j < event.size; j++) {
                         // make sure we don't overwrite a previous byte
-                        while(pos < min_next_pos && pos < nframes) {
+                        while (pos < min_next_pos && pos < nframes) {
                             pos += 8;
                             printMessage("have to correct pos to %d", pos);
                         }
 
-                        if(pos >= nframes) {
+                        if (pos >= nframes) {
                             int f;
                             printMessage("midi message crosses period boundary");
                             driver->playback_channels[chn].nb_overflow_bytes = event.size - j;
-                            if(driver->playback_channels[chn].nb_overflow_bytes > MIDI_OVERFLOW_BUFFER_SIZE) {
+                            if (driver->playback_channels[chn].nb_overflow_bytes > MIDI_OVERFLOW_BUFFER_SIZE) {
                                 printError("too much midi bytes cross period boundary");
                                 driver->playback_channels[chn].nb_overflow_bytes = MIDI_OVERFLOW_BUFFER_SIZE;
                             }
                             // save the bytes that still have to be transmitted in the next period
-                            for(f=0; f<driver->playback_channels[chn].nb_overflow_bytes; f++) {
+                            for (f = 0; f < driver->playback_channels[chn].nb_overflow_bytes; f++) {
                                 driver->playback_channels[chn].overflow_buffer[f] = event.buffer[j+f];
                             }
                             // exit since we can't transmit anything anymore.
                             // the rate should be controlled
-                            if(i<nevents-1) {
-                                printError("%d midi events lost due to period crossing", nevents-i-1);
+                            if (i < nevents - 1) {
+                                printError("%d midi events lost due to period crossing", nevents - i - 1);
                             }
                             break;
                         } else {
@@ -239,7 +239,7 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
 
 jack_nframes_t
 JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *status,
-                                        float *delayed_usecs)
+                                    float *delayed_usecs)
 {
     int nframes;
     jack_time_t wait_enter;
@@ -275,12 +275,12 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
 
     if (response == ffado_wait_xrun) {
         // xrun happened, but it's handled
-        *status=0;
+        *status = 0;
         return 0;
     } else if (response == ffado_wait_error) {
         // an error happened (unhandled xrun)
         // this should be fatal
-        *status=-1;
+        *status = -1;
         return 0;
     }
 
@@ -331,7 +331,7 @@ JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
     printError("Buffer size change requested but not supported!!!");
 
     /*
-	driver->period_size = nframes; 
+    driver->period_size = nframes; 
     driver->period_usecs =
     	(jack_time_t) floor ((((float) nframes) / driver->sample_rate)
     			     * 1000000.0f);
@@ -347,13 +347,13 @@ typedef void (*JackDriverFinishFunction) (jack_driver_t *);
 
 ffado_driver_t *
 JackFFADODriver::ffado_driver_new (char *name,
-                                       ffado_jack_settings_t *params)
+                                   ffado_jack_settings_t *params)
 {
     ffado_driver_t *driver;
 
     assert(params);
 
-    if(ffado_get_api_version() != FIREWIRE_REQUIRED_FFADO_API_VERSION) {
+    if (ffado_get_api_version() != FIREWIRE_REQUIRED_FFADO_API_VERSION) {
         printError("Incompatible libffado version! (%s)", ffado_get_version());
         return NULL;
     }
@@ -411,7 +411,7 @@ JackFFADODriver::ffado_driver_new (char *name,
 void
 JackFFADODriver::ffado_driver_delete (ffado_driver_t *driver)
 {
-	free (driver);
+    free (driver);
 }
 
 int JackFFADODriver::Attach()
@@ -434,16 +434,16 @@ int JackFFADODriver::Attach()
      */
     /* the null buffer is a buffer that contains one period of silence */
     driver->nullbuffer = (ffado_sample_t *)calloc(driver->period_size, sizeof(ffado_sample_t));
-    if(driver->nullbuffer == NULL) {
+    if (driver->nullbuffer == NULL) {
         printError("could not allocate memory for null buffer");
         return -1;
     }
     /* calloc should do this, but it can't hurt to be sure */
     memset(driver->nullbuffer, 0, driver->period_size*sizeof(ffado_sample_t));
-    
+
     /* the scratch buffer is a buffer of one period that can be used as dummy memory */
     driver->scratchbuffer = (ffado_sample_t *)calloc(driver->period_size, sizeof(ffado_sample_t));
-    if(driver->scratchbuffer == NULL) {
+    if (driver->scratchbuffer == NULL) {
         printError("could not allocate memory for scratch buffer");
         return -1;
     }
@@ -480,24 +480,24 @@ int JackFFADODriver::Attach()
     port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
 
     driver->capture_nchannels = ffado_streaming_get_nb_capture_streams(driver->dev);
-    driver->capture_channels=(ffado_capture_channel_t *)calloc(driver->capture_nchannels, sizeof(ffado_capture_channel_t));
-    if(driver->capture_channels==NULL) {
+    driver->capture_channels = (ffado_capture_channel_t *)calloc(driver->capture_nchannels, sizeof(ffado_capture_channel_t));
+    if (driver->capture_channels == NULL) {
         printError("could not allocate memory for capture channel list");
         return -1;
     }
 
-    fCaptureChannels=0;
+    fCaptureChannels = 0;
     for (unsigned int chn = 0; chn < driver->capture_nchannels; chn++) {
         ffado_streaming_get_capture_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
 
-        driver->capture_channels[chn].stream_type=ffado_streaming_get_capture_stream_type(driver->dev, chn);
-        if(driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
+        driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
+        if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
             snprintf(buf, sizeof(buf) - 1, "%s:AC%d_%s", fClientControl->fName, (int)chn, portname);
             printMessage ("Registering audio capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
-                                                          JACK_DEFAULT_AUDIO_TYPE,
-                                                          (JackPortFlags)port_flags, 
-                                                          fEngineControl->fBufferSize)) == NO_PORT) {
+                              JACK_DEFAULT_AUDIO_TYPE,
+                              (JackPortFlags)port_flags,
+                              fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -514,13 +514,13 @@ int JackFFADODriver::Attach()
             JackLog("JackFFADODriver::Attach fCapturePortList[i] %ld \n", port_index);
             fCaptureChannels++;
 
-        } else if(driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
+        } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
             snprintf(buf, sizeof(buf) - 1, "%s:MC%d_%s", fClientControl->fName, (int)chn, portname);
             printMessage ("Registering midi capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
-                                                          JACK_DEFAULT_MIDI_TYPE,
-                                                          (JackPortFlags)port_flags, 
-                                                          fEngineControl->fBufferSize)) == NO_PORT) {
+                              JACK_DEFAULT_MIDI_TYPE,
+                              (JackPortFlags)port_flags,
+                              fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -529,10 +529,10 @@ int JackFFADODriver::Attach()
             if (ffado_streaming_set_capture_stream_buffer(driver->dev, chn, NULL)) {
                 printError(" cannot configure initial port buffer for %s", buf);
             }
-            if(ffado_streaming_capture_stream_onoff(driver->dev, chn, 0)) {
+            if (ffado_streaming_capture_stream_onoff(driver->dev, chn, 0)) {
                 printError(" cannot enable port %s", buf);
             }
-            
+
             // setup midi unpacker
             midi_unpack_init(&driver->capture_channels[chn].midi_unpack);
             midi_unpack_reset(&driver->capture_channels[chn].midi_unpack);
@@ -553,25 +553,25 @@ int JackFFADODriver::Attach()
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
 
     driver->playback_nchannels = ffado_streaming_get_nb_playback_streams(driver->dev);
-    driver->playback_channels=(ffado_playback_channel_t *)calloc(driver->playback_nchannels, sizeof(ffado_playback_channel_t));
-    if(driver->playback_channels==NULL) {
+    driver->playback_channels = (ffado_playback_channel_t *)calloc(driver->playback_nchannels, sizeof(ffado_playback_channel_t));
+    if (driver->playback_channels == NULL) {
         printError("could not allocate memory for playback channel list");
         return -1;
     }
 
-    fPlaybackChannels=0;
+    fPlaybackChannels = 0;
     for (unsigned int chn = 0; chn < driver->playback_nchannels; chn++) {
         ffado_streaming_get_playback_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
 
-        driver->playback_channels[chn].stream_type=ffado_streaming_get_playback_stream_type(driver->dev, chn);
+        driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
 
-        if(driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
+        if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
             snprintf(buf, sizeof(buf) - 1, "%s:AP%d_%s", fClientControl->fName, (int)chn, portname);
             printMessage ("Registering audio playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
-                                                          JACK_DEFAULT_AUDIO_TYPE,
-                                                          (JackPortFlags)port_flags,
-                                                          fEngineControl->fBufferSize)) == NO_PORT) {
+                              JACK_DEFAULT_AUDIO_TYPE,
+                              (JackPortFlags)port_flags,
+                              fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -580,7 +580,7 @@ int JackFFADODriver::Attach()
             if (ffado_streaming_set_playback_stream_buffer(driver->dev, chn, NULL)) {
                 printError(" cannot configure initial port buffer for %s", buf);
             }
-            if(ffado_streaming_playback_stream_onoff(driver->dev, chn, 0)) {
+            if (ffado_streaming_playback_stream_onoff(driver->dev, chn, 0)) {
                 printError(" cannot enable port %s", buf);
             }
 
@@ -589,13 +589,13 @@ int JackFFADODriver::Attach()
             fPlaybackPortList[chn] = port_index;
             JackLog("JackFFADODriver::Attach fPlaybackPortList[i] %ld \n", port_index);
             fPlaybackChannels++;
-        } else if(driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
+        } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
             snprintf(buf, sizeof(buf) - 1, "%s:MP%d_%s", fClientControl->fName, (int)chn, portname);
             printMessage ("Registering midi playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
-                                                          JACK_DEFAULT_MIDI_TYPE,
-                                                          (JackPortFlags)port_flags,
-                                                          fEngineControl->fBufferSize)) == NO_PORT) {
+                              JACK_DEFAULT_MIDI_TYPE,
+                              (JackPortFlags)port_flags,
+                              fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -604,7 +604,7 @@ int JackFFADODriver::Attach()
             if (ffado_streaming_set_playback_stream_buffer(driver->dev, chn, NULL)) {
                 printError(" cannot configure initial port buffer for %s", buf);
             }
-            if(ffado_streaming_playback_stream_onoff(driver->dev, chn, 0)) {
+            if (ffado_streaming_playback_stream_onoff(driver->dev, chn, 0)) {
                 printError(" cannot enable port %s", buf);
             }
             // setup midi packer
@@ -625,7 +625,7 @@ int JackFFADODriver::Attach()
     assert(fCaptureChannels < PORT_NUM);
     assert(fPlaybackChannels < PORT_NUM);
 
-    if(ffado_streaming_prepare(driver->dev)) {
+    if (ffado_streaming_prepare(driver->dev)) {
         printError("Could not prepare streaming device!");
         return -1;
     }
@@ -647,13 +647,13 @@ int JackFFADODriver::Detach()
 
     // free all internal buffers
     for (chn = 0; chn < driver->capture_nchannels; chn++) {
-        if(driver->capture_channels[chn].midi_buffer)
+        if (driver->capture_channels[chn].midi_buffer)
             free(driver->capture_channels[chn].midi_buffer);
     }
     free(driver->capture_channels);
-    
+
     for (chn = 0; chn < driver->playback_nchannels; chn++) {
-        if(driver->playback_channels[chn].midi_buffer)
+        if (driver->playback_channels[chn].midi_buffer)
             free(driver->playback_channels[chn].midi_buffer);
     }
     free(driver->playback_channels);
@@ -661,7 +661,7 @@ int JackFFADODriver::Detach()
     free(driver->nullbuffer);
     free(driver->scratchbuffer);
 
-	return JackAudioDriver::Detach();  // Generic JackAudioDriver Detach
+    return JackAudioDriver::Detach();  // Generic JackAudioDriver Detach
 }
 
 int JackFFADODriver::Open(ffado_jack_settings_t *params)

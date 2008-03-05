@@ -39,14 +39,14 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
 {
     int id = GetPortTypeId(port_type);
     if (id < 0)
-    	return false;
+        return false;
     fTypeId = id;
     fFlags = flags;
     fRefNum = refnum;
     strcpy(fName, port_name);
     fInUse = true;
     fLatency = 0;
-	fTotalLatency = 0;
+    fTotalLatency = 0;
     fTied = NO_PORT;
     // DB: At this point we do not know current buffer size in frames,
     // but every time buffer will be returned to any user,
@@ -64,10 +64,10 @@ void JackPort::Release()
     fRefNum = -1;
     fInUse = false;
     fLatency = 0;
-	fTotalLatency = 0;
+    fTotalLatency = 0;
     fTied = NO_PORT;
-	fAlias1[0] = '\0';
-	fAlias2[0] = '\0';
+    fAlias1[0] = '\0';
+    fAlias2[0] = '\0';
 }
 
 bool JackPort::IsUsed() const
@@ -170,7 +170,7 @@ const char* JackPort::GetShortName() const
 {
     /* we know there is always a colon, because we put
        it there ...
-    */ 
+    */
     return strchr(fName, ':') + 1;
 }
 
@@ -195,66 +195,66 @@ int JackPort::SetName(const char* new_name)
 
 bool JackPort::NameEquals(const char* target)
 {
-	char buf[JACK_PORT_NAME_SIZE + 1];
+    char buf[JACK_PORT_NAME_SIZE + 1];
 
-	/* this nasty, nasty kludge is here because between 0.109.0 and 0.109.1,
-	   the ALSA audio backend had the name "ALSA", whereas as before and
-	   after it, it was called "alsa_pcm". this stops breakage for
-	   any setups that have saved "alsa_pcm" or "ALSA" in their connection
-	   state.
-	*/
+    /* this nasty, nasty kludge is here because between 0.109.0 and 0.109.1,
+       the ALSA audio backend had the name "ALSA", whereas as before and
+       after it, it was called "alsa_pcm". this stops breakage for
+       any setups that have saved "alsa_pcm" or "ALSA" in their connection
+       state.
+    */
 
-	if (strncmp(target, "ALSA:capture", 12) == 0 || strncmp(target, "ALSA:playback", 13) == 0) {
-		snprintf(buf, sizeof(buf), "alsa_pcm%s", target + 4);
-		target = buf;
-	}
-	
-	return (strcmp(fName, target) == 0 
-		|| strcmp(fAlias1, target) == 0 
-		|| strcmp(fAlias2, target) == 0);
+    if (strncmp(target, "ALSA:capture", 12) == 0 || strncmp(target, "ALSA:playback", 13) == 0) {
+        snprintf(buf, sizeof(buf), "alsa_pcm%s", target + 4);
+        target = buf;
+    }
+
+    return (strcmp(fName, target) == 0
+            || strcmp(fAlias1, target) == 0
+            || strcmp(fAlias2, target) == 0);
 }
 
 int JackPort::GetAliases(char* const aliases[2])
 {
-	int cnt = 0;
-	
-	if (fAlias1[0] != '\0') {
-		snprintf(aliases[0], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias1);
-		cnt++;
-	}
+    int cnt = 0;
 
-	if (fAlias2[0] != '\0') {
-		snprintf(aliases[1], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias2);
-		cnt++;
-	}
+    if (fAlias1[0] != '\0') {
+        snprintf(aliases[0], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias1);
+        cnt++;
+    }
 
-	return cnt;
+    if (fAlias2[0] != '\0') {
+        snprintf(aliases[1], JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE, "%s", fAlias2);
+        cnt++;
+    }
+
+    return cnt;
 }
 
 int JackPort::SetAlias(const char* alias)
 {
-	if (fAlias1[0] == '\0') {
-		snprintf(fAlias1, sizeof(fAlias1), "%s", alias);
-	} else if (fAlias2[0] == '\0') {
-		snprintf(fAlias2, sizeof(fAlias2), "%s", alias);
-	} else {
-		return -1;
-	}
+    if (fAlias1[0] == '\0') {
+        snprintf(fAlias1, sizeof(fAlias1), "%s", alias);
+    } else if (fAlias2[0] == '\0') {
+        snprintf(fAlias2, sizeof(fAlias2), "%s", alias);
+    } else {
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 int JackPort::UnsetAlias(const char* alias)
 {
-	if (strcmp(fAlias1, alias) == 0) {
-		fAlias1[0] = '\0';
-	} else if (strcmp(fAlias2, alias) == 0) {
-		fAlias2[0] = '\0';
-	} else {
-		return -1;
-	}
+    if (strcmp(fAlias1, alias) == 0) {
+        fAlias1[0] = '\0';
+    } else if (strcmp(fAlias2, alias) == 0) {
+        fAlias2[0] = '\0';
+    } else {
+        return -1;
+    }
 
-	return 0;
+    return 0;
 }
 
 void JackPort::ClearBuffer(jack_nframes_t frames)
