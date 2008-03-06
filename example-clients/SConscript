@@ -1,6 +1,7 @@
 #
 # Copyright (C) 2007 Arnold Krille
 # Copyright (C) 2007 Pieter Palmers
+# Copyright (C) 2008 Marc-Olivier Barre
 #
 # This file originates from FFADO (www.ffado.org)
 #
@@ -21,66 +22,60 @@
 import os
 from string import Template
 
-Import( 'env' )
+Import('env')
 
 # paths where include files can be found
-env.AppendUnique( CPPPATH=["#/", "#/common"] )
+env.AppendUnique(CPPPATH=['#/', '#/common'])
 
 #
-# Define the source files
+# Source files section
 #
 
-example_client_programs = {
-    "jack_freewheel" : "freewheel.c",
-    "jack_connect" : "connect.c",
-    "jack_lsp" : "lsp.c",
-    "jack_metro" : "metro.c",
-    #"jack_midiseq" : "midiseq.c",
-    #"jack_midisine" : "midisine.c",
-    "jack_showtime" : "showtime.c",
-    "jack_simple_client" : "simple_client.c",
-    "jack_zombie" : "zombie.c",
-    "jack_load" : "ipload.c",
-    "jack_unload" : "ipunload.c",
-}
+example_programs = {
+    'jack_freewheel' : 'freewheel.c',
+    'jack_connect' : 'connect.c',
+    'jack_lsp' : 'lsp.c',
+    'jack_metro' : 'metro.c',
+    'jack_midiseq' : 'midiseq.c',
+    'jack_midisine' : 'midisine.c',
+    'jack_showtime' : 'showtime.c',
+    'jack_simple_client' : 'simple_client.c',
+    'jack_zombie' : 'zombie.c',
+    'jack_load' : 'ipload.c',
+    'jack_unload' : 'ipunload.c',
+    }
 
-example_client_libs = {
-    "inprocess" : "inprocess.c",
-}
+example_libs = {
+    'inprocess' : 'inprocess.c',
+    }
 
-# link extra libs?
+# Libraries to link
 extra_libs = {}
-for example_client_program in example_client_programs.keys():
-    extra_libs[example_client_program] = ["jackservermp", "dl"]
+for example_program in example_programs:
+    extra_libs[example_program] = ['jackservermp', 'dl']
 
-# special cases
-extra_libs["jack_load"] = ["jackmp"]
-extra_libs["jack_unload"] = ["jackmp"]
-
+# Replace library listing for some special cases
+extra_libs['jack_load'] = ['jackmp']
+extra_libs['jack_unload'] = ['jackmp']
+# TODO: we need to really test for READLINE...
 env['HAS_READLINE']=True
 if env['HAS_READLINE']:
-    extra_libs["jack_transport"] = ["readline", "jackservermp", "dl"]
-    example_client_programs["jack_transport"] = "transport.c"
+    extra_libs['jack_transport'] = ['readline', 'jackservermp', 'dl']
+    example_programs['jack_transport'] = 'transport.c'
 
 #
-# Start building
+# Build/install section
 #
 
-# build the  example clients
 if env['BUILD_EXAMPLES']:
     clientenv = env.Copy()
-    clientenv.PrependUnique( LIBPATH=env['build_base'] )
-
-    for example_client_program in example_client_programs.keys():
-        clientenv.Program(target=example_client_program, 
-                          source=env.Split( example_client_programs[example_client_program]),
-                          LIBS=extra_libs[example_client_program] )
+    clientenv.PrependUnique(LIBPATH=env['build_base'])
+    for example_program, example_program_source in example_programs.items():
+        clientenv.Program(example_program, example_program_source, LIBS=extra_libs[example_program])
         if env['INSTALL_EXAMPLES']:
-            clientenv.Install( "$bindir", example_client_program )
-
-    for example_client_lib in example_client_libs.keys():
-        clientenv.SharedLibrary(target=example_client_lib, 
-                                source=env.Split( example_client_libs[example_client_lib] ) )
-        if env['INSTALL_EXAMPLES']:
-            #clientenv.Install( "$libdir", example_client_lib )
-            pass
+            clientenv.Install(env['BINDIR'], example_program)
+    for example_lib, example_lib_source in example_libs.items():
+        clientenv.SharedLibrary(example_lib, example_lib_source)
+# TODO: Not working yet. Do we even intend to install a test library ?
+#        if env['INSTALL_EXAMPLES']:
+#            clientenv.Install(env['LIBDIR'], example_client_lib)

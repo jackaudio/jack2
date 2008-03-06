@@ -1,6 +1,7 @@
 #
 # Copyright (C) 2007 Arnold Krille
 # Copyright (C) 2007 Pieter Palmers
+# Copyright (C) 2008 Marc-Olivier Barre
 #
 # This file originates from FFADO (www.ffado.org)
 #
@@ -21,13 +22,13 @@
 import os
 from string import Template
 
-Import( 'env' )
+Import('env')
 
-# paths where include files can be found
-env.AppendUnique( CPPPATH=["#/", "#/common", "#/common/jack", "#/macosx"] )
+# Paths to include files
+env.AppendUnique(CPPPATH = ['#/', '#/common', '#/common/jack', '#/macosx'])
 
 #
-# Define the source files
+# Source files section
 #
 
 srcfiles_macosx_server = ['#/common/Jackdmp.cpp']
@@ -37,19 +38,19 @@ srcfiles_macosx_coreaudio = ['JackCoreAudioDriver.cpp']
 srcfiles_macosx_dummy = ['#/common/JackDummyDriver.cpp']
 
 #
-# Start building
+# Build/install section
 #
 
 # build the server and its backends
 serverenv = env.Copy()
 serverenv.PrependUnique( LIBPATH=env['build_base'] )
-serverenv.PrependUnique( LIBS=["jackdmp", "dl"] )
+serverenv.PrependUnique( LIBS=['jackdmp', 'dl'] )
 
-server = serverenv.Program("jackdmp", srcfiles_macosx_server)
-serverenv.Install( env['bindir'], server )
+server = serverenv.Program('jackdmp', srcfiles_macosx_server)
+serverenv.Install( env['BINDIR'], server )
 
-drv = serverenv.SharedLibrary( "jack_dummy", srcfiles_macosx_dummy )
-serverenv.InstallAs( env['libdir']+ "/jackmp/jack_dummy.so", drv )
+drv = serverenv.SharedLibrary( 'jack_dummy', srcfiles_macosx_dummy )
+serverenv.InstallAs( env['LIBDIR']+ '/jackmp/jack_dummy.so', drv )
 
-drv = serverenv.SharedLibrary( "jack_coreaudio", srcfiles_macosx_coreaudio )
-serverenv.InstallAs( env['libdir']+ "/jackmp/jack_coreaudio.so", drv )
+drv = serverenv.SharedLibrary( 'jack_coreaudio', srcfiles_macosx_coreaudio )
+serverenv.InstallAs( env['LIBDIR']+ '/jackmp/jack_coreaudio.so', drv )

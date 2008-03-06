@@ -20,6 +20,10 @@ Marc-Olivier Barre
 
 2008-03-06 Stephane Letz  <letz@grame.fr>
 		
+	* Marc-Olivier Barre scons patch (3).
+
+2008-03-06 Stephane Letz  <letz@grame.fr>
+		
 	* Fix JackSocketClientChannel::ClientClose: async call from the client and server does not need to write any reply. 
 	* Correct port notification: 2 notifications have to be sent (src, dst) and (dst, src)...
 

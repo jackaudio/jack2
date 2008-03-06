@@ -1,6 +1,7 @@
 #
 # Copyright (C) 2007 Arnold Krille
 # Copyright (C) 2007 Pieter Palmers
+# Copyright (C) 2008 Marc-Olivier Barre
 #
 # This file originates from FFADO (www.ffado.org)
 #
@@ -21,32 +22,57 @@
 import os
 from string import Template
 
-Import( 'env' )
+Import('env')
 
-# paths where include files can be found
-env.AppendUnique( CPPPATH=["#/", "#/common"] )
+# Paths where include files can be found
+env.AppendUnique(CPPPATH=['#/', '#/common'])
 
 #
-# Define the source files
+# Source files section
 #
 
 test_programs = {
-    "synchroClient" : "testSynchroClient.cpp #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
-    "synchroServer" : "testSynchroServer.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
-    "synchroServerClient" : "testSynchroServerClient.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
-    "testSem" : "testSem.cpp  #/common/JackPosixSemaphore.cpp #/common/JackPosixThread.cpp #/common/JackError.c #/common/JackFifo.cpp",
-    "jack_test" : "jack_test.cpp",
+    'synchroClient': [
+        'testSynchroClient.cpp',
+        '#/common/JackPosixSemaphore.cpp',
+        '#/common/JackPosixThread.cpp',
+        '#/common/JackError.c',
+        '#/common/JackFifo.cpp'
+        ],
+    'synchroServer': [
+        'testSynchroServer.cpp',
+        '#/common/JackPosixSemaphore.cpp',
+        '#/common/JackPosixThread.cpp',
+        '#/common/JackError.c',
+        '#/common/JackFifo.cpp'
+        ],
+    'synchroServerClient': [
+        'testSynchroServerClient.cpp',
+        '#/common/JackPosixSemaphore.cpp',
+        '#/common/JackPosixThread.cpp',
+        '#/common/JackError.c',
+        '#/common/JackFifo.cpp'
+        ],
+    'testSem': [
+        'testSem.cpp',
+        '#/common/JackPosixSemaphore.cpp',
+        '#/common/JackPosixThread.cpp',
+        '#/common/JackError.c',
+        '#/common/JackFifo.cpp'
+        ],
+    'jack_test': [
+        'jack_test.cpp'
+        ],
 }
 
 #
-# Start building
+# Build section
 #
 
 # build the tests
 testenv = env.Copy()
-testenv.PrependUnique( LIBPATH=env['build_base'] )
-testenv.PrependUnique( LIBS="jackmp" )
+testenv.PrependUnique(LIBPATH=env['build_base'])
+testenv.PrependUnique(LIBS='jackmp')
 
-for test_program in test_programs.keys():
-    testenv.Program(target=test_program, 
-                    source=env.Split( test_programs[test_program] ) )
+for test_program, test_program_source in test_programs.items():
+    testenv.Program(test_program, test_program_source)

@@ -1,8 +1,9 @@
 #
 # Copyright (C) 2007 Arnold Krille
 # Copyright (C) 2007 Pieter Palmers
+# Copyright (C) 2008 Marc-Olivier Barre
 #
-# This file originally was part of FFADO
+# This file originates from FFADO (www.ffado.org)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,19 +23,31 @@ import os
 import glob
 from string import Template
 
-Import( 'env' )
+Import('env')
 
-# paths where include files can be found
-env.AppendUnique( CPPPATH=["#/", "#/common", "#/common/jack"] )
+# Define the library suffix for POSIX like systems
+if env['PLATFORM'] == 'posix':
+    env.AppendUnique(SHLIBSUFFIX='.0.0')
+
+# Paths where include files can be found
+env.AppendUnique(CPPPATH=['#/', '#/common', '#/common/jack'])
+
+# Needed libraries
+env.AppendUnique(LIBS=['rt', 'pthread'])
 
 # HACK: this should not be here ideally
-env.AppendUnique( CPPPATH=["#/linux","#/macosx"] )
+env.AppendUnique(CPPPATH=['#/linux','#/macosx'])
 
-# a symlinking command
-symlinkcmd = 'cd $TARGET.dir && rm -f -v $TARGET.name && ln -v -s $SOURCE.name $TARGET.name'
+# A symlinking command for our libraries' names
+symlinkcmd = 'cd $TARGET.dir && rm -f $TARGET.name && ln -s $SOURCE.name $TARGET.name'
+
+# Library names
+clientlib_name = 'jackmp'
+serverlib_name = 'jackservermp'
+wrapperlib_name = 'jackwrapper'
 
 #
-# Define the source files
+# Source files section
 #
 
 srcfiles_common_serverlib = [
@@ -134,64 +147,28 @@ jack_headers = [
     ]
 
 #
-# Start building
+# Build/install section
 #
 
-env.AppendUnique( LIBS=["rt", "pthread"] )
+# Libraries
+clientlib = env.SharedLibrary(clientlib_name, srcfiles_common_clientlib)
+serverlib = env.SharedLibrary(serverlib_name, srcfiles_common_serverlib)
+wrapperlib = env.SharedLibrary(wrapperlib_name, srcfiles_common_wrapperlib)
+env.Install( env['LIBDIR'], [clientlib, serverlib, wrapperlib])
+env.Alias('install', env['LIBDIR'])
 
-# build the common stuff
+# Handle the way we name libraries on a POSIX system
+# TODO: this is not quite clean yet. changing the library version is a pain we'll need a nicer loop and a config value somewhere
 if env['PLATFORM'] == 'posix':
-    env.AppendUnique( SHLIBSUFFIX=".0.0" )
-clientlib_name = "jackmp"
-serverlib_name = "jackservermp"
-wrapperlib_name = "jackwrapper"
-clientlib = env.SharedLibrary( clientlib_name, srcfiles_common_clientlib )
-serverlib = env.SharedLibrary( serverlib_name, srcfiles_common_serverlib )
-wrapperlib = env.SharedLibrary( wrapperlib_name, srcfiles_common_wrapperlib )
-env.Install( env['libdir'], [clientlib, serverlib, wrapperlib])
-env.Alias("install", env['libdir'])
-if env['PLATFORM'] == 'posix':
-        for lib_name, lib in [(clientlib_name, clientlib), (serverlib_name, serverlib), (wrapperlib_name, wrapperlib)]:
-            env.Command('lib' + lib_name + '.so.0', lib, symlinkcmd)
-            env.Command('lib' + lib_name + '.so', 'lib'+lib_name+'.so.0', symlinkcmd)
-            env.Command(env['libdir']  + '/lib' + lib_name + '.so.0', env['libdir'] + '/lib' + lib_name + '.so.0.0', symlinkcmd)
-            env.Command(env['libdir']  + '/lib' + lib_name + '.so', env['libdir'] + '/lib' + lib_name + '.so.0', symlinkcmd)
-            env.Alias("install", env['libdir']  + '/lib' + lib_name + '.so.0')
-            env.Alias("install", env['libdir']  + '/lib' + lib_name + '.so')
+    for lib_name, lib in [(clientlib_name, clientlib), (serverlib_name, serverlib), (wrapperlib_name, wrapperlib)]:
+        env.Command('lib' + lib_name + '.so.0', lib, symlinkcmd)
+        env.Command('lib' + lib_name + '.so', 'lib'+lib_name+'.so.0', symlinkcmd)
+        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.0', env['LIBDIR'] + '/lib' + lib_name + '.so.0.0', symlinkcmd)
+        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.0', symlinkcmd)
+        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.0')
+        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so')
 
-# install the headers
+# Headers
 for header in jack_headers:
-    env.Install(env['includedir'] + '/jack', 'jack/' + header)
-    env.Alias("install", env['includedir'])
-#if env['JACK_FLAGS']:
-    #jack_include_dir = env['JACK_INCLUDEDIR']
-    #if 'install' in COMMAND_LINE_TARGETS and os.path.isdir( jack_include_dir ):
-        #if env.GetOption('clean'):
-            #pass
-        #else:
-            #jack_old_includes_dir = env['includedir'] + '/jack_up'
-            #print "moving old jack includes to %s..." % jack_old_includes_dir
-            #env.Command(jack_old_includes_dir, jack_include_dir, Move("$TARGET", "$SOURCE"))
-
-# install the libs
-#jack_libdir = env['JACK_LIBDIR']
-#libjackdmp_location = env['libdir'] + '/libjackmp.so'
-#if 'install' in COMMAND_LINE_TARGETS and os.path.isdir( jack_libdir ):
-    #if env.GetOption('clean'):
-        #note: is this executed before the actual uninstall?
-        #lib_files = glob.glob(jack_libdir + '/libjack.so.*.up')
-        #for old_name in lib_files:
-            #new_name = old_name[:-3]
-            #print "restoring old jack lib %s to %s..." % (old_name, new_name)
-            #env.Command(Delete(new_name))
-            #env.Command(new_name, old_name, Move("$TARGET", "$SOURCE"))
-    #else:
-        #lib_files = glob.glob(jack_libdir + '/libjack.so.*')
-        #env.Alias("install", env.Install(env['libdir'], serverlib))
-        #env.Alias("install", env.Install(env['libdir'], clientlib))
-        #for old_name in lib_files:
-            #new_name = old_name + '.up'
-            #print "moving old jack lib %s to %s..." % (old_name, new_name)
-            #env.Command(new_name, old_name, Move("$TARGET", "$SOURCE"))
-            #print " linking to %s..." % (libjackdmp_location)
-            #env.Command(old_name, libjackdmp_location, "ln -s $TARGET $SOURCE")
+    env.Install(env['INCLUDEDIR'] + '/jack', 'jack/' + header)
+    env.Alias('install', env['INCLUDEDIR'])
