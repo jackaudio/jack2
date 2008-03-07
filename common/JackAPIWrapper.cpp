@@ -64,15 +64,13 @@ extern "C"
     EXPORT int jack_set_sample_rate_callback (jack_client_t *client,
             JackSampleRateCallback srate_callback,
             void *arg);
-    //
     EXPORT int jack_set_client_registration_callback (jack_client_t *,
             JackClientRegistrationCallback
             registration_callback, void *arg);
     EXPORT int jack_set_port_registration_callback (jack_client_t *,
             JackPortRegistrationCallback
             registration_callback, void *arg);
-    //
-    EXPORT int jack_set_port_connect_callback (jack_client_t *,
+	EXPORT int jack_set_port_connect_callback (jack_client_t *,
             JackPortConnectCallback
             connect_callback, void *arg);
 
@@ -107,11 +105,9 @@ extern "C"
     EXPORT jack_nframes_t jack_port_get_total_latency (jack_client_t *,
             jack_port_t *port);
     EXPORT void jack_port_set_latency (jack_port_t *, jack_nframes_t);
-    //
     EXPORT int jack_recompute_total_latency (jack_client_t*, jack_port_t* port);
     EXPORT int jack_recompute_total_latencies (jack_client_t*);
     EXPORT int jack_port_set_name (jack_port_t *port, const char *port_name);
-    //
     EXPORT int jack_port_set_alias (jack_port_t *port, const char *alias);
     EXPORT int jack_port_unset_alias (jack_port_t *port, const char *alias);
     EXPORT int jack_port_get_aliases (const jack_port_t *port, char* const aliases[2]);
@@ -140,7 +136,6 @@ extern "C"
                                           jack_port_id_t port_id);
     EXPORT int jack_engine_takeover_timebase (jack_client_t *);
     EXPORT jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *);
-    //
     EXPORT jack_time_t jack_get_time();
     EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t time);
     EXPORT jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t frames);
@@ -311,6 +306,27 @@ static jack_port_set_name_fun_def jack_port_set_name_fun = 0;
 EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 {
     return (*jack_port_set_name_fun)(port, name);
+}
+
+typedef int (*jack_port_set_alias_fun_def)(jack_port_t* port, const char* alias);
+static jack_port_set_alias_fun_def jack_port_set_alias_fun = 0;
+EXPORT int jack_port_set_alias(jack_port_t* port, const char* alias)
+{
+    return (*jack_port_set_alias_fun)(port, alias);
+}
+
+typedef int (*jack_port_unset_alias_fun_def)(jack_port_t* port, const char* alias);
+static jack_port_unset_alias_fun_def jack_port_unset_alias_fun = 0;
+EXPORT int jack_port_unset_alias(jack_port_t* port, const char* alias)
+{
+    return (*jack_port_unset_alias_fun)(port, alias);
+}
+
+typedef int (*jack_port_get_aliases_fun_def)(jack_port_t* port, char* const aliases[2]);
+static jack_port_get_aliases_fun_def jack_port_get_aliases_fun = 0;
+EXPORT int jack_port_get_aliases(jack_port_t* port, char* const aliases[2])
+{
+    return (*jack_port_get_aliases_fun)(port, aliases);
 }
 
 typedef int (*jack_port_request_monitor_fun_def)(jack_port_t* port, int onoff);
@@ -586,6 +602,13 @@ static jack_time_to_frames_fun_def jack_time_to_frames_fun = 0;
 EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_time_t time)
 {
     return (*jack_time_to_frames_fun)(ext_client, time);
+}
+
+typedef jack_time_t (*jack_frames_to_time_fun_def)(const jack_client_t* ext_client, jack_nframes_t frames);
+static jack_frames_to_time_fun_def jack_frames_to_time_fun = 0;
+EXPORT jack_time_t jack_frames_to_time(const jack_client_t* ext_client, jack_nframes_t frames)
+{
+    return (*jack_frames_to_time_fun)(ext_client, frames);
 }
 
 typedef jack_nframes_t (*jack_frame_time_fun_def)(const jack_client_t* ext_client);
@@ -986,6 +1009,9 @@ static bool init_library()
     jack_recompute_total_latency_fun = (jack_recompute_total_latency_fun_def)dlsym(gLibrary, "jack_recompute_total_latency");
     jack_recompute_total_latencies_fun = (jack_recompute_total_latencies_fun_def)dlsym(gLibrary, "jack_recompute_total_latencies");
     jack_port_set_name_fun = (jack_port_set_name_fun_def)dlsym(gLibrary, "jack_port_set_name");
+	jack_port_set_alias_fun = (jack_port_set_alias_fun_def)dlsym(gLibrary, "jack_port_set_alias");
+	jack_port_unset_alias_fun = (jack_port_unset_alias_fun_def)dlsym(gLibrary, "jack_port_unset_alias");
+	jack_port_get_aliases_fun = (jack_port_get_aliases_fun_def)dlsym(gLibrary, "jack_port_get_aliases");
     jack_port_request_monitor_fun = (jack_port_request_monitor_fun_def)dlsym(gLibrary, "jack_port_request_monitor");
     jack_port_request_monitor_by_name_fun = (jack_port_request_monitor_by_name_fun_def)dlsym(gLibrary, "jack_port_request_monitor_by_name");
     jack_port_ensure_monitor_fun = (jack_port_ensure_monitor_fun_def)dlsym(gLibrary, "jack_port_ensure_monitor");
@@ -1025,6 +1051,7 @@ static bool init_library()
     jack_frames_since_cycle_start_fun = (jack_frames_since_cycle_start_fun_def)dlsym(gLibrary, "jack_frames_since_cycle_start");
     jack_get_time_fun = (jack_get_time_fun_def)dlsym(gLibrary, "jack_get_time");
     jack_time_to_frames_fun = (jack_time_to_frames_fun_def)dlsym(gLibrary, "jack_time_to_frames");
+	jack_frames_to_time_fun = (jack_frames_to_time_fun_def)dlsym(gLibrary, "jack_frames_to_time");
     jack_frame_time_fun = (jack_frame_time_fun_def)dlsym(gLibrary, "jack_frame_time");
     jack_last_frame_time_fun = (jack_last_frame_time_fun_def)dlsym(gLibrary, "jack_last_frame_time");
     jack_cpu_load_fun = (jack_cpu_load_fun_def)dlsym(gLibrary, "jack_cpu_load");
