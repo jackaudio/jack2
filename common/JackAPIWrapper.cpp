@@ -639,6 +639,13 @@ EXPORT pthread_t  jack_client_thread_id(jack_client_t* ext_client)
     return (*jack_client_thread_id_fun)(ext_client);
 }
 
+typedef void (*jack_set_error_function_fun_def)(void (*func)(const char *));
+static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
+EXPORT void  jack_set_error_function(void (*func)(const char *))
+{
+    return (*jack_set_error_function_fun)(func);
+}
+
 typedef char* (*jack_get_client_name_fun_def)(jack_client_t* ext_client);
 static jack_get_client_name_fun_def jack_get_client_name_fun = 0;
 EXPORT char* jack_get_client_name (jack_client_t* ext_client)
@@ -929,6 +936,7 @@ static void close_library()
 	printf("close_library\n");
     if (--gClientCount == 0) {
         dlclose(gLibrary);
+		gLibrary = 0;
     }
 }
 
@@ -1056,6 +1064,7 @@ static bool init_library()
     jack_last_frame_time_fun = (jack_last_frame_time_fun_def)dlsym(gLibrary, "jack_last_frame_time");
     jack_cpu_load_fun = (jack_cpu_load_fun_def)dlsym(gLibrary, "jack_cpu_load");
     jack_client_thread_id_fun = (jack_client_thread_id_fun_def)dlsym(gLibrary, "jack_client_thread_id");
+	jack_set_error_function_fun = (jack_set_error_function_fun_def)dlsym(gLibrary, "jack_set_error_function");
     jack_get_client_name_fun = (jack_get_client_name_fun_def)dlsym(gLibrary, "jack_get_client_name");
     jack_port_name_size_fun = (jack_port_name_size_fun_def)dlsym(gLibrary, "jack_port_name_size");
     jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(gLibrary, "jack_client_name_size");
