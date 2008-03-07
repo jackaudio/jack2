@@ -128,6 +128,7 @@ install:
 	cp jackdmp $(prefix)/bin
 	cp libjackmp.so $(prefix)/$(libdir)
 	cp libjackservermp.so $(prefix)/$(libdir)
+	cp libjackwrapper.so $(prefix)/$(libdir)
 	install -d $(prefix)/$(libdir)/jackmp/
 	cp jack_alsa.so $(prefix)/$(libdir)/jackmp
 	cp jack_dummy.so $(prefix)/$(libdir)/jackmp
@@ -151,6 +152,7 @@ remove:
 	rm $(prefix)/bin/jackdmp
 	rm $(prefix)/$(libdir)/libjackmp.so
 	rm $(prefix)/$(libdir)/libjackservermp.so
+	rm $(prefix)/$(libdir)/libjackwrapper.so
 	rm -r $(prefix)/$(libdir)/jackmp
 	rm -r $(prefix)/include/jack
 	cd $(prefix)/$(libdir) && rm -f libjack.so*
