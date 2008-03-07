@@ -1054,7 +1054,7 @@ extern "C"
 
         freebob_jack_settings_t cmlparams;
 
-        const char *device_name = "hw:0";
+        char *device_name = "hw:0";
 
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
