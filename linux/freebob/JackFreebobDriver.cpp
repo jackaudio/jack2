@@ -1054,7 +1054,7 @@ extern "C"
 
         freebob_jack_settings_t cmlparams;
 
-        char *device_name = "hw:0";
+        const char *device_name = "hw:0";
 
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
@@ -1078,7 +1078,7 @@ extern "C"
 
             switch (param->character) {
                 case 'd':
-                    device_name = strdup (param->value.str);
+                    device_name = param->value.str;
                     break;
                 case 'p':
                     cmlparams.period_size = param->value.ui;
@@ -1127,7 +1127,6 @@ extern "C"
             nbitems = sscanf(device_name, "hw:%u", &port);
 
             if (nbitems < 1) {
-                free(device_name);
                 printError("device (-d) argument not valid\n");
                 return NULL;
             } else {
