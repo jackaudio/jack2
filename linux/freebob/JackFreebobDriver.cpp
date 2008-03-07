@@ -819,7 +819,7 @@ int JackFreebobDriver::Open(freebob_jack_settings_t *params)
         return -1;
     }
 
-    fDriver = (jack_driver_t *)freebob_driver_new ("freebob_pcm", params);
+    fDriver = (jack_driver_t *)freebob_driver_new ((char*)"freebob_pcm", params);
 
     if (fDriver) {
         // FreeBoB driver may have changed the in/out values
@@ -1054,7 +1054,7 @@ extern "C"
 
         freebob_jack_settings_t cmlparams;
 
-        char *device_name = "hw:0";
+        const char *device_name = "hw:0";
 
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
