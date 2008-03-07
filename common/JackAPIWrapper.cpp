@@ -210,6 +210,9 @@ extern "C"
 }
 #endif
 
+#define JACK_LIB "libjack.so.0.0"
+#define JACKMP_LIB "libjackmp.so"
+
 // Function definition
 
 typedef void* (*jack_port_get_buffer_fun_def)(jack_port_t* port, jack_nframes_t frames);
@@ -858,16 +861,19 @@ EXPORT int jack_client_close(jack_client_t *client)
 }
 
 // Library loader
-static bool get_jack_library_in_directory(const char* dir_name, char* library_name)
+static bool get_jack_library_in_directory(char* dir_name, const char* library_name, char* library_res_name)
 {
+	printf("get_jack_library_in_directory\n");
+
     struct dirent * dir_entry;
     DIR * dir_stream = opendir(dir_name);
     if (!dir_stream)
         return false;
 
     while ((dir_entry = readdir(dir_stream))) {
-        if (strncmp("libjack.so", dir_entry->d_name, 10) == 0) {
-            strcpy(library_name, dir_entry->d_name);
+        if (strncmp(library_name, dir_entry->d_name, strlen(library_name)) == 0) {
+			printf("found\n");
+        	sprintf(library_res_name, "%s/%s", dir_name, dir_entry->d_name);
             closedir(dir_stream);
             return true;
         }
@@ -876,17 +882,18 @@ static bool get_jack_library_in_directory(const char* dir_name, char* library_na
     return false;
 }
 
-static bool get_jack_library(char* library_name)
+static bool get_jack_library(const char* library_name, char* library_res_name)
 {
-    if (get_jack_library_in_directory("/usr/lib", library_name))
+    if (get_jack_library_in_directory("/usr/lib", library_name, library_res_name))
         return true;
-    if (get_jack_library_in_directory("/usr/local/lib", library_name))
+    if (get_jack_library_in_directory("/usr/local/lib", library_name, library_res_name))
         return true;
     return false;
 }
 
 static bool open_library()
 {
+	printf("open_library %ld \n", gClientCount);
     if (gClientCount++ == 0) {
         return init_library();
     } else {
@@ -896,6 +903,7 @@ static bool open_library()
 
 static void close_library()
 {
+	printf("close_library\n");
     if (--gClientCount == 0) {
         dlclose(gLibrary);
     }
@@ -905,6 +913,8 @@ static bool check_client(void* library)
 {
     jack_client_t* client = 0;
 
+	printf("check_library\n");
+
     // Get "new", "open" and "close" entry points...
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
     jack_client_close_fun = (jack_client_close_fun_def)dlsym(library, "jack_client_close");
@@ -912,32 +922,43 @@ static bool check_client(void* library)
 
     // Try opening a client...
     if ((client = (*jack_client_new_fun)("dummy"))) { // jackd server is running....
+		printf("check_library 1  %x\n", jack_client_close_fun);
         (*jack_client_close_fun)(client);
+		printf("check_library 2\n");
         return true;
     } else {
+		printf("check_library NO\n");
         return false;
     }
 }
 
 static bool init_library()
 {
-    char library_name[64];
-    void* jackLibrary = (get_jack_library(library_name)) ? dlopen(library_name, RTLD_LAZY) : 0;
-    void* jackmpLibrary = dlopen("libjackmp.so", RTLD_LAZY);
+    char library_res_name[256];
+    void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
+    void* jackmpLibrary = (get_jack_library(JACKMP_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
 
     if (jackLibrary) {
 
+		printf("jackLibrary\n");
+
         if (check_client(jackLibrary)) { // jackd is running...
+			printf("jackd is running\n");
             gLibrary = jackLibrary;
-            if (jackmpLibrary) dlclose(jackmpLibrary);
+            if (jackmpLibrary) 
+				dlclose(jackmpLibrary);
+			printf("jackd is running OK\n");
         } else if (check_client(jackmpLibrary)) { // jackdmp is running...
             gLibrary = jackmpLibrary;
-            if (jackLibrary) dlclose(jackLibrary);
+            if (jackLibrary) 
+				dlclose(jackLibrary);
         } else {
             goto error;
         }
 
     } else if (jackmpLibrary) {
+
+		printf("jackmpLibrary\n");
 
         if (check_client(jackmpLibrary)) { // jackd is running...
             gLibrary = jackmpLibrary;
@@ -1036,6 +1057,8 @@ static bool init_library()
     jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(gLibrary, "jack_client_new");
     jack_client_close_fun = (jack_client_close_fun_def)dlsym(gLibrary, "jack_client_close");
+
+printf("init_library OK\n");
 
     return true;
 

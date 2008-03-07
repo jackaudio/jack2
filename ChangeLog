@@ -21,6 +21,7 @@ Marc-Olivier Barre
 2008-03-07 Stephane Letz  <letz@grame.fr>
 		
 	* Define an internal jack_client_open_aux needed for library wrapper feature.
+	* Improve wrapper code.
 
 2008-03-06 Stephane Letz  <letz@grame.fr>
 		
