@@ -52,10 +52,8 @@
 
 #include <assert.h>
 #include <jack/midiport.h>
-// #include "JackPort.h"
-// #include "JackMidiPort.h"
-#include <../alsa/midi_pack.h>
-#include <../alsa/midi_unpack.h>
+#include "../alsa/midi_pack.h"
+#include "../alsa/midi_unpack.h"
 
 // debug print control flags
 #define DEBUG_LEVEL_BUFFERS           	(1<<0)
