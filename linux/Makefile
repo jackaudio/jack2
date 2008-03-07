@@ -128,7 +128,6 @@ install:
 	cp jackdmp $(prefix)/bin
 	cp libjackmp.so $(prefix)/$(libdir)
 	cp libjackservermp.so $(prefix)/$(libdir)
-	cp libjackwrapper.so $(prefix)/$(libdir)
 	install -d $(prefix)/$(libdir)/jackmp/
 	cp jack_alsa.so $(prefix)/$(libdir)/jackmp
 	cp jack_dummy.so $(prefix)/$(libdir)/jackmp
@@ -143,6 +142,26 @@ install:
 	cd $(prefix)/$(libdir) && ln -s libjackmp.so  libjack.so
 	cd $(prefix)/$(libdir) && ln -s libjackmp.so  libjack.so.0
 	cd $(prefix)/bin && ln -s jackdmp jackd
+	/sbin/ldconfig
+
+installwrapper:
+	cp jackdmp $(prefix)/bin
+	cp libjackmp.so $(prefix)/$(libdir)
+	cp libjackservermp.so $(prefix)/$(libdir)
+	cp libjackwrapper.so $(prefix)/$(libdir)
+	install -d $(prefix)/$(libdir)/jackmp/
+	cp jack_alsa.so $(prefix)/$(libdir)/jackmp
+	cp jack_dummy.so $(prefix)/$(libdir)/jackmp
+	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/$(libdir)/jackmp || echo "freebob driver not installed"
+	[ -f jack_firewire.so ]  && cp jack_firewire.so $(prefix)/$(libdir)/jackmp || echo "firewire driver not installed"
+	cd $(prefix)/bin && [ -f jackd ]  && mv -f jackd tmp_jackd || echo "jackd server not found, continue..."
+	cd $(prefix)/$(libdir) && [ -f libjack.so.0.0.28 ] && mv -f libjack.so.0.0.28 tmp_libjack.so.0.0.28 || echo "libjack not found, continue..."
+	cd $(prefix)/include &&  [ -d jack ] && mv -f jack tmp_jack || echo "jack headers not found, continue..."
+	install -d $(prefix)/include/jack/
+	cp ../common/jack/*.h $(prefix)/include/jack/
+	cd $(prefix)/$(libdir) && rm -f libjack.so*
+	cd $(prefix)/$(libdir) && ln -s libjackwrapper.so  libjack.so
+	cd $(prefix)/$(libdir) && ln -s libjackwrapper.so  libjack.so.0
 	/sbin/ldconfig
 
 # Remove jackdmp and tries to restore jack
