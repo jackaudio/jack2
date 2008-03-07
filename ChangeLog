@@ -18,6 +18,10 @@ Marc-Olivier Barre
   Jackdmp changes log
 ---------------------------
 
+2008-03-07 Stephane Letz  <letz@grame.fr>
+		
+	* Define an internal jack_client_open_aux needed for library wrapper feature.
+
 2008-03-06 Stephane Letz  <letz@grame.fr>
 		
 	* Marc-Olivier Barre scons patch (3).

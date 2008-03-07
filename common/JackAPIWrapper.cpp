@@ -31,10 +31,6 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_client_t * jack_client_open (const char *client_name,
-            jack_options_t options,
-            jack_status_t *status, ...);
-    EXPORT jack_client_t * jack_client_new (const char *client_name);
     EXPORT int jack_client_name_size (void);
     EXPORT char* jack_get_client_name (jack_client_t *client);
     EXPORT int jack_internal_client_new (const char *client_name,
@@ -828,6 +824,8 @@ typedef jack_client_t * (*jack_client_open_fun_def)(const char *client_name, jac
 static jack_client_open_fun_def jack_client_open_fun = 0;
 EXPORT jack_client_t * jack_client_open(const char *client_name, jack_options_t options, jack_status_t *status, ...)
 {
+	// TODO : in "autodstart mode", has to load jackdrc file and figure out which server has to be started...
+	
     // Library check...
     if (!open_library())
         return 0;

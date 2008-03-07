@@ -48,7 +48,10 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_client_t * jack_client_open (const char *client_name,
+	EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
+            jack_options_t options,
+            jack_status_t *status, ...);
+	EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
     EXPORT jack_client_t * jack_client_new (const char *client_name);
@@ -260,7 +263,7 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
     int options = JackUseExactName;
     if (getenv("JACK_START_SERVER") == NULL)
         options |= JackNoStartServer;
-    return jack_client_open(client_name, (jack_options_t)options, NULL);
+    return jack_client_open_aux(client_name, (jack_options_t)options, NULL);
 }
 
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
