@@ -1003,28 +1003,8 @@ static bool init_library()
     }
 
     // Load entry points...
-    jack_port_get_buffer_fun = (jack_port_get_buffer_fun_def)dlsym(gLibrary, "jack_port_get_buffer");
-    jack_port_name_fun = (jack_port_name_fun_def)dlsym(gLibrary, "jack_port_name");
-    jack_port_short_name_fun = (jack_port_short_name_fun_def)dlsym(gLibrary, "jack_port_short_name");
-    jack_port_flags_fun = (jack_port_flags_fun_def)dlsym(gLibrary, "jack_port_flags");
-    jack_port_type_fun = (jack_port_type_fun_def)dlsym(gLibrary, "jack_port_type");
-    jack_port_connected_fun = (jack_port_connected_fun_def)dlsym(gLibrary, "jack_port_connected");
-    jack_port_connected_to_fun = (jack_port_connected_to_fun_def)dlsym(gLibrary, "jack_port_connected_to");
-    jack_port_tie_fun = (jack_port_tie_fun_def)dlsym(gLibrary, "jack_port_tie");
-    jack_port_untie_fun = (jack_port_untie_fun_def)dlsym(gLibrary, "jack_port_untie");
-    jack_port_get_latency_fun = (jack_port_get_latency_fun_def)dlsym(gLibrary, "jack_port_get_latency");
-    jack_port_set_latency_fun = (jack_port_set_latency_fun_def)dlsym(gLibrary, "jack_port_set_latency");
-    jack_recompute_total_latency_fun = (jack_recompute_total_latency_fun_def)dlsym(gLibrary, "jack_recompute_total_latency");
-    jack_recompute_total_latencies_fun = (jack_recompute_total_latencies_fun_def)dlsym(gLibrary, "jack_recompute_total_latencies");
-    jack_port_set_name_fun = (jack_port_set_name_fun_def)dlsym(gLibrary, "jack_port_set_name");
-	jack_port_set_alias_fun = (jack_port_set_alias_fun_def)dlsym(gLibrary, "jack_port_set_alias");
-	jack_port_unset_alias_fun = (jack_port_unset_alias_fun_def)dlsym(gLibrary, "jack_port_unset_alias");
-	jack_port_get_aliases_fun = (jack_port_get_aliases_fun_def)dlsym(gLibrary, "jack_port_get_aliases");
-    jack_port_request_monitor_fun = (jack_port_request_monitor_fun_def)dlsym(gLibrary, "jack_port_request_monitor");
-    jack_port_request_monitor_by_name_fun = (jack_port_request_monitor_by_name_fun_def)dlsym(gLibrary, "jack_port_request_monitor_by_name");
-    jack_port_ensure_monitor_fun = (jack_port_ensure_monitor_fun_def)dlsym(gLibrary, "jack_port_ensure_monitor");
-    jack_port_monitoring_input_fun = (jack_port_monitoring_input_fun_def)dlsym(gLibrary, "jack_port_monitoring_input_fun");
-    jack_is_realtime_fun = (jack_is_realtime_fun_def)dlsym(gLibrary, "jack_is_realtime");
+   
+	jack_is_realtime_fun = (jack_is_realtime_fun_def)dlsym(gLibrary, "jack_is_realtime");
     jack_on_shutdown_fun = (jack_on_shutdown_fun_def)dlsym(gLibrary, "jack_on_shutdown");
     jack_set_process_callback_fun = (jack_set_process_callback_fun_def)dlsym(gLibrary, "jack_set_process_callback");
     jack_set_freewheel_callback_fun = (jack_set_freewheel_callback_fun_def)dlsym(gLibrary, "jack_set_freewheel_callback");
@@ -1042,10 +1022,31 @@ static bool init_library()
     jack_deactivate_fun = (jack_deactivate_fun_def)dlsym(gLibrary, "jack_deactivate");
     jack_port_register_fun = (jack_port_register_fun_def)dlsym(gLibrary, "jack_port_register");
     jack_port_unregister_fun = (jack_port_unregister_fun_def)dlsym(gLibrary, "jack_port_unregister");
+	jack_port_get_buffer_fun = (jack_port_get_buffer_fun_def)dlsym(gLibrary, "jack_port_get_buffer");
+	jack_port_name_fun = (jack_port_name_fun_def)dlsym(gLibrary, "jack_port_name");
+    jack_port_short_name_fun = (jack_port_short_name_fun_def)dlsym(gLibrary, "jack_port_short_name");
+    jack_port_flags_fun = (jack_port_flags_fun_def)dlsym(gLibrary, "jack_port_flags");
+    jack_port_type_fun = (jack_port_type_fun_def)dlsym(gLibrary, "jack_port_type");
     jack_port_is_mine_fun = (jack_port_is_mine_fun_def)dlsym(gLibrary, "jack_port_is_mine");
+	jack_port_connected_fun = (jack_port_connected_fun_def)dlsym(gLibrary, "jack_port_connected");
+    jack_port_connected_to_fun = (jack_port_connected_to_fun_def)dlsym(gLibrary, "jack_port_connected_to");
     jack_port_get_connections_fun = (jack_port_get_connections_fun_def)dlsym(gLibrary, "jack_port_get_connections");
     jack_port_get_all_connections_fun = (jack_port_get_all_connections_fun_def)dlsym(gLibrary, "jack_port_get_all_connections_fun");
+	jack_port_tie_fun = (jack_port_tie_fun_def)dlsym(gLibrary, "jack_port_tie");
+    jack_port_untie_fun = (jack_port_untie_fun_def)dlsym(gLibrary, "jack_port_untie");
+	jack_port_get_latency_fun = (jack_port_get_latency_fun_def)dlsym(gLibrary, "jack_port_get_latency");
     jack_port_get_total_latency_fun = (jack_port_get_total_latency_fun_def)dlsym(gLibrary, "jack_port_get_total_latency");
+	jack_port_set_latency_fun = (jack_port_set_latency_fun_def)dlsym(gLibrary, "jack_port_set_latency");
+	jack_recompute_total_latency_fun = (jack_recompute_total_latency_fun_def)dlsym(gLibrary, "jack_recompute_total_latency");
+    jack_recompute_total_latencies_fun = (jack_recompute_total_latencies_fun_def)dlsym(gLibrary, "jack_recompute_total_latencies");
+	jack_port_set_name_fun = (jack_port_set_name_fun_def)dlsym(gLibrary, "jack_port_set_name");
+	jack_port_set_alias_fun = (jack_port_set_alias_fun_def)dlsym(gLibrary, "jack_port_set_alias");
+	jack_port_unset_alias_fun = (jack_port_unset_alias_fun_def)dlsym(gLibrary, "jack_port_unset_alias");
+	jack_port_get_aliases_fun = (jack_port_get_aliases_fun_def)dlsym(gLibrary, "jack_port_get_aliases");
+	jack_port_request_monitor_fun = (jack_port_request_monitor_fun_def)dlsym(gLibrary, "jack_port_request_monitor");
+    jack_port_request_monitor_by_name_fun = (jack_port_request_monitor_by_name_fun_def)dlsym(gLibrary, "jack_port_request_monitor_by_name");
+    jack_port_ensure_monitor_fun = (jack_port_ensure_monitor_fun_def)dlsym(gLibrary, "jack_port_ensure_monitor");
+    jack_port_monitoring_input_fun = (jack_port_monitoring_input_fun_def)dlsym(gLibrary, "jack_port_monitoring_input_fun");
     jack_connect_fun = (jack_connect_fun_def)dlsym(gLibrary, "jack_connect");
     jack_disconnect_fun = (jack_disconnect_fun_def)dlsym(gLibrary, "jack_disconnect");
     jack_port_connect_fun = (jack_port_connect_fun_def)dlsym(gLibrary, "jack_port_connect");
