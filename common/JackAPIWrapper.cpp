@@ -891,7 +891,7 @@ EXPORT int jack_client_close(jack_client_t *client)
 }
 
 // Library loader
-static bool get_jack_library_in_directory(char* dir_name, const char* library_name, char* library_res_name)
+static bool get_jack_library_in_directory(const char* dir_name, const char* library_name, char* library_res_name)
 {
 	printf("get_jack_library_in_directory\n");
 
