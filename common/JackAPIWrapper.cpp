@@ -33,10 +33,10 @@ extern "C"
 
     EXPORT int jack_client_name_size (void);
     EXPORT char* jack_get_client_name (jack_client_t *client);
-    EXPORT int jack_internal_client_new (const char *client_name,
+    EXPORT int jack_internal_client_new (const char *client_name,		// deprecated
                                          const char *load_name,
                                          const char *load_init);
-    EXPORT void jack_internal_client_close (const char *client_name);
+    EXPORT void jack_internal_client_close (const char *client_name);	// deprecated
     EXPORT int jack_is_realtime (jack_client_t *client);
     EXPORT void jack_on_shutdown (jack_client_t *client,
                                   void (*function)(void *arg), void *arg);
@@ -369,7 +369,7 @@ typedef void (*jack_on_shutdown_fun_def)(jack_client_t* ext_client, shutdown_fun
 static jack_on_shutdown_fun_def jack_on_shutdown_fun = 0;
 EXPORT void jack_on_shutdown(jack_client_t* ext_client, shutdown_fun callback, void* arg)
 {
-    return (*jack_on_shutdown_fun)(ext_client, callback, arg);
+	(*jack_on_shutdown_fun)(ext_client, callback, arg);
 }
 
 typedef int (*jack_set_process_callback_fun_def)(jack_client_t* ext_client, JackProcessCallback callback, void* arg);
@@ -641,9 +641,9 @@ EXPORT pthread_t  jack_client_thread_id(jack_client_t* ext_client)
 
 typedef void (*jack_set_error_function_fun_def)(void (*func)(const char *));
 static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
-EXPORT void  jack_set_error_function(void (*func)(const char *))
+EXPORT void jack_set_error_function(void (*func)(const char *))
 {
-    return (*jack_set_error_function_fun)(func);
+	(*jack_set_error_function_fun)(func);
 }
 
 typedef char* (*jack_get_client_name_fun_def)(jack_client_t* ext_client);
@@ -651,6 +651,24 @@ static jack_get_client_name_fun_def jack_get_client_name_fun = 0;
 EXPORT char* jack_get_client_name (jack_client_t* ext_client)
 {
     return (*jack_get_client_name_fun)(ext_client);
+}
+
+typedef int (*jack_internal_client_new_fun_def)(const char *client_name,
+												const char *load_name,
+												const char *load_init);
+static jack_internal_client_new_fun_def jack_internal_client_new_fun = 0;
+EXPORT int jack_internal_client_new (const char *client_name,
+										const char *load_name,
+										const char *load_init)
+{
+    return (*jack_internal_client_new_fun)(client_name, load_name, load_init);
+}
+
+typedef void (*jack_internal_client_close_fun_def)(const char *client_name);
+static jack_internal_client_close_fun_def jack_internal_client_close_fun = 0;
+EXPORT void jack_internal_client_close (const char *client_name)
+{
+	(*jack_internal_client_close_fun)(client_name);
 }
 
 typedef int (*jack_client_name_size_fun_def)(void);
@@ -665,6 +683,13 @@ static jack_port_name_size_fun_def jack_port_name_size_fun = 0;
 EXPORT int jack_port_name_size(void)
 {
     return (*jack_port_name_size_fun)();
+}
+
+typedef int (*jack_port_type_size_fun_def)(void);
+static jack_port_type_size_fun_def jack_port_type_size_fun = 0;
+EXPORT int jack_port_type_size(void)
+{
+    return (*jack_port_type_size_fun)();
 }
 
 // transport.h
@@ -729,14 +754,14 @@ typedef void (*jack_transport_start_fun_def)(jack_client_t* ext_client);
 static jack_transport_start_fun_def jack_transport_start_fun = 0;
 EXPORT void jack_transport_start(jack_client_t* ext_client)
 {
-    return (*jack_transport_start_fun)(ext_client);
+	(*jack_transport_start_fun)(ext_client);
 }
 
 typedef void (*jack_transport_stop_fun_def)(jack_client_t* ext_client);
 static jack_transport_stop_fun_def jack_transport_stop_fun = 0;
 EXPORT void jack_transport_stop(jack_client_t* ext_client)
 {
-    return (*jack_transport_stop_fun)(ext_client);
+	(*jack_transport_stop_fun)(ext_client);
 }
 
 // deprecated
@@ -949,8 +974,7 @@ static bool check_client(void* library)
     // Get "new", "open" and "close" entry points...
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
     jack_client_close_fun = (jack_client_close_fun_def)dlsym(library, "jack_client_close");
-    jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
-
+ 
     // Try opening a client...
     if ((client = (*jack_client_new_fun)("dummy"))) { // jackd server is running....
 		printf("check_library 1  %x\n", jack_client_close_fun);
@@ -1002,11 +1026,19 @@ static bool init_library()
         goto error;
     }
 
-    // Load entry points...
-   
+    // Load entry points...    
+	jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
+    jack_client_new_fun = (jack_client_new_fun_def)dlsym(gLibrary, "jack_client_new");
+	jack_client_close_fun = (jack_client_close_fun_def)dlsym(gLibrary, "jack_client_close");
+   	jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(gLibrary, "jack_client_name_size");
+	jack_get_client_name_fun = (jack_get_client_name_fun_def)dlsym(gLibrary, "jack_get_client_name"); 
+	jack_internal_client_new_fun = (jack_internal_client_new_fun_def)dlsym(gLibrary, "jack_internal_client_new"); 
+	jack_internal_client_close_fun = (jack_internal_client_close_fun_def)dlsym(gLibrary, "jack_internal_client_close");    
 	jack_is_realtime_fun = (jack_is_realtime_fun_def)dlsym(gLibrary, "jack_is_realtime");
     jack_on_shutdown_fun = (jack_on_shutdown_fun_def)dlsym(gLibrary, "jack_on_shutdown");
     jack_set_process_callback_fun = (jack_set_process_callback_fun_def)dlsym(gLibrary, "jack_set_process_callback");
+	
+	jack_set_thread_init_callback_fun = (jack_set_thread_init_callback_fun_def)dlsym(gLibrary, "jack_set_thread_init_callback");
     jack_set_freewheel_callback_fun = (jack_set_freewheel_callback_fun_def)dlsym(gLibrary, "jack_set_freewheel_callback");
     jack_set_freewheel_fun = (jack_set_freewheel_fun_def)dlsym(gLibrary, "jack_set_freewheel");
     jack_set_buffer_size_fun = (jack_set_buffer_size_fun_def)dlsym(gLibrary, "jack_set_buffer_size");
@@ -1017,7 +1049,6 @@ static bool init_library()
     jack_set_port_connect_callback_fun = (jack_set_port_connect_callback_fun_def)dlsym(gLibrary, "jack_set_port_connect_callback");
     jack_set_graph_order_callback_fun = (jack_set_graph_order_callback_fun_def)dlsym(gLibrary, "jack_set_graph_order_callback");
     jack_set_xrun_callback_fun = (jack_set_xrun_callback_fun_def)dlsym(gLibrary, "jack_set_xrun_callback");
-    jack_set_thread_init_callback_fun = (jack_set_thread_init_callback_fun_def)dlsym(gLibrary, "jack_set_thread_init_callback");
     jack_activate_fun = (jack_activate_fun_def)dlsym(gLibrary, "jack_activate");
     jack_deactivate_fun = (jack_deactivate_fun_def)dlsym(gLibrary, "jack_deactivate");
     jack_port_register_fun = (jack_port_register_fun_def)dlsym(gLibrary, "jack_port_register");
@@ -1051,6 +1082,8 @@ static bool init_library()
     jack_disconnect_fun = (jack_disconnect_fun_def)dlsym(gLibrary, "jack_disconnect");
     jack_port_connect_fun = (jack_port_connect_fun_def)dlsym(gLibrary, "jack_port_connect");
     jack_port_disconnect_fun = (jack_port_disconnect_fun_def)dlsym(gLibrary, "jack_port_disconnect");
+	jack_port_name_size_fun = (jack_port_name_size_fun_def)dlsym(gLibrary, "jack_port_name_size");
+	jack_port_type_size_fun = (jack_port_type_size_fun_def)dlsym(gLibrary, "jack_port_type_size");
     jack_get_sample_rate_fun = (jack_get_sample_rate_fun_def)dlsym(gLibrary, "jack_get_sample_rate");
     jack_get_buffer_size_fun = (jack_get_buffer_size_fun_def)dlsym(gLibrary, "jack_get_buffer_size");
     jack_get_ports_fun = (jack_get_ports_fun_def)dlsym(gLibrary, "jack_get_ports");
@@ -1066,10 +1099,10 @@ static bool init_library()
     jack_cpu_load_fun = (jack_cpu_load_fun_def)dlsym(gLibrary, "jack_cpu_load");
     jack_client_thread_id_fun = (jack_client_thread_id_fun_def)dlsym(gLibrary, "jack_client_thread_id");
 	jack_set_error_function_fun = (jack_set_error_function_fun_def)dlsym(gLibrary, "jack_set_error_function");
-    jack_get_client_name_fun = (jack_get_client_name_fun_def)dlsym(gLibrary, "jack_get_client_name");
-    jack_port_name_size_fun = (jack_port_name_size_fun_def)dlsym(gLibrary, "jack_port_name_size");
-    jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(gLibrary, "jack_client_name_size");
-    jack_release_timebase_fun = (jack_release_timebase_fun_def)dlsym(gLibrary, "jack_release_timebase");
+	jack_get_max_delayed_usecs_fun = (jack_get_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_max_delayed_usecs");
+    jack_get_xrun_delayed_usecs_fun = (jack_get_xrun_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_xrun_delayed_usecs");
+    jack_reset_max_delayed_usecs_fun = (jack_reset_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_reset_max_delayed_usecs");
+	jack_release_timebase_fun = (jack_release_timebase_fun_def)dlsym(gLibrary, "jack_release_timebase");
     jack_set_sync_callback_fun = (jack_set_sync_callback_fun_def)dlsym(gLibrary, "jack_set_sync_callback");
     jack_set_sync_timeout_fun = (jack_set_sync_timeout_fun_def)dlsym(gLibrary, "jack_set_sync_timeout");
     jack_set_timebase_callback_fun = (jack_set_timebase_callback_fun_def)dlsym(gLibrary, "jack_set_timebase_callback");
@@ -1081,9 +1114,6 @@ static bool init_library()
     jack_transport_stop_fun = (jack_transport_stop_fun_def)dlsym(gLibrary, "jack_transport_stop");
     jack_get_transport_info_fun = (jack_get_transport_info_fun_def)dlsym(gLibrary, "jack_get_transport_info");
     jack_set_transport_info_fun = (jack_set_transport_info_fun_def)dlsym(gLibrary, "jack_set_transport_info");
-    jack_get_max_delayed_usecs_fun = (jack_get_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_max_delayed_usecs");
-    jack_get_xrun_delayed_usecs_fun = (jack_get_xrun_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_xrun_delayed_usecs");
-    jack_reset_max_delayed_usecs_fun = (jack_reset_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_reset_max_delayed_usecs");
     jack_acquire_real_time_scheduling_fun = (jack_acquire_real_time_scheduling_fun_def)dlsym(gLibrary, "jack_acquire_real_time_scheduling");
     jack_client_create_thread_fun = (jack_client_create_thread_fun_def)dlsym(gLibrary, "jack_client_create_thread");
     jack_drop_real_time_scheduling_fun = (jack_drop_real_time_scheduling_fun_def)dlsym(gLibrary, "jack_drop_real_time_scheduling");
@@ -1091,11 +1121,8 @@ static bool init_library()
     jack_internal_client_handle_fun = (jack_internal_client_handle_fun_def)dlsym(gLibrary, "jack_internal_client_handle");
     jack_internal_client_load_fun = (jack_internal_client_load_fun_def)dlsym(gLibrary, "jack_internal_client_load");
     jack_internal_client_unload_fun = (jack_internal_client_unload_fun_def)dlsym(gLibrary, "jack_internal_client_unload");
-    jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
-    jack_client_new_fun = (jack_client_new_fun_def)dlsym(gLibrary, "jack_client_new");
-    jack_client_close_fun = (jack_client_close_fun_def)dlsym(gLibrary, "jack_client_close");
 
-printf("init_library OK\n");
+	printf("init_library OK\n");
 
     return true;
 
@@ -1104,5 +1131,6 @@ error:
         dlclose(jackLibrary);
     if (jackmpLibrary)
         dlclose(jackmpLibrary);
+	gLibrary = 0;
     return false;
 }
