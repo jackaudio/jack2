@@ -425,7 +425,7 @@ int JackFFADODriver::Attach()
 
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
 
-    JackLog("JackFFADODriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    jack_log("JackFFADODriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     g_verbose = (fEngineControl->fVerbose ? 1 : 0);
 
@@ -511,7 +511,7 @@ int JackFFADODriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency(driver->period_size + driver->capture_frame_latency);
             fCapturePortList[chn] = port_index;
-            JackLog("JackFFADODriver::Attach fCapturePortList[i] %ld \n", port_index);
+            jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
 
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
@@ -542,7 +542,7 @@ int JackFFADODriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency(driver->period_size + driver->capture_frame_latency);
             fCapturePortList[chn] = port_index;
-            JackLog("JackFFADODriver::Attach fCapturePortList[i] %ld \n", port_index);
+            jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
         } else {
             printMessage ("Don't register capture port %s", portname);
@@ -587,7 +587,7 @@ int JackFFADODriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency);
             fPlaybackPortList[chn] = port_index;
-            JackLog("JackFFADODriver::Attach fPlaybackPortList[i] %ld \n", port_index);
+            jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
         } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
             snprintf(buf, sizeof(buf) - 1, "%s:MP%d_%s", fClientControl->fName, (int)chn, portname);
@@ -615,7 +615,7 @@ int JackFFADODriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency);
             fPlaybackPortList[chn] = port_index;
-            JackLog("JackFFADODriver::Attach fPlaybackPortList[i] %ld \n", port_index);
+            jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
         } else {
             printMessage ("Don't register playback port %s", portname);
@@ -639,7 +639,7 @@ int JackFFADODriver::Detach()
 {
     unsigned int chn;
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
-    JackLog("JackFFADODriver::Detach\n");
+    jack_log("JackFFADODriver::Detach");
 
     // finish the libfreebob streaming
     ffado_streaming_finish(driver->dev);
@@ -727,7 +727,7 @@ int JackFFADODriver::Read()
          * clients about the delay. 
          */
         //engine->delay (engine, delayed_usecs);
-        JackLog("FFADO XRun \n");
+        jack_log("FFADO XRun ");
         //NotifyXRun(jack_get_microseconds());
         NotifyXRun(fLastWaitUst);
         //return 0;
@@ -736,7 +736,7 @@ int JackFFADODriver::Read()
 
     //fLastWaitUst = GetMicroSeconds(); // Take callback date here
     if (nframes != fEngineControl->fBufferSize)
-        JackLog("JackFFADODriver::Read nframes = %ld\n", nframes);
+        jack_log("JackFFADODriver::Read nframes = %ld", nframes);
 
     //return engine->run_cycle (engine, nframes, delayed_usecs);
     fDelayedUst = (jack_time_t)delayed_usecs;

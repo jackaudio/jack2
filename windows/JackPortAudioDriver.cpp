@@ -259,7 +259,7 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
     int in_max = 0;
     int out_max = 0;
 
-    JackLog("JackPortAudioDriver::Open nframes = %ld in = %ld out = %ld capture name = %s playback name = %s samplerate = %ld\n",
+    jack_log("JackPortAudioDriver::Open nframes = %ld in = %ld out = %ld capture name = %s playback name = %s samplerate = %ld",
             nframes, inchannels, outchannels, capture_driver_uid, playback_driver_uid, samplerate);
 
     // Generic JackAudioDriver Open
@@ -273,12 +273,12 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
         goto error;
     }
 
-    JackLog("JackPortAudioDriver::Pa_GetDefaultInputDevice %ld\n", Pa_GetDefaultInputDevice());
-    JackLog("JackPortAudioDriver::Pa_GetDefaultOutputDevice %ld\n", Pa_GetDefaultOutputDevice());
+    jack_log("JackPortAudioDriver::Pa_GetDefaultInputDevice %ld", Pa_GetDefaultInputDevice());
+    jack_log("JackPortAudioDriver::Pa_GetDefaultOutputDevice %ld", Pa_GetDefaultOutputDevice());
 
     if (capturing) {
         if (!GetInputDeviceFromName(capture_driver_uid, &fInputDevice, &in_max)) {
-            JackLog("JackPortAudioDriver::GetInputDeviceFromName cannot open %s\n", capture_driver_uid);
+            jack_log("JackPortAudioDriver::GetInputDeviceFromName cannot open %s", capture_driver_uid);
             fInputDevice = Pa_GetDefaultInputDevice();
             if (fInputDevice == paNoDevice)
                 goto error;
@@ -295,7 +295,7 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
 
     if (playing) {
         if (!GetOutputDeviceFromName(playback_driver_uid, &fOutputDevice, &out_max)) {
-            JackLog("JackPortAudioDriver::GetOutputDeviceFromName cannot open %s\n", playback_driver_uid);
+            jack_log("JackPortAudioDriver::GetOutputDeviceFromName cannot open %s", playback_driver_uid);
             fOutputDevice = Pa_GetDefaultOutputDevice();
             if (fOutputDevice == paNoDevice)
                 goto error;
@@ -311,12 +311,12 @@ int JackPortAudioDriver::Open(jack_nframes_t nframes,
     }
 
     if (inchannels == 0) {
-        JackLog("JackPortAudioDriver::Open setup max in channels = %ld\n", in_max);
+        jack_log("JackPortAudioDriver::Open setup max in channels = %ld", in_max);
         inchannels = in_max;
     }
 
     if (outchannels == 0) {
-        JackLog("JackPortAudioDriver::Open setup max out channels = %ld\n", out_max);
+        jack_log("JackPortAudioDriver::Open setup max out channels = %ld", out_max);
         outchannels = out_max;
     }
 
@@ -375,7 +375,7 @@ error:
 int JackPortAudioDriver::Close()
 {
     JackAudioDriver::Close();
-    JackLog("JackPortAudioDriver::Close\n");
+    jack_log("JackPortAudioDriver::Close");
     Pa_CloseStream(fStream);
     Pa_Terminate();
     return 0;
@@ -383,7 +383,7 @@ int JackPortAudioDriver::Close()
 
 int JackPortAudioDriver::Start()
 {
-    JackLog("JackPortAudioDriver::Start\n");
+    jack_log("JackPortAudioDriver::Start");
     JackAudioDriver::Start();
     PaError err = Pa_StartStream(fStream);
     return (err == paNoError) ? 0 : -1;
@@ -391,7 +391,7 @@ int JackPortAudioDriver::Start()
 
 int JackPortAudioDriver::Stop()
 {
-    JackLog("JackPortAudioDriver::Stop\n");
+    jack_log("JackPortAudioDriver::Stop");
     PaError err = Pa_StopStream(fStream);
     return (err == paNoError) ? 0 : -1;
 }

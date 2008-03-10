@@ -675,7 +675,7 @@ int JackFreebobDriver::Attach()
 
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;
 
-    JackLog("JackFreebobDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    jack_log("JackFreebobDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     g_verbose = (fEngineControl->fVerbose ? 1 : 0);
     driver->device_options.verbose = (fEngineControl->fVerbose ? 1 : 0);
@@ -743,7 +743,7 @@ int JackFreebobDriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency(driver->period_size + driver->capture_frame_latency);
             fCapturePortList[i] = port_index;
-            JackLog("JackFreebobDriver::Attach fCapturePortList[i] %ld \n", port_index);
+            jack_log("JackFreebobDriver::Attach fCapturePortList[i] %ld ", port_index);
             driver->capture_nchannels_audio++;
         }
     }
@@ -773,7 +773,7 @@ int JackFreebobDriver::Attach()
             port = fGraphManager->GetPort(port_index);
             port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency);
             fPlaybackPortList[i] = port_index;
-            JackLog("JackFreebobDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
+            jack_log("JackFreebobDriver::Attach fPlaybackPortList[i] %ld ", port_index);
             driver->playback_nchannels_audio++;
         }
     }
@@ -792,7 +792,7 @@ int JackFreebobDriver::Attach()
 int JackFreebobDriver::Detach()
 {
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;
-    JackLog("JackFreebobDriver::Detach\n");
+    jack_log("JackFreebobDriver::Detach");
 
     // finish the libfreebob streaming
     freebob_streaming_finish(driver->dev);
@@ -871,7 +871,7 @@ int JackFreebobDriver::Read()
          * clients about the delay. 
          */
         //engine->delay (engine, delayed_usecs);
-        JackLog("FreeBoB XRun \n");
+        jack_log("FreeBoB XRun ");
         //NotifyXRun(jack_get_microseconds());
         NotifyXRun(fLastWaitUst);
         //return 0;
@@ -880,7 +880,7 @@ int JackFreebobDriver::Read()
 
     //fLastWaitUst = GetMicroSeconds(); // Take callback date here
     if (nframes != fEngineControl->fBufferSize)
-        JackLog("JackFreebobDriver::Read nframes = %ld\n", nframes);
+        jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
 
     //return engine->run_cycle (engine, nframes, delayed_usecs);
     fDelayedUst = (jack_time_t)delayed_usecs;

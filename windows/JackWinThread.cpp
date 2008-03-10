@@ -42,7 +42,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
         SetEvent(obj->fEvent);
     }
 
-    JackLog("ThreadHandler: start\n");
+    jack_log("ThreadHandler: start");
 
     // If Init succeed, start the thread loop
     bool res = true;
@@ -51,7 +51,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
     }
 
     SetEvent(obj->fEvent);
-    JackLog("ThreadHandler: exit\n");
+    jack_log("ThreadHandler: exit");
     return 0;
 }
 
@@ -93,7 +93,7 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
 
     if (realtime) {
 
-        JackLog("Create RT thread\n");
+        jack_log("Create RT thread");
         *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
 
         if (*thread == NULL) {
@@ -110,7 +110,7 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
 
     } else {
 
-        JackLog("Create non RT thread\n");
+        jack_log("Create non RT thread");
         *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
 
         if (thread == NULL) {
@@ -134,7 +134,7 @@ int JackWinThread::StartSync()
 
     if (fRealTime) {
 
-        JackLog("Create RT thread\n");
+        jack_log("Create RT thread");
         fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
 
         if (fThread == NULL) {
@@ -156,7 +156,7 @@ int JackWinThread::StartSync()
 
     } else {
 
-        JackLog("Create non RT thread\n");
+        jack_log("Create non RT thread");
         fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
 
         if (fThread == NULL) {
@@ -181,7 +181,7 @@ int JackWinThread::Kill()
         TerminateThread(fThread, 0);
         WaitForSingleObject(fThread, INFINITE);
         CloseHandle(fThread);
-        JackLog("JackWinThread::Kill 2\n");
+        jack_log("JackWinThread::Kill 2");
         fThread = NULL;
         fRunning = false;
         return 0;
@@ -193,7 +193,7 @@ int JackWinThread::Kill()
 int JackWinThread::Stop()
 {
     if (fThread) { // If thread has been started
-        JackLog("JackWinThread::Stop\n");
+        jack_log("JackWinThread::Stop");
         fRunning = false; // Request for the thread to stop
         WaitForSingleObject(fEvent, INFINITE);
         CloseHandle(fThread);
@@ -217,10 +217,10 @@ int JackWinThread::AcquireRealTime(int priority)
 
 int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
 {
-    JackLog("JackWinThread::AcquireRealTime\n");
+    jack_log("JackWinThread::AcquireRealTime");
 
     if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
-        JackLog("JackWinThread::AcquireRealTime OK\n");
+        jack_log("JackWinThread::AcquireRealTime OK");
         return 0;
     } else {
         jack_error("Cannot set thread priority = %d", GetLastError());

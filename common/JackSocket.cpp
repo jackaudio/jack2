@@ -33,7 +33,7 @@ void JackClientSocket::SetReadTimeOut(long sec)
     timout.tv_sec = sec;
     timout.tv_usec = 0;
     if (setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timout, sizeof(timeval)) < 0) {
-        JackLog("setsockopt SO_RCVTIMEO fd = %ld err = %s\n", fSocket, strerror(errno));
+        jack_log("setsockopt SO_RCVTIMEO fd = %ld err = %s", fSocket, strerror(errno));
     }
 }
 
@@ -43,7 +43,7 @@ void JackClientSocket::SetWriteTimeOut(long sec)
     timout.tv_sec = sec ;
     timout.tv_usec = 0;
     if (setsockopt(fSocket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timout, sizeof(timeval)) < 0) {
-        JackLog("setsockopt SO_SNDTIMEO fd = %ld err = %s\n", fSocket, strerror(errno));
+        jack_log("setsockopt SO_SNDTIMEO fd = %ld err = %s", fSocket, strerror(errno));
     }
 }
 
@@ -58,7 +58,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
 
     addr.sun_family = AF_UNIX;
     snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
-    JackLog("Connect: addr.sun_path %s\n", addr.sun_path);
+    jack_log("Connect: addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot connect to server socket err = %s", strerror(errno));
@@ -69,7 +69,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
 #ifdef __APPLE__
     int on = 1 ;
     if (setsockopt(fSocket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
-        JackLog("setsockopt SO_NOSIGPIPE fd = %ld err = %s\n", fSocket, strerror(errno));
+        jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fSocket, strerror(errno));
     }
 #endif
 
@@ -87,7 +87,7 @@ int JackClientSocket::Connect(const char* dir, int which)
 
     addr.sun_family = AF_UNIX;
     snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%d", dir, which);
-    JackLog("Connect: addr.sun_path %s\n", addr.sun_path);
+    jack_log("Connect: addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         jack_error("Cannot connect to server socket err = %s", strerror(errno));
@@ -98,7 +98,7 @@ int JackClientSocket::Connect(const char* dir, int which)
 #ifdef __APPLE__
     int on = 1 ;
     if (setsockopt(fSocket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
-        JackLog("setsockopt SO_NOSIGPIPE fd = %ld err = %s\n", fSocket, strerror(errno));
+        jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fSocket, strerror(errno));
     }
 #endif
 
@@ -107,7 +107,7 @@ int JackClientSocket::Connect(const char* dir, int which)
 
 int JackClientSocket::Close()
 {
-    JackLog("JackClientSocket::Close\n");
+    jack_log("JackClientSocket::Close");
     //shutdown(fSocket, SHUT_RDWR);
     if (fSocket > 0) {
         close(fSocket);
@@ -125,7 +125,7 @@ int JackClientSocket::Read(void* data, int len)
     if ((len1 = read(fSocket, data, len)) != len) {
         jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
         if (errno == EWOULDBLOCK) {
-            JackLog("JackClientSocket::Read time out\n");
+            jack_log("JackClientSocket::Read time out");
             return 0;
         } else {
             return -1;
@@ -165,7 +165,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     }
     */
 
-    JackLog("Bind: addr.sun_path %s\n", addr.sun_path);
+    jack_log("Bind: addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -216,7 +216,7 @@ int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation
     }
     */
 
-    JackLog("Bind: addr.sun_path %s\n", addr.sun_path);
+    jack_log("Bind: addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 
     if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -256,7 +256,7 @@ JackClientSocket* JackServerSocket::Accept()
 
 int JackServerSocket::Close()
 {
-    JackLog("JackServerSocket::Close %s\n", fName);
+    jack_log("JackServerSocket::Close %s", fName);
     //shutdown(fSocket, SHUT_RDWR);
     if (fSocket > 0) {
         //shutdown(fSocket, SHUT_RDWR);

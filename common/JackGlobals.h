@@ -228,7 +228,7 @@ class JackGlobals
 
         static void InitServer()
         {
-            JackLog("JackGlobals InitServer\n");
+            jack_log("JackGlobals InitServer");
             if (!fInstance) {
 
 #ifdef __APPLE__
@@ -248,7 +248,7 @@ class JackGlobals
 
         static void InitClient()
         {
-            JackLog("JackGlobals InitClient\n");
+            jack_log("JackGlobals InitClient");
             if (!fInstance) {
 
 #ifdef __APPLE__
@@ -268,7 +268,7 @@ class JackGlobals
 
         static void Destroy()
         {
-            JackLog("JackGlobals Destroy\n");
+            jack_log("JackGlobals Destroy");
             if (fInstance) {
                 delete fInstance;
                 fInstance = NULL;

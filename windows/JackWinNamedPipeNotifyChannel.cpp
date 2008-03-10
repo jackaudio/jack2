@@ -28,7 +28,7 @@ namespace Jack
 // Server to client
 int JackWinNamedPipeNotifyChannel::Open(const char* name)
 {
-    JackLog("JackWinNamedPipeNotifyChannel::Open name = %s\n", name);
+    jack_log("JackWinNamedPipeNotifyChannel::Open name = %s", name);
 
     // Connect to client listen pipe
     if (fNotifyPipe.Connect(jack_client_dir, name, 0) < 0) {
@@ -42,7 +42,7 @@ int JackWinNamedPipeNotifyChannel::Open(const char* name)
 
 void JackWinNamedPipeNotifyChannel::Close()
 {
-    JackLog("JackWinNamedPipeNotifyChannel::Close\n");
+    jack_log("JackWinNamedPipeNotifyChannel::Close");
     fNotifyPipe.Close();
 }
 

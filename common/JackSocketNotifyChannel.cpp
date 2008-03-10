@@ -28,7 +28,7 @@ namespace Jack
 // Server to client
 int JackSocketNotifyChannel::Open(const char* name)
 {
-    JackLog("JackSocketNotifyChannel::Open name = %s\n", name);
+    jack_log("JackSocketNotifyChannel::Open name = %s", name);
 
     // Connect to client listen socket
     if (fNotifySocket.Connect(jack_client_dir, name, 0) < 0) {
@@ -42,7 +42,7 @@ int JackSocketNotifyChannel::Open(const char* name)
 
 void JackSocketNotifyChannel::Close()
 {
-    JackLog("JackSocketNotifyChannel::Close\n");
+    jack_log("JackSocketNotifyChannel::Close");
     fNotifySocket.Close();
 }
 

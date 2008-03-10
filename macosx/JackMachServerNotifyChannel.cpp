@@ -27,7 +27,7 @@ namespace Jack
 
 int JackMachServerNotifyChannel::Open(const char* server_name)
 {
-    JackLog("JackMachServerChannel::Open\n");
+    jack_log("JackMachServerChannel::Open");
     char jack_server_entry_name[512];
     snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 

@@ -46,12 +46,12 @@ JackSocketServerChannel::~JackSocketServerChannel()
 
 int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
-    JackLog("JackSocketServerChannel::Open \n");
+    jack_log("JackSocketServerChannel::Open ");
     fServer = server;
 
     // Prepare request socket
     if (fRequestListenSocket.Bind(jack_server_dir, server_name, 0) < 0) {
-        JackLog("JackSocketServerChannel::Open : cannot create result listen socket\n");
+        jack_log("JackSocketServerChannel::Open : cannot create result listen socket");
         return -1;
     }
 
@@ -79,7 +79,7 @@ void JackSocketServerChannel::Close()
 
 void JackSocketServerChannel::ClientCreate()
 {
-    JackLog("JackSocketServerChannel::ClientCreate socket\n");
+    jack_log("JackSocketServerChannel::ClientCreate socket");
     JackClientSocket* socket = fRequestListenSocket.Accept();
     if (socket) {
         fSocketTable[socket->GetFd()] = make_pair( -1, socket);
@@ -91,7 +91,7 @@ void JackSocketServerChannel::ClientCreate()
 
 void JackSocketServerChannel::ClientAdd(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackLog("JackSocketServerChannel::ClientAdd\n");
+    jack_log("JackSocketServerChannel::ClientAdd");
     int refnum = -1;
     *result = fServer->GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
@@ -107,7 +107,7 @@ void JackSocketServerChannel::ClientRemove(int fd, int refnum)
     pair<int, JackClientSocket*> elem = fSocketTable[fd];
     JackClientSocket* socket = elem.second;
     assert(socket);
-    JackLog("JackSocketServerChannel::ClientRemove ref = %d\n", refnum);
+    jack_log("JackSocketServerChannel::ClientRemove ref = %d", refnum);
     fSocketTable.erase(fd);
     socket->Close();
     delete socket;
@@ -121,10 +121,10 @@ void JackSocketServerChannel::ClientKill(int fd)
     int refnum = elem.first;
 
     assert(socket);
-    JackLog("JackSocketServerChannel::ClientKill ref = %d\n", refnum);
+    jack_log("JackSocketServerChannel::ClientKill ref = %d", refnum);
 
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
-        JackLog("Client was not opened : probably correspond to server_check\n");
+        jack_log("Client was not opened : probably correspond to server_check");
     } else {
         fServer->Notify(refnum, kDeadClient, 0);
     }
@@ -152,7 +152,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
     switch (header.fType) {
 
         case JackRequest::kClientCheck: {
-            JackLog("JackRequest::kClientCheck\n");
+            jack_log("JackRequest::kClientCheck");
             JackClientCheckRequest req;
             JackClientCheckResult res;
             if (req.Read(socket) == 0)
@@ -163,7 +163,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kClientOpen: {
-            JackLog("JackRequest::ClientOpen\n");
+            jack_log("JackRequest::ClientOpen");
             JackClientOpenRequest req;
             JackClientOpenResult res;
             if (req.Read(socket) == 0)
@@ -174,7 +174,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kClientClose: {
-            JackLog("JackRequest::ClientClose\n");
+            jack_log("JackRequest::ClientClose");
             JackClientCloseRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -187,7 +187,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         case JackRequest::kActivateClient: {
             JackActivateRequest req;
             JackResult res;
-            JackLog("JackRequest::ActivateClient\n");
+            jack_log("JackRequest::ActivateClient");
             if (req.Read(socket) == 0)
                 res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
             if (res.Write(socket) < 0)
@@ -196,7 +196,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kDeactivateClient: {
-            JackLog("JackRequest::DeactivateClient\n");
+            jack_log("JackRequest::DeactivateClient");
             JackDeactivateRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -207,7 +207,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kRegisterPort: {
-            JackLog("JackRequest::RegisterPort\n");
+            jack_log("JackRequest::RegisterPort");
             JackPortRegisterRequest req;
             JackPortRegisterResult res;
             if (req.Read(socket) == 0)
@@ -218,7 +218,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kUnRegisterPort: {
-            JackLog("JackRequest::UnRegisterPort\n");
+            jack_log("JackRequest::UnRegisterPort");
             JackPortUnRegisterRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -229,7 +229,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kConnectNamePorts: {
-            JackLog("JackRequest::ConnectPorts\n");
+            jack_log("JackRequest::ConnectPorts");
             JackPortConnectNameRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -240,7 +240,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kDisconnectNamePorts: {
-            JackLog("JackRequest::DisconnectPorts\n");
+            jack_log("JackRequest::DisconnectPorts");
             JackPortDisconnectNameRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -251,7 +251,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kConnectPorts: {
-            JackLog("JackRequest::ConnectPorts\n");
+            jack_log("JackRequest::ConnectPorts");
             JackPortConnectRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -262,7 +262,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kDisconnectPorts: {
-            JackLog("JackRequest::DisconnectPorts\n");
+            jack_log("JackRequest::DisconnectPorts");
             JackPortDisconnectRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -273,7 +273,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kSetBufferSize: {
-            JackLog("JackRequest::SetBufferSize\n");
+            jack_log("JackRequest::SetBufferSize");
             JackSetBufferSizeRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -284,7 +284,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kSetFreeWheel: {
-            JackLog("JackRequest::SetFreeWheel\n");
+            jack_log("JackRequest::SetFreeWheel");
             JackSetFreeWheelRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -295,7 +295,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kReleaseTimebase: {
-            JackLog("JackRequest::kReleaseTimebase\n");
+            jack_log("JackRequest::kReleaseTimebase");
             JackReleaseTimebaseRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -306,7 +306,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kSetTimebaseCallback: {
-            JackLog("JackRequest::kSetTimebaseCallback\n");
+            jack_log("JackRequest::kSetTimebaseCallback");
             JackSetTimebaseCallbackRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -317,7 +317,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kGetInternalClientName: {
-            JackLog("JackRequest::kGetInternalClientName\n");
+            jack_log("JackRequest::kGetInternalClientName");
             JackGetInternalClientNameRequest req;
             JackGetInternalClientNameResult res;
             if (req.Read(socket) == 0)
@@ -328,7 +328,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kInternalClientHandle: {
-            JackLog("JackRequest::kInternalClientHandle\n");
+            jack_log("JackRequest::kInternalClientHandle");
             JackInternalClientHandleRequest req;
             JackInternalClientHandleResult res;
             if (req.Read(socket) == 0)
@@ -339,7 +339,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kInternalClientLoad: {
-            JackLog("JackRequest::kInternalClientLoad\n");
+            jack_log("JackRequest::kInternalClientLoad");
             JackInternalClientLoadRequest req;
             JackInternalClientLoadResult res;
             if (req.Read(socket) == 0)
@@ -350,7 +350,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kInternalClientUnload: {
-            JackLog("JackRequest::kInternalClientUnload\n");
+            jack_log("JackRequest::kInternalClientUnload");
             JackInternalClientUnloadRequest req;
             JackInternalClientUnloadResult res;
             if (req.Read(socket) == 0)
@@ -361,7 +361,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kNotification: {
-            JackLog("JackRequest::Notification\n");
+            jack_log("JackRequest::Notification");
             JackClientNotificationRequest req;
             if (req.Read(socket) == 0)
                 fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
@@ -369,7 +369,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
         }
 
         default:
-            JackLog("Unknown request %ld\n", header.fType);
+            jack_log("Unknown request %ld", header.fType);
             break;
     }
 
@@ -383,7 +383,7 @@ void JackSocketServerChannel::BuildPoolTable()
         delete[] fPollTable;
         fPollTable = new pollfd[fSocketTable.size() + 1];
 
-        JackLog("JackSocketServerChannel::BuildPoolTable size = %d\n", fSocketTable.size() + 1);
+        jack_log("JackSocketServerChannel::BuildPoolTable size = %d", fSocketTable.size() + 1);
 
         // First fd is the server request socket
         fPollTable[0].fd = fRequestListenSocket.GetFd();
@@ -394,7 +394,7 @@ void JackSocketServerChannel::BuildPoolTable()
         int i;
 
         for (i = 1, it = fSocketTable.begin(); it != fSocketTable.end(); it++, i++) {
-            JackLog("fSocketTable i = %ld fd = %ld\n", i, it->first);
+            jack_log("fSocketTable i = %ld fd = %ld", i, it->first);
             fPollTable[i].fd = it->first;
             fPollTable[i].events = POLLIN | POLLPRI | POLLERR | POLLHUP | POLLNVAL;
         }
@@ -412,9 +412,9 @@ bool JackSocketServerChannel::Execute()
         // Poll all clients
         for (unsigned int i = 1; i < fSocketTable.size() + 1; i++) {
             int fd = fPollTable[i].fd;
-            JackLog("fPollTable i = %ld fd = %ld\n", i, fd);
+            jack_log("fPollTable i = %ld fd = %ld", i, fd);
             if (fPollTable[i].revents & ~POLLIN) {
-                JackLog("Poll client error err = %s\n", strerror(errno));
+                jack_log("Poll client error err = %s", strerror(errno));
                 ClientKill(fd);
             } else if (fPollTable[i].revents & POLLIN) {
                 if (HandleRequest(fd) < 0) {

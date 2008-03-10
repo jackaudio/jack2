@@ -123,7 +123,7 @@ JackAlsaDriver::alsa_driver_check_card_type (alsa_driver_t *driver)
         char tmp[5];
         strncpy(tmp, strstr(driver->alsa_name_playback, "hw"), 4);
         tmp[4] = '\0';
-        JackLog("control device %s\n", tmp);
+        jack_log("control device %s", tmp);
         ctl_name = strdup(tmp);
     } else {
         ctl_name = strdup(driver->alsa_name_playback);
@@ -256,21 +256,21 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
             switch (driver->dither) {
                 case Rectangular:
-                    JackLog("Rectangular dithering at 16 bits\n");
+                    jack_log("Rectangular dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_rect_d16_sSs :
                                              sample_move_dither_rect_d16_sS;
                     break;
 
                 case Triangular:
-                    JackLog("Triangular dithering at 16 bits\n");
+                    jack_log("Triangular dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_tri_d16_sSs :
                                              sample_move_dither_tri_d16_sS;
                     break;
 
                 case Shaped:
-                    JackLog("Noise-shaped dithering at 16 bits\n");
+                    jack_log("Noise-shaped dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_shaped_d16_sSs :
                                              sample_move_dither_shaped_d16_sS;
@@ -292,21 +292,21 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
             switch (driver->dither) {
                 case Rectangular:
-                    JackLog("Rectangular dithering at 16 bits\n");
+                    jack_log("Rectangular dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_rect_d24_sSs :
                                              sample_move_dither_rect_d24_sS;
                     break;
 
                 case Triangular:
-                    JackLog("Triangular dithering at 16 bits\n");
+                    jack_log("Triangular dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_tri_d24_sSs :
                                              sample_move_dither_tri_d24_sS;
                     break;
 
                 case Shaped:
-                    JackLog("Noise-shaped dithering at 16 bits\n");
+                    jack_log("Noise-shaped dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_shaped_d24_sSs :
                                              sample_move_dither_shaped_d24_sS;
@@ -328,21 +328,21 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 
             switch (driver->dither) {
                 case Rectangular:
-                    JackLog("Rectangular dithering at 16 bits\n");
+                    jack_log("Rectangular dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_rect_d32u24_sSs :
                                              sample_move_dither_rect_d32u24_sS;
                     break;
 
                 case Triangular:
-                    JackLog("Triangular dithering at 16 bits\n");
+                    jack_log("Triangular dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_tri_d32u24_sSs :
                                              sample_move_dither_tri_d32u24_sS;
                     break;
 
                 case Shaped:
-                    JackLog("Noise-shaped dithering at 16 bits\n");
+                    jack_log("Noise-shaped dithering at 16 bits");
                     driver->write_via_copy = driver->quirk_bswap ?
                                              sample_move_dither_shaped_d32u24_sSs :
                                              sample_move_dither_shaped_d32u24_sS;
@@ -1317,7 +1317,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
         if (poll (driver->pfd, nfds, driver->poll_timeout) < 0) {
 
             if (errno == EINTR) {
-                JackLog ("poll interrupt\n");
+                jack_log("poll interrupt");
                 // this happens mostly when run
                 // under gdb, or when exiting due to a signal
                 // steph
@@ -1521,7 +1521,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 
 int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackLog("JackAlsaDriver::SetBufferSize %ld\n", buffer_size);
+    jack_log("JackAlsaDriver::SetBufferSize %ld", buffer_size);
     int res = alsa_driver_reset_parameters((alsa_driver_t *)fDriver, buffer_size,
                                            ((alsa_driver_t *)fDriver)->user_nperiods,
                                            ((alsa_driver_t *)fDriver)->frame_rate);
@@ -2118,7 +2118,7 @@ int JackAlsaDriver::Attach()
     JackAudioDriver::SetBufferSize(alsa_driver->frames_per_cycle);
     JackAudioDriver::SetSampleRate(alsa_driver->frame_rate);
 
-    JackLog("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    jack_log("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:capture_%u", fClientControl->fName, i + 1);
@@ -2131,7 +2131,7 @@ int JackAlsaDriver::Attach()
         port->SetAlias(alias);
         port->SetLatency(alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency);
         fCapturePortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fCapturePortList[i] %ld \n", port_index);
+        jack_log("JackAudioDriver::Attach fCapturePortList[i] %ld ", port_index);
     }
 
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -2147,11 +2147,11 @@ int JackAlsaDriver::Attach()
         port->SetAlias(alias);
         port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) + alsa_driver->playback_frame_latency);
         fPlaybackPortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fPlaybackPortList[i] %ld \n", port_index);
+        jack_log("JackAudioDriver::Attach fPlaybackPortList[i] %ld ", port_index);
 
         // Monitor ports
         if (fWithMonitorPorts) {
-            JackLog("Create monitor port \n");
+            jack_log("Create monitor port ");
             snprintf(name, sizeof(name) - 1, "%s:monitor_%lu", fClientControl->fName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error ("ALSA: cannot register monitor port for %s", name);
@@ -2280,7 +2280,7 @@ int JackAlsaDriver::Read()
          * clients about the delay. 
          */
         //engine->delay (engine, delayed_usecs);
-        JackLog("ALSA XRun \n");
+        jack_log("ALSA XRun ");
         //NotifyXRun(jack_get_microseconds());
         NotifyXRun(fLastWaitUst);
         //return 0;
@@ -2289,7 +2289,7 @@ int JackAlsaDriver::Read()
 
     //fLastWaitUst = GetMicroSeconds(); // Take callback date here
     if (nframes != fEngineControl->fBufferSize)
-        JackLog("JackAlsaDriver::Read nframes = %ld\n", nframes);
+        jack_log("JackAlsaDriver::Read nframes = %ld", nframes);
 
     //return engine->run_cycle (engine, nframes, delayed_usecs);
     fDelayedUst = (jack_time_t)delayed_usecs;
@@ -2298,13 +2298,13 @@ int JackAlsaDriver::Read()
 
 int JackAlsaDriver::Write()
 {
-    //JackLog("write\n");
+    //jack_log("write");
     int res = alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
     jack_time_t write_time = GetMicroSeconds();
 
     /*
     if (write_time > (fLastWaitUst - fDelayedUst) + fEngineControl->fPeriodUsecs) {
-    	JackLog("ALSA write XRun \n");
+    	jack_log("ALSA write XRun ");
     	NotifyXRun(write_time);
     }
     */
@@ -2649,7 +2649,7 @@ extern "C"
                     capture = TRUE;
                     if (strcmp (param->value.str, "none") != 0) {
                         capture_pcm_name = strdup (param->value.str);
-                        JackLog("capture device %s\n", capture_pcm_name);
+                        jack_log("capture device %s", capture_pcm_name);
                     }
                     break;
 
@@ -2657,7 +2657,7 @@ extern "C"
                     playback = TRUE;
                     if (strcmp (param->value.str, "none") != 0) {
                         playback_pcm_name = strdup (param->value.str);
-                        JackLog("playback device %s\n", playback_pcm_name);
+                        jack_log("playback device %s", playback_pcm_name);
                     }
                     break;
 
@@ -2669,8 +2669,8 @@ extern "C"
                 case 'd':
                     playback_pcm_name = strdup (param->value.str);
                     capture_pcm_name = strdup (param->value.str);
-                    JackLog("playback device %s\n", playback_pcm_name);
-                    JackLog("capture device %s\n", capture_pcm_name);
+                    jack_log("playback device %s", playback_pcm_name);
+                    jack_log("capture device %s", capture_pcm_name);
                     break;
 
                 case 'H':
@@ -2687,12 +2687,12 @@ extern "C"
 
                 case 'r':
                     srate = param->value.ui;
-                    JackLog("apparent rate = %d\n", srate);
+                    jack_log("apparent rate = %d", srate);
                     break;
 
                 case 'p':
                     frames_per_interrupt = param->value.ui;
-                    JackLog("frames per period = %d\n", frames_per_interrupt);
+                    jack_log("frames per period = %d", frames_per_interrupt);
                     break;
 
                 case 'n':

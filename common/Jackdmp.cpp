@@ -106,7 +106,7 @@ static void DoNothingHandler(int sig)
 
 static int JackStart(const char* server_name, jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
 {
-    JackLog("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
+    jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
     fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
     int res = fServer->Open(driver_desc, driver_params);
     return (res < 0) ? res : fServer->Start();
@@ -116,16 +116,16 @@ static int JackStop()
 {
     fServer->Stop();
     fServer->Close();
-    JackLog("Jackdmp: server close\n");
+    jack_log("Jackdmp: server close");
     delete fServer;
-    JackLog("Jackdmp: delete server\n");
+    jack_log("Jackdmp: delete server");
     return 0;
 }
 
 static int JackDelete()
 {
     delete fServer;
-    JackLog("Jackdmp: delete server\n");
+    jack_log("Jackdmp: delete server");
     return 0;
 }
 

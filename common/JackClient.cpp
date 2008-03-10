@@ -77,7 +77,7 @@ JackClient::~JackClient()
 
 int JackClient::Close()
 {
-    JackLog("JackClient::Close ref = %ld\n", GetClientControl()->fRefNum);
+    jack_log("JackClient::Close ref = %ld", GetClientControl()->fRefNum);
     Deactivate();
     int result = -1;
     fChannel->ClientClose(GetClientControl()->fRefNum, &result);
@@ -105,12 +105,12 @@ pthread_t JackClient::GetThreadID()
 void JackClient::SetupDriverSync(bool freewheel)
 {
     if (!freewheel && !GetEngineControl()->fSyncMode) {
-        JackLog("JackClient::SetupDriverSync driver sem in flush mode\n");
+        jack_log("JackClient::SetupDriverSync driver sem in flush mode");
         fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(true);
         fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(true);
     } else {
-        JackLog("JackClient::SetupDriverSync driver sem in normal mode\n");
+        jack_log("JackClient::SetupDriverSync driver sem in normal mode");
         fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(false);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(false);
         fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(false);
@@ -142,7 +142,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             break;
 
         case kActivateClient:
-            JackLog("JackClient::kActivateClient name = %s ref = %ld \n", name, refnum);
+            jack_log("JackClient::kActivateClient name = %s ref = %ld ", name, refnum);
             Init();
             break;
     }
@@ -156,31 +156,31 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
         switch (notify) {
 
             case kAddClient:
-                JackLog("JackClient::kAddClient fName = %s name = %s\n", GetClientControl()->fName, name);
+                jack_log("JackClient::kAddClient fName = %s name = %s", GetClientControl()->fName, name);
                 if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
                     fClientRegistration(name, 1, fClientRegistrationArg);
                 break;
 
             case kRemoveClient:
-                JackLog("JackClient::kRemoveClient fName = %s name = %s\n", GetClientControl()->fName, name);
+                jack_log("JackClient::kRemoveClient fName = %s name = %s", GetClientControl()->fName, name);
                 if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
                     fClientRegistration(name, 0, fClientRegistrationArg);
                 break;
 
             case kBufferSizeCallback:
-                JackLog("JackClient::kBufferSizeCallback buffer_size = %ld\n", value1);
+                jack_log("JackClient::kBufferSizeCallback buffer_size = %ld", value1);
                 if (fBufferSize)
                     res = fBufferSize(value1, fBufferSizeArg);
                 break;
 
             case kGraphOrderCallback:
-                JackLog("JackClient::kGraphOrderCallback\n");
+                jack_log("JackClient::kGraphOrderCallback");
                 if (fGraphOrder)
                     res = fGraphOrder(fGraphOrderArg);
                 break;
 
             case kStartFreewheelCallback:
-                JackLog("JackClient::kStartFreewheel\n");
+                jack_log("JackClient::kStartFreewheel");
                 SetupDriverSync(true);
                 fThread->DropRealTime();
                 if (fFreewheel)
@@ -188,7 +188,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
 
             case kStopFreewheelCallback:
-                JackLog("JackClient::kStopFreewheel\n");
+                jack_log("JackClient::kStopFreewheel");
                 SetupDriverSync(false);
                 if (fFreewheel)
                     fFreewheel(0, fFreewheelArg);
@@ -196,31 +196,31 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
 
             case kPortRegistrationOnCallback:
-                JackLog("JackClient::kPortRegistrationOn port_index = %ld\n", value1);
+                jack_log("JackClient::kPortRegistrationOn port_index = %ld", value1);
                 if (fPortRegistration)
                     fPortRegistration(value1, 1, fPortRegistrationArg);
                 break;
 
             case kPortRegistrationOffCallback:
-                JackLog("JackClient::kPortRegistrationOff port_index = %ld \n", value1);
+                jack_log("JackClient::kPortRegistrationOff port_index = %ld ", value1);
                 if (fPortRegistration)
                     fPortRegistration(value1, 0, fPortRegistrationArg);
                 break;
 
             case kPortConnectCallback:
-                JackLog("JackClient::kPortConnectCallback src = %ld dst = %ld\n", value1, value2);
+                jack_log("JackClient::kPortConnectCallback src = %ld dst = %ld", value1, value2);
                 if (fPortConnect)
                     fPortConnect(value1, value2, 1, fPortConnectArg);
                 break;
 
             case kPortDisconnectCallback:
-                JackLog("JackClient::kPortDisconnectCallback src = %ld dst = %ld\n", value1, value2);
+                jack_log("JackClient::kPortDisconnectCallback src = %ld dst = %ld", value1, value2);
                 if (fPortConnect)
                     fPortConnect(value1, value2, 0, fPortConnectArg);
                 break;
 
             case kXRunCallback:
-                JackLog("JackClient::kXRunCallback\n");
+                jack_log("JackClient::kXRunCallback");
                 if (fXrun)
                     res = fXrun(fXrunArg);
                 break;
@@ -236,7 +236,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 */
 int JackClient::Activate()
 {
-    JackLog("JackClient::Activate \n");
+    jack_log("JackClient::Activate ");
     if (IsActive())
         return 0;
 
@@ -273,7 +273,7 @@ int JackClient::Activate()
 */
 int JackClient::Deactivate()
 {
-    JackLog("JackClient::Deactivate \n");
+    jack_log("JackClient::Deactivate ");
     if (!IsActive())
         return 0;
 
@@ -281,7 +281,7 @@ int JackClient::Deactivate()
     int result = -1;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
 
-    JackLog("JackClient::Deactivate res = %ld \n", result);
+    jack_log("JackClient::Deactivate res = %ld ", result);
     // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
 
     /* TODO : solve WIN32 thread Kill issue
@@ -306,7 +306,7 @@ int JackClient::Deactivate()
 bool JackClient::Init()
 {
     if (fInit) {
-        JackLog("JackClient::Init calling client thread init callback\n");
+        jack_log("JackClient::Init calling client thread init callback");
         fInit(fInitArg);
     }
     return true;
@@ -314,7 +314,7 @@ bool JackClient::Init()
 
 int JackClient::StartThread()
 {
-    JackLog("JackClient::StartThread : period = %ld computation = %ld constraint = %ld\n",
+    jack_log("JackClient::StartThread : period = %ld computation = %ld constraint = %ld",
             long(int64_t(GetEngineControl()->fPeriod) / 1000.0f),
             long(int64_t(GetEngineControl()->fComputation) / 1000.0f),
             long(int64_t(GetEngineControl()->fConstraint) / 1000.0f));
@@ -362,7 +362,7 @@ inline bool JackClient::WaitFirstSync()
                 return false;
             return true;
         } else {
-            JackLog("Process called for an inactive client\n");
+            jack_log("Process called for an inactive client");
         }
         SignalSync();
     }
@@ -453,7 +453,7 @@ inline void JackClient::SignalSync()
 
 inline int JackClient::End()
 {
-    JackLog("JackClient::Execute end name = %s\n", GetClientControl()->fName);
+    jack_log("JackClient::Execute end name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
     int result;
     fThread->DropRealTime();
@@ -505,12 +505,12 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
         return 0; // Means failure here...
     }
 
-    JackLog("JackClient::PortRegister ref = %ld  name = %s type = %s\n", GetClientControl()->fRefNum, name.c_str(), port_type);
+    jack_log("JackClient::PortRegister ref = %ld  name = %s type = %s", GetClientControl()->fRefNum, name.c_str(), port_type);
 
     int result = -1;
     unsigned int port_index = NO_PORT;
     fChannel->PortRegister(GetClientControl()->fRefNum, name.c_str(), port_type, flags, buffer_size, &port_index, &result);
-    JackLog("JackClient::PortRegister port_index = %ld \n", port_index);
+    jack_log("JackClient::PortRegister port_index = %ld ", port_index);
 
     if (result == 0) {
         fPortList.push_back(port_index);
@@ -522,7 +522,7 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
 
 int JackClient::PortUnRegister(jack_port_id_t port_index)
 {
-    JackLog("JackClient::PortUnRegister port_index = %ld\n", port_index);
+    jack_log("JackClient::PortUnRegister port_index = %ld", port_index);
     list<jack_port_id_t>::iterator it = find(fPortList.begin(), fPortList.end(), port_index);
 
     if (it != fPortList.end()) {
@@ -538,7 +538,7 @@ int JackClient::PortUnRegister(jack_port_id_t port_index)
 
 int JackClient::PortConnect(const char* src, const char* dst)
 {
-    JackLog("JackClient::Connect src = %s dst = %s\n", src, dst);
+    jack_log("JackClient::Connect src = %s dst = %s", src, dst);
     int result = -1;
     fChannel->PortConnect(GetClientControl()->fRefNum, src, dst, &result);
     return result;
@@ -546,7 +546,7 @@ int JackClient::PortConnect(const char* src, const char* dst)
 
 int JackClient::PortDisconnect(const char* src, const char* dst)
 {
-    JackLog("JackClient::Disconnect src = %s dst = %s\n", src, dst);
+    jack_log("JackClient::Disconnect src = %s dst = %s", src, dst);
     int result = -1;
     fChannel->PortDisconnect(GetClientControl()->fRefNum, src, dst, &result);
     return result;
@@ -554,7 +554,7 @@ int JackClient::PortDisconnect(const char* src, const char* dst)
 
 int JackClient::PortDisconnect(jack_port_id_t src)
 {
-    JackLog("JackClient::PortDisconnect src = %ld\n", src);
+    jack_log("JackClient::PortDisconnect src = %ld", src);
     int result = -1;
     fChannel->PortDisconnect(GetClientControl()->fRefNum, src, ALL_PORTS, &result);
     return result;
@@ -593,7 +593,7 @@ ShutDown is called:
 
 void JackClient::ShutDown()
 {
-    JackLog("ShutDown\n");
+    jack_log("ShutDown");
     if (fShutdown) {
         GetClientControl()->fActive = false;
         fShutdown(fShutdownArg);
@@ -638,7 +638,7 @@ int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timeba
     if (IsActive()) {
         int result = -1;
         fChannel->SetTimebaseCallback(GetClientControl()->fRefNum, conditional, &result);
-        JackLog("SetTimebaseCallback result = %ld\n", result);
+        jack_log("SetTimebaseCallback result = %ld", result);
         if (result == 0) {
             fTimebase = timebase_callback;
             fTimebaseArg = arg;
@@ -646,7 +646,7 @@ int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timeba
             fTimebase = NULL;
             fTimebaseArg = NULL;
         }
-        JackLog("SetTimebaseCallback OK result = %ld\n", result);
+        jack_log("SetTimebaseCallback OK result = %ld", result);
         return result;
     } else {
         fTimebase = timebase_callback;
@@ -663,7 +663,7 @@ int JackClient::RequestNewPos(jack_position_t* pos)
     jack_position_t* request = transport.WriteNextStateStart(2);
     pos->unique_1 = pos->unique_2 = transport.GenerateUniqueID();
     JackTransportEngine::TransportCopyPosition(pos, request);
-    JackLog("RequestNewPos pos = %ld\n", pos->frame);
+    jack_log("RequestNewPos pos = %ld", pos->frame);
     transport.WriteNextStateStop(2);
     return 0;
 }
@@ -673,14 +673,14 @@ int JackClient::TransportLocate(jack_nframes_t frame)
     jack_position_t pos;
     pos.frame = frame;
     pos.valid = (jack_position_bits_t)0;
-    JackLog("TransportLocate pos = %ld\n", pos.frame);
+    jack_log("TransportLocate pos = %ld", pos.frame);
     return RequestNewPos(&pos);
 }
 
 int JackClient::TransportReposition(jack_position_t* pos)
 {
     jack_position_t tmp = *pos;
-    JackLog("TransportReposition pos = %ld\n", pos->frame);
+    jack_log("TransportReposition pos = %ld", pos->frame);
     return (tmp.valid & ~JACK_POSITION_MASK) ? EINVAL : RequestNewPos(&tmp);
 }
 
@@ -837,7 +837,7 @@ int JackClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
 
 int JackClient::SetGraphOrderCallback(JackGraphOrderCallback callback, void *arg)
 {
-    JackLog("SetGraphOrderCallback \n");
+    jack_log("SetGraphOrderCallback ");
 
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");

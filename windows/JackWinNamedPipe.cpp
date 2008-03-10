@@ -53,7 +53,7 @@ int JackWinNamedPipe::Write(void* data, int len)
 int JackWinNamedPipeClient::Connect(const char* dir, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%d", dir, which);
-    JackLog("Connect: fName %s\n", fName);
+    jack_log("Connect: fName %s", fName);
 
     fNamedPipe = CreateFile(fName, 			 // pipe name
                             GENERIC_READ |   // read and write access
@@ -75,7 +75,7 @@ int JackWinNamedPipeClient::Connect(const char* dir, int which)
 int JackWinNamedPipeClient::Connect(const char* dir, const char* name, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-    JackLog("Connect: fName %s\n", fName);
+    jack_log("Connect: fName %s", fName);
 
     fNamedPipe = CreateFile(fName, 			 // pipe name
                             GENERIC_READ |   // read and write access
@@ -181,9 +181,9 @@ int JackWinAsyncNamedPipeClient::FinishIO()
 int JackWinAsyncNamedPipeClient::Read(void* data, int len)
 {
     DWORD read;
-    JackLog("JackWinNamedPipeClient::Read len = %ld\n", len);
+    jack_log("JackWinNamedPipeClient::Read len = %ld", len);
     BOOL res = ReadFile(fNamedPipe, data, len, &read, &fOverlap);
-    JackLog("JackWinNamedPipeClient::Read res = %ld read %ld\n", res, read);
+    jack_log("JackWinNamedPipeClient::Read res = %ld read %ld", res, read);
 
     if (res && read != 0) {
         fPendingIO = false;
@@ -201,7 +201,7 @@ int JackWinAsyncNamedPipeClient::Read(void* data, int len)
 int JackWinAsyncNamedPipeClient::Write(void* data, int len)
 {
     DWORD written;
-    JackLog("JackWinNamedPipeClient::Write len = %ld\n", len);
+    jack_log("JackWinNamedPipeClient::Write len = %ld", len);
     BOOL res = WriteFile(fNamedPipe, data, len, &written, &fOverlap);
 
     if (res && written != 0) {
@@ -222,7 +222,7 @@ int JackWinAsyncNamedPipeClient::Write(void* data, int len)
 int JackWinNamedPipeServer::Bind(const char* dir, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%d", dir, which);
-    JackLog("Bind: fName %s\n", fName);
+    jack_log("Bind: fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX,  // read/write access
@@ -244,7 +244,7 @@ int JackWinNamedPipeServer::Bind(const char* dir, int which)
 int JackWinNamedPipeServer::Bind(const char* dir, const char* name, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-    JackLog("Bind: fName %s\n", fName);
+    jack_log("Bind: fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX,  // read/write access
@@ -301,7 +301,7 @@ JackWinNamedPipeClient* JackWinNamedPipeServer::AcceptClient()
 
 int JackWinNamedPipeServer::Close()
 {
-    JackLog("JackWinNamedPipeServer::Close\n");
+    jack_log("JackWinNamedPipeServer::Close");
 
     if (fNamedPipe != INVALID_HANDLE_VALUE) {
         DisconnectNamedPipe(fNamedPipe);
@@ -318,7 +318,7 @@ int JackWinNamedPipeServer::Close()
 int JackWinAsyncNamedPipeServer::Bind(const char* dir, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%d", dir, which);
-    JackLog("Bind: fName %s\n", fName);
+    jack_log("Bind: fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access
@@ -340,7 +340,7 @@ int JackWinAsyncNamedPipeServer::Bind(const char* dir, int which)
 int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int which)
 {
     sprintf(fName, "\\\\.\\pipe\\%s_jack_%s_%d", dir, name, which);
-    JackLog("Bind: fName %s\n", fName);
+    jack_log("Bind: fName %s", fName);
 
     if ((fNamedPipe = CreateNamedPipe(fName,
                                       PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,  // read/write access

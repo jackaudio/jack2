@@ -127,20 +127,20 @@ bool JackMachSemaphore::Allocate(const char* name, const char* server_name, int 
                 /* service not currently registered, "a good thing" (tm) */
                 break;
             case BOOTSTRAP_NOT_PRIVILEGED :
-                JackLog("bootstrap_register(): bootstrap not privileged\n");
+                jack_log("bootstrap_register(): bootstrap not privileged");
                 break;
             case BOOTSTRAP_SERVICE_ACTIVE :
-                JackLog("bootstrap_register(): bootstrap service active\n");
+                jack_log("bootstrap_register(): bootstrap service active");
                 break;
             default :
-                JackLog("bootstrap_register() err = %s\n", mach_error_string(res));
+                jack_log("bootstrap_register() err = %s", mach_error_string(res));
                 break;
         }
 
         return false;
     }
 
-    JackLog("JackMachSemaphore::Allocate name = %s\n", fName);
+    jack_log("JackMachSemaphore::Allocate name = %s", fName);
     return true;
 }
 
@@ -153,7 +153,7 @@ bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
     // Temporary...  A REVOIR
     /*
     if (fSemaphore > 0) {
-    	JackLog("Already connected name = %s\n", name);
+    	jack_log("Already connected name = %s", name);
     	return true;
     }
     */
@@ -170,7 +170,7 @@ bool JackMachSemaphore::ConnectInput(const char* name, const char* server_name)
         return false;
     }
 
-    JackLog("JackMachSemaphore::Connect name = %s \n", fName);
+    jack_log("JackMachSemaphore::Connect name = %s ", fName);
     return true;
 }
 
@@ -187,7 +187,7 @@ bool JackMachSemaphore::ConnectOutput(const char* name, const char* server_name)
 bool JackMachSemaphore::Disconnect()
 {
     if (fSemaphore > 0) {
-        JackLog("JackMachSemaphore::Disconnect name = %s\n", fName);
+        jack_log("JackMachSemaphore::Disconnect name = %s", fName);
         fSemaphore = 0;
     }
     // Nothing to do
@@ -200,7 +200,7 @@ void JackMachSemaphore::Destroy()
     kern_return_t res;
 
     if (fSemaphore > 0) {
-        JackLog("JackMachSemaphore::Destroy\n");
+        jack_log("JackMachSemaphore::Destroy");
         if ((res = semaphore_destroy(mach_task_self(), fSemaphore)) != KERN_SUCCESS) {
             jack_error("JackMachSemaphore::Destroy can't destroy semaphore err = %s", mach_error_string(res));
         }

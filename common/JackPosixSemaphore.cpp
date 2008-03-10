@@ -116,8 +116,8 @@ bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
 
     if ((res = sem_timedwait(fSemaphore, &time)) != 0) {
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
-		JackLog("now %ld %ld \n", now.tv_sec, now.tv_usec);
-		JackLog("next %ld %ld \n", time.tv_sec, time.tv_nsec/1000);
+		jack_log("now %ld %ld ", now.tv_sec, now.tv_usec);
+		jack_log("next %ld %ld ", time.tv_sec, time.tv_nsec/1000);
 	}
     return (res == 0);
 }
@@ -143,7 +143,7 @@ bool JackPosixSemaphore::TimedWait(long usec)
 bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int value)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackPosixSemaphore::Allocate name = %s val = %ld\n", fName, value);
+    jack_log("JackPosixSemaphore::Allocate name = %s val = %ld", fName, value);
 
     if ((fSemaphore = sem_open(fName, O_CREAT, 0777, value)) == (sem_t*)SEM_FAILED) {
         jack_error("Allocate: can't check in named semaphore name = %s err = %s", fName, strerror(errno));
@@ -157,11 +157,11 @@ bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int
 bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackPosixSemaphore::Connect %s\n", fName);
+    jack_log("JackPosixSemaphore::Connect %s", fName);
 
     // Temporary...
     if (fSemaphore) {
-        JackLog("Already connected name = %s\n", name);
+        jack_log("Already connected name = %s", name);
         return true;
     }
 
@@ -171,7 +171,7 @@ bool JackPosixSemaphore::ConnectInput(const char* name, const char* server_name)
     } else {
         int val = 0;
         sem_getvalue(fSemaphore, &val);
-        JackLog("JackPosixSemaphore::Connect sem_getvalue %ld\n", val);
+        jack_log("JackPosixSemaphore::Connect sem_getvalue %ld", val);
         return true;
     }
 }
@@ -188,7 +188,7 @@ bool JackPosixSemaphore::ConnectOutput(const char* name, const char* server_name
 
 bool JackPosixSemaphore::Disconnect()
 {
-    JackLog("JackPosixSemaphore::Disconnect %s\n", fName);
+    jack_log("JackPosixSemaphore::Disconnect %s", fName);
 
     if (fSemaphore) {
         if (sem_close(fSemaphore) != 0) {
@@ -207,7 +207,7 @@ bool JackPosixSemaphore::Disconnect()
 void JackPosixSemaphore::Destroy()
 {
     if (fSemaphore != NULL) {
-        JackLog("JackPosixSemaphore::Destroy\n");
+        jack_log("JackPosixSemaphore::Destroy");
         sem_unlink(fName);
         if (sem_close(fSemaphore) != 0) {
             jack_error("Destroy: can't destroy semaphore name = %s err = %s", fName, strerror(errno));

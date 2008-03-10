@@ -461,13 +461,13 @@ int JackASIODriver::Close()
 
 int JackASIODriver::Start()
 {
-    JackLog("JackASIODriver::Start\n");
+    jack_log("JackASIODriver::Start");
     return 0;
 }
 
 int JackASIODriver::Stop()
 {
-    JackLog("JackASIODriver::Stop\n");
+    jack_log("JackASIODriver::Stop");
     return 0;
 }
 

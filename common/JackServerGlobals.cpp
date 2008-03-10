@@ -50,7 +50,7 @@ int JackServerGlobals::Start(const char* server_name,
                              int loopback,
                              int verbose)
 {
-    JackLog("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld \n", sync, time_out_ms, rt, priority, verbose);
+    jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
     fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
     int res = fServer->Open(driver_desc, driver_params);
     return (res < 0) ? res : fServer->Start();
@@ -60,16 +60,16 @@ int JackServerGlobals::Stop()
 {
     fServer->Stop();
     fServer->Close();
-    JackLog("Jackdmp: server close\n");
+    jack_log("Jackdmp: server close");
     delete fServer;
-    JackLog("Jackdmp: delete server\n");
+    jack_log("Jackdmp: delete server");
     return 0;
 }
 
 int JackServerGlobals::Delete()
 {
     delete fServer;
-    JackLog("Jackdmp: delete server\n");
+    jack_log("Jackdmp: delete server");
     return 0;
 }
 
@@ -77,7 +77,7 @@ bool JackServerGlobals::Init()
 {
     if (fClientCount++ == 0) {
 
-        JackLog("JackServerGlobals Init\n");
+        jack_log("JackServerGlobals Init");
         int realtime = 0;
         int client_timeout = 0; /* msecs; if zero, use period size. */
         int realtime_priority = 10;
@@ -316,7 +316,7 @@ error:
 void JackServerGlobals::Destroy()
 {
     if (--fClientCount == 0) {
-        JackLog("JackServerGlobals Destroy\n");
+        jack_log("JackServerGlobals Destroy");
         Stop();
         jack_cleanup_shm();
 #ifndef WIN32

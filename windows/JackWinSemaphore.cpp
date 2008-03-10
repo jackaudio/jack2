@@ -84,11 +84,11 @@ bool JackWinSemaphore::TimedWait(long usec)
 bool JackWinSemaphore::ConnectInput(const char* name, const char* server_name)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackWinSemaphore::Connect %s\n", fName);
+    jack_log("JackWinSemaphore::Connect %s", fName);
 
     // Temporary...
     if (fSemaphore) {
-        JackLog("Already connected name = %s\n", name);
+        jack_log("Already connected name = %s", name);
         return true;
     }
 
@@ -113,7 +113,7 @@ bool JackWinSemaphore::ConnectOutput(const char* name, const char* server_name)
 bool JackWinSemaphore::Disconnect()
 {
     if (fSemaphore) {
-        JackLog("JackWinSemaphore::Disconnect %s\n", fName);
+        jack_log("JackWinSemaphore::Disconnect %s", fName);
         CloseHandle(fSemaphore);
         fSemaphore = NULL;
         return true;
@@ -125,7 +125,7 @@ bool JackWinSemaphore::Disconnect()
 bool JackWinSemaphore::Allocate(const char* name, const char* server_name, int value)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackWinSemaphore::Allocate name = %s val = %ld\n", fName, value);
+    jack_log("JackWinSemaphore::Allocate name = %s val = %ld", fName, value);
 
     if ((fSemaphore = CreateSemaphore(NULL, value, 32767, fName)) == NULL) {
         jack_error("Allocate: can't check in named semaphore name = %s err = %ld", fName, GetLastError());
@@ -143,7 +143,7 @@ bool JackWinSemaphore::Allocate(const char* name, const char* server_name, int v
 void JackWinSemaphore::Destroy()
 {
     if (fSemaphore != NULL) {
-        JackLog("JackWinSemaphore::Destroy %s\n", fName);
+        jack_log("JackWinSemaphore::Destroy %s", fName);
         CloseHandle(fSemaphore);
         fSemaphore = NULL;
     } else {

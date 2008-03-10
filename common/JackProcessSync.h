@@ -75,7 +75,7 @@ class JackProcessSync : public JackSyncInterface
             int res;
 
             pthread_mutex_lock(&fLock);
-            JackLog("JackProcessSync::Wait time out = %ld\n", usec);
+            jack_log("JackProcessSync::Wait time out = %ld", usec);
             gettimeofday(&T0, 0);
 
             static const UInt64	kNanosPerSec = 1000000000ULL;
@@ -90,7 +90,7 @@ class JackProcessSync : public JackSyncInterface
 
             gettimeofday(&T1, 0);
             pthread_mutex_unlock(&fLock);
-            JackLog("JackProcessSync::Wait finished delta = %5.1lf\n",
+            jack_log("JackProcessSync::Wait finished delta = %5.1lf",
                     (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
             return (res == 0);
         }
@@ -99,11 +99,11 @@ class JackProcessSync : public JackSyncInterface
         {
             int res;
             pthread_mutex_lock(&fLock);
-            JackLog("JackProcessSync::Wait...\n");
+            jack_log("JackProcessSync::Wait...");
             if ((res = pthread_cond_wait(&fCond, &fLock)) != 0)
                 jack_error("pthread_cond_wait error err = %s", strerror(errno));
             pthread_mutex_unlock(&fLock);
-            JackLog("JackProcessSync::Wait finished\n");
+            jack_log("JackProcessSync::Wait finished");
         }
 
         void SignalAll()
@@ -153,11 +153,11 @@ class JackInterProcessSync : public JackSyncInterface
         bool TimedWait(long usec)
         {
             struct timeval T0, T1;
-            JackLog("JackInterProcessSync::Wait...\n");
+            jack_log("JackInterProcessSync::Wait...");
             gettimeofday(&T0, 0);
             bool res = fSynchro->TimedWait(usec);
             gettimeofday(&T1, 0);
-            JackLog("JackInterProcessSync::Wait finished delta = %5.1lf\n",
+            jack_log("JackInterProcessSync::Wait finished delta = %5.1lf",
                     (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
             return res;
         }

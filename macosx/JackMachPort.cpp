@@ -56,7 +56,7 @@ bool JackMachPort::AllocatePort(const char* name, int queue)
         jack_error("Allocate: mach_port_get_attributes error err = %s", name, mach_error_string(res));
     }
 
-    JackLog("AllocatePort: queue limit %ld\n", qlimits.mpl_qlimit);
+    jack_log("AllocatePort: queue limit %ld", qlimits.mpl_qlimit);
 
     if (queue > 0 ) {
         qlimits.mpl_qlimit = queue;
@@ -81,7 +81,7 @@ bool JackMachPort::ConnectPort(const char* name)
 {
     kern_return_t res;
 
-    JackLog("JackMachPort::ConnectPort %s\n", name);
+    jack_log("JackMachPort::ConnectPort %s", name);
 
     if ((res = task_get_bootstrap_port(mach_task_self(), &fBootPort)) != KERN_SUCCESS) {
         jack_error("ConnectPort: can't find bootstrap port err = %s", mach_error_string(res));
@@ -98,7 +98,7 @@ bool JackMachPort::ConnectPort(const char* name)
 
 bool JackMachPort::DisconnectPort()
 {
-    JackLog("JackMacRPC::DisconnectPort\n");
+    jack_log("JackMacRPC::DisconnectPort");
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
@@ -115,7 +115,7 @@ bool JackMachPort::DisconnectPort()
 
 bool JackMachPort::DestroyPort()
 {
-    JackLog("JackMacRPC::DisconnectPort\n");
+    jack_log("JackMacRPC::DisconnectPort");
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
@@ -140,7 +140,7 @@ bool JackMachPortSet::AllocatePort(const char* name, int queue)
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
-    JackLog("JackMachPortSet::AllocatePort\n");
+    jack_log("JackMachPortSet::AllocatePort");
 
     if ((res = task_get_bootstrap_port(task, &fBootPort)) != KERN_SUCCESS) {
         jack_error("AllocatePort: Can't find bootstrap mach port err = %s", mach_error_string(res));
@@ -178,7 +178,7 @@ bool JackMachPortSet::AllocatePort(const char* name, int queue)
         jack_error("Allocate: mach_port_get_attributes error name = %s err = %s", name, mach_error_string(res));
     }
 
-    JackLog("AllocatePort: queue limit = %ld\n", qlimits.mpl_qlimit);
+    jack_log("AllocatePort: queue limit = %ld", qlimits.mpl_qlimit);
 
     if (queue > 0 ) {
         qlimits.mpl_qlimit = queue;
@@ -203,7 +203,7 @@ bool JackMachPortSet::DisconnectPort()
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
-    JackLog("JackMachPortSet::DisconnectPort\n");
+    jack_log("JackMachPortSet::DisconnectPort");
 
     if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
         jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
@@ -221,7 +221,7 @@ bool JackMachPortSet::DestroyPort()
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
-    JackLog("JackMachPortSet::DisconnectPort\n");
+    jack_log("JackMachPortSet::DisconnectPort");
 
     if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
         jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate err = %s", mach_error_string(res));
@@ -245,7 +245,7 @@ mach_port_t JackMachPortSet::AddPort()
     mach_port_t task = mach_task_self();
     mach_port_t old_port, result = 0;
 
-    JackLog("JackMachPortSet::AddPort\n");
+    jack_log("JackMachPortSet::AddPort");
 
     if ((res = mach_port_allocate(task, MACH_PORT_RIGHT_RECEIVE, &result)) != KERN_SUCCESS) {
         jack_error("AddPort: can't allocate mach port err = %s", mach_error_string(res));

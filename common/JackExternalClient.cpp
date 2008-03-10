@@ -39,7 +39,7 @@ JackExternalClient::~JackExternalClient()
 int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
     int result = -1;
-    JackLog("JackExternalClient::ClientNotify ref = %ld name = %s notify = %ld\n", refnum, name, notify);
+    jack_log("JackExternalClient::ClientNotify ref = %ld name = %s notify = %ld", refnum, name, notify);
     fChannel->ClientNotify(refnum, name, notify, sync, value1, value2, &result);
     return result;
 }
@@ -60,7 +60,7 @@ int JackExternalClient::Open(const char* name, int refnum, int* shared_client)
         }
 
         *shared_client = fClientControl->GetShmIndex();
-        JackLog("JackExternalClient::Open name = %s index = %ld base = %x\n", name, fClientControl->GetShmIndex(), fClientControl->GetShmAddress());
+        jack_log("JackExternalClient::Open name = %s index = %ld base = %x", name, fClientControl->GetShmIndex(), fClientControl->GetShmAddress());
         return 0;
 
     } catch (std::exception e) {

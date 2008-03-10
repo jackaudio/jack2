@@ -43,7 +43,7 @@ JackMachClientChannel::~JackMachClientChannel()
 
 int JackMachClientChannel::ServerCheck(const char* server_name)
 {
-    JackLog("JackMachClientChannel::ServerCheck = %s\n", server_name);
+    jack_log("JackMachClientChannel::ServerCheck = %s", server_name);
     char jack_server_entry_name[512];
     snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 
@@ -58,7 +58,7 @@ int JackMachClientChannel::ServerCheck(const char* server_name)
 
 int JackMachClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* client, jack_options_t options, jack_status_t* status)
 {
-    JackLog("JackMachClientChannel::Open name = %s\n", name);
+    jack_log("JackMachClientChannel::Open name = %s", name);
     char jack_server_entry_name[512];
     snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 
@@ -95,7 +95,7 @@ int JackMachClientChannel::Open(const char* server_name, const char* name, char*
 
 void JackMachClientChannel::Close()
 {
-    JackLog("JackMachClientChannel::Close\n");
+    jack_log("JackMachClientChannel::Close");
     JackLibGlobals::fGlobals->fClientTable.erase(fClientPort.GetPort());
     fServerPort.DisconnectPort();
     fClientPort.DestroyPort();
@@ -109,7 +109,7 @@ void JackMachClientChannel::Close()
 
 int JackMachClientChannel::Start()
 {
-    JackLog("JackMachClientChannel::Start\n");
+    jack_log("JackMachClientChannel::Start");
     if (fThread->Start() != 0) {
         jack_error("Cannot start Jack client listener");
         return -1;
@@ -120,7 +120,7 @@ int JackMachClientChannel::Start()
 
 void JackMachClientChannel::Stop()
 {
-    JackLog("JackMachClientChannel::Stop\n");
+    jack_log("JackMachClientChannel::Stop");
     fThread->Kill();
 }
 

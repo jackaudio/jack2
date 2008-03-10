@@ -33,7 +33,7 @@ namespace Jack
 int JackFreewheelDriver::Process()
 {
     if (fIsMaster) {
-        JackLog("JackFreewheelDriver::Process master %lld\n", fEngineControl->fTimeOutUsecs);
+        jack_log("JackFreewheelDriver::Process master %lld", fEngineControl->fTimeOutUsecs);
         fLastWaitUst = GetMicroSeconds();
         fEngine->Process(fLastWaitUst);
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients

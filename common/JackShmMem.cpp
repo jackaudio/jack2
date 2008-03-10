@@ -55,7 +55,7 @@ void* JackShmMem::operator new(size_t size)
     gInfo.size = size;
     gInfo.attached_at = info.attached_at;
 
-    JackLog("JackShmMem::new index = %ld attached = %x size = %ld \n", info.index, info.attached_at, size);
+    jack_log("JackShmMem::new index = %ld attached = %x size = %ld ", info.index, info.attached_at, size);
     return obj;
 
 error:
@@ -70,7 +70,7 @@ void JackShmMem::operator delete(void* p, size_t size)
     info.index = obj->fInfo.index;
     info.attached_at = obj->fInfo.attached_at;
 
-    JackLog("JackShmMem::delete size = %ld index = %ld\n", size, info.index);
+    jack_log("JackShmMem::delete size = %ld index = %ld", size, info.index);
 
     jack_release_shm(&info);
     jack_destroy_shm(&info);
@@ -79,7 +79,7 @@ void JackShmMem::operator delete(void* p, size_t size)
 void LockMemoryImp(void* ptr, size_t size)
 {
     if (CHECK_MLOCK(ptr, size)) {
-        JackLog("Succeeded in locking %u byte memory area\n", size);
+        jack_log("Succeeded in locking %u byte memory area", size);
     } else {
         jack_error("Cannot lock down memory area (%s)", strerror(errno));
     }
@@ -88,7 +88,7 @@ void LockMemoryImp(void* ptr, size_t size)
 void UnlockMemoryImp(void* ptr, size_t size)
 {
     if (CHECK_MUNLOCK(ptr, size)) {
-        JackLog("Succeeded in unlocking %u byte memory area\n", size);
+        jack_log("Succeeded in unlocking %u byte memory area", size);
     } else {
         jack_error("Cannot unlock down memory area (%s)", strerror(errno));
     }
@@ -97,7 +97,7 @@ void UnlockMemoryImp(void* ptr, size_t size)
 void LockAllMemory()
 {
     if (CHECK_MLOCKALL()) {
-        JackLog("Succeeded in locking all memory\n");
+        jack_log("Succeeded in locking all memory");
     } else {
         jack_error("Cannot lock down memory area (%s)", strerror(errno));
     }
@@ -106,7 +106,7 @@ void LockAllMemory()
 void UnlockAllMemory()
 {
     if (CHECK_MUNLOCKALL()) {
-        JackLog("Succeeded in unlocking all memory\n");
+        jack_log("Succeeded in unlocking all memory");
     } else {
         jack_error("Cannot unlock down memory area (%s)", strerror(errno));
     }

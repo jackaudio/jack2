@@ -91,7 +91,7 @@ int JackAudioDriver::Attach()
     unsigned long port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
     int i;
 
-    JackLog("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld\n", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    jack_log("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fClientControl->fName, fCaptureDriverName, i + 1);
@@ -104,7 +104,7 @@ int JackAudioDriver::Attach()
         port->SetAlias(alias);
         port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
         fCapturePortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld\n", port_index);
+        jack_log("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
     }
 
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -120,11 +120,11 @@ int JackAudioDriver::Attach()
         port->SetAlias(alias);
         port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
-        JackLog("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld\n", port_index);
+        jack_log("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
 
         // Monitor ports
         if (fWithMonitorPorts) {
-            JackLog("Create monitor port \n");
+            jack_log("Create monitor port ");
             snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fClientControl->fName, fPlaybackDriverName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
@@ -143,7 +143,7 @@ int JackAudioDriver::Attach()
 int JackAudioDriver::Detach()
 {
     int i;
-    JackLog("JackAudioDriver::Detach\n");
+    jack_log("JackAudioDriver::Detach");
 
     for (i = 0; i < fCaptureChannels; i++) {
         fGraphManager->ReleasePort(fClientControl->fRefNum, fCapturePortList[i]);

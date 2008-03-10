@@ -38,7 +38,7 @@ JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
 
 int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 {
-    JackLog("JackWinNamedPipeClientChannel::ServerCheck = %s\n", server_name);
+    jack_log("JackWinNamedPipeClientChannel::ServerCheck = %s", server_name);
 
     // Connect to server
     if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
@@ -52,7 +52,7 @@ int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
-    JackLog("JackWinNamedPipeClientChannel::Open name = %s\n", name);
+    jack_log("JackWinNamedPipeClientChannel::Open name = %s", name);
 
     /*
     16/08/07: was called before doing "fRequestPipe.Connect" .... still necessary?
@@ -99,7 +99,7 @@ void JackWinNamedPipeClientChannel::Close()
 
 int JackWinNamedPipeClientChannel::Start()
 {
-    JackLog("JackWinNamedPipeClientChannel::Start\n");
+    jack_log("JackWinNamedPipeClientChannel::Start");
 
     if (fThread->Start() != 0) {
         jack_error("Cannot start Jack client listener");
@@ -111,7 +111,7 @@ int JackWinNamedPipeClientChannel::Start()
 
 void JackWinNamedPipeClientChannel::Stop()
 {
-    JackLog("JackWinNamedPipeClientChannel::Stop\n");
+    jack_log("JackWinNamedPipeClientChannel::Stop");
     fThread->Kill();  // Unsafe on WIN32... TODO : solve WIN32 thread Kill issue
 }
 
@@ -289,7 +289,7 @@ void JackWinNamedPipeClientChannel::InternalClientUnload(int refnum, int int_ref
 
 bool JackWinNamedPipeClientChannel::Init()
 {
-    JackLog("JackWinNamedPipeClientChannel::Init \n");
+    jack_log("JackWinNamedPipeClientChannel::Init ");
 
     if (!fNotificationListenPipe.Accept()) {
         jack_error("JackWinNamedPipeClientChannel: cannot establish notification pipe");

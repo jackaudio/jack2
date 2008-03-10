@@ -247,7 +247,7 @@ static inline void WaitGraphChange()
     JackEngineControl* control = GetEngineControl();
 
     if (manager && control && manager->IsPendingChange()) {
-        JackLog("WaitGraphChange...\n");
+        jack_log("WaitGraphChange...");
         JackSleep(int(control->fPeriodUsecs * 1.1f));
     }
 }
@@ -845,7 +845,7 @@ EXPORT int jack_set_graph_order_callback(jack_client_t* ext_client, JackGraphOrd
     JackLibGlobals::CheckContext();
 #endif
     JackClient* client = (JackClient*)ext_client;
-    JackLog("jack_set_graph_order_callback ext_client %x client %x \n", ext_client, client);
+    jack_log("jack_set_graph_order_callback ext_client %x client %x ", ext_client, client);
     if (client == NULL) {
         jack_error("jack_set_graph_order_callback called with a NULL client");
         return -1;
@@ -874,7 +874,7 @@ EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadIn
     JackLibGlobals::CheckContext();
 #endif
     JackClient* client = (JackClient*)ext_client;
-    JackLog("jack_set_thread_init_callback ext_client %x client %x \n", ext_client, client);
+    jack_log("jack_set_thread_init_callback ext_client %x client %x ", ext_client, client);
     if (client == NULL) {
         jack_error("jack_set_thread_init_callback called with a NULL client");
         return -1;
@@ -1474,7 +1474,7 @@ EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    JackLog("jack_get_max_delayed_usecs: not yet implemented\n");
+    jack_log("jack_get_max_delayed_usecs: not yet implemented");
     return 0.f;
 }
 
@@ -1483,7 +1483,7 @@ EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    JackLog("jack_get_xrun_delayed_usecs: not yet implemented\n");
+    jack_log("jack_get_xrun_delayed_usecs: not yet implemented");
     return 0.f;
 }
 
@@ -1492,7 +1492,7 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    JackLog("jack_reset_max_delayed_usecs: not yet implemented\n");
+    jack_log("jack_reset_max_delayed_usecs: not yet implemented");
 }
 
 // thread.h

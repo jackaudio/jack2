@@ -29,7 +29,7 @@ namespace Jack
 
 int JackMachNotifyChannel::Open(const char* name)
 {
-    JackLog("JackMachNotifyChannel::Open name = %s\n", name);
+    jack_log("JackMachNotifyChannel::Open name = %s", name);
 
     char buf[256];
     snprintf(buf, sizeof(buf) - 1, "%s:%s", jack_client_entry, name);

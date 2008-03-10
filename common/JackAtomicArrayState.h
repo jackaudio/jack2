@@ -74,12 +74,12 @@ Requirement:
 
 	The fCounter is an array of indexes to access the current and 3 different "pending" states.
 
-	¥ WriteNextStateStart(int index) must return a valid state to be written into, and must invalidate state "index" ==> cur state switch.
-	¥ WriteNextStateStop(int index) makes the "index" state become "switchable" with the current state.
-	¥ TrySwitchState(int index) must detect that pending state is a new state, and does the switch
-	¥ ReadCurrentState() must return the state
-	¥ GetCurrentIndex() must return an index increased each new switch.
-	¥ WriteNextStateStart(int index1) and WriteNextStateStart(int index2) can be interleaved
+	  WriteNextStateStart(int index) must return a valid state to be written into, and must invalidate state "index" ==> cur state switch.
+	  WriteNextStateStop(int index) makes the "index" state become "switchable" with the current state.
+	  TrySwitchState(int index) must detect that pending state is a new state, and does the switch
+	  ReadCurrentState() must return the state
+	  GetCurrentIndex() must return an index increased each new switch.
+	  WriteNextStateStart(int index1) and WriteNextStateStart(int index2) can be interleaved
 
 	[switch counter][index state][index state][cur index]
 
@@ -136,7 +136,7 @@ class JackAtomicArrayState
 
         JackAtomicArrayState()
         {
-            JackLog("JackAtomicArrayState constructor\n");
+            jack_log("JackAtomicArrayState constructor");
             Counter1(fCounter) = 0;
         }
 

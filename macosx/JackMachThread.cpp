@@ -35,7 +35,7 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
         theTCPolicy.constraint = AudioConvertNanosToHostTime(constraint);
         theTCPolicy.preemptible = true;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) & theTCPolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
-        JackLog("JackMachThread::thread_policy_set %ld\n", res);
+        jack_log("JackMachThread::thread_policy_set %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     } else {
         // OTHER THREADS
@@ -58,7 +58,7 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
 
         thePrecedencePolicy.importance = relativePriority;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_PRECEDENCE_POLICY, (thread_policy_t) & thePrecedencePolicy, THREAD_PRECEDENCE_POLICY_COUNT);
-        JackLog("JackMachThread::thread_policy_set %ld\n", res);
+        jack_log("JackMachThread::thread_policy_set %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     }
 }
@@ -133,7 +133,7 @@ int JackMachThread::GetParams(UInt64* period, UInt64* computation, UInt64* const
         *period = AudioConvertHostTimeToNanos(theTCPolicy.period);
         *computation = AudioConvertHostTimeToNanos(theTCPolicy.computation);
         *constraint = AudioConvertHostTimeToNanos(theTCPolicy.constraint);
-        JackLog("JackMachThread::GetParams period = %ld computation = %ld constraint = %ld\n", long(*period / 1000.0f), long(*computation / 1000.0f), long(*constraint / 1000.0f));
+        jack_log("JackMachThread::GetParams period = %ld computation = %ld constraint = %ld", long(*period / 1000.0f), long(*computation / 1000.0f), long(*constraint / 1000.0f));
         return 0;
     } else {
         return -1;
@@ -154,7 +154,7 @@ int JackMachThread::Kill()
 
 int JackMachThread::AcquireRealTime()
 {
-    JackLog("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld\n",
+    jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
             long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
 
     return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;

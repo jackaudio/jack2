@@ -69,7 +69,7 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
 {
     int result;
     char name_res[JACK_CLIENT_NAME_SIZE];
-    JackLog("JackInternalClient::Open name = %s\n", name);
+    jack_log("JackInternalClient::Open name = %s", name);
 
     snprintf(fServerName, sizeof(fServerName), server_name);
 
@@ -127,7 +127,7 @@ JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackS
     snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
     fHandle = LoadJackModule(path_to_so);
 
-    JackLog("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s\n", path_to_so);
+    jack_log("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s", path_to_so);
 
     if (fHandle == 0) {
         jack_error("error loading %s", so_name);

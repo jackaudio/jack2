@@ -44,7 +44,7 @@ JackMachServerChannel::~JackMachServerChannel()
 
 int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 {
-    JackLog("JackMachServerChannel::Open\n");
+    jack_log("JackMachServerChannel::Open");
     char jack_server_entry_name[512];
     snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
 
@@ -65,7 +65,7 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 
 void JackMachServerChannel::Close()
 {
-    JackLog("JackMachServerChannel::Close\n");
+    jack_log("JackMachServerChannel::Close");
     fThread->Kill();
     fServerPort.DestroyPort();
 }
@@ -119,7 +119,7 @@ void JackMachServerChannel::ClientClose(mach_port_t private_port, int refnum)
 
 void JackMachServerChannel::ClientKill(mach_port_t private_port)
 {
-    JackLog("JackMachServerChannel::ClientKill\n");
+    jack_log("JackMachServerChannel::ClientKill");
     int refnum = fClientTable[private_port];
     assert(refnum > 0);
     fServer->Notify(refnum, kDeadClient, 0);
@@ -135,7 +135,7 @@ void JackMachServerChannel::ClientKill(mach_port_t private_port)
 boolean_t JackMachServerChannel::MessageHandler(mach_msg_header_t* Request, mach_msg_header_t* Reply)
 {
     if (Request->msgh_id == MACH_NOTIFY_NO_SENDERS) {
-        JackLog("MACH_NOTIFY_NO_SENDERS %ld\n", Request->msgh_local_port);
+        jack_log("MACH_NOTIFY_NO_SENDERS %ld", Request->msgh_local_port);
         JackMachServerChannel* channel = JackMachServerChannel::fPortTable[Request->msgh_local_port];
         assert(channel);
         channel->ClientKill(Request->msgh_local_port);
@@ -149,7 +149,7 @@ bool JackMachServerChannel::Execute()
 {
     kern_return_t res;
     if ((res = mach_msg_server(MessageHandler, 1024, fServerPort.GetPortSet(), 0)) != KERN_SUCCESS) {
-        JackLog("JackMachServerChannel::Execute: err = %s\n", mach_error_string(res));
+        jack_log("JackMachServerChannel::Execute: err = %s", mach_error_string(res));
     }
     //return (res == KERN_SUCCESS);  mach_msg_server can fail if the client reply port is not valid anymore (crashed client)
     return true;

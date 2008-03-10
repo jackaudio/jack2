@@ -45,7 +45,7 @@ JackThreadedDriver::~JackThreadedDriver()
 
 int JackThreadedDriver::Start()
 {
-    JackLog("JackThreadedDriver::Start\n");
+    jack_log("JackThreadedDriver::Start");
     int res;
 
     if ((res = fDriver->Start()) < 0) {
@@ -58,7 +58,7 @@ int JackThreadedDriver::Start()
     }
 
     if (fDriver->IsRealTime()) {
-        JackLog("JackThreadedDriver::Start IsRealTime\n");
+        jack_log("JackThreadedDriver::Start IsRealTime");
         if (fThread->AcquireRealTime(GetEngineControl()->fPriority) < 0)
             jack_error("AcquireRealTime error");
     }
@@ -68,7 +68,7 @@ int JackThreadedDriver::Start()
 
 int JackThreadedDriver::Stop()
 {
-    JackLog("JackThreadedDriver::Stop\n");
+    jack_log("JackThreadedDriver::Stop");
     int res;
 
     if ((res = fThread->Stop()) < 0) {  // Stop when the thread cycle is finished

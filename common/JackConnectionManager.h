@@ -255,7 +255,7 @@ class JackLoopFeedback
                     fTable[i][0] = ref1;
                     fTable[i][1] = ref2;
                     fTable[i][2] = 1;
-                    JackLog("JackLoopFeedback::AddConnectionAux ref1 = %ld ref2 = %ld\n", ref1, ref2);
+                    jack_log("JackLoopFeedback::AddConnectionAux ref1 = %ld ref2 = %ld", ref1, ref2);
                     return true;
                 }
             }
@@ -273,7 +273,7 @@ class JackLoopFeedback
                     fTable[i][0] = EMPTY;
                     fTable[i][1] = EMPTY;
                     fTable[i][2] = 0;
-                    JackLog("JackLoopFeedback::RemoveConnectionAux ref1 = %ld ref2 = %ld\n", ref1, ref2);
+                    jack_log("JackLoopFeedback::RemoveConnectionAux ref1 = %ld ref2 = %ld", ref1, ref2);
                     return true;
                 }
             }
@@ -328,7 +328,7 @@ class JackLoopFeedback
             int index = GetConnectionIndex(ref1, ref2);
 
             if (index >= 0) {
-                JackLog("JackLoopFeedback::DecConnection ref1 = %ld ref2 = %ld index = %ld\n", ref1, ref2, index);
+                jack_log("JackLoopFeedback::DecConnection ref1 = %ld ref2 = %ld index = %ld", ref1, ref2, index);
                 return (DecConnection(index) == 0) ? RemoveConnectionAux(ref1, ref2) : true;
             } else {
                 return false;

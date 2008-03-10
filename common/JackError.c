@@ -66,7 +66,7 @@ EXPORT void jack_info_multiline(const char *fmt, ...)
 	va_end(ap);
 }
 
-EXPORT void JackLog(const char *fmt,...)
+EXPORT void jack_log(const char *fmt,...)
 {
 	if (jack_verbose) {
 		va_list ap;

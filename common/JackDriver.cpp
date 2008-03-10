@@ -62,7 +62,7 @@ JackDriver::JackDriver()
 
 JackDriver::~JackDriver()
 {
-    JackLog("~JackDriver\n");
+    jack_log("~JackDriver");
     delete fClientControl;
 }
 
@@ -94,8 +94,8 @@ int JackDriver::Open(jack_nframes_t nframes,
                      jack_nframes_t capture_latency,
                      jack_nframes_t playback_latency)
 {
-    JackLog("JackDriver::Open capture_driver_name = %s\n", capture_driver_name);
-    JackLog("JackDriver::Open playback_driver_name = %s\n", playback_driver_name);
+    jack_log("JackDriver::Open capture_driver_name = %s", capture_driver_name);
+    jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
     int refnum = -1;
 
     if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
@@ -128,7 +128,7 @@ int JackDriver::Open(jack_nframes_t nframes,
 
 int JackDriver::Close()
 {
-    JackLog("JackDriver::Close\n");
+    jack_log("JackDriver::Close");
     fGraphManager->DirectDisconnect(fClientControl->fRefNum, fClientControl->fRefNum); // Disconnect driver from itself for sync
     fClientControl->fActive = false;
     return fEngine->ClientInternalClose(fClientControl->fRefNum, false);
@@ -142,10 +142,10 @@ int JackDriver::Close()
 void JackDriver::SetupDriverSync(int ref, bool freewheel)
 {
     if (!freewheel && !fEngineControl->fSyncMode) {
-        JackLog("JackDriver::SetupDriverSync driver sem in flush mode\n");
+        jack_log("JackDriver::SetupDriverSync driver sem in flush mode");
         fSynchroTable[ref]->SetFlush(true);
     } else {
-        JackLog("JackDriver::SetupDriverSync driver sem in normal mode\n");
+        jack_log("JackDriver::SetupDriverSync driver sem in normal mode");
         fSynchroTable[ref]->SetFlush(false);
     }
 }
@@ -155,12 +155,12 @@ int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync,
     switch (notify) {
 
         case kStartFreewheelCallback:
-            JackLog("JackDriver::kStartFreewheel\n");
+            jack_log("JackDriver::kStartFreewheel");
             SetupDriverSync(fClientControl->fRefNum, true);
             break;
 
         case kStopFreewheelCallback:
-            JackLog("JackDriver::kStopFreewheel\n");
+            jack_log("JackDriver::kStopFreewheel");
             SetupDriverSync(fClientControl->fRefNum, false);
             break;
     }

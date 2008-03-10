@@ -119,7 +119,7 @@ bool JackFifo::Allocate(const char* name, const char* server_name, int value)
     struct stat statbuf;
     BuildName(name, server_name, fName);
 
-    JackLog("JackFifo::Allocate name = %s\n", fName);
+    jack_log("JackFifo::Allocate name = %s", fName);
 
     if (stat(fName, &statbuf)) {
         if (errno == ENOENT) {
@@ -152,11 +152,11 @@ bool JackFifo::Allocate(const char* name, const char* server_name, int value)
 bool JackFifo::ConnectAux(const char* name, const char* server_name, int access)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackFifo::ConnectAux name = %s\n", fName);
+    jack_log("JackFifo::ConnectAux name = %s", fName);
 
     // Temporary...
     if (fFifo >= 0) {
-        JackLog("Already connected name = %s\n", name);
+        jack_log("Already connected name = %s", name);
         return true;
     }
 
@@ -188,7 +188,7 @@ bool JackFifo::ConnectInput(const char* name, const char* server_name)
 bool JackFifo::Disconnect()
 {
     if (fFifo >= 0) {
-        JackLog("JackFifo::Disconnect %s\n", fName);
+        jack_log("JackFifo::Disconnect %s", fName);
         if (close(fFifo) != 0) {
             jack_error("Disconnect: can't disconnect named fifo name = %s err = %s", fName, strerror(errno));
             return false;
@@ -205,7 +205,7 @@ bool JackFifo::Disconnect()
 void JackFifo::Destroy()
 {
     if (fFifo > 0) {
-        JackLog("JackFifo::Destroy name = %s\n", fName);
+        jack_log("JackFifo::Destroy name = %s", fName);
         unlink(fName);
         if (close(fFifo) != 0) {
             jack_error("Destroy: can't destroy fifo name = %s err = %s", fName, strerror(errno));

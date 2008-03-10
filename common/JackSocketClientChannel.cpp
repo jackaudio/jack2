@@ -40,7 +40,7 @@ JackSocketClientChannel::~JackSocketClientChannel()
 
 int JackSocketClientChannel::ServerCheck(const char* server_name)
 {
-    JackLog("JackSocketClientChannel::ServerCheck = %s\n", server_name);
+    jack_log("JackSocketClientChannel::ServerCheck = %s", server_name);
 
     // Connect to server
     if (fRequestSocket.Connect(jack_server_dir, server_name, 0) < 0) {
@@ -55,7 +55,7 @@ int JackSocketClientChannel::ServerCheck(const char* server_name)
 int JackSocketClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
-    JackLog("JackSocketClientChannel::Open name = %s\n", name);
+    jack_log("JackSocketClientChannel::Open name = %s", name);
 
     if (fRequestSocket.Connect(jack_server_dir, server_name, 0) < 0) {
         jack_error("Cannot connect to server socket");
@@ -97,7 +97,7 @@ void JackSocketClientChannel::Close()
 
 int JackSocketClientChannel::Start()
 {
-    JackLog("JackSocketClientChannel::Start\n");
+    jack_log("JackSocketClientChannel::Start");
     if (fThread->Start() != 0) {
         jack_error("Cannot start Jack client listener");
         return -1;
@@ -108,7 +108,7 @@ int JackSocketClientChannel::Start()
 
 void JackSocketClientChannel::Stop()
 {
-    JackLog("JackSocketClientChannel::Stop\n");
+    jack_log("JackSocketClientChannel::Stop");
     fThread->Kill();
 }
 
@@ -286,7 +286,7 @@ void JackSocketClientChannel::InternalClientUnload(int refnum, int int_ref, int*
 
 bool JackSocketClientChannel::Init()
 {
-    JackLog("JackSocketClientChannel::Init \n");
+    jack_log("JackSocketClientChannel::Init ");
     fNotificationSocket = fNotificationListenSocket.Accept();
     // No more needed
     fNotificationListenSocket.Close();

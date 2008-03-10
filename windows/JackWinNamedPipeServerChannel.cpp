@@ -49,7 +49,7 @@ JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
 
 JackClientPipeThread::~JackClientPipeThread()
 {
-    JackLog("JackClientPipeThread::~JackClientPipeThread\n");
+    jack_log("JackClientPipeThread::~JackClientPipeThread");
     delete fPipe;
     delete fThread;
 }
@@ -69,7 +69,7 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
 {
-    JackLog("JackClientPipeThread::Close %x %ld\n", this, fRefNum);
+    jack_log("JackClientPipeThread::Close %x %ld", this, fRefNum);
     /*
     	TODO : solve WIN32 thread Kill issue
     	This would hang.. since Close will be followed by a delete, 
@@ -83,7 +83,7 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
 
 bool JackClientPipeThread::Execute()
 {
-    JackLog("JackClientPipeThread::Execute\n");
+    jack_log("JackClientPipeThread::Execute");
     return (HandleRequest() == 0);
 }
 
@@ -108,7 +108,7 @@ int JackClientPipeThread::HandleRequest()
         switch (header.fType) {
 
             case JackRequest::kClientCheck: {
-                JackLog("JackRequest::kClientCheck\n");
+                jack_log("JackRequest::kClientCheck");
                 JackClientCheckRequest req;
                 JackClientCheckResult res;
                 if (req.Read(fPipe) == 0)
@@ -118,7 +118,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kClientOpen: {
-                JackLog("JackRequest::ClientOpen\n");
+                jack_log("JackRequest::ClientOpen");
                 JackClientOpenRequest req;
                 JackClientOpenResult res;
                 if (req.Read(fPipe) == 0)
@@ -128,7 +128,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kClientClose: {
-                JackLog("JackRequest::ClientClose\n");
+                jack_log("JackRequest::ClientClose");
                 JackClientCloseRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -142,7 +142,7 @@ int JackClientPipeThread::HandleRequest()
             case JackRequest::kActivateClient: {
                 JackActivateRequest req;
                 JackResult res;
-                JackLog("JackRequest::ActivateClient\n");
+                jack_log("JackRequest::ActivateClient");
                 if (req.Read(fPipe) == 0)
                     res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
                 res.Write(fPipe);
@@ -150,7 +150,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kDeactivateClient: {
-                JackLog("JackRequest::DeactivateClient\n");
+                jack_log("JackRequest::DeactivateClient");
                 JackDeactivateRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -160,7 +160,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kRegisterPort: {
-                JackLog("JackRequest::RegisterPort\n");
+                jack_log("JackRequest::RegisterPort");
                 JackPortRegisterRequest req;
                 JackPortRegisterResult res;
                 if (req.Read(fPipe) == 0)
@@ -170,7 +170,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kUnRegisterPort: {
-                JackLog("JackRequest::UnRegisterPort\n");
+                jack_log("JackRequest::UnRegisterPort");
                 JackPortUnRegisterRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -180,7 +180,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kConnectNamePorts: {
-                JackLog("JackRequest::ConnectPorts\n");
+                jack_log("JackRequest::ConnectPorts");
                 JackPortConnectNameRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -190,7 +190,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kDisconnectNamePorts: {
-                JackLog("JackRequest::DisconnectPorts\n");
+                jack_log("JackRequest::DisconnectPorts");
                 JackPortDisconnectNameRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -200,7 +200,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kConnectPorts: {
-                JackLog("JackRequest::ConnectPorts\n");
+                jack_log("JackRequest::ConnectPorts");
                 JackPortConnectRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -210,7 +210,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kDisconnectPorts: {
-                JackLog("JackRequest::DisconnectPorts\n");
+                jack_log("JackRequest::DisconnectPorts");
                 JackPortDisconnectRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -220,7 +220,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kSetBufferSize: {
-                JackLog("JackRequest::SetBufferSize\n");
+                jack_log("JackRequest::SetBufferSize");
                 JackSetBufferSizeRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -230,7 +230,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kSetFreeWheel: {
-                JackLog("JackRequest::SetFreeWheel\n");
+                jack_log("JackRequest::SetFreeWheel");
                 JackSetFreeWheelRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -240,7 +240,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kReleaseTimebase: {
-                JackLog("JackRequest::kReleaseTimebase\n");
+                jack_log("JackRequest::kReleaseTimebase");
                 JackReleaseTimebaseRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -250,7 +250,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kSetTimebaseCallback: {
-                JackLog("JackRequest::kSetTimebaseCallback\n");
+                jack_log("JackRequest::kSetTimebaseCallback");
                 JackSetTimebaseCallbackRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -260,7 +260,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kGetInternalClientName: {
-                JackLog("JackRequest::kGetInternalClientName\n");
+                jack_log("JackRequest::kGetInternalClientName");
                 JackGetInternalClientNameRequest req;
                 JackGetInternalClientNameResult res;
                 if (req.Read(fPipe) == 0)
@@ -270,7 +270,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kInternalClientHandle: {
-                JackLog("JackRequest::kInternalClientHandle\n");
+                jack_log("JackRequest::kInternalClientHandle");
                 JackInternalClientHandleRequest req;
                 JackInternalClientHandleResult res;
                 if (req.Read(fPipe) == 0)
@@ -280,7 +280,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kInternalClientLoad: {
-                JackLog("JackRequest::kInternalClientLoad\n");
+                jack_log("JackRequest::kInternalClientLoad");
                 JackInternalClientLoadRequest req;
                 JackInternalClientLoadResult res;
                 if (req.Read(fPipe) == 0)
@@ -290,7 +290,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kInternalClientUnload: {
-                JackLog("JackRequest::kInternalClientUnload\n");
+                jack_log("JackRequest::kInternalClientUnload");
                 JackInternalClientUnloadRequest req;
                 JackInternalClientUnloadResult res;
                 if (req.Read(fPipe) == 0)
@@ -300,7 +300,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kNotification: {
-                JackLog("JackRequest::Notification\n");
+                jack_log("JackRequest::Notification");
                 JackClientNotificationRequest req;
                 if (req.Read(fPipe) == 0)
                     fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
@@ -308,7 +308,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             default:
-                JackLog("Unknown request %ld\n", header.fType);
+                jack_log("Unknown request %ld", header.fType);
                 break;
         }
     }
@@ -320,14 +320,14 @@ int JackClientPipeThread::HandleRequest()
 
 void JackClientPipeThread::ClientAdd(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackLog("JackClientPipeThread::ClientAdd %s\n", name);
+    jack_log("JackClientPipeThread::ClientAdd %s", name);
     fRefNum = -1;
     *result = fServer->GetEngine()->ClientExternalOpen(name, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
 void JackClientPipeThread::ClientRemove()
 {
-    JackLog("JackClientPipeThread::ClientRemove ref = %d\n", fRefNum);
+    jack_log("JackClientPipeThread::ClientRemove ref = %d", fRefNum);
     /* TODO : solve WIN32 thread Kill issue
     Close();
     */
@@ -337,12 +337,12 @@ void JackClientPipeThread::ClientRemove()
 
 void JackClientPipeThread::ClientKill()
 {
-    JackLog("JackClientPipeThread::ClientKill ref = %d\n", fRefNum);
+    jack_log("JackClientPipeThread::ClientKill ref = %d", fRefNum);
 
     if (fRefNum == -1) {		// Correspond to an already removed client.
-        JackLog("Kill a closed client\n");
+        jack_log("Kill a closed client");
     } else if (fRefNum == 0) {  // Correspond to a still not opened client.
-        JackLog("Kill a not opened client\n");
+        jack_log("Kill a not opened client");
     } else {
         fServer->Notify(fRefNum, kDeadClient, 0);
     }
@@ -370,7 +370,7 @@ JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
 
 int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* server)
 {
-    JackLog("JackWinNamedPipeServerChannel::Open \n");
+    jack_log("JackWinNamedPipeServerChannel::Open ");
 
     fServer = server;
     snprintf(fServerName, sizeof(fServerName), server_name);
@@ -410,7 +410,7 @@ void JackWinNamedPipeServerChannel::Close()
 
 bool JackWinNamedPipeServerChannel::Init()
 {
-    JackLog("JackWinNamedPipeServerChannel::Init \n");
+    jack_log("JackWinNamedPipeServerChannel::Init ");
     JackWinNamedPipeClient* pipe;
 
     // Accept first client, that is the JackWinNamedPipeServerNotifyChannel object
@@ -447,11 +447,11 @@ void JackWinNamedPipeServerChannel::ClientAdd(JackWinNamedPipeClient* pipe)
     std::list<JackClientPipeThread*>::iterator it = fClientList.begin();
     JackClientPipeThread* client;
 
-    JackLog("ClientAdd size  %ld\n", fClientList.size());
+    jack_log("ClientAdd size  %ld", fClientList.size());
 
     while (it != fClientList.end()) {
         client = *it;
-        JackLog("Remove dead client = %x running =  %ld\n", client, client->IsRunning());
+        jack_log("Remove dead client = %x running =  %ld", client, client->IsRunning());
         if (client->IsRunning()) {
             it++;
         } else {

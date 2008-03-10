@@ -97,7 +97,7 @@ int JackDebugClient::Open(const char* server_name, const char* name, jack_option
             *fStream << "Open client with name '" << name << "'." << endl;
         }
     } else {
-        JackLog("JackDebugClient::Open : cannot open log file\n");
+        jack_log("JackDebugClient::Open : cannot open log file");
     }
     strcpy(fClientName, name);
     return res;

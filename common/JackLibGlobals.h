@@ -54,7 +54,7 @@ struct JackLibGlobals
 
     JackLibGlobals()
     {
-        JackLog("JackLibGlobals\n");
+        jack_log("JackLibGlobals");
         for (int i = 0; i < CLIENT_NUM; i++)
             fSynchroTable[i] = JackGlobals::MakeSynchro();
         fGraphManager = -1;
@@ -63,7 +63,7 @@ struct JackLibGlobals
 
     virtual ~JackLibGlobals()
     {
-        JackLog("~JackLibGlobals\n");
+        jack_log("~JackLibGlobals");
         for (int i = 0; i < CLIENT_NUM; i++) {
             fSynchroTable[i]->Disconnect();
             delete fSynchroTable[i];
@@ -73,7 +73,7 @@ struct JackLibGlobals
     static void Init()
     {
         if (fClientCount++ == 0 && !fGlobals) {
-            JackLog("JackLibGlobals Init %x\n", fGlobals);
+            jack_log("JackLibGlobals Init %x", fGlobals);
             JackGlobals::InitClient();
             InitTime();
             fGlobals = new JackLibGlobals();
@@ -83,7 +83,7 @@ struct JackLibGlobals
     static void Destroy()
     {
         if (--fClientCount == 0 && fGlobals) {
-            JackLog("JackLibGlobals Destroy %x\n", fGlobals);
+            jack_log("JackLibGlobals Destroy %x", fGlobals);
             delete fGlobals;
             fGlobals = NULL;
             JackGlobals::Destroy();

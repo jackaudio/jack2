@@ -154,7 +154,7 @@ class JackShmReadWritePtr
         void Init(int index, const char* server_name = "default")
         {
             if (fInfo.index < 0 && index >= 0) {
-                JackLog("JackShmReadWritePtr::Init %ld %ld\n", index, fInfo.index);
+                jack_log("JackShmReadWritePtr::Init %ld %ld", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
@@ -181,7 +181,7 @@ class JackShmReadWritePtr
         virtual ~JackShmReadWritePtr()
         {
             if (fInfo.index >= 0) {
-                JackLog("JackShmReadWritePtr::~JackShmReadWritePtr %ld\n", fInfo.index);
+                jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %ld", fInfo.index);
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }
@@ -234,7 +234,7 @@ class JackShmReadWritePtr1
         void Init(int index, const char* server_name = "default")
         {
             if (fInfo.index < 0 && index >= 0) {
-                JackLog("JackShmReadWritePtr1::Init %ld %ld\n", index, fInfo.index);
+                jack_log("JackShmReadWritePtr1::Init %ld %ld", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
@@ -267,7 +267,7 @@ class JackShmReadWritePtr1
         virtual ~JackShmReadWritePtr1()
         {
             if (fInfo.index >= 0) {
-                JackLog("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld\n", fInfo.index);
+                jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld", fInfo.index);
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }
@@ -320,7 +320,7 @@ class JackShmReadPtr
         void Init(int index, const char* server_name = "default")
         {
             if (fInfo.index < 0 && index >= 0) {
-                JackLog("JackShmPtrRead::Init %ld %ld\n", index, fInfo.index);
+                jack_log("JackShmPtrRead::Init %ld %ld", index, fInfo.index);
                 if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
@@ -347,7 +347,7 @@ class JackShmReadPtr
         virtual ~JackShmReadPtr()
         {
             if (fInfo.index >= 0) {
-                JackLog("JackShmPtrRead::~JackShmPtrRead %ld\n", fInfo.index);
+                jack_log("JackShmPtrRead::~JackShmPtrRead %ld", fInfo.index);
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }

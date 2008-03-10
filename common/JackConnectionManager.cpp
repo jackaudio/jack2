@@ -29,7 +29,7 @@ namespace Jack
 JackConnectionManager::JackConnectionManager()
 {
     int i;
-    JackLog("JackConnectionManager::InitConnections size = %ld \n", sizeof(JackConnectionManager));
+    jack_log("JackConnectionManager::InitConnections size = %ld ", sizeof(JackConnectionManager));
 
     for (i = 0; i < PORT_NUM; i++) {
         fConnection[i].Init();
@@ -37,7 +37,7 @@ JackConnectionManager::JackConnectionManager()
 
     fLoopFeedback.Init();
 
-    JackLog("JackConnectionManager::InitClients\n");
+    jack_log("JackConnectionManager::InitClients");
     for (i = 0; i < CLIENT_NUM; i++) {
         InitRefNum(i);
     }
@@ -52,7 +52,7 @@ JackConnectionManager::~JackConnectionManager()
 
 bool JackConnectionManager::IsLoopPathAux(int ref1, int ref2) const
 {
-    JackLog("JackConnectionManager::IsLoopPathAux ref1 = %ld ref2 = %ld\n", ref1, ref2);
+    jack_log("JackConnectionManager::IsLoopPathAux ref1 = %ld ref2 = %ld", ref1, ref2);
 
     if (ref1 == AUDIO_DRIVER_REFNUM // Driver is reached
             || ref2 == AUDIO_DRIVER_REFNUM
@@ -93,7 +93,7 @@ int JackConnectionManager::GetActivation(int refnum) const
 */
 int JackConnectionManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
-    JackLog("JackConnectionManager::Connect port_src = %ld port_dst = %ld\n", port_src, port_dst);
+    jack_log("JackConnectionManager::Connect port_src = %ld port_dst = %ld", port_src, port_dst);
 
     if (fConnection[port_src].AddItem(port_dst)) {
         return 0;
@@ -108,7 +108,7 @@ int JackConnectionManager::Connect(jack_port_id_t port_src, jack_port_id_t port_
 */
 int JackConnectionManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
-    JackLog("JackConnectionManager::Disconnect port_src = %ld port_dst = %ld\n", port_src, port_dst);
+    jack_log("JackConnectionManager::Disconnect port_src = %ld port_dst = %ld", port_src, port_dst);
 
     if (fConnection[port_src].RemoveItem(port_dst)) {
         return 0;
@@ -158,7 +158,7 @@ const jack_int_t* JackConnectionManager::GetConnections(jack_port_id_t port_inde
 int JackConnectionManager::AddInputPort(int refnum, jack_port_id_t port_index)
 {
     if (fInputPort[refnum].AddItem(port_index)) {
-        JackLog("JackConnectionManager::AddInputPort ref = %ld port = %ld\n", refnum, port_index);
+        jack_log("JackConnectionManager::AddInputPort ref = %ld port = %ld", refnum, port_index);
         return 0;
     } else {
         jack_error("Maximum number of input ports is reached for application ref = %ld", refnum);
@@ -172,7 +172,7 @@ int JackConnectionManager::AddInputPort(int refnum, jack_port_id_t port_index)
 int JackConnectionManager::AddOutputPort(int refnum, jack_port_id_t port_index)
 {
     if (fOutputPort[refnum].AddItem(port_index)) {
-        JackLog("JackConnectionManager::AddOutputPort ref = %ld port = %ld\n", refnum, port_index);
+        jack_log("JackConnectionManager::AddOutputPort ref = %ld port = %ld", refnum, port_index);
         return 0;
     } else {
         jack_error("Maximum number of output ports is reached for application ref = %ld", refnum);
@@ -185,7 +185,7 @@ int JackConnectionManager::AddOutputPort(int refnum, jack_port_id_t port_index)
 */
 int JackConnectionManager::RemoveInputPort(int refnum, jack_port_id_t port_index)
 {
-    JackLog("JackConnectionManager::RemoveInputPort ref = %ld port_index = %ld \n", refnum, port_index);
+    jack_log("JackConnectionManager::RemoveInputPort ref = %ld port_index = %ld ", refnum, port_index);
 
     if (fInputPort[refnum].RemoveItem(port_index)) {
         return 0;
@@ -200,7 +200,7 @@ int JackConnectionManager::RemoveInputPort(int refnum, jack_port_id_t port_index
 */
 int JackConnectionManager::RemoveOutputPort(int refnum, jack_port_id_t port_index)
 {
-    JackLog("JackConnectionManager::RemoveOutputPort ref = %ld port_index = %ld \n", refnum, port_index);
+    jack_log("JackConnectionManager::RemoveOutputPort ref = %ld port_index = %ld ", refnum, port_index);
 
     if (fOutputPort[refnum].RemoveItem(port_index)) {
         return 0;
@@ -285,7 +285,7 @@ int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro*
             timing[i].fSignaledAt = current_date;
 
             if (!fInputCounter[i].Signal(table[i], control)) {
-                JackLog("JackConnectionManager::ResumeRefNum error: ref = %ld output = %ld \n", control->fRefNum, i);
+                jack_log("JackConnectionManager::ResumeRefNum error: ref = %ld output = %ld ", control->fRefNum, i);
                 res = -1;
             }
         }
@@ -305,7 +305,7 @@ void JackConnectionManager::IncDirectConnection(jack_port_id_t port_src, jack_po
     assert(ref1 >= 0 && ref2 >= 0);
 
     DirectConnect(ref1, ref2);
-    JackLog("JackConnectionManager::IncConnectionRef: ref1 = %ld ref2 = %ld\n", ref1, ref2);
+    jack_log("JackConnectionManager::IncConnectionRef: ref1 = %ld ref2 = %ld", ref1, ref2);
 }
 
 /*!
@@ -319,7 +319,7 @@ void JackConnectionManager::DecDirectConnection(jack_port_id_t port_src, jack_po
     assert(ref1 >= 0 && ref2 >= 0);
 
     DirectDisconnect(ref1, ref2);
-    JackLog("JackConnectionManager::DecConnectionRef: ref1 = %ld ref2 = %ld\n", ref1, ref2);
+    jack_log("JackConnectionManager::DecConnectionRef: ref1 = %ld ref2 = %ld", ref1, ref2);
 }
 
 /*!
@@ -330,7 +330,7 @@ void JackConnectionManager::DirectConnect(int ref1, int ref2)
     assert(ref1 >= 0 && ref2 >= 0);
 
     if (fConnectionRef.IncItem(ref1, ref2) == 1) { // First connection between client ref1 and client ref2
-        JackLog("JackConnectionManager::DirectConnect first: ref1 = %ld ref2 = %ld\n", ref1, ref2);
+        jack_log("JackConnectionManager::DirectConnect first: ref1 = %ld ref2 = %ld", ref1, ref2);
         fInputCounter[ref2].IncValue();
     }
 }
@@ -343,7 +343,7 @@ void JackConnectionManager::DirectDisconnect(int ref1, int ref2)
     assert(ref1 >= 0 && ref2 >= 0);
 
     if (fConnectionRef.DecItem(ref1, ref2) == 0) { // Last connection between client ref1 and client ref2
-        JackLog("JackConnectionManager::DirectDisconnect last: ref1 = %ld ref2 = %ld\n", ref1, ref2);
+        jack_log("JackConnectionManager::DirectDisconnect last: ref1 = %ld ref2 = %ld", ref1, ref2);
         fInputCounter[ref2].DecValue();
     }
 }
@@ -402,7 +402,7 @@ bool JackConnectionManager::IncFeedbackConnection(jack_port_id_t port_src, jack_
     int ref2 = GetInputRefNum(port_dst);
 
     // Add an activation connection in the other direction
-    JackLog("JackConnectionManager::IncFeedbackConnection ref1 = %ld ref2 = %ld\n", ref1, ref2);
+    jack_log("JackConnectionManager::IncFeedbackConnection ref1 = %ld ref2 = %ld", ref1, ref2);
     assert(ref1 >= 0 && ref2 >= 0);
 
     if (ref1 != ref2)
@@ -417,7 +417,7 @@ bool JackConnectionManager::DecFeedbackConnection(jack_port_id_t port_src, jack_
     int ref2 = GetInputRefNum(port_dst);
 
     // Remove an activation connection in the other direction
-    JackLog("JackConnectionManager::DecFeedbackConnection ref1 = %ld ref2 = %ld\n", ref1, ref2);
+    jack_log("JackConnectionManager::DecFeedbackConnection ref1 = %ld ref2 = %ld", ref1, ref2);
     assert(ref1 >= 0 && ref2 >= 0);
 
     if (ref1 != ref2)

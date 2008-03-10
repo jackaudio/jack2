@@ -41,7 +41,7 @@ void* JackPosixThread::ThreadHandler(void* arg)
         return 0;
     }
 
-    JackLog("ThreadHandler: start\n");
+    jack_log("ThreadHandler: start");
 
     // If Init succeed, start the thread loop
     bool res = true;
@@ -49,7 +49,7 @@ void* JackPosixThread::ThreadHandler(void* arg)
         res = runnable->Execute();
     }
 
-    JackLog("ThreadHandler: exit\n");
+    jack_log("ThreadHandler: exit");
     return 0;
 }
 
@@ -72,7 +72,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
 
     if (realtime) {
 
-        JackLog("Create RT thread\n");
+        jack_log("Create RT thread");
 
         /* Get the client thread to run as an RT-FIFO
            scheduled thread of appropriate priority.
@@ -123,7 +123,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
 
         return 0;
     } else {
-        JackLog("Create non RT thread\n");
+        jack_log("Create non RT thread");
 
         if ((res = pthread_create(thread, 0, start_routine, arg))) {
             jack_error("Cannot set create thread %d %s", res, strerror(errno));
@@ -142,7 +142,7 @@ int JackPosixThread::StartSync()
 int JackPosixThread::Kill()
 {
     if (fThread) { // If thread has been started
-        JackLog("JackPosixThread::Kill\n");
+        jack_log("JackPosixThread::Kill");
         void* status;
         pthread_cancel(fThread);
         pthread_join(fThread, &status);
@@ -157,7 +157,7 @@ int JackPosixThread::Kill()
 int JackPosixThread::Stop()
 {
     if (fThread) { // If thread has been started
-        JackLog("JackPosixThread::Stop\n");
+        jack_log("JackPosixThread::Stop");
         void* status;
         fRunning = false; // Request for the thread to stop
         pthread_join(fThread, &status);
@@ -223,7 +223,7 @@ pthread_t JackPosixThread::GetThreadID()
 
 void JackPosixThread::Terminate()
 {
-    JackLog("JackPosixThread::Terminate\n");
+    jack_log("JackPosixThread::Terminate");
     pthread_exit(0);
 }
 

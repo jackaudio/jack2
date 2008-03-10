@@ -87,11 +87,11 @@ bool JackWinEvent::TimedWait(long usec)
 bool JackWinEvent::ConnectInput(const char* name, const char* server_name)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackWinEvent::Connect %s\n", fName);
+    jack_log("JackWinEvent::Connect %s", fName);
 
     // Temporary...
     if (fEvent) {
-        JackLog("Already connected name = %s\n", name);
+        jack_log("Already connected name = %s", name);
         return true;
     }
 
@@ -116,7 +116,7 @@ bool JackWinEvent::ConnectOutput(const char* name, const char* server_name)
 bool JackWinEvent::Disconnect()
 {
     if (fEvent) {
-        JackLog("JackWinEvent::Disconnect %s\n", fName);
+        jack_log("JackWinEvent::Disconnect %s", fName);
         CloseHandle(fEvent);
         fEvent = NULL;
         return true;
@@ -128,7 +128,7 @@ bool JackWinEvent::Disconnect()
 bool JackWinEvent::Allocate(const char* name, const char* server_name, int value)
 {
     BuildName(name, server_name, fName);
-    JackLog("JackWinEvent::Allocate name = %s val = %ld\n", fName, value);
+    jack_log("JackWinEvent::Allocate name = %s val = %ld", fName, value);
 
     /* create an auto reset event */
     if ((fEvent = CreateEvent(NULL, FALSE, FALSE, fName)) == NULL) {
@@ -147,7 +147,7 @@ bool JackWinEvent::Allocate(const char* name, const char* server_name, int value
 void JackWinEvent::Destroy()
 {
     if (fEvent != NULL) {
-        JackLog("JackWinEvent::Destroy %s\n", fName);
+        jack_log("JackWinEvent::Destroy %s", fName);
         CloseHandle(fEvent);
         fEvent = NULL;
     } else {

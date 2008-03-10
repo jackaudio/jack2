@@ -38,10 +38,8 @@ extern "C"
 
     EXPORT void jack_info(const char *fmt, ...);
 
-    /* like jack_info but does not add newline */
-    EXPORT void jack_info_multiline(const char *fmt, ...);
-
-    EXPORT void JackLog(const char *fmt, ...);
+    // like jack_info() but only if verbose mode is enabled
+    EXPORT void jack_log(const char *fmt, ...);
 
     extern int jack_verbose;
 

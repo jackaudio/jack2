@@ -66,17 +66,17 @@ class JackWinProcessSync : public JackSyncInterface
 
         bool TimedWait(long usec)
         {
-            JackLog("JackWinProcessSync::Wait time out = %ld\n", usec);
+            jack_log("JackWinProcessSync::Wait time out = %ld", usec);
             DWORD res = WaitForSingleObject(fEvent, usec / 1000);
-            JackLog("JackWinProcessSync::Wait finished res = %ld\n", res == WAIT_OBJECT_0);
+            jack_log("JackWinProcessSync::Wait finished res = %ld", res == WAIT_OBJECT_0);
             return (res == WAIT_OBJECT_0);
         }
 
         void Wait()
         {
-            JackLog("JackWinProcessSync::Wait...\n");
+            jack_log("JackWinProcessSync::Wait...");
             WaitForSingleObject(fEvent, INFINITE);
-            JackLog("JackWinProcessSync::Wait finished\n");
+            jack_log("JackWinProcessSync::Wait finished");
         }
 
         void SignalAll()

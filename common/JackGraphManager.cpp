@@ -35,7 +35,7 @@ static inline jack_nframes_t MAX(jack_nframes_t a, jack_nframes_t b)
 static void AssertPort(jack_port_id_t port_index)
 {
     if (port_index >= PORT_NUM) {
-        JackLog("JackGraphManager::AssertPort port_index = %ld\n", port_index);
+        jack_log("JackGraphManager::AssertPort port_index = %ld", port_index);
         assert(port_index < PORT_NUM);
     }
 }
@@ -43,7 +43,7 @@ static void AssertPort(jack_port_id_t port_index)
 static void AssertBufferSize(jack_nframes_t buffer_size)
 {
     if (buffer_size > BUFFER_SIZE_MAX) {
-        JackLog("JackGraphManager::AssertBufferSize frames = %ld\n", buffer_size);
+        jack_log("JackGraphManager::AssertBufferSize frames = %ld", buffer_size);
         assert(buffer_size <= BUFFER_SIZE_MAX);
     }
 }
@@ -121,7 +121,7 @@ void JackGraphManager::DirectConnect(int ref1, int ref2)
 {
     JackConnectionManager* manager = WriteNextStateStart();
     manager->DirectConnect(ref1, ref2);
-    JackLog("JackGraphManager::ConnectRefNum cur_index = %ld ref1 = %ld ref2 = %ld\n", CurIndex(fCounter), ref1, ref2);
+    jack_log("JackGraphManager::ConnectRefNum cur_index = %ld ref1 = %ld ref2 = %ld", CurIndex(fCounter), ref1, ref2);
     WriteNextStateStop();
 }
 
@@ -130,7 +130,7 @@ void JackGraphManager::DirectDisconnect(int ref1, int ref2)
 {
     JackConnectionManager* manager = WriteNextStateStart();
     manager->DirectDisconnect(ref1, ref2);
-    JackLog("JackGraphManager::DisconnectRefNum cur_index = %ld ref1 = %ld ref2 = %ld\n", CurIndex(fCounter), ref1, ref2);
+    jack_log("JackGraphManager::DisconnectRefNum cur_index = %ld ref1 = %ld ref2 = %ld", CurIndex(fCounter), ref1, ref2);
     WriteNextStateStop();
 }
 
@@ -152,7 +152,7 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
 
     if (!port->IsUsed()) {
         // This happens when a port has just been unregistered and is still used by the RT code.
-        JackLog("JackGraphManager::GetBuffer : port = %ld is released state\n", port_index);
+        jack_log("JackGraphManager::GetBuffer : port = %ld is released state", port_index);
         return GetBuffer(0); // port_index 0 is not used
     }
 
@@ -255,7 +255,7 @@ int JackGraphManager::ComputeTotalLatency(jack_port_id_t port_index)
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 
-    JackLog("JackGraphManager::GetTotalLatency port_index = %ld total latency = %ld\n", port_index, port->fTotalLatency);
+    jack_log("JackGraphManager::GetTotalLatency port_index = %ld total latency = %ld", port_index, port->fTotalLatency);
     return 0;
 }
 
@@ -275,7 +275,7 @@ int JackGraphManager::ComputeTotalLatencies()
 void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackLock lock (this);
-    JackLog("JackGraphManager::SetBufferSize size = %ld\n", (long int)buffer_size);
+    jack_log("JackGraphManager::SetBufferSize size = %ld", (long int)buffer_size);
 
     jack_port_id_t port_index;
     for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
@@ -294,7 +294,7 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
     for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
         JackPort* port = GetPort(port_index);
         if (!port->IsUsed()) {
-            JackLog("JackGraphManager::AllocatePortAux port_index = %ld name = %s type = %s\n", port_index, port_name, port_type);
+            jack_log("JackGraphManager::AllocatePortAux port_index = %ld name = %s type = %s", port_index, port_name, port_type);
             if (!port->Allocate(refnum, port_name, port_type, flags))
                 return NO_PORT;
             break;
@@ -373,7 +373,7 @@ void JackGraphManager::GetOutputPorts(int refnum, jack_int_t* res)
 // Server
 void JackGraphManager::RemoveAllPorts(int refnum)
 {
-    JackLog("JackGraphManager::RemoveAllPorts ref = %ld\n", refnum);
+    jack_log("JackGraphManager::RemoveAllPorts ref = %ld", refnum);
     JackConnectionManager* manager = WriteNextStateStart();
     jack_port_id_t port_index;
 
@@ -396,7 +396,7 @@ void JackGraphManager::RemoveAllPorts(int refnum)
 void JackGraphManager::DisconnectAllPorts(int refnum)
 {
     int i;
-    JackLog("JackGraphManager::DisconnectAllPorts ref = %ld\n", refnum);
+    jack_log("JackGraphManager::DisconnectAllPorts ref = %ld", refnum);
     JackConnectionManager* manager = WriteNextStateStart();
 
     const jack_int_t* input = manager->GetInputPorts(refnum);
@@ -415,12 +415,12 @@ void JackGraphManager::DisconnectAllPorts(int refnum)
 // Server
 void JackGraphManager::DisconnectAllInput(jack_port_id_t port_index)
 {
-    JackLog("JackGraphManager::DisconnectAllInput port_index = %ld \n", port_index);
+    jack_log("JackGraphManager::DisconnectAllInput port_index = %ld ", port_index);
     JackConnectionManager* manager = WriteNextStateStart();
 
     for (int i = 0; i < PORT_NUM; i++) {
         if (manager->IsConnected(i, port_index)) {
-            JackLog("JackGraphManager::Disconnect i = %ld  port_index = %ld\n", i, port_index);
+            jack_log("JackGraphManager::Disconnect i = %ld  port_index = %ld", i, port_index);
             Disconnect(i, port_index);
         }
     }
@@ -430,7 +430,7 @@ void JackGraphManager::DisconnectAllInput(jack_port_id_t port_index)
 // Server
 void JackGraphManager::DisconnectAllOutput(jack_port_id_t port_index)
 {
-    JackLog("JackGraphManager::DisconnectAllOutput port_index = %ld \n", port_index);
+    jack_log("JackGraphManager::DisconnectAllOutput port_index = %ld ", port_index);
     JackConnectionManager* manager = WriteNextStateStart();
 
     const jack_int_t* connections = manager->GetConnections(port_index);
@@ -484,14 +484,14 @@ void JackGraphManager::Deactivate(int refnum)
     if (IsDirectConnection(refnum, FREEWHEEL_DRIVER_REFNUM)) {
         DirectDisconnect(refnum, FREEWHEEL_DRIVER_REFNUM);
     } else {
-        JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
+        jack_log("JackServer::Deactivate: client = %ld was not activated ", refnum);
     }
 
     // Disconnect only when needed
     if (IsDirectConnection(FREEWHEEL_DRIVER_REFNUM, refnum)) {
         DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, refnum);
     } else {
-        JackLog("JackServer::Deactivate: client = %ld was not activated \n", refnum);
+        jack_log("JackServer::Deactivate: client = %ld was not activated ", refnum);
     }
 }
 
@@ -518,7 +518,7 @@ int JackGraphManager::GetOutputRefNum(jack_port_id_t port_index)
 int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
     JackConnectionManager* manager = WriteNextStateStart();
-    JackLog("JackGraphManager::Connect port_src = %ld port_dst = %ld\n", port_src, port_dst);
+    jack_log("JackGraphManager::Connect port_src = %ld port_dst = %ld", port_src, port_dst);
     JackPort* src = GetPort(port_src);
     JackPort* dst = GetPort(port_dst);
     int res = 0;
@@ -554,7 +554,7 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
     }
 
     if (manager->IsLoopPath(port_src, port_dst)) {
-        JackLog("JackGraphManager::Connect: LOOP detected\n");
+        jack_log("JackGraphManager::Connect: LOOP detected");
         manager->IncFeedbackConnection(port_src, port_dst);
     } else {
         manager->IncDirectConnection(port_src, port_dst);
@@ -569,7 +569,7 @@ end:
 int JackGraphManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_dst)
 {
     JackConnectionManager* manager = WriteNextStateStart();
-    JackLog("JackGraphManager::Disconnect port_src = %ld port_dst = %ld\n", port_src, port_dst);
+    jack_log("JackGraphManager::Disconnect port_src = %ld port_dst = %ld", port_src, port_dst);
     bool in_use_src = GetPort(port_src)->fInUse;
     bool in_use_dst = GetPort(port_dst)->fInUse;
     int res = 0;
@@ -600,7 +600,7 @@ int JackGraphManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_ds
     }
 
     if (manager->IsFeedbackConnection(port_src, port_dst)) {
-        JackLog("JackGraphManager::Disconnect: FEEDBACK removed\n");
+        jack_log("JackGraphManager::Disconnect: FEEDBACK removed");
         manager->DecFeedbackConnection(port_src, port_dst);
     } else {
         manager->DecDirectConnection(port_src, port_dst);
@@ -639,7 +639,7 @@ int JackGraphManager::CheckPorts(jack_port_id_t port_src, jack_port_id_t port_ds
 
 int JackGraphManager::CheckPorts(const char* src_name, const char* dst_name, jack_port_id_t* port_src, jack_port_id_t* port_dst)
 {
-    JackLog("JackGraphManager::CheckConnect src_name = %s dst_name = %s\n", src_name, dst_name);
+    jack_log("JackGraphManager::CheckConnect src_name = %s dst_name = %s", src_name, dst_name);
 
     if ((*port_src = GetPort(src_name)) == NO_PORT) {
         jack_error("Unknown source port in attempted (dis)connection src_name [%s] dst_name [%s]", src_name, dst_name);
@@ -786,7 +786,7 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
         cur_index = GetCurrentIndex();
         if (matching_ports) {
             free(matching_ports);
-            JackLog("JackGraphManager::GetPorts retry... \n");
+            jack_log("JackGraphManager::GetPorts retry... ");
         }
         matching_ports = GetPortsAux(port_name_pattern, type_name_pattern, flags);
         next_index = GetCurrentIndex();

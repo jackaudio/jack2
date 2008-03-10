@@ -28,7 +28,7 @@ double __jack_time_ratio;
 /* This should only be called ONCE per process. */
 void InitTime()
 {
-	JackLog("InitTime\n");
+	jack_log("InitTime");
 	mach_timebase_info_data_t info;
     mach_timebase_info(&info);
     __jack_time_ratio = ((float)info.numer / info.denom) / 1000;
@@ -43,7 +43,7 @@ EXPORT LARGE_INTEGER _jack_freq;
 void InitTime()
 {
 	QueryPerformanceFrequency(&_jack_freq);
-	JackLog("InitTime freq = %ld  %ld\n", _jack_freq.HighPart, _jack_freq.LowPart);
+	jack_log("InitTime freq = %ld  %ld", _jack_freq.HighPart, _jack_freq.LowPart);
 	_jack_freq.QuadPart = _jack_freq.QuadPart / 1000000; // by usec
 }
 

@@ -54,20 +54,20 @@ JackSynchro** GetSynchroTable()
 
 JackLibClient::JackLibClient(JackSynchro** table): JackClient(table)
 {
-    JackLog("JackLibClient::JackLibClient table = %x\n", table);
+    jack_log("JackLibClient::JackLibClient table = %x", table);
     fChannel = JackGlobals::MakeClientChannel();
 }
 
 JackLibClient::~JackLibClient()
 {
-    JackLog("JackLibClient::~JackLibClient\n");
+    jack_log("JackLibClient::~JackLibClient");
     delete fChannel;
 }
 
 int JackLibClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
-    JackLog("JackLibClient::Open %s\n", name);
+    jack_log("JackLibClient::Open %s", name);
 
     snprintf(fServerName, sizeof(fServerName), server_name);
 
@@ -119,7 +119,7 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
         goto error;
     }
 
-    JackLog("JackLibClient::Open name = %s refnum = %ld\n", name_res, fClientControl->fRefNum);
+    jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, fClientControl->fRefNum);
     return 0;
 
 error:
@@ -139,13 +139,13 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
     switch (notify) {
 
         case kAddClient:
-            JackLog("JackClient::AddClient name = %s, ref = %ld \n", name, refnum);
+            jack_log("JackClient::AddClient name = %s, ref = %ld ", name, refnum);
             // the synchro must be usable in I/O mode when several clients live in the same process
             res = fSynchroTable[refnum]->Connect(name, fServerName) ? 0 : -1;
             break;
 
         case kRemoveClient:
-            JackLog("JackClient::RemoveClient name = %s, ref = %ld \n", name, refnum);
+            jack_log("JackClient::RemoveClient name = %s, ref = %ld ", name, refnum);
             if (strcmp(GetClientControl()->fName, name) != 0)
                 res = fSynchroTable[refnum]->Disconnect() ? 0 : -1;
             break;

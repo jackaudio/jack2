@@ -134,7 +134,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 
 int JackServer::Close()
 {
-    JackLog("JackServer::Close\n");
+    jack_log("JackServer::Close");
     fChannel->Close();
     fAudioDriver->Detach();
     if (fLoopback > 0)
@@ -171,20 +171,20 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
 
 int JackServer::Start()
 {
-    JackLog("JackServer::Start\n");
+    jack_log("JackServer::Start");
     fEngineControl->InitFrameTime();
     return fAudioDriver->Start();
 }
 
 int JackServer::Stop()
 {
-    JackLog("JackServer::Stop\n");
+    jack_log("JackServer::Stop");
     return fAudioDriver->Stop();
 }
 
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackLog("JackServer::SetBufferSize nframes = %ld\n", buffer_size);
+    jack_log("JackServer::SetBufferSize nframes = %ld", buffer_size);
     jack_nframes_t current_buffer_size = fEngineControl->fBufferSize;
 
     if (fAudioDriver->Stop() != 0) {
@@ -219,7 +219,7 @@ no graph state change can be done during freewheel mode.
 
 int JackServer::SetFreewheel(bool onoff)
 {
-    JackLog("JackServer::SetFreewheel state = %ld\n", onoff);
+    jack_log("JackServer::SetFreewheel state = %ld", onoff);
 
     if (fFreewheel) {
         if (onoff) {
@@ -262,7 +262,7 @@ void JackServer::Notify(int refnum, int notify, int value)
             break;
 
         case kDeadClient:
-            JackLog("JackServer: kDeadClient ref = %ld\n", refnum);
+            jack_log("JackServer: kDeadClient ref = %ld", refnum);
             if (fEngine->ClientDeactivate(refnum) < 0)
                 jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
             fEngine->ClientExternalClose(refnum);
