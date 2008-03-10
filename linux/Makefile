@@ -162,7 +162,7 @@ installwrapper:
 	cd $(prefix)/$(libdir) && rm -f libjack.so*
 	cd $(prefix)/$(libdir) && ln -s libjackwrapper.so  libjack.so
 	cd $(prefix)/$(libdir) && ln -s libjackwrapper.so  libjack.so.0
-	/sbin/ldconfig
+	#/sbin/ldconfig
 
 # Remove jackdmp and tries to restore jack
 uninstall: remove
