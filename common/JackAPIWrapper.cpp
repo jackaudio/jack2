@@ -208,12 +208,24 @@ extern "C"
 #define JACK_LIB "libjack.so.0.0"
 #define JACKMP_LIB "libjackmp.so"
 
+static void JackLog(const char *fmt,...)
+{
+	//if (jack_verbose) {
+		va_list ap;
+		va_start(ap, fmt);
+		fprintf(stderr,"Jack: ");
+		vfprintf(stderr, fmt, ap);
+		va_end(ap);
+	//}
+}
+
 // Function definition
 
 typedef void* (*jack_port_get_buffer_fun_def)(jack_port_t* port, jack_nframes_t frames);
 static jack_port_get_buffer_fun_def jack_port_get_buffer_fun = 0;
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
 {
+	JackLog("jack_port_get_buffer\n");
     return (*jack_port_get_buffer_fun)(port, frames);
 }
 
@@ -221,6 +233,7 @@ typedef const char* (*jack_port_name_fun_def)(const jack_port_t* port);
 static jack_port_name_fun_def jack_port_name_fun = 0;
 EXPORT const char* jack_port_name(const jack_port_t* port)
 {
+	JackLog("jack_port_name\n");
     return (*jack_port_name_fun)(port);
 }
 
@@ -228,6 +241,7 @@ typedef const char* (*jack_port_short_name_fun_def) (const jack_port_t* port);
 static jack_port_short_name_fun_def jack_port_short_name_fun = 0;
 EXPORT const char* jack_port_short_name(const jack_port_t* port)
 {
+	JackLog("jack_port_short_name\n");
     return (*jack_port_short_name_fun)(port);
 }
 
@@ -235,6 +249,7 @@ typedef int (*jack_port_flags_fun_def)(const jack_port_t* port);
 static jack_port_flags_fun_def jack_port_flags_fun = 0;
 EXPORT int jack_port_flags(const jack_port_t* port)
 {
+	JackLog("jack_port_flags\n");
     return (*jack_port_flags_fun)(port);
 }
 
@@ -242,6 +257,7 @@ typedef const char* (*jack_port_type_fun_def)(const jack_port_t* port);
 static jack_port_type_fun_def jack_port_type_fun = 0;
 EXPORT const char* jack_port_type(const jack_port_t* port)
 {
+	JackLog("jack_port_type\n");
     return (*jack_port_type_fun)(port);
 }
 
@@ -249,6 +265,7 @@ typedef int (*jack_port_connected_fun_def)(const jack_port_t* port);
 static jack_port_connected_fun_def jack_port_connected_fun = 0;
 EXPORT int jack_port_connected(const jack_port_t* port)
 {
+	JackLog("jack_port_connected\n");
     return (*jack_port_connected_fun)(port);
 }
 
@@ -256,6 +273,7 @@ typedef int (*jack_port_connected_to_fun_def)(const jack_port_t* port, const cha
 static jack_port_connected_to_fun_def jack_port_connected_to_fun = 0;
 EXPORT int jack_port_connected_to(const jack_port_t* port, const char* portname)
 {
+	JackLog("jack_port_connected_to\n");
     return (*jack_port_connected_to_fun)(port, portname);
 }
 
@@ -263,6 +281,7 @@ typedef int (*jack_port_tie_fun_def)(jack_port_t* src, jack_port_t* dst);
 static jack_port_tie_fun_def jack_port_tie_fun = 0;
 EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
 {
+	JackLog("jack_port_tie\n");
     return (*jack_port_tie_fun)(src, dst);
 }
 
@@ -270,6 +289,7 @@ typedef int (*jack_port_untie_fun_def)(jack_port_t* port);
 static jack_port_untie_fun_def jack_port_untie_fun = 0;
 EXPORT int jack_port_untie(jack_port_t* port)
 {
+	JackLog("jack_port_untie\n");
     return (*jack_port_untie_fun)(port);
 }
 
@@ -277,6 +297,7 @@ typedef jack_nframes_t (*jack_port_get_latency_fun_def)(jack_port_t* port);
 static jack_port_get_latency_fun_def jack_port_get_latency_fun = 0;
 EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
 {
+	JackLog("jack_port_get_latency\n");
     return (*jack_port_get_latency)(port);
 }
 
@@ -284,6 +305,7 @@ typedef void (*jack_port_set_latency_fun_def)(jack_port_t* port, jack_nframes_t 
 static jack_port_set_latency_fun_def jack_port_set_latency_fun = 0;
 EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
 {
+	JackLog("jack_port_set_latency\n");
     (*jack_port_set_latency_fun)(port, frames);
 }
 
@@ -291,6 +313,7 @@ typedef int (*jack_recompute_total_latency_fun_def)(jack_client_t* ext_client, j
 static jack_recompute_total_latency_fun_def jack_recompute_total_latency_fun = 0;
 EXPORT int jack_recompute_total_latency(jack_client_t* ext_client, jack_port_t* port)
 {
+	JackLog("jack_recompute_total_latency\n");
     return (*jack_recompute_total_latency_fun)(ext_client, port);
 }
 
@@ -298,6 +321,7 @@ typedef int (*jack_recompute_total_latencies_fun_def)(jack_client_t* ext_client)
 static jack_recompute_total_latencies_fun_def jack_recompute_total_latencies_fun = 0;
 EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
 {
+	JackLog("jack_recompute_total_latencies\n");
     return (*jack_recompute_total_latencies_fun)(ext_client);
 }
 
@@ -305,6 +329,7 @@ typedef int (*jack_port_set_name_fun_def)(jack_port_t* port, const char* name);
 static jack_port_set_name_fun_def jack_port_set_name_fun = 0;
 EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 {
+	JackLog("jack_port_set_name\n");
     return (*jack_port_set_name_fun)(port, name);
 }
 
@@ -312,6 +337,7 @@ typedef int (*jack_port_set_alias_fun_def)(jack_port_t* port, const char* alias)
 static jack_port_set_alias_fun_def jack_port_set_alias_fun = 0;
 EXPORT int jack_port_set_alias(jack_port_t* port, const char* alias)
 {
+	JackLog("jack_port_set_alias\n");
     return (*jack_port_set_alias_fun)(port, alias);
 }
 
@@ -319,6 +345,7 @@ typedef int (*jack_port_unset_alias_fun_def)(jack_port_t* port, const char* alia
 static jack_port_unset_alias_fun_def jack_port_unset_alias_fun = 0;
 EXPORT int jack_port_unset_alias(jack_port_t* port, const char* alias)
 {
+	JackLog("jack_port_unset_alias\n");
     return (*jack_port_unset_alias_fun)(port, alias);
 }
 
@@ -326,6 +353,7 @@ typedef int (*jack_port_get_aliases_fun_def)(jack_port_t* port, char* const alia
 static jack_port_get_aliases_fun_def jack_port_get_aliases_fun = 0;
 EXPORT int jack_port_get_aliases(jack_port_t* port, char* const aliases[2])
 {
+	JackLog("jack_port_get_aliases\n");
     return (*jack_port_get_aliases_fun)(port, aliases);
 }
 
@@ -333,6 +361,7 @@ typedef int (*jack_port_request_monitor_fun_def)(jack_port_t* port, int onoff);
 static jack_port_request_monitor_fun_def jack_port_request_monitor_fun = 0;
 EXPORT int jack_port_request_monitor(jack_port_t* port, int onoff)
 {
+	JackLog("jack_port_request_monitor\n");
     return (*jack_port_request_monitor_fun)(port, onoff);
 }
 
@@ -340,6 +369,7 @@ typedef int (*jack_port_request_monitor_by_name_fun_def)(jack_client_t* ext_clie
 static jack_port_request_monitor_by_name_fun_def jack_port_request_monitor_by_name_fun = 0;
 EXPORT int jack_port_request_monitor_by_name(jack_client_t* ext_client, const char* port_name, int onoff)
 {
+	JackLog("jack_port_request_monitor_by_name\n");
     return (*jack_port_request_monitor_by_name_fun)(ext_client, port_name, onoff);
 }
 
@@ -347,6 +377,7 @@ typedef int (*jack_port_ensure_monitor_fun_def)(jack_port_t* port, int onoff);
 static jack_port_ensure_monitor_fun_def jack_port_ensure_monitor_fun = 0;
 EXPORT int jack_port_ensure_monitor(jack_port_t* port, int onoff)
 {
+	JackLog("jack_port_ensure_monitor\n");
     return (*jack_port_ensure_monitor_fun)(port, onoff);
 }
 
@@ -354,6 +385,7 @@ typedef int (*jack_port_monitoring_input_fun_def)(jack_port_t* port);
 static jack_port_monitoring_input_fun_def jack_port_monitoring_input_fun = 0;
 EXPORT int jack_port_monitoring_input(jack_port_t* port)
 {
+	JackLog("jack_port_monitoring_input\n");
     return (*jack_port_monitoring_input_fun)(port);
 }
 
@@ -361,6 +393,7 @@ typedef int (*jack_is_realtime_fun_def)(jack_client_t* ext_client);
 static jack_is_realtime_fun_def jack_is_realtime_fun = 0;
 EXPORT int jack_is_realtime(jack_client_t* ext_client)
 {
+	JackLog("jack_is_realtime\n");
     return (*jack_is_realtime_fun)(ext_client);
 }
 
@@ -369,6 +402,7 @@ typedef void (*jack_on_shutdown_fun_def)(jack_client_t* ext_client, shutdown_fun
 static jack_on_shutdown_fun_def jack_on_shutdown_fun = 0;
 EXPORT void jack_on_shutdown(jack_client_t* ext_client, shutdown_fun callback, void* arg)
 {
+	JackLog("jack_on_shutdown\n");
 	(*jack_on_shutdown_fun)(ext_client, callback, arg);
 }
 
@@ -376,6 +410,7 @@ typedef int (*jack_set_process_callback_fun_def)(jack_client_t* ext_client, Jack
 static jack_set_process_callback_fun_def jack_set_process_callback_fun = 0;
 EXPORT int jack_set_process_callback(jack_client_t* ext_client, JackProcessCallback callback, void* arg)
 {
+	JackLog("jack_set_process_callback\n");
     return (*jack_set_process_callback_fun)(ext_client, callback, arg);
 }
 
@@ -383,6 +418,7 @@ typedef int (*jack_set_freewheel_callback_fun_def)(jack_client_t* ext_client, Ja
 static jack_set_freewheel_callback_fun_def jack_set_freewheel_callback_fun = 0;
 EXPORT int jack_set_freewheel_callback(jack_client_t* ext_client, JackFreewheelCallback freewheel_callback, void* arg)
 {
+	JackLog("jack_set_freewheel_callback\n");
     return (*jack_set_freewheel_callback_fun)(ext_client, freewheel_callback, arg);
 }
 
@@ -390,6 +426,7 @@ typedef int (*jack_set_freewheel_fun_def)(jack_client_t* ext_client, int onoff);
 static jack_set_freewheel_fun_def jack_set_freewheel_fun = 0;
 EXPORT int jack_set_freewheel(jack_client_t* ext_client, int onoff)
 {
+	JackLog("jack_set_freewheel\n");
     return (*jack_set_freewheel_fun)(ext_client, onoff);
 }
 
@@ -397,6 +434,7 @@ typedef int (*jack_set_buffer_size_fun_def)(jack_client_t* ext_client, jack_nfra
 static jack_set_buffer_size_fun_def jack_set_buffer_size_fun = 0;
 EXPORT int jack_set_buffer_size(jack_client_t* ext_client, jack_nframes_t buffer_size)
 {
+	JackLog("jack_set_buffer_size\n");
     return (*jack_set_buffer_size_fun)(ext_client, buffer_size);
 }
 
@@ -404,6 +442,7 @@ typedef int (*jack_set_buffer_size_callback_fun_def)(jack_client_t* ext_client, 
 static jack_set_buffer_size_callback_fun_def jack_set_buffer_size_callback_fun = 0;
 EXPORT int jack_set_buffer_size_callback(jack_client_t* ext_client, JackBufferSizeCallback bufsize_callback, void* arg)
 {
+	JackLog("jack_set_buffer_size_callback\n");
     return (*jack_set_buffer_size_callback_fun)(ext_client, bufsize_callback, arg);
 }
 
@@ -411,6 +450,7 @@ typedef int (*jack_set_sample_rate_callback_fun_def)(jack_client_t* ext_client, 
 static jack_set_sample_rate_callback_fun_def jack_set_sample_rate_callback_fun = 0;
 EXPORT int jack_set_sample_rate_callback(jack_client_t* ext_client, JackSampleRateCallback srate_callback, void* arg)
 {
+	JackLog("jack_set_sample_rate_callback\n");
     return (*jack_set_sample_rate_callback_fun)(ext_client, srate_callback, arg);
 }
 
@@ -418,6 +458,7 @@ typedef int (*jack_set_client_registration_callback_fun_def)(jack_client_t* ext_
 static jack_set_client_registration_callback_fun_def jack_set_client_registration_callback_fun = 0;
 EXPORT int jack_set_client_registration_callback(jack_client_t* ext_client, JackClientRegistrationCallback registration_callback, void* arg)
 {
+	JackLog("jack_set_client_registration_callback\n");
     return (*jack_set_client_registration_callback_fun)(ext_client, registration_callback, arg);
 }
 
@@ -425,6 +466,7 @@ typedef int (*jack_set_port_registration_callback_fun_def)(jack_client_t* ext_cl
 static jack_set_port_registration_callback_fun_def jack_set_port_registration_callback_fun = 0;
 EXPORT int jack_set_port_registration_callback(jack_client_t* ext_client, JackPortRegistrationCallback registration_callback, void* arg)
 {
+	JackLog("jack_set_port_registration_callback\n");
     return (*jack_set_port_registration_callback_fun)(ext_client, registration_callback, arg);
 }
 
@@ -432,6 +474,7 @@ typedef int (*jack_set_port_connect_callback_fun_def)(jack_client_t* ext_client,
 static jack_set_port_connect_callback_fun_def jack_set_port_connect_callback_fun = 0;
 EXPORT int jack_set_port_connect_callback(jack_client_t* ext_client, JackPortConnectCallback connect_callback, void* arg)
 {
+	JackLog("jack_set_port_connect_callback\n");
     return (*jack_set_port_connect_callback_fun)(ext_client, connect_callback, arg);
 }
 
@@ -439,6 +482,7 @@ typedef int (*jack_set_graph_order_callback_fun_def)(jack_client_t* ext_client, 
 static jack_set_graph_order_callback_fun_def jack_set_graph_order_callback_fun = 0;
 EXPORT int jack_set_graph_order_callback(jack_client_t* ext_client, JackGraphOrderCallback graph_callback, void* arg)
 {
+	JackLog("jack_set_graph_order_callback\n");
     return (*jack_set_graph_order_callback_fun)(ext_client, graph_callback, arg);
 }
 
@@ -446,6 +490,7 @@ typedef int (*jack_set_xrun_callback_fun_def)(jack_client_t* ext_client, JackXRu
 static jack_set_xrun_callback_fun_def jack_set_xrun_callback_fun = 0;
 EXPORT int jack_set_xrun_callback(jack_client_t* ext_client, JackXRunCallback xrun_callback, void* arg)
 {
+	JackLog("jack_set_xrun_callback\n");
     return (*jack_set_xrun_callback_fun)(ext_client, xrun_callback, arg);
 }
 
@@ -453,6 +498,7 @@ typedef int (*jack_set_thread_init_callback_fun_def)(jack_client_t* ext_client, 
 static jack_set_thread_init_callback_fun_def jack_set_thread_init_callback_fun = 0;
 EXPORT int jack_set_thread_init_callback(jack_client_t* ext_client, JackThreadInitCallback init_callback, void *arg)
 {
+	JackLog("jack_set_thread_init_callback\n");
     return (*jack_set_thread_init_callback_fun)(ext_client, init_callback, arg);
 }
 
@@ -460,6 +506,7 @@ typedef int (*jack_activate_fun_def)(jack_client_t* ext_client);
 static jack_activate_fun_def jack_activate_fun = 0;
 EXPORT int jack_activate(jack_client_t* ext_client)
 {
+	JackLog("jack_activate\n");
     return (*jack_activate_fun)(ext_client);
 }
 
@@ -467,6 +514,7 @@ typedef int (*jack_deactivate_fun_def)(jack_client_t* ext_client);
 static jack_deactivate_fun_def jack_deactivate_fun = 0;
 EXPORT int jack_deactivate(jack_client_t* ext_client)
 {
+	JackLog("jack_deactivate\n");
     return (*jack_deactivate_fun)(ext_client);
 }
 
@@ -474,6 +522,7 @@ typedef jack_port_t* (*jack_port_register_fun_def)(jack_client_t* ext_client, co
 static jack_port_register_fun_def jack_port_register_fun = 0;
 EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
+	JackLog("jack_port_register\n");
     return (*jack_port_register_fun)(ext_client, port_name, port_type, flags, buffer_size);
 }
 
@@ -481,6 +530,7 @@ typedef int (*jack_port_unregister_fun_def)(jack_client_t* ext_client, jack_port
 static jack_port_unregister_fun_def jack_port_unregister_fun = 0;
 EXPORT int jack_port_unregister(jack_client_t* ext_client, jack_port_t* port)
 {
+	JackLog("jack_port_unregister\n");
     return (*jack_port_unregister_fun)(ext_client, port);
 }
 
@@ -488,6 +538,7 @@ typedef int (*jack_port_is_mine_fun_def)(const jack_client_t* ext_client, const 
 static jack_port_is_mine_fun_def jack_port_is_mine_fun = 0;
 EXPORT int jack_port_is_mine(const jack_client_t* ext_client, const jack_port_t* port)
 {
+	JackLog("jack_port_is_mine\n");
     return (*jack_port_is_mine_fun)(ext_client, port);
 }
 
@@ -495,6 +546,7 @@ typedef const char** (*jack_port_get_connections_fun_def)(const jack_port_t* por
 static jack_port_get_connections_fun_def jack_port_get_connections_fun = 0;
 EXPORT const char** jack_port_get_connections(const jack_port_t* port)
 {
+	JackLog("jack_port_get_connections\n");
     return (*jack_port_get_connections_fun)(port);
 }
 
@@ -503,6 +555,7 @@ typedef const char** (*jack_port_get_all_connections_fun_def)(const jack_client_
 static jack_port_get_all_connections_fun_def jack_port_get_all_connections_fun = 0;
 EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_client, const jack_port_t* port)
 {
+	JackLog("jack_port_get_all_connections\n");
     return (*jack_port_get_all_connections_fun)(ext_client, port);
 }
 
@@ -510,6 +563,7 @@ typedef jack_nframes_t (*jack_port_get_total_latency_fun_def)(jack_client_t* ext
 static jack_port_get_total_latency_fun_def jack_port_get_total_latency_fun = 0;
 EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client, jack_port_t* port)
 {
+	JackLog("jack_port_get_total_latency\n");
     return (*jack_port_get_total_latency_fun)(ext_client, port);
 }
 
@@ -517,6 +571,7 @@ typedef int (*jack_connect_fun_def)(jack_client_t* ext_client, const char* src, 
 static jack_connect_fun_def jack_connect_fun = 0;
 EXPORT int jack_connect(jack_client_t* ext_client, const char* src, const char* dst)
 {
+	JackLog("jack_connect\n");
     return (*jack_connect_fun)(ext_client, src, dst);
 }
 
@@ -524,6 +579,7 @@ typedef int (*jack_disconnect_fun_def)(jack_client_t* ext_client, const char* sr
 static jack_disconnect_fun_def jack_disconnect_fun = 0;
 EXPORT int jack_disconnect(jack_client_t* ext_client, const char* src, const char* dst)
 {
+	JackLog("jack_disconnect\n");
     return (*jack_disconnect_fun)(ext_client, src, dst);
 }
 
@@ -531,6 +587,7 @@ typedef int (*jack_port_disconnect_fun_def)(jack_client_t* ext_client, jack_port
 static jack_port_disconnect_fun_def jack_port_disconnect_fun = 0;
 EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
 {
+	JackLog("jack_port_disconnect\n");
     return (*jack_port_disconnect_fun)(ext_client, src);
 }
 
@@ -538,6 +595,7 @@ typedef jack_nframes_t (*jack_get_sample_rate_fun_def)(jack_client_t* ext_client
 static jack_get_sample_rate_fun_def jack_get_sample_rate_fun = 0;
 EXPORT jack_nframes_t jack_get_sample_rate(jack_client_t* ext_client)
 {
+	JackLog("jack_get_sample_rate\n");
     return (*jack_get_sample_rate_fun)(ext_client);
 }
 
@@ -545,6 +603,7 @@ typedef jack_nframes_t (*jack_get_buffer_size_fun_def)(jack_client_t* ext_client
 static jack_get_buffer_size_fun_def jack_get_buffer_size_fun = 0;
 EXPORT jack_nframes_t jack_get_buffer_size(jack_client_t* ext_client)
 {
+	JackLog("jack_get_buffer_size\n");
     return (*jack_get_buffer_size_fun)(ext_client);
 }
 
@@ -552,6 +611,7 @@ typedef const char** (*jack_get_ports_fun_def)(jack_client_t* ext_client, const 
 static jack_get_ports_fun_def jack_get_ports_fun = 0;
 EXPORT const char** jack_get_ports(jack_client_t* ext_client, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
+	JackLog("jack_get_ports\n");
     return (*jack_get_ports_fun)(ext_client, port_name_pattern, type_name_pattern, flags);
 }
 
@@ -559,6 +619,7 @@ typedef jack_port_t* (*jack_port_by_name_fun_def)(jack_client_t* ext_client, con
 static jack_port_by_name_fun_def jack_port_by_name_fun = 0;
 EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* portname)
 {
+	JackLog("jack_port_by_name\n");
     return (*jack_port_by_name_fun)(ext_client, portname);
 }
 
@@ -566,6 +627,7 @@ typedef jack_port_t* (*jack_port_by_id_fun_def)(const jack_client_t* ext_client,
 static jack_port_by_id_fun_def jack_port_by_id_fun = 0;
 EXPORT jack_port_t* jack_port_by_id(const jack_client_t* ext_client, jack_port_id_t id)
 {
+	JackLog("jack_port_by_id\n");
     return (*jack_port_by_id_fun)(ext_client, id);
 }
 
@@ -573,6 +635,7 @@ typedef int (*jack_engine_takeover_timebase_fun_def)(jack_client_t* ext_client);
 static jack_engine_takeover_timebase_fun_def jack_engine_takeover_timebase_fun = 0;
 EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)
 {
+	JackLog("jack_engine_takeover_timebase\n");
     return (*jack_engine_takeover_timebase_fun)(ext_client);
 }
 
@@ -580,6 +643,7 @@ typedef jack_nframes_t (*jack_frames_since_cycle_start_fun_def)(const jack_clien
 static jack_frames_since_cycle_start_fun_def jack_frames_since_cycle_start_fun = 0;
 EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_client)
 {
+	JackLog("jack_frames_since_cycle_start\n");
     return (*jack_frames_since_cycle_start_fun)(ext_client);
 }
 
@@ -587,6 +651,7 @@ typedef jack_time_t (*jack_get_time_fun_def)();
 static jack_get_time_fun_def jack_get_time_fun = 0;
 EXPORT jack_time_t jack_get_time()
 {
+	JackLog("jack_get_time\n");
     return (*jack_get_time_fun)();
 }
 
@@ -594,6 +659,7 @@ typedef jack_nframes_t (*jack_time_to_frames_fun_def)(const jack_client_t* ext_c
 static jack_time_to_frames_fun_def jack_time_to_frames_fun = 0;
 EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_time_t time)
 {
+	JackLog("jack_time_to_frames\n");
     return (*jack_time_to_frames_fun)(ext_client, time);
 }
 
@@ -601,6 +667,7 @@ typedef jack_time_t (*jack_frames_to_time_fun_def)(const jack_client_t* ext_clie
 static jack_frames_to_time_fun_def jack_frames_to_time_fun = 0;
 EXPORT jack_time_t jack_frames_to_time(const jack_client_t* ext_client, jack_nframes_t frames)
 {
+	JackLog("jack_frames_to_time\n");
     return (*jack_frames_to_time_fun)(ext_client, frames);
 }
 
@@ -608,6 +675,7 @@ typedef jack_nframes_t (*jack_frame_time_fun_def)(const jack_client_t* ext_clien
 static jack_frame_time_fun_def jack_frame_time_fun = 0;
 EXPORT jack_nframes_t jack_frame_time(const jack_client_t* ext_client)
 {
+	JackLog("jack_frame_time\n");
     return (*jack_frame_time_fun)(ext_client);
 }
 
@@ -615,6 +683,7 @@ typedef jack_nframes_t (*jack_last_frame_time_fun_def)(const jack_client_t* ext_
 static jack_last_frame_time_fun_def jack_last_frame_time_fun = 0;
 EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 {
+	JackLog("jack_last_frame_time\n");
     return (*jack_last_frame_time_fun)(ext_client);
 }
 
@@ -622,6 +691,7 @@ typedef float (*jack_cpu_load_fun_def)(jack_client_t* ext_client);
 static jack_cpu_load_fun_def jack_cpu_load_fun = 0;
 EXPORT float jack_cpu_load(jack_client_t* ext_client)
 {
+	JackLog("jack_cpu_load\n");
     return (*jack_cpu_load_fun)(ext_client);
 }
 
@@ -629,6 +699,7 @@ typedef pthread_t (*jack_client_thread_id_fun_def)(jack_client_t* ext_client);
 static jack_client_thread_id_fun_def jack_client_thread_id_fun = 0;
 EXPORT pthread_t  jack_client_thread_id(jack_client_t* ext_client)
 {
+	JackLog("jack_client_thread_id\n");
     return (*jack_client_thread_id_fun)(ext_client);
 }
 
@@ -636,6 +707,7 @@ typedef void (*jack_set_error_function_fun_def)(void (*func)(const char *));
 static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
 EXPORT void jack_set_error_function(void (*func)(const char *))
 {
+	JackLog("jack_set_error_function\n");
 	(*jack_set_error_function_fun)(func);
 }
 
@@ -643,6 +715,7 @@ typedef char* (*jack_get_client_name_fun_def)(jack_client_t* ext_client);
 static jack_get_client_name_fun_def jack_get_client_name_fun = 0;
 EXPORT char* jack_get_client_name (jack_client_t* ext_client)
 {
+	JackLog("jack_get_client_name\n");
     return (*jack_get_client_name_fun)(ext_client);
 }
 
@@ -654,6 +727,7 @@ EXPORT int jack_internal_client_new (const char *client_name,
 										const char *load_name,
 										const char *load_init)
 {
+	JackLog("jack_internal_client_new\n");
     return (*jack_internal_client_new_fun)(client_name, load_name, load_init);
 }
 
@@ -661,6 +735,7 @@ typedef void (*jack_internal_client_close_fun_def)(const char *client_name);
 static jack_internal_client_close_fun_def jack_internal_client_close_fun = 0;
 EXPORT void jack_internal_client_close (const char *client_name)
 {
+	JackLog("jack_internal_client_close\n");
 	(*jack_internal_client_close_fun)(client_name);
 }
 
@@ -668,6 +743,7 @@ typedef int (*jack_client_name_size_fun_def)(void);
 static jack_client_name_size_fun_def jack_client_name_size_fun = 0;
 EXPORT int jack_client_name_size(void)
 {
+	JackLog("jack_client_name_size\n");
     return (*jack_client_name_size_fun)();
 }
 
@@ -675,6 +751,7 @@ typedef int (*jack_port_name_size_fun_def)(void);
 static jack_port_name_size_fun_def jack_port_name_size_fun = 0;
 EXPORT int jack_port_name_size(void)
 {
+	JackLog("jack_port_name_size\n");
     return (*jack_port_name_size_fun)();
 }
 
@@ -682,6 +759,7 @@ typedef int (*jack_port_type_size_fun_def)(void);
 static jack_port_type_size_fun_def jack_port_type_size_fun = 0;
 EXPORT int jack_port_type_size(void)
 {
+	JackLog("jack_port_type_size\n");
     return (*jack_port_type_size_fun)();
 }
 
@@ -691,6 +769,7 @@ typedef int (*jack_release_timebase_fun_def)(jack_client_t* ext_client);
 static jack_release_timebase_fun_def jack_release_timebase_fun = 0;
 EXPORT int jack_release_timebase(jack_client_t* ext_client)
 {
+	JackLog("jack_release_timebase\n");
     return (*jack_release_timebase_fun)(ext_client);
 }
 
@@ -698,6 +777,7 @@ typedef int (*jack_set_sync_callback_fun_def)(jack_client_t* ext_client, JackSyn
 static jack_set_sync_callback_fun_def jack_set_sync_callback_fun = 0;
 EXPORT int jack_set_sync_callback(jack_client_t* ext_client, JackSyncCallback sync_callback, void *arg)
 {
+	JackLog("jack_set_sync_callback\n");
     return (*jack_set_sync_callback_fun)(ext_client, sync_callback, arg);
 }
 
@@ -705,6 +785,7 @@ typedef int (*jack_set_sync_timeout_fun_def)(jack_client_t* ext_client, jack_tim
 static jack_set_sync_timeout_fun_def jack_set_sync_timeout_fun = 0;
 EXPORT int jack_set_sync_timeout(jack_client_t* ext_client, jack_time_t timeout)
 {
+	JackLog("jack_set_sync_timeout\n");
     return (*jack_set_sync_timeout_fun)(ext_client, timeout);
 }
 
@@ -712,6 +793,7 @@ typedef int (*jack_set_timebase_callback_fun_def)(jack_client_t* ext_client, int
 static jack_set_timebase_callback_fun_def jack_set_timebase_callback_fun = 0;
 EXPORT int jack_set_timebase_callback(jack_client_t* ext_client, int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
+	JackLog("jack_set_timebase_callback\n");
     return (*jack_set_timebase_callback_fun)(ext_client, conditional, timebase_callback, arg);
 }
 
@@ -719,6 +801,7 @@ typedef int (*jack_transport_locate_fun_def)(jack_client_t* ext_client, jack_nfr
 static jack_transport_locate_fun_def jack_transport_locate_fun = 0;
 EXPORT int jack_transport_locate(jack_client_t* ext_client, jack_nframes_t frame)
 {
+	JackLog("jack_transport_locate\n");
     return (*jack_transport_locate_fun)(ext_client, frame);
 }
 
@@ -726,6 +809,7 @@ typedef jack_transport_state_t (*jack_transport_query_fun_def)(const jack_client
 static jack_transport_query_fun_def jack_transport_query_fun = 0;
 EXPORT jack_transport_state_t jack_transport_query(const jack_client_t* ext_client, jack_position_t* pos)
 {
+	JackLog("jack_transport_query\n");
     return (*jack_transport_query_fun)(ext_client, pos);
 }
 
@@ -733,6 +817,7 @@ typedef jack_nframes_t (*jack_get_current_transport_frame_fun_def)(const jack_cl
 static jack_get_current_transport_frame_fun_def jack_get_current_transport_frame_fun = 0;
 EXPORT jack_nframes_t jack_get_current_transport_frame(const jack_client_t* ext_client)
 {
+	JackLog("jack_get_current_transport_frame\n");
     return (*jack_get_current_transport_frame_fun)(ext_client);
 }
 
@@ -740,6 +825,7 @@ typedef int (*jack_transport_reposition_fun_def)(jack_client_t* ext_client, jack
 static jack_transport_reposition_fun_def jack_transport_reposition_fun = 0;
 EXPORT int jack_transport_reposition(jack_client_t* ext_client, jack_position_t* pos)
 {
+	JackLog("jack_transport_reposition\n");
     return (*jack_transport_reposition_fun)(ext_client, pos);
 }
 
@@ -747,6 +833,7 @@ typedef void (*jack_transport_start_fun_def)(jack_client_t* ext_client);
 static jack_transport_start_fun_def jack_transport_start_fun = 0;
 EXPORT void jack_transport_start(jack_client_t* ext_client)
 {
+	JackLog("jack_transport_start\n");
 	(*jack_transport_start_fun)(ext_client);
 }
 
@@ -754,6 +841,7 @@ typedef void (*jack_transport_stop_fun_def)(jack_client_t* ext_client);
 static jack_transport_stop_fun_def jack_transport_stop_fun = 0;
 EXPORT void jack_transport_stop(jack_client_t* ext_client)
 {
+	JackLog("jack_transport_stop\n");
 	(*jack_transport_stop_fun)(ext_client);
 }
 
@@ -763,6 +851,7 @@ typedef void (*jack_get_transport_info_fun_def)(jack_client_t* ext_client, jack_
 static jack_get_transport_info_fun_def jack_get_transport_info_fun = 0;
 EXPORT void jack_get_transport_info(jack_client_t* ext_client, jack_transport_info_t* tinfo)
 {
+	JackLog("jack_get_transport_info\n");
     (*jack_get_transport_info_fun)(ext_client, tinfo);
 }
 
@@ -770,6 +859,7 @@ typedef void (*jack_set_transport_info_fun_def)(jack_client_t* ext_client, jack_
 static jack_set_transport_info_fun_def jack_set_transport_info_fun = 0;
 EXPORT void jack_set_transport_info(jack_client_t* ext_client, jack_transport_info_t* tinfo)
 {
+	JackLog("jack_set_transport_info\n");
     (*jack_set_transport_info_fun)(ext_client, tinfo);
 }
 
@@ -779,6 +869,7 @@ typedef float (*jack_get_max_delayed_usecs_fun_def)(jack_client_t* ext_client);
 static jack_get_max_delayed_usecs_fun_def jack_get_max_delayed_usecs_fun = 0;
 EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
 {
+	JackLog("jack_get_max_delayed_usecs\n");
     return (*jack_get_max_delayed_usecs_fun)(ext_client);
 }
 
@@ -786,6 +877,7 @@ typedef float (*jack_get_xrun_delayed_usecs_fun_def)(jack_client_t* ext_client);
 static jack_get_xrun_delayed_usecs_fun_def jack_get_xrun_delayed_usecs_fun = 0;
 EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* ext_client)
 {
+	JackLog("jack_get_xrun_delayed_usecs\n");
     return (*jack_get_xrun_delayed_usecs_fun)(ext_client);
 }
 
@@ -793,6 +885,7 @@ typedef void (*jack_reset_max_delayed_usecs_fun_def)(jack_client_t* ext_client);
 static jack_reset_max_delayed_usecs_fun_def jack_reset_max_delayed_usecs_fun = 0;
 EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 {
+	JackLog("jack_reset_max_delayed_usecs\n");
     (*jack_reset_max_delayed_usecs)(ext_client);
 }
 
@@ -802,6 +895,7 @@ typedef int (*jack_acquire_real_time_scheduling_fun_def)(pthread_t thread, int p
 static jack_acquire_real_time_scheduling_fun_def jack_acquire_real_time_scheduling_fun = 0;
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 {
+	JackLog("jack_acquire_real_time_scheduling\n");
     return (*jack_acquire_real_time_scheduling_fun)(thread, priority);
 }
 
@@ -820,6 +914,7 @@ EXPORT int jack_client_create_thread(jack_client_t* client,
                                      start_routine callback,
                                      void *arg)
 {
+	JackLog("jack_client_create_thread\n");
     return (*jack_client_create_thread_fun)(client, thread, priority, realtime, callback, arg);
 }
 
@@ -827,6 +922,7 @@ typedef int (*jack_drop_real_time_scheduling_fun_def)(pthread_t thread);
 static jack_drop_real_time_scheduling_fun_def jack_drop_real_time_scheduling_fun = 0;
 EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 {
+	JackLog("jack_client_create_thread\n");
     return (*jack_drop_real_time_scheduling_fun)(thread);
 }
 
@@ -836,6 +932,7 @@ typedef char* (*jack_get_internal_client_name_fun_def)(jack_client_t* ext_client
 static jack_get_internal_client_name_fun_def jack_get_internal_client_name_fun = 0;
 EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intclient_t intclient)
 {
+	JackLog("jack_get_internal_client_name\n");
     return (*jack_get_internal_client_name_fun)(ext_client, intclient);
 }
 
@@ -843,6 +940,7 @@ typedef jack_intclient_t (*jack_internal_client_handle_fun_def)(jack_client_t* e
 static jack_internal_client_handle_fun_def jack_internal_client_handle_fun = 0;
 EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, const char* client_name, jack_status_t* status)
 {
+	JackLog("jack_internal_client_handle\n");
     return (*jack_internal_client_handle_fun)(ext_client, client_name, status);
 }
 
@@ -850,6 +948,7 @@ typedef jack_intclient_t (*jack_internal_client_load_fun_def)(jack_client_t* ext
 static jack_internal_client_load_fun_def jack_internal_client_load_fun = 0;
 EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
 {
+	JackLog("jack_internal_client_load\n");
     va_list ap;
     va_start(ap, status);
     jack_intclient_t res =  (*jack_internal_client_load_fun)(ext_client, client_name, options, status, ap);
@@ -861,6 +960,7 @@ typedef jack_status_t (*jack_internal_client_unload_fun_def)(jack_client_t* ext_
 static jack_internal_client_unload_fun_def jack_internal_client_unload_fun = 0;
 EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack_intclient_t intclient)
 {
+	JackLog("jack_internal_client_unload\n");
     return (*jack_internal_client_unload_fun)(ext_client, intclient);
 }
 
@@ -875,7 +975,8 @@ typedef jack_client_t * (*jack_client_open_fun_def)(const char *client_name, jac
 static jack_client_open_fun_def jack_client_open_fun = 0;
 EXPORT jack_client_t * jack_client_open(const char *client_name, jack_options_t options, jack_status_t *status, ...)
 {
-	// TODO : in "autodstart mode", has to load jackdrc file and figure out which server has to be started...
+	// TODO : in "autostart mode", has to load jackdrc file and figure out which server has to be started...
+	JackLog("jack_client_open\n");
 	
     // Library check...
     if (!open_library())
@@ -892,6 +993,7 @@ typedef jack_client_t * (*jack_client_new_fun_def)(const char *client_name);
 static jack_client_new_fun_def jack_client_new_fun = 0;
 EXPORT jack_client_t * jack_client_new(const char *client_name)
 {
+	JackLog("jack_client_new\n");
     // Library check...
     if (!open_library())
         return 0;
@@ -903,6 +1005,7 @@ typedef int (*jack_client_close_fun_def)(jack_client_t *client);
 static jack_client_close_fun_def jack_client_close_fun = 0;
 EXPORT int jack_client_close(jack_client_t *client)
 {
+	JackLog("jack_client_close\n");
     int res = (*jack_client_close_fun)(client);
     close_library();
     return res;
