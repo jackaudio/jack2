@@ -210,13 +210,13 @@ extern "C"
 
 static void JackLog(const char *fmt,...)
 {
-	//if (jack_verbose) {
-		va_list ap;
-		va_start(ap, fmt);
-		fprintf(stderr,"Jack: ");
-		vfprintf(stderr, fmt, ap);
-		va_end(ap);
-	//}
+	/*
+	va_list ap;
+	va_start(ap, fmt);
+	fprintf(stderr,"Jack: ");
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+	*/
 }
 
 // Function definition
