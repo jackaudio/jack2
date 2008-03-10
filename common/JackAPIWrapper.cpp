@@ -965,7 +965,7 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 }
 
 // client
-static long gClientCount = 0;
+static bool gInitedLib = false;
 static void* gLibrary = 0;
 static bool init_library();
 static bool open_library();
@@ -1044,20 +1044,19 @@ static bool get_jack_library(const char* library_name, char* library_res_name)
 
 static bool open_library()
 {
-	printf("open_library %ld \n", gClientCount);
-    if (gClientCount++ == 0) {
-        return init_library();
-    } else {
-        return true;
-    }
+	printf("open_library %ld \n", gInitedLib);
+    if (!gInitedLib) 
+        gInitedLib = init_library();
+	return gInitedLib;
 }
 
 static void close_library()
 {
 	printf("close_library\n");
-    if (--gClientCount == 0) {
+    if (gInitedLib) {
         dlclose(gLibrary);
 		gLibrary = 0;
+		gInitedLib = false;
     }
 }
 
