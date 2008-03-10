@@ -6,7 +6,7 @@ sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
 
 # Copy libraries and exe
 sudo cp -r Jackmp.framework /Library/Frameworks/  
-sudo cp -r Jackdmp.framework /Library/Frameworks/   
+sudo cp -r Jackservermp.framework /Library/Frameworks/   
 sudo install -d /usr/local/bin 
 sudo cp jackdmp /usr/local/bin  
 

@@ -8228,7 +8228,7 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -8376,7 +8376,7 @@
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -8518,7 +8518,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -8660,7 +8660,7 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -10841,7 +10841,7 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -10973,7 +10973,7 @@
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -11131,7 +11131,7 @@
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
@@ -11453,7 +11453,7 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
