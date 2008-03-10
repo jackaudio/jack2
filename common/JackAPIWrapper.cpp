@@ -144,7 +144,9 @@ extern "C"
     EXPORT jack_nframes_t jack_last_frame_time (const jack_client_t *client);
     EXPORT float jack_cpu_load (jack_client_t *client);
     EXPORT pthread_t jack_client_thread_id (jack_client_t *);
-    EXPORT void jack_set_error_function (void (*func)(const char *));
+   // EXPORT void jack_set_error_function (void (*func)(const char *));
+	typedef void (*error_callback)(const char *msg);
+	EXPORT void jack_set_error_function (error_callback fun);
 
     EXPORT float jack_get_max_delayed_usecs (jack_client_t *client);
     EXPORT float jack_get_xrun_delayed_usecs (jack_client_t *client);
@@ -705,10 +707,11 @@ EXPORT pthread_t  jack_client_thread_id(jack_client_t* ext_client)
 
 typedef void (*jack_set_error_function_fun_def)(void (*func)(const char *));
 static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
-EXPORT void jack_set_error_function(void (*func)(const char *))
+//EXPORT void jack_set_error_function(void (*func)(const char *) error_fun)
+EXPORT void jack_set_error_function(error_callback fun)
 {
 	JackLog("jack_set_error_function\n");
-	(*jack_set_error_function_fun)(func);
+	(*jack_set_error_function_fun)(fun);
 }
 
 typedef char* (*jack_get_client_name_fun_def)(jack_client_t* ext_client);
