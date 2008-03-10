@@ -554,7 +554,7 @@ jack_cleanup_shm ()
 
 			/* see if allocator still exists */
 		#ifdef WIN32 // steph
-			printf("TODO: kill API not available !!\n");
+			jack_info("TODO: kill API not available !!");
 		#else
 			if (kill (r->allocator, 0)) {
 				if (errno == ESRCH) {

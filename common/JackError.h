@@ -36,11 +36,17 @@ extern "C"
 
     EXPORT void jack_error(const char *fmt, ...);
 
+    EXPORT void jack_info(const char *fmt, ...);
+
+    /* like jack_info but does not add newline */
+    EXPORT void jack_info_multiline(const char *fmt, ...);
+
     EXPORT void JackLog(const char *fmt, ...);
 
     extern int jack_verbose;
 
     extern void (*jack_error_callback)(const char *desc);
+    extern void (*jack_info_callback)(const char *desc);
 
 #ifdef __cplusplus
 }

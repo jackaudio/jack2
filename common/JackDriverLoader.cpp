@@ -296,10 +296,10 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 
 #ifdef WIN32
     if ((so_get_descriptor == NULL) && (dlerr = GetLastError()) != 0) {
-        fprintf(stderr, "%ld\n", dlerr);
+        jack_error("%ld", dlerr);
 #else
     if ((so_get_descriptor == NULL) && (dlerr = dlerror ()) != NULL) {
-        fprintf(stderr, "%s\n", dlerr);
+        jack_error("%s", dlerr);
 #endif
 
         UnloadDriverModule(dlhandle);
@@ -360,7 +360,7 @@ jack_drivers_load (JSList * drivers) {
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
-        printf("error\n");
+        jack_error("error");
         return NULL;
     }
 

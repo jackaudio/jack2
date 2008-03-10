@@ -24,13 +24,45 @@
 
 int jack_verbose = 0;
 
+static
+void 
+jack_format_and_log(const char *prefix, const char *fmt, va_list ap, void (* log_callback)(const char *))
+{
+    char buffer[300];
+    size_t len;
+
+    if (prefix != NULL) {
+        len = strlen(prefix);
+        memcpy(buffer, prefix, len);
+    } else {
+        len = 0;
+    }
+
+    vsnprintf(buffer + len, sizeof(buffer) - len, fmt, ap);
+    log_callback(buffer);
+}
+
 EXPORT void jack_error(const char *fmt, ...)
 {
 	va_list ap;
-	char buffer[300];
 	va_start(ap, fmt);
-	vsnprintf(buffer, sizeof(buffer), fmt, ap);
-	jack_error_callback(buffer);
+	jack_format_and_log(NULL, fmt, ap, jack_error_callback);
+	va_end(ap);
+}
+
+EXPORT void jack_info(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	jack_format_and_log(NULL, fmt, ap, jack_info_callback);
+	va_end(ap);
+}
+
+EXPORT void jack_info_multiline(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	jack_format_and_log(NULL, fmt, ap, jack_info_callback);
 	va_end(ap);
 }
 
@@ -39,8 +71,7 @@ EXPORT void JackLog(const char *fmt,...)
 	if (jack_verbose) {
 		va_list ap;
 		va_start(ap, fmt);
-		fprintf(stderr,"Jack: ");
-		vfprintf(stderr, fmt, ap);
+        jack_format_and_log("Jack: ", fmt, ap, jack_info_callback);
 		va_end(ap);
 	}
 }
@@ -48,7 +79,14 @@ EXPORT void JackLog(const char *fmt,...)
 static void default_jack_error_callback(const char *desc)
 {
     fprintf(stderr, "%s\n", desc);
+    fflush(stdout);
+}
+
+static void default_jack_info_callback (const char *desc)
+{
+    fprintf(stdout, "%s\n", desc);
+    fflush(stdout);
 }
 
 void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
-
+void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;

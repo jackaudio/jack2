@@ -399,7 +399,7 @@ usx2y_driver_null_cycle (alsa_driver_t* driver, jack_nframes_t nframes)
 	int chn;
 
 	VERBOSE(driver->engine,
-		"usx2y_driver_null_cycle (%p, %i)\n", driver, nframes);
+		"usx2y_driver_null_cycle (%p, %i)", driver, nframes);
 
 	if (driver->capture_handle) {
 		nf = nframes;
@@ -689,8 +689,8 @@ jack_alsa_usx2y_hw_new (alsa_driver_t *driver)
 			hw->private = h;
 			/* Set our own operational function pointers. */
 			usx2y_driver_setup(driver);
-			printf("ALSA/USX2Y: EXPERIMENTAL hwdep pcm device %s"
-				" (aka \"rawusb\")\n", driver->alsa_name_playback);
+			jack_info("ALSA/USX2Y: EXPERIMENTAL hwdep pcm device %s"
+				" (aka \"rawusb\")", driver->alsa_name_playback);
 		}
 	}
 

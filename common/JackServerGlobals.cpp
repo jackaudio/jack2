@@ -219,20 +219,20 @@ bool JackServerGlobals::Init()
                     break;
 
                 default:
-                    fprintf(stderr, "unknown option character %c\n", optopt);
+                    jack_error("unknown option character %c", optopt);
                     break;
             }
         }
 
         drivers = jack_drivers_load(drivers);
         if (!drivers) {
-            fprintf(stderr, "jackdmp: no drivers found; exiting\n");
+            jack_error("jackdmp: no drivers found; exiting");
             goto error;
         }
 
         driver_desc = jack_find_driver_descriptor(drivers, driver_name);
         if (!driver_desc) {
-            fprintf(stderr, "jackdmp: unknown driver '%s'\n", driver_name);
+            jack_error("jackdmp: unknown driver '%s'", driver_name);
             goto error;
         }
 
@@ -243,8 +243,8 @@ bool JackServerGlobals::Init()
         }
 
         if (driver_nargs == 0) {
-            fprintf(stderr, "No driver specified ... hmm. JACK won't do"
-                    " anything when run like this.\n");
+            jack_error("No driver specified ... hmm. JACK won't do"
+                    " anything when run like this.");
             goto error;
         }
 
@@ -267,17 +267,17 @@ bool JackServerGlobals::Init()
         rc = jack_register_server(server_name, false);
         switch (rc) {
             case EEXIST:
-                fprintf(stderr, "`%s' server already active\n", server_name);
+                jack_error("`%s' server already active", server_name);
                 goto error;
             case ENOSPC:
-                fprintf(stderr, "too many servers already active\n");
+                jack_error("too many servers already active");
                 goto error;
             case ENOMEM:
-                fprintf(stderr, "no access to shm registry\n");
+                jack_error("no access to shm registry");
                 goto error;
             default:
                 if (jack_verbose)
-                    fprintf(stderr, "server `%s' registered\n", server_name);
+                    jack_info("server `%s' registered", server_name);
         }
 
         /* clean up shared memory and files from any previous instance of this server name */

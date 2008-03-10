@@ -13,10 +13,15 @@ Kjetil S.Matheussen
 Pieter Palmers
 Tim Blechmann
 Marc-Olivier Barre
+Nedko Arnaudov 
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2008-03-10 Stephane Letz  <letz@grame.fr>
+		
+	* Nedko Arnaudov log patch.
 
 2008-03-07 Stephane Letz  <letz@grame.fr>
 		

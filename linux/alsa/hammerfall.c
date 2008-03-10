@@ -117,7 +117,7 @@ hammerfall_check_sync (hammerfall_t *h, snd_ctl_elem_value_t *ctl)
 	int val;
 	snd_ctl_elem_id_t *ctl_id;
 	
-	printf ("check sync\n");
+	jack_info ("check sync");
 
 	snd_ctl_elem_id_alloca (&ctl_id);
 	snd_ctl_elem_value_get_id (ctl, ctl_id);
