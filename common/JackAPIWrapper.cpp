@@ -1062,7 +1062,7 @@ static bool init_library()
 	jack_port_connected_fun = (jack_port_connected_fun_def)dlsym(gLibrary, "jack_port_connected");
     jack_port_connected_to_fun = (jack_port_connected_to_fun_def)dlsym(gLibrary, "jack_port_connected_to");
     jack_port_get_connections_fun = (jack_port_get_connections_fun_def)dlsym(gLibrary, "jack_port_get_connections");
-    jack_port_get_all_connections_fun = (jack_port_get_all_connections_fun_def)dlsym(gLibrary, "jack_port_get_all_connections_fun");
+    jack_port_get_all_connections_fun = (jack_port_get_all_connections_fun_def)dlsym(gLibrary, "jack_port_get_all_connections");
 	jack_port_tie_fun = (jack_port_tie_fun_def)dlsym(gLibrary, "jack_port_tie");
     jack_port_untie_fun = (jack_port_untie_fun_def)dlsym(gLibrary, "jack_port_untie");
 	jack_port_get_latency_fun = (jack_port_get_latency_fun_def)dlsym(gLibrary, "jack_port_get_latency");
