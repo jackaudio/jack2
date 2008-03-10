@@ -1201,7 +1201,7 @@ static bool init_library()
     jack_set_sync_callback_fun = (jack_set_sync_callback_fun_def)dlsym(gLibrary, "jack_set_sync_callback");
     jack_set_sync_timeout_fun = (jack_set_sync_timeout_fun_def)dlsym(gLibrary, "jack_set_sync_timeout");
     jack_set_timebase_callback_fun = (jack_set_timebase_callback_fun_def)dlsym(gLibrary, "jack_set_timebase_callback");
-    jack_transport_locate_fun = (jack_transport_locate_fun_def)dlsym(gLibrary, "jack_transport_locate_fun");
+    jack_transport_locate_fun = (jack_transport_locate_fun_def)dlsym(gLibrary, "jack_transport_locate");
     jack_transport_query_fun = (jack_transport_query_fun_def)dlsym(gLibrary, "jack_transport_query");
     jack_get_current_transport_frame_fun = (jack_get_current_transport_frame_fun_def)dlsym(gLibrary, "jack_get_current_transport_frame");
     jack_transport_reposition_fun = (jack_transport_reposition_fun_def)dlsym(gLibrary, "jack_transport_reposition");
