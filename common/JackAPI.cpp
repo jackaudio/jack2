@@ -1059,29 +1059,6 @@ EXPORT int jack_disconnect(jack_client_t* ext_client, const char* src, const cha
     }
 }
 
-EXPORT int jack_port_connect(jack_client_t* ext_client, jack_port_t* src, jack_port_t* dst)
-{
-#ifdef __CLIENTDEBUG__
-    JackLibGlobals::CheckContext();
-#endif
-    JackClient* client = (JackClient*)ext_client;
-    if (client == NULL) {
-        jack_error("jack_port_connect called with a NULL client");
-        return -1;
-    }
-    jack_port_id_t mysrc = (jack_port_id_t)src;
-    if (!CheckPort(mysrc)) {
-        jack_error("jack_port_connect called with a NULL src port");
-        return -1;
-    }
-    jack_port_id_t mydst = (jack_port_id_t)dst;
-    if (!CheckPort(mydst)) {
-        jack_error("jack_port_connect called with a NULL dst port");
-        return -1;
-    }
-    return client->PortConnect(mysrc, mydst);
-}
-
 EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
 {
 #ifdef __CLIENTDEBUG__

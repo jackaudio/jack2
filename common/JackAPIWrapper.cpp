@@ -527,13 +527,6 @@ EXPORT int jack_disconnect(jack_client_t* ext_client, const char* src, const cha
     return (*jack_disconnect_fun)(ext_client, src, dst);
 }
 
-typedef int (*jack_port_connect_fun_def)(jack_client_t* ext_client, jack_port_t* src, jack_port_t* dst);
-static jack_port_connect_fun_def jack_port_connect_fun = 0;
-EXPORT int jack_port_connect(jack_client_t* ext_client, jack_port_t* src, jack_port_t* dst)
-{
-    return (*jack_port_connect_fun)(ext_client, src, dst);
-}
-
 typedef int (*jack_port_disconnect_fun_def)(jack_client_t* ext_client, jack_port_t* src);
 static jack_port_disconnect_fun_def jack_port_disconnect_fun = 0;
 EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
@@ -1080,8 +1073,7 @@ static bool init_library()
     jack_port_monitoring_input_fun = (jack_port_monitoring_input_fun_def)dlsym(gLibrary, "jack_port_monitoring_input");
     jack_connect_fun = (jack_connect_fun_def)dlsym(gLibrary, "jack_connect");
     jack_disconnect_fun = (jack_disconnect_fun_def)dlsym(gLibrary, "jack_disconnect");
-    jack_port_connect_fun = (jack_port_connect_fun_def)dlsym(gLibrary, "jack_port_connect");
-    jack_port_disconnect_fun = (jack_port_disconnect_fun_def)dlsym(gLibrary, "jack_port_disconnect");
+	jack_port_disconnect_fun = (jack_port_disconnect_fun_def)dlsym(gLibrary, "jack_port_disconnect");
 	jack_port_name_size_fun = (jack_port_name_size_fun_def)dlsym(gLibrary, "jack_port_name_size");
 	jack_port_type_size_fun = (jack_port_type_size_fun_def)dlsym(gLibrary, "jack_port_type_size");
     jack_get_sample_rate_fun = (jack_get_sample_rate_fun_def)dlsym(gLibrary, "jack_get_sample_rate");

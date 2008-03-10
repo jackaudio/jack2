@@ -552,14 +552,6 @@ int JackClient::PortDisconnect(const char* src, const char* dst)
     return result;
 }
 
-int JackClient::PortConnect(jack_port_id_t src, jack_port_id_t dst)
-{
-    JackLog("JackClient::PortConnect src = %ld dst = %ld\n", src, dst);
-    int result = -1;
-    fChannel->PortConnect(GetClientControl()->fRefNum, src, dst, &result);
-    return result;
-}
-
 int JackClient::PortDisconnect(jack_port_id_t src)
 {
     JackLog("JackClient::PortDisconnect src = %ld\n", src);

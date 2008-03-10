@@ -138,7 +138,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 
         virtual int PortConnect(const char* src, const char* dst);
         virtual int PortDisconnect(const char* src, const char* dst);
-        virtual int PortConnect(jack_port_id_t src, jack_port_id_t dst);
         virtual int PortDisconnect(jack_port_id_t src);
 
         virtual int PortIsMine(jack_port_id_t port_index);

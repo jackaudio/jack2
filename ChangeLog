@@ -22,6 +22,7 @@ Nedko Arnaudov
 2008-03-10 Stephane Letz  <letz@grame.fr>
 		
 	* Nedko Arnaudov log patch.
+	* Remove uneeded jack_port_connect API.
 
 2008-03-07 Stephane Letz  <letz@grame.fr>
 		

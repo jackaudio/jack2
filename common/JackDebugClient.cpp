@@ -278,36 +278,6 @@ int JackDebugClient::PortDisconnect(const char* src, const char* dst)
     return res;
 }
 
-int JackDebugClient::PortConnect(jack_port_id_t src, jack_port_id_t dst)
-{
-    CheckClient();
-    if (!fIsActivated)
-        *fStream << "!!! ERROR !!! : Trying to connect port  " << src << " to  " << dst << " while the client has not been activated !" << endl;
-    int res = fClient->PortConnect(src, dst);
-    int i;
-    for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
-        if (fPortList[i].idport == src) {		// We found the record in sources
-            if (fPortList[i].IsUnregistrated != 0)
-                *fStream << "!!! ERROR !!! : Connecting port  " << src << " previoulsy unregistered !" << endl;
-            fPortList[i].IsConnected++;
-            *fStream << "Connecting port " << src << ". ";
-            break;
-        } else if (fPortList[i].idport == dst) { // We found the record in dest
-            if (fPortList[i].IsUnregistrated != 0)
-                *fStream << "!!! ERROR !!! : Connecting port  " << dst << " previoulsy unregistered !" << endl;
-            fPortList[i].IsConnected++;
-            *fStream << "Connecting port " << dst << ". ";
-            break;
-        }
-    }
-    if (i == 0) // Port is not found
-        *fStream << "JackClientDebug : PortConnect : port was not found in debug database !" << endl;
-    if (res == -1)
-        *fStream << "Client '" << fClientName << "' try to do Portconnect but server return " << res << " ." << endl;
-    //*fStream << "Client Port Connect with ID done." << endl;
-    return res;
-}
-
 int JackDebugClient::PortDisconnect(jack_port_id_t src)
 {
     CheckClient();
