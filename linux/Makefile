@@ -154,8 +154,6 @@ installwrapper:
 	cp jack_dummy.so $(prefix)/$(libdir)/jackmp
 	[ -f jack_freebob.so ]  && cp jack_freebob.so $(prefix)/$(libdir)/jackmp || echo "freebob driver not installed"
 	[ -f jack_firewire.so ]  && cp jack_firewire.so $(prefix)/$(libdir)/jackmp || echo "firewire driver not installed"
-	cd $(prefix)/bin && [ -f jackd ]  && mv -f jackd tmp_jackd || echo "jackd server not found, continue..."
-	cd $(prefix)/$(libdir) && [ -f libjack.so.0.0.28 ] && mv -f libjack.so.0.0.28 tmp_libjack.so.0.0.28 || echo "libjack not found, continue..."
 	cd $(prefix)/include &&  [ -d jack ] && mv -f jack tmp_jack || echo "jack headers not found, continue..."
 	install -d $(prefix)/include/jack/
 	cp ../common/jack/*.h $(prefix)/include/jack/
