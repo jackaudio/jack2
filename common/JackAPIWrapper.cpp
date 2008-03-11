@@ -216,6 +216,9 @@ static bool init_library();
 static bool open_library();
 static void close_library();
 
+static void (*error_fun)(const char *) = 0;
+static void (*info_fun)(const char *) = 0;
+
 static void jack_log(const char *fmt,...)
 {
 	/*
@@ -717,10 +720,11 @@ static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
 EXPORT void jack_set_error_function(void (*func)(const char *))
 {
 	jack_log("jack_set_error_function\n");
-	 // Library check...
-    if (!open_library())  // hum...
-        return;
-	(*jack_set_error_function_fun)(func);
+	if (gLibrary) {
+		(*jack_set_error_function_fun)(func);
+	} else {
+		error_fun = func; // Keep the function
+	}
 }
 
 typedef void (*jack_set_info_function_fun_def)(void (*func)(const char *));
@@ -728,10 +732,11 @@ static jack_set_info_function_fun_def jack_set_info_function_fun = 0;
 EXPORT void jack_set_info_function(void (*func)(const char *))
 {
 	jack_log("jack_set_info_function\n");
-	 // Library check...
-    if (!open_library()) // hum...
-        return;
-	(*jack_set_info_function_fun)(func);
+	if (gLibrary) {
+		(*jack_set_error_function_fun)(func);
+	} else {
+		info_fun = func; // Keep the function
+	}
 }
 
 typedef char* (*jack_get_client_name_fun_def)(jack_client_t* ext_client);
@@ -1233,9 +1238,14 @@ static bool init_library()
     jack_internal_client_handle_fun = (jack_internal_client_handle_fun_def)dlsym(gLibrary, "jack_internal_client_handle");
     jack_internal_client_load_fun = (jack_internal_client_load_fun_def)dlsym(gLibrary, "jack_internal_client_load");
     jack_internal_client_unload_fun = (jack_internal_client_unload_fun_def)dlsym(gLibrary, "jack_internal_client_unload");
+	
+	// Functions were kept...
+	if (error_fun)
+		jack_set_error_function_fun(error_fun);
+	if (info_fun)
+		jack_set_info_function_fun(info_fun);
 
 	printf("init_library OK\n");
-
     return true;
 
 error:
