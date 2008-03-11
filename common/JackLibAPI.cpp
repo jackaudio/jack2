@@ -41,7 +41,7 @@ extern "C"
 
 	EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
-            jack_status_t *status, ...);
+            jack_status_t *status, va_list ap);
 	EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
@@ -54,9 +54,8 @@ extern "C"
 JackLibGlobals* JackLibGlobals::fGlobals = NULL;
 int JackLibGlobals::fClientCount = 0;
 
-EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
-    va_list ap;				/* variable argument pointer */
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
     JackClient* client;
@@ -76,10 +75,8 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     }
 
     /* parse variable arguments */
-    va_start(ap, status);
-    jack_varargs_parse(options, ap, &va);
-    va_end(ap);
-
+    if (ap)
+		jack_varargs_parse(options, ap, &va);
 
     jack_log("jack_client_open %s", client_name);
     if (client_name == NULL) {

@@ -22,6 +22,7 @@ Nedko Arnaudov
 2008-03-11 Stephane Letz  <letz@grame.fr>
 		
 	* Fix engine real-time notification (was broken since ??).
+	* Correct jack_client_open_aux, jack_client_open and jack_client_new.
 
 2008-03-10 Stephane Letz  <letz@grame.fr>
 		
