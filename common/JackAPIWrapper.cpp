@@ -993,12 +993,25 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 }
 
 
-typedef jack_client_t * (*jack_client_open_fun_def)(const char *client_name, jack_options_t options, jack_status_t *status, ...);
-static jack_client_open_fun_def jack_client_open_fun = 0;
+typedef jack_client_t * (*jack_client_open_aux_fun_def)(const char *client_name, jack_options_t options, jack_status_t *status, va_list ap);
+static jack_client_open_aux_fun_def jack_client_open_aux_fun = 0;
 EXPORT jack_client_t * jack_client_open(const char *client_name, jack_options_t options, jack_status_t *status, ...)
 {
 	// TODO : in "autostart mode", has to load jackdrc file and figure out which server has to be started...
 	jack_log("jack_client_open");
+	
+	/*
+	va_list ap;
+	va_start (ap, status);
+	
+	if (try_start_server(&va, options, status)) {
+        jack_error("jack server is not running or cannot be started");
+        JackLibGlobals::Destroy(); // jack library destruction
+        return 0;
+    }
+	
+	va_end (ap);
+	*/
 	
     // Library check...
     if (!open_library())
@@ -1006,7 +1019,7 @@ EXPORT jack_client_t * jack_client_open(const char *client_name, jack_options_t 
 
     va_list ap;
     va_start(ap, status);
-    jack_client_t* res = (*jack_client_open_fun)(client_name, options, status, ap);
+    jack_client_t* res = (*jack_client_open_aux_fun)(client_name, options, status, ap);
     va_end(ap);
     return res;
 }
@@ -1088,7 +1101,7 @@ static bool check_client(void* library)
 
 	printf("check_library\n");
 
-    // Get "new", "open" and "close" entry points...
+    // Get "new" and "close" entry points...
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
     jack_client_close_fun = (jack_client_close_fun_def)dlsym(library, "jack_client_close");
  
@@ -1144,7 +1157,7 @@ static bool init_library()
     }
 
     // Load entry points...    
-	jack_client_open_fun = (jack_client_open_fun_def)dlsym(gLibrary, "jack_client_open");
+	jack_client_open_aux_fun = (jack_client_open_aux_fun_def)dlsym(gLibrary, "jack_client_open_aux");
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(gLibrary, "jack_client_new");
 	jack_client_close_fun = (jack_client_close_fun_def)dlsym(gLibrary, "jack_client_close");
    	jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(gLibrary, "jack_client_name_size");
