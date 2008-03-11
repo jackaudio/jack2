@@ -26,6 +26,7 @@ Nedko Arnaudov
 	* Correct jack_internal_client_load for wrapper layer.
 	* In thread model, execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished).
 	* Correct jack_port_get_connections function (should return NULL when no connections).
+	* Start client RT thread only if a thread routine or callback has been setup with jack_set_process_callback or jack_set_process_thread.
 
 2008-03-10 Stephane Letz  <letz@grame.fr>
 		

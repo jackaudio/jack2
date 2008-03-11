@@ -250,8 +250,9 @@ int JackClient::Activate()
     #endif
     */
 
-    if (StartThread() < 0)
-        return -1;
+	if (fProcess || fThreadFun) 
+		if (StartThread() < 0)
+			return -1;
 
     int result = -1;
     fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
@@ -292,7 +293,8 @@ int JackClient::Deactivate()
     	fThread->Kill();
     #endif
     */
-    fThread->Kill();
+	if (fProcess || fThreadFun) 
+		fThread->Kill();
     return result;
 }
 
