@@ -157,7 +157,8 @@ installwrapper:
 	cd $(prefix)/include &&  [ -d jack ] && mv -f jack tmp_jack || echo "jack headers not found, continue..."
 	install -d $(prefix)/include/jack/
 	cp ../common/jack/*.h $(prefix)/include/jack/
-	cd $(prefix)/$(libdir) && rm -f libjack.so*
+	cd $(prefix)/$(libdir) && rm -f libjack.so
+	cd $(prefix)/$(libdir) && rm -f libjack.so.0
 	cd $(prefix)/$(libdir) && ln -s libjackwrapper.so  libjack.so
 	cd $(prefix)/$(libdir) && ln -s libjackwrapper.so  libjack.so.0
 	#/sbin/ldconfig
