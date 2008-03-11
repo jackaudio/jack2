@@ -224,7 +224,7 @@ static void jack_log(const char *fmt,...)
 	/*
 	va_list ap;
 	va_start(ap, fmt);
-	fprintf(stderr,"Jack: ");
+	f//printf(stderr,"Jack: ");
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr,"\n");
 	va_end(ap);
@@ -719,7 +719,7 @@ typedef void (*jack_set_error_function_fun_def)(void (*func)(const char *));
 static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
 EXPORT void jack_set_error_function(void (*func)(const char *))
 {
-	jack_log("jack_set_error_function\n");
+	jack_log("jack_set_error_function");
 	if (gLibrary) {
 		(*jack_set_error_function_fun)(func);
 	} else {
@@ -731,7 +731,7 @@ typedef void (*jack_set_info_function_fun_def)(void (*func)(const char *));
 static jack_set_info_function_fun_def jack_set_info_function_fun = 0;
 EXPORT void jack_set_info_function(void (*func)(const char *))
 {
-	jack_log("jack_set_info_function\n");
+	jack_log("jack_set_info_function");
 	if (gLibrary) {
 		(*jack_set_error_function_fun)(func);
 	} else {
@@ -1049,7 +1049,7 @@ EXPORT int jack_client_close(jack_client_t *client)
 // Library loader
 static bool get_jack_library_in_directory(const char* dir_name, const char* library_name, char* library_res_name)
 {
-	printf("get_jack_library_in_directory\n");
+	jack_log("get_jack_library_in_directory");
 
     struct dirent * dir_entry;
     DIR * dir_stream = opendir(dir_name);
@@ -1058,7 +1058,7 @@ static bool get_jack_library_in_directory(const char* dir_name, const char* libr
 
     while ((dir_entry = readdir(dir_stream))) {
         if (strncmp(library_name, dir_entry->d_name, strlen(library_name)) == 0) {
-			printf("found\n");
+			jack_log("found");
         	sprintf(library_res_name, "%s/%s", dir_name, dir_entry->d_name);
             closedir(dir_stream);
             return true;
@@ -1079,7 +1079,7 @@ static bool get_jack_library(const char* library_name, char* library_res_name)
 
 static bool open_library()
 {
-	printf("open_library %ld \n", gInitedLib);
+	jack_log("open_library %ld", gInitedLib);
     if (!gInitedLib) 
         gInitedLib = init_library();
 	return gInitedLib;
@@ -1087,7 +1087,7 @@ static bool open_library()
 
 static void close_library()
 {
-	printf("close_library\n");
+	jack_log("close_library");
     if (gInitedLib) {
         dlclose(gLibrary);
 		gLibrary = 0;
@@ -1099,7 +1099,7 @@ static bool check_client(void* library)
 {
     jack_client_t* client = 0;
 
-	printf("check_library\n");
+	jack_log("check_library");
 
     // Get "new" and "close" entry points...
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
@@ -1107,12 +1107,12 @@ static bool check_client(void* library)
  
     // Try opening a client...
     if ((client = (*jack_client_new_fun)("dummy"))) { // server is running....
-		printf("check_library 1  %x\n", jack_client_close_fun);
+		jack_log("check_library 1  %x", jack_client_close_fun);
         (*jack_client_close_fun)(client);
-		printf("check_library 2\n");
+		jack_log("check_library 2");
         return true;
     } else {
-		printf("check_library NO\n");
+		jack_log("check_library NO");
         return false;
     }
 }
@@ -1125,14 +1125,14 @@ static bool init_library()
 
     if (jackLibrary) {
 
-		printf("jackLibrary\n");
+		jack_log("jackLibrary");
 
         if (check_client(jackLibrary)) { // jackd is running...
-			printf("jackd is running\n");
+			jack_log("jackd is running");
             gLibrary = jackLibrary;
             if (jackmpLibrary) 
 				dlclose(jackmpLibrary);
-			printf("jackd is running OK\n");
+			jack_log("jackd is running OK");
         } else if (check_client(jackmpLibrary)) { // jackdmp is running...
             gLibrary = jackmpLibrary;
             if (jackLibrary) 
@@ -1143,7 +1143,7 @@ static bool init_library()
 
     } else if (jackmpLibrary) {
 
-		printf("jackmpLibrary\n");
+		jack_log("jackmpLibrary");
 
         if (check_client(jackmpLibrary)) { // jackd is running...
             gLibrary = jackmpLibrary;
@@ -1152,7 +1152,7 @@ static bool init_library()
         }
 
     } else {
-        printf("Jack libraries not found, failure...\n");
+        jack_log("Jack libraries not found, failure...");
         goto error;
     }
 
@@ -1257,7 +1257,7 @@ static bool init_library()
 	if (info_fun)
 		jack_set_info_function_fun(info_fun);
 
-	printf("init_library OK\n");
+	jack_log("init_library OK");
     return true;
 
 error:
