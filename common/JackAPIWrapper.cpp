@@ -914,7 +914,7 @@ static jack_reset_max_delayed_usecs_fun_def jack_reset_max_delayed_usecs_fun = 0
 EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 {
 	jack_log("jack_reset_max_delayed_usecs");
-    (*jack_reset_max_delayed_usecs)(ext_client);
+    (*jack_reset_max_delayed_usecs_fun)(ext_client);
 }
 
 // thread.h
