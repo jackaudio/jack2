@@ -342,6 +342,9 @@ int JackClient::StartThread()
 bool JackClient::Execute()
 {
     if (fThreadFun) {
+		// Execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished)
+		WaitSync();
+		SignalSync();
         fThreadFun(fThreadFunArg);
     } else {
         if (WaitFirstSync())
@@ -404,18 +407,6 @@ jack_nframes_t JackClient::CycleWait()
         return Error();
     CallSyncCallback();
     return GetEngineControl()->fBufferSize;
-}
-
-int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
-{
-    if (IsActive()) {
-        jack_error("You cannot set callbacks on an active client");
-        return -1;
-    } else {
-        fThreadFun = fun;
-        fThreadFunArg = arg;
-        return 0;
-    }
 }
 
 void JackClient::CycleSignal(int status)
@@ -803,7 +794,10 @@ int JackClient::SetProcessCallback(JackProcessCallback callback, void *arg)
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
         return -1;
-    } else {
+    } else if (fThreadFun) {
+		jack_error ("A thread callback has already been setup, both models cannot be used at the same time!");
+		return -1;
+	} else {
         fProcessArg = arg;
         fProcess = callback;
         return 0;
@@ -914,6 +908,21 @@ int JackClient::SetPortConnectCallback(JackPortConnectCallback callback, void *a
         GetClientControl()->fCallback[kPortDisconnectCallback] = (callback != NULL);
         fPortConnectArg = arg;
         fPortConnect = callback;
+        return 0;
+    }
+}
+
+int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else if (fProcess) {
+		jack_error ("A process callback has already been setup, both models cannot be used at the same time!");
+		return -1;
+	} else {
+        fThreadFun = fun;
+        fThreadFunArg = arg;
         return 0;
     }
 }

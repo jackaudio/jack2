@@ -1106,7 +1106,7 @@ static bool check_client(void* library)
     jack_client_close_fun = (jack_client_close_fun_def)dlsym(library, "jack_client_close");
  
     // Try opening a client...
-    if ((client = (*jack_client_new_fun)("dummy"))) { // jackd server is running....
+    if ((client = (*jack_client_new_fun)("dummy"))) { // server is running....
 		printf("check_library 1  %x\n", jack_client_close_fun);
         (*jack_client_close_fun)(client);
 		printf("check_library 2\n");
@@ -1167,7 +1167,6 @@ static bool init_library()
 	jack_is_realtime_fun = (jack_is_realtime_fun_def)dlsym(gLibrary, "jack_is_realtime");
     jack_on_shutdown_fun = (jack_on_shutdown_fun_def)dlsym(gLibrary, "jack_on_shutdown");
     jack_set_process_callback_fun = (jack_set_process_callback_fun_def)dlsym(gLibrary, "jack_set_process_callback");
-	
 	jack_set_thread_init_callback_fun = (jack_set_thread_init_callback_fun_def)dlsym(gLibrary, "jack_set_thread_init_callback");
     jack_set_freewheel_callback_fun = (jack_set_freewheel_callback_fun_def)dlsym(gLibrary, "jack_set_freewheel_callback");
     jack_set_freewheel_fun = (jack_set_freewheel_fun_def)dlsym(gLibrary, "jack_set_freewheel");

@@ -24,6 +24,7 @@ Nedko Arnaudov
 	* Fix engine real-time notification (was broken since ??).
 	* Correct jack_client_open_aux, jack_client_open and jack_client_new.
 	* Correct jack_internal_client_load for wrapper layer.
+	* In thread model, execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished).
 
 2008-03-10 Stephane Letz  <letz@grame.fr>
 		
