@@ -704,7 +704,12 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 
-    return res;
+	if (res[0]) {	// at least one connection
+		return res;
+	} else {		// empty array, should return NULL
+		free(res);
+		return NULL;
+	}
 }
 
 // Client
