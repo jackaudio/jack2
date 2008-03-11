@@ -972,14 +972,14 @@ EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, c
     return (*jack_internal_client_handle_fun)(ext_client, client_name, status);
 }
 
-typedef jack_intclient_t (*jack_internal_client_load_fun_def)(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...);
-static jack_internal_client_load_fun_def jack_internal_client_load_fun = 0;
+typedef jack_intclient_t (*jack_internal_client_load_aux_fun_def)(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, va_list ap);
+static jack_internal_client_load_aux_fun_def jack_internal_client_load_aux_fun = 0;
 EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
 {
 	jack_log("jack_internal_client_load");
     va_list ap;
     va_start(ap, status);
-    jack_intclient_t res =  (*jack_internal_client_load_fun)(ext_client, client_name, options, status, ap);
+    jack_intclient_t res =  (*jack_internal_client_load_aux_fun)(ext_client, client_name, options, status, ap);
     va_end(ap);
     return res;
 }
@@ -1249,7 +1249,7 @@ static bool init_library()
     jack_drop_real_time_scheduling_fun = (jack_drop_real_time_scheduling_fun_def)dlsym(gLibrary, "jack_drop_real_time_scheduling");
     jack_get_internal_client_name_fun = (jack_get_internal_client_name_fun_def)dlsym(gLibrary, "jack_get_internal_client_name");
     jack_internal_client_handle_fun = (jack_internal_client_handle_fun_def)dlsym(gLibrary, "jack_internal_client_handle");
-    jack_internal_client_load_fun = (jack_internal_client_load_fun_def)dlsym(gLibrary, "jack_internal_client_load");
+    jack_internal_client_load_aux_fun = (jack_internal_client_load_aux_fun_def)dlsym(gLibrary, "jack_internal_client_load_aux");
     jack_internal_client_unload_fun = (jack_internal_client_unload_fun_def)dlsym(gLibrary, "jack_internal_client_unload");
 	
 	// Functions were kept...

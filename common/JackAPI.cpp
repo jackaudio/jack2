@@ -50,7 +50,7 @@ extern "C"
 
 	EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
-            jack_status_t *status, ...);
+            jack_status_t *status, va_list ap);
 	EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
@@ -215,6 +215,11 @@ extern "C"
             const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
+	EXPORT jack_intclient_t jack_internal_client_load_aux (jack_client_t *client,
+            const char *client_name,
+            jack_options_t options,
+            jack_status_t *status, va_list ap);
+
     EXPORT jack_status_t jack_internal_client_unload (jack_client_t *client,
             jack_intclient_t intclient);
 
@@ -1591,7 +1596,7 @@ EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, c
     }
 }
 
-EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, ...)
+EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client, const char* client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
@@ -1601,7 +1606,6 @@ EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, con
         jack_error("jack_internal_client_load called with a NULL client");
         return 0;
     } else {
-        va_list ap;
         jack_varargs_t va;
         jack_status_t my_status;
 
@@ -1617,12 +1621,18 @@ EXPORT jack_intclient_t jack_internal_client_load(jack_client_t* ext_client, con
         }
 
         /* parse variable arguments */
-        va_start(ap, status);
         jack_varargs_parse(options, ap, &va);
-        va_end(ap);
-
         return client->InternalClientLoad(client_name, options, status, &va);
     }
+}
+
+EXPORT jack_intclient_t jack_internal_client_load(jack_client_t *client, const char *client_name, jack_options_t options, jack_status_t *status, ...)
+{
+	va_list ap;
+    va_start(ap, status);
+	jack_intclient_t res = jack_internal_client_load_aux(client, client_name, options, status, ap);
+    va_end(ap);
+    return res;
 }
 
 EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack_intclient_t intclient)
