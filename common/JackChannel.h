@@ -201,7 +201,7 @@ class JackServerNotifyChannelInterface
         virtual void Close()
         {}
 
-        virtual void ClientNotify(int refnum, int notify, int value1, int value2)
+        virtual void ClientNotify(int refnum, int notify, int value)
         {}
 
 };
