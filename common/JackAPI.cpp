@@ -167,6 +167,7 @@ extern "C"
     EXPORT float jack_cpu_load (jack_client_t *client);
     EXPORT pthread_t jack_client_thread_id (jack_client_t *);
     EXPORT void jack_set_error_function (void (*func)(const char *));
+	EXPORT void jack_set_info_function (void (*func)(const char *));
 
     EXPORT float jack_get_max_delayed_usecs (jack_client_t *client);
     EXPORT float jack_get_xrun_delayed_usecs (jack_client_t *client);
@@ -255,6 +256,11 @@ static inline void WaitGraphChange()
 EXPORT void jack_set_error_function (void (*func)(const char *))
 {
     jack_error_callback = func;
+}
+
+EXPORT void jack_set_info_function (void (*func)(const char *))
+{
+    jack_info_callback = func;
 }
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)

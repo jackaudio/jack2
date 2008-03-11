@@ -144,10 +144,9 @@ extern "C"
     EXPORT jack_nframes_t jack_last_frame_time (const jack_client_t *client);
     EXPORT float jack_cpu_load (jack_client_t *client);
     EXPORT pthread_t jack_client_thread_id (jack_client_t *);
-   // EXPORT void jack_set_error_function (void (*func)(const char *));
-	typedef void (*error_callback)(const char *msg);
-	EXPORT void jack_set_error_function (error_callback fun);
-
+    EXPORT void jack_set_error_function (void (*func)(const char *));
+	EXPORT void jack_set_info_function (void (*func)(const char *));
+	
     EXPORT float jack_get_max_delayed_usecs (jack_client_t *client);
     EXPORT float jack_get_xrun_delayed_usecs (jack_client_t *client);
     EXPORT void jack_reset_max_delayed_usecs (jack_client_t *client);
@@ -209,6 +208,13 @@ extern "C"
 
 #define JACK_LIB "libjack.so.0.0"
 #define JACKMP_LIB "libjackmp.so"
+
+// client
+static bool gInitedLib = false;
+static void* gLibrary = 0;
+static bool init_library();
+static bool open_library();
+static void close_library();
 
 static void jack_log(const char *fmt,...)
 {
@@ -708,11 +714,24 @@ EXPORT pthread_t  jack_client_thread_id(jack_client_t* ext_client)
 
 typedef void (*jack_set_error_function_fun_def)(void (*func)(const char *));
 static jack_set_error_function_fun_def jack_set_error_function_fun = 0;
-//EXPORT void jack_set_error_function(void (*func)(const char *) error_fun)
-EXPORT void jack_set_error_function(error_callback fun)
+EXPORT void jack_set_error_function(void (*func)(const char *))
 {
 	jack_log("jack_set_error_function\n");
-	(*jack_set_error_function_fun)(fun);
+	 // Library check...
+    if (!open_library())  // hum...
+        return;
+	(*jack_set_error_function_fun)(func);
+}
+
+typedef void (*jack_set_info_function_fun_def)(void (*func)(const char *));
+static jack_set_info_function_fun_def jack_set_info_function_fun = 0;
+EXPORT void jack_set_info_function(void (*func)(const char *))
+{
+	jack_log("jack_set_info_function\n");
+	 // Library check...
+    if (!open_library()) // hum...
+        return;
+	(*jack_set_info_function_fun)(func);
 }
 
 typedef char* (*jack_get_client_name_fun_def)(jack_client_t* ext_client);
@@ -968,12 +987,6 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
     return (*jack_internal_client_unload_fun)(ext_client, intclient);
 }
 
-// client
-static bool gInitedLib = false;
-static void* gLibrary = 0;
-static bool init_library();
-static bool open_library();
-static void close_library();
 
 typedef jack_client_t * (*jack_client_open_fun_def)(const char *client_name, jack_options_t options, jack_status_t *status, ...);
 static jack_client_open_fun_def jack_client_open_fun = 0;
@@ -1197,6 +1210,7 @@ static bool init_library()
     jack_cpu_load_fun = (jack_cpu_load_fun_def)dlsym(gLibrary, "jack_cpu_load");
     jack_client_thread_id_fun = (jack_client_thread_id_fun_def)dlsym(gLibrary, "jack_client_thread_id");
 	jack_set_error_function_fun = (jack_set_error_function_fun_def)dlsym(gLibrary, "jack_set_error_function");
+	jack_set_info_function_fun = (jack_set_info_function_fun_def)dlsym(gLibrary, "jack_set_info_function");
 	jack_get_max_delayed_usecs_fun = (jack_get_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_max_delayed_usecs");
     jack_get_xrun_delayed_usecs_fun = (jack_get_xrun_delayed_usecs_fun_def)dlsym(gLibrary, "jack_get_xrun_delayed_usecs");
     jack_reset_max_delayed_usecs_fun = (jack_reset_max_delayed_usecs_fun_def)dlsym(gLibrary, "jack_reset_max_delayed_usecs");
