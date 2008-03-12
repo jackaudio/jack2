@@ -5719,7 +5719,7 @@
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
-					Jackdmp,
+					Jackservermp,
 					"-framework",
 					CoreAudio,
 					"-framework",
