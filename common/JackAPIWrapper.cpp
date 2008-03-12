@@ -17,6 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#ifndef JACK_LOCATION
+#include "config.h"
+#endif
+
 #include "types.h"
 #include "jack.h"
 #include "JackExports.h"
