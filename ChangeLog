@@ -23,6 +23,7 @@ Nedko Arnaudov
 		
 	* Marc-Olivier Barre library related scons patch.
 	* Nedko Arnaudov FULL_MIMIC patch.
+	* Automatic server launch in wrapper layer.
 
 2008-03-11 Stephane Letz  <letz@grame.fr>
 		

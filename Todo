@@ -3,7 +3,7 @@
 ---------------------
 
 
-2008-03-12 : Do not start the client RT thread if no callback or thread routine has been setup (no use of jack_set_process_callback or jack_set_process_thread). This require change in the server to avoid signaling the client in this case.
+2008-03-12 : Do not start the client RT thread if no callback or thread routine has been setup (no use of jack_set_process_callback or jack_set_process_thread). This require change in the server to avoid signaling the client in this case. Check direct access from server internal clients (see comment in JackInternalClient::JackInternalClient() in JackInternalClient.cpp)
 
 2008-02-07 : Pipelining idea:
 

@@ -56,6 +56,11 @@ JackSynchro** GetSynchroTable()
 JackInternalClient::JackInternalClient(JackServer* server, JackSynchro** table): JackClient(table)
 {
     fClientControl = new JackClientControl();
+	/*
+	TODO: here we use a "direct access" to server internal, which is not safe if library clients access the server using 
+	the "command thread" at the same time. So using the "command thread" also for internal clients would be safer.
+	We may want to keep the "direct access" to server internal mode for "server embeded in client process" kind of use.
+	*/
     fChannel = new JackInternalClientChannel(server);
 }
 
