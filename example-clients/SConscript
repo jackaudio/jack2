@@ -52,16 +52,13 @@ example_libs = {
 # Libraries to link
 extra_libs = {}
 for example_program in example_programs:
-    extra_libs[example_program] = ['jackservermp', 'dl']
+    extra_libs[example_program] = [env['CLIENTLIB']]
 
-# Replace library listing for some special cases
-extra_libs['jack_load'] = ['jackmp']
-extra_libs['jack_unload'] = ['jackmp']
-# TODO: we need to really test for READLINE...
+# TODO: we need to really test for READLINE... pkgconfig ?
 env['HAS_READLINE']=True
 if env['HAS_READLINE']:
-    extra_libs['jack_transport'] = ['readline', 'jackservermp', 'dl']
     example_programs['jack_transport'] = 'transport.c'
+    extra_libs['jack_transport'] = ['readline', env['CLIENTLIB']]
 
 #
 # Build/install section
@@ -75,7 +72,7 @@ if env['BUILD_EXAMPLES']:
         if env['INSTALL_EXAMPLES']:
             clientenv.Install(env['BINDIR'], example_program)
     for example_lib, example_lib_source in example_libs.items():
-        clientenv.SharedLibrary(example_lib, example_lib_source)
-# TODO: Not working yet. Do we even intend to install a test library ?
-#        if env['INSTALL_EXAMPLES']:
-#            clientenv.Install(env['LIBDIR'], example_client_lib)
+        lib = clientenv.SharedLibrary(example_lib, example_lib_source)
+        if clientenv['INSTALL_EXAMPLES']:
+            clientenv.InstallAs(clientenv['LIBDIR'] + '/jackmp/' + example_lib + '.so', lib)
+            clientenv.Alias('install', clientenv['LIBDIR'] + '/jackmp/' + example_lib + '.so')

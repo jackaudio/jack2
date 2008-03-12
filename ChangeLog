@@ -19,6 +19,10 @@ Nedko Arnaudov
   Jackdmp changes log
 ---------------------------
 
+2008-03-12 Stephane Letz  <letz@grame.fr>
+		
+	* Marc-Olivier Barre library related scons patch.
+
 2008-03-11 Stephane Letz  <letz@grame.fr>
 		
 	* Fix engine real-time notification (was broken since ??).

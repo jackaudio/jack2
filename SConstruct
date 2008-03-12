@@ -87,6 +87,11 @@ env = Environment(tools=['default', 'scanreplace', 'pkgconfig', 'doxygen'], tool
 Help('To build jackdmp you can set different options as listed below. You have to specify them only once, scons will save the latest values you set and re-use then. To really undo your settings and return to the factory defaults, remove the .sconsign.dblite and options.cache files from your BUILDDIR directory.')
 Help(opts.GenerateHelpText(env))
 
+# Set the lib names
+env['CLIENTLIB'] = 'jackmp'
+env['SERVERLIB'] = 'jackservermp'
+env['WRAPPERLIB'] = 'jackwrapper'
+
 # make sure the necessary dirs exist
 if not os.path.isdir('cache/' + build_base):
     os.makedirs('cache/' + build_base)

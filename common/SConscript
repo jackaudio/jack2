@@ -39,7 +39,7 @@ env.AppendUnique(LIBS=['rt', 'pthread'])
 env.AppendUnique(CPPPATH=['#/linux','#/macosx'])
 
 # A symlinking command for our libraries' names
-symlinkcmd = 'cd $TARGET.dir && rm -f $TARGET.name && ln -s $SOURCE.name $TARGET.name'
+symlinkcmd = 'ln -nsf $SOURCE.name $TARGET'
 
 # Library names
 clientlib_name = 'jackmp'
@@ -151,18 +151,18 @@ jack_headers = [
 #
 
 # Libraries
-clientlib = env.SharedLibrary(clientlib_name, srcfiles_common_clientlib)
-serverlib = env.SharedLibrary(serverlib_name, srcfiles_common_serverlib)
-wrapperlib = env.SharedLibrary(wrapperlib_name, srcfiles_common_wrapperlib)
+clientlib = env.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
+serverlib = env.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
+wrapperlib = env.SharedLibrary(env['WRAPPERLIB'], srcfiles_common_wrapperlib)
 env.Install( env['LIBDIR'], [clientlib, serverlib, wrapperlib])
 env.Alias('install', env['LIBDIR'])
 
 # Handle the way we name libraries on a POSIX system
 # TODO: this is not quite clean yet. changing the library version is a pain we'll need a nicer loop and a config value somewhere
 if env['PLATFORM'] == 'posix':
-    for lib_name, lib in [(clientlib_name, clientlib), (serverlib_name, serverlib), (wrapperlib_name, wrapperlib)]:
-        env.Command('lib' + lib_name + '.so.0', lib, symlinkcmd)
-        env.Command('lib' + lib_name + '.so', 'lib'+lib_name+'.so.0', symlinkcmd)
+    for lib_name, lib in [(env['CLIENTLIB'], clientlib), (env['SERVERLIB'], serverlib), (env['WRAPPERLIB'], wrapperlib)]:
+        env.Command('#/common/lib' + lib_name + '.so.0', lib, symlinkcmd)
+        env.Command('#/common/lib' + lib_name + '.so', '#/common/lib'+lib_name+'.so.0', symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.0', env['LIBDIR'] + '/lib' + lib_name + '.so.0.0', symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.0', symlinkcmd)
         env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.0')

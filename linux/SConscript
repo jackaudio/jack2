@@ -25,7 +25,7 @@ from string import Template
 Import( 'env' )
 
 # paths where include files can be found
-env.AppendUnique( CPPPATH=["#/", "#/common", "#/common/jack", "#/linux"] )
+env.AppendUnique( CPPPATH=['#/', '#/common', '#/common/jack', '#/linux'] )
 
 #
 # Define the source files
@@ -56,28 +56,28 @@ srcfiles_linux_dummy = ['#/common/JackDummyDriver.cpp']
 # build the server and its backends
 serverenv = env.Copy()
 serverenv.PrependUnique( LIBPATH=env['build_base'] )
-serverenv.PrependUnique( LIBS=["jackservermp", "dl"] )
+serverenv.PrependUnique( LIBS=[env['SERVERLIB'], 'dl'] )
 
-server = serverenv.Program("jackdmp", srcfiles_linux_server)
+server = serverenv.Program('jackdmp', srcfiles_linux_server)
 serverenv.Install( env['BINDIR'], server )
 
-drv = serverenv.SharedLibrary( "jack_dummy", srcfiles_linux_dummy )
-serverenv.InstallAs( env['LIBDIR']+ "/jackmp/jack_dummy.so", drv )
+drv = serverenv.SharedLibrary( 'jack_dummy', srcfiles_linux_dummy )
+serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_dummy.so', drv )
 
 if env['ENABLE_ALSA']:
     if not env.GetOption('clean'):
         serverenv.MergeFlags( env['ALSA_FLAGS'] )
-    drv = serverenv.SharedLibrary( "jack_alsa", srcfiles_linux_alsa )
-    serverenv.InstallAs( env['LIBDIR']+ "/jackmp/jack_alsa.so", drv )
+    drv = serverenv.SharedLibrary( 'jack_alsa', srcfiles_linux_alsa )
+    serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_alsa.so', drv )
 
 if env['ENABLE_FREEBOB']:
     if not env.GetOption('clean'):
         serverenv.MergeFlags( env['FREEBOB_FLAGS'] )
-    drv = serverenv.SharedLibrary( "jack_freebob", srcfiles_linux_freebob )
-    serverenv.InstallAs( env['LIBDIR']+ "/jackmp/jack_freebob.so", drv )
+    drv = serverenv.SharedLibrary( 'jack_freebob', srcfiles_linux_freebob )
+    serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_freebob.so', drv )
 
 if env['ENABLE_FIREWIRE']:
     if not env.GetOption('clean'):
         serverenv.MergeFlags( env['FFADO_FLAGS'] )
-    drv = serverenv.SharedLibrary( "jack_firewire", srcfiles_linux_ffado )
-    serverenv.InstallAs( env['LIBDIR']+ "/jackmp/jack_firewire.so", drv )
+    drv = serverenv.SharedLibrary( 'jack_firewire', srcfiles_linux_ffado )
+    serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_firewire.so', drv )

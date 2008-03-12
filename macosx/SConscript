@@ -44,7 +44,7 @@ srcfiles_macosx_dummy = ['#/common/JackDummyDriver.cpp']
 # build the server and its backends
 serverenv = env.Copy()
 serverenv.PrependUnique( LIBPATH=env['build_base'] )
-serverenv.PrependUnique( LIBS=['jackdmp', 'dl'] )
+serverenv.PrependUnique( LIBS=[env['SERVERLIB'], 'dl'] )
 
 server = serverenv.Program('jackdmp', srcfiles_macosx_server)
 serverenv.Install( env['BINDIR'], server )
