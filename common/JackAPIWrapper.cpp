@@ -232,6 +232,18 @@ static void RewriteName(const char* name, char* new_name)
     new_name[i] = '\0';
 }
 
+static void jack_log(const char *fmt,...)
+{
+	/*
+	va_list ap;
+	va_start(ap, fmt);
+	f//printf(stderr,"Jack: ");
+	vfprintf(stderr, fmt, ap);
+	fprintf(stderr,"\n");
+	va_end(ap);
+	*/
+}
+
 /* Exec the JACK server in this process.  Does not return. */
 static void start_server_aux(const char* server_name)
 {
@@ -246,6 +258,8 @@ static void start_server_aux(const char* server_name)
     int i = 0;
     int good = 0;
     int ret;
+	
+	jack_log("start_server_aux");
 
     snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
     fp = fopen(filename, "r");
@@ -318,9 +332,13 @@ static void start_server_aux(const char* server_name)
 
 int start_server(const char* server_name, jack_options_t options)
 {
+	jack_log("start_server 0");
+	
     if ((options & JackNoStartServer) || getenv("JACK_NO_START_SERVER")) {
         return 1;
     }
+	
+	jack_log("start_server 1");
 
     /* The double fork() forces the server to become a child of
      * init, which will always clean up zombie process state on
@@ -347,19 +365,8 @@ int start_server(const char* server_name, jack_options_t options)
     }
 
     /* only the original parent process goes here */
+	sleep(1);
     return 0;			/* (probably) successful */
-}
-
-static void jack_log(const char *fmt,...)
-{
-	/*
-	va_list ap;
-	va_start(ap, fmt);
-	f//printf(stderr,"Jack: ");
-	vfprintf(stderr, fmt, ap);
-	fprintf(stderr,"\n");
-	va_end(ap);
-	*/
 }
 
 // Function definition
@@ -1123,7 +1130,6 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
     return (*jack_internal_client_unload_fun)(ext_client, intclient);
 }
 
-
 typedef jack_client_t * (*jack_client_open_aux_fun_def)(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap);
 static jack_client_open_aux_fun_def jack_client_open_aux_fun = 0;
 EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_options_t options, jack_status_t *status, ...)
@@ -1168,6 +1174,8 @@ EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_option
 		va_end(ap);
 	
 		if (start_server(va.server_name, options)) {
+			int my_status1 = *status | JackFailure | JackServerFailed;
+            *status = (jack_status_t)my_status1;
 			return NULL;
 		} else if (open_library()) {
 			va_list ap;
@@ -1198,9 +1206,13 @@ static jack_client_close_fun_def jack_client_close_fun = 0;
 EXPORT int jack_client_close(jack_client_t *client)
 {
 	jack_log("jack_client_close");
-    int res = (*jack_client_close_fun)(client);
-    close_library();
-    return res;
+	if (client) {
+		int res = (*jack_client_close_fun)(client);
+		close_library();
+		return res;
+	} else {
+		return -1;
+	}
 }
 
 // Library loader
