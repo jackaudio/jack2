@@ -5838,7 +5838,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -5899,7 +5899,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -5952,7 +5952,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -6012,8 +6012,8 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
-				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -6074,8 +6074,8 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
-				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -6128,8 +6128,8 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
-				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9330,7 +9330,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -9389,7 +9389,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -9440,7 +9440,7 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,
@@ -9498,8 +9498,8 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
-				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9558,8 +9558,8 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
-				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -9610,8 +9610,8 @@
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_2)",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_3)",
 				);
-				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local\\\"";
-				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_3 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -11577,6 +11577,12 @@
 				INFOPLIST_FILE = "Jackwrapper-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
+				);
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
+				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackdmp\\\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Carbon,

@@ -256,26 +256,21 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 #endif
 
     int err;
-    /*
     char* driver_dir;
-       if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-    	driver_dir = ADDON_DIR;
-       }
-    */
 
+    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+        // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
+        // for posix systems, it is absolute path of default driver dir
 #ifdef WIN32
-    char* driver_dir = ADDON_DIR;
-    if (strcmp(ADDON_DIR, "") == 0) {
         char temp_driver_dir1[512];
         char temp_driver_dir2[512];
         GetCurrentDirectory(512, temp_driver_dir1);
         sprintf(temp_driver_dir2, "%s/%s", temp_driver_dir1, ADDON_DIR);
         driver_dir = temp_driver_dir2;
-    }
 #else
-    char driver_dir[512];
-    snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/%s/jackmp", ADDON_DIR, LIB_DIR);
+        driver_dir = ADDON_DIR;
 #endif
+    }
 
     filename = (char *)malloc(strlen (driver_dir) + 1 + strlen(sofile) + 1);
     sprintf (filename, "%s/%s", driver_dir, sofile);
@@ -346,7 +341,8 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 
 EXPORT JSList *
 jack_drivers_load (JSList * drivers) {
-    char driver_dir[512];
+    char * driver_dir;
+    char driver_dir_storage[512];
     char dll_filename[512];
     WIN32_FIND_DATA filedata;
     HANDLE file;
@@ -354,9 +350,16 @@ jack_drivers_load (JSList * drivers) {
     JSList * driver_list = NULL;
     jack_driver_desc_t * desc;
 
-    GetCurrentDirectory(512, driver_dir);
+    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+        // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
+        GetCurrentDirectory(512, driver_dir_storage);
+        strcat(driver_dir_storage, "/");
+        strcat(driver_dir_storage, ADDON_DIR);
+        driver_dir = driver_dir_storage;
+    }
 
-    sprintf(dll_filename, "%s/%s", ADDON_DIR, "*.dll");
+    sprintf(dll_filename, "%s/*.dll", driver_dir);
+
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
@@ -400,14 +403,10 @@ jack_drivers_load (JSList * drivers) {
     JSList * driver_list = NULL;
     jack_driver_desc_t * desc;
 
-    /*
     char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
-    driver_dir = ADDON_DIR;
+        driver_dir = ADDON_DIR;
     }
-    */
-    char driver_dir[512];
-    snprintf(driver_dir,  sizeof(driver_dir) - 1, "%s/%s/jackmp", ADDON_DIR, LIB_DIR);
 
     /* search through the driver_dir and add get descriptors
     from the .so files in it */

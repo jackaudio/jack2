@@ -74,5 +74,5 @@ if env['BUILD_EXAMPLES']:
     for example_lib, example_lib_source in example_libs.items():
         lib = clientenv.SharedLibrary(example_lib, example_lib_source)
         if clientenv['INSTALL_EXAMPLES']:
-            clientenv.InstallAs(clientenv['LIBDIR'] + '/jackmp/' + example_lib + '.so', lib)
-            clientenv.Alias('install', clientenv['LIBDIR'] + '/jackmp/' + example_lib + '.so')
+            clientenv.InstallAs(clientenv['ADDON_DIR'] + '/' + example_lib + '.so', lib)
+            clientenv.Alias('install', clientenv['ADDON_DIR'] + '/' + example_lib + '.so')

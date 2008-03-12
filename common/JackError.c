@@ -79,7 +79,7 @@ EXPORT void jack_log(const char *fmt,...)
 static void default_jack_error_callback(const char *desc)
 {
     fprintf(stderr, "%s\n", desc);
-    fflush(stdout);
+    fflush(stderr);
 }
 
 static void default_jack_info_callback (const char *desc)

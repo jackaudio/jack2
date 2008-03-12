@@ -61,6 +61,12 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     JackClient* client;
     char client_name[JACK_CLIENT_NAME_SIZE];
 
+    if (ext_client_name == NULL) {
+        jack_error("jack_client_open called with a NULL client_name");
+        return NULL;
+    }
+ 
+	jack_log("jack_client_open %s", ext_client_name);
     JackTools::RewriteName(ext_client_name, client_name);
 
     if (status == NULL)			/* no status from caller? */
@@ -78,13 +84,7 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     if (ap)
 		jack_varargs_parse(options, ap, &va);
 
-    jack_log("jack_client_open %s", client_name);
-    if (client_name == NULL) {
-        jack_error("jack_client_open called with a NULL client_name");
-        return NULL;
-    }
-
-    JackLibGlobals::Init(); // jack library initialisation
+	JackLibGlobals::Init(); // jack library initialisation
 
 #ifndef WIN32
     if (try_start_server(&va, options, status)) {

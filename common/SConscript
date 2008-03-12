@@ -41,11 +41,6 @@ env.AppendUnique(CPPPATH=['#/linux','#/macosx'])
 # A symlinking command for our libraries' names
 symlinkcmd = 'ln -nsf $SOURCE.name $TARGET'
 
-# Library names
-clientlib_name = 'jackmp'
-serverlib_name = 'jackservermp'
-wrapperlib_name = 'jackwrapper'
-
 #
 # Source files section
 #
@@ -130,10 +125,11 @@ srcfiles_common_clientlib = [
     'JackTools.cpp'
     ]
 
-srcfiles_common_wrapperlib = [
-    'JackAPIWrapper.cpp',
-    'ringbuffer.c'
-    ]
+if not env['FULL_MIMIC']:
+    srcfiles_common_wrapperlib = [
+        'JackAPIWrapper.cpp',
+        'ringbuffer.c'
+        ]
 
 jack_headers = [
     'intclient.h',
@@ -153,14 +149,19 @@ jack_headers = [
 # Libraries
 clientlib = env.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = env.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
-wrapperlib = env.SharedLibrary(env['WRAPPERLIB'], srcfiles_common_wrapperlib)
-env.Install( env['LIBDIR'], [clientlib, serverlib, wrapperlib])
+env.Install( env['LIBDIR'], [clientlib, serverlib])
+if not env['FULL_MIMIC']:
+    wrapperlib = env.SharedLibrary(env['WRAPPERLIB'], srcfiles_common_wrapperlib)
+    env.Install( env['LIBDIR'], [wrapperlib])
 env.Alias('install', env['LIBDIR'])
 
 # Handle the way we name libraries on a POSIX system
 # TODO: this is not quite clean yet. changing the library version is a pain we'll need a nicer loop and a config value somewhere
 if env['PLATFORM'] == 'posix':
-    for lib_name, lib in [(env['CLIENTLIB'], clientlib), (env['SERVERLIB'], serverlib), (env['WRAPPERLIB'], wrapperlib)]:
+    libs = [(env['CLIENTLIB'], clientlib), (env['SERVERLIB'], serverlib)]
+    if not env['FULL_MIMIC']:
+        libs.append((env['WRAPPERLIB'], wrapperlib))
+    for lib_name, lib in libs:
         env.Command('#/common/lib' + lib_name + '.so.0', lib, symlinkcmd)
         env.Command('#/common/lib' + lib_name + '.so', '#/common/lib'+lib_name+'.so.0', symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.0', env['LIBDIR'] + '/lib' + lib_name + '.so.0.0', symlinkcmd)

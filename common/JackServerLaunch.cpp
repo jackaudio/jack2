@@ -114,7 +114,7 @@ static void start_server_aux(const char* server_name)
     fprintf(stderr, "exec of JACK server (command = \"%s\") failed: %s\n", command, strerror(errno));
 }
 
-static int start_server(const char* server_name, jack_options_t options)
+int start_server(const char* server_name, jack_options_t options)
 {
     if ((options & JackNoStartServer) || getenv("JACK_NO_START_SERVER")) {
         return 1;

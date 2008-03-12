@@ -20,6 +20,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "types.h"
 #include "jack.h"
 #include "JackExports.h"
+
+// TODO 
+//#include "varargs.h"
+//#include "JackTools.h"
+//#include "JackConstants.h"
+//#include "JackServerLaunch.h"
+
 #include <dlfcn.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -205,6 +212,9 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+// TODO
+//using namespace Jack;
 
 #define JACK_LIB "libjack.so.0.0"
 #define JACKMP_LIB "libjackmp.so"
@@ -991,35 +1001,64 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 }
 
 
-typedef jack_client_t * (*jack_client_open_aux_fun_def)(const char *client_name, jack_options_t options, jack_status_t *status, va_list ap);
+typedef jack_client_t * (*jack_client_open_aux_fun_def)(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap);
 static jack_client_open_aux_fun_def jack_client_open_aux_fun = 0;
-EXPORT jack_client_t * jack_client_open(const char *client_name, jack_options_t options, jack_status_t *status, ...)
+EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_options_t options, jack_status_t *status, ...)
 {
-	// TODO : in "autostart mode", has to load jackdrc file and figure out which server has to be started...
 	jack_log("jack_client_open");
 	
-	/*
-	va_list ap;
-	va_start (ap, status);
+	// Library check...
+    if (open_library()) {
+        va_list ap;
+		va_start(ap, status);
+		jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
+		va_end(ap);
+		return res;
+	} else {
 	
-	if (try_start_server(&va, options, status)) {
-        jack_error("jack server is not running or cannot be started");
-        JackLibGlobals::Destroy(); // jack library destruction
-        return 0;
-    }
-	
-	va_end (ap);
-	*/
-	
-    // Library check...
-    if (!open_library())
-        return 0;
+		/*
+		jack_varargs_t va;		// variable arguments 
+		jack_status_t my_status;
+		char client_name[JACK_CLIENT_NAME_SIZE];
+		
+		if (ext_client_name == NULL) {
+			jack_log("jack_client_open called with a NULL client_name");
+			return NULL;
+		}
+		
+		JackTools::RewriteName(ext_client_name, client_name);
 
-    va_list ap;
-    va_start(ap, status);
-    jack_client_t* res = (*jack_client_open_aux_fun)(client_name, options, status, ap);
-    va_end(ap);
-    return res;
+		if (status == NULL)			// no status from caller? 
+			status = &my_status;	// use local status word 
+		*status = (jack_status_t)0;
+
+		// validate parameters 
+		if ((options & ~JackOpenOptions)) {
+			int my_status1 = *status | (JackFailure | JackInvalidOption);
+			*status = (jack_status_t)my_status1;
+			return NULL;
+		}
+
+		// parse variable arguments 
+		va_list ap;
+		va_start(ap, status);
+		jack_varargs_parse(options, ap, &va);
+		va_end(ap);
+	
+		if (start_server(va.server_name, options)) {
+			return NULL;
+		} else if (open_library()) {
+			va_list ap;
+			va_start(ap, status);
+			jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
+			va_end(ap);
+			return res;
+		} else {
+			return NULL;
+		}	
+		*/
+		return NULL;
+	}
 }
 
 typedef jack_client_t * (*jack_client_new_fun_def)(const char *client_name);
@@ -1095,7 +1134,7 @@ static bool check_client(void* library)
  
     // Try opening a client...
     if ((client = (*jack_client_new_fun)("dummy"))) { // server is running....
-		jack_log("check_client 1  %x", jack_client_close_fun);
+		jack_log("check_client 1 %x", jack_client_close_fun);
         (*jack_client_close_fun)(client);
 		jack_log("check_client 2");
         return true;

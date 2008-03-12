@@ -35,6 +35,9 @@ srcfiles_linux_server = ['#/common/Jackdmp.cpp']
 
 srcfiles_linux_alsa = [
     'JackAlsaDriver.cpp',
+    'alsa_rawmidi.c',
+    'alsa_seqmidi.c',
+    'alsa_midi_jackmp.cpp',
     'memops.c',
     'generic_hw.c',
     'hdsp.c',
@@ -58,26 +61,28 @@ serverenv = env.Copy()
 serverenv.PrependUnique( LIBPATH=env['build_base'] )
 serverenv.PrependUnique( LIBS=[env['SERVERLIB'], 'dl'] )
 
-server = serverenv.Program('jackdmp', srcfiles_linux_server)
+server = serverenv.Program(env['SERVER'], srcfiles_linux_server)
 serverenv.Install( env['BINDIR'], server )
 
+driver_dir = env['ADDON_DIR'] + "/"
+
 drv = serverenv.SharedLibrary( 'jack_dummy', srcfiles_linux_dummy )
-serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_dummy.so', drv )
+serverenv.InstallAs( driver_dir + "jack_dummy.so", drv )
 
 if env['ENABLE_ALSA']:
     if not env.GetOption('clean'):
         serverenv.MergeFlags( env['ALSA_FLAGS'] )
     drv = serverenv.SharedLibrary( 'jack_alsa', srcfiles_linux_alsa )
-    serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_alsa.so', drv )
+    serverenv.InstallAs( driver_dir + "jack_alsa.so", drv )
 
 if env['ENABLE_FREEBOB']:
     if not env.GetOption('clean'):
         serverenv.MergeFlags( env['FREEBOB_FLAGS'] )
     drv = serverenv.SharedLibrary( 'jack_freebob', srcfiles_linux_freebob )
-    serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_freebob.so', drv )
+    serverenv.InstallAs( driver_dir + "jack_freebob.so", drv )
 
 if env['ENABLE_FIREWIRE']:
     if not env.GetOption('clean'):
         serverenv.MergeFlags( env['FFADO_FLAGS'] )
     drv = serverenv.SharedLibrary( 'jack_firewire', srcfiles_linux_ffado )
-    serverenv.InstallAs( env['LIBDIR'] + '/jackmp/jack_firewire.so', drv )
+    serverenv.InstallAs( driver_dir + "jack_firewire.so", drv )

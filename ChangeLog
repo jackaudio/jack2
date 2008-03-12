@@ -22,6 +22,7 @@ Nedko Arnaudov
 2008-03-12 Stephane Letz  <letz@grame.fr>
 		
 	* Marc-Olivier Barre library related scons patch.
+	* Nedko Arnaudov FULL_MIMIC patch.
 
 2008-03-11 Stephane Letz  <letz@grame.fr>
 		

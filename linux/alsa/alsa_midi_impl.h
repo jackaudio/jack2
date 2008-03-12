@@ -68,7 +68,7 @@ extern "C"
 #if defined(STANDALONE)
 #define MESSAGE(...) fprintf(stderr, __VA_ARGS__)
 #elif defined(JACKMP)
-#define MESSAGE(...) fprintf(stderr, __VA_ARGS__)
+#define MESSAGE(...) fprintf(stderr, __VA_ARGS__) ; fprintf(stderr, "\n")
 #else
 #include <jack/messagebuffer.h>
 #endif

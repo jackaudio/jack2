@@ -59,6 +59,7 @@ opts.AddOptions(
     BoolOption('BUILD_EXAMPLES', 'Build the example clients in their directory', True),
     BoolOption('INSTALL_EXAMPLES', 'Install the example clients in the BINDIR directory', True),
     BoolOption('BUILD_DOXYGEN_DOCS', 'Build doxygen documentation', False),
+    BoolOption('FULL_MIMIC', 'Mimic jack-1.0 installation layout as much as possible', False),
     )
 
 #
@@ -167,15 +168,31 @@ else:
 env.AppendUnique(CCFLAGS = ['-fPIC', '-DSOCKET_RPC_FIFO_SEMA', '-D__SMP__'])
 env.AppendUnique(CFLAGS = ['-fPIC', '-DUSE_POSIX_SHM'])
 
+# used for alsa midi code, probably this define should be removed
+env.AppendUnique(CFLAGS = ['-DJACKMP'])
+env.AppendUnique(CPPFLAGS = ['-DJACKMP'])
+
 env.Alias('install', env['LIBDIR'])
 env.Alias('install', env['INCLUDEDIR'])
 env.Alias('install', env['BINDIR'])
 
+if env['FULL_MIMIC']:
+    env['SERVER'] = 'jackd'
+    env['CLIENTLIB'] = 'jack'
+    env['SERVERLIB'] = 'jackserver'
+    env['WRAPPERLIB'] = 'jackwrapper'
+    env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jack"
+else:
+    env['SERVER'] = 'jackdmp'
+    env['CLIENTLIB'] = 'jackmp'
+    env['SERVERLIB'] = 'jackservermp'
+    env['WRAPPERLIB'] = 'jackwrapper'
+    env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
+
 # for config.h.in
 # TODO: Is that necessary ?
-env['ADDON_DIR']='%s' % env['PREFIX']
 env['LIB_DIR']='lib'
-env['JACK_LOCATION']='%s' % env['BINDIR']
+env['JACK_LOCATION']=env.subst(env['BINDIR'])
 
 # To have the top_srcdir as the doxygen-script is used from auto*
 # TODO: Understand the previous comment
