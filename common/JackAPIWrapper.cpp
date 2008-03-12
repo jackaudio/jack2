@@ -210,9 +210,7 @@ extern "C"
 #define JACKMP_LIB "libjackmp.so"
 
 // client
-static bool gInitedLib = false;
 static void* gLibrary = 0;
-static bool init_library();
 static bool open_library();
 static void close_library();
 
@@ -1077,29 +1075,19 @@ static bool get_jack_library(const char* library_name, char* library_res_name)
     return false;
 }
 
-static bool open_library()
-{
-	jack_log("open_library %ld", gInitedLib);
-    if (!gInitedLib) 
-        gInitedLib = init_library();
-	return gInitedLib;
-}
-
 static void close_library()
 {
 	jack_log("close_library");
-    if (gInitedLib) {
+    if (gLibrary) {
         dlclose(gLibrary);
 		gLibrary = 0;
-		gInitedLib = false;
-    }
+	}
 }
 
 static bool check_client(void* library)
 {
     jack_client_t* client = 0;
-
-	jack_log("check_library");
+	jack_log("check_client");
 
     // Get "new" and "close" entry points...
     jack_client_new_fun = (jack_client_new_fun_def)dlsym(library, "jack_client_new");
@@ -1107,17 +1095,17 @@ static bool check_client(void* library)
  
     // Try opening a client...
     if ((client = (*jack_client_new_fun)("dummy"))) { // server is running....
-		jack_log("check_library 1  %x", jack_client_close_fun);
+		jack_log("check_client 1  %x", jack_client_close_fun);
         (*jack_client_close_fun)(client);
-		jack_log("check_library 2");
+		jack_log("check_client 2");
         return true;
     } else {
-		jack_log("check_library NO");
+		jack_log("check_client NO");
         return false;
     }
 }
 
-static bool init_library()
+static bool open_library()
 {
     char library_res_name[256];
     void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
