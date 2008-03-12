@@ -42,7 +42,7 @@ namespace Jack
 
 JackServer* JackServer::fInstance = NULL;
 
-JackServer::JackServer(bool sync,  bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
 {
     JackGlobals::InitServer();
     for (int i = 0; i < CLIENT_NUM; i++)

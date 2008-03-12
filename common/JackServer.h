@@ -54,8 +54,7 @@ class EXPORT JackServer
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
         JackServerChannelInterface* fChannel;
-        //JackConnectionManager* fConnectionState;
-        JackConnectionManager fConnectionState;
+		JackConnectionManager fConnectionState;
         JackSynchro* fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
         long fLoopback;

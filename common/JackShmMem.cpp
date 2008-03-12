@@ -99,7 +99,7 @@ void LockAllMemory()
     if (CHECK_MLOCKALL()) {
         jack_log("Succeeded in locking all memory");
     } else {
-        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+        jack_error("Cannot lock all memory (%s)", strerror(errno));
     }
 }
 
@@ -108,7 +108,7 @@ void UnlockAllMemory()
     if (CHECK_MUNLOCKALL()) {
         jack_log("Succeeded in unlocking all memory");
     } else {
-        jack_error("Cannot unlock down memory area (%s)", strerror(errno));
+        jack_error("Cannot unlock all memory (%s)", strerror(errno));
     }
 }
 
