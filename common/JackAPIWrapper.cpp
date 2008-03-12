@@ -446,7 +446,7 @@ static jack_port_get_latency_fun_def jack_port_get_latency_fun = 0;
 EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
 {
 	jack_log("jack_port_get_latency");
-    return (*jack_port_get_latency)(port);
+    return (*jack_port_get_latency_fun)(port);
 }
 
 typedef void (*jack_port_set_latency_fun_def)(jack_port_t* port, jack_nframes_t frames);
