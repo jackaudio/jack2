@@ -106,7 +106,7 @@ $(TARGET_LINUX_CLIENT_LIB) : $(objects_common_client_lib) $(objects_linux_lib)
 	$(CXX) $(CXXFLAGS) -shared $(objects_common_client_lib) $(objects_linux_lib) $(LIB_LINUX)  -o $(TARGET_LINUX_CLIENT_LIB)
 
 $(TARGET_LINUX_WRAPPER_LIB) : JackAPIWrapper.o ringbuffer.o
-	$(CXX) $(CXXFLAGS) -shared JackAPIWrapper.o ringbuffer.o -o $(TARGET_LINUX_WRAPPER_LIB)
+	$(CXX) $(CXXFLAGS) -shared JackAPIWrapper.o ringbuffer.o -ldl -o $(TARGET_LINUX_WRAPPER_LIB)
 
 $(TARGET_LINUX_SERVER) : $(objects_linux_server)
 	$(CXX) $(CXXFLAGS)  $(objects_linux_server) $(LIB_LINUX) libjackservermp.so -o $(TARGET_LINUX_SERVER)
