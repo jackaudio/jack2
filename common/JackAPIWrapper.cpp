@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdarg.h>
 #include <stdio.h>
 #include <dirent.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C"
