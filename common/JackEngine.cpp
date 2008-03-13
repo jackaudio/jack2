@@ -748,7 +748,7 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
             for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
                 jack_log("NotifyPortConnect src = %ld dst = %ld false", connections[i], src);
                 NotifyPortConnect(connections[i], src, false);
-                NotifyPortConnect(connections[i], src, false);
+                NotifyPortConnect(src, connections[i], false);
             }
         }
 
