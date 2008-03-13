@@ -1033,7 +1033,12 @@ EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client, jac
     } else {
         WaitGraphChange();
         JackGraphManager* manager = GetGraphManager();
-        return (manager ? manager->GetPort(myport)->GetTotalLatency() : 0);
+        if (manager) {
+            manager->ComputeTotalLatency(myport);
+            return manager->GetPort(myport)->GetTotalLatency();
+        } else {
+            return 0;
+        }
     }
 }
 
