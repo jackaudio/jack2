@@ -222,6 +222,8 @@ static void close_library();
 static void (*error_fun)(const char *) = 0;
 static void (*info_fun)(const char *) = 0;
 
+static bool jack_debug = false;
+
 static void RewriteName(const char* name, char* new_name)
 {
     size_t i;
@@ -236,14 +238,14 @@ static void RewriteName(const char* name, char* new_name)
 
 static void jack_log(const char *fmt, ...)
 {
-    /*
-    va_list ap;
-    va_start(ap, fmt);
-    f//printf(stderr,"Jack: ");
-    vfprintf(stderr, fmt, ap);
-    fprintf(stderr,"\n");
-    va_end(ap);
-    */
+    if (jack_debug) {
+        va_list ap;
+        va_start(ap, fmt);
+        fprintf(stderr,"Jack: ");
+        vfprintf(stderr, fmt, ap);
+        fprintf(stderr,"\n");
+        va_end(ap);
+    }
 }
 
 /* Exec the JACK server in this process.  Does not return. */
@@ -1305,7 +1307,7 @@ static bool check_client(void* library)
         jack_log("check_client 2");
         return true;
     } else {
-        jack_log("check_client NO");
+        jack_log("check_client failure...");
         return false;
     }
 }
@@ -1313,20 +1315,28 @@ static bool check_client(void* library)
 static bool open_library()
 {
     char library_res_name[256];
+    char* jack_debug_var;
+
+    if (!jack_debug_var) {
+        jack_debug_var = getenv("JACK_WRAPPER_DEBUG");
+        if (jack_debug_var && strcmp(jack_debug_var, "on") == 0) 
+            jack_debug = true;
+    }
+
     void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
     void* jackmpLibrary = (get_jack_library(JACKMP_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
 
     if (jackLibrary) {
 
-        jack_log("jackLibrary");
+        jack_log("testjackLibrary");
 
         if (check_client(jackLibrary)) { // jackd is running...
             jack_log("jackd is running");
             gLibrary = jackLibrary;
             if (jackmpLibrary)
                 dlclose(jackmpLibrary);
-            jack_log("jackd is running OK");
-        } else if (check_client(jackmpLibrary)) { // jackdmp is running...
+       } else if (check_client(jackmpLibrary)) { // jackdmp is running...
+            jack_log("jackdmp is running");
             gLibrary = jackmpLibrary;
             if (jackLibrary)
                 dlclose(jackLibrary);
@@ -1336,9 +1346,10 @@ static bool open_library()
 
     } else if (jackmpLibrary) {
 
-        jack_log("jackmpLibrary");
-
+        jack_log("test jackmpLibrary");
+        
         if (check_client(jackmpLibrary)) { // jackd is running...
+            jack_log("jackdmp is running");
             gLibrary = jackmpLibrary;
         } else {
             goto error;
