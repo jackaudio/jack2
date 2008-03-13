@@ -1315,14 +1315,9 @@ static bool check_client(void* library)
 static bool open_library()
 {
     char library_res_name[256];
-    char* jack_debug_var;
-
-    if (!jack_debug_var) {
-        jack_debug_var = getenv("JACK_WRAPPER_DEBUG");
-        if (jack_debug_var && strcmp(jack_debug_var, "on") == 0) 
-            jack_debug = true;
-    }
-
+    char* jack_debug_var = getenv("JACK_WRAPPER_DEBUG");
+    jack_debug = (jack_debug_var && strcmp(jack_debug_var, "on") == 0); 
+ 
     void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
     void* jackmpLibrary = (get_jack_library(JACKMP_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
 
