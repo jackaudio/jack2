@@ -72,8 +72,7 @@ char* JackTools::ServerDir(const char* server_name, char* server_dir)
 }
 
 void JackTools::CleanupFiles(const char* server_name)
-{
-}
+{}
 
 int JackTools::GetTmpdir()
 {

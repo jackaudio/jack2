@@ -48,10 +48,10 @@ extern "C"
 {
 #endif
 
-	EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
+    EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
-	EXPORT jack_client_t * jack_client_open (const char *client_name,
+    EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
     EXPORT jack_client_t * jack_client_new (const char *client_name);
@@ -167,7 +167,7 @@ extern "C"
     EXPORT float jack_cpu_load (jack_client_t *client);
     EXPORT pthread_t jack_client_thread_id (jack_client_t *);
     EXPORT void jack_set_error_function (void (*func)(const char *));
-	EXPORT void jack_set_info_function (void (*func)(const char *));
+    EXPORT void jack_set_info_function (void (*func)(const char *));
 
     EXPORT float jack_get_max_delayed_usecs (jack_client_t *client);
     EXPORT float jack_get_xrun_delayed_usecs (jack_client_t *client);
@@ -215,7 +215,7 @@ extern "C"
             const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-	EXPORT jack_intclient_t jack_internal_client_load_aux (jack_client_t *client,
+    EXPORT jack_intclient_t jack_internal_client_load_aux (jack_client_t *client,
             const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
@@ -274,7 +274,7 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
     int options = JackUseExactName;
     if (getenv("JACK_START_SERVER") == NULL)
         options |= JackNoStartServer;
-	va_list ap;
+    va_list ap;
     return jack_client_open_aux(client_name, (jack_options_t)options, NULL, ap);
 }
 
@@ -1628,9 +1628,9 @@ EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client,
 
 EXPORT jack_intclient_t jack_internal_client_load(jack_client_t *client, const char *client_name, jack_options_t options, jack_status_t *status, ...)
 {
-	va_list ap;
+    va_list ap;
     va_start(ap, status);
-	jack_intclient_t res = jack_internal_client_load_aux(client, client_name, options, status, ap);
+    jack_intclient_t res = jack_internal_client_load_aux(client, client_name, options, status, ap);
     va_end(ap);
     return res;
 }

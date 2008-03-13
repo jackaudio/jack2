@@ -250,9 +250,9 @@ int JackClient::Activate()
     #endif
     */
 
-	//if (fProcess || fThreadFun) 
-		if (StartThread() < 0)
-			return -1;
+    //if (fProcess || fThreadFun)
+    if (StartThread() < 0)
+        return -1;
 
     int result = -1;
     fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
@@ -293,8 +293,8 @@ int JackClient::Deactivate()
     	fThread->Kill();
     #endif
     */
-	//if (fProcess || fThreadFun) 
-		fThread->Kill();
+    //if (fProcess || fThreadFun)
+    fThread->Kill();
     return result;
 }
 
@@ -317,9 +317,9 @@ bool JackClient::Init()
 int JackClient::StartThread()
 {
     jack_log("JackClient::StartThread : period = %ld computation = %ld constraint = %ld",
-            long(int64_t(GetEngineControl()->fPeriod) / 1000.0f),
-            long(int64_t(GetEngineControl()->fComputation) / 1000.0f),
-            long(int64_t(GetEngineControl()->fConstraint) / 1000.0f));
+             long(int64_t(GetEngineControl()->fPeriod) / 1000.0f),
+             long(int64_t(GetEngineControl()->fComputation) / 1000.0f),
+             long(int64_t(GetEngineControl()->fConstraint) / 1000.0f));
 
     // Will do "something" on OSX only...
     fThread->SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
@@ -344,9 +344,9 @@ int JackClient::StartThread()
 bool JackClient::Execute()
 {
     if (fThreadFun) {
-		// Execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished)
-		WaitSync();
-		SignalSync();
+        // Execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished)
+        WaitSync();
+        SignalSync();
         fThreadFun(fThreadFunArg);
     } else {
         if (WaitFirstSync())
@@ -797,9 +797,9 @@ int JackClient::SetProcessCallback(JackProcessCallback callback, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else if (fThreadFun) {
-		jack_error ("A thread callback has already been setup, both models cannot be used at the same time!");
-		return -1;
-	} else {
+        jack_error ("A thread callback has already been setup, both models cannot be used at the same time!");
+        return -1;
+    } else {
         fProcessArg = arg;
         fProcess = callback;
         return 0;
@@ -920,9 +920,9 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else if (fProcess) {
-		jack_error ("A process callback has already been setup, both models cannot be used at the same time!");
-		return -1;
-	} else {
+        jack_error ("A process callback has already been setup, both models cannot be used at the same time!");
+        return -1;
+    } else {
         fThreadFun = fun;
         fThreadFunArg = arg;
         return 0;

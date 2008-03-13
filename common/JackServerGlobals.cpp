@@ -244,7 +244,7 @@ bool JackServerGlobals::Init()
 
         if (driver_nargs == 0) {
             jack_error("No driver specified ... hmm. JACK won't do"
-                    " anything when run like this.");
+                       " anything when run like this.");
             goto error;
         }
 

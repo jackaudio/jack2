@@ -118,7 +118,8 @@ int JackAudioDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        port->SetLatency(fEngineControl->fBufferSize + fPlaybackLatency);
+        // Add more latency if "async" mode is used...
+        port->SetLatency(fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
 

@@ -91,7 +91,7 @@ class JackDebugClient : public JackClient
 
         int PortConnect(const char* src, const char* dst);
         int PortDisconnect(const char* src, const char* dst);
-		int PortDisconnect(jack_port_id_t src);
+        int PortDisconnect(jack_port_id_t src);
 
         int PortIsMine(jack_port_id_t port_index);
 

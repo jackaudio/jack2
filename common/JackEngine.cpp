@@ -555,8 +555,8 @@ int JackEngine::ClientInternalClose(int refnum, bool wait)
 int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wait)
 {
     jack_log("JackEngine::ClientCloseAux ref = %ld name = %s",
-            refnum,
-            (client->GetClientControl()) ? client->GetClientControl()->fName : "No name");
+             refnum,
+             (client->GetClientControl()) ? client->GetClientControl()->fName : "No name");
 
     // Remove the client from the table
     ReleaseRefnum(refnum);

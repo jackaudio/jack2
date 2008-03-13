@@ -275,7 +275,7 @@ int JackGraphManager::ComputeTotalLatencies()
 void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackLock lock (this);
-    jack_log("JackGraphManager::SetBufferSize size = %ld", (long int)buffer_size);
+    jack_log("JackGraphManager::SetBufferSize size = %ld", buffer_size);
 
     jack_port_id_t port_index;
     for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
@@ -704,12 +704,12 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 
-	if (res[0]) {	// at least one connection
-		return res;
-	} else {		// empty array, should return NULL
-		free(res);
-		return NULL;
-	}
+    if (res[0]) {	// at least one connection
+        return res;
+    } else {		// empty array, should return NULL
+        free(res);
+        return NULL;
+    }
 }
 
 // Client

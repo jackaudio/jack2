@@ -86,7 +86,7 @@ extern "C"
         /* JackPositionTimecode fields:	(EXPERIMENTAL: could change) */
         double	frame_time;	/**< current time in seconds */
         double	next_time;	/**< next sequential frame_time
-                        					     (unless repositioned) */
+                                					     (unless repositioned) */
 
         /* For binary compatibility, new fields should be allocated from
          * this padding area with new valid bits controlling access, so

@@ -28,8 +28,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include <iostream>
 
-#define IO_CPU 0
-
 namespace Jack
 {
 
@@ -421,7 +419,7 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int* channe
 }
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
-        : JackAudioDriver(name, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false)
+        : JackAudioDriver(name, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f)
 {}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
@@ -848,17 +846,14 @@ int JackCoreAudioDriver::AddListeners()
         return -1;
     }
 
-#if IO_CPU
     if (!fEngineControl->fSyncMode) {
         UInt32 outSize = sizeof(float);
-        float iousage = 0.5f;
-        err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyIOCycleUsage, outSize, &iousage);
+        err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyIOCycleUsage, outSize, &fIOUsage);
         if (err != noErr) {
             jack_error("Error calling AudioDeviceSetProperty kAudioDevicePropertyIOCycleUsage");
             printError(err);
         }
     }
-#endif
 
     return 0;
 }
@@ -1032,7 +1027,8 @@ int JackCoreAudioDriver::Attach()
 
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        port->SetLatency(fEngineControl->fBufferSize + value1 + value2 + fPlaybackLatency);
+        // Add more latency if "async" mode is used...
+        port->SetLatency(fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency);
         fPlaybackPortList[i] = port_index;
 
         // Monitor ports

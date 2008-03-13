@@ -771,7 +771,8 @@ int JackFreebobDriver::Attach()
                 return -1;
             }
             port = fGraphManager->GetPort(port_index);
-            port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency);
+            // Add one buffer more latency if "async" mode is used...
+            port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency);
             fPlaybackPortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fPlaybackPortList[i] %ld ", port_index);
             driver->playback_nchannels_audio++;

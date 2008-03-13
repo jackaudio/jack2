@@ -155,7 +155,7 @@ int JackMachThread::Kill()
 int JackMachThread::AcquireRealTime()
 {
     jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
-            long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
+             long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
 
     return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
 }

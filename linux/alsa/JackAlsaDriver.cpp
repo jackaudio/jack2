@@ -2145,7 +2145,9 @@ int JackAlsaDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) + alsa_driver->playback_frame_latency);
+        // Add one buffer more latency if "async" mode is used...
+        port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
+                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] %ld ", port_index);
 

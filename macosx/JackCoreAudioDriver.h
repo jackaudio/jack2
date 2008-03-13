@@ -71,6 +71,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         char fPlaybackUID[256];
 
         bool fMonitor;
+        float fIOUsage;
 
         static	OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,

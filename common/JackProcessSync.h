@@ -91,7 +91,7 @@ class JackProcessSync : public JackSyncInterface
             gettimeofday(&T1, 0);
             pthread_mutex_unlock(&fLock);
             jack_log("JackProcessSync::Wait finished delta = %5.1lf",
-                    (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
+                     (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
             return (res == 0);
         }
 
@@ -158,7 +158,7 @@ class JackInterProcessSync : public JackSyncInterface
             bool res = fSynchro->TimedWait(usec);
             gettimeofday(&T1, 0);
             jack_log("JackInterProcessSync::Wait finished delta = %5.1lf",
-                    (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
+                     (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
             return res;
         }
 
