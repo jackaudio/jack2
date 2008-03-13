@@ -582,6 +582,14 @@ EXPORT void jack_cycle_signal(jack_client_t* ext_client, int status)
 	(*jack_cycle_signal_fun)(ext_client, status);
 }
 
+typedef int (*jack_set_process_thread_fun_def)(jack_client_t* ext_client, JackThreadCallback callback, void *arg);
+static jack_set_process_thread_fun_def jack_set_process_thread_fun = 0;
+EXPORT int jack_set_process_thread(jack_client_t* ext_client, JackThreadCallback callback, void *arg)
+{
+	jack_log("jack_set_process_thread");
+    return (*jack_set_process_thread_fun)(ext_client, callback, arg);
+}
+
 typedef jack_nframes_t (*jack_thread_wait_fun_def)(jack_client_t* ext_client, int status);
 static jack_thread_wait_fun_def jack_thread_wait_fun = 0;
 EXPORT jack_nframes_t jack_thread_wait(jack_client_t* ext_client, int status)
@@ -1355,6 +1363,7 @@ static bool open_library()
 	jack_thread_wait_fun = (jack_thread_wait_fun_def)dlsym(gLibrary, "jack_thread_wait");
 	jack_cycle_wait_fun = (jack_cycle_wait_fun_def)dlsym(gLibrary, "jack_cycle_wait");
 	jack_cycle_signal_fun = (jack_cycle_signal_fun_def)dlsym(gLibrary, "jack_cycle_signal");
+	jack_set_process_thread_fun = (jack_set_process_thread_fun_def)dlsym(gLibrary, "jack_set_process_thread");
 	jack_set_thread_init_callback_fun = (jack_set_thread_init_callback_fun_def)dlsym(gLibrary, "jack_set_thread_init_callback");
     jack_set_freewheel_callback_fun = (jack_set_freewheel_callback_fun_def)dlsym(gLibrary, "jack_set_freewheel_callback");
     jack_set_freewheel_fun = (jack_set_freewheel_fun_def)dlsym(gLibrary, "jack_set_freewheel");
