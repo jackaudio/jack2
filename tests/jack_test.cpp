@@ -408,6 +408,35 @@ int process2(jack_nframes_t nframes, void *arg)
     return 0;
 }
 
+// Alternate thread model
+static int _process (jack_nframes_t nframes)
+{
+	jack_default_audio_sample_t *in, *out;
+	in = (jack_default_audio_sample_t *)jack_port_get_buffer (input_port1, nframes);
+	out = (jack_default_audio_sample_t *)jack_port_get_buffer (output_port1, nframes);
+	memcpy (out, in,
+		sizeof (jack_default_audio_sample_t) * nframes);
+	return 0;      
+}
+
+static void* jack_thread(void *arg) 
+{
+	jack_client_t* client = (jack_client_t*) arg;
+	jack_nframes_t last_thread_time = jack_frame_time(client);
+	
+	while (1) {
+		jack_nframes_t frames = jack_cycle_wait (client);
+		jack_nframes_t current_thread_time = jack_frame_time(client);
+		jack_nframes_t delta_time = current_thread_time - last_thread_time;
+		Log("jack_thread : delta_time = %ld\n", delta_time);
+		int status = _process(frames);
+		last_thread_time = current_thread_time;
+		jack_cycle_signal (client, status);
+	}
+	
+	return 0;
+}
+
 // To test callback exiting
 int process3(jack_nframes_t nframes, void *arg)
 {
@@ -424,10 +453,12 @@ int process3(jack_nframes_t nframes, void *arg)
 
 int process4(jack_nframes_t nframes, void *arg)
 {
-	static jack_nframes_t last_time = jack_frame_time((jack_client_t*)arg);
+	jack_client_t* client = (jack_client_t*) arg;
+
+	static jack_nframes_t last_time = jack_frame_time(client);
 	static jack_nframes_t tolerance = (jack_nframes_t)(cur_buffer_size * 0.1f);
 	
-	jack_nframes_t cur_time = jack_frame_time((jack_client_t*)arg);
+	jack_nframes_t cur_time = jack_frame_time(client);
 	jack_nframes_t delta_time = cur_time - last_time;
 	
 	Log("calling process4 callback : jack_frame_time = %ld delta_time = %ld\n", cur_time, delta_time);
@@ -1819,11 +1850,23 @@ int main (int argc, char *argv[])
 	jack_activate(client1);
 	jack_sleep(2 * 1000); 
 	
+	
+	/**
+     * Checking alternate thread model
+    */
+	Log("Testing jack_frame_time...\n");
+	jack_deactivate(client1);
+	jack_set_process_callback(client1, NULL, NULL);  // remove callback
+	jack_set_process_thread(client1, jack_thread, client1);
+	jack_activate(client1);
+	jack_sleep(2 * 1000);
+	
 	/**
      * Checking callback exiting : when the return code is != 0, the client is desactivated.
     */
 	Log("Testing callback exiting...\n");
 	jack_deactivate(client1);
+	jack_set_process_thread(client1, NULL, NULL); // remove thread callback
 	jack_set_process_callback(client1, process3, 0);
 	jack_activate(client1);
 	jack_sleep(3 * 1000); 

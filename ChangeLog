@@ -19,6 +19,10 @@ Nedko Arnaudov
   Jackdmp changes log
 ---------------------------
 
+2008-03-13 Stephane Letz  <letz@grame.fr>
+		
+	* Add test for jack_cycle_wait, jack_cycle_wait and jack_set_process_callback API.
+
 2008-03-12 Stephane Letz  <letz@grame.fr>
 		
 	* Marc-Olivier Barre library related scons patch.
