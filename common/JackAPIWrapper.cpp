@@ -809,9 +809,9 @@ EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* por
     return (*jack_port_by_name_fun)(ext_client, portname);
 }
 
-typedef jack_port_t* (*jack_port_by_id_fun_def)(const jack_client_t* ext_client, jack_port_id_t id);
+typedef jack_port_t* (*jack_port_by_id_fun_def)(jack_client_t* ext_client, jack_port_id_t id);
 static jack_port_by_id_fun_def jack_port_by_id_fun = 0;
-EXPORT jack_port_t* jack_port_by_id(const jack_client_t* ext_client, jack_port_id_t id)
+EXPORT jack_port_t* jack_port_by_id(jack_client_t* ext_client, jack_port_id_t id)
 {
     jack_log("jack_port_by_id");
     return (*jack_port_by_id_fun)(ext_client, id);

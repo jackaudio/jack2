@@ -24,6 +24,8 @@ Nedko Arnaudov
 	* Add test for jack_cycle_wait, jack_cycle_wait and jack_set_process_thread API.
 	* Add jack_set_process_thread in wrapper library.
 	* Correct all backend playback port latency in case of "asynchronous" mode (1 buffer more).
+	* Correct jack_port_get_total_latency.
+	* Correct jack_port_by_id in wrapper library.
 
 2008-03-12 Stephane Letz  <letz@grame.fr>
 		
