@@ -59,6 +59,7 @@ env['HAS_READLINE']=True
 if env['HAS_READLINE']:
     example_programs['jack_transport'] = 'transport.c'
     extra_libs['jack_transport'] = ['readline', env['CLIENTLIB']]
+    extra_libs['jack_transport'] += ['ncurses', env['CLIENTLIB']]
 
 #
 # Build/install section

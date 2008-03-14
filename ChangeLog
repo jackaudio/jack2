@@ -13,11 +13,16 @@ Kjetil S.Matheussen
 Pieter Palmers
 Tim Blechmann
 Marc-Olivier Barre
-Nedko Arnaudov 
+Nedko Arnaudov
+Fernando Lopez-Lezcano
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2008-03-14 Stephane Letz  <letz@grame.fr>
+		
+	* Fernando Lopez-Lezcano scons patch.
 
 2008-03-13 Stephane Letz  <letz@grame.fr>
 		
