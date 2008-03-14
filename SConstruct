@@ -22,6 +22,12 @@
 import os
 from string import Template
 
+JACK_MAJOR_VERSION=2
+JACK_MINOR_VERSION=0
+JACK_MICRO_VERSION=0
+
+JACK_VERSION="%u.%u.%u" % (JACK_MAJOR_VERSION, JACK_MINOR_VERSION, JACK_MICRO_VERSION)
+
 platform = ARGUMENTS.get('OS', str(Platform()))
 
 build_dir = ARGUMENTS.get('BUILDDIR', '')
@@ -87,6 +93,12 @@ env = Environment(tools=['default', 'scanreplace', 'pkgconfig', 'doxygen'], tool
 
 Help('To build jackdmp you can set different options as listed below. You have to specify them only once, scons will save the latest values you set and re-use then. To really undo your settings and return to the factory defaults, remove the .sconsign.dblite and options.cache files from your BUILDDIR directory.')
 Help(opts.GenerateHelpText(env))
+
+# Set version
+env['JACK_MAJOR_VERSION'] = JACK_MAJOR_VERSION
+env['JACK_MINOR_VERSION'] = JACK_MINOR_VERSION
+env['JACK_MICRO_VERSION'] = JACK_MICRO_VERSION
+env['JACK_VERSION'] = JACK_VERSION
 
 # Set the lib names
 env['CLIENTLIB'] = 'jackmp'
@@ -188,6 +200,17 @@ else:
     env['SERVERLIB'] = 'jackservermp'
     env['WRAPPERLIB'] = 'jackwrapper'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
+
+env['PREFIX'] = env.subst(env['PREFIX'])
+env['BINDIR'] = env.subst(env['BINDIR'])
+env['LIBDIR'] = env.subst(env['LIBDIR'])
+env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
+
+env.ScanReplace('jack.pc.in')
+AlwaysBuild('jack.pc')
+pkg_config_dir = env['PREFIX']+"/lib/pkgconfig/"
+env.Install(pkg_config_dir, 'jack.pc')
+env.Alias('install', pkg_config_dir)
 
 # for config.h.in
 # TODO: Is that necessary ?
