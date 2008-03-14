@@ -250,7 +250,6 @@ int JackClient::Activate()
     #endif
     */
 
-    //if (fProcess || fThreadFun)
     if (StartThread() < 0)
         return -1;
 
@@ -293,7 +292,6 @@ int JackClient::Deactivate()
     	fThread->Kill();
     #endif
     */
-    //if (fProcess || fThreadFun)
     fThread->Kill();
     return result;
 }
