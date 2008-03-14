@@ -256,7 +256,7 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 #endif
 
     int err;
-    char* driver_dir;
+    const char* driver_dir;
 
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
@@ -403,7 +403,7 @@ jack_drivers_load (JSList * drivers) {
     JSList * driver_list = NULL;
     jack_driver_desc_t * desc;
 
-    char* driver_dir;
+    const char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         driver_dir = ADDON_DIR;
     }
