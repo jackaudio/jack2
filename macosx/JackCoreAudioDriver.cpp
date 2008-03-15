@@ -846,7 +846,7 @@ int JackCoreAudioDriver::AddListeners()
         return -1;
     }
 
-    if (!fEngineControl->fSyncMode) {
+    if (!fEngineControl->fSyncMode && fIOUsage != 1.f) {
         UInt32 outSize = sizeof(float);
         err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyIOCycleUsage, outSize, &fIOUsage);
         if (err != noErr) {
@@ -879,7 +879,8 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
                               const char* capture_driver_uid,
                               const char* playback_driver_uid,
                               jack_nframes_t capture_latency,
-                              jack_nframes_t playback_latency)
+                              jack_nframes_t playback_latency,
+                              int async_output_latency)
 {
     int in_nChannels = 0;
     int out_nChannels = 0;
@@ -896,6 +897,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
     strcpy(fPlaybackUID, playback_driver_uid);
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
+    fIOUsage = float(async_output_latency)/ 100.f;
 
     if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name) < 0)
         return -1;
@@ -1122,7 +1124,7 @@ extern "C"
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
 
         strcpy(desc->name, "coreaudio");
-        desc->nparams = 13;
+        desc->nparams = 14;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1229,6 +1231,14 @@ extern "C"
         desc->params[i].value.i = TRUE;
         strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "async-latency");
+        desc->params[i].character = 'L';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.i = 100;
+        strcpy(desc->params[i].short_desc, "Extra output latency in aynchronous mode (percent)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;
     }
@@ -1247,6 +1257,7 @@ extern "C"
         const jack_driver_param_t *param;
         jack_nframes_t systemic_input_latency = 0;
         jack_nframes_t systemic_output_latency = 0;
+        int async_output_latency = 100;
 
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t *) node->data;
@@ -1312,6 +1323,10 @@ extern "C"
                 case 'l':
                     Jack::DisplayDeviceNames();
                     break;
+                    
+                case 'L':
+                    async_output_latency = param->value.ui;
+                    break;
             }
         }
 
@@ -1321,8 +1336,9 @@ extern "C"
             playback = TRUE;
         }
 
-        Jack::JackDriverClientInterface* driver = new Jack::JackCoreAudioDriver("coreaudio", engine, table);
-        if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency) == 0) {
+        Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("coreaudio", engine, table);
+        if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_pcm_name, 
+            playback_pcm_name, systemic_input_latency, systemic_output_latency, async_output_latency) == 0) {
             return driver;
         } else {
             delete driver;

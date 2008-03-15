@@ -156,7 +156,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                  const char* capture_driver_name,
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency);
+                 jack_nframes_t playback_latency,
+                 int async_output_latency);
         int Close();
 
         int Attach();

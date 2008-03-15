@@ -22,6 +22,10 @@ Fernando Lopez-Lezcano
 
 2008-03-14 Stephane Letz  <letz@grame.fr>
 		
+	* Add -L (extra output latency in aynchronous mode) in CoreAudio driver.
+
+2008-03-14 Stephane Letz  <letz@grame.fr>
+		
 	* Fernando Lopez-Lezcano scons patch.
 
 2008-03-13 Stephane Letz  <letz@grame.fr>
