@@ -122,10 +122,9 @@ struct JackEngineControl : public JackShmMem
         ClearTimeMeasures();
         ResetRollingUsecs();
         snprintf(fServerName, sizeof(fServerName), server_name);
-        // For OSX thread
         fPeriod = 0;
-        fComputation = 500 * 1000;
-        fConstraint = 500 * 1000;
+        fComputation = 0;
+        fConstraint = 0;
     }
     ~JackEngineControl()
     {}
