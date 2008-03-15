@@ -95,7 +95,7 @@ struct JackEngineControl : public JackShmMem
     int	fRollingInterval;
     float fCPULoad;
 
-    // Fos OSX thread
+    // For OSX thread
     UInt64 fPeriod;
     UInt64 fComputation;
     UInt64 fConstraint;
@@ -122,6 +122,10 @@ struct JackEngineControl : public JackShmMem
         ClearTimeMeasures();
         ResetRollingUsecs();
         snprintf(fServerName, sizeof(fServerName), server_name);
+        // For OSX thread
+        fPeriod = 0;
+        fComputation = 500 * 1000;
+        fConstraint = 500 * 1000;
     }
     ~JackEngineControl()
     {}
