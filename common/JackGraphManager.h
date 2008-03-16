@@ -26,7 +26,6 @@ This program is free software; you can redistribute it and/or modify
 #include "JackConstants.h"
 #include "JackConnectionManager.h"
 #include "JackAtomicState.h"
-#include "JackMutex.h"
 
 namespace Jack
 {
@@ -35,7 +34,7 @@ namespace Jack
 \brief Graph manager: contains the connection manager and the port array.
 */
 
-class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>, public JackLockAble
+class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
 {
 
     private:

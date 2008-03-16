@@ -28,7 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackLoopbackDriver.h"
 #include "JackThreadedDriver.h"
 #include "JackGlobals.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackAudioDriver.h"
 #include "JackChannel.h"
 #include "JackClientControl.h"
@@ -49,7 +49,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
         fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
-    fEngine = new JackEngine(fGraphManager, fSynchroTable, fEngineControl);
+    fEngine = new JackLockedEngine(new JackEngine(fGraphManager, fSynchroTable, fEngineControl));
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver("loopback", fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();

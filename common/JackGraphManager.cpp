@@ -274,7 +274,6 @@ int JackGraphManager::ComputeTotalLatencies()
 // Server
 void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackLock lock (this);
     jack_log("JackGraphManager::SetBufferSize size = %ld", buffer_size);
 
     jack_port_id_t port_index;
@@ -307,7 +306,6 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
 // Server
 jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size)
 {
-    JackLock lock (this);
     JackConnectionManager* manager = WriteNextStateStart();
     jack_port_id_t port_index = AllocatePortAux(refnum, port_name, port_type, flags);
 
@@ -336,7 +334,6 @@ jack_port_id_t JackGraphManager::AllocatePort(int refnum, const char* port_name,
 // Server
 int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
 {
-    JackLock lock (this);
     JackConnectionManager* manager = WriteNextStateStart();
     JackPort* port = GetPort(port_index);
     int res;

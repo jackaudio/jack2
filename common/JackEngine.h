@@ -70,50 +70,52 @@ class JackEngine
 
     public:
 
+        JackEngine()
+        {}
         JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler);
         virtual ~JackEngine();
 
-        int Open();
-        int Close();
+        virtual int Open();
+        virtual int Close();
 
         // Client management
-        int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
-        int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
-        int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
+        virtual int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
+        virtual int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
+        virtual int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
 
-        int ClientExternalClose(int refnum);
-        int ClientInternalClose(int refnum, bool wait);
+        virtual int ClientExternalClose(int refnum);
+        virtual int ClientInternalClose(int refnum, bool wait);
 
-        int ClientActivate(int refnum);
-        int ClientDeactivate(int refnum);
+        virtual int ClientActivate(int refnum);
+        virtual int ClientDeactivate(int refnum);
 
         // Internal client management
-        int GetInternalClientName(int int_ref, char* name_res);
-        int InternalClientHandle(const char* client_name, int* status, int* int_ref);
-        int InternalClientUnload(int refnum, int* status);
+        virtual int GetInternalClientName(int int_ref, char* name_res);
+        virtual int InternalClientHandle(const char* client_name, int* status, int* int_ref);
+        virtual int InternalClientUnload(int refnum, int* status);
 
         // Port management
-        int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index);
-        int PortUnRegister(int refnum, jack_port_id_t port);
+        virtual int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port);
+        virtual int PortUnRegister(int refnum, jack_port_id_t port);
 
-        int PortConnect(int refnum, const char* src, const char* dst);
-        int PortDisconnect(int refnum, const char* src, const char* dst);
+        virtual int PortConnect(int refnum, const char* src, const char* dst);
+        virtual int PortDisconnect(int refnum, const char* src, const char* dst);
 
-        int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
-        int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
+        virtual int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
+        virtual int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
 
         // Graph
-        bool Process(jack_time_t callback_usecs);
+        virtual bool Process(jack_time_t callback_usecs);
 
         // Notifications
-        void NotifyXRun(jack_time_t callback_usecs);
-        void NotifyXRun(int refnum);
-        void NotifyGraphReorder();
-        void NotifyBufferSize(jack_nframes_t nframes);
-        void NotifyFreewheel(bool onoff);
-        void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
-        void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
-        void NotifyActivate(int refnum);
+        virtual void NotifyXRun(jack_time_t callback_usecs);
+        virtual void NotifyXRun(int refnum);
+        virtual void NotifyGraphReorder();
+        virtual void NotifyBufferSize(jack_nframes_t nframes);
+        virtual void NotifyFreewheel(bool onoff);
+        virtual void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
+        virtual void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
+        virtual void NotifyActivate(int refnum);
 };
 
 
