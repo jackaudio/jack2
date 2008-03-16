@@ -42,18 +42,18 @@ class JackAlsaDriver : public JackAudioDriver
         jack_driver_t* fDriver;
         jack_time_t fDelayedUst;
 
-        void alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver);
-        int alsa_driver_check_capabilities (alsa_driver_t *driver);
-        int alsa_driver_check_card_type (alsa_driver_t *driver);
-        int alsa_driver_hammerfall_hardware (alsa_driver_t *driver);
-        int alsa_driver_hdsp_hardware (alsa_driver_t *driver);
-        int alsa_driver_ice1712_hardware (alsa_driver_t *driver);
-        int alsa_driver_usx2y_hardware (alsa_driver_t *driver);
-        int alsa_driver_generic_hardware (alsa_driver_t *driver);
-        int alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitoring,
+        void alsa_driver_release_channel_dependent_memory(alsa_driver_t *driver);
+        int alsa_driver_check_capabilities(alsa_driver_t *driver);
+        int alsa_driver_check_card_type(alsa_driver_t *driver);
+        int alsa_driver_hammerfall_hardware(alsa_driver_t *driver);
+        int alsa_driver_hdsp_hardware(alsa_driver_t *driver);
+        int alsa_driver_ice1712_hardware(alsa_driver_t *driver);
+        int alsa_driver_usx2y_hardware(alsa_driver_t *driver);
+        int alsa_driver_generic_hardware(alsa_driver_t *driver);
+        int alsa_driver_hw_specific(alsa_driver_t *driver, int hw_monitoring,
                                      int hw_metering);
         void alsa_driver_setup_io_function_pointers (alsa_driver_t *driver);
-        int alsa_driver_configure_stream (alsa_driver_t *driver, char *device_name,
+        int alsa_driver_configure_stream(alsa_driver_t *driver, char *device_name,
                                           const char *stream_name,
                                           snd_pcm_t *handle,
                                           snd_pcm_hw_params_t *hw_params,
@@ -62,17 +62,17 @@ class JackAlsaDriver : public JackAudioDriver
                                           unsigned long *nchns,
                                           unsigned long sample_width);
 
-        int alsa_driver_set_parameters (alsa_driver_t *driver,
+        int alsa_driver_set_parameters(alsa_driver_t *driver,
                                         jack_nframes_t frames_per_cycle,
                                         jack_nframes_t user_nperiods,
                                         jack_nframes_t rate);
 
-        int	alsa_driver_reset_parameters (alsa_driver_t *driver,
+        int	alsa_driver_reset_parameters(alsa_driver_t *driver,
                                           jack_nframes_t frames_per_cycle,
                                           jack_nframes_t user_nperiods,
                                           jack_nframes_t rate);
 
-        int alsa_driver_get_channel_addresses (alsa_driver_t *driver,
+        int alsa_driver_get_channel_addresses(alsa_driver_t *driver,
                                                snd_pcm_uframes_t *capture_avail,
                                                snd_pcm_uframes_t *playback_avail,
                                                snd_pcm_uframes_t *capture_offset,
@@ -96,8 +96,7 @@ class JackAlsaDriver : public JackAudioDriver
                                         int shorts_first,
                                         jack_nframes_t capture_latency,
                                         jack_nframes_t playback_latency,
-                                        alsa_midi_t *midi
-                                       );
+                                        alsa_midi_t *midi);
 
         void alsa_driver_delete(alsa_driver_t *driver);
         int alsa_driver_start(alsa_driver_t *driver);
@@ -105,16 +104,16 @@ class JackAlsaDriver : public JackAudioDriver
         int alsa_driver_read(alsa_driver_t *driver, jack_nframes_t nframes);
         int alsa_driver_write(alsa_driver_t *driver, jack_nframes_t nframes);
 
-        jack_nframes_t alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
+        jack_nframes_t alsa_driver_wait(alsa_driver_t *driver, int extra_fd, int *status, float
                                          *delayed_usecs);
 
-        void alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
+        void alsa_driver_silence_untouched_channels(alsa_driver_t *driver,
                 jack_nframes_t nframes);
 
-        int alsa_driver_restart (alsa_driver_t *driver);
-        int alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs);
-        void jack_driver_init (jack_driver_t *driver);
-        void jack_driver_nt_init (jack_driver_nt_t * driver);
+        int alsa_driver_restart(alsa_driver_t *driver);
+        int alsa_driver_xrun_recovery(alsa_driver_t *driver, float *delayed_usecs);
+        void jack_driver_init(jack_driver_t *driver);
+        void jack_driver_nt_init(jack_driver_nt_t * driver);
 
     public:
 
@@ -160,8 +159,8 @@ class JackAlsaDriver : public JackAudioDriver
         int is_realtime() const;
         int create_thread(pthread_t *thread, int prio, int rt, void *(*start_func)(void*), void *arg);
 
-        int port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size);
-        int port_unregister(int port);
+        jack_port_id_t port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size);
+        int port_unregister(jack_port_id_t port_index);
         void* port_get_buffer(int port, jack_nframes_t nframes);
         int port_set_alias(int port, const char* name);
 

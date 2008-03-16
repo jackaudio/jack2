@@ -2349,7 +2349,6 @@ JackAlsaDriver::jack_driver_nt_init (jack_driver_nt_t * driver)
     driver->nt_run_cycle = 0;
 }
 
-
 int JackAlsaDriver::is_realtime() const
 {
     return fEngineControl->fRealTime;
@@ -2360,22 +2359,16 @@ int JackAlsaDriver::create_thread(pthread_t *thread, int priority, int realtime,
     return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
 }
 
-int JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buf_size)
+jack_port_id_t JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size)
 {
-    int port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, port_name, port_type, (JackPortFlags) flags, fEngineControl->fBufferSize);
-    if (port_index != NO_PORT)
-        fEngine->NotifyPortRegistation(port_index, true);
-    return port_index;
+    unsigned int port_index;
+    int res = fEngine->PortRegister(fClientControl->fRefNum, port_name, port_type, flags, buffer_size, &port_index);
+    return (res == 0) ? port_index : 0;
 }
 
-int JackAlsaDriver::port_unregister(int port_index)
+int JackAlsaDriver::port_unregister(jack_port_id_t port_index)
 {
-    if (fGraphManager->ReleasePort(fClientControl->fRefNum, port_index) == 0) {
-        fEngine->NotifyPortRegistation(port_index, false);
-        return 0;
-    } else {
-        return -1;
-    }
+    return fEngine->PortUnRegister(fClientControl->fRefNum, port_index);
 }
 
 void* JackAlsaDriver::port_get_buffer(int port, jack_nframes_t nframes)

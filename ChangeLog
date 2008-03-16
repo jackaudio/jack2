@@ -20,7 +20,11 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
-2008-03-14 Stephane Letz  <letz@grame.fr>
+2008-03-16 Stephane Letz  <letz@grame.fr>
+		
+	* Use engine in JackAlsaDriver::port_register and JackAlsaDriver::port_unregister.
+
+2008-03-15 Stephane Letz  <letz@grame.fr>
 		
 	* Add -L (extra output latency in aynchronous mode) in CoreAudio driver.
 	* RT scheduling for OSX thread (when use in dummy driver).
