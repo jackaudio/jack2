@@ -704,10 +704,8 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
     }
 
     int res = fGraphManager->Connect(src, dst);
-    if (res == 0) {
+    if (res == 0) 
         NotifyPortConnect(src, dst, true);
-        NotifyPortConnect(dst, src, true);
-    }
     return res;
 }
 
@@ -720,7 +718,6 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
         return -1;
     } else if (fGraphManager->Disconnect(port_src, port_dst) == 0) {
         NotifyPortConnect(port_src, port_dst, false);
-        NotifyPortConnect(port_dst, port_src, false);
         return 0;
     } else {
         return -1;
@@ -742,13 +739,11 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
             for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
                 jack_log("NotifyPortConnect src = %ld dst = %ld false", src, connections[i]);
                 NotifyPortConnect(src, connections[i], false);
-                NotifyPortConnect(connections[i], src, false);
             }
         } else {
             for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
                 jack_log("NotifyPortConnect src = %ld dst = %ld false", connections[i], src);
                 NotifyPortConnect(connections[i], src, false);
-                NotifyPortConnect(src, connections[i], false);
             }
         }
 
@@ -758,7 +753,6 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
     } else if (fGraphManager->Disconnect(src, dst) == 0) {
         // Notifications
         NotifyPortConnect(src, dst, false);
-        NotifyPortConnect(dst, src, false);
         return 0;
     } else {
         return -1;
