@@ -65,7 +65,7 @@ CXXFLAGS := -g -O3 -fPIC -DJACKMP -DSOCKET_RPC_FIFO_SEMA -D__SMP__ -DADDON_DIR=\
 
 all : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_DUMMY) \
-        synchroClient synchroServer synchroServerClient testSem jack_test inprocess jack_load jack_unload
+        synchroClient synchroServer synchroServerClient testSem jack_test inprocess jack_load jack_unload jack_control
 
 freebob : $(TARGET_LINUX_SERVER_LIB) $(TARGET_LINUX_CLIENT_LIB) $(TARGET_LINUX_WRAPPER_LIB) \
         $(TARGET_LINUX_SERVER) $(TARGET_LINUX_ALSA) $(TARGET_LINUX_FREEBOB) $(TARGET_LINUX_DUMMY) \
