@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "types.h"
+#include "midiport.h"
 #include "jack.h"
 #include "JackExports.h"
 #include "varargs.h"
@@ -206,6 +207,15 @@ extern "C"
             jack_status_t *status, ...);
     EXPORT jack_client_t * jack_client_new (const char *client_name);
     EXPORT int jack_client_close (jack_client_t *client);
+    
+    // MIDI
+    EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer);
+    EXPORT int jack_midi_event_get(jack_midi_event_t *event, void* port_buffer, jack_nframes_t event_index);
+    EXPORT void jack_midi_clear_buffer(void* port_buffer);
+    EXPORT size_t jack_midi_max_event_size(void* port_buffer);
+    EXPORT jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t  time, size_t data_size);
+    EXPORT int jack_midi_event_write(void* port_buffer, jack_nframes_t time, const jack_midi_data_t *data, size_t data_size);
+    EXPORT jack_nframes_t jack_midi_get_lost_event_count(void *port_buffer);
 
 #ifdef __cplusplus
 }
