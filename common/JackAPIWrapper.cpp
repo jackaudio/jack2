@@ -1261,6 +1261,65 @@ EXPORT int jack_client_close(jack_client_t *client)
     }
 }
 
+// MIDI
+
+typedef jack_nframes_t (*jack_midi_get_event_count_fun_def)(void* port_buffer);
+static jack_midi_get_event_count_fun_def jack_midi_get_event_count_fun = 0;
+EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer)
+{
+    jack_log("jack_midi_get_event_count");
+    return (*jack_midi_get_event_count_fun)(port_buffer);
+}
+
+typedef int (*jack_midi_event_get_fun_def)(void* port_buffer);
+static jack_midi_event_get_fun_def jack_midi_event_get_fun = 0;
+EXPORT int jack_midi_event_get(void* port_buffer)
+{
+    jack_log("jack_midi_get_event_count");
+    return (*jack_midi_event_get_fun)(port_buffer);
+}
+
+typedef void (*jack_midi_clear_buffer_fun_def)(void* port_buffer);
+static jack_midi_clear_buffer_fun_def jack_midi_clear_buffer_fun = 0;
+EXPORT void jack_midi_clear_buffer(void* port_buffer)
+{
+    jack_log("jack_midi_clear_buffer");
+    (*jack_midi_clear_buffer_fun)(port_buffer);
+}
+
+typedef size_t (*jack_midi_max_event_size_fun_def)(void* port_buffer);
+static jack_midi_max_event_size_fun_def jack_midi_max_event_size_fun = 0;
+EXPORT size_t jack_midi_max_event_size(void* port_buffer)
+{
+    jack_log("jack_midi_max_event_size");
+    return (*jack_midi_max_event_size_fun)(port_buffer);
+}
+
+typedef jack_midi_data_t* (*jack_midi_event_reserve_fun_def)(void* port_buffer, jack_nframes_t  time, size_t data_size);
+static jack_midi_event_reserve_fun_def jack_midi_event_reserve_fun = 0;
+EXPORT jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t  time, size_t data_size)
+{
+    jack_log("jack_midi_event_reserve");
+    return (*jack_midi_event_reserve_fun)(port_buffer, time, data_size);
+}
+
+typedef int (*jack_midi_event_write_fun_def)(void* port_buffer, jack_nframes_t time, const jack_midi_data_t *data, size_t data_size);
+static jack_midi_event_write_fun_def jack_midi_event_write_fun = 0;
+EXPORT int jack_midi_event_write(void* port_buffer, jack_nframes_t time, const jack_midi_data_t *data, size_t data_size)
+{
+    jack_log("jack_midi_event_write");
+    return (*jack_midi_event_write_fun)(port_buffer, time, data, data_size);
+}
+
+typedef jack_nframes_t (*jack_midi_get_lost_event_count_fun_def)(void *port_buffer);
+static jack_midi_get_lost_event_count_fun_def jack_midi_get_lost_event_count_fun = 0;
+EXPORT jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer)
+{
+    jack_log("jack_midi_get_lost_event_count");
+    return (*jack_midi_get_lost_event_count_fun)(port_buffer);
+}
+
+
 // Library loader
 static bool get_jack_library_in_directory(const char* dir_name, const char* library_name, char* library_res_name)
 {
@@ -1463,6 +1522,14 @@ static bool open_library()
     jack_internal_client_handle_fun = (jack_internal_client_handle_fun_def)dlsym(gLibrary, "jack_internal_client_handle");
     jack_internal_client_load_aux_fun = (jack_internal_client_load_aux_fun_def)dlsym(gLibrary, "jack_internal_client_load_aux");
     jack_internal_client_unload_fun = (jack_internal_client_unload_fun_def)dlsym(gLibrary, "jack_internal_client_unload");
+    // MIDI
+    jack_midi_get_event_count_fun = (jack_midi_get_event_count_fun_def)dlsym(gLibrary, "jack_midi_get_event_count");
+    jack_midi_event_get_fun = (jack_midi_event_get_fun_def)dlsym(gLibrary, "jack_midi_event_get");
+    jack_midi_clear_buffer_fun = (jack_midi_clear_buffer_fun_def)dlsym(gLibrary, "jack_midi_clear_buffer");
+    jack_midi_max_event_size_fun = (jack_midi_max_event_size_fun_def)dlsym(gLibrary, "jack_midi_max_event_size");
+    jack_midi_event_reserve_fun = (jack_midi_event_reserve_fun_def)dlsym(gLibrary, "jack_midi_event_reserve");
+    jack_midi_event_write_fun = (jack_midi_event_write_fun_def)dlsym(gLibrary, "jack_midi_event_write");
+    jack_midi_get_lost_event_count_fun = (jack_midi_get_lost_event_count_fun_def)dlsym(gLibrary, "jack_midi_get_lost_event_count");
 
     // Functions were kept...
     if (error_fun)

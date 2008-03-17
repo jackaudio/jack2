@@ -24,7 +24,7 @@ Fernando Lopez-Lezcano
 		
 	* New jack_server_control client to test notifications when linked to the server library.
 	* Correct JackClient::Activate so that first kGraphOrderCallback can be received by the client notification thread.
-	* MIDI API in wrapper lib (in progress).
+	* MIDI API in wrapper lib.
 
 2008-03-16 Stephane Letz  <letz@grame.fr>
 		
