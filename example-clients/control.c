@@ -22,17 +22,21 @@ static int Jack_Graph_Order_Callback(void *arg)
     printf("Jack_Graph_Order_Callback count = %ld\n", reorder++);
     
     ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical|JackPortIsOutput);
-	for (i = 0;  ports[i]; ++i) {
-        printf("name: %s\n", ports[i]);
+    if (ports) {
+        for (i = 0;  ports[i]; ++i) {
+            printf("name: %s\n", ports[i]);
+        }
+        free(ports);
     }
-	free(ports);
     
     ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
-	for (i = 0;  ports[i]; ++i) {
-        printf("name: %s\n", ports[i]);
+    if (ports) { 
+        for (i = 0;  ports[i]; ++i) {
+            printf("name: %s\n", ports[i]);
+        }
+        free(ports);
     }
-	free(ports);
-    
+	
     return 0;
 }
 

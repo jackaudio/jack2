@@ -272,10 +272,9 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
     jack_error("jack_client_new: deprecated");
     int options = JackUseExactName;
-    if (getenv("JACK_START_SERVER") == NULL)
+    if (getenv("JACK_START_SERVER") == NULL) 
         options |= JackNoStartServer;
-    va_list ap;
-    return jack_client_open_aux(client_name, (jack_options_t)options, NULL, ap);
+    return jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
 }
 
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)

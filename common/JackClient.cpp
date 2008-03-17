@@ -234,9 +234,10 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 \brief We need to start thread before activating in the server, otherwise the FW driver
 	   connected to the client may not be activated.
 */
+
 int JackClient::Activate()
 {
-    jack_log("JackClient::Activate ");
+    jack_log("JackClient::Activate");
     if (IsActive())
         return 0;
 
@@ -252,20 +253,22 @@ int JackClient::Activate()
 
     if (StartThread() < 0)
         return -1;
-
-    int result = -1;
-    fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
-    if (result < 0)
-        return result;
-
+    
     if (fSync != NULL)		/* If a SyncCallback is pending... */
         SetSyncCallback(fSync, fSyncArg);
 
     if (fTimebase != NULL)	/* If a TimebaseCallback is pending... */
         SetTimebaseCallback(fConditionnal, fTimebase, fTimebaseArg);
-
+        
+    /*
+    Insertion of client in the graph will cause a kGraphOrderCallback notification 
+    to be delivered by the server, the client wants to receive it.
+    */
     GetClientControl()->fActive = true;
-    return 0;
+
+    int result = -1;
+    fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
+    return result;
 }
 
 /*!
@@ -273,7 +276,7 @@ int JackClient::Activate()
 */
 int JackClient::Deactivate()
 {
-    jack_log("JackClient::Deactivate ");
+    jack_log("JackClient::Deactivate");
     if (!IsActive())
         return 0;
 

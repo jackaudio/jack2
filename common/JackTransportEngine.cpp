@@ -111,7 +111,7 @@ void JackTransportEngine::MakeAllStarting(JackClientInterface** table)
         if (client) {
             // Unactive clients don't have their process function called at all, they appear as already "rolling" for the transport....
             client->GetClientControl()->fTransportState = (client->GetClientControl()->fActive) ? JackTransportStarting : JackTransportRolling;
-            jack_log("MakeAllStarting refnum = %ld ", i);
+            jack_log("MakeAllStarting refnum = %ld", i);
         }
     }
     jack_log("MakeAllStarting");

@@ -85,6 +85,8 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     /* parse variable arguments */
     if (ap)
         jack_varargs_parse(options, ap, &va);
+    else
+        jack_varargs_init(&va);
 
     if (!JackServerGlobals::Init()) { // jack server initialisation
         int my_status1 = (JackFailure | JackServerError);

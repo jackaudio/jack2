@@ -20,6 +20,11 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-03-17 Stephane Letz  <letz@grame.fr>
+		
+	* New jack_control client to test notifications when linked to the server library.
+	* Correct JackClient::Activate so that first kGraphOrderCallback can be received by the client notification thread.
+
 2008-03-16 Stephane Letz  <letz@grame.fr>
 		
 	* Use engine in JackAlsaDriver::port_register and JackAlsaDriver::port_unregister.
