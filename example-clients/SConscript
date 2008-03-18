@@ -27,6 +27,9 @@ Import('env')
 # paths where include files can be found
 env.AppendUnique(CPPPATH=['#/', '#/common'])
 
+# A symlinking command
+symlinkcmd = 'ln -nsf $SOURCE.name $TARGET'
+
 #
 # Source files section
 #
@@ -72,6 +75,9 @@ if env['BUILD_EXAMPLES']:
         clientenv.Program(example_program, example_program_source, LIBS=extra_libs[example_program])
         if env['INSTALL_EXAMPLES']:
             clientenv.Install(env['BINDIR'], example_program)
+    jack_disconnect_install_path = env['BINDIR'] + '/jack_disconnect'
+    env.Command(jack_disconnect_install_path, 'jack_connect', symlinkcmd)
+    env.Alias('install', jack_disconnect_install_path)
     for example_lib, example_lib_source in example_libs.items():
         lib = clientenv.SharedLibrary(example_lib, example_lib_source)
         if clientenv['INSTALL_EXAMPLES']:
