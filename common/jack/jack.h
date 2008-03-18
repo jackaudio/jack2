@@ -179,31 +179,51 @@ extern "C"
      * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
      * for more information.
      *
-     * @return 0 on success, otherwise a non-zero error code, causing JACK
-     * to remove that client from the process() graph.
+     * @return 0 on success, otherwise a non-zero error code.
      */
     int jack_set_process_callback (jack_client_t *client,
                                    JackProcessCallback process_callback,
                                    void *arg);
-	/**
-	* Block until this JACK client should process data.
-	* 
-	* The @a status argument typically indicates the result
-	* of some recent data processing.
-	* 
-	* @param client - pointer to a JACK client structure
-	* @param status - if non-zero, calling thread should exit
+    /**
+	* \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
+	*  NEW JACK CLIENTS.
+    *
+    * It should be replace by use of @ jack_thread_wait and @ jack_cycle_wait functions.
 	*
-	* @return the number of frames of data to process
 	*/
 	jack_nframes_t jack_thread_wait (jack_client_t*, int status);
 	
-	// New experimental alternate threading model
+	/**
+	* Wait until this JACK client should process data.
+	* 
+	* @param client - pointer to a JACK client structure
+	*
+	* @return the number of frames of data to process
+	*/
 	jack_nframes_t jack_cycle_wait (jack_client_t* client);
 	
+    /**
+	* Signal next clients in the graph.
+	* 
+	* @param client - pointer to a JACK client structure
+	* @param status - if non-zero, calling thread should exit
+	*/
 	void jack_cycle_signal (jack_client_t* client, int status);
 	
-	int jack_set_process_thread(jack_client_t* client, JackThreadCallback fun, void *arg);
+    /**
+     * Tell the Jack server to call @a thread_callback in the RT thread.
+     * Typical use are in conjunction with @a jack_cycle_wait and @ jack_cycle_signal functions.
+     * The code in the supplied function must be suitable for real-time
+     * execution.  That means that it cannot call functions that might
+     * block for a long time.  This includes malloc, free, printf,
+     * pthread_mutex_lock, sleep, wait, poll, select, pthread_join,
+     * pthread_cond_wait, etc, etc.  See
+     * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
+     * for more information.
+     *
+     * @return 0 on success, otherwise a non-zero error code.
+    */
+	int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_callback, void *arg);
 	
     /**
      * Tell JACK to call @a thread_init_callback once just after

@@ -112,6 +112,15 @@ typedef uint32_t jack_port_id_t;
 typedef int (*JackProcessCallback)(jack_nframes_t nframes, void *arg);
 
 /**
+ * Prototype for the client thread routine called 
+ * by the engine when the client is inserted in the graph.
+ *
+ * @param arg pointer to a client supplied structure
+ *
+ */
+typedef void *(*JackThreadCallback)(void* arg);
+
+/**
  * Prototype for the client supplied function that is called 
  * once after the creation of the thread in which other
  * callbacks will be made. Special thread characteristics
@@ -214,8 +223,6 @@ typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int 
  */
 typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
-
-typedef void *(*JackThreadCallback)(void* arg);
 
 /**
  * Used for the type argument of jack_port_register() for default
