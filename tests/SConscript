@@ -72,7 +72,7 @@ test_programs = {
 # build the tests
 testenv = env.Copy()
 testenv.PrependUnique(LIBPATH=env['build_base'])
-testenv.PrependUnique(LIBS='jackmp')
+testenv.PrependUnique(LIBS=env['CLIENTLIB'])
 
 for test_program, test_program_source in test_programs.items():
     testenv.Program(test_program, test_program_source)
