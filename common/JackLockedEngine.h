@@ -178,7 +178,7 @@ class JackLockedEngine : public JackEngine, public JackLockAble
         void NotifyFreewheel(bool onoff)
         {
             JackLock lock(this);
-            return fEngine->NotifyFreewheel(onoff);
+            fEngine->NotifyFreewheel(onoff);
         }
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
         {
