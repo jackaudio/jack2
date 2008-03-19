@@ -20,6 +20,11 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+
+2008-03-10 Stephane Letz  <letz@grame.fr>
+		
+	* Synchronise transport.h with latest jackd version (Video handling).
+
 2008-03-17 Stephane Letz  <letz@grame.fr>
 		
 	* New jack_server_control client to test notifications when linked to the server library.

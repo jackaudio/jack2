@@ -24,7 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "types.h"
 #include "midiport.h"
 #include "jack.h"
-#include "JackExports.h"
 #include "varargs.h"
 #include "JackConstants.h"
 #include <dlfcn.h>
@@ -33,6 +32,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <dirent.h>
 #include <unistd.h>
 #include <errno.h>
+
+#ifdef WIN32
+#define	EXPORT __declspec(dllexport)
+#else
+#define	EXPORT
+#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -234,7 +239,7 @@ static void (*info_fun)(const char *) = 0;
 
 static bool jack_debug = false;
 
-static void RewriteName(const char* name, char* new_name)
+static void rewrite_name(const char* name, char* new_name)
 {
     size_t i;
     for (i = 0; i < strlen(name); i++) {
@@ -1200,7 +1205,7 @@ EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_option
             return NULL;
         }
 
-        RewriteName(ext_client_name, client_name);
+        rewrite_name(ext_client_name, client_name);
 
         if (status == NULL)			// no status from caller?
             status = &my_status;	// use local status word
