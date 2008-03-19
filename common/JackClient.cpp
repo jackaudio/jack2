@@ -254,11 +254,13 @@ int JackClient::Activate()
     if (StartThread() < 0)
         return -1;
     
-    if (fSync != NULL)		/* If a SyncCallback is pending... */
+    /* seems just useless
+    if (fSync != NULL)		// If a SyncCallback is pending... 
         SetSyncCallback(fSync, fSyncArg);
 
-    if (fTimebase != NULL)	/* If a TimebaseCallback is pending... */
+    if (fTimebase != NULL)	// If a TimebaseCallback is pending... 
         SetTimebaseCallback(fConditionnal, fTimebase, fTimebaseArg);
+    */
         
     /*
     Insertion of client in the graph will cause a kGraphOrderCallback notification 
@@ -627,6 +629,7 @@ int JackClient::SetSyncTimeout(jack_time_t timeout)
 }
 
 /* Call the server if the client is active, otherwise keeps the arguments */
+/*
 int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
     if (IsActive()) {
@@ -648,6 +651,22 @@ int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timeba
         fConditionnal = conditional;
         return 0;
     }
+}
+*/
+
+int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
+{
+    int result = -1;
+    fChannel->SetTimebaseCallback(GetClientControl()->fRefNum, conditional, &result);
+    jack_log("SetTimebaseCallback result = %ld", result);
+    if (result == 0) {
+        fTimebase = timebase_callback;
+        fTimebaseArg = arg;
+    } else {
+        fTimebase = NULL;
+        fTimebaseArg = NULL;
+    }
+    return result;
 }
 
 // Must be RT safe
@@ -755,7 +774,7 @@ void JackClient::CallTimebaseCallback()
 {
     JackTransportEngine& transport = GetEngineControl()->fTransport;
 
-    if (fTimebase != NULL && fTimebaseArg != NULL && GetClientControl()->fRefNum == transport.GetTimebaseMaster()) {
+    if (fTimebase != NULL && GetClientControl()->fRefNum == transport.GetTimebaseMaster()) {
 
         jack_transport_state_t transport_state = transport.GetState();
         jack_position_t* cur_pos = transport.WriteNextStateStart(1);
