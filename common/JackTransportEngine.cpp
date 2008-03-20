@@ -116,10 +116,23 @@ void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
+            client->GetClientControl()->fTransportState = JackTransportStopped;
             client->GetClientControl()->fTransportSync = false; 
             client->GetClientControl()->fTransportTimebase = false; 
-            client->GetClientControl()->fTransportState = JackTransportStopped;
             jack_log("MakeAllStopping ref = %ld", i);
+        }
+    }
+}
+
+// RT
+void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
+{
+    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = table[i];
+        if (client) {
+            client->GetClientControl()->fTransportState = JackTransportStopped;
+            client->GetClientControl()->fTransportTimebase = true; 
+            jack_log("MakeAllLocating ref = %ld", i);
         }
     }
 }
@@ -157,7 +170,10 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
                 fTransportState = JackTransportStarting;
                 MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
-            } 
+            } else if (fPendingPos) {
+                jack_log("transport stopped ==> stopped (locating)");
+                MakeAllLocating(table);
+            }
             break;
 
         case JackTransportStarting:

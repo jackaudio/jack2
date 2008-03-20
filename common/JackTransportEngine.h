@@ -106,6 +106,7 @@ class JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         
         void MakeAllStartingLocating(JackClientInterface** table);
         void MakeAllStopping(JackClientInterface** table);
+         void MakeAllLocating(JackClientInterface** table);
         
         void SyncTimeout(jack_nframes_t frame_rate, jack_nframes_t buffer_size);
 
