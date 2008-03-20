@@ -49,6 +49,43 @@ We have:
 	The current position can be read by clients.
 
 	We use a JackAtomicArrayState pattern that allows to manage several "next" states independantly.
+    
+    In jack1 implementation, transport code (jack_transport_cycle_end) was not called if the graph could not be locked (see jack_run_one_cycle).
+    Here transport cycle (CycleBegin, CycleEnd) has to run in the RT thread concurrently with code executed from the "command" thread.
+    
+    Each client maintains a state in it's shared memory area defined by:
+    
+    - it's current transport state
+    - a boolean that is "true" when slow-sync cb has to be called
+    - a boolean that is "true" when timebase cb is called with new_pos on
+    
+    Several operations set the "slow-sync cb" flag to true:
+    
+        - setting a new cb (client)
+        - activate (client)
+        - transport start (server)
+        - new pos (server)
+        
+    Slow-sync cb calls stops when:
+    
+        - the cb return true (client)
+        - desactivate (client)
+        - transport stop (server)
+        
+    Several operations set the "timebase cb" flag to true:
+    
+        - setting a new cb (client)
+        - activate (client)
+        - transport start (server) ??
+        - new pos (server)
+        
+    Timebase cb "new_pos" argument calls stops when:
+    
+        - after one cb call with "new_pos" argument true (client)
+        - desactivate (client)
+        - release (client)
+        - transport stop (server)
+        
 */
 
 class JackTransportEngine : public JackAtomicArrayState<jack_position_t>
@@ -65,9 +102,11 @@ class JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         bool fPendingPos;
         SInt32 fWriteCounter;
 
-        bool CheckOneSynching(JackClientInterface** table);
         bool CheckAllRolling(JackClientInterface** table);
-        void MakeAllStarting(JackClientInterface** table);
+        
+        void MakeAllStartingLocating(JackClientInterface** table);
+        void MakeAllStopping(JackClientInterface** table);
+        
         void SyncTimeout(jack_nframes_t frame_rate, jack_nframes_t buffer_size);
 
     public:

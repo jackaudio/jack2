@@ -44,11 +44,12 @@ JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t
 // compute the number of cycle for timeout
 void JackTransportEngine::SyncTimeout(jack_nframes_t frame_rate, jack_nframes_t buffer_size)
 {
-    long buf_usecs = (long)((buffer_size * (jack_time_t) 1000000) / frame_rate);
+    long buf_usecs = (long)((buffer_size * (jack_time_t)1000000) / frame_rate);
     fSyncTimeLeft = fSyncTimeout / buf_usecs;
     jack_log("SyncTimeout fSyncTimeout = %ld fSyncTimeLeft = %ld", (long)fSyncTimeout, (long)fSyncTimeLeft);
 }
 
+// Server
 int JackTransportEngine::ResetTimebase(int refnum)
 {
     if (fTimeBaseMaster == refnum) {
@@ -62,6 +63,7 @@ int JackTransportEngine::ResetTimebase(int refnum)
     }
 }
 
+// Server
 int JackTransportEngine::SetTimebase(int refnum, bool conditionnal)
 {
     if (conditionnal && fTimeBaseMaster > 0) {
@@ -79,24 +81,13 @@ int JackTransportEngine::SetTimebase(int refnum, bool conditionnal)
     }
 }
 
-bool JackTransportEngine::CheckOneSynching(JackClientInterface** table)
-{
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = table[i];
-        if (client && client->GetClientControl()->fTransportState == JackTransportSynching) {
-            jack_log("CheckOneSynching");
-            return true;
-        }
-    }
-    return false;
-}
-
+// RT
 bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
 {
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client && client->GetClientControl()->fTransportState != JackTransportRolling) {
-            jack_log("CheckAllRolling refnum = %ld is not rolling", i);
+            jack_log("CheckAllRolling ref = %ld is not rolling", i);
             return false;
         }
     }
@@ -104,19 +95,36 @@ bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
     return true;
 }
 
-void JackTransportEngine::MakeAllStarting(JackClientInterface** table)
+// RT
+void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
 {
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
-            // Unactive clients don't have their process function called at all, they appear as already "rolling" for the transport....
+             // Inactive clients don't have their process function called at all, so they appear as already "rolling" for the transport....
             client->GetClientControl()->fTransportState = (client->GetClientControl()->fActive) ? JackTransportStarting : JackTransportRolling;
-            jack_log("MakeAllStarting refnum = %ld", i);
+            client->GetClientControl()->fTransportSync = true; 
+            client->GetClientControl()->fTransportTimebase = true; 
+            jack_log("MakeAllStartingLocating ref = %ld", i);
         }
     }
-    jack_log("MakeAllStarting");
 }
 
+// RT
+void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
+{
+    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = table[i];
+        if (client) {
+            client->GetClientControl()->fTransportSync = false; 
+            client->GetClientControl()->fTransportTimebase = false; 
+            client->GetClientControl()->fTransportState = JackTransportStopped;
+            jack_log("MakeAllStopping ref = %ld", i);
+        }
+    }
+}
+
+// RT
 void JackTransportEngine::CycleBegin(jack_nframes_t frame_rate, jack_time_t time) // really needed?? (would be done in CycleEnd...)
 {
     jack_position_t* pending = WriteNextStateStart(1); // Update "pending" state
@@ -125,6 +133,7 @@ void JackTransportEngine::CycleBegin(jack_nframes_t frame_rate, jack_time_t time
     WriteNextStateStop(1);
 }
 
+// RT
 void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t frame_rate, jack_nframes_t buffer_size)
 {
     TrySwitchState(1);	// Switch from "pending" to "current", it always works since there is always a pending state
@@ -141,59 +150,42 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
     /* state transition switch */
     switch (fTransportState) {
 
-        case JackTransportSynching:
-            if (cmd == TransportCommandStart) {
-                fTransportState = JackTransportStarting;
-                MakeAllStarting(table);
-                SyncTimeout(frame_rate, buffer_size);
-                jack_log("transport locate ==> starting....");
-            } else if (fPendingPos) {
-                fTransportState = JackTransportSynching;
-                jack_log("transport locate ==> locate....");
-            } else {
-                fTransportState = JackTransportStopped;
-                jack_log("transport locate ==> stopped....");
-            }
-            break;
-
         case JackTransportStopped:
-            // Set a JackTransportStarting for the current cycle, if all clients are ready (now slow_sync) ==> JackTransportRolling next state
+            // Set a JackTransportStarting for the current cycle, if all clients are ready (no slow_sync) ==> JackTransportRolling next state
             if (cmd == TransportCommandStart) {
+                jack_log("transport stopped ==> starting");
                 fTransportState = JackTransportStarting;
-                MakeAllStarting(table);
+                MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
-                jack_log("transport stopped ==> starting....");
-            } else if (fPendingPos || CheckOneSynching(table)) {
-                fTransportState = JackTransportSynching;
-                jack_log("transport stopped ==> locate....");
-            }
+            } 
             break;
 
         case JackTransportStarting:
-            jack_log("transport starting fSyncTimeLeft %ld", fSyncTimeLeft);
-
             if (cmd == TransportCommandStop) {
-                fTransportState = JackTransportStopped;
                 jack_log("transport starting ==> stopped");
+                fTransportState = JackTransportStopped;
+                MakeAllStopping(table);
             } else if (fPendingPos) {
+                jack_log("transport starting ==> starting");
                 fTransportState = JackTransportStarting;
-                MakeAllStarting(table);
+                MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
-            } else if (--fSyncTimeLeft == 0 || CheckAllRolling(table)) {
+            } else if (--fSyncTimeLeft == 0 || CheckAllRolling(table)) {  // Slow clients may still catch up
+                jack_log("transport starting ==> rolling fSyncTimeLeft = %ld", fSyncTimeLeft);
                 fTransportState = JackTransportRolling;
-                jack_log("transport starting ==> rolling.... fSyncTimeLeft %ld", fSyncTimeLeft);
             }
             break;
 
         case JackTransportRolling:
             if (cmd == TransportCommandStop) {
-                fTransportState = JackTransportStopped;
                 jack_log("transport rolling ==> stopped");
-            } else if (fPendingPos || CheckOneSynching(table)) {
+                fTransportState = JackTransportStopped;
+                MakeAllStopping(table);
+            } else if (fPendingPos) {
+                jack_log("transport rolling ==> starting");
                 fTransportState = JackTransportStarting;
-                MakeAllStarting(table);
+                MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
-                jack_log("transport rolling ==> starting....");
             }
             break;
 
@@ -218,6 +210,7 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
     }
 }
 
+// Client
 void JackTransportEngine::ReadCurrentPos(jack_position_t* pos)
 {
     UInt16 next_index = GetCurrentIndex();
@@ -229,6 +222,7 @@ void JackTransportEngine::ReadCurrentPos(jack_position_t* pos)
     } while (cur_index != next_index); // Until a coherent state has been read
 }
 
+// RT, client
 void JackTransportEngine::TransportCopyPosition(jack_position_t* from, jack_position_t* to)
 {
     int tries = 0;

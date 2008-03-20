@@ -374,7 +374,7 @@ int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int 
     *status = 0;
     strcpy(name_res, name);
 
-    jack_log("Check protocol client  %ld server = %ld", protocol, JACK_PROTOCOL_VERSION);
+    jack_log("Check protocol client %ld server = %ld", protocol, JACK_PROTOCOL_VERSION);
 
     if (protocol != JACK_PROTOCOL_VERSION) {
         *status |= (JackFailure | JackVersionError);
@@ -561,7 +561,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     // Remove the client from the table
     ReleaseRefnum(refnum);
 
-    // Notiy unregister
+    // Notify unregister
     jack_int_t ports[PORT_NUM_FOR_CLIENT];
     int i;
 

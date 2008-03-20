@@ -254,19 +254,15 @@ int JackClient::Activate()
     if (StartThread() < 0)
         return -1;
     
-    /* seems just useless
-    if (fSync != NULL)		// If a SyncCallback is pending... 
-        SetSyncCallback(fSync, fSyncArg);
-
-    if (fTimebase != NULL)	// If a TimebaseCallback is pending... 
-        SetTimebaseCallback(fConditionnal, fTimebase, fTimebaseArg);
-    */
-        
     /*
     Insertion of client in the graph will cause a kGraphOrderCallback notification 
     to be delivered by the server, the client wants to receive it.
     */
     GetClientControl()->fActive = true;
+    
+    // Transport related callback become "active"
+    GetClientControl()->fTransportSync = true;
+    GetClientControl()->fTransportTimebase = true;
 
     int result = -1;
     fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
@@ -283,6 +279,11 @@ int JackClient::Deactivate()
         return 0;
 
     GetClientControl()->fActive = false;
+    
+    // Transport related callback become "unactive"
+    GetClientControl()->fTransportSync = false;
+    GetClientControl()->fTransportTimebase = false;
+    
     int result = -1;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
 
@@ -606,6 +607,7 @@ int JackClient::ReleaseTimebase()
     int result = -1;
     fChannel->ReleaseTimebase(GetClientControl()->fRefNum, &result);
     if (result == 0) {
+        GetClientControl()->fTransportTimebase = false;
         fTimebase = NULL;
         fTimebaseArg = NULL;
     }
@@ -615,10 +617,9 @@ int JackClient::ReleaseTimebase()
 /* Call the server if the client is active, otherwise keeps the arguments */
 int JackClient::SetSyncCallback(JackSyncCallback sync_callback, void* arg)
 {
-    if (IsActive())
-        GetClientControl()->fTransportState = (sync_callback == NULL) ? JackTransportStopped : JackTransportSynching;
-    fSync = sync_callback;
+    GetClientControl()->fTransportSync = (fSync != NULL);
     fSyncArg = arg;
+    fSync = sync_callback;
     return 0;
 }
 
@@ -628,38 +629,13 @@ int JackClient::SetSyncTimeout(jack_time_t timeout)
     return 0;
 }
 
-/* Call the server if the client is active, otherwise keeps the arguments */
-/*
-int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
-{
-    if (IsActive()) {
-        int result = -1;
-        fChannel->SetTimebaseCallback(GetClientControl()->fRefNum, conditional, &result);
-        jack_log("SetTimebaseCallback result = %ld", result);
-        if (result == 0) {
-            fTimebase = timebase_callback;
-            fTimebaseArg = arg;
-        } else {
-            fTimebase = NULL;
-            fTimebaseArg = NULL;
-        }
-        jack_log("SetTimebaseCallback OK result = %ld", result);
-        return result;
-    } else {
-        fTimebase = timebase_callback;
-        fTimebaseArg = arg;
-        fConditionnal = conditional;
-        return 0;
-    }
-}
-*/
-
 int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
     int result = -1;
     fChannel->SetTimebaseCallback(GetClientControl()->fRefNum, conditional, &result);
     jack_log("SetTimebaseCallback result = %ld", result);
     if (result == 0) {
+        GetClientControl()->fTransportTimebase = true;
         fTimebase = timebase_callback;
         fTimebaseArg = arg;
     } else {
@@ -731,68 +707,45 @@ void JackClient::TransportStop()
 }
 
 // Never called concurently with the server
-// TODO check concurency with SetSyncCallback
-
+// TODO check concurrency with SetSyncCallback
 void JackClient::CallSyncCallback()
 {
-    JackTransportEngine& transport = GetEngineControl()->fTransport;
-    jack_position_t* cur_pos = transport.ReadCurrentState();
-    jack_transport_state_t transport_state = transport.GetState();
-
-    switch (transport_state) {
-
-        case JackTransportStarting:  // Starting...
-            if (fSync == NULL) {
+    if (GetClientControl()->fTransportSync) {
+    
+        JackTransportEngine& transport = GetEngineControl()->fTransport;
+        jack_position_t* cur_pos = transport.ReadCurrentState();
+        jack_transport_state_t transport_state = transport.GetState();
+    
+        if (fSync != NULL) {
+            if (fSync(transport_state, cur_pos, fSyncArg)) {
                 GetClientControl()->fTransportState = JackTransportRolling;
-            } else if (GetClientControl()->fTransportState == JackTransportStarting) {
-                if (fSync(transport_state, cur_pos, fSyncArg))
-                    GetClientControl()->fTransportState = JackTransportRolling;
+                GetClientControl()->fTransportSync = false;
             }
-            break;
-
-        case JackTransportRolling:
-            if (fSync != NULL && GetClientControl()->fTransportState == JackTransportStarting) { // Client still not ready
-                if (fSync(transport_state, cur_pos, fSyncArg))
-                    GetClientControl()->fTransportState = JackTransportRolling;
-            }
-            break;
-
-        case JackTransportSynching:
-            // New pos when transport engine is stopped...
-            if (fSync != NULL) {
-                fSync(JackTransportStopped, cur_pos, fSyncArg);
-                GetClientControl()->fTransportState = JackTransportStopped;
-            }
-            break;
-
-        default:
-            break;
+        } else {
+            GetClientControl()->fTransportState = JackTransportRolling;
+            GetClientControl()->fTransportSync = false;
+        }
     }
 }
 
 void JackClient::CallTimebaseCallback()
 {
     JackTransportEngine& transport = GetEngineControl()->fTransport;
-
-    if (fTimebase != NULL && GetClientControl()->fRefNum == transport.GetTimebaseMaster()) {
-
+    
+    if (GetClientControl()->fRefNum == transport.GetTimebaseMaster()) { // Client *is* timebase...
+    
         jack_transport_state_t transport_state = transport.GetState();
         jack_position_t* cur_pos = transport.WriteNextStateStart(1);
-
-        switch (transport_state) {
-
-            case JackTransportRolling:
-                fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
-                break;
-
-            case JackTransportSynching:
-                fTimebase(JackTransportStopped, GetEngineControl()->fBufferSize, cur_pos, true, fTimebaseArg);
-                break;
-
-            default:
-                break;
+        
+        if (transport_state == JackTransportRolling) {
+            assert(fTimebase);
+            fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
+        } else if (GetClientControl()->fTransportTimebase) {
+            assert(fTimebase);
+            fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, true, fTimebaseArg); 
+            GetClientControl()->fTransportTimebase = true; // Callback is called only once with "new_pos" = true 
         }
-
+        
         transport.WriteNextStateStop(1);
     }
 }

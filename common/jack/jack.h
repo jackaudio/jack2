@@ -923,20 +923,20 @@ extern "C"
      */
     void jack_set_error_function (void (*func)(const char *));
 
-/**
- * Display JACK info message.
- *
- * Set via jack_set_info_function(), otherwise a JACK-provided
- * default will print @a msg (plus a newline) to stdout.
- *
- * @param msg info message text (no newline at end).
- */
-extern void (*jack_info_callback)(const char *msg);
+    /**
+     * Display JACK info message.
+     *
+     * Set via jack_set_info_function(), otherwise a JACK-provided
+     * default will print @a msg (plus a newline) to stdout.
+     *
+     * @param msg info message text (no newline at end).
+     */
+    extern void (*jack_info_callback)(const char *msg);
 
-/**
- * Set the @ref jack_info_callback for info message display.
- */
-void jack_set_info_function (void (*func)(const char *));
+    /**
+     * Set the @ref jack_info_callback for info message display.
+     */
+    void jack_set_info_function (void (*func)(const char *));
 
 #ifdef __cplusplus
 }

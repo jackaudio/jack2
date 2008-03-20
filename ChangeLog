@@ -20,8 +20,11 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-03-20 Stephane Letz  <letz@grame.fr>
+		
+	* Transport timebase fix (in progress).
 
-2008-03-10 Stephane Letz  <letz@grame.fr>
+2008-03-19 Stephane Letz  <letz@grame.fr>
 		
 	* Synchronise transport.h with latest jackd version (Video handling).
 

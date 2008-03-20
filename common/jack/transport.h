@@ -37,7 +37,6 @@ typedef enum {
 	JackTransportRolling = 1,	/**< Transport playing */
 	JackTransportLooping = 2,	/**< For OLD_TRANSPORT, now ignored */
 	JackTransportStarting = 3,	/**< Waiting for sync ready */
-    JackTransportSynching = 4	/**< internal use*/
 
 } jack_transport_state_t;
 

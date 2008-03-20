@@ -39,6 +39,8 @@ struct JackClientControl : public JackShmMem
     char fName[JACK_CLIENT_NAME_SIZE + 1];
     bool fCallback[kMaxNotification];
     volatile jack_transport_state_t fTransportState;
+    volatile bool fTransportSync;      /* Will be true when slow-sync cb has to be called */
+    volatile bool fTransportTimebase;  /* Will be true when timebase cb is called with new_pos on */
     int fRefNum;
     bool fActive;
 
@@ -71,6 +73,8 @@ struct JackClientControl : public JackShmMem
         fCallback[kStopFreewheelCallback] = true;
         fRefNum = refnum;
         fTransportState = JackTransportStopped;
+        fTransportSync = false;
+        fTransportTimebase = false;
         fActive = false;
     }
 
