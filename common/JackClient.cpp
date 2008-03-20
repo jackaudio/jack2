@@ -732,18 +732,16 @@ void JackClient::CallTimebaseCallback()
 {
     JackTransportEngine& transport = GetEngineControl()->fTransport;
     
-    if (GetClientControl()->fRefNum == transport.GetTimebaseMaster()) { // Client *is* timebase...
+    if (GetClientControl()->fRefNum == transport.GetTimebaseMaster() && fTimebase) { // Client *is* timebase...
     
         jack_transport_state_t transport_state = transport.GetState();
         jack_position_t* cur_pos = transport.WriteNextStateStart(1);
         
         if (transport_state == JackTransportRolling) {
-            assert(fTimebase);
-            fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
+             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
         } else if (GetClientControl()->fTransportTimebase) {
-            assert(fTimebase);
             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, true, fTimebaseArg); 
-            GetClientControl()->fTransportTimebase = true; // Callback is called only once with "new_pos" = true 
+            GetClientControl()->fTransportTimebase = false; // Callback is called only once with "new_pos" = true 
         }
         
         transport.WriteNextStateStop(1);
