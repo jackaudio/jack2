@@ -737,12 +737,12 @@ void JackClient::CallTimebaseCallback()
         jack_transport_state_t transport_state = transport.GetState();
         jack_position_t* cur_pos = transport.WriteNextStateStart(1);
         
-        if (transport_state == JackTransportRolling) {
-             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
-        } else if (GetClientControl()->fTransportTimebase) {
+        if (GetClientControl()->fTransportTimebase) {
             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, true, fTimebaseArg); 
             GetClientControl()->fTransportTimebase = false; // Callback is called only once with "new_pos" = true 
-        }
+        } else if (transport_state == JackTransportRolling) {
+             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
+        } 
         
         transport.WriteNextStateStop(1);
     }
