@@ -22,9 +22,9 @@
 import os
 from string import Template
 
-JACK_MAJOR_VERSION=1
-JACK_MINOR_VERSION=8
-JACK_MICRO_VERSION=0
+JACK_MAJOR_VERSION=0
+JACK_MINOR_VERSION=7
+JACK_MICRO_VERSION=1
 
 JACK_VERSION="%u.%u.%u" % (JACK_MAJOR_VERSION, JACK_MINOR_VERSION, JACK_MICRO_VERSION)
 
@@ -141,13 +141,13 @@ if not env.GetOption('clean'):
         print "--> At least one of the dependencies is missing. I can't go on without it, please install the needed packages (remember to also install the *-devel packages)"
         Exit(1)
 
-    # If jack has the same PREFIX as the one we plan to use, exit with an error message
-    env['JACK_FLAGS'] = conf.GetPKGFlags('jack', '0.90')
-    if env['JACK_FLAGS']:
-        print "--> Found an existing JACK installation, let's be careful not to erase it"
-        if conf.GetPKGPrefix( 'jack' ) == env['PREFIX']:
-            print '--> JACK is installed in the same directory as our current PREFIX. Either remove JACK or change your installation PREFIX.'
-            Exit(1)
+# Shouldn't be needed with the new wrapper/full_mimic features
+#    env['JACK_FLAGS'] = conf.GetPKGFlags('jack', '0.90')
+#    if env['JACK_FLAGS']:
+#        print "--> Found an existing JACK installation, let's be careful not to erase it"
+#        if conf.GetPKGPrefix( 'jack' ) == env['PREFIX']:
+#            print '--> JACK is installed in the same directory as our current PREFIX. Either remove JACK or change your installation PREFIX.'
+#            Exit(1)
 
     # Optional checks follow:
     if env['BUILD_FOR_LINUX'] and env['ENABLE_ALSA']:
@@ -207,22 +207,22 @@ env['LIBDIR'] = env.subst(env['LIBDIR'])
 env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
 
 env.ScanReplace('jack.pc.in')
+# jack.pc is always updated in case of config changes
+# (PREFIX or JACK_VERSION for instance)
 AlwaysBuild('jack.pc')
 pkg_config_dir = env['PREFIX']+"/lib/pkgconfig/"
 env.Install(pkg_config_dir, 'jack.pc')
 env.Alias('install', pkg_config_dir)
 
-# for config.h.in
-# TODO: Is that necessary ?
-env['LIB_DIR']='lib'
-env['JACK_LOCATION']=env.subst(env['BINDIR'])
-
 # To have the top_srcdir as the doxygen-script is used from auto*
-# TODO: Understand the previous comment
 env['top_srcdir'] = env.Dir('.').abspath
 
+# for config.h.in
+env['LIB_DIR']='lib'
+env['JACK_LOCATION']=env.subst(env['BINDIR'])
 env.ScanReplace( 'config.h.in' )
-# TODO: find out what's that about. Is it useful ?
+# just like jack.pc, config.h is always updated in case of config changes 
+# (PREFIX or JACK_VERSION for instance)
 AlwaysBuild('config.h')
 
 # Ensure we have a path to where the libraries are

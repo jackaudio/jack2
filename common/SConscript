@@ -27,7 +27,7 @@ Import('env')
 
 # Define the library suffix for POSIX like systems
 if env['PLATFORM'] == 'posix':
-    env.AppendUnique(SHLIBSUFFIX='.0.0')
+    env.AppendUnique(SHLIBSUFFIX='.' + env['JACK_VERSION'])
 
 # Paths where include files can be found
 env.AppendUnique(CPPPATH=['#/', '#/common', '#/common/jack'])
@@ -39,7 +39,7 @@ env.AppendUnique(LIBS=['rt', 'pthread'])
 env.AppendUnique(CPPPATH=['#/linux','#/macosx'])
 
 # A symlinking command for our libraries' names
-symlinkcmd = 'ln -nsf $SOURCE.name $TARGET'
+symlinkcmd = 'rm -f $TARGET;ln -nsf $SOURCE.name $TARGET'
 
 #
 # Source files section
@@ -161,13 +161,19 @@ if env['PLATFORM'] == 'posix':
     libs = [(env['CLIENTLIB'], clientlib), (env['SERVERLIB'], serverlib)]
     if not env['FULL_MIMIC']:
         libs.append((env['WRAPPERLIB'], wrapperlib))
+	# When we use the wrapper, we want symlinks named libjack.so[.0] so regular clients can use it as a proxy
+	# this will delete the 2 links installed by jack-1
+	# if jackd if running and not jackdmp, jack-1 libs will be used (hopefully...)
+	# Uncomment when sletz approves
+	env.Command(env['LIBDIR'] + '/libjack.so.0', env['LIBDIR'] + '/lib' + env['WRAPPERLIB'] + '.so.' + env['JACK_VERSION'], symlinkcmd)
+	env.Command(env['LIBDIR'] + '/libjack.so', env['LIBDIR'] + '/libjack.so.0', symlinkcmd)
+	env.Alias('install', env['LIBDIR'] + '/lib' + env['WRAPPERLIB'] + '.so.' + env['JACK_VERSION'])
     for lib_name, lib in libs:
-        env.Command('#/common/lib' + lib_name + '.so.0', lib, symlinkcmd)
-        env.Command('#/common/lib' + lib_name + '.so', '#/common/lib'+lib_name+'.so.0', symlinkcmd)
-        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.0', env['LIBDIR'] + '/lib' + lib_name + '.so.0.0', symlinkcmd)
-        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.0', symlinkcmd)
-        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.0')
-        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so')
+        env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), lib, symlinkcmd)
+        env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
+        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), env['LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACK_VERSION'], symlinkcmd)
+        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
+        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']))
 
 # Headers
 for header in jack_headers:
