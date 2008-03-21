@@ -55,14 +55,13 @@ example_libs = {
 # Libraries to link
 extra_libs = {}
 for example_program in example_programs:
-    extra_libs[example_program] = [env['CLIENTLIB']]
+    extra_libs[example_program] = ['jack']
 
 # TODO: we need to really test for READLINE... pkgconfig ?
 env['HAS_READLINE']=True
 if env['HAS_READLINE']:
     example_programs['jack_transport'] = 'transport.c'
-    extra_libs['jack_transport'] = ['readline', env['CLIENTLIB']]
-    extra_libs['jack_transport'] += ['ncurses', env['CLIENTLIB']]
+    extra_libs['jack_transport'] = ['readline', 'jack', 'ncurses']
 
 #
 # Build/install section

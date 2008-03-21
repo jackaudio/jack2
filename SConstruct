@@ -100,11 +100,6 @@ env['JACK_MINOR_VERSION'] = JACK_MINOR_VERSION
 env['JACK_MICRO_VERSION'] = JACK_MICRO_VERSION
 env['JACK_VERSION'] = JACK_VERSION
 
-# Set the lib names
-env['CLIENTLIB'] = 'jackmp'
-env['SERVERLIB'] = 'jackservermp'
-env['WRAPPERLIB'] = 'jackwrapper'
-
 # make sure the necessary dirs exist
 if not os.path.isdir('cache/' + build_base):
     os.makedirs('cache/' + build_base)
@@ -192,13 +187,12 @@ if env['FULL_MIMIC']:
     env['SERVER'] = 'jackd'
     env['CLIENTLIB'] = 'jack'
     env['SERVERLIB'] = 'jackserver'
-    env['WRAPPERLIB'] = 'jackwrapper'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jack"
 else:
     env['SERVER'] = 'jackdmp'
     env['CLIENTLIB'] = 'jackmp'
     env['SERVERLIB'] = 'jackservermp'
-    env['WRAPPERLIB'] = 'jackwrapper'
+    env['WRAPPERLIB'] = 'jack'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
 
 env['PREFIX'] = env.subst(env['PREFIX'])

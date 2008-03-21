@@ -164,13 +164,12 @@ if env['PLATFORM'] == 'posix':
 	# When we use the wrapper, we want symlinks named libjack.so[.0] so regular clients can use it as a proxy
 	# this will delete the 2 links installed by jack-1
 	# if jackd if running and not jackdmp, jack-1 libs will be used (hopefully...)
-	# Uncomment when sletz approves
-	env.Command(env['LIBDIR'] + '/libjack.so.0', env['LIBDIR'] + '/lib' + env['WRAPPERLIB'] + '.so.' + env['JACK_VERSION'], symlinkcmd)
-	env.Command(env['LIBDIR'] + '/libjack.so', env['LIBDIR'] + '/libjack.so.0', symlinkcmd)
-	env.Alias('install', env['LIBDIR'] + '/lib' + env['WRAPPERLIB'] + '.so.' + env['JACK_VERSION'])
+	env.Command('#/common/libjack.so.0', '#/common/lib' + env['CLIENTLIB'] + '.so.' + env['JACK_VERSION'], symlinkcmd)
+	env.Command('#/common/libjack.so', '#/common/libjack.so.0', symlinkcmd)
     for lib_name, lib in libs:
-        env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), lib, symlinkcmd)
-        env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
+        if lib_name != 'jack':
+	    env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), lib, symlinkcmd)
+	    env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), env['LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACK_VERSION'], symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
         env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']))
