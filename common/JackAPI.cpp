@@ -501,6 +501,10 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
     }
 }
 
+/*
+This is unsafe if case of concurrent access, and should be "serialized" doing a server call.
+*/
+
 EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 {
 #ifdef __CLIENTDEBUG__

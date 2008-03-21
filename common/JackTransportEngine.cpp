@@ -101,7 +101,7 @@ void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
-             // Inactive clients don't have their process function called at all, so they appear as already "rolling" for the transport....
+             // Inactive clients don't have their process function called at all, so they must appear as already "rolling" for the transport....
             client->GetClientControl()->fTransportState = (client->GetClientControl()->fActive) ? JackTransportStarting : JackTransportRolling;
             client->GetClientControl()->fTransportSync = true; 
             client->GetClientControl()->fTransportTimebase = true; 
@@ -138,7 +138,7 @@ void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
 }
 
 // RT
-void JackTransportEngine::CycleBegin(jack_nframes_t frame_rate, jack_time_t time) // really needed?? (would be done in CycleEnd...)
+void JackTransportEngine::CycleBegin(jack_nframes_t frame_rate, jack_time_t time)
 {
     jack_position_t* pending = WriteNextStateStart(1); // Update "pending" state
     pending->usecs = time;
