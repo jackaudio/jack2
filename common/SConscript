@@ -151,7 +151,7 @@ clientlib = env.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = env.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
 env.Install( env['LIBDIR'], [clientlib, serverlib])
 if not env['FULL_MIMIC']:
-    wrapperlib = env.SharedLibrary(env['WRAPPERLIB'], srcfiles_common_wrapperlib)
+    wrapperlib = env.SharedLibrary(env['WRAPPERLIB'], srcfiles_common_wrapperlib, LIBS='dl')
     env.Install( env['LIBDIR'], [wrapperlib])
 env.Alias('install', env['LIBDIR'])
 
@@ -164,12 +164,9 @@ if env['PLATFORM'] == 'posix':
 	# When we use the wrapper, we want symlinks named libjack.so[.0] so regular clients can use it as a proxy
 	# this will delete the 2 links installed by jack-1
 	# if jackd if running and not jackdmp, jack-1 libs will be used (hopefully...)
-	env.Command('#/common/libjack.so.0', '#/common/lib' + env['CLIENTLIB'] + '.so.' + env['JACK_VERSION'], symlinkcmd)
-	env.Command('#/common/libjack.so', '#/common/libjack.so.0', symlinkcmd)
     for lib_name, lib in libs:
-        if lib_name != 'jack':
-	    env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), lib, symlinkcmd)
-	    env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
+	env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), lib, symlinkcmd)
+	env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), env['LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACK_VERSION'], symlinkcmd)
         env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
         env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']))
