@@ -961,6 +961,9 @@ static jack_client_name_size_fun_def jack_client_name_size_fun = 0;
 EXPORT int jack_client_name_size(void)
 {
     jack_log("jack_client_name_size");
+    // Library check...
+    if (!open_library())
+        return 0;
     return (*jack_client_name_size_fun)();
 }
 
@@ -969,6 +972,9 @@ static jack_port_name_size_fun_def jack_port_name_size_fun = 0;
 EXPORT int jack_port_name_size(void)
 {
     jack_log("jack_port_name_size");
+    // Library check...
+    if (!open_library())
+        return 0;
     return (*jack_port_name_size_fun)();
 }
 
@@ -977,6 +983,9 @@ static jack_port_type_size_fun_def jack_port_type_size_fun = 0;
 EXPORT int jack_port_type_size(void)
 {
     jack_log("jack_port_type_size");
+    // Library check...
+    if (!open_library())
+        return 0;
     return (*jack_port_type_size_fun)();
 }
 

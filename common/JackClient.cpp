@@ -502,7 +502,7 @@ int JackClient::PortRegister(const char* port_name, const char* port_type, unsig
         return 0; // Means failure here...
     }
 
-    jack_log("JackClient::PortRegister ref = %ld  name = %s type = %s", GetClientControl()->fRefNum, name.c_str(), port_type);
+    jack_log("JackClient::PortRegister ref = %ld name = %s type = %s", GetClientControl()->fRefNum, name.c_str(), port_type);
 
     int result = -1;
     unsigned int port_index = NO_PORT;
