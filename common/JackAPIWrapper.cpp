@@ -349,7 +349,7 @@ static void start_server_aux(const char* server_name)
     fprintf(stderr, "exec of JACK server (command = \"%s\") failed: %s\n", command, strerror(errno));
 }
 
-int start_server(const char* server_name, jack_options_t options)
+static int start_server(const char* server_name, jack_options_t options)
 {
     jack_log("start_server 0");
 
@@ -1289,7 +1289,7 @@ typedef int (*jack_midi_event_get_fun_def)(void* port_buffer);
 static jack_midi_event_get_fun_def jack_midi_event_get_fun = 0;
 EXPORT int jack_midi_event_get(void* port_buffer)
 {
-    jack_log("jack_midi_get_event_count");
+    jack_log("jack_midi_event_get");
     return (*jack_midi_event_get_fun)(port_buffer);
 }
 
