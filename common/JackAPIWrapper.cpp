@@ -518,9 +518,9 @@ EXPORT int jack_port_unset_alias(jack_port_t* port, const char* alias)
     return (*jack_port_unset_alias_fun)(port, alias);
 }
 
-typedef int (*jack_port_get_aliases_fun_def)(jack_port_t* port, char* const aliases[2]);
+typedef int (*jack_port_get_aliases_fun_def)(const jack_port_t* port, char* const aliases[2]);
 static jack_port_get_aliases_fun_def jack_port_get_aliases_fun = 0;
-EXPORT int jack_port_get_aliases(jack_port_t* port, char* const aliases[2])
+EXPORT int jack_port_get_aliases(const jack_port_t* port, char* const aliases[2])
 {
     jack_log("jack_port_get_aliases");
     return (*jack_port_get_aliases_fun)(port, aliases);
@@ -1285,12 +1285,12 @@ EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer)
     return (*jack_midi_get_event_count_fun)(port_buffer);
 }
 
-typedef int (*jack_midi_event_get_fun_def)(void* port_buffer);
+typedef int (*jack_midi_event_get_fun_def)(jack_midi_event_t *event, void *port_buffer, jack_nframes_t event_index);
 static jack_midi_event_get_fun_def jack_midi_event_get_fun = 0;
-EXPORT int jack_midi_event_get(void* port_buffer)
+EXPORT int jack_midi_event_get(jack_midi_event_t *event, void *port_buffer, jack_nframes_t event_index)
 {
     jack_log("jack_midi_event_get");
-    return (*jack_midi_event_get_fun)(port_buffer);
+    return (*jack_midi_event_get_fun)(event, port_buffer, event_index);
 }
 
 typedef void (*jack_midi_clear_buffer_fun_def)(void* port_buffer);
