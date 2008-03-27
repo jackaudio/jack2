@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-03-27 Stephane Letz  <letz@grame.fr>
+		
+	* Pieter Palmers patch FFADO driver.
+
 2008-03-26 Stephane Letz  <letz@grame.fr>
 		
 	* JackWrapperAPI.cpp: use open_library in jack_client_name_size, jack_port_name_size and jack_port_type_size.

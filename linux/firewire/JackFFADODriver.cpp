@@ -44,7 +44,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-#define FIREWIRE_REQUIRED_FFADO_API_VERSION 7
+#define FIREWIRE_REQUIRED_FFADO_API_VERSION 8
 
 #define jack_get_microseconds GetMicroSeconds
 
@@ -273,7 +273,10 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
     driver->wait_next = wait_ret + driver->period_usecs;
 // 	driver->engine->transport_cycle_start (driver->engine, wait_ret);
 
-    if (response == ffado_wait_xrun) {
+    if(response == ffado_wait_ok) {
+       // all good
+       *status = 0;
+    } else if (response == ffado_wait_xrun) {
         // xrun happened, but it's handled
         *status = 0;
         return 0;
@@ -282,9 +285,18 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
         // this should be fatal
         *status = -1;
         return 0;
+    } else if (response == ffado_wait_shutdown) {
+        // ffado requested shutdown (e.g. device unplugged)
+        // this should be fatal
+        *status = -1;
+        return 0;
+    } else {
+        // unknown response code. should be fatal
+        // this should be fatal
+        *status = -1;
+        return 0;
     }
 
-    *status = 0;
     fLastWaitUst = wait_ret;
 
     printExit();

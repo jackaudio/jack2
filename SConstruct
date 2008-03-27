@@ -158,7 +158,7 @@ if not env.GetOption('clean'):
             env['ENABLE_FREEBOB'] = False
 
     if env['BUILD_FOR_LINUX'] and env['ENABLE_FIREWIRE']:
-        env['FFADO_FLAGS'] = conf.GetPKGFlags('libffado', '1.999.14')
+        env['FFADO_FLAGS'] = conf.GetPKGFlags('libffado', '1.999.17')
         if env['FFADO_FLAGS'] == 0:
             print "--> Disabling 'firewire' backend since no useful FFADO installation found"
             env['ENABLE_FIREWIRE'] = False
