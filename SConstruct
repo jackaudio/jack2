@@ -22,11 +22,16 @@
 import os
 from string import Template
 
-JACK_MAJOR_VERSION=0
-JACK_MINOR_VERSION=7
-JACK_MICRO_VERSION=1
+JACK_MAJOR_VERSION=1
+JACK_MINOR_VERSION=9
+JACK_MICRO_VERSION=0
+
+JACKAPI_MAJOR_VERSION=0
+JACKAPI_MINOR_VERSION=1
+JACKAPI_MICRO_VERSION=0
 
 JACK_VERSION="%u.%u.%u" % (JACK_MAJOR_VERSION, JACK_MINOR_VERSION, JACK_MICRO_VERSION)
+JACKAPI_VERSION="%u.%u.%u" % (JACKAPI_MAJOR_VERSION, JACKAPI_MINOR_VERSION, JACKAPI_MICRO_VERSION)
 
 platform = ARGUMENTS.get('OS', str(Platform()))
 
@@ -99,6 +104,10 @@ env['JACK_MAJOR_VERSION'] = JACK_MAJOR_VERSION
 env['JACK_MINOR_VERSION'] = JACK_MINOR_VERSION
 env['JACK_MICRO_VERSION'] = JACK_MICRO_VERSION
 env['JACK_VERSION'] = JACK_VERSION
+env['JACKAPI_MAJOR_VERSION'] = JACKAPI_MAJOR_VERSION
+env['JACKAPI_MINOR_VERSION'] = JACKAPI_MINOR_VERSION
+env['JACKAPI_MICRO_VERSION'] = JACKAPI_MICRO_VERSION
+env['JACKAPI_VERSION'] = JACKAPI_VERSION
 
 # make sure the necessary dirs exist
 if not os.path.isdir('cache/' + build_base):
@@ -179,10 +188,6 @@ env.AppendUnique(CFLAGS = ['-fPIC', '-DUSE_POSIX_SHM'])
 env.AppendUnique(CFLAGS = ['-DJACKMP'])
 env.AppendUnique(CPPFLAGS = ['-DJACKMP'])
 
-env.Alias('install', env['LIBDIR'])
-env.Alias('install', env['INCLUDEDIR'])
-env.Alias('install', env['BINDIR'])
-
 if env['FULL_MIMIC']:
     env['SERVER'] = 'jackd'
     env['CLIENTLIB'] = 'jack'
@@ -195,6 +200,11 @@ else:
     env['WRAPPERLIB'] = 'jack'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
 
+env.Alias('install', env['LIBDIR'])
+env.Alias('install', env['INCLUDEDIR'])
+env.Alias('install', env['BINDIR'])
+env.Alias('install', env['ADDON_DIR'])
+
 env['PREFIX'] = env.subst(env['PREFIX'])
 env['BINDIR'] = env.subst(env['BINDIR'])
 env['LIBDIR'] = env.subst(env['LIBDIR'])
@@ -204,7 +214,7 @@ env.ScanReplace('jack.pc.in')
 # jack.pc is always updated in case of config changes
 # (PREFIX or JACK_VERSION for instance)
 AlwaysBuild('jack.pc')
-pkg_config_dir = env['PREFIX']+"/lib/pkgconfig/"
+pkg_config_dir = env['LIBDIR']+"/pkgconfig/"
 env.Install(pkg_config_dir, 'jack.pc')
 env.Alias('install', pkg_config_dir)
 

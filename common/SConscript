@@ -147,8 +147,8 @@ jack_headers = [
 # Each platform should get it's own environment
 libenv = env.Copy()
 if env['PLATFORM'] == 'posix':
-    libenv.Append(SHLIBSUFFIX='.' + env['JACK_VERSION'])
-    libenv.Append(SHLINKFLAGS='-Wl,-soname,${str(TARGET.file).split(".")[0]}.so.' + str(env['JACK_MAJOR_VERSION']))
+    libenv.Append(SHLIBSUFFIX='.' + env['JACKAPI_VERSION'])
+    libenv.Append(SHLINKFLAGS='-Wl,-soname,${str(TARGET.file).split(".")[0]}.so.' + str(env['JACKAPI_MAJOR_VERSION']))
 
 clientlib = libenv.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = libenv.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
@@ -165,11 +165,11 @@ if env['PLATFORM'] == 'posix':
     if not env['FULL_MIMIC']:
         libs.append((env['WRAPPERLIB'], wrapperlib))
     for lib_name, lib in libs:
-	env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), lib, symlinkcmd)
-	env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
-        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), env['LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACK_VERSION'], symlinkcmd)
-        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']), symlinkcmd)
-        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACK_MAJOR_VERSION']))
+	env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), lib, symlinkcmd)
+	env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), symlinkcmd)
+        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), env['LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACKAPI_VERSION'], symlinkcmd)
+        env.Command(env['LIBDIR']  + '/lib' + lib_name + '.so', env['LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), symlinkcmd)
+        env.Alias('install', env['LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']))
 
 # Headers
 for header in jack_headers:
