@@ -22,7 +22,8 @@ Fernando Lopez-Lezcano
 
 2008-03-27 Stephane Letz  <letz@grame.fr>
 		
-	* Pieter Palmers patch FFADO driver.
+	* Pieter Palmers patch for FFADO driver.
+	* Dmitry Baikov patch for alsa_rawmidi driver.
 
 2008-03-26 Stephane Letz  <letz@grame.fr>
 		

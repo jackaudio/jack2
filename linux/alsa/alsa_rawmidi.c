@@ -479,15 +479,22 @@ int midi_port_open(alsa_rawmidi_t *midi, midi_port_t *port)
 static
 void midi_port_close(const alsa_rawmidi_t *midi, midi_port_t *port)
 {
-	if (port->data_ring)
+	if (port->data_ring) {
 		jack_ringbuffer_free(port->data_ring);
-	if (port->event_ring)
+		port->data_ring = NULL;
+	}
+	if (port->event_ring) {
 		jack_ringbuffer_free(port->event_ring);
-	if (port->jack)
+		port->event_ring = NULL;
+	}
+	if (port->jack) {
 		jack_port_unregister(midi->client, port->jack);
-	if (port->rawmidi)
+		port->jack = NULL;
+	}
+	if (port->rawmidi) {
 		snd_rawmidi_close(port->rawmidi);
-	memset(port, 0, sizeof(*port));
+		port->rawmidi = NULL;
+	}
 }
 
 /*
@@ -689,11 +696,12 @@ midi_port_t** scan_port_open(alsa_rawmidi_t *midi, midi_port_t **list)
  	(str->port_close)(midi, port);
  fail_1:
 	midi_port_close(midi, port);
+	port->state = PORT_ZOMBIFIED;
+	error_log("scan: can't open port %s %s, zombified", port->dev, port->name);
+	return &port->next;
  fail_0:
- 	*list = port->next;
 	error_log("scan: can't open port %s %s", port->dev, port->name);
- 	free(port);
-	return list;
+	return &port->next;
 }
 
 static
