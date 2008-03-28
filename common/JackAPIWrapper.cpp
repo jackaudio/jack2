@@ -962,9 +962,7 @@ EXPORT int jack_client_name_size(void)
 {
     jack_log("jack_client_name_size");
     // Library check...
-    if (!open_library())
-        return 0;
-    return (*jack_client_name_size_fun)();
+    return (open_library() ? (*jack_client_name_size_fun)() : 0;
 }
 
 typedef int (*jack_port_name_size_fun_def)(void);
@@ -973,9 +971,7 @@ EXPORT int jack_port_name_size(void)
 {
     jack_log("jack_port_name_size");
     // Library check...
-    if (!open_library())
-        return 0;
-    return (*jack_port_name_size_fun)();
+    return (open_library() ? (*jack_port_name_size_fun)() : 0;
 }
 
 typedef int (*jack_port_type_size_fun_def)(void);
@@ -984,9 +980,7 @@ EXPORT int jack_port_type_size(void)
 {
     jack_log("jack_port_type_size");
     // Library check...
-    if (!open_library())
-        return 0;
-    return (*jack_port_type_size_fun)();
+    return (open_library() ? (*jack_port_type_size_fun)() : 0;
 }
 
 // transport.h
@@ -1255,10 +1249,7 @@ EXPORT jack_client_t * jack_client_new(const char *client_name)
 {
     jack_log("jack_client_new");
     // Library check...
-    if (!open_library())
-        return 0;
-
-    return (*jack_client_new_fun)(client_name);
+    return (open_library()) ? (*jack_client_new_fun)(client_name) : 0;
 }
 
 typedef int (*jack_client_close_fun_def)(jack_client_t *client);
@@ -1397,6 +1388,10 @@ static bool check_client(void* library)
 
 static bool open_library()
 {
+    // Already loaded
+    if (gLibrary)
+        return true;
+        
     char library_res_name[256];
     char* jack_debug_var = getenv("JACK_WRAPPER_DEBUG");
     jack_debug = (jack_debug_var && strcmp(jack_debug_var, "on") == 0); 
