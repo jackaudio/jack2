@@ -962,7 +962,7 @@ EXPORT int jack_client_name_size(void)
 {
     jack_log("jack_client_name_size");
     // Library check...
-    return (open_library() ? (*jack_client_name_size_fun)() : 0;
+    return (open_library() ? (*jack_client_name_size_fun)() : 0);
 }
 
 typedef int (*jack_port_name_size_fun_def)(void);
@@ -971,7 +971,7 @@ EXPORT int jack_port_name_size(void)
 {
     jack_log("jack_port_name_size");
     // Library check...
-    return (open_library() ? (*jack_port_name_size_fun)() : 0;
+    return (open_library() ? (*jack_port_name_size_fun)() : 0);
 }
 
 typedef int (*jack_port_type_size_fun_def)(void);
@@ -980,7 +980,7 @@ EXPORT int jack_port_type_size(void)
 {
     jack_log("jack_port_type_size");
     // Library check...
-    return (open_library() ? (*jack_port_type_size_fun)() : 0;
+    return (open_library() ? (*jack_port_type_size_fun)() : 0);
 }
 
 // transport.h
