@@ -89,4 +89,9 @@ bool JackThreadedDriver::Execute()
     return (Process() == 0);
 }
 
+bool JackThreadedDriver::Init()
+{
+    return fDriver->Init();
+}
+
 } // end of namespace

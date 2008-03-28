@@ -75,7 +75,7 @@ class EXPORT JackDriverInterface
         virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
 
         virtual int Process() = 0;
-
+    
         virtual void SetMaster(bool onoff) = 0;
         virtual bool GetMaster() = 0;
         virtual void AddSlave(JackDriverInterface* slave) = 0;
@@ -85,19 +85,38 @@ class EXPORT JackDriverInterface
         virtual bool IsRealTime() = 0;
 };
 
+/*
+\brief The base interface for blocking drivers.
+*/
+
+class EXPORT JackBlockingInterface
+{
+    
+    public:
+    
+        JackBlockingInterface()
+        {}
+        virtual ~JackBlockingInterface()
+        {}
+
+        virtual bool Init() = 0;  /* To be called by the wrapping thread Init method when the driver is a "blocking" one */
+
+};
+
 /*!
 \brief The base interface for drivers clients.
 */
 
 class EXPORT JackDriverClientInterface : public JackDriverInterface, public JackClientInterface
-    {};
+{};
 
 /*!
 \brief The base class for drivers clients.
 */
 
-class EXPORT JackDriverClient : public JackDriverClientInterface
+class EXPORT JackDriverClient : public JackDriverClientInterface, public JackBlockingInterface
 {
+    
     private:
 
         std::list<JackDriverInterface*> fSlaveList;
@@ -208,7 +227,12 @@ class EXPORT JackDriver : public JackDriverClient
         int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
 
         void SetupDriverSync(int ref, bool freewheel);
-
+        
+        virtual bool Init()
+        {
+            return true;
+        }
+   
 };
 
 } // end of namespace

@@ -143,8 +143,8 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         }
 
         // JackRunnableInterface interface
-
         virtual bool Execute();
+        virtual bool Init();
 
 };
 
