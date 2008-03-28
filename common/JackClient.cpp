@@ -479,37 +479,30 @@ inline int JackClient::Error()
 
 int JackClient::PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
-    // Check port name length
+    // Check if port name is empty
     string port_name_str = string(port_name);
     if (port_name_str.size() == 0) {
-        jack_error("port_name is empty.");
+        jack_error("port_name is empty");
         return 0; // Means failure here...
     }
 
+    // Check port name length
     string name = string(GetClientControl()->fName) + string(":") + port_name_str;
     if (name.size() >= JACK_PORT_NAME_SIZE) {
         jack_error("\"%s:%s\" is too long to be used as a JACK port name.\n"
-                   "Please use %lu characters or less.",
+                   "Please use %lu characters or less",
                    GetClientControl()->fName,
                    port_name,
                    JACK_PORT_NAME_SIZE - 1);
         return 0; // Means failure here...
     }
 
-    // Check if port name already exists
-    if (GetGraphManager()->GetPort(name.c_str()) != NO_PORT) {
-        jack_error("port_name \"%s\" already exists.", port_name);
-        return 0; // Means failure here...
-    }
-
-    jack_log("JackClient::PortRegister ref = %ld name = %s type = %s", GetClientControl()->fRefNum, name.c_str(), port_type);
-
     int result = -1;
     unsigned int port_index = NO_PORT;
     fChannel->PortRegister(GetClientControl()->fRefNum, name.c_str(), port_type, flags, buffer_size, &port_index, &result);
-    jack_log("JackClient::PortRegister port_index = %ld ", port_index);
-
+  
     if (result == 0) {
+        jack_log("JackClient::PortRegister ref = %ld name = %s type = %s port_index = %ld", GetClientControl()->fRefNum, name.c_str(), port_type, port_index);
         fPortList.push_back(port_index);
         return port_index;
     } else {

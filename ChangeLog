@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-03-28 Stephane Letz  <letz@grame.fr>
+		
+	* Correct PortRegister, port name checking must be done on server side.
+
 2008-03-27 Stephane Letz  <letz@grame.fr>
 		
 	* Pieter Palmers patch for FFADO driver.

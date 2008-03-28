@@ -641,6 +641,12 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 {
     jack_log("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d", refnum, name, type, flags, buffer_size);
     assert(fClientTable[refnum]);
+    
+    // Check if port name already exists
+    if (GetGraphManager()->GetPort(name) != NO_PORT) {
+        jack_error("port_name \"%s\" already exists", name);
+        return -1; 
+    }
 
     *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
     if (*port_index != NO_PORT) {
