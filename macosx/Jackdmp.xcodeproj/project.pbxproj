@@ -6424,7 +6424,7 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -6527,7 +6527,7 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -6630,7 +6630,7 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -6731,7 +6731,7 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -7119,7 +7119,7 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -7219,7 +7219,7 @@
 					x86_64,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -9135,7 +9135,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -9232,7 +9232,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -9888,7 +9888,7 @@
 					i386,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -9983,7 +9983,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -10350,7 +10350,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -11636,7 +11636,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
@@ -12152,7 +12152,7 @@
 					ppc,
 				);
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = /Volumes/Document1/Developpement/ProjectsCVS/JackCVS/JackServerCPP/build;
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
