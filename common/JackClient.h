@@ -81,7 +81,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fTimebaseArg;
         void* fSyncArg;
         void* fThreadFunArg;
-        int fConditionnal;
         char fServerName[64];
 
         JackThread*	fThread;    /*! Thread to execute the Process function */

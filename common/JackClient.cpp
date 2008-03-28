@@ -67,7 +67,6 @@ JackClient::JackClient(JackSynchro** table)
     fSyncArg = NULL;
     fThreadFun = NULL;
     fThreadFunArg = NULL;
-    fConditionnal = 0; // Temporary??
 }
 
 JackClient::~JackClient()
