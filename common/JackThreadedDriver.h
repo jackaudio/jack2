@@ -64,87 +64,87 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
             return fDriver->Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
         }
 
-        virtual int Close()
+        int Close()
         {
             return fDriver->Close();
         }
 
-        virtual int Process()
+        int Process()
         {
             return fDriver->Process();
         }
 
-        virtual int Attach()
+        int Attach()
         {
             return fDriver->Attach();
         }
-        virtual int Detach()
+        int Detach()
         {
             return fDriver->Detach();
         }
 
-        virtual int Read()
+        int Read()
         {
             return fDriver->Read();
         }
-        virtual int Write()
+        int Write()
         {
             return fDriver->Write();
         }
 
-        virtual int Start();
-        virtual int Stop();
+        int Start();
+        int Stop();
 
-        virtual int SetBufferSize(jack_nframes_t buffer_size)
+        int SetBufferSize(jack_nframes_t buffer_size)
         {
             return fDriver->SetBufferSize(buffer_size);
         }
 
-        virtual int SetSampleRate(jack_nframes_t sample_rate)
+        int SetSampleRate(jack_nframes_t sample_rate)
         {
             return fDriver->SetSampleRate(sample_rate);
         }
 
-        virtual void SetMaster(bool onoff)
+        void SetMaster(bool onoff)
         {
             fDriver->SetMaster(onoff);
         }
-        virtual bool GetMaster()
+        bool GetMaster()
         {
             return fDriver->GetMaster();
         }
 
-        virtual void AddSlave(JackDriverInterface* slave)
+        void AddSlave(JackDriverInterface* slave)
         {
             fDriver->AddSlave(slave);
         }
-        virtual void RemoveSlave(JackDriverInterface* slave)
+        void RemoveSlave(JackDriverInterface* slave)
         {
             fDriver->RemoveSlave(slave);
         }
-        virtual int ProcessSlaves()
+        int ProcessSlaves()
         {
             return fDriver->ProcessSlaves();
         }
 
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+        int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
         {
             return fDriver->ClientNotify(refnum, name, notify, sync, value1, value2);
         }
 
-        virtual JackClientControl* GetClientControl() const
+        JackClientControl* GetClientControl() const
         {
             return fDriver->GetClientControl();
         }
 
-        virtual bool IsRealTime()
+        bool IsRealTime()
         {
             return fDriver->IsRealTime();
         }
 
         // JackRunnableInterface interface
-        virtual bool Execute();
-        virtual bool Init();
+        bool Execute();
+        bool Init();
 
 };
 
