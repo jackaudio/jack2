@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-03-29 Stephane Letz  <letz@grame.fr>
+		
+	* Correct a missing parameter in the usage message of jack_midiseq.
+
 2008-03-28 Stephane Letz  <letz@grame.fr>
 		
 	* Correct PortRegister, port name checking must be done on server side.

@@ -35,7 +35,7 @@ jack_nframes_t loop_index;
 void usage()
 {
 	fprintf(stderr, "usage: jack_midiseq name nsamp [startindex note nsamp] ...... [startindex note nsamp]\n");
-	fprintf(stderr, "eg: jack_midiseq 24000 0 60 8000 12000 63 8000\n");
+	fprintf(stderr, "eg: jack_midiseq Sequencer 24000 0 60 8000 12000 63 8000\n");
 	fprintf(stderr, "will play a 1/2 sec loop (if srate is 48khz) with a c4 note at the start of the loop\n");
 	fprintf(stderr, "that lasts for 12000 samples, then a d4# that starts at 1/4 sec that lasts for 800 samples\n");
 }
