@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackServerGlobals__
 
 #include "driver_interface.h"
-#include "driver_parse.h"
 #include "JackDriverLoader.h"
 #include "JackServer.h"
 #include <assert.h>

@@ -61,5 +61,7 @@ EXPORT JSList * jack_drivers_load (JSList * drivers);
 
 jack_driver_info_t * jack_load_driver (jack_driver_desc_t * driver_desc);
 
+EXPORT int jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
+
 #endif
 
