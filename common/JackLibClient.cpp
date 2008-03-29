@@ -29,23 +29,17 @@ namespace Jack
 // Used for external C API (JackAPI.cpp)
 JackGraphManager* GetGraphManager()
 {
-    if (JackLibGlobals::fGlobals)
-        return JackLibGlobals::fGlobals->fGraphManager;
-    else
-        return NULL;
+    return (JackLibGlobals::fGlobals) ? JackLibGlobals::fGlobals->fGraphManager : NULL;
 }
 
 JackEngineControl* GetEngineControl()
 {
-    if (JackLibGlobals::fGlobals)
-        return JackLibGlobals::fGlobals->fEngineControl;
-    else
-        return NULL;
+    return (JackLibGlobals::fGlobals) ? JackLibGlobals::fGlobals->fEngineControl : NULL;
 }
 
 JackSynchro** GetSynchroTable()
 {
-    return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
+    return (JackLibGlobals::fGlobals) ? JackLibGlobals::fGlobals->fSynchroTable : NULL;
 }
 
 //-------------------
@@ -114,12 +108,12 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     #endif
     */
     // Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process
-    if (!fSynchroTable[fClientControl->fRefNum]->Connect(name_res, fServerName)) {
+    if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(name_res, fServerName)) {
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
 
-    jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, fClientControl->fRefNum);
+    jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
     return 0;
 
 error:

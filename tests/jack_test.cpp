@@ -191,7 +191,7 @@ int Jack_XRun_Callback(void *arg)
 {
     xrun++;
     have_xrun = 1;
-    printf("Xrun has been detected ! (msg from callback)\n");
+    Log("Xrun has been detected ! (msg from callback)\n");
     return 0;
 }
 
@@ -276,7 +276,7 @@ int Jack_Sync_Callback(jack_transport_state_t state, jack_position_t *pos, void 
  *
  * -1 : idle mode
  *  0 : write zeros to output 1
- *  1 : write continuously signal1 (sinusoïdal test signal) to output1
+ *  1 : write continuously signal1 (sinusoidal test signal) to output1
  *  3 : mode for summation test. While record (done by process2) is not running, write signal1 to both out1 & out1b.
  *      when record begin (index2 > 0), write signal1 in phase opposition to out1 & out2
  *  5 : Frames Time checking mode : write the array containing the three values of frame_time, frames cycles start and

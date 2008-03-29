@@ -34,7 +34,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include <iostream>
 
-
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -42,7 +41,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "asio.h"
 #include "asiodrivers.h"
 #include "iasiothiscallresolver.h"
-
 
 /* external references */
 extern AsioDrivers* asioDrivers ;
@@ -59,46 +57,45 @@ namespace Jack
     and must be closed by the called by calling ASIOExit() - if an error
     is returned the driver will already be closed.
 */
-static PaError LoadAsioDriver( const char *driverName,
-                               PaAsioDriverInfo *driverInfo, void *systemSpecific )
+static PaError LoadAsioDriver(const char *driverName, PaAsioDriverInfo *driverInfo, void *systemSpecific)
 {
     PaError result = paNoError;
     ASIOError asioError;
     int asioIsInitialized = 0;
 
-    if ( !loadAsioDriver(const_cast<char*>(driverName))) {
+    if (!loadAsioDriver(const_cast<char*>(driverName))) {
         result = paUnanticipatedHostError;
-        PA_ASIO_SET_LAST_HOST_ERROR( 0, "Failed to load ASIO driver" );
+        PA_ASIO_SET_LAST_HOST_ERROR(0, "Failed to load ASIO driver");
         goto error;
     }
 
-    memset( &driverInfo->asioDriverInfo, 0, sizeof(ASIODriverInfo) );
+    memset(&driverInfo->asioDriverInfo, 0, sizeof(ASIODriverInfo));
     driverInfo->asioDriverInfo.asioVersion = 2;
     driverInfo->asioDriverInfo.sysRef = systemSpecific;
-    if ( (asioError = ASIOInit( &driverInfo->asioDriverInfo )) != ASE_OK ) {
+    if ((asioError = ASIOInit(&driverInfo->asioDriverInfo)) != ASE_OK) {
         result = paUnanticipatedHostError;
-        PA_ASIO_SET_LAST_ASIO_ERROR( asioError );
+        PA_ASIO_SET_LAST_ASIO_ERROR(asioError);
         goto error;
     } else {
         asioIsInitialized = 1;
     }
 
-    if ( (asioError = ASIOGetChannels(&driverInfo->inputChannelCount,
-                                      &driverInfo->outputChannelCount)) != ASE_OK ) {
+    if ((asioError = ASIOGetChannels(&driverInfo->inputChannelCount,
+                                      &driverInfo->outputChannelCount)) != ASE_OK) {
         result = paUnanticipatedHostError;
-        PA_ASIO_SET_LAST_ASIO_ERROR( asioError );
+        PA_ASIO_SET_LAST_ASIO_ERROR(asioError);
         goto error;
     }
 
-    if ( (asioError = ASIOGetBufferSize(&driverInfo->bufferMinSize,
+    if ((asioError = ASIOGetBufferSize(&driverInfo->bufferMinSize,
                                         &driverInfo->bufferMaxSize, &driverInfo->bufferPreferredSize,
-                                        &driverInfo->bufferGranularity)) != ASE_OK ) {
+                                        &driverInfo->bufferGranularity)) != ASE_OK) {
         result = paUnanticipatedHostError;
-        PA_ASIO_SET_LAST_ASIO_ERROR( asioError );
+        PA_ASIO_SET_LAST_ASIO_ERROR(asioError);
         goto error;
     }
 
-    if ( ASIOOutputReady() == ASE_OK )
+    if (ASIOOutputReady() == ASE_OK)
         driverInfo->postOutput = true;
     else
         driverInfo->postOutput = false;
@@ -106,12 +103,11 @@ static PaError LoadAsioDriver( const char *driverName,
     return result;
 
 error:
-    if ( asioIsInitialized )
+    if (asioIsInitialized)
         ASIOExit();
 
     return result;
 }
-
 
 int JackASIODriver::bufferSwitch(long index, ASIOBool directProcess)
 {
@@ -131,7 +127,7 @@ int JackASIODriver::bufferSwitch(long index, ASIOBool directProcess)
 
     // get the time stamp of the buffer, not necessary if no
     // synchronization to other media is required
-    if ( ASIOGetSamplePosition(&timeInfo.timeInfo.samplePosition, &timeInfo.timeInfo.systemTime) == ASE_OK)
+    if (ASIOGetSamplePosition(&timeInfo.timeInfo.samplePosition, &timeInfo.timeInfo.systemTime) == ASE_OK)
         timeInfo.timeInfo.flags = kSystemTimeValid | kSamplePositionValid;
 
 
@@ -140,7 +136,7 @@ int JackASIODriver::bufferSwitch(long index, ASIOBool directProcess)
     driver->fOutputBuffer = (float**)outputBuffer;
 
     // Call the real callback
-    bufferSwitchTimeInfo( &timeInfo, index, directProcess );
+    bufferSwitchTimeInfo(&timeInfo, index, directProcess);
 
     return driver->Process();
 }
@@ -155,8 +151,7 @@ int JackASIODriver::Write()
     return 0;
 }
 
-
-int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApiIndex hostApiIndex )
+int JackASIODriver::Initialize(PaUtilHostApiRepresentation **hostApi, PaHostApiIndex hostApiIndex)
 {
     PaError result = paNoError;
     int i, driverCount;
@@ -165,14 +160,14 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
     char **names;
     PaAsioDriverInfo paAsioDriverInfo;
 
-    asioHostApi = (PaAsioHostApiRepresentation*)PaUtil_AllocateMemory( sizeof(PaAsioHostApiRepresentation) );
-    if ( !asioHostApi ) {
+    asioHostApi = (PaAsioHostApiRepresentation*)PaUtil_AllocateMemory(sizeof(PaAsioHostApiRepresentation));
+    if (!asioHostApi) {
         result = paInsufficientMemory;
         goto error;
     }
 
     asioHostApi->allocations = PaUtil_CreateAllocationGroup();
-    if ( !asioHostApi->allocations ) {
+    if (!asioHostApi->allocations) {
         result = paInsufficientMemory;
         goto error;
     }
@@ -194,7 +189,7 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
 #endif
 
     /* MUST BE CHECKED : to force fragments loading on Mac */
-    loadAsioDriver( "dummy" );
+    loadAsioDriver("dummy");
 
     /* driverCount is the number of installed drivers - not necessarily
         the number of installed physical devices. */
@@ -204,32 +199,31 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
     driverCount = asioDrivers->asioGetNumDev();
 #endif
 
-    if ( driverCount > 0 ) {
-        names = GetAsioDriverNames( asioHostApi->allocations, driverCount );
-        if ( !names ) {
+    if (driverCount > 0) {
+        names = GetAsioDriverNames(asioHostApi->allocations, driverCount);
+        if (!names) {
             result = paInsufficientMemory;
             goto error;
         }
 
-
         /* allocate enough space for all drivers, even if some aren't installed */
 
         (*hostApi)->deviceInfos = (PaDeviceInfo**)PaUtil_GroupAllocateMemory(
-                                      asioHostApi->allocations, sizeof(PaDeviceInfo*) * driverCount );
-        if ( !(*hostApi)->deviceInfos ) {
+                                      asioHostApi->allocations, sizeof(PaDeviceInfo*) * driverCount);
+        if (!(*hostApi)->deviceInfos) {
             result = paInsufficientMemory;
             goto error;
         }
 
         /* allocate all device info structs in a contiguous block */
         deviceInfoArray = (PaAsioDeviceInfo*)PaUtil_GroupAllocateMemory(
-                              asioHostApi->allocations, sizeof(PaAsioDeviceInfo) * driverCount );
-        if ( !deviceInfoArray ) {
+                              asioHostApi->allocations, sizeof(PaAsioDeviceInfo) * driverCount);
+        if (!deviceInfoArray) {
             result = paInsufficientMemory;
             goto error;
         }
 
-        for ( i = 0; i < driverCount; ++i ) {
+        for (i = 0; i < driverCount; ++i) {
 
             PA_DEBUG(("ASIO names[%d]:%s\n", i, names[i]));
 
@@ -240,18 +234,17 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
             // so lets NOT try to load any such wrappers.
             // The ones i [davidv] know of so far are:
 
-            if (   strcmp (names[i], "ASIO DirectX Full Duplex Driver") == 0
-                    || strcmp (names[i], "ASIO Multimedia Driver")          == 0
-                    || strncmp(names[i], "Premiere", 8)                      == 0 //"Premiere Elements Windows Sound 1.0"
-                    || strncmp(names[i], "Adobe", 5)                         == 0 ) //"Adobe Default Windows Sound 1.5"
+            if (strcmp (names[i], "ASIO DirectX Full Duplex Driver") == 0
+                    || strcmp (names[i], "ASIO Multimedia Driver")   == 0
+                    || strncmp(names[i], "Premiere", 8)              == 0  //"Premiere Elements Windows Sound 1.0"
+                    || strncmp(names[i], "Adobe", 5)                 == 0) //"Adobe Default Windows Sound 1.5"
             {
                 PA_DEBUG(("BLACKLISTED!!!\n"));
                 continue;
             }
 
-
             /* Attempt to load the asio driver... */
-            if ( LoadAsioDriver( names[i], &paAsioDriverInfo, asioHostApi->systemSpecific ) == paNoError ) {
+            if (LoadAsioDriver(names[i], &paAsioDriverInfo, asioHostApi->systemSpecific) == paNoError) {
                 PaAsioDeviceInfo *asioDeviceInfo = &deviceInfoArray[ (*hostApi)->info.deviceCount ];
                 PaDeviceInfo *deviceInfo = &asioDeviceInfo->commonDeviceInfo;
 
@@ -272,9 +265,9 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
 
                 deviceInfo->defaultSampleRate = 0.;
                 bool foundDefaultSampleRate = false;
-                for ( int j = 0; j < PA_DEFAULTSAMPLERATESEARCHORDER_COUNT_; ++j ) {
-                    ASIOError asioError = ASIOCanSampleRate( defaultSampleRateSearchOrder_[j] );
-                    if ( asioError != ASE_NoClock && asioError != ASE_NotPresent ) {
+                for (int j = 0; j < PA_DEFAULTSAMPLERATESEARCHORDER_COUNT_; ++j) {
+                    ASIOError asioError = ASIOCanSampleRate(defaultSampleRateSearchOrder_[j]);
+                    if (asioError != ASE_NoClock && asioError != ASE_NotPresent) {
                         deviceInfo->defaultSampleRate = defaultSampleRateSearchOrder_[j];
                         foundDefaultSampleRate = true;
                         break;
@@ -283,7 +276,7 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
 
                 PA_DEBUG(("PaAsio_Initialize: drv:%d defaultSampleRate = %f\n", i, deviceInfo->defaultSampleRate));
 
-                if ( foundDefaultSampleRate ) {
+                if (foundDefaultSampleRate) {
 
                     /* calculate default latency values from bufferPreferredSize
                         for default low latency, and bufferPreferredSize * 3
@@ -302,20 +295,19 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
                     long defaultHighLatencyBufferSize =
                         paAsioDriverInfo.bufferPreferredSize * 3;
 
-                    if ( defaultHighLatencyBufferSize > paAsioDriverInfo.bufferMaxSize )
+                    if (defaultHighLatencyBufferSize > paAsioDriverInfo.bufferMaxSize)
                         defaultHighLatencyBufferSize = paAsioDriverInfo.bufferMaxSize;
 
                     double defaultHighLatency =
                         defaultHighLatencyBufferSize / deviceInfo->defaultSampleRate;
 
-                    if ( defaultHighLatency < defaultLowLatency )
+                    if (defaultHighLatency < defaultLowLatency)
                         defaultHighLatency = defaultLowLatency; /* just incase the driver returns something strange */
 
                     deviceInfo->defaultHighInputLatency = defaultHighLatency;
                     deviceInfo->defaultHighOutputLatency = defaultHighLatency;
 
                 } else {
-
                     deviceInfo->defaultLowInputLatency = 0.;
                     deviceInfo->defaultLowOutputLatency = 0.;
                     deviceInfo->defaultHighInputLatency = 0.;
@@ -336,33 +328,33 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
                 asioDeviceInfo->asioChannelInfos = (ASIOChannelInfo*)PaUtil_GroupAllocateMemory(
                                                        asioHostApi->allocations,
                                                        sizeof(ASIOChannelInfo) * (deviceInfo->maxInputChannels
-                                                                                  + deviceInfo->maxOutputChannels) );
-                if ( !asioDeviceInfo->asioChannelInfos ) {
+                                                                                  + deviceInfo->maxOutputChannels));
+                if (!asioDeviceInfo->asioChannelInfos) {
                     result = paInsufficientMemory;
                     goto error;
                 }
 
                 int a;
 
-                for ( a = 0; a < deviceInfo->maxInputChannels; ++a ) {
+                for (a = 0; a < deviceInfo->maxInputChannels; ++a) {
                     asioDeviceInfo->asioChannelInfos[a].channel = a;
                     asioDeviceInfo->asioChannelInfos[a].isInput = ASIOTrue;
-                    ASIOError asioError = ASIOGetChannelInfo( &asioDeviceInfo->asioChannelInfos[a] );
-                    if ( asioError != ASE_OK ) {
+                    ASIOError asioError = ASIOGetChannelInfo(&asioDeviceInfo->asioChannelInfos[a]);
+                    if (asioError != ASE_OK) {
                         result = paUnanticipatedHostError;
-                        PA_ASIO_SET_LAST_ASIO_ERROR( asioError );
+                        PA_ASIO_SET_LAST_ASIO_ERROR(asioError);
                         goto error;
                     }
                 }
 
-                for ( a = 0; a < deviceInfo->maxOutputChannels; ++a ) {
+                for (a = 0; a < deviceInfo->maxOutputChannels; ++a) {
                     int b = deviceInfo->maxInputChannels + a;
                     asioDeviceInfo->asioChannelInfos[b].channel = a;
                     asioDeviceInfo->asioChannelInfos[b].isInput = ASIOFalse;
-                    ASIOError asioError = ASIOGetChannelInfo( &asioDeviceInfo->asioChannelInfos[b] );
-                    if ( asioError != ASE_OK ) {
+                    ASIOError asioError = ASIOGetChannelInfo(&asioDeviceInfo->asioChannelInfos[b]);
+                    if (asioError != ASE_OK) {
                         result = paUnanticipatedHostError;
-                        PA_ASIO_SET_LAST_ASIO_ERROR( asioError );
+                        PA_ASIO_SET_LAST_ASIO_ERROR(asioError);
                         goto error;
                     }
                 }
@@ -377,7 +369,7 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
         }
     }
 
-    if ( (*hostApi)->info.deviceCount > 0 ) {
+    if ((*hostApi)->info.deviceCount > 0) {
         (*hostApi)->info.defaultInputDevice = 0;
         (*hostApi)->info.defaultOutputDevice = 0;
     } else {
@@ -390,34 +382,32 @@ int JackASIODriver::Initialize( PaUtilHostApiRepresentation **hostApi, PaHostApi
     (*hostApi)->OpenStream = OpenStream;
     (*hostApi)->IsFormatSupported = IsFormatSupported;
 
-    PaUtil_InitializeStreamInterface( &asioHostApi->callbackStreamInterface, CloseStream, StartStream,
+    PaUtil_InitializeStreamInterface(&asioHostApi->callbackStreamInterface, CloseStream, StartStream,
                                       StopStream, AbortStream, IsStreamStopped, IsStreamActive,
                                       GetStreamTime, GetStreamCpuLoad,
                                       PaUtil_DummyRead, PaUtil_DummyWrite,
-                                      PaUtil_DummyGetReadAvailable, PaUtil_DummyGetWriteAvailable );
+                                      PaUtil_DummyGetReadAvailable, PaUtil_DummyGetWriteAvailable);
 
-    PaUtil_InitializeStreamInterface( &asioHostApi->blockingStreamInterface, CloseStream, StartStream,
+    PaUtil_InitializeStreamInterface(&asioHostApi->blockingStreamInterface, CloseStream, StartStream,
                                       StopStream, AbortStream, IsStreamStopped, IsStreamActive,
                                       GetStreamTime, PaUtil_DummyGetCpuLoad,
-                                      ReadStream, WriteStream, GetStreamReadAvailable, GetStreamWriteAvailable );
+                                      ReadStream, WriteStream, GetStreamReadAvailable, GetStreamWriteAvailable);
 
     return result;
 
 error:
-    if ( asioHostApi ) {
-        if ( asioHostApi->allocations ) {
-            PaUtil_FreeAllAllocations( asioHostApi->allocations );
-            PaUtil_DestroyAllocationGroup( asioHostApi->allocations );
+    if (asioHostApi) {
+        if (asioHostApi->allocations) {
+            PaUtil_FreeAllAllocations(asioHostApi->allocations);
+            PaUtil_DestroyAllocationGroup(asioHostApi->allocations);
         }
 
-        PaUtil_FreeMemory( asioHostApi );
+        PaUtil_FreeMemory(asioHostApi);
     }
     return result;
 }
 
-
-
-void JackASIODriverTerminate( struct PaUtilHostApiRepresentation *hostApi )
+void JackASIODriverTerminate(struct PaUtilHostApiRepresentation *hostApi)
 {
     PaAsioHostApiRepresentation *asioHostApi = (PaAsioHostApiRepresentation*)hostApi;
 
@@ -426,15 +416,14 @@ void JackASIODriverTerminate( struct PaUtilHostApiRepresentation *hostApi )
             - clean up any resources not handled by the allocation group
     */
 
-    if ( asioHostApi->allocations )
+    if (asioHostApi->allocations)
     {
-        PaUtil_FreeAllAllocations( asioHostApi->allocations );
-        PaUtil_DestroyAllocationGroup( asioHostApi->allocations );
+        PaUtil_FreeAllAllocations(asioHostApi->allocations);
+        PaUtil_DestroyAllocationGroup(asioHostApi->allocations);
     }
 
-    PaUtil_FreeMemory( asioHostApi );
+    PaUtil_FreeMemory(asioHostApi);
 }
-
 
 int JackASIODriver::Open(jack_nframes_t nframes,
                          jack_nframes_t samplerate,
@@ -480,9 +469,7 @@ void JackASIODriver::PrintState()
 {
     int i;
     std::cout << "JackASIODriver state" << std::endl;
-
     jack_port_id_t port_index;
-
     std::cout << "Input ports" << std::endl;
 
     /*

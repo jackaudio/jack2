@@ -228,10 +228,8 @@ typedef struct _jack_driver
     JackDriverBufSizeFunction bufsize;
 
     JACK_DRIVER_DECL			/* expand the macro */
-
 }
 jack_driver_t;
-
 
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 
@@ -240,7 +238,6 @@ void jack_driver_release (jack_driver_t *);
 
 jack_driver_t *jack_driver_load (int argc, char **argv);
 void jack_driver_unload (jack_driver_t *);
-
 
 /****************************
  *** Non-Threaded Drivers ***
@@ -265,8 +262,6 @@ void jack_driver_unload (jack_driver_t *);
 
      Note that stop/start may be called multiple times in the event of an
      error return from the `wait' function.
-
-
 */
 
 struct _jack_driver_nt;
@@ -281,7 +276,6 @@ typedef int (*JackDriverNTRunCycleFunction)(struct _jack_driver_nt *);
 
 typedef struct _jack_driver_nt
 {
-
 #define JACK_DRIVER_NT_DECL \
     JACK_DRIVER_DECL \
     struct _jack_engine * engine; \
@@ -299,13 +293,10 @@ typedef struct _jack_driver_nt
 #define nt_null_cycle null_cycle
 
     JACK_DRIVER_NT_DECL
-
-
 }
 jack_driver_nt_t;
 
 void jack_driver_nt_init (jack_driver_nt_t * driver);
 void jack_driver_nt_finish (jack_driver_nt_t * driver);
-
 
 #endif /* __jack_driver_h__ */
