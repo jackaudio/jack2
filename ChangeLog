@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-03-29 Stephane Letz  <letz@grame.fr>
 		
 	* Correct a missing parameter in the usage message of jack_midiseq.
+	* Add a client counter in wrapper layer : library is unloaded only when all clients have been closed.
 
 2008-03-28 Stephane Letz  <letz@grame.fr>
 		

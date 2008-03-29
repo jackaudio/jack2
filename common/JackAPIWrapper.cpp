@@ -239,6 +239,8 @@ static void (*info_fun)(const char *) = 0;
 
 static bool jack_debug = false;
 
+static unsigned int gClientCount = 0;
+
 static void rewrite_name(const char* name, char* new_name)
 {
     size_t i;
@@ -984,7 +986,6 @@ EXPORT int jack_port_type_size(void)
 }
 
 // transport.h
-
 typedef int (*jack_release_timebase_fun_def)(jack_client_t* ext_client);
 static jack_release_timebase_fun_def jack_release_timebase_fun = 0;
 EXPORT int jack_release_timebase(jack_client_t* ext_client)
@@ -1066,7 +1067,6 @@ EXPORT void jack_transport_stop(jack_client_t* ext_client)
 }
 
 // deprecated
-
 typedef void (*jack_get_transport_info_fun_def)(jack_client_t* ext_client, jack_transport_info_t* tinfo);
 static jack_get_transport_info_fun_def jack_get_transport_info_fun = 0;
 EXPORT void jack_get_transport_info(jack_client_t* ext_client, jack_transport_info_t* tinfo)
@@ -1084,7 +1084,6 @@ EXPORT void jack_set_transport_info(jack_client_t* ext_client, jack_transport_in
 }
 
 // statistics.h
-
 typedef float (*jack_get_max_delayed_usecs_fun_def)(jack_client_t* ext_client);
 static jack_get_max_delayed_usecs_fun_def jack_get_max_delayed_usecs_fun = 0;
 EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
@@ -1110,7 +1109,6 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 }
 
 // thread.h
-
 typedef int (*jack_acquire_real_time_scheduling_fun_def)(pthread_t thread, int priority);
 static jack_acquire_real_time_scheduling_fun_def jack_acquire_real_time_scheduling_fun = 0;
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
@@ -1147,7 +1145,6 @@ EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 }
 
 // intclient.h
-
 typedef char* (*jack_get_internal_client_name_fun_def)(jack_client_t* ext_client, jack_intclient_t intclient);
 static jack_get_internal_client_name_fun_def jack_get_internal_client_name_fun = 0;
 EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intclient_t intclient)
@@ -1196,6 +1193,8 @@ EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_option
         va_start(ap, status);
         jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
         va_end(ap);
+        if (res != NULL)
+            gClientCount++;
         return res;
     } else {
 
@@ -1236,6 +1235,8 @@ EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_option
             va_start(ap, status);
             jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
             va_end(ap);
+            if (res != NULL)
+                gClientCount++;
             return res;
         } else {
             return NULL;
@@ -1249,7 +1250,10 @@ EXPORT jack_client_t * jack_client_new(const char *client_name)
 {
     jack_log("jack_client_new");
     // Library check...
-    return (open_library()) ? (*jack_client_new_fun)(client_name) : 0;
+    jack_client_t * res = (open_library()) ? (*jack_client_new_fun)(client_name) : NULL;
+    if (res != NULL)
+        gClientCount++;
+    return res;
 }
 
 typedef int (*jack_client_close_fun_def)(jack_client_t *client);
@@ -1259,7 +1263,8 @@ EXPORT int jack_client_close(jack_client_t *client)
     jack_log("jack_client_close");
     if (client) {
         int res = (*jack_client_close_fun)(client);
-        close_library();
+        if (--gClientCount == 0) 
+            close_library();
         return res;
     } else {
         return -1;
@@ -1267,7 +1272,6 @@ EXPORT int jack_client_close(jack_client_t *client)
 }
 
 // MIDI
-
 typedef jack_nframes_t (*jack_midi_get_event_count_fun_def)(void* port_buffer);
 static jack_midi_get_event_count_fun_def jack_midi_get_event_count_fun = 0;
 EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer)
@@ -1323,7 +1327,6 @@ EXPORT jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer)
     jack_log("jack_midi_get_lost_event_count");
     return (*jack_midi_get_lost_event_count_fun)(port_buffer);
 }
-
 
 // Library loader
 static bool get_jack_library_in_directory(const char* dir_name, const char* library_name, char* library_res_name)
