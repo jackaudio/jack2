@@ -31,6 +31,7 @@ int JackSocketServerNotifyChannel::Open(const char* server_name)
         jack_error("Cannot connect to server socket");
         return -1;
     } else {
+        fRequestSocket.SetBlocking(true);
         return 0;
     }
 }
@@ -46,7 +47,7 @@ Can the write operation block?
 A non blocking write operation shoud be used : check if write can succeed, and ignore the notification otherwise
 (since its mainly used for XRun, ignoring a notification is OK, successive XRun will come...)
 */
-void JackSocketServerNotifyChannel::ClientNotify(int refnum, int notify, int value)
+void JackSocketServerNotifyChannel::Notify(int refnum, int notify, int value)
 {
     JackClientNotificationRequest req(refnum, notify, value);
     if (req.Write(&fRequestSocket) < 0) {

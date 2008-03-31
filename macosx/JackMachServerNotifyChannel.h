@@ -47,7 +47,7 @@ class JackMachServerNotifyChannel : public JackServerNotifyChannelInterface
         int Open(const char* server_name);         // Open the Server/Client connection
         void Close();       // Close the Server/Client connection
 
-        void ClientNotify(int refnum, int notify, int value);
+        void Notify(int refnum, int notify, int value);
 };
 
 } // end of namespace

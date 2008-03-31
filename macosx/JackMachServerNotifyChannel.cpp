@@ -44,7 +44,7 @@ void JackMachServerNotifyChannel::Close()
     //fClientPort.DisconnectPort(); pas nécessaire car le JackMachServerChannel a déja disparu?
 }
 
-void JackMachServerNotifyChannel::ClientNotify(int refnum, int notify, int value)
+void JackMachServerNotifyChannel::Notify(int refnum, int notify, int value)
 {
     kern_return_t res = rpc_jack_client_rt_notify(fClientPort.GetPort(), refnum, notify, value, 0);
     if (res != KERN_SUCCESS) {

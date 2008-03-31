@@ -25,6 +25,7 @@ Copyright (C) 2004-2008 Grame
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h> 
 #include <sys/time.h>
 #include <arpa/inet.h>
 #include <errno.h>
@@ -67,6 +68,8 @@ class JackClientSocket : public JackChannelTransaction
         }
         void SetReadTimeOut(long sec);
         void SetWriteTimeOut(long sec);
+        
+        void SetBlocking(bool onoff);
 };
 
 /*!

@@ -35,6 +35,7 @@ int JackSocketNotifyChannel::Open(const char* name)
         jack_error("Cannot connect client socket");
         return -1;
     }
+    
     // Use a time out for notifications
     fNotifySocket.SetReadTimeOut(SOCKET_TIME_OUT);
     return 0;

@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-03-31 Stephane Letz  <letz@grame.fr>
+		
+	* New SetBlocking method for JackSocket.
+
 2008-03-29 Stephane Letz  <letz@grame.fr>
 		
 	* Correct a missing parameter in the usage message of jack_midiseq.

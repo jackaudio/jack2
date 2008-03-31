@@ -46,7 +46,7 @@ Can the write operation block?
 A non blocking write operation shoud be used : check if write can succeed, and ignore the notification otherwise
 (since its mainly used for XRun, ignoring a notification is OK, successive XRun will come...)
 */
-void JackWinNamedPipeServerNotifyChannel::ClientNotify(int refnum, int notify, int value)
+void JackWinNamedPipeServerNotifyChannel::Notify(int refnum, int notify, int value)
 {
     JackClientNotificationRequest req(refnum, notify, value);
     if (req.Write(&fRequestPipe) < 0) {

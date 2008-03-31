@@ -33,7 +33,7 @@ void JackClientSocket::SetReadTimeOut(long sec)
     timout.tv_sec = sec;
     timout.tv_usec = 0;
     if (setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timout, sizeof(timeval)) < 0) {
-        jack_log("setsockopt SO_RCVTIMEO fd = %ld err = %s", fSocket, strerror(errno));
+        jack_error("SetReadTimeOut fd = %ld err = %s", fSocket, strerror(errno));
     }
 }
 
@@ -43,7 +43,15 @@ void JackClientSocket::SetWriteTimeOut(long sec)
     timout.tv_sec = sec ;
     timout.tv_usec = 0;
     if (setsockopt(fSocket, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timout, sizeof(timeval)) < 0) {
-        jack_log("setsockopt SO_SNDTIMEO fd = %ld err = %s", fSocket, strerror(errno));
+        jack_error("SetWriteTimeOut fd = %ld err = %s", fSocket, strerror(errno));
+    }
+}
+
+void JackClientSocket::SetBlocking(bool onoff)
+{   
+    int flag = (onoff) ? 1 : 0;
+    if (ioctl(fSocket, FIONBIO, &flag) < 0) {
+        jack_error("SetBlocking fd = %ld err = %s", fSocket, strerror(errno));
     }
 }
 
@@ -120,13 +128,11 @@ int JackClientSocket::Close()
 
 int JackClientSocket::Read(void* data, int len)
 {
-    int len1;
-
-    if ((len1 = read(fSocket, data, len)) != len) {
+    if (read(fSocket, data, len) != len) {
         jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
         if (errno == EWOULDBLOCK) {
-            jack_log("JackClientSocket::Read time out");
-            return 0;
+            jack_error("JackClientSocket::Read time out");
+            return 0;  // For a non blocking socket, a read failure is not considered as an error
         } else {
             return -1;
         }
@@ -139,7 +145,12 @@ int JackClientSocket::Write(void* data, int len)
 {
     if (write(fSocket, data, len) != len) {
         jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
-        return -1;
+        if (errno == EWOULDBLOCK) {
+            jack_log("JackClientSocket::Write time out");
+            return 0;  // For a non blocking socket, a write failure is not considered as an error
+        } else {
+            return -1;
+        }
     } else {
         return 0;
     }

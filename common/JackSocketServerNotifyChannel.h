@@ -46,7 +46,7 @@ class JackSocketServerNotifyChannel : public JackServerNotifyChannelInterface
         int Open(const char* server_name);
         void Close();
 
-        void ClientNotify(int refnum, int notify, int value);
+        void Notify(int refnum, int notify, int value);
 };
 
 } // end of namespace
