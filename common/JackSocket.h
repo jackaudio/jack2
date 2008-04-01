@@ -69,7 +69,7 @@ class JackClientSocket : public JackChannelTransaction
         void SetReadTimeOut(long sec);
         void SetWriteTimeOut(long sec);
         
-        void SetBlocking(bool onoff);
+        void SetNonBlocking(bool onoff);
 };
 
 /*!

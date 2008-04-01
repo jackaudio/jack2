@@ -31,7 +31,7 @@ int JackSocketServerNotifyChannel::Open(const char* server_name)
         jack_error("Cannot connect to server socket");
         return -1;
     } else {
-        fRequestSocket.SetBlocking(true);
+        fRequestSocket.SetNonBlocking(true);
         return 0;
     }
 }

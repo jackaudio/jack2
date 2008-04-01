@@ -47,11 +47,11 @@ void JackClientSocket::SetWriteTimeOut(long sec)
     }
 }
 
-void JackClientSocket::SetBlocking(bool onoff)
+void JackClientSocket::SetNonBlocking(bool onoff)
 {   
     int flag = (onoff) ? 1 : 0;
     if (ioctl(fSocket, FIONBIO, &flag) < 0) {
-        jack_error("SetBlocking fd = %ld err = %s", fSocket, strerror(errno));
+        jack_error("SetNonBlocking fd = %ld err = %s", fSocket, strerror(errno));
     }
 }
 
