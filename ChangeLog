@@ -22,7 +22,7 @@ Fernando Lopez-Lezcano
 
 2008-03-31 Stephane Letz  <letz@grame.fr>
 		
-	* New SetBlocking method for JackSocket.
+	* New SetNonBlocking method for JackSocket.
 
 2008-03-29 Stephane Letz  <letz@grame.fr>
 		
