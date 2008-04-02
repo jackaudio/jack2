@@ -189,7 +189,7 @@ extern "C"
 	* \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
 	*  NEW JACK CLIENTS.
     *
-    * It should be replace by use of @ jack_thread_wait and @ jack_cycle_wait functions.
+    * It should be replace by use of @ jack_cycle_wait and @ jack_cycle_signal functions.
 	*
 	*/
 	jack_nframes_t jack_thread_wait (jack_client_t*, int status);
@@ -469,13 +469,16 @@ extern "C"
      * zero-filled. if there are multiple inbound connections, the data
      * will be mixed appropriately.  
      *
-     * FOR OUTPUT PORTS ONLY
-     * ---------------------
+     * FOR OUTPUT PORTS ONLY : DEPRECATED in Jack 2.0 !!
+     * ---------------------------------------------------
      * You may cache the value returned, but only between calls to
      * your "blocksize" callback. For this reason alone, you should
      * either never cache the return value or ensure you have
      * a "blocksize" callback and be sure to invalidate the cached
      * address from there.
+     * 
+     * Caching output ports is DEPRECATED in Jack 2.0, due to some new optimization (like "pipelining").
+     * Port buffers have to be retrieved in each callback for proper functionning. 
      */
     void * jack_port_get_buffer (jack_port_t *, jack_nframes_t);
 
