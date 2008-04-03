@@ -64,6 +64,11 @@ class JackMutex
             DWORD dwWaitResult = WaitForSingleObject(fMutex, INFINITE);
         }
 
+        bool Trylock()
+        {
+           return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
+        }
+
         void Unlock()
         {
             ReleaseMutex(fMutex);
@@ -87,6 +92,11 @@ class JackMutex
         void Lock()
         {
             pthread_mutex_lock(&fMutex);
+        }
+
+	bool Trylock()
+        {
+            return (pthread_mutex_trylock(&fMutex) == 0);
         }
 
         void Unlock()
@@ -116,7 +126,12 @@ class JackLockAble
             fMutex.Lock();
         }
 
-        void Unlock()
+        bool Trylock()
+        {
+            return fMutex.Trylock();
+        }
+
+	void Unlock()
         {
             fMutex.Unlock();
         }
