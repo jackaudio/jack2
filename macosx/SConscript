@@ -47,10 +47,10 @@ serverenv.PrependUnique( LIBPATH=env['build_base'] )
 serverenv.PrependUnique( LIBS=[env['SERVERLIB'], 'dl'] )
 
 server = serverenv.Program(env['SERVER'], srcfiles_macosx_server)
-serverenv.Install( env['BINDIR'], server )
+serverenv.Install( env['INSTALL_BINDIR'], server )
 
 drv = serverenv.SharedLibrary( 'jack_dummy', srcfiles_macosx_dummy )
-serverenv.InstallAs( env['ADDON_DIR']+ '/jack_dummy.so', drv )
+serverenv.InstallAs( env['INSTALL_ADDON_DIR']+ '/jack_dummy.so', drv )
 
 drv = serverenv.SharedLibrary( 'jack_coreaudio', srcfiles_macosx_coreaudio )
-serverenv.InstallAs( env['ADDON_DIR']+ '/jack_coreaudio.so', drv )
+serverenv.InstallAs( env['INSTALL_ADDON_DIR']+ '/jack_coreaudio.so', drv )

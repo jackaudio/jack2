@@ -57,7 +57,7 @@ extra_libs = {}
 for example_program in example_programs:
     extra_libs[example_program] = ['jack']
 
-# TODO: we need to really test for READLINE... pkgconfig ?
+# TODO: we need to test for READLINE... is that even possible ?
 env['HAS_READLINE']=True
 if env['HAS_READLINE']:
     example_programs['jack_transport'] = 'transport.c'
@@ -73,12 +73,12 @@ if env['BUILD_EXAMPLES']:
     for example_program, example_program_source in example_programs.items():
         clientenv.Program(example_program, example_program_source, LIBS=extra_libs[example_program])
         if env['INSTALL_EXAMPLES']:
-            clientenv.Install(env['BINDIR'], example_program)
-    jack_disconnect_install_path = env['BINDIR'] + '/jack_disconnect'
+            clientenv.Install(env['INSTALL_BINDIR'], example_program)
+    jack_disconnect_install_path = env['INSTALL_BINDIR'] + '/jack_disconnect'
     env.Command(jack_disconnect_install_path, 'jack_connect', symlinkcmd)
     env.Alias('install', jack_disconnect_install_path)
     for example_lib, example_lib_source in example_libs.items():
         lib = clientenv.SharedLibrary(example_lib, example_lib_source)
         if clientenv['INSTALL_EXAMPLES']:
-            env.InstallAs(env['ADDON_DIR'] + '/' + example_lib + '.so', lib)
-            env.Alias('install', env['ADDON_DIR'] + '/' + example_lib + '.so')
+            env.InstallAs(env['INSTALL_ADDON_DIR'] + '/' + example_lib + '.so', lib)
+            env.Alias('install', env['INSTALL_ADDON_DIR'] + '/' + example_lib + '.so')

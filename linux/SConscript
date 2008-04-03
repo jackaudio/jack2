@@ -62,9 +62,9 @@ serverenv.PrependUnique( LIBPATH=env['build_base'] )
 serverenv.PrependUnique( LIBS=[env['SERVERLIB'], 'dl'] )
 
 server = serverenv.Program(env['SERVER'], srcfiles_linux_server)
-serverenv.Install( env['BINDIR'], server )
+serverenv.Install( env['INSTALL_BINDIR'], server )
 
-driver_dir = env['ADDON_DIR'] + "/"
+driver_dir = env['INSTALL_ADDON_DIR'] + "/"
 
 drv = serverenv.SharedLibrary( 'jack_dummy', srcfiles_linux_dummy )
 serverenv.InstallAs( driver_dir + "jack_dummy.so", drv )
