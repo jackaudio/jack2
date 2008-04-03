@@ -44,7 +44,7 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
 
         jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void GetConnectionsAux(JackConnectionManager* manager, const char** res, jack_port_id_t port_index);
-        const char** GetPortsAux(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
+        void GetPortsAux(const char** matching_ports, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
         float* GetBuffer(jack_port_id_t port_index);
         void* GetBufferAux(JackConnectionManager* manager, jack_port_id_t port_index, jack_nframes_t frames);
         jack_nframes_t ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count);

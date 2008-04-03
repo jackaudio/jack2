@@ -672,6 +672,9 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
     const jack_int_t* connections = manager->GetConnections(port_index);
     jack_int_t index;
     int i;
+    
+    // Cleanup connection array
+    memset(res, 0, sizeof(char*) * CONNECTION_NUM);
 
     for (i = 0; (i < CONNECTION_NUM) && ((index = connections[i]) != EMPTY); i++) {
         JackPort* port = GetPort(index);
@@ -690,10 +693,8 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
 // Client
 const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 {
-    const char** res = (const char**)malloc(sizeof(char*) * (CONNECTION_NUM + 1));
-    UInt16 cur_index;
-    UInt16 next_index;
-    AssertPort(port_index);
+    const char** res = (const char**)malloc(sizeof(char*) * CONNECTION_NUM);
+    UInt16 cur_index, next_index;
 
     do {
         cur_index = GetCurrentIndex();
@@ -710,13 +711,11 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 }
 
 // Client
-const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
+void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
-    unsigned long match_cnt = 0;
-    regex_t port_regex;
-    regex_t type_regex;
-    bool matching;
-
+    int match_cnt = 0;
+    regex_t port_regex, type_regex;
+  
     if (port_name_pattern && port_name_pattern[0]) {
         regcomp(&port_regex, port_name_pattern, REG_EXTENDED | REG_NOSUB);
     }
@@ -724,10 +723,11 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
         regcomp(&type_regex, type_name_pattern, REG_EXTENDED | REG_NOSUB);
     }
 
-    const char** matching_ports = (const char**)malloc(sizeof(char*) * PORT_NUM);
+    // Cleanup port array
+    memset(matching_ports, 0, sizeof(char*) * PORT_NUM);
 
     for (int i = 0; i < PORT_NUM; i++) {
-        matching = true;
+        bool matching = true;
         JackPort* port = GetPort(i);
 
         if (port->IsUsed()) {
@@ -757,19 +757,12 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
 
     matching_ports[match_cnt] = 0;
 
-    if (match_cnt == 0) {
-        free(matching_ports);
-        matching_ports = NULL;
-    }
-
     if (port_name_pattern && port_name_pattern[0]) {
         regfree(&port_regex);
     }
     if (type_name_pattern && type_name_pattern[0]) {
         regfree(&type_regex);
     }
-
-    return matching_ports;
 }
 
 // Client
@@ -780,21 +773,21 @@ const char** JackGraphManager::GetPortsAux(const char* port_name_pattern, const 
 */
 const char** JackGraphManager::GetPorts(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
-    const char** matching_ports = NULL;
-    UInt16 cur_index;
-    UInt16 next_index;
-
+    const char** res = (const char**)malloc(sizeof(char*) * PORT_NUM);
+    UInt16 cur_index, next_index;
+ 
     do {
         cur_index = GetCurrentIndex();
-        if (matching_ports) {
-            free(matching_ports);
-            jack_log("JackGraphManager::GetPorts retry... ");
-        }
-        matching_ports = GetPortsAux(port_name_pattern, type_name_pattern, flags);
+        GetPortsAux(res, port_name_pattern, type_name_pattern, flags);
         next_index = GetCurrentIndex();
-    } while (cur_index != next_index); // Until a coherent state has been read
+    } while (cur_index != next_index);  // Until a coherent state has been read 
 
-    return matching_ports;
+    if (res[0]) {    // at least one port
+        return res;
+    } else {
+        free(res);   // empty array, should return NULL
+        return NULL;
+    }
 }
 
 // Server
