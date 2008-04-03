@@ -56,7 +56,7 @@ opts = Options('cache/'+build_base+'options.cache')
 # If this is just to display a help-text for the variable used via ARGUMENTS, then its wrong...
 opts.Add( 'BUILDDIR', 'Path to place the built files in', '')
 opts.AddOptions(
-    PathOption('DISTDIR', 'A prefix where the installed tree will be placed - for package maintainers', '', PathOption.PathAccept),
+    PathOption('DESTDIR', 'A prefix where the installed tree will be placed - for package maintainers', '', PathOption.PathAccept),
     PathOption('PREFIX', 'The prefix where jackdmp will be installed to', '/usr/local', PathOption.PathAccept),
     PathOption('BINDIR', 'Overwrite the directory where apps are installed to', '$PREFIX/bin', PathOption.PathAccept),
     PathOption('LIBDIR', 'Overwrite the directory where libs are installed to', '$PREFIX/lib', PathOption.PathAccept),
@@ -194,24 +194,24 @@ if env['FULL_MIMIC']:
     env['CLIENTLIB'] = 'jack'
     env['SERVERLIB'] = 'jackserver'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jack"
-    env['INSTALL_ADDON_DIR'] = env['DISTDIR'] + env.subst(env['LIBDIR']) + "/jack"
+    env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jack"
 else:
     env['SERVER'] = 'jackdmp'
     env['CLIENTLIB'] = 'jackmp'
     env['SERVERLIB'] = 'jackservermp'
     env['WRAPPERLIB'] = 'jack'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
-    env['INSTALL_ADDON_DIR'] = env['DISTDIR'] + env.subst(env['LIBDIR']) + "/jackmp"
+    env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jackmp"
 
 env['PREFIX'] = env.subst(env['PREFIX'])
 env['BINDIR'] = env.subst(env['BINDIR'])
 env['LIBDIR'] = env.subst(env['LIBDIR'])
 env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
 
-env['INSTALL_PREFIX'] = env['DISTDIR'] + env['PREFIX']
-env['INSTALL_BINDIR'] = env['DISTDIR'] + env['BINDIR']
-env['INSTALL_LIBDIR'] = env['DISTDIR'] + env['LIBDIR']
-env['INSTALL_INCLUDEDIR'] = env['DISTDIR'] + env['INCLUDEDIR'] + '/jack'
+env['INSTALL_PREFIX'] = env['DESTDIR'] + env['PREFIX']
+env['INSTALL_BINDIR'] = env['DESTDIR'] + env['BINDIR']
+env['INSTALL_LIBDIR'] = env['DESTDIR'] + env['LIBDIR']
+env['INSTALL_INCLUDEDIR'] = env['DESTDIR'] + env['INCLUDEDIR'] + '/jack'
 
 env.Alias('install', env['INSTALL_LIBDIR'])
 env.Alias('install', env['INSTALL_INCLUDEDIR'])
