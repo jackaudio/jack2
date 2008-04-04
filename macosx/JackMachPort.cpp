@@ -102,14 +102,18 @@ bool JackMachPort::DisconnectPort()
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
-    if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
-        jack_error("JackMacRPC::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
+    if (fBootPort != 0) {
+        if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
+            jack_error("JackMacRPC::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
+        }
     }
 
-    if ((res = mach_port_deallocate(task, fServerPort)) != KERN_SUCCESS) {
-        jack_error("JackMacRPC::DisconnectPort mach_port_deallocate fServerPort err = %s", mach_error_string(res));
+    if (fServerPort != 0) {
+        if ((res = mach_port_deallocate(task, fServerPort)) != KERN_SUCCESS) {
+            jack_error("JackMacRPC::DisconnectPort mach_port_deallocate fServerPort err = %s", mach_error_string(res));
+        }
     }
-
+    
     return true;
 }
 
@@ -119,12 +123,16 @@ bool JackMachPort::DestroyPort()
     kern_return_t res;
     mach_port_t task = mach_task_self();
 
-    if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
-        jack_error("JackMacRPC::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
+    if (fBootPort != 0) {
+        if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
+            jack_error("JackMacRPC::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
+        }
     }
 
-    if ((res = mach_port_destroy(task, fServerPort)) != KERN_SUCCESS) {
-        jack_error("JackMacRPC::DisconnectPort mach_port_destroy fServerPort err = %s", mach_error_string(res));
+    if (fServerPort != 0) {
+        if ((res = mach_port_destroy(task, fServerPort)) != KERN_SUCCESS) {
+            jack_error("JackMacRPC::DisconnectPort mach_port_destroy fServerPort err = %s", mach_error_string(res));
+        }
     }
 
     return true;
@@ -180,7 +188,7 @@ bool JackMachPortSet::AllocatePort(const char* name, int queue)
 
     jack_log("AllocatePort: queue limit = %ld", qlimits.mpl_qlimit);
 
-    if (queue > 0 ) {
+    if (queue > 0) {
         qlimits.mpl_qlimit = queue;
 
         if ((res = mach_port_set_attributes(task, fServerPort, MACH_PORT_LIMITS_INFO, (mach_port_info_t) & qlimits, MACH_PORT_LIMITS_INFO_COUNT)) != KERN_SUCCESS) {
@@ -205,12 +213,16 @@ bool JackMachPortSet::DisconnectPort()
 
     jack_log("JackMachPortSet::DisconnectPort");
 
-    if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
-        jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
+    if (fBootPort != 0) {
+        if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
+            jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate fBootPort err = %s", mach_error_string(res));
+        }
     }
 
-    if ((res = mach_port_deallocate(task, fServerPort)) != KERN_SUCCESS) {
-        jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate fServerPort err = %s", mach_error_string(res));
+    if (fServerPort != 0) {
+        if ((res = mach_port_deallocate(task, fServerPort)) != KERN_SUCCESS) {
+            jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate fServerPort err = %s", mach_error_string(res));
+        }
     }
 
     return true;
@@ -223,12 +235,16 @@ bool JackMachPortSet::DestroyPort()
 
     jack_log("JackMachPortSet::DisconnectPort");
 
-    if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
-        jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate err = %s", mach_error_string(res));
+    if (fBootPort != 0) {
+        if ((res = mach_port_deallocate(task, fBootPort)) != KERN_SUCCESS) {
+            jack_error("JackMachPortSet::DisconnectPort mach_port_deallocate err = %s", mach_error_string(res));
+        }
     }
 
-    if ((res = mach_port_destroy(task, fServerPort)) != KERN_SUCCESS) {
-        jack_error("JackMachPortSet::DisconnectPort mach_port_destroy fServerPort err = %s", mach_error_string(res));
+    if (fServerPort != 0) {
+        if ((res = mach_port_destroy(task, fServerPort)) != KERN_SUCCESS) {
+            jack_error("JackMachPortSet::DisconnectPort mach_port_destroy fServerPort err = %s", mach_error_string(res));
+        }
     }
 
     return true;

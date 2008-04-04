@@ -43,7 +43,7 @@ class JackMachPort
 
     public:
 
-        JackMachPort()
+        JackMachPort():fBootPort(0), fServerPort(0)
         {}
         virtual ~JackMachPort()
         {}
@@ -69,7 +69,7 @@ class JackMachPortSet : public JackMachPort
 
     public:
 
-        JackMachPortSet()
+        JackMachPortSet():fPortSet(0)
         {}
         virtual ~JackMachPortSet()
         {}

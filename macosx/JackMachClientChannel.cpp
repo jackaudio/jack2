@@ -29,7 +29,7 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-JackMachClientChannel::JackMachClientChannel()
+JackMachClientChannel::JackMachClientChannel():fPrivatePort(0)
 {
     fThread = new JackMachThread(this);
 }
@@ -100,10 +100,11 @@ void JackMachClientChannel::Close()
     fServerPort.DisconnectPort();
     fClientPort.DestroyPort();
 
-    // TO CHECK
-    kern_return_t res;
-    if ((res = mach_port_destroy(mach_task_self(), fPrivatePort)) != KERN_SUCCESS) {
-        jack_error("JackMachClientChannel::Close err = %s", mach_error_string(res));
+    if (fPrivatePort != 0) {
+         kern_return_t res;
+        if ((res = mach_port_destroy(mach_task_self(), fPrivatePort)) != KERN_SUCCESS) {
+            jack_error("JackMachClientChannel::Close err = %s", mach_error_string(res));
+        }
     }
 }
 
