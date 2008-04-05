@@ -1772,10 +1772,15 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
         (driver->midi->destroy)(driver->midi);
 
     for (node = driver->clock_sync_listeners; node;
-            node = jack_slist_next (node)) {
+        node = jack_slist_next (node)) {
         free (node->data);
     }
     jack_slist_free (driver->clock_sync_listeners);
+    
+    if (driver->ctl_handle) {
+		snd_ctl_close (driver->ctl_handle);
+		driver->ctl_handle = 0;
+	} 
 
     if (driver->capture_handle) {
         snd_pcm_close (driver->capture_handle);
