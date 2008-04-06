@@ -26,7 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackGlobals.h"
 #include "JackTime.h"
 #include "JackExports.h"
-#include "JackAPI.h"
 
 #ifdef __APPLE__
 #include "JackMachThread.h"
