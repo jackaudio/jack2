@@ -263,6 +263,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
             int out_nChannels = 0;
             char capture_driver_name[256];
             char playback_driver_name[256];
+            CFStringRef ref;
 
             // Stop and restart
             driver->Stop();
@@ -303,7 +304,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 
             // Send notification to be used in JackPilot or JackRouter plugin
             jack_error("Device restart...");
-            CFStringRef ref = CFStringCreateWithCString(NULL, driver->fEngineControl->fServerName, kCFStringEncodingMacRoman);
+            ref = CFStringCreateWithCString(NULL, driver->fEngineControl->fServerName, kCFStringEncodingMacRoman);
             CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
                     CFSTR("com.grame.jackserver.restart"),
                     ref,
@@ -1251,8 +1252,8 @@ extern "C"
         int chan_in = 0;
         int chan_out = 0;
         bool monitor = false;
-        char* capture_pcm_name = "";
-        char* playback_pcm_name = "";
+        const char* capture_pcm_name = "";
+        const char* playback_pcm_name = "";
         const JSList *node;
         const jack_driver_param_t *param;
         jack_nframes_t systemic_input_latency = 0;
