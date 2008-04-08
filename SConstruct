@@ -63,6 +63,7 @@ opts.AddOptions(
     PathOption('INCLUDEDIR', 'Overwrite the directory where headers are installed to', '$PREFIX/include', PathOption.PathAccept),
     # TODO: The next one is stupid, should be autodetected
     BoolOption('BUILD_FOR_LINUX', 'Enable/Disable depending on your system', True),
+    BoolOption('X86_64_BUILD', 'Enable/Disable an x86_64 like install layout', False),
     BoolOption('ENABLE_ALSA', 'Enable/Disable the ALSA backend', True),
     BoolOption('ENABLE_FREEBOB', 'Enable/Disable the FreeBoB backend', True),
     BoolOption('ENABLE_FIREWIRE', 'Enable/Disable the FireWire backend', True),
@@ -71,7 +72,7 @@ opts.AddOptions(
     BoolOption('BUILD_EXAMPLES', 'Build the example clients in their directory', True),
     BoolOption('INSTALL_EXAMPLES', 'Install the example clients in the BINDIR directory', True),
     BoolOption('BUILD_DOXYGEN_DOCS', 'Build doxygen documentation', False),
-    BoolOption('FULL_MIMIC', 'Mimic jack-1.0 installation layout as much as possible', False),
+    BoolOption('FULL_MIMIC', 'Mimic jack-1.0 installation layout as much as possible', True),
     )
 
 #
@@ -189,6 +190,13 @@ env.AppendUnique(CFLAGS = ['-fPIC', '-DUSE_POSIX_SHM'])
 env.AppendUnique(CFLAGS = ['-DJACKMP'])
 env.AppendUnique(CPPFLAGS = ['-DJACKMP'])
 
+env['PREFIX'] = env.subst(env['PREFIX'])
+env['BINDIR'] = env.subst(env['BINDIR'])
+env['LIBDIR'] = env.subst(env['LIBDIR'])
+env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
+if (env['X86_64_BUILD']):
+    env['LIBDIR'] += '64'
+
 if env['FULL_MIMIC']:
     env['SERVER'] = 'jackd'
     env['CLIENTLIB'] = 'jack'
@@ -202,11 +210,6 @@ else:
     env['WRAPPERLIB'] = 'jack'
     env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
     env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jackmp"
-
-env['PREFIX'] = env.subst(env['PREFIX'])
-env['BINDIR'] = env.subst(env['BINDIR'])
-env['LIBDIR'] = env.subst(env['LIBDIR'])
-env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
 
 env['INSTALL_PREFIX'] = env['DESTDIR'] + env['PREFIX']
 env['INSTALL_BINDIR'] = env['DESTDIR'] + env['BINDIR']
@@ -230,7 +233,6 @@ env.Alias('install', pkg_config_dir)
 env['top_srcdir'] = env.Dir('.').abspath
 
 # for config.h.in
-env['LIB_DIR']='lib'
 env['JACK_LOCATION']=env.subst(env['BINDIR'])
 env.ScanReplace( 'config.h.in' )
 # just like jack.pc, config.h is always updated in case of config changes 

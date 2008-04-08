@@ -10,8 +10,6 @@
 
 #define ADDON_DIR "$ADDON_DIR"
 
-#define LIB_DIR "$LIB_DIR"
-
 #define JACK_LOCATION "$JACK_LOCATION"
 
 #endif // CONFIG_H
