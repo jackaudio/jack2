@@ -58,7 +58,7 @@ bool JackMachPort::AllocatePort(const char* name, int queue)
 
     jack_log("AllocatePort: queue limit %ld", qlimits.mpl_qlimit);
 
-    if (queue > 0 ) {
+    if (queue > 0) {
         qlimits.mpl_qlimit = queue;
         if ((res = mach_port_set_attributes(task, fServerPort, MACH_PORT_LIMITS_INFO, (mach_port_info_t) & qlimits, MACH_PORT_LIMITS_INFO_COUNT)) != KERN_SUCCESS) {
             jack_error("Allocate: mach_port_set_attributes error name = %s err = %s", name, mach_error_string(res));
