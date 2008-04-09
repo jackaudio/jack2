@@ -20,45 +20,20 @@ The audible result of this mode is that if a client is not activated during one 
 Linux version
 --------------
 
-The published version still uses fifos for server/client synchronization. The use of POSIX named semaphore is implemented but still a bit unstable. Sockets are used for server/client communications. The ALSA backend derived from jackd implementation is used.
+The published version still uses fifos for server/client synchronization. The use of POSIX named semaphore is implemented but still a bit unstable. Sockets are used for server/client communications. The ALSA backend derived from jackd implementation is used. To build jackdmp, a "scons" based compilation system is available. The code has to be compiled on a machine where ALSA and possibly frebob (FFADO) headers and libraries are corrected installed.
 
-To build jackdmp, two options have available : a rather simple "Makefile" and a "scons" based compilation system.  Makefile based compilation is the preferred option since the scons one is not complete yet. There is no configuration step yet. The code has to be compiled on a machine where ALSA and frebob (FFADO) headers and libraries are corrected installed.
+In the top folder do :
 
-Go in the src/linux folder and do :
-
-make
-(sudo) make install 
+scons
+sudo scons install 
 
 (WARNING : this will install everything needed in /usr/local in place of a regular jack installation so that jack applications will use jackdmp)
 
-Freebob driver can be compiled with : make freebob
-FFADO driver can be compiled with : make firewire
+Various compilations options can be seed using scons -h.
 
-You may define variables for special purpose, like :
+Important compilation options :
 
-make prefix=/usr  to compile and install everything in /usr location instead of /usr/local or
-make libdir=lib64 on a 64 bits system so that libraries are installed at the proper location.
-
-Compilation options :
-
-- the GETCYCLE_TIME flag must be defined to use "get_cycles" to measure time otherwise "clock_gettime" is used (used by default)
-
-- the __CLIENTDEBUG__ flag must be added in the makefile to activate client validation
-
-- the SOCKET_RPC_POSIX_SEMA flag must be used to test POSIX named semaphore for server/client synchronization
-
-- the following variables may have to be changed in common/JackConstants.h to use a ramfs for fifos and sockets.
-
-#define jack_server_dir "/dev/shm"
-#define jack_client_dir "/dev/shm"
-
-After installation, qjackctl setting will have to be changed to use "jackdmp" instead of "jackd".
-
-To remove jackdmp, go in the src/linux folder and do :
-
-make remove
-
-This will remove jackdmp and (possibly) restore regular jack.
+- the FULL_MIMIC flag must be defined so that jackdmp use the same exe and library naming than jackd. When compiled and installed with FULL_MIMIC=yes, jackdmp will *replace* regular jackd. When compiled and installed with FULL_MIMIC=no, a special "wrapper" library will be used so that jackd and jackdmp can be used side by side. The wrapper library will then cleanly redirect all jack API calls on the currently running server. If the "automatic start server option" is used by clients, the wrapper library will try to start the server (either jackd or jackdmp) that is currently described in the .jackdrc configuration file. By default FULL_MIMIC is "yes".
 
 Using Jackdmp with Qjackctl :
 
@@ -157,7 +132,7 @@ To activate loopback driver, use :
 Validations tools
 ------------------
 
-jackdmp can possibly validate client applications by checking they are using the API in a correct manner (calling functions in the right order, correctly desallocating ressources....) and produce a log file. By default jackdmp is compiled with client validation off. A __CLIENTDEBUG__ flag must be activated in the Makefile (or Xcode project) to activate validation.
+jackdmp can possibly validate client applications by checking they are using the API in a correct manner (calling functions in the right order, correctly desallocating ressources....) and produce a log file. A JACK_CLIENT_DEBUG environment variable must be used to activate client validation : use "export JACK_CLIENT_DEBUG=on".
 
 --------------
 Documentation
@@ -206,6 +181,7 @@ Note : To experiment with the -S option, jackdmp must be launched in a console.
 0.68 : Internal loadable client implementation, winpipe version added. Reorganize jack headers. Improve Linux install/remove scripts. Use LIB_DIR variable for 64 bits related compilation (drivers location). More generic Linux script. Correct jack_acquire_real_time_scheduling on OSX. Merge of Dmitry Baikov MIDI branch. Correct JackGraphManager::GetPortsAux to use port type. Remove JackEngineTiming class: code moved in JackEngineControl. Add midiseq and midisine examples. Cleanup old zombification code. Linux Makefile now install jack headers. Use of JACK_CLIENT_DEBUG environment variable to activate debug client mode. Definition of JACK_LOCATION variable using -D in the Makefile. Restore jack 0.103.0 MIDI API version. Fix a bug in freewheel management in async mode: drivers now receive the kStartFreewheelCallback and kStopFreewheelCallback notifications. Server and user directory related code moved in a JackTools file. Client name rewritting to remove path characters (used in fifo naming). Correct ALSA driver Attach method: internal driver may have changed the buffer_size and sample_rate values. Add JackWinSemaphore class. Add an implementation for obsolete jack_internal_client_new and jack_internal_client_close. Add missing jack_port_type_size. Use of JackWinSemaphore instead of JackWinEvent for inter-process synchronization. Correct types.h for use with MINGW on Windows. Move OSX start/stop notification mechanism in Jackdmp.cpp. Correct CheckPort in JackAPI.cpp.
 0.69 : On OSX, use CFNotificationCenterPostNotificationWithOptions with kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions for server ==> JackRouter plugin notification. On OSX, use jack server name in notification system. Correct fPeriodUsecs computation in JackAudioDriver::SetBufferSize and JackAudioDriver::SetSampleRate. Correct JackMachNotifyChannel::ClientNotify. Correct bug in CoreAudio driver sample rate management. Add a sample_rate change listener in CoreAudio driver. Correct sample_rate management in JackCoreAudioDriver::Open. Better handling in sample_rate change listener. Pieter Palmers FFADO driver and scons based build. Pieter Palmers second new build system: scons and Makefile based build. Tim Blechmann scons patch. Change string management for proper compilation with gcc 4.2.2. JackLog cleanup. Cleanup in CoreAudio driver. Tim Blechmann patch for JackGraphManager::GetPortsAux memory leak, Tim Blechmann patch for scons install. Dmitry Baikov MIDI patch : alsa_seqmidi and alsa_rammidi drivers. CoreAudio driver improvement : detect and notify abnormal situations (stopped driver in case of SR change...).
 0.70 : Updated API to match jack 0.109.0 version. Update in usx2y.c and JackPort.cpp to match jackd 0.109.2. Latest jack_lsp code from jack SVN. Add jack_mp_thread_wait client example. Add jack_thread_wait client example. Remove checking thread in CoreAudio driver, better device state change recovery strategy: the driver is stopped and restarted. Move transport related methods from JackEngine to JackServer. Tim Blechmann sse optimization patch for JackaudioPort::MixAudioBuffer, use of Apple Accelerate framework on OSX. Remove use of assert in JackFifo, JackMachSemaphore, and JackPosixSemaphore: print an error instead. Correct "server_connect": close the communication channel. More robust external API. Use SetAlias for port naming. Use jackd midi port naming scheme. Notify ports unregistration in JackEngine::ClientCloseAux. Fix in JackClient::Error(): when RT thread is failing and calling Shutdown, Shutdown was not desactivating the client correctly.
+0.71 : Add port register/unregister notification in JackAlsaDriver. Correct JACK_port_unregister. Add TimeCallback in JackDebugClient class. Correct jack_get_time propotype. Correct JackSocketClientChannel::ClientClose to use ServerSyncCall instead of ServerAsyncCall. Better documentation in jack.h. libjackdmp.so renamed to libjackservermp.so and same for OSX framework. Define an internal jack_client_open_aux needed for library wrapper feature. Remove unneeded jack_port_connect API. Correct jack_port_get_connections function (should return NULL when no connections). In thread model, execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished). Fix engine real-time notification (was broken since ??). Implements wrapper layer. Correct jack_port_get_total_latency. Correct all backend playback port latency in case of "asynchronous" mode (1 buffer more). Add test for jack_cycle_wait, jack_cycle_wait and jack_set_process_thread API. RT scheduling for OSX thread (when use in dummy driver). Add -L (extra output latency in aynchronous mode) in CoreAudio driver. New JackLockedEngine decorator class to serialize access from ALSA Midi thread, command thread and in-server clients. Use engine in JackAlsaDriver::port_register and JackAlsaDriver::port_unregister. Fix connect notification to deliver *one* notification only. Correct JackClient::Activate so that first kGraphOrderCallback can be received by the client notification thread. New jack_server_control client to test notifications when linked to the server library. Synchronise transport.h with latest jackd version (Video handling). Transport timebase fix. Dmitry Baikov patch for alsa_rawmidi driver. Pieter Palmers patch for FFADO driver. Add an Init method for blocking drivers to be decorated using JackThreadedDriver class. Correct PortRegister, port name checking must be done on server side. Correct a missing parameter in the usage message of jack_midiseq. New SetNonBlocking method for JackSocket. Correct a dirty port array issue in JackGraphManager::GetPortsAux. 
 
 This is a work in progress but the implementation is now stable enough to be tested. jackdmp has been used successfully with the following applications : Ardour, Hydrogen, Jamin, Qjackctl, Jack-Rack, SooperLooper, AlsaPlayer...  
 
