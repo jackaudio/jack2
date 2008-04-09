@@ -63,7 +63,6 @@ opts.AddOptions(
     PathOption('INCLUDEDIR', 'Overwrite the directory where headers are installed to', '$PREFIX/include', PathOption.PathAccept),
     # TODO: The next one is stupid, should be autodetected
     BoolOption('BUILD_FOR_LINUX', 'Enable/Disable depending on your system', True),
-    BoolOption('X86_64_BUILD', 'Enable/Disable an x86_64 like install layout', False),
     BoolOption('ENABLE_ALSA', 'Enable/Disable the ALSA backend', True),
     BoolOption('ENABLE_FREEBOB', 'Enable/Disable the FreeBoB backend', True),
     BoolOption('ENABLE_FIREWIRE', 'Enable/Disable the FireWire backend', True),
@@ -147,14 +146,6 @@ if not env.GetOption('clean'):
         print "--> At least one of the dependencies is missing. I can't go on without it, please install the needed packages (remember to also install the *-devel packages)"
         Exit(1)
 
-# Shouldn't be needed with the new wrapper/full_mimic features
-#    env['JACK_FLAGS'] = conf.GetPKGFlags('jack', '0.90')
-#    if env['JACK_FLAGS']:
-#        print "--> Found an existing JACK installation, let's be careful not to erase it"
-#        if conf.GetPKGPrefix( 'jack' ) == env['PREFIX']:
-#            print '--> JACK is installed in the same directory as our current PREFIX. Either remove JACK or change your installation PREFIX.'
-#            Exit(1)
-
     # Optional checks follow:
     if env['BUILD_FOR_LINUX'] and env['ENABLE_ALSA']:
         env['ALSA_FLAGS'] = conf.GetPKGFlags('alsa', '1.0.0')
@@ -194,8 +185,6 @@ env['PREFIX'] = env.subst(env['PREFIX'])
 env['BINDIR'] = env.subst(env['BINDIR'])
 env['LIBDIR'] = env.subst(env['LIBDIR'])
 env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
-if (env['X86_64_BUILD']):
-    env['LIBDIR'] += '64'
 
 if env['FULL_MIMIC']:
     env['SERVER'] = 'jackd'
