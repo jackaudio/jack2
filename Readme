@@ -22,7 +22,7 @@ Linux version
 
 The published version still uses fifos for server/client synchronization. The use of POSIX named semaphore is implemented but still a bit unstable. Sockets are used for server/client communications. The ALSA backend derived from jackd implementation is used. To build jackdmp, a "scons" based compilation system is available. The code has to be compiled on a machine where ALSA and possibly frebob (FFADO) headers and libraries are corrected installed.
 
-In the top folder do :
+In the src folder do :
 
 scons
 sudo scons install 
