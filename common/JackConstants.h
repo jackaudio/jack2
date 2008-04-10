@@ -25,7 +25,7 @@
 namespace Jack
 {
 
-#define VERSION "0.71"
+#define VERSION "0.72"
 
 #define FORK_SERVER 1
 
