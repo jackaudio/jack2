@@ -33,11 +33,13 @@ Various compilations options can be seed using scons -h.
 
 Important compilation options :
 
-- the FULL_MIMIC flag must be defined so that jackdmp use the same exe and library naming than jackd. When compiled and installed with FULL_MIMIC=yes, jackdmp will *replace* regular jackd. When compiled and installed with FULL_MIMIC=no, a special "wrapper" library will be used so that jackd and jackdmp can be used side by side. The wrapper library will then cleanly redirect all jack API calls on the currently running server. If the "automatic start server option" is used by clients, the wrapper library will try to start the server (either jackd or jackdmp) that is currently described in the .jackdrc configuration file. By default FULL_MIMIC is "yes".
+- the FULL_MIMIC flag must be defined so that jackdmp use the same exe and library naming than jackd. When compiled and installed with FULL_MIMIC=yes, jackdmp will *replace* regular jackd (it means a new jackd executable is compiled and installed). When compiled and installed with FULL_MIMIC=no, a special "wrapper" library will be used so that jackd and jackdmp can be used side by side (it means the new jackdmp executable is compiled and installed). The wrapper library will then cleanly redirect all jack API calls on the currently running server. If the "automatic start server option" is used by clients, the wrapper library will try to start the server (either jackd or jackdmp) that is currently described in the .jackdrc configuration file. By default FULL_MIMIC is "yes".
 
 Using Jackdmp with Qjackctl :
 
 To start jackdmp server in Qjackctl, the complete server path has to be added, like /usr/local/bin/jackdmp in Setup/Server Path.
+
+WARNING !! : when used in FULL_MIMIC=yes mode, the "jackd" name has to be used, when used in FULL_MIMIC=yes mode, the "jackdmp" name has to be used (since regular jack and jackdmp can be used together).
 
 Known problems, limitations
 ----------------------------
