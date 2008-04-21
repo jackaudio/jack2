@@ -1183,6 +1183,7 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 
 typedef jack_client_t * (*jack_client_open_aux_fun_def)(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap);
 static jack_client_open_aux_fun_def jack_client_open_aux_fun = 0;
+/*
 EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_options_t options, jack_status_t *status, ...)
 {
     jack_log("jack_client_open");
@@ -1243,9 +1244,75 @@ EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_option
         }
     }
 }
+*/
+
+static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap)
+{
+    jack_log("jack_client_open");
+
+    // Library check...
+    if (open_library()) {
+        jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
+        if (res != NULL)
+            gClientCount++;
+        return res;
+    } else {
+
+        jack_varargs_t va;		// variable arguments
+        jack_status_t my_status;
+        char client_name[JACK_CLIENT_NAME_SIZE];
+
+        if (ext_client_name == NULL) {
+            jack_log("jack_client_open called with a NULL client_name");
+            return NULL;
+        }
+
+        rewrite_name(ext_client_name, client_name);
+
+        if (status == NULL)			// no status from caller?
+            status = &my_status;	// use local status word
+        *status = (jack_status_t)0;
+
+        // validate parameters
+        if ((options & ~JackOpenOptions)) {
+            int my_status1 = *status | (JackFailure | JackInvalidOption);
+            *status = (jack_status_t)my_status1;
+            return NULL;
+        }
+
+        /* parse variable arguments */
+        if (ap)
+            jack_varargs_parse(options, ap, &va);
+        else
+            jack_varargs_init(&va);
+  
+        if (start_server(va.server_name, options)) {
+            int my_status1 = *status | JackFailure | JackServerFailed;
+            *status = (jack_status_t)my_status1;
+            return NULL;
+        } else if (open_library()) {
+            jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
+            if (res != NULL)
+                gClientCount++;
+            return res;
+        } else {
+            return NULL;
+        }
+    }
+}
+
+EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+{
+    va_list ap;
+    va_start(ap, status);
+    jack_client_t* res =  jack_client_open_aux(ext_client_name, options, status, ap);
+    va_end(ap);
+    return res;
+}
 
 typedef jack_client_t * (*jack_client_new_fun_def)(const char *client_name);
 static jack_client_new_fun_def jack_client_new_fun = 0;
+/*
 EXPORT jack_client_t * jack_client_new(const char *client_name)
 {
     jack_log("jack_client_new");
@@ -1254,6 +1321,16 @@ EXPORT jack_client_t * jack_client_new(const char *client_name)
     if (res != NULL)
         gClientCount++;
     return res;
+}
+*/
+
+EXPORT jack_client_t* jack_client_new(const char* client_name)
+{
+    jack_log("jack_client_new: deprecated");
+    int options = JackUseExactName;
+    if (getenv("JACK_START_SERVER") == NULL) 
+        options |= JackNoStartServer;
+    return jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
 }
 
 typedef int (*jack_client_close_fun_def)(jack_client_t *client);
