@@ -1186,7 +1186,7 @@ static jack_client_open_aux_fun_def jack_client_open_aux_fun = 0;
 
 static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap)
 {
-    jack_log("jack_client_open");
+    jack_log("jack_client_open_aux");
 
     // Library check...
     if (open_library()) {
@@ -1229,7 +1229,7 @@ static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_op
             *status = (jack_status_t)my_status1;
             return NULL;
         } else if (open_library()) {
-	    // To let a "temporary" server quits properly
+	        // To let a "temporary" server quits properly
             usleep(500000);
             jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
             if (res != NULL)
