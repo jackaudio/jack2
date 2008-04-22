@@ -120,7 +120,7 @@ void JackEngine::ReleaseRefnum(int ref)
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
 #ifndef WIN32
-            kill(getpid(), SIGINT);
+ 	    exit(0);
 #endif
         }
     }

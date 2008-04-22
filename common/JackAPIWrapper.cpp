@@ -1183,68 +1183,6 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
 
 typedef jack_client_t * (*jack_client_open_aux_fun_def)(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap);
 static jack_client_open_aux_fun_def jack_client_open_aux_fun = 0;
-/*
-EXPORT jack_client_t * jack_client_open(const char *ext_client_name, jack_options_t options, jack_status_t *status, ...)
-{
-    jack_log("jack_client_open");
-
-    // Library check...
-    if (open_library()) {
-        va_list ap;
-        va_start(ap, status);
-        jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
-        va_end(ap);
-        if (res != NULL)
-            gClientCount++;
-        return res;
-    } else {
-
-        jack_varargs_t va;		// variable arguments
-        jack_status_t my_status;
-        char client_name[JACK_CLIENT_NAME_SIZE];
-
-        if (ext_client_name == NULL) {
-            jack_log("jack_client_open called with a NULL client_name");
-            return NULL;
-        }
-
-        rewrite_name(ext_client_name, client_name);
-
-        if (status == NULL)			// no status from caller?
-            status = &my_status;	// use local status word
-        *status = (jack_status_t)0;
-
-        // validate parameters
-        if ((options & ~JackOpenOptions)) {
-            int my_status1 = *status | (JackFailure | JackInvalidOption);
-            *status = (jack_status_t)my_status1;
-            return NULL;
-        }
-
-        // parse variable arguments
-        va_list ap;
-        va_start(ap, status);
-        jack_varargs_parse(options, ap, &va);
-        va_end(ap);
-
-        if (start_server(va.server_name, options)) {
-            int my_status1 = *status | JackFailure | JackServerFailed;
-            *status = (jack_status_t)my_status1;
-            return NULL;
-        } else if (open_library()) {
-            va_list ap;
-            va_start(ap, status);
-            jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
-            va_end(ap);
-            if (res != NULL)
-                gClientCount++;
-            return res;
-        } else {
-            return NULL;
-        }
-    }
-}
-*/
 
 static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_options_t options, jack_status_t *status, va_list ap)
 {
@@ -1291,6 +1229,8 @@ static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_op
             *status = (jack_status_t)my_status1;
             return NULL;
         } else if (open_library()) {
+	    // To let a "temporary" server quits properly
+            usleep(500000);
             jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
             if (res != NULL)
                 gClientCount++;
@@ -1312,17 +1252,6 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
 
 typedef jack_client_t * (*jack_client_new_fun_def)(const char *client_name);
 static jack_client_new_fun_def jack_client_new_fun = 0;
-/*
-EXPORT jack_client_t * jack_client_new(const char *client_name)
-{
-    jack_log("jack_client_new");
-    // Library check...
-    jack_client_t * res = (open_library()) ? (*jack_client_new_fun)(client_name) : NULL;
-    if (res != NULL)
-        gClientCount++;
-    return res;
-}
-*/
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
@@ -1515,7 +1444,6 @@ static bool open_library()
 
     // Load entry points...
     jack_client_open_aux_fun = (jack_client_open_aux_fun_def)dlsym(gLibrary, "jack_client_open_aux");
-    jack_client_new_fun = (jack_client_new_fun_def)dlsym(gLibrary, "jack_client_new");
     jack_client_close_fun = (jack_client_close_fun_def)dlsym(gLibrary, "jack_client_close");
     jack_client_name_size_fun = (jack_client_name_size_fun_def)dlsym(gLibrary, "jack_client_name_size");
     jack_get_client_name_fun = (jack_get_client_name_fun_def)dlsym(gLibrary, "jack_get_client_name");
