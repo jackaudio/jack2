@@ -1230,7 +1230,7 @@ static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_op
             return NULL;
         } else if (open_library()) {
 	        // To let a "temporary" server quits properly
-            usleep(500000);
+            sleep(1);
             jack_client_t* res = (*jack_client_open_aux_fun)(ext_client_name, options, status, ap);
             if (res != NULL)
                 gClientCount++;
