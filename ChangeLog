@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-04-24 Stephane Letz  <letz@grame.fr>
+		
+	* Correct internal client load.
+
 2008-04-10 Stephane Letz  <letz@grame.fr>
 		
 	* Remove Linux Makefile, update Readme.

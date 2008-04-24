@@ -122,8 +122,7 @@ JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackS
         : JackInternalClient(server, table)
 {
     char path_to_so[PATH_MAX + 1];
-    //snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.so", so_name);
-    snprintf(path_to_so, sizeof(path_to_so), so_name);
+    snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.so", so_name);
     snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
     fHandle = LoadJackModule(path_to_so);
 
