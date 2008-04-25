@@ -1204,7 +1204,6 @@ extern "C"
         strcpy(desc->params[i].name, "device");
         desc->params[i].character = 'd';
         desc->params[i].type = JackDriverParamString;
-        desc->params[i].value.ui = 128U;
         strcpy(desc->params[i].value.str, "will take default CoreAudio device name");
         strcpy(desc->params[i].short_desc, "CoreAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
