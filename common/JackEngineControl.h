@@ -105,6 +105,9 @@ struct JackEngineControl : public JackShmMem
 
     JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, const char* server_name)
     {
+        fBufferSize = 512;
+        fSampleRate = 48000;
+        fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize);
         fSyncMode = sync;
         fTemporary = temporary;
         fTimeOut = (timeout > 0);
