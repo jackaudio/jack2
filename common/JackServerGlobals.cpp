@@ -27,10 +27,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "shm.h"
 #include <getopt.h>
 
-#ifndef WIN32
-#include <dirent.h>
-#endif
-
 static char* server_name = NULL;
 
 namespace Jack
@@ -75,6 +71,11 @@ int JackServerGlobals::Delete()
 
 bool JackServerGlobals::Init()
 {
+    // Server already started
+    if (JackServer::fInstance != NULL) 
+        return true;
+        
+    // Otherwise first client starts the server
     if (fClientCount++ == 0) {
 
         jack_log("JackServerGlobals Init");
@@ -282,9 +283,7 @@ bool JackServerGlobals::Init()
 
         /* clean up shared memory and files from any previous instance of this server name */
         jack_cleanup_shm();
-#ifndef WIN32
         JackTools::CleanupFiles(server_name);
-#endif
 
         if (!realtime && client_timeout == 0)
             client_timeout = 500; /* 0.5 sec; usable when non realtime. */
@@ -298,9 +297,7 @@ bool JackServerGlobals::Init()
             jack_error("Cannot start server... exit");
             Delete();
             jack_cleanup_shm();
-#ifndef WIN32
             JackTools::CleanupFiles(server_name);
-#endif
             jack_unregister_server(server_name);
             goto error;
         }
@@ -319,9 +316,7 @@ void JackServerGlobals::Destroy()
         jack_log("JackServerGlobals Destroy");
         Stop();
         jack_cleanup_shm();
-#ifndef WIN32
         JackTools::CleanupFiles(server_name);
-#endif
         jack_unregister_server(server_name);
     }
 }

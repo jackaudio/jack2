@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-04-25 Stephane Letz  <letz@grame.fr>
+		
+	* Correct JackServerGlobals::Init: now check is server is already started.
+
 2008-04-24 Stephane Letz  <letz@grame.fr>
 		
 	* Correct internal client load.

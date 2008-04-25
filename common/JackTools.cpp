@@ -209,5 +209,4 @@ void JackTools::RewriteName(const char* name, char* new_name)
     new_name[i] = '\0';
 }
 
-
 }
