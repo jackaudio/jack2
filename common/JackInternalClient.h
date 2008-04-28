@@ -67,6 +67,38 @@ class JackInternalClient : public JackClient
 #define UnloadJackModule(handle) FreeLibrary((handle));
 #define GetJackProc(handle, name) GetProcAddress((handle), (name));
 
+void PrintLoadError(const char* so_name) 
+{ 
+    // Retrieve the system error message for the last-error code
+
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError(); 
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and exit the process
+
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+        (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
+    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("error loading %s err = %s"), so_name, lpMsgBuf); 
+        
+    jack_error((LPCTSTR)lpDisplayBuf); 
+
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
+}
+
 #else
 
 #include <dlfcn.h>
@@ -74,6 +106,7 @@ class JackInternalClient : public JackClient
 #define LoadJackModule(name) dlopen((name), RTLD_NOW | RTLD_LOCAL);
 #define UnloadJackModule(handle) dlclose((handle));
 #define GetJackProc(handle, name) dlsym((handle), (name));
+#define PrintLoadError(so_name) jack_log("error loading %s err = %s", so_name, dlerror());
 
 #endif
 

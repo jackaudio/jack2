@@ -135,7 +135,7 @@ JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackS
     jack_log("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s", path_to_so);
 
     if (fHandle == 0) {
-        jack_error("error loading %s", so_name);
+        PrintLoadError(so_name);
         throw - 1;
     }
 
