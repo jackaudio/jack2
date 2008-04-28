@@ -30,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackEngine.h"
+#include "JackException.h"
 #include <assert.h>
 
 namespace Jack
@@ -175,7 +176,12 @@ int JackAudioDriver::Write()
 
 int JackAudioDriver::Process()
 {
-    return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    try {
+        return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    } catch (JackException e) {
+        e.PrintMessage();
+        return -1;
+    }
 }
 
 /*
@@ -186,13 +192,13 @@ synchronize to the end of client graph execution.
 int JackAudioDriver::ProcessAsync()
 {
     if (Read() < 0) { // Read input buffers for the current cycle
-        jack_error("ProcessAsync: read error");
-        return 0;
+        jack_error("ProcessAsync: read error, skip cycle");
+        return -1;
     }
 
     if (Write() < 0) { // Write output buffers from the previous cycle
-        jack_error("ProcessAsync: write error");
-        return 0;
+        jack_error("ProcessAsync: write error, skip cycle");
+        return -1;
     }
 
     if (fIsMaster) {
@@ -215,8 +221,8 @@ output buffers computed at the *current cycle* are used.
 int JackAudioDriver::ProcessSync()
 {
     if (Read() < 0) { // Read input buffers for the current cycle
-        jack_error("ProcessSync: read error");
-        return 0;
+        jack_error("ProcessSync: read error, skip cycle");
+        return -1;
     }
 
     if (fIsMaster) {
@@ -231,9 +237,11 @@ int JackAudioDriver::ProcessSync()
             jack_error("ProcessSync: error");
         }
 
-        if (Write() < 0)  // Write output buffers for the current cycle
-            jack_error("ProcessSync: write error");
-
+        if (Write() < 0) { // Write output buffers for the current cycle
+            jack_error("ProcessSync: write error, skip cycle");
+            return -1;
+        }
+        
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     }

@@ -86,6 +86,15 @@ class JackThread
         virtual int AcquireRealTime() = 0;
         virtual int AcquireRealTime(int priority) = 0;
         virtual int DropRealTime() = 0;
+        
+        virtual bool GetRunning()
+        {
+            return fRunning;
+        }
+        virtual void SetRunning(bool state)
+        {
+            fRunning = state;
+        }
 
         virtual void SetParams(UInt64 period, UInt64 computation, UInt64 constraint) // Empty implementation, will only make sense on OSX...
         {}

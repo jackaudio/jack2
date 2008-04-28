@@ -27,6 +27,7 @@
 #include "JackGlobals.h"
 #include "JackClient.h"
 #include "JackEngineControl.h"
+#include "JackException.h"
 
 namespace Jack
 {
@@ -86,12 +87,37 @@ int JackThreadedDriver::Stop()
 
 bool JackThreadedDriver::Execute()
 {
-    return (Process() == 0);
+    try {
+        // Keep running even in case of error
+        Process();
+        return true;
+    } catch (JackException e) {
+        e.PrintMessage();
+        jack_error("Driver is stopped");
+        return false;
+    } 
 }
 
 bool JackThreadedDriver::Init()
 {
     return fDriver->Init();
+}
+
+bool JackRestartThreadedDriver::Execute()
+{
+    while (fThread->GetRunning()) { 
+        try {
+            // Keep running even in case of error
+            while (true) {
+                Process();
+            }
+        } catch (JackException e) {
+            e.PrintMessage();
+            jack_log("Driver is restarted...");
+            Init();
+        }   
+    }
+    return false;
 }
 
 } // end of namespace

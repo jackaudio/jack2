@@ -34,7 +34,7 @@ namespace Jack
 class JackThreadedDriver : public JackDriverClientInterface, public JackRunnableInterface
 {
 
-    private:
+    protected:
 
         JackThread* fThread;
         JackDriverClient* fDriver;
@@ -143,10 +143,24 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
         }
 
         // JackRunnableInterface interface
-        bool Execute();
-        bool Init();
+        virtual bool Execute();
+        virtual bool Init();
 
 };
+
+class JackRestartThreadedDriver : public JackThreadedDriver
+{
+     public:
+
+        JackRestartThreadedDriver(JackDriverClient* driver):JackThreadedDriver(driver)
+        {}
+        virtual ~JackRestartThreadedDriver()
+        {}
+
+        // JackRunnableInterface interface
+        virtual bool Execute();
+};
+
 
 } // end of namespace
 
