@@ -67,10 +67,9 @@ class JackInternalClient : public JackClient
 #define UnloadJackModule(handle) FreeLibrary((handle));
 #define GetJackProc(handle, name) GetProcAddress((handle), (name));
 
-void PrintLoadError(const char* so_name) 
+static void PrintLoadError(const char* so_name) 
 { 
     // Retrieve the system error message for the last-error code
-
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
     DWORD dw = GetLastError(); 
@@ -86,11 +85,9 @@ void PrintLoadError(const char* so_name)
         0, NULL );
 
     // Display the error message and exit the process
-
     lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
-    StringCchPrintf((LPTSTR)lpDisplayBuf, 
-        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR)); 
+    _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
         TEXT("error loading %s err = %s"), so_name, lpMsgBuf); 
         
     jack_error((LPCTSTR)lpDisplayBuf); 
