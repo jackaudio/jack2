@@ -90,7 +90,7 @@ class JackThread
         virtual int AcquireRealTime(int priority) = 0;
         virtual int DropRealTime() = 0;
         
-        virtual bool GetStatus()
+        virtual kThreadState GetStatus()
         {
             return fStatus;
         }
