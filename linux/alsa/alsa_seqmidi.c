@@ -212,7 +212,7 @@ void stream_close(alsa_seqmidi_t *self, int dir)
 alsa_midi_t* alsa_seqmidi_new(jack_client_t *client, const char* alsa_name)
 {
 	alsa_seqmidi_t *self = calloc(1, sizeof(alsa_seqmidi_t));
-	debug_log("midi: new\n");
+	debug_log("midi: new");
 	if (!self)
 		return NULL;
 	self->jack = client;
@@ -244,7 +244,7 @@ void alsa_seqmidi_delete(alsa_midi_t *m)
 {
 	alsa_seqmidi_t *self = (alsa_seqmidi_t*) m;
 
-	debug_log("midi: delete\n");
+	debug_log("midi: delete");
 	alsa_seqmidi_detach(m);
 
 	stream_close(self, PORT_OUTPUT);
@@ -263,7 +263,7 @@ int alsa_seqmidi_attach(alsa_midi_t *m)
 	alsa_seqmidi_t *self = (alsa_seqmidi_t*) m;
 	int err;
 
-	debug_log("midi: attach\n");
+	debug_log("midi: attach");
 
 	if (self->seq)
 		return -EALREADY;
@@ -297,7 +297,7 @@ int alsa_seqmidi_detach(alsa_midi_t *m)
 {
 	alsa_seqmidi_t *self = (alsa_seqmidi_t*) m;
 
-	debug_log("midi: detach\n");
+	debug_log("midi: detach");
 
 	if (!self->seq)
 		return -EALREADY;
@@ -328,7 +328,7 @@ int alsa_seqmidi_start(alsa_midi_t *m)
 	alsa_seqmidi_t *self = (alsa_seqmidi_t*) m;
 	int err;
 
-	debug_log("midi: start\n");
+	debug_log("midi: start");
 
 	if (!self->seq)
 		return -EBADF;
@@ -359,7 +359,7 @@ int alsa_seqmidi_stop(alsa_midi_t *m)
 {
 	alsa_seqmidi_t *self = (alsa_seqmidi_t*) m;
 
-	debug_log("midi: stop\n");
+	debug_log("midi: stop");
 
 	if (!self->keep_walking)
 		return -EALREADY;
@@ -395,7 +395,7 @@ int alsa_connect_from(alsa_seqmidi_t *self, int client, int port)
 	snd_seq_port_subscribe_set_time_real(sub, 1);
 
 	if ((err=snd_seq_subscribe_port(self->seq, sub)))
-		error_log("can't subscribe to %d:%d - %s\n", client, port, snd_strerror(err));
+		error_log("can't subscribe to %d:%d - %s", client, port, snd_strerror(err));
 	return err;
 }
 
@@ -436,7 +436,7 @@ void port_setdead(port_hash_t hash, snd_seq_addr_t addr)
 	if (port)
 		port->is_dead = 1; // see jack_process
 	else
-		debug_log("port_setdead: not found (%d:%d)\n", addr.client, addr.port);
+		debug_log("port_setdead: not found (%d:%d)", addr.client, addr.port);
 }
 
 static
@@ -448,7 +448,7 @@ void port_free(alsa_seqmidi_t *self, port_t *port)
 		jack_ringbuffer_free(port->early_events);
 	if (port->jack_port)
 		jack_port_unregister(self->jack, port->jack_port);
-	info_log("port deleted: %s\n", port->name);
+	info_log("port deleted: %s", port->name);
 
 	free(port);
 }
@@ -497,7 +497,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 
 	port->early_events = jack_ringbuffer_create(MAX_EVENT_SIZE*16);
 
-	info_log("port created: %s\n", port->name);
+	info_log("port created: %s", port->name);
 	return port;
 
  failed:
@@ -515,10 +515,10 @@ void update_port_type(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, int c
 	int alsa_mask = port_type[type].alsa_mask;
 	port_t *port = port_get(str->ports, addr);
 
-	debug_log("update_port_type(%d:%d)\n", addr.client, addr.port);
+	debug_log("update_port_type(%d:%d)", addr.client, addr.port);
 
 	if (port && (caps & alsa_mask)!=alsa_mask) {
-		debug_log("setdead: %s\n", port->name);
+		debug_log("setdead: %s", port->name);
 		port->is_dead = 1;
 	}
 
@@ -583,7 +583,7 @@ void* port_thread(void *arg)
 		free_ports(self, self->port_del);
 		update_ports(self);
 	}
-	debug_log("port_thread exited\n");
+	debug_log("port_thread exited");
 	return NULL;
 }
 
@@ -642,7 +642,7 @@ void add_ports(stream_t *str)
 {
 	port_t *port;
 	while (jack_ringbuffer_read(str->new_ports, (char*)&port, sizeof(port))) {
-		debug_log("jack: inserted port %s\n", port->name);
+		debug_log("jack: inserted port %s", port->name);
 		port_insert(str->ports, port);
 	}
 }
@@ -668,7 +668,7 @@ void jack_process(alsa_seqmidi_t *self, struct process_info *info)
 			if (!port->is_dead)
 				(*process)(self, port, info);
 			else if (jack_ringbuffer_write_space(self->port_del) >= sizeof(port)) {
-				debug_log("jack: removed port %s\n", port->name);
+				debug_log("jack: removed port %s", port->name);
 				*pport = port->next;
 				jack_ringbuffer_write(self->port_del, (char*)&port, sizeof(port));
 				del++;
@@ -703,7 +703,7 @@ void do_jack_input(alsa_seqmidi_t *self, port_t *port, struct process_info *info
 			jack_ringbuffer_read(port->early_events, (char*)buf, ev.size);
 		else
 			jack_ringbuffer_read_advance(port->early_events, ev.size);
-		debug_log("input: it's time for %d bytes at %lld\n", ev.size, time);
+		debug_log("input: it's time for %d bytes at %lld", ev.size, time);
 	}
 }
 
@@ -718,11 +718,11 @@ void port_event(alsa_seqmidi_t *self, snd_seq_event_t *ev)
 	if (ev->type == SND_SEQ_EVENT_PORT_START || ev->type == SND_SEQ_EVENT_PORT_CHANGE) {
 		assert (jack_ringbuffer_write_space(self->port_add) >= sizeof(addr));
 
-		debug_log("port_event: add/change %d:%d\n", addr.client, addr.port);
+		debug_log("port_event: add/change %d:%d", addr.client, addr.port);
 		jack_ringbuffer_write(self->port_add, (char*)&addr, sizeof(addr));
 		sem_post(&self->port_sem);
 	} else if (ev->type == SND_SEQ_EVENT_PORT_EXIT) {
-		debug_log("port_event: del %d:%d\n", addr.client, addr.port);
+		debug_log("port_event: del %d:%d", addr.client, addr.port);
 		port_setdead(self->stream[PORT_INPUT].ports, addr);
 		port_setdead(self->stream[PORT_OUTPUT].ports, addr);
 	}
@@ -761,7 +761,7 @@ void input_event(alsa_seqmidi_t *self, snd_seq_event_t *alsa_event, struct proce
 	frame_offset = (info->sample_rate * time_offset) / NSEC_PER_SEC;
 	event_frame = info->cur_frames - info->period_start - frame_offset + info->nframes;
 
-	debug_log("input: %d bytes at event_frame=%d\n", (int)size, (int)event_frame);
+	debug_log("input: %d bytes at event_frame = %d", (int)size, (int)event_frame);
 
 	if (event_frame >= info->nframes &&
 	    jack_ringbuffer_write_space(port->early_events) >= (sizeof(alsa_midi_event_t) + size)) {
@@ -770,7 +770,7 @@ void input_event(alsa_seqmidi_t *self, snd_seq_event_t *alsa_event, struct proce
 		ev.size = size;
 		jack_ringbuffer_write(port->early_events, (char*)&ev, sizeof(ev));
 		jack_ringbuffer_write(port->early_events, (char*)data, size);
-		debug_log("postponed to next frame +%d\n", (int) (event_frame - info->nframes)); 
+		debug_log("postponed to next frame +%d", (int) (event_frame - info->nframes)); 
 		return;
 	}
 
@@ -835,7 +835,7 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		frame_offset = jack_event.time + info->period_start + info->nframes - info->cur_frames;
 		out_time = info->alsa_time + (frame_offset * NSEC_PER_SEC) / info->sample_rate;
 
-		debug_log("alsa_out: frame_offset = %lld, info->alsa_time = %lld, out_time = %lld, port->last_out_time = %lld\n",
+		debug_log("alsa_out: frame_offset = %lld, info->alsa_time = %lld, out_time = %lld, port->last_out_time = %lld",
 			frame_offset, info->alsa_time, out_time, port->last_out_time);
 
 		// we should use absolute time to prevent reordering caused by rounding errors
@@ -849,7 +849,7 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		snd_seq_ev_schedule_real(&alsa_event, self->queue, 0, &out_rt);
 
 		err = snd_seq_event_output(self->seq, &alsa_event);
-		debug_log("alsa_out: written %d bytes to %s at %+d (%lld): %d\n", (int)jack_event.size, port->name, (int)frame_offset, out_time, err);
+		debug_log("alsa_out: written %d bytes to %s at %+d (%lld): %d", (int)jack_event.size, port->name, (int)frame_offset, out_time, err);
 	}
 }
 
