@@ -32,7 +32,7 @@ WARNING :
 - this will install everything needed in /usr/local in place of a regular jack installation so that jack applications will use jackdmp
 - you will have to remove the "cache" folder and the ".sconsign.dblite" file before recompiling with different options.
 
-Various compilations options can be seed using scons -h.
+Various compilation options can be seen using scons -h.
 
 Important compilation options :
 

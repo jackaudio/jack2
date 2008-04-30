@@ -108,7 +108,7 @@ bool JackRestartThreadedDriver::Execute()
     while (fThread->GetRunning()) { 
         try {
             // Keep running even in case of error
-            while (true) {
+            while (fThread->GetRunning()) {
                 Process();
             }
         } catch (JackException e) {

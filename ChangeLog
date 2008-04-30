@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-04-30 Stephane Letz  <letz@grame.fr>
+		
+	* Fix JackRestartThreadedDriver::Execute.
+
 2008-04-28 Stephane Letz  <letz@grame.fr>
 		
 	* Add exceptions management to distinguish drivers recoverable errors from non recoverable ones. Will be used in special threaded drivers (for network).
