@@ -176,12 +176,7 @@ int JackAudioDriver::Write()
 
 int JackAudioDriver::Process()
 {
-    try {
-        return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
-    } catch (JackException e) {
-        e.PrintMessage();
-        return -1;
-    }
+   return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
 }
 
 /*
