@@ -91,6 +91,9 @@ int JackThreadedDriver::Stop()
                 return res;
             }
             break;
+            
+        default:
+            break;
     }
 
     if ((res = fDriver->Stop()) < 0) {
