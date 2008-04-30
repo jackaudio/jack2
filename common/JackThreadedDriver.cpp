@@ -115,17 +115,15 @@ bool JackThreadedDriver::Init()
 
 bool JackRestartThreadedDriver::Execute()
 {
-    while (fThread->GetStatus() == JackThread::kRunning) { 
-        try {
-            // Keep running even in case of error
-            while (fThread->GetStatus() == JackThread::kRunning) {
-                Process();
-            }
-        } catch (JackDriverException e) {
-            e.PrintMessage();
-            jack_log("Driver is restarted");
-            Init();
-        }   
+    try {
+        // Keep running even in case of error
+        while (fThread->GetStatus() == JackThread::kRunning) { 
+            Process();
+        }
+    } catch (JackDriverException e) {
+        e.PrintMessage();
+        jack_log("Driver is restarted");
+        return Init();
     }
     return false;
 }

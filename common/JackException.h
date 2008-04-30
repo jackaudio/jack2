@@ -45,7 +45,7 @@ namespace Jack
             void PrintMessage() 
             {
                 std::string str = what();
-                jack_error(str.c_str());
+                jack_info(str.c_str());
             }
     };
     
@@ -58,7 +58,6 @@ namespace Jack
            JackDriverException(const char* msg) : JackException(msg) 
            {}
     };
-
 } 
 
 #endif 
