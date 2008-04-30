@@ -73,11 +73,26 @@ int JackThreadedDriver::Stop()
 {
     jack_log("JackThreadedDriver::Stop");
     int res;
-
-    if ((res = fThread->Stop()) < 0) {  // Stop when the thread cycle is finished
-        jack_error("Cannot stop thread");
-        return res;
+    
+    switch (fThread->GetStatus()) {
+            
+        // Kill the thread in Init phase
+        case JackThread::kStarting:
+            if ((res = fThread->Kill()) < 0) {  
+                jack_error("Cannot kill thread");
+                return res;
+            }
+            break;
+           
+        // Stop when the thread cycle is finished
+        case JackThread::kRunning:
+            if ((res = fThread->Stop()) < 0) {
+                jack_error("Cannot stop thread"); 
+                return res;
+            }
+            break;
     }
+
     if ((res = fDriver->Stop()) < 0) {
         jack_error("Cannot stop driver");
         return res;
@@ -105,10 +120,10 @@ bool JackThreadedDriver::Init()
 
 bool JackRestartThreadedDriver::Execute()
 {
-    while (fThread->GetRunning()) { 
+    while (fThread->GetStatus() == JackThread::kRunning) { 
         try {
             // Keep running even in case of error
-            while (fThread->GetRunning()) {
+            while (fThread->GetStatus() == JackThread::kRunning) {
                 Process();
             }
         } catch (JackException e) {

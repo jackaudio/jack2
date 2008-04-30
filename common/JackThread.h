@@ -60,19 +60,22 @@ class JackRunnableInterface
 
 class JackThread
 {
-
+    public:
+    
+         enum kThreadState { kIdle, kStarting, kRunning};
+    
     protected:
-
+    
         JackRunnableInterface* fRunnable;
         int fPriority;
         bool fRealTime;
-        volatile bool fRunning;
+        volatile kThreadState fStatus;
         int fCancellation;
-
+    
     public:
-
+  
         JackThread(JackRunnableInterface* runnable, int priority, bool real_time, int cancellation):
-                fRunnable(runnable), fPriority(priority), fRealTime(real_time), fRunning(false), fCancellation(cancellation)
+                fRunnable(runnable), fPriority(priority), fRealTime(real_time), fStatus(kIdle), fCancellation(cancellation)
         {}
         virtual ~JackThread()
         {}
@@ -87,19 +90,20 @@ class JackThread
         virtual int AcquireRealTime(int priority) = 0;
         virtual int DropRealTime() = 0;
         
-        virtual bool GetRunning()
+        virtual bool GetStatus()
         {
-            return fRunning;
+            return fStatus;
         }
-        virtual void SetRunning(bool state)
+        virtual void SetRunning(kThreadState status)
         {
-            fRunning = state;
+            fStatus = status;
         }
-
+       
         virtual void SetParams(UInt64 period, UInt64 computation, UInt64 constraint) // Empty implementation, will only make sense on OSX...
         {}
 
         virtual pthread_t GetThreadID() = 0;
+   
 };
 
 } // end of namespace

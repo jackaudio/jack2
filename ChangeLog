@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-04-30 Stephane Letz  <letz@grame.fr>
 		
 	* Fix JackRestartThreadedDriver::Execute.
+	* Better handling of init and run state in JackThread.
 
 2008-04-28 Stephane Letz  <letz@grame.fr>
 		

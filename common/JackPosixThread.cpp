@@ -40,12 +40,13 @@ void* JackPosixThread::ThreadHandler(void* arg)
         jack_error("Thread init fails: thread quits");
         return 0;
     }
-
+    
     jack_log("ThreadHandler: start");
+    obj->fStatus = kRunning;
 
     // If Init succeed, start the thread loop
     bool res = true;
-    while (obj->fRunning && res) {
+    while (obj->fStatus == kRunning && res) {
         res = runnable->Execute();
     }
 
@@ -55,11 +56,11 @@ void* JackPosixThread::ThreadHandler(void* arg)
 
 int JackPosixThread::Start()
 {
-    fRunning = true;
+    fStatus = kStarting;
 
     // Check if the thread was correctly started
     if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
-        fRunning = false;
+        fStatus = kIdle;
         return -1;
     } else {
         return 0;
@@ -146,7 +147,7 @@ int JackPosixThread::Kill()
         void* status;
         pthread_cancel(fThread);
         pthread_join(fThread, &status);
-        fRunning = false;
+        fStatus = kIdle;
         fThread = (pthread_t)NULL;
         return 0;
     } else {
@@ -159,7 +160,7 @@ int JackPosixThread::Stop()
     if (fThread) { // If thread has been started
         jack_log("JackPosixThread::Stop");
         void* status;
-        fRunning = false; // Request for the thread to stop
+        fStatus = kIdle; // Request for the thread to stop
         pthread_join(fThread, &status);
         fThread = (pthread_t)NULL;
         return 0;

@@ -36,17 +36,20 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
         return 0;
     }
 
-    // Signal creation thread when started with StartSync
+    // TODO: Signal creation thread when started with StartSync
+    /*
     if (!obj->fRunning) {
         obj->fRunning = true;
         SetEvent(obj->fEvent);
     }
+    */
 
     jack_log("ThreadHandler: start");
-
+    obj->fStatus = kRunning;
+    
     // If Init succeed, start the thread loop
     bool res = true;
-    while (obj->fRunning && res) {
+    while (obj->fStatus == kRunning && res) {
         res = runnable->Execute();
     }
 
@@ -76,11 +79,11 @@ int JackWinThread::Start()
         return -1;
     }
 
-    fRunning = true;
+    fStatus = kStarting;
 
     // Check if the thread was correctly started
     if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
-        fRunning = false;
+        fStatus = kIdle;
         return -1;
     } else {
         return 0;
@@ -124,6 +127,10 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
 
 int JackWinThread::StartSync()
 {
+    jack_error("Not implemented yet");
+    return -1;
+    
+    /*
     DWORD id;
 
     fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -131,6 +138,8 @@ int JackWinThread::StartSync()
         jack_error("Cannot create event error = %d", GetLastError());
         return -1;
     }
+    
+    fStatus = kStarting;
 
     if (fRealTime) {
 
@@ -171,6 +180,7 @@ int JackWinThread::StartSync()
 
         return 0;
     }
+     */
 }
 
 // voir http://www.microsoft.com/belux/msdn/nl/community/columns/ldoc/multithread1.mspx
@@ -181,9 +191,9 @@ int JackWinThread::Kill()
         TerminateThread(fThread, 0);
         WaitForSingleObject(fThread, INFINITE);
         CloseHandle(fThread);
-        jack_log("JackWinThread::Kill 2");
+        jack_log("JackWinThread::Kill");
         fThread = NULL;
-        fRunning = false;
+        fStatus = kIdle;
         return 0;
     } else {
         return -1;
@@ -194,7 +204,7 @@ int JackWinThread::Stop()
 {
     if (fThread) { // If thread has been started
         jack_log("JackWinThread::Stop");
-        fRunning = false; // Request for the thread to stop
+        fStatus = kIdle; // Request for the thread to stop
         WaitForSingleObject(fEvent, INFINITE);
         CloseHandle(fThread);
         fThread = NULL;
