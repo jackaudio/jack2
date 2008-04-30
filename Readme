@@ -42,7 +42,7 @@ Using Jackdmp with Qjackctl :
 
 To start jackdmp server in Qjackctl, the complete server path has to be added, like /usr/local/bin/jackdmp in Setup/Server Path.
 
-WARNING !! : when used in FULL_MIMIC=yes mode, the "jackd" name has to be used, when used in FULL_MIMIC=yes mode, the "jackdmp" name has to be used (since regular jack and jackdmp can be used together).
+WARNING !! : when used in FULL_MIMIC=yes mode, the "jackd" name has to be used, when used in FULL_MIMIC=no mode, the "jackdmp" name has to be used (since regular jack and jackdmp can be used together).
 
 Known problems, limitations
 ----------------------------
