@@ -163,9 +163,15 @@ JackLoadableInternalClient::~JackLoadableInternalClient()
 
 int JackLoadableInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
-    int res = JackInternalClient::Open(server_name, name, options, status);
-    if (res == 0)
-        fInitialize((jack_client_t*)this, fObjectData);
+    int res = -1;
+    if (JackInternalClient::Open(server_name, name, options, status) == 0) {
+        if (fInitialize((jack_client_t*)this, fObjectData) == 0) {
+            res = 0;
+        } else {
+            JackInternalClient::Close();
+            fFinish = NULL;
+        }
+    } 
     return res;
 }
 

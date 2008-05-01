@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-05-01 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackMachClientChannel::InternalClientLoad.
+	* Correct internal client loading.
 
 2008-04-30 Stephane Letz  <letz@grame.fr>
 		
