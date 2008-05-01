@@ -24,6 +24,7 @@ Fernando Lopez-Lezcano
 
 	* Fix JackMachClientChannel::InternalClientLoad.
 	* Correct internal client loading.
+	* For threaded drivers, AcquireRealTime is called after Init step.
 
 2008-04-30 Stephane Letz  <letz@grame.fr>
 		

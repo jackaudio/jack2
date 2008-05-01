@@ -47,23 +47,14 @@ JackThreadedDriver::~JackThreadedDriver()
 int JackThreadedDriver::Start()
 {
     jack_log("JackThreadedDriver::Start");
-    int res;
 
-    if ((res = fDriver->Start()) < 0) {
+    if (fDriver->Start() < 0) {
         jack_error("Cannot start driver");
-        return res;
+        return -1;
     }
-    if ((res = fThread->Start()) < 0) {
+    if (fThread->Start() < 0) {
         jack_error("Cannot start thread");
-        return res;
-    }
-
-    if (fDriver->IsRealTime()) {
-        jack_log("JackThreadedDriver::Start IsRealTime");
-        // Will do "something" on OSX only...
-        fThread->SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-        if (fThread->AcquireRealTime(GetEngineControl()->fPriority) < 0)
-            jack_error("AcquireRealTime error");
+        return -1;
     }
 
     return 0;
@@ -72,23 +63,22 @@ int JackThreadedDriver::Start()
 int JackThreadedDriver::Stop()
 {
     jack_log("JackThreadedDriver::Stop");
-    int res;
     
     switch (fThread->GetStatus()) {
             
         // Kill the thread in Init phase
         case JackThread::kStarting:
-            if ((res = fThread->Kill()) < 0) {  
+            if (fThread->Kill() < 0) {  
                 jack_error("Cannot kill thread");
-                return res;
+                return -1;
             }
             break;
            
         // Stop when the thread cycle is finished
         case JackThread::kRunning:
-            if ((res = fThread->Stop()) < 0) {
+            if (fThread->Stop() < 0) {
                 jack_error("Cannot stop thread"); 
-                return res;
+                return -1;
             }
             break;
             
@@ -96,9 +86,9 @@ int JackThreadedDriver::Stop()
             break;
     }
 
-    if ((res = fDriver->Stop()) < 0) {
+    if (fDriver->Stop() < 0) {
         jack_error("Cannot stop driver");
-        return res;
+        return -1;
     }
     return 0;
 }
@@ -110,7 +100,18 @@ bool JackThreadedDriver::Execute()
 
 bool JackThreadedDriver::Init()
 {
-    return fDriver->Init();
+    if (fDriver->Init())  {
+        if (fDriver->IsRealTime()) {
+            jack_log("JackThreadedDriver::Init IsRealTime");
+            // Will do "something" on OSX only...
+            fThread->SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+            if (fThread->AcquireRealTime(GetEngineControl()->fPriority) < 0)
+                jack_error("AcquireRealTime error");
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool JackRestartThreadedDriver::Execute()
@@ -123,6 +124,7 @@ bool JackRestartThreadedDriver::Execute()
     } catch (JackDriverException e) {
         e.PrintMessage();
         jack_log("Driver is restarted");
+        fThread->DropRealTime();
         return Init();
     }
     return false;
