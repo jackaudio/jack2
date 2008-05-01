@@ -279,7 +279,11 @@ void JackMachClientChannel::InternalClientHandle(int refnum, const char* client_
 
 void JackMachClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
 {
-    kern_return_t res = rpc_jack_internal_clientload(fPrivatePort, refnum, (char*)client_name, (char*)so_name, (char*)objet_data, options, status, int_ref, result);
+    const char* int_client_name = (client_name) ? client_name : "";
+    const char* int_so_name = (so_name) ? so_name : "";
+    const char* int_objet_data = (objet_data) ? objet_data : "";
+    
+    kern_return_t res = rpc_jack_internal_clientload(fPrivatePort, refnum, (char*)int_client_name, (char*)int_so_name, (char*)int_objet_data, options, status, int_ref, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::InternalClientLoad err = %s", mach_error_string(res));

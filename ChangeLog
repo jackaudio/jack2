@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-01 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackMachClientChannel::InternalClientLoad.
+
 2008-04-30 Stephane Letz  <letz@grame.fr>
 		
 	* Fix JackRestartThreadedDriver::Execute.
