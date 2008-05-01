@@ -36,7 +36,7 @@ int JackFreewheelDriver::Process()
         fLastWaitUst = GetMicroSeconds();
         fEngine->Process(fLastWaitUst);
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
-        if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, 10 * 1000000) < 0) { // Wait for all clients to finish for 10 sec
+        if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, FREEWHEEL_DRIVER_TIMEOUT * 1000000) < 0) { // Wait for all clients to finish for 10 sec
             jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
             return -1;
         }

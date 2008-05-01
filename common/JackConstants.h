@@ -27,8 +27,6 @@ namespace Jack
 
 #define VERSION "0.72"
 
-#define FORK_SERVER 1
-
 #define BUFFER_SIZE_MAX 8192
 
 #define JACK_PORT_NAME_SIZE 256
@@ -44,12 +42,10 @@ namespace Jack
 
 #define CLIENT_NUM 64
 
-#define AUDIO_DRIVER_REFNUM   0						// Audio driver is initialized first, it will get the refnum 0
-#define FREEWHEEL_DRIVER_REFNUM   1					// Freewheel driver is initialized second, it will get the refnum 1
-#define LOOPBACK_DRIVER_REFNUM   2					// Loopback driver is initialized third, it will get the refnum 2
-#define REAL_REFNUM LOOPBACK_DRIVER_REFNUM + 1		// Real clients start at LOOPBACK_DRIVER_REFNUM + 1
-
-#define SOCKET_TIME_OUT 5
+#define AUDIO_DRIVER_REFNUM   0                     // Audio driver is initialized first, it will get the refnum 0
+#define FREEWHEEL_DRIVER_REFNUM   1                 // Freewheel driver is initialized second, it will get the refnum 1
+#define LOOPBACK_DRIVER_REFNUM   2                  // Loopback driver is initialized third, it will get the refnum 2
+#define REAL_REFNUM LOOPBACK_DRIVER_REFNUM + 1      // Real clients start at LOOPBACK_DRIVER_REFNUM + 1
 
 #ifdef WIN32
 #define jack_server_dir "server"
@@ -76,7 +72,9 @@ namespace Jack
 #define JACK_PROTOCOL_VERSION 3
 #endif
 
-#define DRIVER_OPEN_TIMEOUT 5   // in sec
+#define SOCKET_TIME_OUT 5               // in sec
+#define DRIVER_OPEN_TIMEOUT 5           // in sec
+#define FREEWHEEL_DRIVER_TIMEOUT 10     // in sec
 
 #define NO_PORT   0xFFFE
 
