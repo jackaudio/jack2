@@ -165,7 +165,7 @@ void JackWinNamedPipeClientChannel::ClientClose(int refnum, int* result)
 {
     JackClientCloseRequest req(refnum);
     JackResult res;
-    ServerAsyncCall(&req, &res, result);
+    ServerSyncCall(&req, &res, result);
 }
 
 void JackWinNamedPipeClientChannel::ClientActivate(int refnum, int* result)

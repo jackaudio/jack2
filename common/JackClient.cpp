@@ -78,8 +78,8 @@ int JackClient::Close()
     jack_log("JackClient::Close ref = %ld", GetClientControl()->fRefNum);
     Deactivate();
     int result = -1;
+    fChannel->Stop();  // Channels is stopped first to avoid receiving notifications while closing
     fChannel->ClientClose(GetClientControl()->fRefNum, &result);
-    fChannel->Stop();
     fChannel->Close();
     fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
     return result;

@@ -215,7 +215,7 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value1, int v
         jack_log("JackEngine::NotifyClient: client not available anymore");
     } else if (client->GetClientControl()->fCallback[event]) {
         if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
-            jack_error("NotifyClient fails name = %s event = %ld = val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
+            jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
     } else {
         jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);
     }

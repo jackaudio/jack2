@@ -108,7 +108,7 @@ int JackClientPipeThread::HandleRequest()
         switch (header.fType) {
 
             case JackRequest::kClientCheck: {
-                jack_log("JackRequest::kClientCheck");
+                jack_log("JackRequest::ClientCheck");
                 JackClientCheckRequest req;
                 JackClientCheckResult res;
                 if (req.Read(fPipe) == 0)
@@ -133,7 +133,7 @@ int JackClientPipeThread::HandleRequest()
                 JackResult res;
                 if (req.Read(fPipe) == 0)
                     res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
-                // No write: client is actually doing an "ServerAsyncCall", and not interested by the result
+                res.Write(fPipe);
                 ClientRemove();
                 ret = -1;
                 break;
@@ -240,7 +240,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kReleaseTimebase: {
-                jack_log("JackRequest::kReleaseTimebase");
+                jack_log("JackRequest::ReleaseTimebase");
                 JackReleaseTimebaseRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -250,7 +250,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kSetTimebaseCallback: {
-                jack_log("JackRequest::kSetTimebaseCallback");
+                jack_log("JackRequest::SetTimebaseCallback");
                 JackSetTimebaseCallbackRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -260,7 +260,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kGetInternalClientName: {
-                jack_log("JackRequest::kGetInternalClientName");
+                jack_log("JackRequest::GetInternalClientName");
                 JackGetInternalClientNameRequest req;
                 JackGetInternalClientNameResult res;
                 if (req.Read(fPipe) == 0)
@@ -270,7 +270,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kInternalClientHandle: {
-                jack_log("JackRequest::kInternalClientHandle");
+                jack_log("JackRequest::InternalClientHandle");
                 JackInternalClientHandleRequest req;
                 JackInternalClientHandleResult res;
                 if (req.Read(fPipe) == 0)
@@ -280,7 +280,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kInternalClientLoad: {
-                jack_log("JackRequest::kInternalClientLoad");
+                jack_log("JackRequest::InternalClientLoad");
                 JackInternalClientLoadRequest req;
                 JackInternalClientLoadResult res;
                 if (req.Read(fPipe) == 0)
@@ -290,7 +290,7 @@ int JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kInternalClientUnload: {
-                jack_log("JackRequest::kInternalClientUnload");
+                jack_log("JackRequest::InternalClientUnload");
                 JackInternalClientUnloadRequest req;
                 JackInternalClientUnloadResult res;
                 if (req.Read(fPipe) == 0)

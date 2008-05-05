@@ -143,7 +143,8 @@ int JackMachThread::GetParams(UInt64* period, UInt64* computation, UInt64* const
 int JackMachThread::Kill()
 {
     // pthread_cancel still not yet implemented in Darwin (TO CHECK ON TIGER)
-
+    jack_log("JackMachThread::Kill");
+    
     if (fThread) { // If thread has been started
         mach_port_t machThread = pthread_mach_thread_np(fThread);
         return (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
