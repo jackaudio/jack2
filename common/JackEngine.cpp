@@ -75,13 +75,11 @@ int JackEngine::Close()
     jack_log("JackEngine::Close");
     fChannel->Close();
 
-    // Close (possibly) remaining clients (RT is stopped)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
             jack_log("JackEngine::Close remaining client %ld", i);
             fClientTable[i] = NULL;
-            client->Close();
             delete client;
         }
     }
