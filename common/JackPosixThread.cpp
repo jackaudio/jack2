@@ -75,17 +75,17 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     int res;
 
     if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
-        jack_error("Cannot request explicit scheduling for RT thread  %d %s", res, strerror(errno));
+        jack_error("Cannot request explicit scheduling for RT thread res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
     if ((res = pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_JOINABLE))) {
-        jack_error("Cannot request joinable thread creation for RT thread  %d %s", res, strerror(errno));
+        jack_error("Cannot request joinable thread creation for RT thread res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
     if ((res = pthread_attr_setscope(&attributes, PTHREAD_SCOPE_SYSTEM))) {
-        jack_error("Cannot set scheduling scope for RT thread %d %s", res, strerror(errno));
+        jack_error("Cannot set scheduling scope for RT thread res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
@@ -95,7 +95,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     
         //if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_FIFO))) {
         if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_RR))) {
-            jack_error("Cannot set RR scheduling class for RT thread  %d %s", res, strerror(errno));
+            jack_error("Cannot set RR scheduling class for RT thread res = %d err = %s", res, strerror(errno));
             return -1;
         }
     } else {
@@ -106,17 +106,17 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     rt_param.sched_priority = priority;
 
     if ((res = pthread_attr_setschedparam(&attributes, &rt_param))) {
-        jack_error("Cannot set scheduling priority for RT thread %d %s", res, strerror(errno));
+        jack_error("Cannot set scheduling priority for RT thread res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
     if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
-        jack_error("setting thread stack size%d %s", res, strerror(errno));
+        jack_error("setting thread stack size res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
     if ((res = pthread_create(thread, &attributes, start_routine, arg))) {
-        jack_error("Cannot set create thread %d %s", res, strerror(errno));
+        jack_error("Cannot set create thread res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
