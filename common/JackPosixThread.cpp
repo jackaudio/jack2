@@ -88,7 +88,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     
         jack_log("Create RT thread");
 
-	if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
+        if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
             jack_error("Cannot request explicit scheduling for RT thread res = %d err = %s", res, strerror(errno));
             return -1;
     	}
