@@ -94,7 +94,7 @@ class JackThread
         {
             return fStatus;
         }
-        virtual void SetRunning(kThreadState status)
+        virtual void SetStatus(kThreadState status)
         {
             fStatus = status;
         }
