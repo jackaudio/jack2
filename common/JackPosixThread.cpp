@@ -74,11 +74,6 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     pthread_attr_init(&attributes);
     int res;
 
-    if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
-        jack_error("Cannot request explicit scheduling for RT thread res = %d err = %s", res, strerror(errno));
-        return -1;
-    }
-
     if ((res = pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_JOINABLE))) {
         jack_error("Cannot request joinable thread creation for RT thread res = %d err = %s", res, strerror(errno));
         return -1;
@@ -92,6 +87,11 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     if (realtime) {
     
         jack_log("Create RT thread");
+
+	if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
+            jack_error("Cannot request explicit scheduling for RT thread res = %d err = %s", res, strerror(errno));
+            return -1;
+    	}
     
         //if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_FIFO))) {
         if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_RR))) {
@@ -131,7 +131,7 @@ int JackPosixThread::StartSync()
 
 int JackPosixThread::Kill()
 {
-    if (fThread != NULL) { // If thread has been started
+    if (fThread != (pthread_t)NULL) { // If thread has been started
         jack_log("JackPosixThread::Kill");
         void* status;
         pthread_cancel(fThread);
@@ -146,7 +146,7 @@ int JackPosixThread::Kill()
 
 int JackPosixThread::Stop()
 {
-    if (fThread != NULL) { // If thread has been started
+    if (fThread != (pthread_t)NULL) { // If thread has been started
         jack_log("JackPosixThread::Stop");
         void* status;
         fStatus = kIdle; // Request for the thread to stop
@@ -160,7 +160,7 @@ int JackPosixThread::Stop()
 
 int JackPosixThread::AcquireRealTime()
 {
-    return (fThread != NULL) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+    return (fThread != (pthread_t)NULL) ? AcquireRealTimeImp(fThread, fPriority) : -1;
 }
 
 int JackPosixThread::AcquireRealTime(int priority)
@@ -189,7 +189,7 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
 
 int JackPosixThread::DropRealTime()
 {
-    return (fThread != NULL) ? DropRealTimeImp(fThread) : -1;
+    return (fThread != (pthread_t)NULL) ? DropRealTimeImp(fThread) : -1;
 }
 
 int JackPosixThread::DropRealTimeImp(pthread_t thread)
