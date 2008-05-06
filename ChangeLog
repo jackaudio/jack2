@@ -20,10 +20,14 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-06 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackPosixThread::StartImp and JackWinThread::StartImp.
+
 2008-05-05 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackClient::Close : notification channel is stopped first to avoid receiving notifications while closing and Close is again a synchronous call.
-	* No more client close in JackEngine::Close().
+	* No more remaining client close in JackEngine::Close().
 
 2008-05-01 Stephane Letz  <letz@grame.fr>
 

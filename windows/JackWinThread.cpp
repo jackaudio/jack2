@@ -93,36 +93,27 @@ int JackWinThread::Start()
 int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg)
 {
     DWORD id;
+    *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
+
+    if (*thread == NULL) {
+        jack_error("Cannot create thread error = %d", GetLastError());
+        return -1;
+    }
 
     if (realtime) {
-
+        
         jack_log("Create RT thread");
-        *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
-
-        if (*thread == NULL) {
-            jack_error("Cannot create thread error = %d", GetLastError());
-            return -1;
-        }
-
+        
         if (!SetThreadPriority(*thread, THREAD_PRIORITY_TIME_CRITICAL)) {
             jack_error("Cannot set priority class = %d", GetLastError());
             return -1;
         }
 
-        return 0;
-
     } else {
-
         jack_log("Create non RT thread");
-        *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
-
-        if (thread == NULL) {
-            jack_error("Cannot create thread error = %d", GetLastError());
-            return -1;
-        }
-
-        return 0;
     }
+    
+    return 0;
 }
 
 int JackWinThread::StartSync()
