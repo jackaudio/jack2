@@ -111,12 +111,12 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     }
 
     if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
-        jack_error("setting thread stack size res = %d err = %s", res, strerror(errno));
+        jack_error("Cannot set thread stack size res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
     if ((res = pthread_create(thread, &attributes, start_routine, arg))) {
-        jack_error("Cannot set create thread res = %d err = %s", res, strerror(errno));
+        jack_error("Cannot create thread res = %d err = %s", res, strerror(errno));
         return -1;
     }
 
@@ -131,7 +131,7 @@ int JackPosixThread::StartSync()
 
 int JackPosixThread::Kill()
 {
-    if (fThread) { // If thread has been started
+    if (fThread != NULL) { // If thread has been started
         jack_log("JackPosixThread::Kill");
         void* status;
         pthread_cancel(fThread);
@@ -146,7 +146,7 @@ int JackPosixThread::Kill()
 
 int JackPosixThread::Stop()
 {
-    if (fThread) { // If thread has been started
+    if (fThread != NULL) { // If thread has been started
         jack_log("JackPosixThread::Stop");
         void* status;
         fStatus = kIdle; // Request for the thread to stop
@@ -160,7 +160,7 @@ int JackPosixThread::Stop()
 
 int JackPosixThread::AcquireRealTime()
 {
-    return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+    return (fThread != NULL) ? AcquireRealTimeImp(fThread, fPriority) : -1;
 }
 
 int JackPosixThread::AcquireRealTime(int priority)
@@ -189,7 +189,7 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
 
 int JackPosixThread::DropRealTime()
 {
-    return (fThread) ? DropRealTimeImp(fThread) : -1;
+    return (fThread != NULL) ? DropRealTimeImp(fThread) : -1;
 }
 
 int JackPosixThread::DropRealTimeImp(pthread_t thread)
