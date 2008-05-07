@@ -52,6 +52,7 @@ class JackMutex
 
         JackMutex()
         {
+            // In recursive mode by default
             fMutex = CreateMutex(0, FALSE, 0);
         }
         virtual ~JackMutex()
