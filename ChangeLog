@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-09 Stephane Letz  <letz@grame.fr>
+
+	* Mike Taht's fix for proper alsa xrun duration measurement.
+
 2008-05-06 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackPosixThread::StartImp and JackWinThread::StartImp.

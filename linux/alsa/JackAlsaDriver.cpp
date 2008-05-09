@@ -1204,7 +1204,7 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
             && driver->process_count > XRUN_REPORT_DELAY) {
         struct timeval now, diff, tstamp;
         driver->xrun_count++;
-        gettimeofday(&now, 0);
+        snd_pcm_status_get_tstamp(status,&now); 
         snd_pcm_status_get_trigger_tstamp(status, &tstamp);
         timersub(&now, &tstamp, &diff);
         *delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
