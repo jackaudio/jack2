@@ -238,8 +238,11 @@ static void (*error_fun)(const char *) = 0;
 static void (*info_fun)(const char *) = 0;
 
 static bool jack_debug = false;
-
 static unsigned int gClientCount = 0;
+static FILE* gWrapperLog = NULL;
+
+void log_init() __attribute__ ((constructor));
+void log_uninit()  __attribute__ ((destructor));
 
 static void rewrite_name(const char* name, char* new_name)
 {
@@ -258,10 +261,40 @@ static void jack_log(const char *fmt, ...)
     if (jack_debug) {
         va_list ap;
         va_start(ap, fmt);
-        fprintf(stderr,"Jack: ");
-        vfprintf(stderr, fmt, ap);
-        fprintf(stderr,"\n");
+        if (gWrapperLog) {
+            fprintf(gWrapperLog,"Jack: ");
+            vfprintf(gWrapperLog, fmt, ap);
+            fprintf(gWrapperLog,"\n");
+        } else {
+	    fprintf(stderr, "Jack: ");
+            vfprintf(stderr, fmt, ap);
+            fprintf(stderr,"\n");
+        }
         va_end(ap);
+    }
+}
+
+void log_init() 
+{
+    char* jack_debug_var = getenv("JACK_WRAPPER_DEBUG");
+   
+    if (jack_debug_var) {
+	if (strcmp(jack_debug_var, "file") == 0 && gWrapperLog == NULL) {
+  	    gWrapperLog = fopen("wrapper.log", "w");
+  	    jack_debug = true;
+	} else if (strcmp(jack_debug_var, "on") == 0) {
+	    jack_debug = true;
+	} else {
+	   jack_debug = false;
+	}
+    }
+}
+
+void log_uninit()
+{
+    if (gWrapperLog != NULL) {
+	fclose(gWrapperLog);
+        gWrapperLog = NULL;
     }
 }
 
@@ -1243,6 +1276,8 @@ static jack_client_t * jack_client_open_aux(const char *ext_client_name, jack_op
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
+jack_log("jack_client_open");
+
     va_list ap;
     va_start(ap, status);
     jack_client_t* res =  jack_client_open_aux(ext_client_name, options, status, ap);
@@ -1402,9 +1437,7 @@ static bool open_library()
         return true;
         
     char library_res_name[256];
-    char* jack_debug_var = getenv("JACK_WRAPPER_DEBUG");
-    jack_debug = (jack_debug_var && strcmp(jack_debug_var, "on") == 0); 
- 
+  
     void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
     void* jackmpLibrary = (get_jack_library(JACKMP_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
 
