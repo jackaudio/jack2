@@ -641,7 +641,7 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
     assert(fClientTable[refnum]);
     
     // Check if port name already exists
-    if (GetGraphManager()->GetPort(name) != NO_PORT) {
+    if (fGraphManager->GetPort(name) != NO_PORT) {
         jack_error("port_name \"%s\" already exists", name);
         return -1; 
     }
