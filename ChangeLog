@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-13 Stephane Letz  <letz@grame.fr>
+
+	* Fix exception handling in JackShmMem::operator new.
+
 2008-05-12 Stephane Letz  <letz@grame.fr>
 
 	* Allows wrapper library to log in a file (using JACK_WRAPPER_DEBUG=file).

@@ -60,7 +60,7 @@ void* JackShmMem::operator new(size_t size)
 
 error:
     jack_error("JackShmMem::new bad alloc", size);
-    throw new std::bad_alloc;
+    throw std::bad_alloc();
 }
 
 void JackShmMem::operator delete(void* p, size_t size)
