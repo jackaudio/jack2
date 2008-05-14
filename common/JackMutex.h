@@ -88,7 +88,7 @@ class JackMutex
             assert(res == 0);
             res = pthread_mutex_init(&fMutex, &mutex_attr);
             assert(res == 0);
-            pthread_mutexattr_destroy(&mutex_attr);
+            res = pthread_mutexattr_destroy(&mutex_attr);
             assert(res == 0);
         }
         virtual ~JackMutex()
