@@ -81,9 +81,15 @@ class JackMutex
         {
             // Use recursive mutex
             pthread_mutexattr_t mutex_attr;
-            assert(pthread_mutexattr_init(&mutex_attr) == 0);
-            assert(pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE) == 0);
-            assert(pthread_mutex_init(&fMutex, &mutex_attr) == 0);
+            int res;
+            res = pthread_mutexattr_init(&mutex_attr);
+            assert(res == 0);
+            res = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+            assert(res == 0);
+            res = pthread_mutex_init(&fMutex, &mutex_attr);
+            assert(res == 0);
+            pthread_mutexattr_destroy(&mutex_attr);
+            assert(res == 0);
         }
         virtual ~JackMutex()
         {

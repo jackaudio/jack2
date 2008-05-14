@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-05-13 Stephane Letz  <letz@grame.fr>
 
 	* Fix exception handling in JackShmMem::operator new.
+	* Fix JackMutex constructor.
 
 2008-05-12 Stephane Letz  <letz@grame.fr>
 
