@@ -74,20 +74,23 @@ int JackEngine::Close()
 {
     jack_log("JackEngine::Close");
     fChannel->Close();
-
+    
     for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
-        if (client) {
-            jack_log("JackEngine::Close remaining client %ld", i);
+        /*
+        Can only delete clients that where loaded using "jack_internal_client_load" (and not properly unloaded using "jack_internal_client_unload"...)
+        */
+        JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i]);
+        if (loadable_client) {
+            jack_log("JackEngine::Close delete loadable client %ld", i);
+            delete loadable_client;
             fClientTable[i] = NULL;
-            delete client;
         }
     }
-
+    
     fSignal->Destroy();
     return 0;
 }
-
+    
 //-----------------------------
 // Client ressource management
 //-----------------------------
