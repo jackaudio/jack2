@@ -267,9 +267,9 @@ JackClientSocket* JackServerSocket::Accept()
 
 int JackServerSocket::Close()
 {
-    jack_log("JackServerSocket::Close %s", fName);
     //shutdown(fSocket, SHUT_RDWR);
     if (fSocket > 0) {
+        jack_log("JackServerSocket::Close %s", fName);
         //shutdown(fSocket, SHUT_RDWR);
         close(fSocket);
         unlink(fName);
