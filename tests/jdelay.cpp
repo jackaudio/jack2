@@ -23,12 +23,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <jack/jack.h>
 #ifdef WIN32
-	#include "jack.h"
 	#define M_PI 3.141562653
 #else
 	#include <unistd.h>
-	#include <jack/jack.h>
 #endif
 
 class Freq
