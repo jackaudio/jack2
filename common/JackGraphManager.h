@@ -33,13 +33,13 @@ namespace Jack
 /*!
 \brief Graph manager: contains the connection manager and the port array.
 */
-
+    
 class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
 {
 
     private:
 
-        JackPort fPortArray[PORT_NUM];
+        JackPort fPortArray[];
         JackClientTiming fClientTiming[CLIENT_NUM];
 
         jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);

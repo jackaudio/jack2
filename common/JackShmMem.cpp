@@ -28,6 +28,12 @@ namespace Jack
 unsigned int JackShmMem::fSegmentNum = 0;
 jack_shm_info_t JackShmMem::gInfo;
 size_t JackMem::gSize = 0;
+    
+void* JackShmMem::operator new(size_t size, void* memory)
+{
+    jack_log("JackShmMem::new placement size = %ld", size);
+    return memory;
+}
 
 void* JackShmMem::operator new(size_t size)
 {

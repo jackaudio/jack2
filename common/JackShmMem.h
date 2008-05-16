@@ -105,6 +105,7 @@ class JackShmMem
     public:
 
         void* operator new(size_t size);
+        void* operator new(size_t size, void* memory);
         void operator delete(void* p, size_t size);
 
         JackShmMem()

@@ -47,7 +47,11 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     JackGlobals::InitServer();
     for (int i = 0; i < CLIENT_NUM; i++)
         fSynchroTable[i] = JackGlobals::MakeSynchro();
-    fGraphManager = new JackGraphManager();
+    
+    // Use "placement" new for graph manager
+    void* shared_mem = JackShmMem::operator new(PORT_NUM * 1*sizeof(JackPort) + sizeof(JackGraphManager));
+    fGraphManager = new(shared_mem) JackGraphManager();
+    
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
     fEngine = new JackLockedEngine(new JackEngine(fGraphManager, fSynchroTable, fEngineControl));
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver("freewheel", fEngine, fSynchroTable));
