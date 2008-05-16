@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Jan 28 15:04:07 2008
- * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
+ * stub generated Fri May 16 09:21:55 2008
+ * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCClient_subsystem__ 1

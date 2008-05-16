@@ -86,7 +86,7 @@ class JackEngine
         virtual int ClientExternalClose(int refnum);
         virtual int ClientInternalClose(int refnum, bool wait);
 
-        virtual int ClientActivate(int refnum);
+        virtual int ClientActivate(int refnum, bool state);
         virtual int ClientDeactivate(int refnum);
 
         // Internal client management

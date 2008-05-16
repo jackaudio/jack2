@@ -144,7 +144,7 @@ int JackClientPipeThread::HandleRequest()
                 JackResult res;
                 jack_log("JackRequest::ActivateClient");
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
+                    res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fState);
                 res.Write(fPipe);
                 break;
             }

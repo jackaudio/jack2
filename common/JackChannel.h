@@ -80,7 +80,7 @@ class JackClientChannelInterface
         virtual void ClientClose(int refnum, int* result)
         {}
 
-        virtual void ClientActivate(int refnum, int* result)
+        virtual void ClientActivate(int refnum, int state, int* result)
         {}
         virtual void ClientDeactivate(int refnum, int* result)
         {}

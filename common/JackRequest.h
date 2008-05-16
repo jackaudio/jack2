@@ -287,21 +287,24 @@ struct JackActivateRequest : public JackRequest
 {
 
     int fRefNum;
+    int fState;
 
     JackActivateRequest()
     {}
-    JackActivateRequest(int refnum): JackRequest(JackRequest::kActivateClient), fRefNum(refnum)
+    JackActivateRequest(int refnum, int state): JackRequest(JackRequest::kActivateClient), fRefNum(refnum), fState(state)
     {}
 
     int Read(JackChannelTransaction* trans)
     {
-        return trans->Read(&fRefNum, sizeof(int));
+        CheckRes(trans->Read(&fRefNum, sizeof(int)));
+        return trans->Read(&fState, sizeof(int));
     }
 
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackRequest::Write(trans));
-        return trans->Write(&fRefNum, sizeof(int));
+        CheckRes(trans->Write(&fRefNum, sizeof(int)));
+        return trans->Write(&fState, sizeof(int));
     }
 
 };

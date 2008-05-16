@@ -57,6 +57,7 @@ routine  rpc_jack_client_close(
 routine  rpc_jack_client_activate(
 	server_port	: mach_port_t;
 	refnum		: int;
+    state		: int;
 	out result 	: int);
 
 routine  rpc_jack_client_deactivate(

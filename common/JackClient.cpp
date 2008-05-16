@@ -35,6 +35,8 @@ using namespace std;
 namespace Jack
 {
 
+#define IsRealTime() ((fProcess != NULL) | (fThreadFun != NULL) | (fSync != NULL) | (fTimebase != NULL))
+    
 JackClient::JackClient()
 {}
 
@@ -52,7 +54,9 @@ JackClient::JackClient(JackSynchro** table)
     fFreewheel = NULL;
     fPortRegistration = NULL;
     fPortConnect = NULL;
+    fTimebase = NULL;
     fSync = NULL;
+    fThreadFun = NULL;
     fProcessArg = NULL;
     fGraphOrderArg = NULL;
     fXrunArg = NULL;
@@ -64,7 +68,7 @@ JackClient::JackClient(JackSynchro** table)
     fPortRegistrationArg = NULL;
     fPortConnectArg = NULL;
     fSyncArg = NULL;
-    fThreadFun = NULL;
+    fTimebaseArg = NULL;
     fThreadFunArg = NULL;
 }
 
@@ -232,25 +236,17 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 \brief We need to start thread before activating in the server, otherwise the FW driver
 	   connected to the client may not be activated.
 */
-
 int JackClient::Activate()
 {
     jack_log("JackClient::Activate");
     if (IsActive())
         return 0;
 
-    /* TODO : solve WIN32 thread Kill issue
-    #ifdef WIN32
-    	// Done first so that the RT thread then access an allocated synchro
-    	if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(GetClientControl()->fName)) {
-            jack_error("Cannot ConnectSemaphore %s client", GetClientControl()->fName);
+    // RT thread is started only when needed...
+    if (IsRealTime()) {
+        if (StartThread() < 0)
             return -1;
-        }
-    #endif
-    */
-
-    if (StartThread() < 0)
-        return -1;
+    }
     
     /*
     Insertion of client in the graph will cause a kGraphOrderCallback notification 
@@ -263,7 +259,8 @@ int JackClient::Activate()
     GetClientControl()->fTransportTimebase = true;
 
     int result = -1;
-    fChannel->ClientActivate(GetClientControl()->fRefNum, &result);
+    GetClientControl()->fCallback[kRealTimeCallback] = IsRealTime();
+    fChannel->ClientActivate(GetClientControl()->fRefNum, IsRealTime(), &result);
     return result;
 }
 
@@ -288,15 +285,10 @@ int JackClient::Deactivate()
     jack_log("JackClient::Deactivate res = %ld ", result);
     // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
 
-    /* TODO : solve WIN32 thread Kill issue
-    #ifdef WIN32
-    	fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
-    	fThread->Stop();
-    #else
-    	fThread->Kill();
-    #endif
-    */
-    fThread->Kill();
+    // RT thread is stopped only when needed...
+    if (IsRealTime()) {
+        fThread->Kill();
+    }
     return result;
 }
 

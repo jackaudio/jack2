@@ -596,14 +596,15 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     return 0;
 }
 
-int JackEngine::ClientActivate(int refnum)
+int JackEngine::ClientActivate(int refnum, bool state)
 {
     JackClientInterface* client = fClientTable[refnum];
     assert(fClientTable[refnum]);
-
+  
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
-    fGraphManager->Activate(refnum);
-
+    if (state) 
+        fGraphManager->Activate(refnum);
+ 
     // Wait for graph state change to be effective
     if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);

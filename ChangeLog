@@ -20,7 +20,11 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
-2008-05-13 Stephane Letz  <letz@grame.fr>
+2008-05-16 Stephane Letz  <letz@grame.fr>
+
+	* Activate now connect to FW driver and start the realtime thread only if clients are actually realtime, that is have setup any of the RT callback.
+
+2008-05-14 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackEngine::Close to only delete "loadable" clients.
 

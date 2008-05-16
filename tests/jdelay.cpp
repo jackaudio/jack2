@@ -181,8 +181,7 @@ static int jack_callback (jack_nframes_t nframes, void *arg)
 
 int main (int ac, char *av [])
 {
-    int i, k;
-	const char** ports;
+ 	const char** ports;
 
     if ((jack_handle = jack_client_new ("jdelay")) == 0)
     {

@@ -100,6 +100,7 @@ kern_return_t rpc_jack_client_activate
 (
 	mach_port_t server_port,
 	int refnum,
+	int state,
 	int *result
 );
 
@@ -404,6 +405,7 @@ __END_DECLS
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		int refnum;
+		int state;
 	} __Request__rpc_jack_client_activate_t;
 #ifdef  __MigPackStructs
 #pragma pack()

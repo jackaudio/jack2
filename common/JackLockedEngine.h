@@ -84,10 +84,10 @@ class JackLockedEngine : public JackEngine, public JackLockAble
             return fEngine->ClientInternalClose(refnum, wait);
         }
 
-        int ClientActivate(int refnum)
+        int ClientActivate(int refnum, bool state)
         {
             JackLock lock(this);
-            return fEngine->ClientActivate(refnum);
+            return fEngine->ClientActivate(refnum, state);
         }
         int ClientDeactivate(int refnum)
         {

@@ -190,7 +190,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
             JackResult res;
             jack_log("JackRequest::ActivateClient");
             if (req.Read(socket) == 0)
-                res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum);
+                res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, ref.fState);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ActivateClient write error ref = %d", req.fRefNum);
             break;

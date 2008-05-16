@@ -60,7 +60,7 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
         void ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(int refnum, int* result);
 
-        void ClientActivate(int refnum, int* result);
+        void ClientActivate(int refnum, int state, int* result);
         void ClientDeactivate(int refnum, int* result);
 
         void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result);

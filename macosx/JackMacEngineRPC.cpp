@@ -59,12 +59,12 @@ rpc_type server_rpc_jack_client_close(mach_port_t private_port, int refnum, int*
     return KERN_SUCCESS;
 }
 
-rpc_type server_rpc_jack_client_activate(mach_port_t private_port, int refnum, int* result)
+rpc_type server_rpc_jack_client_activate(mach_port_t private_port, int refnum, int state, int* result)
 {
     jack_log("rpc_jack_client_activate");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    *result = channel->GetEngine()->ClientActivate(refnum);
+    *result = channel->GetEngine()->ClientActivate(refnum, state);
     return KERN_SUCCESS;
 }
 

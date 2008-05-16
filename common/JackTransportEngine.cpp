@@ -101,10 +101,11 @@ void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
-             // Inactive clients don't have their process function called at all, so they must appear as already "rolling" for the transport....
-            client->GetClientControl()->fTransportState = (client->GetClientControl()->fActive) ? JackTransportStarting : JackTransportRolling;
-            client->GetClientControl()->fTransportSync = true; 
-            client->GetClientControl()->fTransportTimebase = true; 
+            JackClientControl* control = client->GetClientControl();
+            // Inactive clients don't have their process function called at all, so they must appear as already "rolling" for the transport....
+            control->fTransportState = (control->fActive && control->fCallback[kRealTimeCallback]) ? JackTransportStarting : JackTransportRolling;
+            control->fTransportSync = true; 
+            control->fTransportTimebase = true; 
             jack_log("MakeAllStartingLocating ref = %ld", i);
         }
     }
@@ -116,9 +117,10 @@ void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
-            client->GetClientControl()->fTransportState = JackTransportStopped;
-            client->GetClientControl()->fTransportSync = false; 
-            client->GetClientControl()->fTransportTimebase = false; 
+            JackClientControl* control = client->GetClientControl();
+            control->fTransportState = JackTransportStopped;
+            control->fTransportSync = false; 
+            control->fTransportTimebase = false; 
             jack_log("MakeAllStopping ref = %ld", i);
         }
     }
@@ -130,8 +132,9 @@ void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
-            client->GetClientControl()->fTransportState = JackTransportStopped;
-            client->GetClientControl()->fTransportTimebase = true; 
+            JackClientControl* control = client->GetClientControl();
+            control->fTransportState = JackTransportStopped;
+            control->fTransportTimebase = true; 
             jack_log("MakeAllLocating ref = %ld", i);
         }
     }
@@ -155,7 +158,7 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
     transport_command_t cmd = fTransportCmd;
     if (cmd != fPreviousCmd) {
         fPreviousCmd = cmd;
-        jack_log("transport command: %s", (cmd == TransportCommandStart ? "START" : "STOP"));
+        jack_log("transport command: %s", (cmd == TransportCommandStart ? "Transport start" : "Transport stop"));
     } else {
         cmd = TransportCommandNone;
     }

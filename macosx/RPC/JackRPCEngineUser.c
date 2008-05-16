@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Jan 28 15:04:07 2008
- * with a MiG generated Sun Sep 23 15:44:06 PDT 2007 by root@hoosier.apple.com
+ * stub generated Fri May 16 09:21:56 2008
+ * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCEngine_subsystem__ 1
@@ -1425,6 +1425,7 @@ mig_external kern_return_t rpc_jack_client_activate
 (
 	mach_port_t server_port,
 	int refnum,
+	int state,
 	int *result
 )
 {
@@ -1436,6 +1437,7 @@ mig_external kern_return_t rpc_jack_client_activate
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		int refnum;
+		int state;
 	} Request;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -1494,6 +1496,8 @@ mig_external kern_return_t rpc_jack_client_activate
 	InP->NDR = NDR_record;
 
 	InP->refnum = refnum;
+
+	InP->state = state;
 
 	InP->Head.msgh_bits =
 		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);

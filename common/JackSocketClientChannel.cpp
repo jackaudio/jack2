@@ -165,9 +165,9 @@ void JackSocketClientChannel::ClientClose(int refnum, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
-void JackSocketClientChannel::ClientActivate(int refnum, int* result)
+void JackSocketClientChannel::ClientActivate(int refnum, int state, int* result)
 {
-    JackActivateRequest req(refnum);
+    JackActivateRequest req(refnum, state);
     JackResult res;
     ServerSyncCall(&req, &res, result);
 }

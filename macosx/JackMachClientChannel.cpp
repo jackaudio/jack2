@@ -152,9 +152,9 @@ void JackMachClientChannel::ClientClose(int refnum, int* result)
     }
 }
 
-void JackMachClientChannel::ClientActivate(int refnum, int* result)
+void JackMachClientChannel::ClientActivate(int refnum, int state, int* result)
 {
-    kern_return_t res = rpc_jack_client_activate(fPrivatePort, refnum, result);
+    kern_return_t res = rpc_jack_client_activate(fPrivatePort, refnum, state, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientActivate err = %s", mach_error_string(res));
