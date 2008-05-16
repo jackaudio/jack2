@@ -1438,8 +1438,8 @@ static bool open_library()
         
     char library_res_name[256];
   
-    void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
-    void* jackmpLibrary = (get_jack_library(JACKMP_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_LAZY) : 0;
+    void* jackLibrary = (get_jack_library(JACK_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_NOW) : 0;
+    void* jackmpLibrary = (get_jack_library(JACKMP_LIB, library_res_name)) ? dlopen(library_res_name, RTLD_NOW) : 0;
 
     if (jackLibrary) {
 
