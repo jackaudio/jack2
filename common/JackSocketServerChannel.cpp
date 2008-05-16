@@ -135,7 +135,7 @@ void JackSocketServerChannel::ClientKill(int fd)
     fRebuild = true;
 }
 
-int JackSocketServerChannel::HandleRequest(int fd)
+bool JackSocketServerChannel::HandleRequest(int fd)
 {
     pair<int, JackClientSocket*> elem = fSocketTable[fd];
     JackClientSocket* socket = elem.second;
@@ -145,7 +145,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
     JackRequest header;
     if (header.Read(socket) < 0) {
         jack_error("HandleRequest: cannot read header");
-        return -1;
+        return false;
     }
 
     // Read data
@@ -374,7 +374,7 @@ int JackSocketServerChannel::HandleRequest(int fd)
             break;
     }
 
-    return 0;
+    return true;
 }
 
 void JackSocketServerChannel::BuildPoolTable()
@@ -418,22 +418,17 @@ bool JackSocketServerChannel::Execute()
                 jack_log("Poll client error err = %s", strerror(errno));
                 ClientKill(fd);
             } else if (fPollTable[i].revents & POLLIN) {
-                if (HandleRequest(fd) < 0) {
+                if (!HandleRequest(fd)) 
                     jack_error("Could not handle external client request");
-                    //ClientRemove(fd); TO CHECK
-                }
             }
         }
 
         // Check the server request socket */
-        if (fPollTable[0].revents & POLLERR) {
+        if (fPollTable[0].revents & POLLERR) 
             jack_error("Error on server request socket err = %s", strerror(errno));
-            //return false; TO CHECK
-        }
-
-        if (fPollTable[0].revents & POLLIN) {
+   
+        if (fPollTable[0].revents & POLLIN) 
             ClientCreate();
-        }
     }
 
     BuildPoolTable();

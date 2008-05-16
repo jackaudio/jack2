@@ -84,15 +84,15 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
 bool JackClientPipeThread::Execute()
 {
     jack_log("JackClientPipeThread::Execute");
-    return (HandleRequest() == 0);
+    return(HandleRequest();
 }
 
-int JackClientPipeThread::HandleRequest()
+bool JackClientPipeThread::HandleRequest()
 {
     // Read header
     JackRequest header;
     int res = header.Read(fPipe);
-    int ret = 0;
+    bool ret = true;
 
     // Lock the global mutex
     if (WaitForSingleObject(fMutex, INFINITE) == WAIT_FAILED)
@@ -101,7 +101,7 @@ int JackClientPipeThread::HandleRequest()
     if (res < 0) {
         jack_error("HandleRequest: cannot read header");
         ClientKill();
-        ret = -1;
+        ret = false;
     } else {
 
         // Read data
@@ -135,7 +135,7 @@ int JackClientPipeThread::HandleRequest()
                     res.fResult = fServer->GetEngine()->ClientExternalClose(req.fRefNum);
                 res.Write(fPipe);
                 ClientRemove();
-                ret = -1;
+                ret = false;
                 break;
             }
 

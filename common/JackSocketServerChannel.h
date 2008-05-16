@@ -45,7 +45,7 @@ class JackSocketServerChannel : public JackServerChannelInterface, public JackRu
         bool fRebuild;
         std::map<int, std::pair<int, JackClientSocket*> > fSocketTable;
 
-        int HandleRequest(int fd);
+        bool HandleRequest(int fd);
         void BuildPoolTable();
 
         void ClientCreate();

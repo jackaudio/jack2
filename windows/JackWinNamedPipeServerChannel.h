@@ -53,7 +53,7 @@ class JackClientPipeThread : public JackRunnableInterface
         int Open(JackServer* server);	// Open the Server/Client connection
         void Close();					// Close the Server/Client connection
 
-        int HandleRequest();
+        bool HandleRequest();
 
         // JackRunnableInterface interface
         bool Execute();
