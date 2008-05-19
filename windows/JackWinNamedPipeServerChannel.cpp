@@ -84,7 +84,7 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
 bool JackClientPipeThread::Execute()
 {
     jack_log("JackClientPipeThread::Execute");
-    return(HandleRequest();
+    return(HandleRequest());
 }
 
 bool JackClientPipeThread::HandleRequest()
