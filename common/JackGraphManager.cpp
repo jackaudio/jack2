@@ -677,7 +677,7 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
     // Cleanup connection array
     memset(res, 0, sizeof(char*) * CONNECTION_NUM_FOR_PORT);
 
-    for (i = 0; (i < PORT_NUM) && ((index = connections[i]) != EMPTY); i++) {
+    for (i = 0; (i < CONNECTION_NUM_FOR_PORT) && ((index = connections[i]) != EMPTY); i++) {
         JackPort* port = GetPort(index);
         res[i] = port->fName;
     }
