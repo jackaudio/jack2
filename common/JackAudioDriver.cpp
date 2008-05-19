@@ -186,14 +186,16 @@ synchronize to the end of client graph execution.
 
 int JackAudioDriver::ProcessAsync()
 {
-    if (Read() < 0) { // Read input buffers for the current cycle
+    // Read input buffers for the current cycle
+    if (Read() < 0) {   
         jack_error("ProcessAsync: read error, skip cycle");
-        return -1;
+        return 0;   // Skip cycle, but continue processing...
     }
 
-    if (Write() < 0) { // Write output buffers from the previous cycle
+    // Write output buffers from the previous cycle
+    if (Write() < 0) {
         jack_error("ProcessAsync: write error, skip cycle");
-        return -1;
+        return 0;   // Skip cycle, but continue processing...
     }
 
     if (fIsMaster) {
@@ -215,9 +217,10 @@ output buffers computed at the *current cycle* are used.
 
 int JackAudioDriver::ProcessSync()
 {
-    if (Read() < 0) { // Read input buffers for the current cycle
+    // Read input buffers for the current cycle
+    if (Read() < 0) { 
         jack_error("ProcessSync: read error, skip cycle");
-        return -1;
+        return 0;   // Skip cycle, but continue processing...
     }
 
     if (fIsMaster) {
@@ -232,9 +235,10 @@ int JackAudioDriver::ProcessSync()
             jack_error("ProcessSync: error");
         }
 
-        if (Write() < 0) { // Write output buffers for the current cycle
+        // Write output buffers for the current cycle
+        if (Write() < 0) { 
             jack_error("ProcessSync: write error, skip cycle");
-            return -1;
+            return 0;   // Skip cycle, but continue processing...
         }
         
     } else {

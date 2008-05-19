@@ -427,7 +427,7 @@ int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
     CheckClient();
     fProcessTimeCallback = callback;
     fProcessTimeCallbackArg = arg;
-    return  fClient->SetProcessCallback(TimeCallback, this);
+    return fClient->SetProcessCallback(TimeCallback, this);
 }
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)

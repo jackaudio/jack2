@@ -24,6 +24,7 @@ Fernando Lopez-Lezcano
 
 	* Use of placement new for dynamic port allocation is possibly not safe... so avoid that until a definitive answer is found.
 	* Cleanup.
+	* JackAudioDriver::ProcessAsync and JackAudioDriver::ProcessSync were broken at some point : 0 has to be returned in all cases.
 
 2008-05-16 Stephane Letz  <letz@grame.fr>
 
