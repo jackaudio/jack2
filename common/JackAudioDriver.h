@@ -40,9 +40,9 @@ class EXPORT JackAudioDriver : public JackDriver
 
         // static tables since the actual number of ports may be changed by the real driver
         // thus dynamic allocation is more difficult to handle
-        jack_port_id_t fCapturePortList[PORT_NUM];
-        jack_port_id_t fPlaybackPortList[PORT_NUM];
-        jack_port_id_t fMonitorPortList[PORT_NUM];
+        jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
+        jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
+        jack_port_id_t fMonitorPortList[DRIVER_PORT_NUM];
 
         bool fWithMonitorPorts;
 

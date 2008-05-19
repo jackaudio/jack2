@@ -174,11 +174,11 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     } else {  // Multiple connections
 
         const jack_int_t* connections = manager->GetConnections(port_index);
-        void* buffers[CONNECTION_NUM];
+        void* buffers[CONNECTION_NUM_FOR_PORT];
         jack_port_id_t src_index;
         int i;
 
-        for (i = 0; (i < CONNECTION_NUM) && ((src_index = connections[i]) != EMPTY); i++) {
+        for (i = 0; (i < CONNECTION_NUM_FOR_PORT) && ((src_index = connections[i]) != EMPTY); i++) {
             AssertPort(src_index);
             buffers[i] = GetBuffer(src_index, buffer_size);
         }
@@ -209,7 +209,7 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
     const jack_int_t* connections = ReadCurrentState()->GetConnections(port_index);
     if ((port->fFlags & JackPortIsOutput) == 0) { // ?? Taken from jack, why not (port->fFlags  & JackPortIsInput) ?
         jack_port_id_t src_index;
-        for (int i = 0; (i < CONNECTION_NUM) && ((src_index = connections[i]) != EMPTY); i++) {
+        for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && ((src_index = connections[i]) != EMPTY); i++) {
             // XXX much worse things will happen if there is a feedback loop !!!
             RequestMonitor(src_index, onoff);
         }
@@ -228,7 +228,7 @@ jack_nframes_t JackGraphManager::ComputeTotalLatencyAux(jack_port_id_t port_inde
     if (hop_count > 8)
         return GetPort(port_index)->GetLatency();
 
-    for (int i = 0; (i < CONNECTION_NUM) && ((dst_index = connections[i]) != EMPTY); i++) {
+    for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && ((dst_index = connections[i]) != EMPTY); i++) {
         if (src_port_index != dst_index) {
             AssertPort(dst_index);
             JackPort* dst_port = GetPort(dst_index);
@@ -457,7 +457,7 @@ void JackGraphManager::GetConnections(jack_port_id_t port_index, jack_int_t* res
 {
     JackConnectionManager* manager = WriteNextStateStart();
     const jack_int_t* connections = manager->GetConnections(port_index);
-    memcpy(res, connections, sizeof(jack_int_t) * CONNECTION_NUM);
+    memcpy(res, connections, sizeof(jack_int_t) * CONNECTION_NUM_FOR_PORT);
     WriteNextStateStop();
 }
 
@@ -675,9 +675,9 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
     int i;
     
     // Cleanup connection array
-    memset(res, 0, sizeof(char*) * CONNECTION_NUM);
+    memset(res, 0, sizeof(char*) * CONNECTION_NUM_FOR_PORT);
 
-    for (i = 0; (i < CONNECTION_NUM) && ((index = connections[i]) != EMPTY); i++) {
+    for (i = 0; (i < PORT_NUM) && ((index = connections[i]) != EMPTY); i++) {
         JackPort* port = GetPort(index);
         res[i] = port->fName;
     }
@@ -694,7 +694,7 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
 // Client
 const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 {
-    const char** res = (const char**)malloc(sizeof(char*) * CONNECTION_NUM);
+    const char** res = (const char**)malloc(sizeof(char*) * CONNECTION_NUM_FOR_PORT);
     UInt16 cur_index, next_index;
 
     do {

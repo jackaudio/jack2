@@ -36,9 +36,10 @@ namespace Jack
 
 #define FIRST_AVAILABLE_PORT 1
 #define PORT_NUM 512
+#define DRIVER_PORT_NUM 256
 #define PORT_NUM_FOR_CLIENT 256
 
-#define CONNECTION_NUM 256
+#define CONNECTION_NUM_FOR_PORT 256
 
 #define CLIENT_NUM 64
 

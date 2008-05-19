@@ -136,7 +136,7 @@ jack_int_t JackConnectionManager::Connections(jack_port_id_t port_index) const
 
 jack_port_id_t JackConnectionManager::GetPort(jack_port_id_t port_index, int connection) const
 {
-    assert(connection < CONNECTION_NUM);
+    assert(connection < CONNECTION_NUM_FOR_PORT);
     return (jack_port_id_t)fConnection[port_index].GetItem(connection);
 }
 

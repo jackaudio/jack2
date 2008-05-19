@@ -29,7 +29,14 @@ namespace Jack
 {
 
 JackPort::JackPort()
-        : fFlags(JackPortIsInput), fRefNum( -1), fLatency(0), fTotalLatency(0), fMonitorRequests(0), fInUse(false), fTied(NO_PORT)
+        : fTypeId(0),
+        fFlags(JackPortIsInput), 
+        fRefNum( -1), 
+        fLatency(0), 
+        fTotalLatency(0), 
+        fMonitorRequests(0), 
+        fInUse(false), 
+        fTied(NO_PORT)
 {}
 
 JackPort::~JackPort()

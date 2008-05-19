@@ -46,7 +46,6 @@ static JackServer* fServer;
 static char* server_name = NULL;
 static int realtime_priority = 10;
 static int do_mlock = 1;
-static unsigned int port_max = 128;
 static int realtime = 0;
 static int loopback = 0;
 static int temporary = 0;
@@ -74,11 +73,8 @@ static void usage(FILE* file)
     fprintf(file, "\n"
             "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
             "               [ --name OR -n server-name ]\n"
-            // "               [ --no-mlock OR -m ]\n"
-            // "               [ --unlock OR -u ]\n"
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
             "               [ --loopback OR -L loopback-port-number ]\n"
-            // "               [ --port-max OR -p maximum-number-of-ports]\n"
             "               [ --verbose OR -v ]\n"
             "               [ --replace-registry OR -r ]\n"
             "               [ --silent OR -s ]\n"
@@ -145,10 +141,9 @@ int main(int argc, char* argv[])
     int waiting;
 
     jack_driver_desc_t* driver_desc;
-    const char *options = "-ad:P:uvrshVRL:STFl:t:mn:p:";
+    const char *options = "-ad:P:uvrshVRL:STFl:t:mn:";
     struct option long_options[] = {
-                                       { "driver", 1, 0, 'd'
-                                       },
+                                       { "driver", 1, 0, 'd'},
                                        { "verbose", 0, 0, 'v' },
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
@@ -207,10 +202,6 @@ int main(int argc, char* argv[])
 
             case 'm':
                 do_mlock = 0;
-                break;
-
-            case 'p':
-                port_max = (unsigned int)atol(optarg);
                 break;
 
             case 'P':

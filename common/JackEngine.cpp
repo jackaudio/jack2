@@ -738,18 +738,18 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 
     if (dst == ALL_PORTS) {
 
-        jack_int_t connections[CONNECTION_NUM];
+        jack_int_t connections[CONNECTION_NUM_FOR_PORT];
         fGraphManager->GetConnections(src, connections);
 
         // Notifications
         JackPort* port = fGraphManager->GetPort(src);
         if (port->GetFlags() & JackPortIsOutput) {
-            for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
+            for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
                 jack_log("NotifyPortConnect src = %ld dst = %ld false", src, connections[i]);
                 NotifyPortConnect(src, connections[i], false);
             }
         } else {
-            for (int i = 0; (i < CONNECTION_NUM) && (connections[i] != EMPTY); i++) {
+            for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
                 jack_log("NotifyPortConnect src = %ld dst = %ld false", connections[i], src);
                 NotifyPortConnect(connections[i], src, false);
             }

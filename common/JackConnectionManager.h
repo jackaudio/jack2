@@ -385,12 +385,12 @@ class JackConnectionManager
 
     private:
 
-        JackFixedArray<CONNECTION_NUM> fConnection[PORT_NUM];			/*! Connection matrix: list of connected ports for a given port: needed to compute Mix buffer */
+        JackFixedArray<CONNECTION_NUM_FOR_PORT> fConnection[PORT_NUM];  /*! Connection matrix: list of connected ports for a given port: needed to compute Mix buffer */
         JackFixedArray1<PORT_NUM_FOR_CLIENT> fInputPort[CLIENT_NUM];	/*! Table of input port per refnum : to find a refnum for a given port */
         JackFixedArray<PORT_NUM_FOR_CLIENT> fOutputPort[CLIENT_NUM];	/*! Table of output port per refnum : to find a refnum for a given port */
         JackFixedMatrix<CLIENT_NUM> fConnectionRef;						/*! Table of port connections by (refnum , refnum) */
         JackActivationCount fInputCounter[CLIENT_NUM];					/*! Activation counter per refnum */
-        JackLoopFeedback<CONNECTION_NUM> fLoopFeedback;					/*! Loop feedback connections */
+        JackLoopFeedback<CONNECTION_NUM_FOR_PORT> fLoopFeedback;		/*! Loop feedback connections */
 
         bool IsLoopPathAux(int ref1, int ref2) const;
 
