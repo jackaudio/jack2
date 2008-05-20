@@ -246,16 +246,12 @@ int main(int argc, char* argv[])
         }
     }
 
-    /*
-    if (show_version) {
-    	printf ( "jackd version " VERSION 
-    			" tmpdir " DEFAULT_TMP_DIR 
-    			" protocol " PROTOCOL_VERSION
-    			"\n");
+   if (show_version) {
+    	printf("jackdmp version " VERSION 
+               "\n");
     	return -1;
     }
-    */
-
+ 
     if (!seen_driver) {
         usage(stderr);
         exit(1);

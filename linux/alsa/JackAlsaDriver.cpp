@@ -1184,7 +1184,7 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
     snd_pcm_status_t *status;
     int res;
 
-    jack_error("alsa_driver_xrun_recovery ");
+    jack_error("alsa_driver_xrun_recovery");
 
     snd_pcm_status_alloca(&status);
 
@@ -2287,10 +2287,8 @@ int JackAlsaDriver::Read()
          * clients about the delay. 
          */
         //engine->delay (engine, delayed_usecs);
-        jack_log("ALSA XRun ");
-        //NotifyXRun(jack_get_microseconds());
+        jack_log("ALSA XRun");
         NotifyXRun(fLastWaitUst);
-        //return 0;
         return -1;
     }
 

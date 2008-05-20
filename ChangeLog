@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-20 Stephane Letz  <letz@grame.fr>
+
+	* Package number bumped to 1.90 everywhere.
+
 2008-05-19 Stephane Letz  <letz@grame.fr>
 
 	* Use of placement new for dynamic port allocation is possibly not safe... so avoid that until a definitive answer is found.

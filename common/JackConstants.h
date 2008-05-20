@@ -25,7 +25,7 @@
 namespace Jack
 {
 
-#define VERSION "0.72"
+#define VERSION "1.90"
 
 #define BUFFER_SIZE_MAX 8192
 
