@@ -148,6 +148,7 @@ class EXPORT JackDriver : public JackDriverClient
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
         jack_time_t fLastWaitUst;
+        jack_time_t fDelayedUsecs;
         JackEngine*	fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro** fSynchroTable;
@@ -220,7 +221,7 @@ class EXPORT JackDriver : public JackDriverClient
             return 0;
         }
 
-        void NotifyXRun(jack_time_t callback_usecs); // XRun notification sent by the driver
+        void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs); // XRun notification sent by the driver
 
         virtual bool IsRealTime();
 

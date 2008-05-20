@@ -73,6 +73,8 @@ struct JackEngineControl : public JackShmMem
     bool fTemporary;
     jack_time_t fPeriodUsecs;
     jack_time_t fTimeOutUsecs;
+    float fMaxDelayedUsecs;
+    float fXrunDelayedUsecs;
     bool fTimeOut;
     bool fRealTime;
     int fPriority;
@@ -128,6 +130,8 @@ struct JackEngineControl : public JackShmMem
         fPeriod = 0;
         fComputation = 0;
         fConstraint = 0;
+        fMaxDelayedUsecs = 0.f;
+        fXrunDelayedUsecs = 0.f;
     }
     ~JackEngineControl()
     {}
@@ -140,6 +144,10 @@ struct JackEngineControl : public JackShmMem
     void InitFrameTime();
     void ResetFrameTime(jack_time_t callback_usecs);
     void ReadFrameTime(JackTimer* timer);
+    
+    // XRun
+    void NotifyXRun(float delayed_usecs);
+    void ResetXRun();
 
     // Private
     void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager);

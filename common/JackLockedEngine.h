@@ -154,10 +154,10 @@ class JackLockedEngine : public JackEngine, public JackLockAble
         }
 
         // Notifications
-        void NotifyXRun(jack_time_t callback_usecs)
+        void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
         {
-            //  RT : no lock
-            fEngine->NotifyXRun(callback_usecs);
+            // RT : no lock
+            fEngine->NotifyXRun(callback_usecs, delayed_usecs);
         }
 
         void NotifyXRun(int refnum)

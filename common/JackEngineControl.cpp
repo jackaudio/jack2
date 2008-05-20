@@ -155,5 +155,17 @@ void JackEngineControl::ClearTimeMeasures()
     }
     fLastTime = fCurTime = 0;
 }
+    
+void JackEngineControl::NotifyXRun(float delayed_usecs)
+{
+    fXrunDelayedUsecs = delayed_usecs;
+    if (delayed_usecs > fMaxDelayedUsecs)
+        fMaxDelayedUsecs = delayed_usecs;
+}
+    
+void JackEngineControl::ResetXRun()
+{
+    fMaxDelayedUsecs = 0.f;
+}
 
 } // end of namespace

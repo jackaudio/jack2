@@ -47,6 +47,7 @@ JackDriver::JackDriver(const char* name, JackEngine* engine, JackSynchro** table
     fEngine = engine;
     fGraphManager = NULL;
     fLastWaitUst = 0;
+    fDelayedUsecs = 0.f;
     fIsMaster = true;
 }
 
@@ -178,9 +179,9 @@ JackClientControl* JackDriver::GetClientControl() const
     return fClientControl;
 }
 
-void JackDriver::NotifyXRun(jack_time_t callback_usecs)
+void JackDriver::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
 {
-    fEngine->NotifyXRun(callback_usecs);
+    fEngine->NotifyXRun(callback_usecs, delayed_usecs);
 }
 
 void JackDriverClient::SetMaster(bool onoff)

@@ -1493,17 +1493,29 @@ EXPORT float jack_get_max_delayed_usecs(jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    jack_log("jack_get_max_delayed_usecs: not yet implemented");
-    return 0.f;
-}
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_get_max_delayed_usecs called with a NULL client");
+        return 0.f;
+    } else {
+        JackEngineControl* control = GetEngineControl();
+        return (control ? control->fMaxDelayedUsecs : 0.f);
+    }
+ }
 
 EXPORT float jack_get_xrun_delayed_usecs(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    jack_log("jack_get_xrun_delayed_usecs: not yet implemented");
-    return 0.f;
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_get_xrun_delayed_usecs called with a NULL client");
+        return 0.f;
+    } else {
+        JackEngineControl* control = GetEngineControl();
+        return (control ? control->fXrunDelayedUsecs : 0.f);
+    }
 }
 
 EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
@@ -1511,7 +1523,13 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    jack_log("jack_reset_max_delayed_usecs: not yet implemented");
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_reset_max_delayed_usecs called with a NULL client");
+    } else {
+        JackEngineControl* control = GetEngineControl();
+        control->ResetXRun();
+    }
 }
 
 // thread.h

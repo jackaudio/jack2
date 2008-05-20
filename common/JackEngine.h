@@ -108,7 +108,7 @@ class JackEngine
         virtual bool Process(jack_time_t callback_usecs);
 
         // Notifications
-        virtual void NotifyXRun(jack_time_t callback_usecs);
+        virtual void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
         virtual void NotifyXRun(int refnum);
         virtual void NotifyGraphReorder();
         virtual void NotifyBufferSize(jack_nframes_t nframes);

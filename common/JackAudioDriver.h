@@ -81,7 +81,7 @@ class EXPORT JackAudioDriver : public JackDriver
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
 
-        virtual void NotifyXRun(jack_time_t callback_usecs); // XRun notification sent by the driver
+        virtual void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs); // XRun notification sent by the driver
 
 };
 

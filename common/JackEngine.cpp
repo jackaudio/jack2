@@ -269,10 +269,11 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
 }
 
 // Coming from the driver
-void JackEngine::NotifyXRun(jack_time_t callback_usecs)
+void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
 {
     // Use the audio thread => request thread communication channel
     fEngineControl->ResetFrameTime(callback_usecs);
+    fEngineControl->NotifyXRun(delayed_usecs);
     fChannel->Notify(ALL_CLIENTS, kXRunCallback, 0);
 }
 

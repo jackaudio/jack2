@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-05-20 Stephane Letz  <letz@grame.fr>
 
 	* Package number bumped to 1.90 everywhere.
+	* Implementation of jack_get_max_delayed_usecs, jack_get_xrun_delayed_usecs and jack_reset_max_delayed_usecs.
 
 2008-05-19 Stephane Letz  <letz@grame.fr>
 

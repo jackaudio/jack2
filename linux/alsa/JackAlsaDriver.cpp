@@ -2268,52 +2268,33 @@ int JackAlsaDriver::Stop()
 int JackAlsaDriver::Read()
 {
     /* Taken from alsa_driver_run_cycle */
-
-    //jack_engine_t *engine = driver->engine;
-    int wait_status;
-    float delayed_usecs;
+   int wait_status;
     jack_nframes_t nframes;
 
-    //DEBUG ("alsa run cycle wait\n");
-    nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &delayed_usecs);
-    //DEBUG ("alsaback from wait, nframes = %lu", nframes);
-
+    nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
+ 
     if (wait_status < 0)
         return -1;		/* driver failed */
 
     if (nframes == 0) {
-
         /* we detected an xrun and restarted: notify
          * clients about the delay. 
          */
-        //engine->delay (engine, delayed_usecs);
         jack_log("ALSA XRun");
-        NotifyXRun(fLastWaitUst);
+        NotifyXRun(fLastWaitUst, fDelayedUsecs);
         return -1;
     }
 
-    //fLastWaitUst = GetMicroSeconds(); // Take callback date here
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackAlsaDriver::Read nframes = %ld", nframes);
 
-    //return engine->run_cycle (engine, nframes, delayed_usecs);
     fDelayedUst = (jack_time_t)delayed_usecs;
     return alsa_driver_read((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }
 
 int JackAlsaDriver::Write()
 {
-    //jack_log("write");
-    int res = alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
-    jack_time_t write_time = GetMicroSeconds();
-
-    /*
-    if (write_time > (fLastWaitUst - fDelayedUst) + fEngineControl->fPeriodUsecs) {
-    	jack_log("ALSA write XRun ");
-    	NotifyXRun(write_time);
-    }
-    */
-    return res;
+    return alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }
 
 void

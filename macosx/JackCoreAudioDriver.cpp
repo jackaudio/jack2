@@ -250,7 +250,8 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 
         case kAudioDeviceProcessorOverload:
             jack_log("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload");
-            driver->NotifyXRun(GetMicroSeconds());
+            jack_time_t cur_time = GetMicroSeconds();
+            driver->NotifyXRun(cur_time, float(cur_time - driver->fLastWaitUst));   // Better this value than nothing... 
             break;
 
         case kAudioDevicePropertyStreamConfiguration:
