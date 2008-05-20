@@ -2288,7 +2288,6 @@ int JackAlsaDriver::Read()
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackAlsaDriver::Read nframes = %ld", nframes);
 
-    fDelayedUst = (jack_time_t)delayed_usecs;
     return alsa_driver_read((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }
 

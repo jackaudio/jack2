@@ -148,8 +148,8 @@ class EXPORT JackDriver : public JackDriverClient
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
         jack_time_t fLastWaitUst;
-        jack_time_t fDelayedUsecs;
-        JackEngine*	fEngine;
+        float fDelayedUsecs;
+        JackEngine* fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro** fSynchroTable;
         JackEngineControl* fEngineControl;
