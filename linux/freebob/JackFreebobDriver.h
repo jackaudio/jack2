@@ -44,7 +44,6 @@ class JackFreebobDriver : public JackAudioDriver
         int g_verbose;
 
         jack_driver_t* fDriver;
-        jack_time_t fDelayedUst;
         int freebob_driver_attach (freebob_driver_t *driver);
         int freebob_driver_detach (freebob_driver_t *driver);
         int freebob_driver_read (freebob_driver_t * driver, jack_nframes_t nframes);

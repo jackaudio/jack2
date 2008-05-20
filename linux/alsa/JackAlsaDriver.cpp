@@ -2268,8 +2268,9 @@ int JackAlsaDriver::Stop()
 int JackAlsaDriver::Read()
 {
     /* Taken from alsa_driver_run_cycle */
-   int wait_status;
+    int wait_status;
     jack_nframes_t nframes;
+    fDelayedUsecs = 0.f;
 
     nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
  

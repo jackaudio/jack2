@@ -40,8 +40,7 @@ class JackAlsaDriver : public JackAudioDriver
     private:
 
         jack_driver_t* fDriver;
-        jack_time_t fDelayedUst;
-
+    
         void alsa_driver_release_channel_dependent_memory(alsa_driver_t *driver);
         int alsa_driver_check_capabilities(alsa_driver_t *driver);
         int alsa_driver_check_card_type(alsa_driver_t *driver);
@@ -153,9 +152,7 @@ class JackAlsaDriver : public JackAudioDriver
 
         int SetBufferSize(jack_nframes_t nframes);
 
-
         // jack api emulation for the midi driver
-
         int is_realtime() const;
         int create_thread(pthread_t *thread, int prio, int rt, void *(*start_func)(void*), void *arg);
 

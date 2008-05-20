@@ -856,10 +856,10 @@ int JackFreebobDriver::Read()
     /* Taken from freebob_driver_run_cycle */
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;
     int wait_status = 0;
-    float delayed_usecs = 0.0;
+    fDelayedUsecs = 0.f;
 
     jack_nframes_t nframes = freebob_driver_wait (driver, -1, &wait_status,
-                             &delayed_usecs);
+                             &fDelayedUsecs);
 
     if ((wait_status < 0)) {
         printError( "wait status < 0! (= %d)", wait_status);
@@ -867,24 +867,18 @@ int JackFreebobDriver::Read()
     }
 
     if (nframes == 0) {
-
         /* we detected an xrun and restarted: notify
          * clients about the delay. 
          */
-        //engine->delay (engine, delayed_usecs);
         jack_log("FreeBoB XRun ");
-        //NotifyXRun(jack_get_microseconds());
-        NotifyXRun(fLastWaitUst);
-        //return 0;
+        NotifyXRun(fLastWaitUst, fDelayedUsecs);
         return -1;
     }
 
-    //fLastWaitUst = GetMicroSeconds(); // Take callback date here
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
 
     //return engine->run_cycle (engine, nframes, delayed_usecs);
-    fDelayedUst = (jack_time_t)delayed_usecs;
     printExit();
     return freebob_driver_read((freebob_driver_t *)fDriver, fEngineControl->fBufferSize);
 }

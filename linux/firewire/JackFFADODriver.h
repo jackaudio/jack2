@@ -44,7 +44,6 @@ class JackFFADODriver : public JackAudioDriver
         int g_verbose;
 
         jack_driver_t* fDriver;
-        jack_time_t fDelayedUst;
         int ffado_driver_attach (ffado_driver_t *driver);
         int ffado_driver_detach (ffado_driver_t *driver);
         int ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nframes);
