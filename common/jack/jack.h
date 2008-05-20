@@ -174,9 +174,9 @@ extern "C"
      *
      * The code in the supplied function must be suitable for real-time
      * execution.  That means that it cannot call functions that might
-     * block for a long time.  This includes malloc, free, printf,
+     * block for a long time. This includes malloc, free, printf,
      * pthread_mutex_lock, sleep, wait, poll, select, pthread_join,
-     * pthread_cond_wait, etc, etc.  See
+     * pthread_cond_wait, etc, etc. See
      * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
      * for more information.
      *
@@ -216,9 +216,9 @@ extern "C"
      * Typical use are in conjunction with @a jack_cycle_wait and @ jack_cycle_signal functions.
      * The code in the supplied function must be suitable for real-time
      * execution.  That means that it cannot call functions that might
-     * block for a long time.  This includes malloc, free, printf,
+     * block for a long time. This includes malloc, free, printf,
      * pthread_mutex_lock, sleep, wait, poll, select, pthread_join,
-     * pthread_cond_wait, etc, etc.  See
+     * pthread_cond_wait, etc, etc. See
      * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
      * for more information.
      *
