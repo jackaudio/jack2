@@ -62,10 +62,10 @@ class JackLockedEngine : public JackEngine, public JackLockAble
             JackLock lock(this);
             return fEngine->ClientCheck(name, name_res, protocol, options, status);
         }
-        int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+        int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
         {
             JackLock lock(this);
-            return fEngine->ClientExternalOpen(name, ref, shared_engine, shared_client, shared_graph_manager);
+            return fEngine->ClientExternalOpen(name, pid, ref, shared_engine, shared_client, shared_graph_manager);
         }
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)
         {
@@ -195,6 +195,13 @@ class JackLockedEngine : public JackEngine, public JackLockAble
             JackLock lock(this);
             fEngine->NotifyActivate(refnum);
         }
+    
+        int GetClientPID(const char* name)
+        {
+            JackLock lock(this);
+            return fEngine->GetClientPID(name);
+        }
+    
 };
 
 

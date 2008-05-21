@@ -39,11 +39,12 @@ using namespace std;
 namespace Jack
 {
 
-JackDriver::JackDriver(const char* name, JackEngine* engine, JackSynchro** table)
+JackDriver::JackDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;
     fClientControl = new JackClientControl(name);
+    strcpy(fAliasName, alias);
     fEngine = engine;
     fGraphManager = NULL;
     fLastWaitUst = 0;

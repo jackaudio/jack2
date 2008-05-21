@@ -122,7 +122,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientOpenRequest req;
                 JackClientOpenResult res;
                 if (req.Read(fPipe) == 0)
-                    ClientAdd(req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+                    ClientAdd(req.fName, req.fPID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(fPipe);
                 break;
             }
@@ -318,11 +318,11 @@ bool JackClientPipeThread::HandleRequest()
     return ret;
 }
 
-void JackClientPipeThread::ClientAdd(char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackClientPipeThread::ClientAdd(char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     jack_log("JackClientPipeThread::ClientAdd %s", name);
     fRefNum = -1;
-    *result = fServer->GetEngine()->ClientExternalOpen(name, &fRefNum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
 void JackClientPipeThread::ClientRemove()

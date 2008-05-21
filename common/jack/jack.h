@@ -105,6 +105,11 @@ extern "C"
      * name will differ from the @a client_name requested.
      */
     char * jack_get_client_name (jack_client_t *client);
+    
+    /**
+     * @return pid of client. If not available, 0 will be returned.
+     */
+    int jack_get_client_pid (const char *name);
 
     /**
      * Load an internal client into the Jack server.

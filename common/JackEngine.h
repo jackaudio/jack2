@@ -80,7 +80,7 @@ class JackEngine
 
         // Client management
         virtual int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
-        virtual int ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
+        virtual int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
         virtual int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
 
         virtual int ClientExternalClose(int refnum);
@@ -88,7 +88,9 @@ class JackEngine
 
         virtual int ClientActivate(int refnum, bool state);
         virtual int ClientDeactivate(int refnum);
-
+    
+        virtual int GetClientPID(const char* name);
+    
         // Internal client management
         virtual int GetInternalClientName(int int_ref, char* name_res);
         virtual int InternalClientHandle(const char* client_name, int* status, int* int_ref);

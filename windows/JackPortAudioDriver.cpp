@@ -656,7 +656,7 @@ extern "C"
             playback = TRUE;
         }
 
-        Jack::JackDriverClientInterface* driver = new Jack::JackPortAudioDriver("portaudio", engine, table);
+        Jack::JackDriverClientInterface* driver = new Jack::JackPortAudioDriver("system", "portaudio", engine, table);
         if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency) == 0) {
             return driver;
         } else {

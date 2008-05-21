@@ -2126,8 +2126,8 @@ int JackAlsaDriver::Attach()
     jack_log("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:capture_%u", fClientControl->fName, i + 1);
-        snprintf(name, sizeof(name) - 1, "system:capture_%d", i + 1);
+        snprintf(alias, sizeof(alias) - 1, "%s:capture_%u", fAliasName, i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl->fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
@@ -2142,8 +2142,8 @@ int JackAlsaDriver::Attach()
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
 
     for (int i = 0; i < fPlaybackChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:playback_%u", fClientControl->fName, i + 1);
-        snprintf(name, sizeof(name) - 1, "system:playback_%d", i + 1);
+        snprintf(alias, sizeof(alias) - 1, "%s:playback_%u", fAliasName, i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl->fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
@@ -2723,7 +2723,7 @@ extern "C"
             playback = TRUE;
         }
 
-        Jack::JackAlsaDriver* alsa_driver = new Jack::JackAlsaDriver("alsa_pcm", engine, table);
+        Jack::JackAlsaDriver* alsa_driver = new Jack::JackAlsaDriver("system", "alsa_pcm", engine, table);
         Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(alsa_driver);
         // Special open for ALSA driver...
         if (alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor,

@@ -35,7 +35,7 @@ class JackFreewheelDriver : public JackDriver
 
     public:
 
-        JackFreewheelDriver(const char* name, JackEngine* engine, JackSynchro** table): JackDriver(name, engine, table)
+        JackFreewheelDriver(JackEngine* engine, JackSynchro** table): JackDriver("freewheel", "", engine, table)
         {}
         virtual ~JackFreewheelDriver()
         {}

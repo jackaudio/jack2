@@ -447,8 +447,19 @@ bool JackEngine::ClientCheckName(const char* name)
     return false;
 }
 
+int JackEngine::GetClientPID(const char* name)
+{
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
+            return client->GetClientControl()->fPID;
+    }
+    
+    return 0;
+}
+
 // Used for external clients
-int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
     jack_log("JackEngine::ClientOpen: name = %s ", name);
 
@@ -465,7 +476,7 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
         goto error;
     }
 
-    if (client->Open(name, refnum, shared_client) < 0) {
+    if (client->Open(name, pid, refnum, shared_client) < 0) {
         jack_error("Cannot open client");
         goto error;
     }
@@ -476,12 +487,13 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
         goto error;
     }
 
+    fClientTable[refnum] = client;
+
     if (NotifyAddClient(client, name, refnum) < 0) {
         jack_error("Cannot notify add client");
         goto error;
     }
-
-    fClientTable[refnum] = client;
+ 
     fGraphManager->InitRefNum(refnum);
     fEngineControl->ResetRollingUsecs();
     *shared_engine = fEngineControl->GetShmIndex();
@@ -490,7 +502,9 @@ int JackEngine::ClientExternalOpen(const char* name, int* ref, int* shared_engin
     return 0;
 
 error:
-    ClientCloseAux(refnum, client, false);
+    // Cleanup...
+    fSynchroTable[refnum]->Destroy();   
+    fClientTable[refnum] = 0;
     client->Close();
     delete client;
     return -1;
@@ -504,32 +518,39 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
     int refnum = AllocateRefnum();
     if (refnum < 0) {
         jack_error("No more refnum available");
-        return -1;
+        goto error;
     }
 
     if (!fSynchroTable[refnum]->Allocate(name, fEngineControl->fServerName, 0)) {
         jack_error("Cannot allocate synchro");
-        return -1;
+        goto error;
     }
 
     if (wait && !fSignal->TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
-        return -1;
-    }
-
-    if (NotifyAddClient(client, name, refnum) < 0) {
-        jack_error("Cannot notify add client");
-        return -1;
+        goto error;
     }
 
     fClientTable[refnum] = client;
+
+    if (NotifyAddClient(client, name, refnum) < 0) {
+        jack_error("Cannot notify add client");
+        goto error;
+    }
+
     fGraphManager->InitRefNum(refnum);
     fEngineControl->ResetRollingUsecs();
     *shared_engine = fEngineControl;
     *shared_manager = fGraphManager;
     *ref = refnum;
     return 0;
+
+error:
+    // Cleanup...
+    fSynchroTable[refnum]->Destroy();  
+    fClientTable[refnum] = 0;
+    return -1;
 }
 
 // Used for external clients
@@ -556,9 +577,7 @@ int JackEngine::ClientInternalClose(int refnum, bool wait)
 
 int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wait)
 {
-    jack_log("JackEngine::ClientCloseAux ref = %ld name = %s",
-             refnum,
-             (client->GetClientControl()) ? client->GetClientControl()->fName : "No name");
+    jack_log("JackEngine::ClientCloseAux ref = %ld", refnum);
 
     // Unregister all ports ==> notifications are sent
     jack_int_t ports[PORT_NUM_FOR_CLIENT];
@@ -588,8 +607,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     }
 
     // Notify running clients
-    if (client->GetClientControl())  // When called in error cases, client may not be completely allocated
-        NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
+    NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
 
     // Cleanup...
     fSynchroTable[refnum]->Destroy();

@@ -44,7 +44,7 @@ int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, i
     return result;
 }
 
-int JackExternalClient::Open(const char* name, int refnum, int* shared_client)
+int JackExternalClient::Open(const char* name, int pid, int refnum, int* shared_client)
 {
     try {
 
@@ -53,7 +53,7 @@ int JackExternalClient::Open(const char* name, int refnum, int* shared_client)
             return -1;
         }
 
-        fClientControl = new JackClientControl(name, refnum);
+        fClientControl = new JackClientControl(name, pid, refnum);
         if (!fClientControl) {
             jack_error("Cannot allocate client shared memory segment");
             return -1;

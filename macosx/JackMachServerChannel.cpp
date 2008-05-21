@@ -85,10 +85,10 @@ void JackMachServerChannel::ClientCheck(char* name, char* name_res, int protocol
     *result = GetEngine()->ClientCheck(name, name_res, protocol, options, status);
 }
 
-void JackMachServerChannel::ClientOpen(char* name, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackMachServerChannel::ClientOpen(char* name, int pid, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     int refnum = -1;
-    *result = GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
+    *result = GetEngine()->ClientExternalOpen(name, pid, &refnum, shared_engine, shared_client, shared_graph);
 
     if (*result == 0) {
         mach_port_t port = fServerPort.AddPort();

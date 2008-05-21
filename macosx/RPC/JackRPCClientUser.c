@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Fri May 16 09:21:55 2008
+ * stub generated Wed May 21 10:43:25 2008
  * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */

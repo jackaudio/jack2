@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Fri May 16 09:21:56 2008
+ * stub generated Wed May 21 10:43:25 2008
  * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
@@ -111,6 +111,7 @@
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
+		int pid;
 	} __Request__rpc_jack_client_open_t;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -767,6 +768,26 @@ mig_internal novalue _Xrpc_jack_client_rt_notify
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined */
 
+#ifndef __NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined */
+
 #ifndef __NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined
 #if	defined(__NDR_convert__char_rep__JackRPCEngine__client_name_t__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined
@@ -786,6 +807,26 @@ mig_internal novalue _Xrpc_jack_client_rt_notify
 	__NDR_convert__char_rep__string(a, f, 128)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined */
+
+#ifndef __NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined */
 
 #ifndef __NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined
 #if	defined(__NDR_convert__float_rep__JackRPCEngine__client_name_t__defined)
@@ -807,6 +848,26 @@ mig_internal novalue _Xrpc_jack_client_rt_notify
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined */
 
+#ifndef __NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined */
+
 
 mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_open_t(__attribute__((__unused__)) __Request__rpc_jack_client_open_t *In0P)
 {
@@ -818,27 +879,39 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_open_t(__attrib
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
-#if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined)
+#if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined) || \
+	defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined)
 	if (In0P->NDR.int_rep != NDR_record.int_rep) {
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name(&In0P->client_name, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined */
+#if defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined)
+		__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid(&In0P->pid, In0P->NDR.int_rep);
+#endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined */
 	}
 #endif	/* defined(__NDR_convert__int_rep...) */
 
-#if	defined(__NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined)
+#if	defined(__NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined) || \
+	defined(__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined)
 	if (In0P->NDR.char_rep != NDR_record.char_rep) {
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name(&In0P->client_name, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_open_t__client_name__defined */
+#if defined(__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined)
+		__NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid(&In0P->pid, In0P->NDR.char_rep);
+#endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_open_t__pid__defined */
 	}
 #endif	/* defined(__NDR_convert__char_rep...) */
 
-#if	defined(__NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined)
+#if	defined(__NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined) || \
+	defined(__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined)
 	if (In0P->NDR.float_rep != NDR_record.float_rep) {
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name(&In0P->client_name, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_open_t__client_name__defined */
+#if defined(__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined)
+		__NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid(&In0P->pid, In0P->NDR.float_rep);
+#endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_open_t__pid__defined */
 	}
 #endif	/* defined(__NDR_convert__float_rep...) */
 
@@ -859,6 +932,7 @@ kern_return_t server_rpc_jack_client_open
 (
 	mach_port_t server_port,
 	client_name_t client_name,
+	int pid,
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
@@ -878,6 +952,7 @@ mig_internal novalue _Xrpc_jack_client_open
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
+		int pid;
 		mach_msg_trailer_t trailer;
 	} Request;
 #ifdef  __MigPackStructs
@@ -928,7 +1003,7 @@ mig_internal novalue _Xrpc_jack_client_open
 #endif	/* UseStaticTemplates */
 
 
-	RetCode = server_rpc_jack_client_open(In0P->Head.msgh_request_port, In0P->client_name, &OutP->private_port.name, &OutP->shared_engine, &OutP->shared_client, &OutP->shared_graph, &OutP->result);
+	RetCode = server_rpc_jack_client_open(In0P->Head.msgh_request_port, In0P->client_name, In0P->pid, &OutP->private_port.name, &OutP->shared_engine, &OutP->shared_client, &OutP->shared_graph, &OutP->result);
 	if (RetCode != KERN_SUCCESS) {
 		MIG_RETURN_ERROR(OutP, RetCode);
 	}
@@ -6198,7 +6273,7 @@ const struct server_JackRPCEngine_subsystem {
 	(vm_address_t)0,
 	{
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_open, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_open_t)},
+            (mig_stub_routine_t) _Xrpc_jack_client_open, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_open_t)},
           { (mig_impl_routine_t) 0,
             (mig_stub_routine_t) _Xrpc_jack_client_check, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_check_t)},
           { (mig_impl_routine_t) 0,

@@ -57,7 +57,7 @@ class EXPORT JackAudioDriver : public JackDriver
 
     public:
 
-        JackAudioDriver(const char* name, JackEngine* engine, JackSynchro** table);
+        JackAudioDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table);
         virtual ~JackAudioDriver();
 
         virtual int Process();

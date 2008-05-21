@@ -89,11 +89,11 @@ void JackSocketServerChannel::ClientCreate()
     }
 }
 
-void JackSocketServerChannel::ClientAdd(int fd, char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketServerChannel::ClientAdd(int fd, char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     jack_log("JackSocketServerChannel::ClientAdd");
     int refnum = -1;
-    *result = fServer->GetEngine()->ClientExternalOpen(name, &refnum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
         fSocketTable[fd].first = refnum;
         fRebuild = true;
@@ -167,7 +167,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientOpenRequest req;
             JackClientOpenResult res;
             if (req.Read(socket) == 0)
-                ClientAdd(fd, req.fName, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+                ClientAdd(fd, req.fName, req.fPID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientOpen write error name = %s", req.fName);
             break;

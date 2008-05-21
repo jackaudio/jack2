@@ -419,8 +419,8 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int* channe
     return err;
 }
 
-JackCoreAudioDriver::JackCoreAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
-        : JackAudioDriver(name, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f)
+JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table)
+        : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f)
 {}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
@@ -967,12 +967,12 @@ int JackCoreAudioDriver::Attach()
             err = AudioDeviceGetProperty(fDeviceID, i + 1, true, kAudioDevicePropertyChannelName, &size, channel_name);
             if (err != noErr)
                 jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error ");
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:out_%s%u", fClientControl->fName, fCaptureDriverName, channel_name, i + 1);
+            snprintf(alias, sizeof(alias) - 1, "%s:%s:out_%s%u", fAliasName, fCaptureDriverName, channel_name, i + 1);
         } else {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:out%u", fClientControl->fName, fCaptureDriverName, i + 1);
+            snprintf(alias, sizeof(alias) - 1, "%s:%s:out%u", fAliasName, fCaptureDriverName, i + 1);
         }
 
-        snprintf(name, sizeof(name) - 1, "system:capture_%d", i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl->fName, i + 1);
 
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("Cannot register port for %s", name);
@@ -1006,12 +1006,12 @@ int JackCoreAudioDriver::Attach()
             err = AudioDeviceGetProperty(fDeviceID, i + 1, false, kAudioDevicePropertyChannelName, &size, channel_name);
             if (err != noErr)
                 jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error ");
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:in_%s%u", fClientControl->fName, fPlaybackDriverName, channel_name, i + 1);
+            snprintf(alias, sizeof(alias) - 1, "%s:%s:in_%s%u", fAliasName, fPlaybackDriverName, channel_name, i + 1);
         } else {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:in%u", fClientControl->fName, fPlaybackDriverName, i + 1);
+            snprintf(alias, sizeof(alias) - 1, "%s:%s:in%u", fAliasName, fPlaybackDriverName, i + 1);
         }
 
-        snprintf(name, sizeof(name) - 1, "system:playback_%d", i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl->fName, i + 1);
 
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("Cannot register port for %s", name);
@@ -1037,7 +1037,7 @@ int JackCoreAudioDriver::Attach()
         // Monitor ports
         if (fWithMonitorPorts) {
             jack_log("Create monitor port ");
-            snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fClientControl->fName, fPlaybackDriverName, i + 1);
+            snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fAliasName, fPlaybackDriverName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
@@ -1336,7 +1336,7 @@ extern "C"
             playback = TRUE;
         }
 
-        Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("coreaudio", engine, table);
+        Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("system", "coreaudio", engine, table);
         if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_pcm_name, 
             playback_pcm_name, systemic_input_latency, systemic_output_latency, async_output_latency) == 0) {
             return driver;

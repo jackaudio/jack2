@@ -993,7 +993,7 @@ extern "C"
             cmlparams.capture_ports = TRUE;
         }
 
-        Jack::JackFFADODriver* ffado_driver = new Jack::JackFFADODriver("firewire_pcm", engine, table);
+        Jack::JackFFADODriver* ffado_driver = new Jack::JackFFADODriver("system", "firewire_pcm", engine, table);
         Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(ffado_driver);
         // Special open for FFADO driver...
         if (ffado_driver->Open(&cmlparams) == 0) {

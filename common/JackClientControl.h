@@ -42,24 +42,25 @@ struct JackClientControl : public JackShmMem
     volatile bool fTransportSync;      /* Will be true when slow-sync cb has to be called */
     volatile bool fTransportTimebase;  /* Will be true when timebase cb is called with new_pos on */
     int fRefNum;
+    int fPID;
     bool fActive;
 
-    JackClientControl(const char* name, int refnum)
+    JackClientControl(const char* name, int pid, int refnum)
     {
-        Init(name, refnum);
+        Init(name, pid, refnum);
     }
 
     JackClientControl(const char* name)
     {
-        Init(name, -1);
+        Init(name, 0, -1);
     }
 
     JackClientControl()
     {
-        Init("", -1);
+        Init("", 0, -1);
     }
 
-    void Init(const char* name, int refnum)
+    void Init(const char* name, int pid, int refnum)
     {
         strcpy(fName, name);
         for (int i = 0; i < kMaxNotification; i++)
@@ -72,6 +73,7 @@ struct JackClientControl : public JackShmMem
         fCallback[kStartFreewheelCallback] = true;
         fCallback[kStopFreewheelCallback] = true;
         fRefNum = refnum;
+        fPID = pid;
         fTransportState = JackTransportStopped;
         fTransportSync = false;
         fTransportTimebase = false;

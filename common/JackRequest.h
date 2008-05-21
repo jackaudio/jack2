@@ -192,23 +192,27 @@ struct JackClientCheckResult : public JackResult
 struct JackClientOpenRequest : public JackRequest
 {
 
+    int fPID;
     char fName[JACK_CLIENT_NAME_SIZE + 1];
 
     JackClientOpenRequest()
     {}
-    JackClientOpenRequest(const char* name): JackRequest(JackRequest::kClientOpen)
+    JackClientOpenRequest(const char* name, int pid): JackRequest(JackRequest::kClientOpen)
     {
         snprintf(fName, sizeof(fName), "%s", name);
+        fPID = pid;
     }
 
     int Read(JackChannelTransaction* trans)
     {
+        CheckRes(trans->Read(&fPID, sizeof(int)));
         return trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1);
     }
 
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fPID, sizeof(int)));
         return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
     }
 };

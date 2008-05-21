@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Fri May 16 09:21:56 2008
+ * stub generated Wed May 21 10:43:25 2008
  * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
@@ -475,6 +475,7 @@ mig_external kern_return_t rpc_jack_client_open
 (
 	mach_port_t server_port,
 	client_name_t client_name,
+	int pid,
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
@@ -490,6 +491,7 @@ mig_external kern_return_t rpc_jack_client_open
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
+		int pid;
 	} Request;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -560,6 +562,8 @@ mig_external kern_return_t rpc_jack_client_open
 	InP->NDR = NDR_record;
 
 	(void) mig_strncpy(InP->client_name, client_name, 128);
+
+	InP->pid = pid;
 
 	InP->Head.msgh_bits =
 		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);

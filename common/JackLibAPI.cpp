@@ -46,6 +46,7 @@ extern "C"
             jack_options_t options,
             jack_status_t *status, ...);
     EXPORT int jack_client_close (jack_client_t *client);
+    EXPORT int jack_get_client_pid (const char *name);
 
 #ifdef __cplusplus
 }
@@ -59,7 +60,7 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
     JackClient* client;
-    char client_name[JACK_CLIENT_NAME_SIZE];
+    char client_name[JACK_CLIENT_NAME_SIZE + 1];
 
     if (ext_client_name == NULL) {
         jack_error("jack_client_open called with a NULL client_name");
@@ -143,4 +144,9 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     }
 }
 
+EXPORT int jack_get_client_pid(const char *name)
+{
+    jack_error("jack_get_client_pid : not implemented on library side");
+    return 0;
+}
 

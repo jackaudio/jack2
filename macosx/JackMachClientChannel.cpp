@@ -134,9 +134,9 @@ void JackMachClientChannel::ClientCheck(const char* name, char* name_res, int pr
     }
 }
 
-void JackMachClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackMachClientChannel::ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    kern_return_t res = rpc_jack_client_open(fServerPort.GetPort(), (char*)name, &fPrivatePort, shared_engine, shared_client, shared_graph, result);
+    kern_return_t res = rpc_jack_client_open(fServerPort.GetPort(), (char*)name, pid, &fPrivatePort, shared_engine, shared_client, shared_graph, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientOpen err = %s", mach_error_string(res));

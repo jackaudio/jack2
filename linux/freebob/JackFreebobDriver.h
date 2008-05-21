@@ -69,7 +69,8 @@ class JackFreebobDriver : public JackAudioDriver
 
     public:
 
-        JackFreebobDriver(const char* name, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, engine, table)
+        JackFreebobDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table)
+            :JackAudioDriver(name, alias, engine, table)
         {}
         virtual ~JackFreebobDriver()
         {}

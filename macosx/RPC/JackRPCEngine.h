@@ -53,6 +53,7 @@ kern_return_t rpc_jack_client_open
 (
 	mach_port_t server_port,
 	client_name_t client_name,
+	int pid,
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
@@ -367,6 +368,7 @@ __END_DECLS
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
 		client_name_t client_name;
+		int pid;
 	} __Request__rpc_jack_client_open_t;
 #ifdef  __MigPackStructs
 #pragma pack()

@@ -35,6 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackInternalClientChannel.h"
+#include "JackTools.h"
 #include <assert.h>
 
 namespace Jack
@@ -74,7 +75,7 @@ JackInternalClient::~JackInternalClient()
 int JackInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int result;
-    char name_res[JACK_CLIENT_NAME_SIZE];
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
     jack_log("JackInternalClient::Open name = %s", name);
 
     snprintf(fServerName, sizeof(fServerName), server_name);
@@ -97,7 +98,7 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
         jack_error("Cannot open client name = %s", name_res);
         goto error;
     }
-
+    
     SetupDriverSync(false);
     return 0;
 

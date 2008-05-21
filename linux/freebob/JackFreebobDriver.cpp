@@ -1141,7 +1141,7 @@ extern "C"
 
         jack_error("Freebob using Firewire port %d, node %d", cmlparams.port, cmlparams.node_id);
 
-        Jack::JackFreebobDriver* freebob_driver = new Jack::JackFreebobDriver("freebob_pcm", engine, table);
+        Jack::JackFreebobDriver* freebob_driver = new Jack::JackFreebobDriver("system", "freebob_pcm", engine, table);
         Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(freebob_driver);
         // Special open for FreeBoB driver...
         if (freebob_driver->Open(&cmlparams) == 0) {

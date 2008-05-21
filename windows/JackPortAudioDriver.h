@@ -53,8 +53,8 @@ class JackPortAudioDriver : public JackAudioDriver
 
     public:
 
-        JackPortAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
-                : JackAudioDriver(name, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
+        JackPortAudioDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table)
+                : JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputDevice(paNoDevice), fOutputDevice(paNoDevice)
         {}
 

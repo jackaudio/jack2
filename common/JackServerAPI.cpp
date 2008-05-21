@@ -30,6 +30,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackError.h"
 #include "JackServerLaunch.h"
 #include "JackTools.h"
+#include "JackEngine.h"
 
 #ifdef WIN32
 #define	EXPORT __declspec(dllexport)
@@ -49,6 +50,7 @@ extern "C"
             jack_options_t options,
             jack_status_t *status, ...);
     EXPORT int jack_client_close (jack_client_t *client);
+    EXPORT int jack_get_client_pid (const char *name);
 
 #ifdef __cplusplus
 }
@@ -61,7 +63,7 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
     JackClient* client;
-    char client_name[JACK_CLIENT_NAME_SIZE];
+    char client_name[JACK_CLIENT_NAME_SIZE + 1];
 
     if (ext_client_name == NULL) {
         jack_error("jack_client_open called with a NULL client_name");
@@ -139,5 +141,12 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
         JackServerGlobals::Destroy();	// jack server destruction
         return res;
     }
+}
+
+EXPORT int jack_get_client_pid(const char *name)
+{
+    return (JackServer::fInstance != NULL) 
+        ? JackServer::fInstance->GetEngine()->GetClientPID(name)
+        : 0;
 }
 

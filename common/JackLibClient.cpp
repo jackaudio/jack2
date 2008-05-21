@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackLibGlobals.h"
 #include "JackGlobals.h"
 #include "JackChannel.h"
+#include "JackTools.h"
 
 namespace Jack
 {
@@ -50,7 +51,6 @@ JackSynchro** GetSynchroTable()
     return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
 }
 
-
 //-------------------
 // Client management
 //-------------------
@@ -75,7 +75,7 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     snprintf(fServerName, sizeof(fServerName), server_name);
 
     // Open server/client channel
-    char name_res[JACK_CLIENT_NAME_SIZE];
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
     if (fChannel->Open(server_name, name, name_res, this, options, status) < 0) {
         jack_error("Cannot connect to the server");
         goto error;
@@ -88,7 +88,7 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     }
 
     // Require new client
-    fChannel->ClientOpen(name_res, &shared_engine, &shared_client, &shared_graph, &result);
+    fChannel->ClientOpen(name_res, JackTools::GetPID(), &shared_engine, &shared_client, &shared_graph, &result);
     if (result < 0) {
         jack_error("Cannot open %s client", name_res);
         goto error;

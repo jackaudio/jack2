@@ -143,8 +143,9 @@ class EXPORT JackDriver : public JackDriverClient
 
     protected:
 
-        char fCaptureDriverName[JACK_CLIENT_NAME_SIZE];
-        char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE];
+        char fCaptureDriverName[JACK_CLIENT_NAME_SIZE + 1];
+        char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE + 1];
+        char fAliasName[JACK_CLIENT_NAME_SIZE + 1];
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
         jack_time_t fLastWaitUst;
@@ -159,7 +160,7 @@ class EXPORT JackDriver : public JackDriverClient
 
     public:
 
-        JackDriver(const char* name, JackEngine* engine, JackSynchro** table);
+        JackDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table);
         JackDriver();
         virtual ~JackDriver();
 

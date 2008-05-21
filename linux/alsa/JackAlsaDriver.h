@@ -116,7 +116,7 @@ class JackAlsaDriver : public JackAudioDriver
 
     public:
 
-        JackAlsaDriver(const char* name, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, engine, table)
+        JackAlsaDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table): JackAudioDriver(name, alias, engine, table)
         {}
         virtual ~JackAlsaDriver()
         {}

@@ -36,8 +36,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackAudioDriver::JackAudioDriver(const char* name, JackEngine* engine, JackSynchro** table)
-        : JackDriver(name, engine, table),
+JackAudioDriver::JackAudioDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table)
+        : JackDriver(name, alias, engine, table),
         fCaptureChannels(0),
         fPlaybackChannels(0),
         fWithMonitorPorts(false)
@@ -95,8 +95,8 @@ int JackAudioDriver::Attach()
     jack_log("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (i = 0; i < fCaptureChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fClientControl->fName, fCaptureDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "system:capture_%d", i + 1);
+        snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl->fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
@@ -111,8 +111,8 @@ int JackAudioDriver::Attach()
     port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
 
     for (i = 0; i < fPlaybackChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fClientControl->fName, fPlaybackDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "system:playback_%d", i + 1);
+        snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl->fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
@@ -127,7 +127,7 @@ int JackAudioDriver::Attach()
         // Monitor ports
         if (fWithMonitorPorts) {
             jack_log("Create monitor port ");
-            snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fClientControl->fName, fPlaybackDriverName, i + 1);
+            snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fAliasName, fPlaybackDriverName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;

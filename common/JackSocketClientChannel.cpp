@@ -148,9 +148,9 @@ void JackSocketClientChannel::ClientCheck(const char* name, char* name_res, int 
     strcpy(name_res, res.fName);
 }
 
-void JackSocketClientChannel::ClientOpen(const char* name, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketClientChannel::ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackClientOpenRequest req(name);
+    JackClientOpenRequest req(name, pid);
     JackClientOpenResult res;
     ServerSyncCall(&req, &res, result);
     *shared_engine = res.fSharedEngine;
