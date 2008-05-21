@@ -29,14 +29,14 @@ namespace Jack
 static bool gKeyRealtimeInitialized = false;
 jack_tls_key gRealTime;
 
-void jack_realtime_init()
+void jack_init()
 {
     if (!gKeyRealtimeInitialized) {
         gKeyRealtimeInitialized = jack_tls_allocate_key(&gRealTime);
     }
 }
 
-void jack_realtime_uninit()
+void jack_uninit()
 {
     if (gKeyRealtimeInitialized) {
         jack_tls_free_key(gRealTime);
@@ -52,10 +52,10 @@ BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 {
     switch (fdwReason) {
         case DLL_PROCESS_ATTACH:
-            jack_realtime_init();
+            jack_init();
             break;
         case DLL_PROCESS_DETACH:
-            jack_realtime_uninit();
+            jack_uninit();
             break;
     }
     return TRUE;

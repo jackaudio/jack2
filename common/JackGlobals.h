@@ -22,6 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackError.h"
 #include "JackThread.h"
+#include "JackThread.h"
+#include "JackExports.h"
 
 namespace Jack
 {
@@ -286,9 +288,18 @@ extern "C"
 #endif
     
 extern jack_tls_key gRealTime;
+
+#ifdef WIN32
+
+EXPORT void jack_init();
+EXPORT void jack_uninit();
+
+#else
     
-void __attribute__ ((constructor)) jack_realtime_init();
-void __attribute__ ((destructor)) jack_realtime_uninit();
+void __attribute__ ((constructor)) jack_init();
+void __attribute__ ((destructor)) jack_uninit();
+
+#endif
 
 #ifdef __cplusplus
 }
