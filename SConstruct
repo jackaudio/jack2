@@ -71,7 +71,6 @@ opts.AddOptions(
     BoolOption('BUILD_EXAMPLES', 'Build the example clients in their directory', True),
     BoolOption('INSTALL_EXAMPLES', 'Install the example clients in the BINDIR directory', True),
     BoolOption('BUILD_DOXYGEN_DOCS', 'Build doxygen documentation', False),
-    BoolOption('FULL_MIMIC', 'Mimic jack-1.0 installation layout as much as possible', True),
     )
 
 #
@@ -186,19 +185,11 @@ env['BINDIR'] = env.subst(env['BINDIR'])
 env['LIBDIR'] = env.subst(env['LIBDIR'])
 env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
 
-if env['FULL_MIMIC']:
-    env['SERVER'] = 'jackd'
-    env['CLIENTLIB'] = 'jack'
-    env['SERVERLIB'] = 'jackserver'
-    env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jack"
-    env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jack"
-else:
-    env['SERVER'] = 'jackdmp'
-    env['CLIENTLIB'] = 'jackmp'
-    env['SERVERLIB'] = 'jackservermp'
-    env['WRAPPERLIB'] = 'jack'
-    env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jackmp"
-    env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jackmp"
+env['SERVER'] = 'jackd'
+env['CLIENTLIB'] = 'jack'
+env['SERVERLIB'] = 'jackserver'
+env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jack"
+env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jack"
 
 env['INSTALL_PREFIX'] = env['DESTDIR'] + env['PREFIX']
 env['INSTALL_BINDIR'] = env['DESTDIR'] + env['BINDIR']

@@ -122,12 +122,6 @@ srcfiles_common_clientlib = [
     'JackTools.cpp'
     ]
 
-if not env['FULL_MIMIC']:
-    srcfiles_common_wrapperlib = [
-        'JackAPIWrapper.cpp',
-        'ringbuffer.c'
-        ]
-
 jack_headers = [
     'intclient.h',
     'jack.h',
@@ -153,18 +147,11 @@ if env['PLATFORM'] == 'posix':
 clientlib = libenv.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = libenv.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
 env.Install( env['INSTALL_LIBDIR'], [clientlib, serverlib])
-if not env['FULL_MIMIC']:
-    # TODO: the next line generates a warning because of the LIBS variable addition
-    # Is there a clean way to do that ?
-    wrapperlib = libenv.SharedLibrary(env['WRAPPERLIB'], srcfiles_common_wrapperlib, LIBS='dl')
-    env.Install( env['INSTALL_LIBDIR'], [wrapperlib])
 env.Alias('install', env['INSTALL_LIBDIR'])
 
 # Handle the way we name libraries on a POSIX system
 if env['PLATFORM'] == 'posix':
     libs = [(env['CLIENTLIB'], clientlib), (env['SERVERLIB'], serverlib)]
-    if not env['FULL_MIMIC']:
-        libs.append((env['WRAPPERLIB'], wrapperlib))
     for lib_name, lib in libs:
         env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), lib, symlinkcmd)
         env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), symlinkcmd)
