@@ -22,6 +22,43 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackFactoryImpl* JackGlobals::fInstance;
-
+    JackFactoryImpl* JackGlobals::fInstance;
+ 
 } // end of namespace
+
+static bool gKeyRealtimeInitialized = false;
+jack_tls_key gRealTime;
+
+void jack_realtime_init()
+{
+    if (!gKeyRealtimeInitialized) {
+        gKeyRealtimeInitialized = jack_tls_allocate_key(&gRealTime);
+    }
+}
+
+void jack_realtime_uninit()
+{
+    if (gKeyRealtimeInitialized) {
+        jack_tls_free_key(gRealTime);
+        gKeyRealtimeInitialized = false;
+    }
+}
+
+// Initialisation at library load time
+
+#ifdef WIN32
+
+BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
+    switch (fdwReason) {
+        case DLL_PROCESS_ATTACH:
+            jack_realtime_init();
+            break;
+        case DLL_PROCESS_DETACH:
+            jack_realtime_uninit();
+            break;
+    }
+    return TRUE;
+}
+
+#endif

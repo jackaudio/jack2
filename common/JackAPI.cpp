@@ -248,12 +248,20 @@ static inline bool CheckBufferSize(jack_nframes_t buffer_size)
 
 static inline void WaitGraphChange()
 {
-    JackGraphManager* manager = GetGraphManager();
-    JackEngineControl* control = GetEngineControl();
-
-    if (manager && control && manager->IsPendingChange()) {
-        jack_log("WaitGraphChange...");
-        JackSleep(int(control->fPeriodUsecs * 1.1f));
+    /*
+    TLS key that is set only in RT thread, so never waits for pending 
+    graph change in RT context (just read the current graph state).
+    */
+    
+    if (jack_tls_get(gRealTime) == NULL) {   
+        JackGraphManager* manager = GetGraphManager();
+        JackEngineControl* control = GetEngineControl();
+        assert(manager);
+        assert(control);
+        if (manager->IsPendingChange()) {
+            jack_log("WaitGraphChange...");
+            JackSleep(int(control->fPeriodUsecs * 1.1f));
+        }
     }
 }
 

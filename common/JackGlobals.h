@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackGlobals__
 
 #include "JackError.h"
+#include "JackThread.h"
 
 namespace Jack
 {
@@ -278,5 +279,19 @@ class JackGlobals
 };
 
 } // end of namespace
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    
+extern jack_tls_key gRealTime;
+    
+void __attribute__ ((constructor)) jack_realtime_init();
+void __attribute__ ((destructor)) jack_realtime_uninit();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

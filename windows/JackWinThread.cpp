@@ -257,3 +257,44 @@ void JackWinThread::Terminate()
 
 } // end of namespace
 
+bool jack_tls_allocate_key(jack_tls_key *key_ptr)
+{
+    DWORD key;
+    
+    key = TlsAlloc();
+    if (key == TLS_OUT_OF_INDEXES)
+    {
+        jack_error("TlsAlloc() failed. Error is %d", (unsigned int)GetLastError());
+        return false;
+    }
+    
+    *key_ptr = key;
+    return true;
+}
+
+bool jack_tls_free_key(jack_tls_key key)
+{
+    if (!TlsFree(key))
+    {
+        jack_error("TlsFree() failed. Error is %d", (unsigned int)GetLastError());
+        return false;
+    }
+    
+    return true;
+}
+
+bool jack_tls_set(jack_tls_key key, void *data_ptr)
+{
+    if (!TlsSetValue(key, data_ptr))
+    {
+        jack_error("TlsSetValue() failed. Error is %d", (unsigned int)GetLastError());
+        return false;
+    }
+    
+    return true;
+}
+
+void *jack_tls_get(jack_tls_key key)
+{
+    return TlsGetValue(key);
+}

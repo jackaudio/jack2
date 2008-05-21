@@ -24,6 +24,7 @@ Fernando Lopez-Lezcano
 
 	* Correct JackEngine::PortUnRegister, JackEngine::ClientCloseAux and JackEngine::ClientDeactivate to correctly send notifications. 
 	* New jack_get_client_pid API, implemented on server side.
+	* Better handling of graph state read functions : never wait when used in the real-time thread, current state is used.
 
 2008-05-20 Stephane Letz  <letz@grame.fr>
 

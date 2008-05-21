@@ -219,3 +219,49 @@ void JackPosixThread::Terminate()
 
 } // end of namespace
 
+bool jack_tls_allocate_key(jack_tls_key *key_ptr)
+{
+    int ret;
+    
+    ret = pthread_key_create(key_ptr, NULL);
+    if (ret != 0)
+    {
+        jack_error("pthread_key_create() failed with error %d errno %s", ret, strerror(errno));
+        return false;
+    }
+    
+    return true;
+}
+
+bool jack_tls_free_key(jack_tls_key key)
+{
+    int ret;
+    
+    ret = pthread_key_delete(key);
+    if (ret != 0)
+    {
+        jack_error("pthread_key_delete() failed with error %d errno %s", ret, strerror(errno));
+        return false;
+    }
+    
+    return true;
+}
+
+bool jack_tls_set(jack_tls_key key, void *data_ptr)
+{
+    int ret;
+    
+    ret = pthread_setspecific(key, (const void *)data_ptr);
+    if (ret != 0)
+    {
+        jack_error("pthread_setspecific() failed with error %d errno %s", ret, strerror(errno));
+        return false;
+    }
+    
+    return true;
+}
+
+void *jack_tls_get(jack_tls_key key)
+{
+    return pthread_getspecific(key);
+}

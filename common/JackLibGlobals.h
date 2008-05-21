@@ -48,7 +48,7 @@ struct JackLibGlobals
 #ifdef __APPLE__
     std::map<mach_port_t, JackClient*> fClientTable;        /*! Client table */
 #endif
-
+ 
     static int fClientCount;
     static JackLibGlobals* fGlobals;
 
