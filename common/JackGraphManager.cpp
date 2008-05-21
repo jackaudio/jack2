@@ -413,7 +413,7 @@ void JackGraphManager::DisconnectAllPorts(int refnum)
 // Server
 void JackGraphManager::DisconnectAllInput(jack_port_id_t port_index)
 {
-    jack_log("JackGraphManager::DisconnectAllInput port_index = %ld ", port_index);
+    jack_log("JackGraphManager::DisconnectAllInput port_index = %ld", port_index);
     JackConnectionManager* manager = WriteNextStateStart();
 
     for (int i = 0; i < PORT_NUM; i++) {
@@ -476,20 +476,18 @@ void JackGraphManager::Activate(int refnum)
 // Server
 void JackGraphManager::Deactivate(int refnum)
 {
-    DisconnectAllPorts(refnum);
-
     // Disconnect only when needed
     if (IsDirectConnection(refnum, FREEWHEEL_DRIVER_REFNUM)) {
         DirectDisconnect(refnum, FREEWHEEL_DRIVER_REFNUM);
     } else {
-        jack_log("JackServer::Deactivate: client = %ld was not activated ", refnum);
+        jack_log("JackServer::Deactivate client = %ld was not activated", refnum);
     }
 
     // Disconnect only when needed
     if (IsDirectConnection(FREEWHEEL_DRIVER_REFNUM, refnum)) {
         DirectDisconnect(FREEWHEEL_DRIVER_REFNUM, refnum);
     } else {
-        jack_log("JackServer::Deactivate: client = %ld was not activated ", refnum);
+        jack_log("JackServer::Deactivate client = %ld was not activated", refnum);
     }
 }
 
@@ -523,14 +521,14 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
 
     if (!src->fInUse || !dst->fInUse) {
         if (!src->fInUse)
-            jack_error("JackGraphManager::Connect: port_src = %ld not used name = %s", port_src, GetPort(port_src)->fName);
+            jack_error("JackGraphManager::Connect port_src = %ld not used name = %s", port_src, GetPort(port_src)->fName);
         if (!dst->fInUse)
-            jack_error("JackGraphManager::Connect: port_dst = %ld not used name = %s", port_dst, GetPort(port_dst)->fName);
+            jack_error("JackGraphManager::Connect port_dst = %ld not used name = %s", port_dst, GetPort(port_dst)->fName);
         res = -1;
         goto end;
     }
     if (src->fTypeId != dst->fTypeId) {
-        jack_error("JackGraphManager::Connect: different port types: port_src = %ld port_dst = %ld", port_src, port_dst);
+        jack_error("JackGraphManager::Connect different port types port_src = %ld port_dst = %ld", port_src, port_dst);
         res = -1;
         goto end;
     }

@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-21 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackEngine::PortUnRegister, JackEngine::ClientCloseAux and JackEngine::ClientDeactivate to correctly send notifications. 
+
 2008-05-20 Stephane Letz  <letz@grame.fr>
 
 	* Package number bumped to 1.90 everywhere.
@@ -28,7 +32,6 @@ Fernando Lopez-Lezcano
 2008-05-19 Stephane Letz  <letz@grame.fr>
 
 	* Use of placement new for dynamic port allocation is possibly not safe... so avoid that until a definitive answer is found.
-	* Cleanup.
 	* JackAudioDriver::ProcessAsync and JackAudioDriver::ProcessSync were broken at some point : 0 has to be returned in all cases.
 
 2008-05-16 Stephane Letz  <letz@grame.fr>

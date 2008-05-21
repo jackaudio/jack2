@@ -560,22 +560,22 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
              refnum,
              (client->GetClientControl()) ? client->GetClientControl()->fName : "No name");
 
-    // Remove the client from the table
-    ReleaseRefnum(refnum);
-
-    // Notify unregister
+    // Unregister all ports ==> notifications are sent
     jack_int_t ports[PORT_NUM_FOR_CLIENT];
     int i;
 
     fGraphManager->GetInputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
-        NotifyPortRegistation(ports[i], false);
+        PortUnRegister(refnum, ports[i]);
     }
 
     fGraphManager->GetOutputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
-        NotifyPortRegistation(ports[i], false);
+        PortUnRegister(refnum, ports[i]);
     }
+    
+    // Remove the client from the table
+    ReleaseRefnum(refnum);
 
     // Remove all ports
     fGraphManager->RemoveAllPorts(refnum);
@@ -624,6 +624,21 @@ int JackEngine::ClientDeactivate(int refnum)
         return -1;
 
     jack_log("JackEngine::ClientDeactivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
+    
+    // Disconnect all ports ==> notifications are sent
+    jack_int_t ports[PORT_NUM_FOR_CLIENT];
+    int i;
+    
+    fGraphManager->GetInputPorts(refnum, ports);
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+        PortDisconnect(refnum, ports[i], ALL_PORTS);
+    }
+
+    fGraphManager->GetOutputPorts(refnum, ports);
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+        PortDisconnect(refnum, ports[i], ALL_PORTS);
+    }
+    
     fGraphManager->Deactivate(refnum);
     fLastSwitchUsecs = 0; // Force switch to occur next cycle, even when called with "dead" clients
 
@@ -664,6 +679,9 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
     assert(fClientTable[refnum]);
+    
+    // Disconnect port ==> notification is sent
+    PortDisconnect(refnum, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
         NotifyPortRegistation(port_index, false);

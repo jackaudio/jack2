@@ -279,16 +279,14 @@ int JackClient::Deactivate()
     GetClientControl()->fTransportSync = false;
     GetClientControl()->fTransportTimebase = false;
     
+    // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
     int result = -1;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-
-    jack_log("JackClient::Deactivate res = %ld ", result);
-    // We need to wait for the new engine cycle before stopping the RT thread, but this is done by ClientDeactivate
-
+    jack_log("JackClient::Deactivate res = %ld", result);
+  
     // RT thread is stopped only when needed...
-    if (IsRealTime()) {
+    if (IsRealTime()) 
         fThread->Kill();
-    }
     return result;
 }
 
