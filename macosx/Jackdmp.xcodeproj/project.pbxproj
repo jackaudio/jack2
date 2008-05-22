@@ -1105,7 +1105,6 @@
 		4BD6240C0CBCF16600DE782F /* inprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = inprocess.c; path = "../example-clients/inprocess.c"; sourceTree = SOURCE_ROOT; };
 		4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTools.cpp; path = ../common/JackTools.cpp; sourceTree = SOURCE_ROOT; };
 		4BE4CC000CDA153400CCF5BB /* JackTools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTools.h; path = ../common/JackTools.h; sourceTree = SOURCE_ROOT; };
-		4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackAPIWrapper.cpp; path = ../common/JackAPIWrapper.cpp; sourceTree = SOURCE_ROOT; };
 		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
 		4BE6C6A30A3E096F005A203A /* jack_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jack_test.cpp; path = ../tests/jack_test.cpp; sourceTree = SOURCE_ROOT; };
@@ -1981,7 +1980,6 @@
 				4B98AE000931D30C0091932A /* JackDebugClient.cpp */,
 				4BF8D1E90834EF7500C94B91 /* JackAPI.cpp */,
 				4B80D7E70BA0D17400F035BB /* JackMidiAPI.cpp */,
-				4BE50F650B01E96200C05E63 /* JackAPIWrapper.cpp */,
 				4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */,
 				4BF520580CB8D1010037470E /* timestamps.h */,
 				4BF520520CB8D0E80037470E /* timestamps.c */,
