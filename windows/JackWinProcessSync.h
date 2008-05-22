@@ -43,8 +43,6 @@ class JackWinProcessSync : public JackSyncInterface
         JackWinProcessSync()
         {
             fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-            if (fEvent == NULL)
-                throw new std::bad_alloc;
         }
         virtual ~JackWinProcessSync()
         {
