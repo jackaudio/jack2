@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-22 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackPort::ClearBuffer.
+
 2008-05-21 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackEngine::PortUnRegister, JackEngine::ClientCloseAux and JackEngine::ClientDeactivate to correctly send notifications. 
