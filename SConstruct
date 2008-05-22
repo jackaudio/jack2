@@ -21,6 +21,7 @@
 
 import os
 from string import Template
+import commands
 
 JACK_MAJOR_VERSION=1
 JACK_MINOR_VERSION=9
@@ -30,8 +31,17 @@ JACKAPI_MAJOR_VERSION=0
 JACKAPI_MINOR_VERSION=1
 JACKAPI_MICRO_VERSION=0
 
+def fetch_svn_revision(path):
+    cmd = "LANG= "
+    cmd += "svnversion "
+    cmd += path
+    return commands.getoutput(cmd)
+
+JACK_SVNREVISION=fetch_svn_revision('.')
 JACK_VERSION="%u.%u.%u" % (JACK_MAJOR_VERSION, JACK_MINOR_VERSION, JACK_MICRO_VERSION)
 JACKAPI_VERSION="%u.%u.%u" % (JACKAPI_MAJOR_VERSION, JACKAPI_MINOR_VERSION, JACKAPI_MICRO_VERSION)
+
+print "JACK %s (%s)" % (JACK_VERSION, JACK_SVNREVISION)
 
 platform = ARGUMENTS.get('OS', str(Platform()))
 
@@ -103,6 +113,7 @@ Help(opts.GenerateHelpText(env))
 env['JACK_MAJOR_VERSION'] = JACK_MAJOR_VERSION
 env['JACK_MINOR_VERSION'] = JACK_MINOR_VERSION
 env['JACK_MICRO_VERSION'] = JACK_MICRO_VERSION
+env['JACK_SVNREVISION'] = JACK_SVNREVISION
 env['JACK_VERSION'] = JACK_VERSION
 env['JACKAPI_MAJOR_VERSION'] = JACKAPI_MAJOR_VERSION
 env['JACKAPI_MINOR_VERSION'] = JACKAPI_MINOR_VERSION
