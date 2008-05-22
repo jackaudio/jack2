@@ -70,7 +70,7 @@ void JackMachServerChannel::Close()
     fServerPort.DestroyPort();
 }
 
-JackEngine* JackMachServerChannel::GetEngine()
+JackEngineInterface* JackMachServerChannel::GetEngine()
 {
     return fServer->GetEngine();
 }

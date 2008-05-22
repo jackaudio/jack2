@@ -39,7 +39,7 @@ using namespace std;
 namespace Jack
 {
 
-JackDriver::JackDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table)
+JackDriver::JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;

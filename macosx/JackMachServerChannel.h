@@ -29,7 +29,7 @@ namespace Jack
 {
 
 class JackServer;
-class JackEngine;
+class JackEngineInterface;
 
 /*!
 \brief JackServerChannel using Mach IPC.
@@ -55,7 +55,7 @@ class JackMachServerChannel : public JackServerChannelInterface, public JackRunn
         int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();                   // Close the Server/Client connection
 
-        JackEngine* GetEngine();
+        JackEngineInterface* GetEngine();
         JackServer* GetServer();
 
         void ClientCheck(char* name, char* name_res, int protocol, int options, int* status, int* result);

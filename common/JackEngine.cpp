@@ -53,6 +53,7 @@ JackEngine::JackEngine(JackGraphManager* manager,
 
 JackEngine::~JackEngine()
 {
+    jack_log("JackEngine::~JackEngine");
     delete fChannel;
     delete fSignal;
 }

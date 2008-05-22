@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-class JackEngine;
+class JackEngineInterface;
 class JackGraphManager;
 class JackSynchro;
 struct JackEngineControl;
@@ -150,7 +150,7 @@ class EXPORT JackDriver : public JackDriverClient
         jack_nframes_t fPlaybackLatency;
         jack_time_t fLastWaitUst;
         float fDelayedUsecs;
-        JackEngine* fEngine;
+        JackEngineInterface* fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro** fSynchroTable;
         JackEngineControl* fEngineControl;
@@ -160,7 +160,7 @@ class EXPORT JackDriver : public JackDriverClient
 
     public:
 
-        JackDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table);
+        JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table);
         JackDriver();
         virtual ~JackDriver();
 

@@ -38,7 +38,7 @@ class JackDummyDriver : public JackAudioDriver
 
     public:
 
-        JackDummyDriver(const char* name, const char* alias, JackEngine* engine, JackSynchro** table, unsigned long wait_time)
+        JackDummyDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table, unsigned long wait_time)
                 : JackAudioDriver(name, alias, engine, table), fWaitTime(wait_time)
         {}
         virtual ~JackDummyDriver()

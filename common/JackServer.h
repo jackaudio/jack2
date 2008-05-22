@@ -35,7 +35,7 @@ class JackDriverClientInterface;
 class JackServerChannelInterface;
 class JackSyncInterface;
 struct JackEngineControl;
-class JackEngine;
+class JackEngineInterface;
 
 /*!
 \brief The Jack server.
@@ -50,7 +50,7 @@ class EXPORT JackServer
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
         JackDriverClientInterface* fLoopbackDriver;
-        JackEngine* fEngine;
+        JackEngineInterface* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
         JackServerChannelInterface* fChannel;
@@ -81,7 +81,7 @@ class EXPORT JackServer
         int SetTimebaseCallback(int refnum, int conditional);
 
         // Object access
-        JackEngine* GetEngine();
+        JackEngineInterface* GetEngine();
         JackEngineControl* GetEngineControl();
         JackSynchro** GetSynchroTable();
         JackGraphManager* GetGraphManager();

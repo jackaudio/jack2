@@ -33,12 +33,68 @@ struct JackEngineControl;
 class JackServerNotifyChannelInterface;
 class JackExternalClient;
 class JackSyncInterface;
+    
+class JackEngineInterface
+{
+     public:
+        
+        JackEngineInterface()
+        {}
+        JackEngineInterface(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler)
+        {}
+        virtual ~JackEngineInterface()
+        {}
+        
+        virtual int Open() = 0;
+        virtual int Close() = 0;
+        
+        // Client management
+        virtual int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status) = 0;
+        virtual int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager) = 0;
+        virtual int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait) = 0;
+        
+        virtual int ClientExternalClose(int refnum) = 0;
+        virtual int ClientInternalClose(int refnum, bool wait) = 0;
+        
+        virtual int ClientActivate(int refnum, bool state) = 0;
+        virtual int ClientDeactivate(int refnum) = 0;
+        
+        virtual int GetClientPID(const char* name) = 0;
+        
+        // Internal client management
+        virtual int GetInternalClientName(int int_ref, char* name_res) = 0;
+        virtual int InternalClientHandle(const char* client_name, int* status, int* int_ref) = 0;
+        virtual int InternalClientUnload(int refnum, int* status) = 0;
+        
+        // Port management
+        virtual int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port) = 0;
+        virtual int PortUnRegister(int refnum, jack_port_id_t port) = 0;
+        
+        virtual int PortConnect(int refnum, const char* src, const char* dst) = 0;
+        virtual int PortDisconnect(int refnum, const char* src, const char* dst) = 0;
+        
+        virtual int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst) = 0;
+        virtual int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst) = 0;
+        
+        // Graph
+        virtual bool Process(jack_time_t callback_usecs) = 0;
+        
+        // Notifications
+        virtual void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs) = 0;
+        virtual void NotifyXRun(int refnum) = 0;
+        virtual void NotifyGraphReorder() = 0;
+        virtual void NotifyBufferSize(jack_nframes_t nframes) = 0;
+        virtual void NotifyFreewheel(bool onoff) = 0;
+        virtual void NotifyPortRegistation(jack_port_id_t port_index, bool onoff) = 0;
+        virtual void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff) = 0;
+        virtual void NotifyActivate(int refnum) = 0;
+};
 
 /*!
 \brief Engine description.
 */
 
-class JackEngine
+class JackEngine : public JackEngineInterface
 {
     private:
 

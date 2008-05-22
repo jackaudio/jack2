@@ -284,7 +284,7 @@ int JackServer::SetTimebaseCallback(int refnum, int conditional)
     return fEngineControl->fTransport.SetTimebase(refnum, conditional);
 }
 
-JackEngine* JackServer::GetEngine()
+JackEngineInterface* JackServer::GetEngine()
 {
     return fEngine;
 }

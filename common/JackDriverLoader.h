@@ -44,11 +44,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
-typedef Jack::JackDriverClientInterface* (*initialize) (Jack::JackEngine*, Jack::JackSynchro**, const JSList *);
+typedef Jack::JackDriverClientInterface* (*initialize) (Jack::JackEngineInterface*, Jack::JackSynchro**, const JSList *);
 
 typedef struct _jack_driver_info
 {
-    Jack::JackDriverClientInterface* (*initialize)(Jack::JackEngine*, Jack::JackSynchro**, const JSList *);
+    Jack::JackDriverClientInterface* (*initialize)(Jack::JackEngineInterface*, Jack::JackSynchro**, const JSList *);
     DRIVER_HANDLE handle;
 }
 jack_driver_info_t;

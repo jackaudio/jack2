@@ -568,7 +568,7 @@ extern "C"
         return desc;
     }
 
-    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngine* engine, Jack::JackSynchro** table, const JSList* params) {
+    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngineInterface* engine, Jack::JackSynchro** table, const JSList* params) {
         jack_nframes_t srate = 44100;
         jack_nframes_t frames_per_interrupt = 512;
         int capture = FALSE;
