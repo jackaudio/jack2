@@ -101,7 +101,7 @@ class JackMutex
             pthread_mutex_lock(&fMutex);
         }
 
-	bool Trylock()
+        bool Trylock()
         {
             return (pthread_mutex_trylock(&fMutex) == 0);
         }
@@ -138,7 +138,7 @@ class JackLockAble
             return fMutex.Trylock();
         }
 
-	void Unlock()
+        void Unlock()
         {
             fMutex.Unlock();
         }
