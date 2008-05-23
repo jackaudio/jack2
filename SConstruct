@@ -81,6 +81,9 @@ opts.AddOptions(
     BoolOption('BUILD_EXAMPLES', 'Build the example clients in their directory', True),
     BoolOption('INSTALL_EXAMPLES', 'Install the example clients in the BINDIR directory', True),
     BoolOption('BUILD_DOXYGEN_DOCS', 'Build doxygen documentation', False),
+    ('cc', 'cc', False),
+    ('cxx', 'cxx', False),
+    ('ccflags', 'ccflags', False),
     )
 
 #
@@ -108,6 +111,17 @@ env = Environment(tools=['default', 'scanreplace', 'pkgconfig', 'doxygen'], tool
 
 Help('To build jackdmp you can set different options as listed below. You have to specify them only once, scons will save the latest values you set and re-use then. To really undo your settings and return to the factory defaults, remove the .sconsign.dblite and options.cache files from your BUILDDIR directory.')
 Help(opts.GenerateHelpText(env))
+
+# update build settings
+if env['cc']:
+    env['CC'] = env['cc']
+
+if env['cxx']:
+    env['CXX'] = env['cxx']
+
+if env['ccflags']:
+    env.Append(CCFLAGS=env['ccflags'])
+
 
 # Set version
 env['JACK_MAJOR_VERSION'] = JACK_MAJOR_VERSION

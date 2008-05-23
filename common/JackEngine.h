@@ -94,7 +94,7 @@ class JackEngineInterface
 \brief Engine description.
 */
 
-class JackEngine : public JackEngineInterface
+class JackEngine 
 {
     private:
 
@@ -127,7 +127,7 @@ class JackEngine : public JackEngineInterface
     public:
 
         JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler);
-        virtual ~JackEngine();
+        ~JackEngine();
 
         int Open();
         int Close();

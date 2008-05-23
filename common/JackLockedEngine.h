@@ -41,7 +41,7 @@ class JackLockedEngine : public JackEngineInterface, public JackLockAble
         JackLockedEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler):
             fEngine(manager, table, controler)
         {}
-        virtual ~JackLockedEngine()
+        ~JackLockedEngine()
         {}
 
         int Open()
