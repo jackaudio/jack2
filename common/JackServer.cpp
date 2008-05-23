@@ -49,7 +49,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
         fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
-    fEngine = new JackLockedEngine(new JackEngine(fGraphManager, fSynchroTable, fEngineControl));
+    fEngine = new JackLockedEngine(fGraphManager, fSynchroTable, fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, fSynchroTable));
     fLoopbackDriver = new JackLoopbackDriver(fEngine, fSynchroTable);
     fChannel = JackGlobals::MakeServerChannel();
@@ -303,7 +303,7 @@ JackGraphManager* JackServer::GetGraphManager()
 {
     return fGraphManager;
 }
-    
+
 
 } // end of namespace
 

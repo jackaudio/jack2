@@ -34,174 +34,173 @@ class JackLockedEngine : public JackEngineInterface, public JackLockAble
 {
     private:
 
-        JackEngine* fEngine;
-      
+        JackEngine fEngine;
+
     public:
 
-        JackLockedEngine(JackEngine* engine):fEngine(engine)
+        JackLockedEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler):
+            fEngine(manager, table, controler)
         {}
         virtual ~JackLockedEngine()
-        { 
-            delete fEngine;
-        }
+        {}
 
         int Open()
         {
             // No lock needed
-            return fEngine->Open();
+            return fEngine.Open();
         }
         int Close()
         {
             // No lock needed
-            return fEngine->Close();
+            return fEngine.Close();
         }
 
         // Client management
         int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status)
         {
             JackLock lock(this);
-            return fEngine->ClientCheck(name, name_res, protocol, options, status);
+            return fEngine.ClientCheck(name, name_res, protocol, options, status);
         }
         int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
         {
             JackLock lock(this);
-            return fEngine->ClientExternalOpen(name, pid, ref, shared_engine, shared_client, shared_graph_manager);
+            return fEngine.ClientExternalOpen(name, pid, ref, shared_engine, shared_client, shared_graph_manager);
         }
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)
         {
             JackLock lock(this);
-            return fEngine->ClientInternalOpen(name, ref, shared_engine, shared_manager, client, wait);
+            return fEngine.ClientInternalOpen(name, ref, shared_engine, shared_manager, client, wait);
         }
 
         int ClientExternalClose(int refnum)
         {
             JackLock lock(this);
-            return fEngine->ClientExternalClose(refnum);
+            return fEngine.ClientExternalClose(refnum);
         }
         int ClientInternalClose(int refnum, bool wait)
         {
             JackLock lock(this);
-            return fEngine->ClientInternalClose(refnum, wait);
+            return fEngine.ClientInternalClose(refnum, wait);
         }
 
         int ClientActivate(int refnum, bool state)
         {
             JackLock lock(this);
-            return fEngine->ClientActivate(refnum, state);
+            return fEngine.ClientActivate(refnum, state);
         }
         int ClientDeactivate(int refnum)
         {
             JackLock lock(this);
-            return fEngine->ClientDeactivate(refnum);
+            return fEngine.ClientDeactivate(refnum);
         }
 
         // Internal client management
         int GetInternalClientName(int int_ref, char* name_res)
         {
             JackLock lock(this);
-            return fEngine->GetInternalClientName(int_ref, name_res);
+            return fEngine.GetInternalClientName(int_ref, name_res);
         }
         int InternalClientHandle(const char* client_name, int* status, int* int_ref)
         {
             JackLock lock(this);
-            return fEngine->InternalClientHandle(client_name, status, int_ref);
+            return fEngine.InternalClientHandle(client_name, status, int_ref);
         }
         int InternalClientUnload(int refnum, int* status)
         {
             JackLock lock(this);
-            return fEngine->InternalClientUnload(refnum, status);
+            return fEngine.InternalClientUnload(refnum, status);
         }
 
         // Port management
         int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port)
         {
             JackLock lock(this);
-            return fEngine->PortRegister(refnum, name, type, flags, buffer_size, port);
+            return fEngine.PortRegister(refnum, name, type, flags, buffer_size, port);
         }
         int PortUnRegister(int refnum, jack_port_id_t port)
         {
             JackLock lock(this);
-            return fEngine->PortUnRegister(refnum, port);
+            return fEngine.PortUnRegister(refnum, port);
         }
 
         int PortConnect(int refnum, const char* src, const char* dst)
         {
             JackLock lock(this);
-            return fEngine->PortConnect(refnum, src, dst);
+            return fEngine.PortConnect(refnum, src, dst);
         }
         int PortDisconnect(int refnum, const char* src, const char* dst)
         {
             JackLock lock(this);
-            return fEngine->PortDisconnect(refnum, src, dst);
+            return fEngine.PortDisconnect(refnum, src, dst);
         }
 
         int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
         {
             JackLock lock(this);
-            return fEngine->PortConnect(refnum, src, dst);
+            return fEngine.PortConnect(refnum, src, dst);
         }
         int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
         {
             JackLock lock(this);
-            return fEngine->PortDisconnect(refnum, src, dst);
+            return fEngine.PortDisconnect(refnum, src, dst);
         }
 
         // Graph
         bool Process(jack_time_t callback_usecs)
         {
             // RT : no lock
-            return fEngine->Process(callback_usecs);
+            return fEngine.Process(callback_usecs);
         }
 
         // Notifications
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
         {
             // RT : no lock
-            fEngine->NotifyXRun(callback_usecs, delayed_usecs);
+            fEngine.NotifyXRun(callback_usecs, delayed_usecs);
         }
 
         void NotifyXRun(int refnum)
         {
             JackLock lock(this);
-            fEngine->NotifyXRun(refnum);
+            fEngine.NotifyXRun(refnum);
         }
         void NotifyGraphReorder()
         {
             JackLock lock(this);
-            fEngine->NotifyGraphReorder();
+            fEngine.NotifyGraphReorder();
         }
         void NotifyBufferSize(jack_nframes_t nframes)
         {
             JackLock lock(this);
-            fEngine->NotifyBufferSize(nframes);
+            fEngine.NotifyBufferSize(nframes);
         }
         void NotifyFreewheel(bool onoff)
         {
             JackLock lock(this);
-            fEngine->NotifyFreewheel(onoff);
+            fEngine.NotifyFreewheel(onoff);
         }
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
         {
             JackLock lock(this);
-            fEngine->NotifyPortRegistation(port_index, onoff);
+            fEngine.NotifyPortRegistation(port_index, onoff);
         }
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff)
         {
             JackLock lock(this);
-            fEngine->NotifyPortConnect(src, dst, onoff);
+            fEngine.NotifyPortConnect(src, dst, onoff);
         }
         void NotifyActivate(int refnum)
         {
             JackLock lock(this);
-            fEngine->NotifyActivate(refnum);
+            fEngine.NotifyActivate(refnum);
         }
-    
+
         int GetClientPID(const char* name)
         {
             JackLock lock(this);
-            return fEngine->GetClientPID(name);
+            return fEngine.GetClientPID(name);
         }
-    
+
 };
 
 

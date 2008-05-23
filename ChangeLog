@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-05-23 Stephane Letz  <letz@grame.fr>
 
 	* Use StartSync to start the client notification thread, otherwise initial notifications from the server may be lost.
+	* Tim Blechmann JackEngine cleanup patch.
 
 2008-05-22 Stephane Letz  <letz@grame.fr>
 
