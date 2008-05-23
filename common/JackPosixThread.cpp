@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackPosixThread.h"
 #include "JackError.h"
+#include "JackTime.h"
 #include <string.h> // for memset
 
 namespace Jack
@@ -34,16 +35,17 @@ void* JackPosixThread::ThreadHandler(void* arg)
     if ((err = pthread_setcanceltype(obj->fCancellation, NULL)) != 0) {
         jack_error("pthread_setcanceltype err = %s", strerror(err));
     }
-
+    
+    // Signal creation thread when started with StartSync
+    jack_log("ThreadHandler: start");
+    obj->fStatus = kRunning;
+    
     // Call Init method
     if (!runnable->Init()) {
         jack_error("Thread init fails: thread quits");
         return 0;
     }
     
-    jack_log("ThreadHandler: start");
-    obj->fStatus = kRunning;
-
     // If Init succeed, start the thread loop
     bool res = true;
     while (obj->fStatus == kRunning && res) {
@@ -66,7 +68,23 @@ int JackPosixThread::Start()
         return 0;
     }
 }
-
+    
+int JackPosixThread::StartSync()
+{
+    fStatus = kStarting;
+    
+    if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
+        fStatus = kIdle;
+        return -1;
+    } else {
+        int count = 0;
+        while (fStatus != kRunning && ++count < 1000) {
+            JackSleep(1000);
+        }
+        return (count == 1000) ? -1 : 0;
+    }    
+}
+    
 int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
 {
     pthread_attr_t attributes;
@@ -121,12 +139,6 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     }
 
     return 0;
-}
-
-int JackPosixThread::StartSync()
-{
-    jack_error("Not implemented yet");
-    return -1;
 }
 
 int JackPosixThread::Kill()

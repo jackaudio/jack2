@@ -20,9 +20,14 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-23 Stephane Letz  <letz@grame.fr>
+
+	* Use StartSync to start the client notification thread, otherwise initial notifications from the server may be lost.
+
 2008-05-22 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackPort::ClearBuffer.
+	* Correct JackEngine inheritance graph.
 
 2008-05-21 Stephane Letz  <letz@grame.fr>
 

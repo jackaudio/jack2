@@ -30,22 +30,15 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
     JackWinThread* obj = (JackWinThread*)arg;
     JackRunnableInterface* runnable = obj->fRunnable;
 
+    // Signal creation thread when started with StartSync
+    jack_log("ThreadHandler: start");
+    obj->fStatus = kRunning;
+    
     // Call Init method
     if (!runnable->Init()) {
         jack_error("Thread init fails: thread quits");
         return 0;
     }
-
-    // TODO: Signal creation thread when started with StartSync
-    /*
-    if (!obj->fRunning) {
-        obj->fRunning = true;
-        SetEvent(obj->fEvent);
-    }
-    */
-
-    jack_log("ThreadHandler: start");
-    obj->fStatus = kRunning;
     
     // If Init succeed, start the thread loop
     bool res = true;
@@ -73,12 +66,6 @@ JackWinThread::~JackWinThread()
 
 int JackWinThread::Start()
 {
-    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (fEvent == NULL) {
-        jack_error("Cannot create event error = %d", GetLastError());
-        return -1;
-    }
-
     fStatus = kStarting;
 
     // Check if the thread was correctly started
@@ -87,6 +74,22 @@ int JackWinThread::Start()
         return -1;
     } else {
         return 0;
+    }
+}
+    
+int JackWinThread::StartSync()
+{
+    fStatus = kStarting;
+    
+    if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
+        fStatus = kIdle;
+        return -1;
+    } else {
+        int count = 0;
+        while (fStatus != kRunning && ++count < 1000) {
+            JackSleep(1000);
+        }
+        return (count == 1000) ? -1 : 0;
     }
 }
 
@@ -103,7 +106,6 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
     if (realtime) {
         
         jack_log("Create RT thread");
-        
         if (!SetThreadPriority(*thread, THREAD_PRIORITY_TIME_CRITICAL)) {
             jack_error("Cannot set priority class = %d", GetLastError());
             return -1;
@@ -114,64 +116,6 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
     }
     
     return 0;
-}
-
-int JackWinThread::StartSync()
-{
-    jack_error("Not implemented yet");
-    return -1;
-    
-    /*
-    DWORD id;
-
-    fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    if (fEvent == NULL) {
-        jack_error("Cannot create event error = %d", GetLastError());
-        return -1;
-    }
-    
-    fStatus = kStarting;
-
-    if (fRealTime) {
-
-        jack_log("Create RT thread");
-        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
-
-        if (fThread == NULL) {
-            jack_error("Cannot create thread error = %d", GetLastError());
-            return -1;
-        }
-
-        if (WaitForSingleObject(fEvent, 3000) != WAIT_OBJECT_0) { // wait 3 sec
-            jack_error("Thread has not started");
-            return -1;
-        }
-
-        if (!SetThreadPriority(fThread, THREAD_PRIORITY_TIME_CRITICAL)) {
-            jack_error("Cannot set priority class = %d", GetLastError());
-            return -1;
-        }
-
-        return 0;
-
-    } else {
-
-        jack_log("Create non RT thread");
-        fThread = CreateThread(NULL, 0, ThreadHandler, (void*)this, 0, &id);
-
-        if (fThread == NULL) {
-            jack_error("Cannot create thread error = %d", GetLastError());
-            return -1;
-        }
-
-        if (WaitForSingleObject(fEvent, 3000) != WAIT_OBJECT_0) { // wait 3 sec
-            jack_error("Thread has not started");
-            return -1;
-        }
-
-        return 0;
-    }
-     */
 }
 
 // voir http://www.microsoft.com/belux/msdn/nl/community/columns/ldoc/multithread1.mspx

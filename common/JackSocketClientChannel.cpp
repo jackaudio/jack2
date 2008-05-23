@@ -98,7 +98,10 @@ void JackSocketClientChannel::Close()
 int JackSocketClientChannel::Start()
 {
     jack_log("JackSocketClientChannel::Start");
-    if (fThread->Start() != 0) {
+    /*
+     To be sure notification thread is started before ClientOpen is called.
+    */
+    if (fThread->StartSync() != 0) {
         jack_error("Cannot start Jack client listener");
         return -1;
     } else {

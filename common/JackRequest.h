@@ -227,13 +227,12 @@ struct JackClientOpenResult : public JackResult
     int fSharedEngine;
     int fSharedClient;
     int fSharedGraph;
-    uint32_t fProtocolVersion;
-
+   
     JackClientOpenResult()
-            : JackResult(), fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1), fProtocolVersion(0)
+            : JackResult(), fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1)
     {}
     JackClientOpenResult(int32_t result, int index1, int index2, int index3)
-            : JackResult(result), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3), fProtocolVersion(0)
+            : JackResult(result), fSharedEngine(index1), fSharedClient(index2), fSharedGraph(index3)
     {}
 
     int Read(JackChannelTransaction* trans)
@@ -242,8 +241,7 @@ struct JackClientOpenResult : public JackResult
         CheckRes(trans->Read(&fSharedEngine, sizeof(int)));
         CheckRes(trans->Read(&fSharedClient, sizeof(int)));
         CheckRes(trans->Read(&fSharedGraph, sizeof(int)));
-        CheckRes(trans->Read(&fProtocolVersion, sizeof(uint32_t)));
-        return 0;
+         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
@@ -252,7 +250,6 @@ struct JackClientOpenResult : public JackResult
         CheckRes(trans->Write(&fSharedEngine, sizeof(int)));
         CheckRes(trans->Write(&fSharedClient, sizeof(int)));
         CheckRes(trans->Write(&fSharedGraph, sizeof(int)));
-        CheckRes(trans->Write(&fProtocolVersion, sizeof(uint32_t)));
         return 0;
     }
 };
