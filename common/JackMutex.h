@@ -1,5 +1,4 @@
 /*
-
  Copyright (C) 2006 Grame
 
  This library is free software; you can redistribute it and/or
@@ -18,7 +17,6 @@
 
  Grame Research Laboratory, 9 rue du Garet, 69001 Lyon - France
  grame@grame.fr
-
 */
 
 #ifndef __JackMutex__
