@@ -291,13 +291,13 @@ void JackWinNamedPipeClientChannel::InternalClientUnload(int refnum, int int_ref
 
 bool JackWinNamedPipeClientChannel::Init()
 {
-    jack_log("JackWinNamedPipeClientChannel::Init ");
+    jack_log("JackWinNamedPipeClientChannel::Init");
 
     if (!fNotificationListenPipe.Accept()) {
         jack_error("JackWinNamedPipeClientChannel: cannot establish notification pipe");
         return false;
     } else {
-        return true;
+        return fClient->Init();
     }
 }
 
@@ -324,8 +324,7 @@ bool JackWinNamedPipeClientChannel::Execute()
     return true;
 
 error:
-
-    //fClient->ShutDown(); needed ??
+    fClient->ShutDown();
     return false;
 }
 

@@ -84,6 +84,7 @@ class JackMachClientChannel : public JackClientChannelInterface, public JackRunn
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
 
         // JackRunnableInterface interface
+        bool Init();
         bool Execute();
 };
 

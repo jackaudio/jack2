@@ -302,12 +302,19 @@ void JackMachClientChannel::InternalClientUnload(int refnum, int int_ref, int* s
     }
 }
 
+bool JackMachClientChannel::Init()
+{
+    jack_log("JackMachClientChannel::Init");
+    JackClient* client = JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()];
+    return client->Init();
+}
+
 bool JackMachClientChannel::Execute()
 {
     kern_return_t res;
     if ((res = mach_msg_server(JackRPCClient_server, 1024, fClientPort.GetPort(), 0)) != KERN_SUCCESS) {
         jack_error("JackMachClientChannel::Execute err = %s", mach_error_string(res));
-        //fClient->ShutDown();
+        fClient->ShutDown();
         return false;
     } else {
         return true;

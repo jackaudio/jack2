@@ -289,7 +289,7 @@ void JackSocketClientChannel::InternalClientUnload(int refnum, int int_ref, int*
 
 bool JackSocketClientChannel::Init()
 {
-    jack_log("JackSocketClientChannel::Init ");
+    jack_log("JackSocketClientChannel::Init");
     fNotificationSocket = fNotificationListenSocket.Accept();
     // No more needed
     fNotificationListenSocket.Close();
@@ -298,7 +298,7 @@ bool JackSocketClientChannel::Init()
         jack_error("JackSocketClientChannel: cannot establish notication socket");
         return false;
     } else {
-        return true;
+        return fClient->Init();
     }
 }
 
