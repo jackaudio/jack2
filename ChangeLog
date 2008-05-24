@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-24 Stephane Letz  <letz@grame.fr>
+
+	* Tim Blechmann RAII idiom patch for JackServer ressource initialization.
+
 2008-05-23 Stephane Letz  <letz@grame.fr>
 
 	* Use StartSync to start the client notification thread, otherwise initial notifications from the server may be lost.

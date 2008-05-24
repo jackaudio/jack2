@@ -280,13 +280,29 @@ class JackGlobals
 
 };
 
+namespace detail
+{
+struct JackGlobalsServerInitializer
+{
+        JackGlobalsServerInitializer(void)
+        {
+            JackGlobals::InitServer();
+        }
+
+        ~JackGlobalsServerInitializer(void)
+        {
+            JackGlobals::Destroy();
+        }
+};
+}
+
 } // end of namespace
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-    
+
 extern jack_tls_key gRealTime;
 
 #ifdef WIN32
@@ -295,7 +311,7 @@ EXPORT void jack_init();
 EXPORT void jack_uninit();
 
 #else
-    
+
 void __attribute__ ((constructor)) jack_init();
 void __attribute__ ((destructor)) jack_uninit();
 

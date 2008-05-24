@@ -27,6 +27,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConnectionManager.h"
 #include "jslist.h"
 
+#include "JackGlobals.h"
+
 namespace Jack
 {
 
@@ -41,7 +43,7 @@ class JackEngineInterface;
 \brief The Jack server.
 */
 
-class EXPORT JackServer
+class EXPORT JackServer : private detail::JackGlobalsServerInitializer
 {
 
     private:
