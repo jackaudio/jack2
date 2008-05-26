@@ -49,11 +49,9 @@ jack_print_driver_options (jack_driver_desc_t * desc, FILE *file)
     for (i = 0; i < desc->nparams; i++) {
         switch (desc->params[i].type) {
             case JackDriverParamInt:
-                //sprintf (arg_default, "%" PRIi32, desc->params[i].value.i);
                 sprintf (arg_default, "%" "i", desc->params[i].value.i);
                 break;
             case JackDriverParamUInt:
-                //sprintf (arg_default, "%" PRIu32, desc->params[i].value.ui);
                 sprintf (arg_default, "%" "u", desc->params[i].value.ui);
                 break;
             case JackDriverParamChar:
