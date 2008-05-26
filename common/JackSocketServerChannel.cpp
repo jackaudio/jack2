@@ -402,6 +402,15 @@ void JackSocketServerChannel::BuildPoolTable()
     }
 }
 
+bool JackSocketServerChannel::Init()
+{
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SIGPIPE);
+    pthread_sigmask(SIG_BLOCK, &set, 0);
+    return true;
+}
+
 bool JackSocketServerChannel::Execute()
 {
     // Global poll
