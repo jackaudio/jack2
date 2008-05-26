@@ -9,7 +9,7 @@
 
 jack_client_t *client;
 
-void
+static void
 showtime ()
 {
 	jack_position_t current;
@@ -19,9 +19,7 @@ showtime ()
 	transport_state = jack_transport_query (client, &current);
 	frame_time = jack_frame_time (client);
 	
-	//printf ("frame: %7" PRIu32 " @ %" PRIu32 "\t", current.frame, frame_time);
-	
-	printf ("frame = %ld  frame_time = %ld usecs = %lld \t",  current.frame, frame_time, current.usecs);
+	printf ("frame = %u  frame_time = %u usecs = %lld \t",  current.frame, frame_time, current.usecs);
 
 	switch (transport_state) {
 	case JackTransportStopped:
@@ -47,7 +45,7 @@ showtime ()
 	printf ("\n");
 }
 
-void
+static void
 jack_shutdown (void *arg)
 {
 	exit (1);
@@ -66,7 +64,7 @@ main (int argc, char *argv[])
 {
 	/* try to become a client of the JACK server */
 
-	if ((client = jack_client_new ("showtime")) == 0) {
+	if ((client = jack_client_open ("showtime", JackNullOption, NULL)) == 0) {
 		fprintf (stderr, "jack server not running?\n");
 		return 1;
 	}

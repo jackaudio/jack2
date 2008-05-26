@@ -46,6 +46,11 @@ example_programs = {
     'jack_zombie' : 'zombie.c',
     'jack_load' : 'ipload.c',
     'jack_unload' : 'ipunload.c',
+    'jack_showtime' : 'showtime.c',
+    'jack_alias' : 'alias.c',
+    'jack_bufsize' : 'bufsize.c',
+    'jack_evmon' : 'evmon.c',
+    'jack_monitor_client' : 'monitor_client.c',
     }
 
 example_libs = {
