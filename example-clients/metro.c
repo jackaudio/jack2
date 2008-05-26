@@ -19,7 +19,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <math.h>
 #include <signal.h>
 #include <getopt.h>
@@ -268,14 +270,24 @@ main (int argc, char *argv[])
 	}
     
     /* install a signal handler to properly quits jack client */
-    signal(SIGQUIT, signal_handler);
+#ifdef WIN32
+	signal(SIGINT, signal_handler);
+    signal(SIGABRT, signal_handler);
+	signal(SIGTERM, signal_handler);
+#else
+	signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);
 	signal(SIGHUP, signal_handler);
 	signal(SIGINT, signal_handler);
+#endif
 
     /* run until interrupted */
 	while (1) {
+	#ifdef WIN32
+		Sleep(1000);
+	#else
 		sleep(1);
+	#endif
 	};
 	
     jack_client_close(client);
