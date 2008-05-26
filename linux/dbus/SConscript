@@ -1,0 +1,316 @@
+#
+# Copyright (C) 2008 Nedko Arnaudov
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+from string import Template
+from SCons.Script.SConscript import SConsEnvironment
+
+def pkg_config_get_value(module, args):
+    return env.backtick('pkg-config ' + args + ' ' + module).strip()
+
+def merge_pkg_config_append_string(env, envvar, module, args):
+    value = pkg_config_get_value(module, args)
+    #print value
+    if env._dict.has_key(envvar):
+        env._dict[envvar] += value
+    else:
+        env._dict[envvar] = value
+
+def merge_pkg_config_libs(env, module):
+    for lib in pkg_config_get_value(module, "--libs").split(' '):
+        if lib[:2] == '-l':
+            env._dict['LIBS'].append(lib[2:])
+        elif lib[:2] == '-L':
+            env._dict['LIBPATH'].append(lib[2:])
+
+def merge_pkg_config_variable(env, envvar, module, pkgvar):
+    merge_pkg_config_append_string(env, envvar, module, '--variable=' + pkgvar)
+
+def merge_pkg_config_std(env, module):
+    merge_pkg_config_append_string(env, 'CCFLAGS', module, '--cflags')
+    merge_pkg_config_libs(env, module)
+
+Import('env')
+jackenv = env.Copy()
+#print "LIBS (orig): " + repr(jackenv['LIBS'])
+#print "SERVERLIB: " + repr(jackenv['SERVERLIB'])
+jackenv.Append(LIBS=[jackenv['SERVERLIB'], 'dl', 'expat'])
+merge_pkg_config_variable(jackenv, 'DBUS_SERVICES_DIR', 'dbus-1', 'session_bus_services_dir')
+merge_pkg_config_std(jackenv, 'dbus-1')
+
+#print "CFLAGS: " + jackenv['CFLAGS']
+#print "CCFLAGS: " + jackenv['CCFLAGS']
+#print "LINKFLAGS: " + repr(jackenv['LINKFLAGS'])
+#print "LIBPATH: " + repr(jackenv['LIBPATH'])
+#print "LIBS: " + repr(jackenv['LIBS'])
+#print "DBUS_SERVICES_DIR: " + jackenv['DBUS_SERVICES_DIR']
+
+jackenv.Install(env['BINDIR'], jackenv.Program('jackdbus', [
+    'jackdbus.c',
+    'controller.c',
+    'controller_iface_configure.c',
+    'controller_iface_control.c',
+    'controller_iface_introspectable.c',
+    'controller_iface_patchbay.c',
+    'controller_iface_transport.c',
+    'xml.c',
+    'xml_expat.c',
+#    'xml_libxml.c',
+#    'xml_nop.c',
+    'xml_write_raw.c',
+    ]))
+jackenv.Alias('install', env['BINDIR'])
+
+jackenv.ScanReplace('org.jackaudio.service.in')
+jackenv.Install(jackenv['DBUS_SERVICES_DIR'], 'org.jackaudio.service')
+jackenv.Alias('install', jackenv['DBUS_SERVICES_DIR'])
+#
+# Copyright (C) 2008 Nedko Arnaudov
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+from string import Template
+from SCons.Script.SConscript import SConsEnvironment
+
+def pkg_config_get_value(module, args):
+    return env.backtick('pkg-config ' + args + ' ' + module).strip()
+
+def merge_pkg_config_append_string(env, envvar, module, args):
+    value = pkg_config_get_value(module, args)
+    #print value
+    if env._dict.has_key(envvar):
+        env._dict[envvar] += value
+    else:
+        env._dict[envvar] = value
+
+def merge_pkg_config_libs(env, module):
+    for lib in pkg_config_get_value(module, "--libs").split(' '):
+        if lib[:2] == '-l':
+            env._dict['LIBS'].append(lib[2:])
+        elif lib[:2] == '-L':
+            env._dict['LIBPATH'].append(lib[2:])
+
+def merge_pkg_config_variable(env, envvar, module, pkgvar):
+    merge_pkg_config_append_string(env, envvar, module, '--variable=' + pkgvar)
+
+def merge_pkg_config_std(env, module):
+    merge_pkg_config_append_string(env, 'CCFLAGS', module, '--cflags')
+    merge_pkg_config_libs(env, module)
+
+Import('env')
+jackenv = env.Copy()
+#print "LIBS (orig): " + repr(jackenv['LIBS'])
+#print "SERVERLIB: " + repr(jackenv['SERVERLIB'])
+jackenv.Append(LIBS=[jackenv['SERVERLIB'], 'dl', 'expat'])
+merge_pkg_config_variable(jackenv, 'DBUS_SERVICES_DIR', 'dbus-1', 'session_bus_services_dir')
+merge_pkg_config_std(jackenv, 'dbus-1')
+
+#print "CFLAGS: " + jackenv['CFLAGS']
+#print "CCFLAGS: " + jackenv['CCFLAGS']
+#print "LINKFLAGS: " + repr(jackenv['LINKFLAGS'])
+#print "LIBPATH: " + repr(jackenv['LIBPATH'])
+#print "LIBS: " + repr(jackenv['LIBS'])
+#print "DBUS_SERVICES_DIR: " + jackenv['DBUS_SERVICES_DIR']
+
+jackenv.Install(env['BINDIR'], jackenv.Program('jackdbus', [
+    'jackdbus.c',
+    'controller.c',
+    'controller_iface_configure.c',
+    'controller_iface_control.c',
+    'controller_iface_introspectable.c',
+    'controller_iface_patchbay.c',
+    'controller_iface_transport.c',
+    'xml.c',
+    'xml_expat.c',
+#    'xml_libxml.c',
+#    'xml_nop.c',
+    'xml_write_raw.c',
+    ]))
+jackenv.Alias('install', env['BINDIR'])
+
+jackenv.ScanReplace('org.jackaudio.service.in')
+jackenv.Install(jackenv['DBUS_SERVICES_DIR'], 'org.jackaudio.service')
+jackenv.Alias('install', jackenv['DBUS_SERVICES_DIR'])
+#
+# Copyright (C) 2008 Nedko Arnaudov
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+from string import Template
+from SCons.Script.SConscript import SConsEnvironment
+
+def pkg_config_get_value(module, args):
+    return env.backtick('pkg-config ' + args + ' ' + module).strip()
+
+def merge_pkg_config_append_string(env, envvar, module, args):
+    value = pkg_config_get_value(module, args)
+    #print value
+    if env._dict.has_key(envvar):
+        env._dict[envvar] += value
+    else:
+        env._dict[envvar] = value
+
+def merge_pkg_config_libs(env, module):
+    for lib in pkg_config_get_value(module, "--libs").split(' '):
+        if lib[:2] == '-l':
+            env._dict['LIBS'].append(lib[2:])
+        elif lib[:2] == '-L':
+            env._dict['LIBPATH'].append(lib[2:])
+
+def merge_pkg_config_variable(env, envvar, module, pkgvar):
+    merge_pkg_config_append_string(env, envvar, module, '--variable=' + pkgvar)
+
+def merge_pkg_config_std(env, module):
+    merge_pkg_config_append_string(env, 'CCFLAGS', module, '--cflags')
+    merge_pkg_config_libs(env, module)
+
+Import('env')
+jackenv = env.Copy()
+#print "LIBS (orig): " + repr(jackenv['LIBS'])
+#print "SERVERLIB: " + repr(jackenv['SERVERLIB'])
+jackenv.Append(LIBS=[jackenv['SERVERLIB'], 'dl', 'expat'])
+merge_pkg_config_variable(jackenv, 'DBUS_SERVICES_DIR', 'dbus-1', 'session_bus_services_dir')
+merge_pkg_config_std(jackenv, 'dbus-1')
+
+#print "CFLAGS: " + jackenv['CFLAGS']
+#print "CCFLAGS: " + jackenv['CCFLAGS']
+#print "LINKFLAGS: " + repr(jackenv['LINKFLAGS'])
+#print "LIBPATH: " + repr(jackenv['LIBPATH'])
+#print "LIBS: " + repr(jackenv['LIBS'])
+#print "DBUS_SERVICES_DIR: " + jackenv['DBUS_SERVICES_DIR']
+
+jackenv.Install(env['BINDIR'], jackenv.Program('jackdbus', [
+    'jackdbus.c',
+    'controller.c',
+    'controller_iface_configure.c',
+    'controller_iface_control.c',
+    'controller_iface_introspectable.c',
+    'controller_iface_patchbay.c',
+    'controller_iface_transport.c',
+    'xml.c',
+    'xml_expat.c',
+#    'xml_libxml.c',
+#    'xml_nop.c',
+    'xml_write_raw.c',
+    ]))
+jackenv.Alias('install', env['BINDIR'])
+
+jackenv.ScanReplace('org.jackaudio.service.in')
+jackenv.Install(jackenv['DBUS_SERVICES_DIR'], 'org.jackaudio.service')
+jackenv.Alias('install', jackenv['DBUS_SERVICES_DIR'])
+#
+# Copyright (C) 2008 Nedko Arnaudov
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+from string import Template
+from SCons.Script.SConscript import SConsEnvironment
+
+def pkg_config_get_value(module, args):
+    return env.backtick('pkg-config ' + args + ' ' + module).strip()
+
+def merge_pkg_config_append_string(env, envvar, module, args):
+    value = pkg_config_get_value(module, args)
+    #print value
+    if env._dict.has_key(envvar):
+        env._dict[envvar] += value
+    else:
+        env._dict[envvar] = value
+
+def merge_pkg_config_libs(env, module):
+    for lib in pkg_config_get_value(module, "--libs").split(' '):
+        if lib[:2] == '-l':
+            env._dict['LIBS'].append(lib[2:])
+        elif lib[:2] == '-L':
+            env._dict['LIBPATH'].append(lib[2:])
+
+def merge_pkg_config_variable(env, envvar, module, pkgvar):
+    merge_pkg_config_append_string(env, envvar, module, '--variable=' + pkgvar)
+
+def merge_pkg_config_std(env, module):
+    merge_pkg_config_append_string(env, 'CCFLAGS', module, '--cflags')
+    merge_pkg_config_libs(env, module)
+
+Import('env')
+jackenv = env.Copy()
+#print "LIBS (orig): " + repr(jackenv['LIBS'])
+#print "SERVERLIB: " + repr(jackenv['SERVERLIB'])
+jackenv.Append(LIBS=[jackenv['SERVERLIB'], 'dl', 'expat'])
+merge_pkg_config_variable(jackenv, 'DBUS_SERVICES_DIR', 'dbus-1', 'session_bus_services_dir')
+merge_pkg_config_std(jackenv, 'dbus-1')
+
+#print "CFLAGS: " + jackenv['CFLAGS']
+#print "CCFLAGS: " + jackenv['CCFLAGS']
+#print "LINKFLAGS: " + repr(jackenv['LINKFLAGS'])
+#print "LIBPATH: " + repr(jackenv['LIBPATH'])
+#print "LIBS: " + repr(jackenv['LIBS'])
+#print "DBUS_SERVICES_DIR: " + jackenv['DBUS_SERVICES_DIR']
+
+jackenv.Install(env['BINDIR'], jackenv.Program('jackdbus', [
+    'jackdbus.c',
+    'controller.c',
+    'controller_iface_configure.c',
+    'controller_iface_control.c',
+    'controller_iface_introspectable.c',
+    'controller_iface_patchbay.c',
+    'controller_iface_transport.c',
+    'xml.c',
+    'xml_expat.c',
+#    'xml_libxml.c',
+#    'xml_nop.c',
+    'xml_write_raw.c',
+    ]))
+jackenv.Alias('install', env['BINDIR'])
+
+jackenv.ScanReplace('org.jackaudio.service.in')
+jackenv.Install(jackenv['DBUS_SERVICES_DIR'], 'org.jackaudio.service')
+jackenv.Alias('install', jackenv['DBUS_SERVICES_DIR'])

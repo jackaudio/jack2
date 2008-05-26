@@ -1,0 +1,12 @@
+[D-BUS Service]
+Name=org.jackaudio.service
+Exec=${BINDIR}/jackdbus auto
+[D-BUS Service]
+Name=org.jackaudio.service
+Exec=${BINDIR}/jackdbus auto
+[D-BUS Service]
+Name=org.jackaudio.service
+Exec=${BINDIR}/jackdbus auto
+[D-BUS Service]
+Name=org.jackaudio.service
+Exec=${BINDIR}/jackdbus auto
