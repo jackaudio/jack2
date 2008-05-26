@@ -82,3 +82,6 @@ if env['BUILD_EXAMPLES']:
         if clientenv['INSTALL_EXAMPLES']:
             env.InstallAs(env['INSTALL_ADDON_DIR'] + '/' + example_lib + '.so', lib)
             env.Alias('install', env['INSTALL_ADDON_DIR'] + '/' + example_lib + '.so')
+
+if env['ENABLE_DBUS']:
+    clientenv.Install(env['BINDIR'], 'jack_control')

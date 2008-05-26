@@ -34,6 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackChannel.h"
 #include "JackSyncInterface.h"
+#include "JackError.h"
 
 namespace Jack
 {
@@ -76,6 +77,7 @@ int JackEngine::Close()
     jack_log("JackEngine::Close");
     fChannel->Close();
     
+    // Close (possibly) remaining clients (RT is stopped)
     for (int i = 0; i < CLIENT_NUM; i++) {
         /*
         Can only delete clients that where loaded using "jack_internal_client_load" (and not properly unloaded using "jack_internal_client_unload"...)
@@ -112,6 +114,7 @@ void JackEngine::ReleaseRefnum(int ref)
     fClientTable[ref] = NULL;
 
     if (fEngineControl->fTemporary) {
+	jack_log("JackEngine::ReleaseRefnum fTemporary");
         int i;
         for (i = REAL_REFNUM; i < CLIENT_NUM; i++) {
             if (fClientTable[i])
@@ -217,7 +220,7 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value1, int v
         jack_log("JackEngine::NotifyClient: client not available anymore");
     } else if (client->GetClientControl()->fCallback[event]) {
         if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
-            jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
+            jack_error("NotifyClient fails name = %s event = %ld = val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
     } else {
         jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);
     }
@@ -680,7 +683,7 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
     assert(fClientTable[refnum]);
     
     // Check if port name already exists
-    if (fGraphManager->GetPort(name) != NO_PORT) {
+    if (GetGraphManager()->GetPort(name) != NO_PORT) {
         jack_error("port_name \"%s\" already exists", name);
         return -1; 
     }

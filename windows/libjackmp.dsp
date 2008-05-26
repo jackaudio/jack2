@@ -115,7 +115,7 @@ SOURCE=..\common\JackEngineControl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\JackError.c
+SOURCE=..\common\JackError.cpp
 # End Source File
 # Begin Source File
 
@@ -140,6 +140,10 @@ SOURCE=..\common\JackLibAPI.cpp
 # Begin Source File
 
 SOURCE=..\common\JackLibClient.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackMessageBuffer.cpp
 # End Source File
 # Begin Source File
 
@@ -180,6 +184,10 @@ SOURCE=.\JackWinNamedPipe.cpp
 # Begin Source File
 
 SOURCE=.\JackWinNamedPipeClientChannel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\JackWinProcessSync.cpp
 # End Source File
 # Begin Source File
 

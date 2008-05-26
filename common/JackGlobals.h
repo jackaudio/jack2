@@ -229,55 +229,12 @@ class JackGlobals
             return fInstance->MakeThread(runnable);
         }
 
-        static void InitServer()
-        {
-            jack_log("JackGlobals InitServer");
-            if (!fInstance) {
-
-#ifdef __APPLE__
-                fInstance = new JackFactoryOSXServer();
-#endif
-
-#ifdef WIN32
-                fInstance = new JackFactoryWindowsServer();
-#endif
-
-#ifdef __linux__
-                fInstance = new JackFactoryLinuxServer();
-#endif
-
-            }
-        }
-
-        static void InitClient()
-        {
-            jack_log("JackGlobals InitClient");
-            if (!fInstance) {
-
-#ifdef __APPLE__
-                fInstance = new JackFactoryOSXClient();
-#endif
-
-#ifdef WIN32
-                fInstance = new JackFactoryWindowsClient();
-#endif
-
-#ifdef __linux__
-                fInstance = new JackFactoryLinuxClient();
-#endif
-
-            }
-        }
-
-        static void Destroy()
-        {
-            jack_log("JackGlobals Destroy");
-            if (fInstance) {
-                delete fInstance;
-                fInstance = NULL;
-            }
-        }
-
+        static void InitServer();
+   
+        static void InitClient();
+    
+        static void Destroy();
+ 
 };
 
 namespace detail
@@ -304,6 +261,7 @@ extern "C"
 #endif
 
 extern jack_tls_key gRealTime;
+extern jack_tls_key g_key_log_function;
 
 #ifdef WIN32
 

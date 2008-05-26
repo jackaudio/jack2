@@ -33,37 +33,26 @@ env.AppendUnique(CPPPATH=['#/', '#/common'])
 
 test_programs = {
     'synchroClient': [
-        'testSynchroClient.cpp',
-        '#/common/JackPosixSemaphore.cpp',
-        '#/common/JackPosixThread.cpp',
-        '#/common/JackError.c',
-        '#/common/JackFifo.cpp'
+        'testSynchroClient.cpp'
         ],
     'synchroServer': [
-        'testSynchroServer.cpp',
-        '#/common/JackPosixSemaphore.cpp',
-        '#/common/JackPosixThread.cpp',
-        '#/common/JackError.c',
-        '#/common/JackFifo.cpp'
+        'testSynchroServer.cpp'
         ],
     'synchroServerClient': [
-        'testSynchroServerClient.cpp',
-        '#/common/JackPosixSemaphore.cpp',
-        '#/common/JackPosixThread.cpp',
-        '#/common/JackError.c',
-        '#/common/JackFifo.cpp'
-        ],
+        'testSynchroServerClient.cpp'
+         ],
     'testSem': [
-        'testSem.cpp',
-        '#/common/JackPosixSemaphore.cpp',
-        '#/common/JackPosixThread.cpp',
-        '#/common/JackError.c',
-        '#/common/JackFifo.cpp'
+        'testSem.cpp'
         ],
     'jack_test': [
         'jack_test.cpp'
         ],
 }
+
+# Libraries to link
+extra_libs = {}
+for test_program in test_programs:
+    extra_libs[test_program] = ['jackserver']
 
 #
 # Build section

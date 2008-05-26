@@ -435,7 +435,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
                        handle, hw_params, formats[format].format)) < 0) {
 
             if ((sample_width == 4
-                    ? format++ >= NUMFORMATS - 1
+                    ? format++ >= (int)NUMFORMATS - 1
                     : format-- <= 0)) {
                 jack_error ("Sorry. The audio interface \"%s\""
                             " doesn't support any of the"
@@ -450,7 +450,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
             } else {
                 driver->quirk_bswap = 0;
             }
-            jack_error ("ALSA: final selected sample format for %s: %s", stream_name, formats[format].Name);
+            jack_info ("ALSA: final selected sample format for %s: %s", stream_name, formats[format].Name);
             break;
         }
     }
@@ -524,7 +524,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
                     stream_name);
         return -1;
     }
-    jack_error ("ALSA: use %d periods for %s", *nperiodsp, stream_name);
+    jack_info ("ALSA: use %d periods for %s", *nperiodsp, stream_name);
 
     /*
     	if (!jack_power_of_two(driver->frames_per_cycle)) {
@@ -1782,6 +1782,11 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
 		driver->ctl_handle = 0;
 	} 
 
+    if (driver->ctl_handle) {
+        snd_ctl_close (driver->ctl_handle);
+        driver->ctl_handle = 0;
+    } 
+
     if (driver->capture_handle) {
         snd_pcm_close (driver->capture_handle);
         driver->capture_handle = 0;
@@ -2159,7 +2164,7 @@ int JackAlsaDriver::Attach()
         // Monitor ports
         if (fWithMonitorPorts) {
             jack_log("Create monitor port ");
-            snprintf(name, sizeof(name) - 1, "%s:monitor_%lu", fClientControl->fName, i + 1);
+            snprintf(name, sizeof(name) - 1, "%s:monitor_%d", fClientControl->fName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error ("ALSA: cannot register monitor port for %s", name);
             } else {
@@ -2713,7 +2718,6 @@ extern "C"
                 case 'X':
                     midi_driver = strdup(param->value.str);
                     break;
-
             }
         }
 

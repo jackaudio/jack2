@@ -27,16 +27,10 @@ This program is free software; you can redistribute it and/or modify
 #include "JackServer.h"
 #include "JackDebugClient.h"
 #include "JackServerGlobals.h"
-#include "JackError.h"
 #include "JackServerLaunch.h"
 #include "JackTools.h"
+#include "JackExports.h"
 #include "JackEngine.h"
-
-#ifdef WIN32
-#define	EXPORT __declspec(dllexport)
-#else
-#define	EXPORT
-#endif
 
 #ifdef __cplusplus
 extern "C"
@@ -57,6 +51,9 @@ extern "C"
 #endif
 
 using namespace Jack;
+
+// beware!!! things can go nasty if one client is started with JackNoStartServer and another without it
+bool g_nostart;
 
 EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
@@ -90,10 +87,13 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     else
         jack_varargs_init(&va);
 
-    if (!JackServerGlobals::Init()) { // jack server initialisation
-        int my_status1 = (JackFailure | JackServerError);
-        *status = (jack_status_t)my_status1;
-        return NULL;
+    g_nostart = (options & JackNoStartServer) != 0;
+    if (!g_nostart) {
+        if (!JackServerGlobals::Init()) { // jack server initialisation
+            int my_status1 = (JackFailure | JackServerError);
+            *status = (jack_status_t)my_status1;
+            return NULL;
+        }
     }
 
 #ifndef WIN32
@@ -109,7 +109,9 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {
         delete client;
-        JackServerGlobals::Destroy(); // jack server destruction
+        if (!g_nostart) {
+            JackServerGlobals::Destroy(); // jack server destruction
+        }
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -138,7 +140,9 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
         int res = client->Close();
         delete client;
         jack_log("jack_client_close OK");
-        JackServerGlobals::Destroy();	// jack server destruction
+        if (!g_nostart) {
+            JackServerGlobals::Destroy();	// jack server destruction
+        }
         return res;
     }
 }

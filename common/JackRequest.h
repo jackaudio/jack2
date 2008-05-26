@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackConstants.h"
 #include "JackChannelTransaction.h"
-#include "JackError.h"
 #include <stdio.h>
+#include <string.h>
 
 namespace Jack
 {

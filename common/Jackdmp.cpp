@@ -21,38 +21,56 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <iostream>
 #include <assert.h>
 #include <signal.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <getopt.h>
 
-#include "JackServer.h"
-#include "JackConstants.h"
-#include "driver_interface.h"
-#include "JackDriverLoader.h"
-#include "jslist.h"
-#include "JackError.h"
-#include "JackTools.h"
-#include "shm.h"
+#include <sys/types.h>
+#include <getopt.h>
+#include <string.h>
 #include "jack.h"
+#include "JackConstants.h"
+#include "JackDriverLoader.h"
+
+/*
+This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server 
+are "hard-coded" in the source. A much better approach would be to use the control API to:
+- dynamically retrieve available server parameters and then prepare to parse them
+- get available drivers and their possible parameters, then prepare to parse them.
+*/
 
 #ifdef __APPLE_
 #include <CoreFoundation/CFNotificationCenter.h>
+
+static void notify_server_start(const char* server_name)
+{
+    // Send notification to be used in the JackRouter plugin
+    CFStringRef ref = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
+    CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
+            CFSTR("com.grame.jackserver.start"),
+            ref,
+            NULL,
+            kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+    CFRelease(ref);
+}
+
+static void notify_server_stop(const char* server_name)
+{
+    // Send notification to be used in the JackRouter plugin
+    CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);    
+    CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
+            CFSTR("com.grame.jackserver.stop"),
+            ref1,
+            NULL,
+            kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
+    CFRelease(ref1);
+}
+
+#else
+
+static void notify_server_start(const char* server_name)
+{}
+static void notify_server_stop(const char* server_name)
+{}
+
 #endif
-
-using namespace Jack;
-
-static JackServer* fServer;
-static char* server_name = NULL;
-static int realtime_priority = 10;
-static int do_mlock = 1;
-static int realtime = 0;
-static int loopback = 0;
-static int temporary = 0;
-static int client_timeout = 0; /* msecs; if zero, use period size. */
-static int do_unlock = 0;
-static JSList* drivers = NULL;
-static sigset_t signals;
 
 static void silent_jack_error_callback(const char *desc)
 {}
@@ -87,63 +105,56 @@ static void usage(FILE* file)
             "             to display options for each driver\n\n");
 }
 
-
-static void DoNothingHandler(int sig)
+// To put in the control.h interface??
+static jackctl_driver_t *
+jackctl_server_get_driver(
+    jackctl_server_t *server,
+    const char *driver_name)
 {
-    /* this is used by the child (active) process, but it never
-       gets called unless we are already shutting down after
-       another signal.
-    */
-    char buf[64];
-    snprintf(buf, sizeof(buf), "received signal %d during shutdown(ignored)\n", sig);
-    write(1, buf, strlen(buf));
+    const JSList * node_ptr;
+
+    node_ptr = jackctl_server_get_drivers_list(server);
+
+    while (node_ptr)
+    {
+        if (strcmp(jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data), driver_name) == 0)
+        {
+            return (jackctl_driver_t *)node_ptr->data;
+        }
+
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
 }
 
-static int JackStart(const char* server_name, jack_driver_desc_t* driver_desc, JSList* driver_params, int sync, int temporary, int time_out_ms, int rt, int priority, int loopback, int verbose)
+static jackctl_parameter_t *
+jackctl_get_parameter(
+    const JSList * parameters_list,
+    const char * parameter_name)
 {
-    jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
-    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
-    int res = fServer->Open(driver_desc, driver_params);
-    return (res < 0) ? res : fServer->Start();
-}
+    while (parameters_list)
+    {
+        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0)
+        {
+            return (jackctl_parameter_t *)parameters_list->data;
+        }
 
-static int JackStop()
-{
-    fServer->Stop();
-    fServer->Close();
-    jack_log("Jackdmp: server close");
-    delete fServer;
-    jack_log("Jackdmp: delete server");
-    return 0;
-}
+        parameters_list = jack_slist_next(parameters_list);
+    }
 
-static int JackDelete()
-{
-    delete fServer;
-    jack_log("Jackdmp: delete server");
-    return 0;
-}
-
-static void FilterSIGPIPE()
-{
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGPIPE);
-    //sigprocmask(SIG_BLOCK, &set, 0);
-    pthread_sigmask(SIG_BLOCK, &set, 0);
+    return NULL;
 }
 
 int main(int argc, char* argv[])
 {
-    int sig;
-    sigset_t allsignals;
-    struct sigaction action;
-    int waiting;
-
-    jack_driver_desc_t* driver_desc;
+    jackctl_server_t * server_ctl;
+    const JSList * server_parameters;
+    const char* server_name = "default";
+    jackctl_driver_t * driver_ctl;
     const char *options = "-ad:P:uvrshVRL:STFl:t:mn:";
     struct option long_options[] = {
-                                       { "driver", 1, 0, 'd'},
+                                       { "driver", 1, 0, 'd' },
                                        { "verbose", 0, 0, 'v' },
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
@@ -161,17 +172,26 @@ int main(int argc, char* argv[])
                                        { "sync", 0, 0, 'S' },
                                        { 0, 0, 0, 0 }
                                    };
-    int opt = 0;
+    int i,opt = 0;
     int option_index = 0;
-    int seen_driver = 0;
+    bool seen_driver = false;
     char *driver_name = NULL;
     char **driver_args = NULL;
-    JSList* driver_params;
     int driver_nargs = 1;
-    int show_version = 0;
-    int replace_registry = 0;
-    int sync = 0;
-    int rc, i;
+    bool show_version = false;
+    sigset_t signals;
+    jackctl_parameter_t* param;
+    union jackctl_parameter_value value;
+
+    copyright(stdout);
+    
+    server_ctl = jackctl_server_create();
+    if (server_ctl == NULL) {
+        fprintf(stderr, "Failed to create server object");
+        return -1;
+    }
+    
+    server_parameters = jackctl_server_get_parameters(server_ctl);
 
     opterr = 0;
     while (!seen_driver &&
@@ -180,12 +200,16 @@ int main(int argc, char* argv[])
         switch (opt) {
 
             case 'd':
-                seen_driver = 1;
+                seen_driver = true;
                 driver_name = optarg;
                 break;
 
             case 'v':
-                jack_verbose = 1;
+                param = jackctl_get_parameter(server_parameters, "verbose");
+                if (param != NULL) {
+                    value.b = true;
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 's':
@@ -193,80 +217,98 @@ int main(int argc, char* argv[])
                 break;
 
             case 'S':
-                sync = 1;
+                param = jackctl_get_parameter(server_parameters, "sync");
+                if (param != NULL) {
+                    value.b = true;
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'n':
                 server_name = optarg;
-                break;
-
-            case 'm':
-                do_mlock = 0;
+                param = jackctl_get_parameter(server_parameters, "name");
+                if (param != NULL) {
+                    strncpy(value.str, optarg, JACK_PARAM_STRING_MAX);
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'P':
-                realtime_priority = atoi(optarg);
+                param = jackctl_get_parameter(server_parameters, "realtime-priority");
+                if (param != NULL) {
+                    value.i = atoi(optarg);
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'r':
-                replace_registry = 1;
+                param = jackctl_get_parameter(server_parameters, "replace-registry");
+                if (param != NULL) {
+                    value.b = true;
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'R':
-                realtime = 1;
+                param = jackctl_get_parameter(server_parameters, "realtime");
+                if (param != NULL) {
+                    value.b = true;
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'L':
-                loopback = atoi(optarg);
+                param = jackctl_get_parameter(server_parameters, "loopback ports");
+                if (param != NULL) {
+                    value.ui = atoi(optarg);
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'T':
-                temporary = 1;
+                param = jackctl_get_parameter(server_parameters, "temporary");
+                if (param != NULL) {
+                    value.b = true;
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 't':
-                client_timeout = atoi(optarg);
-                break;
-
-            case 'u':
-                do_unlock = 1;
+                param = jackctl_get_parameter(server_parameters, "client-timeout");
+                if (param != NULL) {
+                    value.i = atoi(optarg);
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'V':
-                show_version = 1;
+                show_version = true;
                 break;
 
             default:
-                fprintf(stderr, "unknown option character %c\n",
-                        optopt);
+                fprintf(stderr, "unknown option character %c\n", optopt);
                 /*fallthru*/
             case 'h':
                 usage(stdout);
-                return -1;
+                goto fail_free;
         }
     }
 
-   if (show_version) {
-    	printf("jackdmp version " VERSION 
+    if (show_version) {
+    	printf("jackdmp version" VERSION 
                "\n");
     	return -1;
     }
  
     if (!seen_driver) {
         usage(stderr);
-        exit(1);
+        goto fail_free;
     }
 
-    drivers = jack_drivers_load(drivers);
-    if (!drivers) {
-        fprintf(stderr, "jackdmp: no drivers found; exiting\n");
-        exit(1);
-    }
-
-    driver_desc = jack_find_driver_descriptor(drivers, driver_name);
-    if (!driver_desc) {
-        fprintf(stderr, "jackdmp: unknown driver '%s'\n", driver_name);
-        exit(1);
+    driver_ctl = jackctl_server_get_driver(server_ctl, driver_name);
+    if (driver_ctl == NULL) {
+	fprintf(stderr, "Unkown driver \"%s\"\n", driver_name);
+        goto fail_free;
     }
 
     if (optind < argc) {
@@ -278,7 +320,7 @@ int main(int argc, char* argv[])
     if (driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                 " anything when run like this.\n");
-        return -1;
+        goto fail_free;
     }
 
     driver_args = (char **) malloc(sizeof(char *) * driver_nargs);
@@ -288,132 +330,27 @@ int main(int argc, char* argv[])
         driver_args[i] = argv[optind++];
     }
 
-    if (jack_parse_driver_params(driver_desc, driver_nargs,
-                                 driver_args, &driver_params)) {
-        exit(0);
+    if (jackctl_parse_driver_params(driver_ctl, driver_nargs, driver_args)) {
+        goto fail_free;
     }
-
-    if (server_name == NULL)
-        server_name = (char*)JackTools::DefaultServerName();
-
-    copyright(stdout);
-
-    rc = jack_register_server(server_name, replace_registry);
-    switch (rc) {
-        case EEXIST:
-            fprintf(stderr, "`%s' server already active\n", server_name);
-            exit(1);
-        case ENOSPC:
-            fprintf(stderr, "too many servers already active\n");
-            exit(2);
-        case ENOMEM:
-            fprintf(stderr, "no access to shm registry\n");
-            exit(3);
-        default:
-            if (jack_verbose)
-                fprintf(stderr, "server `%s' registered\n", server_name);
+    
+    if (!jackctl_server_start(server_ctl, driver_ctl)) {
+        fprintf(stderr,"Failed to start server");
+        goto fail_free;
     }
+    
+    notify_server_start(server_name);
 
-    /* clean up shared memory and files from any previous
-     * instance of this server name */
-    jack_cleanup_shm();
-    JackTools::CleanupFiles(server_name);
-
-    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-
-    sigemptyset(&signals);
-    sigaddset(&signals, SIGHUP);
-    sigaddset(&signals, SIGINT);
-    sigaddset(&signals, SIGQUIT);
-    sigaddset(&signals, SIGPIPE);
-    sigaddset(&signals, SIGTERM);
-    sigaddset(&signals, SIGUSR1);
-    sigaddset(&signals, SIGUSR2);
-
-    // all child threads will inherit this mask unless they
-    // explicitly reset it
-
-    FilterSIGPIPE();
-    pthread_sigmask(SIG_BLOCK, &signals, 0);
-
-    if (!realtime && client_timeout == 0)
-        client_timeout = 500; /* 0.5 sec; usable when non realtime. */
-
-    int res = JackStart(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, jack_verbose);
-    if (res < 0) {
-        jack_error("Cannot start server... exit");
-        JackDelete();
-        return 0;
-    }
-
-#ifdef __APPLE__
-    CFStringRef ref = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
-    // Send notification to be used in the JackRouter plugin
-    CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
-            CFSTR("com.grame.jackserver.start"),
-            ref,
-            NULL,
-            kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
-    CFRelease(ref);
-#endif
-
-    // install a do-nothing handler because otherwise pthreads
-    // behaviour is undefined when we enter sigwait.
-
-    sigfillset(&allsignals);
-    action.sa_handler = DoNothingHandler;
-    action.sa_mask = allsignals;
-    action.sa_flags = SA_RESTART | SA_RESETHAND;
-
-    for (i = 1; i < NSIG; i++) {
-        if (sigismember(&signals, i)) {
-            sigaction(i, &action, 0);
-        }
-    }
-
-    waiting = TRUE;
-
-    while (waiting) {
-        sigwait(&signals, &sig);
-        fprintf(stderr, "jack main caught signal %d\n", sig);
-
-        switch (sig) {
-            case SIGUSR1:
-                //jack_dump_configuration(engine, 1);
-                break;
-            case SIGUSR2:
-                // driver exit
-                waiting = FALSE;
-                break;
-            default:
-                waiting = FALSE;
-                break;
-        }
-    }
-
-    if (sig != SIGSEGV) {
-        // unblock signals so we can see them during shutdown.
-        // this will help prod developers not to lose sight of
-        // bugs that cause segfaults etc. during shutdown.
-        sigprocmask(SIG_UNBLOCK, &signals, 0);
-    }
-
-    JackStop();
-
-    jack_cleanup_shm();
-    JackTools::CleanupFiles(server_name);
-    jack_unregister_server(server_name);
-
-#ifdef __APPLE__
-    CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
-    // Send notification to be used in the JackRouter plugin
-    CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
-            CFSTR("com.grame.jackserver.stop"),
-            ref1,
-            NULL,
-            kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
-    CFRelease(ref1);
-#endif
-
+    // Waits for signal
+    signals = jackctl_setup_signals(0);
+    jackctl_wait_signals(signals);
+       
+    if (!jackctl_server_stop(server_ctl))
+        fprintf(stderr,"Cannot stop server...");
+        
+fail_free:
+        
+    jackctl_server_destroy(server_ctl);
+    notify_server_stop(server_name);
     return 1;
 }

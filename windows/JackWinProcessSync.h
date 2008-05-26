@@ -62,17 +62,10 @@ class JackWinProcessSync : public JackSyncInterface
         void Destroy()
         {}
 
-        bool TimedWait(long usec)
-        {
-            DWORD res = WaitForSingleObject(fEvent, usec / 1000);
-            return (res == WAIT_OBJECT_0);
-        }
-
-        void Wait()
-        {
-            WaitForSingleObject(fEvent, INFINITE);
-        }
-
+        bool TimedWait(long usec);
+  
+        void Wait();
+  
         void SignalAll()
         {
             SetEvent(fEvent);

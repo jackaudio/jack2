@@ -81,6 +81,7 @@ opts.AddOptions(
     BoolOption('BUILD_EXAMPLES', 'Build the example clients in their directory', True),
     BoolOption('INSTALL_EXAMPLES', 'Install the example clients in the BINDIR directory', True),
     BoolOption('BUILD_DOXYGEN_DOCS', 'Build doxygen documentation', False),
+    BoolOption('ENABLE_DBUS', 'Whether to use D-Bus API', False),
     ('cc', 'cc', False),
     ('cxx', 'cxx', False),
     ('ccflags', 'ccflags', False),
@@ -195,6 +196,7 @@ if env['DEBUG']:
     print '--> Doing a DEBUG build'
     # TODO: -Werror could be added to, which would force the devs to really remove all the warnings :-)
     env.AppendUnique(CCFLAGS = ['-DDEBUG', '-Wall', '-g'])
+    env.AppendUnique(LINKFLAGS = ['-g'])
 else:
     env.AppendUnique(CCFLAGS = ['-O3','-DNDEBUG'])
 
@@ -234,6 +236,8 @@ pkg_config_dir = env['INSTALL_LIBDIR']+"/pkgconfig/"
 env.Install(pkg_config_dir, 'jack.pc')
 env.Alias('install', pkg_config_dir)
 
+env['BINDIR']=env.subst(env['BINDIR'])
+
 # To have the top_srcdir as the doxygen-script is used from auto*
 env['top_srcdir'] = env.Dir('.').abspath
 
@@ -258,6 +262,10 @@ subdirs=['common']
 
 if env['PLATFORM'] == 'posix':
     subdirs.append('linux')
+
+if env['ENABLE_DBUS']:
+    subdirs.append('linux/dbus')
+    env.AppendUnique(CCFLAGS = ['-DJACK_DBUS'])
 
 # TODO FOR Marc: make macosx/SConscript work right
 if env['PLATFORM'] == 'macosx':

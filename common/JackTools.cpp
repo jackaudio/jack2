@@ -25,6 +25,8 @@
 #include <process.h>
 #endif
 
+#include "JackConstants.h"
+
 namespace Jack
 {
 
@@ -54,7 +56,7 @@ const char* JackTools::DefaultServerName()
 {
     const char* server_name;
     if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
-        server_name = "default";
+        server_name = JACK_DEFAULT_SERVER_NAME;
     return server_name;
 }
 

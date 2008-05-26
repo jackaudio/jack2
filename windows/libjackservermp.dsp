@@ -124,6 +124,10 @@ SOURCE=..\common\JackConnectionManager.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackControl.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackDriver.cpp
 # End Source File
 # Begin Source File
@@ -140,7 +144,7 @@ SOURCE=..\common\JackEngineControl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\JackError.c
+SOURCE=..\common\JackError.cpp
 # End Source File
 # Begin Source File
 
@@ -173,6 +177,10 @@ SOURCE=..\common\JackInternalClient.cpp
 # Begin Source File
 
 SOURCE=..\common\JackLoopbackDriver.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackMessageBuffer.cpp
 # End Source File
 # Begin Source File
 
@@ -241,6 +249,10 @@ SOURCE=.\JackWinNamedPipeServerChannel.cpp
 # Begin Source File
 
 SOURCE=.\JackWinNamedPipeServerNotifyChannel.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\JackWinProcessSync.cpp
 # End Source File
 # Begin Source File
 

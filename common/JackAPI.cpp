@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackGlobals.h"
 #include "JackTime.h"
 #include "JackExports.h"
+#include "JackPortType.h"
 
 #ifdef __APPLE__
 #include "JackMachThread.h"
@@ -46,6 +47,18 @@ using namespace Jack;
 extern "C"
 {
 #endif
+
+    EXPORT
+    void
+    jack_get_version(
+        int *major_ptr,
+        int *minor_ptr,
+        int *micro_ptr,
+        int *proto_ptr);
+
+    EXPORT
+    const char *
+    jack_get_version_string();
 
     EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
@@ -114,6 +127,7 @@ extern "C"
     EXPORT const char * jack_port_short_name (const jack_port_t *port);
     EXPORT int jack_port_flags (const jack_port_t *port);
     EXPORT const char * jack_port_type (const jack_port_t *port);
+    EXPORT jack_port_type_id_t jack_port_type_id (const jack_port_t *port);
     EXPORT int jack_port_is_mine (const jack_client_t *, const jack_port_t *port);
     EXPORT int jack_port_connected (const jack_port_t *port);
     EXPORT int jack_port_connected_to (const jack_port_t *port,
@@ -356,6 +370,21 @@ EXPORT const char* jack_port_type(const jack_port_t* port)
     } else {
         JackGraphManager* manager = GetGraphManager();
         return (manager ? manager->GetPort(myport)->GetType() : NULL);
+    }
+}
+
+EXPORT jack_port_type_id_t jack_port_type_id (const jack_port_t *port)
+{
+#ifdef __CLIENTDEBUG__
+    JackLibGlobals::CheckContext();
+#endif
+    jack_port_id_t myport = (jack_port_id_t)port;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_type_id called an incorrect port %ld", myport);
+        return 0;
+    } else {
+        JackGraphManager* manager = GetGraphManager();
+        return (manager ? GetPortTypeId(manager->GetPort(myport)->GetType()) : 0);
     }
 }
 
@@ -1685,4 +1714,26 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
         client->InternalClientUnload(intclient, &my_status);
         return my_status;
     }
+}
+
+EXPORT
+void
+jack_get_version(
+    int *major_ptr,
+    int *minor_ptr,
+    int *micro_ptr,
+    int *proto_ptr)
+{
+    // FIXME: We need these comming from build system
+    *major_ptr = 0;
+    *minor_ptr = 0;
+    *micro_ptr = 0;
+    *proto_ptr = 0;
+}
+
+EXPORT
+const char *
+jack_get_version_string()
+{
+    return VERSION;
 }

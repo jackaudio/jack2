@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackSynchro__
 #define __JackSynchro__
 
-#include "JackError.h"
-
 #define SYNC_MAX_NAME_SIZE 256
 
 namespace Jack

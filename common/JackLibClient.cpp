@@ -27,22 +27,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+
 // Used for external C API (JackAPI.cpp)
 JackGraphManager* GetGraphManager()
 {
-	if (JackLibGlobals::fGlobals) {
-		return JackLibGlobals::fGlobals->fGraphManager;
-	} else {
-		return NULL;
+    if (JackLibGlobals::fGlobals) {
+        return JackLibGlobals::fGlobals->fGraphManager;
+    } else {
+        return NULL;
     }
 }
 
 JackEngineControl* GetEngineControl()
 {
-  	if (JackLibGlobals::fGlobals) {
-		return JackLibGlobals::fGlobals->fEngineControl;
-	} else {
-		return NULL;
+    if (JackLibGlobals::fGlobals) {
+        return JackLibGlobals::fGlobals->fEngineControl;
+    } else {
+        return NULL;
     }
 }
 

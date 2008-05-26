@@ -48,6 +48,8 @@ namespace Jack
 #define LOOPBACK_DRIVER_REFNUM   2                  // Loopback driver is initialized third, it will get the refnum 2
 #define REAL_REFNUM LOOPBACK_DRIVER_REFNUM + 1      // Real clients start at LOOPBACK_DRIVER_REFNUM + 1
 
+#define JACK_DEFAULT_SERVER_NAME "default"
+
 #ifdef WIN32
 #define jack_server_dir "server"
 #define jack_client_dir "client"

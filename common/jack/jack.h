@@ -42,6 +42,34 @@ extern "C"
      */
 
     /**
+     * Call this function to get version of the JACK, in form of several numbers
+     *
+     * @param major_ptr pointer to variable receiving major version of JACK.
+     *
+     * @param minor_ptr pointer to variable receiving minor version of JACK.
+     *
+     * @param major_ptr pointer to variable receiving micro version of JACK.
+     *
+     * @param major_ptr pointer to variable receiving protocol version of JACK.
+     *
+     */
+    void
+    jack_get_version(
+        int *major_ptr,
+        int *minor_ptr,
+        int *micro_ptr,
+        int *proto_ptr);
+
+    /**
+     * Call this function to get version of the JACK, in form of a string
+     *
+     * @return Human readable string describing JACK version being used.
+     *
+     */
+    const char *
+    jack_get_version_string();
+
+    /**
      * Open an external client session with a JACK server.  This interface
      * is more complex but more powerful than jack_client_new().  With it,
      * clients may choose which of several servers to connect, and control
@@ -513,6 +541,11 @@ extern "C"
      * including a final NULL.
      */
     const char * jack_port_type (const jack_port_t *port);
+    
+     /**
+     * @return the @a port type id.
+     */
+    jack_port_type_id_t jack_port_type_id (const jack_port_t *port);
 
     /**
      * @return TRUE if the jack_port_t belongs to the jack_client_t.

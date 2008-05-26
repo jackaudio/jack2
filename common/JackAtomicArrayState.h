@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackAtomicArrayState__
 
 #include "JackAtomic.h"
-#include "JackError.h"
 #include <string.h> // for memcpy
 
 namespace Jack
@@ -136,7 +135,6 @@ class JackAtomicArrayState
 
         JackAtomicArrayState()
         {
-            jack_log("JackAtomicArrayState constructor");
             Counter1(fCounter) = 0;
         }
 

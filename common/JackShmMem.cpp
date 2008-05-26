@@ -18,8 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackShmMem.h"
 #include "JackError.h"
+#include "JackShmMem.h"
 #include <stdio.h>
 
 namespace Jack
@@ -80,6 +80,11 @@ void JackShmMem::operator delete(void* p, size_t size)
 
     jack_release_shm(&info);
     jack_destroy_shm(&info);
+}
+
+void JackShmMem::operator delete(void* p)
+{		
+	JackShmMem::operator delete(p, 0);
 }
 
 void LockMemoryImp(void* ptr, size_t size)

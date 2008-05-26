@@ -95,7 +95,7 @@ SOURCE=.\getopt1.c
 # End Source File
 # Begin Source File
 
-SOURCE=.\JackdmpWIN32.cpp
+SOURCE=..\common\Jackdmp.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"

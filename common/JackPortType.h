@@ -34,11 +34,11 @@ struct JackPortType
     void (*mixdown)(void *mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes);
 };
 
-extern int GetPortTypeId(const char* port_type);
-extern const JackPortType* GetPortType(int port_type_id);
+extern jack_port_type_id_t GetPortTypeId(const char* port_type);
+extern const struct JackPortType* GetPortType(jack_port_type_id_t port_type_id);
 
-extern const JackPortType gAudioPortType;
-extern const JackPortType gMidiPortType;
+extern const struct JackPortType gAudioPortType;
+extern const struct JackPortType gMidiPortType;
 
 } // namespace Jack
 

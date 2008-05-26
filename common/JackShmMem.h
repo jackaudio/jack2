@@ -68,7 +68,7 @@ class JackMem
         {
             free(ptr);
         }
-
+	
         JackMem(): fSize(gSize)
         {}
 
@@ -107,6 +107,7 @@ class JackShmMem
         void* operator new(size_t size);
         void* operator new(size_t size, void* memory);
         void operator delete(void* p, size_t size);
+	 void operator delete(void* p);
 
         JackShmMem()
         {

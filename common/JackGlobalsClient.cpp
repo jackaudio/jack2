@@ -67,6 +67,13 @@ namespace Jack
 {
 
 #ifdef WIN32
+JackSynchro* JackFactoryWindowsServer::MakeSynchro() {return NULL;}
+JackServerNotifyChannelInterface* JackFactoryWindowsServer::MakeServerNotifyChannel() {return NULL;}
+JackClientChannelInterface* JackFactoryWindowsServer::MakeClientChannel() {return NULL;}
+JackNotifyChannelInterface* JackFactoryWindowsServer::MakeNotifyChannel() {return NULL;}
+JackServerChannelInterface* JackFactoryWindowsServer::MakeServerChannel() {return NULL;}
+JackSyncInterface* JackFactoryWindowsServer::MakeInterProcessSync() {return NULL;}
+JackThread* JackFactoryWindowsServer::MakeThread(JackRunnableInterface* runnable) {return NULL;}
 
 JackSynchro* JackFactoryWindowsClient::MakeSynchro()
 {
@@ -144,6 +151,14 @@ JackThread* JackFactoryLinuxClient::MakeThread(JackRunnableInterface* runnable)
 #endif
 
 #if defined(SOCKET_RPC_FIFO_SEMA)
+JackSynchro* JackFactoryLinuxServer::MakeSynchro() {return NULL;}
+JackServerNotifyChannelInterface* JackFactoryLinuxServer::MakeServerNotifyChannel() {return NULL;}
+JackClientChannelInterface* JackFactoryLinuxServer::MakeClientChannel() {return NULL;}
+JackNotifyChannelInterface* JackFactoryLinuxServer::MakeNotifyChannel() {return NULL;}
+JackServerChannelInterface* JackFactoryLinuxServer::MakeServerChannel() {return NULL;}
+JackSyncInterface* JackFactoryLinuxServer::MakeInterProcessSync() {return NULL;}
+JackThread* JackFactoryLinuxServer::MakeThread(JackRunnableInterface* runnable) {return NULL;}
+
 JackSynchro* JackFactoryLinuxClient::MakeSynchro()
 {
     return new JackFifo();
@@ -223,6 +238,14 @@ JackThread* JackFactoryLinuxClient::MakeThread(JackRunnableInterface* runnable)
 
 #if defined(MACH_RPC_MACH_SEMA)
 // Mach RPC + Mach Semaphore
+JackSynchro* JackFactoryOSXServer::MakeSynchro() {return NULL;}
+JackServerNotifyChannelInterface* JackFactoryOSXServer::MakeServerNotifyChannel() {return NULL;}
+JackClientChannelInterface* JackFactoryOSXServer::MakeClientChannel() {return NULL;}
+JackNotifyChannelInterface* JackFactoryOSXServer::MakeNotifyChannel() {return NULL;}
+JackServerChannelInterface* JackFactoryOSXServer::MakeServerChannel() {return NULL;}
+JackSyncInterface* JackFactoryOSXServer::MakeInterProcessSync() {return NULL;}
+JackThread* JackFactoryOSXServer::MakeThread(JackRunnableInterface* runnable) {return NULL;}
+
 JackSynchro* JackFactoryOSXClient::MakeSynchro()
 {
     return new JackMachSemaphore();
@@ -338,6 +361,7 @@ JackThread* JackFactoryOSXClient::MakeThread(JackRunnableInterface* runnable)
 
 #if defined(MACH_RPC_FIFO_SEMA)
 // Mach RPC + Fifo Semaphore
+        
 JackSynchro* JackFactoryOSXClient::MakeSynchro()
 {
     return new JackFifo();

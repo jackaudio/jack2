@@ -49,6 +49,7 @@
 #include <ctype.h>
 
 #include "alsa_midi_impl.h"
+#include "JackError.h"
 
 #define NSEC_PER_SEC ((int64_t)1000*1000*1000)
 

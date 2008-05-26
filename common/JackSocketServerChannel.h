@@ -62,6 +62,7 @@ class JackSocketServerChannel : public JackServerChannelInterface, public JackRu
         void Close();					// Close the Server/Client connection
 
         // JackRunnableInterface interface
+        bool Init();
         bool Execute();
 };
 

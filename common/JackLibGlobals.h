@@ -28,7 +28,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #endif
 #include "JackGlobals.h"
 #include "JackGraphManager.h"
+#include "JackMessageBuffer.h"
 #include "JackTime.h"
+#include "JackError.h"
 #include <assert.h>
 
 namespace Jack
@@ -55,6 +57,7 @@ struct JackLibGlobals
     JackLibGlobals()
     {
         jack_log("JackLibGlobals");
+        JackMessageBuffer::Create();
         for (int i = 0; i < CLIENT_NUM; i++)
             fSynchroTable[i] = JackGlobals::MakeSynchro();
         fGraphManager = -1;
@@ -68,6 +71,7 @@ struct JackLibGlobals
             fSynchroTable[i]->Disconnect();
             delete fSynchroTable[i];
         }
+        JackMessageBuffer::Destroy();
     }
 
     static void Init()

@@ -22,6 +22,8 @@
 #ifdef __cplusplus
 extern "C"
 {
+#else
+#include <stdbool.h>
 #endif
 
     typedef struct alsa_midi_t alsa_midi_t;

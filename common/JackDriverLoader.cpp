@@ -36,6 +36,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <dirent.h>
 #endif
 
+#include <errno.h>
+
+jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver_t * driver);
+
 static void
 jack_print_driver_options (jack_driver_desc_t * desc, FILE *file)
 {
@@ -219,6 +223,147 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
     if (param_ptr)
         *param_ptr = params;
 
+    return 0;
+}
+
+EXPORT int
+jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
+{
+    struct option * long_options;
+    char * options, * options_ptr;
+    unsigned long i;
+    int opt;
+    JSList * node_ptr;
+    jackctl_parameter_t * param;
+    union jackctl_parameter_value value;
+
+    if (argc <= 1) 
+        return 0;
+  
+    const JSList * driver_params = jackctl_driver_get_parameters(driver_ptr);
+    if (driver_params == NULL)
+	return 1;
+
+    jack_driver_desc_t * desc = jackctl_driver_get_desc(driver_ptr); 
+
+    /* check for help */
+    if (strcmp (argv[1], "-h") == 0 || strcmp (argv[1], "--help") == 0) {
+        if (argc > 2) {
+            for (i = 0; i < desc->nparams; i++) {
+                if (strcmp (desc->params[i].name, argv[2]) == 0) {
+                    jack_print_driver_param_usage (desc, i, stdout);
+                    return 1;
+                }
+            }
+
+            fprintf (stderr, "jackd: unknown option '%s' "
+                     "for driver '%s'\n", argv[2],
+                     desc->name);
+        }
+
+        printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
+        jack_print_driver_options (desc, stdout);
+        return 1;
+    }
+
+   /* set up the stuff for getopt */
+    options = (char*)calloc (desc->nparams * 3 + 1, sizeof (char));
+    long_options = (option*)calloc (desc->nparams + 1, sizeof (struct option));
+
+    options_ptr = options;
+    for (i = 0; i < desc->nparams; i++) {
+        sprintf (options_ptr, "%c::", desc->params[i].character);
+        options_ptr += 3;
+        long_options[i].name = desc->params[i].name;
+        long_options[i].flag = NULL;
+        long_options[i].val = desc->params[i].character;
+        long_options[i].has_arg = optional_argument;
+    }
+
+    /* create the params */
+    optind = 0;
+    opterr = 0;
+    while ((opt = getopt_long(argc, argv, options, long_options, NULL)) != -1) {
+
+        if (opt == ':' || opt == '?') {
+            if (opt == ':') {
+                fprintf (stderr, "Missing option to argument '%c'\n", optopt);
+            } else {
+                fprintf (stderr, "Unknownage with option '%c'\n", optopt);
+            }
+
+            fprintf (stderr, "Options for driver '%s':\n", desc->name);
+            jack_print_driver_options (desc, stderr);
+            exit (1);
+        }
+
+        node_ptr = (JSList *)driver_params;
+       	while (node_ptr) {
+	    param = (jackctl_parameter_t*)node_ptr->data; 
+ 	    if (opt == jackctl_parameter_get_id(param)) {
+	        break;
+	    }
+	    node_ptr = node_ptr->next;
+	}
+
+        if (!optarg && optind < argc &&
+                strlen(argv[optind]) &&
+                argv[optind][0] != '-') {
+            optarg = argv[optind];
+        }
+
+        if (optarg) {
+            switch (jackctl_parameter_get_type(param)) {
+                case JackDriverParamInt:              
+                    value.i = atoi (optarg);
+		    jackctl_parameter_set_value(param, &value);
+                    break;
+                case JackDriverParamUInt:
+                    value.ui = strtoul (optarg, NULL, 10);
+                    jackctl_parameter_set_value(param, &value);
+                    break;
+                case JackDriverParamChar:
+                    value.c = optarg[0];
+                    jackctl_parameter_set_value(param, &value);
+                    break;
+                case JackDriverParamString:
+                    strncpy (value.str, optarg, JACK_DRIVER_PARAM_STRING_MAX);
+                    jackctl_parameter_set_value(param, &value);
+                    break;
+                case JackDriverParamBool:
+
+                    /*
+                     if (strcasecmp ("false", optarg) == 0 ||
+                         strcasecmp ("off", optarg) == 0 ||
+                         strcasecmp ("no", optarg) == 0 ||
+                         strcasecmp ("0", optarg) == 0 ||
+                         strcasecmp ("(null)", optarg) == 0 ) {
+                    */
+                    // steph
+                    if (strcmp ("false", optarg) == 0 ||
+                            strcmp ("off", optarg) == 0 ||
+                            strcmp ("no", optarg) == 0 ||
+                            strcmp ("0", optarg) == 0 ||
+                            strcmp ("(null)", optarg) == 0 ) {
+                        value.i = false;
+                    } else {
+                        value.i = true;
+                    }
+                    jackctl_parameter_set_value(param, &value);
+                    break;
+            }
+        } else {
+            if (jackctl_parameter_get_type(param) == JackParamBool) {
+                value.i = true;
+            } else {
+                value = jackctl_parameter_get_default_value(param);
+		jackctl_parameter_set_value(param, &value);
+            }            
+        }
+    }
+
+    free (options);
+    free (long_options);
     return 0;
 }
 

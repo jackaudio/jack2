@@ -35,7 +35,7 @@ enum
     PORT_TYPES_MAX = sizeof(port_types) / sizeof(port_types[0])
 };
 
-int GetPortTypeId(const char* port_type)
+jack_port_type_id_t GetPortTypeId(const char* port_type)
 {
     for (int i = 0; i < PORT_TYPES_MAX; ++i) {
         const JackPortType* type = port_types[i];
@@ -46,7 +46,7 @@ int GetPortTypeId(const char* port_type)
     return -1;
 }
 
-const JackPortType* GetPortType(int type_id)
+const JackPortType* GetPortType(jack_port_type_id_t type_id)
 {
     assert(type_id >= 0 && type_id <= PORT_TYPES_MAX);
     const JackPortType* type = port_types[type_id];

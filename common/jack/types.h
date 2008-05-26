@@ -23,6 +23,8 @@
 
 #ifdef WIN32
 #include <windows.h>
+#define vsnprintf _vsnprintf
+#define snprintf _snprintf
 #ifndef __MINGW32__
 	typedef long int32_t;
 	typedef unsigned long uint32_t;
@@ -96,6 +98,8 @@ typedef uint64_t jack_port_id_t;
 #else
 typedef uint32_t jack_port_id_t;
 #endif
+
+typedef uint32_t jack_port_type_id_t;
 
 /**
  * Prototype for the client supplied function that is called 

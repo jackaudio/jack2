@@ -354,7 +354,7 @@ void JackConnectionManager::DirectDisconnect(int ref1, int ref2)
 bool JackConnectionManager::IsDirectConnection(int ref1, int ref2) const
 {
     assert(ref1 >= 0 && ref2 >= 0);
-    return fConnectionRef.GetItemCount(ref1, ref2);
+    return (fConnectionRef.GetItemCount(ref1, ref2) > 0);
 }
 
 /*!

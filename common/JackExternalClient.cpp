@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackGlobals.h"
 #include "JackChannel.h"
+#include "JackError.h"
 
 namespace Jack
 {

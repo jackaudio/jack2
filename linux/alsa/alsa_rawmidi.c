@@ -35,6 +35,7 @@
 #include "alsa_midi_impl.h"
 #include "midi_pack.h"
 #include "midi_unpack.h"
+#include "JackError.h"
 
 enum {
 	NANOSLEEP_RESOLUTION = 7000
@@ -628,6 +629,7 @@ void scan_device(scan_t *scan)
 			alsa_error("scan: snd_ctl_rawmidi_info on subdevice", err);
 			continue;
 		}
+
 		scan_port_update(scan);
 	}
 }
@@ -665,7 +667,7 @@ midi_port_t** scan_port_add(scan_t *scan, const alsa_id_t *id, midi_port_t **lis
 
 	port->next = *list;
 	*list = port;
-	error_log("scan: added port %s %s", port->dev, port->name);
+	info_log("scan: added port %s %s", port->dev, port->name);
 	return &port->next;
 }
 
@@ -689,7 +691,7 @@ midi_port_t** scan_port_open(alsa_rawmidi_t *midi, midi_port_t **list)
 	port->state = PORT_ADDED_TO_JACK;
 	jack_ringbuffer_write(str->jack.new_ports, (char*) &port, sizeof(port));
 
-	error_log("scan: opened port %s %s", port->dev, port->name);
+	info_log("scan: opened port %s %s", port->dev, port->name);
 	return &port->next;
 
  fail_2:
@@ -709,7 +711,7 @@ midi_port_t** scan_port_del(alsa_rawmidi_t *midi, midi_port_t **list)
 {
 	midi_port_t *port = *list;
 	if (port->state == PORT_REMOVED_FROM_JACK) {
-		error_log("scan: deleted port %s %s", port->dev, port->name);
+		info_log("scan: deleted port %s %s", port->dev, port->name);
 		*list = port->next;
 		if (port->id.id[2] )
 			(midi->out.port_close)(midi, port);

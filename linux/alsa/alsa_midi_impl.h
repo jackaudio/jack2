@@ -67,17 +67,15 @@ extern "C"
 
 #if defined(STANDALONE)
 #define MESSAGE(...) fprintf(stderr, __VA_ARGS__)
-#elif defined(JACKMP)
-#define MESSAGE(...) fprintf(stderr, __VA_ARGS__) ; fprintf(stderr, "\n")
-#else
+#elif !defined(JACKMP)
 #include <jack/messagebuffer.h>
 #endif
 
-#define info_log(...)  MESSAGE(__VA_ARGS__)
-#define error_log(...) MESSAGE(__VA_ARGS__)
+#define info_log(...)  jack_info(__VA_ARGS__)
+#define error_log(...) jack_error(__VA_ARGS__)
 
-#ifdef DEBUG
-#define debug_log(...) MESSAGE(__VA_ARGS__)
+#ifdef ALSA_MIDI_DEBUG
+#define debug_log(...) jack_info(__VA_ARGS__)
 #else
 #define debug_log(...)
 #endif

@@ -213,6 +213,8 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
     AudioDeviceRemoveIOProc(driver->fDeviceID, MeasureCallback);
     jack_log("JackCoreAudioDriver::MeasureCallback called");
     JackMachThread::GetParams(&driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
+    // Setup threadded based log function
+    set_threaded_log_function();
     return noErr;
 }
 
@@ -245,7 +247,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         void* inClientData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
-
+         
     switch (inPropertyID) {
 
         case kAudioDeviceProcessorOverload:

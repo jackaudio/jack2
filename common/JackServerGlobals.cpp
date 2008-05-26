@@ -22,10 +22,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackServerGlobals.h"
-#include "JackError.h"
 #include "JackTools.h"
 #include "shm.h"
 #include <getopt.h>
+#include <stdio.h>
+#include <errno.h>
 
 static char* server_name = NULL;
 
@@ -277,8 +278,7 @@ bool JackServerGlobals::Init()
                 jack_error("no access to shm registry");
                 goto error;
             default:
-                if (jack_verbose)
-                    jack_info("server `%s' registered", server_name);
+                jack_info("server `%s' registered", server_name);
         }
 
         /* clean up shared memory and files from any previous instance of this server name */

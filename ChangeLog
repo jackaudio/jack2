@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-26 Stephane Letz  <letz@grame.fr>
+
+	*  Merge control branch.
+
 2008-05-24 Stephane Letz  <letz@grame.fr>
 
 	* Tim Blechmann RAII idiom patch for JackServer ressource initialization.
@@ -142,6 +146,10 @@ Fernando Lopez-Lezcano
 2008-03-19 Stephane Letz  <letz@grame.fr>
 		
 	* Synchronise transport.h with latest jackd version (Video handling).
+
+2008-03-19 Stephane Letz  <letz@grame.fr>
+		
+	* Add jack_port_type_id in jack API.
 
 2008-03-17 Stephane Letz  <letz@grame.fr>
 		

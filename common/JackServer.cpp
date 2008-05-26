@@ -36,6 +36,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackSyncInterface.h"
 #include "JackGraphManager.h"
 #include "JackInternalClient.h"
+#include "JackError.h"
+#include "JackMessageBuffer.h"
 
 namespace Jack
 {
@@ -81,6 +83,9 @@ JackServer::~JackServer()
 
 int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
+    // TODO: move that in reworked JackServerGlobals::Init()
+    JackMessageBuffer::Create();
+  
     if (fChannel->Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
         return -1;
@@ -141,6 +146,8 @@ int JackServer::Close()
     fFreewheelDriver->Close();
     fLoopbackDriver->Close();
     fEngine->Close();
+    // TODO: move that in reworked JackServerGlobals::Destroy()
+    JackMessageBuffer::Destroy();
     return 0;
 }
 
@@ -151,10 +158,9 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
         *status = 0;
         JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
         assert(client);
-        if (client->Open("unused", client_name, (jack_options_t)options, (jack_status_t*)status) < 0) {
+        int res = client->Open("unused", client_name, (jack_options_t)options, (jack_status_t*)status);
+        if (res < 0) {
             delete client;
-            int my_status1 = *status | JackFailure;
-            *status = (jack_status_t)my_status1;
             *int_ref = 0;
         } else {
             *int_ref = client->GetClientControl()->fRefNum;
@@ -164,6 +170,7 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
         *status = (jack_status_t)my_status1;
         *int_ref = 0;
     }
+
     return 0;
 }
 

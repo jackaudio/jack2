@@ -67,45 +67,10 @@ class JackProcessSync : public JackSyncInterface
         void Destroy()
         {}
 
-        bool TimedWait(long usec)
-        {
-            struct timeval T0, T1;
-            timespec time;
-            struct timeval now;
-            int res;
-
-            pthread_mutex_lock(&fLock);
-            jack_log("JackProcessSync::Wait time out = %ld", usec);
-            gettimeofday(&T0, 0);
-
-            static const UInt64	kNanosPerSec = 1000000000ULL;
-            static const UInt64	kNanosPerUsec = 1000ULL;
-            gettimeofday(&now, 0);
-            UInt64 nextDateNanos = now.tv_sec * kNanosPerSec + (now.tv_usec + usec) * kNanosPerUsec;
-            time.tv_sec = nextDateNanos / kNanosPerSec;
-            time.tv_nsec = nextDateNanos % kNanosPerSec;
-            res = pthread_cond_timedwait(&fCond, &fLock, &time);
-            if (res != 0)
-                jack_error("pthread_cond_timedwait error usec = %ld err = %s", usec, strerror(res));
-
-            gettimeofday(&T1, 0);
-            pthread_mutex_unlock(&fLock);
-            jack_log("JackProcessSync::Wait finished delta = %5.1lf",
-                     (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
-            return (res == 0);
-        }
-
-        void Wait()
-        {
-            int res;
-            pthread_mutex_lock(&fLock);
-            jack_log("JackProcessSync::Wait...");
-            if ((res = pthread_cond_wait(&fCond, &fLock)) != 0)
-                jack_error("pthread_cond_wait error err = %s", strerror(errno));
-            pthread_mutex_unlock(&fLock);
-            jack_log("JackProcessSync::Wait finished");
-        }
-
+        bool TimedWait(long usec);
+  
+        void Wait();
+     
         void SignalAll()
         {
             //pthread_mutex_lock(&fLock);
@@ -150,17 +115,7 @@ class JackInterProcessSync : public JackSyncInterface
             return fSynchro->Connect(name, "");
         }
 
-        bool TimedWait(long usec)
-        {
-            struct timeval T0, T1;
-            jack_log("JackInterProcessSync::Wait...");
-            gettimeofday(&T0, 0);
-            bool res = fSynchro->TimedWait(usec);
-            gettimeofday(&T1, 0);
-            jack_log("JackInterProcessSync::Wait finished delta = %5.1lf",
-                     (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
-            return res;
-        }
+        bool TimedWait(long usec);
 
         void Wait()
         {
