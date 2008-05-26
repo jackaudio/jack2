@@ -52,7 +52,7 @@ JackMessageBuffer::~JackMessageBuffer()
         jack_info("no message buffer overruns"); 
     }
     fThread->SetStatus(JackThread::kIdle);
-    fSignal->SignalAll();
+    fSignal->Signal();
     fThread->Stop();
     Flush();
     delete fThread;

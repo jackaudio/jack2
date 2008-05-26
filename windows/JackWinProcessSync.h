@@ -66,6 +66,11 @@ class JackWinProcessSync : public JackSyncInterface
   
         void Wait();
   
+        void Signal()
+        {
+            SetEvent(fEvent);
+        }
+        
         void SignalAll()
         {
             SetEvent(fEvent);

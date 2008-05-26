@@ -41,6 +41,7 @@ class JackSyncInterface
         virtual bool Connect(const char* name) = 0;
         virtual bool TimedWait(long usec) = 0;
         virtual void Wait() = 0;
+        virtual void Signal() = 0;
         virtual void SignalAll() = 0;
         virtual void Destroy() = 0;
 };

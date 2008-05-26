@@ -70,6 +70,13 @@ class JackProcessSync : public JackSyncInterface
         bool TimedWait(long usec);
   
         void Wait();
+        
+        void Signal()
+        {
+            pthread_mutex_lock(&fLock);
+            pthread_cond_signal(&fCond);
+            pthread_mutex_unlock(&fLock);
+        }
      
         void SignalAll()
         {

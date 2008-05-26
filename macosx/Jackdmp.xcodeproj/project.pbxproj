@@ -762,28 +762,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B363EDF0DEB091C001F72D9 /* jack_rec Universal */;
+			remoteGlobalIDString = 4B363EDF0DEB091C001F72D9;
 			remoteInfo = "jack_rec Universal";
 		};
 		4B363F240DEB0ABE001F72D9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B363F140DEB0A6A001F72D9 /* jack_monitor_client Universal */;
+			remoteGlobalIDString = 4B363F140DEB0A6A001F72D9;
 			remoteInfo = "jack_monitor_client Universal";
 		};
 		4B363F520DEB0CFE001F72D9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B363F2B0DEB0BD1001F72D9 /* jack_showtime Universal */;
+			remoteGlobalIDString = 4B363F2B0DEB0BD1001F72D9;
 			remoteInfo = "jack_showtime Universal";
 		};
 		4B363F770DEB0D85001F72D9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B363F680DEB0D4E001F72D9 /* jack_impulse_grabber Universal */;
+			remoteGlobalIDString = 4B363F680DEB0D4E001F72D9;
 			remoteInfo = "jack_impulse_grabber Universal";
 		};
 		4B5A1BCE0CD1CCC80005BF74 /* PBXContainerItemProxy */ = {
