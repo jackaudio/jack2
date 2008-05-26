@@ -68,6 +68,12 @@ if env['HAS_READLINE']:
     example_programs['jack_transport'] = 'transport.c'
     extra_libs['jack_transport'] = ['readline', 'jack', 'ncurses']
 
+# TODO: we need to test for SNDFILE... 
+env['HAS_SNDFILE']=True
+if env['HAS_SNDFILE']:
+    example_programs['jack_rec'] = 'capture_client.c'
+    extra_libs['jack_rec'] = ['sndfile', 'jack']
+
 #
 # Build/install section
 #
