@@ -114,7 +114,6 @@ void JackEngine::ReleaseRefnum(int ref)
     fClientTable[ref] = NULL;
 
     if (fEngineControl->fTemporary) {
-	jack_log("JackEngine::ReleaseRefnum fTemporary");
         int i;
         for (i = REAL_REFNUM; i < CLIENT_NUM; i++) {
             if (fClientTable[i])
@@ -683,7 +682,7 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
     assert(fClientTable[refnum]);
     
     // Check if port name already exists
-    if (GetGraphManager()->GetPort(name) != NO_PORT) {
+    if (fGraphManager->GetPort(name) != NO_PORT) {
         jack_error("port_name \"%s\" already exists", name);
         return -1; 
     }
