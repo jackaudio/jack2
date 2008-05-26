@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <math.h>
+#include <signal.h>
 #include <getopt.h>
 #include <string.h>
 

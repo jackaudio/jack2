@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <math.h>
 
 #include <jack/jack.h>
