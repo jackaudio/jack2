@@ -314,7 +314,8 @@ bool JackMachClientChannel::Execute()
     kern_return_t res;
     if ((res = mach_msg_server(JackRPCClient_server, 1024, fClientPort.GetPort(), 0)) != KERN_SUCCESS) {
         jack_error("JackMachClientChannel::Execute err = %s", mach_error_string(res));
-        fClient->ShutDown();
+        JackClient* client = JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()];
+        client->ShutDown();
         return false;
     } else {
         return true;
