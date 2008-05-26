@@ -18,7 +18,6 @@
 
     * 2002/08/23 - modify for libsndfile 1.0.0 <andy@alsaplayer.org>
     * 2003/05/26 - use ringbuffers - joq
-    
 */
 
 #include <stdio.h>
