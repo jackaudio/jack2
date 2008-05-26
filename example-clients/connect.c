@@ -57,8 +57,6 @@ main (int argc, char *argv[])
 		fprintf(stderr, "ERROR! client should be called jack_connect or jack_disconnect. client is called %s\n", my_name);
 		return 1;
 	}
-	
-	printf("connecting %ld\n",connecting);
 
 	if (argc != 3) {
 		fprintf (stderr, "usage: %s <src_port> <dst_port>\n", my_name);
@@ -69,7 +67,7 @@ main (int argc, char *argv[])
 
 	/* try to become a client of the JACK server */
 
-	if ((client = jack_client_new (my_name)) == 0) {
+	if ((client = jack_client_open (my_name, JackNullOption, NULL)) == 0) {
 		fprintf (stderr, "jack server not running?\n");
 		return 1;
 	}

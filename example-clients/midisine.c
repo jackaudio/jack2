@@ -33,7 +33,16 @@ jack_default_audio_sample_t note_on;
 unsigned char note = 0;
 jack_default_audio_sample_t note_frqs[128];
 
-void calc_note_frqs(jack_default_audio_sample_t srate)
+jack_client_t *client;
+
+static void signal_handler(int sig)
+{
+	jack_client_close(client);
+	fprintf(stderr, "signal received, exiting ...\n");
+	exit(0);
+}
+
+static void calc_note_frqs(jack_default_audio_sample_t srate)
 {
 	int i;
 	for(i=0; i<128; i++)
@@ -42,7 +51,7 @@ void calc_note_frqs(jack_default_audio_sample_t srate)
 	}
 }
 
-int process(jack_nframes_t nframes, void *arg)
+static int process(jack_nframes_t nframes, void *arg)
 {
 	int i;
 	void* port_buf = jack_port_get_buffer(input_port, nframes);
@@ -88,23 +97,21 @@ int process(jack_nframes_t nframes, void *arg)
 	return 0;      
 }
 
-int srate(jack_nframes_t nframes, void *arg)
+static int srate(jack_nframes_t nframes, void *arg)
 {
 	printf("the sample rate is now %" PRIu32 "/sec\n", nframes);
 	calc_note_frqs((jack_default_audio_sample_t)nframes);
 	return 0;
 }
 
-void jack_shutdown(void *arg)
+static void jack_shutdown(void *arg)
 {
 	exit(1);
 }
 
 int main(int narg, char **args)
 {
-	jack_client_t *client;
-
-	if ((client = jack_client_new("midisine")) == 0)
+	if ((client = jack_client_open("midisine", JackNullOption, NULL)) == 0)
 	{
 		fprintf(stderr, "jack server not running?\n");
 		return 1;
@@ -126,10 +133,15 @@ int main(int narg, char **args)
 		fprintf(stderr, "cannot activate client");
 		return 1;
 	}
+    
+    /* install a signal handler to properly quits jack client */
+    signal(SIGQUIT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
 
 	/* run until interrupted */
-	while(1)
-	{
+	while(1) {
 		sleep(1);
 	}
 	jack_client_close(client);

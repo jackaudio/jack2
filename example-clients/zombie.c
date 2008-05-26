@@ -29,7 +29,7 @@ int running = 1;
 int count = 0;
 jack_port_t* output_port;
 
-int
+static int
 process(jack_nframes_t nframes, void* arg) 
 {
 	if (count++ == 1000) {
@@ -41,7 +41,7 @@ process(jack_nframes_t nframes, void* arg)
     return 0;
 }
 
-void 
+static void 
 shutdown (void *arg)
 {
     printf("shutdown \n");

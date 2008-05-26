@@ -5,20 +5,17 @@
 #endif
 #include <string.h>
 #include <getopt.h>
-
-//#include <config.h>
-
 #include <jack/jack.h>
 
 char * my_name;
 
-void
+static void
 show_version (void)
 {
 	//fprintf (stderr, "%s: JACK Audio Connection Kit version " VERSION "\n", my_name);
 }
 
-void
+static void
 show_usage (void)
 {
 	show_version ();
@@ -130,8 +127,6 @@ main (int argc, char *argv[])
 	}
 
 	ports = jack_get_ports (client, NULL, NULL, 0);
-
-	//jack_port_t *port;
 
 	for (i = 0; ports[i]; ++i) {
 		// skip over any that don't match ALL of the strings presented at command line

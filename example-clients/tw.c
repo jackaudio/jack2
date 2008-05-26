@@ -23,6 +23,13 @@ volatile enum {
 	Exit
 } client_state = Init;
 
+static void signal_handler(int sig)
+{
+	jack_client_close(client);
+	fprintf(stderr, "signal received, exiting ...\n");
+	exit(0);
+}
+
 /**
  * The process callback for this JACK application is called in a
  * special realtime thread once for each audio cycle.
@@ -30,7 +37,7 @@ volatile enum {
  * This client follows a simple rule: when the JACK transport is
  * running, copy the input port to the output.  When it stops, exit.
  */
-int
+static int
 _process (jack_nframes_t nframes)
 {
 	jack_default_audio_sample_t *in, *out;
@@ -57,38 +64,55 @@ _process (jack_nframes_t nframes)
 	return 0;      
 }
 
-/*
-int
-process (jack_nframes_t nframes, void* arg)
+static void* jack_thread(void *arg) 
 {
 	jack_client_t* client = (jack_client_t*) arg;
+	
+	while (1) {
+		jack_nframes_t frames = jack_cycle_wait (client);
+		int status = _process(frames);
+		jack_cycle_signal (client, status);
+        // possibly do something else after signaling next clients in the graph
+	}
+	
+	return 0;
+}
 
-	while ((nframes = jack_thread_wait (client, _process (nframes))) != 0);
-
+/*
+static void* jack_thread(void *arg) 
+{
+	jack_client_t* client = (jack_client_t*) arg;
+	
+	while (1) {
+		jack_nframes_t frames;
+		int status;
+		// cycle 1
+		frames = jack_cycle_wait (client);
+		status = _process(frames);
+		jack_cycle_signal (client, status);
+		// cycle 2
+		frames = jack_cycle_wait (client);
+		status = _process(frames);
+		jack_cycle_signal (client, status);
+		// cycle 3		
+		frames = jack_cycle_wait (client);
+		status = _process(frames);
+		jack_cycle_signal (client, status);
+		// cycle 4
+		frames = jack_cycle_wait (client);
+		status = _process(frames);
+		jack_cycle_signal (client, status);
+	}
+	
 	return 0;
 }
 */
-
-int
-process (jack_nframes_t nframes, void* arg)
-{
-	jack_client_t* client = (jack_client_t*) arg;
-	
-	do {
-		int status = _process(nframes);
-		jack_cycle_signal (client, status);
-		// possibly do something else after signaling next clients in the graph
-		nframes = jack_cycle_wait (client);
-	} while (nframes != 0);
-	
-	return 0;
-}
 
 /**
  * JACK calls this shutdown_callback if the server ever shuts down or
  * decides to disconnect the client.
  */
-void
+static void
 jack_shutdown (void *arg)
 {
 	exit (1);
@@ -139,9 +163,9 @@ main (int argc, char *argv[])
 
 	/* tell the JACK server to call `process()' whenever
 	   there is work to be done.
-	*/
-
-	jack_set_process_callback (client, process, client);
+	*/    
+    if (jack_set_process_thread(client, jack_thread, client) < 0) 
+		exit(1);
 
 	/* tell the JACK server to call `jack_shutdown()' if
 	   it ever shuts down, either entirely, or if it
@@ -211,6 +235,12 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
+    
+    /* install a signal handler to properly quits jack client */
+    signal(SIGQUIT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
 
 	/* keep running until the transport stops */
 

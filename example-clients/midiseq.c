@@ -32,7 +32,14 @@ jack_nframes_t num_notes;
 jack_nframes_t loop_nsamp;
 jack_nframes_t loop_index;
 
-void usage()
+static void signal_handler(int sig)
+{
+	jack_client_close(client);
+	fprintf(stderr, "signal received, exiting ...\n");
+	exit(0);
+}
+
+static void usage()
 {
 	fprintf(stderr, "usage: jack_midiseq name nsamp [startindex note nsamp] ...... [startindex note nsamp]\n");
 	fprintf(stderr, "eg: jack_midiseq Sequencer 24000 0 60 8000 12000 63 8000\n");
@@ -40,7 +47,7 @@ void usage()
 	fprintf(stderr, "that lasts for 12000 samples, then a d4# that starts at 1/4 sec that lasts for 800 samples\n");
 }
 
-int process(jack_nframes_t nframes, void *arg)
+static int process(jack_nframes_t nframes, void *arg)
 {
 	int i,j;
 	void* port_buf = jack_port_get_buffer(output_port, nframes);
@@ -83,7 +90,7 @@ int main(int narg, char **args)
 		usage();
 		exit(1);
 	}
-	if((client = jack_client_new (args[1])) == 0)
+	if((client = jack_client_open (args[1], JackNullOption, NULL)) == 0)
 	{
 		fprintf (stderr, "jack server not running?\n");
 		return 1;
@@ -109,10 +116,18 @@ int main(int narg, char **args)
 		fprintf (stderr, "cannot activate client");
 		return 1;
 	}
+    
+    /* install a signal handler to properly quits jack client */
+    signal(SIGQUIT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
 
-	while (1)
-	{
+    /* run until interrupted */
+	while (1) {
 		sleep(1);
 	};
-	
+    
+    jack_client_close(client);
+	exit (0);
 }

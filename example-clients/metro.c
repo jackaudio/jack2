@@ -19,20 +19,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#ifndef WIN32
 #include <unistd.h>
-#endif
 #include <math.h>
 #include <getopt.h>
 #include <string.h>
+
 #include <jack/jack.h>
+#include <jack/transport.h>
 
 typedef jack_default_audio_sample_t sample_t;
 
 const double PI = 3.14;
 
 jack_client_t *client;
-jack_port_t *input_port;
 jack_port_t *output_port;
 unsigned long sr;
 int freq = 880;
@@ -43,32 +42,41 @@ long offset = 0;
 int transport_aware = 0;
 jack_transport_state_t transport_state;
 
-void
-usage ()
+static void signal_handler(int sig)
 {
-	fprintf (stderr, "\n"
-	"usage: jack_metro \n"
-	"              [ --frequency OR -f frequency (in Hz) ]\n"
-	"              [ --amplitude OR -A maximum amplitude (between 0 and 1) ]\n"
-	"              [ --duration OR -D duration (in ms) ]\n"
-	"              [ --attack OR -a attack (in percent of duration) ]\n"
-	"              [ --decay OR -d decay (in percent of duration) ]\n"
-	"              [ --name OR -n jack name for metronome client ]\n"
-	"              [ --transport OR -t transport aware ]\n"
-	"              --bpm OR -b beats per minute\n"
-	);
+	jack_client_close(client);
+	fprintf(stderr, "signal received, exiting ...\n");
+	exit(0);
 }
 
-void
+static void
+usage ()
+
+{
+	fprintf (stderr, "\n"
+"usage: jack_metro \n"
+"              [ --frequency OR -f frequency (in Hz) ]\n"
+"              [ --amplitude OR -A maximum amplitude (between 0 and 1) ]\n"
+"              [ --duration OR -D duration (in ms) ]\n"
+"              [ --attack OR -a attack (in percent of duration) ]\n"
+"              [ --decay OR -d decay (in percent of duration) ]\n"
+"              [ --name OR -n jack name for metronome client ]\n"
+"              [ --transport OR -t transport aware ]\n"
+"              --bpm OR -b beats per minute\n"
+);
+}
+
+static void
 process_silence (jack_nframes_t nframes) 
 {
 	sample_t *buffer = (sample_t *) jack_port_get_buffer (output_port, nframes);
 	memset (buffer, 0, sizeof (jack_default_audio_sample_t) * nframes);
 }
 
-int
-process_audio (jack_nframes_t nframes, void *arg) 
+static void
+process_audio (jack_nframes_t nframes) 
 {
+
 	sample_t *buffer = (sample_t *) jack_port_get_buffer (output_port, nframes);
 	jack_nframes_t frames_left = nframes;
 		
@@ -81,17 +89,9 @@ process_audio (jack_nframes_t nframes, void *arg)
 		memcpy (buffer + (nframes - frames_left), wave + offset, sizeof (sample_t) * frames_left);
 		offset += frames_left;
 	}
-	
-	return 0;
 }
 
-void jack_port_register_cb(jack_port_id_t port, int mode, void *arg)
-{
-  printf("jack_port_register port = %ld mode = %ld\n", port, mode);
-}
-
-/*
-int
+static int
 process (jack_nframes_t nframes, void *arg)
 {
 	if (transport_aware) {
@@ -108,8 +108,8 @@ process (jack_nframes_t nframes, void *arg)
 	process_audio (nframes);
 	return 0;
 }
-*/
-int
+
+static int
 sample_rate_change () {
 	printf("Sample rate has changed! Exiting...\n");
 	exit(-1);
@@ -118,6 +118,7 @@ sample_rate_change () {
 int
 main (int argc, char *argv[])
 {
+	
 	sample_t scale;
 	int i, attack_length, decay_length;
 	double *amp;
@@ -129,6 +130,7 @@ main (int argc, char *argv[])
 	char *client_name = 0;
 	char *bpm_string = "bpm";
 	int verbose = 0;
+	jack_status_t status;
 
 	const char *options = "f:A:D:a:d:b:n:thv";
 	struct option long_options[] =
@@ -145,7 +147,7 @@ main (int argc, char *argv[])
 		{"verbose", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
- 
+	
 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
 		switch (opt) {
 		case 'f':
@@ -203,7 +205,6 @@ main (int argc, char *argv[])
 			return -1;
 		}
 	}
-
 	if (!got_bpm) {
 		fprintf (stderr, "bpm not specified\n");
 		usage ();
@@ -215,16 +216,14 @@ main (int argc, char *argv[])
 		client_name = (char *) malloc (9 * sizeof (char));
 		strcpy (client_name, "metro");
 	}
-	if ((client = jack_client_new (client_name)) == 0) {
+	if ((client = jack_client_open (client_name, JackNoStartServer, &status)) == 0) {
 		fprintf (stderr, "jack server not running?\n");
 		return 1;
 	}
-    
-	jack_set_process_callback (client, process_audio, 0);
+	jack_set_process_callback (client, process, 0);
 	output_port = jack_port_register (client, bpm_string, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-	input_port = jack_port_register (client, "metro_in", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-	
-    sr = jack_get_sample_rate (client);
+
+	sr = jack_get_sample_rate (client);
 
 	/* setup wave table parameters */
 	wave_length = 60 * sr / bpm;
@@ -234,9 +233,7 @@ main (int argc, char *argv[])
 	scale = 2 * PI * freq / sr;
 
 	if (tone_length >= wave_length) {
-		//fprintf (stderr, "invalid duration (tone length = %" PRIu32
-		//	 ", wave length = %" PRIu32 "\n", tone_length,
-		//	 wave_length);
+		fprintf (stderr, "invalid duration (tone length = %u, wave length = %u\n", tone_length, wave_length);
 		return -1;
 	}
 	if (attack_length + decay_length > (int)tone_length) {
@@ -251,51 +248,35 @@ main (int argc, char *argv[])
 	for (i = 0; i < attack_length; i++) {
 		amp[i] = max_amp * i / ((double) attack_length);
 	}
-	for (i = attack_length; i < (int) tone_length - decay_length; i++) {
+	for (i = attack_length; i < (int)tone_length - decay_length; i++) {
 		amp[i] = max_amp;
 	}
 	for (i = (int)tone_length - decay_length; i < (int)tone_length; i++) {
 		amp[i] = - max_amp * (i - (double) tone_length) / ((double) decay_length);
 	}
-	for (i = 0; i < (int) tone_length; i++) {
+	for (i = 0; i < (int)tone_length; i++) {
 		wave[i] = amp[i] * sin (scale * i);
 	}
-	for (i = tone_length; i < (int) wave_length; i++) {
+	for (i = tone_length; i < (int)wave_length; i++) {
 		wave[i] = 0;
 	}
-		
-    if (jack_set_port_registration_callback(client, jack_port_register_cb, 0) != 0) {
-        printf("Error when calling jack_set_port_registration_callback() !\n");
-    }
-	
-    if (jack_activate (client)) {
+
+	if (jack_activate (client)) {
 		fprintf (stderr, "cannot activate client");
 		return 1;
 	}
     
-#ifdef WIN32
-    // Connection can only be done after activation
-    jack_connect(client,jack_port_name(output_port), "portaudio:winmme:in1");
-	jack_connect(client,jack_port_name(output_port), "portaudio:winmme:in2");
-	jack_connect(client,"portaudio:winmme:out2", jack_port_name(input_port));
-#else
-	// Connection can only be done after activation
-    jack_connect(client,jack_port_name(output_port), "coreaudio:Built-in Audio:in2");
-	jack_connect(client,"coreaudio:Built-in Audio:out2", jack_port_name(input_port));
-#endif
-	
-   while ((getchar() != 'q')) {
-		//while (1) {
-		//sleep(1);
-		//printf("jack_frame_time %ld\n", (long)jack_frame_time(client));
-		//usleep(2000);
+    /* install a signal handler to properly quits jack client */
+    signal(SIGQUIT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
+
+    /* run until interrupted */
+	while (1) {
+		sleep(1);
 	};
-   
-    if (jack_deactivate (client)) {
-		fprintf (stderr, "cannot deactivate client");
-		return 1;
-	}
-    
+	
     jack_client_close(client);
-    return 0;
+    exit (0);
 }

@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-05-26 Stephane Letz  <letz@grame.fr>
 
 	*  Merge control branch.
+	*  Cleanup example clients : use jack_client_open and install a proper 'quit' signal handler.
 
 2008-05-24 Stephane Letz  <letz@grame.fr>
 

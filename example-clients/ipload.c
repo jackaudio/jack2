@@ -16,7 +16,7 @@ char *load_init = "";
 char *server_name = NULL;
 int wait_opt = 0;
 
-void
+static void
 signal_handler (int sig)
 {
 	jack_status_t status;
@@ -31,7 +31,7 @@ signal_handler (int sig)
 	exit (0);
 }
 
-void
+static void
 show_usage ()
 {
 	fprintf (stderr, "usage: %s [ options ] client-name [ load-name "
@@ -45,7 +45,7 @@ show_usage ()
 		);
 }
 
-int
+static int
 parse_args (int argc, char *argv[])
 {
 	int c;
@@ -169,7 +169,8 @@ main (int argc, char *argv[])
 			sleep (1);
 		}
 	}
-
+    
+    jack_client_close(client);
 	return 0;
 }
 	

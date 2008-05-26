@@ -19,7 +19,7 @@ static int Jack_Graph_Order_Callback(void *arg)
     const char **ports;
     int i;
 	
-    printf("Jack_Graph_Order_Callback count = %ld\n", reorder++);
+    printf("Jack_Graph_Order_Callback count = %d\n", reorder++);
     
     ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical|JackPortIsOutput);
     if (ports) {
@@ -45,7 +45,6 @@ main (int argc, char *argv[])
 {
 	jack_options_t options = JackNullOption;
 	jack_status_t status;
-    char c;
 	
 	/* open a client connection to the JACK server */
 
