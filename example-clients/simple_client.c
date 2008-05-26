@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
+#include <signal.h>
 #include <jack/jack.h>
 
 jack_port_t *input_port;
@@ -29,13 +29,19 @@ typedef struct
 }
 paTestData;
 
+static void signal_handler(int sig)
+{
+	jack_client_close(client);
+	fprintf(stderr, "signal received, exiting ...\n");
+	exit(0);
+}
+
 static int Jack_Graph_Order_Callback(void *arg)
 {
 	static int reorder = 0;
     printf("Jack_Graph_Order_Callback count = %ld\n", reorder++);
     return 0;
 }
-
 
 /* a simple state machine for this client */
 volatile enum {
@@ -219,6 +225,18 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
+    
+    /* install a signal handler to properly quits jack client */
+#ifdef WIN32
+	signal(SIGINT, signal_handler);
+    signal(SIGABRT, signal_handler);
+	signal(SIGTERM, signal_handler);
+#else
+	signal(SIGQUIT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
+#endif
 
 	/* keep running until the transport stops */
 

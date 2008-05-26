@@ -48,7 +48,7 @@ volatile int time_reset = 1;		/* true when time values change */
  *
  * Runs in the process thread.  Realtime, must not wait.
  */
-void timebase(jack_transport_state_t state, jack_nframes_t nframes, 
+static void timebase(jack_transport_state_t state, jack_nframes_t nframes, 
 	      jack_position_t *pos, int new_pos, void *arg)
 {
 	double min;			/* minutes since frame 0 */
@@ -108,7 +108,7 @@ void timebase(jack_transport_state_t state, jack_nframes_t nframes,
 	}
 }
 
-void jack_shutdown(void *arg)
+static void jack_shutdown(void *arg)
 {
 #if defined(RL_READLINE_VERSION) && RL_READLINE_VERSION >= 0x0400
 	rl_cleanup_after_signal();
@@ -117,38 +117,37 @@ void jack_shutdown(void *arg)
 	exit(1);
 }
 
-void signal_handler(int sig)
+static void signal_handler(int sig)
 {
 	jack_client_close(client);
 	fprintf(stderr, "signal received, exiting ...\n");
 	exit(0);
 }
 
-
 /* Command functions: see commands[] table following. */
 
-void com_activate(char *arg)
+static void com_activate(char *arg)
 {
 	if (jack_activate(client)) {
 		fprintf(stderr, "cannot activate client");
 	}
 }
 
-void com_deactivate(char *arg)
+static void com_deactivate(char *arg)
 {
 	if (jack_deactivate(client)) {
 		fprintf(stderr, "cannot deactivate client");
 	}
 }
 
-void com_exit(char *arg)
+static void com_exit(char *arg)
 {
 	done = 1;
 }
 
-void com_help(char *);			/* forward declaration */
+static void com_help(char *);			/* forward declaration */
 
-void com_locate(char *arg)
+static void com_locate(char *arg)
 {
 	jack_nframes_t frame = 0;
 
@@ -158,31 +157,31 @@ void com_locate(char *arg)
 	jack_transport_locate(client, frame);
 }
 
-void com_master(char *arg)
+static void com_master(char *arg)
 {
 	int cond = (*arg != '\0');
 	if (jack_set_timebase_callback(client, cond, timebase, NULL) != 0)
 		fprintf(stderr, "Unable to take over timebase.\n");
 }
 
-void com_play(char *arg)
+static void com_play(char *arg)
 {
 	jack_transport_start(client);
 }
 
-void com_release(char *arg)
+static void com_release(char *arg)
 {
 	jack_release_timebase(client);
 }
 
-void com_stop(char *arg)
+static void com_stop(char *arg)
 {
 	jack_transport_stop(client);
 }
 
 /* Change the tempo for the entire timeline, not just from the current
  * location. */
-void com_tempo(char *arg)
+static void com_tempo(char *arg)
 {
 	float tempo = 120.0;
 
@@ -194,7 +193,7 @@ void com_tempo(char *arg)
 }
 
 /* Set sync timeout in seconds. */
-void com_timeout(char *arg)
+static void com_timeout(char *arg)
 {
 	double timeout = 2.0;
 
@@ -235,7 +234,7 @@ command_t commands[] = {
 	{(char *)NULL, (cmd_function_t *)NULL, (char *)NULL }
 };
      
-command_t *find_command(char *name)
+static command_t *find_command(char *name)
 {
 	register int i;
 	size_t namelen;
@@ -258,7 +257,7 @@ command_t *find_command(char *name)
 	return ((command_t *)NULL);
 }
 
-void com_help(char *arg)
+static void com_help(char *arg)
 {
 	register int i;
 	command_t *cmd;
@@ -293,7 +292,7 @@ void com_help(char *arg)
 	}
 }
 
-void execute_command(char *line)
+static void execute_command(char *line)
 {
 	register int i;
 	command_t *command;
@@ -331,7 +330,7 @@ void execute_command(char *line)
 
 
 /* Strip whitespace from the start and end of string. */
-char *stripwhite(char *string)
+static char *stripwhite(char *string)
 {
 	register char *s, *t;
 
@@ -350,7 +349,7 @@ char *stripwhite(char *string)
 	return s;
 }
      
-char *dupstr(char *s)
+static char *dupstr(char *s)
 {
 	char *r = malloc(strlen(s) + 1);
 	strcpy(r, s);
@@ -358,7 +357,7 @@ char *dupstr(char *s)
 }
      
 /* Readline generator function for command completion. */
-char *command_generator (const char *text, int state)
+static char *command_generator (const char *text, int state)
 {
 	static int list_index, len;
 	char *name;
@@ -383,7 +382,7 @@ char *command_generator (const char *text, int state)
 	return (char *) NULL;		/* No names matched. */
 }
 
-void command_loop()
+static void command_loop()
 {
 	char *line, *cmd;
 	char prompt[32];
