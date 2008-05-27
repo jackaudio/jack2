@@ -40,7 +40,6 @@ JackMessageBuffer::JackMessageBuffer():fInBuffer(0),fOutBuffer(0),fOverruns(0)
 {
     fThread = JackGlobals::MakeThread(this); 
     fSignal = JackGlobals::MakeInterProcessSync(); 
-    fMutex = new JackMutex(); 
     fThread->StartSync();
 }
 
@@ -56,7 +55,6 @@ JackMessageBuffer::~JackMessageBuffer()
     fThread->Stop();
     Flush();
     delete fThread;
-    delete fMutex;
     delete fSignal;
 }
 
