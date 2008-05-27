@@ -14,8 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-    $Id: connect.c,v 1.1.2.1 2006/06/05 16:54:55 letz Exp $
 */
 
 #include <stdio.h>
