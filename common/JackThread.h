@@ -62,7 +62,7 @@ class JackThread
 {
     public:
         
-        enum kThreadState {kIdle, kStarting, kRunning};
+        enum kThreadState {kIdle, kStarting, kIniting, kRunning};
         
     protected:
         

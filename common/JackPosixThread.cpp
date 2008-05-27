@@ -36,15 +36,19 @@ void* JackPosixThread::ThreadHandler(void* arg)
         jack_error("pthread_setcanceltype err = %s", strerror(err));
     }
     
+    set_threaded_log_function(); 
+    
     // Signal creation thread when started with StartSync
     jack_log("ThreadHandler: start");
-    obj->fStatus = kRunning;
+    obj->fStatus = kIniting;
     
     // Call Init method
     if (!runnable->Init()) {
         jack_error("Thread init fails: thread quits");
         return 0;
     }
+    
+    obj->fStatus = kRunning;
     
     // If Init succeed, start the thread loop
     bool res = true;
@@ -78,7 +82,7 @@ int JackPosixThread::StartSync()
         return -1;
     } else {
         int count = 0;
-        while (fStatus != kRunning && ++count < 1000) {
+        while (fStatus == kStarting && ++count < 1000) {
             JackSleep(1000);
         }
         return (count == 1000) ? -1 : 0;

@@ -68,6 +68,7 @@ int JackThreadedDriver::Stop()
             
         // Kill the thread in Init phase
         case JackThread::kStarting:
+        case JackThread::kIniting:
             if (fThread->Kill() < 0) {  
                 jack_error("Cannot kill thread");
                 return -1;
