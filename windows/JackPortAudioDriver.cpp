@@ -223,6 +223,7 @@ int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
     driver->fOutputBuffer = (float**)outputBuffer;
     // Setup threadded based log function
     set_threaded_log_function();
+    driver->fEngineControl->CycleIncTime(driver->fLastWaitUst);
     return (driver->Process() == 0) ? paContinue : paAbort;
 }
 

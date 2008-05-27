@@ -27,13 +27,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+void JackEngineControl::CycleIncTime(jack_time_t callback_usecs)
+{
+    // Timer
+    fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
+}
+
 void JackEngineControl::CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs)
 {
     // Transport
     fTransport.CycleBegin(fSampleRate, callback_usecs);
-
-    // Timer
-    fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
 
     // Timing
     GetTimeMeasure(table, manager, callback_usecs);

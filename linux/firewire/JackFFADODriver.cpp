@@ -745,6 +745,9 @@ int JackFFADODriver::Read()
 
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackFFADODriver::Read nframes = %ld", nframes);
+        
+    // Has to be done before read
+    fEngineControl->CycleIncTime(fLastWaitUst);
 
     printExit();
     return ffado_driver_read((ffado_driver_t *)fDriver, fEngineControl->fBufferSize);

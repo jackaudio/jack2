@@ -45,7 +45,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "hdsp.h"
 #include "ice1712.h"
 #include "usx2y.h"
-
 #include "generic.h"
 #include "memops.h"
 
@@ -1209,7 +1208,7 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
         timersub(&now, &tstamp, &diff);
         *delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
 
-        // steph: utiliser une version TR
+        // steph: TODO use a RT version
         jack_error("\n\n**** alsa_pcm: xrun of at least %.3f msecs\n\n", *delayed_usecs / 1000.0);
     }
 
@@ -2293,6 +2292,9 @@ int JackAlsaDriver::Read()
 
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackAlsaDriver::Read nframes = %ld", nframes);
+        
+    // Has to be done before read
+    fEngineControl->CycleIncTime(fLastWaitUst);
 
     return alsa_driver_read((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }

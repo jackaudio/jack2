@@ -61,6 +61,7 @@ int JackDummyDriver::Open(jack_nframes_t nframes,
 int JackDummyDriver::Process()
 {
     fLastWaitUst = GetMicroSeconds(); // Take callback date here
+    fEngineControl->CycleIncTime(fLastWaitUst);
     JackAudioDriver::Process();
     usleep(std::max(0L, long(fWaitTime - (GetMicroSeconds() - fLastWaitUst))));
     return 0;

@@ -20,10 +20,14 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-27 Stephane Letz  <letz@grame.fr>
+
+	* Correct timing in drivers : frame time has to be incremented before Read.
+
 2008-05-26 Stephane Letz  <letz@grame.fr>
 
-	*  Merge control branch.
-	*  Cleanup example clients : use jack_client_open and install a proper 'quit' signal handler.
+	* Merge control branch.
+	* Cleanup example clients : use jack_client_open and install a proper 'quit' signal handler.
 
 2008-05-24 Stephane Letz  <letz@grame.fr>
 

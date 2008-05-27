@@ -261,7 +261,7 @@ JackFreebobDriver::SetBufferSize (jack_nframes_t nframes)
     printError("Buffer size change requested but not supported!!!");
 
     /*
-     driver->period_size = nframes; 
+    driver->period_size = nframes; 
     driver->period_usecs =
     	(jack_time_t) floor ((((float) nframes) / driver->sample_rate)
     			     * 1000000.0f);
@@ -870,7 +870,7 @@ int JackFreebobDriver::Read()
         /* we detected an xrun and restarted: notify
          * clients about the delay. 
          */
-        jack_log("FreeBoB XRun ");
+        jack_log("FreeBoB XRun");
         NotifyXRun(fLastWaitUst, fDelayedUsecs);
         return -1;
     }
@@ -878,7 +878,9 @@ int JackFreebobDriver::Read()
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
 
-    //return engine->run_cycle (engine, nframes, delayed_usecs);
+    // Has to be done before read
+    fEngineControl->CycleIncTime(fLastWaitUst);
+    
     printExit();
     return freebob_driver_read((freebob_driver_t *)fDriver, fEngineControl->fBufferSize);
 }

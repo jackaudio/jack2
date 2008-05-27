@@ -138,6 +138,7 @@ struct JackEngineControl : public JackShmMem
     {}
 
     // Cycle
+    void CycleIncTime(jack_time_t callback_usecs);
     void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
     void CycleEnd(JackClientInterface** table);
 
