@@ -50,7 +50,7 @@ class EXPORT JackAudioDriver : public JackDriver
         jack_default_audio_sample_t* GetOutputBuffer(int port_index);
         jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
 
-		void CycleIncTime();
+        void CycleIncTime();
 
     private:
 

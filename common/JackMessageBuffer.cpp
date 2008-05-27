@@ -70,12 +70,12 @@ void JackMessageBuffer::Flush()
 
 void JackMessageBuffer::AddMessage(int level, const char *message)
 {
-    if (fMutex->Trylock()) {
+    if (fMutex.Trylock()) {
         fBuffers[fInBuffer].level = level;
         strncpy(fBuffers[fInBuffer].message, message, MB_BUFFERSIZE);
         fInBuffer = MB_NEXT(fInBuffer);
         fSignal->SignalAll();
-        fMutex->Unlock();
+        fMutex.Unlock();
     } else {            /* lock collision */
         INC_ATOMIC(&fOverruns);
     }
@@ -84,9 +84,9 @@ void JackMessageBuffer::AddMessage(int level, const char *message)
 bool JackMessageBuffer::Execute()
 {
     fSignal->Wait();	
-    fMutex->Lock();
+    fMutex.Lock();
     Flush();
-    fMutex->Unlock();
+    fMutex.Unlock();
     return true;	
 }
 
