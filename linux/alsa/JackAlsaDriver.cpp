@@ -2294,7 +2294,7 @@ int JackAlsaDriver::Read()
         jack_log("JackAlsaDriver::Read nframes = %ld", nframes);
         
     // Has to be done before read
-    fEngineControl->CycleIncTime(fLastWaitUst);
+	JackAudioDriver::CycleIncTime();
 
     return alsa_driver_read((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }

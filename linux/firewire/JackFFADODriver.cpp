@@ -747,7 +747,7 @@ int JackFFADODriver::Read()
         jack_log("JackFFADODriver::Read nframes = %ld", nframes);
         
     // Has to be done before read
-    fEngineControl->CycleIncTime(fLastWaitUst);
+    JackAudioDriver::CycleIncTime();
 
     printExit();
     return ffado_driver_read((ffado_driver_t *)fDriver, fEngineControl->fBufferSize);

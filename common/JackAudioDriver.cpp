@@ -270,4 +270,9 @@ jack_default_audio_sample_t* JackAudioDriver::GetMonitorBuffer(int port_index)
     return (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[port_index], fEngineControl->fBufferSize);
 }
 
+void JackAudioDriver::CycleIncTime()
+{
+	fEngineControl->CycleIncTime(fLastWaitUst);
+}
+
 } // end of namespace

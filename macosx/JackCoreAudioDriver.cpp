@@ -173,7 +173,7 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
     driver->fActionFags = ioActionFlags;
     driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
     driver->fDriverOutputData = ioData;
-    driver->fEngineControl->CycleIncTime(driver->fLastWaitUst);
+    driver->CycleIncTime();
     return driver->Process();
 }
 
