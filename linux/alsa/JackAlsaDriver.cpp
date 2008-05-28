@@ -175,8 +175,8 @@ JackAlsaDriver::alsa_driver_ice1712_hardware (alsa_driver_t *driver)
 int
 JackAlsaDriver::alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 {
-    // steph
-    driver->hw = jack_alsa_usx2y_hw_new (driver);
+    // TODO : will need so deeped redesign
+    // driver->hw = jack_alsa_usx2y_hw_new (driver);
     return 0;
 }
 
