@@ -37,6 +37,7 @@
 #include "jack/jack.h"
 #include "jack/jslist.h"
 #include "jack/control.h"
+#include "sigsegv.h"
 
 FILE *g_logfile;
 char *g_jackdbus_config_dir;
@@ -743,6 +744,9 @@ main (int argc, char **argv)
 
     jack_set_error_function(jack_dbus_error_callback);
     jack_set_info_function(jack_dbus_info_callback);
+
+    /* setup our SIGSEGV magic that prints nice stack in our logfile */
+    setup_sigsegv();
 
     jack_info("------------------");
     jack_info("Controller activated. Version %s (%s)", jack_get_version_string(), JACK_SVNREVISION);
