@@ -708,7 +708,14 @@ main (int argc, char **argv)
 {
     DBusError error;
     int ret;
-        void *controller_ptr;
+    void *controller_ptr;
+    struct stat st;
+    char timestamp_str[26];
+
+    st.st_mtime = 0;
+    stat(argv[0], &st);
+    ctime_r(&st.st_mtime, timestamp_str);
+    timestamp_str[24] = 0;
 
     if (!jack_controller_settings_init())
     {
@@ -749,7 +756,7 @@ main (int argc, char **argv)
     setup_sigsegv();
 
     jack_info("------------------");
-    jack_info("Controller activated. Version %s (%s)", jack_get_version_string(), JACK_SVNREVISION);
+    jack_info("Controller activated. Version %s (%s) built on %s", jack_get_version_string(), JACK_SVNREVISION, timestamp_str);
 
     if (!dbus_threads_init_default())
     {
