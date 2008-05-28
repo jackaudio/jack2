@@ -507,6 +507,11 @@ jack_dbus_info_callback(const char *msg)
     fflush(g_logfile);
 }
 
+#define ANSI_BOLD_ON    "\033[1m"
+#define ANSI_BOLD_OFF   "\033[22m"
+#define ANSI_COLOR_RED  "\033[31m"
+#define ANSI_RESET      "\033[0m"
+
 void 
 jack_dbus_error_callback(const char *msg)
 {
@@ -517,7 +522,7 @@ jack_dbus_error_callback(const char *msg)
     ctime_r(&timestamp, timestamp_str);
     timestamp_str[24] = 0;
 
-    fprintf(g_logfile, "%s: ERROR: %s\n", timestamp_str, msg);
+    fprintf(g_logfile, "%s: " ANSI_BOLD_ON ANSI_COLOR_RED "ERROR: %s" ANSI_RESET "\n", timestamp_str, msg);
     fflush(g_logfile);
 }
 
