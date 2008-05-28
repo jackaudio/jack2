@@ -31,6 +31,8 @@
 char * __cxa_demangle(const char * __mangled_name, char * __output_buffer, size_t * __length, int * __status);
 #endif
 
+#include "JackError.h"
+
 #if defined(REG_RIP)
 # define SIGSEGV_STACK_IA64
 # define REGFORMAT "%016lx"
@@ -59,7 +61,27 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     size_t sz;
 #endif
 
-    jack_error("Segmentation Fault!");
+    if (signum == SIGSEGV)
+    {
+        jack_error("Segmentation Fault!");
+    }
+    else if (signum == SIGABRT)
+    {
+        jack_error("Abort!");
+    }
+    else if (signum == SIGILL)
+    {
+        jack_error("Illegal instruction!");
+    }
+    else if (signum == SIGFPE)
+    {
+        jack_error("Floating point exception!");
+    }
+    else
+    {
+        jack_error("Unknown bad signal catched!");
+    }
+
     jack_error("info.si_signo = %d", signum);
     jack_error("info.si_errno = %d", info->si_errno);
     jack_error("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
@@ -122,10 +144,26 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
 
 int setup_sigsegv() {
     struct sigaction action;
+
     memset(&action, 0, sizeof(action));
     action.sa_sigaction = signal_segv;
     action.sa_flags = SA_SIGINFO;
     if(sigaction(SIGSEGV, &action, NULL) < 0) {
+        jack_error("sigaction failed. errno is %d (%s)", errno, strerror(errno));
+        return 0;
+    }
+
+    if(sigaction(SIGILL, &action, NULL) < 0) {
+        jack_error("sigaction failed. errno is %d (%s)", errno, strerror(errno));
+        return 0;
+    }
+
+    if(sigaction(SIGABRT, &action, NULL) < 0) {
+        jack_error("sigaction failed. errno is %d (%s)", errno, strerror(errno));
+        return 0;
+    }
+
+    if(sigaction(SIGFPE, &action, NULL) < 0) {
         jack_error("sigaction failed. errno is %d (%s)", errno, strerror(errno));
         return 0;
     }
