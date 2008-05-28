@@ -176,7 +176,7 @@ int
 JackAlsaDriver::alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 {
     // steph
-    //driver->hw = jack_alsa_usx2y_hw_new (driver);
+    driver->hw = jack_alsa_usx2y_hw_new (driver);
     return 0;
 }
 
