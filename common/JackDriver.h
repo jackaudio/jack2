@@ -157,6 +157,9 @@ class EXPORT JackDriver : public JackDriverClient
         JackClientControl* fClientControl;
 
         JackClientControl* GetClientControl() const;
+        
+        void CycleIncTime();
+        void CycleTakeTime();
 
     public:
 

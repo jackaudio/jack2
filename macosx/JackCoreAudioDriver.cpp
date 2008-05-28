@@ -169,11 +169,10 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
                                      AudioBufferList *ioData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inRefCon;
-    driver->fLastWaitUst = GetMicroSeconds(); // Take callback date here
     driver->fActionFags = ioActionFlags;
     driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
     driver->fDriverOutputData = ioData;
-    driver->CycleIncTime();
+    driver->CycleTakeTime();
     return driver->Process();
 }
 

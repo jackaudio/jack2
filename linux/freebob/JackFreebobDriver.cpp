@@ -879,7 +879,7 @@ int JackFreebobDriver::Read()
         jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
 
     // Has to be done before read
-    JackAudioDriver::CycleIncTime();
+    JackDriver::CycleIncTime();
     
     printExit();
     return freebob_driver_read((freebob_driver_t *)fDriver, fEngineControl->fBufferSize);

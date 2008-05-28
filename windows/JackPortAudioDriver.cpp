@@ -218,12 +218,11 @@ int JackPortAudioDriver::Render(const void* inputBuffer, void* outputBuffer,
                                 void* userData)
 {
     JackPortAudioDriver* driver = (JackPortAudioDriver*)userData;
-    driver->fLastWaitUst = GetMicroSeconds(); // Take callback date here
     driver->fInputBuffer = (float**)inputBuffer;
     driver->fOutputBuffer = (float**)outputBuffer;
     // Setup threadded based log function
     set_threaded_log_function();
-    driver->CycleIncTime();
+    driver->CycleTakeTime();
     return (driver->Process() == 0) ? paContinue : paAbort;
 }
 

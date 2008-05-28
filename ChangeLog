@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-28 Stephane Letz  <letz@grame.fr>
+
+	* New testMutex test, correct timing in drivers.
+
 2008-05-27 Stephane Letz  <letz@grame.fr>
 
 	* Correct timing in drivers : frame time has to be incremented before Read.

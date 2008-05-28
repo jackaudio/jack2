@@ -537,6 +537,8 @@
 		4BF520540CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
 		4BF520590CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4BF5205A0CB8D1010037470E /* timestamps.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF520580CB8D1010037470E /* timestamps.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BFA5E920DEC4D9C00FA4CDB /* Jackservermp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA7BDCB0DC22F4500AA3457 /* Jackservermp.framework */; };
+		4BFA5E9F0DEC4DD900FA4CDB /* testMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA5E9E0DEC4DD900FA4CDB /* testMutex.cpp */; };
 		4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
 /* End PBXBuildFile section */
 
@@ -1207,6 +1209,8 @@
 		4BF8D2470834F20600C94B91 /* testSem.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSem.cpp; path = ../tests/testSem.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFrameTimer.cpp; path = ../common/JackFrameTimer.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFrameTimer.h; path = ../common/JackFrameTimer.h; sourceTree = SOURCE_ROOT; };
+		4BFA5E980DEC4D9C00FA4CDB /* testMutex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testMutex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BFA5E9E0DEC4DD900FA4CDB /* testMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testMutex.cpp; path = ../tests/testMutex.cpp; sourceTree = SOURCE_ROOT; };
 		4BFA99A20AAAF3B0009E916C /* jdelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jdelay; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA99A90AAAF40C009E916C /* jdelay.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jdelay.cpp; path = ../tests/jdelay.cpp; sourceTree = SOURCE_ROOT; };
 		4BFB297708AF44ED00D450D4 /* JackMachServerNotifyChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachServerNotifyChannel.cpp; sourceTree = "<group>"; };
@@ -1667,6 +1671,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4BFA5E910DEC4D9C00FA4CDB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BFA5E920DEC4D9C00FA4CDB /* Jackservermp.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4BFA999C0AAAF3B0009E916C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1785,6 +1797,7 @@
 				4B363F1E0DEB0A6A001F72D9 /* jack_monitor_client */,
 				4B363F350DEB0BD1001F72D9 /* jack_showtime */,
 				4B363F720DEB0D4E001F72D9 /* jack_impulse_grabber */,
+				4BFA5E980DEC4D9C00FA4CDB /* testMutex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1854,6 +1867,7 @@
 				4BA577BC08BF8BE200F82DE1 /* testSynchroClient.cpp */,
 				4BA577FB08BF8E4600F82DE1 /* testSynchroServer.cpp */,
 				4BBD13CC08C71EB40079F7FF /* testSynchroServerClient.cpp */,
+				4BFA5E9E0DEC4DD900FA4CDB /* testMutex.cpp */,
 				4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */,
 			);
 			name = Tests;
@@ -2766,6 +2780,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4BE99D270AD7A04800C59091 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BFA5E8C0DEC4D9C00FA4CDB /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3927,6 +3948,25 @@
 			productReference = 4BE99D300AD7A04800C59091 /* jack_cpu */;
 			productType = "com.apple.product-type.tool";
 		};
+		4BFA5E8B0DEC4D9C00FA4CDB /* testMutex Universal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BFA5E940DEC4D9C00FA4CDB /* Build configuration list for PBXNativeTarget "testMutex Universal" */;
+			buildPhases = (
+				4BFA5E8C0DEC4D9C00FA4CDB /* Headers */,
+				4BFA5E8D0DEC4D9C00FA4CDB /* Sources */,
+				4BFA5E910DEC4D9C00FA4CDB /* Frameworks */,
+				4BFA5E930DEC4D9C00FA4CDB /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "testMutex Universal";
+			productInstallPath = /usr/local/bin;
+			productName = testSem;
+			productReference = 4BFA5E980DEC4D9C00FA4CDB /* testMutex */;
+			productType = "com.apple.product-type.tool";
+		};
 		4BFA99980AAAF3B0009E916C /* jdelay Universal */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jdelay Universal" */;
@@ -3975,6 +4015,7 @@
 				4B699D03097D421600A18468 /* jack_external_metro Universal */,
 				4B699D13097D421600A18468 /* testAtomic Universal */,
 				4B699D27097D421600A18468 /* testSem Universal */,
+				4BFA5E8B0DEC4D9C00FA4CDB /* testMutex Universal */,
 				4B699D3F097D421600A18468 /* zombie Universal */,
 				4BE6C6910A3E096F005A203A /* jack_test Universal */,
 				4BA7FEB90D8E76270017FF73 /* jack_server_control Universal */,
@@ -4423,6 +4464,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4BE99D2B0AD7A04800C59091 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BFA5E930DEC4D9C00FA4CDB /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -5096,6 +5144,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B3F49080AD8503300491C6E /* jack_cpu.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BFA5E8D0DEC4D9C00FA4CDB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BFA5E9F0DEC4DD900FA4CDB /* testMutex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12363,6 +12419,111 @@
 			};
 			name = Default;
 		};
+		4BFA5E950DEC4D9C00FA4CDB /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Development\"";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					CoreAudio,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = testSem;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4BFA5E960DEC4D9C00FA4CDB /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Development\"";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				HEADER_SEARCH_PATHS = ../common;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					CoreAudio,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = testMutex;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4BFA5E970DEC4D9C00FA4CDB /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/build/Development\"";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					AudioToolBox,
+					"-framework",
+					CoreAudio,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = testSem;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
 		4BFA999F0AAAF3B0009E916C /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -13093,6 +13254,16 @@
 				4BE99D2D0AD7A04800C59091 /* Development */,
 				4BE99D2E0AD7A04800C59091 /* Deployment */,
 				4BE99D2F0AD7A04800C59091 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4BFA5E940DEC4D9C00FA4CDB /* Build configuration list for PBXNativeTarget "testMutex Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BFA5E950DEC4D9C00FA4CDB /* Development */,
+				4BFA5E960DEC4D9C00FA4CDB /* Deployment */,
+				4BFA5E970DEC4D9C00FA4CDB /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;

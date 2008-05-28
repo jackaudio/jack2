@@ -175,6 +175,16 @@ bool JackDriver::IsRealTime()
     return fEngineControl->fRealTime;
 }
 
+void JackDriver::CycleIncTime()
+{
+	fEngineControl->CycleIncTime(fLastWaitUst);
+}
+void JackDriver::CycleTakeTime()
+{   
+    fLastWaitUst = GetMicroSeconds(); // Take callback date here
+    fEngineControl->CycleIncTime(fLastWaitUst);
+}
+
 JackClientControl* JackDriver::GetClientControl() const
 {
     return fClientControl;
