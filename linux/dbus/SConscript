@@ -58,7 +58,7 @@ merge_pkg_config_std(jackenv, 'dbus-1')
 #print "LIBS: " + repr(jackenv['LIBS'])
 #print "DBUS_SERVICES_DIR: " + jackenv['DBUS_SERVICES_DIR']
 
-jackenv.Install(env['BINDIR'], jackenv.Program('jackdbus', [
+jackenv.Install(env['INSTALL_BINDIR'], jackenv.Program('jackdbus', [
     'jackdbus.c',
     'controller.c',
     'controller_iface_configure.c',
@@ -73,9 +73,8 @@ jackenv.Install(env['BINDIR'], jackenv.Program('jackdbus', [
     'xml_write_raw.c',
     'sigsegv.c',
     ]))
-jackenv.Alias('install', env['BINDIR'])
 
 jackenv.ScanReplace('org.jackaudio.service.in')
-jackenv.Install(jackenv['DBUS_SERVICES_DIR'], 'org.jackaudio.service')
-jackenv.Alias('install', jackenv['DBUS_SERVICES_DIR'])
+jackenv.Install(jackenv['DESTDIR'] + jackenv['DBUS_SERVICES_DIR'], 'org.jackaudio.service')
+jackenv.Alias('install', jackenv['DESTDIR'] + jackenv['DBUS_SERVICES_DIR'])
 
