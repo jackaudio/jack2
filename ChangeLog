@@ -23,6 +23,7 @@ Fernando Lopez-Lezcano
 2008-05-29 Stephane Letz  <letz@grame.fr>
 
 	* Tim Blechmann patch for JackPosixSemaphore (still to test...).
+	*  Correct JackWinThread::Terminate.
 
 2008-05-28 Stephane Letz  <letz@grame.fr>
 

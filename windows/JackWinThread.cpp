@@ -67,6 +67,7 @@ JackWinThread::JackWinThread(JackRunnableInterface* runnable)
 JackWinThread::~JackWinThread()
 {
     CloseHandle(fEvent);
+    CloseHandle(fThread);
 }
 
 int JackWinThread::Start()
@@ -199,9 +200,7 @@ pthread_t JackWinThread::GetThreadID()
 
 void JackWinThread::Terminate()
 {
-    TerminateThread(fThread, 0);
-    WaitForSingleObject(fThread, INFINITE);
-    CloseHandle(fThread);
+    ExitThread(0);
 }
 
 } // end of namespace
