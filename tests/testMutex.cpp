@@ -24,7 +24,6 @@
 #include <unistd.h>
 
 #ifdef __APPLE__
-#include "JackMachSemaphore.h"
 #include "JackMachThread.h"
 #endif
 
@@ -52,21 +51,21 @@ struct LockedObject : public JackLockAble {
     {   
         JackLock lock(this);
         fCount++;
-        //printf("LockedMethod1 self %x fCount %ld\n", pthread_self(), fCount);
+        printf("LockedMethod1 self %x fCount %d\n", pthread_self(), fCount);
     }
     
     void LockedMethod2()
     {   
         JackLock lock(this);
         fCount--;
-        //printf("LockedMethod2 self %x fCount %ld\n", pthread_self(), fCount);
+        printf("LockedMethod2 self %x fCount %d\n", pthread_self(), fCount);
     }
     
     void LockedMethod3()
     {   
         JackLock lock(this);
         fCount--;
-        //printf("LockedMethod3 self %x fCount %ld\n", pthread_self(), fCount);
+        printf("LockedMethod3 self %x fCount %d\n", pthread_self(), fCount);
     }
 
 };
@@ -93,7 +92,7 @@ struct TestThread : public JackRunnableInterface {
      
     bool Execute()
     {
-		//printf("TestThread Execute\n");
+		printf("TestThread Execute\n");
         switch (fNum) {
         
             case 1:
@@ -109,7 +108,7 @@ struct TestThread : public JackRunnableInterface {
                 break;
         };
    		
-        //usleep(fNum * 1000);
+        usleep(fNum * 1000);
 		return true;
     }
 	
@@ -119,11 +118,11 @@ int main (int argc, char * const argv[])
 {
     char c;
     
-    LockedObject* obj = new LockedObject();
-    TestThread* th1 = new TestThread(obj, 1);
-    TestThread* th2 = new TestThread(obj,3);
-    TestThread* th3 = new TestThread(obj, 2);
+    LockedObject obj;
+    TestThread th1(&obj, 1);
+    TestThread th2(&obj, 2);
+    TestThread th3(&obj, 3);
       
-    while ((c = getchar()) != 'q')) {}
+    while ((c = getchar()) != 'q') {}
     
 }

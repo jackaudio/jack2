@@ -73,6 +73,7 @@
 				4BFA99AC0AAAF41D009E916C /* PBXTargetDependency */,
 				4BFA99500AAAED90009E916C /* PBXTargetDependency */,
 				4BFA99520AAAED90009E916C /* PBXTargetDependency */,
+				4B5F25B30DEEA2430041E486 /* PBXTargetDependency */,
 				4BFA99540AAAED90009E916C /* PBXTargetDependency */,
 				4BFA99580AAAED90009E916C /* PBXTargetDependency */,
 				4BFA995A0AAAED90009E916C /* PBXTargetDependency */,
@@ -802,6 +803,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B5A1BD00CD1CCE10005BF74;
 			remoteInfo = jack_midisine;
+		};
+		4B5F25B20DEEA2430041E486 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BFA5E8B0DEC4D9C00FA4CDB /* testMutex Universal */;
+			remoteInfo = "testMutex Universal";
 		};
 		4B699DB3097D421700A18468 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -5354,6 +5362,11 @@
 			isa = PBXTargetDependency;
 			target = 4B5A1BD00CD1CCE10005BF74 /* jack_midisine Universal */;
 			targetProxy = 4B5A1BE10CD1CD730005BF74 /* PBXContainerItemProxy */;
+		};
+		4B5F25B30DEEA2430041E486 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BFA5E8B0DEC4D9C00FA4CDB /* testMutex Universal */;
+			targetProxy = 4B5F25B20DEEA2430041E486 /* PBXContainerItemProxy */;
 		};
 		4B699DB4097D421700A18468 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
