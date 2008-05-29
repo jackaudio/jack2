@@ -318,6 +318,7 @@
 		4B5A1BDD0CD1CD420005BF74 /* midisine.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A1BDC0CD1CD420005BF74 /* midisine.c */; };
 		4B5DB9830CD2429A00EBA5EE /* JackDebugClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B98AE000931D30C0091932A /* JackDebugClient.cpp */; };
 		4B5DB9840CD2429B00EBA5EE /* JackDebugClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B98AE010931D30C0091932A /* JackDebugClient.h */; };
+		4B5F253E0DEE9B8F0041E486 /* JackLockedEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B5F253D0DEE9B8F0041E486 /* JackLockedEngine.h */; };
 		4B60CE490AAABA31004956AA /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B60CE4A0AAABA31004956AA /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B699BAA097D421600A18468 /* Jackdmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */; };
@@ -1052,6 +1053,7 @@
 		4B5A1BBD0CD1CC110005BF74 /* midiseq.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = midiseq.c; path = "../example-clients/midiseq.c"; sourceTree = SOURCE_ROOT; };
 		4B5A1BDA0CD1CCE10005BF74 /* jack_midisine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_midisine; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B5A1BDC0CD1CD420005BF74 /* midisine.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = midisine.c; path = "../example-clients/midisine.c"; sourceTree = SOURCE_ROOT; };
+		4B5F253D0DEE9B8F0041E486 /* JackLockedEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackLockedEngine.h; path = ../common/JackLockedEngine.h; sourceTree = SOURCE_ROOT; };
 		4B60CE480AAABA31004956AA /* connect.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = connect.c; path = "../example-clients/connect.c"; sourceTree = SOURCE_ROOT; };
 		4B66A8580934964500A89560 /* JackConstants.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackConstants.h; path = ../common/JackConstants.h; sourceTree = SOURCE_ROOT; };
 		4B699BB1097D421600A18468 /* jackdmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jackdmp; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2019,6 +2021,7 @@
 		4BA550FB05E2420000569492 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
+				4B5F253D0DEE9B8F0041E486 /* JackLockedEngine.h */,
 				4B168CA3076A5319005B2802 /* MIG_RPC */,
 				4BF8D2130834F02800C94B91 /* JackEngine.h */,
 				4BF8D2140834F02800C94B91 /* JackEngine.cpp */,
@@ -2633,6 +2636,7 @@
 				4B95BCAE0D913073000F7695 /* control.h in Headers */,
 				4B9A26020DBF8584006E9FBC /* jslist.h in Headers */,
 				4B4F9C8D0DC20C0400706CB0 /* JackMessageBuffer.h in Headers */,
+				4B5F253E0DEE9B8F0041E486 /* JackLockedEngine.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

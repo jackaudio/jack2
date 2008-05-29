@@ -28,7 +28,8 @@
 #include <pthread.h>
 #endif
 
-#include<assert.h>
+#include <assert.h>
+#include "JackError.h"
 
 namespace Jack
 {
@@ -96,7 +97,9 @@ class JackMutex
 
         void Lock()
         {
-            pthread_mutex_lock(&fMutex);
+            int res = pthread_mutex_lock(&fMutex);
+            if (res != 0)
+                jack_error("JackMutex::Lock res = %d", res);
         }
 
         bool Trylock()
@@ -106,7 +109,9 @@ class JackMutex
 
         void Unlock()
         {
-            pthread_mutex_unlock(&fMutex);
+            int res = pthread_mutex_unlock(&fMutex);
+            if (res != 0)
+                jack_error("JackMutex::Unlock res = %d", res);
         }
 
 #endif
