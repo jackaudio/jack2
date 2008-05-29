@@ -97,10 +97,9 @@ bool JackPosixSemaphore::Wait()
 }
 
 
-/*
-#ifdef __linux__
+#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) // glibc feature test
 
-bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
+bool JackPosixSemaphore::TimedWait(long usec) 
 {
 	int res;
 	struct timeval now;
@@ -112,7 +111,11 @@ bool JackPosixSemaphore::TimedWait(long usec) // unusable semantic !!
 	}
 	gettimeofday(&now, 0);
 	time.tv_sec = now.tv_sec + usec / 1000000;
-	time.tv_nsec = (now.tv_usec + (usec % 1000000)) * 1000;
+    long tv_usec = (now.tv_usec + (usec % 1000000));
+
+    time.tv_sec += tv_usec / 1000000;
+
+    time.tv_nsec = (tv_usec % 1000000) * 1000;
 
     if ((res = sem_timedwait(fSemaphore, &time)) != 0) {
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
@@ -130,14 +133,6 @@ bool JackPosixSemaphore::TimedWait(long usec)
 	return Wait();
 }
 #endif
-*/
-
-#warning JackPosixSemaphore::TimedWait not available : synchronous mode may not work correctly if POSIX semaphore are used
-
-bool JackPosixSemaphore::TimedWait(long usec)
-{
-    return Wait();
-}
 
 // Server side : publish the semaphore in the global namespace
 bool JackPosixSemaphore::Allocate(const char* name, const char* server_name, int value)

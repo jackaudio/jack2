@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-29 Stephane Letz  <letz@grame.fr>
+
+	* Tim Blechmann patch for JackPosixSemaphore (still to test...).
+
 2008-05-28 Stephane Letz  <letz@grame.fr>
 
 	* New testMutex test, correct timing in drivers.
