@@ -808,7 +808,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4BFA5E8B0DEC4D9C00FA4CDB /* testMutex Universal */;
+			remoteGlobalIDString = 4BFA5E8B0DEC4D9C00FA4CDB;
 			remoteInfo = "testMutex Universal";
 		};
 		4B699DB3097D421700A18468 /* PBXContainerItemProxy */ = {
@@ -2029,8 +2029,8 @@
 		4BA550FB05E2420000569492 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
-				4B5F253D0DEE9B8F0041E486 /* JackLockedEngine.h */,
 				4B168CA3076A5319005B2802 /* MIG_RPC */,
+				4B5F253D0DEE9B8F0041E486 /* JackLockedEngine.h */,
 				4BF8D2130834F02800C94B91 /* JackEngine.h */,
 				4BF8D2140834F02800C94B91 /* JackEngine.cpp */,
 				4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */,

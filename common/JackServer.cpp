@@ -158,7 +158,7 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
         *status = 0;
         JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
         assert(client);
-        int res = client->Open("unused", client_name, (jack_options_t)options, (jack_status_t*)status);
+        int res = client->Open(JACK_DEFAULT_SERVER_NAME, client_name, (jack_options_t)options, (jack_status_t*)status);
         if (res < 0) {
             delete client;
             *int_ref = 0;

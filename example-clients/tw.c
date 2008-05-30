@@ -69,12 +69,21 @@ static void* jack_thread(void *arg)
 	jack_client_t* client = (jack_client_t*) arg;
 	
 	while (1) {
+    
 		jack_nframes_t frames = jack_cycle_wait (client);
 		int status = _process(frames);
 		jack_cycle_signal (client, status);
-        // possibly do something else after signaling next clients in the graph
+        
+        /*
+            Possibly do something else after signaling next clients in the graph
+        */
+        
+        /* End condition */
+        if (status != 0)
+            return 0;  
 	}
-	
+    
+    /* not reached*/
 	return 0;
 }
 

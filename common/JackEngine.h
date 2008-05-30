@@ -85,10 +85,8 @@ class JackEngineInterface
         virtual void NotifyGraphReorder() = 0;
         virtual void NotifyBufferSize(jack_nframes_t nframes) = 0;
         virtual void NotifyFreewheel(bool onoff) = 0;
-        virtual void NotifyPortRegistation(jack_port_id_t port_index, bool onoff) = 0;
-        virtual void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff) = 0;
-        virtual void NotifyActivate(int refnum) = 0;
-};
+ 
+ };
 
 /*!
 \brief Engine description.
@@ -123,6 +121,9 @@ class JackEngine
 
         void NotifyClient(int refnum, int event, int sync, int value1, int value2);
         void NotifyClients(int event, int sync, int value1, int value2);
+        void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
+        void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
+        void NotifyActivate(int refnum);
 
     public:
 
@@ -169,9 +170,6 @@ class JackEngine
         void NotifyGraphReorder();
         void NotifyBufferSize(jack_nframes_t nframes);
         void NotifyFreewheel(bool onoff);
-        void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
-        void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
-        void NotifyActivate(int refnum);
 };
 
 

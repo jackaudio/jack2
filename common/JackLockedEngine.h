@@ -179,22 +179,7 @@ class JackLockedEngine : public JackEngineInterface, public JackLockAble
             JackLock lock(this);
             fEngine.NotifyFreewheel(onoff);
         }
-        void NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
-        {
-            JackLock lock(this);
-            fEngine.NotifyPortRegistation(port_index, onoff);
-        }
-        void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff)
-        {
-            JackLock lock(this);
-            fEngine.NotifyPortConnect(src, dst, onoff);
-        }
-        void NotifyActivate(int refnum)
-        {
-            JackLock lock(this);
-            fEngine.NotifyActivate(refnum);
-        }
-
+    
         int GetClientPID(const char* name)
         {
             JackLock lock(this);

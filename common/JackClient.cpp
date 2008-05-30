@@ -347,7 +347,7 @@ bool JackClient::Execute()
         if (WaitFirstSync())
             ExecuteThread();
     }
-    return false; // Never reached
+    return false; 
 }
 
 inline bool JackClient::WaitFirstSync()
@@ -366,15 +366,12 @@ inline bool JackClient::WaitFirstSync()
         }
         SignalSync();
     }
-    return false; // Never reached
+    return false; 
 }
 
 inline void JackClient::ExecuteThread()
 {
-    while (true) {
-        if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
-            return;
-    }
+    while (Wait(CallProcessCallback()) == GetEngineControl()->fBufferSize);
 }
 
 jack_nframes_t JackClient::Wait(int status)
@@ -447,8 +444,7 @@ inline int JackClient::End()
     fThread->DropRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    fThread->Terminate();
-    return 0; // Never reached
+    return 0; 
 }
 
 inline int JackClient::Error()
@@ -460,8 +456,7 @@ inline int JackClient::Error()
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     ShutDown();
-    fThread->Terminate();
-    return 0; // Never reached
+    return 0; 
 }
 
 //-----------------

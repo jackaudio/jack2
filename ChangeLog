@@ -20,10 +20,14 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-30 Stephane Letz  <letz@grame.fr>
+
+	* Avoid using Terminate when "quitting" in RT thread. Cleanup JackEngineInterface.
+
 2008-05-29 Stephane Letz  <letz@grame.fr>
 
 	* Tim Blechmann patch for JackPosixSemaphore (still to test...).
-	*  Correct JackWinThread::Terminate.
+	* Correct JackWinThread::Terminate.
 
 2008-05-28 Stephane Letz  <letz@grame.fr>
 
