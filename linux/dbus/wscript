@@ -1,9 +1,50 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+import Constants
+import Params
+from Configure import g_maxlen
+#g_maxlen = 40
+
+def display_msg(msg, status = None, color = None):
+    sr = msg
+    global g_maxlen
+    g_maxlen = max(g_maxlen, len(msg))
+    if status:
+        print "%s :" % msg.ljust(g_maxlen),
+        Params.pprint(color, status)
+    else:
+        print "%s" % msg.ljust(g_maxlen)
+
+def display_feature(msg, build):
+    if build:
+        display_msg(msg, "yes", 'GREEN')
+    else:
+        display_msg(msg, "no", 'YELLOW')
+
+def configure(conf):
+    conf.check_pkg('dbus-1')
+
+    e = conf.create_header_configurator()
+    e.name = 'expat.h'
+    e.define = 'HAVE_EXPAT'
+    e.run()
+
+    if conf.is_defined('HAVE_EXPAT'):
+        conf.env['LIB_EXPAT'] = ['expat']
+
+    build_jackdbus = False;
+    if conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1'):
+        build_jackdbus = True
+    conf.env['BUILD_JACKDBUS'] = build_jackdbus
+    display_feature('Build D-Bus JACK (jackdbus)', build_jackdbus)
+
 def build(bld):
-    obj = bld.create_obj('cpp', 'program')
-    #obj.features.append('cc')
+    if bld.env()["BUILD_JACKDBUS"] != True:
+        return
+
+    obj = bld.create_obj('cc', 'program')
+    obj.includes = ['.', '../../common', '../../common/jack']
     obj.source = [
         'jackdbus.c',
         'controller.c',
@@ -19,10 +60,6 @@ def build(bld):
         'xml_write_raw.c',
         'sigsegv.c',
         ]
-    obj.includes     = '.'
-    obj.uselib = 'DBUS-1'
-    #obj.uselib_local = 'tony john testshlib' # 'tony john peter' # look for 'peter' above
-    obj.target       = 'jackdbus_dyn_linked'
-
-def configure(conf):
-    conf.check_pkg('dbus-1', mandatory=True)
+    obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'
+    obj.uselib_local = 'serverlib'
+    obj.target       = 'jackdbus'
