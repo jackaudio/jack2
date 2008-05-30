@@ -125,6 +125,7 @@ bool JackRestartThreadedDriver::Execute()
     } catch (JackDriverException e) {
         e.PrintMessage();
         jack_log("Driver is restarted");
+        fThread->SetStatus(JackThread::kIniting);
         fThread->DropRealTime();
         return Init();
     }
