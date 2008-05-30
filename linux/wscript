@@ -1,0 +1,13 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+def build(bld):
+    obj = bld.create_obj('cpp', 'program')
+    obj.includes = ['../common/jack']
+    obj.source = ['../common/Jackdmp.cpp']
+    obj.uselib = 'PTHREAD DL RT'
+    obj.uselib_local = 'serverlib'
+    obj.target = 'jackd'
+
+def configure(conf):
+    conf.check_pkg('dbus-1', mandatory=True)

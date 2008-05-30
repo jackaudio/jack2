@@ -1,0 +1,58 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+def build(bld):
+    obj = bld.create_obj('cpp', 'shlib')
+    obj.features.append('cc')
+    obj.defines = 'HAVE_CONFIG_H'
+    obj.includes = ['.', './jack', '..', '../linux']
+    obj.name         = 'serverlib'
+    obj.target       = 'jackserver'
+    obj.source = [
+        'JackActivationCount.cpp',
+        'JackAPI.cpp',
+        'JackAudioDriver.cpp',
+        'JackClient.cpp',
+        'JackConnectionManager.cpp',
+        'JackDriver.cpp',
+        'JackEngine.cpp',
+        'JackEngineControl.cpp',
+        'JackError.cpp',
+        'JackExternalClient.cpp',
+        'JackFrameTimer.cpp',
+        'JackFreewheelDriver.cpp',
+        'JackGlobalsServer.cpp',
+        'JackGraphManager.cpp',
+        'JackInternalClient.cpp',
+        'JackPort.cpp',
+        'JackPosixSemaphore.cpp',
+        'JackPosixThread.cpp',
+        'JackFifo.cpp',
+        'JackLoopbackDriver.cpp',
+        'JackPortType.cpp',
+        'JackAudioPort.cpp',
+        'JackMidiPort.cpp',
+        'JackMidiAPI.cpp',
+        'JackServer.cpp',
+        'JackShmMem.cpp',
+        'JackThreadedDriver.cpp',
+        'shm.c',
+        'JackSocket.cpp',
+        'JackSocketServerChannel.cpp',
+        'JackSocketNotifyChannel.cpp',
+        'JackSocketServerNotifyChannel.cpp',
+        'JackTime.c',
+        'JackServerAPI.cpp',
+        'JackGlobals.cpp',
+        'JackDriverLoader.cpp',
+        'JackDebugClient.cpp',
+        'JackTransportEngine.cpp',
+        'JackServerGlobals.cpp',
+        'JackServerLaunch.cpp',
+        'timestamps.c',
+        'JackTools.cpp',
+        'ringbuffer.c',
+        'JackControl.cpp',
+        'JackMessageBuffer.cpp',
+        'JackProcessSync.cpp'
+        ]

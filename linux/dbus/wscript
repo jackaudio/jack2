@@ -1,0 +1,28 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+def build(bld):
+    obj = bld.create_obj('cpp', 'program')
+    #obj.features.append('cc')
+    obj.source = [
+        'jackdbus.c',
+        'controller.c',
+        'controller_iface_configure.c',
+        'controller_iface_control.c',
+        'controller_iface_introspectable.c',
+        'controller_iface_patchbay.c',
+        'controller_iface_transport.c',
+        'xml.c',
+        'xml_expat.c',
+        #'xml_libxml.c',
+        #'xml_nop.c',
+        'xml_write_raw.c',
+        'sigsegv.c',
+        ]
+    obj.includes     = '.'
+    obj.uselib = 'DBUS-1'
+    #obj.uselib_local = 'tony john testshlib' # 'tony john peter' # look for 'peter' above
+    obj.target       = 'jackdbus_dyn_linked'
+
+def configure(conf):
+    conf.check_pkg('dbus-1', mandatory=True)
