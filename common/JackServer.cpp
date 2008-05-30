@@ -253,7 +253,7 @@ int JackServer::SetFreewheel(bool onoff)
     }
 }
 
-// Coming from the RT thread or server channel
+// Coming from the RT thread
 void JackServer::Notify(int refnum, int notify, int value)
 {
     switch (notify) {
@@ -266,12 +266,15 @@ void JackServer::Notify(int refnum, int notify, int value)
             fEngine->NotifyXRun(refnum);
             break;
 
-        case kDeadClient:
-            jack_log("JackServer: kDeadClient ref = %ld", refnum);
-            if (fEngine->ClientDeactivate(refnum) < 0)
-                jack_error("JackServer: DeadClient ref = %ld cannot be removed from the graph !!", refnum);
-            fEngine->ClientExternalClose(refnum);
-            break;
+    }
+}
+
+void JackServer::DeadClient(int refnum)
+{
+    jack_log("JackServer::DeadClient ref = %ld", refnum);
+    if (fEngine->ClientDeactivate(refnum) < 0) {
+        jack_error("JackServer::DeadClient ref = %ld cannot be removed from the graph !!", refnum);
+        fEngine->ClientExternalClose(refnum);
     }
 }
 

@@ -72,11 +72,14 @@ class EXPORT JackServer : private detail::JackGlobalsServerInitializer
         int Start();
         int Stop();
 
-        int SetBufferSize(jack_nframes_t buffer_size);
-        int SetFreewheel(bool onoff);
+        // RT thread
         void Notify(int refnum, int notify, int value);
 
+        // Command thread : API
+        int SetBufferSize(jack_nframes_t buffer_size);
+        int SetFreewheel(bool onoff);
         int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
+        void DeadClient(int refnum);
 
         // Transport management
         int ReleaseTimebase(int refnum);
