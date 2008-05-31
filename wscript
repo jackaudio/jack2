@@ -61,6 +61,8 @@ def configure(conf):
     conf.write_config_header('config.h')
 
     print
+    display_msg("JACK %s %s" % (VERSION, conf.get_define('JACK_SVNREVISION')))
+    print
     display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
     display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
     display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
@@ -71,5 +73,4 @@ def build(bld):
     # process subfolders from here
     bld.add_subdirs('common')
     bld.add_subdirs('linux')
-
     bld.add_subdirs('linux/dbus')
