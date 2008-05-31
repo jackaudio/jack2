@@ -61,9 +61,11 @@ def configure(conf):
     conf.define('JACK_SVNREVISION', fetch_svn_revision('.'))
     conf.write_config_header('config.h')
 
-    print
+    display_msg("\n==================")
     display_msg("JACK %s %s" % (VERSION, conf.get_define('JACK_SVNREVISION')))
     print
+    display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
+    display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
     display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
     display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
