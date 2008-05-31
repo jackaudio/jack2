@@ -62,6 +62,8 @@ def configure(conf):
     conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACK_SVNREVISION', fetch_svn_revision('.'))
+    if conf.env['BUILD_JACKDBUS'] == True:
+        conf.define('JACK_DBUS', 1)
     conf.write_config_header('config.h')
 
     display_msg("\n==================")
@@ -79,6 +81,6 @@ def build(bld):
     # process subfolders from here
     bld.add_subdirs('common')
     bld.add_subdirs('linux')
-    if Params.g_options.dbus:
+    if bld.env()['BUILD_JACKDBUS'] == True:
         bld.add_subdirs('linux/dbus')
     bld.add_subdirs('example-clients')

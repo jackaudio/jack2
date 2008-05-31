@@ -8,7 +8,6 @@ def build(bld):
         'JackClient.cpp',
         'JackConnectionManager.cpp',
         'ringbuffer.c',
-        'JackServerLaunch.cpp',
         'JackError.cpp',
         'JackFrameTimer.cpp',
         'JackGraphManager.cpp',
@@ -64,6 +63,8 @@ def build(bld):
     clientlib = bld.create_obj('cpp', 'shlib')
     clientlib.features.append('cc')
     clientlib.defines = 'HAVE_CONFIG_H'
+    if bld.env()['BUILD_JACKDBUS'] == True:
+        clientlib.uselib = ['DBUS-1']
     clientlib.includes = ['.', './jack', '..', '../linux']
     clientlib.name         = 'clientlib'
     clientlib.target       = 'jack'
@@ -73,4 +74,5 @@ def build(bld):
         'JackLibClient.cpp',
         'JackLibAPI.cpp',
         'JackSocketClientChannel.cpp',
+        'JackServerLaunch.cpp', 
         ]
