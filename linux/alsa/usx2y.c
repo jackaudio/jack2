@@ -18,14 +18,9 @@
 
 */
 
-//#include <jack/hardware.h>
 #include "hardware.h"
 #include "alsa_driver.h"
 #include "usx2y.h"
-
-//#include <jack/internal.h>
-//#include <jack/engine.h>
-//#include <jack/messagebuffer.h>
 #include <sys/mman.h>
 
 #ifndef ARRAY_SIZE
@@ -644,7 +639,6 @@ usx2y_driver_setup (alsa_driver_t *driver)
 	driver->null_cycle =
 		(JackDriverNullCycleFunction) usx2y_driver_null_cycle;
 }
-
 
 jack_hardware_t *
 jack_alsa_usx2y_hw_new (alsa_driver_t *driver)

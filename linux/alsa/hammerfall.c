@@ -18,10 +18,6 @@
     $Id: hammerfall.c,v 1.3 2005/09/29 14:51:59 letz Exp $
 */
 
-//#include <jack/hardware.h>
-//#include <jack/internal.h>
-//#include "internal.h"
-
 #include "hardware.h"
 #include "alsa_driver.h"
 #include "hammerfall.h"
@@ -29,7 +25,6 @@
 
 #define FALSE 0
 #define TRUE 1
-
 
 /* Set this to 1 if you want this compile error:
  *   warning: `hammerfall_monitor_controls' defined but not used */

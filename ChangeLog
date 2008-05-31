@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-05-31 Stephane Letz  <letz@grame.fr>
+
+	* Add missing include for proper compilation when jack headers are not installed.
+
 2008-05-30 Stephane Letz  <letz@grame.fr>
 
 	* Avoid using Terminate when "quitting" in RT thread. Cleanup JackEngineInterface.

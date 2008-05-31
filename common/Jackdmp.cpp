@@ -25,6 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/types.h>
 #include <getopt.h>
 #include <string.h>
+#include "types.h"
 #include "jack.h"
 #include "JackConstants.h"
 #include "JackDriverLoader.h"
