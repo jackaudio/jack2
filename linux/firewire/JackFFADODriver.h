@@ -54,7 +54,7 @@ class JackFFADODriver : public JackAudioDriver
         int ffado_driver_start (ffado_driver_t *driver);
         int ffado_driver_stop (ffado_driver_t *driver);
         int ffado_driver_restart (ffado_driver_t *driver);
-        ffado_driver_t *ffado_driver_new (char *name, ffado_jack_settings_t *params);
+        ffado_driver_t *ffado_driver_new (const char *name, ffado_jack_settings_t *params);
         void ffado_driver_delete (ffado_driver_t *driver);
 
         void jack_driver_init (jack_driver_t *driver);

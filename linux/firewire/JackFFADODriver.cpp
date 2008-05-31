@@ -54,7 +54,7 @@ namespace Jack
 int
 JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nframes)
 {
-    unsigned int chn;
+    channel_t chn;
     jack_default_audio_sample_t* buf = NULL;
 
     printEnter();
@@ -94,7 +94,7 @@ JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nfra
     /* process the midi data */
     for (chn = 0; chn < driver->capture_nchannels; chn++) {
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            int i;
+            jack_nframes_t i;
             int done;
             uint32_t *midi_buffer = driver->capture_channels[chn].midi_buffer;
             midi_unpack_t *midi_unpack = &driver->capture_channels[chn].midi_unpack;
@@ -127,7 +127,7 @@ JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nfra
 int
 JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nframes)
 {
-    unsigned int chn;
+    channel_t chn;
     jack_default_audio_sample_t* buf;
     printEnter();
 
@@ -149,12 +149,12 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(buf));
 
             } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
-                int nevents;
-                int i;
+                jack_nframes_t nevents;
+                jack_nframes_t i;
                 midi_pack_t *midi_pack = &driver->playback_channels[chn].midi_pack;
                 uint32_t *midi_buffer = driver->playback_channels[chn].midi_buffer;
                 buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], nframes);
-                int min_next_pos = 0;
+                jack_nframes_t min_next_pos = 0;
 
                 memset(midi_buffer, 0, nframes * sizeof(uint32_t));
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(midi_buffer));
@@ -182,14 +182,14 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                 //  printMessage("MIDI: %d events in ch %d", nevents, chn);
 
                 for (i = 0; i < nevents; ++i) {
-                    int j;
+                    size_t j;
                     jack_midi_event_t event;
                     jack_midi_event_get(&event, buf, i);
 
                     midi_pack_event(midi_pack, &event);
 
                     // floor the initial position to be a multiple of 8
-                    int pos = event.time & 0xFFFFFFF8;
+                    jack_nframes_t pos = event.time & 0xFFFFFFF8;
                     for (j = 0; j < event.size; j++) {
                         // make sure we don't overwrite a previous byte
                         while (pos < min_next_pos && pos < nframes) {
@@ -198,7 +198,7 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                         }
 
                         if (pos >= nframes) {
-                            int f;
+                            unsigned int f;
                             printMessage("midi message crosses period boundary");
                             driver->playback_channels[chn].nb_overflow_bytes = event.size - j;
                             if (driver->playback_channels[chn].nb_overflow_bytes > MIDI_OVERFLOW_BUFFER_SIZE) {
@@ -241,7 +241,6 @@ jack_nframes_t
 JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *status,
                                     float *delayed_usecs)
 {
-    int nframes;
     jack_time_t wait_enter;
     jack_time_t wait_ret;
     ffado_wait_response response;
@@ -358,7 +357,7 @@ JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
 typedef void (*JackDriverFinishFunction) (jack_driver_t *);
 
 ffado_driver_t *
-JackFFADODriver::ffado_driver_new (char *name,
+JackFFADODriver::ffado_driver_new (const char *name,
                                    ffado_jack_settings_t *params)
 {
     ffado_driver_t *driver;
@@ -499,7 +498,7 @@ int JackFFADODriver::Attach()
     }
 
     fCaptureChannels = 0;
-    for (unsigned int chn = 0; chn < driver->capture_nchannels; chn++) {
+    for (channel_t chn = 0; chn < driver->capture_nchannels; chn++) {
         ffado_streaming_get_capture_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
 
         driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
@@ -572,7 +571,7 @@ int JackFFADODriver::Attach()
     }
 
     fPlaybackChannels = 0;
-    for (unsigned int chn = 0; chn < driver->playback_nchannels; chn++) {
+    for (channel_t chn = 0; chn < driver->playback_nchannels; chn++) {
         ffado_streaming_get_playback_stream_name(driver->dev, chn, portname, sizeof(portname) - 1);
 
         driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
@@ -650,7 +649,7 @@ int JackFFADODriver::Attach()
 
 int JackFFADODriver::Detach()
 {
-    unsigned int chn;
+    channel_t chn;
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
     jack_log("JackFFADODriver::Detach");
 
@@ -814,20 +813,12 @@ extern "C"
         desc = (jack_driver_desc_t *)calloc (1, sizeof (jack_driver_desc_t));
 
         strcpy (desc->name, "firewire");
-        desc->nparams = 12;
+        desc->nparams = 11;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
         desc->params = params;
 
         i = 0;
-        strcpy (params[i].name, "device");
-        params[i].character  = 'd';
-        params[i].type       = JackDriverParamString;
-        strcpy (params[i].value.str,  "hw:0");
-        strcpy (params[i].short_desc, "The FireWire device to use. Format is: 'hw:port[,node]'.");
-        strcpy (params[i].long_desc,  params[i].short_desc);
-
-        i++;
         strcpy (params[i].name, "period");
         params[i].character  = 'p';
         params[i].type       = JackDriverParamUInt;
@@ -924,8 +915,6 @@ extern "C"
 
         ffado_jack_settings_t cmlparams;
 
-        char *device_name = "hw:0";
-
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
         cmlparams.buffer_size_set = 0;
@@ -949,9 +938,6 @@ extern "C"
             param = (jack_driver_param_t *) node->data;
 
             switch (param->character) {
-                case 'd':
-                    device_name = strdup (param->value.str);
-                    break;
                 case 'p':
                     cmlparams.period_size = param->value.ui;
                     cmlparams.period_size_set = 1;
