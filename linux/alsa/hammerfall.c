@@ -25,6 +25,7 @@
 #include "hardware.h"
 #include "alsa_driver.h"
 #include "hammerfall.h"
+#include "JackError.h"
 
 #define FALSE 0
 #define TRUE 1

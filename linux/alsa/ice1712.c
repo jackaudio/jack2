@@ -27,7 +27,7 @@
 #include "alsa_driver.h"
 #include "ice1712.h"
 //#include <jack/internal.h>
-
+#include "JackError.h"
 
 
 static int
