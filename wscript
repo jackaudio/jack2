@@ -41,12 +41,15 @@ def set_options(opt):
     opt.tool_options('compiler_cxx')
     opt.tool_options('compiler_cc')
 
+    opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+
 def configure(conf):
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
 
     conf.sub_config('linux')
-    conf.sub_config('linux/dbus')
+    if Params.g_options.dbus:
+        conf.sub_config('linux/dbus')
     conf.sub_config('example-clients')
 
     conf.env['LIB_PTHREAD'] = ['pthread']
@@ -76,5 +79,6 @@ def build(bld):
     # process subfolders from here
     bld.add_subdirs('common')
     bld.add_subdirs('linux')
-    bld.add_subdirs('linux/dbus')
+    if Params.g_options.dbus:
+        bld.add_subdirs('linux/dbus')
     bld.add_subdirs('example-clients')
