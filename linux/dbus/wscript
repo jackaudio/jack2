@@ -1,27 +1,6 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-import Constants
-import Params
-from Configure import g_maxlen
-#g_maxlen = 40
-
-def display_msg(msg, status = None, color = None):
-    sr = msg
-    global g_maxlen
-    g_maxlen = max(g_maxlen, len(msg))
-    if status:
-        print "%s :" % msg.ljust(g_maxlen),
-        Params.pprint(color, status)
-    else:
-        print "%s" % msg.ljust(g_maxlen)
-
-def display_feature(msg, build):
-    if build:
-        display_msg(msg, "yes", 'GREEN')
-    else:
-        display_msg(msg, "no", 'YELLOW')
-
 def configure(conf):
     conf.check_pkg('dbus-1')
 
@@ -33,11 +12,7 @@ def configure(conf):
     if conf.is_defined('HAVE_EXPAT'):
         conf.env['LIB_EXPAT'] = ['expat']
 
-    build_jackdbus = False;
-    if conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1'):
-        build_jackdbus = True
-    conf.env['BUILD_JACKDBUS'] = build_jackdbus
-    display_feature('Build D-Bus JACK (jackdbus)', build_jackdbus)
+    conf.env['BUILD_JACKDBUS'] = conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1')
 
 def build(bld):
     if bld.env()["BUILD_JACKDBUS"] != True:

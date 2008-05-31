@@ -3,6 +3,9 @@
 
 import Params
 import commands
+import Params
+from Configure import g_maxlen
+#g_maxlen = 40
 
 VERSION='1.9.0'
 APPNAME='jack'
@@ -10,6 +13,22 @@ APPNAME='jack'
 # these variables are mandatory ('/' are converted automatically)
 srcdir = '.'
 blddir = 'build'
+
+def display_msg(msg, status = None, color = None):
+    sr = msg
+    global g_maxlen
+    g_maxlen = max(g_maxlen, len(msg))
+    if status:
+        print "%s :" % msg.ljust(g_maxlen),
+        Params.pprint(color, status)
+    else:
+        print "%s" % msg.ljust(g_maxlen)
+
+def display_feature(msg, build):
+    if build:
+        display_msg(msg, "yes", 'GREEN')
+    else:
+        display_msg(msg, "no", 'YELLOW')
 
 def fetch_svn_revision(path):
     cmd = "LANG= "
@@ -26,6 +45,7 @@ def configure(conf):
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
 
+    conf.sub_config('linux')
     conf.sub_config('linux/dbus')
 
     conf.env['LIB_PTHREAD'] = ['pthread']
@@ -40,8 +60,12 @@ def configure(conf):
     conf.define('JACK_SVNREVISION', fetch_svn_revision('.'))
     conf.write_config_header('config.h')
 
-    #print Params.g_options
-    #print conf.env
+    print
+    display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
+    display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
+    display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
+    display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'] == True)
+    print
 
 def build(bld):
     # process subfolders from here

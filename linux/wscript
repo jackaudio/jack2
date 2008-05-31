@@ -1,13 +1,70 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-def build(bld):
-    obj = bld.create_obj('cpp', 'program')
-    obj.includes = ['../common/jack']
-    obj.source = ['../common/Jackdmp.cpp']
-    obj.uselib = 'PTHREAD DL RT'
-    obj.uselib_local = 'serverlib'
-    obj.target = 'jackd'
-
 def configure(conf):
-    conf.check_pkg('dbus-1', mandatory=True)
+    conf.check_pkg('alsa', vnum = '1.0.0')
+    conf.env['BUILD_DRIVER_ALSA'] = conf.is_defined('HAVE_ALSA')
+
+    #print "--> Disabling 'alsa' backend since no useful ALSA installation found"
+    #print "--> Disabling 'freebob' backend since no useful FreeBoB installation found"
+    #print "--> Disabling 'firewire' backend since no useful FFADO installation found"
+
+    #echo \| Build with ALSA support............................... : $HAVE_ALSA
+    #echo \| Build with old FireWire \(FreeBob\) support............. : $HAVE_FREEBOB
+    #echo \| Build with new FireWire \(FFADO\) support............... : $HAVE_FIREWIRE
+
+    conf.check_pkg('libfreebob', vnum = '1.0.0')
+    conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
+
+    conf.check_pkg('libffado', vnum = '1.999.17')
+    conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
+
+def build(bld):
+    jackd = bld.create_obj('cpp', 'program')
+    jackd.includes = ['../common/jack']
+    jackd.source = ['../common/Jackdmp.cpp']
+    jackd.uselib = 'PTHREAD DL RT'
+    jackd.uselib_local = 'serverlib'
+    jackd.target = 'jackd'
+
+    driver_dummy = bld.create_obj('cpp', 'shlib')
+    driver_dummy.env['shlib_PATTERN'] = '%s.so'
+    driver_dummy.defines = 'HAVE_CONFIG_H'
+    driver_dummy.includes = ['../common/jack']
+    driver_dummy.target = 'dummy'
+    driver_dummy.source = '../common/JackDummyDriver.cpp'
+
+    if bld.env()['BUILD_DRIVER_ALSA'] == True:
+        driver_alsa = bld.create_obj('cpp', 'shlib')
+        driver_alsa.features.append('cc')
+        driver_alsa.env['shlib_PATTERN'] = '%s.so'
+        driver_alsa.defines = 'HAVE_CONFIG_H JACKMP'
+        driver_alsa.includes = ['.', '../common', '../common/jack']
+        driver_alsa.target = 'alsa'
+        driver_alsa.source = [
+            'alsa/JackAlsaDriver.cpp',
+            'alsa/alsa_rawmidi.c',
+            'alsa/alsa_seqmidi.c',
+            'alsa/alsa_midi_jackmp.cpp',
+            'alsa/memops.c',
+            'alsa/generic_hw.c',
+            'alsa/hdsp.c',
+            'alsa/hammerfall.c',
+            'alsa/ice1712.c'
+            ]
+
+    if bld.env()['BUILD_DRIVER_FREEBOB'] == True:
+        driver_freebob = bld.create_obj('cpp', 'shlib')
+        driver_freebob.env['shlib_PATTERN'] = '%s.so'
+        driver_freebob.defines = 'HAVE_CONFIG_H'
+        driver_freebob.includes = ['.', '../common', '../common/jack']
+        driver_freebob.target = 'freebob'
+        driver_freebob.source = 'freebob/JackFreebobDriver.cpp'
+
+    if bld.env()['BUILD_DRIVER_FFADO'] == True:
+        driver_ffado = bld.create_obj('cpp', 'shlib')
+        driver_ffado.env['shlib_PATTERN'] = '%s.so'
+        driver_ffado.defines = 'HAVE_CONFIG_H'
+        driver_ffado.includes = ['.', '../common', '../common/jack']
+        driver_ffado.target = 'firewire'
+        driver_ffado.source = 'firewire/JackFFADODriver.cpp'
