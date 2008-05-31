@@ -5,14 +5,6 @@ def configure(conf):
     conf.check_pkg('alsa', vnum = '1.0.0')
     conf.env['BUILD_DRIVER_ALSA'] = conf.is_defined('HAVE_ALSA')
 
-    #print "--> Disabling 'alsa' backend since no useful ALSA installation found"
-    #print "--> Disabling 'freebob' backend since no useful FreeBoB installation found"
-    #print "--> Disabling 'firewire' backend since no useful FFADO installation found"
-
-    #echo \| Build with ALSA support............................... : $HAVE_ALSA
-    #echo \| Build with old FireWire \(FreeBob\) support............. : $HAVE_FREEBOB
-    #echo \| Build with new FireWire \(FFADO\) support............... : $HAVE_FIREWIRE
-
     conf.check_pkg('libfreebob', vnum = '1.0.0')
     conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
 
