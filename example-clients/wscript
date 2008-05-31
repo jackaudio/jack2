@@ -1,0 +1,86 @@
+#! /usr/bin/env python
+# encoding: utf-8
+
+example_programs = {
+    'jack_freewheel' : 'freewheel.c',
+    'jack_connect' : 'connect.c',
+    'jack_lsp' : 'lsp.c',
+    'jack_metro' : 'metro.c',
+    'jack_midiseq' : 'midiseq.c',
+    'jack_midisine' : 'midisine.c',
+    'jack_showtime' : 'showtime.c',
+    'jack_simple_client' : 'simple_client.c',
+    'jack_zombie' : 'zombie.c',
+    'jack_load' : 'ipload.c',
+    'jack_unload' : 'ipunload.c',
+    'jack_showtime' : 'showtime.c',
+    'jack_alias' : 'alias.c',
+    'jack_bufsize' : 'bufsize.c',
+    'jack_evmon' : 'evmon.c',
+    'jack_monitor_client' : 'monitor_client.c',
+    }
+
+example_libs = {
+    'inprocess' : 'inprocess.c',
+    }
+
+def configure(conf):
+    e = conf.create_header_configurator()
+    e.name = 'sndfile.h'
+    e.define = 'HAVE_SNDFILE'
+    e.run()
+
+    if conf.is_defined('HAVE_SNDFILE'):
+        conf.env['LIB_SNDFILE'] = ['sndfile']
+
+    e = conf.create_header_configurator()
+    e.name = 'ncurses.h'
+    e.define = 'HAVE_NCURSES'
+    e.run()
+
+    if conf.is_defined('HAVE_NCURSES'):
+        conf.env['LIB_NCURSES'] = ['ncurses']
+
+    e = conf.create_library_configurator()
+    e.name = 'readline'
+    e.define = 'HAVE_READLINE'
+    e.run()
+
+    if conf.is_defined('HAVE_NCURSES'):
+        conf.env['LIB_NCURSES'] = ['ncurses']
+
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.is_defined('HAVE_READLINE') and conf.is_defined('HAVE_NCURSES')
+
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.is_defined('HAVE_SNDFILE')
+
+def build(bld):
+    for example_program, example_program_source in example_programs.items():
+        prog = bld.create_obj('cc', 'program')
+        prog.includes = ['../common/jack']
+        prog.source = example_program_source
+        prog.uselib = 'RT'
+        prog.uselib_local = 'clientlib'
+        prog.target = example_program
+
+    if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
+        prog = bld.create_obj('cc', 'program')
+        prog.includes = ['../common/jack']
+        prog.source = 'transport.c'
+        prog.uselib = 'RT READLINE NCURSES'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'jack_transport'
+
+    if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
+        prog = bld.create_obj('cc', 'program')
+        prog.includes = ['../common/jack']
+        prog.source = 'capture_client.c'
+        prog.uselib = 'RT SNDFILE'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'jack_rec'
+
+    for example_lib, example_lib_source in example_libs.items():
+        lib = bld.create_obj('cc', 'shlib')
+        lib.env['shlib_PATTERN'] = '%s.so'
+        lib.includes = ['../common/jack']
+        lib.target = example_lib
+        lib.source = example_lib_source

@@ -47,6 +47,7 @@ def configure(conf):
 
     conf.sub_config('linux')
     conf.sub_config('linux/dbus')
+    conf.sub_config('example-clients')
 
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
@@ -74,3 +75,4 @@ def build(bld):
     bld.add_subdirs('common')
     bld.add_subdirs('linux')
     bld.add_subdirs('linux/dbus')
+    bld.add_subdirs('example-clients')
