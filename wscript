@@ -84,3 +84,4 @@ def build(bld):
     if bld.env()['BUILD_JACKDBUS'] == True:
         bld.add_subdirs('linux/dbus')
     bld.add_subdirs('example-clients')
+    bld.add_subdirs('tests')
