@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-06-02 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup and correct wscript for example-clients.
+
 2008-05-31 Stephane Letz  <letz@grame.fr>
 
 	* Add missing include for proper compilation when jack headers are not installed.

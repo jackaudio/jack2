@@ -178,13 +178,13 @@ main (int argc, char *argv[])
 		}
 		if (show_port_latency) {
 			if (port) {
-				printf ("	port latency = %ld frames\n",
+				printf ("	port latency = %d frames\n",
 					jack_port_get_latency (port));
 			}
 		}
 		if (show_total_latency) {
 			if (port) {
-				printf ("	total latency = %ld frames\n",
+				printf ("	total latency = %d frames\n",
 					jack_port_get_total_latency (client, port));
 			}
 		}

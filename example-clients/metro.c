@@ -112,12 +112,6 @@ process (jack_nframes_t nframes, void *arg)
 	return 0;
 }
 
-static int
-sample_rate_change () {
-	printf("Sample rate has changed! Exiting...\n");
-	exit(-1);
-}
-
 int
 main (int argc, char *argv[])
 {

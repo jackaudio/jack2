@@ -46,12 +46,12 @@ def configure(conf):
     e.define = 'HAVE_READLINE'
     e.run()
 
-    if conf.is_defined('HAVE_NCURSES'):
-        conf.env['LIB_NCURSES'] = ['ncurses']
+    if conf.is_defined('HAVE_READLINE'):
+        conf.env['LIB_READLINE'] = ['readline']
 
     conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.is_defined('HAVE_READLINE') and conf.is_defined('HAVE_NCURSES')
 
-    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.is_defined('HAVE_SNDFILE')
+    conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
 def build(bld):
     for example_program, example_program_source in example_programs.items():
@@ -70,7 +70,7 @@ def build(bld):
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
-    if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
+    if bld.env()['BUILD_EXAMPLE_CLIENT_REC'] == True:
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack']
         prog.source = 'capture_client.c'
