@@ -11,7 +11,7 @@ def configure(conf):
     conf.check_pkg('libffado', vnum = '1.999.17')
     conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
 
-def create_jack_driver_obj(bld, target, sources):
+def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld.create_obj('cpp', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
@@ -21,6 +21,8 @@ def create_jack_driver_obj(bld, target, sources):
     driver.source = sources
     driver.inst_var = bld.env()['ADDON_DIR']
     driver.inst_dir = '/'
+    if uselib:
+        driver.uselib = uselib
     return driver
 
 def build(bld):
@@ -43,10 +45,10 @@ def build(bld):
                                              'alsa/hdsp.c',
                                              'alsa/hammerfall.c',
                                              'alsa/ice1712.c'
-                                             ])
+                                             ], "ALSA")
 
     if bld.env()['BUILD_DRIVER_FREEBOB'] == True:
-        create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp')
+        create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")
 
     if bld.env()['BUILD_DRIVER_FFADO'] == True:
-        create_jack_driver_obj(bld, 'firewire', 'firewire/JackFFADODriver.cpp')
+        create_jack_driver_obj(bld, 'firewire', 'firewire/JackFFADODriver.cpp', "LIBFFADO")
