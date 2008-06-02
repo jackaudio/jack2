@@ -423,7 +423,7 @@ int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
     int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
     jack_time_t t2 = GetMicroSeconds();
     long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
-    if (delta > 0)
+    if (delta > 0 && !client->fFreewheel)
         *client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
     return res;
 }
