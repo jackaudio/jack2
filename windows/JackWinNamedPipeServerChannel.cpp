@@ -17,6 +17,10 @@ Copyright (C) 2004-2006 Grame
 
 */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #ifdef WIN32
 #pragma warning (disable : 4786)
 #endif

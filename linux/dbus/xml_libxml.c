@@ -17,6 +17,10 @@
 
 */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include <stdbool.h>
 #include <string.h>
 #include <dbus/dbus.h>

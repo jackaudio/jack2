@@ -17,6 +17,10 @@ Copyright (C) 2004-2006 Grame
 
 */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include "JackRequest.h"
 #include "JackWinNamedPipeNotifyChannel.h"
 #include "JackError.h"

@@ -11,6 +11,10 @@
  * Copyright (C) 2005 - 2008 Jaco Kroon
  */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 //#define NO_CPP_DEMANGLE
 #define SIGSEGV_NO_AUTO_INIT
 

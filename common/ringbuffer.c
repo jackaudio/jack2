@@ -20,6 +20,10 @@
   This is safe for the case of one read thread and one write thread.
 */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #ifdef USE_MLOCK
