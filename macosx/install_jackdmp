@@ -1,8 +1,8 @@
 # Install jackdmp and owerwrite jack installation
 
 # Plug-ins
-sudo cp -r Panda.framework /Library/Frameworks
-sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
+[ -f Panda.framework ] && sudo cp -r Panda.framework /Library/Frameworks
+[ -f JackRouter.plugin ] && sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
 
 # Copy libraries and exe
 sudo cp -r Jackmp.framework /Library/Frameworks/  
