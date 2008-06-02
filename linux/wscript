@@ -20,7 +20,7 @@ def build(bld):
     jackd.target = 'jackd'
 
     driver_dummy = bld.create_obj('cpp', 'shlib')
-    driver_dummy.env['shlib_PATTERN'] = '%s.so'
+    driver_dummy.env['shlib_PATTERN'] = 'jack_%s.so'
     driver_dummy.defines = 'HAVE_CONFIG_H'
     driver_dummy.includes = ['../common/jack']
     driver_dummy.target = 'dummy'
@@ -29,7 +29,7 @@ def build(bld):
     if bld.env()['BUILD_DRIVER_ALSA'] == True:
         driver_alsa = bld.create_obj('cpp', 'shlib')
         driver_alsa.features.append('cc')
-        driver_alsa.env['shlib_PATTERN'] = '%s.so'
+        driver_alsa.env['shlib_PATTERN'] = 'jack_%s.so'
         driver_alsa.defines = 'HAVE_CONFIG_H JACKMP'
         driver_alsa.includes = ['.', '../common', '../common/jack']
         driver_alsa.target = 'alsa'
@@ -47,7 +47,7 @@ def build(bld):
 
     if bld.env()['BUILD_DRIVER_FREEBOB'] == True:
         driver_freebob = bld.create_obj('cpp', 'shlib')
-        driver_freebob.env['shlib_PATTERN'] = '%s.so'
+        driver_freebob.env['shlib_PATTERN'] = 'jack_%s.so'
         driver_freebob.defines = 'HAVE_CONFIG_H'
         driver_freebob.includes = ['.', '../common', '../common/jack']
         driver_freebob.target = 'freebob'
@@ -55,7 +55,7 @@ def build(bld):
 
     if bld.env()['BUILD_DRIVER_FFADO'] == True:
         driver_ffado = bld.create_obj('cpp', 'shlib')
-        driver_ffado.env['shlib_PATTERN'] = '%s.so'
+        driver_ffado.env['shlib_PATTERN'] = 'jack_%s.so'
         driver_ffado.defines = 'HAVE_CONFIG_H'
         driver_ffado.includes = ['.', '../common', '../common/jack']
         driver_ffado.target = 'firewire'
