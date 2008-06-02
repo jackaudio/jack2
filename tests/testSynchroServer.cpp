@@ -185,7 +185,7 @@ int main(int ac, char *av [])
     }
 #endif
 
-    if (!sem1->Allocate(SERVER, "default", 0)
+    if (!sem1->Allocate(SERVER, "default", 0))
         return -1;
     if (!sem2->Allocate(CLIENT, "default", 0))
         return -1;
