@@ -76,3 +76,5 @@ def build(bld):
         'JackSocketClientChannel.cpp',
         'JackServerLaunch.cpp', 
         ]
+
+    install_files('PREFIX', 'jack', 'jack/*.h')

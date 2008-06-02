@@ -25,6 +25,8 @@ def build(bld):
     driver_dummy.includes = ['../common/jack']
     driver_dummy.target = 'dummy'
     driver_dummy.source = '../common/JackDummyDriver.cpp'
+    driver_dummy.inst_var = bld.env()['ADDON_DIR']
+    driver_dummy.inst_dir = '/'
 
     if bld.env()['BUILD_DRIVER_ALSA'] == True:
         driver_alsa = bld.create_obj('cpp', 'shlib')
@@ -44,6 +46,8 @@ def build(bld):
             'alsa/hammerfall.c',
             'alsa/ice1712.c'
             ]
+        driver_alsa.inst_var = bld.env()['ADDON_DIR']
+        driver_alsa.inst_dir = '/'
 
     if bld.env()['BUILD_DRIVER_FREEBOB'] == True:
         driver_freebob = bld.create_obj('cpp', 'shlib')
@@ -52,6 +56,8 @@ def build(bld):
         driver_freebob.includes = ['.', '../common', '../common/jack']
         driver_freebob.target = 'freebob'
         driver_freebob.source = 'freebob/JackFreebobDriver.cpp'
+        driver_freebob.inst_var = bld.env()['ADDON_DIR']
+        driver_freebob.inst_dir = '/'
 
     if bld.env()['BUILD_DRIVER_FFADO'] == True:
         driver_ffado = bld.create_obj('cpp', 'shlib')
@@ -60,3 +66,5 @@ def build(bld):
         driver_ffado.includes = ['.', '../common', '../common/jack']
         driver_ffado.target = 'firewire'
         driver_ffado.source = 'firewire/JackFFADODriver.cpp'
+        driver_ffado.inst_var = bld.env()['ADDON_DIR']
+        driver_ffado.inst_dir = '/'
