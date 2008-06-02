@@ -1139,6 +1139,7 @@
 		4BC2168D0A444BED00BDA09F /* JackServerGlobals.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackServerGlobals.h; path = ../common/JackServerGlobals.h; sourceTree = SOURCE_ROOT; };
 		4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackDummyDriver.cpp; path = ../common/JackDummyDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4BC3988A08B3CF6C00B6F371 /* JackDummyDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackDummyDriver.h; path = ../common/JackDummyDriver.h; sourceTree = SOURCE_ROOT; };
+		4BC8326D0DF42C7D00DD1C93 /* JackMutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackMutex.h; path = ../common/JackMutex.h; sourceTree = SOURCE_ROOT; };
 		4BCC87950D57168300A7FEB1 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = /System/Library/Frameworks/Accelerate.framework; sourceTree = "<absolute>"; };
 		4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTransportEngine.h; path = ../common/JackTransportEngine.h; sourceTree = SOURCE_ROOT; };
 		4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTransportEngine.cpp; path = ../common/JackTransportEngine.cpp; sourceTree = SOURCE_ROOT; };
@@ -1968,6 +1969,7 @@
 		4BA3874007947A46008D8992 /* Synchro */ = {
 			isa = PBXGroup;
 			children = (
+				4BC8326D0DF42C7D00DD1C93 /* JackMutex.h */,
 				4B02069D0DC0BAB400319AF1 /* JackProcessSync.cpp */,
 				4BF8D1A70834EEB400C94B91 /* JackActivationCount.h */,
 				4BF8D1A80834EEB400C94B91 /* JackActivationCount.cpp */,

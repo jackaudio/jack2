@@ -224,7 +224,7 @@ no graph state change can be done during freewheel mode.
 
 int JackServer::SetFreewheel(bool onoff)
 {
-    jack_log("JackServer::SetFreewheel state = %ld", onoff);
+    jack_log("JackServer::SetFreewheel is = %ld want = %ld", fFreewheel, onoff);
 
     if (fFreewheel) {
         if (onoff) {

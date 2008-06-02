@@ -54,7 +54,7 @@ class JackMutex
             // In recursive mode by default
             fMutex = CreateMutex(0, FALSE, 0);
         }
-        virtual ~JackMutex()
+        ~JackMutex()
         {
             CloseHandle(fMutex);
         }
@@ -90,7 +90,7 @@ class JackMutex
             res = pthread_mutexattr_destroy(&mutex_attr);
             assert(res == 0);
         }
-        virtual ~JackMutex()
+        ~JackMutex()
         {
             pthread_mutex_destroy(&fMutex);
         }
@@ -124,13 +124,15 @@ class JackLockAble
 
         JackMutex fMutex;
 
-    public:
+    protected:
 
         JackLockAble()
         {}
-        virtual ~JackLockAble()
+        ~JackLockAble()
         {}
 
+    public:
+     
         void Lock()
         {
             fMutex.Lock();
@@ -166,7 +168,7 @@ class JackLock
             fObj->Lock();
         }
 
-        virtual ~JackLock()
+        ~JackLock()
         {
             fObj->Unlock();
         }

@@ -41,6 +41,7 @@ JackDebugClient::JackDebugClient(JackClient * client)
     fIsDeactivated = 0;
     fIsClosed = 0;
     fClient = client;
+    fFreewheel = false;
 }
 
 JackDebugClient::~JackDebugClient()
@@ -321,6 +322,11 @@ int JackDebugClient::SetBufferSize(jack_nframes_t buffer_size)
 int JackDebugClient::SetFreeWheel(int onoff)
 {
     CheckClient();
+    if (onoff && fFreewheel)
+         *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = ON while FW is already ON " << endl;
+    if (!onoff && !fFreewheel)
+         *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = OFF while FW is already OFF " << endl;
+    fFreewheel = onoff;
     return fClient->SetFreeWheel(onoff);
 }
 
