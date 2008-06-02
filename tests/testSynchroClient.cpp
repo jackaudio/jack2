@@ -129,8 +129,10 @@ int main(int ac, char *av [])
     }
 #endif
 
-    sem1->ConnectOutput(SERVER, "default");
-    sem2->ConnectInput(CLIENT, "default");
+    if (!sem1->ConnectOutput(SERVER, "default"))
+        return -1;
+    if (!sem2->ConnectInput(CLIENT, "default"))
+        return -1;
 
     obj = new Test2(sem1, sem2);
 
