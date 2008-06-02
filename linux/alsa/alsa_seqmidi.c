@@ -37,6 +37,11 @@
  * 	free deleted ports
  * 	create new ports or mark existing as dead
  */
+
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include <alsa/asoundlib.h>
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>

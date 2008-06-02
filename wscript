@@ -62,6 +62,7 @@ def configure(conf):
     conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACK_SVNREVISION', fetch_svn_revision('.'))
+    conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
     conf.write_config_header('config.h')
