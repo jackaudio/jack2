@@ -56,7 +56,7 @@ def configure(conf):
 def build(bld):
     for example_program, example_program_source in example_programs.items():
         prog = bld.create_obj('cc', 'program')
-        prog.includes = ['../common/jack']
+        prog.includes = ['../common/jack', '../common']
         prog.source = example_program_source
         prog.uselib = 'RT'
         prog.uselib_local = 'clientlib'
@@ -64,7 +64,7 @@ def build(bld):
 
     if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
         prog = bld.create_obj('cc', 'program')
-        prog.includes = ['../common/jack']
+        prog.includes = ['../common/jack', '../common']
         prog.source = 'transport.c'
         prog.uselib = 'RT READLINE NCURSES'
         prog.uselib_local = 'clientlib'
@@ -72,7 +72,7 @@ def build(bld):
 
     if bld.env()['BUILD_EXAMPLE_CLIENT_REC'] == True:
         prog = bld.create_obj('cc', 'program')
-        prog.includes = ['../common/jack']
+        prog.includes = ['../common/jack', '../common']
         prog.source = 'capture_client.c'
         prog.uselib = 'RT SNDFILE'
         prog.uselib_local = 'clientlib'
@@ -81,6 +81,6 @@ def build(bld):
     for example_lib, example_lib_source in example_libs.items():
         lib = bld.create_obj('cc', 'shlib')
         lib.env['shlib_PATTERN'] = '%s.so'
-        lib.includes = ['../common/jack']
+        lib.includes = ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
