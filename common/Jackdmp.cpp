@@ -183,8 +183,6 @@ int main(int argc, char* argv[])
     sigset_t signals;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
-
-    copyright(stdout);
     
     server_ctl = jackctl_server_create();
     if (server_ctl == NULL) {
