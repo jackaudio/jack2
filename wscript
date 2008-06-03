@@ -9,6 +9,7 @@ from Configure import g_maxlen
 
 VERSION='1.9.0'
 APPNAME='jack'
+JACK_API_VERSION = '0.1.0'
 
 # these variables are mandatory ('/' are converted automatically)
 srcdir = '.'
@@ -55,6 +56,7 @@ def configure(conf):
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
+    conf.env['JACK_API_VERSION'] = JACK_API_VERSION
 
     conf.define('ADDON_DIR', conf.env['PREFIX'] + '/lib/jack')
     conf.define('JACK_LOCATION', conf.env['PREFIX'] + '/bin')
