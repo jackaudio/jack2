@@ -326,7 +326,7 @@ int process1(jack_nframes_t nframes, void *arg)
     }
     if (process1_activated == 0) {
         out1 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port1, nframes);
-        memset (out1, 0, sizeof (jack_default_audio_sample_t) * nframes); //écrit des zéros en sortie...
+        memset (out1, 0, sizeof (jack_default_audio_sample_t) * nframes); //ï¿½crit des zï¿½ros en sortie...
     }
     if (process1_activated == 5) {
         Collect(&framecollect[frames_collected]);
@@ -359,7 +359,7 @@ int process2(jack_nframes_t nframes, void *arg)
 
     if (process2_activated == 1) { // Reception du process1 pour comparer les donnees
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
-        for (int p = 0; p < nframes; p++) {
+        for (unsigned int p = 0; p < nframes; p++) {
             signal2[index2] = in2[p];
             if (index2 == 95999) {
                 process2_activated = 0;
@@ -371,11 +371,11 @@ int process2(jack_nframes_t nframes, void *arg)
         }
     }
 	
-    if (process2_activated == 2) { // envoie de signal1 pour test tie mode et le récupère direct + latence de la boucle jack...
+    if (process2_activated == 2) { // envoie de signal1 pour test tie mode et le rï¿½cupï¿½re direct + latence de la boucle jack...
         out2 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port2, nframes);
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
 
-        for (int p = 0; p < nframes; p++) {
+        for (unsigned int p = 0; p < nframes; p++) {
             out2[p] = signal1[index1];
             index1++;
             if (index1 == 48000)
@@ -393,7 +393,7 @@ int process2(jack_nframes_t nframes, void *arg)
     if (process2_activated == 3) { // envoie de -signal1 pour sommation en oppo de phase par jack
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
 
-        for (int p = 0; p < nframes;p++) {
+        for (unsigned int p = 0; p < nframes;p++) {
             signal2[index2] = in2[p];
             if (index2 == 95999) {
                 process2_activated = 0;
@@ -462,8 +462,8 @@ int process4(jack_nframes_t nframes, void *arg)
 	jack_nframes_t delta_time = cur_time - last_time;
 	
 	Log("calling process4 callback : jack_frame_time = %ld delta_time = %ld\n", cur_time, delta_time);
-	if (delta_time > 0  && abs(delta_time - cur_buffer_size) > tolerance) {
-		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %ld, delta_time = %ld\n", cur_buffer_size, delta_time);
+	if (delta_time > 0  && (unsigned int)abs(delta_time - cur_buffer_size) > tolerance) {
+		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %d, delta_time = %d\n", cur_buffer_size, delta_time);
 	}
 	
 	last_time = cur_time;
@@ -520,7 +520,6 @@ int main (int argc, char *argv[])
     int test_link = 0;	// for testing the "overconnect" function
     int flag;			// flag for ports...
     int is_mine = 0;	// to test jack_port_is_mine function...
-    int connected = 0;	// check connect functions of ports
     const char *options = "kRnqvt:";
     float ratio;		// for speed calculation in freewheel mode
     jack_options_t jack_options = JackNullOption; 
@@ -767,7 +766,7 @@ int main (int argc, char *argv[])
         Log("Can't register two ports with the same name... ok\n");
     } else {
         if (strcmp (jack_port_name(output_port1), jack_port_name(output_port2)) == 0) {
-            printf("!!! ERROR !!! Can register two ports with the same name ! (%i : %s & %i : %s).\n", output_port1, jack_port_name(output_port1), output_port2, jack_port_name(output_port2));
+            printf("!!! ERROR !!! Can register two ports with the same name ! (%px : %s & %px : %s).\n", output_port1, jack_port_name(output_port1), output_port2, jack_port_name(output_port2));
             jack_port_unregister(client1, output_port2);
         } else {
             Log("Can't register two ports with the same name... ok (auto-rename %s into %s).\n", jack_port_name(output_port1), jack_port_name(output_port2));
@@ -792,7 +791,7 @@ int main (int argc, char *argv[])
     if (jack_port_set_name (output_port1, "renamed-port#") == 0 ) {
         if (strcmp(jack_port_name(output_port1), "renamed-port#") == 0) {
             printf("!!! ERROR !!! functions jack_port_set_name seems to be invalid !\n");
-            printf("Jack_port_name return '%s' whereas 'renamed-port#' was expected...\n");
+            printf("jack_port_name return '%s' whereas 'renamed-port#' was expected...\n", jack_port_name(output_port1));
         } else {
             Log("Checking jack_port_set_name()... ok\n");
             jack_port_set_name (output_port1, "port");
@@ -910,12 +909,12 @@ int main (int argc, char *argv[])
     */
     if (output_port1 != jack_port_by_name(client1, jack_port_name(output_port1))) {
         printf("!!! ERROR !!! function jack_port_by_name() return bad value !\n");
-        printf("!!! jack_port_by_name(jack_port_name(_ID_) ) != _ID_returned_at_port_registering ! (%i != %i)\n", jack_port_by_name(client1, jack_port_name(output_port1)), output_port1);
+        printf("!!! jack_port_by_name(jack_port_name(_ID_) ) != _ID_returned_at_port_registering ! (%px != %px)\n", jack_port_by_name(client1, jack_port_name(output_port1)), output_port1);
     } else {
         Log("Checking jack_port_by_name() return value... ok\n");
     }
     if (NULL != jack_port_by_name(client1, jack_port_short_name(output_port1))) {
-        printf("!!! ERROR !!! function jack_port_by_name() return a value (%i) while name is incomplete !\n", jack_port_by_name(client1, jack_port_short_name(output_port1)));
+        printf("!!! ERROR !!! function jack_port_by_name() return a value (%px) while name is incomplete !\n", jack_port_by_name(client1, jack_port_short_name(output_port1)));
     } else {
         Log("Checking jack_port_by_name() with bad argument... ok (returned id 0)\n");
     }
@@ -1232,10 +1231,10 @@ int main (int argc, char *argv[])
         Log("Checking jack_port_connected()... ok.\n");
     } else {
         printf("!!! ERROR !!! function jack_port_connected() return a bad value !\n");
-        printf("jack_port_connected(output_port1) %ld\n", jack_port_connected(output_port1));
-        printf("jack_port_connected(output_port2) %ld\n", jack_port_connected(output_port2));
-        printf("jack_port_connected(input_port1) %ld\n", jack_port_connected(input_port1));
-        printf("jack_port_connected(input_port2) %ld\n", jack_port_connected(input_port2));
+        printf("jack_port_connected(output_port1) %d\n", jack_port_connected(output_port1));
+        printf("jack_port_connected(output_port2) %d\n", jack_port_connected(output_port2));
+        printf("jack_port_connected(input_port1) %d\n", jack_port_connected(input_port1));
+        printf("jack_port_connected(input_port2) %d\n", jack_port_connected(input_port2));
     }
 
     /**
@@ -1444,10 +1443,10 @@ int main (int argc, char *argv[])
             printf("!!! ERROR !!! data transmission seems not to be valid !\n");
             printf("Links topology : (emitt) client2.out2 ----> client1.in1--(tie)--client1.out1----->client2.in2 (recive)\n");
             printf("  port_name    : Port_adress \n");
-            printf("  output_port1 : %x\n", jack_port_get_buffer(output_port1, cur_buffer_size));
-            printf("  input_port2  : %x\n", jack_port_get_buffer(input_port2, cur_buffer_size));
-            printf("  output_port2 : %x\n", jack_port_get_buffer(output_port2, cur_buffer_size));
-            printf("  input_port1  : %x\n", jack_port_get_buffer(input_port1, cur_buffer_size));
+            printf("  output_port1 : %px\n", jack_port_get_buffer(output_port1, cur_buffer_size));
+            printf("  input_port2  : %px\n", jack_port_get_buffer(input_port2, cur_buffer_size));
+            printf("  output_port2 : %px\n", jack_port_get_buffer(output_port2, cur_buffer_size));
+            printf("  input_port1  : %px\n", jack_port_get_buffer(input_port1, cur_buffer_size));
         }
 
         jack_port_untie(output_port1);
@@ -1897,7 +1896,7 @@ int main (int argc, char *argv[])
     if (xrun == 0) {
         Log("No Xrun have been detected during this test... cool !\n");
     } else {
-        printf("%i Xrun have been detected during this session (seen callback messages to see where are the problems).\n");
+        printf("%i Xrun have been detected during this session (seen callback messages to see where are the problems).\n", xrun);
     }
     free(framecollect);
     free(signal1);
