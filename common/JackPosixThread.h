@@ -35,7 +35,7 @@ namespace Jack
 \brief The POSIX thread base class.
 */
 
-class JackPosixThread : public JackThread
+class JackPosixThread : public detail::JackThread
 {
 
     protected:
@@ -48,25 +48,19 @@ class JackPosixThread : public JackThread
         JackPosixThread(JackRunnableInterface* runnable, bool real_time, int priority, int cancellation)
                 : JackThread(runnable, priority, real_time, cancellation), fThread((pthread_t)NULL)
         {}
-        JackPosixThread(JackRunnableInterface* runnable)
-                : JackThread(runnable, 0, false, PTHREAD_CANCEL_DEFERRED), fThread((pthread_t)NULL)
-        {}
-        JackPosixThread(JackRunnableInterface* runnable, int cancellation)
+        JackPosixThread(JackRunnableInterface* runnable, int cancellation = PTHREAD_CANCEL_ASYNCHRONOUS)
                 : JackThread(runnable, 0, false, cancellation), fThread((pthread_t)NULL)
         {}
 
-        virtual ~JackPosixThread()
-        {}
+        int Start();
+        int StartSync();
+        int Kill();
+        int Stop();
+        void Terminate();
 
-        virtual int Start();
-        virtual int StartSync();
-        virtual int Kill();
-        virtual int Stop();
-        virtual void Terminate();
-
-        virtual int AcquireRealTime();
-        virtual int AcquireRealTime(int priority);
-        virtual int DropRealTime();
+        int AcquireRealTime();
+        int AcquireRealTime(int priority);
+        int DropRealTime();
 
         pthread_t GetThreadID();
 

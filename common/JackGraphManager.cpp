@@ -104,14 +104,14 @@ bool JackGraphManager::IsFinishedGraph()
 }
 
 // RT
-int JackGraphManager::ResumeRefNum(JackClientControl* control, JackSynchro** table)
+int JackGraphManager::ResumeRefNum(JackClientControl* control, JackSynchro* table)
 {
     JackConnectionManager* manager = ReadCurrentState();
     return manager->ResumeRefNum(control, table, fClientTiming);
 }
 
 // RT
-int JackGraphManager::SuspendRefNum(JackClientControl* control, JackSynchro** table, long usec)
+int JackGraphManager::SuspendRefNum(JackClientControl* control, JackSynchro* table, long usec)
 {
     JackConnectionManager* manager = ReadCurrentState();
     return manager->SuspendRefNum(control, table, fClientTiming, usec);

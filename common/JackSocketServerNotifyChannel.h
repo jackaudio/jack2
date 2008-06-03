@@ -30,7 +30,7 @@ namespace Jack
 \brief JackServerNotifyChannel using sockets.
 */
 
-class JackSocketServerNotifyChannel : public JackServerNotifyChannelInterface
+class JackSocketServerNotifyChannel
 {
     private:
 
@@ -39,8 +39,6 @@ class JackSocketServerNotifyChannel : public JackServerNotifyChannelInterface
     public:
 
         JackSocketServerNotifyChannel()
-        {}
-        virtual ~JackSocketServerNotifyChannel()
         {}
 
         int Open(const char* server_name);

@@ -24,12 +24,12 @@
 
 #ifdef __APPLE__
 #include "JackMachSemaphore.h"
-#include "JackMachThread.h"
 #endif
 
-#include "JackPosixThread.h"
 #include "JackPosixSemaphore.h"
 #include "JackFifo.h"
+
+#include "JackPlatformThread.h"
 
 #define ITER 500000
 
@@ -38,8 +38,8 @@ using namespace Jack;
 struct ServerThread : public JackRunnableInterface {
 
 	JackThread* fThread;
-    JackSynchro* fServerSem;
-    JackSynchro* fClientSem;
+    detail::JackSynchro* fServerSem;
+    detail::JackSynchro* fClientSem;
 	
 	ServerThread()
 	{
@@ -72,8 +72,8 @@ struct ServerThread : public JackRunnableInterface {
 struct ClientThread : public JackRunnableInterface {
 
 	JackThread* fThread;
-    JackSynchro* fServerSem;
-    JackSynchro* fClientSem;
+    detail::JackSynchro* fServerSem;
+    detail::JackSynchro* fClientSem;
 	
 	ClientThread()
 	{
@@ -110,7 +110,7 @@ struct ClientThread : public JackRunnableInterface {
 	
 };
 
-void server(JackSynchro* sem)
+void server(detail::JackSynchro* sem)
 {
 	char c;
 	printf("server\n");
@@ -137,7 +137,7 @@ void server(JackSynchro* sem)
 	}
 }
 
-void client(JackSynchro* sem)
+void client(detail::JackSynchro* sem)
 {
 	char c;
 	printf("client\n");
@@ -168,7 +168,7 @@ int main (int argc, char * const argv[])
     char c;
     ServerThread* serverthread = NULL;
     ClientThread* clientthread = NULL;
-	JackSynchro* sem1 = NULL;
+    detail::JackSynchro* sem1 = NULL;
 	
 	if (strcmp(argv[1],"-s") == 0) {
 		printf("Posix semaphore\n");

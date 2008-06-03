@@ -33,19 +33,17 @@ namespace Jack
 
 JackExternalClient::JackExternalClient(): fClientControl(NULL)
 {
-    fChannel = JackGlobals::MakeNotifyChannel();
 }
 
 JackExternalClient::~JackExternalClient()
 {
-    delete fChannel;
 }
 
 int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
     int result = -1;
     jack_log("JackExternalClient::ClientNotify ref = %ld name = %s notify = %ld", refnum, name, notify);
-    fChannel->ClientNotify(refnum, name, notify, sync, value1, value2, &result);
+    fChannel.ClientNotify(refnum, name, notify, sync, value1, value2, &result);
     return result;
 }
 
@@ -53,7 +51,7 @@ int JackExternalClient::Open(const char* name, int pid, int refnum, int* shared_
 {
     try {
 
-        if (fChannel->Open(name) < 0) {
+        if (fChannel.Open(name) < 0) {
             jack_error("Cannot connect to client name = %s\n", name);
             return -1;
         }
@@ -75,7 +73,7 @@ int JackExternalClient::Open(const char* name, int pid, int refnum, int* shared_
 
 int JackExternalClient::Close()
 {
-    fChannel->Close();
+    fChannel.Close();
     delete fClientControl;
     return 0;
 }

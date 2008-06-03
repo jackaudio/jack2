@@ -43,7 +43,7 @@ using namespace std;
 namespace Jack
 {
 
-JackDriver::JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table)
+JackDriver::JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;
@@ -149,10 +149,10 @@ void JackDriver::SetupDriverSync(int ref, bool freewheel)
 {
     if (!freewheel && !fEngineControl->fSyncMode) {
         jack_log("JackDriver::SetupDriverSync driver sem in flush mode");
-        fSynchroTable[ref]->SetFlush(true);
+        fSynchroTable[ref].SetFlush(true);
     } else {
         jack_log("JackDriver::SetupDriverSync driver sem in normal mode");
-        fSynchroTable[ref]->SetFlush(false);
+        fSynchroTable[ref].SetFlush(false);
     }
 }
 

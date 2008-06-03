@@ -32,7 +32,7 @@ namespace Jack
 \brief Inter process synchronization using Fifo.
 */
 
-class JackFifo : public JackSynchro
+class JackFifo : public detail::JackSynchro
 {
 
     private:
@@ -48,9 +48,7 @@ class JackFifo : public JackSynchro
 
     public:
 
-        JackFifo(): JackSynchro(), fFifo( -1)
-        {}
-        virtual ~JackFifo()
+        JackFifo(): fFifo( -1)
         {}
 
         bool Signal();

@@ -29,16 +29,13 @@ Copyright (C) 2004-2006 Grame
 namespace Jack
 {
 
-JackWinNamedPipeClientChannel::JackWinNamedPipeClientChannel()
+JackWinNamedPipeClientChannel::JackWinNamedPipeClientChannel():fThread(this)
 {
-    fThread = JackGlobals::MakeThread(this);
     fClient = NULL;
 }
 
 JackWinNamedPipeClientChannel::~JackWinNamedPipeClientChannel()
-{
-    delete fThread;
-}
+{}
 
 int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
 {
@@ -98,7 +95,7 @@ void JackWinNamedPipeClientChannel::Close()
     fRequestPipe.Close();
     fNotificationListenPipe.Close();
     // Here the thread will correctly stop when the pipe are closed
-    fThread->Stop();
+    fThread.Stop();
 }
 
 int JackWinNamedPipeClientChannel::Start()
@@ -107,7 +104,7 @@ int JackWinNamedPipeClientChannel::Start()
     /*
      To be sure notification thread is started before ClientOpen is called.
     */
-    if (fThread->StartSync() != 0) {
+    if (fThread.StartSync() != 0) {
         jack_error("Cannot start Jack client listener");
         return -1;
     } else {
@@ -118,7 +115,7 @@ int JackWinNamedPipeClientChannel::Start()
 void JackWinNamedPipeClientChannel::Stop()
 {
     jack_log("JackWinNamedPipeClientChannel::Stop");
-    fThread->Kill();  // Unsafe on WIN32... TODO : solve WIN32 thread Kill issue
+    fThread.Kill();  // Unsafe on WIN32... TODO : solve WIN32 thread Kill issue
 }
 
 void JackWinNamedPipeClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)

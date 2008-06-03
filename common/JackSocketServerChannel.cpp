@@ -35,16 +35,15 @@ using namespace std;
 namespace Jack
 {
 
-JackSocketServerChannel::JackSocketServerChannel()
+JackSocketServerChannel::JackSocketServerChannel():
+    fThread(this)
 {
-    fThread = JackGlobals::MakeThread(this);
     fPollTable = NULL;
     fRebuild = true;
 }
 
 JackSocketServerChannel::~JackSocketServerChannel()
 {
-    delete fThread;
     delete[] fPollTable;
 }
 
@@ -63,7 +62,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
     BuildPoolTable();
 
     // Start listening
-    if (fThread->Start() != 0) {
+    if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         goto error;
     }
@@ -77,7 +76,7 @@ error:
 
 void JackSocketServerChannel::Close()
 {
-    fThread->Kill();
+    fThread.Kill();
     fRequestListenSocket.Close();
 }
 

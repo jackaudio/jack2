@@ -24,15 +24,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGraphManager.h"
 #include "JackSynchro.h"
 #include "JackTransportEngine.h"
+#include "JackPlatformProcessSync.h"
+#include "JackPlatformServerNotifyChannel.h"
 
 namespace Jack
 {
 
 class JackClientInterface;
 struct JackEngineControl;
-class JackServerNotifyChannelInterface;
 class JackExternalClient;
-class JackSyncInterface;
     
 class JackEngineInterface
 {
@@ -99,9 +99,9 @@ class JackEngine
         JackGraphManager* fGraphManager;
         JackEngineControl* fEngineControl;
         JackClientInterface* fClientTable[CLIENT_NUM];
-        JackSynchro** fSynchroTable;
-        JackServerNotifyChannelInterface* fChannel;              /*! To communicate between the RT thread and server */
-        JackSyncInterface* fSignal;
+        JackSynchro* fSynchroTable;
+        JackServerNotifyChannel fChannel;              /*! To communicate between the RT thread and server */
+        JackProcessSync fSignal;
         jack_time_t fLastSwitchUsecs;
 
         int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
@@ -127,7 +127,7 @@ class JackEngine
 
     public:
 
-        JackEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler);
+        JackEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler);
         ~JackEngine();
 
         int Open();

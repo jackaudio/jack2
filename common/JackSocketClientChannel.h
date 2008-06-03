@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackChannel.h"
 #include "JackSocket.h"
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 #include "JackRequest.h"
 
 namespace Jack
@@ -32,7 +32,7 @@ namespace Jack
 \brief JackClientChannel using sockets.
 */
 
-class JackSocketClientChannel : public JackClientChannelInterface, public JackRunnableInterface
+class JackSocketClientChannel : public detail::JackClientChannelInterface, public JackRunnableInterface
 {
 
     private:
@@ -40,7 +40,7 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
         JackClientSocket fRequestSocket;			// Socket to communicate with the server
         JackServerSocket fNotificationListenSocket;	// Socket listener for server notification
         JackClientSocket* fNotificationSocket;		// Socket for server notification
-        JackThread*	fThread;						// Thread to execute the event loop
+        JackThread fThread;                         // Thread to execute the event loop
         JackClient*	fClient;
 
         void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
@@ -61,6 +61,8 @@ class JackSocketClientChannel : public JackClientChannelInterface, public JackRu
 
         void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
         void ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
+        {}
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int state, int* result);

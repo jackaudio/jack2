@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackMachServerChannel__
 
 #include "JackChannel.h"
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 #include "JackMachPort.h"
 #include <map>
 
@@ -35,13 +35,13 @@ class JackEngineInterface;
 \brief JackServerChannel using Mach IPC.
 */
 
-class JackMachServerChannel : public JackServerChannelInterface, public JackRunnableInterface
+class JackMachServerChannel : public JackRunnableInterface
 {
 
     private:
 
         JackMachPortSet fServerPort;    /*! Mach port to communicate with the server : from client to server */
-        JackThread* fThread;			/*! Thread to execute the event loop */
+        JackThread fThread;			/*! Thread to execute the event loop */
         JackServer* fServer;
         std::map<mach_port_t, int> fClientTable;
 
@@ -50,7 +50,7 @@ class JackMachServerChannel : public JackServerChannelInterface, public JackRunn
     public:
 
         JackMachServerChannel();
-        virtual ~JackMachServerChannel();
+        ~JackMachServerChannel();
 
         int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();                   // Close the Server/Client connection

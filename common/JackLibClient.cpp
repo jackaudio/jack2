@@ -25,12 +25,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTime.h"
 #include "JackLibGlobals.h"
 #include "JackGlobals.h"
-#include "JackChannel.h"
+#include "JackPlatformClientChannel.h"
 #include "JackTools.h"
 
 namespace Jack
 {
-
 
 // Used for external C API (JackAPI.cpp)
 JackGraphManager* GetGraphManager()
@@ -51,7 +50,7 @@ JackEngineControl* GetEngineControl()
     }
 }
 
-JackSynchro** GetSynchroTable()
+JackSynchro* GetSynchroTable()
 {
     return (JackLibGlobals::fGlobals ? JackLibGlobals::fGlobals->fSynchroTable : 0);
 }
@@ -60,10 +59,10 @@ JackSynchro** GetSynchroTable()
 // Client management
 //-------------------
 
-JackLibClient::JackLibClient(JackSynchro** table): JackClient(table)
+JackLibClient::JackLibClient(JackSynchro* table): JackClient(table)
 {
     jack_log("JackLibClient::JackLibClient table = %x", table);
-    fChannel = JackGlobals::MakeClientChannel();
+    fChannel = new JackClientChannel();
 }
 
 JackLibClient::~JackLibClient()
@@ -113,7 +112,7 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     SetupDriverSync(false);
 
     // Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process
-    if (!fSynchroTable[GetClientControl()->fRefNum]->Connect(name_res, fServerName)) {
+    if (!fSynchroTable[GetClientControl()->fRefNum].Connect(name_res, fServerName)) {
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
@@ -140,13 +139,13 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
         case kAddClient:
             jack_log("JackClient::AddClient name = %s, ref = %ld ", name, refnum);
             // the synchro must be usable in I/O mode when several clients live in the same process
-            res = fSynchroTable[refnum]->Connect(name, fServerName) ? 0 : -1;
+            res = fSynchroTable[refnum].Connect(name, fServerName) ? 0 : -1;
             break;
 
         case kRemoveClient:
             jack_log("JackClient::RemoveClient name = %s, ref = %ld ", name, refnum);
             if (strcmp(GetClientControl()->fName, name) != 0)
-                res = fSynchroTable[refnum]->Disconnect() ? 0 : -1;
+                res = fSynchroTable[refnum].Disconnect() ? 0 : -1;
             break;
     }
 

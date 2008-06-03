@@ -30,17 +30,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "varargs.h"
 #include <list>
 
+#include "JackPlatformSynchro.h"
+#include "JackPlatformThread.h"
+#include "JackChannel.h"
+
 namespace Jack
 {
 
-class JackClientChannelInterface;
 class JackGraphManager;
 class JackServer;
 class JackEngine;
-class JackSynchro;
 struct JackClientControl;
 struct JackEngineControl;
-class JackSyncInterface;
 
 typedef void (*JackShutdownCallback)(void *arg);
 
@@ -83,9 +84,9 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fThreadFunArg;
         char fServerName[64];
 
-        JackThread*	fThread;    /*! Thread to execute the Process function */
-        JackClientChannelInterface* fChannel;
-        JackSynchro** fSynchroTable;
+        JackThread fThread;    /*! Thread to execute the Process function */
+        detail::JackClientChannelInterface* fChannel;
+        JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
 
         int StartThread();
@@ -110,7 +111,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
     public:
 
         JackClient();
-        JackClient(JackSynchro** table);
+        JackClient(JackSynchro* table);
         virtual ~JackClient();
 
         virtual int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status) = 0;
@@ -186,7 +187,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
 extern JackGraphManager* GetGraphManager();
 extern JackEngineControl* GetEngineControl();
-extern JackSynchro** GetSynchroTable();
+extern JackSynchro* GetSynchroTable();
 
 } // end of namespace
 

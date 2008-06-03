@@ -46,7 +46,6 @@ def build(bld):
         'JackEngine.cpp',
         'JackExternalClient.cpp',
         'JackFreewheelDriver.cpp',
-        'JackGlobalsServer.cpp',
         'JackInternalClient.cpp',
         'JackLoopbackDriver.cpp',
         'JackServer.cpp',
@@ -71,7 +70,6 @@ def build(bld):
     clientlib.target       = 'jack'
     clientlib.source = [] + common_libsources
     clientlib.source += [
-        'JackGlobalsClient.cpp',
         'JackLibClient.cpp',
         'JackLibAPI.cpp',
         'JackSocketClientChannel.cpp',

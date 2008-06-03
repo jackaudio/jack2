@@ -256,10 +256,10 @@ void JackConnectionManager::ResetGraph(JackClientTiming* timing)
 /*!
 \brief Wait on the input synchro.
 */
-int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro** table, JackClientTiming* timing, long time_out_usec)
+int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec)
 {
     bool res;
-    if ((res = table[control->fRefNum]->TimedWait(time_out_usec))) {
+    if ((res = table[control->fRefNum].TimedWait(time_out_usec))) {
         timing[control->fRefNum].fStatus = Running;
         timing[control->fRefNum].fAwakeAt = GetMicroSeconds();
     }
@@ -269,7 +269,7 @@ int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro
 /*!
 \brief Signal clients connected to the given client.
 */
-int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro** table, JackClientTiming* timing)
+int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing)
 {
     jack_time_t current_date = GetMicroSeconds();
     const jack_int_t* outputRef = fConnectionRef.GetItems(control->fRefNum);
@@ -288,7 +288,7 @@ int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro*
             timing[i].fStatus = Triggered;
             timing[i].fSignaledAt = current_date;
 
-            if (!fInputCounter[i].Signal(table[i], control)) {
+            if (!fInputCounter[i].Signal(table + i, control)) {
                 jack_log("JackConnectionManager::ResumeRefNum error: ref = %ld output = %ld ", control->fRefNum, i);
                 res = -1;
             }

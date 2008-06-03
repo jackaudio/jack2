@@ -29,16 +29,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-JackSocketClientChannel::JackSocketClientChannel()
+JackSocketClientChannel::JackSocketClientChannel():
+    fThread(this)
 {
-    fThread = JackGlobals::MakeThread(this);
     fNotificationSocket = NULL;
     fClient = NULL;
 }
 
 JackSocketClientChannel::~JackSocketClientChannel()
 {
-    delete fThread;
     delete fNotificationSocket;
 }
 
@@ -105,7 +104,7 @@ int JackSocketClientChannel::Start()
     /*
      To be sure notification thread is started before ClientOpen is called.
     */
-    if (fThread->StartSync() != 0) {
+    if (fThread.StartSync() != 0) {
         jack_error("Cannot start Jack client listener");
         return -1;
     } else {
@@ -113,10 +112,11 @@ int JackSocketClientChannel::Start()
     }
 }
 
+
 void JackSocketClientChannel::Stop()
 {
     jack_log("JackSocketClientChannel::Stop");
-    fThread->Kill();
+    fThread.Kill();
 }
 
 void JackSocketClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, int* result)

@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "types.h"
 #include "JackClientInterface.h"
 #include "JackConstants.h"
+#include "JackPlatformSynchro.h"
 #include <list>
 
 namespace Jack
@@ -31,7 +32,6 @@ namespace Jack
 
 class JackEngineInterface;
 class JackGraphManager;
-class JackSynchro;
 struct JackEngineControl;
 struct JackClientControl;
 
@@ -152,7 +152,7 @@ class EXPORT JackDriver : public JackDriverClient
         float fDelayedUsecs;
         JackEngineInterface* fEngine;
         JackGraphManager* fGraphManager;
-        JackSynchro** fSynchroTable;
+        JackSynchro* fSynchroTable;
         JackEngineControl* fEngineControl;
         JackClientControl* fClientControl;
 
@@ -163,7 +163,7 @@ class EXPORT JackDriver : public JackDriverClient
 
     public:
 
-        JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table);
+        JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table);
         JackDriver();
         virtual ~JackDriver();
 

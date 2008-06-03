@@ -164,6 +164,11 @@ int JackMachThread::AcquireRealTime()
 
     return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
 }
+int JackMachThread::AcquireRealTime(int priority)
+{
+    fPriority = priority;
+    return AcquireRealTime();
+}
 
 int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
 {

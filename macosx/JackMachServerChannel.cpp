@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackRPCEngineServer.c"
 #include "JackError.h"
 #include "JackServer.h"
-#include "JackMachThread.h"
 #include "JackEngine.h"
 #include "JackNotification.h"
 
@@ -36,15 +35,11 @@ namespace Jack
 
 map<mach_port_t, JackMachServerChannel*> JackMachServerChannel::fPortTable;
 
-JackMachServerChannel::JackMachServerChannel()
-{
-    fThread = new JackMachThread(this);
-}
+JackMachServerChannel::JackMachServerChannel():fThread(this)
+{}
 
 JackMachServerChannel::~JackMachServerChannel()
-{
-    delete fThread;
-}
+{}
 
 int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 {
@@ -57,7 +52,7 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
         return -1;
     }
 
-    if (fThread->Start() != 0) {
+    if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
     }
@@ -70,7 +65,7 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 void JackMachServerChannel::Close()
 {
     jack_log("JackMachServerChannel::Close");
-    fThread->Kill();
+    fThread.Kill();
     fServerPort.DestroyPort();
 }
 

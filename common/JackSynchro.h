@@ -28,6 +28,8 @@ namespace Jack
 /*!
 \brief An inter process synchronization primitive.
 */
+namespace detail
+{
 
 class JackSynchro
 {
@@ -37,53 +39,53 @@ class JackSynchro
         char fName[SYNC_MAX_NAME_SIZE];
         bool fFlush; // If true, signal are "flushed" : used for drivers that do no consume the signal
 
-        virtual void BuildName(const char* name, const char* server_name, char* res)
+        void BuildName(const char* name, const char* server_name, char* res)
         {}
 
     public:
 
         JackSynchro(): fFlush(false)
         {}
-        virtual ~JackSynchro()
+        ~JackSynchro()
         {}
 
-        virtual bool Signal()
+        bool Signal()
         {
             return true;
         }
-        virtual bool SignalAll()
+        bool SignalAll()
         {
             return true;
         }
-        virtual bool Wait()
+        bool Wait()
         {
             return true;
         }
-        virtual bool TimedWait(long usec)
+        bool TimedWait(long usec)
         {
             return true;
         }
-        virtual bool Allocate(const char* name, const char* server_name, int value)
+        bool Allocate(const char* name, const char* server_name, int value)
         {
             return true;
         }
-        virtual bool Connect(const char* name, const char* server_name)
+        bool Connect(const char* name, const char* server_name)
         {
             return true;
         }
-        virtual bool ConnectInput(const char* name, const char* server_name)
+        bool ConnectInput(const char* name, const char* server_name)
         {
             return true;
         }
-        virtual bool ConnectOutput(const char* name, const char* server_name)
+        bool ConnectOutput(const char* name, const char* server_name)
         {
             return true;
         }
-        virtual bool Disconnect()
+        bool Disconnect()
         {
             return true;
         }
-        virtual void Destroy()
+        void Destroy()
         {}
 
         void SetFlush(bool mode)
@@ -92,7 +94,7 @@ class JackSynchro
         }
 
 };
-
+}
 
 } // end of namespace
 

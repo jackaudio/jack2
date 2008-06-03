@@ -27,7 +27,6 @@ namespace Jack
 {
 
 struct JackEngineControl;
-class JackClientChannelInterface;
 
 /*!
 \brief Internal clients in the server.
@@ -42,7 +41,7 @@ class JackInternalClient : public JackClient
 
     public:
 
-        JackInternalClient(JackServer* server, JackSynchro** table);
+        JackInternalClient(JackServer* server, JackSynchro* table);
         virtual ~JackInternalClient();
 
         int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
@@ -122,7 +121,7 @@ class JackLoadableInternalClient : public JackInternalClient
 
     public:
 
-        JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data);
+        JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data);
         virtual ~JackLoadableInternalClient();
 
         int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);

@@ -58,6 +58,8 @@ class JackRunnableInterface
  \brief The thread base class.
  */
 
+namespace detail
+{
 class JackThread
 {
     public:
@@ -77,35 +79,24 @@ class JackThread
         JackThread(JackRunnableInterface* runnable, int priority, bool real_time, int cancellation):
         fRunnable(runnable), fPriority(priority), fRealTime(real_time), fStatus(kIdle), fCancellation(cancellation)
         {}
-        virtual ~JackThread()
-        {}
         
-        virtual int Start() = 0;
-        virtual int StartSync() = 0;
-        virtual int Kill() = 0;
-        virtual int Stop() = 0;
-        virtual void Terminate() = 0;
         
-        virtual int AcquireRealTime() = 0;
-        virtual int AcquireRealTime(int priority) = 0;
-        virtual int DropRealTime() = 0;
-        
-        virtual kThreadState GetStatus()
+        kThreadState GetStatus()
         {
             return fStatus;
         }
-        virtual void SetStatus(kThreadState status)
+        void SetStatus(kThreadState status)
         {
             fStatus = status;
         }
         
-        virtual void SetParams(UInt64 period, UInt64 computation, UInt64 constraint) // Empty implementation, will only make sense on OSX...
+        void SetParams(UInt64 period, UInt64 computation, UInt64 constraint) // Empty implementation, will only make sense on OSX...
         {}
-        
-        virtual pthread_t GetThreadID() = 0;
         
 };
     
+}
+
 } // end of namespace
 
 #if defined(WIN32)

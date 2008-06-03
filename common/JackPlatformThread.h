@@ -1,5 +1,4 @@
 /*
-Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -18,32 +17,43 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackLoopbackDriver__
-#define __JackLoopbackDriver__
+#ifndef __JackPlatformThread__
+#define __JackPlatformThread__
 
-#include "JackAudioDriver.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h" 
+#endif 
+
+// OSX
+#if defined(__APPLE__)
+#include "JackMachThread.h"
+#endif
+
+// WINDOWS
+#ifdef WIN32
+#include "JackWinThread.h"
+#endif
+
+// LINUX
+#ifdef __linux__
+#include "JackPosixThread.h"
+#endif
 
 namespace Jack
 {
 
-/*!
-\brief The loopback driver : to be used to "pipeline" applications connected in sequence.
-*/
+#ifdef WIN32
+typedef JackWinThread JackThread;
+#endif
 
-class JackLoopbackDriver : public JackAudioDriver
-{
+#ifdef __linux__
+typedef JackPosixThread JackThread;
+#endif
 
-    public:
-
-        JackLoopbackDriver(JackEngineInterface* engine, JackSynchro* table)
-                : JackAudioDriver("loopback", "", engine, table)
-        {}
-        virtual ~JackLoopbackDriver()
-        {}
-
-        int Process();
-};
+#if defined(__APPLE__)
+typedef JackMachThread JackThread;
+#endif
 
 } // end of namespace
 
-#endif
+#endif /* __JackPlatformThread__ */

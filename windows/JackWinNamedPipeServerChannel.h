@@ -22,7 +22,7 @@ Copyright (C) 2004-2006 Grame
 
 #include "JackChannel.h"
 #include "JackWinNamedPipe.h"
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 #include <map>
 #include <list>
 
@@ -36,7 +36,7 @@ class JackClientPipeThread : public JackRunnableInterface
 
         JackWinNamedPipeClient* fPipe;
         JackServer*	fServer;
-        JackThread*	fThread;
+        JackThread fThread;
         int fRefNum;
 
         void ClientAdd(char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
@@ -69,14 +69,14 @@ class JackClientPipeThread : public JackRunnableInterface
 \brief JackServerChannel using pipe.
 */
 
-class JackWinNamedPipeServerChannel : public JackServerChannelInterface, public JackRunnableInterface
+class JackWinNamedPipeServerChannel : public JackRunnableInterface
 {
 
     private:
 
         JackWinNamedPipeServer fRequestListenPipe;	// Pipe to create request socket for the client
         JackServer*	fServer;
-        JackThread*	fThread;						// Thread to execute the event loop
+        JackThread fThread;                         // Thread to execute the event loop
         char fServerName[64];
 
         std::list<JackClientPipeThread*> fClientList;
@@ -86,7 +86,7 @@ class JackWinNamedPipeServerChannel : public JackServerChannelInterface, public 
     public:
 
         JackWinNamedPipeServerChannel();
-        virtual ~JackWinNamedPipeServerChannel();
+        ~JackWinNamedPipeServerChannel();
 
         int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();					// Close the Server/Client connection

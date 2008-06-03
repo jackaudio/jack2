@@ -35,7 +35,7 @@ namespace Jack
 \brief Inter process synchronization using using Mach semaphore.
 */
 
-class JackMachSemaphore : public JackSynchro
+class JackMachSemaphore : public detail::JackSynchro
 {
 
     private:
@@ -49,9 +49,7 @@ class JackMachSemaphore : public JackSynchro
 
     public:
 
-        JackMachSemaphore(): JackSynchro(), fSemaphore(0)
-        {}
-        virtual ~JackMachSemaphore()
+        JackMachSemaphore(): fSemaphore(0)
         {}
 
         bool Signal();

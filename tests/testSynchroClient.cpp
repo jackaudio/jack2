@@ -36,19 +36,18 @@
 
 #ifdef __APPLE__
 	#include "JackMachSemaphore.h"
-	#include "JackMachThread.h"
 #endif
 
 #ifdef WIN32
-	#include "JackWinThread.h"
 	#include "JackWinEvent.h"
 #endif
 
 #ifdef linux
-	#include "JackPosixThread.h"
 	#include "JackPosixSemaphore.h"
 	#include "JackFifo.h"
 #endif
+
+#include "JackPlatformThread.h"
 
 #define ITER 1000
 
@@ -62,12 +61,12 @@ class Test2 : public JackRunnableInterface
 
     private:
 
-        JackSynchro* fSynchro1;
-        JackSynchro* fSynchro2;
+        detail::JackSynchro* fSynchro1;
+        detail::JackSynchro* fSynchro2;
 
     public:
 
-        Test2(JackSynchro* synchro1, JackSynchro* synchro2)
+        Test2(detail::JackSynchro* synchro1, detail::JackSynchro* synchro2)
                 : fSynchro1(synchro1), fSynchro2(synchro2)
         {}
 
@@ -89,8 +88,8 @@ class Test2 : public JackRunnableInterface
 int main(int ac, char *av [])
 {
     Test2* obj;
-    JackSynchro* sem1 = NULL;
-    JackSynchro* sem2 = NULL;
+    detail::JackSynchro* sem1 = NULL;
+    detail::JackSynchro* sem2 = NULL;
     JackThread* thread;
 
     printf("Test of synchronization primitives : client side\n");

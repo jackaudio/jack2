@@ -28,14 +28,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "jslist.h"
 
 #include "JackGlobals.h"
+#include "JackPlatformSynchro.h"
+#include "JackPlatformSynchro.h"
+#include "JackPlatformServerChannel.h"
+
 
 namespace Jack
 {
 
 class JackGraphManager;
 class JackDriverClientInterface;
-class JackServerChannelInterface;
-class JackSyncInterface;
 struct JackEngineControl;
 class JackEngineInterface;
 
@@ -43,7 +45,7 @@ class JackEngineInterface;
 \brief The Jack server.
 */
 
-class EXPORT JackServer : private detail::JackGlobalsServerInitializer
+class EXPORT JackServer
 {
 
     private:
@@ -55,9 +57,9 @@ class EXPORT JackServer : private detail::JackGlobalsServerInitializer
         JackEngineInterface* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
-        JackServerChannelInterface* fChannel;
+        JackServerChannel fChannel;
         JackConnectionManager fConnectionState;
-        JackSynchro* fSynchroTable[CLIENT_NUM];
+        JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
         long fLoopback;
 
@@ -88,7 +90,7 @@ class EXPORT JackServer : private detail::JackGlobalsServerInitializer
         // Object access
         JackEngineInterface* GetEngine();
         JackEngineControl* GetEngineControl();
-        JackSynchro** GetSynchroTable();
+        JackSynchro* GetSynchroTable();
         JackGraphManager* GetGraphManager();
 
         static JackServer* fInstance; // Unique instance

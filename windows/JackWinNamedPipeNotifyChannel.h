@@ -30,7 +30,7 @@ namespace Jack
 \brief JackNotifyChannel using named pipe.
 */
 
-class JackWinNamedPipeNotifyChannel : public JackNotifyChannelInterface
+class JackWinNamedPipeNotifyChannel
 {
 
     private:
@@ -40,8 +40,6 @@ class JackWinNamedPipeNotifyChannel : public JackNotifyChannelInterface
     public:
 
         JackWinNamedPipeNotifyChannel()
-        {}
-        virtual ~JackWinNamedPipeNotifyChannel()
         {}
 
         int Open(const char* name);		// Open the Server/Client connection

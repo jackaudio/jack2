@@ -33,7 +33,7 @@ namespace Jack
 \brief Inter process synchronization using POSIX semaphore.
 */
 
-class JackPosixSemaphore : public JackSynchro
+class JackPosixSemaphore : public detail::JackSynchro
 {
 
     private:
@@ -46,9 +46,7 @@ class JackPosixSemaphore : public JackSynchro
 
     public:
 
-        JackPosixSemaphore(): JackSynchro(), fSemaphore(NULL)
-        {}
-        virtual ~JackPosixSemaphore()
+        JackPosixSemaphore(): fSemaphore(NULL)
         {}
 
         bool Signal();

@@ -20,7 +20,6 @@ This program is free software; you can redistribute it and/or modify
 #ifndef __JackWinProcessSync__
 #define __JackWinProcessSync__
 
-#include "JackSyncInterface.h"
 #include <windows.h>
 #include <new>
 
@@ -31,7 +30,7 @@ namespace Jack
 \brief  A synchronization primitive built using a condition variable.
 */
 
-class JackWinProcessSync : public JackSyncInterface
+class JackWinProcessSync
 {
 
     private:
@@ -44,7 +43,7 @@ class JackWinProcessSync : public JackSyncInterface
         {
             fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
         }
-        virtual ~JackWinProcessSync()
+        ~JackWinProcessSync()
         {
             CloseHandle(fEvent);
         }

@@ -28,6 +28,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
 def build(bld):
     jackd = bld.create_obj('cpp', 'program')
     jackd.includes = ['../common/jack', '../common']
+    jackd.defines = 'HAVE_CONFIG_H'
     jackd.source = ['../common/Jackdmp.cpp']
     jackd.uselib = 'PTHREAD DL RT'
     jackd.uselib_local = 'serverlib'

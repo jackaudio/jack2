@@ -143,7 +143,7 @@ class JackCoreAudioDriver : public JackAudioDriver
 
     public:
 
-        JackCoreAudioDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table);
+        JackCoreAudioDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table);
         virtual ~JackCoreAudioDriver();
 
         int Open(jack_nframes_t frames_per_cycle,

@@ -22,11 +22,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackExternalClient__
 
 #include "JackClientInterface.h"
+#include "JackPlatformNotifyChannel.h"
 
 namespace Jack
 {
 
-class JackNotifyChannelInterface;
 struct JackClientControl;
 
 /*!
@@ -38,7 +38,7 @@ class JackExternalClient : public JackClientInterface
 
     private:
 
-        JackNotifyChannelInterface*	fChannel;   /*! Server/client communication channel */
+        JackNotifyChannel fChannel;   /*! Server/client communication channel */
         JackClientControl*	fClientControl;     /*! Client control in shared memory     */
 
     public:

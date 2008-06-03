@@ -38,7 +38,7 @@ class JackLockedEngine : public JackEngineInterface, public JackLockAble
 
     public:
 
-        JackLockedEngine(JackGraphManager* manager, JackSynchro** table, JackEngineControl* controler):
+        JackLockedEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler):
             fEngine(manager, table, controler)
         {}
         ~JackLockedEngine()

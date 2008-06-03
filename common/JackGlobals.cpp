@@ -24,62 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackError.h"
 
-namespace Jack
-{
-
-JackFactoryImpl* JackGlobals::fInstance;
-
-void JackGlobals::InitServer()
-{
-	jack_log("JackGlobals InitServer");
-	if (!fInstance) {
-		
-#ifdef __APPLE__
-		fInstance = new JackFactoryOSXServer();
-#endif
-		
-#ifdef WIN32
-		fInstance = new JackFactoryWindowsServer();
-#endif
-		
-#ifdef __linux__
-		fInstance = new JackFactoryLinuxServer();
-#endif
-		
-	}
-}
-
-void JackGlobals::InitClient()
-{
-	jack_log("JackGlobals InitClient");
-	if (!fInstance) {
-		
-#ifdef __APPLE__
-		fInstance = new JackFactoryOSXClient();
-#endif
-		
-#ifdef WIN32
-		fInstance = new JackFactoryWindowsClient();
-#endif
-		
-#ifdef __linux__
-		fInstance = new JackFactoryLinuxClient();
-#endif
-		
-	}
-}
-
-void JackGlobals::Destroy()
-{
-	jack_log("JackGlobals Destroy");
-	if (fInstance) {
-		delete fInstance;
-		fInstance = NULL;
-	}
-}
- 
-} // end of namespace
-
 static bool gKeyRealtimeInitialized = false;
 static bool g_key_log_function_initialized = false;
 

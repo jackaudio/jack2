@@ -22,7 +22,7 @@
 #define __JackThreadedDriver__
 
 #include "JackDriver.h"
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 
 namespace Jack
 {
@@ -36,7 +36,7 @@ class JackThreadedDriver : public JackDriverClientInterface, public JackRunnable
 
     protected:
 
-        JackThread* fThread;
+        JackThread fThread;
         JackDriverClient* fDriver;
 
     public:

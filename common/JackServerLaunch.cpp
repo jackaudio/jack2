@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackChannel.h"
 #include "JackLibGlobals.h"
 #include "JackServerLaunch.h"
+#include "JackPlatformClientChannel.h"
 
 using namespace Jack;
 
@@ -210,10 +211,9 @@ int start_server(const char* server_name, jack_options_t options)
 
 int server_connect(char* server_name)
 {
-    JackClientChannelInterface* channel = JackGlobals::MakeClientChannel();
-    int res = channel->ServerCheck(server_name);
-    channel->Close();
-    delete channel;
+    JackClientChannel channel;
+    int res = channel.ServerCheck(server_name);
+    channel.Close();
     return res;
 }
 

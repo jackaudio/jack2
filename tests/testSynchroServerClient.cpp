@@ -6,7 +6,7 @@
 	the Free Software Foundation; either version 2 of the License, or
 	(at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
+	This program is distributed in the hope that it will be useful, 
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU General Public License for more details.
@@ -36,24 +36,25 @@
 
 #ifdef __APPLE__
 	#include "JackMachSemaphore.h"
-	#include "JackMachThread.h"
 #endif
 
 #ifdef WIN32
-	#include "JackWinThread.h"
 	#include "JackWinEvent.h"
 #endif
 
 #ifdef linux
-	#include "JackPosixThread.h"
 	#include "JackPosixSemaphore.h"
 	#include "JackFifo.h"
 #endif
+
+#include "JackPlatformThread.h"
 
 #define ITER 100000
 
 #define SERVER "serveur1"
 #define CLIENT "client1"
+
+#include "JackPlatformSynchro.h"
 
 using namespace Jack;
 
@@ -86,17 +87,18 @@ static BOOL overhead (long * overhead)
 
 #endif
 
+template <typename sync_type>
 class Test1 : public JackRunnableInterface
 {
 
     private:
 
-        JackSynchro* fSynchro1;
-        JackSynchro* fSynchro2;
+        sync_type* fSynchro1;
+        sync_type* fSynchro2;
 
     public:
 
-        Test1(JackSynchro* synchro1, JackSynchro* synchro2)
+        Test1(sync_type* synchro1, sync_type* synchro2)
                 : fSynchro1(synchro1), fSynchro2(synchro2)
         {}
 
@@ -136,17 +138,18 @@ class Test1 : public JackRunnableInterface
 
 };
 
+template <typename sync_type>
 class Test2 : public JackRunnableInterface
 {
 
     private:
 
-        JackSynchro* fSynchro1;
-        JackSynchro* fSynchro2;
+        sync_type* fSynchro1;
+        sync_type* fSynchro2;
 
     public:
 
-        Test2(JackSynchro* synchro1, JackSynchro* synchro2)
+        Test2(sync_type* synchro1, sync_type* synchro2)
                 : fSynchro1(synchro1), fSynchro2(synchro2)
         {}
 
@@ -162,17 +165,59 @@ class Test2 : public JackRunnableInterface
 
 };
 
-int main(int ac, char *av [])
+template <typename sync_type>
+void run_tests(void)
 {
-    Test1* obj1;
-    Test2* obj2;
-    JackSynchro* sem1 = NULL;
-    JackSynchro* sem2 = NULL;
-    JackSynchro* sem3 = NULL;
-    JackSynchro* sem4 = NULL;
+    sync_type sem1, sem2, sem3, sem4;
+
+    sem1.Allocate(SERVER, "default", 0);
+    sem2.Allocate(CLIENT, "default", 0);
+    sem3.ConnectOutput(SERVER, "default");
+    sem4.ConnectInput(CLIENT, "default");
+
+    Test1<sync_type> obj1(&sem1, &sem2);
+    Test2<sync_type> obj2(&sem3, &sem4);
+
     JackThread* thread1;
     JackThread* thread2;
 
+#ifdef __APPLE__
+    thread1 = new JackMachThread(&obj1, 10000 * 1000, 500 * 1000, 10000 * 1000);
+    thread2 = new JackMachThread(&obj2, 10000 * 1000, 500 * 1000, 10000 * 1000);
+#endif
+
+#ifdef  WIN32
+    thread1 = new JackWinThread(&obj1);
+    thread2 = new JackWinThread(&obj2);
+#endif
+
+#ifdef linux
+    thread1 = new JackPosixThread(&obj1, false, 50, PTHREAD_CANCEL_DEFERRED);
+    thread2 = new JackPosixThread(&obj2, false, 50, PTHREAD_CANCEL_DEFERRED);
+#endif
+    thread1->Start();
+    thread2->Start();
+    //thread1->AcquireRealTime();
+    //thread2->AcquireRealTime();
+#ifdef  WIN32
+    Sleep(30 * 1000);
+#else
+    sleep (30);
+#endif
+
+    thread1->Stop();
+    thread2->Stop();
+    sem3.Disconnect();
+    sem4.Disconnect();
+    sem1.Destroy();
+    sem2.Destroy();
+
+    delete thread1;
+    delete thread2;
+}
+
+int main(int ac, char *av [])
+{
 #ifdef WIN32
     if (!QueryPerformanceFrequency (&gFreq) ||
             !overhead (&gQueryOverhead)) {
@@ -189,93 +234,28 @@ int main(int ac, char *av [])
 #ifdef __APPLE__
     if (strcmp(av[1], "-m") == 0) {
         printf("Mach semaphore\n");
-        sem1 = new JackMachSemaphore();
-        sem2 = new JackMachSemaphore();
-        sem3 = new JackMachSemaphore();
-        sem4 = new JackMachSemaphore();
+        run_tests<JackMachSemaphore>();
     }
 #endif
 
 #ifdef WIN32
     if (strcmp(av[1], "-e") == 0) {
         printf("Win event\n");
-        sem1 = new JackWinEvent();
-        sem2 = new JackWinEvent();
-        sem3 = new JackWinEvent();
-        sem4 = new JackWinEvent();
+        run_tests<JackWinEvent>();
     }
 #endif
 
 #ifdef linux
     if (strcmp(av[1], "-s") == 0) {
         printf("Posix semaphore\n");
-        sem1 = new JackPosixSemaphore();
-        sem2 = new JackPosixSemaphore();
-        sem3 = new JackPosixSemaphore();
-        sem4 = new JackPosixSemaphore();
+        run_tests<JackPosixSemaphore>();
     }
 
     if (strcmp(av[1], "-f") == 0) {
         printf("Fifo\n");
-        sem1 = new JackFifo();
-        sem2 = new JackFifo();
-        sem3 = new JackFifo();
-        sem4 = new JackFifo();
+        run_tests<JackFifo>();
     }
 
  #endif
-
-    if (!sem1->Allocate(SERVER, "default", 0))
-        return -1;
-    if (!sem2->Allocate(CLIENT, "default", 0))
-        return -1;
-    if (sem3->ConnectOutput(SERVER, "default"))
-        return -1;
-    if (sem4->ConnectInput(CLIENT, "default"))
-        return -1;
-
-    // run test in RT thread
-    obj1 = new Test1(sem1, sem2);
-    obj2 = new Test2(sem3, sem4);
-
-#ifdef __APPLE__
-    thread1 = new JackMachThread(obj1, 10000 * 1000, 500 * 1000, 10000 * 1000);
-    thread2 = new JackMachThread(obj2, 10000 * 1000, 500 * 1000, 10000 * 1000);
-#endif
-
-#ifdef  WIN32
-    thread1 = new JackWinThread(obj1);
-    thread2 = new JackWinThread(obj2);
-#endif
-
-#ifdef linux
-    thread1 = new JackPosixThread(obj1, false, 50, PTHREAD_CANCEL_DEFERRED);
-    thread2 = new JackPosixThread(obj2, false, 50, PTHREAD_CANCEL_DEFERRED);
-#endif
-
-    thread1->Start();
-    thread2->Start();
-    //thread1->AcquireRealTime();
-    //thread2->AcquireRealTime();
-#ifdef  WIN32
-    Sleep(30 * 1000);
-#else
-    sleep (30);
-#endif
-
-    thread1->Stop();
-    thread2->Stop();
-    sem3->Disconnect();
-    sem4->Disconnect();
-    sem1->Destroy();
-    sem2->Destroy();
-    delete obj1;
-    delete obj2;
-    delete thread1;
-    delete thread2;
-    delete sem1;
-    delete sem2;
-    delete sem3;
-    delete sem4;
     return 0;
 }

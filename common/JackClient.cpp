@@ -33,6 +33,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <math.h>
 #include <string>
 #include <algorithm>
+#include "JackPlatformThread.h"
 
 using namespace std;
 
@@ -41,12 +42,11 @@ namespace Jack
 
 #define IsRealTime() ((fProcess != NULL) | (fThreadFun != NULL) | (fSync != NULL) | (fTimebase != NULL))
         
-JackClient::JackClient()
+JackClient::JackClient():fThread(this)
 {}
 
-JackClient::JackClient(JackSynchro** table)
+JackClient::JackClient(JackSynchro* table):fThread(this)
 {
-    fThread = JackGlobals::MakeThread(this);
     fSynchroTable = table;
     fProcess = NULL;
     fGraphOrder = NULL;
@@ -78,7 +78,6 @@ JackClient::JackClient(JackSynchro** table)
 
 JackClient::~JackClient()
 {
-    delete fThread;
 }
 
 int JackClient::Close()
@@ -89,7 +88,7 @@ int JackClient::Close()
     fChannel->Stop();  // Channels is stopped first to avoid receiving notifications while closing
     fChannel->ClientClose(GetClientControl()->fRefNum, &result);
     fChannel->Close();
-    fSynchroTable[GetClientControl()->fRefNum]->Disconnect();
+    fSynchroTable[GetClientControl()->fRefNum].Disconnect();
     return result;
 }
 
@@ -100,7 +99,7 @@ bool JackClient::IsActive()
 
 pthread_t JackClient::GetThreadID()
 {
-    return fThread->GetThreadID();
+    return fThread.GetThreadID();
 }
 
 /*!
@@ -112,14 +111,14 @@ void JackClient::SetupDriverSync(bool freewheel)
 {
     if (!freewheel && !GetEngineControl()->fSyncMode) {
         jack_log("JackClient::SetupDriverSync driver sem in flush mode");
-        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(true);
-        fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(true);
-        fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(true);
+        fSynchroTable[AUDIO_DRIVER_REFNUM].SetFlush(true);
+        fSynchroTable[FREEWHEEL_DRIVER_REFNUM].SetFlush(true);
+        fSynchroTable[LOOPBACK_DRIVER_REFNUM].SetFlush(true);
     } else {
         jack_log("JackClient::SetupDriverSync driver sem in normal mode");
-        fSynchroTable[AUDIO_DRIVER_REFNUM]->SetFlush(false);
-        fSynchroTable[FREEWHEEL_DRIVER_REFNUM]->SetFlush(false);
-        fSynchroTable[LOOPBACK_DRIVER_REFNUM]->SetFlush(false);
+        fSynchroTable[AUDIO_DRIVER_REFNUM].SetFlush(false);
+        fSynchroTable[FREEWHEEL_DRIVER_REFNUM].SetFlush(false);
+        fSynchroTable[LOOPBACK_DRIVER_REFNUM].SetFlush(false);
     }
 }
 
@@ -188,7 +187,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             case kStartFreewheelCallback:
                 jack_log("JackClient::kStartFreewheel");
                 SetupDriverSync(true);
-                fThread->DropRealTime();
+                fThread.DropRealTime();
                 if (fFreewheel)
                     fFreewheel(1, fFreewheelArg);
                 break;
@@ -198,7 +197,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 SetupDriverSync(false);
                 if (fFreewheel)
                     fFreewheel(0, fFreewheelArg);
-                fThread->AcquireRealTime();
+                fThread.AcquireRealTime();
                 break;
 
             case kPortRegistrationOnCallback:
@@ -290,7 +289,7 @@ int JackClient::Deactivate()
   
     // RT thread is stopped only when needed...
     if (IsRealTime()) 
-        fThread->Kill();
+        fThread.Kill();
     return result;
 }
 
@@ -318,15 +317,15 @@ int JackClient::StartThread()
              long(int64_t(GetEngineControl()->fConstraint) / 1000.0f));
 
     // Will do "something" on OSX only...
-    fThread->SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+    fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
 
-    if (fThread->Start() < 0) {
+    if (fThread.Start() < 0) {
         jack_error("Start thread error");
         return -1;
     }
 
     if (GetEngineControl()->fRealTime) {
-        if (fThread->AcquireRealTime(GetEngineControl()->fPriority - 1) < 0) {
+        if (fThread.AcquireRealTime(GetEngineControl()->fPriority - 1) < 0) {
             jack_error("AcquireRealTime error");
         }
     }
@@ -445,7 +444,7 @@ inline int JackClient::End()
     jack_log("JackClient::Execute end name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
     int result;
-    fThread->DropRealTime();
+    fThread.DropRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     return 0; 
@@ -456,7 +455,7 @@ inline int JackClient::Error()
     jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
     int result;
-    fThread->DropRealTime();
+    fThread.DropRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     ShutDown();

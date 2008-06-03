@@ -1045,7 +1045,7 @@ extern "C"
         return desc;
     }
 
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngineInterface* engine, Jack::JackSynchro** table, const JSList* params) {
+    Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngineInterface* engine, Jack::JackSynchro* table, const JSList* params) {
         unsigned int port = 0;
         unsigned int node_id = -1;
         int nbitems;

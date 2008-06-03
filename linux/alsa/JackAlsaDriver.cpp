@@ -2608,7 +2608,7 @@ extern "C"
         return desc;
     }
 
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngineInterface* engine, Jack::JackSynchro** table, const JSList* params) {
+    Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngineInterface* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t srate = 48000;
         jack_nframes_t frames_per_interrupt = 1024;
         unsigned long user_nperiods = 2;

@@ -37,21 +37,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackGlobals.h"
 #include "JackChannel.h"
-#include "JackSyncInterface.h"
 #include "JackError.h"
 
 namespace Jack
 {
 
 JackEngine::JackEngine(JackGraphManager* manager,
-                       JackSynchro** table,
+                       JackSynchro* table,
                        JackEngineControl* control)
 {
     fGraphManager = manager;
     fSynchroTable = table;
     fEngineControl = control;
-    fChannel = JackGlobals::MakeServerNotifyChannel();
-    fSignal = JackGlobals::MakeInterProcessSync();
     for (int i = 0; i < CLIENT_NUM; i++)
         fClientTable[i] = NULL;
 }
@@ -59,8 +56,6 @@ JackEngine::JackEngine(JackGraphManager* manager,
 JackEngine::~JackEngine()
 {
     jack_log("JackEngine::~JackEngine");
-    delete fChannel;
-    delete fSignal;
 }
 
 int JackEngine::Open()
@@ -68,7 +63,7 @@ int JackEngine::Open()
     jack_log("JackEngine::Open");
 
     // Open audio thread => request thread communication channel
-    if (fChannel->Open(fEngineControl->fServerName) < 0) {
+    if (fChannel.Open(fEngineControl->fServerName) < 0) {
         jack_error("Cannot connect to server");
         return -1;
     } else {
@@ -79,7 +74,7 @@ int JackEngine::Open()
 int JackEngine::Close()
 {
     jack_log("JackEngine::Close");
-    fChannel->Close();
+    fChannel.Close();
     
     // Close (possibly) remaining clients (RT is stopped)
     for (int i = 0; i < CLIENT_NUM; i++) {
@@ -94,7 +89,7 @@ int JackEngine::Close()
         }
     }
     
-    fSignal->Destroy();
+    fSignal.Destroy();
     return 0;
 }
     
@@ -142,8 +137,8 @@ void JackEngine::ProcessNext(jack_time_t callback_usecs)
 {
     fLastSwitchUsecs = callback_usecs;
     if (fGraphManager->RunNextGraph())	// True if the graph actually switched to a new state
-        fChannel->Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
-    fSignal->SignalAll();				// Signal for threads waiting for next cycle
+        fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
+    fSignal.SignalAll();               // Signal for threads waiting for next cycle
 }
 
 void JackEngine::ProcessCurrent(jack_time_t callback_usecs)
@@ -199,12 +194,12 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
 
             if (status != NotTriggered && status != Finished) {
                 jack_error("JackEngine::XRun: client = %s was not run: state = %ld", client->GetClientControl()->fName, status);
-                fChannel->Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
+                fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
 
             if (status == Finished && (long)(finished_date - callback_usecs) > 0) {
                 jack_error("JackEngine::XRun: client %s finished after current callback", client->GetClientControl()->fName);
-                fChannel->Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
+                fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);  // Notify all clients
             }
         }
     }
@@ -281,7 +276,7 @@ void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
     // Use the audio thread => request thread communication channel
     fEngineControl->ResetFrameTime(callback_usecs);
     fEngineControl->NotifyXRun(delayed_usecs);
-    fChannel->Notify(ALL_CLIENTS, kXRunCallback, 0);
+    fChannel.Notify(ALL_CLIENTS, kXRunCallback, 0);
 }
 
 void JackEngine::NotifyXRun(int refnum)
@@ -478,7 +473,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
 
     JackExternalClient* client = new JackExternalClient();
 
-    if (!fSynchroTable[refnum]->Allocate(name, fEngineControl->fServerName, 0)) {
+    if (!fSynchroTable[refnum].Allocate(name, fEngineControl->fServerName, 0)) {
         jack_error("Cannot allocate synchro");
         goto error;
     }
@@ -488,7 +483,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
         goto error;
     }
 
-    if (!fSignal->TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
+    if (!fSignal.TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
         goto error;
@@ -510,7 +505,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
 
 error:
     // Cleanup...
-    fSynchroTable[refnum]->Destroy();   
+    fSynchroTable[refnum].Destroy();
     fClientTable[refnum] = 0;
     client->Close();
     delete client;
@@ -528,12 +523,12 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
         goto error;
     }
 
-    if (!fSynchroTable[refnum]->Allocate(name, fEngineControl->fServerName, 0)) {
+    if (!fSynchroTable[refnum].Allocate(name, fEngineControl->fServerName, 0)) {
         jack_error("Cannot allocate synchro");
         goto error;
     }
 
-    if (wait && !fSignal->TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
+    if (wait && !fSignal.TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
         goto error;
@@ -555,7 +550,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
 
 error:
     // Cleanup...
-    fSynchroTable[refnum]->Destroy();  
+    fSynchroTable[refnum].Destroy();
     fClientTable[refnum] = 0;
     return -1;
 }
@@ -608,7 +603,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 
     // Wait until next cycle to be sure client is not used anymore
     if (wait) {
-        if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 2)) { // Must wait at least until a switch occurs in Process, even in case of graph end failure
+        if (!fSignal.TimedWait(fEngineControl->fTimeOutUsecs * 2)) { // Must wait at least until a switch occurs in Process, even in case of graph end failure
             jack_error("JackEngine::ClientCloseAux wait error ref = %ld", refnum);
         }
     }
@@ -617,7 +612,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     NotifyRemoveClient(client->GetClientControl()->fName, client->GetClientControl()->fRefNum);
 
     // Cleanup...
-    fSynchroTable[refnum]->Destroy();
+    fSynchroTable[refnum].Destroy();
     fEngineControl->ResetRollingUsecs();
     return 0;
 }
@@ -632,7 +627,7 @@ int JackEngine::ClientActivate(int refnum, bool state)
         fGraphManager->Activate(refnum);
  
     // Wait for graph state change to be effective
-    if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
+    if (!fSignal.TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {
@@ -668,7 +663,7 @@ int JackEngine::ClientDeactivate(int refnum)
     fLastSwitchUsecs = 0; // Force switch to occur next cycle, even when called with "dead" clients
 
     // Wait for graph state change to be effective
-    if (!fSignal->TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
+    if (!fSignal.TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientDeactivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {

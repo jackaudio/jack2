@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackChannel.h"
 #include "JackSocket.h"
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 #include <poll.h>
 #include <map>
 
@@ -33,13 +33,13 @@ namespace Jack
 \brief JackServerChannel using sockets.
 */
 
-class JackSocketServerChannel : public JackServerChannelInterface, public JackRunnableInterface
+class JackSocketServerChannel : public JackRunnableInterface
 {
 
     private:
 
         JackServerSocket fRequestListenSocket;	// Socket to create request socket for the client
-        JackThread*	fThread;					// Thread to execute the event loop
+        JackThread fThread;                     // Thread to execute the event loop
         JackServer*	fServer;
         pollfd*	fPollTable;
         bool fRebuild;
@@ -56,7 +56,7 @@ class JackSocketServerChannel : public JackServerChannelInterface, public JackRu
     public:
 
         JackSocketServerChannel();
-        virtual ~JackSocketServerChannel();
+        ~JackSocketServerChannel();
 
         int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();					// Close the Server/Client connection

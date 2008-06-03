@@ -29,7 +29,7 @@ namespace Jack
 \brief JackClientChannel for server internal clients.
 */
 
-class JackInternalClientChannel : public JackClientChannelInterface
+class JackInternalClientChannel : public detail::JackClientChannelInterface
 {
 
     private:

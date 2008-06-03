@@ -40,7 +40,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackAudioDriver::JackAudioDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro** table)
+JackAudioDriver::JackAudioDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table)
         : JackDriver(name, alias, engine, table),
         fCaptureChannels(0),
         fPlaybackChannels(0),

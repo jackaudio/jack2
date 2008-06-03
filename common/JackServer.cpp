@@ -37,7 +37,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackChannel.h"
 #include "JackClientControl.h"
 #include "JackEngineControl.h"
-#include "JackSyncInterface.h"
 #include "JackGraphManager.h"
 #include "JackInternalClient.h"
 #include "JackError.h"
@@ -50,14 +49,11 @@ JackServer* JackServer::fInstance = NULL;
 
 JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
 {
-    for (int i = 0; i < CLIENT_NUM; i++)
-        fSynchroTable[i] = JackGlobals::MakeSynchro();
     fGraphManager = new JackGraphManager();
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
-    fEngine = new JackLockedEngine(fGraphManager, fSynchroTable, fEngineControl);
-    fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, fSynchroTable));
-    fLoopbackDriver = new JackLoopbackDriver(fEngine, fSynchroTable);
-    fChannel = JackGlobals::MakeServerChannel();
+    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
+    fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
+    fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
     fFreewheel = false;
     fLoopback = loopback;
     fDriverInfo = NULL;
@@ -68,14 +64,11 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
 
 JackServer::~JackServer()
 {
-    for (int i = 0; i < CLIENT_NUM; i++)
-        delete fSynchroTable[i];
     delete fGraphManager;
     delete fAudioDriver;
     delete fFreewheelDriver;
     delete fLoopbackDriver;
     delete fEngine;
-    delete fChannel;
     delete fEngineControl;
     if (fDriverInfo) {
         UnloadDriverModule(fDriverInfo->handle);
@@ -90,7 +83,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
     // TODO: move that in reworked JackServerGlobals::Init()
     JackMessageBuffer::Create();
   
-    if (fChannel->Open(fEngineControl->fServerName, this) < 0) {
+    if (fChannel.Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
         return -1;
     }
@@ -104,7 +97,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         return -1;
     }
 
-    if ((fAudioDriver = fDriverInfo->initialize(fEngine, fSynchroTable, driver_params)) == NULL) {
+    if ((fAudioDriver = fDriverInfo->initialize(fEngine, GetSynchroTable(), driver_params)) == NULL) {
         jack_error("Cannot initialize driver");
         return -1;
     }
@@ -142,7 +135,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 int JackServer::Close()
 {
     jack_log("JackServer::Close");
-    fChannel->Close();
+    fChannel.Close();
     fAudioDriver->Detach();
     if (fLoopback > 0)
         fLoopbackDriver->Detach();
@@ -303,7 +296,7 @@ JackEngineInterface* JackServer::GetEngine()
     return fEngine;
 }
 
-JackSynchro** JackServer::GetSynchroTable()
+JackSynchro* JackServer::GetSynchroTable()
 {
     return fSynchroTable;
 }

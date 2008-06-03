@@ -59,12 +59,12 @@ JackEngineControl* GetEngineControl()
     return JackServer::fInstance->GetEngineControl();
 }
 
-JackSynchro** GetSynchroTable()
+JackSynchro* GetSynchroTable()
 {
     return JackServer::fInstance->GetSynchroTable();
 }
 
-JackInternalClient::JackInternalClient(JackServer* server, JackSynchro** table): JackClient(table)
+JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)
 {
     fClientControl = new JackClientControl();
     fChannel = new JackInternalClientChannel(server);
@@ -129,7 +129,7 @@ JackClientControl* JackInternalClient::GetClientControl() const
     return fClientControl;
 }
 
-JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro** table, const char* so_name, const char* object_data)
+JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data)
         : JackInternalClient(server, table)
 {
     char path_to_so[PATH_MAX + 1];

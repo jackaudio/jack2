@@ -442,8 +442,8 @@ class JackConnectionManager
 
         // Graph
         void ResetGraph(JackClientTiming* timing);
-        int ResumeRefNum(JackClientControl* control, JackSynchro** table, JackClientTiming* timing);
-        int SuspendRefNum(JackClientControl* control, JackSynchro** table, JackClientTiming* timing, long time_out_usec);
+        int ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing);
+        int SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec);
 };
 
 } // end of namespace

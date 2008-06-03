@@ -30,10 +30,10 @@
 #ifndef __JackMessageBuffer__
 #define __JackMessageBuffer__
 
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 #include "JackMutex.h"
 #include "JackAtomic.h"
-#include "JackSyncInterface.h"
+#include "JackPlatformProcessSync.h"
 
 namespace Jack
 {
@@ -56,8 +56,8 @@ class JackMessageBuffer : public JackRunnableInterface
     
         JackMessage fBuffers[MB_BUFFERS];
         JackMutex fMutex;
-        JackThread* fThread;
-        JackSyncInterface* fSignal;
+        JackThread fThread;
+        JackProcessSync fSignal;
         volatile unsigned int fInBuffer;
         volatile unsigned int fOutBuffer;
         SInt32 fOverruns;

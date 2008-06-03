@@ -31,6 +31,8 @@ class JackServer;
 struct JackEngineControl;
 class JackGraphManager;
 
+namespace detail
+{
 /*!
 \brief Inter process channel for server/client bidirectionnal communication : request and (receiving) notifications.
 */
@@ -120,91 +122,9 @@ class JackClientChannelInterface
 
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
-};
-
-/*!
-\brief Inter process channel for server to client notifications.
-*/
-
-class JackNotifyChannelInterface
-{
-
-    public:
-
-        JackNotifyChannelInterface()
-        {}
-        virtual ~JackNotifyChannelInterface()
-        {}
-
-        // Open the Server/Client connection
-        virtual int Open(const char* name)
-        {
-            return 0;
-        }
-        // Close the Server/Client connection
-        virtual void Close()
-        {}
-
-        /*
-        The "sync" parameter allows to choose between "synchronous" and "asynchronous" notification
-        */
-        virtual void ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2, int* result)
-        {}
-
-};
-
-/*!
-\brief Entry point channel for client/server communication.
-*/
-
-class JackServerChannelInterface
-{
-
-    public:
-
-        JackServerChannelInterface()
-        {}
-        virtual ~JackServerChannelInterface()
-        {}
-
-        // Open the Server/Client connection
-        virtual int Open(const char* server_name, JackServer* server)
-        {
-            return 0;
-        }
-        // Close the Server/Client connection
-        virtual void Close()
-        {}
-};
-
-/*!
-\brief Channel for server RT thread to request server thread communication.
-*/
-
-class JackServerNotifyChannelInterface
-{
-
-    public:
-
-        JackServerNotifyChannelInterface()
-        {}
-        virtual ~JackServerNotifyChannelInterface()
-        {}
-
-        // Open the Server RT/Server connection
-        virtual int Open(const char* server_name)
-        {
-            return 0;
-        }
-        // Close the Server RT/Server connection
-        virtual void Close()
-        {}
-
-        virtual void Notify(int refnum, int notify, int value)
-        {}
         
 };
-
+}
 
 } // end of namespace
 

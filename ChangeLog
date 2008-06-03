@@ -22,6 +22,10 @@ Fernando Lopez-Lezcano
 
 2008-06-02 Stephane Letz  <letz@grame.fr>
 
+	*  Tim Blechmann patch to remove unnecessary virtual methods : choice of the appropriate platform version is now done at compilation time.
+
+2008-06-02 Stephane Letz  <letz@grame.fr>
+
 	* Cleanup and correct wscript for example-clients.
 	* Add a test for coherent freewheel state in JackDebugClient. 
 	* Cleanup JackMutex class.

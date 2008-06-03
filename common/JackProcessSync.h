@@ -20,8 +20,7 @@ This program is free software; you can redistribute it and/or modify
 #ifndef __JackProcessSync__
 #define __JackProcessSync__
 
-#include "JackSyncInterface.h"
-#include "JackSynchro.h"
+#include "JackPlatformSynchro.h"
 #include <pthread.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -33,7 +32,7 @@ namespace Jack
 \brief  A synchronization primitive built using a condition variable.
 */
 
-class JackProcessSync : public JackSyncInterface
+class JackProcessSync
 {
 
     private:
@@ -43,12 +42,13 @@ class JackProcessSync : public JackSyncInterface
 
     public:
 
-        JackProcessSync(): JackSyncInterface()
+        JackProcessSync()
         {
             pthread_mutex_init(&fLock, NULL);
             pthread_cond_init(&fCond, NULL);
         }
-        virtual ~JackProcessSync()
+
+        ~JackProcessSync()
         {
             pthread_mutex_destroy(&fLock);
             pthread_cond_destroy(&fCond);
@@ -91,7 +91,7 @@ class JackProcessSync : public JackSyncInterface
 \brief  A synchronization primitive built using an inter-process synchronization object.
 */
 
-class JackInterProcessSync : public JackSyncInterface
+class JackInterProcessSync
 {
 
     private:
@@ -102,7 +102,7 @@ class JackInterProcessSync : public JackSyncInterface
 
         JackInterProcessSync(JackSynchro* synchro): fSynchro(synchro)
         {}
-        virtual ~JackInterProcessSync()
+        ~JackInterProcessSync()
         {
             delete fSynchro;
         }

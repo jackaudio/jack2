@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackConnectionManager.h"
 #include "JackAtomicState.h"
+#include "JackPlatformSynchro.h"
 
 namespace Jack
 {
@@ -108,8 +109,8 @@ class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectio
         bool IsFinishedGraph();
 
         void InitRefNum(int refnum);
-        int ResumeRefNum(JackClientControl* control, JackSynchro** table);
-        int SuspendRefNum(JackClientControl* control, JackSynchro** table, long usecs);
+        int ResumeRefNum(JackClientControl* control, JackSynchro* table);
+        int SuspendRefNum(JackClientControl* control, JackSynchro* table, long usecs);
 
         JackClientTiming* GetClientTiming(int refnum);
 

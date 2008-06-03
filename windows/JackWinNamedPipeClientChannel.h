@@ -22,7 +22,7 @@ Copyright (C) 2004-2006 Grame
 
 #include "JackChannel.h"
 #include "JackWinNamedPipe.h"
-#include "JackThread.h"
+#include "JackPlatformThread.h"
 #include "JackRequest.h"
 
 namespace Jack
@@ -32,14 +32,14 @@ namespace Jack
 \brief JackClientChannel using pipes.
 */
 
-class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public JackRunnableInterface
+class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface, public JackRunnableInterface
 {
 
     private:
 
         JackWinNamedPipeClient fRequestPipe;			// Pipe to communicate with the server
         JackWinNamedPipeServer fNotificationListenPipe;	// Pipe listener for server notification
-        JackThread*	fThread;							// Thread to execute the event loop
+        JackThread fThread;                             // Thread to execute the event loop
         JackClient*	fClient;
 
         void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
@@ -60,6 +60,8 @@ class JackWinNamedPipeClientChannel : public JackClientChannelInterface, public 
 
         void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
         void ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
+        {}
         void ClientClose(int refnum, int* result);
 
         void ClientActivate(int refnum, int state, int* result);

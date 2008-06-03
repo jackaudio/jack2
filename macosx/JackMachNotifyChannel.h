@@ -30,7 +30,7 @@ namespace Jack
 \brief JackNotifyChannel using Mach IPC.
 */
 
-class JackMachNotifyChannel : public JackNotifyChannelInterface
+class JackMachNotifyChannel
 {
 
     private:
@@ -40,8 +40,6 @@ class JackMachNotifyChannel : public JackNotifyChannelInterface
     public:
 
         JackMachNotifyChannel()
-        {}
-        virtual ~JackMachNotifyChannel()
         {}
 
         int Open(const char* name);		// Open the Server/Client connection

@@ -44,9 +44,8 @@ HANDLE JackClientPipeThread::fMutex = NULL;  // never released....
 // fRefNum = -1 correspond to already removed client
 
 JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
-        : fPipe(pipe), fServer(NULL), fRefNum(0)
+    : fPipe(pipe), fServer(NULL), fRefNum(0), fThread(this)
 {
-    fThread = JackGlobals::MakeThread(this);
     if (fMutex == NULL)
         fMutex = CreateMutex(NULL, FALSE, NULL);
 }
@@ -55,7 +54,6 @@ JackClientPipeThread::~JackClientPipeThread()
 {
     jack_log("JackClientPipeThread::~JackClientPipeThread");
     delete fPipe;
-    delete fThread;
 }
 
 int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
@@ -63,7 +61,7 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
     fServer = server;
 
     // Start listening
-    if (fThread->Start() != 0) {
+    if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener\n");
         return -1;
     } else {
@@ -80,7 +78,7 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
     	all ressources will be desallocated at the end.
     */
 
-    fThread->Kill();
+    fThread.Kill();
     fPipe->Close();
     fRefNum = -1;
 }
@@ -354,10 +352,8 @@ void JackClientPipeThread::ClientKill()
     Close();
 }
 
-JackWinNamedPipeServerChannel::JackWinNamedPipeServerChannel()
-{
-    fThread = JackGlobals::MakeThread(this);
-}
+JackWinNamedPipeServerChannel::JackWinNamedPipeServerChannel():fThread(this)
+{}
 
 JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
 {
@@ -368,8 +364,6 @@ JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
         client->Close();
         delete client;
     }
-
-    delete fThread;
 }
 
 int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* server)
@@ -386,7 +380,7 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
     }
 
     // Start listening
-    if (fThread->Start() != 0) {
+    if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener\n");
         goto error;
     }
@@ -405,10 +399,10 @@ void JackWinNamedPipeServerChannel::Close()
     	all ressources will be desallocated at the end.
     	
     	fRequestListenPipe.Close();
-    	fThread->Stop();
+        fThread.Stop();
     */
 
-    fThread->Kill();
+    fThread.Kill();
     fRequestListenPipe.Close();
 }
 

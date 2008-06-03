@@ -97,19 +97,14 @@ class JackMachThread : public JackPosixThread
                 : JackPosixThread(runnable), fPeriod(period), fComputation(computation), fConstraint(constraint)
         {}
 
-        JackMachThread(JackRunnableInterface* runnable)
-                : JackPosixThread(runnable), fPeriod(0), fComputation(0), fConstraint(0)
-        {}
-        JackMachThread(JackRunnableInterface* runnable, int cancellation)
+        JackMachThread(JackRunnableInterface* runnable, int cancellation = PTHREAD_CANCEL_ASYNCHRONOUS)
                 : JackPosixThread(runnable, cancellation), fPeriod(0), fComputation(0), fConstraint(0)
-        {}
-
-        virtual ~JackMachThread()
         {}
 
         int Kill();
 
         int AcquireRealTime();
+        int AcquireRealTime(int priority);
         int DropRealTime();
         void SetParams(UInt64 period, UInt64 computation, UInt64 constraint);
         static int GetParams(UInt64* period, UInt64* computation, UInt64* constraint);

@@ -32,7 +32,7 @@ namespace Jack
 \brief Inter process synchronization using system wide semaphore.
 */
 
-class JackWinSemaphore : public JackSynchro
+class JackWinSemaphore : public detail::JackSynchro
 {
 
     private:
@@ -45,9 +45,7 @@ class JackWinSemaphore : public JackSynchro
 
     public:
 
-        JackWinSemaphore(): JackSynchro(), fSemaphore(NULL)
-        {}
-        virtual ~JackWinSemaphore()
+        JackWinSemaphore(): fSemaphore(NULL)
         {}
 
         bool Signal();

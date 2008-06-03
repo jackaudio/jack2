@@ -36,15 +36,14 @@
 namespace Jack
 {
 
-JackThreadedDriver::JackThreadedDriver(JackDriverClient* driver)
+JackThreadedDriver::JackThreadedDriver(JackDriverClient* driver):
+    fThread(this)
 {
-    fThread = JackGlobals::MakeThread(this);
     fDriver = driver;
 }
 
 JackThreadedDriver::~JackThreadedDriver()
 {
-    delete fThread;
     delete fDriver;
 }
 
@@ -56,7 +55,7 @@ int JackThreadedDriver::Start()
         jack_error("Cannot start driver");
         return -1;
     }
-    if (fThread->Start() < 0) {
+    if (fThread.Start() < 0) {
         jack_error("Cannot start thread");
         return -1;
     }
@@ -68,12 +67,12 @@ int JackThreadedDriver::Stop()
 {
     jack_log("JackThreadedDriver::Stop");
     
-    switch (fThread->GetStatus()) {
+    switch (fThread.GetStatus()) {
             
         // Kill the thread in Init phase
         case JackThread::kStarting:
         case JackThread::kIniting:
-            if (fThread->Kill() < 0) {  
+            if (fThread.Kill() < 0) {
                 jack_error("Cannot kill thread");
                 return -1;
             }
@@ -81,7 +80,7 @@ int JackThreadedDriver::Stop()
            
         // Stop when the thread cycle is finished
         case JackThread::kRunning:
-            if (fThread->Stop() < 0) {
+            if (fThread.Stop() < 0) {
                 jack_error("Cannot stop thread"); 
                 return -1;
             }
@@ -109,8 +108,8 @@ bool JackThreadedDriver::Init()
         if (fDriver->IsRealTime()) {
             jack_log("JackThreadedDriver::Init IsRealTime");
             // Will do "something" on OSX only...
-            fThread->SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-            if (fThread->AcquireRealTime(GetEngineControl()->fPriority) < 0)
+            fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+            if (fThread.AcquireRealTime(GetEngineControl()->fPriority) < 0)
                 jack_error("AcquireRealTime error");
         }
         return true;
@@ -123,14 +122,14 @@ bool JackRestartThreadedDriver::Execute()
 {
     try {
         // Keep running even in case of error
-        while (fThread->GetStatus() == JackThread::kRunning) { 
+        while (fThread.GetStatus() == JackThread::kRunning) {
             Process();
         }
     } catch (JackDriverException e) {
         e.PrintMessage();
         jack_log("Driver is restarted");
-        fThread->SetStatus(JackThread::kIniting);
-        fThread->DropRealTime();
+        fThread.SetStatus(JackThread::kIniting);
+        fThread.DropRealTime();
         return Init();
     }
     return false;
