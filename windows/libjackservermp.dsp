@@ -164,10 +164,6 @@ SOURCE=..\common\JackGlobals.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\common\JackGlobalsServer.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\common\JackGraphManager.cpp
 # End Source File
 # Begin Source File

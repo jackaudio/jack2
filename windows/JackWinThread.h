@@ -34,7 +34,7 @@ typedef DWORD  (WINAPI *ThreadCallback)(void *arg);
 \brief Windows threads.
 */
 
-class JackWinThread : public JackThread
+class JackWinThread : public detail::JackThread
 {
 
     private:

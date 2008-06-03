@@ -94,7 +94,7 @@ class JackWinAsyncNamedPipeClient : public JackWinNamedPipeClient
 
         HANDLE GetEvent()
         {
-            return fOverlap.hEvent;
+            return (HANDLE)fOverlap.hEvent;
         }
 
         kIOState GetIOState()

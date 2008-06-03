@@ -36,8 +36,7 @@
 namespace Jack
 {
 
-JackThreadedDriver::JackThreadedDriver(JackDriverClient* driver):
-    fThread(this)
+JackThreadedDriver::JackThreadedDriver(JackDriverClient* driver):fThread(this)
 {
     fDriver = driver;
 }

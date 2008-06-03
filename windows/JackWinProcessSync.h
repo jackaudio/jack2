@@ -21,7 +21,6 @@ This program is free software; you can redistribute it and/or modify
 #define __JackWinProcessSync__
 
 #include <windows.h>
-#include <new>
 
 namespace Jack
 {
@@ -41,7 +40,7 @@ class JackWinProcessSync
 
         JackWinProcessSync()
         {
-            fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+            fEvent = (HANDLE)CreateEvent(NULL, FALSE, FALSE, NULL);
         }
         ~JackWinProcessSync()
         {
