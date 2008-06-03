@@ -29,14 +29,14 @@
 
 #include "JackPosixThread.h"
 #include "JackMutex.h"
-#include <jack/thread.h>
+#include "thread.h"
 
 using namespace Jack;
 
 static void CleanupHandler(void * arg)
 {
     JackLockAble* locked = (JackLockAble*)arg;
-    printf("CleanupHandler locked %x \n", locked);
+    printf("CleanupHandler locked %px \n", locked);
     locked->Unlock();
 }
 
@@ -92,7 +92,7 @@ struct LockedObject : public JackLockAble {
         fCount++;
         //printf("LockedMethod1 self %x fCount %d\n", pthread_self(), fCount);
         if (fCount >= 1000) {
-            printf("Terminate self = %x  count = %d\n", pthread_self(), fCount);
+            printf("Terminate self = %px  count = %d\n", pthread_self(), fCount);
             pthread_exit(NULL);
         }
         Unlock();
@@ -107,7 +107,7 @@ struct LockedObject : public JackLockAble {
         fCount++;
         //printf("LockedMethod2 self %x fCount %d\n", pthread_self(), fCount);
         if (fCount >= 1500) {
-            printf("Terminate self = %x  count = %d\n", pthread_self(), fCount);
+            printf("Terminate self = %px  count = %d\n", pthread_self(), fCount);
             pthread_exit(NULL);
         }
         Unlock();
@@ -122,7 +122,7 @@ struct LockedObject : public JackLockAble {
         fCount++;
         //printf("LockedMethod3 self %x fCount %d\n", pthread_self(), fCount);
         if (fCount >= 3000) {
-            printf("Terminate self = %x  count = %d\n", pthread_self(), fCount);
+            printf("Terminate self = %px  count = %d\n", pthread_self(), fCount);
             pthread_exit(NULL);
         }
         Unlock();
@@ -149,7 +149,7 @@ struct TestThread : public JackRunnableInterface {
 
 	virtual ~TestThread()
 	{
-        printf("DELETE %x\n", fThread);
+        printf("DELETE %px\n", fThread);
         fThread->Kill();
 		delete fThread;
 	}

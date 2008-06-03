@@ -7835,6 +7835,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					CoreAudio,
@@ -7870,6 +7871,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					CoreAudio,
@@ -7902,6 +7904,7 @@
 					x86_64,
 				);
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					AudioToolBox,
@@ -7940,6 +7943,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					CoreAudio,
@@ -7975,6 +7979,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					CoreAudio,
@@ -8007,6 +8012,7 @@
 					x86_64,
 				);
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					AudioToolBox,
@@ -8045,6 +8051,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					CoreAudio,
@@ -8080,6 +8087,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					CoreAudio,
@@ -8112,6 +8120,7 @@
 					x86_64,
 				);
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					AudioToolBox,
@@ -8160,7 +8169,7 @@
 				MACH_O_TYPE = mh_dylib;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -8207,7 +8216,7 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackservermp,
@@ -8251,7 +8260,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -8303,7 +8312,7 @@
 				MACH_O_TYPE = mh_dylib;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
@@ -8354,7 +8363,7 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
@@ -8402,7 +8411,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					libportaudio.a,
 					"-framework",
@@ -8453,6 +8462,7 @@
 				MACH_O_TYPE = mh_dylib;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -8498,6 +8508,7 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackservermp,
@@ -8540,6 +8551,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -9073,7 +9085,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = ../common;
+				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
+					../common,
+				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-framework",
