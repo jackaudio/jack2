@@ -39,6 +39,7 @@ def build(bld):
     serverlib.includes = ['.', './jack', '..', '../linux']
     serverlib.name         = 'serverlib'
     serverlib.target       = 'jackserver'
+    serverlib.uselib = ['RT', "PTHREAD"]
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
@@ -63,8 +64,9 @@ def build(bld):
     clientlib = bld.create_obj('cpp', 'shlib')
     clientlib.features.append('cc')
     clientlib.defines = 'HAVE_CONFIG_H'
+    clientlib.uselib = ['RT', "PTHREAD"]
     if bld.env()['BUILD_JACKDBUS'] == True:
-        clientlib.uselib = ['DBUS-1']
+        clientlib.uselib.append('DBUS-1')
     clientlib.includes = ['.', './jack', '..', '../linux']
     clientlib.name         = 'clientlib'
     clientlib.target       = 'jack'
