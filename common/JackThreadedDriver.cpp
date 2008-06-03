@@ -124,14 +124,21 @@ bool JackRestartThreadedDriver::Execute()
         while (fThread.GetStatus() == JackThread::kRunning) {
             Process();
         }
+        return false;
     } catch (JackDriverException e) {
         e.PrintMessage();
         jack_log("Driver is restarted");
-        fThread.SetStatus(JackThread::kIniting);
         fThread.DropRealTime();
-        return Init();
+        // Thread in kIniting status again...
+        fThread.SetStatus(JackThread::kIniting);
+        if (Init()) {
+            // Thread in kRunning status again...
+            fThread.SetStatus(JackThread::kRunning);
+            return true;
+        } else {
+            return false;
+        }
     }
-    return false;
-}
+ }
 
 } // end of namespace
