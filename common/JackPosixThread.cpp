@@ -40,8 +40,6 @@ void* JackPosixThread::ThreadHandler(void* arg)
         jack_error("pthread_setcanceltype err = %s", strerror(err));
     }
     
-    set_threaded_log_function(); 
-    
     // Signal creation thread when started with StartSync
     jack_log("ThreadHandler: start");
     obj->fStatus = kIniting;

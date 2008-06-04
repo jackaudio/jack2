@@ -34,9 +34,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
 {
     JackWinThread* obj = (JackWinThread*)arg;
     JackRunnableInterface* runnable = obj->fRunnable;
-
-    set_threaded_log_function(); 
-    
+   
     // Signal creation thread when started with StartSync
     jack_log("ThreadHandler: start");
     obj->fStatus = kIniting;

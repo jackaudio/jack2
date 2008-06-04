@@ -39,7 +39,7 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
         theTCPolicy.constraint = AudioConvertNanosToHostTime(constraint);
         theTCPolicy.preemptible = true;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) & theTCPolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
-        jack_log("JackMachThread::thread_policy_set %ld", res);
+        jack_log("JackMachThread::thread_policy_set res = %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     } else {
         // OTHER THREADS
@@ -62,7 +62,7 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
 
         thePrecedencePolicy.importance = relativePriority;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_PRECEDENCE_POLICY, (thread_policy_t) & thePrecedencePolicy, THREAD_PRECEDENCE_POLICY_COUNT);
-        jack_log("JackMachThread::thread_policy_set %ld", res);
+        jack_log("JackMachThread::thread_policy_set res = %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     }
 }

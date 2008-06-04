@@ -63,9 +63,7 @@ void jack_log_function(int level, const char *message)
     log_callback(message);
 }
 
-static
-void 
-jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
+static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
 {
     char buffer[300];
     size_t len;

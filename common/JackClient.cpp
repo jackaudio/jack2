@@ -340,6 +340,9 @@ bool JackClient::Execute()
 {
     if (!jack_tls_set(gRealTime, this)) 
         jack_error("failed to set thread realtime key");
+        
+    if (GetEngineControl()->fRealTime) 
+        set_threaded_log_function(); 
     
     if (fThreadFun) {
         // Execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished)

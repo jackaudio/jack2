@@ -20,6 +20,10 @@ Fernando Lopez-Lezcano
   Jackdmp changes log
 ---------------------------
 
+2008-06-04 Stephane Letz  <letz@grame.fr>
+
+	*  Use of set_threaded_log_function only when needed in RT threads.
+
 2008-06-02 Stephane Letz  <letz@grame.fr>
 
 	*  Tim Blechmann patch to remove unnecessary virtual methods : choice of the appropriate platform version is now done at compilation time.

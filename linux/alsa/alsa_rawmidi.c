@@ -837,6 +837,9 @@ void *midi_thread(void *arg)
 	pfds[0].events = POLLIN|POLLERR|POLLNVAL;
 	npfds = 1;
 
+ 	if (jack_is_realtime(midi->client))
+	    set_threaded_log_function(); 	
+
 	//debug_log("midi_thread(%s): enter", str->name);
 
 	while (midi->keep_walking) {
