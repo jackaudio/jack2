@@ -35,7 +35,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
     private:
 
         JackServer* fServer;
-        JackEngineInterface* fEngine;
+        JackLockedEngine* fEngine;
 
     public:
 

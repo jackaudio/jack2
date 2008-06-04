@@ -29,7 +29,7 @@ Copyright (C) 2004-2006 Grame
 #include "JackNotification.h"
 #include "JackRequest.h"
 #include "JackServer.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackGlobals.h"
 #include "JackClient.h"
 #include <assert.h>

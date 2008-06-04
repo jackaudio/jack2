@@ -28,7 +28,7 @@
 
 #include "JackFreewheelDriver.h"
 #include "JackEngineControl.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 
 namespace Jack
 {

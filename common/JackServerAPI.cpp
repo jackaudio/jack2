@@ -34,7 +34,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackServerLaunch.h"
 #include "JackTools.h"
 #include "JackExports.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 
 #ifdef __cplusplus
 extern "C"

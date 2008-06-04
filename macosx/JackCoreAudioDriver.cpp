@@ -425,7 +425,7 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int* channe
     return err;
 }
 
-JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table)
+JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
         : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f)
 {}
 
@@ -1249,7 +1249,7 @@ extern "C"
         return desc;
     }
 
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackEngineInterface* engine, Jack::JackSynchro* table, const JSList* params) {
+    Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t srate = 44100;
         jack_nframes_t frames_per_interrupt = 128;
         int capture = FALSE;

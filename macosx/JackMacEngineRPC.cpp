@@ -22,7 +22,7 @@ This program is free software; you can redistribute it and/or modify
 #endif
 
 #include "JackServer.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackRPCEngine.h"
 #include "JackMachServerChannel.h"
 #include <assert.h>

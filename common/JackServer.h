@@ -39,7 +39,7 @@ namespace Jack
 class JackGraphManager;
 class JackDriverClientInterface;
 struct JackEngineControl;
-class JackEngineInterface;
+class JackLockedEngine;
 
 /*!
 \brief The Jack server.
@@ -54,7 +54,7 @@ class EXPORT JackServer
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
         JackDriverClientInterface* fLoopbackDriver;
-        JackEngineInterface* fEngine;
+        JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
         JackServerChannel fChannel;
@@ -88,7 +88,7 @@ class EXPORT JackServer
         int SetTimebaseCallback(int refnum, int conditional);
 
         // Object access
-        JackEngineInterface* GetEngine();
+        JackLockedEngine* GetEngine();
         JackEngineControl* GetEngineControl();
         JackSynchro* GetSynchroTable();
         JackGraphManager* GetGraphManager();

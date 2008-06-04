@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackRPCEngineServer.c"
 #include "JackError.h"
 #include "JackServer.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackNotification.h"
 
 using namespace std;
@@ -69,7 +69,7 @@ void JackMachServerChannel::Close()
     fServerPort.DestroyPort();
 }
 
-JackEngineInterface* JackMachServerChannel::GetEngine()
+JackLockedEngine* JackMachServerChannel::GetEngine()
 {
     return fServer->GetEngine();
 }

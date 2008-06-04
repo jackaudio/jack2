@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSocketServerChannel.h"
 #include "JackRequest.h"
 #include "JackServer.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackGlobals.h"
 #include "JackClient.h"
 #include "JackNotification.h"

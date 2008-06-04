@@ -30,7 +30,7 @@
 namespace Jack
 {
     
-class JackEngineInterface;
+class JackLockedEngine;
 class JackGraphManager;
 struct JackEngineControl;
 struct JackClientControl;
@@ -150,7 +150,7 @@ class EXPORT JackDriver : public JackDriverClient
         jack_nframes_t fPlaybackLatency;
         jack_time_t fLastWaitUst;
         float fDelayedUsecs;
-        JackEngineInterface* fEngine;
+        JackLockedEngine* fEngine;
         JackGraphManager* fGraphManager;
         JackSynchro* fSynchroTable;
         JackEngineControl* fEngineControl;
@@ -163,7 +163,7 @@ class EXPORT JackDriver : public JackDriverClient
 
     public:
         
-        JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table);
+        JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         JackDriver();
         virtual ~JackDriver();
         

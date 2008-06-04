@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include <math.h>
 #include <assert.h>
 
@@ -43,7 +43,7 @@ using namespace std;
 namespace Jack
 {
 
-JackDriver::JackDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table)
+JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;

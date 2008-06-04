@@ -62,7 +62,7 @@ class JackFFADODriver : public JackAudioDriver
 
     public:
 
-        JackFFADODriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table)
+        JackFFADODriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
             : JackAudioDriver(name, alias,engine, table)
         {}
         virtual ~JackFFADODriver()

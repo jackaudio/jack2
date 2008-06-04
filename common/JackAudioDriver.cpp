@@ -33,14 +33,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackException.h"
 #include <assert.h>
 
 namespace Jack
 {
 
-JackAudioDriver::JackAudioDriver(const char* name, const char* alias, JackEngineInterface* engine, JackSynchro* table)
+JackAudioDriver::JackAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
         : JackDriver(name, alias, engine, table),
         fCaptureChannels(0),
         fPlaybackChannels(0),

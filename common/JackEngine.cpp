@@ -30,7 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 #endif
 
-#include "JackEngine.h"
+#include "JackLockedEngine.h"
 #include "JackExternalClient.h"
 #include "JackInternalClient.h"
 #include "JackEngineControl.h"

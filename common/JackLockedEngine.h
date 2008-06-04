@@ -30,7 +30,7 @@ namespace Jack
 \brief Locked Engine.
 */
 
-class JackLockedEngine : public JackEngineInterface, public JackLockAble
+class JackLockedEngine : public JackLockAble
 {
     private:
 
@@ -187,7 +187,6 @@ class JackLockedEngine : public JackEngineInterface, public JackLockAble
         }
 
 };
-
 
 } // end of namespace
 
