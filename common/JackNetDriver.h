@@ -76,7 +76,7 @@ namespace Jack
 			int Write();
 		public:
 			JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-				char* ip, size_t port, int midi_input_ports, int midi_output_ports, char* master_name );
+				const char* ip, size_t port, int midi_input_ports, int midi_output_ports, const char* master_name );
 			~JackNetDriver();
 
 			int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,

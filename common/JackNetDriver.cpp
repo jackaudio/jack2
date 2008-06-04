@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 	JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-	                               char* ip, size_t port, int midi_input_ports, int midi_output_ports, char* net_name )
+	                               const char* ip, size_t port, int midi_input_ports, int midi_output_ports, const char* net_name )
 			: JackAudioDriver ( name, alias, engine, table )
 	{
 		fMulticastIP = new char[strlen ( ip ) + 1];
