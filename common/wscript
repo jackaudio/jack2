@@ -30,7 +30,7 @@ def build(bld):
         'timestamps.c',
         'JackTools.cpp',
         'JackMessageBuffer.cpp',
-        'JackProcessSync.cpp'
+        'JackProcessSync.cpp',
         ]
     
     serverlib = bld.create_obj('cpp', 'shlib')
@@ -58,6 +58,7 @@ def build(bld):
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
         'JackControl.cpp',
+	'JackNetTool.cpp',
         ]
     serverlib.vnum = bld.env()['JACK_API_VERSION']
 
@@ -78,5 +79,12 @@ def build(bld):
         'JackServerLaunch.cpp', 
         ]
     clientlib.vnum = bld.env()['JACK_API_VERSION']
+
+    netmanager_lib = bld.create_obj('cpp', 'shlib')
+    netmanager_lib.env['shlib_PATTERN'] = '%s.so'
+    netmanager_lib.includes = ['./jack', '.']
+    netmanager_lib.name     = 'netmanager'
+    netmanager_lib.target   = 'netmanager'
+    netmanager_lib.source   = 'JackNetManager.cpp'
 
     install_files('PREFIX', 'jack', 'jack/*.h')

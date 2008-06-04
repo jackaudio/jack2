@@ -63,16 +63,16 @@ class EXPORT JackAudioDriver : public JackDriver
         virtual int Process();
 
         virtual int Open(jack_nframes_t nframes,
-                         jack_nframes_t samplerate,
-                         int capturing,
-                         int playing,
-                         int inchannels,
-                         int outchannels,
-                         bool monitor,
-                         const char* capture_driver_name,
-                         const char* playback_driver_name,
-                         jack_nframes_t capture_latency,
-                         jack_nframes_t playback_latency);
+                        jack_nframes_t samplerate,
+                        int capturing,
+                        int playing,
+                        int inchannels,
+                        int outchannels,
+                        bool monitor,
+                        const char* capture_driver_name,
+                        const char* playback_driver_name,
+                        jack_nframes_t capture_latency,
+                        jack_nframes_t playback_latency);
 
         virtual int Attach();
         virtual int Detach();

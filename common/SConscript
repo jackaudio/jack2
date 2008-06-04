@@ -74,6 +74,7 @@ srcfiles_common_serverlib = [
     'JackClient.cpp',
     'JackConnectionManager.cpp',
     'JackDriver.cpp',
+    'JackNetTool.cpp',
     'JackEngine.cpp',
     'JackEngineControl.cpp',
     'JackError.cpp',
@@ -179,6 +180,7 @@ if env['PLATFORM'] == 'posix':
 
 clientlib = libenv.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = libenv.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
+netmanagerlib = libenv.SharedLibrary(env['NETMANAGERLIB'], 'JackNetManager.cpp')
 env.Install( env['INSTALL_LIBDIR'], [clientlib, serverlib])
 env.Alias('install', env['INSTALL_LIBDIR'])
 

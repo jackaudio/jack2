@@ -53,3 +53,6 @@ def build(bld):
 
     if bld.env()['BUILD_DRIVER_FFADO'] == True:
         create_jack_driver_obj(bld, 'firewire', 'firewire/JackFFADODriver.cpp', "LIBFFADO")
+
+    create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
+

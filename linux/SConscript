@@ -51,6 +51,7 @@ for i in range(len(srcfiles_linux_alsa)):
 srcfiles_linux_freebob = ['freebob/JackFreebobDriver.cpp']
 srcfiles_linux_ffado = ['firewire/JackFFADODriver.cpp']
 srcfiles_linux_dummy = ['#/common/JackDummyDriver.cpp']
+srcfiles_linux_net = ['#/common/JackNetDriver.cpp']
 
 #
 # Start building
@@ -68,6 +69,9 @@ driver_dir = env['INSTALL_ADDON_DIR'] + "/"
 
 drv = serverenv.SharedLibrary( 'jack_dummy', srcfiles_linux_dummy )
 serverenv.InstallAs( driver_dir + "jack_dummy.so", drv )
+
+drv = serverenv.SharedLibrary( 'jack_net', srcfiles_linux_net )
+serverenv.InstallAs( driver_dir + "jack_net.so", drv )
 
 if env['ENABLE_ALSA']:
     if not env.GetOption('clean'):

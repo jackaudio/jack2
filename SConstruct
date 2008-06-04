@@ -215,6 +215,7 @@ env['INCLUDEDIR'] = env.subst(env['INCLUDEDIR'])
 env['SERVER'] = 'jackd'
 env['CLIENTLIB'] = 'jack'
 env['SERVERLIB'] = 'jackserver'
+env['NETMANAGERLIB'] = 'netmanager'
 env['ADDON_DIR'] = env.subst(env['LIBDIR']) + "/jack"
 env['INSTALL_ADDON_DIR'] = env['DESTDIR'] + env.subst(env['LIBDIR']) + "/jack"
 
