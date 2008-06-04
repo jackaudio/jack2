@@ -28,7 +28,7 @@ With gigabytes networks, the MTU is larger, so we can put more data in one packe
 For midi data, netjack used to send the whole buffer, in this example, 512 frames * 4 bytes per sample and per midi port. Those 2048 bytes are in 99% of the time filled to a few bytes, but rarely more. This means that if we have 2 audio and 2 midi channels to transmit, everything happens as if we had 4 audio channels, which is quite a waste of bandwidth.
 In netjackmp, the idea is to take into account that fact, by sending only the useful bytes, and not more. It's completely unappropriate to overload the network with useless data.
 So we now have : 99% of the time one midi packet (of a few dozen of bytes), followed by four audio packets (in this example).
-Those five packets are preceded by a synchronization packet, which will make the slave directly synced on the master's cycle rythm.
+Those five packets are preceded by a synchronization packet, which will make the slave directly synched on the master's cycle rythm.
 
 This way of separating audio and midi is quite important. We deal here with network transmissions, and also need to be 'realtime'. We need a system which allow to carry as many audio and midi data streams as we need and can, as if the distant computer was in fact a simple jack client. With all those constraints, we can't avoid packets loss. The better thing to do is to deal with it.
 But to loose an audio packet is different from skipping a midi one. Indeed, an audio loss leads to audio click, or undesirable, but very short side effect. Whereas a midi data loss can be completely disastrous. Imagine that we play some notes, with sustain, and we loose the sustain 0 value, which stops the effect. The sustain keeps going on on all following notes until the next 'sustain off' event. A simple missing byte can put all the midi system offside (that's the purpose of all the big PANIC buttons on midi softwares...).
@@ -54,15 +54,15 @@ The netjackmp's development has just started. This prerelease is operational, bu
 - This is not actually working on windows, because the windows socket API (the network development tools) aren't the same as under unix systems (linux and macosx).
 - Because of the current development, the parametering of the whole system is minimalistic. For now you can't set another value of the MTU (allowing larger packets, meaning less packet, so less packet loss). The MTU issue is also a quite big one. In fact, the better thing to do seems to include an automatic detection of the MTU (called path MTU discovery) between master and slave. But this detection is quite controversial because it actually needs ICMP messages, which are more and more often unwanted nay blocked or ignored by network devices such as routers or firewalls (for security reasons). So in a first time, the MTU will possibly be a parameter of the master, like it is now in netjack. The fact is in this version, the MTU is set to 1500bytes, and it works fine on local 100mb networks. Future versions will include the possibility to set the MTU, which can be larger on gigabit networks (9000bytes for jumbo frames).
 - Unlike netjack, this version doesn't include transport, this is naturraly planned for the fully operational version.
-- Netjackmp can't use audio hardware to capture or play some sound. All these resampling processes will also be developped soon.
+- Netjackmp can't use audio hardware to capture or play some sound. All these resampling processes will also be developed soon.
 
 
 -------------------------------
 How-to use this ?
 -------------------------------
 
-Netjackmpis very simple to use. On the master's side, an internal client deals with the slaves, and the slaves themselves are classical jack servers running under a 'network audio driver'.
-The difference between the two versions is that the master has now a manager, which takes care of the slaves, while listening on the multicast address and create a new master as soon as a slave is available. But everything is transparent to the user, that's why it uses multicast (someone says "hello", and anyone who wants to hear it just has to listen).
+Netjackmp is very simple to use. On the master's side, an internal client deals with the slaves, and the slaves themselves are classical jack servers running under a 'network audio driver'.
+The difference between the two versions is that the master now has a manager, which takes care of the slaves, while listening on the multicast address and create a new master as soon as a slave is available. But everything is transparent to the user, that's why it uses multicast (someone says "hello", and anyone who wants to hear it just has to listen).
 
 So, just compile and install jackmp as you are used to, on linux, using 'scons' then 'scons install', on macosx, you can use the xcode project.
 
@@ -75,11 +75,11 @@ This will load the internal client, which will wait for an available slave (see 
 
 On the slave, just launch a new jack server using :
 
-'jackd -S -d net' (or 'jackdmp -S -d net')
+'jackd -R -S -d net' (or 'jackdmp -R -S -d net')
 
-You can add the realtime '-R' option if you want (we don't guarantee a proper working if you don't...). The '-S' (synchronous) option is mandatory. Indeed, the jack server isn't able to deal with the current cycle produced audio data because when the 'send' is called, data are not necessarily already available. So in a given 'n' cycle, the server will send the data produced at the 'n-1' cycle.
+The '-S' (synchronous) option is mandatory. Indeed, the jack server isn't able to deal with the current cycle produced audio data because when the 'send' is called, data are not necessarily already available. So in a given 'n' cycle, the server will send the data produced at the 'n-1' cycle.
 In this case, there is no effect on latency because all the subcycles of the slave (the previous 4 subcycles for instance) are run in the given master's cycle.
-You can specify some options, like '-n name' (will give a name to the slave, default is the network hostname), '-C capture_channels' (the number of master-->slave channels), '-P playback_channels' (the number of slave-->master channels), default is 2 ; or '-i midi_capture_channels' and '-o midi_playback_channels', default is 0. Don't use '-a address' and '-p port', these are here to specify others multicast address and port, but it's not implemented on the master yet.
+You can specify some options, like '-n name' (will give a name to the slave, default is the network hostname), '-C input_ports' (the number of master-->slave channels), '-P output_ports' (the number of slave-->master channels), default is 2 ; or '-i midi_in_ports' and '-o midi_out_ports', default is 0. Don't use '-a address' and '-p port', these are here to specify others multicast address and port, but it's not implemented on the master yet.
 
 
 -------------------------------

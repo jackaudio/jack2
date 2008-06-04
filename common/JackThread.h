@@ -60,6 +60,7 @@ class JackRunnableInterface
 
 namespace detail
 {
+
 class JackThread
 {
     public:

@@ -175,7 +175,7 @@ int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
     jack_log("JackWinThread::AcquireRealTime");
 
     if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
-        jack_log("JackWinThread::AcquireRealTime OK");
+        fRealTime = true;
         return 0;
     } else {
         jack_error("Cannot set thread priority = %d", GetLastError());
@@ -190,6 +190,7 @@ int JackWinThread::DropRealTime()
 int JackWinThread::DropRealTimeImp(pthread_t thread)
 {
     if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
+        fRealTime = false;
         return 0;
     } else {
         jack_error("Cannot set thread priority = %d", GetLastError());

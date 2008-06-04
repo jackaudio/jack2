@@ -177,6 +177,7 @@ int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 c
     UInt64 int_computation;
     UInt64 int_constraint;
     GetParams(&int_period, &int_computation, &int_constraint);
+    fRealTime = true;
     return 0;
 }
 
@@ -188,6 +189,7 @@ int JackMachThread::DropRealTime()
 int JackMachThread::DropRealTimeImp(pthread_t thread)
 {
     SetThreadToPriority(thread, 63, false, 0, 0, 0);
+    fRealTime = false;
     return 0;
 }
 
