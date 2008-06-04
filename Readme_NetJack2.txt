@@ -45,7 +45,7 @@ The 'unloading' of the internal client (the manager) will cause a full cleaning 
 
 
 -------------------------------
-Actual limitations
+Current limitations
 -------------------------------
 
 The netjackmp's development has just started. This prerelease is operational, but involve some serious limitations :
@@ -75,7 +75,7 @@ This will load the internal client, which will wait for an available slave (see 
 
 On the slave, just launch a new jack server using :
 
-'jackd -R -S -d net' (or 'jackdmp -R -S -d net')
+'jackd -R -S -d net'
 
 The '-S' (synchronous) option is mandatory. Indeed, the jack server isn't able to deal with the current cycle produced audio data because when the 'send' is called, data are not necessarily already available. So in a given 'n' cycle, the server will send the data produced at the 'n-1' cycle.
 In this case, there is no effect on latency because all the subcycles of the slave (the previous 4 subcycles for instance) are run in the given master's cycle.
