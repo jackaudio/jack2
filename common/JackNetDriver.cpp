@@ -634,7 +634,7 @@ namespace Jack
 
 		Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
 		{
-			char* multicast_ip = DEFAULT_MULTICAST_IP;
+			const char* multicast_ip = DEFAULT_MULTICAST_IP;
 			char name[JACK_CLIENT_NAME_SIZE];
 			gethostname ( name, JACK_CLIENT_NAME_SIZE );
 			jack_nframes_t udp_port = DEFAULT_PORT;
