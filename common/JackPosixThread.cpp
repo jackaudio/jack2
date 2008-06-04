@@ -40,7 +40,7 @@ void* JackPosixThread::ThreadHandler(void* arg)
         jack_error("pthread_setcanceltype err = %s", strerror(err));
     }
     
-    //set_threaded_log_function(); 
+    set_threaded_log_function(); 
     
     // Signal creation thread when started with StartSync
     jack_log("ThreadHandler: start");
@@ -204,7 +204,6 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
                    strerror(res));
         return -1;
     }
-    fRealTime = true;
     return 0;
 }
 
@@ -224,7 +223,6 @@ int JackPosixThread::DropRealTimeImp(pthread_t thread)
         jack_error("Cannot switch to normal scheduling priority(%s)\n", strerror(errno));
         return -1;
     }
-    fRealTime = false;
     return 0;
 }
 
