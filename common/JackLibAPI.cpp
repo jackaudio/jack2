@@ -28,15 +28,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackLibGlobals.h"
 #include "JackGlobals.h"
 #include "JackServerLaunch.h"
+#include "JackExports.h"
 #include "JackTools.h"
 
 using namespace Jack;
-
-#ifdef WIN32
-#define	EXPORT __declspec(dllexport)
-#else
-#define	EXPORT
-#endif
 
 #ifdef __cplusplus
 extern "C"

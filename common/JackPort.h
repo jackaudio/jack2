@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "types.h"
 #include "JackConstants.h"
+#include "JackExports.h"
 
 namespace Jack
 {
@@ -34,7 +35,7 @@ namespace Jack
 \brief Base class for port.
 */
 
-class JackPort
+class EXPORT JackPort
 {
 
         friend class JackGraphManager;

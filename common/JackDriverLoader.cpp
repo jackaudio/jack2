@@ -88,7 +88,7 @@ jack_print_driver_param_usage (jack_driver_desc_t * desc, unsigned long param, F
     fprintf (file, "%s\n", desc->params[param].long_desc);
 }
 
-EXPORT int
+int
 jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr)
 {
     struct option * long_options;
@@ -369,7 +369,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
     return 0;
 }
 
-EXPORT jack_driver_desc_t *
+jack_driver_desc_t *
 jack_find_driver_descriptor (JSList * drivers, const char * name)
 {
     jack_driver_desc_t * desc = 0;
@@ -486,7 +486,7 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 
 #ifdef WIN32
 
-EXPORT JSList *
+JSList *
 jack_drivers_load (JSList * drivers) {
     char * driver_dir;
     char driver_dir_storage[512];

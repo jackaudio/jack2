@@ -35,7 +35,7 @@ namespace Jack
 \brief Graph manager: contains the connection manager and the port array.
 */
     
-class JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
+class EXPORT JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
 {
 
     private:

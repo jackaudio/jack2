@@ -17,9 +17,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackMacSemaphore__
-#define __JackMacSemaphore__
+#ifndef __JackMachSemaphore__
+#define __JackMachSemaphore__
 
+#include "JackExports.h"
 #include "JackSynchro.h"
 #include <mach/mach.h>
 #include <mach/mach_types.h>
@@ -35,7 +36,7 @@ namespace Jack
 \brief Inter process synchronization using using Mach semaphore.
 */
 
-class JackMachSemaphore : public detail::JackSynchro
+class EXPORT JackMachSemaphore : public detail::JackSynchro
 {
 
     private:

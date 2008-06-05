@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackFrameTimer__
 
 #include "JackAtomicState.h"
+#include "JackExports.h"
 #include "types.h"
 
 namespace Jack
@@ -31,7 +32,7 @@ namespace Jack
 \brief A structure used for time management.
 */
 
-struct JackTimer
+struct EXPORT JackTimer
 {
     jack_nframes_t fFrames;
     jack_time_t	fCurrentWakeup;

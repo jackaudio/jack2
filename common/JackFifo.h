@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackFifo__
 
 #include "JackSynchro.h"
+#include "JackExports.h"
 #include <assert.h>
 #include <stdio.h>
 #include <poll.h>
@@ -32,7 +33,7 @@ namespace Jack
 \brief Inter process synchronization using Fifo.
 */
 
-class JackFifo : public detail::JackSynchro
+class EXPORT JackFifo : public detail::JackSynchro
 {
 
     private:

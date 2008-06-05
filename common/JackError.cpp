@@ -132,5 +132,5 @@ static void default_jack_info_callback (const char *desc)
     fflush(stdout);
 }
 
-void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
-void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;
+EXPORT void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
+EXPORT void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;

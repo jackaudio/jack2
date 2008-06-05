@@ -38,7 +38,7 @@ class JackExternalClient;
 \brief Engine description.
 */
 
-class JackEngine 
+class EXPORT JackEngine 
 {
     private:
 

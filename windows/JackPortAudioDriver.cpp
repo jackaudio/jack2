@@ -32,6 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackError.h"
 #include "JackTime.h"
+#include "JackExports.h"
 #include <iostream>
 #include <assert.h>
 

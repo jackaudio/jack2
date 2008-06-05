@@ -200,8 +200,8 @@ if env['DEBUG']:
 else:
     env.AppendUnique(CCFLAGS = ['-O3','-DNDEBUG'])
 
-env.AppendUnique(CCFLAGS = ['-fPIC', '-DSOCKET_RPC_FIFO_SEMA', '-D__SMP__'])
-env.AppendUnique(CFLAGS = ['-fPIC', '-DUSE_POSIX_SHM'])
+env.AppendUnique(CCFLAGS = ['-fvisibility=hidden', '-fPIC', '-DSOCKET_RPC_FIFO_SEMA', '-D__SMP__'])
+env.AppendUnique(CFLAGS = ['-fvisibility=hidden', '-fPIC', '-DUSE_POSIX_SHM'])
 
 # used for alsa midi code, probably this define should be removed
 env.AppendUnique(CFLAGS = ['-DJACKMP'])

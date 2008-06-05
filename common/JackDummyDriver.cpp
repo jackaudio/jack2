@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGraphManager.h"
 #include "JackDriverLoader.h"
 #include "JackThreadedDriver.h"
+#include "JackExports.h"
 #include <iostream>
 #include <unistd.h>
 
@@ -77,7 +78,7 @@ extern "C"
 {
 #endif
 
-    jack_driver_desc_t * driver_get_descriptor () {
+    EXPORT jack_driver_desc_t * driver_get_descriptor () {
         jack_driver_desc_t * desc;
         unsigned int i;
 
@@ -138,7 +139,7 @@ extern "C"
         return desc;
     }
 
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
+    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t sample_rate = 48000;
         jack_nframes_t period_size = 1024;
         unsigned int capture_ports = 2;

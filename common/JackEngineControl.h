@@ -65,7 +65,7 @@ struct JackTimingMeasure
 \brief Engine control in shared memory.
 */
 
-struct JackEngineControl : public JackShmMem
+struct EXPORT JackEngineControl : public JackShmMem
 {
     // Shared state
     jack_nframes_t fBufferSize;

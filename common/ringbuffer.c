@@ -34,7 +34,7 @@
 /* Create a new ringbuffer to hold at least `sz' bytes of data. The
    actual buffer size is rounded up to the next power of two.  */
 
-jack_ringbuffer_t *
+EXPORT jack_ringbuffer_t *
 jack_ringbuffer_create (size_t sz)
 {
   int power_of_two;
@@ -58,7 +58,7 @@ jack_ringbuffer_create (size_t sz)
 
 /* Free all data associated with the ringbuffer `rb'. */
 
-void
+EXPORT void
 jack_ringbuffer_free (jack_ringbuffer_t * rb)
 {
 #ifdef USE_MLOCK
@@ -72,7 +72,7 @@ jack_ringbuffer_free (jack_ringbuffer_t * rb)
 
 /* Lock the data block of `rb' using the system call 'mlock'.  */
 
-int
+EXPORT int
 jack_ringbuffer_mlock (jack_ringbuffer_t * rb)
 {
 #ifdef USE_MLOCK
@@ -87,7 +87,7 @@ jack_ringbuffer_mlock (jack_ringbuffer_t * rb)
 /* Reset the read and write pointers to zero. This is not thread
    safe. */
 
-void
+EXPORT void
 jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 {
   rb->read_ptr = 0;
@@ -98,7 +98,7 @@ jack_ringbuffer_reset (jack_ringbuffer_t * rb)
    number of bytes in front of the read pointer and behind the write
    pointer.  */
 
-size_t
+EXPORT size_t
 jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
 {
   size_t w, r;
@@ -117,7 +117,7 @@ jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
    number of bytes in front of the write pointer and behind the read
    pointer.  */
 
-size_t
+EXPORT size_t
 jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 {
   size_t w, r;
@@ -137,7 +137,7 @@ jack_ringbuffer_write_space (const jack_ringbuffer_t * rb)
 /* The copying data reader.  Copy at most `cnt' bytes from `rb' to
    `dest'.  Returns the actual number of bytes copied. */
 
-size_t
+EXPORT size_t
 jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 {
   size_t free_cnt;
@@ -178,7 +178,7 @@ jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
    `cnt' bytes from `rb' to `dest'.  Returns the actual number of bytes 
 copied. */
 
-size_t
+EXPORT size_t
 jack_ringbuffer_peek (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 {
   size_t free_cnt;
@@ -221,7 +221,7 @@ jack_ringbuffer_peek (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 /* The copying data writer.  Copy at most `cnt' bytes to `rb' from
    `src'.  Returns the actual number of bytes copied. */
 
-size_t
+EXPORT size_t
 jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 {
   size_t free_cnt;
@@ -260,7 +260,7 @@ jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 
 /* Advance the read pointer `cnt' places. */
 
-void
+EXPORT void
 jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
   rb->read_ptr += cnt;
@@ -269,7 +269,7 @@ jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 
 /* Advance the write pointer `cnt' places. */
 
-void
+EXPORT void
 jack_ringbuffer_write_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
   rb->write_ptr += cnt;
@@ -281,7 +281,7 @@ jack_ringbuffer_write_advance (jack_ringbuffer_t * rb, size_t cnt)
    the readable data is in one segment the second segment has zero
    length.  */
 
-void
+EXPORT void
 jack_ringbuffer_get_read_vector (const jack_ringbuffer_t * rb,
 				 jack_ringbuffer_data_t * vec)
 {
@@ -325,7 +325,7 @@ jack_ringbuffer_get_read_vector (const jack_ringbuffer_t * rb,
    the writeable data is in one segment the second segment has zero
    length.  */
 
-void
+EXPORT void
 jack_ringbuffer_get_write_vector (const jack_ringbuffer_t * rb,
 				  jack_ringbuffer_data_t * vec)
 {

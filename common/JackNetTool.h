@@ -2,6 +2,7 @@
 #include "types.h"
 #include "JackConstants.h"
 #include "JackMidiPort.h"
+#include "JackExports.h"
 
 #include <string>
 #include <algorithm>
@@ -101,7 +102,7 @@ namespace Jack
 
 //midi data ***********************************************************************************
 
-	class NetMidiBuffer
+	class EXPORT NetMidiBuffer
 	{
 		private:
 			int fNPorts;
@@ -130,7 +131,7 @@ namespace Jack
 
 // audio data *********************************************************************************
 
-	class NetAudioBuffer
+	class EXPORT NetAudioBuffer
 	{
 		private:
 			int fNPorts;
@@ -153,24 +154,24 @@ namespace Jack
 //utility *************************************************************************************
 
 	//n<-->h functions
-	void SessionParamsHToN ( session_params_t* params );
-	void SessionParamsNToH ( session_params_t* params );
-	void PacketHeaderHToN ( packet_header_t* header );
-	void PacketHeaderNToH ( packet_header_t* header );
+	EXPORT void SessionParamsHToN ( session_params_t* params );
+	EXPORT void SessionParamsNToH ( session_params_t* params );
+	EXPORT void PacketHeaderHToN ( packet_header_t* header );
+	EXPORT void PacketHeaderNToH ( packet_header_t* header );
 	//display session parameters
-	void SessionParamsDisplay ( session_params_t* params );
+	EXPORT void SessionParamsDisplay ( session_params_t* params );
 	//display packet header
-	void PacketHeaderDisplay ( packet_header_t* header );
+	EXPORT void PacketHeaderDisplay ( packet_header_t* header );
 	//get the packet type from a sesion parameters
-	sync_packet_type_t GetPacketType ( session_params_t* params );
+	EXPORT sync_packet_type_t GetPacketType ( session_params_t* params );
 	//set the packet type in a session parameters
-	int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
+	EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
 	//step of network initialization
-	size_t SetFramesPerPacket ( session_params_t* params );
+	EXPORT size_t SetFramesPerPacket ( session_params_t* params );
 	//get the midi packet number for a given cycle
-	size_t GetNMidiPckt ( session_params_t* params, size_t data_size );
+	EXPORT size_t GetNMidiPckt ( session_params_t* params, size_t data_size );
 	//set the recv timeout on a socket
-	int SetRxTimeout ( int* sockfd, session_params_t* params );
+	EXPORT int SetRxTimeout ( int* sockfd, session_params_t* params );
 	//check if 'next' packet is really the next after 'previous'
-	bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, size_t subcycles );
+	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, size_t subcycles );
 }

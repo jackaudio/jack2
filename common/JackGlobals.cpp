@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackGlobals.h"
-#include "JackError.h"
 
 static bool gKeyRealtimeInitialized = false;
 static bool g_key_log_function_initialized = false;
@@ -30,7 +29,8 @@ static bool g_key_log_function_initialized = false;
 jack_tls_key gRealTime;
 jack_tls_key g_key_log_function;
 
-void jack_init()
+__attribute__ ((constructor))
+static void jack_init()
 {
     if (!gKeyRealtimeInitialized) {
         gKeyRealtimeInitialized = jack_tls_allocate_key(&gRealTime);
@@ -40,7 +40,8 @@ void jack_init()
         g_key_log_function_initialized = jack_tls_allocate_key(&g_key_log_function);
 }
 
-void jack_uninit()
+__attribute__ ((destructor))
+static void jack_uninit()
 {
     if (gKeyRealtimeInitialized) {
         jack_tls_free_key(gRealTime);
@@ -57,6 +58,11 @@ void jack_uninit()
 
 #ifdef WIN32
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     switch (fdwReason) {
@@ -69,5 +75,9 @@ BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserv
     }
     return TRUE;
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -20,36 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackGlobals__
 #define __JackGlobals__
 
-#include "JackError.h"
-#include "JackExports.h"
-
-#include "JackPlatformSynchro.h"
-#include "JackPlatformProcessSync.h"
 #include "JackPlatformThread.h"
-
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 extern jack_tls_key gRealTime;
 extern jack_tls_key g_key_log_function;
-
-#ifdef WIN32
-
-EXPORT void jack_init();
-EXPORT void jack_uninit();
-
-#else
-
-void __attribute__ ((constructor)) jack_init();
-void __attribute__ ((destructor)) jack_uninit();
-
-#endif
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

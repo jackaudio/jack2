@@ -44,8 +44,8 @@ extern "C"
     // like jack_info() but only if verbose mode is enabled
     EXPORT void jack_log(const char *fmt, ...);
 
-    extern void (*jack_error_callback)(const char *desc);
-    extern void (*jack_info_callback)(const char *desc);
+    EXPORT extern void (*jack_error_callback)(const char *desc);
+    EXPORT extern void (*jack_info_callback)(const char *desc);
 
     typedef void (* jack_log_function_t)(int level, const char *message);
 

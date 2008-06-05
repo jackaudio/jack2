@@ -127,7 +127,7 @@ namespace Jack
 
 // SessionParams ************************************************************************************
 
-	void SessionParamsHToN ( session_params_t* params )
+	EXPORT void SessionParamsHToN ( session_params_t* params )
 	{
 		params->fPacketID = htonl ( params->fPacketID );
 		params->fMtu = htonl ( params->fMtu );
@@ -142,7 +142,7 @@ namespace Jack
 		params->fBitdepth = htonl ( params->fBitdepth );
 	}
 
-	void SessionParamsNToH ( session_params_t* params )
+	EXPORT void SessionParamsNToH ( session_params_t* params )
 	{
 		params->fPacketID = ntohl ( params->fPacketID );
 		params->fMtu = ntohl ( params->fMtu );
@@ -157,7 +157,7 @@ namespace Jack
 		params->fBitdepth = ntohl ( params->fBitdepth );
 	}
 
-	void SessionParamsDisplay ( session_params_t* params )
+	EXPORT void SessionParamsDisplay ( session_params_t* params )
 	{
 		jack_info ( "********************Params********************" );
 		jack_info ( "Protocol revision : %c", params->fProtocolVersion );
@@ -176,7 +176,7 @@ namespace Jack
 		jack_info ( "**********************************************" );
 	}
 
-	sync_packet_type_t GetPacketType ( session_params_t* params )
+	EXPORT sync_packet_type_t GetPacketType ( session_params_t* params )
 	{
 		switch ( params->fPacketID )
 		{
@@ -194,7 +194,7 @@ namespace Jack
 		return INVALID;
 	}
 
-	int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type )
+	EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type )
 	{
 		switch ( packet_type )
 		{
@@ -220,7 +220,7 @@ namespace Jack
 
 // Packet header **********************************************************************************
 
-	void PacketHeaderHToN ( packet_header_t* header )
+	EXPORT void PacketHeaderHToN ( packet_header_t* header )
 	{
 		header->fID = htonl ( header->fID );
 		header->fMidiDataSize = htonl ( header->fMidiDataSize );
@@ -230,7 +230,7 @@ namespace Jack
 		header->fSubCycle = htonl ( header->fSubCycle );
 	}
 
-	void PacketHeaderNToH ( packet_header_t* header )
+	EXPORT void PacketHeaderNToH ( packet_header_t* header )
 	{
 		header->fID = ntohl ( header->fID );
 		header->fMidiDataSize = ntohl ( header->fMidiDataSize );
@@ -240,7 +240,7 @@ namespace Jack
 		header->fSubCycle = ntohl ( header->fSubCycle );
 	}
 
-	void PacketHeaderDisplay ( packet_header_t* header )
+	EXPORT void PacketHeaderDisplay ( packet_header_t* header )
 	{
 		jack_info ( "********************Header********************" );
 		jack_info ( "Data type : %c", header->fDataType );
@@ -257,7 +257,7 @@ namespace Jack
 
 // Utility *******************************************************************************************************
 
-	size_t SetFramesPerPacket ( session_params_t* params )
+	EXPORT size_t SetFramesPerPacket ( session_params_t* params )
 	{
 		if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
 			return ( params->fFramesPerPacket = params->fPeriodSize );
@@ -267,7 +267,7 @@ namespace Jack
 		return params->fFramesPerPacket;
 	}
 
-	size_t GetNMidiPckt ( session_params_t* params, size_t data_size )
+	EXPORT size_t GetNMidiPckt ( session_params_t* params, size_t data_size )
 	{
 		//even if there is no midi data, jack need an empty buffer to know there is no event to read
 		//99% of the cases : all data in one packet
@@ -280,7 +280,7 @@ namespace Jack
 		return npckt;
 	}
 
-	int SetRxTimeout ( int* sockfd, session_params_t* params )
+	EXPORT int SetRxTimeout ( int* sockfd, session_params_t* params )
 	{
 		int ret;
 		struct timeval timeout;
@@ -295,7 +295,7 @@ namespace Jack
 
 // Packet *******************************************************************************************************
 
-	bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, size_t subcycles )
+	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, size_t subcycles )
 	{
 		//ignore first cycle
 		if ( previous->fCycle <= 1 )

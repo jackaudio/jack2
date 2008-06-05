@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackPosixSemaphore__
 
 #include "JackSynchro.h"
+#include "JackExports.h"
 #include <semaphore.h>
 #include <time.h>
 #include <stdio.h>
@@ -33,7 +34,7 @@ namespace Jack
 \brief Inter process synchronization using POSIX semaphore.
 */
 
-class JackPosixSemaphore : public detail::JackSynchro
+class EXPORT JackPosixSemaphore : public detail::JackSynchro
 {
 
     private:

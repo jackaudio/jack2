@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "JackThreadedDriver.h"
 #include "JackException.h"
+#include "JackExports.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -571,7 +572,7 @@ namespace Jack
 	extern "C"
 	{
 #endif
-		jack_driver_desc_t* driver_get_descriptor ()
+		EXPORT jack_driver_desc_t* driver_get_descriptor ()
 		{
 			jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
 			strcpy ( desc->name, "net" );
@@ -637,7 +638,7 @@ namespace Jack
 			return desc;
 		}
 
-		Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
+		EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
 		{
 			const char* multicast_ip = DEFAULT_MULTICAST_IP;
 			char name[JACK_CLIENT_NAME_SIZE];

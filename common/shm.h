@@ -123,32 +123,30 @@ extern "C"
     jack_shm_info_t;
 
     /* utility functions used only within JACK */
-
-    extern void jack_shm_copy_from_registry (jack_shm_info_t*,
+      
+    void jack_shm_copy_from_registry (jack_shm_info_t*,
                 jack_shm_registry_index_t);
-    extern void jack_shm_copy_to_registry (jack_shm_info_t*,
+    void jack_shm_copy_to_registry (jack_shm_info_t*,
                                                jack_shm_registry_index_t*);
-    extern void jack_release_shm_info (jack_shm_registry_index_t);
+    void jack_release_shm_info (jack_shm_registry_index_t);
+    char* jack_shm_addr (jack_shm_info_t* si);  // steph
 
-    extern char* jack_shm_addr (jack_shm_info_t* si);  // steph
+    // here begin the API 
+    int jack_register_server (const char *server_name, int new_registry);
+    void jack_unregister_server (const char *server_name);
 
-    /* here beginneth the API */
+    int jack_initialize_shm (const char *server_name);
+    int jack_initialize_shm_server (void);  // steph
+    int jack_initialize_shm_client (void);  // steph
+    int jack_cleanup_shm (void);
 
-    EXPORT extern int jack_register_server (const char *server_name, int new_registry);
-    EXPORT extern void jack_unregister_server (const char *server_name);
-
-    extern int jack_initialize_shm (const char *server_name);
-    extern int jack_initialize_shm_server (void);  // steph
-    extern int jack_initialize_shm_client (void);  // steph
-    EXPORT extern int jack_cleanup_shm (void);
-
-    extern int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
+    int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
                                   jack_shm_info_t* result);
-    extern void jack_release_shm (jack_shm_info_t*);
-    extern void jack_destroy_shm (jack_shm_info_t*);
-    extern int jack_attach_shm (jack_shm_info_t*);
-    extern int jack_attach_shm_read (jack_shm_info_t*); // steph
-    extern int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
+    void jack_release_shm (jack_shm_info_t*);
+    void jack_destroy_shm (jack_shm_info_t*);
+    int jack_attach_shm (jack_shm_info_t*);
+    int jack_attach_shm_read (jack_shm_info_t*); // steph
+    int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
 
 #ifdef __cplusplus
 }

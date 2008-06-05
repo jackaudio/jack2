@@ -35,7 +35,7 @@ namespace Jack
 \brief The POSIX thread base class.
 */
 
-class JackPosixThread : public detail::JackThread
+class EXPORT JackPosixThread : public detail::JackThread
 {
 
     protected:

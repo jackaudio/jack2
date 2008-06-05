@@ -29,6 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackDriverLoader.h"
 #include "JackGlobals.h"
+#include "JackExports.h"
 #include <iostream>
 
 namespace Jack
@@ -1125,7 +1126,7 @@ extern "C"
 {
 #endif
 
-    jack_driver_desc_t* driver_get_descriptor() {
+    EXPORT jack_driver_desc_t* driver_get_descriptor() {
         jack_driver_desc_t *desc;
         unsigned int i;
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
@@ -1249,7 +1250,7 @@ extern "C"
         return desc;
     }
 
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
+    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         jack_nframes_t srate = 44100;
         jack_nframes_t frames_per_interrupt = 128;
         int capture = FALSE;

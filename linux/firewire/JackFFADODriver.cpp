@@ -44,6 +44,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
+#include "JackExports.h"
 
 namespace Jack
 {
@@ -808,7 +809,7 @@ extern "C"
 {
 #endif
 
-    const jack_driver_desc_t *
+    EXPORT const jack_driver_desc_t *
     driver_get_descriptor () {
         jack_driver_desc_t * desc;
         jack_driver_param_desc_t * params;
@@ -913,7 +914,7 @@ extern "C"
         return desc;
     }
 
-    Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
+    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         const JSList * node;
         const jack_driver_param_t * param;
 

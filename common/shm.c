@@ -426,7 +426,7 @@ jack_release_shm_info (jack_shm_registry_index_t index)
  *	   ENOSPC if server registration limit reached
  *	   ENOMEM if unable to access shared memory registry
  */
-EXPORT int
+int
 jack_register_server (const char *server_name, int new_registry)
 {
 	int i, res = 0;
@@ -496,7 +496,7 @@ jack_register_server (const char *server_name, int new_registry)
 }
 
 /* release server_name registration */
-EXPORT void
+void
 jack_unregister_server (const char *server_name /* unused */)
 {
 	int i;
@@ -520,7 +520,7 @@ jack_unregister_server (const char *server_name /* unused */)
 }
 
 /* called for server startup and termination */
-EXPORT int
+int
 jack_cleanup_shm ()
 {
 	int i;
