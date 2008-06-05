@@ -109,14 +109,7 @@ class EXPORT JackShmMem
 		void operator delete(void* p);
 
         JackShmMem();
-		/*
-        {
-            fInfo.index = gInfo.index;
-            fInfo.attached_at = gInfo.attached_at;
-            fInfo.size = gInfo.size;
-        }
-		*/
-
+	
         virtual ~JackShmMem()
         {}
 

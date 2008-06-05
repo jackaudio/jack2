@@ -39,20 +39,21 @@ struct AtomicArrayCounter
         scounter;
         UInt32 fLongVal;
     }info;
-
-	AtomicArrayCounter()
-	{
-        info.fLongVal = 0;
+    
+    AtomicArrayCounter()
+    {
+    info.fLongVal = 0;
     }
 
-	AtomicArrayCounter(volatile const AtomicArrayCounter& obj) 
-	{
-		info.fLongVal = obj.info.fLongVal;
-	}
-	AtomicArrayCounter(volatile AtomicArrayCounter& obj) 
-	{
-		info.fLongVal = obj.info.fLongVal;
-	}
+    AtomicArrayCounter(volatile const AtomicArrayCounter& obj) 
+    {
+        info.fLongVal = obj.info.fLongVal;
+    }
+
+    AtomicArrayCounter(volatile AtomicArrayCounter& obj) 
+    {
+    info.fLongVal = obj.info.fLongVal;
+    }
 
     AtomicArrayCounter& operator=(volatile AtomicArrayCounter& obj)
     {
@@ -65,6 +66,7 @@ struct AtomicArrayCounter
         info.fLongVal = obj.info.fLongVal;
         return *this;
     }
+    
 };
 
 #define Counter1(e) (e).info.fLongVal

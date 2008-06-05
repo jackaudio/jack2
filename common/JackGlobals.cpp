@@ -30,7 +30,6 @@ jack_tls_key gRealTime;
 jack_tls_key g_key_log_function;
 
 // Initialisation at library load time
-
 #ifdef WIN32
 
 #ifdef __cplusplus
@@ -90,6 +89,7 @@ static void jack_init()
     if (!g_key_log_function_initialized)
         g_key_log_function_initialized = jack_tls_allocate_key(&g_key_log_function);
 }
+
 __attribute__ ((destructor))
 static void jack_uninit()
 {
@@ -103,7 +103,5 @@ static void jack_uninit()
         g_key_log_function_initialized = false;
     }
 }
-
-
 
 #endif

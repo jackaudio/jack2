@@ -50,6 +50,7 @@ struct AtomicCounter
 	{
 		info.fLongVal = obj.info.fLongVal;
 	}
+    
 	AtomicCounter(volatile AtomicCounter& obj) 
 	{
 		info.fLongVal = obj.info.fLongVal;
