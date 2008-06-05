@@ -116,6 +116,8 @@ namespace Jack
 			//then tell the master we are ready
 			jack_info ( "Initializing connection with %s...", fParams.fMasterNetName );
 			status = SendMasterStartSync();
+			if ( status == NET_ERROR )
+				return false;
 		}
 		while ( status != ROLLING );
 
@@ -217,7 +219,10 @@ namespace Jack
 		//tell the master to start
 		SetPacketType ( &fParams, START_MASTER );
 		if ( send ( fSockfd, &fParams, sizeof ( session_params_t ), MSG_DONTWAIT ) < 0 )
+		{
 			jack_error ( "Error in send : %s", strerror ( errno ) );
+			return ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) ) ? NET_ERROR : SEND_ERROR;
+		}
 		return ROLLING;
 	}
 
@@ -237,7 +242,7 @@ namespace Jack
 		fTxBuffer = NULL;
 		fRxBuffer = NULL;
 		fNetAudioCaptureBuffer = NULL;
-		fNetAudioCaptureBuffer = NULL;
+		fNetAudioPlaybackBuffer = NULL;
 		fNetMidiCaptureBuffer = NULL;
 		fNetMidiPlaybackBuffer = NULL;
 		fMidiCapturePortList = NULL;
