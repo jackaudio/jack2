@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
     
     server_ctl = jackctl_server_create();
     if (server_ctl == NULL) {
-        fprintf(stderr, "Failed to create server object");
+        fprintf(stderr, "Failed to create server object\n");
         return -1;
     }
     
@@ -339,7 +339,7 @@ int main(int argc, char* argv[])
     }
     
     if (!jackctl_server_start(server_ctl, driver_ctl)) {
-        fprintf(stderr,"Failed to start server");
+        fprintf(stderr, "Failed to start server\n");
         goto fail_free;
     }
     
@@ -350,7 +350,7 @@ int main(int argc, char* argv[])
     jackctl_wait_signals(signals);
        
     if (!jackctl_server_stop(server_ctl))
-        fprintf(stderr,"Cannot stop server...");
+        fprintf(stderr, "Cannot stop server...\n");
         
 fail_free:
         
