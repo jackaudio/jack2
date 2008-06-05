@@ -29,9 +29,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-unsigned int JackShmMem::fSegmentNum = 0;
-jack_shm_info_t JackShmMem::gInfo;
+static unsigned int fSegmentNum;
+static jack_shm_info_t gInfo;
 size_t JackMem::gSize = 0;
+
+JackShmMem::JackShmMem()
+{
+    fInfo.index = gInfo.index;
+    fInfo.attached_at = gInfo.attached_at;
+    fInfo.size = gInfo.size;
+}
     
 void* JackShmMem::operator new(size_t size, void* memory)
 {
@@ -45,7 +52,7 @@ void* JackShmMem::operator new(size_t size)
     JackShmMem* obj;
     char name[64];
 
-    snprintf(name, sizeof(name), "/jack_shared%d", JackShmMem::fSegmentNum++);
+    snprintf(name, sizeof(name), "/jack_shared%d", fSegmentNum++);
 
     if (jack_shmalloc(name, size, &info)) {
         jack_error("cannot create shared memory segment of size = %d", size, strerror(errno));

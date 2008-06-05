@@ -578,7 +578,7 @@ int main (int argc, char *argv[])
     signal1[0] = 0;
     int p;
     for (p = 1; p < 48000;p++) {
-        signal1[p] = (sin((p * 2 * M_PI * 1000 ) / 48000));
+        signal1[p] = (float)(sin((p * 2 * M_PI * 1000 ) / 48000));
     }
     for (p = 0; p < 95999;p++) {
         signal2[p] = 0.0 ;
@@ -1930,5 +1930,5 @@ int main (int argc, char *argv[])
     fprintf(file, "set label \"| buf.siz:%i | fr.wl:%i | rg.ports:%i | 2nd.client:%i | trsprt:%i |\" at graph 0.01, 0.04\n", linebuf, linefw, lineports, linecl2, linetransport);
     fprintf(file, "plot 'framefile-%i.dat' using 2 with impulses title \"Xruns\",'framefile-%i.dat' using 1 with line title \"Sampletime variation at %i\"\n", cur_buffer_size, cur_buffer_size, cur_buffer_size);
     fclose(file);
-    exit(0);
+    return 0;
 }

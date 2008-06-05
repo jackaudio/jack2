@@ -88,7 +88,7 @@ We have:
         
 */
 
-class JackTransportEngine : public JackAtomicArrayState<jack_position_t>
+class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
 {
 
     private:

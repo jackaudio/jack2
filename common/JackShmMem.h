@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "shm.h"
 #include "JackError.h"
+#include "JackExports.h"
 
 #include <new>  // GCC 4.0
 #include <errno.h>
@@ -46,8 +47,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-void LockMemoryImp(void* ptr, size_t size);
-void UnlockMemoryImp(void* ptr, size_t size);
+EXPORT void LockMemoryImp(void* ptr, size_t size);
+EXPORT void UnlockMemoryImp(void* ptr, size_t size);
 
 class JackMem
 {
@@ -93,28 +94,28 @@ class JackMem
 A class which objects need to be allocated in shared memory derives from this class.
 */
 
-class JackShmMem
+class EXPORT JackShmMem
 {
 
     protected:
 
         jack_shm_info_t fInfo;
-        static unsigned int fSegmentNum;
-        static jack_shm_info_t gInfo;
-
+ 
     public:
 
         void* operator new(size_t size);
         void* operator new(size_t size, void* memory);
         void operator delete(void* p, size_t size);
-	 void operator delete(void* p);
+		void operator delete(void* p);
 
-        JackShmMem()
+        JackShmMem();
+		/*
         {
             fInfo.index = gInfo.index;
             fInfo.attached_at = gInfo.attached_at;
             fInfo.size = gInfo.size;
         }
+		*/
 
         virtual ~JackShmMem()
         {}
