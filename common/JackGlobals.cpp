@@ -29,7 +29,15 @@ static bool g_key_log_function_initialized = false;
 jack_tls_key gRealTime;
 jack_tls_key g_key_log_function;
 
-__attribute__ ((constructor))
+// Initialisation at library load time
+
+#ifdef WIN32
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 static void jack_init()
 {
     if (!gKeyRealtimeInitialized) {
@@ -40,7 +48,6 @@ static void jack_init()
         g_key_log_function_initialized = jack_tls_allocate_key(&g_key_log_function);
 }
 
-__attribute__ ((destructor))
 static void jack_uninit()
 {
     if (gKeyRealtimeInitialized) {
@@ -53,15 +60,6 @@ static void jack_uninit()
         g_key_log_function_initialized = false;
     }
 }
-
-// Initialisation at library load time
-
-#ifdef WIN32
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
 BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -79,5 +77,33 @@ BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserv
 #ifdef __cplusplus
 }
 #endif
+
+#else
+
+__attribute__ ((constructor))
+static void jack_init()
+{
+    if (!gKeyRealtimeInitialized) {
+        gKeyRealtimeInitialized = jack_tls_allocate_key(&gRealTime);
+    }
+    
+    if (!g_key_log_function_initialized)
+        g_key_log_function_initialized = jack_tls_allocate_key(&g_key_log_function);
+}
+__attribute__ ((destructor))
+static void jack_uninit()
+{
+    if (gKeyRealtimeInitialized) {
+        jack_tls_free_key(gRealTime);
+        gKeyRealtimeInitialized = false;
+    }
+    
+    if (g_key_log_function_initialized) {
+        jack_tls_free_key(g_key_log_function);
+        g_key_log_function_initialized = false;
+    }
+}
+
+
 
 #endif

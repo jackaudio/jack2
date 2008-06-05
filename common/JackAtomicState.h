@@ -41,14 +41,33 @@ struct AtomicCounter
         UInt32 fLongVal;
     }info;
 
-    AtomicCounter& operator=(volatile AtomicCounter& obj)
+	AtomicCounter()
+	{
+        info.fLongVal = 0;
+    }
+
+	AtomicCounter(volatile const AtomicCounter& obj) 
+	{
+		info.fLongVal = obj.info.fLongVal;
+	}
+	AtomicCounter(volatile AtomicCounter& obj) 
+	{
+		info.fLongVal = obj.info.fLongVal;
+	}
+
+ 	AtomicCounter& operator=(AtomicCounter& obj)
     {
         info.fLongVal = obj.info.fLongVal;
         return *this;
     }
 
-};
+	AtomicCounter& operator=(volatile AtomicCounter& obj)
+	{
+        info.fLongVal = obj.info.fLongVal;
+        return *this;
+    }
 
+};
 
 #define Counter(e) (e).info.fLongVal
 #define CurIndex(e) (e).info.scounter.fShortVal1

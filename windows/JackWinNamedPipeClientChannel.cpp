@@ -25,6 +25,7 @@ Copyright (C) 2004-2006 Grame
 #include "JackRequest.h"
 #include "JackClient.h"
 #include "JackGlobals.h"
+#include "JackError.h"
 
 namespace Jack
 {
