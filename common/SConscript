@@ -178,6 +178,9 @@ if env['PLATFORM'] == 'posix':
     libenv.Append(SHLIBSUFFIX='.' + env['JACKAPI_VERSION'])
     libenv.Append(SHLINKFLAGS='-Wl,-soname,${str(TARGET.file).split(".")[0]}.so.' + str(env['JACKAPI_MAJOR_VERSION']))
 
+libenv.AppendUnique(CCFLAGS = ['-fvisibility=hidden'])
+libenv.AppendUnique(CPPFLAGS = ['-fvisibility=hidden'])
+     
 clientlib = libenv.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = libenv.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
 netmanagerlib = libenv.SharedLibrary(env['NETMANAGERLIB'], 'JackNetManager.cpp')
@@ -188,7 +191,7 @@ env.Alias('install', env['INSTALL_LIBDIR'])
 if env['PLATFORM'] == 'posix':
     libs = [(env['CLIENTLIB'], clientlib), (env['SERVERLIB'], serverlib)]
     for lib_name, lib in libs:
-        env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), lib, symlinkcmd)
+	env.Command('#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), lib, symlinkcmd)
         env.Command('#/common/lib' + lib_name + '.so', '#/common/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), symlinkcmd)
         env.Command(env['INSTALL_LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), env['INSTALL_LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACKAPI_VERSION'], symlinkcmd)
         env.Command(env['INSTALL_LIBDIR']  + '/lib' + lib_name + '.so', env['INSTALL_LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), symlinkcmd)
