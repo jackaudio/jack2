@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-static unsigned int fSegmentNum;
+static unsigned int fSegmentNum = 0;
 static jack_shm_info_t gInfo;
 size_t JackMem::gSize = 0;
 
