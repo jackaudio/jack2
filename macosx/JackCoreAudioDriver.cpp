@@ -156,6 +156,8 @@ static OSStatus DisplayDeviceNames()
             return err;
 
         jack_info("Device name = \'%s\', internal_name = \'%s\' (to be used as -C, -P, or -d parameter)", device_name, internal_name);
+        printf("Device name = \'%s\', internal_name = \'%s\' (to be used as -C, -P, or -d parameter)", device_name, internal_name);
+
     }
 
     return noErr;
@@ -1265,10 +1267,10 @@ extern "C"
         jack_nframes_t systemic_input_latency = 0;
         jack_nframes_t systemic_output_latency = 0;
         int async_output_latency = 100;
-
+    
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t *) node->data;
-
+       
             switch (param->character) {
 
                 case 'd':

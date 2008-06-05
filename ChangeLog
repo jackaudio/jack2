@@ -24,6 +24,7 @@ Romain Moret
 2008-06-05 Stephane Letz  <letz@grame.fr>
 
 	* Better control of exported symbols.
+	* Fix a bug in backend parameter parsing.
 
 2008-06-04 Stephane Letz  <letz@grame.fr>
 
