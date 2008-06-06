@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-06-06 Stephane Letz  <letz@grame.fr>
+
+	* Better error checking in JackGraphManager::RemoveAllPorts.
+
 2008-06-05 Stephane Letz  <letz@grame.fr>
 
 	* Better control of exported symbols.

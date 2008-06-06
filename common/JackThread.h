@@ -65,6 +65,7 @@ namespace detail
 
 class JackThread
 {
+
     public:
         
         enum kThreadState {kIdle, kStarting, kIniting, kRunning};
@@ -82,8 +83,7 @@ class JackThread
         JackThread(JackRunnableInterface* runnable, int priority, bool real_time, int cancellation):
         fRunnable(runnable), fPriority(priority), fRealTime(real_time), fStatus(kIdle), fCancellation(cancellation)
         {}
-        
-        
+         
         kThreadState GetStatus()
         {
             return fStatus;

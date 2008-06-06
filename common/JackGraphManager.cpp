@@ -380,16 +380,24 @@ void JackGraphManager::RemoveAllPorts(int refnum)
     JackConnectionManager* manager = WriteNextStateStart();
     jack_port_id_t port_index;
 
-    // Warning : RemovePort shift port to left, thus we always remove the first port until the "input" table is empty
+    // Warning : ReleasePort shift port to left, thus we always remove the first port until the "input" table is empty
     const jack_int_t* input = manager->GetInputPorts(refnum);
     while ((port_index = input[0]) != EMPTY) {
-        ReleasePort(refnum, port_index);
+        int res = ReleasePort(refnum, port_index);
+        if (res < 0) {
+            jack_error("JackGraphManager::RemoveAllPorts failure ref = %ld port_index = %ld", refnum, port_index);
+            assert(true);
+        }
     }
 
-    // Warning : RemovePort shift port to left, thus we always remove the first port until the "output" table is empty
+    // Warning : ReleasePort shift port to left, thus we always remove the first port until the "output" table is empty
     const jack_int_t* output = manager->GetOutputPorts(refnum);
     while ((port_index = output[0]) != EMPTY) {
-        ReleasePort(refnum, port_index);
+        int res = ReleasePort(refnum, port_index);
+        if (res < 0) {
+            jack_error("JackGraphManager::RemoveAllPorts failure ref = %ld port_index = %ld", refnum, port_index);
+            assert(true);
+        } 
     }
 
     WriteNextStateStop();
