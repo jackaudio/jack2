@@ -18,3 +18,5 @@ def build(bld):
         prog.uselib = 'RT'
         prog.uselib_local = 'clientlib'
         prog.target = test_program
+        if test_program != 'jack_test':
+            prog.inst_var = 0
