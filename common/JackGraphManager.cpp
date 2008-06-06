@@ -387,6 +387,7 @@ void JackGraphManager::RemoveAllPorts(int refnum)
         if (res < 0) {
             jack_error("JackGraphManager::RemoveAllPorts failure ref = %ld port_index = %ld", refnum, port_index);
             assert(true);
+            break;
         }
     }
 
@@ -397,6 +398,7 @@ void JackGraphManager::RemoveAllPorts(int refnum)
         if (res < 0) {
             jack_error("JackGraphManager::RemoveAllPorts failure ref = %ld port_index = %ld", refnum, port_index);
             assert(true);
+            break;
         } 
     }
 
