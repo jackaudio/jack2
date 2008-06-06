@@ -93,8 +93,8 @@ namespace Jack
 			static int SetProcess ( jack_nframes_t nframes, void* arg );
 
 			jack_client_t* fManagerClient;
-			char* fManagerName;
-			char* fMCastIP;
+			const char* fManagerName;
+			const char* fMCastIP;
 			pthread_t fManagerThread;
 			master_list_t fMasterList;
 			size_t fGlobalID;
