@@ -32,12 +32,10 @@ namespace Jack
 {
 
 JackExternalClient::JackExternalClient(): fClientControl(NULL)
-{
-}
+{}
 
 JackExternalClient::~JackExternalClient()
-{
-}
+{}
 
 int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {

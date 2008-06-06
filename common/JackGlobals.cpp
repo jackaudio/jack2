@@ -32,11 +32,6 @@ jack_tls_key g_key_log_function;
 // Initialisation at library load time
 #ifdef WIN32
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 static void jack_init()
 {
     if (!gKeyRealtimeInitialized) {
@@ -59,6 +54,11 @@ static void jack_uninit()
         g_key_log_function_initialized = false;
     }
 }
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 BOOL WINAPI DllEntryPoint(HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
