@@ -58,6 +58,7 @@ def configure(conf):
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
+    conf.env['JACK_VERSION'] = VERSION
 
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))

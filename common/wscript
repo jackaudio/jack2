@@ -1,6 +1,40 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+import re
+import os
+
+# by default waf subst tool uses @VAR@ while scons legacy is ${VAR}
+# so we use same template as scons for now
+def subst_func(tsk):
+    "Substitutes variables in a .in file"
+
+    m4_re = re.compile('\$\{(\w+)\}', re.M)
+
+    env = tsk.env()
+    infile = tsk.m_inputs[0].abspath(env)
+    outfile = tsk.m_outputs[0].abspath(env)
+
+    file = open(infile, 'r')
+    code = file.read()
+    file.close()
+
+    s = m4_re.sub(r'%(\1)s', code)
+
+    dict = tsk.dict
+    if not dict:
+        names = m4_re.findall(code)
+        for i in names:
+            if env[i] and type(env[i]) is types.ListType :
+                dict[i] = " ".join(env[i])
+            else: dict[i] = env[i]
+
+    file = open(outfile, 'w')
+    file.write(s % dict)
+    file.close()
+
+    return 0
+
 def build(bld):
     common_libsources = [
         'JackActivationCount.cpp',
@@ -88,3 +122,17 @@ def build(bld):
     netmanager_lib.source   = 'JackNetManager.cpp'
 
     install_files('PREFIX', 'jack', 'jack/*.h')
+
+    # process jack.pc.in -> jack.pc
+    obj = bld.create_obj('subst')
+    obj.source = '../jack.pc.in'
+    obj.target = 'jack.pc'
+    obj.dict = {'PREFIX': bld.env()['PREFIX'],
+                'LIBDIR': os.path.normpath(bld.env()['PREFIX'] + '/lib'),
+                'INCLUDEDIR': os.path.normpath(bld.env()['PREFIX'] + '/include'),
+                'SERVERLIB': serverlib.target,
+                'JACK_VERSION': bld.env()['JACK_VERSION'],
+                }
+    obj.inst_var = bld.env()['PREFIX']
+    obj.inst_dir = '/lib/pkgconfig/'
+    obj.fun = subst_func # @VAR@ -> ${VAR}
