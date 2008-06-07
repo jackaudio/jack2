@@ -33,8 +33,6 @@ def configure(conf):
 def subst_func(tsk):
     "Substitutes variables in a .in file"
 
-    print "subsituting!"
-
     m4_re = re.compile('\$\{(\w+)\}', re.M)
 
     env = tsk.env()
