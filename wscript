@@ -6,6 +6,7 @@ import Params
 import commands
 from Configure import g_maxlen
 #g_maxlen = 40
+import shutil
 
 VERSION='1.9.0'
 APPNAME='jack'
@@ -107,3 +108,32 @@ def build(bld):
         bld.add_subdirs('linux/dbus')
     bld.add_subdirs('example-clients')
     bld.add_subdirs('tests')
+
+    #print "shutdown called"
+    share_dir = Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
+    html_docs_dir = share_dir + '/reference/html/'
+    if Params.g_commands['install']:
+        #print "shutdown called as part of install"
+        if os.path.isdir(html_docs_dir):
+            Params.pprint('CYAN', "Removing old doxygen documentation installation...")
+            shutil.rmtree(html_docs_dir)
+            Params.pprint('CYAN', "Removing old doxygen documentation installation done.")
+        Params.pprint('CYAN', "Installing doxygen documentation...")
+        shutil.copytree('html', html_docs_dir)
+        Params.pprint('CYAN', "Installing doxygen documentation done.")
+    elif Params.g_commands['uninstall']:
+        #print "shutdown called as part of uninstall"
+        Params.pprint('CYAN', "Uninstalling doxygen documentation...")
+        if os.path.isdir(share_dir):
+            shutil.rmtree(share_dir)
+        Params.pprint('CYAN', "Uninstalling doxygen documentation done.")
+    elif Params.g_commands['clean']:
+        if os.access('html', os.R_OK):
+            Params.pprint('CYAN', "Removing doxygen generated documentation...")
+            shutil.rmtree('html')
+            Params.pprint('CYAN', "Removing doxygen generated documentation done.")
+    elif Params.g_commands['build']:
+        if not os.access('html', os.R_OK):
+            os.popen("doxygen").read()
+        else:
+            Params.pprint('CYAN', "doxygen documentation already built.")
