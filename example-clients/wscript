@@ -86,3 +86,5 @@ def build(bld):
         lib.source = example_lib_source
         lib.inst_var = bld.env()['ADDON_DIR']
         lib.inst_dir = '/'
+
+    symlink_as('PREFIX', 'jack_connect', 'bin/jack_disconnect')
