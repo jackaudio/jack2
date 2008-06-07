@@ -84,3 +84,5 @@ def build(bld):
         lib.includes = ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
+        lib.inst_var = bld.env()['ADDON_DIR']
+        lib.inst_dir = '/'
