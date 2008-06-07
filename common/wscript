@@ -4,6 +4,9 @@
 import re
 import os
 
+def configure(conf):
+    conf.check_tool('misc')
+
 # by default waf subst tool uses @VAR@ while scons legacy is ${VAR}
 # so we use same template as scons for now
 def subst_func(tsk):

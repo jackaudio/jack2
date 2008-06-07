@@ -49,6 +49,7 @@ def configure(conf):
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
 
+    conf.sub_config('common')
     conf.sub_config('linux')
     if Params.g_options.dbus:
         conf.sub_config('linux/dbus')
