@@ -44,6 +44,7 @@ def set_options(opt):
     opt.tool_options('compiler_cc')
 
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+    opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.sub_options('linux/dbus')
 
 def configure(conf):
@@ -62,6 +63,8 @@ def configure(conf):
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
+    conf.env['BUILD_DOXYGEN_DOCS'] = Params.g_options.doxygen
+
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
     conf.define('SOCKET_RPC_FIFO_SEMA', 1)
@@ -78,6 +81,7 @@ def configure(conf):
     print
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
+    display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
     display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
     display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
@@ -109,31 +113,29 @@ def build(bld):
     bld.add_subdirs('example-clients')
     bld.add_subdirs('tests')
 
-    #print "shutdown called"
-    share_dir = Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
-    html_docs_dir = share_dir + '/reference/html/'
-    if Params.g_commands['install']:
-        #print "shutdown called as part of install"
-        if os.path.isdir(html_docs_dir):
-            Params.pprint('CYAN', "Removing old doxygen documentation installation...")
-            shutil.rmtree(html_docs_dir)
-            Params.pprint('CYAN', "Removing old doxygen documentation installation done.")
-        Params.pprint('CYAN', "Installing doxygen documentation...")
-        shutil.copytree('html', html_docs_dir)
-        Params.pprint('CYAN', "Installing doxygen documentation done.")
-    elif Params.g_commands['uninstall']:
-        #print "shutdown called as part of uninstall"
-        Params.pprint('CYAN', "Uninstalling doxygen documentation...")
-        if os.path.isdir(share_dir):
-            shutil.rmtree(share_dir)
-        Params.pprint('CYAN', "Uninstalling doxygen documentation done.")
-    elif Params.g_commands['clean']:
-        if os.access('html', os.R_OK):
-            Params.pprint('CYAN', "Removing doxygen generated documentation...")
-            shutil.rmtree('html')
-            Params.pprint('CYAN', "Removing doxygen generated documentation done.")
-    elif Params.g_commands['build']:
-        if not os.access('html', os.R_OK):
-            os.popen("doxygen").read()
-        else:
-            Params.pprint('CYAN', "doxygen documentation already built.")
+    if bld.env()['BUILD_DOXYGEN_DOCS'] == True:
+        share_dir = Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
+        html_docs_dir = share_dir + '/reference/html/'
+        if Params.g_commands['install']:
+            if os.path.isdir(html_docs_dir):
+                Params.pprint('CYAN', "Removing old doxygen documentation installation...")
+                shutil.rmtree(html_docs_dir)
+                Params.pprint('CYAN', "Removing old doxygen documentation installation done.")
+            Params.pprint('CYAN', "Installing doxygen documentation...")
+            shutil.copytree('html', html_docs_dir)
+            Params.pprint('CYAN', "Installing doxygen documentation done.")
+        elif Params.g_commands['uninstall']:
+            Params.pprint('CYAN', "Uninstalling doxygen documentation...")
+            if os.path.isdir(share_dir):
+                shutil.rmtree(share_dir)
+            Params.pprint('CYAN', "Uninstalling doxygen documentation done.")
+        elif Params.g_commands['clean']:
+            if os.access('html', os.R_OK):
+                Params.pprint('CYAN', "Removing doxygen generated documentation...")
+                shutil.rmtree('html')
+                Params.pprint('CYAN', "Removing doxygen generated documentation done.")
+        elif Params.g_commands['build']:
+            if not os.access('html', os.R_OK):
+                os.popen("doxygen").read()
+            else:
+                Params.pprint('CYAN', "doxygen documentation already built.")
