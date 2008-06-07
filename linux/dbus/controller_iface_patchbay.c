@@ -379,6 +379,8 @@ jack_controller_patchbay_destroy_client(
     struct jack_controller_patchbay *patchbay_ptr,
     struct jack_graph_client *client_ptr)
 {
+    jack_info("Client '%s' with PID %d is out", client_ptr->name, client_ptr->pid);
+
     pthread_mutex_lock(&patchbay_ptr->lock);
     list_del(&client_ptr->siblings);
     patchbay_ptr->graph.version++;
