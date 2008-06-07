@@ -121,7 +121,7 @@ def build(bld):
     netmanager_lib.target   = 'netmanager'
     netmanager_lib.source   = 'JackNetManager.cpp'
 
-    install_files('PREFIX', 'jack', 'jack/*.h')
+    install_files('PREFIX', 'include/jack', 'jack/*.h')
 
     # process jack.pc.in -> jack.pc
     obj = bld.create_obj('subst')
