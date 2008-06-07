@@ -98,6 +98,7 @@ def build(bld):
 	'JackNetTool.cpp',
         ]
     serverlib.vnum = bld.env()['JACK_API_VERSION']
+    serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
     clientlib = bld.create_obj('cpp', 'shlib')
     clientlib.features.append('cc')
@@ -116,6 +117,7 @@ def build(bld):
         'JackServerLaunch.cpp', 
         ]
     clientlib.vnum = bld.env()['JACK_API_VERSION']
+    clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
     netmanager_lib = bld.create_obj('cpp', 'shlib')
     netmanager_lib.env['shlib_PATTERN'] = '%s.so'
@@ -123,6 +125,7 @@ def build(bld):
     netmanager_lib.name     = 'netmanager'
     netmanager_lib.target   = 'netmanager'
     netmanager_lib.source   = 'JackNetManager.cpp'
+    netmanager_lib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
     install_files('PREFIX', 'include/jack', 'jack/*.h')
 
