@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+import os
 import Params
 import commands
-import Params
 from Configure import g_maxlen
 #g_maxlen = 40
 
@@ -43,6 +43,7 @@ def set_options(opt):
     opt.tool_options('compiler_cc')
 
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+    opt.sub_options('linux/dbus')
 
 def configure(conf):
     conf.check_tool('compiler_cxx')
@@ -58,8 +59,8 @@ def configure(conf):
     conf.env['LIB_RT'] = ['rt']
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
 
-    conf.define('ADDON_DIR', conf.env['PREFIX'] + '/lib/jack')
-    conf.define('JACK_LOCATION', conf.env['PREFIX'] + '/bin')
+    conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
+    conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
     conf.define('SOCKET_RPC_FIFO_SEMA', 1)
     conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
@@ -78,6 +79,22 @@ def configure(conf):
     display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
     display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'] == True)
+    if conf.env['BUILD_JACKDBUS'] == True:
+        display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
+        #display_msg('Settings persistence', xxx)
+
+        if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]:
+            print
+            print Params.g_colors['RED'] + "WARNING: D-Bus session services directory as reported by pkg-config is"
+            print Params.g_colors['RED'] + "WARNING:",
+            print Params.g_colors['CYAN'] + conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]
+            print Params.g_colors['RED'] + 'WARNING: but service file will be installed in'
+            print Params.g_colors['RED'] + "WARNING:",
+            print Params.g_colors['CYAN'] + conf.env['DBUS_SERVICES_DIR']
+            print Params.g_colors['RED'] + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
+            print 'WARNING: You can override dbus service install directory'
+            print 'WARNING: with --enable-pkg-config-dbus-service-dir option to this script'
+            print Params.g_colors['NORMAL'],
     print
 
 def build(bld):
