@@ -21,8 +21,6 @@
 #ifndef _RINGBUFFER_H
 #define _RINGBUFFER_H
 
-#include "JackExports.h"
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -70,7 +68,7 @@ extern "C"
      * @return a pointer to a new jack_ringbuffer_t, if successful; NULL
      * otherwise.
      */
-    EXPORT jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
+    jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
 
     /**
      * Frees the ringbuffer data structure allocated by an earlier call to
@@ -78,7 +76,7 @@ extern "C"
      *
      * @param rb a pointer to the ringbuffer structure.
      */
-    EXPORT void jack_ringbuffer_free(jack_ringbuffer_t *rb);
+    void jack_ringbuffer_free(jack_ringbuffer_t *rb);
 
     /**
      * Fill a data structure with a description of the current readable
@@ -100,7 +98,7 @@ extern "C"
      * @param vec a pointer to a 2 element array of jack_ringbuffer_data_t.
      *
      */
-    EXPORT void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
+    void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
                                          jack_ringbuffer_data_t *vec);
 
     /**
@@ -122,7 +120,7 @@ extern "C"
      * @param rb a pointer to the ringbuffer structure.
      * @param vec a pointer to a 2 element array of jack_ringbuffer_data_t.
      */
-    EXPORT void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
+    void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
                                           jack_ringbuffer_data_t *vec);
 
     /**
@@ -135,7 +133,7 @@ extern "C"
      *
      * @return the number of bytes read, which may range from 0 to cnt.
      */
-    EXPORT size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
+    size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
 
     /**
      * Read data from the ringbuffer. Opposed to jack_ringbuffer_read()
@@ -152,7 +150,7 @@ extern "C"
      *
      * @return the number of bytes read, which may range from 0 to cnt.
      */
-    EXPORT size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
+    size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
 
     /**
      * Advance the read pointer.
@@ -165,7 +163,7 @@ extern "C"
      * @param rb a pointer to the ringbuffer structure.
      * @param cnt the number of bytes read.
      */
-    EXPORT void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
+    void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
 
     /**
      * Return the number of bytes available for reading.
@@ -174,7 +172,7 @@ extern "C"
      *
      * @return the number of bytes available to read.
      */
-    EXPORT size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
+    size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
 
     /**
      * Lock a ringbuffer data block into memory.
@@ -183,7 +181,7 @@ extern "C"
      *
      * @param rb a pointer to the ringbuffer structure.
      */
-    EXPORT int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
+    int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
 
     /**
      * Reset the read and write pointers, making an empty buffer.
@@ -192,7 +190,7 @@ extern "C"
      *
      * @param rb a pointer to the ringbuffer structure.
      */
-    EXPORT void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
+    void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
 
     /**
      * Write data into the ringbuffer.
@@ -203,7 +201,7 @@ extern "C"
      *
      * @return the number of bytes write, which may range from 0 to cnt
      */
-    EXPORT size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
+    size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
                                  size_t cnt);
 
     /**
@@ -217,7 +215,7 @@ extern "C"
      * @param rb a pointer to the ringbuffer structure.
      * @param cnt the number of bytes written.
      */
-    EXPORT void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
+    void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
 
     /**
      * Return the number of bytes available for writing.
@@ -226,7 +224,7 @@ extern "C"
      *
      * @return the amount of free space (in bytes) available for writing.
      */
-    EXPORT size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
+    size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
 
 #ifdef __cplusplus
 }
