@@ -126,6 +126,8 @@ def build(bld):
     netmanager_lib.target   = 'netmanager'
     netmanager_lib.source   = 'JackNetManager.cpp'
     netmanager_lib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    netmanager_lib.inst_var = bld.env()['ADDON_DIR']
+    netmanager_lib.inst_dir = '/'
 
     install_files('PREFIX', 'include/jack', 'jack/*.h')
 
