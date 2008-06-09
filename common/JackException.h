@@ -23,20 +23,20 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdexcept>
 #include <iostream>
 #include <string>
-#include "JackError.h"
+#include "JackExports.h"
 
 namespace Jack 
 {
 
-    class JackException : public std::runtime_error {
-    
+    class EXPORT JackException : public std::runtime_error {
+     
         public:
         
             JackException(const std::string& msg) : runtime_error(msg) 
             {}
             JackException(const char* msg) : runtime_error(msg) 
             {}
-            
+      
             std::string Message() 
             {
                 return what();
@@ -50,17 +50,20 @@ namespace Jack
             }
     };
     
-    class JackDriverException : public JackException {
+    class EXPORT JackDriverException : public JackException {
     
         public:
         
-           JackDriverException(const std::string& msg) : JackException(msg) 
-           {}
-           JackDriverException(const char* msg) : JackException(msg) 
-           {}
-		   JackDriverException() : JackException("") 
-           {}
+            JackDriverException(const std::string& msg) : JackException(msg) 
+            {}
+            JackDriverException(const char* msg) : JackException(msg) 
+            {}
+            
+            JackDriverException() : JackException("") 
+            {}
+            
     };
 
 } 
+
 #endif
