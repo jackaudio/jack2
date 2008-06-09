@@ -88,3 +88,5 @@ def build(bld):
         lib.inst_dir = '/'
 
     symlink_as('PREFIX', 'jack_connect', 'bin/jack_disconnect')
+
+    install_files('PREFIX', 'bin', 'jack_control')
