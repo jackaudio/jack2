@@ -20,6 +20,7 @@
 
 #include "JackNetManager.h"
 #include "JackError.h"
+#include "JackExports.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -266,7 +267,7 @@ namespace Jack
 		int mcast_sockfd = socket ( AF_INET, SOCK_DGRAM, 0 );
 		if ( mcast_sockfd < 0 )
 			jack_error ( "Can't create socket : %s", strerror ( errno ) );
-		if ( sendto ( mcast_sockfd, &fParams, sizeof ( session_params_t ), MSG_DONTWAIT,
+		if ( sendto ( mcast_sockfd, &fParams, sizeof ( session_params_t ), 0,
 		              reinterpret_cast<socket_address_t*> ( &fMcastAddr ), sizeof ( socket_address_t ) ) < 0 )
 			jack_error ( "Can't send suicide request : %s", strerror ( errno ) );
 		close ( mcast_sockfd );
@@ -357,7 +358,7 @@ namespace Jack
 		fTxHeader.fDataType = 's';
 		if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
 			fTxHeader.fIsLastPckt = 'y';
-		tx_bytes = Send ( reinterpret_cast<char*> ( &fTxHeader ), sizeof ( packet_header_t ), MSG_DONTWAIT );
+		tx_bytes = Send ( reinterpret_cast<char*> ( &fTxHeader ), sizeof ( packet_header_t ), 0 );
 		if ( tx_bytes < 1 )
 			return tx_bytes;
 
@@ -374,7 +375,7 @@ namespace Jack
 					fTxHeader.fIsLastPckt = 'y';
 				memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
 				copy_size = fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-				tx_bytes = Send ( fTxBuffer, sizeof ( packet_header_t ) + copy_size, MSG_DONTWAIT );
+				tx_bytes = Send ( fTxBuffer, sizeof ( packet_header_t ) + copy_size, 0 );
 				if ( tx_bytes < 1 )
 					return tx_bytes;
 			}
@@ -391,7 +392,7 @@ namespace Jack
 					fTxHeader.fIsLastPckt = 'y';
 				memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
 				fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
-				tx_bytes = Send ( fTxBuffer, fAudioTxLen, MSG_DONTWAIT );
+				tx_bytes = Send ( fTxBuffer, fAudioTxLen, 0 );
 				if ( tx_bytes < 1 )
 					return tx_bytes;
 			}
@@ -644,7 +645,7 @@ static Jack::JackNetMasterManager* master_manager = NULL;
 extern "C"
 {
 #endif
-	int jack_initialize ( jack_client_t* jack_client, const char* load_init )
+	EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
 	{
 		if ( master_manager )
 		{
@@ -659,7 +660,7 @@ extern "C"
 		}
 	}
 
-	void jack_finish ( void* arg )
+	EXPORT void jack_finish ( void* arg )
 	{
 		if ( master_manager )
 		{

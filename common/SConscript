@@ -95,6 +95,7 @@ srcfiles_common_serverlib = [
     'JackServer.cpp',
     'JackShmMem.cpp',
     'JackThreadedDriver.cpp',
+    'JackWaitThreadedDriver.cpp',
     'shm.c',
     'JackSocket.cpp',
     'JackSocketServerChannel.cpp',
@@ -183,7 +184,6 @@ libenv.AppendUnique(CPPFLAGS = ['-fvisibility=hidden'])
      
 clientlib = libenv.SharedLibrary(env['CLIENTLIB'], srcfiles_common_clientlib)
 serverlib = libenv.SharedLibrary(env['SERVERLIB'], srcfiles_common_serverlib)
-netmanagerlib = libenv.SharedLibrary(env['NETMANAGERLIB'], 'JackNetManager.cpp')
 env.Install( env['INSTALL_LIBDIR'], [clientlib, serverlib])
 env.Alias('install', env['INSTALL_LIBDIR'])
 
@@ -196,6 +196,12 @@ if env['PLATFORM'] == 'posix':
         env.Command(env['INSTALL_LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), env['INSTALL_LIBDIR'] + '/lib' + lib_name + '.so.' + env['JACKAPI_VERSION'], symlinkcmd)
         env.Command(env['INSTALL_LIBDIR']  + '/lib' + lib_name + '.so', env['INSTALL_LIBDIR'] + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']), symlinkcmd)
         env.Alias('install', env['INSTALL_LIBDIR']  + '/lib' + lib_name + '.so.' + str(env['JACKAPI_MAJOR_VERSION']))
+
+# NetManager
+netmanagerenv = env.Copy()
+netmanagerenv.AppendUnique(CPPFLAGS = ['-fvisibility=hidden'])
+env.InstallAs(env['INSTALL_ADDON_DIR'] + '/netmanager.so', netmanagerenv.SharedLibrary('netmanager', 'JackNetManager.cpp'))
+env.Alias('install', env['INSTALL_ADDON_DIR'] + '/netmanager.so')
 
 # Headers
 for header in jack_headers:

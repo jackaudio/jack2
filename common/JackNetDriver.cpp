@@ -192,7 +192,7 @@ namespace Jack
 		do
 		{
 			//send 'available'
-			if ( sendto ( fSockfd, &fParams, sizeof ( session_params_t ), MSG_DONTWAIT,
+			if ( sendto ( fSockfd, &fParams, sizeof ( session_params_t ), 0,
 			              reinterpret_cast<socket_address_t*> ( &mcast_addr ), addr_len ) < 0 )
 				jack_error ( "Error in data send : %s", strerror ( errno ) );
 			//filter incoming packets : don't exit while receiving wrong packets
@@ -228,7 +228,7 @@ namespace Jack
 		jack_log ( "JackNetDriver::GetNetMasterStartSync()" );
 		//tell the master to start
 		SetPacketType ( &fParams, START_MASTER );
-		if ( send ( fSockfd, &fParams, sizeof ( session_params_t ), MSG_DONTWAIT ) < 0 )
+		if ( send ( fSockfd, &fParams, sizeof ( session_params_t ), 0 ) < 0 )
 		{
 			jack_error ( "Error in send : %s", strerror ( errno ) );
 			return ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) ) ? NET_ERROR : SEND_ERROR;
@@ -551,7 +551,7 @@ namespace Jack
 					fTxHeader.fIsLastPckt = 'y';
 				memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
 				copy_size = fNetMidiPlaybackBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-				tx_bytes = Send ( sizeof ( packet_header_t ) + copy_size, MSG_DONTWAIT );
+				tx_bytes = Send ( sizeof ( packet_header_t ) + copy_size, 0 );
 			}
 		}
 
@@ -566,7 +566,7 @@ namespace Jack
 					fTxHeader.fIsLastPckt = 'y';
 				fNetAudioPlaybackBuffer->RenderFromJackPorts ( subproc );
 				memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-				tx_bytes = Send ( fAudioTxLen, MSG_DONTWAIT );
+				tx_bytes = Send ( fAudioTxLen, 0 );
 			}
 		}
 		return 0;
