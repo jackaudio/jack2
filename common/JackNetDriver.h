@@ -32,10 +32,10 @@ namespace Jack
 		private:
 			session_params_t fParams;
 			char* fMulticastIP;
-			size_t fPort;
+			unsigned int fPort;
 			int fSockfd;
 			struct sockaddr_in fMasterAddr;
-			size_t fNSubProcess;
+			unsigned int fNSubProcess;
 
 			jack_port_id_t* fMidiCapturePortList;
 			jack_port_id_t* fMidiPlaybackPortList;
@@ -67,12 +67,12 @@ namespace Jack
 			JackMidiBuffer* GetMidiInputBuffer ( int port_index );
 			JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
 
-			int Recv ( size_t size, int flags );
-			int Send ( size_t size, int flags );
+			int Recv ( unsigned int size, int flags );
+			int Send ( unsigned int size, int flags );
 			
 		public:
 			JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-				const char* ip, size_t port, int midi_input_ports, int midi_output_ports, const char* master_name );
+				const char* ip, unsigned int port, int midi_input_ports, int midi_output_ports, const char* master_name );
 			~JackNetDriver();
 
 			int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,

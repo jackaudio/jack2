@@ -35,7 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 	JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-	                               const char* ip, size_t port, int midi_input_ports, int midi_output_ports, const char* net_name )
+	                               const char* ip, unsigned int port, int midi_input_ports, int midi_output_ports, const char* net_name )
 			: JackAudioDriver ( name, alias, engine, table )
 	{
 		fMulticastIP = new char[strlen ( ip ) + 1];
@@ -411,7 +411,7 @@ namespace Jack
 		return static_cast<JackMidiBuffer*> ( fGraphManager->GetBuffer ( fMidiPlaybackPortList[port_index], fEngineControl->fBufferSize ) );
 	}
 
-	int JackNetDriver::Recv ( size_t size, int flags )
+	int JackNetDriver::Recv ( unsigned int size, int flags )
 	{
 		int rx_bytes;
 		if ( ( rx_bytes = recv ( fSockfd, fRxBuffer, size, flags ) ) < 0 )
@@ -435,7 +435,7 @@ namespace Jack
 		return rx_bytes;
 	}
 
-	int JackNetDriver::Send ( size_t size, int flags )
+	int JackNetDriver::Send ( unsigned int size, int flags )
 	{
 		int tx_bytes;
 		if ( ( tx_bytes = send ( fSockfd, fTxBuffer, size, flags ) ) < 0 )
@@ -456,7 +456,7 @@ namespace Jack
 	int JackNetDriver::Read()
 	{
 		int rx_bytes;
-		size_t recvd_midi_pckt = 0;
+		unsigned int recvd_midi_pckt = 0;
 		packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 		fRxHeader.fIsLastPckt = 'n';
 
@@ -536,7 +536,7 @@ namespace Jack
 			fTxHeader.fDataType = 'm';
 			fTxHeader.fMidiDataSize = fNetMidiPlaybackBuffer->RenderFromJackPorts();
 			fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
-			for ( size_t subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
+			for ( unsigned int subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fReturnAudioChannels )
@@ -551,7 +551,7 @@ namespace Jack
 		if ( fParams.fReturnAudioChannels )
 		{
 			fTxHeader.fDataType = 'a';
-			for ( size_t subproc = 0; subproc < fNSubProcess; subproc++ )
+			for ( unsigned int subproc = 0; subproc < fNSubProcess; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( subproc == ( fNSubProcess - 1 ) )
@@ -577,7 +577,7 @@ namespace Jack
 			desc->nparams = 7;
 			desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
-			size_t i = 0;
+			unsigned int i = 0;
 			strcpy ( desc->params[i].name, "multicast_ip" );
 			desc->params[i].character = 'a';
 			desc->params[i].type = JackDriverParamString;
