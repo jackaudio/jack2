@@ -259,7 +259,7 @@ main (int argc, char *argv[])
 	}
 
 	if (jack_activate (client)) {
-		fprintf (stderr, "cannot activate client");
+		fprintf (stderr, "cannot activate client\n");
 		return 1;
 	}
     

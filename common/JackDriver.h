@@ -75,6 +75,7 @@ class EXPORT JackDriverInterface
         virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
         
         virtual int Process() = 0;
+        virtual int ProcessNull() = 0;
         
         virtual void SetMaster(bool onoff) = 0;
         virtual bool GetMaster() = 0;
@@ -184,6 +185,11 @@ class EXPORT JackDriver : public JackDriverClient
         virtual int Close();
         
         virtual int Process()
+        {
+            return 0;
+        }
+        
+        virtual int ProcessNull()
         {
             return 0;
         }

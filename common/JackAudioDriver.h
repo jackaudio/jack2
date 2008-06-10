@@ -61,6 +61,7 @@ class EXPORT JackAudioDriver : public JackDriver
         virtual ~JackAudioDriver();
 
         virtual int Process();
+        virtual int ProcessNull();
 
         virtual int Open(jack_nframes_t nframes,
                         jack_nframes_t samplerate,

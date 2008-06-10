@@ -73,6 +73,11 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         {
             return fDriver->Process();
         }
+        
+        int ProcessNull()
+        {
+            return fDriver->ProcessNull();
+        }
 
         int Attach()
         {
@@ -150,7 +155,7 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
 
 class EXPORT JackRestartThreadedDriver : public JackThreadedDriver
 {
-     public:
+    public:
 
         JackRestartThreadedDriver(JackDriverClient* driver):JackThreadedDriver(driver)
         {}
@@ -160,7 +165,6 @@ class EXPORT JackRestartThreadedDriver : public JackThreadedDriver
         // JackRunnableInterface interface
         virtual bool Execute();
 };
-
 
 } // end of namespace
 

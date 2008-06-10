@@ -143,6 +143,8 @@ main (int argc, char *argv[])
 	}
 
 	ports = jack_get_ports (client, NULL, NULL, 0);
+    if (!ports) 
+        goto error;
 
 	for (i = 0; ports[i]; ++i) {
 		// skip over any that don't match ALL of the strings presented at command line
@@ -152,10 +154,9 @@ main (int argc, char *argv[])
 				skip_port = 1;
 			}
 		}
-		if(skip_port) continue;
+		if (skip_port) continue;
 
 		printf ("%s\n", ports[i]);
-
 		port = jack_port_by_name (client, ports[i]);
 
 		if (show_aliases) {
@@ -218,6 +219,8 @@ main (int argc, char *argv[])
 			}
 		}
 	}
+    
+error:
 	jack_client_close (client);
 	exit (0);
 }

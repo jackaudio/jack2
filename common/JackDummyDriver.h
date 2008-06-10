@@ -30,7 +30,7 @@ namespace Jack
 \brief The dummy driver.
 */
 
-class JackDummyDriver : public JackAudioDriver
+class EXPORT JackDummyDriver : public JackAudioDriver
 {
     private:
 

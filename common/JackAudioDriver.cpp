@@ -180,7 +180,20 @@ int JackAudioDriver::Write()
 
 int JackAudioDriver::Process()
 {
-   return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+    return (fEngineControl->fSyncMode) ? ProcessSync() : ProcessAsync();
+}
+
+int JackAudioDriver::ProcessNull()
+{
+    JackDriver::CycleTakeTime();
+    
+    if (!fEngine->Process(fLastWaitUst)) // fLastWaitUst is set in the "low level" layer
+        jack_error("JackAudioDriver::ProcessNull Process error");
+    fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+    if (ProcessSlaves() < 0)
+        jack_error("JackAudioDriver::ProcessNull ProcessSlaves error");
+        
+    return 0;
 }
 
 /*

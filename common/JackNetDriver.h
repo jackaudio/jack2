@@ -56,9 +56,6 @@ namespace Jack
 			int fAudioRxLen;
 			int fAudioTxLen;
 
-			int Attach();
-			int Detach();
-
 			bool Init();
 			net_status_t GetNetMaster();
 			net_status_t SendMasterStartSync();
@@ -72,8 +69,7 @@ namespace Jack
 
 			int Recv ( size_t size, int flags );
 			int Send ( size_t size, int flags );
-			int Read();
-			int Write();
+			
 		public:
 			JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
 				const char* ip, size_t port, int midi_input_ports, int midi_output_ports, const char* master_name );
@@ -82,6 +78,14 @@ namespace Jack
 			int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
 			           int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
 			           const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
+                       
+            int ProcessNull();
+            
+            int Attach();
+            int Detach();
+            
+            int Read();
+            int Write();
 	};
 }
 
