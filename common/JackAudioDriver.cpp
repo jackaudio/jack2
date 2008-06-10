@@ -187,6 +187,9 @@ int JackAudioDriver::ProcessNull()
 {
     JackDriver::CycleTakeTime();
     
+    int wait_time = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
+    usleep(wait_time);
+    
     if (!fEngine->Process(fLastWaitUst)) // fLastWaitUst is set in the "low level" layer
         jack_error("JackAudioDriver::ProcessNull Process error");
     fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);

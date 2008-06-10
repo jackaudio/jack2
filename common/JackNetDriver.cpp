@@ -87,15 +87,7 @@ namespace Jack
 		return 0;
 	}
     
-    int JackNetDriver::ProcessNull()
-    {
-        JackDriver::CycleTakeTime();
-        int wait_time = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
-        usleep(wait_time);
-        return JackAudioDriver::ProcessNull();
-    }
-
-	bool JackNetDriver::Init()
+   	bool JackNetDriver::Init()
 	{
 		jack_log ( "JackNetDriver::Init()" );
 		if ( fSockfd )

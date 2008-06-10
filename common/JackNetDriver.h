@@ -78,8 +78,6 @@ namespace Jack
 			int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
 			           int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
 			           const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
-                       
-            int ProcessNull();
             
             int Attach();
             int Detach();
