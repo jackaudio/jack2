@@ -688,10 +688,7 @@ namespace Jack
 						strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
 				}
 			}
-            /*
-			Jack::JackDriverClientInterface* driver = new Jack::JackRestartThreadedDriver (
-			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, midi_input_ports, midi_output_ports, name ) );
-            */  
+       
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
 			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, midi_input_ports, midi_output_ports, name ) );
           
