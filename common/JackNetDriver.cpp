@@ -29,8 +29,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackException.h"
 #include "JackExports.h"
 
-//#define DEFAULT_MULTICAST_IP "225.3.19.154"
-#define DEFAULT_MULTICAST_IP "225.3.19.155"
+#define DEFAULT_MULTICAST_IP "225.3.19.154"
+//#define DEFAULT_MULTICAST_IP "225.3.19.155"
 #define DEFAULT_PORT 19000
 
 namespace Jack
@@ -689,12 +689,12 @@ namespace Jack
 				}
 			}
        
-            Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, midi_input_ports, midi_output_ports, name ) );
-          
-			if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
-			                    monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
+            Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver(
+			    new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, midi_input_ports, midi_output_ports, name));
+            if (driver->Open (period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
+			                    monitor, "from_master_", "to_master_", 0, 0 ) == 0)
 				return driver;
+
 			delete driver;
 			return NULL;
 		}
