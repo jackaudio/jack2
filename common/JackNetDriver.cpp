@@ -431,8 +431,7 @@ namespace Jack
 			else if ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) )
 			{
 				jack_error ( "Fatal error : %s.", strerror ( errno ) );
-				throw JackDriverException ( "" );
-				return -1;
+				throw JackDriverException();
 			}
 			else
 			{
@@ -451,8 +450,7 @@ namespace Jack
 			if ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) )
 			{
 				jack_error ( "Fatal error : %s.", strerror ( errno ) );
-				throw JackDriverException ( "" );
-				return -1;
+				throw JackDriverException();
 			}
 			else
 				jack_error ( "Error in send : %s", strerror ( errno ) );
