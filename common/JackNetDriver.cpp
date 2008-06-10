@@ -30,7 +30,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackExports.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
-//#define DEFAULT_MULTICAST_IP "225.3.19.155"
 #define DEFAULT_PORT 19000
 
 namespace Jack
