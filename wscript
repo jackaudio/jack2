@@ -48,11 +48,22 @@ def set_options(opt):
     opt.sub_options('linux/dbus')
 
 def configure(conf):
+    platform = conf.detect_platform()
+    conf.env['IS_MACOSX'] = platform == 'darwin'
+    conf.env['IS_LINUX'] = platform == 'linux'
+
+    if conf.env['IS_LINUX']:
+        Params.pprint('CYAN', "Linux detected")
+
+    if conf.env['IS_MACOSX']:
+        Params.pprint('CYAN', "MacOS X detected")
+
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
 
     conf.sub_config('common')
-    conf.sub_config('linux')
+    if conf.env['IS_LINUX']:
+        conf.sub_config('linux')
     if Params.g_options.dbus:
         conf.sub_config('linux/dbus')
     conf.sub_config('example-clients')
@@ -67,7 +78,10 @@ def configure(conf):
 
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
-    conf.define('SOCKET_RPC_FIFO_SEMA', 1)
+    if conf.env['IS_LINUX']:
+        conf.define('SOCKET_RPC_FIFO_SEMA', 1)
+    if conf.env['IS_MACOSX']:
+        conf.define('MACH_RPC_MACH_SEMA', 1)
     conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACK_SVNREVISION', fetch_svn_revision('.'))
@@ -82,10 +96,11 @@ def configure(conf):
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
-    display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
-    display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
-    display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
-    display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'] == True)
+    if conf.env['IS_LINUX']:
+        display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
+        display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
+        display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
+        display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'] == True)
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
         #display_msg('Settings persistence', xxx)
@@ -107,11 +122,12 @@ def configure(conf):
 def build(bld):
     # process subfolders from here
     bld.add_subdirs('common')
-    bld.add_subdirs('linux')
-    if bld.env()['BUILD_JACKDBUS'] == True:
-        bld.add_subdirs('linux/dbus')
-    bld.add_subdirs('example-clients')
-    bld.add_subdirs('tests')
+    if bld.env()['IS_LINUX']:
+        bld.add_subdirs('linux')
+        if bld.env()['BUILD_JACKDBUS'] == True:
+            bld.add_subdirs('linux/dbus')
+        bld.add_subdirs('example-clients')
+        bld.add_subdirs('tests')
 
     if bld.env()['BUILD_DOXYGEN_DOCS'] == True:
         share_dir = Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'

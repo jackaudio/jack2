@@ -49,8 +49,6 @@ def build(bld):
         'JackFrameTimer.cpp',
         'JackGraphManager.cpp',
         'JackPort.cpp',
-        'JackPosixSemaphore.cpp',
-        'JackFifo.cpp',
         'JackPortType.cpp',
         'JackAudioPort.cpp',
         'JackMidiPort.cpp',
@@ -69,14 +67,33 @@ def build(bld):
         'JackMessageBuffer.cpp',
         'JackProcessSync.cpp',
         ]
-    
+
+    includes = ['.', './jack', '..']
+    uselib = ["PTHREAD"]
+
+    if bld.env()['IS_LINUX']:
+        common_libsources += [
+            'JackPosixSemaphore.cpp',
+            'JackFifo.cpp',
+            ]
+        includes.append('../linux')
+        uselib.append('RT')
+
+    if bld.env()['IS_MACOSX']:
+        common_libsources += [
+            '../macosx/JackMachSemaphore.cpp',
+            '../macosx/JackMachThread.cpp',
+            '../macosx/JackMachPort.cpp',
+            ]
+        includes += ['../macosx', '../macosx/RPC']
+
     serverlib = bld.create_obj('cpp', 'shlib')
     serverlib.features.append('cc')
     serverlib.defines = 'HAVE_CONFIG_H'
-    serverlib.includes = ['.', './jack', '..', '../linux']
+    serverlib.includes = includes
     serverlib.name         = 'serverlib'
     serverlib.target       = 'jackserver'
-    serverlib.uselib = ['RT', "PTHREAD"]
+    serverlib.uselib = uselib
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
@@ -89,36 +106,66 @@ def build(bld):
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
 	'JackWaitThreadedDriver.cpp',
-        'JackSocketServerChannel.cpp',
-        'JackSocketNotifyChannel.cpp',
-        'JackSocketServerNotifyChannel.cpp',
         'JackServerAPI.cpp',
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
         'JackControl.cpp',
-	'JackNetTool.cpp',
+        'JackNetTool.cpp',
         ]
+
+    if bld.env()['IS_LINUX']:
+        serverlib.source += [
+            'JackSocketServerChannel.cpp',
+            'JackSocketNotifyChannel.cpp',
+            'JackSocketServerNotifyChannel.cpp',
+            ]
+
+    if bld.env()['IS_MACOSX']:
+        serverlib.source += [
+            '../macosx/JackMachServerChannel.cpp',
+            '../macosx/JackMachNotifyChannel.cpp',
+            '../macosx/JackMachServerNotifyChannel.cpp',
+            '../macosx/JackMacEngineRPC.cpp',
+            '../macosx/RPC/JackRPCClientUser.c',
+            ]
+
     serverlib.vnum = bld.env()['JACK_API_VERSION']
     serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    if bld.env()['IS_MACOSX']:
+        serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib")
 
     clientlib = bld.create_obj('cpp', 'shlib')
     clientlib.features.append('cc')
     clientlib.defines = 'HAVE_CONFIG_H'
-    clientlib.uselib = ['RT', "PTHREAD"]
+    clientlib.uselib = uselib
     if bld.env()['BUILD_JACKDBUS'] == True:
         clientlib.uselib.append('DBUS-1')
-    clientlib.includes = ['.', './jack', '..', '../linux']
+    clientlib.includes = includes
     clientlib.name         = 'clientlib'
     clientlib.target       = 'jack'
     clientlib.source = [] + common_libsources
     clientlib.source += [
         'JackLibClient.cpp',
         'JackLibAPI.cpp',
-        'JackSocketClientChannel.cpp',
-        'JackServerLaunch.cpp', 
+        'JackServerLaunch.cpp',
         ]
+
+    if bld.env()['IS_LINUX']:
+        clientlib.source += [
+            'JackSocketClientChannel.cpp',
+            ]
+
+    if bld.env()['IS_MACOSX']:
+        clientlib.source += [
+            '../macosx/JackMachClientChannel.cpp',
+            '../macosx/RPC/JackRPCEngineUser.c',
+            '../macosx/JackMacLibClientRPC.cpp',
+            ]
+
     clientlib.vnum = bld.env()['JACK_API_VERSION']
     clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    if bld.env()['IS_MACOSX']:
+        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib")
 
     netmanagerlib = bld.create_obj('cpp', 'shlib')
     netmanagerlib.env['shlib_PATTERN'] = '%s.so'
@@ -129,6 +176,8 @@ def build(bld):
     netmanagerlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     netmanagerlib.inst_var = bld.env()['ADDON_DIR']
     netmanagerlib.inst_dir = '/'
+    if bld.env()['IS_MACOSX']:          # is this really macosx sepcific?
+        netmanagerlib.uselib_local = serverlib.name
 
     install_files('PREFIX', 'include/jack', 'jack/*.h')
 
