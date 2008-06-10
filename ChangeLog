@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-06-09 Stephane Letz  <letz@grame.fr>
+
+	* Improve net driver so that jack clients can be registered even if driver has not yet started. 
+
 2008-06-08 Stephane Letz  <letz@grame.fr>
 
 	* Add a missing EXPORT for JackException class. 
