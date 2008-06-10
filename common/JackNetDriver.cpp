@@ -90,7 +90,8 @@ namespace Jack
     
     int JackNetDriver::ProcessNull()
     {
-        usleep(10 * 1000);
+        static unsigned int wait_time = (unsigned int)((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f);
+        usleep(wait_time);
         return JackAudioDriver::ProcessNull();
     }
 
