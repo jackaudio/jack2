@@ -20,25 +20,21 @@ The audible result of this mode is that if a client is not activated during one 
 Linux version
 --------------
 
-The published version still uses fifos for server/client synchronization. The use of POSIX named semaphore is implemented but still a bit unstable. Sockets are used for server/client communications. The ALSA backend derived from jackd implementation is used. To build jackdmp, a "scons" based compilation system is available. The code has to be compiled on a machine where ALSA and possibly frebob (FFADO) headers and libraries are corrected installed.
+The published version still uses fifos for server/client synchronization. The use of POSIX named semaphore is implemented but still a bit unstable. Sockets are used for server/client communications. The ALSA backend derived from jackd implementation is used. To build jackdmp, a "waf" (http://code.google.com/p/waf/) based compilation system is available. The code has to be compiled on a machine where ALSA and possibly frebob (FFADO) headers and libraries are corrected installed.
 
-In the src folder do :
+In the top folder do :
 
-scons
-sudo scons install 
+./waf configure 
+./waf build 
+sudo ./waf install 
 
-WARNING : 
-
-- this will install everything needed in /usr/local in place of a regular jack installation so that jack applications will use jackdmp
-- you will have to remove the "cache" folder and the ".sconsign.dblite" file before recompiling with different options.
-
-Various compilation options can be seen using scons -h.
+Various compilation options can be seen using ./waf --help.
 
 Important compilation options :
 
 - default compilation mode will produce a set of libraries and executable that will *replace* regular jackd. If the "automatic start server option" is used by clients, jackd server will be started using the old fork + exe system.
 
-- the ENABLE_DBUS flag must be defined to compile the jackdbus executable. If the "automatic start server option" is used by clients, jackd server will be started using the dbus service.
+- the --dbus flag must be defined at configure time to compile the jackdbus executable. If the "automatic start server option" is used by clients, jackd server will be started using the dbus service.
 
 
 Known problems, limitations
@@ -73,7 +69,7 @@ Use the "/Applications/Utilities/Audio MIDI Setup" tool to build and aggregate d
 
 jackdmp -R -d coreaudio -n "~:Aggregate:0"
 
-or directly with the JackPilotMP tool.
+or directly with the JackPilot tool.
 
 - CoreAudio applications running under Rosetta emulator cannot access an Intel version of Jackdmp.
 
@@ -128,7 +124,7 @@ An experimental loopback driver allows to manually "pipeline" applications conne
 
 To activate loopback driver, use :
 
-- jackdmp ... -L n ...  where n is the number of input/output ports.
+- jackd (jackdmp) ... -L n ...  where n is the number of input/output ports.
 
 ------------------
 Validations tools
