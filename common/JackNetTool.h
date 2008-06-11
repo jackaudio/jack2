@@ -172,5 +172,5 @@ namespace Jack
 	//set the recv timeout on a socket
 	EXPORT int SetRxTimeout ( int* sockfd, session_params_t* params );
 	//check if 'next' packet is really the next after 'previous'
-	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, int subcycles );
+	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, uint subcycles );
 }

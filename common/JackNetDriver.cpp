@@ -355,7 +355,7 @@ namespace Jack
 		}
 		//midi
 		port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-		for ( int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 		{
 			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, port_index + 1 );
 			snprintf ( name, sizeof ( name ) - 1, "%s:midi_capture_%d", fClientControl->fName, port_index + 1 );
@@ -370,7 +370,7 @@ namespace Jack
 		}
 
 		port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-		for ( int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 		{
 			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, port_index + 1 );
 			snprintf ( name, sizeof ( name ) - 1, "%s:midi_playback_%d", fClientControl->fName, port_index + 1 );
