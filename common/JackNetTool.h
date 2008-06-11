@@ -34,14 +34,14 @@ namespace Jack
 	{
 		char fPacketType[7];			//packet type ('param')
 		char fProtocolVersion;			//version
-		int32_t fPacketID;				//indicates the packet type
+		int32_t fPacketID;			//indicates the packet type
 		char fMasterNetName[256];		//master hostname (network)
 		char fSlaveNetName[256];		//slave hostname (network)
 		uint32_t fMtu;				//connection mtu
 		uint32_t fID;				//slave's ID
-		int32_t fSendAudioChannels;			//number of master->slave channels
+		int32_t fSendAudioChannels;		//number of master->slave channels
 		int32_t fReturnAudioChannels;		//number of slave->master channels
-		int32_t fSendMidiChannels;			//number of master->slave midi channels
+		int32_t fSendMidiChannels;		//number of master->slave midi channels
 		int32_t fReturnMidiChannels;		//number of slave->master midi channels
 		uint32_t fSampleRate;			//session sample rate
 		uint32_t fPeriodSize;			//period size
@@ -111,7 +111,7 @@ namespace Jack
 			char* fBuffer;
 			char* fNetBuffer;
 		public:
-			NetMidiBuffer ( session_params_t* params, unsigned int nports, char* net_buffer );
+			NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
 			~NetMidiBuffer();
 
 			JackMidiBuffer** fPortBuffer;
@@ -124,8 +124,8 @@ namespace Jack
 			int RenderFromJackPorts();
 			int RenderToJackPorts();
 			//network<->buffer
-			int RenderFromNetwork ( unsigned int subcycle, unsigned int copy_size );
-			int RenderToNetwork ( unsigned int subcycle, unsigned int copy_size );
+			int RenderFromNetwork ( size_t subcycle, size_t copy_size );
+			int RenderToNetwork ( size_t subcycle, size_t copy_size );
 	};
 
 // audio data *********************************************************************************
@@ -139,15 +139,15 @@ namespace Jack
 			size_t fSubPeriodBytesSize;
 			char* fNetBuffer;
 		public:
-			NetAudioBuffer ( session_params_t* params, unsigned int nports, char* net_buffer );
+			NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
 			~NetAudioBuffer();
 
 			sample_t** fPortBuffer;	
 
 			size_t GetSize();
 			//jack<->buffer
-			void RenderFromJackPorts ( unsigned int subcycle );
-			void RenderToJackPorts ( unsigned int subcycle );
+			void RenderFromJackPorts ( size_t subcycle );
+			void RenderToJackPorts ( size_t subcycle );
 	};
 
 //utility *************************************************************************************

@@ -8,7 +8,7 @@ namespace Jack
 {
 // NetMidiBuffer**********************************************************************************
 
-	NetMidiBuffer::NetMidiBuffer ( session_params_t* params, size_t nports, char* net_buffer )
+	NetMidiBuffer::NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
 	{
 		fNPorts = nports;
 		fMaxBufsize = fNPorts * sizeof ( sample_t ) * params->fPeriodSize ;
@@ -91,7 +91,7 @@ namespace Jack
 
 // net audio buffer *********************************************************************************
 
-	NetAudioBuffer::NetAudioBuffer ( session_params_t* params, size_t nports, char* net_buffer )
+	NetAudioBuffer::NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
 	{
 		fNPorts = nports;
 		fPeriodSize = params->fPeriodSize;
