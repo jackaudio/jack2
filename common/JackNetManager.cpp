@@ -130,7 +130,7 @@ namespace Jack
 		struct timeval timeout;
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		unsigned int attempt = 0;
+		size_t attempt = 0;
 		int rx_bytes = 0;
 
 		//socket
@@ -273,7 +273,7 @@ namespace Jack
 		close ( mcast_sockfd );
 	}
 
-	int JackNetMaster::Send ( char* buffer, unsigned int size, int flags )
+	int JackNetMaster::Send ( char* buffer, size_t size, int flags )
 	{
 		int tx_bytes;
 		if ( ( tx_bytes = send ( fSockfd, buffer, size, flags ) ) < 0 )
@@ -292,7 +292,7 @@ namespace Jack
 		return tx_bytes;
 	}
 
-	int JackNetMaster::Recv ( unsigned int size, int flags )
+	int JackNetMaster::Recv ( size_t size, int flags )
 	{
 		int rx_bytes;
 		if ( ( rx_bytes = recv ( fSockfd, fRxBuffer, size, flags ) ) < 0 )
@@ -333,7 +333,7 @@ namespace Jack
 			return 0;
 
 		int tx_bytes, rx_bytes, copy_size;
-		unsigned int midi_recvd_pckt = 0;
+		size_t midi_recvd_pckt = 0;
 		fTxHeader.fCycle++;
 		fTxHeader.fSubCycle = 0;
 		fTxHeader.fIsLastPckt = 'n';
@@ -368,7 +368,7 @@ namespace Jack
 			fTxHeader.fDataType = 'm';
 			fTxHeader.fMidiDataSize = fNetMidiCaptureBuffer->RenderFromJackPorts();
 			fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
-			for ( unsigned int subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
+			for ( size_t subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fSendAudioChannels )
@@ -385,7 +385,7 @@ namespace Jack
 		if ( fParams.fSendAudioChannels )
 		{
 			fTxHeader.fDataType = 'a';
-			for ( unsigned int subproc = 0; subproc < fNSubProcess; subproc++ )
+			for ( size_t subproc = 0; subproc < fNSubProcess; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( subproc == ( fNSubProcess - 1 ) )
@@ -479,7 +479,7 @@ namespace Jack
 		struct timeval timeout;
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
-		unsigned int attempt = 0;
+		size_t attempt = 0;
 
 		//network
 		int mcast_sockfd;
@@ -542,7 +542,7 @@ namespace Jack
 		do
 		{
 			rx_bytes = recvfrom ( mcast_sockfd, &params, sizeof ( session_params_t ), 0,
-			                    reinterpret_cast<socket_address_t*> ( &response_addr ), &addr_len );
+			                      reinterpret_cast<socket_address_t*> ( &response_addr ), &addr_len );
 			if ( ( rx_bytes < 0 ) && ( errno != EAGAIN ) )
 			{
 				jack_error ( "Error in receive : %s", strerror ( errno ) );
@@ -617,7 +617,7 @@ namespace Jack
 				sprintf ( params.fName, "%s-%u", params.fName, params.fID );
 	}
 
-	master_list_it_t JackNetMasterManager::FindMaster ( unsigned int id )
+	master_list_it_t JackNetMasterManager::FindMaster ( size_t id )
 	{
 		jack_log ( "JackNetMasterManager::FindMaster, ID %u.", id );
 		master_list_it_t it;

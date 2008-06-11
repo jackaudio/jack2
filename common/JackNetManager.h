@@ -22,11 +22,9 @@
 #define __JACKNETMASTER_H__
 
 #include "JackNetTool.h"
-#include <list>
-#include <algorithm>
 #include "thread.h"
-#include <unistd.h>
 #include "jack.h"
+#include <list>
 
 namespace Jack
 {
@@ -43,8 +41,8 @@ namespace Jack
 			struct sockaddr_in fAddr;
 			struct sockaddr_in fMcastAddr;
 			int fSockfd;
-			unsigned int fNSubProcess;
-			unsigned int fNetJumpCnt;
+			size_t fNSubProcess;
+			size_t fNetJumpCnt;
 			bool fRunning;
 
 			jack_client_t* fJackClient;
@@ -75,8 +73,8 @@ namespace Jack
 			void FreePorts();
 			void Exit();
 
-			int Send ( char* buffer, unsigned int size, int flags );
-			int Recv ( unsigned int size, int flags );
+			int Send ( char* buffer, size_t size, int flags );
+			int Recv ( size_t size, int flags );
 			int Process();
 		public:
 			JackNetMaster ( JackNetMasterManager* manager, session_params_t& params, struct sockaddr_in& address, struct sockaddr_in& mcast_addr );
@@ -97,13 +95,13 @@ namespace Jack
 			const char* fMCastIP;
 			pthread_t fManagerThread;
 			master_list_t fMasterList;
-			unsigned int fGlobalID;
+			size_t fGlobalID;
 			bool fRunning;
-			unsigned int fPort;
+			size_t fPort;
 
 			void Run();
 			JackNetMaster* MasterInit ( session_params_t& params, struct sockaddr_in& address, struct sockaddr_in& mcast_addr );
-			master_list_it_t FindMaster ( unsigned int client_id );
+			master_list_it_t FindMaster ( size_t client_id );
 			void KillMaster ( session_params_t* params );
 			void SetSlaveName ( session_params_t& params );
 			int Process();
