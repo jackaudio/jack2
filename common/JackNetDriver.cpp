@@ -35,12 +35,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 	JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-	                               const char* ip, size_t port, int midi_input_ports, int midi_output_ports, const char* net_name )
+	                               const char* ip, int port, int midi_input_ports, int midi_output_ports, const char* net_name )
 			: JackAudioDriver ( name, alias, engine, table )
 	{
 		fMulticastIP = new char[strlen ( ip ) + 1];
 		strcpy ( fMulticastIP, ip );
-		fPort = port;
+		fUDPPort = port;
 		fParams.fSendMidiChannels = midi_input_ports;
 		fParams.fReturnMidiChannels = midi_output_ports;
 		strcpy ( fParams.fName, net_name );
@@ -150,13 +150,13 @@ namespace Jack
 
 		//set the multicast address
 		mcast_addr.sin_family = AF_INET;
-		mcast_addr.sin_port = htons ( fPort );
+		mcast_addr.sin_port = htons ( fUDPPort );
 		inet_aton ( fMulticastIP, &mcast_addr.sin_addr );
 		memset ( &mcast_addr.sin_zero, 0, 8 );
 
 		//set the listening address
 		listen_addr.sin_family = AF_INET;
-		listen_addr.sin_port = htons ( fPort );
+		listen_addr.sin_port = htons ( fUDPPort );
 		listen_addr.sin_addr.s_addr = htonl ( INADDR_ANY );
 		memset ( &listen_addr.sin_zero, 0, 8 );
 
@@ -394,9 +394,9 @@ namespace Jack
 			fGraphManager->ReleasePort ( fClientControl->fRefNum, fCapturePortList[port_index] );
 		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
 			fGraphManager->ReleasePort ( fClientControl->fRefNum, fPlaybackPortList[port_index] );
-		for ( int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 			fGraphManager->ReleasePort ( fClientControl->fRefNum, fMidiCapturePortList[port_index] );
-		for ( int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 			fGraphManager->ReleasePort ( fClientControl->fRefNum, fMidiPlaybackPortList[port_index] );
 		return 0;
 	}
@@ -456,12 +456,12 @@ namespace Jack
 	int JackNetDriver::Read()
 	{
 		int rx_bytes;
-		size_t recvd_midi_pckt = 0;
+		uint recvd_midi_pckt = 0;
 		packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 		fRxHeader.fIsLastPckt = 'n';
 
 		//buffers
-		for ( int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 			fNetMidiCaptureBuffer->fPortBuffer[port_index] = GetMidiInputBuffer ( port_index );
 		for ( int port_index = 0; port_index < fCaptureChannels; port_index++ )
 			fNetAudioCaptureBuffer->fPortBuffer[port_index] = GetInputBuffer ( port_index );
@@ -525,7 +525,7 @@ namespace Jack
 		fTxHeader.fIsLastPckt = 'n';
 
 		//buffers
-		for ( int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 			fNetMidiPlaybackBuffer->fPortBuffer[port_index] = GetMidiOutputBuffer ( port_index );
 		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
 			fNetAudioPlaybackBuffer->fPortBuffer[port_index] = GetOutputBuffer ( port_index );
@@ -536,7 +536,7 @@ namespace Jack
 			fTxHeader.fDataType = 'm';
 			fTxHeader.fMidiDataSize = fNetMidiPlaybackBuffer->RenderFromJackPorts();
 			fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
-			for ( size_t subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
+			for ( uint subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fReturnAudioChannels )
@@ -551,7 +551,7 @@ namespace Jack
 		if ( fParams.fReturnAudioChannels )
 		{
 			fTxHeader.fDataType = 'a';
-			for ( size_t subproc = 0; subproc < fNSubProcess; subproc++ )
+			for ( uint subproc = 0; subproc < fNSubProcess; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( subproc == ( fNSubProcess - 1 ) )
@@ -577,7 +577,7 @@ namespace Jack
 			desc->nparams = 7;
 			desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
-			size_t i = 0;
+			int i = 0;
 			strcpy ( desc->params[i].name, "multicast_ip" );
 			desc->params[i].character = 'a';
 			desc->params[i].type = JackDriverParamString;
@@ -588,8 +588,8 @@ namespace Jack
 			i++;
 			strcpy ( desc->params[i].name, "udp_net_port" );
 			desc->params[i].character = 'p';
-			desc->params[i].type = JackDriverParamUInt;
-			desc->params[i].value.ui = 19000U;
+			desc->params[i].type = JackDriverParamInt;
+			desc->params[i].value.i = 19000;
 			strcpy ( desc->params[i].short_desc, "UDP port" );
 			strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
@@ -604,7 +604,7 @@ namespace Jack
 			i++;
 			strcpy ( desc->params[i].name, "output_ports" );
 			desc->params[i].character = 'P';
-			desc->params[i].type = JackDriverParamUInt;
+			desc->params[i].type = JackDriverParamInt;
 			desc->params[i].value.i = 2;
 			strcpy ( desc->params[i].short_desc, "Number of audio output ports" );
 			strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
@@ -641,7 +641,7 @@ namespace Jack
 			const char* multicast_ip = DEFAULT_MULTICAST_IP;
 			char name[JACK_CLIENT_NAME_SIZE];
 			gethostname ( name, JACK_CLIENT_NAME_SIZE );
-			jack_nframes_t udp_port = DEFAULT_PORT;
+			int udp_port = DEFAULT_PORT;
 			jack_nframes_t period_size = 128;
 			jack_nframes_t sample_rate = 48000;
 			int audio_capture_ports = 2;

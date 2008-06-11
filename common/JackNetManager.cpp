@@ -48,17 +48,17 @@ namespace Jack
 
 		//jack audio ports
 		fAudioCapturePorts = new jack_port_t* [fParams.fSendAudioChannels];
-		for ( int port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
 			fAudioCapturePorts[port_index] = NULL;
 		fAudioPlaybackPorts = new jack_port_t* [fParams.fReturnAudioChannels];
-		for ( int port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
 			fAudioPlaybackPorts[port_index] = NULL;
 		//jack midi ports
 		fMidiCapturePorts = new jack_port_t* [fParams.fSendMidiChannels];
-		for ( int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 			fMidiCapturePorts[port_index] = NULL;
 		fMidiPlaybackPorts = new jack_port_t* [fParams.fReturnMidiChannels];
-		for ( int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 			fMidiPlaybackPorts[port_index] = NULL;
 
 		//TX header init
@@ -190,7 +190,7 @@ namespace Jack
 		jack_set_process_callback ( fJackClient, SetProcess, this );
 
 		//port registering
-		int i;
+		uint i;
 		char name[24];
 		//audio
 		for ( i = 0; i < fParams.fSendAudioChannels; i++ )
@@ -242,16 +242,17 @@ namespace Jack
 	void JackNetMaster::FreePorts()
 	{
 		jack_log ( "JackNetMaster::FreePorts, ID %u", fParams.fID );
-		for ( int port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
+		uint port_index;
+		for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
 			if ( fAudioCapturePorts[port_index] )
 				jack_port_unregister ( fJackClient, fAudioCapturePorts[port_index] );
-		for ( int port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
 			if ( fAudioPlaybackPorts[port_index] )
 				jack_port_unregister ( fJackClient, fAudioPlaybackPorts[port_index] );
-		for ( int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 			if ( fMidiCapturePorts[port_index] )
 				jack_port_unregister ( fJackClient, fMidiCapturePorts[port_index] );
-		for ( int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 			if ( fMidiPlaybackPorts[port_index] )
 				jack_port_unregister ( fJackClient, fMidiPlaybackPorts[port_index] );
 	}
@@ -340,16 +341,17 @@ namespace Jack
 		packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
 		//buffers
-		for ( int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		uint port_index;
+		for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 			fNetMidiCaptureBuffer->fPortBuffer[port_index] =
 			    static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index], fParams.fPeriodSize ) );
-		for ( int port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
 			fNetAudioCaptureBuffer->fPortBuffer[port_index] =
 			    static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index], fParams.fPeriodSize ) );
-		for ( int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 			fNetMidiPlaybackBuffer->fPortBuffer[port_index] =
 			    static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index], fParams.fPeriodSize ) );
-		for ( int port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
 			fNetAudioPlaybackBuffer->fPortBuffer[port_index] =
 			    static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index], fParams.fPeriodSize ) );
 
@@ -368,7 +370,7 @@ namespace Jack
 			fTxHeader.fDataType = 'm';
 			fTxHeader.fMidiDataSize = fNetMidiCaptureBuffer->RenderFromJackPorts();
 			fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
-			for ( size_t subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
+			for ( uint subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fSendAudioChannels )
@@ -385,7 +387,7 @@ namespace Jack
 		if ( fParams.fSendAudioChannels )
 		{
 			fTxHeader.fDataType = 'a';
-			for ( size_t subproc = 0; subproc < fNSubProcess; subproc++ )
+			for ( uint subproc = 0; subproc < fNSubProcess; subproc++ )
 			{
 				fTxHeader.fSubCycle = subproc;
 				if ( subproc == ( fNSubProcess - 1 ) )
@@ -444,7 +446,7 @@ namespace Jack
 		fManagerClient = client;
 		fManagerName = jack_get_client_name ( fManagerClient );
 		fMCastIP = DEFAULT_MULTICAST_IP;
-		fPort = DEFAULT_PORT;
+		fUDPPort = DEFAULT_PORT;
 		fGlobalID = 0;
 		fRunning = true;
 
@@ -479,7 +481,7 @@ namespace Jack
 		struct timeval timeout;
 		timeout.tv_sec = 2;
 		timeout.tv_usec = 0;
-		size_t attempt = 0;
+		int attempt = 0;
 
 		//network
 		int mcast_sockfd;
@@ -501,7 +503,7 @@ namespace Jack
 
 		//set the multicast address
 		mcast_addr.sin_family = AF_INET;
-		mcast_addr.sin_port = htons ( fPort );
+		mcast_addr.sin_port = htons ( fUDPPort );
 		if ( inet_aton ( fMCastIP, &mcast_addr.sin_addr ) < 0 )
 		{
 			jack_error ( "Cant set multicast address : %s", strerror ( errno ) );
@@ -617,7 +619,7 @@ namespace Jack
 				sprintf ( params.fName, "%s-%u", params.fName, params.fID );
 	}
 
-	master_list_it_t JackNetMasterManager::FindMaster ( size_t id )
+	master_list_it_t JackNetMasterManager::FindMaster ( uint32_t id )
 	{
 		jack_log ( "JackNetMasterManager::FindMaster, ID %u.", id );
 		master_list_it_t it;

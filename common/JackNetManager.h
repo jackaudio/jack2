@@ -41,8 +41,8 @@ namespace Jack
 			struct sockaddr_in fAddr;
 			struct sockaddr_in fMcastAddr;
 			int fSockfd;
-			size_t fNSubProcess;
-			size_t fNetJumpCnt;
+			uint fNSubProcess;
+			int fNetJumpCnt;
 			bool fRunning;
 
 			jack_client_t* fJackClient;
@@ -93,15 +93,15 @@ namespace Jack
 			jack_client_t* fManagerClient;
 			const char* fManagerName;
 			const char* fMCastIP;
+			int fUDPPort;
 			pthread_t fManagerThread;
 			master_list_t fMasterList;
-			size_t fGlobalID;
+			uint32_t fGlobalID;
 			bool fRunning;
-			size_t fPort;
 
 			void Run();
 			JackNetMaster* MasterInit ( session_params_t& params, struct sockaddr_in& address, struct sockaddr_in& mcast_addr );
-			master_list_it_t FindMaster ( size_t client_id );
+			master_list_it_t FindMaster ( uint32_t client_id );
 			void KillMaster ( session_params_t* params );
 			void SetSlaveName ( session_params_t& params );
 			int Process();

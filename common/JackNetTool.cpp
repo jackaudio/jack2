@@ -35,7 +35,7 @@ namespace Jack
 	{
 		for ( int port_index = 0; port_index < fNPorts; port_index++ )
 		{
-			for ( size_t event = 0; event < fPortBuffer[port_index]->event_count; event++ )
+			for ( uint event = 0; event < fPortBuffer[port_index]->event_count; event++ )
 				if ( fPortBuffer[port_index]->IsValid() )
 					jack_info ( "port %d : midi event %u/%u -> time : %u, size : %u",
 						port_index + 1, event + 1, fPortBuffer[port_index]->event_count,
@@ -46,7 +46,7 @@ namespace Jack
 	int NetMidiBuffer::RenderFromJackPorts()
 	{
 		int pos = 0;
-		int copy_size;
+		size_t copy_size;
 		for ( int port_index = 0; port_index < fNPorts; port_index++ )
 		{
 			copy_size = sizeof ( JackMidiBuffer ) + fPortBuffer[port_index]->event_count * sizeof ( JackMidiEvent );
@@ -75,13 +75,13 @@ namespace Jack
 		return pos;
 	}
 
-	int NetMidiBuffer::RenderFromNetwork ( size_t subcycle, size_t copy_size )
+	int NetMidiBuffer::RenderFromNetwork ( int subcycle, size_t copy_size )
 	{
 		memcpy ( fBuffer + subcycle * fMaxPcktSize, fNetBuffer, copy_size );
 		return copy_size;
 	}
 
-	int NetMidiBuffer::RenderToNetwork ( size_t subcycle, size_t total_size )
+	int NetMidiBuffer::RenderToNetwork ( int subcycle, size_t total_size )
 	{
 		int size = total_size - subcycle * fMaxPcktSize;
 		int copy_size = ( size <= fMaxPcktSize ) ? size : fMaxPcktSize;
@@ -113,13 +113,13 @@ namespace Jack
 		return fNPorts * fSubPeriodBytesSize;
 	}
 
-	void NetAudioBuffer::RenderFromJackPorts ( size_t subcycle )
+	void NetAudioBuffer::RenderFromJackPorts ( int subcycle )
 	{
 		for ( int port_index = 0; port_index < fNPorts; port_index++ )
 			memcpy ( fNetBuffer + port_index * fSubPeriodBytesSize, fPortBuffer[port_index] + subcycle * fSubPeriodSize, fSubPeriodBytesSize );
 	}
 
-	void NetAudioBuffer::RenderToJackPorts ( size_t subcycle )
+	void NetAudioBuffer::RenderToJackPorts ( int subcycle )
 	{
 		for ( int port_index = 0; port_index < fNPorts; port_index++ )
 			memcpy ( fPortBuffer[port_index] + subcycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize );
@@ -257,7 +257,7 @@ namespace Jack
 
 // Utility *******************************************************************************************************
 
-	EXPORT size_t SetFramesPerPacket ( session_params_t* params )
+	EXPORT jack_nframes_t SetFramesPerPacket ( session_params_t* params )
 	{
 		if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
 			return ( params->fFramesPerPacket = params->fPeriodSize );
@@ -267,14 +267,14 @@ namespace Jack
 		return params->fFramesPerPacket;
 	}
 
-	EXPORT size_t GetNMidiPckt ( session_params_t* params, size_t data_size )
+	EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size )
 	{
 		//even if there is no midi data, jack need an empty buffer to know there is no event to read
 		//99% of the cases : all data in one packet
 		if ( data_size <= ( params->fMtu - sizeof ( packet_header_t ) ) )
 			return 1;
 		//else, get the number of needed packets (simply slice the biiig buffer)
-		size_t npckt = data_size / ( params->fMtu - sizeof ( packet_header_t ) );
+		int npckt = data_size / ( params->fMtu - sizeof ( packet_header_t ) );
 		if ( data_size % ( params->fMtu - sizeof ( packet_header_t ) ) )
 			return ++npckt;
 		return npckt;
@@ -295,7 +295,7 @@ namespace Jack
 
 // Packet *******************************************************************************************************
 
-	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, size_t subcycles )
+	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, uint subcycles )
 	{
 		//ignore first cycle
 		if ( previous->fCycle <= 1 )

@@ -34,15 +34,15 @@ namespace Jack
 	{
 		char fPacketType[7];			//packet type ('param')
 		char fProtocolVersion;			//version
-		int32_t fPacketID;			//indicates the packet type
+		uint32_t fPacketID;			//indicates the packet type
 		char fMasterNetName[256];		//master hostname (network)
 		char fSlaveNetName[256];		//slave hostname (network)
 		uint32_t fMtu;				//connection mtu
 		uint32_t fID;				//slave's ID
-		int32_t fSendAudioChannels;		//number of master->slave channels
-		int32_t fReturnAudioChannels;		//number of slave->master channels
-		int32_t fSendMidiChannels;		//number of master->slave midi channels
-		int32_t fReturnMidiChannels;		//number of slave->master midi channels
+		uint32_t fSendAudioChannels;		//number of master->slave channels
+		uint32_t fReturnAudioChannels;		//number of slave->master channels
+		uint32_t fSendMidiChannels;		//number of master->slave midi channels
+		uint32_t fReturnMidiChannels;		//number of slave->master midi channels
 		uint32_t fSampleRate;			//session sample rate
 		uint32_t fPeriodSize;			//period size
 		uint32_t fFramesPerPacket;		//complete frames per packet
@@ -124,8 +124,8 @@ namespace Jack
 			int RenderFromJackPorts();
 			int RenderToJackPorts();
 			//network<->buffer
-			int RenderFromNetwork ( size_t subcycle, size_t copy_size );
-			int RenderToNetwork ( size_t subcycle, size_t copy_size );
+			int RenderFromNetwork ( int subcycle, size_t copy_size );
+			int RenderToNetwork ( int subcycle, size_t total_size );
 	};
 
 // audio data *********************************************************************************
@@ -146,8 +146,8 @@ namespace Jack
 
 			size_t GetSize();
 			//jack<->buffer
-			void RenderFromJackPorts ( size_t subcycle );
-			void RenderToJackPorts ( size_t subcycle );
+			void RenderFromJackPorts ( int subcycle );
+			void RenderToJackPorts ( int subcycle );
 	};
 
 //utility *************************************************************************************
@@ -166,11 +166,11 @@ namespace Jack
 	//set the packet type in a session parameters
 	EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
 	//step of network initialization
-	EXPORT size_t SetFramesPerPacket ( session_params_t* params );
+	EXPORT jack_nframes_t SetFramesPerPacket ( session_params_t* params );
 	//get the midi packet number for a given cycle
-	EXPORT size_t GetNMidiPckt ( session_params_t* params, size_t data_size );
+	EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size );
 	//set the recv timeout on a socket
 	EXPORT int SetRxTimeout ( int* sockfd, session_params_t* params );
 	//check if 'next' packet is really the next after 'previous'
-	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, size_t subcycles );
+	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, int subcycles );
 }
