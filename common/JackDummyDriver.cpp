@@ -67,7 +67,7 @@ int JackDummyDriver::Process()
 {
     JackDriver::CycleTakeTime();
     JackAudioDriver::Process();
-    usleep(std::max(0L, long(fWaitTime - (GetMicroSeconds() - fLastWaitUst))));
+    JackSleep(std::max(0L, long(fWaitTime - (GetMicroSeconds() - fLastWaitUst))));
     return 0;
 }
 
