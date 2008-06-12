@@ -60,7 +60,7 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         bool fState;
 
-        /// Intitial state
+        // Initial state
         bool fCapturing;
         bool fPlaying;
 

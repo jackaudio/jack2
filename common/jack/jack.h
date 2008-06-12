@@ -213,6 +213,9 @@ extern "C"
      * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
      * for more information.
      *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @return 0 on success, otherwise a non-zero error code.
      */
     int jack_set_process_callback (jack_client_t *client,
@@ -255,6 +258,9 @@ extern "C"
      * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
      * for more information.
      *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @return 0 on success, otherwise a non-zero error code.
     */
 	int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_callback, void *arg);
@@ -266,6 +272,9 @@ extern "C"
      *
      * The code in the supplied function does not need to be
      * suitable for real-time execution.
+     *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
      *
      * @return 0 on success, otherwise a non-zero error code, causing JACK
      * to remove that client from the process() graph.
@@ -284,7 +293,10 @@ extern "C"
 	 * All "notification events" are received in a seperated non RT thread,
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
-	 *
+     *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @return 0 on success, otherwise a non-zero error code.
      */
     int jack_set_freewheel_callback (jack_client_t *client,
@@ -344,6 +356,9 @@ extern "C"
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
      *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @param client pointer to JACK client structure.
      * @param bufsize_callback function to call when the buffer size changes.
      * @param arg argument for @a bufsize_callback.
@@ -362,6 +377,9 @@ extern "C"
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
      *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @return 0 on success, otherwise a non-zero error code
      */
     int jack_set_sample_rate_callback (jack_client_t *client,
@@ -375,6 +393,9 @@ extern "C"
 	 * All "notification events" are received in a seperated non RT thread,
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
+     *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
      *
 	 * @return 0 on success, otherwise a non-zero error code
 	 */
@@ -390,6 +411,9 @@ extern "C"
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
      *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @return 0 on success, otherwise a non-zero error code
      */
     int jack_set_port_registration_callback (jack_client_t *,
@@ -403,6 +427,9 @@ extern "C"
 	 * All "notification events" are received in a seperated non RT thread,
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
+     *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
      *
 	 * @return 0 on success, otherwise a non-zero error code
 	 */
@@ -418,6 +445,9 @@ extern "C"
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
      *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
      * @return 0 on success, otherwise a non-zero error code
      */
     int jack_set_graph_order_callback (jack_client_t *,
@@ -431,6 +461,9 @@ extern "C"
 	 * All "notification events" are received in a seperated non RT thread,
 	 * the code in the supplied function does not need to be
      * suitable for real-time execution.
+     *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
      *
      * @return 0 on success, otherwise a non-zero error code
      */
