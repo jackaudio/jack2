@@ -2194,7 +2194,7 @@ int JackAlsaDriver::Detach()
     if (alsa_driver->midi)
         (alsa_driver->midi->detach)(alsa_driver->midi);
 
-    return JackDriver::Detach();
+    return JackAudioDriver::Detach();
 }
 
 int JackAlsaDriver::Open(jack_nframes_t nframes,

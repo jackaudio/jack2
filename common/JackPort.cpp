@@ -43,9 +43,6 @@ JackPort::JackPort()
         fTied(NO_PORT)
 {}
 
-JackPort::~JackPort()
-{}
-
 bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
     int id = GetPortTypeId(port_type);

@@ -42,13 +42,15 @@ namespace Jack
 class JackRunnableInterface
 {
         
-    public:
-        
+    protected:
+    
         JackRunnableInterface()
         {}
         virtual ~JackRunnableInterface()
         {}
         
+    public:
+    
         virtual bool Init()          /*! Called once when the thread is started */
         {
             return true;

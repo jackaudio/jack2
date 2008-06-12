@@ -45,8 +45,6 @@ class JackActivationCount
 
         JackActivationCount(): fValue(0), fCount(0)
         {}
-        virtual ~JackActivationCount()
-        {}
 
         bool Signal(JackSynchro* synchro, JackClientControl* control);
 
@@ -81,4 +79,3 @@ class JackActivationCount
 
 
 #endif
-

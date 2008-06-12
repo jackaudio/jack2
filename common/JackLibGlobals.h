@@ -63,7 +63,7 @@ struct JackLibGlobals
         fEngineControl = -1;
     }
 
-    virtual ~JackLibGlobals()
+    ~JackLibGlobals()
     {
         jack_log("~JackLibGlobals");
         for (int i = 0; i < CLIENT_NUM; i++) {

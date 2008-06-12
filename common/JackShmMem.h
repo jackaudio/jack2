@@ -57,6 +57,14 @@ class JackMem
         size_t fSize;
         static size_t gSize;
 
+    protected:
+    
+        JackMem(): fSize(gSize)
+        {}
+
+        ~JackMem()
+        {}
+        
     public:
 
         void* operator new(size_t size)
@@ -70,12 +78,6 @@ class JackMem
             free(ptr);
         }
 	
-        JackMem(): fSize(gSize)
-        {}
-
-        virtual ~JackMem()
-        {}
-
         void LockMemory()
         {
             LockMemoryImp(this, fSize);
@@ -100,6 +102,13 @@ class EXPORT JackShmMem
     protected:
 
         jack_shm_info_t fInfo;
+        
+    protected:
+    
+        JackShmMem();
+	
+        ~JackShmMem()
+        {}
  
     public:
 
@@ -107,11 +116,6 @@ class EXPORT JackShmMem
         void* operator new(size_t size, void* memory);
         void operator delete(void* p, size_t size);
 		void operator delete(void* p);
-
-        JackShmMem();
-	
-        virtual ~JackShmMem()
-        {}
 
         int GetShmIndex()
         {
@@ -174,7 +178,7 @@ class JackShmReadWritePtr
             Init(index, server_name);
         }
 
-        virtual ~JackShmReadWritePtr()
+        ~JackShmReadWritePtr()
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %ld", fInfo.index);
@@ -260,7 +264,7 @@ class JackShmReadWritePtr1
             Init(index, server_name);
         }
 
-        virtual ~JackShmReadWritePtr1()
+        ~JackShmReadWritePtr1()
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld", fInfo.index);
@@ -340,7 +344,7 @@ class JackShmReadPtr
             Init(index, server_name);
         }
 
-        virtual ~JackShmReadPtr()
+        ~JackShmReadPtr()
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmPtrRead::~JackShmPtrRead %ld", fInfo.index);

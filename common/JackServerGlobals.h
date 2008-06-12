@@ -40,7 +40,7 @@ struct JackServerGlobals
     static JackServer* fServer;
 
     JackServerGlobals();
-    virtual ~JackServerGlobals();
+    ~JackServerGlobals();
 
     static bool Init();
     static void Destroy();

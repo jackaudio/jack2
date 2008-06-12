@@ -75,7 +75,6 @@ class EXPORT JackPort
     public:
 
         JackPort();
-        virtual ~JackPort();
 
         bool Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void Release();

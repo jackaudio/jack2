@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackSocket__
 #define __JackSocket__
 
-#include "JackChannelTransaction.h"
-
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -42,7 +40,7 @@ namespace Jack
 \brief Client socket.
 */
 
-class JackClientSocket : public JackChannelTransaction
+class JackClientSocket
 {
 
     private:
@@ -54,8 +52,6 @@ class JackClientSocket : public JackChannelTransaction
         JackClientSocket(): fSocket( -1)
         {}
         JackClientSocket(int socket);
-        virtual ~JackClientSocket()
-        {}
 
         int Connect(const char* dir, int which);
         int Connect(const char* dir, const char* name, int which);
@@ -88,7 +84,7 @@ class JackServerSocket
 
         JackServerSocket(): fSocket( -1)
         {}
-        virtual ~JackServerSocket()
+        ~JackServerSocket()
         {}
 
         int Bind(const char* dir, int which);

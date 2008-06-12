@@ -51,9 +51,6 @@ class JackFixedArray
             Init();
         }
 
-        virtual ~JackFixedArray()
-        {}
-
         void Init()
         {
             for (int i = 0; i < SIZE; i++)
@@ -138,9 +135,6 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
             Init();
         }
 
-        virtual ~JackFixedArray1()
-        {}
-
         void Init()
         {
             JackFixedArray<SIZE>::Init();
@@ -172,9 +166,6 @@ class JackFixedMatrix
     public:
 
         JackFixedMatrix()
-        {}
-
-        virtual ~JackFixedMatrix()
         {}
 
         void Init(jack_int_t index)
@@ -301,8 +292,6 @@ class JackLoopFeedback
         {
             Init();
         }
-        virtual ~JackLoopFeedback()
-        {}
 
         void Init()
         {

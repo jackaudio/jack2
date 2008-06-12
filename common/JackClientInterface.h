@@ -35,13 +35,13 @@ struct JackClientControl;
 class EXPORT JackClientInterface
 {
 
-    public:
-
+     public:
+    
         JackClientInterface()
         {}
         virtual ~JackClientInterface()
         {}
-
+ 
         virtual int Close() = 0;
 
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2) = 0;

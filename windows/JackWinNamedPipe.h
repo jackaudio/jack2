@@ -20,7 +20,6 @@ This program is free software; you can redistribute it and/or modify
 #ifndef __JackWinNamedPipe__
 #define __JackWinNamedPipe__
 
-#include "JackChannelTransaction.h"
 #include <assert.h>
 #include <stdio.h>
 #include <windows.h>
@@ -28,7 +27,7 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-class JackWinNamedPipe : public JackChannelTransaction
+class JackWinNamedPipe
 {
 
     protected:

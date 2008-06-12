@@ -4589,6 +4589,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 4B699DD5097D427F00A18468 /* Build configuration list for PBXProject "Jackdmp" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* JackServer */;
 			projectDirPath = "";
@@ -9854,7 +9855,10 @@
 		4B363EE70DEB091C001F72D9 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = i386;
+				ARCHS = (
+					i386,
+					ppc,
+				);
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
