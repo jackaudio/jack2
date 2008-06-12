@@ -89,4 +89,4 @@ def build(bld):
 
     symlink_as('PREFIX', 'jack_connect', 'bin/jack_disconnect')
 
-    install_files('PREFIX', 'bin', 'jack_control')
+    install_files('PREFIX', 'bin', 'jack_control', chmod=0755)
