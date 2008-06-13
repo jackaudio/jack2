@@ -46,6 +46,111 @@ JackThreadedDriver::~JackThreadedDriver()
     delete fDriver;
 }
 
+int JackThreadedDriver::Open()
+{
+    return fDriver->Open();
+}
+
+int JackThreadedDriver::Open(jack_nframes_t nframes,
+                 jack_nframes_t samplerate,
+                 bool capturing,
+                 bool playing,
+                 int inchannels,
+                 int outchannels,
+                 bool monitor,
+                 const char* capture_driver_name,
+                 const char* playback_driver_name,
+                 jack_nframes_t capture_latency,
+                 jack_nframes_t playback_latency)
+{
+    return fDriver->Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+}
+
+int JackThreadedDriver::Close()
+{
+    return fDriver->Close();
+}
+
+int JackThreadedDriver::Process()
+{
+    return fDriver->Process();
+}
+
+int JackThreadedDriver::ProcessNull()
+{
+    return fDriver->ProcessNull();
+}
+
+int JackThreadedDriver::Attach()
+{
+    return fDriver->Attach();
+}
+
+int JackThreadedDriver::Detach()
+{
+    return fDriver->Detach();
+}
+
+int JackThreadedDriver::Read()
+{
+    return fDriver->Read();
+}
+
+int JackThreadedDriver::Write()
+{
+    return fDriver->Write();
+}
+
+int JackThreadedDriver::SetBufferSize(jack_nframes_t buffer_size)
+{
+    return fDriver->SetBufferSize(buffer_size);
+}
+
+int JackThreadedDriver::SetSampleRate(jack_nframes_t sample_rate)
+{
+    return fDriver->SetSampleRate(sample_rate);
+}
+
+void JackThreadedDriver::SetMaster(bool onoff)
+{
+    fDriver->SetMaster(onoff);
+}
+
+bool JackThreadedDriver::GetMaster()
+{
+    return fDriver->GetMaster();
+}
+
+void JackThreadedDriver::AddSlave(JackDriverInterface* slave)
+{
+    fDriver->AddSlave(slave);
+}
+
+void JackThreadedDriver::RemoveSlave(JackDriverInterface* slave)
+{
+    fDriver->RemoveSlave(slave);
+}
+
+int JackThreadedDriver::ProcessSlaves()
+{
+    return fDriver->ProcessSlaves();
+}
+
+int JackThreadedDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+{
+    return fDriver->ClientNotify(refnum, name, notify, sync, value1, value2);
+}
+
+JackClientControl* JackThreadedDriver::GetClientControl() const
+{
+    return fDriver->GetClientControl();
+}
+
+bool JackThreadedDriver::IsRealTime() const
+{
+    return fDriver->IsRealTime();
+}
+
 int JackThreadedDriver::Start()
 {
     jack_log("JackThreadedDriver::Start");
@@ -117,30 +222,6 @@ bool JackThreadedDriver::Init()
         return true;
     } else {
         return false;
-    }
-}
-
-bool JackRestartThreadedDriver::Execute()
-{
-    try {
-        // Keep running even in case of error
-        while (fThread.GetStatus() == JackThread::kRunning) {
-            Process();
-        }
-        return false;
-    } catch (JackDriverException& e) {
-        e.PrintMessage();
-        jack_log("Driver is restarted");
-        fThread.DropRealTime();
-        // Thread in kIniting status again...
-        fThread.SetStatus(JackThread::kIniting);
-        if (Init()) {
-            // Thread in kRunning status again...
-            fThread.SetStatus(JackThread::kRunning);
-            return true;
-        } else {
-            return false;
-        }
     }
 }
 

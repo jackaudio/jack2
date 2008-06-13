@@ -174,7 +174,7 @@ int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync,
     return 0;
 }
 
-bool JackDriver::IsRealTime()
+bool JackDriver::IsRealTime() const
 {
     return fEngineControl->fRealTime;
 }
@@ -230,5 +230,61 @@ int JackDriverClient::ProcessSlaves()
     }
     return res;
 }
+
+int JackDriver::Process()
+{
+    return 0;
+}
+
+int JackDriver::ProcessNull()
+{
+    return 0;
+}
+
+int JackDriver::Attach()
+{
+    return 0;
+}
+
+int JackDriver::Detach()
+{
+    return 0;
+}
+
+int JackDriver::Read()
+{
+    return 0;
+}
+
+int JackDriver::Write()
+{
+    return 0;
+}
+
+int JackDriver::Start()
+{
+    return 0;
+}
+
+int JackDriver::Stop()
+{
+    return 0;
+}
+
+int JackDriver::SetBufferSize(jack_nframes_t buffer_size)
+{
+    return 0;
+}
+
+int JackDriver::SetSampleRate(jack_nframes_t sample_rate)
+{
+    return 0;
+}
+
+bool JackDriver::Init()
+{
+    return true;
+}
+
 
 } // end of namespace

@@ -44,11 +44,7 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         JackThreadedDriver(JackDriverClient* driver);
         virtual ~JackThreadedDriver();
 
-        virtual int Open()
-        {
-            return fDriver->Open();
-        }
-
+        virtual int Open();
         virtual int Open(jack_nframes_t nframes,
                          jack_nframes_t samplerate,
                          bool capturing,
@@ -59,111 +55,42 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
                          const char* capture_driver_name,
                          const char* playback_driver_name,
                          jack_nframes_t capture_latency,
-                         jack_nframes_t playback_latency)
-        {
-            return fDriver->Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
-        }
-
-        int Close()
-        {
-            return fDriver->Close();
-        }
-
-        int Process()
-        {
-            return fDriver->Process();
-        }
+                         jack_nframes_t playback_latency);
+    
+        virtual int Close();
+  
+        virtual int Process();
         
-        int ProcessNull()
-        {
-            return fDriver->ProcessNull();
-        }
+        virtual int ProcessNull();
+    
+        virtual int Attach();
+        virtual int Detach();
+     
+        virtual int Read();
+        virtual int Write();
+    
+        virtual int Start();
+        virtual int Stop();
 
-        int Attach()
-        {
-            return fDriver->Attach();
-        }
-        int Detach()
-        {
-            return fDriver->Detach();
-        }
-
-        int Read()
-        {
-            return fDriver->Read();
-        }
-        int Write()
-        {
-            return fDriver->Write();
-        }
-
-        int Start();
-        int Stop();
-
-        int SetBufferSize(jack_nframes_t buffer_size)
-        {
-            return fDriver->SetBufferSize(buffer_size);
-        }
-
-        int SetSampleRate(jack_nframes_t sample_rate)
-        {
-            return fDriver->SetSampleRate(sample_rate);
-        }
-
-        void SetMaster(bool onoff)
-        {
-            fDriver->SetMaster(onoff);
-        }
-        bool GetMaster()
-        {
-            return fDriver->GetMaster();
-        }
-
-        void AddSlave(JackDriverInterface* slave)
-        {
-            fDriver->AddSlave(slave);
-        }
-        void RemoveSlave(JackDriverInterface* slave)
-        {
-            fDriver->RemoveSlave(slave);
-        }
-        int ProcessSlaves()
-        {
-            return fDriver->ProcessSlaves();
-        }
-
-        int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
-        {
-            return fDriver->ClientNotify(refnum, name, notify, sync, value1, value2);
-        }
-
-        JackClientControl* GetClientControl() const
-        {
-            return fDriver->GetClientControl();
-        }
-
-        bool IsRealTime()
-        {
-            return fDriver->IsRealTime();
-        }
-
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
+        virtual int SetSampleRate(jack_nframes_t sample_rate);
+     
+        virtual void SetMaster(bool onoff);
+        virtual bool GetMaster();
+        virtual void AddSlave(JackDriverInterface* slave);
+        virtual void RemoveSlave(JackDriverInterface* slave);
+        virtual int ProcessSlaves();
+    
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
+     
+        virtual JackClientControl* GetClientControl() const;
+      
+        virtual bool IsRealTime() const;
+   
         // JackRunnableInterface interface
         virtual bool Execute();
         virtual bool Init();
 
-};
-
-class EXPORT JackRestartThreadedDriver : public JackThreadedDriver
-{
-    public:
-
-        JackRestartThreadedDriver(JackDriverClient* driver):JackThreadedDriver(driver)
-        {}
-        virtual ~JackRestartThreadedDriver()
-        {}
-
-        // JackRunnableInterface interface
-        virtual bool Execute();
 };
 
 } // end of namespace

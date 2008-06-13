@@ -83,7 +83,7 @@ class EXPORT JackDriverInterface
         virtual void RemoveSlave(JackDriverInterface* slave) = 0;
         virtual int ProcessSlaves() = 0;
         
-        virtual bool IsRealTime() = 0;
+        virtual bool IsRealTime() const = 0;
 };
 /*!
  \brief The base interface for drivers clients.
@@ -165,66 +165,32 @@ class EXPORT JackDriver : public JackDriverClient
         
         virtual int Close();
         
-        virtual int Process()
-        {
-            return 0;
-        }
+        virtual int Process();
         
-        virtual int ProcessNull()
-        {
-            return 0;
-        }
+        virtual int ProcessNull();
         
-        virtual int Attach()
-        {
-            return 0;
-        }
-        virtual int Detach()
-        {
-            return 0;
-        }
+        virtual int Attach();
+        virtual int Detach();
+         
+        virtual int Read();
+        virtual int Write();
+          
+        virtual int Start();
+        virtual int Stop();
         
-        virtual int Read()
-        {
-            return 0;
-        }
-        virtual int Write()
-        {
-            return 0;
-        }
-        
-        virtual int Start()
-        {
-            return 0;
-        }
-        virtual int Stop()
-        {
-            return 0;
-        }
-        
-        virtual int SetBufferSize(jack_nframes_t buffer_size)
-        {
-            return 0;
-        }
-        
-        virtual int SetSampleRate(jack_nframes_t sample_rate)
-        {
-            return 0;
-        }
-        
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
+        virtual int SetSampleRate(jack_nframes_t sample_rate);
+         
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs); // XRun notification sent by the driver
         
-        virtual bool IsRealTime();
+        virtual bool IsRealTime() const;
         
         int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
         
         void SetupDriverSync(int ref, bool freewheel);
         
-        virtual bool Init()
-        {
-            return true;
-        }
-    
+        virtual bool Init();
+         
 };
     
 } // end of namespace

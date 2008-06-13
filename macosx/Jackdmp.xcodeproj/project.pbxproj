@@ -310,6 +310,10 @@
 		4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
 		4B3F49080AD8503300491C6E /* jack_cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* jack_cpu.c */; };
 		4B44FAE70C7598370033A72C /* JackServerLaunch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */; };
+		4B4CA9750E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */; };
+		4B4CA9760E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */; };
+		4B4CA9770E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */; };
+		4B4CA9780E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */; };
 		4B4F9C8C0DC20C0400706CB0 /* JackMessageBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F9C8A0DC20C0400706CB0 /* JackMessageBuffer.cpp */; };
 		4B4F9C8D0DC20C0400706CB0 /* JackMessageBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4F9C8B0DC20C0400706CB0 /* JackMessageBuffer.h */; };
 		4B4F9C8E0DC20C0400706CB0 /* JackMessageBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B4F9C8A0DC20C0400706CB0 /* JackMessageBuffer.cpp */; };
@@ -1187,6 +1191,8 @@
 		4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacEngineRPC.cpp; sourceTree = SOURCE_ROOT; };
 		4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServerLaunch.cpp; path = ../common/JackServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
 		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
+		4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackRestartThreadedDriver.h; path = ../common/JackRestartThreadedDriver.h; sourceTree = SOURCE_ROOT; };
+		4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackRestartThreadedDriver.cpp; path = ../common/JackRestartThreadedDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B4F9C8A0DC20C0400706CB0 /* JackMessageBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackMessageBuffer.cpp; path = ../common/JackMessageBuffer.cpp; sourceTree = SOURCE_ROOT; };
 		4B4F9C8B0DC20C0400706CB0 /* JackMessageBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackMessageBuffer.h; path = ../common/JackMessageBuffer.h; sourceTree = SOURCE_ROOT; };
 		4B56880F08B5C8620022B32D /* JackFifo.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFifo.cpp; path = ../common/JackFifo.cpp; sourceTree = SOURCE_ROOT; };
@@ -2482,12 +2488,14 @@
 		4BD56D8707968982006D44F9 /* Threaded */ = {
 			isa = PBXGroup;
 			children = (
-				4BBC93B90DF9736C002DF220 /* JackWaitThreadedDriver.h */,
-				4BBC93B80DF9736C002DF220 /* JackWaitThreadedDriver.cpp */,
 				4BF8D1BD0834EEFC00C94B91 /* JackThreadedDriver.h */,
 				4BF8D1BE0834EEFC00C94B91 /* JackThreadedDriver.cpp */,
 				4BF8D1B90834EEF100C94B91 /* JackFreewheelDriver.h */,
 				4BF8D1BA0834EEF100C94B91 /* JackFreewheelDriver.cpp */,
+				4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */,
+				4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */,
+				4BBC93B90DF9736C002DF220 /* JackWaitThreadedDriver.h */,
+				4BBC93B80DF9736C002DF220 /* JackWaitThreadedDriver.cpp */,
 			);
 			name = Threaded;
 			sourceTree = "<group>";
@@ -2676,6 +2684,7 @@
 				BA222ADB0DC88269001A17F4 /* JackNetTool.h in Headers */,
 				4B9A26060DBF8584006E9FBC /* jslist.h in Headers */,
 				4B4F9C930DC20C0400706CB0 /* JackMessageBuffer.h in Headers */,
+				4B4CA9770E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3024,6 +3033,7 @@
 				4B4F9C8D0DC20C0400706CB0 /* JackMessageBuffer.h in Headers */,
 				4B5F253E0DEE9B8F0041E486 /* JackLockedEngine.h in Headers */,
 				4BBC93BB0DF9736C002DF220 /* JackWaitThreadedDriver.h in Headers */,
+				4B4CA9750E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5250,6 +5260,7 @@
 				4B9A26680DBF8B23006E9FBC /* JackControl.cpp in Sources */,
 				4B0206A10DC0BAB400319AF1 /* JackProcessSync.cpp in Sources */,
 				4B4F9C920DC20C0400706CB0 /* JackMessageBuffer.cpp in Sources */,
+				4B4CA9780E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5619,6 +5630,7 @@
 				4B02069E0DC0BAB400319AF1 /* JackProcessSync.cpp in Sources */,
 				4B4F9C8C0DC20C0400706CB0 /* JackMessageBuffer.cpp in Sources */,
 				4BBC93BA0DF9736C002DF220 /* JackWaitThreadedDriver.cpp in Sources */,
+				4B4CA9760E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
