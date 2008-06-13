@@ -196,6 +196,10 @@ SOURCE=..\common\JackPortType.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\common\JackRestartThreadedDriver.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\common\JackServer.cpp
 # End Source File
 # Begin Source File
@@ -225,6 +229,10 @@ SOURCE=..\common\JackTools.cpp
 # Begin Source File
 
 SOURCE=..\common\JackTransportEngine.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\common\JackWaitThreadedDriver.cpp
 # End Source File
 # Begin Source File
 
