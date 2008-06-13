@@ -59,7 +59,8 @@ void* JackPosixThread::ThreadHandler(void* arg)
     }
 
     jack_log("ThreadHandler: exit");
-    return 0;
+    pthread_exit(0);
+    return 0; // never reached
 }
 
 int JackPosixThread::Start()

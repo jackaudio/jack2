@@ -54,7 +54,7 @@ int JackThreadedDriver::Start()
         jack_error("Cannot start driver");
         return -1;
     }
-    if (fThread.Start() < 0) {
+    if (fThread.StartSync() < 0) {
         jack_error("Cannot start thread");
         return -1;
     }

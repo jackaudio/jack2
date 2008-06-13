@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-06-13 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackPosixThread::ThreadHandler termination, do not set buffer size if same value is used.
+
 2008-06-12 Stephane Letz  <letz@grame.fr>
 
 	* Another Tim Blechmann patch to remove unnecessary virtual methods.
