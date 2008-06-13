@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,12 +35,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 	JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-	                               const char* ip, int port, int midi_input_ports, int midi_output_ports, const char* net_name )
+	                               const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name )
 			: JackAudioDriver ( name, alias, engine, table )
 	{
 		fMulticastIP = new char[strlen ( ip ) + 1];
 		strcpy ( fMulticastIP, ip );
 		fUDPPort = port;
+		fParams.fMtu = mtu;
 		fParams.fSendMidiChannels = midi_input_ports;
 		fParams.fReturnMidiChannels = midi_output_ports;
 		strcpy ( fParams.fName, net_name );
@@ -574,7 +575,7 @@ namespace Jack
 		{
 			jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
 			strcpy ( desc->name, "net" );
-			desc->nparams = 7;
+			desc->nparams = 8;
 			desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
 			int i = 0;
@@ -591,6 +592,14 @@ namespace Jack
 			desc->params[i].type = JackDriverParamInt;
 			desc->params[i].value.i = 19000;
 			strcpy ( desc->params[i].short_desc, "UDP port" );
+			strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+
+			i++;
+			strcpy ( desc->params[i].name, "mtu" );
+			desc->params[i].character = 'M';
+			desc->params[i].type = JackDriverParamInt;
+			desc->params[i].value.i = 1500;
+			strcpy ( desc->params[i].short_desc, "MTU to the master" );
 			strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
 			i++;
@@ -642,6 +651,7 @@ namespace Jack
 			char name[JACK_CLIENT_NAME_SIZE];
 			gethostname ( name, JACK_CLIENT_NAME_SIZE );
 			int udp_port = DEFAULT_PORT;
+			int mtu = 1500;
 			jack_nframes_t period_size = 128;
 			jack_nframes_t sample_rate = 48000;
 			int audio_capture_ports = 2;
@@ -663,6 +673,9 @@ namespace Jack
 					case 'p':
 						udp_port = param->value.ui;
 						break;
+					case 'M':
+						mtu = param->value.i;
+						break;
 					case 'C':
 						audio_capture_ports = param->value.i;
 						break;
@@ -681,7 +694,7 @@ namespace Jack
 			}
 
 			Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, midi_input_ports, midi_output_ports, name ) );
+			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu, midi_input_ports, midi_output_ports, name ) );
 			if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
 			                    monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
 				return driver;

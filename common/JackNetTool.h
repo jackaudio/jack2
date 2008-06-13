@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2008 Grame
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
 
 #include "types.h"
 #include "JackConstants.h"
@@ -22,7 +40,6 @@ namespace Jack
 {
 	typedef struct _session_params session_params_t;
 	typedef struct _packet_header packet_header_t;
-	typedef struct _midi_portbuf_desc midi_portbuf_desc_t;
 	typedef struct sockaddr socket_address_t;
 	typedef struct in_addr address_t;
 	typedef jack_default_audio_sample_t sample_t;
@@ -99,6 +116,9 @@ namespace Jack
 		char fFree[13];             	//unused
 	};
 
+#ifndef __NetMidiBuffer__
+#define __NetMidiBuffer__
+
 //midi data ***********************************************************************************
 
 	class EXPORT NetMidiBuffer
@@ -128,7 +148,12 @@ namespace Jack
 			int RenderToNetwork ( int subcycle, size_t total_size );
 	};
 
+#endif
+
 // audio data *********************************************************************************
+
+#ifndef __NetAudioBuffer__
+#define __NetAudioBuffer__
 
 	class EXPORT NetAudioBuffer
 	{
@@ -149,6 +174,8 @@ namespace Jack
 			void RenderFromJackPorts ( int subcycle );
 			void RenderToJackPorts ( int subcycle );
 	};
+
+#endif
 
 //utility *************************************************************************************
 

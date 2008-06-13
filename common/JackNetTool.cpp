@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2008 Grame
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
 
 #include "JackNetTool.h"
 #include "JackError.h"
@@ -38,8 +56,8 @@ namespace Jack
 			for ( uint event = 0; event < fPortBuffer[port_index]->event_count; event++ )
 				if ( fPortBuffer[port_index]->IsValid() )
 					jack_info ( "port %d : midi event %u/%u -> time : %u, size : %u",
-						port_index + 1, event + 1, fPortBuffer[port_index]->event_count,
-							fPortBuffer[port_index]->events[event].time, fPortBuffer[port_index]->events[event].size );
+					            port_index + 1, event + 1, fPortBuffer[port_index]->event_count,
+					            fPortBuffer[port_index]->events[event].time, fPortBuffer[port_index]->events[event].size );
 		}
 	}
 
@@ -53,7 +71,7 @@ namespace Jack
 			memcpy ( fBuffer + pos, fPortBuffer[port_index], copy_size );
 			pos += copy_size;
 			memcpy ( fBuffer + pos, fPortBuffer[port_index] + ( fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos ),
-					fPortBuffer[port_index]->write_pos );
+			         fPortBuffer[port_index]->write_pos );
 			pos += fPortBuffer[port_index]->write_pos;
 		}
 		return pos;
@@ -65,11 +83,11 @@ namespace Jack
 		int copy_size;
 		for ( int port_index = 0; port_index < fNPorts; port_index++ )
 		{
-			copy_size = sizeof ( JackMidiBuffer ) + reinterpret_cast<JackMidiBuffer*>(fBuffer + pos)->event_count * sizeof ( JackMidiEvent );
+			copy_size = sizeof ( JackMidiBuffer ) + reinterpret_cast<JackMidiBuffer*> ( fBuffer + pos )->event_count * sizeof ( JackMidiEvent );
 			memcpy ( fPortBuffer[port_index], fBuffer + pos, copy_size );
 			pos += copy_size;
 			memcpy ( fPortBuffer[port_index] + ( fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos ),
-					fBuffer + pos, fPortBuffer[port_index]->write_pos );
+			         fBuffer + pos, fPortBuffer[port_index]->write_pos );
 			pos += fPortBuffer[port_index]->write_pos;
 		}
 		return pos;
@@ -262,7 +280,7 @@ namespace Jack
 		if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
 			return ( params->fFramesPerPacket = params->fPeriodSize );
 		size_t period = ( int ) powf ( 2.f, ( int ) log2 ( ( params->fMtu - sizeof ( packet_header_t ) )
-			/ ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) );
+		                               / ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) );
 		( period > params->fPeriodSize ) ? params->fFramesPerPacket = params->fPeriodSize : params->fFramesPerPacket = period;
 		return params->fFramesPerPacket;
 	}

@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2008 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-
 	class JackNetDriver : public JackAudioDriver
 	{
 		private:
@@ -72,7 +71,7 @@ namespace Jack
 
 		public:
 			JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-			                const char* ip, int port, int midi_input_ports, int midi_output_ports, const char* master_name );
+			                const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* master_name );
 			~JackNetDriver();
 
 			int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
