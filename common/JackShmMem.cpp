@@ -35,6 +35,11 @@ size_t JackMem::gSize = 0;
 
 JackShmMem::JackShmMem()
 {
+    JackShmMemAble::Init();
+}
+
+void JackShmMemAble::Init()
+{
     fInfo.index = gInfo.index;
     fInfo.attached_at = gInfo.attached_at;
     fInfo.size = gInfo.size;

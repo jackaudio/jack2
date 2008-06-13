@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackInternalClient__
 
 #include "JackClient.h"
+#include "JackClientControl.h"
 
 namespace Jack
 {
@@ -37,7 +38,7 @@ class JackInternalClient : public JackClient
 
     private:
 
-        JackClientControl* fClientControl;     /*! Client control */
+        JackClientControl fClientControl;     /*! Client control */
 
     public:
 

@@ -31,10 +31,10 @@ namespace Jack
 {
 
 /*!
-\brief Client control in shared memory.
+\brief Client control possibly in shared memory.
 */
 
-struct JackClientControl : public JackShmMem
+struct JackClientControl : public JackShmMemAble
 {
     char fName[JACK_CLIENT_NAME_SIZE + 1];
     bool fCallback[kMaxNotification];

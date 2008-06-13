@@ -61,7 +61,6 @@ class JackMem
     
         JackMem(): fSize(gSize)
         {}
-
         ~JackMem()
         {}
         
@@ -91,31 +90,20 @@ class JackMem
 };
 
 /*!
-\brief The base class for shared memory management.
+\brief
 
-A class which objects need to be allocated in shared memory derives from this class.
+A class which objects possibly want to be allocated in shared memory derives from this class.
 */
 
-class EXPORT JackShmMem
+class JackShmMemAble
 {
-
     protected:
-
+        
         jack_shm_info_t fInfo;
         
-    protected:
-    
-        JackShmMem();
-	
-        ~JackShmMem()
-        {}
- 
     public:
-
-        void* operator new(size_t size);
-        void* operator new(size_t size, void* memory);
-        void operator delete(void* p, size_t size);
-		void operator delete(void* p);
+             
+        void Init();
 
         int GetShmIndex()
         {
@@ -137,6 +125,31 @@ class EXPORT JackShmMem
             UnlockMemoryImp(this, fInfo.size);
         }
 
+};
+
+/*!
+\brief The base class for shared memory management.
+
+A class which objects need to be allocated in shared memory derives from this class.
+*/
+
+class EXPORT JackShmMem : public JackShmMemAble
+{
+
+     protected:
+    
+        JackShmMem();
+        ~JackShmMem()
+        {}
+ 
+    public:
+    
+        void* operator new(size_t size);
+        void* operator new(size_t size, void* memory);
+        
+        void operator delete(void* p, size_t size);
+		void operator delete(void* p);
+   
 };
 
 /*!

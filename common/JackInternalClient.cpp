@@ -66,13 +66,11 @@ JackSynchro* GetSynchroTable()
 
 JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)
 {
-    fClientControl = new JackClientControl();
     fChannel = new JackInternalClientChannel(server);
 }
 
 JackInternalClient::~JackInternalClient()
 {
-    delete fClientControl;
     delete fChannel;
 }
 
@@ -94,10 +92,10 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
         goto error;
     }
 
-    strcpy(fClientControl->fName, name_res);
+    strcpy(fClientControl.fName, name_res);
 
     // Require new client
-    fChannel->ClientOpen(name_res, &fClientControl->fRefNum, &fEngineControl, &fGraphManager, this, &result);
+    fChannel->ClientOpen(name_res, &fClientControl.fRefNum, &fEngineControl, &fGraphManager, this, &result);
     if (result < 0) {
         jack_error("Cannot open client name = %s", name_res);
         goto error;
@@ -126,7 +124,7 @@ JackEngineControl* JackInternalClient::GetEngineControl() const
 
 JackClientControl* JackInternalClient::GetClientControl() const
 {
-    return fClientControl;
+    return const_cast<JackClientControl*>(&fClientControl);
 }
 
 JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data)

@@ -85,25 +85,6 @@ class EXPORT JackDriverInterface
         
         virtual bool IsRealTime() = 0;
 };
-    
-/*
- \brief The base interface for blocking drivers.
- */
-
-class EXPORT JackBlockingInterface
-{
-    
-    public:
-        
-        JackBlockingInterface()
-        {}
-        virtual ~JackBlockingInterface()
-        {}
-        
-        virtual bool Init() = 0;  /* To be called by the wrapping thread Init method when the driver is a "blocking" one */
-    
-};
-
 /*!
  \brief The base interface for drivers clients.
  */
@@ -115,7 +96,7 @@ class EXPORT JackDriverClientInterface : public JackDriverInterface, public Jack
  \brief The base class for drivers clients.
  */
 
-class EXPORT JackDriverClient : public JackDriverClientInterface, public JackBlockingInterface
+class EXPORT JackDriverClient : public JackDriverClientInterface
 {
     
     private:
@@ -127,7 +108,7 @@ class EXPORT JackDriverClient : public JackDriverClientInterface, public JackBlo
         bool fIsMaster;
         
     public:
-        
+        virtual bool Init() = 0;  /* To be called by the wrapping thread Init method when the driver is a "blocking" one */
         virtual void SetMaster(bool onoff);
         virtual bool GetMaster();
         virtual void AddSlave(JackDriverInterface* slave);
