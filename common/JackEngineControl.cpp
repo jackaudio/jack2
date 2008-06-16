@@ -42,11 +42,7 @@ void JackEngineControl::CycleBegin(JackClientInterface** table,
                                     jack_time_t cur_cycle_begin, 
                                     jack_time_t prev_cycle_end)
 {
-    // Transport
     fTransport.CycleBegin(fSampleRate, cur_cycle_begin);
-
-    // Timing
-    //GetTimeMeasure(table, manager, callback_usecs);
     CalcCPULoad(table, manager, cur_cycle_begin, prev_cycle_end);
 }
 

@@ -185,17 +185,21 @@ int JackAudioDriver::Process()
 
 int JackAudioDriver::ProcessNull()
 {
+    // Keep begin cycle time
     JackDriver::CycleTakeBeginTime();
     
-    int wait_time_usec = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
-    JackSleep(wait_time_usec);
-    
-    if (!fEngine->Process(fBeginDateUst, fEndDateUst)) // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
+    // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
+    if (!fEngine->Process(fBeginDateUst, fEndDateUst)) 
         jack_error("JackAudioDriver::ProcessNull Process error");
     fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     if (ProcessSlaves() < 0)
         jack_error("JackAudioDriver::ProcessNull ProcessSlaves error");
         
+     // Keep end cycle time
+    JackDriver::CycleTakeEndTime();
+        
+    int wait_time_usec = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
+    JackSleep(std::max(0L, long(wait_time_usec - (GetMicroSeconds() - fBeginDateUst))));
     return 0;
 }
 
@@ -230,7 +234,7 @@ int JackAudioDriver::ProcessAsync()
     }
     
     // Keep end cycle time
-    CycleTakeEndTime();
+    JackDriver::CycleTakeEndTime();
     return 0;
 }
 
@@ -271,7 +275,7 @@ int JackAudioDriver::ProcessSync()
     }
     
     // Keep end cycle time
-    CycleTakeEndTime();
+    JackDriver::CycleTakeEndTime();
     return 0;
 }
 
