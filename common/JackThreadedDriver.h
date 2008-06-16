@@ -60,7 +60,6 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         virtual int Close();
   
         virtual int Process();
-        
         virtual int ProcessNull();
     
         virtual int Attach();

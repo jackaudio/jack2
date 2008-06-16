@@ -59,8 +59,8 @@ extern "C"
 
 #else // usual jack
 
-#include <jack/jack.h>
-#include <jack/thread.h>
+#include "jack/jack.h"
+#include "jack/thread.h"
 
 #endif
 
