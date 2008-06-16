@@ -133,41 +133,41 @@ void JackEngine::ReleaseRefnum(int ref)
 // Graph management
 //------------------
 
-void JackEngine::ProcessNext(jack_time_t callback_usecs)
+void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
 {
-    fLastSwitchUsecs = callback_usecs;
+    fLastSwitchUsecs = cur_cycle_begin;
     if (fGraphManager->RunNextGraph())	// True if the graph actually switched to a new state
         fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
-    fSignal.SignalAll();               // Signal for threads waiting for next cycle
+    fSignal.SignalAll();                // Signal for threads waiting for next cycle
 }
 
-void JackEngine::ProcessCurrent(jack_time_t callback_usecs)
+void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
 {
-    if (callback_usecs < fLastSwitchUsecs + 2 * fEngineControl->fPeriodUsecs) // Signal XRun only for the first failing cycle
-        CheckXRun(callback_usecs);
+    if (cur_cycle_begin < fLastSwitchUsecs + 2 * fEngineControl->fPeriodUsecs) // Signal XRun only for the first failing cycle
+        CheckXRun(cur_cycle_begin);
     fGraphManager->RunCurrentGraph();
 }
 
-bool JackEngine::Process(jack_time_t callback_usecs)
+bool JackEngine::Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)
 {
     bool res = true;
 
     // Cycle  begin
-    fEngineControl->CycleBegin(fClientTable, fGraphManager, callback_usecs);
+    fEngineControl->CycleBegin(fClientTable, fGraphManager, cur_cycle_begin, prev_cycle_end);
 
     // Graph
     if (fGraphManager->IsFinishedGraph()) {
-        ProcessNext(callback_usecs);
+        ProcessNext(cur_cycle_begin);
         res = true;
     } else {
         jack_log("Process: graph not finished!");
-        if (callback_usecs > fLastSwitchUsecs + fEngineControl->fTimeOutUsecs) {
-            jack_log("Process: switch to next state delta = %ld", long(callback_usecs - fLastSwitchUsecs));
-            ProcessNext(callback_usecs);
+        if (cur_cycle_begin > fLastSwitchUsecs + fEngineControl->fTimeOutUsecs) {
+            jack_log("Process: switch to next state delta = %ld", long(cur_cycle_begin - fLastSwitchUsecs));
+            ProcessNext(cur_cycle_begin);
             res = true;
         } else {
-            jack_log("Process: waiting to switch delta = %ld", long(callback_usecs - fLastSwitchUsecs));
-            ProcessCurrent(callback_usecs);
+            jack_log("Process: waiting to switch delta = %ld", long(cur_cycle_begin - fLastSwitchUsecs));
+            ProcessCurrent(cur_cycle_begin);
             res = false;
         }
     }

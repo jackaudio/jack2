@@ -475,7 +475,7 @@ namespace Jack
 		}
 		while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
-		JackDriver::CycleTakeTime();
+		JackDriver::CycleTakeBeginTime();
 
 		//audio, midi or sync if driver is late
 		if ( fParams.fSendMidiChannels || fParams.fSendAudioChannels )

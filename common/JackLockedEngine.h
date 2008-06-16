@@ -146,17 +146,17 @@ class EXPORT JackLockedEngine : public JackLockAble
         }
 
         // Graph
-        bool Process(jack_time_t callback_usecs)
+        bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)
         {
             // RT : no lock
-            return fEngine.Process(callback_usecs);
+            return fEngine.Process(cur_cycle_begin, prev_cycle_end);
         }
 
         // Notifications
-        void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
+        void NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
         {
             // RT : no lock
-            fEngine.NotifyXRun(callback_usecs, delayed_usecs);
+            fEngine.NotifyXRun(cur_cycle_begin, delayed_usecs);
         }
 
         void NotifyXRun(int refnum)

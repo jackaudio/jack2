@@ -130,7 +130,8 @@ class EXPORT JackDriver : public JackDriverClient
         char fAliasName[JACK_CLIENT_NAME_SIZE + 1];
         jack_nframes_t fCaptureLatency;
         jack_nframes_t fPlaybackLatency;
-        jack_time_t fLastWaitUst;
+        jack_time_t fBeginDateUst;
+        jack_time_t fEndDateUst;
         float fDelayedUsecs;
         JackLockedEngine* fEngine;
         JackGraphManager* fGraphManager;
@@ -141,7 +142,8 @@ class EXPORT JackDriver : public JackDriverClient
         JackClientControl* GetClientControl() const;
            
         void CycleIncTime();
-        void CycleTakeTime();
+        void CycleTakeBeginTime();
+        void CycleTakeEndTime();
 
     public:
         

@@ -177,7 +177,7 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
     driver->fActionFags = ioActionFlags;
     driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
     driver->fDriverOutputData = ioData;
-    driver->CycleTakeTime();
+    driver->CycleTakeBeginTime();
     return driver->Process();
 }
 
@@ -258,7 +258,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         case kAudioDeviceProcessorOverload:
             jack_log("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload");
             jack_time_t cur_time = GetMicroSeconds();
-            driver->NotifyXRun(cur_time, float(cur_time - driver->fLastWaitUst));   // Better this value than nothing... 
+            driver->NotifyXRun(cur_time, float(cur_time - driver->fBeginDateUst));   // Better this value than nothing... 
             break;
 
         case kAudioDevicePropertyStreamConfiguration:

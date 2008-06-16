@@ -37,14 +37,17 @@ void JackEngineControl::CycleIncTime(jack_time_t callback_usecs)
     fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
 }
 
-void JackEngineControl::CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs)
+void JackEngineControl::CycleBegin(JackClientInterface** table, 
+                                    JackGraphManager* manager, 
+                                    jack_time_t cur_cycle_begin, 
+                                    jack_time_t prev_cycle_end)
 {
     // Transport
-    fTransport.CycleBegin(fSampleRate, callback_usecs);
+    fTransport.CycleBegin(fSampleRate, cur_cycle_begin);
 
     // Timing
-    GetTimeMeasure(table, manager, callback_usecs);
-    CalcCPULoad(table, manager);
+    //GetTimeMeasure(table, manager, callback_usecs);
+    CalcCPULoad(table, manager, cur_cycle_begin, prev_cycle_end);
 }
 
 void JackEngineControl::CycleEnd(JackClientInterface** table)
@@ -57,9 +60,9 @@ void JackEngineControl::InitFrameTime()
     fFrameTimer.InitFrameTime();
 }
 
-void JackEngineControl::ResetFrameTime(jack_time_t callback_usecs)
+void JackEngineControl::ResetFrameTime(jack_time_t cur_cycle_begin)
 {
-    fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
+    fFrameTimer.ResetFrameTime(fSampleRate, cur_cycle_begin, fPeriodUsecs);
 }
 
 void JackEngineControl::ReadFrameTime(JackTimer* timer)
@@ -77,38 +80,41 @@ inline jack_time_t MAX(jack_time_t a, jack_time_t b)
 #define MAX(a,b) std::max((a),(b))
 #endif
 
-void JackEngineControl::CalcCPULoad(JackClientInterface** table, JackGraphManager* manager)
+void JackEngineControl::CalcCPULoad(JackClientInterface** table, 
+                                    JackGraphManager* manager, 
+                                    jack_time_t cur_cycle_begin, 
+                                    jack_time_t prev_cycle_end)
 {
-    jack_time_t lastCycleEnd = fLastProcessTime;
-
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = table[i];
-        JackClientTiming* timing = manager->GetClientTiming(i);
-        if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) {
-            lastCycleEnd = MAX(lastCycleEnd, timing->fFinishedAt);
+    fPrevCycleTime = fCurCycleTime;
+    fCurCycleTime = cur_cycle_begin;
+    jack_time_t last_cycle_end = prev_cycle_end;
+    
+    // In Asynchronous mode, last cycle end is the max of client end dates
+    if (!fSyncMode) {
+        for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+            JackClientInterface* client = table[i];
+            JackClientTiming* timing = manager->GetClientTiming(i);
+            if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) 
+                last_cycle_end = MAX(last_cycle_end, timing->fFinishedAt);
         }
     }
 
-    /* store the execution time for later averaging */
-    fRollingClientUsecs[fRollingClientUsecsIndex++] = lastCycleEnd - fLastTime;
-
-    if (fRollingClientUsecsIndex >= JACK_ENGINE_ROLLING_COUNT) {
+    // Store the execution time for later averaging 
+    fRollingClientUsecs[fRollingClientUsecsIndex++] = last_cycle_end - fPrevCycleTime;
+    if (fRollingClientUsecsIndex >= JACK_ENGINE_ROLLING_COUNT) 
         fRollingClientUsecsIndex = 0;
-    }
-
-    /* every so often, recompute the current maximum use over the
-       last JACK_ENGINE_ROLLING_COUNT client iterations.
-    */
-
+  
+    // Every so often, recompute the current maximum use over the
+    // last JACK_ENGINE_ROLLING_COUNT client iterations.
+ 
     if (++fRollingClientUsecsCnt % fRollingInterval == 0) {
 
-        jack_time_t maxUsecs = 0;
-        for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++) {
-            maxUsecs = MAX(fRollingClientUsecs[i], maxUsecs);
-        }
-
-        fMaxUsecs = MAX(fMaxUsecs, maxUsecs);
-        fSpareUsecs = jack_time_t((maxUsecs < fPeriodUsecs) ? fPeriodUsecs - maxUsecs : 0);
+        jack_time_t max_usecs = 0;
+        for (int i = 0; i < JACK_ENGINE_ROLLING_COUNT; i++) 
+            max_usecs = MAX(fRollingClientUsecs[i], max_usecs);
+    
+        fMaxUsecs = MAX(fMaxUsecs, max_usecs);
+        fSpareUsecs = jack_time_t((max_usecs < fPeriodUsecs) ? fPeriodUsecs - max_usecs : 0);
         fCPULoad = ((1.f - (float(fSpareUsecs) / float(fPeriodUsecs))) * 50.f + (fCPULoad * 0.5f));
     }
 }
@@ -119,48 +125,7 @@ void JackEngineControl::ResetRollingUsecs()
     fRollingClientUsecsIndex = 0;
     fRollingClientUsecsCnt = 0;
     fSpareUsecs = 0;
-    fRollingInterval = (int)floor((JACK_ENGINE_ROLLING_INTERVAL * 1000.f) / fPeriodUsecs);
-}
-
-void JackEngineControl::GetTimeMeasure(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs)
-{
-    int pos = (++fAudioCycle) % TIME_POINTS;
-
-    fLastTime = fCurTime;
-    fCurTime = callback_usecs;
-
-    fLastProcessTime = fProcessTime;
-    fProcessTime = GetMicroSeconds();
-
-    if (fLastTime > 0) {
-        fMeasure[pos].fEngineTime = fLastTime;
-        fMeasure[pos].fAudioCycle = fAudioCycle;
-
-        for (int i = 0; i < CLIENT_NUM; i++) {
-            JackClientInterface* client = table[i];
-            JackClientTiming* timing = manager->GetClientTiming(i);
-            if (client && client->GetClientControl()->fActive) {
-                fMeasure[pos].fClientTable[i].fRefNum = i;
-                fMeasure[pos].fClientTable[i].fSignaledAt = timing->fSignaledAt;
-                fMeasure[pos].fClientTable[i].fAwakeAt = timing->fAwakeAt;
-                fMeasure[pos].fClientTable[i].fFinishedAt = timing->fFinishedAt;
-                fMeasure[pos].fClientTable[i].fStatus = timing->fStatus;
-            }
-        }
-    }
-}
-
-void JackEngineControl::ClearTimeMeasures()
-{
-    for (int i = 0; i < TIME_POINTS; i++) {
-        for (int j = 0; j < CLIENT_NUM; j++) {
-            fMeasure[i].fClientTable[j].fRefNum = 0;
-            fMeasure[i].fClientTable[j].fSignaledAt = 0;
-            fMeasure[i].fClientTable[j].fAwakeAt = 0;
-            fMeasure[i].fClientTable[j].fFinishedAt = 0;
-        }
-    }
-    fLastTime = fCurTime = 0;
+    fRollingInterval = int(floor((JACK_ENGINE_ROLLING_INTERVAL * 1000.f) / fPeriodUsecs));
 }
     
 void JackEngineControl::NotifyXRun(float delayed_usecs)

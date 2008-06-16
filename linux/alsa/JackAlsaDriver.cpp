@@ -1343,7 +1343,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 
         poll_ret = jack_get_microseconds ();
         // steph
-        fLastWaitUst = poll_ret;
+        fBeginDateUst = poll_ret;
 
         if (extra_fd < 0) {
             if (driver->poll_next && poll_ret > driver->poll_next) {
@@ -2291,7 +2291,7 @@ int JackAlsaDriver::Read()
          * clients about the delay. 
          */
         jack_log("ALSA XRun");
-        NotifyXRun(fLastWaitUst, fDelayedUsecs);
+        NotifyXRun(fBeginDateUst, fDelayedUsecs);
         return -1;
     }
 

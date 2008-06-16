@@ -108,7 +108,7 @@ class EXPORT JackEngine
         int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
 
         // Graph
-        bool Process(jack_time_t callback_usecs);
+        bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
 
         // Notifications
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);

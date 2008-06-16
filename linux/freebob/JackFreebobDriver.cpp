@@ -195,7 +195,7 @@ JackFreebobDriver::freebob_driver_wait (freebob_driver_t *driver, int extra_fd, 
     }
 
     *status = 0;
-    fLastWaitUst = wait_ret;
+    fBeginDateUst = wait_ret;
 
     // FIXME: this should do something more usefull
     *delayed_usecs = 0;
@@ -316,7 +316,7 @@ JackFreebobDriver::freebob_driver_new (char *name,
     /* prepare all parameters */
     driver->sample_rate = params->sample_rate;
     driver->period_size = params->period_size;
-    fLastWaitUst = 0;
+    fBeginDateUst = 0;
 
     driver->period_usecs =
         (jack_time_t) floor ((((float) driver->period_size) * 1000000.0f) / driver->sample_rate);
@@ -875,7 +875,7 @@ int JackFreebobDriver::Read()
          * clients about the delay. 
          */
         jack_log("FreeBoB XRun");
-        NotifyXRun(fLastWaitUst, fDelayedUsecs);
+        NotifyXRun(fBeginDateUst, fDelayedUsecs);
         return -1;
     }
 

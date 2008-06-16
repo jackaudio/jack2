@@ -482,6 +482,8 @@
 		4B80D7EB0BA0D17400F035BB /* JackMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B80D7E50BA0D17400F035BB /* JackMidiPort.h */; };
 		4B80D7EC0BA0D17400F035BB /* JackMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E60BA0D17400F035BB /* JackMidiPort.cpp */; };
 		4B80D7ED0BA0D17400F035BB /* JackMidiAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E70BA0D17400F035BB /* JackMidiAPI.cpp */; };
+		4B8F3D4B0E06C4A10096D19C /* JackEngineTiming.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B8F3D490E06C4A10096D19C /* JackEngineTiming.cpp */; };
+		4B8F3D4C0E06C4A10096D19C /* JackEngineTiming.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B8F3D4A0E06C4A10096D19C /* JackEngineTiming.h */; };
 		4B95BCAC0D913064000F7695 /* JackControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B95BCAB0D913064000F7695 /* JackControl.cpp */; };
 		4B95BCAE0D913073000F7695 /* control.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B95BCAD0D913073000F7695 /* control.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B978DED0A31D099009E2DD1 /* JackPortAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B978DEB0A31D099009E2DD1 /* JackPortAudioDriver.h */; };
@@ -1241,6 +1243,8 @@
 		4B869D7F08C9CB00001CF041 /* JackDriverLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackDriverLoader.cpp; path = ../common/JackDriverLoader.cpp; sourceTree = SOURCE_ROOT; };
 		4B89B759076B731100D170DE /* JackRPCClientUser.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = JackRPCClientUser.c; path = RPC/JackRPCClientUser.c; sourceTree = SOURCE_ROOT; };
 		4B89B769076B74D200D170DE /* JackRPCEngineUser.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = JackRPCEngineUser.c; path = RPC/JackRPCEngineUser.c; sourceTree = SOURCE_ROOT; };
+		4B8F3D490E06C4A10096D19C /* JackEngineTiming.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackEngineTiming.cpp; path = ../common/JackEngineTiming.cpp; sourceTree = SOURCE_ROOT; };
+		4B8F3D4A0E06C4A10096D19C /* JackEngineTiming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackEngineTiming.h; path = ../common/JackEngineTiming.h; sourceTree = SOURCE_ROOT; };
 		4B940B9B06DDDE5B00D77F60 /* AudioHardware.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AudioHardware.h; path = /System/Library/Frameworks/CoreAudio.framework/Versions/A/Headers/AudioHardware.h; sourceTree = "<absolute>"; };
 		4B95BCAB0D913064000F7695 /* JackControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackControl.cpp; path = ../common/JackControl.cpp; sourceTree = SOURCE_ROOT; };
 		4B95BCAD0D913073000F7695 /* control.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = control.h; path = ../common/jack/control.h; sourceTree = SOURCE_ROOT; };
@@ -2288,6 +2292,8 @@
 				4B2C28F908DAD01E00249230 /* JackGlobals.cpp */,
 				4BF8D2190834F03D00C94B91 /* JackEngineControl.h */,
 				4B6F7AEC0CD0CDBD00F48A9D /* JackEngineControl.cpp */,
+				4B8F3D4A0E06C4A10096D19C /* JackEngineTiming.h */,
+				4B8F3D490E06C4A10096D19C /* JackEngineTiming.cpp */,
 				4BD4B4D409BACD9600750C0F /* JackTransportEngine.h */,
 				4BD4B4D509BACD9600750C0F /* JackTransportEngine.cpp */,
 				4BF8D2220834F05C00C94B91 /* JackServer.h */,
@@ -3034,6 +3040,7 @@
 				4B5F253E0DEE9B8F0041E486 /* JackLockedEngine.h in Headers */,
 				4BBC93BB0DF9736C002DF220 /* JackWaitThreadedDriver.h in Headers */,
 				4B4CA9750E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */,
+				4B8F3D4C0E06C4A10096D19C /* JackEngineTiming.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5631,6 +5638,7 @@
 				4B4F9C8C0DC20C0400706CB0 /* JackMessageBuffer.cpp in Sources */,
 				4BBC93BA0DF9736C002DF220 /* JackWaitThreadedDriver.cpp in Sources */,
 				4B4CA9760E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */,
+				4B8F3D4B0E06C4A10096D19C /* JackEngineTiming.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

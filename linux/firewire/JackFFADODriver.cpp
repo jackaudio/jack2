@@ -301,7 +301,7 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
         return 0;
     }
 
-    fLastWaitUst = wait_ret;
+    fBeginDateUst = wait_ret;
 
     printExit();
     return driver->period_size;
@@ -398,7 +398,7 @@ JackFFADODriver::ffado_driver_new (const char *name,
     /* prepare all parameters */
     driver->sample_rate = params->sample_rate;
     driver->period_size = params->period_size;
-    fLastWaitUst = 0;
+    fBeginDateUst = 0;
 
     driver->period_usecs =
         (jack_time_t) floor ((((float) driver->period_size) * 1000000.0f) / driver->sample_rate);
@@ -743,7 +743,7 @@ int JackFFADODriver::Read()
          * clients about the delay. 
          */
         jack_log("FFADO XRun");
-        NotifyXRun(fLastWaitUst, fDelayedUsecs);
+        NotifyXRun(fBeginDateUst, fDelayedUsecs);
         return -1;
     }
 

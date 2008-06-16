@@ -51,7 +51,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     strcpy(fAliasName, alias);
     fEngine = engine;
     fGraphManager = NULL;
-    fLastWaitUst = 0;
+    fBeginDateUst = 0;
     fDelayedUsecs = 0.f;
     fIsMaster = true;
 }
@@ -62,7 +62,7 @@ JackDriver::JackDriver()
     fClientControl = NULL;
     fEngine = NULL;
     fGraphManager = NULL;
-    fLastWaitUst = 0;
+    fBeginDateUst = 0;
     fIsMaster = true;
 }
 
@@ -181,12 +181,18 @@ bool JackDriver::IsRealTime() const
 
 void JackDriver::CycleIncTime()
 {
-	fEngineControl->CycleIncTime(fLastWaitUst);
+	fEngineControl->CycleIncTime(fBeginDateUst);
 }
-void JackDriver::CycleTakeTime()
+
+void JackDriver::CycleTakeBeginTime()
 {   
-    fLastWaitUst = GetMicroSeconds(); // Take callback date here
-    fEngineControl->CycleIncTime(fLastWaitUst);
+    fBeginDateUst = GetMicroSeconds();  // Take callback date here
+    fEngineControl->CycleIncTime(fBeginDateUst);
+}
+
+void JackDriver::CycleTakeEndTime()
+{   
+    fEndDateUst = GetMicroSeconds();    // Take end date here
 }
 
 JackClientControl* JackDriver::GetClientControl() const
@@ -194,9 +200,9 @@ JackClientControl* JackDriver::GetClientControl() const
     return fClientControl;
 }
 
-void JackDriver::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
+void JackDriver::NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
 {
-    fEngine->NotifyXRun(callback_usecs, delayed_usecs);
+    fEngine->NotifyXRun(cur_cycle_begin, delayed_usecs);
 }
 
 void JackDriverClient::SetMaster(bool onoff)

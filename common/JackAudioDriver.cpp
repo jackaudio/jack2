@@ -185,12 +185,12 @@ int JackAudioDriver::Process()
 
 int JackAudioDriver::ProcessNull()
 {
-    JackDriver::CycleTakeTime();
+    JackDriver::CycleTakeBeginTime();
     
     int wait_time_usec = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
     JackSleep(wait_time_usec);
     
-    if (!fEngine->Process(fLastWaitUst)) // fLastWaitUst is set in the "low level" layer
+    if (!fEngine->Process(fBeginDateUst, fEndDateUst)) // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
         jack_error("JackAudioDriver::ProcessNull Process error");
     fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     if (ProcessSlaves() < 0)
@@ -219,7 +219,8 @@ int JackAudioDriver::ProcessAsync()
     }
 
     if (fIsMaster) {
-        if (!fEngine->Process(fLastWaitUst)) // fLastWaitUst is set in the "low level" layer
+        // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
+        if (!fEngine->Process(fBeginDateUst, fEndDateUst)) 
             jack_error("JackAudioDriver::ProcessAsync Process error");
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
         if (ProcessSlaves() < 0)
@@ -227,6 +228,9 @@ int JackAudioDriver::ProcessAsync()
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     }
+    
+    // Keep end cycle time
+    CycleTakeEndTime();
     return 0;
 }
 
@@ -245,7 +249,8 @@ int JackAudioDriver::ProcessSync()
 
     if (fIsMaster) {
 
-        if (fEngine->Process(fLastWaitUst)) { // fLastWaitUst is set in the "low level" layer
+        // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
+        if (fEngine->Process(fBeginDateUst, fEndDateUst)) { 
             fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
             if (ProcessSlaves() < 0)
                 jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
@@ -264,6 +269,9 @@ int JackAudioDriver::ProcessSync()
     } else {
         fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
     }
+    
+    // Keep end cycle time
+    CycleTakeEndTime();
     return 0;
 }
 

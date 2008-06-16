@@ -33,33 +33,8 @@ namespace Jack
 class JackClientInterface;
 class JackGraphManager;
 
-#define TIME_POINTS 1000
 #define JACK_ENGINE_ROLLING_COUNT 32
 #define JACK_ENGINE_ROLLING_INTERVAL 1024
-
-/*!
-\brief Timing stucture for a client.
-*/
-
-struct JackTimingMeasureClient
-{
-    int fRefNum;
-    jack_time_t	fSignaledAt;
-    jack_time_t	fAwakeAt;
-    jack_time_t	fFinishedAt;
-    jack_client_state_t fStatus;
-};
-
-/*!
-\brief Timing stucture for a table of clients.
-*/
-
-struct JackTimingMeasure
-{
-    unsigned int fAudioCycle;
-    jack_time_t fEngineTime;
-    JackTimingMeasureClient fClientTable[CLIENT_NUM];
-};
 
 /*!
 \brief Engine control in shared memory.
@@ -83,15 +58,11 @@ struct EXPORT JackEngineControl : public JackShmMem
     JackTransportEngine fTransport;
     bool fVerbose;
 
-    // Timing
-    JackTimingMeasure fMeasure[TIME_POINTS];
-    jack_time_t fLastTime;
-    jack_time_t fCurTime;
-    jack_time_t fProcessTime;
-    jack_time_t fLastProcessTime;
+    // CPU Load
+    jack_time_t fPrevCycleTime;
+    jack_time_t fCurCycleTime;
     jack_time_t fSpareUsecs;
     jack_time_t fMaxUsecs;
-    unsigned int fAudioCycle;
     jack_time_t fRollingClientUsecs[JACK_ENGINE_ROLLING_COUNT];
     int	fRollingClientUsecsCnt;
     int	fRollingClientUsecsIndex;
@@ -118,14 +89,10 @@ struct EXPORT JackEngineControl : public JackShmMem
         fRealTime = rt;
         fPriority = priority;
         fVerbose = verbose;
-        fLastTime = 0;
-        fCurTime = 0;
-        fProcessTime = 0;
-        fLastProcessTime = 0;
+        fPrevCycleTime = 0;
+        fCurCycleTime = 0;
         fSpareUsecs = 0;
         fMaxUsecs = 0;
-        fAudioCycle = 0;
-        ClearTimeMeasures();
         ResetRollingUsecs();
         snprintf(fServerName, sizeof(fServerName), server_name);
         fPeriod = 0;
@@ -139,7 +106,7 @@ struct EXPORT JackEngineControl : public JackShmMem
 
     // Cycle
     void CycleIncTime(jack_time_t callback_usecs);
-    void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
+    void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
     void CycleEnd(JackClientInterface** table);
 
     // Timer
@@ -152,9 +119,7 @@ struct EXPORT JackEngineControl : public JackShmMem
     void ResetXRun();
 
     // Private
-    void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager);
-    void GetTimeMeasure(JackClientInterface** table, JackGraphManager* manager, jack_time_t callback_usecs);
-    void ClearTimeMeasures();
+    void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager, jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
     void ResetRollingUsecs();
 
 };
