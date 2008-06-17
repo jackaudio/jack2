@@ -199,7 +199,9 @@ int JackAudioDriver::ProcessNull()
     JackDriver::CycleTakeEndTime();
         
     int wait_time_usec = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));
-    JackSleep(std::max(0L, long(wait_time_usec - (GetMicroSeconds() - fBeginDateUst))));
+    wait_time_usec = int(wait_time_usec - (GetMicroSeconds() - fBeginDateUst));
+	if (wait_time_usec > 0)
+		JackSleep(wait_time_usec);
     return 0;
 }
 
