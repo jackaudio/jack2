@@ -23,6 +23,7 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackWinEvent.h"
 #include "JackError.h"
+#include <assert.h>
 
 // http://www.codeproject.com/win32/Win32_Event_Handling.asp
 // http://www.codeproject.com/threads/Synchronization.asp

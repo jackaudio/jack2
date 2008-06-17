@@ -22,7 +22,6 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackSynchro.h"
 #include <windows.h>
-#include <stdio.h>
 #include <assert.h>
 
 namespace Jack

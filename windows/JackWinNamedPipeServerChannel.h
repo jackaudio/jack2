@@ -23,7 +23,6 @@ Copyright (C) 2004-2006 Grame
 #include "JackChannel.h"
 #include "JackWinNamedPipe.h"
 #include "JackPlatformThread.h"
-#include <map>
 #include <list>
 
 namespace Jack

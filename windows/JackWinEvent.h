@@ -22,13 +22,11 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackSynchro.h"
 #include <windows.h>
-#include <stdio.h>
-#include <assert.h>
 
 namespace Jack
 {
 
-//http://bob.developpez.com/tutapiwin/article_56.php
+// http://bob.developpez.com/tutapiwin/article_56.php
 
 /*!
 \brief Inter process synchronization using system wide events.

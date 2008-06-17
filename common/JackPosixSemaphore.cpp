@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackError.h"
 #include <fcntl.h>
+#include <stdio.h>
 #include <sys/time.h>
 
 namespace Jack

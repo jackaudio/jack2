@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTools.h"
 #include "shm.h"
 #include <getopt.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <errno.h>
 
 static char* server_name = NULL;

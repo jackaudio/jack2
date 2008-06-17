@@ -21,15 +21,15 @@
 #include "config.h"
 #endif
 
+#include "JackConstants.h"
 #include "JackTools.h"
 #include "JackError.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef WIN32
 #include <process.h>
 #endif
-
-#include "JackConstants.h"
 
 namespace Jack
 {
