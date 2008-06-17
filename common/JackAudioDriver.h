@@ -38,7 +38,7 @@ class EXPORT JackAudioDriver : public JackDriver
         int fCaptureChannels;
         int fPlaybackChannels;
 
-        // static tables since the actual number of ports may be changed by the real driver
+        // Static tables since the actual number of ports may be changed by the real driver
         // thus dynamic allocation is more difficult to handle
         jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
         jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
@@ -60,9 +60,6 @@ class EXPORT JackAudioDriver : public JackDriver
         JackAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         virtual ~JackAudioDriver();
 
-        virtual int Process();
-        virtual int ProcessNull();
-
         virtual int Open(jack_nframes_t nframes,
                         jack_nframes_t samplerate,
                         int capturing,
@@ -74,15 +71,17 @@ class EXPORT JackAudioDriver : public JackDriver
                         const char* playback_driver_name,
                         jack_nframes_t capture_latency,
                         jack_nframes_t playback_latency);
+                        
+        virtual int Process();
+        virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();
+        
         virtual int Write();
 
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
-
-        virtual void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs); // XRun notification sent by the driver
 
 };
 

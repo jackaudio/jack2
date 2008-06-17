@@ -30,7 +30,7 @@ class EXPORT JackRestartThreadedDriver : public JackThreadedDriver
 {
     public:
 
-        JackRestartThreadedDriver(JackDriverClient* driver)
+        JackRestartThreadedDriver(JackDriver* driver)
             :JackThreadedDriver(driver)
         {}
         virtual ~JackRestartThreadedDriver()

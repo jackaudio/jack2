@@ -50,7 +50,6 @@ class EXPORT JackDriverInterface
         {}
         
         virtual int Open() = 0;
-        
         virtual int Open(jack_nframes_t nframes,
                          jack_nframes_t samplerate,
                          bool capturing,
@@ -71,6 +70,7 @@ class EXPORT JackDriverInterface
         
         virtual int Start() = 0;
         virtual int Stop() = 0;
+        
         virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;
         virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
         
@@ -85,6 +85,7 @@ class EXPORT JackDriverInterface
         
         virtual bool IsRealTime() const = 0;
 };
+
 /*!
  \brief The base interface for drivers clients.
  */
@@ -93,34 +94,10 @@ class EXPORT JackDriverClientInterface : public JackDriverInterface, public Jack
 {};
 
 /*!
- \brief The base class for drivers clients.
- */
-
-class EXPORT JackDriverClient : public JackDriverClientInterface
-{
-    
-    private:
-        
-        std::list<JackDriverInterface*> fSlaveList;
-        
-    protected:
-        
-        bool fIsMaster;
-        
-    public:
-        virtual bool Init() = 0;  /* To be called by the wrapping thread Init method when the driver is a "blocking" one */
-        virtual void SetMaster(bool onoff);
-        virtual bool GetMaster();
-        virtual void AddSlave(JackDriverInterface* slave);
-        virtual void RemoveSlave(JackDriverInterface* slave);
-        virtual int ProcessSlaves();
-};
-
-/*!
  \brief The base class for drivers.
  */
 
-class EXPORT JackDriver : public JackDriverClient
+class EXPORT JackDriver : public JackDriverClientInterface
 {
     
     protected:
@@ -138,21 +115,29 @@ class EXPORT JackDriver : public JackDriverClient
         JackSynchro* fSynchroTable;
         JackEngineControl* fEngineControl;
         JackClientControl* fClientControl;
-        
-        JackClientControl* GetClientControl() const;
+        std::list<JackDriverInterface*> fSlaveList;
+        bool fIsMaster;
            
         void CycleIncTime();
         void CycleTakeBeginTime();
         void CycleTakeEndTime();
-
+        
+        void SetupDriverSync(int ref, bool freewheel);
+        void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs); // XRun notification sent by the driver
+ 
     public:
         
         JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         JackDriver();
         virtual ~JackDriver();
         
+        void SetMaster(bool onoff);
+        bool GetMaster();
+        void AddSlave(JackDriverInterface* slave);
+        void RemoveSlave(JackDriverInterface* slave);
+        int ProcessSlaves();
+      
         virtual int Open();
-        
         virtual int Open(jack_nframes_t nframes,
                          jack_nframes_t samplerate,
                          bool capturing,
@@ -164,11 +149,9 @@ class EXPORT JackDriver : public JackDriverClient
                          const char* playback_driver_name,
                          jack_nframes_t capture_latency,
                          jack_nframes_t playback_latency);
-        
         virtual int Close();
         
         virtual int Process();
-        
         virtual int ProcessNull();
         
         virtual int Attach();
@@ -182,17 +165,13 @@ class EXPORT JackDriver : public JackDriverClient
         
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
-         
-        void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs); // XRun notification sent by the driver
+        
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
+        virtual JackClientControl* GetClientControl() const;
         
         virtual bool IsRealTime() const;
-        
-        int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
-        
-        void SetupDriverSync(int ref, bool freewheel);
-        
-        virtual bool Init();
-         
+        virtual bool Init();  // To be called by the wrapping thread Init method when the driver is a "blocking" one 
+            
 };
     
 } // end of namespace

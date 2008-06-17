@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-06-137Stephane Letz  <letz@grame.fr>
+
+	* Driver class hierarchy simplification.
+
 2008-06-13 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackPosixThread::ThreadHandler termination, do not set buffer size if same value is used.

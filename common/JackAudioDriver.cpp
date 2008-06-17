@@ -279,11 +279,6 @@ int JackAudioDriver::ProcessSync()
     return 0;
 }
 
-void JackAudioDriver::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
-{
-    fEngine->NotifyXRun(callback_usecs, delayed_usecs);
-}
-
 jack_default_audio_sample_t* JackAudioDriver::GetInputBuffer(int port_index)
 {
     assert(fCapturePortList[port_index]);

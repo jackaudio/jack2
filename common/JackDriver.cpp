@@ -205,27 +205,27 @@ void JackDriver::NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
     fEngine->NotifyXRun(cur_cycle_begin, delayed_usecs);
 }
 
-void JackDriverClient::SetMaster(bool onoff)
+void JackDriver::SetMaster(bool onoff)
 {
     fIsMaster = onoff;
 }
 
-bool JackDriverClient::GetMaster()
+bool JackDriver::GetMaster()
 {
     return fIsMaster;
 }
 
-void JackDriverClient::AddSlave(JackDriverInterface* slave)
+void JackDriver::AddSlave(JackDriverInterface* slave)
 {
     fSlaveList.push_back(slave);
 }
 
-void JackDriverClient::RemoveSlave(JackDriverInterface* slave)
+void JackDriver::RemoveSlave(JackDriverInterface* slave)
 {
     fSlaveList.remove(slave);
 }
 
-int JackDriverClient::ProcessSlaves()
+int JackDriver::ProcessSlaves()
 {
     int res = 0;
     list<JackDriverInterface*>::const_iterator it;

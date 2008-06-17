@@ -37,11 +37,11 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
     protected:
 
         JackThread fThread;
-        JackDriverClient* fDriver;
-
+        JackDriver* fDriver;
+        
     public:
 
-        JackThreadedDriver(JackDriverClient* driver);
+        JackThreadedDriver(JackDriver* driver);
         virtual ~JackThreadedDriver();
 
         virtual int Open();
@@ -56,7 +56,6 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
                          const char* playback_driver_name,
                          jack_nframes_t capture_latency,
                          jack_nframes_t playback_latency);
-    
         virtual int Close();
   
         virtual int Process();
@@ -75,15 +74,13 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         virtual int SetSampleRate(jack_nframes_t sample_rate);
      
         virtual void SetMaster(bool onoff);
-        virtual bool GetMaster();
+        virtual  bool GetMaster();
         virtual void AddSlave(JackDriverInterface* slave);
         virtual void RemoveSlave(JackDriverInterface* slave);
         virtual int ProcessSlaves();
-    
+        
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
-     
         virtual JackClientControl* GetClientControl() const;
-      
         virtual bool IsRealTime() const;
    
         // JackRunnableInterface interface

@@ -34,11 +34,11 @@ class EXPORT JackWaitThreadedDriver : public JackThreadedDriver
         struct EXPORT JackDriverStarter : public JackRunnableInterface 
         {
         
-                JackDriverClient* fDriver;
+                JackDriver* fDriver;
                 JackThread fThread;
                 bool fRunning;
                 
-                JackDriverStarter(JackDriverClient* driver)
+                JackDriverStarter(JackDriver* driver)
                     :fDriver(driver),fThread(this),fRunning(false)
                 {}
                 
@@ -68,7 +68,7 @@ class EXPORT JackWaitThreadedDriver : public JackThreadedDriver
                 
     public:
 
-        JackWaitThreadedDriver(JackDriverClient* netdriver)
+        JackWaitThreadedDriver(JackDriver* netdriver)
             :JackThreadedDriver(netdriver),fStarter(netdriver)
         {}
         virtual ~JackWaitThreadedDriver()
