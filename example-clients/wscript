@@ -58,7 +58,8 @@ def build(bld):
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack', '../common']
         prog.source = example_program_source
-        prog.uselib = 'RT'
+        if bld.env()['IS_LINUX']:
+            prog.uselib = 'RT'
         prog.uselib_local = 'clientlib'
         prog.target = example_program
 
@@ -66,7 +67,10 @@ def build(bld):
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack', '../common']
         prog.source = 'transport.c'
-        prog.uselib = 'RT READLINE NCURSES'
+        if bld.env()['IS_LINUX']:
+            prog.uselib = 'RT READLINE NCURSES'
+        if bld.env()['IS_MACOSX']:
+	    prog.uselib = 'READLINE NCURSES'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
@@ -74,7 +78,10 @@ def build(bld):
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack', '../common']
         prog.source = 'capture_client.c'
-        prog.uselib = 'RT SNDFILE'
+        if bld.env()['IS_LINUX']:
+            prog.uselib = 'RT SNDFILE'
+        if bld.env()['IS_MACOSX']:
+            prog.uselib = 'SNDFILE'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_rec'
 
@@ -84,6 +91,7 @@ def build(bld):
         lib.includes = ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
+        lib.uselib_local = 'clientlib'
         lib.inst_var = bld.env()['ADDON_DIR']
         lib.inst_dir = '/'
 

@@ -133,7 +133,8 @@ def build(bld):
     serverlib.vnum = bld.env()['JACK_API_VERSION']
     serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     if bld.env()['IS_MACOSX']:
-        serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib")
+        serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+        serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
 
     clientlib = bld.create_obj('cpp', 'shlib')
     clientlib.features.append('cc')
@@ -166,7 +167,8 @@ def build(bld):
     clientlib.vnum = bld.env()['JACK_API_VERSION']
     clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     if bld.env()['IS_MACOSX']:
-        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib")
+        clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
 
     netmanagerlib = bld.create_obj('cpp', 'shlib')
     netmanagerlib.env['shlib_PATTERN'] = '%s.so'

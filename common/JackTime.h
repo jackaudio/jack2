@@ -37,14 +37,16 @@ extern "C"
 
     extern EXPORT double __jack_time_ratio;
 
-    static inline jack_time_t GetMicroSeconds(void) {
+    static inline jack_time_t GetMicroSeconds(void) 
+    {
         return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
     }
 
     /* This should only be called ONCE per process. */
     extern void InitTime();
 
-    static inline void JackSleep(int usec) {
+    static inline void JackSleep(int usec) 
+    {
         usleep(usec);
     }
 
@@ -58,7 +60,8 @@ extern "C"
 
     extern void InitTime();
 
-    static void JackSleep(int usec) {
+    static void JackSleep(int usec) 
+    {
         Sleep(usec / 1000);
     }
 
@@ -68,7 +71,8 @@ extern "C"
 
 #include <unistd.h>
 
-    static inline void JackSleep(long usec) {
+    static inline void JackSleep(long usec) 
+    {
         usleep(usec);
     }
 
@@ -77,13 +81,15 @@ extern "C"
     extern jack_time_t __jack_cpu_mhz;
     extern jack_time_t GetMhz();
     extern void InitTime();
-    static inline jack_time_t GetMicroSeconds(void) {
+    static inline jack_time_t GetMicroSeconds(void) 
+    {
         return get_cycles() / __jack_cpu_mhz;
     }
 #else
 #include <time.h>
     extern void InitTime();
-    static inline jack_time_t GetMicroSeconds(void) {
+    static inline jack_time_t GetMicroSeconds(void) 
+    {
         struct timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
         return (jack_time_t)ts.tv_sec * 1000000 + ts.tv_nsec / 1000;

@@ -13,9 +13,10 @@ def build(bld):
     for test_program, test_program_sources in test_programs.items():
         prog = bld.create_obj('cpp', 'program')
         prog.features.append('cc')
-        prog.includes = ['../common/jack', '../common']
+        prog.includes = ['../macosx', '../common/jack', '../common']
         prog.source = test_program_sources
-        prog.uselib = 'RT'
+        if bld.env()['IS_LINUX']:
+            prog.uselib = 'RT'
         prog.uselib_local = 'clientlib'
         prog.target = test_program
         if test_program != 'jack_test':
