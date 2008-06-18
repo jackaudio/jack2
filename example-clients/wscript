@@ -62,7 +62,8 @@ def build(bld):
         prog.source = example_program_source
         if bld.env()['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT'
         prog.uselib_local = 'clientlib'
@@ -75,7 +76,8 @@ def build(bld):
         prog.source = 'transport.c'
         if bld.env()['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT READLINE NCURSES'
         if bld.env()['IS_MACOSX']:
@@ -89,7 +91,8 @@ def build(bld):
         prog.source = 'capture_client.c'
         if bld.env()['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT SNDFILE'
         if bld.env()['IS_MACOSX']:
@@ -105,7 +108,8 @@ def build(bld):
         lib.source = example_lib_source
 	if bld.env()['IS_MACOSX']:
             lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-            lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+            lib.env.append_value("LINKFLAGS", "")
         lib.uselib_local = 'clientlib'
         lib.inst_var = bld.env()['ADDON_DIR']
         lib.inst_dir = '/'

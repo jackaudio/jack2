@@ -48,6 +48,14 @@ char * __cxa_demangle(const char * __mangled_name, char * __output_buffer, size_
 # define REGFORMAT "%x"
 #endif
 
+#ifdef __APPLE__
+
+// TODO : does not compile yet on OSX
+static void signal_segv(int signum, siginfo_t* info, void*ptr) 
+{}
+
+#else
+
 static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
 
@@ -145,6 +153,8 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     jack_error("End of stack trace");
     exit (-1);
 }
+
+#endif
 
 int setup_sigsegv() {
     struct sigaction action;

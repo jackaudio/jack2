@@ -80,7 +80,10 @@ def build(bld):
         'xml_write_raw.c',
         'sigsegv.c',
         ]
-    obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'
+    if bld.env()['IS_LINUX']:
+        obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'
+    if bld.env()['IS_MACOSX']:
+        obj.uselib = 'PTHREAD DL DBUS-1 EXPAT'
     obj.uselib_local = 'serverlib'
     obj.target       = 'jackdbus'
 

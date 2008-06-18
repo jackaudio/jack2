@@ -132,6 +132,8 @@ def build(bld):
         bld.add_subdirs('macosx')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
+        if bld.env()['BUILD_JACKDBUS'] == True:
+            bld.add_subdirs('linux/dbus')
 
     if bld.env()['BUILD_DOXYGEN_DOCS'] == True:
         share_dir = Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
