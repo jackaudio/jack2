@@ -45,5 +45,7 @@ def build(bld):
 
     create_jack_audio_driver_obj(bld, 'coreaudio', 'JackCoreAudioDriver.cpp')
 
+    #create_jack_audio_driver_obj(bld, 'portaudio', '../windows/JackPortAudioDriver.cpp')
+
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 
