@@ -16,6 +16,22 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
         driver.uselib = uselib
     return driver
 
+def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
+    driver = bld.create_obj('cpp', 'shlib')
+    driver.features.append('cc')
+    driver.env['shlib_PATTERN'] = 'jack_%s.so'
+    driver.defines = 'HAVE_CONFIG_H'
+    driver.includes = ['.', '../common', '../common/jack']
+    driver.target = target
+    driver.source = sources
+    driver.inst_var = bld.env()['ADDON_DIR']
+    driver.inst_dir = '/'
+    driver.uselib_local = 'serverlib'
+    driver.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreServices -framework AudioUnit")
+    if uselib:
+        driver.uselib = uselib
+    return driver
+
 def build(bld):
     jackd = bld.create_obj('cpp', 'program')
     jackd.includes = ['.', '../common/jack', '../common']
@@ -27,7 +43,7 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 
-    #create_jack_driver_obj(bld, 'coreaudio', 'JackCoreAudioDriver.cpp', )
+    create_jack_audio_driver_obj(bld, 'coreaudio', 'JackCoreAudioDriver.cpp')
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 
