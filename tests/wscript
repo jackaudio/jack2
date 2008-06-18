@@ -17,6 +17,9 @@ def build(bld):
         prog.source = test_program_sources
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT'
+        if bld.env()['IS_MACOSX']:
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
         prog.uselib_local = 'clientlib'
         prog.target = test_program
         if test_program != 'jack_test':

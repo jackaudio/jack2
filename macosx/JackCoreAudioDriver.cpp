@@ -35,20 +35,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-static void PrintStreamDesc(AudioStreamBasicDescription *inDesc)
-{
-    jack_log("- - - - - - - - - - - - - - - - - - - -");
-    jack_log("  Sample Rate:%f", inDesc->mSampleRate);
-    jack_log("  Format ID:%.*s", (int) sizeof(inDesc->mFormatID), (char*)&inDesc->mFormatID);
-    jack_log("  Format Flags:%lX", inDesc->mFormatFlags);
-    jack_log("  Bytes per Packet:%ld", inDesc->mBytesPerPacket);
-    jack_log("  Frames per Packet:%ld", inDesc->mFramesPerPacket);
-    jack_log("  Bytes per Frame:%ld", inDesc->mBytesPerFrame);
-    jack_log("  Channels per Frame:%ld", inDesc->mChannelsPerFrame);
-    jack_log("  Bits per Channel:%ld", inDesc->mBitsPerChannel);
-    jack_log("- - - - - - - - - - - - - - - - - - - -");
-}
-
 static void printError(OSStatus err)
 {
     switch (err) {
@@ -215,7 +201,11 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
     AudioDeviceStop(driver->fDeviceID, MeasureCallback);
+#ifdef MAC_OS_X_VERSION_10_5
+    AudioDeviceDestroyIOProcID(driver->fDeviceID, driver->fMesureCallbackID);
+#else
     AudioDeviceRemoveIOProc(driver->fDeviceID, MeasureCallback);
+#endif
     jack_log("JackCoreAudioDriver::MeasureCallback called");
     JackMachThread::GetParams(&driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
     // Setup threadded based log function
@@ -868,7 +858,11 @@ int JackCoreAudioDriver::AddListeners()
 
 void JackCoreAudioDriver::RemoveListeners()
 {
+#ifdef MAC_OS_X_VERSION_10_5
+    AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
+#else
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
+#endif
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
@@ -1068,8 +1062,11 @@ int JackCoreAudioDriver::Start()
 {
     jack_log("JackCoreAudioDriver::Start");
     JackAudioDriver::Start();
-
+#ifdef MAC_OS_X_VERSION_10_5
+    OSStatus err = AudioDeviceCreateIOProcID(fDeviceID, MeasureCallback, this, &fMesureCallbackID);
+#else
     OSStatus err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
+#endif
     if (err != noErr)
         return -1;
 
@@ -1090,7 +1087,11 @@ int JackCoreAudioDriver::Stop()
 {
     jack_log("JackCoreAudioDriver::Stop");
     AudioDeviceStop(fDeviceID, MeasureCallback);
+#ifdef MAC_OS_X_VERSION_10_5
+    AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
+#else
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
+#endif
     return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
 }
 

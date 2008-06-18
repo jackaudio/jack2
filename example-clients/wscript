@@ -54,19 +54,28 @@ def configure(conf):
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
 def build(bld):
+
+   
     for example_program, example_program_source in example_programs.items():
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack', '../common']
         prog.source = example_program_source
+        if bld.env()['IS_MACOSX']:
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT'
         prog.uselib_local = 'clientlib'
         prog.target = example_program
-
-    if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
+   
+    #if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT']
+    if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True and bld.env()['IS_LINUX'] == True:
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack', '../common']
         prog.source = 'transport.c'
+        if bld.env()['IS_MACOSX']:
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT READLINE NCURSES'
         if bld.env()['IS_MACOSX']:
@@ -78,6 +87,9 @@ def build(bld):
         prog = bld.create_obj('cc', 'program')
         prog.includes = ['../common/jack', '../common']
         prog.source = 'capture_client.c'
+        if bld.env()['IS_MACOSX']:
+            prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+            prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT SNDFILE'
         if bld.env()['IS_MACOSX']:
@@ -91,6 +103,9 @@ def build(bld):
         lib.includes = ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
+	if bld.env()['IS_MACOSX']:
+            lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+            lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
         lib.uselib_local = 'clientlib'
         lib.inst_var = bld.env()['ADDON_DIR']
         lib.inst_dir = '/'
