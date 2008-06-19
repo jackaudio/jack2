@@ -101,7 +101,6 @@ bool JackPosixSemaphore::Wait()
     return (res == 0);
 }
 
-
 #if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) // glibc feature test
 
 bool JackPosixSemaphore::TimedWait(long usec) 
@@ -117,9 +116,7 @@ bool JackPosixSemaphore::TimedWait(long usec)
 	gettimeofday(&now, 0);
 	time.tv_sec = now.tv_sec + usec / 1000000;
     long tv_usec = (now.tv_usec + (usec % 1000000));
-
     time.tv_sec += tv_usec / 1000000;
-
     time.tv_nsec = (tv_usec % 1000000) * 1000;
 
     if ((res = sem_timedwait(fSemaphore, &time)) != 0) {
