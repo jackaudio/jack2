@@ -973,9 +973,9 @@ int JackCoreAudioDriver::Attach()
             snprintf(alias, sizeof(alias) - 1, "%s:%s:out%u", fAliasName, fCaptureDriverName, i + 1);
         }
 
-        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl->fName, i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("Cannot register port for %s", name);
             return -1;
         }
@@ -1012,9 +1012,9 @@ int JackCoreAudioDriver::Attach()
             snprintf(alias, sizeof(alias) - 1, "%s:%s:in%u", fAliasName, fPlaybackDriverName, i + 1);
         }
 
-        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl->fName, i + 1);
+        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("Cannot register port for %s", name);
             return -1;
         }
@@ -1039,7 +1039,7 @@ int JackCoreAudioDriver::Attach()
         if (fWithMonitorPorts) {
             jack_log("Create monitor port ");
             snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fAliasName, fPlaybackDriverName, i + 1);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
+            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {

@@ -324,8 +324,8 @@ namespace Jack
 		for ( int port_index = 0; port_index < fCaptureChannels; port_index++ )
 		{
 			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:capture_%d", fClientControl->fName, port_index + 1 );
-			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
+			snprintf ( name, sizeof ( name ) - 1, "%s:capture_%d", fClientControl.fName, port_index + 1 );
+			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
 				jack_error ( "driver: cannot register port for %s", name );
@@ -341,8 +341,8 @@ namespace Jack
 		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
 		{
 			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:playback_%d",fClientControl->fName, port_index + 1 );
-			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
+			snprintf ( name, sizeof ( name ) - 1, "%s:playback_%d",fClientControl.fName, port_index + 1 );
+			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
 				jack_error ( "driver: cannot register port for %s", name );
@@ -359,8 +359,8 @@ namespace Jack
 		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 		{
 			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:midi_capture_%d", fClientControl->fName, port_index + 1 );
-			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl->fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
+			snprintf ( name, sizeof ( name ) - 1, "%s:midi_capture_%d", fClientControl.fName, port_index + 1 );
+			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
 				jack_error ( "driver: cannot register port for %s", name );
@@ -374,8 +374,8 @@ namespace Jack
 		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 		{
 			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:midi_playback_%d", fClientControl->fName, port_index + 1 );
-			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl->fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
+			snprintf ( name, sizeof ( name ) - 1, "%s:midi_playback_%d", fClientControl.fName, port_index + 1 );
+			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
 				jack_error ( "driver: cannot register port for %s", name );
@@ -392,13 +392,13 @@ namespace Jack
 	{
 		jack_log ( "JackNetDriver::FreePorts" );
 		for ( int port_index = 0; port_index < fCaptureChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl->fRefNum, fCapturePortList[port_index] );
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[port_index] );
 		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl->fRefNum, fPlaybackPortList[port_index] );
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[port_index] );
 		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl->fRefNum, fMidiCapturePortList[port_index] );
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[port_index] );
 		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl->fRefNum, fMidiPlaybackPortList[port_index] );
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[port_index] );
 		return 0;
 	}
 

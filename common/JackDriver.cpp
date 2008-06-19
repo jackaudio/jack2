@@ -44,10 +44,10 @@ namespace Jack
 {
 
 JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+    :fClientControl(name)
 {
     assert(strlen(name) < JACK_CLIENT_NAME_SIZE);
     fSynchroTable = table;
-    fClientControl = new JackClientControl(name);
     strcpy(fAliasName, alias);
     fEngine = engine;
     fGraphManager = NULL;
@@ -59,7 +59,6 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
 JackDriver::JackDriver()
 {
     fSynchroTable = NULL;
-    fClientControl = NULL;
     fEngine = NULL;
     fGraphManager = NULL;
     fBeginDateUst = 0;
@@ -69,22 +68,21 @@ JackDriver::JackDriver()
 JackDriver::~JackDriver()
 {
     jack_log("~JackDriver");
-    delete fClientControl;
 }
 
 int JackDriver::Open()
 {
     int refnum = -1;
 
-    if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
+    if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for audio driver");
         return -1;
     }
 
-    fClientControl->fRefNum = refnum;
-    fClientControl->fActive = true;
-    fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
-    SetupDriverSync(fClientControl->fRefNum, false);
+    fClientControl.fRefNum = refnum;
+    fClientControl.fActive = true;
+    fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
+    SetupDriverSync(fClientControl.fRefNum, false);
     return 0;
 }
 
@@ -104,13 +102,13 @@ int JackDriver::Open(jack_nframes_t nframes,
     jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
     int refnum = -1;
 
-    if (fEngine->ClientInternalOpen(fClientControl->fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
+    if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for audio driver");
         return -1;
     }
 
-    fClientControl->fRefNum = refnum;
-    fClientControl->fActive = true;
+    fClientControl.fRefNum = refnum;
+    fClientControl.fActive = true;
     fEngineControl->fBufferSize = nframes;
     fEngineControl->fSampleRate = samplerate;
     fCaptureLatency = capture_latency;
@@ -127,17 +125,17 @@ int JackDriver::Open(jack_nframes_t nframes,
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
 
     fGraphManager->SetBufferSize(nframes);
-    fGraphManager->DirectConnect(fClientControl->fRefNum, fClientControl->fRefNum); // Connect driver to itself for "sync" mode
-    SetupDriverSync(fClientControl->fRefNum, false);
+    fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
+    SetupDriverSync(fClientControl.fRefNum, false);
     return 0;
 }
 
 int JackDriver::Close()
 {
     jack_log("JackDriver::Close");
-    fGraphManager->DirectDisconnect(fClientControl->fRefNum, fClientControl->fRefNum); // Disconnect driver from itself for sync
-    fClientControl->fActive = false;
-    return fEngine->ClientInternalClose(fClientControl->fRefNum, false);
+    fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
+    fClientControl.fActive = false;
+    return fEngine->ClientInternalClose(fClientControl.fRefNum, false);
 }
 
 /*!
@@ -162,12 +160,12 @@ int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync,
 
         case kStartFreewheelCallback:
             jack_log("JackDriver::kStartFreewheel");
-            SetupDriverSync(fClientControl->fRefNum, true);
+            SetupDriverSync(fClientControl.fRefNum, true);
             break;
 
         case kStopFreewheelCallback:
             jack_log("JackDriver::kStopFreewheel");
-            SetupDriverSync(fClientControl->fRefNum, false);
+            SetupDriverSync(fClientControl.fRefNum, false);
             break;
     }
 
@@ -197,7 +195,7 @@ void JackDriver::CycleTakeEndTime()
 
 JackClientControl* JackDriver::GetClientControl() const
 {
-    return fClientControl;
+    return (JackClientControl*)&fClientControl;
 }
 
 void JackDriver::NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)

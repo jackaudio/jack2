@@ -730,14 +730,14 @@ int JackFreebobDriver::Attach()
     for (unsigned int i = 0; i < driver->capture_nchannels; i++) {
 
         freebob_streaming_get_capture_stream_name(driver->dev, i, portname, sizeof(portname) - 1);
-        snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl->fName, portname);
+        snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
 
         if (freebob_streaming_get_capture_stream_type(driver->dev, i) != freebob_stream_type_audio) {
             printMessage ("Don't register capture port %s", buf);
         } else {
             printMessage ("Registering capture port %s", buf);
 
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
+            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               (JackPortFlags)port_flags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
@@ -761,13 +761,13 @@ int JackFreebobDriver::Attach()
     for (unsigned int i = 0; i < driver->playback_nchannels; i++) {
 
         freebob_streaming_get_playback_stream_name(driver->dev, i, portname, sizeof(portname) - 1);
-        snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl->fName, portname);
+        snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
 
         if (freebob_streaming_get_playback_stream_type(driver->dev, i) != freebob_stream_type_audio) {
             printMessage ("Don't register playback port %s", buf);
         } else {
             printMessage ("Registering playback port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, buf,
+            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               (JackPortFlags)port_flags,
                               fEngineControl->fBufferSize)) == NO_PORT) {

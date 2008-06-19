@@ -25,6 +25,7 @@
 #include "JackClientInterface.h"
 #include "JackConstants.h"
 #include "JackPlatformSynchro.h"
+#include "JackClientControl.h"
 #include <list>
 
 namespace Jack
@@ -33,7 +34,6 @@ namespace Jack
 class JackLockedEngine;
 class JackGraphManager;
 struct JackEngineControl;
-struct JackClientControl;
     
 /*!
 \brief The base interface for drivers.
@@ -114,7 +114,7 @@ class EXPORT JackDriver : public JackDriverClientInterface
         JackGraphManager* fGraphManager;
         JackSynchro* fSynchroTable;
         JackEngineControl* fEngineControl;
-        JackClientControl* fClientControl;
+        JackClientControl fClientControl;
         std::list<JackDriverInterface*> fSlaveList;
         bool fIsMaster;
            

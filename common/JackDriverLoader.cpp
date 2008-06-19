@@ -35,6 +35,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "JackError.h"
 #include <getopt.h>
+#include <stdio.h>
 
 #ifndef WIN32
 #include <dirent.h>

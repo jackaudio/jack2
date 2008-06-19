@@ -22,8 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackDriverLoader__
 
 #include "driver_interface.h"
-#include "JackDriver.h"
 #include "control_types.h"
+#include "JackPlatformSynchro.h"
 #include "jslist.h"
 
 #ifdef WIN32
@@ -44,12 +44,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif
 
+namespace Jack
+{
+    class JackDriverClientInterface;
+    class JackLockedEngine;
+};
+
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
-typedef Jack::JackDriverClientInterface* (*initialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList *);
+typedef Jack::JackDriverClientInterface* (*initialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
 
 typedef struct _jack_driver_info
 {
-    Jack::JackDriverClientInterface* (*initialize)(Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList *);
+    Jack::JackDriverClientInterface* (*initialize)(Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
     DRIVER_HANDLE handle;
 }
 jack_driver_info_t;
@@ -59,7 +65,7 @@ jack_driver_desc_t * jack_drivers_get_descriptor (JSList * drivers, const char *
 JSList * jack_drivers_load (JSList * drivers);
 jack_driver_info_t * jack_load_driver (jack_driver_desc_t * driver_desc);
 int jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
-EXPORT int jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[]);
+EXPORT int jackctl_parse_driver_params (jackctl_driver * driver_ptr, int argc, char* argv[]);
 
 #endif
 

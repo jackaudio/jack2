@@ -39,15 +39,15 @@ int JackFreewheelDriver::Process()
         jack_log("JackFreewheelDriver::Process master %lld", fEngineControl->fTimeOutUsecs);
         JackDriver::CycleTakeBeginTime();
         fEngine->Process(fBeginDateUst, fEndDateUst);
-        fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
-        if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, FREEWHEEL_DRIVER_TIMEOUT * 1000000) < 0) { // Wait for all clients to finish for 10 sec
+        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable); // Signal all clients
+        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, FREEWHEEL_DRIVER_TIMEOUT * 1000000) < 0) { // Wait for all clients to finish for 10 sec
             jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
             return -1;
         }
     } else {
-        fGraphManager->ResumeRefNum(fClientControl, fSynchroTable); // Signal all clients
+        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable); // Signal all clients
         if (fEngineControl->fSyncMode) {
-            if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) {
+            if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) {
                 jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
                 return -1;
             }

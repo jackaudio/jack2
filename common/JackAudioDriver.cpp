@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2008 GramefClientControl.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTime.h"
 #include "JackError.h"
 #include "JackEngineControl.h"
-#include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackLockedEngine.h"
@@ -100,8 +99,8 @@ int JackAudioDriver::Attach()
 
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl->fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
+        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
@@ -116,8 +115,8 @@ int JackAudioDriver::Attach()
 
     for (i = 0; i < fPlaybackChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
-        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl->fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
+        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
@@ -132,7 +131,7 @@ int JackAudioDriver::Attach()
         if (fWithMonitorPorts) {
             jack_log("Create monitor port ");
             snprintf(name, sizeof(name) - 1, "%s:%s:monitor_%u", fAliasName, fPlaybackDriverName, i + 1);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl->fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
+            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
@@ -152,13 +151,13 @@ int JackAudioDriver::Detach()
     jack_log("JackAudioDriver::Detach");
 
     for (i = 0; i < fCaptureChannels; i++) {
-        fGraphManager->ReleasePort(fClientControl->fRefNum, fCapturePortList[i]);
+        fGraphManager->ReleasePort(fClientControl.fRefNum, fCapturePortList[i]);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
-        fGraphManager->ReleasePort(fClientControl->fRefNum, fPlaybackPortList[i]);
+        fGraphManager->ReleasePort(fClientControl.fRefNum, fPlaybackPortList[i]);
         if (fWithMonitorPorts)
-            fGraphManager->ReleasePort(fClientControl->fRefNum, fMonitorPortList[i]);
+            fGraphManager->ReleasePort(fClientControl.fRefNum, fMonitorPortList[i]);
     }
 
     return 0;
@@ -191,7 +190,7 @@ int JackAudioDriver::ProcessNull()
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
     if (!fEngine->Process(fBeginDateUst, fEndDateUst)) 
         jack_error("JackAudioDriver::ProcessNull Process error");
-    fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+    fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     if (ProcessSlaves() < 0)
         jack_error("JackAudioDriver::ProcessNull ProcessSlaves error");
         
@@ -228,11 +227,11 @@ int JackAudioDriver::ProcessAsync()
         // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
         if (!fEngine->Process(fBeginDateUst, fEndDateUst)) 
             jack_error("JackAudioDriver::ProcessAsync Process error");
-        fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
         if (ProcessSlaves() < 0)
             jack_error("JackAudioDriver::ProcessAsync ProcessSlaves error");
     } else {
-        fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     }
     
     // Keep end cycle time
@@ -257,10 +256,10 @@ int JackAudioDriver::ProcessSync()
 
         // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
         if (fEngine->Process(fBeginDateUst, fEndDateUst)) { 
-            fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+            fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
             if (ProcessSlaves() < 0)
                 jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
-            if (fGraphManager->SuspendRefNum(fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0)
+            if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0)
                 jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
         } else { // Graph not finished: do not activate it
             jack_error("ProcessSync: error");
@@ -273,7 +272,7 @@ int JackAudioDriver::ProcessSync()
         }
         
     } else {
-        fGraphManager->ResumeRefNum(fClientControl, fSynchroTable);
+        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     }
     
     // Keep end cycle time

@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-06-19 Stephane Letz  <letz@grame.fr>
+
+	* Embed JackEngineControl in JackDriver (starting from Tim Blechmann idea).
+
 2008-06-18 Stephane Letz  <letz@grame.fr>
 
 	* On OSX waf now compiles Universal Binaries.
