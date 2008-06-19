@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -33,7 +33,7 @@ namespace Jack
 
 void JackPosixSemaphore::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "%s/jack_sem.%s_%s", jack_client_dir, server_name, name);
+    sprintf(res, "jack_sem.%s_%s", server_name, name);
 }
 
 bool JackPosixSemaphore::Signal()
@@ -77,10 +77,10 @@ bool JackPosixSemaphore::Wait()
 {
     int res;
 
-	if (!fSemaphore) {
-		jack_error("JackPosixSemaphore::Wait name = %s already desallocated!!", fName);
-		return false;
-	}
+    if (!fSemaphore) {
+        jack_error("JackPosixSemaphore::Wait name = %s already desallocated!!", fName);
+        return false;
+    }
 
     if ((res = sem_wait(fSemaphore)) != 0) {
         jack_error("JackPosixSemaphore::Wait name = %s err = %s", fName, strerror(errno));
@@ -124,9 +124,9 @@ bool JackPosixSemaphore::TimedWait(long usec)
 
     if ((res = sem_timedwait(fSemaphore, &time)) != 0) {
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
-		jack_log("now %ld %ld ", now.tv_sec, now.tv_usec);
-		jack_log("next %ld %ld ", time.tv_sec, time.tv_nsec/1000);
-	}
+        jack_log("now %ld %ld ", now.tv_sec, now.tv_usec);
+        jack_log("next %ld %ld ", time.tv_sec, time.tv_nsec/1000);
+    }
     return (res == 0);
 }
 
