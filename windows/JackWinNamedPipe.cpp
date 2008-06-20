@@ -24,6 +24,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackWinNamedPipe.h"
 #include "JackError.h"
 #include <assert.h>
+#include <stdio.h>
 
 #define BUFSIZE 4096
 

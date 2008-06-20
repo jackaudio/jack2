@@ -40,7 +40,7 @@ class EXPORT JackGraphManager : public JackShmMem, public JackAtomicState<JackCo
 
     private:
 
-	JackPort fPortArray[PORT_NUM];
+		JackPort fPortArray[PORT_NUM];
         JackClientTiming fClientTiming[CLIENT_NUM];
 
         jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);

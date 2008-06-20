@@ -23,6 +23,7 @@ This program is free software; you can redistribute it and/or modify
 
 #include "JackWinSemaphore.h"
 #include "JackError.h"
+#include <stdio.h>
 
 namespace Jack
 {
