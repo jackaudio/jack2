@@ -67,9 +67,9 @@ class JackInternalClient : public JackClient
 #define UnloadJackModule(handle) FreeLibrary((handle));
 #define GetJackProc(handle, name) GetProcAddress((handle), (name));
 
-static void BuildClientPath(char* path_to_so, const char* so_name)
+static void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 {
-    snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.dll", so_name);
+    snprintf(path_to_so, path_len, ADDON_DIR "/%s.dll", so_name);
 }
 
 static void PrintLoadError(const char* so_name) 
@@ -110,9 +110,9 @@ static void PrintLoadError(const char* so_name)
 #define GetJackProc(handle, name) dlsym((handle), (name));
 #define PrintLoadError(so_name) jack_log("error loading %s err = %s", so_name, dlerror());
 
-static void BuildClientPath(char* path_to_so, const char* so_name)
+static void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 {
-    snprintf(path_to_so, sizeof(path_to_so), ADDON_DIR "/%s.so", so_name);
+    snprintf(path_to_so, path_len, ADDON_DIR "/%s.so", so_name);
 }
 
 #endif
