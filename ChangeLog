@@ -24,6 +24,7 @@ Romain Moret
 2008-06-20 Stephane Letz  <letz@grame.fr>
 
 	* Add new jack_client_stop_thread and jack_client_kill_thread API.
+	* New generic BuildClientPath for internal clients loading.
 
 2008-06-19 Stephane Letz  <letz@grame.fr>
 
