@@ -157,6 +157,29 @@ int JackWinThread::Stop()
     }
 }
 
+int JackWinThread::KillImp(pthread_t thread)
+{
+    if (thread) { // If thread has been started
+        TerminateThread(thread, 0);
+        WaitForSingleObject(thread, INFINITE);
+        CloseHandle(thread);
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+int JackWinThread::StopImp(pthread_t thread)
+{
+    if (thread) { // If thread has been started
+        WaitForSingleObject(thread, INFINITE);
+        CloseHandle(thread);
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
 int JackWinThread::AcquireRealTime()
 {
     return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;

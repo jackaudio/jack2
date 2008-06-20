@@ -67,6 +67,8 @@ class EXPORT JackPosixThread : public detail::JackThread
         static int AcquireRealTimeImp(pthread_t thread, int priority);
         static int DropRealTimeImp(pthread_t thread);
         static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+        static int StopImp(pthread_t thread);
+        static int KillImp(pthread_t thread);
 
 };
 

@@ -222,6 +222,9 @@ extern "C"
                                           void *(*start_routine)(void*),
                                           void *arg);
     EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
+    
+    EXPORT int jack_client_stop_thread(jack_client_t* client, pthread_t thread);
+    EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread);
 
     EXPORT char * jack_get_internal_client_name (jack_client_t *client,
             jack_intclient_t intclient);
@@ -1610,6 +1613,24 @@ EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
     return JackWinThread::DropRealTimeImp(thread);
 #else
     return JackPosixThread::DropRealTimeImp(thread);
+#endif
+}
+
+EXPORT int jack_client_stop_thread(jack_client_t* client, pthread_t thread)
+{
+#ifdef WIN32
+    return JackWinThread::StopImp(thread);
+#else
+    return JackPosixThread::StopImp(thread);
+#endif
+}
+
+EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread)
+{
+#ifdef WIN32
+    return JackWinThread::KillImp(thread);
+#else
+    return JackPosixThread::KillImp(thread);
 #endif
 }
 

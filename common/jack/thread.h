@@ -83,6 +83,24 @@ extern "C"
      * @returns 0, if successful; otherwise an error number.
      */
     int jack_drop_real_time_scheduling (pthread_t thread);
+    
+    /**
+     * Stop the thread, waiting for the thread handler to terminate.
+     *
+     * @param thread POSIX thread ID.
+     *
+     * @returns 0, if successful; otherwise an error number.
+     */
+    int jack_client_stop_thread(jack_client_t* client, pthread_t thread);
+    
+    /**
+     * Cancel the thread then waits for the thread handler to terminate.
+     *
+     * @param thread POSIX thread ID.
+     *
+     * @returns 0, if successful; otherwise an error number.
+     */    
+     int jack_client_kill_thread(jack_client_t* client, pthread_t thread);
 
 #ifdef __cplusplus
 }

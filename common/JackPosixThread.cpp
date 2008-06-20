@@ -177,6 +177,31 @@ int JackPosixThread::Stop()
     }
 }
 
+int JackPosixThread::KillImp(pthread_t thread)
+{
+    if (thread != (pthread_t)NULL) { // If thread has been started
+        jack_log("JackPosixThread::Kill");
+        void* status;
+        pthread_cancel(thread);
+        pthread_join(thread, &status);
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
+int JackPosixThread::StopImp(pthread_t thread)
+{
+    if (thread != (pthread_t)NULL) { // If thread has been started
+        jack_log("JackPosixThread::Stop");
+        void* status;
+        pthread_join(thread, &status);
+        return 0;
+    } else {
+        return -1;
+    }
+}
+
 int JackPosixThread::AcquireRealTime()
 {
     return (fThread != (pthread_t)NULL) ? AcquireRealTimeImp(fThread, fPriority) : -1;
