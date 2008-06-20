@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackWinThread__
 
 #include "JackThread.h"
+#include "JackExports.h"
 #include <windows.h>
 
 namespace Jack
@@ -34,7 +35,7 @@ typedef DWORD  (WINAPI *ThreadCallback)(void *arg);
 \brief Windows threads.
 */
 
-class JackWinThread : public detail::JackThread
+class EXPORT JackWinThread : public detail::JackThread
 {
 
     private:

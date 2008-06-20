@@ -29,25 +29,22 @@ namespace Jack
 {
 
 static const JackPortType* port_types[] =
-    {
-        &gAudioPortType,
-        &gMidiPortType,
-    };
-
-enum
 {
-    PORT_TYPES_MAX = sizeof(port_types) / sizeof(port_types[0])
+    &gAudioPortType,
+    &gMidiPortType,
 };
+
+jack_port_type_id_t PORT_TYPES_MAX = sizeof(port_types) / sizeof(port_types[0]);
 
 jack_port_type_id_t GetPortTypeId(const char* port_type)
 {
-    for (int i = 0; i < PORT_TYPES_MAX; ++i) {
+    for (jack_port_type_id_t i = 0; i < PORT_TYPES_MAX; ++i) {
         const JackPortType* type = port_types[i];
         assert(type != 0);
         if (strcmp(port_type, type->name) == 0)
             return i;
     }
-    return -1;
+    return PORT_TYPES_MAX;
 }
 
 const JackPortType* GetPortType(jack_port_type_id_t type_id)

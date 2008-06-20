@@ -122,7 +122,7 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
 {
     va_list ap;
     va_start(ap, status);
-    jack_client_t* res =  jack_client_open_aux(ext_client_name, options, status, ap);
+    jack_client_t* res = jack_client_open_aux(ext_client_name, options, status, ap);
     va_end(ap);
     return res;
 }

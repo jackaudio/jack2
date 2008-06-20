@@ -823,7 +823,9 @@ struct JackInternalClientHandleResult : public JackResult
 struct JackInternalClientLoadRequest : public JackRequest
 {
 
+#ifndef MAX_PATH
 #define MAX_PATH 256
+#endif
 
     int fRefNum;
     char fName[JACK_CLIENT_NAME_SIZE + 1];

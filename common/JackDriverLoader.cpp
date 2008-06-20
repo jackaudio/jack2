@@ -238,7 +238,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
     unsigned long i;
     int opt;
     JSList * node_ptr;
-    jackctl_parameter_t * param;
+    jackctl_parameter_t * param = NULL;
     union jackctl_parameter_value value;
 
     if (argc <= 1) 

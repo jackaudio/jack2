@@ -75,7 +75,7 @@ int jack_midi_event_get(jack_midi_event_t *event, void* port_buffer, jack_nframe
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
     if (!buf || !buf->IsValid())
         return -EINVAL;
-    if (event_index < 0 || event_index >= buf->event_count)
+    if (event_index >= buf->event_count)
         return -ENOBUFS;
     JackMidiEvent* ev = &buf->events[event_index];
     event->time = ev->time;
@@ -107,7 +107,7 @@ jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t time
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
     if (!buf && !buf->IsValid())
         return 0;
-    if (time < 0 || time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time))
+    if (time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time))
         return 0;
     return buf->ReserveEvent(time, data_size);
 }
@@ -119,7 +119,7 @@ int jack_midi_event_write(void* port_buffer,
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
     if (!buf && !buf->IsValid())
         return -EINVAL;
-    if (time < 0 || time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time))
+    if (time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time))
         return -EINVAL;
     jack_midi_data_t* dest = buf->ReserveEvent(time, data_size);
     if (!dest)

@@ -65,7 +65,7 @@ class JackRunnableInterface
 namespace detail
 {
 
-class JackThread
+class EXPORT JackThread
 {
 
     public:

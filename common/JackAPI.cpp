@@ -1636,7 +1636,7 @@ EXPORT char* jack_get_internal_client_name(jack_client_t* ext_client, jack_intcl
     if (client == NULL) {
         jack_error("jack_get_internal_client_name called with a NULL client");
         return NULL;
-    } else if (intclient < 0 || intclient >= CLIENT_NUM) {
+    } else if (intclient >= CLIENT_NUM) {
         jack_error("jack_get_internal_client_name: incorrect client");
         return NULL;
     } else {
@@ -1710,7 +1710,7 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
     if (client == NULL) {
         jack_error("jack_internal_client_unload called with a NULL client");
         return (jack_status_t)(JackNoSuchClient | JackFailure);
-    } else if (intclient < 0 || intclient >= CLIENT_NUM) {
+    } else if (intclient >= CLIENT_NUM) {
         jack_error("jack_internal_client_unload: incorrect client");
         return (jack_status_t)(JackNoSuchClient | JackFailure);
     } else {
