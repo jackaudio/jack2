@@ -43,6 +43,8 @@ namespace Jack
 			JackResampler();
         	virtual ~JackResampler();
             
+            virtual void Reset();
+            
             virtual int ReadResample(float* buffer, unsigned int frames);
             virtual int WriteResample(float* buffer, unsigned int frames);
             

@@ -79,6 +79,8 @@ namespace Jack
              
             bool IsRunning() {return fRunning;}
             
+            virtual void Reset() {fRunning = false;}
+            
             virtual int Open();
             virtual int Close();
             

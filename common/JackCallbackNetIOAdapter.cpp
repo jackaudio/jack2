@@ -33,6 +33,7 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
 {
     JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
     float* buffer;
+    bool failure = false;
     int i;
     
     if (!adapter->fIOAdapter->IsRunning())
@@ -41,16 +42,34 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     // DLL
     adapter->fIOAdapter->SetCallbackTime(jack_get_time());
      
+    // Push/pull from ringbuffer
     for (i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
-        adapter->fCaptureRingBuffer[i]->Read(buffer, frames);
+        if (adapter->fCaptureRingBuffer[i]->Read(buffer, frames) == 0) 
+            failure = true;
     }
     
     for (i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
-        adapter->fPlaybackRingBuffer[i]->Write(buffer, frames);
+        if (adapter->fPlaybackRingBuffer[i]->Write(buffer, frames) == 0)
+            failure = true;
     }
      
+    // Reset all ringbuffers in case of failure
+    if (failure) {
+    
+        jack_error("JackCallbackNetIOAdapter::Process ringbuffer failure... reset");
+        
+        for (i = 0; i < adapter->fCaptureChannels; i++) {
+            adapter->fCaptureRingBuffer[i]->Reset();
+        }
+    
+        for (i = 0; i < adapter->fPlaybackChannels; i++) {
+           adapter->fPlaybackRingBuffer[i]->Reset();
+        }
+        
+        adapter->fIOAdapter->Reset();
+    }
     return 0;
 }
 
