@@ -26,8 +26,19 @@ using namespace std;
 namespace Jack
 {
 
-int JackNetAudioAdapter::Process()
+int JackNetAudioAdapter::Process(jack_nframes_t frames, void* arg)
 {
+    JackNetAudioAdapter* adapter = static_cast<JackNetAudioAdapter*>(arg);
+    int i;
+    
+    for (i = 0; i < adapter->fCaptureChannels; i++) {
+        float* buffer = static_cast<float*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
+    }
+    
+    for (i = 0; i < adapter->fPlaybackChannels; i++) {
+        float* buffer = static_cast<float*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
+    }
+     
     return 0;
 }
 
@@ -46,16 +57,20 @@ JackNetAudioAdapter::JackNetAudioAdapter(jack_client_t* jack_client)
         sprintf(name, "in_%d", i+1);
         if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL) 
             goto fail;
-   }
+    }
     
     for (i = 0; i < fPlaybackChannels; i++) {
         sprintf(name, "out_%d", i+1);
         if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)) == NULL) 
             goto fail;
     }
+          
+    if (jack_set_process_callback(fJackClient, Process, this) < 0)
+        goto fail;
     
     if (jack_activate(fJackClient) < 0)
         goto fail;
+       
     return;
         
 fail:
@@ -83,8 +98,6 @@ void JackNetAudioAdapter::FreePorts()
     delete[] fPlaybackPortList;
 }
 
-
-
 } //namespace
 
 static Jack::JackNetAudioAdapter* adapter = NULL;
@@ -93,6 +106,7 @@ static Jack::JackNetAudioAdapter* adapter = NULL;
 extern "C"
 {
 #endif
+
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
 		if (adapter) {
@@ -113,6 +127,7 @@ extern "C"
 			adapter = NULL;
 		}
 	}
+    
 #ifdef __cplusplus
 }
 #endif

@@ -39,7 +39,7 @@ namespace Jack
 			jack_client_t* fJackClient;
 			const char* fClientName;
       
-            static int Process();
+            static int Process(jack_nframes_t, void* arg);
             
             void FreePorts();
             
