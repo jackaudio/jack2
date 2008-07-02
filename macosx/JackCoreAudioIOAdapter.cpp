@@ -166,7 +166,12 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
         adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames); 
     }
-   
+    
+#ifdef DEBUG    
+    adapter->fTable.Write(time1, time2, src_ratio_input, src_ratio_output, 
+         adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
+#endif
+  
     return noErr;
 }
 
@@ -563,6 +568,9 @@ error:
 
 int JackCoreAudioIOAdapter::Close()
 {
+#ifdef DEBUG    
+    fTable.Save();
+#endif
     AudioOutputUnitStop(fAUHAL);
     DisposeBuffers();
     CloseAUHAL();

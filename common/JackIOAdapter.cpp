@@ -38,7 +38,7 @@ void MeasureTable::Write(int time1, int time2, float r1, float r2, int pos1, int
                 
 void MeasureTable::Save()
 {
-	FILE* file = fopen("JackAlsaIOAdapter.log", "w");
+	FILE* file = fopen("JackIOAdapter.log", "w");
 
 	for (int i = 1; i < TABLE_MAX; i++) {
 		fprintf(file, "%d \t %d \t %d  \t %f \t %f \t %d \t %d \n", 

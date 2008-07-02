@@ -36,7 +36,9 @@ int JackAlsaIOAdapter::Open()
 
 int JackAlsaIOAdapter::Close()
 {
+#ifdef DEBUG
     fTable.Save();
+#endif
     fThread.Stop();
     return fAudioInterface.close();
 }
@@ -97,8 +99,10 @@ bool JackAlsaIOAdapter::Execute()
         fPlaybackRingBuffer[i]->ReadResample(fAudioInterface.fOutputSoftChannels[i], fBufferSize); 
     }
 
+#ifdef DEBUG
     fTable.Write(time1, time2, src_ratio_input, src_ratio_output, 
-	fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
+        fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
+#endif
         
     if (fAudioInterface.write() < 0)
         return false;
