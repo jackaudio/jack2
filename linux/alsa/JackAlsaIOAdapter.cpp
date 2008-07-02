@@ -22,20 +22,38 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-            
 int JackAlsaIOAdapter::Open()
 {
-    return 0;
+    if (fAudioInterface.open() == 0) {
+        fAudioInterface.longinfo();
+        fAudioInterface.write();
+        fAudioInterface.write();
+        fThread.AcquireRealTime();
+        fThread.StartSync();
+        return 0;
+    } else {
+        return -1;
+    }
 }
+
 int JackAlsaIOAdapter::Close()
 {
-    return 0;
+    fThread.Stop();
+    return fAudioInterface.close();
 }
             
+bool JackAlsaIOAdapter:Execute()
+{
+    if (fAudioInterface.read()) < 0)
+        return false;
+    if (fAudioInterface.write()) < 0)
+        return false;
+}
+
 int JackAlsaIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
 {
     return 0;
 }
-           
 
+        
 }
