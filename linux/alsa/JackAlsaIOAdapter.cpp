@@ -59,7 +59,7 @@ bool JackAlsaIOAdapter::Execute()
     ResampleFactor(time1, time2);
   
     for (int i = 0; i < fCaptureChannels; i++) {
-         fCaptureRingBuffer[i]->SetRatio(time1, time2);
+        fCaptureRingBuffer[i]->SetRatio(time1, time2);
         fCaptureRingBuffer[i]->WriteResample(fAudioInterface.fInputSoftChannels[i], fBufferSize);
      }
     
