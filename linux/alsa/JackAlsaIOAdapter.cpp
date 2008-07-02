@@ -56,7 +56,7 @@ bool JackAlsaIOAdapter::Execute()
         return false;
 
     jack_nframes_t time1, time2; 
-    adapter->ResampleFactor(time1, time2);
+    ResampleFactor(time1, time2);
   
     for (int i = 0; i < fCaptureChannels; i++) {
          fCaptureRingBuffer[i]->SetRatio(time1, time2);
