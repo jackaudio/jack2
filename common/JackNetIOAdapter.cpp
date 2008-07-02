@@ -64,13 +64,13 @@ int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
-JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io)
+JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io, int input, int output)
 {
     int i;
     char name[32];
     fJackClient = jack_client;
-    fCaptureChannels = 2;
-    fPlaybackChannels = 2;
+    fCaptureChannels = input;
+    fPlaybackChannels = output;
     
     fIOAdapter = audio_io;
     
@@ -159,7 +159,7 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-			adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter());
+			adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter(2, 2), 2, 2);
 			return (adapter) ? 0 : 1;
 		}
 	}

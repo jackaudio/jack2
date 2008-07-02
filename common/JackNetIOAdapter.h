@@ -48,7 +48,7 @@ namespace Jack
             
 		public:
         
-			JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io);
+			JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io, int input, int output);
 			~JackNetIOAdapter();
 	};
 }

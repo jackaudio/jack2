@@ -20,22 +20,35 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackIOAdapter__
 #define __JackIOAdapter__
 
+#include "ringbuffer.h"
+
 namespace Jack
 {
 
 	class JackIOAdapterInterface
 	{
-		private:
-              
+    
+		protected:
+        
+            int fCaptureChannels;
+            int fPlaybackChannels;
+            
+            jack_ringbuffer_t* fCaptureRingBuffer;
+            jack_ringbuffer_t* fPlaybackRingBuffer;
+               
 		public:
         
-			JackIOAdapterInterface()
+			JackIOAdapterInterface(int input, int output)
+                :fCaptureChannels(input), fPlaybackChannels(output)
             {}
 			~JackIOAdapterInterface()
             {}
             
-            void SetRingBuffers(jack_ringbuffer_t* input,  jack_ringbuffer_t* output)
-            {}
+            void SetRingBuffers(jack_ringbuffer_t* input, jack_ringbuffer_t* output)
+            {
+                fCaptureRingBuffer = input;
+                fPlaybackRingBuffer = output;
+            }
 	};
 }
 
