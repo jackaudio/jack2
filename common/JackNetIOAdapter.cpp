@@ -28,7 +28,7 @@ using namespace std;
 namespace Jack
 {
 
-#define DEFAULT_RB_SIZE 16384	/* ringbuffer size in frames */
+#define DEFAULT_RB_SIZE 16384	
 
 int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
 {
@@ -36,13 +36,16 @@ int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     char* buffer;
     int i;
     
+    if (!adapter->fIOAdapter->IsRunning())
+        return 0;
+    
     for (i = 0; i < adapter->fCaptureChannels; i++) {
     
         buffer = static_cast<char*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
         size_t len = jack_ringbuffer_read_space(adapter->fCaptureRingBuffer);
         
-        if (len <  frames * sizeof(float)) {
-            jack_error("JackNetIOAdapter::Process : consumer too slow, skip frames...");
+        if (len < frames * sizeof(float)) {
+            jack_error("JackNetIOAdapter::Process : consumer too slow, skip frames = %d", (frames * sizeof(float)) - len);
             jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, len);
         } else {
             jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
@@ -54,8 +57,8 @@ int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
         buffer = static_cast<char*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
         size_t len = jack_ringbuffer_write_space(adapter->fPlaybackRingBuffer);
         
-        if (len <  frames * sizeof(float)) {
-            jack_error("JackNetIOAdapter::Process : producer too slow, missing frames...");
+         if (len < frames * sizeof(float)) {
+            jack_error("JackNetIOAdapter::Process : producer too slow, missing frames = %d", (frames * sizeof(float)) - len);
             jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, len);
         } else {
             jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));

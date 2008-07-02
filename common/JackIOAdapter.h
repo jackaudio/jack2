@@ -37,11 +37,16 @@ namespace Jack
           
             jack_ringbuffer_t* fCaptureRingBuffer;
             jack_ringbuffer_t* fPlaybackRingBuffer;
+            bool fRunning;
                
 		public:
         
 			JackIOAdapterInterface(int input, int output, int buffer_size, float sample_rate)
-                :fCaptureChannels(input), fPlaybackChannels(output), fBufferSize(buffer_size), fSampleRate(sample_rate)
+                :fCaptureChannels(input), 
+                fPlaybackChannels(output), 
+                fBufferSize(buffer_size), 
+                fSampleRate(sample_rate),
+                fRunning(false)
             {}
 			virtual ~JackIOAdapterInterface()
             {}
@@ -50,7 +55,9 @@ namespace Jack
             {
                 fCaptureRingBuffer = input;
                 fPlaybackRingBuffer = output;
-             }
+            }
+            
+            bool IsRunning() {return fRunning;}
             
             virtual int Open() = 0;
             virtual int Close() = 0;
