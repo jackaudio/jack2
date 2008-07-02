@@ -37,6 +37,8 @@ namespace Jack
             static int Process(jack_nframes_t, void* arg);
             static int BufferSize(jack_nframes_t nframes, void *arg);
             
+            void Reset();
+            
 		public:
         
 			JackCallbackNetIOAdapter(jack_client_t* jack_client, 

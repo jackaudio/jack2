@@ -57,6 +57,8 @@ class JackDummyDriver : public JackAudioDriver
                  jack_nframes_t playback_latency);
 
         int Process();
+        
+        int SetBufferSize(jack_nframes_t buffer_size);
 
 };
 

@@ -57,38 +57,33 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
      
     // Reset all ringbuffers in case of failure
     if (failure) {
-    
         jack_error("JackCallbackNetIOAdapter::Process ringbuffer failure... reset");
-        
-        for (i = 0; i < adapter->fCaptureChannels; i++) {
-            adapter->fCaptureRingBuffer[i]->Reset();
-        }
-    
-        for (i = 0; i < adapter->fPlaybackChannels; i++) {
-           adapter->fPlaybackRingBuffer[i]->Reset();
-        }
-        
-        adapter->fIOAdapter->Reset();
+        adapter->Reset();
     }
     return 0;
 }
 
 int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t nframes, void* arg)
 {
-    int i;
     JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
-        
-    for (i = 0; i < adapter->fCaptureChannels; i++) {
-        adapter->fCaptureRingBuffer[i]->Reset();
-    }
-    
-    for (i = 0; i < adapter->fPlaybackChannels; i++) {
-        adapter->fPlaybackRingBuffer[i]->Reset();
-    }
-        
-    adapter->fIOAdapter->Reset();
+    adapter->Reset();
     adapter->fIOAdapter->SetBufferSize(nframes);
     return 0;
+}
+
+void JackCallbackNetIOAdapter::Reset()
+{
+    int i;
+        
+    for (i = 0; i < fCaptureChannels; i++) {
+        fCaptureRingBuffer[i]->Reset();
+    }
+    
+    for (i = 0; i < fPlaybackChannels; i++) {
+        fPlaybackRingBuffer[i]->Reset();
+    }
+        
+    fIOAdapter->Reset();
 }
 
 JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client, 

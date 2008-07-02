@@ -71,6 +71,13 @@ int JackDummyDriver::Process()
     return 0;
 }
 
+int JackDummyDriver::SetBufferSize(jack_nframes_t buffer_size)
+{
+    JackAudioDriver::SetBufferSize(buffer_size);
+    fWaitTime = (unsigned long)((((float)buffer_size) / ((float)fEngineControl->fSampleRate)) * 1000000.0f);
+    return 0;
+}
+
 } // end of namespace
 
 #ifdef __cplusplus
