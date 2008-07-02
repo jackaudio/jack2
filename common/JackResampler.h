@@ -49,6 +49,9 @@ namespace Jack
             int Read(float* buffer, unsigned int frames);
             int Write(float* buffer, unsigned int frames);
             
+            unsigned int ReadSpace();
+            unsigned int WriteSpace();
+    
             void SetRatio(double ratio) 
             {
                 fRatio = ratio;

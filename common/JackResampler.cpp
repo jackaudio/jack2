@@ -29,13 +29,24 @@ JackResampler::JackResampler():fRatio(0)
     if (error != 0) 
         jack_error("JackResampler::JackResampler err = %s", src_strerror(error));
     fRingBuffer = jack_ringbuffer_create(sizeof(float) * DEFAULT_RB_SIZE);
-}
+    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * DEFAULT_RB_SIZE) / 2);
+ }
 
 JackResampler::~JackResampler()
 {
     src_delete(fResampler);
     if (fRingBuffer)
         jack_ringbuffer_free(fRingBuffer);
+}
+
+unsigned int JackResampler::ReadSpace()
+{
+    return jack_ringbuffer_read_space(fRingBuffer);
+}
+
+unsigned int JackResampler::WriteSpace()
+{
+    return jack_ringbuffer_write_space(fRingBuffer);
 }
 
 int JackResampler::Read(float* buffer, unsigned int frames)
@@ -93,18 +104,24 @@ int JackResampler::ReadResample(float* buffer, unsigned int frames)
              
             res = src_process(fResampler, &src_data);
             if (res != 0)
-                jack_error("JackPortAudioIOAdapter::Render err = %s", src_strerror(res));
+                jack_error("JackResampler::ReadResample err = %s", src_strerror(res));
                 
             frames_to_write -= src_data.output_frames_gen;
             written_frames += src_data.output_frames_gen;
+            
+            if ((src_data.input_frames_used == 0 || src_data.output_frames_gen == 0) && j == 0) {
+                jack_error("OUTPUT : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
+            }
             
             jack_log("OUTPUT : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
             jack_ringbuffer_read_advance(fRingBuffer, src_data.input_frames_used * sizeof(float));
         }
     }
     
-    if (written_frames < frames)
-        jack_error("JackPortAudioIOAdapter::Render error written_frames = %ld", written_frames);
+    if (written_frames < frames) {
+        jack_error("OUPUT available = %ld", available_frames);
+        jack_error("JackResampler::ReadResample error written_frames = %ld", written_frames);
+    }
         
     return written_frames;
 }
@@ -134,18 +151,24 @@ int JackResampler::WriteResample(float* buffer, unsigned int frames)
          
             res = src_process(fResampler, &src_data);
             if (res != 0)
-                jack_error("JackPortAudioIOAdapter::Render err = %s", src_strerror(res));
+                jack_error("JackResampler::ReadResample err = %s", src_strerror(res));
                 
             frames_to_read -= src_data.input_frames_used;
             read_frames += src_data.input_frames_used;
+            
+            if ((src_data.input_frames_used == 0 || src_data.output_frames_gen == 0) && j == 0) {
+                jack_error("INPUT : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
+            }
         
             jack_log("INPUT : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
             jack_ringbuffer_write_advance(fRingBuffer, src_data.output_frames_gen * sizeof(float));
         }
     }
     
-    if (read_frames < frames) 
-        jack_error("JackPortAudioIOAdapter::Render error read_frames = %ld", read_frames);
+    if (read_frames < frames) {
+        jack_error("INPUT available = %ld", available_frames);
+        jack_error("JackResampler::ReadResample error read_frames = %ld", read_frames);
+    }
         
     return read_frames;
 }

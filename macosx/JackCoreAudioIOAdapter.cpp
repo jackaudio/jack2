@@ -134,6 +134,7 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
     adapter->fProducerFilter.AddValue(adapter->fDeltaTime);
 
     jack_log("JackCoreAudioIOAdapter::Render delta %ld", adapter->fCurCallbackTime - adapter->fLastCallbackTime);
+    //printf("JackCoreAudioIOAdapter::Render delta %ld\n", adapter->fCurCallbackTime - adapter->fLastCallbackTime);
       
     if (!adapter->fRunning) 
         adapter->fRunning = true;
@@ -143,27 +144,32 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
     double src_ratio_output = double(val1) / double(val2);
     double src_ratio_input = double(val2) / double(val1);
   
-    if (src_ratio_input < 0.8f || src_ratio_input > 1.2f)
+    if (src_ratio_input < 0.8f || src_ratio_input > 1.2f) {
         jack_error("src_ratio_input = %f", src_ratio_input);
+        src_ratio_input = 1;
+    }
     
-    if (src_ratio_output < 0.8f || src_ratio_output > 1.2f)
+    if (src_ratio_output < 0.8f || src_ratio_output > 1.2f) {
         jack_error("src_ratio_output = %f", src_ratio_output);
+        src_ratio_output = 1;
+    }
   
     src_ratio_input = Range(0.8f, 1.2f, src_ratio_input);
     src_ratio_output = Range(0.8f, 1.2f, src_ratio_output);
     
-    jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
+    //jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
+    //jack_info("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
      
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         adapter->fCaptureRingBuffer[i].SetRatio(src_ratio_input);
-        //adapter->fCaptureRingBuffer[i].WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
-        adapter->fCaptureRingBuffer[i].Write((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
+        adapter->fCaptureRingBuffer[i].WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
+       // adapter->fCaptureRingBuffer[i].Write((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
     }
     
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         adapter->fPlaybackRingBuffer[i].SetRatio(src_ratio_output);
-        //adapter->fPlaybackRingBuffer[i].ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames); 
-        adapter->fPlaybackRingBuffer[i].Read((float*)ioData->mBuffers[i].mData, inNumberFrames);    
+        adapter->fPlaybackRingBuffer[i].ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames); 
+       // adapter->fPlaybackRingBuffer[i].Read((float*)ioData->mBuffers[i].mData, inNumberFrames);    
     }
    
     return noErr;
@@ -553,7 +559,7 @@ int JackCoreAudioIOAdapter::Open()
     if (err != noErr)
         goto error;
   
-    return noErr;
+    return 0;
 
 error:
     Close();
@@ -568,5 +574,4 @@ int JackCoreAudioIOAdapter::Close()
     return 0;
 }
 
-  
 }

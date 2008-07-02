@@ -49,21 +49,26 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     double src_ratio_output = double(adapter->fCurCallbackTime - adapter->fLastCallbackTime) / double(adapter->fDeltaTime);
     double src_ratio_input = double(adapter->fDeltaTime) / double(adapter->fCurCallbackTime - adapter->fLastCallbackTime);
     */
-    jack_time_t val1 = adapter->fConsumerFilter.GetVal();
-    jack_time_t val2 = adapter->fProducerFilter.GetVal();
+    jack_time_t val2 = adapter->fConsumerFilter.GetVal();
+    jack_time_t val1 = adapter->fProducerFilter.GetVal();
     double src_ratio_output = double(val1) / double(val2);
     double src_ratio_input = double(val2) / double(val1);
   
-    if (src_ratio_input < 0.8f || src_ratio_input > 1.2f)
+    if (src_ratio_input < 0.8f || src_ratio_input > 1.2f) {
         jack_error("src_ratio_input = %f", src_ratio_input);
+        src_ratio_input = 1;
+    }
     
-    if (src_ratio_output < 0.8f || src_ratio_output > 1.2f)
+    
+    if (src_ratio_output < 0.8f || src_ratio_output > 1.2f) {
         jack_error("src_ratio_output = %f", src_ratio_output);
-  
+        src_ratio_output = 1;
+    }  
     src_ratio_input = Range(0.8f, 1.2f, src_ratio_input);
     src_ratio_output = Range(0.8f, 1.2f, src_ratio_output);
     
-    jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
+    //jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
+    printf("Callback resampler src_ratio_input = %f src_ratio_output = %f\n", src_ratio_input, src_ratio_output);
     
     paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {

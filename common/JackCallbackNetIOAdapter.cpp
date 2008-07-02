@@ -42,6 +42,9 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
         
     adapter->fIOAdapter->SetCallbackDeltaTime(adapter->fCurCallbackTime - adapter->fLastCallbackTime);
     
+    //jack_info("ReadSpace = %ld", adapter->fCaptureRingBuffer[0].ReadSpace());
+    //jack_info("WriteSpace = %ld", adapter->fPlaybackRingBuffer[0].WriteSpace());
+    
     for (i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
         adapter->fCaptureRingBuffer[i].Read(buffer, frames);
@@ -94,6 +97,9 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
         fPlaybackRingBuffer[i].Write(buffer, frames);
     }
     */
+    
+    jack_log("ReadSpace = %ld", fCaptureRingBuffer[0].ReadSpace());
+    jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0].WriteSpace());
  
     if (jack_set_process_callback(fJackClient, Process, this) < 0)
         goto fail;

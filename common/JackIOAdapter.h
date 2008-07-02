@@ -83,6 +83,7 @@ namespace Jack
             virtual void SetCallbackDeltaTime(jack_time_t delta_usec)
             {
                 jack_log("SetCallbackDeltaTime %ld", delta_usec);
+                //printf("SetCallbackDeltaTime %ld\n", delta_usec);
                 fDeltaTime = delta_usec;
             }
         
