@@ -119,6 +119,9 @@ extern "C"
 #include "JackPortAudioIOAdapter.h"
 #endif
 
+#define max(x,y) (((x)>(y)) ? (x) : (y))
+#define min(x,y) (((x)<(y)) ? (x) : (y))
+
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
 		if (adapter) {
@@ -142,7 +145,10 @@ extern "C"
             }
             if (ports)
                 free(ports);
-
+                
+            input = max(2, input);
+            output = max(2, output);
+         
         #ifdef __linux__
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
                 new Jack::JackAlsaIOAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);

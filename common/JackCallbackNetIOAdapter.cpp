@@ -94,6 +94,8 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
 {
     int i;
     
+    printf("input , %ld  %ld\n", input, output);
+    
     fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
     fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
     
