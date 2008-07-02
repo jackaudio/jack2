@@ -154,6 +154,7 @@ def build(bld):
         serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
         serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
+	serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
     clientlib = bld.create_obj('cpp', 'shlib')
     clientlib.features.append('cc')
@@ -189,6 +190,7 @@ def build(bld):
         clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
 	clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
+        clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 

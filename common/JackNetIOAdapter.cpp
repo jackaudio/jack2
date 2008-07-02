@@ -94,13 +94,13 @@ JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client,
     fIOAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
   
     for (i = 0; i < fCaptureChannels; i++) {
-        sprintf(name, "in_%d", i+1);
+        sprintf(name, "capture_%d", i+1);
         if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL) 
             goto fail;
     }
     
     for (i = 0; i < fPlaybackChannels; i++) {
-        sprintf(name, "out_%d", i+1);
+        sprintf(name, "playback_%d", i+1);
         if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)) == NULL) 
             goto fail;
     }
