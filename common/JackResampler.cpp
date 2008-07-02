@@ -41,12 +41,12 @@ void JackResampler::Reset()
 
 unsigned int JackResampler::ReadSpace()
 {
-    return jack_ringbuffer_read_space(fRingBuffer);
+    return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float));
 }
 
 unsigned int JackResampler::WriteSpace()
 {
-    return jack_ringbuffer_write_space(fRingBuffer);
+    return (jack_ringbuffer_write_space(fRingBuffer) / sizeof(float));
 }
 
 int JackResampler::Read(float* buffer, unsigned int frames)
