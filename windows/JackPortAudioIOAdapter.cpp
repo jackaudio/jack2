@@ -31,15 +31,17 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
                                 void* userData)
 {
     JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
+    float** paBuffer;
     char* buffer;
     
     jack_log("JackPortAudioIOAdapter::Render");
-     
+    
+    paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         
-        buffer = (char*)inputBuffer;
+        buffer = (char*)paBuffer[i];
         size_t len = jack_ringbuffer_read_space(adapter->fCaptureRingBuffer);
-         
+        
         if (len < framesPerBuffer * sizeof(float)) {
             jack_error("JackPortAudioIOAdapter::Process : producer too slow, skip frames...");
             jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, len);
@@ -48,9 +50,10 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
         }
     }
     
+    paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         
-        buffer =  (char*)outputBuffer;
+        buffer =  (char*)paBuffer[i];
         size_t len = jack_ringbuffer_write_space(adapter->fPlaybackRingBuffer);
          
         if (len < framesPerBuffer * sizeof(float)) {
@@ -60,7 +63,6 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
             jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, framesPerBuffer * sizeof(float));
         }
     }
-    jack_log("JackPortAudioIOAdapter::Render");
     
     return paContinue;
 }
