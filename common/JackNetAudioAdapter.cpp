@@ -20,23 +20,45 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetAudioAdapter.h"
 #include "JackError.h"
 #include "JackExports.h"
+#include <stdio.h>
 
 using namespace std;
 
 namespace Jack
 {
 
+#define DEFAULT_RB_SIZE 16384		/* ringbuffer size in frames */
+
 int JackNetAudioAdapter::Process(jack_nframes_t frames, void* arg)
 {
     JackNetAudioAdapter* adapter = static_cast<JackNetAudioAdapter*>(arg);
+    char* buffer;
     int i;
     
     for (i = 0; i < adapter->fCaptureChannels; i++) {
-        float* buffer = static_cast<float*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
+    
+        buffer = static_cast<char*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
+        size_t len = jack_ringbuffer_write_space(adapter->fCaptureRingBuffer);
+        
+        if (len <  frames * sizeof(float)) {
+            jack_error("JackNetAudioAdapter::Process : consumer too slow, skip frames...");
+            jack_ringbuffer_write(adapter->fCaptureRingBuffer, buffer, len);
+        } else {
+            jack_ringbuffer_write(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
+        }
     }
     
     for (i = 0; i < adapter->fPlaybackChannels; i++) {
-        float* buffer = static_cast<float*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
+    
+        buffer = static_cast<char*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
+        size_t len = jack_ringbuffer_read_space(adapter->fPlaybackRingBuffer);
+        
+        if (len <  frames * sizeof(float)) {
+            jack_error("JackNetAudioAdapter::Process : producer too slow, missing frames...");
+            jack_ringbuffer_read(adapter->fPlaybackRingBuffer, buffer, len);
+        } else {
+            jack_ringbuffer_read(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));
+        }
     }
      
     return 0;
@@ -53,6 +75,14 @@ JackNetAudioAdapter::JackNetAudioAdapter(jack_client_t* jack_client)
     fCapturePortList = new jack_port_t* [fCaptureChannels];
     fPlaybackPortList = new jack_port_t* [fPlaybackChannels];
     
+    fCaptureRingBuffer = jack_ringbuffer_create(fCaptureChannels * sizeof(float) * DEFAULT_RB_SIZE);
+    if (fCaptureRingBuffer == NULL)
+        goto fail;
+
+    fPlaybackRingBuffer = jack_ringbuffer_create(fPlaybackChannels * sizeof(float) * DEFAULT_RB_SIZE);
+    if (fPlaybackRingBuffer == NULL)
+        goto fail;
+
     for (i = 0; i < fCaptureChannels; i++) {
         sprintf(name, "in_%d", i+1);
         if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL) 
@@ -86,12 +116,20 @@ void JackNetAudioAdapter::FreePorts()
 {
     int i;
     
+    if (fCaptureRingBuffer)
+        jack_ringbuffer_free(fCaptureRingBuffer);
+    
+    if (fPlaybackRingBuffer)
+        jack_ringbuffer_free(fPlaybackRingBuffer);
+    
     for (i = 0; i < fCaptureChannels; i++) {
-        jack_port_unregister(fJackClient, fCapturePortList[i]);
+        if (fCapturePortList[i])
+            jack_port_unregister(fJackClient, fCapturePortList[i]);
     }
     
     for (i = 0; i < fCaptureChannels; i++) {
-        jack_port_unregister(fJackClient, fPlaybackPortList[i]);
+        if (fPlaybackPortList[i])
+            jack_port_unregister(fJackClient, fPlaybackPortList[i]);
     }
 
     delete[] fCapturePortList;

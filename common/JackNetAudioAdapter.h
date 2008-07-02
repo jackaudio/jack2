@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackNetAudioAdapter__
 
 #include "jack.h"
-#include <list>
+#include "ringbuffer.h"
 
 namespace Jack
 {
@@ -35,12 +35,13 @@ namespace Jack
 
             jack_port_t** fCapturePortList;
             jack_port_t** fPlaybackPortList;
+            
+            jack_ringbuffer_t* fCaptureRingBuffer;
+            jack_ringbuffer_t* fPlaybackRingBuffer;
         
 			jack_client_t* fJackClient;
-			const char* fClientName;
-      
+		
             static int Process(jack_nframes_t, void* arg);
-            
             void FreePorts();
             
 		public:
