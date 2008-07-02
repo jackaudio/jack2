@@ -20,8 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetAudioAdapter__
 #define __JackNetAudioAdapter__
 
-//#include "JackNetTool.h"
-//#include "thread.h"
 #include "jack.h"
 #include <list>
 
@@ -32,14 +30,22 @@ namespace Jack
 	{
 		private:
         
+            int fCaptureChannels;
+            int fPlaybackChannels;
+
+            jack_port_t** fCapturePortList;
+            jack_port_t** fPlaybackPortList;
+        
 			jack_client_t* fJackClient;
 			const char* fClientName;
       
             static int Process();
             
+            void FreePorts();
+            
 		public:
         
-			JackNetAudioAdapter();
+			JackNetAudioAdapter(jack_client_t* jack_client);
 			~JackNetAudioAdapter();
 	};
 }

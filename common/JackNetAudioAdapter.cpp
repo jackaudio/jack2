@@ -31,15 +31,58 @@ int JackNetAudioAdapter::Process()
     return 0;
 }
 
-JackNetAudioAdapter::JackNetAudioAdapter()
+JackNetAudioAdapter::JackNetAudioAdapter(jack_client_t* jack_client)
 {
-
+    int i;
+    char name[32];
+    fJackClient = jack_client;
+    fCaptureChannels = 2;
+    fPlaybackChannels = 2;
+    
+    fCapturePortList = new jack_port_t* [fCaptureChannels];
+    fPlaybackPortList = new jack_port_t* [fPlaybackChannels];
+    
+    for (i = 0; i < fCaptureChannels; i++) {
+        sprintf(name, "in_%d", i+1);
+        if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL) 
+            goto fail;
+   }
+    
+    for (i = 0; i < fPlaybackChannels; i++) {
+        sprintf(name, "out_%d", i+1);
+        if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)) == NULL) 
+            goto fail;
+    }
+    
+    if (jack_activate(fJackClient) < 0)
+        goto fail;
+    return;
+        
+fail:
+     FreePorts();
 }
 
 JackNetAudioAdapter::~JackNetAudioAdapter()
 {
-
+    FreePorts();
 }
+
+void JackNetAudioAdapter::FreePorts()
+{
+    int i;
+    
+    for (i = 0; i < fCaptureChannels; i++) {
+        jack_port_unregister(fJackClient, fCapturePortList[i]);
+    }
+    
+    for (i = 0; i < fCaptureChannels; i++) {
+        jack_port_unregister(fJackClient, fPlaybackPortList[i]);
+    }
+
+    delete[] fCapturePortList;
+    delete[] fPlaybackPortList;
+}
+
 
 
 } //namespace
@@ -50,14 +93,14 @@ static Jack::JackNetAudioAdapter* adapter = NULL;
 extern "C"
 {
 #endif
-	EXPORT int jack_initialize (jack_client_t* jack_client, const char* load_init)
+	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
 		if (adapter) {
 			jack_error("NetAudio Adapter already loaded");
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-			adapter = new Jack::JackNetAudioAdapter();
+			adapter = new Jack::JackNetAudioAdapter(jack_client);
 			return (adapter) ? 0 : 1;
 		}
 	}
