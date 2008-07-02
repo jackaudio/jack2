@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-07-02 Stephane Letz  <letz@grame.fr>
+
+	* New netioadapter in server client.
+
 2008-06-20 Stephane Letz  <letz@grame.fr>
 
 	* Add new jack_client_stop_thread and jack_client_kill_thread API.
