@@ -52,8 +52,7 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
         process.env.append_value("LINKFLAGS", "")
     process.inst_var = bld.env()['ADDON_DIR']
     process.inst_dir = '/'
-    if bld.env()['IS_MACOSX']:          # is this really macosx sepcific?
-        process.uselib_local = uselib.name
+    process.uselib_local = uselib.name
     return process
 
 def build(bld):
