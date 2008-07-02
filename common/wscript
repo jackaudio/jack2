@@ -38,6 +38,24 @@ def subst_func(tsk):
 
     return 0
 
+def create_jack_process_obj(bld, target, sources, uselib = None):
+    process = bld.create_obj('cpp', 'shlib')
+    process.env['shlib_PATTERN'] = '%s.so'
+    process.includes = ['./jack', '.']
+    process.name     = target
+    process.target   = target
+    process.source   = sources
+    process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    if bld.env()['IS_MACOSX']:
+        process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
+        #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
+        process.env.append_value("LINKFLAGS", "")
+    process.inst_var = bld.env()['ADDON_DIR']
+    process.inst_dir = '/'
+    if bld.env()['IS_MACOSX']:          # is this really macosx sepcific?
+        process.uselib_local = uselib.name
+    return process
+
 def build(bld):
     common_libsources = [
         'JackActivationCount.cpp',
@@ -172,21 +190,9 @@ def build(bld):
         #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
 	clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
 
-    netmanagerlib = bld.create_obj('cpp', 'shlib')
-    netmanagerlib.env['shlib_PATTERN'] = '%s.so'
-    netmanagerlib.includes = ['./jack', '.']
-    netmanagerlib.name     = 'netmanager'
-    netmanagerlib.target   = 'netmanager'
-    netmanagerlib.source   = 'JackNetManager.cpp'
-    netmanagerlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-    if bld.env()['IS_MACOSX']:
-        netmanagerlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-        #netmanagerlib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
-        netmanagerlib.env.append_value("LINKFLAGS", "")
-    netmanagerlib.inst_var = bld.env()['ADDON_DIR']
-    netmanagerlib.inst_dir = '/'
-    if bld.env()['IS_MACOSX']:          # is this really macosx sepcific?
-        netmanagerlib.uselib_local = serverlib.name
+    create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
+
+    create_jack_process_obj(bld, 'netaudioadapter', 'JackNetAudioAdapter.cpp', serverlib)
 
     install_files('PREFIX', 'include/jack', 'jack/*.h')
 
