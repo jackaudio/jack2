@@ -46,8 +46,11 @@ namespace Jack
             JackFilter fConsumerFilter;
             
             // DLL
-            JackDelayLockedLoop fProducerDLL;
-            JackDelayLockedLoop fConsumerDLL;
+            //JackDelayLockedLoop fProducerDLL;
+            //JackDelayLockedLoop fConsumerDLL;
+            
+            JackAtomicDelayLockedLoop fProducerDLL;
+            JackAtomicDelayLockedLoop fConsumerDLL;
              
             JackResampler** fCaptureRingBuffer;
             JackResampler** fPlaybackRingBuffer;

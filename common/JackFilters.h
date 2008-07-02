@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackFilters__
 
 #include "jack.h"
+#include "JackAtomicState.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -69,10 +70,19 @@ namespace Jack
             jack_nframes_t fSampleRate;
             jack_time_t fPeriodUsecs;
             float fFilterCoefficient;	/* set once, never altered */
+            bool fUpdating;
         
         public:
         
+            JackDelayLockedLoop()
+            {}
+            
             JackDelayLockedLoop(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+            {
+                Init(buffer_size, sample_rate);
+            }
+            
+            void Init(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
             {
                 fFrames = 0;
                 fCurrentWakeup = 0;
@@ -80,7 +90,6 @@ namespace Jack
                 fNextWakeUp = 0;
                 fFilterCoefficient = 0.01f;
                 fSecondOrderIntegrator = 0.0f;
-                
                 fBufferSize = buffer_size;
                 fSampleRate = sample_rate;
                 fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize);	// in microsec
@@ -123,6 +132,63 @@ namespace Jack
                 return fFrames;
             }
 
+    };
+    
+    class JackAtomicDelayLockedLoop : public JackAtomicState<JackDelayLockedLoop>
+    {
+         public:
+         
+            JackAtomicDelayLockedLoop(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+            {
+                fState[0].Init(buffer_size, sample_rate);
+                fState[1].Init(buffer_size, sample_rate);
+            }
+            
+            void Init(jack_time_t callback_usecs)
+            {
+                JackDelayLockedLoop* dll = WriteNextStateStart();
+                dll->Init(callback_usecs);
+                WriteNextStateStop();
+                TrySwitchState(); // always succeed since there is only one writer
+            }
+            
+            void IncFrame(jack_time_t callback_usecs)
+            {
+                JackDelayLockedLoop* dll = WriteNextStateStart();
+                dll->IncFrame(callback_usecs);
+                WriteNextStateStop();
+                TrySwitchState(); // always succeed since there is only one writer
+            }
+            
+            jack_nframes_t Time2Frames(jack_time_t time)
+            {
+                UInt16 next_index = GetCurrentIndex();
+                UInt16 cur_index;
+                jack_nframes_t res;
+                
+                do {
+                    cur_index = next_index;
+                    res = ReadCurrentState()->Time2Frames(time);
+                    next_index = GetCurrentIndex();
+                } while (cur_index != next_index); // Until a coherent state has been read
+                
+                return res;
+            }
+             
+            jack_time_t Frames2Time(jack_nframes_t frames)
+            {
+                UInt16 next_index = GetCurrentIndex();
+                UInt16 cur_index;
+                jack_time_t res;
+                
+                do {
+                    cur_index = next_index;
+                    res = ReadCurrentState()->Frames2Time(frames);
+                    next_index = GetCurrentIndex();
+                } while (cur_index != next_index); // Until a coherent state has been read
+                
+                return res;
+            }
     };
 
     inline float Range(float min, float max, float val)
