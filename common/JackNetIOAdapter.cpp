@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackNetAudioAdapter.h"
+#include "JackNetIOAdapter.h"
 #include "JackError.h"
 #include "JackExports.h"
 #include <stdio.h>
@@ -29,9 +29,9 @@ namespace Jack
 
 #define DEFAULT_RB_SIZE 16384		/* ringbuffer size in frames */
 
-int JackNetAudioAdapter::Process(jack_nframes_t frames, void* arg)
+int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
 {
-    JackNetAudioAdapter* adapter = static_cast<JackNetAudioAdapter*>(arg);
+    JackNetIOAdapter* adapter = static_cast<JackNetIOAdapter*>(arg);
     char* buffer;
     int i;
     
@@ -41,7 +41,7 @@ int JackNetAudioAdapter::Process(jack_nframes_t frames, void* arg)
         size_t len = jack_ringbuffer_write_space(adapter->fCaptureRingBuffer);
         
         if (len <  frames * sizeof(float)) {
-            jack_error("JackNetAudioAdapter::Process : consumer too slow, skip frames...");
+            jack_error("JackNetIOAdapter::Process : consumer too slow, skip frames...");
             jack_ringbuffer_write(adapter->fCaptureRingBuffer, buffer, len);
         } else {
             jack_ringbuffer_write(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
@@ -54,7 +54,7 @@ int JackNetAudioAdapter::Process(jack_nframes_t frames, void* arg)
         size_t len = jack_ringbuffer_read_space(adapter->fPlaybackRingBuffer);
         
         if (len <  frames * sizeof(float)) {
-            jack_error("JackNetAudioAdapter::Process : producer too slow, missing frames...");
+            jack_error("JackNetIOAdapter::Process : producer too slow, missing frames...");
             jack_ringbuffer_read(adapter->fPlaybackRingBuffer, buffer, len);
         } else {
             jack_ringbuffer_read(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));
@@ -64,7 +64,7 @@ int JackNetAudioAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
-JackNetAudioAdapter::JackNetAudioAdapter(jack_client_t* jack_client)
+JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client)
 {
     int i;
     char name[32];
@@ -107,12 +107,12 @@ fail:
      FreePorts();
 }
 
-JackNetAudioAdapter::~JackNetAudioAdapter()
+JackNetIOAdapter::~JackNetIOAdapter()
 {
     FreePorts();
 }
 
-void JackNetAudioAdapter::FreePorts()
+void JackNetIOAdapter::FreePorts()
 {
     int i;
     
@@ -138,7 +138,7 @@ void JackNetAudioAdapter::FreePorts()
 
 } //namespace
 
-static Jack::JackNetAudioAdapter* adapter = NULL;
+static Jack::JackNetIOAdapter* adapter = NULL;
 
 #ifdef __cplusplus
 extern "C"
@@ -152,7 +152,7 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-			adapter = new Jack::JackNetAudioAdapter(jack_client);
+			adapter = new Jack::JackNetIOAdapter(jack_client);
 			return (adapter) ? 0 : 1;
 		}
 	}

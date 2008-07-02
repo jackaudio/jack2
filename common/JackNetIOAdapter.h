@@ -17,8 +17,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackNetAudioAdapter__
-#define __JackNetAudioAdapter__
+#ifndef __JackNetIOAdapter__
+#define __JackNetIOAdapter__
 
 #include "jack.h"
 #include "ringbuffer.h"
@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-	class JackNetAudioAdapter
+	class JackNetIOAdapter
 	{
 		private:
         
@@ -46,8 +46,8 @@ namespace Jack
             
 		public:
         
-			JackNetAudioAdapter(jack_client_t* jack_client);
-			~JackNetAudioAdapter();
+			JackNetIOAdapter(jack_client_t* jack_client);
+			~JackNetIOAdapter();
 	};
 }
 
