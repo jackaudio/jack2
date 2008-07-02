@@ -194,8 +194,8 @@ def build(bld):
 
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 
-    #process = create_jack_process_obj(bld, 'netioadapter', 'JackResampler.cpp ackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../macosx/JackCoreAudioIOAdapter.cpp', serverlib)
-    process = create_jack_process_obj(bld, 'netioadapter', 'JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../windows/JackPortAudioIOAdapter.cpp', serverlib)
+    process = create_jack_process_obj(bld, 'netioadapter', 'JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../macosx/JackCoreAudioIOAdapter.cpp', serverlib)
+    #process = create_jack_process_obj(bld, 'netioadapter', 'JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../windows/JackPortAudioIOAdapter.cpp', serverlib)
 
     process.env.append_value("LINKFLAGS", "-lsamplerate")
     if bld.env()['IS_MACOSX']:

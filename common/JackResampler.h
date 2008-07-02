@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    #define DEFAULT_RB_SIZE 16384 * 4	
+    #define DEFAULT_RB_SIZE 16384 * 1	
 
 	class JackResampler
 	{

@@ -22,9 +22,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackResampler::JackResampler()
-    :fNum(1),fDenom(1)
+JackResampler::JackResampler():fNum(1),fDenom(1)
 {
+    jack_log("JackResampler::JackResampler");
     fRingBuffer = jack_ringbuffer_create(sizeof(float) * DEFAULT_RB_SIZE);
     jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * DEFAULT_RB_SIZE) / 2);
  }

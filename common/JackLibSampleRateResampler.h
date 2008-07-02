@@ -42,7 +42,7 @@ namespace Jack
             int ReadResample(float* buffer, unsigned int frames);
             int WriteResample(float* buffer, unsigned int frames);
              
-            virtual void SetRatio(unsigned int num, unsigned int denom)
+            void SetRatio(unsigned int num, unsigned int denom)
             {
                 JackResampler::SetRatio(num, denom);
                 fRatio = double(num) / double(denom);

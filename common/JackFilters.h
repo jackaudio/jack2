@@ -125,7 +125,6 @@ namespace Jack
             }
 
     };
-    
 
     inline float Range(float min, float max, float val)
     {

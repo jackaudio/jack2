@@ -22,8 +22,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackLibSampleRateResampler::JackLibSampleRateResampler():JackResampler(),fRatio(1)
+JackLibSampleRateResampler::JackLibSampleRateResampler()
+    :JackResampler(),fRatio(1)
 {
+    jack_log("JackLibSampleRateResampler::JackLibSampleRateResampler");
     int error;
     fResampler = src_new(SRC_LINEAR, 1, &error);
     if (error != 0) 

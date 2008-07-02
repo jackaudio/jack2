@@ -47,7 +47,6 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
         jack_time_t time = jack_get_time();
         adapter->fProducerDLL.Init(time);
         adapter->fConsumerDLL.Init(time);
-        adapter->fCurFrames = 0;
     }
            
     /*
@@ -59,10 +58,21 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     //adapter->fConsumerDLL.IncFrame(adapter->fConsumerTime);
     jack_time_t time = jack_get_time();
     adapter->fProducerDLL.IncFrame(time);
-      
     jack_nframes_t time1 = adapter->fConsumerDLL.Time2Frames(time);
     jack_nframes_t time2 = adapter->fProducerDLL.Time2Frames(time);
     
+    //time1 = 1;
+    //time2 = 1;
+
+    
+    /*
+    if ((adapter->fConsumerDLL.CurTime2Frame() / adapter->fSampleRate) > 10) {
+        printf("REINIT DLL\n");
+        adapter->fConsumerDLL.Init(time);
+        adapter->fConsumerDLL.Init(time);
+    }
+    */
+   
     //printf("time1 %ld time2 %ld\n",time1, time2);
 
     double src_ratio_output = double(time2) / double(time1);
@@ -78,11 +88,15 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     if (src_ratio_input < 0.8f || src_ratio_input > 1.2f) {
         jack_error("src_ratio_input = %f", src_ratio_input);
         src_ratio_input = 1;
+        time1 = 1;
+        time2 = 1;
     }
     
     if (src_ratio_output < 0.8f || src_ratio_output > 1.2f) {
         jack_error("src_ratio_output = %f", src_ratio_output);
         src_ratio_output = 1;
+        time1 = 1;
+        time2 = 1;
     }  
     src_ratio_input = Range(0.8f, 1.2f, src_ratio_input);
     src_ratio_output = Range(0.8f, 1.2f, src_ratio_output);
@@ -92,23 +106,23 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
-        adapter->fCaptureRingBuffer[i].SetRatio(time1, time2);
+        adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
         //adapter->fCaptureRingBuffer[i].WriteResample(buffer, framesPerBuffer);
         //adapter->fCaptureRingBuffer[i].SetRatio(double(adapter->fNum) * adapter->fError1, adapter->fDenom);
-        adapter->fCaptureRingBuffer[i].Write(buffer, framesPerBuffer);
+        adapter->fCaptureRingBuffer[i]->Write(buffer, framesPerBuffer);
     }
     
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = (float*)paBuffer[i];
-        adapter->fPlaybackRingBuffer[i].SetRatio(time2, time1);
+        adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
         //adapter->fPlaybackRingBuffer[i].ReadResample(buffer, framesPerBuffer); 
         //adapter->fCaptureRingBuffer[i].SetRatio(double(adapter->fDenom) * adapter->fError1, adapter->fNum);
-        adapter->fPlaybackRingBuffer[i].Read(buffer, framesPerBuffer);    
+        adapter->fPlaybackRingBuffer[i]->Read(buffer, framesPerBuffer);    
     }
      
     printf("Callback resampler src_ratio_input = %f src_ratio_output = %f\n",   double(time1) / double(time2),  double(time2) / double(time1));
-      
+           
     return paContinue;
 }
         

@@ -52,10 +52,10 @@ namespace Jack
             // DLL
             JackDelayLockedLoop fProducerDLL;
             JackDelayLockedLoop fConsumerDLL;
-            jack_time_t fCurFrames;
              
-            JackResampler* fCaptureRingBuffer;
-            JackResampler* fPlaybackRingBuffer;
+            JackResampler** fCaptureRingBuffer;
+            JackResampler** fPlaybackRingBuffer;
+
             bool fRunning;
                
 		public:
@@ -75,7 +75,7 @@ namespace Jack
 			virtual ~JackIOAdapterInterface()
             {}
             
-            void SetRingBuffers(JackResampler* input, JackResampler* output)
+            void SetRingBuffers(JackResampler** input, JackResampler** output)
             {
                 fCaptureRingBuffer = input;
                 fPlaybackRingBuffer = output;
