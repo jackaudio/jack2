@@ -41,14 +41,8 @@ namespace Jack
             
             jack_nframes_t fBufferSize;
             jack_nframes_t fSampleRate;
-            
-            JackFilter fProducerFilter;
-            JackFilter fConsumerFilter;
-            
+             
             // DLL
-            //JackDelayLockedLoop fProducerDLL;
-            //JackDelayLockedLoop fConsumerDLL;
-            
             JackAtomicDelayLockedLoop fProducerDLL;
             JackAtomicDelayLockedLoop fConsumerDLL;
              
