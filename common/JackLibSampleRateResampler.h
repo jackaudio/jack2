@@ -47,6 +47,8 @@ namespace Jack
                 JackResampler::SetRatio(num, denom);
                 fRatio = double(num) / double(denom);
             }
+            
+            void Reset();
               
         };
 }

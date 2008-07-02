@@ -36,6 +36,12 @@ JackLibSampleRateResampler::~JackLibSampleRateResampler()
     src_delete(fResampler);
 }
 
+void JackLibSampleRateResampler::Reset()
+{
+    JackResampler::Reset();
+    src_reset(fResampler);
+}
+
 int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned int frames)
 {
     jack_ringbuffer_data_t ring_buffer_data[2];
