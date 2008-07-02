@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackFilters__
 
 #include "jack.h"
+#include <math.h>
+#include <stdio.h>
 
 namespace Jack
 {
@@ -54,11 +56,86 @@ namespace Jack
         }
     };
     
+    class JackDelayLockedLoop
+    {
+    
+        private:
+        
+            jack_nframes_t fFrames;
+            jack_time_t	fCurrentWakeup;
+            jack_time_t	fCurrentCallback;
+            jack_time_t	fNextWakeUp;
+            float fSecondOrderIntegrator;
+            jack_nframes_t fBufferSize;
+            jack_nframes_t fSampleRate;
+            jack_time_t fPeriodUsecs;
+            float fFilterCoefficient;	/* set once, never altered */
+        
+        public:
+        
+            JackDelayLockedLoop(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+            {
+                fFrames = 0;
+                fCurrentWakeup = 0;
+                fCurrentCallback = 0;
+                fNextWakeUp = 0;
+                fFilterCoefficient = 0.01f;
+                fSecondOrderIntegrator = 0.0f;
+                
+                fBufferSize = buffer_size;
+                fSampleRate = sample_rate;
+                fPeriodUsecs = jack_time_t(1000000.f / fSampleRate * fBufferSize);	// in microsec
+            }
+        
+            void Init(jack_time_t callback_usecs)
+            {
+                fSecondOrderIntegrator = 0.0f;
+                fCurrentCallback = callback_usecs;
+                fNextWakeUp = callback_usecs + fPeriodUsecs;
+            }
+            
+            void IncFrame(jack_time_t callback_usecs)
+            {
+                float delta = (int64_t)callback_usecs - (int64_t)fNextWakeUp;
+                fCurrentWakeup = fNextWakeUp;
+                fCurrentCallback = callback_usecs;
+                fFrames += fBufferSize;
+                fSecondOrderIntegrator += 0.5f * fFilterCoefficient * delta;
+                fNextWakeUp = fCurrentWakeup + fPeriodUsecs + (int64_t) floorf((fFilterCoefficient * (delta + fSecondOrderIntegrator)));
+            }
+            
+            jack_nframes_t Time2Frames(jack_time_t time)
+            {
+                /*
+                long val = (long) rint(((double) (long(time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * fBufferSize);
+                if (val < 0) {
+                    printf("Time2Frames %ld\n", val);
+                    printf("time %ld\n", time);
+                    printf("fCurrentWakeup %ld\n", fCurrentWakeup);
+                    printf("fNextWakeUp %ld\n", fNextWakeUp);
+                }
+                */
+                return fFrames + (long) rint(((double) (long(time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * fBufferSize);
+            }
+            
+            jack_time_t Frames2Time(jack_nframes_t frames)
+            {
+                 return fCurrentWakeup + (long) rint(((double) ((frames - fFrames)) * ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) / fBufferSize);
+            }
+            
+            jack_time_t CurFrame2Time()
+            {
+                 return fCurrentWakeup;
+            }
+
+    };
+    
+    
     inline float Range(float min, float max, float val)
     {
         return (val < min) ? min : ((val > max) ? max : val);
     }
-
+ 
 }
 
 #endif

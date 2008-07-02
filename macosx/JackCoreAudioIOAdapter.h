@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackCoreAudioIOAdapter__
 
 #include "JackIOAdapter.h"
-#include "JackFilters.h"
 #include "jack.h"
 #include <AudioToolbox/AudioConverter.h>
 #include <CoreAudio/CoreAudio.h>

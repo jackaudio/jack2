@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "jack.h"
 #include "JackError.h"
 #include "JackResampler.h"
+#include "JackFilters.h"
 #include <samplerate.h>
 #include <stdio.h>
 
@@ -45,6 +46,14 @@ namespace Jack
             jack_time_t fCurCallbackTime;
             jack_time_t fDeltaTime;
             
+            JackFilter fProducerFilter;
+            JackFilter fConsumerFilter;
+            
+            // DLL
+            JackDelayLockedLoop fConsumerDLL;
+            JackDelayLockedLoop fProducerDLL;
+            jack_time_t fCurFrames;
+             
             JackResampler* fCaptureRingBuffer;
             JackResampler* fPlaybackRingBuffer;
             bool fRunning;
@@ -59,6 +68,8 @@ namespace Jack
                 fLastCallbackTime(0),
                 fCurCallbackTime(0),
                 fDeltaTime(0),
+                fProducerDLL(buffer_size, sample_rate),
+                fConsumerDLL(buffer_size, sample_rate),
                 fRunning(false)
             {}
 			virtual ~JackIOAdapterInterface()
@@ -85,6 +96,13 @@ namespace Jack
                 jack_log("SetCallbackDeltaTime %ld", delta_usec);
                 //printf("SetCallbackDeltaTime %ld\n", delta_usec);
                 fDeltaTime = delta_usec;
+            }
+            
+            virtual void SetCallbackTime(jack_time_t callback_usec)
+            {
+                jack_log("SetCallbackTime %ld", callback_usec);
+                //printf("SetCallbackDeltaTime %ld\n", delta_usec);
+                fConsumerDLL.IncFrame(callback_usec);
             }
         
 	};

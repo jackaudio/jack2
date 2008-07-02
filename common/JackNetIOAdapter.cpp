@@ -115,14 +115,15 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-            /*
+            
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
                 new Jack::JackPortAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
-            */
+            /*
         #ifdef __APPLE__
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
                 new Jack::JackCoreAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
         #endif
+        */
             assert(adapter);
             
             if (adapter->Open() == 0) {

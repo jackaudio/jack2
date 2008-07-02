@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackPortAudioIOAdapter__
 
 #include "JackIOAdapter.h"
-#include "JackFilters.h"
 #include "portaudio.h"
 
 namespace Jack
@@ -35,9 +34,6 @@ namespace Jack
             PaStream* fStream;
             PaDeviceIndex fInputDevice;
             PaDeviceIndex fOutputDevice;
-            
-            JackFilter fProducerFilter;
-            JackFilter fConsumerFilter;
             
             static int Render(const void* inputBuffer, void* outputBuffer,
                             unsigned long framesPerBuffer,
