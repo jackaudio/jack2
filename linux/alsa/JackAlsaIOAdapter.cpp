@@ -26,9 +26,10 @@ int JackAlsaIOAdapter::Open()
 {
     if (fAudioInterface.open() == 0) {
         fAudioInterface.longinfo();
-        fAudioInterface.write();
-        fAudioInterface.write();
+        //fAudioInterface.write();
+        //fAudioInterface.write();
         fThread.AcquireRealTime();
+jack_log("StartSync");
         fThread.StartSync();
         return 0;
     } else {
@@ -48,6 +49,7 @@ bool JackAlsaIOAdapter::Execute()
         return false;
     if (fAudioInterface.write() < 0)
         return false;
+jack_log("execute");
     return true;
 }
 

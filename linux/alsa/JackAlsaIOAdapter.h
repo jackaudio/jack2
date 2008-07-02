@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackIOAdapter.h"
 #include "JackPlatformThread.h"
 #include "jack.h"
+#include "JackError.h"
 
 namespace Jack
 {
@@ -35,9 +36,9 @@ namespace Jack
     #define max(x,y) (((x)>(y)) ? (x) : (y))
     #define min(x,y) (((x)<(y)) ? (x) : (y))
 
-    #define check_error(err) if (err) { printf("%s:%d, alsa error %d : %s\n", __FILE__, __LINE__, err, snd_strerror(err)); return err; }
-    #define check_error_msg(err,msg) if (err) { fprintf(stderr, "%s:%d, %s : %s(%d)\n", __FILE__, __LINE__, msg, snd_strerror(err), err); return err; }
-    #define display_error_msg(err,msg) if (err) { fprintf(stderr, "%s:%d, %s : %s(%d)\n", __FILE__, __LINE__, msg, snd_strerror(err), err); }
+    #define check_error(err) if (err) { jack_error("%s:%d, alsa error %d : %s", __FILE__, __LINE__, err, snd_strerror(err)); return err; }
+    #define check_error_msg(err,msg) if (err) { jack_error("%s:%d, %s : %s(%d)", __FILE__, __LINE__, msg, snd_strerror(err), err); return err; }
+    #define display_error_msg(err,msg) if (err) { jack_error("%s:%d, %s : %s(%d)", __FILE__, __LINE__, msg, snd_strerror(err), err); }
 
     /**
      * A convenient class to pass parameters to AudioInterface
@@ -64,7 +65,7 @@ namespace Jack
             fSoftOutputs(2)
         {}
         
-         AudioParam(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
+        AudioParam(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
             fCardName("hw:0"),
             fFrequency(sample_rate),
             fBuffering(buffer_size),
@@ -72,11 +73,11 @@ namespace Jack
             fSoftOutputs(output)
         {}
         
-        AudioParam&	cardName(const char* n)	{ fCardName = n; 		return *this; }
-        AudioParam&	frequency(int f)		{ fFrequency = f; 		return *this; }
-        AudioParam&	buffering(int fpb)		{ fBuffering = fpb; 	return *this; }
-        AudioParam&	inputs(int n)			{ fSoftInputs = n; 		return *this; }
-        AudioParam&	outputs(int n)			{ fSoftOutputs = n; 	return *this; }
+        AudioParam&	cardName(const char* n)	{ fCardName = n; 	return *this; }
+        AudioParam&	frequency(int f)	{ fFrequency = f; 	return *this; }
+        AudioParam&	buffering(int fpb)	{ fBuffering = fpb; 	return *this; }
+        AudioParam&	inputs(int n)		{ fSoftInputs = n; 	return *this; }
+        AudioParam&	outputs(int n)		{ fSoftOutputs = n; 	return *this; }
     };
 
     /**
@@ -129,6 +130,11 @@ namespace Jack
             fInputParams			= 0;
             fOutputParams			= 0;
         }
+
+	AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
+            AudioParam(input, output, buffer_size, sample_rate)
+         {}
+        
         
         /**
          * Open the audio interface
@@ -136,10 +142,13 @@ namespace Jack
         int open()
         {
             int err;
+		jack_log("open %s", fCardName);
             
             // allocation d'un stream d'entree et d'un stream de sortie
             err = snd_pcm_open(&fInputDevice,  fCardName, SND_PCM_STREAM_CAPTURE, 0); 	check_error(err)
+jack_log("open 1");
             err = snd_pcm_open(&fOutputDevice, fCardName, SND_PCM_STREAM_PLAYBACK, 0); 	check_error(err)
+jack_log("open 2");
 
             // recherche des parametres d'entree
             err = snd_pcm_hw_params_malloc(&fInputParams); 	check_error(err);
@@ -151,7 +160,7 @@ namespace Jack
             setAudioParams(fOutputDevice, fOutputParams);
             snd_pcm_hw_params_get_channels(fOutputParams, &fCardOutputs);
 
-            printf("inputs : %ud, outputs : %ud\n", fCardInputs, fCardOutputs);
+            jack_info("inputs : %ud, outputs : %ud", fCardInputs, fCardOutputs);
 
             // enregistrement des parametres d'entree-sortie
             err = snd_pcm_hw_params(fInputDevice,  fInputParams);	 	check_error (err);
@@ -191,7 +200,7 @@ namespace Jack
                     fOutputSoftChannels[i][j] = 0.0;
                 }
             }
-
+jack_log("opren ok");
             return 0;
         }
         
@@ -210,8 +219,7 @@ namespace Jack
                 err = snd_pcm_hw_params_set_access (stream, params, SND_PCM_ACCESS_RW_INTERLEAVED );
                 check_error_msg(err, "unable to set access mode neither to non-interleaved or to interleaved");
             }
-            snd_pcm_hw_params_get_access(params, &fSampleAccess);
-            
+            snd_pcm_hw_params_get_access(params, &fSampleAccess);  
 
             // search for 32-bits or 16-bits format
             err = snd_pcm_hw_params_set_format (stream, params, SND_PCM_FORMAT_S32);
@@ -357,7 +365,7 @@ namespace Jack
                 }
 
                 int count = snd_pcm_writei(fOutputDevice, fOutputCardBuffer, fBuffering); 	
-                if (count<0) { 
+                if (count < 0) { 
                     display_error_msg(count, "w3"); 
                     int err = snd_pcm_prepare(fOutputDevice);	
                     check_error_msg(err, "preparing output stream");
@@ -408,12 +416,12 @@ namespace Jack
          */
         int shortinfo()
         {
-            int						err;
-            snd_ctl_card_info_t*	card_info;
-            snd_ctl_t*				ctl_handle;
-            err = snd_ctl_open(&ctl_handle, fCardName, 0);		check_error(err);
+            int	err;
+            snd_ctl_card_info_t* card_info;
+            snd_ctl_t* ctl_handle;
+            err = snd_ctl_open(&ctl_handle, fCardName, 0);	check_error(err);
             snd_ctl_card_info_alloca(&card_info);
-            err = snd_ctl_card_info(ctl_handle, card_info);		check_error(err);
+            err = snd_ctl_card_info(ctl_handle, card_info);	check_error(err);
             printf("%s|%d|%d|%d|%d|%s\n", 
                     snd_ctl_card_info_get_driver(card_info),
                     fCardInputs, fCardOutputs,
@@ -426,9 +434,9 @@ namespace Jack
          */
         int longinfo()
         {
-            int						err;
-            snd_ctl_card_info_t*	card_info;
-            snd_ctl_t*				ctl_handle;
+            int	err;
+            snd_ctl_card_info_t* card_info;
+            snd_ctl_t* ctl_handle;
 
             printf("Audio Interface Description :\n");
             printf("Sampling Frequency : %d, Sample Format : %s, buffering : %d\n", 
@@ -483,23 +491,17 @@ namespace Jack
 	{
     
 	    private:
-        
-            	AudioInterface	fAudioInterface;
+        	
             	JackThread fThread;
+		AudioInterface	fAudioInterface;
        
 	    public:
         
 		JackAlsaIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
                 :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
-                ,fThread(this)
-		
-            {
-		fAudioInterface.fFrequency = sample_rate;
-		fAudioInterface.fBuffering = buffer_size;
-		fAudioInterface.fSoftInputs = input;
-		fAudioInterface.fSoftOutputs = output;
-	    }
-            
+                ,fThread(this), fAudioInterface(input, output, buffer_size, sample_rate)	
+            {}
+           
 	    ~JackAlsaIOAdapter()
             {}
             
