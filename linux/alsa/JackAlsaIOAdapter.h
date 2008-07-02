@@ -20,6 +20,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackAlsaIOAdapter__
 #define __JackAlsaIOAdapter__
 
+#include <math.h>
+#include <limits.h>
 #include <alsa/asoundlib.h>
 #include "JackIOAdapter.h"
 #include "JackPlatformThread.h"
@@ -45,9 +47,9 @@ namespace Jack
     
       public:
                 
-        const char*		fCardName;					
+        const char*	fCardName;					
         unsigned int	fFrequency;
-        int				fBuffering; 
+        int		fBuffering; 
         
         unsigned int	fSoftInputs;
         unsigned int	fSoftOutputs;
@@ -85,19 +87,19 @@ namespace Jack
     
      public:
      
-        snd_pcm_t*				fOutputDevice;		
-        snd_pcm_t*				fInputDevice;			
+        snd_pcm_t*		fOutputDevice;		
+        snd_pcm_t*		fInputDevice;			
         snd_pcm_hw_params_t* 	fInputParams;
         snd_pcm_hw_params_t* 	fOutputParams;
         
-        snd_pcm_format_t 		fSampleFormat;
-        snd_pcm_access_t 		fSampleAccess;
+        snd_pcm_format_t 	fSampleFormat;
+        snd_pcm_access_t 	fSampleAccess;
         
-        unsigned int			fCardInputs;
-        unsigned int			fCardOutputs;
+        unsigned int	fCardInputs;
+        unsigned int	fCardOutputs;
         
-        unsigned int			fChanInputs;
-        unsigned int			fChanOutputs;
+        unsigned int	fChanInputs;
+        unsigned int	fChanOutputs;
         
         // interleaved mode audiocard buffers
         void*		fInputCardBuffer;
@@ -113,11 +115,11 @@ namespace Jack
 
      public:
      
-        const char*	cardName()				{ return fCardName;  	}
-        int			frequency()				{ return fFrequency; 	}
-        int			buffering()				{ return fBuffering;  	}
+        const char*	cardName()		{ return fCardName;  	}
+        int		frequency()		{ return fFrequency; 	}
+        int		buffering()		{ return fBuffering;  	}
         
-        float**		inputSoftChannels()		{ return fInputSoftChannels;	}
+        float**		inputSoftChannels()	{ return fInputSoftChannels;	}
         float**		outputSoftChannels()	{ return fOutputSoftChannels;	}
         
         AudioInterface(const AudioParam& ap = AudioParam()) : AudioParam(ap)
@@ -189,6 +191,8 @@ namespace Jack
                     fOutputSoftChannels[i][j] = 0.0;
                 }
             }
+
+            return 0;
         }
         
         int setAudioParams(snd_pcm_t* stream, snd_pcm_hw_params_t* params)
@@ -225,6 +229,7 @@ namespace Jack
             
             err = snd_pcm_hw_params_set_periods (stream, params, 2, 0); 			
             check_error_msg(err, "number of periods not available");
+            return 0;
         }
 
         ssize_t interleavedBufferSize(snd_pcm_hw_params_t* params)
@@ -244,8 +249,11 @@ namespace Jack
             return bsize;
         }
 
-        void close()
-        {}
+        int close()
+        {
+            // TODO
+	    return 0;
+	}
 
         /**
          * Read audio samples from the audio card. Convert samples to floats and take 
@@ -312,6 +320,8 @@ namespace Jack
             } else {
                 check_error_msg(-10000, "unknow access mode");
             }
+
+            return 0;
         }
 
 
@@ -389,6 +399,8 @@ namespace Jack
             } else {
                 check_error_msg(-10000, "unknow access mode");
             }
+
+            return 0;
         }
       
         /**
@@ -434,6 +446,7 @@ namespace Jack
             // affichage des infos liees aux streams d'entree-sortie
             if (fSoftInputs > 0)	printHWParams(fInputParams);
             if (fSoftOutputs > 0)	printHWParams(fOutputParams);
+            return 0;
         }
         
         void printCardInfo(snd_ctl_card_info_t*	ci)
@@ -469,19 +482,25 @@ namespace Jack
 	class JackAlsaIOAdapter : public JackIOAdapterInterface, public JackRunnableInterface
 	{
     
-		private:
+	    private:
         
-            AudioInterface	fAudioInterface;
-            JackThread fThread;
+            	AudioInterface	fAudioInterface;
+            	JackThread fThread;
        
-		public:
+	    public:
         
-			JackAlsaIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+		JackAlsaIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
                 :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
-                ,fThread(this),AudioParam().frequency(sample_rate).buffering(buffer_size).inputs(input).output(output)
-            {}
+                ,fThread(this)
+		
+            {
+		fAudioInterface.fFrequency = sample_rate;
+		fAudioInterface.fBuffering = buffer_size;
+		fAudioInterface.fSoftInputs = input;
+		fAudioInterface.fSoftOutputs = output;
+	    }
             
-			~JackAlsaIOAdapter()
+	    ~JackAlsaIOAdapter()
             {}
             
             virtual int Open();

@@ -42,12 +42,13 @@ int JackAlsaIOAdapter::Close()
     return fAudioInterface.close();
 }
             
-bool JackAlsaIOAdapter:Execute()
+bool JackAlsaIOAdapter::Execute()
 {
-    if (fAudioInterface.read()) < 0)
+    if (fAudioInterface.read() < 0)
         return false;
-    if (fAudioInterface.write()) < 0)
+    if (fAudioInterface.write() < 0)
         return false;
+    return true;
 }
 
 int JackAlsaIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
