@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackCoreAudioIOAdapter__
 
 #include "JackIOAdapter.h"
+#include "JackFilters.h"
 #include "jack.h"
 #include <AudioToolbox/AudioConverter.h>
 #include <CoreAudio/CoreAudio.h>
@@ -29,12 +30,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-typedef	UInt8	CAAudioHardwareDeviceSectionID;
-#define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
-#define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
-#define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
-#define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
-
+    typedef	UInt8	CAAudioHardwareDeviceSectionID;
+    #define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
+    #define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
+    #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
+    #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
 
 	class JackCoreAudioIOAdapter : public JackIOAdapterInterface
 	{
@@ -42,24 +42,31 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 		private:
         
             AudioUnit fAUHAL;
+            AudioBufferList* fInputData;
+            
+            JackFilter fProducerFilter;
+            JackFilter fConsumerFilter;
             
             AudioDeviceID fDeviceID;
+            bool fState;
 
             AudioUnitRenderActionFlags* fActionFags;
             AudioTimeStamp* fCurrentTime;
             
             static	OSStatus Render(void *inRefCon,
-                               AudioUnitRenderActionFlags *ioActionFlags,
-                               const AudioTimeStamp *inTimeStamp,
-                               UInt32 inBusNumber,
-                               UInt32 inNumberFrames,
-                               AudioBufferList *ioData);
+                                    AudioUnitRenderActionFlags *ioActionFlags,
+                                    const AudioTimeStamp *inTimeStamp,
+                                    UInt32 inBusNumber,
+                                    UInt32 inNumberFrames,
+                                    AudioBufferList *ioData);
+                               
+            static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
+                                                    UInt32 inChannel,
+                                                    Boolean	isInput,
+                                                    AudioDevicePropertyID inPropertyID,
+                                                    void* inClientData);
 
-            OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
             OSStatus GetDefaultDevice(AudioDeviceID* id);
-            OSStatus GetDefaultInputDevice(AudioDeviceID* id);
-            OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
-            OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
             OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
 
             // Setup
@@ -75,14 +82,26 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
                               int& in_nChannels,
                               int& out_nChannels,
                               bool strict);
-
+                              
+            int OpenAUHAL(bool capturing,
+                        bool playing,
+                        int inchannels,
+                        int outchannels,
+                        int in_nChannels,
+                        int out_nChannels,
+                        jack_nframes_t nframes,
+                        jack_nframes_t samplerate,
+                        bool strict);
 
             int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
+            int SetupBuffers(int inchannels, int outchannels);
+            void DisposeBuffers();
+            void CloseAUHAL();
     
 		public:
         
 			JackCoreAudioIOAdapter(int input, int output, int buffer_size, float sample_rate)
-                :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
+                :JackIOAdapterInterface(input, output, buffer_size, sample_rate),fInputData(0),fState(false)
             {}
 			~JackCoreAudioIOAdapter()
             {}

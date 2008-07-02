@@ -115,9 +115,10 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-            // adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter(2, 2, 512, 44100.f), 2, 2);
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
-                new Jack::JackPortAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
+                new Jack::JackCoreAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
+            //adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
+            //    new Jack::JackPortAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
             assert(adapter);
             
             if (adapter->Open() == 0) {

@@ -224,7 +224,7 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
     switch (inPropertyID) {
 
         case kAudioDevicePropertyNominalSampleRate: {
-            jack_log("JackCoreAudioDriver::SRNotificationCallback kAudioDevicePropertyNominalSampleRate ");
+            jack_log("JackCoreAudioDriver::SRNotificationCallback kAudioDevicePropertyNominalSampleRate");
             driver->fState = true;
             break;
         }

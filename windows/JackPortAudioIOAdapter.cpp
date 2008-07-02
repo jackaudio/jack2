@@ -49,24 +49,20 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
      
     if (!adapter->fRunning) {
         adapter->fRunning = true;
-        
-        paBuffer = (float**)inputBuffer;
+        float buffer[framesPerBuffer];
         for (int i = 0; i < adapter->fCaptureChannels; i++) {
-            buffer =  static_cast<float*>(paBuffer[i]);
-            adapter->fCaptureRingBuffer[i].Read(buffer, framesPerBuffer);
-            adapter->fCaptureRingBuffer[i].Read(buffer, framesPerBuffer);
-            adapter->fCaptureRingBuffer[i].Read(buffer, framesPerBuffer);
+            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
+            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
+            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
         }
         
-        paBuffer = (float**)outputBuffer;
         for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-            buffer =  static_cast<float*>(paBuffer[i]);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, framesPerBuffer);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, framesPerBuffer);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, framesPerBuffer);
+            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
+            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
+            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
         }
-    }
-    
+    }  
+      
     /*
     double src_ratio_output = double(adapter->fCurCallbackTime - adapter->fLastCallbackTime) / double(adapter->fDeltaTime);
     double src_ratio_input = double(adapter->fDeltaTime) / double(adapter->fCurCallbackTime - adapter->fLastCallbackTime);
@@ -91,16 +87,16 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fCaptureRingBuffer[i].SetRatio(src_ratio_input);
-        //int len = adapter->fCaptureRingBuffer[i].WriteResample(buffer, framesPerBuffer);
-        int len = adapter->fCaptureRingBuffer[i].Write(buffer, framesPerBuffer);
+        //adapter->fCaptureRingBuffer[i].WriteResample(buffer, framesPerBuffer);
+        adapter->fCaptureRingBuffer[i].Write(buffer, framesPerBuffer);
     }
     
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fPlaybackRingBuffer[i].SetRatio(src_ratio_output);
-        //int len = adapter->fPlaybackRingBuffer[i].ReadResample(buffer, framesPerBuffer); 
-        int len = adapter->fPlaybackRingBuffer[i].Read(buffer, framesPerBuffer);    
+        //adapter->fPlaybackRingBuffer[i].ReadResample(buffer, framesPerBuffer); 
+        adapter->fPlaybackRingBuffer[i].Read(buffer, framesPerBuffer);    
     }
     
     return paContinue;

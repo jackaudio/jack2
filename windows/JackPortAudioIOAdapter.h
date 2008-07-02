@@ -21,40 +21,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackPortAudioIOAdapter__
 
 #include "JackIOAdapter.h"
+#include "JackFilters.h"
 #include "portaudio.h"
 
 namespace Jack
 {
 
-    #define MAX_SIZE 64
-    
-    struct  Filter {
-    
-        jack_time_t fTable[MAX_SIZE];
-        
-        Filter()
-        {
-            for (int i = 0; i < MAX_SIZE; i++)
-                fTable[i] = 0;
-        }
-        
-        void AddValue(jack_time_t val)
-        {
-            memcpy(&fTable[1], &fTable[0], sizeof(jack_time_t) * (MAX_SIZE - 1));
-            fTable[0] = val;
-        }
-        
-        jack_time_t GetVal()
-        {
-            jack_time_t mean = 0;
-            for (int i = 0; i < MAX_SIZE; i++)
-                mean += fTable[i];
-            
-            return mean / MAX_SIZE;
-        }
-    };
-
-	class JackPortAudioIOAdapter : public JackIOAdapterInterface
+   	class JackPortAudioIOAdapter : public JackIOAdapterInterface
 	{
     
 		private:
@@ -63,8 +36,8 @@ namespace Jack
             PaDeviceIndex fInputDevice;
             PaDeviceIndex fOutputDevice;
             
-            Filter fProducerFilter;
-            Filter fConsumerFilter;
+            JackFilter fProducerFilter;
+            JackFilter fConsumerFilter;
             
             static int Render(const void* inputBuffer, void* outputBuffer,
                             unsigned long framesPerBuffer,
