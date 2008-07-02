@@ -39,26 +39,26 @@ int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     for (i = 0; i < adapter->fCaptureChannels; i++) {
     
         buffer = static_cast<char*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
-        size_t len = jack_ringbuffer_write_space(adapter->fCaptureRingBuffer);
+        size_t len = jack_ringbuffer_read_space(adapter->fCaptureRingBuffer);
         
         if (len <  frames * sizeof(float)) {
             jack_error("JackNetIOAdapter::Process : consumer too slow, skip frames...");
-            jack_ringbuffer_write(adapter->fCaptureRingBuffer, buffer, len);
+            jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, len);
         } else {
-            jack_ringbuffer_write(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
+            jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
         }
     }
     
     for (i = 0; i < adapter->fPlaybackChannels; i++) {
     
         buffer = static_cast<char*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
-        size_t len = jack_ringbuffer_read_space(adapter->fPlaybackRingBuffer);
+        size_t len = jack_ringbuffer_write_space(adapter->fPlaybackRingBuffer);
         
         if (len <  frames * sizeof(float)) {
             jack_error("JackNetIOAdapter::Process : producer too slow, missing frames...");
-            jack_ringbuffer_read(adapter->fPlaybackRingBuffer, buffer, len);
+            jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, len);
         } else {
-            jack_ringbuffer_read(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));
+            jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));
         }
     }
      
