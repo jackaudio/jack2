@@ -28,8 +28,6 @@ using namespace std;
 namespace Jack
 {
 
-#define DEFAULT_RB_SIZE 16384	
-
 int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
 {
     JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);

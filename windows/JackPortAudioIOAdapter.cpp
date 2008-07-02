@@ -29,57 +29,6 @@ static inline float Range(float min, float max, float val)
     return (val < min) ? min : ((val > max) ? max : val);
 }
 
-/*
-int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
-                                unsigned long framesPerBuffer,
-                                const PaStreamCallbackTimeInfo* timeInfo,
-                                PaStreamCallbackFlags statusFlags,
-                                void* userData)
-{
-    JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
-    float** paBuffer;
-    char* buffer;
-    
-    if (!adapter->fRunning) {
-        adapter->fRunning = true;
-        adapter->fFirstCallbackTime = jack_get_time();
-    }
-    
-    double src_ratio = double(jack_get_time() - adapter->fFirstCallbackTime) / double( adapter->fCallbackTime - adapter->fFirstCallbackTime);
-    jack_log("Callback resampler coeff %f", src_ratio);
-    
-    paBuffer = (float**)inputBuffer;
-    for (int i = 0; i < adapter->fCaptureChannels; i++) {
-        
-        buffer = (char*)paBuffer[i];
-        size_t len = jack_ringbuffer_write_space(adapter->fCaptureRingBuffer[i]);
-        
-        if (len < framesPerBuffer * sizeof(float)) {
-            jack_error("JackPortAudioIOAdapter::Process : producer too slow, missing frames = %d", framesPerBuffer - len / sizeof(float));
-            jack_ringbuffer_write(adapter->fCaptureRingBuffer[i], buffer, len);
-        } else {
-            jack_ringbuffer_write(adapter->fCaptureRingBuffer[i], buffer, framesPerBuffer * sizeof(float));
-        }
-    }
-    
-    paBuffer = (float**)outputBuffer;
-    for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-        
-        buffer = (char*)paBuffer[i];
-        size_t len = jack_ringbuffer_read_space(adapter->fPlaybackRingBuffer[i]);
-         
-        if (len < framesPerBuffer * sizeof(float)) {
-            jack_error("JackPortAudioIOAdapter::Process : consumer too slow, skip frames = %d", framesPerBuffer - len / sizeof(float));
-            jack_ringbuffer_read(adapter->fPlaybackRingBuffer[i], buffer, len);
-        } else {
-            jack_ringbuffer_read(adapter->fPlaybackRingBuffer[i], buffer, framesPerBuffer * sizeof(float));
-        }
-    }
-    
-    return paContinue;
-}
-*/
-
 int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
                                 unsigned long framesPerBuffer,
                                 const PaStreamCallbackTimeInfo* timeInfo,
@@ -89,7 +38,6 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
     float** paBuffer;
     float* buffer;
-    int res;
     
     adapter->fLastCallbackTime = adapter->fCurCallbackTime;
     adapter->fCurCallbackTime = jack_get_time();
@@ -143,16 +91,16 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fCaptureRingBuffer[i].SetRatio(src_ratio_input);
-        int len = adapter->fCaptureRingBuffer[i].WriteResample(buffer, framesPerBuffer);
-        //int len = adapter->fCaptureRingBuffer[i].Write(buffer, framesPerBuffer);
+        //int len = adapter->fCaptureRingBuffer[i].WriteResample(buffer, framesPerBuffer);
+        int len = adapter->fCaptureRingBuffer[i].Write(buffer, framesPerBuffer);
     }
     
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fPlaybackRingBuffer[i].SetRatio(src_ratio_output);
-        int len = adapter->fPlaybackRingBuffer[i].ReadResample(buffer, framesPerBuffer); 
-        //int len = adapter->fPlaybackRingBuffer[i].Read(buffer, framesPerBuffer);    
+        //int len = adapter->fPlaybackRingBuffer[i].ReadResample(buffer, framesPerBuffer); 
+        int len = adapter->fPlaybackRingBuffer[i].Read(buffer, framesPerBuffer);    
     }
     
     return paContinue;
