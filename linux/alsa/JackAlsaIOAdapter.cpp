@@ -55,39 +55,8 @@ bool JackAlsaIOAdapter::Execute()
     if (fAudioInterface.read() < 0)
         return false;
 
-    if (!fRunning) {
-        fRunning = true;
-        jack_time_t time = jack_get_time();
-        fProducerDLL.Init(time);
-        fConsumerDLL.Init(time);
-    }
-
-    // DLL
-    jack_time_t time = jack_get_time();
-    fProducerDLL.IncFrame(time);
-    jack_nframes_t time1 = fConsumerDLL.Time2Frames(time);
-    jack_nframes_t time2 = fProducerDLL.Time2Frames(time);
-     
-    double src_ratio_output = double(time2) / double(time1);
-    double src_ratio_input = double(time1) / double(time2);
-   
-    if (src_ratio_input < 0.1f || src_ratio_input > 1.9f) {
-        jack_error("src_ratio_input = %f", src_ratio_input);
-        src_ratio_input = 1;
-        time1 = 1;
-        time2 = 1;
-    }
-    
-    if (src_ratio_output < 0.1f || src_ratio_output > 1.9f) {
-        jack_error("src_ratio_output = %f", src_ratio_output);
-        src_ratio_output = 1;
-        time1 = 1;
-        time2 = 1;
-    }  
-    
-    src_ratio_input = Range(0.1f, 1.9f, src_ratio_input);
-    src_ratio_output = Range(0.1f, 1.9f, src_ratio_output);
-    jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
+    jack_nframes_t time1, time2; 
+    adapter->ResampleFactor(time1, time2);
   
     for (int i = 0; i < fCaptureChannels; i++) {
          fCaptureRingBuffer[i]->SetRatio(time1, time2);
@@ -100,7 +69,7 @@ bool JackAlsaIOAdapter::Execute()
     }
 
 #ifdef DEBUG
-    fTable.Write(time1, time2, src_ratio_input, src_ratio_output, 
+    fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
         fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
 #endif
         

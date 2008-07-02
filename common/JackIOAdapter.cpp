@@ -50,6 +50,46 @@ void MeasureTable::Save()
 	fclose(file);
 }
 
+void JackIOAdapterInterface::ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2)
+{
+    if (!fRunning) {
+        fRunning = true;
+        jack_time_t time = jack_get_time();
+        fProducerDLL.Init(time);
+        fConsumerDLL.Init(time);
+    }
+           
+    // DLL
+    jack_time_t time = jack_get_time();
+    fProducerDLL.IncFrame(time);
+    jack_nframes_t time1 = fConsumerDLL.Time2Frames(time);
+    jack_nframes_t time2 = fProducerDLL.Time2Frames(time);
+     
+    double src_ratio_output = double(time2) / double(time1);
+    double src_ratio_input = double(time1) / double(time2);
+   
+    if (src_ratio_input < 0.7f || src_ratio_input > 1.3f) {
+        jack_error("src_ratio_input = %f", src_ratio_input);
+        src_ratio_input = 1;
+        time1 = 1;
+        time2 = 1;
+    }
+    
+    if (src_ratio_output < 0.7f || src_ratio_output > 1.3f) {
+        jack_error("src_ratio_output = %f", src_ratio_output);
+        src_ratio_output = 1;
+        time1 = 1;
+        time2 = 1;
+    }  
+    
+    src_ratio_input = Range(0.7f, 1.3f, src_ratio_input);
+    src_ratio_output = Range(0.7f, 1.3f, src_ratio_output);
+    jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
+    
+    frame1 = time1;
+    frame2 = time2;
+}
+
 int JackIOAdapterInterface::Open()
 {
     return 0;

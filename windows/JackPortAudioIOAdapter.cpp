@@ -34,46 +34,15 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     float** paBuffer;
     float* buffer;
     
-    if (!adapter->fRunning) {
-        adapter->fRunning = true;
-        jack_time_t time = jack_get_time();
-        adapter->fProducerDLL.Init(time);
-        adapter->fConsumerDLL.Init(time);
-    }
-           
-    // DLL
-    jack_time_t time = jack_get_time();
-    adapter->fProducerDLL.IncFrame(time);
-    jack_nframes_t time1 = adapter->fConsumerDLL.Time2Frames(time);
-    jack_nframes_t time2 = adapter->fProducerDLL.Time2Frames(time);
-     
-    double src_ratio_output = double(time2) / double(time1);
-    double src_ratio_input = double(time1) / double(time2);
-   
-    if (src_ratio_input < 0.7f || src_ratio_input > 1.3f) {
-        jack_error("src_ratio_input = %f", src_ratio_input);
-        src_ratio_input = 1;
-        time1 = 1;
-        time2 = 1;
-    }
+    jack_nframes_t time1, time2; 
+    adapter->ResampleFactor(time1, time2);
     
-    if (src_ratio_output < 0.7f || src_ratio_output > 1.3f) {
-        jack_error("src_ratio_output = %f", src_ratio_output);
-        src_ratio_output = 1;
-        time1 = 1;
-        time2 = 1;
-    }  
-    
-    src_ratio_input = Range(0.7f, 1.3f, src_ratio_input);
-    src_ratio_output = Range(0.7f, 1.3f, src_ratio_output);
-    jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
-  
     paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
         adapter->fCaptureRingBuffer[i]->WriteResample(buffer, framesPerBuffer);
-     }
+    }
     
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
@@ -83,7 +52,7 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     }
     
 #ifdef DEBUG    
-    adapter->fTable.Write(time1, time2, src_ratio_input, src_ratio_output, 
+    adapter->fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1), 
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
     

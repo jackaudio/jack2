@@ -119,6 +119,9 @@ namespace Jack
             {
                 fConsumerDLL.IncFrame(callback_usec);
             }
+            
+            void ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2);
+            
         
 	};
 }
