@@ -300,7 +300,7 @@ jack_log("opren ok");
             } else if (fSampleAccess == SND_PCM_ACCESS_RW_NONINTERLEAVED) {
                 
                 int count = snd_pcm_readn(fInputDevice, fInputCardChannels, fBuffering); 	
-                if (count<0) { 
+                if (count < 0) { 
                     display_error_msg(count, "reading samples");
                     int err = snd_pcm_prepare(fInputDevice);	
                     check_error_msg(err, "preparing input stream");
@@ -510,6 +510,7 @@ jack_log("opren ok");
              
             virtual int SetBufferSize(jack_nframes_t buffer_size);
             
+	    virtual bool Init();
             virtual bool Execute();
              
    	};
