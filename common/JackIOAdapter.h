@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackIOAdapter__
 
 #include "ringbuffer.h"
+#include "jack.h"
+#include "JackError.h"
 
 namespace Jack
 {
@@ -34,6 +36,8 @@ namespace Jack
             int fPlaybackChannels;
             int fBufferSize;
             float fSampleRate;
+            jack_time_t fCallbackTime;
+            jack_time_t fFirstCallbackTime;
           
             jack_ringbuffer_t* fCaptureRingBuffer;
             jack_ringbuffer_t* fPlaybackRingBuffer;
@@ -46,6 +50,7 @@ namespace Jack
                 fPlaybackChannels(output), 
                 fBufferSize(buffer_size), 
                 fSampleRate(sample_rate),
+                fCallbackTime(0),
                 fRunning(false)
             {}
 			virtual ~JackIOAdapterInterface()
@@ -65,6 +70,11 @@ namespace Jack
             virtual void SetBufferSize(int buffer_size)
             {
                 fBufferSize = buffer_size;
+            }
+            
+            virtual void SetCallbackTime(jack_time_t usec)
+            {
+                fCallbackTime = usec;
             }
         
 	};

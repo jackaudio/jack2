@@ -38,6 +38,8 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     
     if (!adapter->fIOAdapter->IsRunning())
         return 0;
+        
+    adapter->fIOAdapter->SetCallbackTime(jack_get_time());
     
     for (i = 0; i < adapter->fCaptureChannels; i++) {
     
@@ -45,7 +47,7 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
         size_t len = jack_ringbuffer_read_space(adapter->fCaptureRingBuffer);
         
         if (len < frames * sizeof(float)) {
-            jack_error("JackCallbackNetIOAdapter::Process : consumer too slow, skip frames = %d", (frames * sizeof(float)) - len);
+            jack_error("JackCallbackNetIOAdapter::Process : consumer too slow, skip frames = %d", frames - len / sizeof(float));
             jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, len);
         } else {
             jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
@@ -58,7 +60,7 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
         size_t len = jack_ringbuffer_write_space(adapter->fPlaybackRingBuffer);
         
          if (len < frames * sizeof(float)) {
-            jack_error("JackCallbackNetIOAdapter::Process : producer too slow, missing frames = %d", (frames * sizeof(float)) - len);
+            jack_error("JackCallbackNetIOAdapter::Process : producer too slow, missing frames = %d", frames - len / sizeof(float));
             jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, len);
         } else {
             jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));
