@@ -68,6 +68,13 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
+int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t nframes, void *arg)
+{
+     JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
+     adapter->fIOAdapter->SetBufferSize(nframes);
+     return 0;
+}
+
 JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client, 
                                     JackIOAdapterInterface* audio_io, 
                                     int input, 
@@ -86,6 +93,9 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
     fIOAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
      
     if (jack_set_process_callback(fJackClient, Process, this) < 0)
+        goto fail;
+        
+    if (jack_set_buffer_size_callback(fJackClient, BufferSize, this) < 0)
         goto fail;
     
     if (jack_activate(fJackClient) < 0)

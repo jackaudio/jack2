@@ -49,7 +49,7 @@ namespace Jack
                                 int input, 
                                 int output);
 			virtual ~JackNetIOAdapter();
-            
+             
             int Open();
             int Close();
             

@@ -56,11 +56,16 @@ namespace Jack
                 fCaptureRingBuffer = input;
                 fPlaybackRingBuffer = output;
             }
-            
+             
             bool IsRunning() {return fRunning;}
             
             virtual int Open() = 0;
             virtual int Close() = 0;
+            
+            virtual void SetBufferSize(int buffer_size)
+            {
+                fBufferSize = buffer_size;
+            }
         
 	};
 }

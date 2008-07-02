@@ -35,6 +35,7 @@ namespace Jack
             jack_ringbuffer_t* fPlaybackRingBuffer;
       	
             static int Process(jack_nframes_t, void* arg);
+            static int BufferSize(jack_nframes_t nframes, void *arg);
             
 		public:
         
@@ -43,7 +44,7 @@ namespace Jack
                                 int input, 
                                 int output);
 			~JackCallbackNetIOAdapter();
-            
+               
 	};
 }
 
