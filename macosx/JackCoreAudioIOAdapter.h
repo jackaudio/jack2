@@ -43,9 +43,6 @@ namespace Jack
             AudioUnit fAUHAL;
             AudioBufferList* fInputData;
             
-            JackFilter fProducerFilter;
-            JackFilter fConsumerFilter;
-            
             AudioDeviceID fDeviceID;
             bool fState;
 
