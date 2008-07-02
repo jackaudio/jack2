@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ringbuffer.h"
 #include "jack.h"
 #include "JackError.h"
+#include "JackResampler.h"
 #include <samplerate.h>
 
 namespace Jack
@@ -43,11 +44,8 @@ namespace Jack
             jack_time_t fCurCallbackTime;
             jack_time_t fDeltaTime;
             
-            SRC_STATE** fCaptureResampler;
-            SRC_STATE** fPlaybackResampler;
-          
-            jack_ringbuffer_t** fCaptureRingBuffer;
-            jack_ringbuffer_t** fPlaybackRingBuffer;
+            JackResampler* fCaptureRingBuffer;
+            JackResampler* fPlaybackRingBuffer;
             bool fRunning;
                
 		public:
@@ -61,17 +59,11 @@ namespace Jack
                 fCurCallbackTime(0),
                 fDeltaTime(0),
                 fRunning(false)
-            {
-                fCaptureResampler = new SRC_STATE*[fCaptureChannels];
-                fPlaybackResampler = new SRC_STATE*[fPlaybackChannels];
-            }
+            {}
 			virtual ~JackIOAdapterInterface()
-            {
-                delete[] fCaptureResampler;
-                delete[] fPlaybackResampler;
-            }
+            {}
             
-            void SetRingBuffers(jack_ringbuffer_t** input, jack_ringbuffer_t** output)
+            void SetRingBuffers(JackResampler* input, JackResampler* output)
             {
                 fCaptureRingBuffer = input;
                 fPlaybackRingBuffer = output;

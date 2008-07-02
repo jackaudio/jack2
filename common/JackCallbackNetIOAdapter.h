@@ -31,9 +31,9 @@ namespace Jack
     
 		private:
         
-            jack_ringbuffer_t** fCaptureRingBuffer;
-            jack_ringbuffer_t** fPlaybackRingBuffer;
-            
+            JackResampler* fCaptureRingBuffer;
+            JackResampler* fPlaybackRingBuffer;
+           
             jack_time_t fLastCallbackTime;
             jack_time_t fCurCallbackTime;
        	

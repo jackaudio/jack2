@@ -89,9 +89,7 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
     float** paBuffer;
     float* buffer;
-    SRC_DATA src_data;
     int res;
-    jack_ringbuffer_data_t ring_buffer_data[2];
     
     adapter->fLastCallbackTime = adapter->fCurCallbackTime;
     adapter->fCurCallbackTime = jack_get_time();
@@ -106,18 +104,18 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
         
         paBuffer = (float**)inputBuffer;
         for (int i = 0; i < adapter->fCaptureChannels; i++) {
-            buffer = (float*)paBuffer[i];
-            jack_ringbuffer_read(adapter->fCaptureRingBuffer[i], (char*)buffer, framesPerBuffer * sizeof(float));
-            jack_ringbuffer_read(adapter->fCaptureRingBuffer[i], (char*)buffer, framesPerBuffer * sizeof(float));
-            jack_ringbuffer_read(adapter->fCaptureRingBuffer[i], (char*)buffer, framesPerBuffer * sizeof(float));
+            buffer =  static_cast<float*>(paBuffer[i]);
+            adapter->fCaptureRingBuffer[i].Read(buffer, framesPerBuffer);
+            adapter->fCaptureRingBuffer[i].Read(buffer, framesPerBuffer);
+            adapter->fCaptureRingBuffer[i].Read(buffer, framesPerBuffer);
         }
         
         paBuffer = (float**)outputBuffer;
         for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-            buffer = (float*)paBuffer[i];
-            jack_ringbuffer_write(adapter->fPlaybackRingBuffer[i], (char*)buffer, framesPerBuffer * sizeof(float));
-            jack_ringbuffer_write(adapter->fPlaybackRingBuffer[i], (char*)buffer, framesPerBuffer * sizeof(float));
-            jack_ringbuffer_write(adapter->fPlaybackRingBuffer[i], (char*)buffer, framesPerBuffer * sizeof(float));
+            buffer =  static_cast<float*>(paBuffer[i]);
+            adapter->fPlaybackRingBuffer[i].Write(buffer, framesPerBuffer);
+            adapter->fPlaybackRingBuffer[i].Write(buffer, framesPerBuffer);
+            adapter->fPlaybackRingBuffer[i].Write(buffer, framesPerBuffer);
         }
     }
     
@@ -143,90 +141,18 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     
     paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
-        
         buffer = (float*)paBuffer[i];
-        jack_ringbuffer_get_write_vector(adapter->fCaptureRingBuffer[i], ring_buffer_data);
-        
-        unsigned int available_frames = (ring_buffer_data[0].len + ring_buffer_data[1].len) / sizeof(float);
-        jack_log("INPUT available = %ld", available_frames);
-        
-        unsigned int frames_to_read = framesPerBuffer;
-        unsigned int read_frames = 0;
-        
-        if (available_frames < framesPerBuffer) {
-             jack_error("JackPortAudioIOAdapter::Render : consumer too slow, skip frames = %d", framesPerBuffer);
-        } else {
-            
-            for (int j = 0; j < 2; j++) {
-            
-                if (ring_buffer_data[j].len > 0) {
-                
-                    src_data.data_in = &buffer[read_frames];
-                    src_data.data_out = (float*)ring_buffer_data[j].buf;
-                    src_data.input_frames = frames_to_read;
-                    src_data.output_frames = (ring_buffer_data[j].len / sizeof(float));
-                    src_data.end_of_input = 0;
-                    src_data.src_ratio = src_ratio_input;
-                 
-                    res = src_process(adapter->fCaptureResampler[i], &src_data);
-                    if (res != 0)
-                        jack_error("JackPortAudioIOAdapter::Render err = %s", src_strerror(res));
-                        
-                    frames_to_read -= src_data.input_frames_used;
-                    read_frames += src_data.input_frames_used;
-                
-                    jack_log("INPUT : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
-                    jack_ringbuffer_write_advance(adapter->fCaptureRingBuffer[i], src_data.output_frames_gen * sizeof(float));
-                }
-            }
-            
-            if (read_frames < framesPerBuffer)
-                jack_error("JackPortAudioIOAdapter::Render error read_frames = %ld", read_frames);
-        }
+        adapter->fCaptureRingBuffer[i].SetRatio(src_ratio_input);
+        int len = adapter->fCaptureRingBuffer[i].WriteResample(buffer, framesPerBuffer);
+        //int len = adapter->fCaptureRingBuffer[i].Write(buffer, framesPerBuffer);
     }
     
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-        
         buffer = (float*)paBuffer[i];
-        jack_ringbuffer_get_read_vector(adapter->fPlaybackRingBuffer[i], ring_buffer_data);
-        
-        unsigned int available_frames = (ring_buffer_data[0].len + ring_buffer_data[1].len) / sizeof(float);
-        jack_log("OUTPUT available = %ld", available_frames);
-        
-        unsigned int frames_to_write = framesPerBuffer;
-        unsigned int written_frames = 0;
-        
-        if (available_frames < framesPerBuffer) {
-             jack_error("JackPortAudioIOAdapter::Render : producer too slow, skip frames = %d", framesPerBuffer);
-        } else {
-            
-            for (int j = 0; j < 2; j++) {
-            
-                if (ring_buffer_data[j].len > 0) {
-                    
-                    src_data.data_in = (float*)ring_buffer_data[j].buf;
-                    src_data.data_out = &buffer[written_frames];
-                    src_data.input_frames = ring_buffer_data[j].len / sizeof(float);
-                    src_data.output_frames = frames_to_write;
-                    src_data.end_of_input = 0;
-                    src_data.src_ratio = src_ratio_output;
-                     
-                    res = src_process(adapter->fPlaybackResampler[i], &src_data);
-                    if (res != 0)
-                        jack_error("JackPortAudioIOAdapter::Render err = %s", src_strerror(res));
-                        
-                    frames_to_write -= src_data.output_frames_gen;
-                    written_frames += src_data.output_frames_gen;
-                    
-                    jack_log("OUTPUT : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
-                    jack_ringbuffer_read_advance(adapter->fPlaybackRingBuffer[i], src_data.input_frames_used * sizeof(float));
-                }
-            }
-            
-            if (written_frames < framesPerBuffer)
-                jack_error("JackPortAudioIOAdapter::Render error written_frames = %ld", written_frames);
-        }
+        adapter->fPlaybackRingBuffer[i].SetRatio(src_ratio_output);
+        int len = adapter->fPlaybackRingBuffer[i].ReadResample(buffer, framesPerBuffer); 
+        //int len = adapter->fPlaybackRingBuffer[i].Read(buffer, framesPerBuffer);    
     }
     
     return paContinue;
@@ -251,7 +177,6 @@ int JackPortAudioIOAdapter::Open()
     
     jack_log("JackPortAudioIOAdapter::Pa_GetDefaultInputDevice %ld", Pa_GetDefaultInputDevice());
     jack_log("JackPortAudioIOAdapter::Pa_GetDefaultOutputDevice %ld", Pa_GetDefaultOutputDevice());
-    
     jack_log("JackPortAudioIOAdapter::Open fBufferSize = %ld fSampleRate %f", fBufferSize, fSampleRate);
 
     inputDevice = Pa_GetDefaultInputDevice();
