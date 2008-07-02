@@ -26,10 +26,7 @@ int JackAlsaIOAdapter::Open()
 {
     if (fAudioInterface.open() == 0) {
         fAudioInterface.longinfo();
-        //fAudioInterface.write();
-        //fAudioInterface.write();
         fThread.AcquireRealTime();
-jack_log("StartSync");
         fThread.StartSync();
         return 0;
     } else {
@@ -62,7 +59,7 @@ bool JackAlsaIOAdapter::Execute()
         fConsumerDLL.Init(time);
     }
 
-// DLL
+    // DLL
     jack_time_t time = jack_get_time();
     fProducerDLL.IncFrame(time);
     jack_nframes_t time1 = fConsumerDLL.Time2Frames(time);
@@ -90,20 +87,18 @@ bool JackAlsaIOAdapter::Execute()
     jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
   
     for (int i = 0; i < fCaptureChannels; i++) {
-        float* buffer = (float*)fAudioInterface.fInputSoftChannels[i];
-        fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        fCaptureRingBuffer[i]->WriteResample(buffer, fBufferSize);
+         fCaptureRingBuffer[i]->SetRatio(time1, time2);
+        fCaptureRingBuffer[i]->WriteResample(fAudioInterface.fInputSoftChannels[i], fBufferSize);
      }
     
     for (int i = 0; i < fPlaybackChannels; i++) {
-        float* buffer = (float*)fAudioInterface.fOutputSoftChannels[i];
         fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        fPlaybackRingBuffer[i]->ReadResample(buffer, fBufferSize); 
+        fPlaybackRingBuffer[i]->ReadResample(fAudioInterface.fOutputSoftChannels[i], fBufferSize); 
     }
         
     if (fAudioInterface.write() < 0)
         return false;
-jack_log("execute");
+        
     return true;
 }
 

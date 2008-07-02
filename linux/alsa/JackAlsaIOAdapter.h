@@ -48,9 +48,9 @@ namespace Jack
     
       public:
                 
-        const char*	fCardName;					
+        const char*     fCardName;					
         unsigned int	fFrequency;
-        int		fBuffering; 
+        int             fBuffering; 
         
         unsigned int	fSoftInputs;
         unsigned int	fSoftOutputs;
@@ -116,7 +116,7 @@ namespace Jack
 
      public:
      
-        const char*	cardName()		{ return fCardName;  	}
+        const char*	cardName()	{ return fCardName;  	}
         int		frequency()		{ return fFrequency; 	}
         int		buffering()		{ return fBuffering;  	}
         
@@ -131,10 +131,9 @@ namespace Jack
             fOutputParams			= 0;
         }
 
-	AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
+        AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
             AudioParam(input, output, buffer_size, sample_rate)
-         {}
-        
+        {}
         
         /**
          * Open the audio interface
@@ -142,13 +141,9 @@ namespace Jack
         int open()
         {
             int err;
-		jack_log("open %s", fCardName);
-            
             // allocation d'un stream d'entree et d'un stream de sortie
             err = snd_pcm_open(&fInputDevice,  fCardName, SND_PCM_STREAM_CAPTURE, 0); 	check_error(err)
-jack_log("open 1");
             err = snd_pcm_open(&fOutputDevice, fCardName, SND_PCM_STREAM_PLAYBACK, 0); 	check_error(err)
-jack_log("open 2");
 
             // recherche des parametres d'entree
             err = snd_pcm_hw_params_malloc(&fInputParams); 	check_error(err);
@@ -200,7 +195,6 @@ jack_log("open 2");
                     fOutputSoftChannels[i][j] = 0.0;
                 }
             }
-jack_log("opren ok");
             return 0;
         }
         
@@ -260,8 +254,8 @@ jack_log("opren ok");
         int close()
         {
             // TODO
-	    return 0;
-	}
+            return 0;
+        }
 
         /**
          * Read audio samples from the audio card. Convert samples to floats and take 
@@ -331,7 +325,6 @@ jack_log("opren ok");
 
             return 0;
         }
-
 
         /**
          * write the output soft channels to the audio card. Convert sample 
@@ -492,17 +485,17 @@ jack_log("opren ok");
     
 	    private:
         	
-            	JackThread fThread;
-		AudioInterface	fAudioInterface;
+            JackThread fThread;
+            AudioInterface	fAudioInterface;
        
 	    public:
         
-		JackAlsaIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+            JackAlsaIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
                 :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
                 ,fThread(this), fAudioInterface(input, output, buffer_size, sample_rate)	
             {}
            
-	    ~JackAlsaIOAdapter()
+            ~JackAlsaIOAdapter()
             {}
             
             virtual int Open();
@@ -510,7 +503,7 @@ jack_log("opren ok");
              
             virtual int SetBufferSize(jack_nframes_t buffer_size);
             
-	    virtual bool Init();
+            virtual bool Init();
             virtual bool Execute();
              
    	};
