@@ -17,40 +17,26 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackNetIOAdapter__
-#define __JackNetIOAdapter__
+#ifndef __JackCoreAudioIOAdapter__
+#define __JackCoreAudioIOAdapter__
 
-#include "jack.h"
-#include "ringbuffer.h"
 #include "JackIOAdapter.h"
 
 namespace Jack
 {
 
-	class JackNetIOAdapter
+	class JackCoreAudioIOAdapter : public JackIOAdapterInterface
 	{
 		private:
-        
-            int fCaptureChannels;
-            int fPlaybackChannels;
-
-            jack_port_t** fCapturePortList;
-            jack_port_t** fPlaybackPortList;
-            
-            jack_ringbuffer_t* fCaptureRingBuffer;
-            jack_ringbuffer_t* fPlaybackRingBuffer;
-        
-			jack_client_t* fJackClient;
-            JackIOAdapterInterface* fIOAdapter;
-		
-            static int Process(jack_nframes_t, void* arg);
-            void FreePorts();
-            
+              
 		public:
         
-			JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io);
-			~JackNetIOAdapter();
-	};
+			JackCoreAudioIOAdapter()
+            {}
+			~JackCoreAudioIOAdapter()
+            {}
+            
+   	};
 }
 
 #endif

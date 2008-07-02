@@ -27,7 +27,7 @@ using namespace std;
 namespace Jack
 {
 
-#define DEFAULT_RB_SIZE 16384		/* ringbuffer size in frames */
+#define DEFAULT_RB_SIZE 16384	/* ringbuffer size in frames */
 
 int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
 {
@@ -64,13 +64,15 @@ int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
-JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client)
+JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io)
 {
     int i;
     char name[32];
     fJackClient = jack_client;
     fCaptureChannels = 2;
     fPlaybackChannels = 2;
+    
+    fIOAdapter = audio_io;
     
     fCapturePortList = new jack_port_t* [fCaptureChannels];
     fPlaybackPortList = new jack_port_t* [fPlaybackChannels];
@@ -83,6 +85,8 @@ JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client)
     if (fPlaybackRingBuffer == NULL)
         goto fail;
 
+    fIOAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
+  
     for (i = 0; i < fCaptureChannels; i++) {
         sprintf(name, "in_%d", i+1);
         if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL) 
@@ -94,7 +98,7 @@ JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client)
         if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)) == NULL) 
             goto fail;
     }
-          
+    
     if (jack_set_process_callback(fJackClient, Process, this) < 0)
         goto fail;
     
@@ -109,7 +113,8 @@ fail:
 
 JackNetIOAdapter::~JackNetIOAdapter()
 {
-    FreePorts();
+    // When called Close has already been sued for the client, thus ports are already unregistered.
+    delete fIOAdapter;
 }
 
 void JackNetIOAdapter::FreePorts()
@@ -145,6 +150,8 @@ extern "C"
 {
 #endif
 
+#include "JackCoreAudioIOAdapter.h"
+
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
 		if (adapter) {
@@ -152,7 +159,7 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-			adapter = new Jack::JackNetIOAdapter(jack_client);
+			adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter());
 			return (adapter) ? 0 : 1;
 		}
 	}
