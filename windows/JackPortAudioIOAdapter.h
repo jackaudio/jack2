@@ -40,7 +40,7 @@ namespace Jack
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags,
                             void* userData);
-
+       
 		public:
         
 			JackPortAudioIOAdapter(int input, int output, int buffer_size, float sample_rate)

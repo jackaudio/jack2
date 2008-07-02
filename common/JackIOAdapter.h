@@ -50,8 +50,8 @@ namespace Jack
             JackFilter fConsumerFilter;
             
             // DLL
-            JackDelayLockedLoop fConsumerDLL;
             JackDelayLockedLoop fProducerDLL;
+            JackDelayLockedLoop fConsumerDLL;
             jack_time_t fCurFrames;
              
             JackResampler* fCaptureRingBuffer;

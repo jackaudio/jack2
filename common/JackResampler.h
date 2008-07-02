@@ -22,45 +22,48 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ringbuffer.h"
 #include "JackError.h"
-#include <samplerate.h>
+
 
 namespace Jack
 {
 
-    #define DEFAULT_RB_SIZE 16384	
+    #define DEFAULT_RB_SIZE 16384 * 4	
 
 	class JackResampler
 	{
     
 		protected:
         
-            SRC_STATE* fResampler;
             jack_ringbuffer_t* fRingBuffer;
-            double fRatio;
+            unsigned int fNum;
+            unsigned int fDenom;
                
 		public:
         
 			JackResampler();
         	virtual ~JackResampler();
             
-            int ReadResample(float* buffer, unsigned int frames);
-            int WriteResample(float* buffer, unsigned int frames);
+            virtual int ReadResample(float* buffer, unsigned int frames);
+            virtual int WriteResample(float* buffer, unsigned int frames);
             
-            int Read(float* buffer, unsigned int frames);
-            int Write(float* buffer, unsigned int frames);
+            virtual int Read(float* buffer, unsigned int frames);
+            virtual int Write(float* buffer, unsigned int frames);
             
-            unsigned int ReadSpace();
-            unsigned int WriteSpace();
+            virtual unsigned int ReadSpace();
+            virtual unsigned int WriteSpace();
     
-            void SetRatio(double ratio) 
+            virtual void SetRatio(unsigned int num, unsigned int denom)
             {
-                fRatio = ratio;
+                fNum = num;
+                fDenom = denom;
             }
-            double GetRatio() 
+            virtual void GetRatio(unsigned int& num, unsigned int& denom)
             {
-                return fRatio;
+                num = fNum;
+                denom = fDenom;
             }
-	};
+     
+        };
 }
 
 #endif
