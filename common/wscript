@@ -196,7 +196,8 @@ def build(bld):
 
     #create_jack_process_obj(bld, 'netioadapter', 'JackNetIOAdapter.cpp ../macosx/JackCoreAudioIOAdapter.cpp', serverlib)
 
-    process = create_jack_process_obj(bld, 'netioadapter', 'JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../windows/JackPortAudioIOAdapter.cpp', serverlib)
+    process = create_jack_process_obj(bld, 'netioadapter', 'JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../windows/JackPortAudioIOAdapter.cpp', serverlib)
+    process.env.append_value("LINKFLAGS", "-lsamplerate")
     if bld.env()['IS_MACOSX']:
         process.env.append_value("LINKFLAGS", "../macosx/libportaudio.a -framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
 

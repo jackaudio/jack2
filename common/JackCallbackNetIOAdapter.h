@@ -31,9 +31,12 @@ namespace Jack
     
 		private:
         
-            jack_ringbuffer_t* fCaptureRingBuffer;
-            jack_ringbuffer_t* fPlaybackRingBuffer;
-      	
+            jack_ringbuffer_t** fCaptureRingBuffer;
+            jack_ringbuffer_t** fPlaybackRingBuffer;
+            
+            jack_time_t fLastCallbackTime;
+            jack_time_t fCurCallbackTime;
+       	
             static int Process(jack_nframes_t, void* arg);
             static int BufferSize(jack_nframes_t nframes, void *arg);
             
