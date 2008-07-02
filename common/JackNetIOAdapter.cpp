@@ -115,16 +115,32 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
+            const char** ports;
             
+            // Find out input and output ports numbers
+            int input = 0;
+            if ((ports = jack_get_ports(jack_client, NULL, NULL, JackPortIsPhysical|JackPortIsOutput)) != NULL) {
+                while (ports[input]) input++;
+            }
+            if (ports)
+                free(ports);
+            
+            int output = 0;
+            if ((ports = jack_get_ports(jack_client, NULL, NULL, JackPortIsPhysical|JackPortIsInput)) != NULL) {
+                while (ports[output]) output++;
+            }
+            if (ports)
+                free(ports);
+
+        #ifdef WIN32
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
-                new Jack::JackPortAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
+                new Jack::JackPortAudioIOAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);
+        #endif
             
-           /*
         #ifdef __APPLE__
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
-                new Jack::JackCoreAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
+                new Jack::JackCoreAudioIOAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);
         #endif
-            */
             
             assert(adapter);
             

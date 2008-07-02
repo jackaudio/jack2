@@ -50,24 +50,24 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     double src_ratio_output = double(time2) / double(time1);
     double src_ratio_input = double(time1) / double(time2);
    
-    if (src_ratio_input < 0.8f || src_ratio_input > 1.2f) {
+    if (src_ratio_input < 0.7f || src_ratio_input > 1.3f) {
         jack_error("src_ratio_input = %f", src_ratio_input);
         src_ratio_input = 1;
         time1 = 1;
         time2 = 1;
     }
     
-    if (src_ratio_output < 0.8f || src_ratio_output > 1.2f) {
+    if (src_ratio_output < 0.7f || src_ratio_output > 1.3f) {
         jack_error("src_ratio_output = %f", src_ratio_output);
         src_ratio_output = 1;
         time1 = 1;
         time2 = 1;
     }  
     
-    src_ratio_input = Range(0.8f, 1.2f, src_ratio_input);
-    src_ratio_output = Range(0.8f, 1.2f, src_ratio_output);
+    src_ratio_input = Range(0.7f, 1.3f, src_ratio_input);
+    src_ratio_output = Range(0.7f, 1.3f, src_ratio_output);
     jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
-   
+  
     paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
@@ -160,7 +160,6 @@ int JackPortAudioIOAdapter::Close()
     jack_log("JackPortAudioIOAdapter:: Pa_CloseStream");
     Pa_Terminate();
     jack_log("JackPortAudioIOAdapter:: Pa_Terminate");
-    
     return JackIOAdapterInterface::Close();
 }
 
