@@ -71,7 +71,7 @@ void JackNetIOAdapter::FreePorts()
 {
     int i;
     
-     for (i = 0; i < fCaptureChannels; i++) {
+    for (i = 0; i < fCaptureChannels; i++) {
         if (fCapturePortList[i])
             jack_port_unregister(fJackClient, fCapturePortList[i]);
     }

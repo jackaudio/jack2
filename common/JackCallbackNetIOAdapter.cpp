@@ -73,11 +73,22 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
-int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t nframes, void *arg)
+int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t nframes, void* arg)
 {
-     JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
-     adapter->fIOAdapter->SetBufferSize(nframes);
-     return 0;
+    int i;
+    JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
+        
+    for (i = 0; i < adapter->fCaptureChannels; i++) {
+        adapter->fCaptureRingBuffer[i]->Reset();
+    }
+    
+    for (i = 0; i < adapter->fPlaybackChannels; i++) {
+        adapter->fPlaybackRingBuffer[i]->Reset();
+    }
+        
+    adapter->fIOAdapter->Reset();
+    adapter->fIOAdapter->SetBufferSize(nframes);
+    return 0;
 }
 
 JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client, 
