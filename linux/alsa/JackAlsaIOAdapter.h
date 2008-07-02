@@ -151,7 +151,7 @@ namespace Jack
             snd_pcm_hw_params_get_channels(fInputParams, &fCardInputs);
 
             // recherche des parametres de sortie
-            err = snd_pcm_hw_params_malloc( &fOutputParams ); check_error(err)
+            err = snd_pcm_hw_params_malloc(&fOutputParams); check_error(err)
             setAudioParams(fOutputDevice, fOutputParams);
             snd_pcm_hw_params_get_channels(fOutputParams, &fCardOutputs);
 
@@ -167,7 +167,6 @@ namespace Jack
             if (fSampleAccess == SND_PCM_ACCESS_RW_INTERLEAVED) {
                 fInputCardBuffer = aligned_calloc(interleavedBufferSize(fInputParams), 1);
                 fOutputCardBuffer = aligned_calloc(interleavedBufferSize(fOutputParams), 1);
-                
             } else {
                 for (unsigned int i = 0; i < fCardInputs; i++) {
                     fInputCardChannels[i] = aligned_calloc(noninterleavedBufferSize(fInputParams), 1);
@@ -195,6 +194,43 @@ namespace Jack
                     fOutputSoftChannels[i][j] = 0.0;
                 }
             }
+            return 0;
+        }
+        
+        int close()
+        {
+            for (unsigned int i = 0; i < fChanInputs; i++) {
+                if (fInputSoftChannels[i])
+                    free(fInputSoftChannels[i]);
+            }
+
+            for (unsigned int i = 0; i < fChanOutputs; i++) {
+                if (fOutputSoftChannels[i])
+                    free(fOutputSoftChannels[i]);
+            }
+            
+            for (unsigned int i = 0; i < fCardInputs; i++) {
+                if (fInputCardChannels[i])
+                    free(fInputCardChannels[i]);
+            }
+            
+            for (unsigned int i = 0; i < fCardOutputs; i++) {
+                if (fCardOutputs[i])
+                    free(fCardOutputs[i]);
+            }
+            
+            if (fInputCardBuffer)
+                free(fInputCardBuffer);
+                
+            if (fOutputCardBuffer)
+                free(fOutputCardBuffer);
+          
+            snd_pcm_hw_params_free(fInputParams);
+            snd_pcm_hw_params_free(fOutputParams);
+            
+            snd_pcm_close(fInputDevice);
+            snd_pcm_close(fOutputDevice);
+            
             return 0;
         }
         
@@ -239,7 +275,7 @@ namespace Jack
             _snd_pcm_format 	format;  	snd_pcm_hw_params_get_format(params, &format);
             snd_pcm_uframes_t 	psize;		snd_pcm_hw_params_get_period_size(params, &psize, NULL);
             unsigned int 		channels; 	snd_pcm_hw_params_get_channels(params, &channels);
-            ssize_t bsize = snd_pcm_format_size (format, psize * channels);
+            ssize_t bsize = snd_pcm_format_size(format, psize * channels);
             return bsize;
         }
 
@@ -247,14 +283,8 @@ namespace Jack
         {
             _snd_pcm_format 	format;  	snd_pcm_hw_params_get_format(params, &format);
             snd_pcm_uframes_t 	psize;		snd_pcm_hw_params_get_period_size(params, &psize, NULL);
-            ssize_t bsize = snd_pcm_format_size (format, psize);
+            ssize_t bsize = snd_pcm_format_size(format, psize);
             return bsize;
-        }
-
-        int close()
-        {
-            // TODO
-            return 0;
         }
 
         /**
