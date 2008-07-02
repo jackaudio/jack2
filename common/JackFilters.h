@@ -51,7 +51,6 @@ namespace Jack
             jack_time_t mean = 0;
             for (int i = 0; i < MAX_SIZE; i++)
                 mean += fTable[i];
-            
             return mean / MAX_SIZE;
         }
     };

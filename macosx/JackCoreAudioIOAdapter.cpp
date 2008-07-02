@@ -121,21 +121,7 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
                                         AudioBufferList *ioData)
 {
     JackCoreAudioIOAdapter* adapter = static_cast<JackCoreAudioIOAdapter*>(inRefCon);
-    
-    jack_log("JackCoreAudioIOAdapter::Render inNumberFrames %ld", inNumberFrames);
-    
-    AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
-    
-    /*
-    adapter->fLastCallbackTime = adapter->fCurCallbackTime;
-    adapter->fCurCallbackTime = jack_get_time();
-    
-    adapter->fConsumerFilter.AddValue(adapter->fCurCallbackTime - adapter->fLastCallbackTime);
-    adapter->fProducerFilter.AddValue(adapter->fDeltaTime);
-    */
-    
-    //jack_log("JackCoreAudioIOAdapter::Render delta %ld", adapter->fCurCallbackTime - adapter->fLastCallbackTime);
-    //printf("JackCoreAudioIOAdapter::Render delta %ld\n", adapter->fCurCallbackTime - adapter->fLastCallbackTime);
+     AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
       
     if (!adapter->fRunning) {
         adapter->fRunning = true;
@@ -144,31 +130,15 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
         adapter->fConsumerDLL.Init(time);
     }
     
-    // DLL based
-    //adapter->fConsumerDLL.IncFrame(adapter->fConsumerTime);
+    // DLL 
     jack_time_t time = jack_get_time();
     adapter->fProducerDLL.IncFrame(time);
-    
-    /*
-    jack_time_t time1 = adapter->fConsumerDLL.CurFrame2Time();
-    jack_time_t time2 = adapter->fProducerDLL.CurFrame2Time();
-    */
-    
     jack_nframes_t time1 = adapter->fConsumerDLL.Time2Frames(time);
     jack_nframes_t time2 = adapter->fProducerDLL.Time2Frames(time);
     
-    printf("time1 %ld time2 %ld\n",time1, time2);
-
     double src_ratio_output = double(time2) / double(time1);
     double src_ratio_input = double(time1) / double(time2);
  
-     /*  
-    jack_time_t val2 = adapter->fConsumerFilter.GetVal();
-    jack_time_t val1 = adapter->fProducerFilter.GetVal();
-    double src_ratio_output = double(val1) / double(val2);
-    double src_ratio_input = double(val2) / double(val1);
-    */
-  
     if (src_ratio_input < 0.8f || src_ratio_input > 1.2f) {
         jack_error("src_ratio_input = %f", src_ratio_input);
         src_ratio_input = 1;
@@ -185,21 +155,16 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
   
     src_ratio_input = Range(0.8f, 1.2f, src_ratio_input);
     src_ratio_output = Range(0.8f, 1.2f, src_ratio_output);
-    
-    //jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
-    //jack_info("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
-    printf("Callback resampler src_ratio_input = %f src_ratio_output = %f\n", src_ratio_input, src_ratio_output);
+    jack_log("Callback resampler src_ratio_input = %f src_ratio_output = %f", src_ratio_input, src_ratio_output);
      
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
         adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
-       // adapter->fCaptureRingBuffer[i].Write((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
     }
     
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
         adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames); 
-       // adapter->fPlaybackRingBuffer[i].Read((float*)ioData->mBuffers[i].mData, inNumberFrames);    
     }
    
     return noErr;

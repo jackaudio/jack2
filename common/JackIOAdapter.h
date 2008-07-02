@@ -42,10 +42,6 @@ namespace Jack
             int fBufferSize;
             float fSampleRate;
             
-            jack_time_t fLastCallbackTime;
-            jack_time_t fCurCallbackTime;
-            jack_time_t fDeltaTime;
-            
             JackFilter fProducerFilter;
             JackFilter fConsumerFilter;
             
@@ -65,9 +61,6 @@ namespace Jack
                 fPlaybackChannels(output), 
                 fBufferSize(buffer_size), 
                 fSampleRate(sample_rate),
-                fLastCallbackTime(0),
-                fCurCallbackTime(0),
-                fDeltaTime(0),
                 fProducerDLL(buffer_size, sample_rate),
                 fConsumerDLL(buffer_size, sample_rate),
                 fRunning(false)
@@ -91,17 +84,8 @@ namespace Jack
                 fBufferSize = buffer_size;
             }
             
-            virtual void SetCallbackDeltaTime(jack_time_t delta_usec)
-            {
-                jack_log("SetCallbackDeltaTime %ld", delta_usec);
-                //printf("SetCallbackDeltaTime %ld\n", delta_usec);
-                fDeltaTime = delta_usec;
-            }
-            
             virtual void SetCallbackTime(jack_time_t callback_usec)
             {
-                jack_log("SetCallbackTime %ld", callback_usec);
-                //printf("SetCallbackDeltaTime %ld\n", delta_usec);
                 fConsumerDLL.IncFrame(callback_usec);
             }
         
