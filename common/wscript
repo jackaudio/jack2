@@ -41,7 +41,7 @@ def subst_func(tsk):
 def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld.create_obj('cpp', 'shlib')
     process.env['shlib_PATTERN'] = '%s.so'
-    process.includes = ['./jack', '.', '../macosx','../windows']
+    process.includes = ['./jack', '.', '../macosx','../windows', '../linux/alsa']
     process.name     = target
     process.target   = target
     process.source   = sources
@@ -198,7 +198,7 @@ def build(bld):
          process = create_jack_process_obj(bld, 'netioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../macosx/JackCoreAudioIOAdapter.cpp', serverlib)
     
     if bld.env()['IS_LINUX']:
-         process = create_jack_process_obj(bld, 'netioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp', serverlib)
+         process = create_jack_process_obj(bld, 'netioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../linux/alsa/JackAlsaIOAdapter.cpp', serverlib)
 
     #process = create_jack_process_obj(bld, 'netioadapter', 'JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../windows/JackPortAudioIOAdapter.cpp', serverlib)
 

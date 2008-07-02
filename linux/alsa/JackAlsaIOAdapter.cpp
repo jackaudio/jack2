@@ -17,19 +17,25 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackIOAdapter.h"
+#include "JackAlsaIOAdapter.h"
 
 namespace Jack
 {
 
-int JackIOAdapterInterface::Open()
+            
+int JackAlsaIOAdapter::Open()
 {
     return 0;
 }
+int JackAlsaIOAdapter::Close()
+{
+    return 0;
+}
+            
+int JackAlsaIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
+{
+    return 0;
+}
+           
 
-int JackIOAdapterInterface::Close()
-{
-    return 0;
 }
- 
-} // namespace

@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackExports.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 using namespace std;
@@ -106,6 +107,10 @@ extern "C"
 
 #include "JackCallbackNetIOAdapter.h"
 
+#ifdef __linux__
+#include "JackAlsaIOAdapter.h"
+#endif
+
 #ifdef __APPLE__
 #include "JackCoreAudioIOAdapter.h"
 #endif
@@ -137,6 +142,11 @@ extern "C"
             }
             if (ports)
                 free(ports);
+
+        #ifdef __linux__
+            adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
+                new Jack::JackAlsaIOAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);
+        #endif
 
         #ifdef WIN32
             adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
