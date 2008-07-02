@@ -104,9 +104,15 @@ extern "C"
 {
 #endif
 
-#include "JackCoreAudioIOAdapter.h"
-#include "JackPortAudioIOAdapter.h"
 #include "JackCallbackNetIOAdapter.h"
+
+#ifdef __APPLE__
+#include "JackCoreAudioIOAdapter.h"
+#endif
+
+#ifdef WIN32
+#include "JackPortAudioIOAdapter.h"
+#endif
 
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
