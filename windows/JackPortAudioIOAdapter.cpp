@@ -19,17 +19,126 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackPortAudioIOAdapter.h"
 #include "portaudio.h"
+#include "JackError.h"
 
 namespace Jack
 {
-        
-JackPortAudioIOAdapter::JackPortAudioIOAdapter(int input, int output)
-    :JackIOAdapterInterface(input, output)
-{}
 
-JackPortAudioIOAdapter::~JackPortAudioIOAdapter()
-{}
-            
+int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
+                                unsigned long framesPerBuffer,
+                                const PaStreamCallbackTimeInfo* timeInfo,
+                                PaStreamCallbackFlags statusFlags,
+                                void* userData)
+{
+    JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
+    char* buffer;
+    
+    jack_log("JackPortAudioIOAdapter::Render");
+     
+    for (int i = 0; i < adapter->fCaptureChannels; i++) {
+        
+        buffer = (char*)inputBuffer;
+        size_t len = jack_ringbuffer_read_space(adapter->fCaptureRingBuffer);
+         
+        if (len < framesPerBuffer * sizeof(float)) {
+            jack_error("JackPortAudioIOAdapter::Process : producer too slow, skip frames...");
+            jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, len);
+        } else {
+            jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, framesPerBuffer * sizeof(float));
+        }
+    }
+    
+    for (int i = 0; i < adapter->fPlaybackChannels; i++) {
+        
+        buffer =  (char*)outputBuffer;
+        size_t len = jack_ringbuffer_write_space(adapter->fPlaybackRingBuffer);
+         
+        if (len < framesPerBuffer * sizeof(float)) {
+            jack_error("JackPortAudioIOAdapter::Process : consumer too slow, skip frames...");
+            jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, len);
+        } else {
+            jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, framesPerBuffer * sizeof(float));
+        }
+    }
+    jack_log("JackPortAudioIOAdapter::Render");
+    
+    return paContinue;
+}
+        
+int JackPortAudioIOAdapter::Open()
+{
+    PaError err;
+    PaStreamParameters inputParameters;
+    PaStreamParameters outputParameters;
+    PaDeviceIndex inputDevice;
+    PaDeviceIndex outputDevice;
+    
+    err = Pa_Initialize();
+    if (err != paNoError) {
+        jack_error("JackPortAudioIOAdapter::Pa_Initialize error = %s\n", Pa_GetErrorText(err));
+        goto error;
+    }
+    
+    jack_log("JackPortAudioIOAdapter::Pa_GetDefaultInputDevice %ld", Pa_GetDefaultInputDevice());
+    jack_log("JackPortAudioIOAdapter::Pa_GetDefaultOutputDevice %ld", Pa_GetDefaultOutputDevice());
+    
+    jack_log("JackPortAudioIOAdapter::Open fBufferSize = %ld fSampleRate %f", fBufferSize, fSampleRate);
+
+    inputDevice = Pa_GetDefaultInputDevice();
+    outputDevice = Pa_GetDefaultOutputDevice();
+    
+    inputParameters.device = inputDevice;
+    inputParameters.channelCount = fCaptureChannels;
+    inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
+    inputParameters.suggestedLatency = (inputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
+                                       ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
+                                       : 0;
+    inputParameters.hostApiSpecificStreamInfo = NULL;
+
+    outputParameters.device = outputDevice;
+    outputParameters.channelCount = fPlaybackChannels;
+    outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
+    outputParameters.suggestedLatency = (outputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
+                                        ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
+                                        : 0;
+    outputParameters.hostApiSpecificStreamInfo = NULL;
+
+    err = Pa_OpenStream(&fStream,
+                        (inputDevice == paNoDevice) ? 0 : &inputParameters,
+                        (outputDevice == paNoDevice) ? 0 : &outputParameters,
+                        fSampleRate,
+                        fBufferSize,
+                        paNoFlag,  // Clipping is on...
+                        Render,
+                        this);
+    if (err != paNoError) {
+        jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
+        goto error;
+    }
+    
+    err = Pa_StartStream(fStream);
+    if (err != paNoError) {
+         jack_error("Pa_StartStream error = %s", Pa_GetErrorText(err));
+         goto error;
+    }
+    jack_log("JackPortAudioIOAdapter::Open OK");
+    return 0;
+     
+error:
+    Pa_Terminate();
+    return -1;
 }
 
-#endif
+int JackPortAudioIOAdapter::Close()
+{
+    jack_log("JackPortAudioIOAdapter::Close");
+    Pa_StopStream(fStream);
+    jack_log("JackPortAudioIOAdapter:: Pa_StopStream");
+    Pa_CloseStream(fStream);
+    jack_log("JackPortAudioIOAdapter:: Pa_CloseStream");
+    Pa_Terminate();
+    jack_log("JackPortAudioIOAdapter:: Pa_Terminate");
+    return 0;
+}
+
+} // namespace

@@ -31,14 +31,26 @@ namespace Jack
     
 		private:
         
-          
+            PaStream* fStream;
+            PaDeviceIndex fInputDevice;
+            PaDeviceIndex fOutputDevice;
+            
+            static int Render(const void* inputBuffer, void* outputBuffer,
+                            unsigned long framesPerBuffer,
+                            const PaStreamCallbackTimeInfo* timeInfo,
+                            PaStreamCallbackFlags statusFlags,
+                            void* userData);
+
 		public:
         
-			JackPortAudioIOAdapter(int input, int output)
-                :JackIOAdapterInterface(input, output)
+			JackPortAudioIOAdapter(int input, int output, int buffer_size, float sample_rate)
+                :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
             {}
 			~JackPortAudioIOAdapter()
             {}
+            
+            int Open();
+            int Close();
             
    	};
 }

@@ -81,12 +81,15 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
     
 		public:
         
-			JackCoreAudioIOAdapter(int input, int output)
-                :JackIOAdapterInterface(input, output)
+			JackCoreAudioIOAdapter(int input, int output, int buffer_size, float sample_rate)
+                :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
             {}
 			~JackCoreAudioIOAdapter()
             {}
             
+            virtual int Open();
+            virtual int Close();
+           
    	};
 }
 

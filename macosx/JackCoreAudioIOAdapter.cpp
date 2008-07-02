@@ -45,6 +45,7 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
     AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
     */
     
+    ///AudioUnitRender(fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, fJackInputData);
     return noErr;
 }
 
@@ -114,5 +115,15 @@ int JackCoreAudioIOAdapter::SetupBufferSizeAndSampleRate(jack_nframes_t nframes,
     return 0;
 }
   
+int JackCoreAudioIOAdapter::Open()
+{
+
+}
+
+int JackCoreAudioIOAdapter::Close()
+{
+
+}
+
   
 }

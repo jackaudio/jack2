@@ -410,7 +410,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     PaStreamParameters outputParameters;
 
     if ((err = Pa_CloseStream(fStream)) != paNoError) {
-        jack_error("Pa_CloseStream error = %s\n", Pa_GetErrorText(err));
+        jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
         return -1;
     }
 
@@ -440,7 +440,7 @@ int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
                         this);
 
     if (err != paNoError) {
-        jack_error("Pa_OpenStream error = %s\n", Pa_GetErrorText(err));
+        jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
         return -1;
     } else {
         // Only done when success

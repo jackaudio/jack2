@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackExports.h"
 #include <stdio.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -64,14 +65,16 @@ int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
-JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io, int input, int output)
+JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, 
+                                    JackIOAdapterInterface* audio_io, 
+                                    int input, 
+                                    int output)
 {
     int i;
     char name[32];
     fJackClient = jack_client;
     fCaptureChannels = input;
     fPlaybackChannels = output;
-    
     fIOAdapter = audio_io;
     
     fCapturePortList = new jack_port_t* [fCaptureChannels];
@@ -141,6 +144,16 @@ void JackNetIOAdapter::FreePorts()
     delete[] fPlaybackPortList;
 }
 
+int JackNetIOAdapter::Open()
+{
+    return fIOAdapter->Open();
+}
+
+int JackNetIOAdapter::Close()
+{
+    return fIOAdapter->Close();
+}
+
 } //namespace
 
 static Jack::JackNetIOAdapter* adapter = NULL;
@@ -151,6 +164,7 @@ extern "C"
 #endif
 
 #include "JackCoreAudioIOAdapter.h"
+#include "JackPortAudioIOAdapter.h"
 
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
@@ -159,15 +173,26 @@ extern "C"
 			return 1;
 		} else {
 			jack_log("Loading NetAudio Adapter");
-			adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter(2, 2), 2, 2);
-			return (adapter) ? 0 : 1;
+            // adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter(2, 2, 512, 44100.f), 2, 2);
+            adapter = new Jack::JackNetIOAdapter(jack_client, 
+                new Jack::JackPortAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
+            assert(adapter);
+            
+            if (adapter->Open() == 0) {
+                return 0;
+            } else {
+                delete adapter;
+                adapter = NULL;
+                return 1;
+            }
 		}
 	}
 
 	EXPORT void jack_finish(void* arg)
 	{
 		if (adapter) {
-			jack_log("Unloading  NetAudio Adapter");
+			jack_log("Unloading NetAudio Adapter");
+            adapter->Close();
 			delete adapter;
 			adapter = NULL;
 		}

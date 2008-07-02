@@ -33,7 +33,7 @@ namespace Jack
         
             int fCaptureChannels;
             int fPlaybackChannels;
-
+    
             jack_port_t** fCapturePortList;
             jack_port_t** fPlaybackPortList;
             
@@ -48,8 +48,15 @@ namespace Jack
             
 		public:
         
-			JackNetIOAdapter(jack_client_t* jack_client, JackIOAdapterInterface* audio_io, int input, int output);
+			JackNetIOAdapter(jack_client_t* jack_client, 
+                                JackIOAdapterInterface* audio_io, 
+                                int input, 
+                                int output);
 			~JackNetIOAdapter();
+            
+            int Open();
+            int Close();
+            
 	};
 }
 
