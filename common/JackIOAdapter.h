@@ -82,9 +82,10 @@ namespace Jack
             virtual int Open();
             virtual int Close();
             
-            virtual void SetBufferSize(int buffer_size)
+            virtual int SetBufferSize(int buffer_size)
             {
                 fBufferSize = buffer_size;
+                return 0;
             }
             
             virtual void SetCallbackTime(jack_time_t callback_usec)

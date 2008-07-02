@@ -52,7 +52,7 @@ namespace Jack
             int Open();
             int Close();
             
-           void SetBufferSize(int buffer_size);
+           int SetBufferSize(int buffer_size);
             
    	};
 }

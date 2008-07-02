@@ -163,11 +163,11 @@ int JackPortAudioIOAdapter::Close()
     return JackIOAdapterInterface::Close();
 }
 
-void JackPortAudioIOAdapter::SetBufferSize(int buffer_size)
+int JackPortAudioIOAdapter::SetBufferSize(int buffer_size)
 {
     JackIOAdapterInterface::SetBufferSize(buffer_size);
     Close();
-    Open();
+    return Open();
 }
 
 } // namespace

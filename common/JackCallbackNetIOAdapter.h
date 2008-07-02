@@ -47,6 +47,12 @@ namespace Jack
                                 int input, 
                                 int output);
 			~JackCallbackNetIOAdapter();
+            
+            virtual int SetBufferSize(int buffer_size)
+            {
+                // TODO
+                return -1;
+            }
                
 	};
 }
