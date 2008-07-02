@@ -28,7 +28,6 @@ using namespace std;
 namespace Jack
 {
 
-
 JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, 
                                     JackIOAdapterInterface* audio_io, 
                                     int input, 
@@ -64,7 +63,7 @@ fail:
 
 JackNetIOAdapter::~JackNetIOAdapter()
 {
-    // When called Close has already been sued for the client, thus ports are already unregistered.
+    // When called, Close has already been used for the client, thus ports are already unregistered.
     delete fIOAdapter;
 }
 

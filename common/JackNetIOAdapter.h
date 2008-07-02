@@ -28,6 +28,7 @@ namespace Jack
 
 	class JackNetIOAdapter
 	{
+    
 		protected:
         
             int fCaptureChannels;
@@ -39,7 +40,7 @@ namespace Jack
 			jack_client_t* fJackClient;
             JackIOAdapterInterface* fIOAdapter;
 		
-             void FreePorts();
+            void FreePorts();
             
 		public:
         

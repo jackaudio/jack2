@@ -28,6 +28,7 @@ namespace Jack
 
 	class JackCallbackNetIOAdapter : public JackNetIOAdapter
 	{
+    
 		private:
         
             jack_ringbuffer_t* fCaptureRingBuffer;
