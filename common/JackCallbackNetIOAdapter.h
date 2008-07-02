@@ -29,29 +29,29 @@ namespace Jack
 	class JackCallbackNetIOAdapter : public JackNetIOAdapter
 	{
     
-		private:
+	    private:
         
-            JackResampler** fCaptureRingBuffer;
-            JackResampler** fPlaybackRingBuffer;
+                JackResampler** fCaptureRingBuffer;
+                JackResampler** fPlaybackRingBuffer;
            
-            static int Process(jack_nframes_t, void* arg);
-            static int BufferSize(jack_nframes_t nframes, void *arg);
+                static int Process(jack_nframes_t, void* arg);
+                static int BufferSize(jack_nframes_t nframes, void *arg);
             
-            void Reset();
+                void Reset();
             
-		public:
+	    public:
         
-			JackCallbackNetIOAdapter(jack_client_t* jack_client, 
+		JackCallbackNetIOAdapter(jack_client_t* jack_client, 
                                 JackIOAdapterInterface* audio_io, 
                                 int input, 
                                 int output);
-			~JackCallbackNetIOAdapter();
+		~JackCallbackNetIOAdapter();
             
-            virtual int SetBufferSize(int buffer_size)
-            {
-                // TODO
-                return -1;
-            }
+                virtual int SetBufferSize(int buffer_size)
+                {
+                   // TODO
+                   return -1;
+                }
                
 	};
 }

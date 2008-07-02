@@ -26,15 +26,42 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackResampler.h"
 #include "JackFilters.h"
 #include <samplerate.h>
-#include <stdio.h>
+
 
 namespace Jack
 {
+
+	#define TABLE_MAX 100000
+
+        struct Measure {
+		int delta;
+		int time1;
+		int time2;
+		float r1;
+		float r2;
+		int pos1;
+		int pos2;
+        };
+
+        struct MeasureTable {
+
+        	Measure fTable[TABLE_MAX];
+                int fCount;
+	
+                MeasureTable():fCount(0)
+		{}
+
+		void Write(int time1, int time2, float r1, float r2, int pos1, int pos2);
+		void Save();
+        
+	};
 
 	class JackIOAdapterInterface
 	{
     
 		protected:
+
+        	MeasureTable fTable;
         
             int fCaptureChannels;
             int fPlaybackChannels;

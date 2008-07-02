@@ -31,7 +31,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    inline void* aligned_calloc(size_t nmemb, size_t size) { return (void*)((size_t)(calloc((nmemb*size) + 15, sizeof(char))) + 15 & ~15); }
+    //inline void* aligned_calloc(size_t nmemb, size_t size) { return (void*)((size_t)(calloc((nmemb * size) + 15, sizeof(char))) + 15 & ~15); }
+    inline void* aligned_calloc(size_t nmemb, size_t size) { return (void*)calloc(nmemb, size); }
     
     #define max(x,y) (((x)>(y)) ? (x) : (y))
     #define min(x,y) (((x)<(y)) ? (x) : (y))
@@ -133,7 +134,17 @@ namespace Jack
 
         AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
             AudioParam(input, output, buffer_size, sample_rate)
-        {}
+        {
+	    fInputCardBuffer = 0;
+	    fOutputCardBuffer = 0;
+
+	    for (int i = 0; i < 256; i++) {
+                fInputCardChannels[i] = 0;
+		fOutputCardChannels[i] = 0;
+		fInputSoftChannels[i] = 0;
+		fOutputSoftChannels[i] = 0;
+            }
+	}
         
         /**
          * Open the audio interface
@@ -199,6 +210,11 @@ namespace Jack
         
         int close()
         {
+            snd_pcm_hw_params_free(fInputParams);
+            snd_pcm_hw_params_free(fOutputParams);
+            snd_pcm_close(fInputDevice);
+            snd_pcm_close(fOutputDevice);
+ 
             for (unsigned int i = 0; i < fChanInputs; i++) {
                 if (fInputSoftChannels[i])
                     free(fInputSoftChannels[i]);
@@ -208,29 +224,22 @@ namespace Jack
                 if (fOutputSoftChannels[i])
                     free(fOutputSoftChannels[i]);
             }
-            
+
             for (unsigned int i = 0; i < fCardInputs; i++) {
                 if (fInputCardChannels[i])
                     free(fInputCardChannels[i]);
             }
-            
+
             for (unsigned int i = 0; i < fCardOutputs; i++) {
-                if (fCardOutputs[i])
-                    free(fCardOutputs[i]);
+                if (fOutputCardChannels[i])
+                    free(fOutputCardChannels[i]);
             }
-            
+
             if (fInputCardBuffer)
                 free(fInputCardBuffer);
-                
             if (fOutputCardBuffer)
                 free(fOutputCardBuffer);
-          
-            snd_pcm_hw_params_free(fInputParams);
-            snd_pcm_hw_params_free(fOutputParams);
-            
-            snd_pcm_close(fInputDevice);
-            snd_pcm_close(fOutputDevice);
-            
+	           
             return 0;
         }
         
