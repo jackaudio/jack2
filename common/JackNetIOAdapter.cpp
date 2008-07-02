@@ -28,45 +28,6 @@ using namespace std;
 namespace Jack
 {
 
-#define DEFAULT_RB_SIZE 16384	
-
-int JackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
-{
-    JackNetIOAdapter* adapter = static_cast<JackNetIOAdapter*>(arg);
-    char* buffer;
-    int i;
-    
-    if (!adapter->fIOAdapter->IsRunning())
-        return 0;
-    
-    for (i = 0; i < adapter->fCaptureChannels; i++) {
-    
-        buffer = static_cast<char*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
-        size_t len = jack_ringbuffer_read_space(adapter->fCaptureRingBuffer);
-        
-        if (len < frames * sizeof(float)) {
-            jack_error("JackNetIOAdapter::Process : consumer too slow, skip frames = %d", (frames * sizeof(float)) - len);
-            jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, len);
-        } else {
-            jack_ringbuffer_read(adapter->fCaptureRingBuffer, buffer, frames * sizeof(float));
-        }
-    }
-    
-    for (i = 0; i < adapter->fPlaybackChannels; i++) {
-    
-        buffer = static_cast<char*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
-        size_t len = jack_ringbuffer_write_space(adapter->fPlaybackRingBuffer);
-        
-         if (len < frames * sizeof(float)) {
-            jack_error("JackNetIOAdapter::Process : producer too slow, missing frames = %d", (frames * sizeof(float)) - len);
-            jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, len);
-        } else {
-            jack_ringbuffer_write(adapter->fPlaybackRingBuffer, buffer, frames * sizeof(float));
-        }
-    }
-     
-    return 0;
-}
 
 JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client, 
                                     JackIOAdapterInterface* audio_io, 
@@ -82,17 +43,7 @@ JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client,
     
     fCapturePortList = new jack_port_t* [fCaptureChannels];
     fPlaybackPortList = new jack_port_t* [fPlaybackChannels];
-    
-    fCaptureRingBuffer = jack_ringbuffer_create(fCaptureChannels * sizeof(float) * DEFAULT_RB_SIZE);
-    if (fCaptureRingBuffer == NULL)
-        goto fail;
-
-    fPlaybackRingBuffer = jack_ringbuffer_create(fPlaybackChannels * sizeof(float) * DEFAULT_RB_SIZE);
-    if (fPlaybackRingBuffer == NULL)
-        goto fail;
-
-    fIOAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
-  
+   
     for (i = 0; i < fCaptureChannels; i++) {
         sprintf(name, "capture_%d", i+1);
         if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL) 
@@ -105,12 +56,6 @@ JackNetIOAdapter::JackNetIOAdapter(jack_client_t* jack_client,
             goto fail;
     }
     
-    if (jack_set_process_callback(fJackClient, Process, this) < 0)
-        goto fail;
-    
-    if (jack_activate(fJackClient) < 0)
-        goto fail;
-       
     return;
         
 fail:
@@ -127,13 +72,7 @@ void JackNetIOAdapter::FreePorts()
 {
     int i;
     
-    if (fCaptureRingBuffer)
-        jack_ringbuffer_free(fCaptureRingBuffer);
-    
-    if (fPlaybackRingBuffer)
-        jack_ringbuffer_free(fPlaybackRingBuffer);
-    
-    for (i = 0; i < fCaptureChannels; i++) {
+     for (i = 0; i < fCaptureChannels; i++) {
         if (fCapturePortList[i])
             jack_port_unregister(fJackClient, fCapturePortList[i]);
     }
@@ -168,6 +107,7 @@ extern "C"
 
 #include "JackCoreAudioIOAdapter.h"
 #include "JackPortAudioIOAdapter.h"
+#include "JackCallbackNetIOAdapter.h"
 
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
@@ -177,7 +117,7 @@ extern "C"
 		} else {
 			jack_log("Loading NetAudio Adapter");
             // adapter = new Jack::JackNetIOAdapter(jack_client, new Jack::JackCoreAudioIOAdapter(2, 2, 512, 44100.f), 2, 2);
-            adapter = new Jack::JackNetIOAdapter(jack_client, 
+            adapter = new Jack::JackCallbackNetIOAdapter(jack_client, 
                 new Jack::JackPortAudioIOAdapter(2, 2, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), 2, 2);
             assert(adapter);
             

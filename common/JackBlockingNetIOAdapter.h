@@ -17,42 +17,31 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackNetIOAdapter__
-#define __JackNetIOAdapter__
+#ifndef __JackBlockingNetIOAdapter__
+#define __JackBlockingNetIOAdapter__
 
-#include "jack.h"
-#include "JackIOAdapter.h"
+#include "JackNetIOAdapter.h"
 
 namespace Jack
 {
 
-	class JackNetIOAdapter
+	class JackBlockingNetIOAdapter : public JackNetIOAdapter
 	{
-		protected:
-        
-            int fCaptureChannels;
-            int fPlaybackChannels;
-    
-            jack_port_t** fCapturePortList;
-            jack_port_t** fPlaybackPortList;
-        
-			jack_client_t* fJackClient;
-            JackIOAdapterInterface* fIOAdapter;
-		
-             void FreePorts();
+		private:
+      	
+            static int Process(jack_nframes_t, void* arg) {return 0;}
             
 		public:
         
-			JackNetIOAdapter(jack_client_t* jack_client, 
+			JackBlockingNetIOAdapter(jack_client_t* jack_client, 
                                 JackIOAdapterInterface* audio_io, 
                                 int input, 
-                                int output);
-			virtual ~JackNetIOAdapter();
+                                int output)
+                                : JackNetIOAdapter(jack_client, audio_io, input, output)
+			~JackBlockingNetIOAdapter()
+            {}
             
-            int Open();
-            int Close();
-            
-	};
+ 	};
 }
 
 #endif
