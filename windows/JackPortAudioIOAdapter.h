@@ -43,7 +43,7 @@ namespace Jack
        
 		public:
         
-			JackPortAudioIOAdapter(int input, int output, int buffer_size, float sample_rate)
+			JackPortAudioIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
                 :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
             {}
 			~JackPortAudioIOAdapter()
@@ -52,7 +52,7 @@ namespace Jack
             int Open();
             int Close();
             
-           int SetBufferSize(int buffer_size);
+           int SetBufferSize(jack_nframes_t buffer_size);
             
    	};
 }

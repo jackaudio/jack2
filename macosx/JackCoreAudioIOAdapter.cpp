@@ -569,4 +569,11 @@ int JackCoreAudioIOAdapter::Close()
     return 0;
 }
 
+int JackCoreAudioIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
+{
+    JackIOAdapterInterface::SetBufferSize(buffer_size);
+    Close();
+    return Open();
+}
+
 }

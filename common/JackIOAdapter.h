@@ -39,8 +39,8 @@ namespace Jack
             int fCaptureChannels;
             int fPlaybackChannels;
             
-            int fBufferSize;
-            float fSampleRate;
+            jack_nframes_t fBufferSize;
+            jack_nframes_t fSampleRate;
             
             JackFilter fProducerFilter;
             JackFilter fConsumerFilter;
@@ -59,7 +59,7 @@ namespace Jack
                
 		public:
         
-			JackIOAdapterInterface(int input, int output, int buffer_size, float sample_rate)
+			JackIOAdapterInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
                 :fCaptureChannels(input), 
                 fPlaybackChannels(output), 
                 fBufferSize(buffer_size), 
@@ -84,7 +84,7 @@ namespace Jack
             virtual int Open();
             virtual int Close();
             
-            virtual int SetBufferSize(int buffer_size)
+            virtual int SetBufferSize(jack_nframes_t buffer_size)
             {
                 fBufferSize = buffer_size;
                 return 0;

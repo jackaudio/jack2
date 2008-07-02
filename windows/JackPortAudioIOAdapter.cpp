@@ -163,7 +163,7 @@ int JackPortAudioIOAdapter::Close()
     return JackIOAdapterInterface::Close();
 }
 
-int JackPortAudioIOAdapter::SetBufferSize(int buffer_size)
+int JackPortAudioIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
 {
     JackIOAdapterInterface::SetBufferSize(buffer_size);
     Close();
