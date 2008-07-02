@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackCoreAudioIOAdapter.h"
+#include "JackError.h"
 
 namespace Jack
 {
@@ -29,13 +30,43 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
                    UInt32 inNumberFrames,
                    AudioBufferList *ioData)
 {
+   
+    
+    JackCoreAudioIOAdapter* driver = static_cast<JackCoreAudioIOAdapter*>(inRefCon);
+    
+    /*
+    driver->fActionFags = ioActionFlags;
+    driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
+    driver->fDriverOutputData = ioData;
+    driver->CycleTakeBeginTime();
+    return driver->Process();
+    
+    
+    AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
+    */
+    
     return noErr;
 }
 
 OSStatus JackCoreAudioIOAdapter::GetDeviceIDFromUID(const char* UID, AudioDeviceID* id)
 {
+    /*
+    UInt32 size = sizeof(AudioValueTranslation);
+    CFStringRef inIUD = CFStringCreateWithCString(NULL, UID, CFStringGetSystemEncoding());
+    AudioValueTranslation value = { &inIUD, sizeof(CFStringRef), id, sizeof(AudioDeviceID) };
+
+    if (inIUD == NULL) {
+        return kAudioHardwareUnspecifiedError;
+    } else {
+        OSStatus res = AudioHardwareGetProperty(kAudioHardwarePropertyDeviceForUID, &size, &value);
+        CFRelease(inIUD);
+        jack_log("get_device_id_from_uid %s %ld ", UID, *id);
+        return (*id == kAudioDeviceUnknown) ? kAudioHardwareBadDeviceError : res;
+    }
+    */
     return noErr;
 }
+
 OSStatus JackCoreAudioIOAdapter::GetDefaultDevice(AudioDeviceID* id)
 {
     return noErr;
