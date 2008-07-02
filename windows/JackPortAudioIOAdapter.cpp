@@ -24,11 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-static inline float Range(float min, float max, float val)
-{
-    return (val < min) ? min : ((val > max) ? max : val);
-}
-
 int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
                                 unsigned long framesPerBuffer,
                                 const PaStreamCallbackTimeInfo* timeInfo,
@@ -47,22 +42,9 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     
     jack_log("JackPortAudioIOAdapter::Render delta %ld", adapter->fCurCallbackTime - adapter->fLastCallbackTime);
      
-    if (!adapter->fRunning) {
+    if (!adapter->fRunning) 
         adapter->fRunning = true;
-        float buffer[framesPerBuffer];
-        for (int i = 0; i < adapter->fCaptureChannels; i++) {
-            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
-            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
-            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
-        }
-        
-        for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
-        }
-    }  
-      
+           
     /*
     double src_ratio_output = double(adapter->fCurCallbackTime - adapter->fLastCallbackTime) / double(adapter->fDeltaTime);
     double src_ratio_input = double(adapter->fDeltaTime) / double(adapter->fCurCallbackTime - adapter->fLastCallbackTime);

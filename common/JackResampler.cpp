@@ -44,7 +44,7 @@ int JackResampler::Read(float* buffer, unsigned int frames)
     jack_log("JackResampler::Read INPUT available = %ld", len / sizeof(float));
         
     if (len < frames * sizeof(float)) {
-        jack_error("JackResampler::Read : producer too slow, skip frames = %d", frames);
+        jack_error("JackResampler::Read : producer too slow, missing frames = %d", frames);
         //jack_ringbuffer_read(fRingBuffer, buffer, len);
         return 0;
     } else {
@@ -59,7 +59,7 @@ int JackResampler::Write(float* buffer, unsigned int frames)
     jack_log("JackResampler::Write OUTPUT available = %ld", len / sizeof(float));
         
     if (len < frames * sizeof(float)) {
-        jack_error("JackResampler::Write : consumer too slow, missing frames = %d", frames);
+        jack_error("JackResampler::Write : consumer too slow, skip frames = %d", frames);
         //jack_ringbuffer_write(fRingBuffer, buffer, len);
         return 0;
     } else {

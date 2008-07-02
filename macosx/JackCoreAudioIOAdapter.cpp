@@ -135,22 +135,9 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
 
     jack_log("JackCoreAudioIOAdapter::Render delta %ld", adapter->fCurCallbackTime - adapter->fLastCallbackTime);
       
-    if (!adapter->fRunning) {
+    if (!adapter->fRunning) 
         adapter->fRunning = true;
-        float buffer[inNumberFrames];
-        for (int i = 0; i < adapter->fCaptureChannels; i++) {
-            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
-            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
-            adapter->fCaptureRingBuffer[i].Read(buffer, inNumberFrames);
-        }
-        
-        for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
-            adapter->fPlaybackRingBuffer[i].Write(buffer, inNumberFrames);
-        }
-    }
-    
+       
     jack_time_t val2 = adapter->fConsumerFilter.GetVal();
     jack_time_t val1 = adapter->fProducerFilter.GetVal();
     double src_ratio_output = double(val1) / double(val2);

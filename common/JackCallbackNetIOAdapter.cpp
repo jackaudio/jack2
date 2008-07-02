@@ -44,12 +44,12 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     
     for (i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
-        int len = adapter->fCaptureRingBuffer[i].Read(buffer, frames);
+        adapter->fCaptureRingBuffer[i].Read(buffer, frames);
     }
     
     for (i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
-        int len = adapter->fPlaybackRingBuffer[i].Write(buffer, frames);
+        adapter->fPlaybackRingBuffer[i].Write(buffer, frames);
     }
      
     return 0;
@@ -68,7 +68,6 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
                                                 int output)
                                                 : JackNetIOAdapter(jack_client, audio_io, input, output)
 {
-    
     fCurCallbackTime = 0;
     fLastCallbackTime = 0;
     
@@ -76,7 +75,26 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
     fPlaybackRingBuffer = new JackResampler[fPlaybackChannels];
  
     fIOAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
-     
+    
+    // Init Ringbuffers
+    /*
+    int frames = jack_get_buffer_size(jack_client);
+    float buffer[frames];
+    int i;
+   
+    for (i = 0; i < fCaptureChannels; i++) {
+        fCaptureRingBuffer[i].Read(buffer, frames);
+        fCaptureRingBuffer[i].Read(buffer, frames);
+        fCaptureRingBuffer[i].Read(buffer, frames);
+    }
+    
+    for (i = 0; i < fPlaybackChannels; i++) {
+        fPlaybackRingBuffer[i].Write(buffer, frames);
+        fPlaybackRingBuffer[i].Write(buffer, frames);
+        fPlaybackRingBuffer[i].Write(buffer, frames);
+    }
+    */
+ 
     if (jack_set_process_callback(fJackClient, Process, this) < 0)
         goto fail;
         
