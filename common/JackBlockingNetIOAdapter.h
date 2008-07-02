@@ -42,6 +42,7 @@ namespace Jack
             {}
             
  	};
+    
 }
 
 #endif

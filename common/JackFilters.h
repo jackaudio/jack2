@@ -97,6 +97,8 @@ namespace Jack
         
             void Init(jack_time_t callback_usecs)
             {
+                fFrames = 0;
+                fCurrentWakeup = 0;
                 fSecondOrderIntegrator = 0.0f;
                 fCurrentCallback = callback_usecs;
                 fNextWakeUp = callback_usecs + fPeriodUsecs;
