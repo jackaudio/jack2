@@ -83,6 +83,11 @@ namespace Jack
 
 			int Read();
 			int Write();
+            
+            int SetBufferSize(jack_nframes_t buffer_size)
+            {
+                return -1;
+            }
 	};
 }
 
