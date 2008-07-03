@@ -71,6 +71,7 @@ class EXPORT JackDriverInterface
         virtual int Start() = 0;
         virtual int Stop() = 0;
         
+        virtual bool IsFixedBufferSize() = 0;
         virtual int SetBufferSize(jack_nframes_t buffer_size) = 0;
         virtual int SetSampleRate(jack_nframes_t sample_rate) = 0;
         
@@ -163,6 +164,7 @@ class EXPORT JackDriver : public JackDriverClientInterface
         virtual int Start();
         virtual int Stop();
         
+        virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
         

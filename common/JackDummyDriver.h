@@ -58,6 +58,12 @@ class JackDummyDriver : public JackAudioDriver
 
         int Process();
         
+        // BufferSize can be changed
+        bool IsFixedBufferSize()
+        {
+            return false;
+        }
+
         int SetBufferSize(jack_nframes_t buffer_size);
 
 };

@@ -193,6 +193,11 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
         jack_log("SetBufferSize: requirement for new buffer size equals current value");
         return 0;
     }
+    
+    if (fAudioDriver->IsFixedBufferSize()) {
+        jack_log("SetBufferSize: driver only supports a fixed buffer size");
+        return 0;
+    }
 
     if (fAudioDriver->Stop() != 0) {
         jack_error("Cannot stop audio driver");

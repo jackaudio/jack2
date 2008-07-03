@@ -150,6 +150,12 @@ class JackAlsaDriver : public JackAudioDriver
         int Read();
         int Write();
 
+        // BufferSize can be changed
+        bool IsFixedBufferSize()
+        {
+            return false;
+        }
+
         int SetBufferSize(jack_nframes_t nframes);
 
         // jack api emulation for the midi driver

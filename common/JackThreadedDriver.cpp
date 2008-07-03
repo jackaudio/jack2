@@ -101,6 +101,11 @@ int JackThreadedDriver::Write()
     return fDriver->Write();
 }
 
+bool JackThreadedDriver::IsFixedBufferSize()
+{
+    return fDriver->IsFixedBufferSize();
+}
+
 int JackThreadedDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     return fDriver->SetBufferSize(buffer_size);

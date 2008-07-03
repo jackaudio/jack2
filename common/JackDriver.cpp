@@ -275,6 +275,11 @@ int JackDriver::Stop()
     return 0;
 }
 
+bool JackDriver::IsFixedBufferSize()
+{
+    return true;
+}
+
 int JackDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     return 0;

@@ -70,6 +70,7 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         virtual int Start();
         virtual int Stop();
 
+        virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
      

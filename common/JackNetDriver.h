@@ -84,6 +84,12 @@ namespace Jack
 			int Read();
 			int Write();
             
+            // BufferSize can be changed
+            bool IsFixedBufferSize()
+            {
+                return true;
+            }
+
             int SetBufferSize(jack_nframes_t buffer_size)
             {
                 return -1;
