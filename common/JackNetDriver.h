@@ -88,6 +88,12 @@ namespace Jack
             {
                 return -1;
             }
+            
+            int SetSampleRate(jack_nframes_t sample_rate)
+            {
+                return -1;
+            }
+
 	};
 }
 
