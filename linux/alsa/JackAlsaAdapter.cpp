@@ -82,7 +82,7 @@ bool JackAlsaAdapter::Execute()
     // Reset all ringbuffers in case of failure
     if (failure) {
         jack_error("JackAlsaAdapter::Execute ringbuffer failure... reset");
-        adapter->ResetRingBuffers();
+        ResetRingBuffers();
     }
     return true;
 }
