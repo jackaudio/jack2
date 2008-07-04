@@ -13107,7 +13107,10 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-D__SMP__",
+				);
 				OTHER_LDFLAGS = (
 					/opt/local/lib/libsamplerate.a,
 					"-framework",
