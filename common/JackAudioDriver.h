@@ -33,6 +33,14 @@ namespace Jack
 class EXPORT JackAudioDriver : public JackDriver
 {
 
+    private:
+
+        int ProcessAsync();
+        int ProcessSync();
+        void ProcessGraphAsync();
+        void ProcessGraphSync();
+        void WaitUntilNextCycle();
+
     protected:
 
         int fCaptureChannels;
@@ -49,11 +57,6 @@ class EXPORT JackAudioDriver : public JackDriver
         jack_default_audio_sample_t* GetInputBuffer(int port_index);
         jack_default_audio_sample_t* GetOutputBuffer(int port_index);
         jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
-
-    private:
-
-        int ProcessAsync();
-        int ProcessSync();
 
     public:
 
