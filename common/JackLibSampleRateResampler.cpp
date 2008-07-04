@@ -42,7 +42,7 @@ void JackLibSampleRateResampler::Reset()
     src_reset(fResampler);
 }
 
-int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned int frames)
+unsigned int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned int frames)
 {
     jack_ringbuffer_data_t ring_buffer_data[2];
     SRC_DATA src_data;
@@ -66,14 +66,17 @@ int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned int frames)
             src_data.src_ratio = fRatio;
              
             res = src_process(fResampler, &src_data);
-            if (res != 0)
+            if (res != 0) {
                 jack_error("JackLibSampleRateResampler::ReadResample err = %s", src_strerror(res));
+                return 0;
+            }
                 
             frames_to_write -= src_data.output_frames_gen;
             written_frames += src_data.output_frames_gen;
             
             if ((src_data.input_frames_used == 0 || src_data.output_frames_gen == 0) && j == 0) {
                 jack_error("Output : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
+                return 0;
             }
             
             jack_log("Output : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
@@ -89,7 +92,7 @@ int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned int frames)
     return written_frames;
 }
 
-int JackLibSampleRateResampler::WriteResample(float* buffer, unsigned int frames)
+unsigned int JackLibSampleRateResampler::WriteResample(float* buffer, unsigned int frames)
 {
     jack_ringbuffer_data_t ring_buffer_data[2];
     SRC_DATA src_data;
@@ -113,14 +116,17 @@ int JackLibSampleRateResampler::WriteResample(float* buffer, unsigned int frames
             src_data.src_ratio = fRatio;
          
             res = src_process(fResampler, &src_data);
-            if (res != 0)
+            if (res != 0) {
                 jack_error("JackLibSampleRateResampler::ReadResample err = %s", src_strerror(res));
+                return 0;
+            }
                 
             frames_to_read -= src_data.input_frames_used;
             read_frames += src_data.input_frames_used;
             
             if ((src_data.input_frames_used == 0 || src_data.output_frames_gen == 0) && j == 0) {
                 jack_error("Input : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
+                return 0;
             }
         
             jack_log("Input : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);

@@ -49,7 +49,7 @@ unsigned int JackResampler::WriteSpace()
     return (jack_ringbuffer_write_space(fRingBuffer) / sizeof(float));
 }
 
-int JackResampler::Read(float* buffer, unsigned int frames)
+unsigned int JackResampler::Read(float* buffer, unsigned int frames)
 {
     size_t len = jack_ringbuffer_read_space(fRingBuffer);
     jack_log("JackResampler::Read input available = %ld", len / sizeof(float));
@@ -63,7 +63,7 @@ int JackResampler::Read(float* buffer, unsigned int frames)
     }
 }
 
-int JackResampler::Write(float* buffer, unsigned int frames)
+unsigned int JackResampler::Write(float* buffer, unsigned int frames)
 {
     size_t len = jack_ringbuffer_write_space(fRingBuffer);
     jack_log("JackResampler::Write output available = %ld", len / sizeof(float));
@@ -77,12 +77,12 @@ int JackResampler::Write(float* buffer, unsigned int frames)
     }
 }
 
-int JackResampler::ReadResample(float* buffer, unsigned int frames)
+unsigned int JackResampler::ReadResample(float* buffer, unsigned int frames)
 {
     return Read(buffer, frames);
 }
 
-int JackResampler::WriteResample(float* buffer, unsigned int frames)
+unsigned int JackResampler::WriteResample(float* buffer, unsigned int frames)
 {
     return Write(buffer, frames);
 }

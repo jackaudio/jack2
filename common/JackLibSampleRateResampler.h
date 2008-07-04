@@ -39,8 +39,8 @@ namespace Jack
 			JackLibSampleRateResampler();
         	virtual ~JackLibSampleRateResampler();
             
-            int ReadResample(float* buffer, unsigned int frames);
-            int WriteResample(float* buffer, unsigned int frames);
+            unsigned int ReadResample(float* buffer, unsigned int frames);
+            unsigned int WriteResample(float* buffer, unsigned int frames);
              
             void SetRatio(unsigned int num, unsigned int denom)
             {

@@ -45,13 +45,13 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     // Push/pull from ringbuffer
     for (i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fCapturePortList[i], frames));
-        if (adapter->fCaptureRingBuffer[i]->Read(buffer, frames) == 0) 
+        if (adapter->fCaptureRingBuffer[i]->Read(buffer, frames) < frames) 
             failure = true;
     }
     
     for (i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = static_cast<float*>(jack_port_get_buffer(adapter->fPlaybackPortList[i], frames));
-        if (adapter->fPlaybackRingBuffer[i]->Write(buffer, frames) == 0)
+        if (adapter->fPlaybackRingBuffer[i]->Write(buffer, frames) < frames)
             failure = true;
     }
      

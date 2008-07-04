@@ -42,7 +42,7 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        if (adapter->fCaptureRingBuffer[i]->WriteResample(buffer, framesPerBuffer) == 0)
+        if (adapter->fCaptureRingBuffer[i]->WriteResample(buffer, framesPerBuffer) < framesPerBuffer)
             failure = true;
     }
     
@@ -50,7 +50,7 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        if (adapter->fPlaybackRingBuffer[i]->ReadResample(buffer, framesPerBuffer) == 0)
+        if (adapter->fPlaybackRingBuffer[i]->ReadResample(buffer, framesPerBuffer) < framesPerBuffer)
             failure = true;
     }
     

@@ -129,13 +129,13 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
      
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        if (adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames) == 0)
+        if (adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames) < inNumberFrames)
             failure = true;
     }
     
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        if (adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames) == 0)
+        if (adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames) < inNumberFrames)
              failure = true;
     }
     

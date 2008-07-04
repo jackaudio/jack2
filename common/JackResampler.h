@@ -45,11 +45,11 @@ namespace Jack
             
             virtual void Reset();
             
-            virtual int ReadResample(float* buffer, unsigned int frames);
-            virtual int WriteResample(float* buffer, unsigned int frames);
+            virtual unsigned int ReadResample(float* buffer, unsigned int frames);
+            virtual unsigned int WriteResample(float* buffer, unsigned int frames);
             
-            virtual int Read(float* buffer, unsigned int frames);
-            virtual int Write(float* buffer, unsigned int frames);
+            virtual unsigned int Read(float* buffer, unsigned int frames);
+            virtual unsigned int Write(float* buffer, unsigned int frames);
             
             virtual unsigned int ReadSpace();
             virtual unsigned int WriteSpace();
