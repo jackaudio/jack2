@@ -50,6 +50,19 @@ void MeasureTable::Save()
 	fclose(file);
 }
 
+void JackIOAdapterInterface::ResetRingBuffers()
+{
+    int i;
+        
+    for (i = 0; i < fCaptureChannels; i++) {
+        fCaptureRingBuffer[i]->Reset();
+    }
+    
+    for (i = 0; i < fPlaybackChannels; i++) {
+        fPlaybackRingBuffer[i]->Reset();
+    }
+}
+
 void JackIOAdapterInterface::ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2)
 {
     jack_time_t time = jack_get_time();

@@ -33,6 +33,7 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
     float** paBuffer;
     float* buffer;
+    bool failure = false;
     
     jack_nframes_t time1, time2; 
     adapter->ResampleFactor(time1, time2);
@@ -41,21 +42,28 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        adapter->fCaptureRingBuffer[i]->WriteResample(buffer, framesPerBuffer);
+        if (adapter->fCaptureRingBuffer[i]->WriteResample(buffer, framesPerBuffer) == 0)
+            failure = true;
     }
     
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = (float*)paBuffer[i];
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        adapter->fPlaybackRingBuffer[i]->ReadResample(buffer, framesPerBuffer); 
+        if (adapter->fPlaybackRingBuffer[i]->ReadResample(buffer, framesPerBuffer) == 0)
+            failure = true;
     }
     
 #ifdef DEBUG    
     adapter->fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1), 
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
-    
+
+    // Reset all ringbuffers in case of failure
+    if (failure) {
+        jack_error("JackPortAudioIOAdapter::Render ringbuffer failure... reset");
+        adapter->ResetRingBuffers();
+    }
     return paContinue;
 }
         

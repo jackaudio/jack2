@@ -121,26 +121,34 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
                                         AudioBufferList *ioData)
 {
     JackCoreAudioIOAdapter* adapter = static_cast<JackCoreAudioIOAdapter*>(inRefCon);
-     AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
+    AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
+    bool failure = false;
       
     jack_nframes_t time1, time2; 
     adapter->ResampleFactor(time1, time2);
      
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames);
+        if (adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames) == 0)
+            failure = true;
     }
     
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames); 
+        if (adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames) == 0)
+             failure = true;
     }
     
 #ifdef DEBUG    
     adapter->fTable.Write(time1, time2,  double(time1) / double(time2), double(time2) / double(time1), 
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
-  
+    
+    // Reset all ringbuffers in case of failure
+    if (failure) {
+        jack_error("JackCoreAudioIOAdapter::Render ringbuffer failure... reset");
+        adapter->ResetRingBuffers();
+    }
     return noErr;
 }
 
