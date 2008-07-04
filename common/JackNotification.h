@@ -29,13 +29,14 @@ enum NotificationType {
     kXRunCallback = 3,
     kGraphOrderCallback = 4,
     kBufferSizeCallback = 5,
-    kStartFreewheelCallback = 6,
-    kStopFreewheelCallback = 7,
-    kPortRegistrationOnCallback = 8,
-    kPortRegistrationOffCallback = 9,
-    kPortConnectCallback = 10,
-    kPortDisconnectCallback = 11,
-    kRealTimeCallback = 12,
+    kSampleRateCallback = 6,
+    kStartFreewheelCallback = 7,
+    kStopFreewheelCallback = 8,
+    kPortRegistrationOnCallback = 9,
+    kPortRegistrationOffCallback = 10,
+    kPortConnectCallback = 11,
+    kPortDisconnectCallback = 12,
+    kRealTimeCallback = 13,
     kMaxNotification
 };
 

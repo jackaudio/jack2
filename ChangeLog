@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-07-04 Stephane Letz  <letz@grame.fr>
+
+	* Netioadapter now adapts for buffer size and sample rate changes.
+
 2008-07-03 Stephane Letz  <letz@grame.fr>
 
 	* Add IsFixedBufferSize method in all drivers.

@@ -26,35 +26,34 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-	
-	class JackNetIOAdapter
-	{
-    
-	    protected:
+    class JackNetIOAdapter
+    {
 
-	        int fCaptureChannels;
-                int fPlaybackChannels;
-    
-                jack_port_t** fCapturePortList;
-                jack_port_t** fPlaybackPortList;
-        
-		jack_client_t* fJackClient;
-                JackIOAdapterInterface* fIOAdapter;
-		
-                void FreePorts();
-            
-	    public:
-        
-		JackNetIOAdapter(jack_client_t* jack_client, 
-                                JackIOAdapterInterface* audio_io, 
-                                int input, 
-                                int output);
-		virtual ~JackNetIOAdapter();
-             
-                int Open();
-                int Close();
-            
-	};
+        protected:
+
+            int fCaptureChannels;
+            int fPlaybackChannels;
+
+            jack_port_t** fCapturePortList;
+            jack_port_t** fPlaybackPortList;
+
+            jack_client_t* fJackClient;
+            JackIOAdapterInterface* fIOAdapter;
+
+            void FreePorts();
+
+        public:
+
+            JackNetIOAdapter(jack_client_t* jack_client, 
+                            JackIOAdapterInterface* audio_io, 
+                            int input, 
+                            int output);
+            virtual ~JackNetIOAdapter();
+         
+            int Open();
+            int Close();
+
+    };
 }
 
 #endif

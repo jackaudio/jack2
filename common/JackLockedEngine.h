@@ -169,10 +169,15 @@ class EXPORT JackLockedEngine : public JackLockAble
             JackLock lock(this);
             fEngine.NotifyGraphReorder();
         }
-        void NotifyBufferSize(jack_nframes_t nframes)
+        void NotifyBufferSize(jack_nframes_t buffer_size)
         {
             JackLock lock(this);
-            fEngine.NotifyBufferSize(nframes);
+            fEngine.NotifyBufferSize(buffer_size);
+        }
+        void NotifySampleRate(jack_nframes_t sample_rate)
+        {
+            JackLock lock(this);
+            fEngine.NotifySampleRate(sample_rate);
         }
         void NotifyFreewheel(bool onoff)
         {

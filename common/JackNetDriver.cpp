@@ -255,8 +255,11 @@ namespace Jack
 	int JackNetDriver::SetParams()
 	{
 		fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
-		JackAudioDriver::SetBufferSize ( fParams.fPeriodSize );
-		JackAudioDriver::SetSampleRate ( fParams.fSampleRate );
+		JackAudioDriver::SetBufferSize(fParams.fPeriodSize);
+		JackAudioDriver::SetSampleRate(fParams.fSampleRate);
+        
+        JackDriver::NotifyBufferSize(fParams.fPeriodSize);
+        JackDriver::NotifySampleRate(fParams.fSampleRate);
 
 		//allocate midi ports lists
 		fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];

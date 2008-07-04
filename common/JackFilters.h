@@ -154,6 +154,14 @@ namespace Jack
                 TrySwitchState(); // always succeed since there is only one writer
             }
             
+            void Init(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+            {
+                JackDelayLockedLoop* dll = WriteNextStateStart();
+                dll->Init(buffer_size, sample_rate);
+                WriteNextStateStop();
+                TrySwitchState(); // always succeed since there is only one writer
+            }
+            
             void IncFrame(jack_time_t callback_usecs)
             {
                 JackDelayLockedLoop* dll = WriteNextStateStart();

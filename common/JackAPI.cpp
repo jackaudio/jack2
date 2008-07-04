@@ -850,8 +850,7 @@ EXPORT int jack_set_sample_rate_callback(jack_client_t* ext_client, JackSampleRa
         jack_error("jack_set_sample_rate_callback called with a NULL client");
         return -1;
     } else {
-        jack_error("jack_set_sample_rate_callback: deprecated");
-        return 0;
+        return client->SetSampleRateCallback(srate_callback, arg);
     }
 }
 

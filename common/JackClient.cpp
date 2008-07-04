@@ -177,6 +177,12 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 if (fBufferSize)
                     res = fBufferSize(value1, fBufferSizeArg);
                 break;
+                
+            case kSampleRateCallback:
+                jack_log("JackClient::kSampleRateCallback sample_rate = %ld", value1);
+                if (fSampleRate)
+                    res = fSampleRate(value1, fSampleRateArg);
+                break;
 
             case kGraphOrderCallback:
                 jack_log("JackClient::kGraphOrderCallback");
@@ -811,6 +817,19 @@ int JackClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void *arg
         GetClientControl()->fCallback[kBufferSizeCallback] = (callback != NULL);
         fBufferSizeArg = arg;
         fBufferSize = callback;
+        return 0;
+    }
+}
+
+int JackClient::SetSampleRateCallback(JackSampleRateCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+        GetClientControl()->fCallback[kSampleRateCallback] = (callback != NULL);
+        fSampleRateArg = arg;
+        fSampleRate = callback;
         return 0;
     }
 }

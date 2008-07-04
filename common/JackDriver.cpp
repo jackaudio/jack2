@@ -203,6 +203,18 @@ void JackDriver::NotifyXRun(jack_time_t cur_cycle_begin, float delayed_usecs)
     fEngine->NotifyXRun(cur_cycle_begin, delayed_usecs);
 }
 
+void JackDriver::NotifyBufferSize(jack_nframes_t buffer_size)
+{
+    fEngine->NotifyBufferSize(buffer_size);
+    fEngineControl->InitFrameTime();
+}
+
+void JackDriver::NotifySampleRate(jack_nframes_t sample_rate)
+{
+    fEngine->NotifySampleRate(sample_rate);
+    fEngineControl->InitFrameTime();
+}
+
 void JackDriver::SetMaster(bool onoff)
 {
     fIsMaster = onoff;

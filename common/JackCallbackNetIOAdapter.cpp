@@ -63,11 +63,19 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
     return 0;
 }
 
-int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t nframes, void* arg)
+int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t buffer_size, void* arg)
 {
     JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
     adapter->Reset();
-    adapter->fIOAdapter->SetBufferSize(nframes);
+    adapter->fIOAdapter->SetBufferSize(buffer_size);
+    return 0;
+}
+
+int JackCallbackNetIOAdapter::SampleRate(jack_nframes_t sample_rate, void* arg)
+{
+    JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
+    adapter->Reset();
+    adapter->fIOAdapter->SetSampleRate(sample_rate);
     return 0;
 }
 
@@ -114,6 +122,9 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
         goto fail;
         
     if (jack_set_buffer_size_callback(fJackClient, BufferSize, this) < 0)
+        goto fail;
+        
+    if (jack_set_sample_rate_callback(fJackClient, SampleRate, this) < 0)
         goto fail;
     
     if (jack_activate(fJackClient) < 0)

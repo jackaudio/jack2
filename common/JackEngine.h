@@ -114,7 +114,8 @@ class EXPORT JackEngine
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
         void NotifyXRun(int refnum);
         void NotifyGraphReorder();
-        void NotifyBufferSize(jack_nframes_t nframes);
+        void NotifyBufferSize(jack_nframes_t buffer_size);
+        void NotifySampleRate(jack_nframes_t sample_rate);
         void NotifyFreewheel(bool onoff);
 };
 

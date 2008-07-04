@@ -293,9 +293,14 @@ void JackEngine::NotifyGraphReorder()
     NotifyClients(kGraphOrderCallback, false, 0, 0);
 }
 
-void JackEngine::NotifyBufferSize(jack_nframes_t nframes)
+void JackEngine::NotifyBufferSize(jack_nframes_t buffer_size)
 {
-    NotifyClients(kBufferSizeCallback, true, nframes, 0);
+    NotifyClients(kBufferSizeCallback, true, buffer_size, 0);
+}
+
+void JackEngine::NotifySampleRate(jack_nframes_t sample_rate)
+{
+    NotifyClients(kSampleRateCallback, true, sample_rate, 0);
 }
 
 void JackEngine::NotifyFreewheel(bool onoff)

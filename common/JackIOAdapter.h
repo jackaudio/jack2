@@ -112,16 +112,25 @@ namespace Jack
             virtual int SetBufferSize(jack_nframes_t buffer_size)
             {
                 fBufferSize = buffer_size;
+                fConsumerDLL.Init(fBufferSize, fSampleRate);
+                fProducerDLL.Init(fBufferSize, fSampleRate);
                 return 0;
             }
             
+            virtual int SetSampleRate(jack_nframes_t sample_rate)
+            {
+                fSampleRate = sample_rate;
+                fConsumerDLL.Init(fBufferSize, fSampleRate);
+                // Producer (Audio) keep the same SR
+                return 0;
+            }
+      
             virtual void SetCallbackTime(jack_time_t callback_usec)
             {
                 fConsumerDLL.IncFrame(callback_usec);
             }
             
             void ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2);
-            
         
 	};
 }
