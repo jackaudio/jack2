@@ -81,8 +81,9 @@ bool JackAlsaIOAdapter::Execute()
 
 int JackAlsaIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
 {
-    return 0;
+    JackIOAdapterInterface::SetBufferSize(buffer_size);
+    Close();
+    return Open();
 }
-
         
 }

@@ -22,11 +22,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <math.h>
 #include <limits.h>
+#include <assert.h>
 #include <alsa/asoundlib.h>
 #include "JackIOAdapter.h"
 #include "JackPlatformThread.h"
-#include "jack.h"
 #include "JackError.h"
+#include "jack.h"
 
 namespace Jack
 {
@@ -135,16 +136,16 @@ namespace Jack
         AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
             AudioParam(input, output, buffer_size, sample_rate)
         {
-	    fInputCardBuffer = 0;
-	    fOutputCardBuffer = 0;
+            fInputCardBuffer = 0;
+            fOutputCardBuffer = 0;
 
-	    for (int i = 0; i < 256; i++) {
+            for (int i = 0; i < 256; i++) {
                 fInputCardChannels[i] = 0;
-		fOutputCardChannels[i] = 0;
-		fInputSoftChannels[i] = 0;
-		fOutputSoftChannels[i] = 0;
+                fOutputCardChannels[i] = 0;
+                fInputSoftChannels[i] = 0;
+                fOutputSoftChannels[i] = 0;
             }
-	}
+        }
         
         /**
          * Open the audio interface
@@ -172,8 +173,6 @@ namespace Jack
             err = snd_pcm_hw_params(fInputDevice,  fInputParams);	 	check_error (err);
             err = snd_pcm_hw_params(fOutputDevice, fOutputParams);	check_error (err);
 
-            //assert(snd_pcm_hw_params_get_period_size(fInputParams,NULL) == snd_pcm_hw_params_get_period_size(fOutputParams,NULL));
-
             // allocation of alsa buffers
             if (fSampleAccess == SND_PCM_ACCESS_RW_INTERLEAVED) {
                 fInputCardBuffer = aligned_calloc(interleavedBufferSize(fInputParams), 1);
@@ -188,7 +187,6 @@ namespace Jack
             }
             
             // allocation of floating point buffers needed by the dsp code
-            
             fChanInputs = max(fSoftInputs, fCardInputs);		assert (fChanInputs < 256);
             fChanOutputs = max(fSoftOutputs, fCardOutputs);		assert (fChanOutputs < 256);
 
@@ -454,7 +452,7 @@ namespace Jack
             err = snd_ctl_open(&ctl_handle, fCardName, 0);	check_error(err);
             snd_ctl_card_info_alloca(&card_info);
             err = snd_ctl_card_info(ctl_handle, card_info);	check_error(err);
-            printf("%s|%d|%d|%d|%d|%s\n", 
+            jack_info("%s|%d|%d|%d|%d|%s", 
                     snd_ctl_card_info_get_driver(card_info),
                     fCardInputs, fCardOutputs,
                     fFrequency, fBuffering,
@@ -470,12 +468,12 @@ namespace Jack
             snd_ctl_card_info_t* card_info;
             snd_ctl_t* ctl_handle;
 
-            printf("Audio Interface Description :\n");
-            printf("Sampling Frequency : %d, Sample Format : %s, buffering : %d\n", 
+            jack_info("Audio Interface Description :");
+            jack_info("Sampling Frequency : %d, Sample Format : %s, buffering : %d", 
                     fFrequency, snd_pcm_format_name((_snd_pcm_format)fSampleFormat), fBuffering);
-            printf("Software inputs : %2d, Software outputs : %2d\n", fSoftInputs, fSoftOutputs);
-            printf("Hardware inputs : %2d, Hardware outputs : %2d\n", fCardInputs, fCardOutputs);
-            printf("Channel inputs  : %2d, Channel outputs  : %2d\n", fChanInputs, fChanOutputs);
+            jack_info("Software inputs : %2d, Software outputs : %2d", fSoftInputs, fSoftOutputs);
+            jack_info("Hardware inputs : %2d, Hardware outputs : %2d", fCardInputs, fCardOutputs);
+            jack_info("Channel inputs  : %2d, Channel outputs  : %2d", fChanInputs, fChanOutputs);
             
             // affichage des infos de la carte
             err = snd_ctl_open (&ctl_handle, fCardName, 0);		check_error(err);
@@ -491,31 +489,31 @@ namespace Jack
         
         void printCardInfo(snd_ctl_card_info_t*	ci)
         {
-            printf("Card info (address : %p)\n", ci);
-            printf("\tID         = %s\n", snd_ctl_card_info_get_id(ci));
-            printf("\tDriver     = %s\n", snd_ctl_card_info_get_driver(ci));
-            printf("\tName       = %s\n", snd_ctl_card_info_get_name(ci));
-            printf("\tLongName   = %s\n", snd_ctl_card_info_get_longname(ci));
-            printf("\tMixerName  = %s\n", snd_ctl_card_info_get_mixername(ci));
-            printf("\tComponents = %s\n", snd_ctl_card_info_get_components(ci));
-            printf("--------------\n");
+            jack_info("Card info (address : %p)", ci);
+            jack_info("\tID         = %s", snd_ctl_card_info_get_id(ci));
+            jack_info("\tDriver     = %s", snd_ctl_card_info_get_driver(ci));
+            jack_info("\tName       = %s", snd_ctl_card_info_get_name(ci));
+            jack_info("\tLongName   = %s", snd_ctl_card_info_get_longname(ci));
+            jack_info("\tMixerName  = %s", snd_ctl_card_info_get_mixername(ci));
+            jack_info("\tComponents = %s", snd_ctl_card_info_get_components(ci));
+            jack_info("--------------");
         }
 
         void printHWParams(snd_pcm_hw_params_t* params)
         {
-            printf("HW Params info (address : %p)\n", params);
+            jack_info("HW Params info (address : %p)\n", params);
     #if 0
-            printf("\tChannels    = %d\n", snd_pcm_hw_params_get_channels(params));
-            printf("\tFormat      = %s\n", snd_pcm_format_name((_snd_pcm_format)snd_pcm_hw_params_get_format(params)));
-            printf("\tAccess      = %s\n", snd_pcm_access_name((_snd_pcm_access)snd_pcm_hw_params_get_access(params)));
-            printf("\tRate        = %d\n", snd_pcm_hw_params_get_rate(params, NULL));
-            printf("\tPeriods     = %d\n", snd_pcm_hw_params_get_periods(params, NULL));
-            printf("\tPeriod size = %d\n", (int)snd_pcm_hw_params_get_period_size(params, NULL));
-            printf("\tPeriod time = %d\n", snd_pcm_hw_params_get_period_time(params, NULL));
-            printf("\tBuffer size = %d\n", (int)snd_pcm_hw_params_get_buffer_size(params));
-            printf("\tBuffer time = %d\n", snd_pcm_hw_params_get_buffer_time(params, NULL));
+            jack_info("\tChannels    = %d", snd_pcm_hw_params_get_channels(params));
+            jack_info("\tFormat      = %s", snd_pcm_format_name((_snd_pcm_format)snd_pcm_hw_params_get_format(params)));
+            jack_info("\tAccess      = %s", snd_pcm_access_name((_snd_pcm_access)snd_pcm_hw_params_get_access(params)));
+            jack_info("\tRate        = %d", snd_pcm_hw_params_get_rate(params, NULL));
+            jack_info("\tPeriods     = %d", snd_pcm_hw_params_get_periods(params, NULL));
+            jack_info("\tPeriod size = %d", (int)snd_pcm_hw_params_get_period_size(params, NULL));
+            jack_info("\tPeriod time = %d", snd_pcm_hw_params_get_period_time(params, NULL));
+            jack_info("\tBuffer size = %d", (int)snd_pcm_hw_params_get_buffer_size(params));
+            jack_info("\tBuffer time = %d", snd_pcm_hw_params_get_buffer_time(params, NULL));
     #endif
-            printf("--------------\n");
+            jack_info("--------------");
         }
     };
 
@@ -525,7 +523,7 @@ namespace Jack
 	    private:
         	
             JackThread fThread;
-            AudioInterface	fAudioInterface;
+            AudioInterface fAudioInterface;
        
 	    public:
         
