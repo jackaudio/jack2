@@ -17,10 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackCoreAudioIOAdapter__
-#define __JackCoreAudioIOAdapter__
+#ifndef __JackCoreAudioAdapter__
+#define __JackCoreAudioAdapter__
 
-#include "JackIOAdapter.h"
+#include "JackAudioAdapterInterface.h"
 #include "jack.h"
 #include <AudioToolbox/AudioConverter.h>
 #include <CoreAudio/CoreAudio.h>
@@ -35,7 +35,7 @@ namespace Jack
     #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
     #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
 
-	class JackCoreAudioIOAdapter : public JackIOAdapterInterface
+	class JackCoreAudioAdapter : public JackAudioAdapterInterface
 	{
     
 		private:
@@ -96,10 +96,10 @@ namespace Jack
     
 		public:
         
-			JackCoreAudioIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
-                :JackIOAdapterInterface(input, output, buffer_size, sample_rate),fInputData(0),fState(false)
+			JackCoreAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+                :JackAudioAdapterInterface(input, output, buffer_size, sample_rate),fInputData(0),fState(false)
             {}
-			~JackCoreAudioIOAdapter()
+			~JackCoreAudioAdapter()
             {}
             
             virtual int Open();

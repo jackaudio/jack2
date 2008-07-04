@@ -17,16 +17,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackNetIOAdapter__
-#define __JackNetIOAdapter__
+#ifndef __JackAudioAdapter__
+#define __JackAudioAdapter__
 
 #include "jack.h"
-#include "JackIOAdapter.h"
+#include "JackAudioAdapterInterface.h"
 
 namespace Jack
 {
 
-    class JackNetIOAdapter
+    class JackAudioAdapter
     {
 
         protected:
@@ -38,17 +38,17 @@ namespace Jack
             jack_port_t** fPlaybackPortList;
 
             jack_client_t* fJackClient;
-            JackIOAdapterInterface* fIOAdapter;
+            JackAudioAdapterInterface* fAudioAdapter;
 
             void FreePorts();
 
         public:
 
-            JackNetIOAdapter(jack_client_t* jack_client, 
-                            JackIOAdapterInterface* audio_io, 
+            JackAudioAdapter(jack_client_t* jack_client, 
+                            JackAudioAdapterInterface* audio_io, 
                             int input, 
                             int output);
-            virtual ~JackNetIOAdapter();
+            virtual ~JackAudioAdapter();
          
             int Open();
             int Close();

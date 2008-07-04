@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackCoreAudioIOAdapter.h"
+#include "JackCoreAudioAdapter.h"
 #include "JackError.h"
 #include <unistd.h>
 
@@ -93,13 +93,13 @@ static void printError(OSStatus err)
     }
 }
 
-OSStatus JackCoreAudioIOAdapter::SRNotificationCallback(AudioDeviceID inDevice,
+OSStatus JackCoreAudioAdapter::SRNotificationCallback(AudioDeviceID inDevice,
                                                         UInt32 inChannel,
                                                         Boolean	isInput,
                                                         AudioDevicePropertyID inPropertyID,
                                                         void* inClientData)
 {
-    JackCoreAudioIOAdapter* driver = static_cast<JackCoreAudioIOAdapter*>(inClientData);
+    JackCoreAudioAdapter* driver = static_cast<JackCoreAudioAdapter*>(inClientData);
 
     switch (inPropertyID) {
 
@@ -113,14 +113,14 @@ OSStatus JackCoreAudioIOAdapter::SRNotificationCallback(AudioDeviceID inDevice,
     return noErr;
 }
             
-OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
+OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                                         AudioUnitRenderActionFlags *ioActionFlags,
                                         const AudioTimeStamp *inTimeStamp,
                                         UInt32 inBusNumber,
                                         UInt32 inNumberFrames,
                                         AudioBufferList *ioData)
 {
-    JackCoreAudioIOAdapter* adapter = static_cast<JackCoreAudioIOAdapter*>(inRefCon);
+    JackCoreAudioAdapter* adapter = static_cast<JackCoreAudioAdapter*>(inRefCon);
     AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
     bool failure = false;
       
@@ -146,13 +146,13 @@ OSStatus JackCoreAudioIOAdapter::Render(void *inRefCon,
     
     // Reset all ringbuffers in case of failure
     if (failure) {
-        jack_error("JackCoreAudioIOAdapter::Render ringbuffer failure... reset");
+        jack_error("JackCoreAudioAdapter::Render ringbuffer failure... reset");
         adapter->ResetRingBuffers();
     }
     return noErr;
 }
 
-OSStatus JackCoreAudioIOAdapter::GetDefaultDevice(AudioDeviceID* id)
+OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
 {
     OSStatus res;
     UInt32 theSize = sizeof(UInt32);
@@ -177,7 +177,7 @@ OSStatus JackCoreAudioIOAdapter::GetDefaultDevice(AudioDeviceID* id)
     }
 }
 
-OSStatus JackCoreAudioIOAdapter::GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput)
+OSStatus JackCoreAudioAdapter::GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput)
 {
     OSStatus err = noErr;
     UInt32	outSize;
@@ -202,7 +202,7 @@ OSStatus JackCoreAudioIOAdapter::GetTotalChannels(AudioDeviceID device, int* cha
 }
 
 // Setup
-int JackCoreAudioIOAdapter::SetupDevices(const char* capture_driver_uid,
+int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
                                         const char* playback_driver_uid,
                                         char* capture_driver_name,
                                         char* playback_driver_name)
@@ -215,7 +215,7 @@ int JackCoreAudioIOAdapter::SetupDevices(const char* capture_driver_uid,
     return 0;
 }
 
-int JackCoreAudioIOAdapter::SetupChannels(bool capturing,
+int JackCoreAudioAdapter::SetupChannels(bool capturing,
                                         bool playing,
                                         int& inchannels,
                                         int& outchannels,
@@ -242,7 +242,7 @@ int JackCoreAudioIOAdapter::SetupChannels(bool capturing,
     return 0;
 }
 
-int JackCoreAudioIOAdapter::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate)
+int JackCoreAudioAdapter::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate)
 {
     OSStatus err = noErr;
     UInt32 outSize;
@@ -298,9 +298,9 @@ int JackCoreAudioIOAdapter::SetupBufferSizeAndSampleRate(jack_nframes_t nframes,
     return 0;
 }
 
-int JackCoreAudioIOAdapter::SetupBuffers(int inchannels, int outchannels)
+int JackCoreAudioAdapter::SetupBuffers(int inchannels, int outchannels)
 {
-    jack_log("JackCoreAudioIOAdapter::SetupBuffers: input = %ld output = %ld", inchannels, outchannels);
+    jack_log("JackCoreAudioAdapter::SetupBuffers: input = %ld output = %ld", inchannels, outchannels);
     
     // Prepare buffers
     fInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
@@ -317,7 +317,7 @@ int JackCoreAudioIOAdapter::SetupBuffers(int inchannels, int outchannels)
     return 0;
 }
 
-void JackCoreAudioIOAdapter::DisposeBuffers()
+void JackCoreAudioAdapter::DisposeBuffers()
 {
     if (fInputData) {
         for (int i = 0; i < fCaptureChannels; i++) 
@@ -327,7 +327,7 @@ void JackCoreAudioIOAdapter::DisposeBuffers()
     }
 }
 
-int JackCoreAudioIOAdapter::OpenAUHAL(bool capturing,
+int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
                                     bool playing,
                                     int inchannels,
                                     int outchannels,
@@ -505,13 +505,13 @@ int JackCoreAudioIOAdapter::OpenAUHAL(bool capturing,
     return 0;
 }
 
-void JackCoreAudioIOAdapter::CloseAUHAL()
+void JackCoreAudioAdapter::CloseAUHAL()
 {
     AudioUnitUninitialize(fAUHAL);
     CloseComponent(fAUHAL);
 }
   
-int JackCoreAudioIOAdapter::Open()
+int JackCoreAudioAdapter::Open()
 {
     OSStatus err;
     int in_nChannels = 0;
@@ -543,7 +543,7 @@ error:
     return -1;
 }
 
-int JackCoreAudioIOAdapter::Close()
+int JackCoreAudioAdapter::Close()
 {
 #ifdef DEBUG    
     fTable.Save();
@@ -554,9 +554,9 @@ int JackCoreAudioIOAdapter::Close()
     return 0;
 }
 
-int JackCoreAudioIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
+int JackCoreAudioAdapter::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackIOAdapterInterface::SetBufferSize(buffer_size);
+    JackAudioAdapterInterface::SetBufferSize(buffer_size);
     Close();
     return Open();
 }

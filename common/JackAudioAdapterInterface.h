@@ -17,8 +17,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackIOAdapter__
-#define __JackIOAdapter__
+#ifndef __JackAudioAdapterInterface__
+#define __JackAudioAdapterInterface__
 
 #include "ringbuffer.h"
 #include "jack.h"
@@ -58,7 +58,7 @@ namespace Jack
     
     };
 
-	class JackIOAdapterInterface
+	class JackAudioAdapterInterface
 	{
     
 		protected:
@@ -84,7 +84,7 @@ namespace Jack
                
 		public:
         
-			JackIOAdapterInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+			JackAudioAdapterInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
                 :fCaptureChannels(input), 
                 fPlaybackChannels(output), 
                 fBufferSize(buffer_size), 
@@ -93,7 +93,7 @@ namespace Jack
                 fConsumerDLL(buffer_size, sample_rate),
                 fRunning(false)
             {}
-			virtual ~JackIOAdapterInterface()
+			virtual ~JackAudioAdapterInterface()
             {}
             
             void SetRingBuffers(JackResampler** input, JackResampler** output)

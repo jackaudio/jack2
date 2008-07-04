@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackCallbackNetIOAdapter.h"
+#include "JackCallbackAudioAdapter.h"
 #include "JackLibSampleRateResampler.h"
 #include "JackError.h"
 #include "JackExports.h"
@@ -29,18 +29,18 @@ using namespace std;
 namespace Jack
 {
 
-int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
+int JackCallbackAudioAdapter::Process(jack_nframes_t frames, void* arg)
 {
-    JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
+    JackCallbackAudioAdapter* adapter = static_cast<JackCallbackAudioAdapter*>(arg);
     float* buffer;
     bool failure = false;
     int i;
     
-    if (!adapter->fIOAdapter->IsRunning())
+    if (!adapter->fAudioAdapter->IsRunning())
         return 0;
         
     // DLL
-    adapter->fIOAdapter->SetCallbackTime(jack_get_time());
+    adapter->fAudioAdapter->SetCallbackTime(jack_get_time());
      
     // Push/pull from ringbuffer
     for (i = 0; i < adapter->fCaptureChannels; i++) {
@@ -57,29 +57,29 @@ int JackCallbackNetIOAdapter::Process(jack_nframes_t frames, void* arg)
      
     // Reset all ringbuffers in case of failure
     if (failure) {
-        jack_error("JackCallbackNetIOAdapter::Process ringbuffer failure... reset");
+        jack_error("JackCallbackAudioAdapter::Process ringbuffer failure... reset");
         adapter->Reset();
     }
     return 0;
 }
 
-int JackCallbackNetIOAdapter::BufferSize(jack_nframes_t buffer_size, void* arg)
+int JackCallbackAudioAdapter::BufferSize(jack_nframes_t buffer_size, void* arg)
 {
-    JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
+    JackCallbackAudioAdapter* adapter = static_cast<JackCallbackAudioAdapter*>(arg);
     adapter->Reset();
-    adapter->fIOAdapter->SetBufferSize(buffer_size);
+    adapter->fAudioAdapter->SetBufferSize(buffer_size);
     return 0;
 }
 
-int JackCallbackNetIOAdapter::SampleRate(jack_nframes_t sample_rate, void* arg)
+int JackCallbackAudioAdapter::SampleRate(jack_nframes_t sample_rate, void* arg)
 {
-    JackCallbackNetIOAdapter* adapter = static_cast<JackCallbackNetIOAdapter*>(arg);
+    JackCallbackAudioAdapter* adapter = static_cast<JackCallbackAudioAdapter*>(arg);
     adapter->Reset();
-    adapter->fIOAdapter->SetSampleRate(sample_rate);
+    adapter->fAudioAdapter->SetSampleRate(sample_rate);
     return 0;
 }
 
-void JackCallbackNetIOAdapter::Reset()
+void JackCallbackAudioAdapter::Reset()
 {
     int i;
         
@@ -91,14 +91,14 @@ void JackCallbackNetIOAdapter::Reset()
         fPlaybackRingBuffer[i]->Reset();
     }
         
-    fIOAdapter->Reset();
+    fAudioAdapter->Reset();
 }
 
-JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client, 
-                                                JackIOAdapterInterface* audio_io, 
+JackCallbackAudioAdapter::JackCallbackAudioAdapter(jack_client_t* jack_client, 
+                                                JackAudioAdapterInterface* audio_io, 
                                                 int input, 
                                                 int output)
-                                                : JackNetIOAdapter(jack_client, audio_io, input, output)
+                                                : JackAudioAdapter(jack_client, audio_io, input, output)
 {
     int i;
      
@@ -113,7 +113,7 @@ JackCallbackNetIOAdapter::JackCallbackNetIOAdapter(jack_client_t* jack_client,
         fPlaybackRingBuffer[i] = new JackLibSampleRateResampler();
    }
  
-    fIOAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
+    fAudioAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
        
     jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
     jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace());
@@ -136,7 +136,7 @@ fail:
      FreePorts();
 }
 
-JackCallbackNetIOAdapter::~JackCallbackNetIOAdapter()
+JackCallbackAudioAdapter::~JackCallbackAudioAdapter()
 {
     int i;
     

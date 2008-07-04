@@ -17,7 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackIOAdapter.h"
+#include "JackAudioAdapter.h"
 #include <stdio.h>
 
 namespace Jack
@@ -38,7 +38,7 @@ void MeasureTable::Write(int time1, int time2, float r1, float r2, int pos1, int
                 
 void MeasureTable::Save()
 {
-	FILE* file = fopen("JackIOAdapter.log", "w");
+	FILE* file = fopen("JackAudioAdapter.log", "w");
 
 	for (int i = 1; i < TABLE_MAX; i++) {
 		fprintf(file, "%d \t %d \t %d  \t %f \t %f \t %d \t %d \n", 
@@ -50,7 +50,7 @@ void MeasureTable::Save()
 	fclose(file);
 }
 
-void JackIOAdapterInterface::ResetRingBuffers()
+void JackAudioAdapterInterface::ResetRingBuffers()
 {
     int i;
         
@@ -63,7 +63,7 @@ void JackIOAdapterInterface::ResetRingBuffers()
     }
 }
 
-void JackIOAdapterInterface::ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2)
+void JackAudioAdapterInterface::ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2)
 {
     jack_time_t time = jack_get_time();
     
@@ -81,16 +81,16 @@ void JackIOAdapterInterface::ResampleFactor(jack_nframes_t& frame1, jack_nframes
         jack_nframes_t time2 = fProducerDLL.Time2Frames(time);
         frame1 = time1;
         frame2 = time2;
-        jack_log("JackIOAdapterInterface::ResampleFactor src_ratio_input = %f src_ratio_output = %f", double(time1) / double(time2), double(time2) / double(time1));
+        jack_log("JackAudioAdapterInterface::ResampleFactor src_ratio_input = %f src_ratio_output = %f", double(time1) / double(time2), double(time2) / double(time1));
     }
 }
 
-int JackIOAdapterInterface::Open()
+int JackAudioAdapterInterface::Open()
 {
     return 0;
 }
 
-int JackIOAdapterInterface::Close()
+int JackAudioAdapterInterface::Close()
 {
     return 0;
 }

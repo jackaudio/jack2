@@ -17,20 +17,20 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackPortAudioIOAdapter.h"
+#include "JackPortAudioAdapter.h"
 #include "portaudio.h"
 #include "JackError.h"
 
 namespace Jack
 {
 
-int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
+int JackPortAudioAdapter::Render(const void* inputBuffer, void* outputBuffer,
                                 unsigned long framesPerBuffer,
                                 const PaStreamCallbackTimeInfo* timeInfo,
                                 PaStreamCallbackFlags statusFlags,
                                 void* userData)
 {
-    JackPortAudioIOAdapter* adapter = static_cast<JackPortAudioIOAdapter*>(userData);
+    JackPortAudioAdapter* adapter = static_cast<JackPortAudioAdapter*>(userData);
     float** paBuffer;
     float* buffer;
     bool failure = false;
@@ -61,13 +61,13 @@ int JackPortAudioIOAdapter::Render(const void* inputBuffer, void* outputBuffer,
 
     // Reset all ringbuffers in case of failure
     if (failure) {
-        jack_error("JackPortAudioIOAdapter::Render ringbuffer failure... reset");
+        jack_error("JackPortAudioAdapter::Render ringbuffer failure... reset");
         adapter->ResetRingBuffers();
     }
     return paContinue;
 }
         
-int JackPortAudioIOAdapter::Open()
+int JackPortAudioAdapter::Open()
 {
     PaError err;
     PaStreamParameters inputParameters;
@@ -75,18 +75,18 @@ int JackPortAudioIOAdapter::Open()
     PaDeviceIndex inputDevice;
     PaDeviceIndex outputDevice;
     
-    if (JackIOAdapterInterface::Open() < 0)
+    if (JackAudioAdapterInterface::Open() < 0)
         return -1;
     
     err = Pa_Initialize();
     if (err != paNoError) {
-        jack_error("JackPortAudioIOAdapter::Pa_Initialize error = %s\n", Pa_GetErrorText(err));
+        jack_error("JackPortAudioAdapter::Pa_Initialize error = %s\n", Pa_GetErrorText(err));
         goto error;
     }
     
-    jack_log("JackPortAudioIOAdapter::Pa_GetDefaultInputDevice %ld", Pa_GetDefaultInputDevice());
-    jack_log("JackPortAudioIOAdapter::Pa_GetDefaultOutputDevice %ld", Pa_GetDefaultOutputDevice());
-    jack_log("JackPortAudioIOAdapter::Open fBufferSize = %ld fSampleRate %f", fBufferSize, fSampleRate);
+    jack_log("JackPortAudioAdapter::Pa_GetDefaultInputDevice %ld", Pa_GetDefaultInputDevice());
+    jack_log("JackPortAudioAdapter::Pa_GetDefaultOutputDevice %ld", Pa_GetDefaultOutputDevice());
+    jack_log("JackPortAudioAdapter::Open fBufferSize = %ld fSampleRate %f", fBufferSize, fSampleRate);
 
     inputDevice = Pa_GetDefaultInputDevice();
     outputDevice = Pa_GetDefaultOutputDevice();
@@ -125,7 +125,7 @@ int JackPortAudioIOAdapter::Open()
          jack_error("Pa_StartStream error = %s", Pa_GetErrorText(err));
          goto error;
     }
-    jack_log("JackPortAudioIOAdapter::Open OK");
+    jack_log("JackPortAudioAdapter::Open OK");
     return 0;
      
 error:
@@ -133,24 +133,24 @@ error:
     return -1;
 }
 
-int JackPortAudioIOAdapter::Close()
+int JackPortAudioAdapter::Close()
 {
 #ifdef DEBUG
     fTable.Save();
 #endif
-    jack_log("JackPortAudioIOAdapter::Close");
+    jack_log("JackPortAudioAdapter::Close");
     Pa_StopStream(fStream);
-    jack_log("JackPortAudioIOAdapter:: Pa_StopStream");
+    jack_log("JackPortAudioAdapter:: Pa_StopStream");
     Pa_CloseStream(fStream);
-    jack_log("JackPortAudioIOAdapter:: Pa_CloseStream");
+    jack_log("JackPortAudioAdapter:: Pa_CloseStream");
     Pa_Terminate();
-    jack_log("JackPortAudioIOAdapter:: Pa_Terminate");
-    return JackIOAdapterInterface::Close();
+    jack_log("JackPortAudioAdapter:: Pa_Terminate");
+    return JackAudioAdapterInterface::Close();
 }
 
-int JackPortAudioIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
+int JackPortAudioAdapter::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackIOAdapterInterface::SetBufferSize(buffer_size);
+    JackAudioAdapterInterface::SetBufferSize(buffer_size);
     Close();
     return Open();
 }

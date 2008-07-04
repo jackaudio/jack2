@@ -17,16 +17,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackPortAudioIOAdapter__
-#define __JackPortAudioIOAdapter__
+#ifndef __JackPortAudioAdapter__
+#define __JackPortAudioAdapter__
 
-#include "JackIOAdapter.h"
+#include "JackAudioAdapter.h"
 #include "portaudio.h"
 
 namespace Jack
 {
 
-   	class JackPortAudioIOAdapter : public JackIOAdapterInterface
+   	class JackPortAudioAdapter : public JackAudioAdapterInterface
 	{
     
 		private:
@@ -43,10 +43,10 @@ namespace Jack
        
 		public:
         
-			JackPortAudioIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
-                :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
+			JackPortAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+                :JackAudioAdapterInterface(input, output, buffer_size, sample_rate)
             {}
-			~JackPortAudioIOAdapter()
+			~JackPortAudioAdapter()
             {}
             
             int Open();

@@ -194,12 +194,12 @@ def build(bld):
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 
     if bld.env()['IS_MACOSX']:
-         process = create_jack_process_obj(bld, 'netioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../macosx/JackCoreAudioIOAdapter.cpp', serverlib)
+         process = create_jack_process_obj(bld, 'audioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackAudioAdapter.cpp JackAudioAdapterInterface.cpp JackCallbackAudioAdapter.cpp ../macosx/JackCoreAudioAdapter.cpp', serverlib)
     
     if bld.env()['IS_LINUX']:
-         process = create_jack_process_obj(bld, 'netioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../linux/alsa/JackAlsaIOAdapter.cpp', serverlib)
+         process = create_jack_process_obj(bld, 'audioadapter','JackResampler.cpp JackLibSampleRateResampler.cpp JackAudioAdapter.cpp JackAudioAdapterInterface.cpp JackCallbackAudioAdapter.cpp ../linux/alsa/JackAlsaAdapter.cpp', serverlib)
 
-    #process = create_jack_process_obj(bld, 'netioadapter', 'JackResampler.cpp JackLibSampleRateResampler.cpp JackIOAdapter.cpp JackNetIOAdapter.cpp JackCallbackNetIOAdapter.cpp ../windows/JackPortAudioIOAdapter.cpp', serverlib)
+    #process = create_jack_process_obj(bld, 'audioadapter', 'JackResampler.cpp JackLibSampleRateResampler.cpp JackAudioAdapter.cpp JackAudioAdapterInterface.cpp JackCallbackAudioAdapter.cpp ../windows/JackPortAudioAdapter.cpp', serverlib)
 
     process.env.append_value("LINKFLAGS", "-lsamplerate")
 

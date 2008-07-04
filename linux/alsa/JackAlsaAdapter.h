@@ -17,14 +17,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackAlsaIOAdapter__
-#define __JackAlsaIOAdapter__
+#ifndef __JackAlsaAdapter__
+#define __JackAlsaAdapter__
 
 #include <math.h>
 #include <limits.h>
 #include <assert.h>
 #include <alsa/asoundlib.h>
-#include "JackIOAdapter.h"
+#include "JackAudioAdapterInterface.h"
 #include "JackPlatformThread.h"
 #include "JackError.h"
 #include "jack.h"
@@ -517,7 +517,7 @@ namespace Jack
         }
     };
 
-	class JackAlsaIOAdapter : public JackIOAdapterInterface, public JackRunnableInterface
+	class JackAlsaAdapter : public JackAudioAdapterInterface, public JackRunnableInterface
 	{
     
 	    private:
@@ -527,12 +527,12 @@ namespace Jack
        
 	    public:
         
-            JackAlsaIOAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
-                :JackIOAdapterInterface(input, output, buffer_size, sample_rate)
+            JackAlsaAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+                :JackAudioAdapterInterface(input, output, buffer_size, sample_rate)
                 ,fThread(this), fAudioInterface(input, output, buffer_size, sample_rate)	
             {}
            
-            ~JackAlsaIOAdapter()
+            ~JackAlsaAdapter()
             {}
             
             virtual int Open();

@@ -17,12 +17,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackAlsaIOAdapter.h"
+#include "JackAlsaAdapter.h"
 
 namespace Jack
 {
 
-int JackAlsaIOAdapter::Open()
+int JackAlsaAdapter::Open()
 {
     if (fAudioInterface.open() == 0) {
         fAudioInterface.longinfo();
@@ -34,7 +34,7 @@ int JackAlsaIOAdapter::Open()
     }
 }
 
-int JackAlsaIOAdapter::Close()
+int JackAlsaAdapter::Close()
 {
 #ifdef DEBUG
     fTable.Save();
@@ -43,14 +43,14 @@ int JackAlsaIOAdapter::Close()
     return fAudioInterface.close();
 }
 
-bool JackAlsaIOAdapter::Init()
+bool JackAlsaAdapter::Init()
 {
     fAudioInterface.write();
     fAudioInterface.write();
     return true;
 }
             
-bool JackAlsaIOAdapter::Execute()
+bool JackAlsaAdapter::Execute()
 {
     if (fAudioInterface.read() < 0)
         return false;
@@ -81,15 +81,15 @@ bool JackAlsaIOAdapter::Execute()
      
     // Reset all ringbuffers in case of failure
     if (failure) {
-        jack_error("JackAlsaIOAdapter::Execute ringbuffer failure... reset");
+        jack_error("JackAlsaAdapter::Execute ringbuffer failure... reset");
         adapter->ResetRingBuffers();
     }
     return true;
 }
 
-int JackAlsaIOAdapter::SetBufferSize(jack_nframes_t buffer_size)
+int JackAlsaAdapter::SetBufferSize(jack_nframes_t buffer_size)
 {
-    JackIOAdapterInterface::SetBufferSize(buffer_size);
+    JackAudioAdapterInterface::SetBufferSize(buffer_size);
     Close();
     return Open();
 }

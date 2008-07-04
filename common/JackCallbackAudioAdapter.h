@@ -17,15 +17,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackCallbackNetIOAdapter__
-#define __JackCallbackNetIOAdapter__
+#ifndef __JackCallbackAudioAdapter__
+#define __JackCallbackAudioAdapter__
 
-#include "JackNetIOAdapter.h"
+#include "JackAudioAdapter.h"
 #include "ringbuffer.h"
 
 namespace Jack
 {
-    class JackCallbackNetIOAdapter : public JackNetIOAdapter
+    class JackCallbackAudioAdapter : public JackAudioAdapter
     {
 
         private:
@@ -41,11 +41,11 @@ namespace Jack
 
         public:
 
-            JackCallbackNetIOAdapter(jack_client_t* jack_client, 
-                                    JackIOAdapterInterface* audio_io, 
+            JackCallbackAudioAdapter(jack_client_t* jack_client, 
+                                    JackAudioAdapterInterface* audio_io, 
                                     int input, 
                                     int output);
-            ~JackCallbackNetIOAdapter();
+            ~JackCallbackAudioAdapter();
     
     };
     
