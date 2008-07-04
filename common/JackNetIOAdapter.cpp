@@ -98,8 +98,6 @@ int JackNetIOAdapter::Close()
 
 } //namespace
 
-//static Jack::JackNetIOAdapter* adapter = NULL;
-
 #ifdef __cplusplus
 extern "C"
 {
