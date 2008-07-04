@@ -55,17 +55,20 @@ bool JackAlsaIOAdapter::Execute()
     if (fAudioInterface.read() < 0)
         return false;
 
+    bool failure = false;
     jack_nframes_t time1, time2; 
     ResampleFactor(time1, time2);
   
     for (int i = 0; i < fCaptureChannels; i++) {
         fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        fCaptureRingBuffer[i]->WriteResample(fAudioInterface.fInputSoftChannels[i], fBufferSize);
-     }
+        if (fCaptureRingBuffer[i]->WriteResample(fAudioInterface.fInputSoftChannels[i], fBufferSize) < fBufferSize)
+            failure = true;
+    }
     
     for (int i = 0; i < fPlaybackChannels; i++) {
         fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        fPlaybackRingBuffer[i]->ReadResample(fAudioInterface.fOutputSoftChannels[i], fBufferSize); 
+        if (fPlaybackRingBuffer[i]->ReadResample(fAudioInterface.fOutputSoftChannels[i], fBufferSize) < fBufferSize)
+            failure = true;
     }
 
 #ifdef DEBUG
@@ -75,7 +78,12 @@ bool JackAlsaIOAdapter::Execute()
         
     if (fAudioInterface.write() < 0)
         return false;
-        
+     
+    // Reset all ringbuffers in case of failure
+    if (failure) {
+        jack_error("JackAlsaIOAdapter::Execute ringbuffer failure... reset");
+        adapter->ResetRingBuffers();
+    }
     return true;
 }
 
