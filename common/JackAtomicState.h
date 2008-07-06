@@ -238,15 +238,15 @@ class JackAtomicState
         {
         	T* state;
         	UInt16 cur_index;
-        UInt16 next_index = GetCurrentIndex();
+            UInt16 next_index = GetCurrentIndex();
         	do {
-        cur_index = next_index; 
+                cur_index = next_index; 
         		state = ReadCurrentState();
         		
         		......
         		......
                 
-        next_index = GetCurrentIndex();
+                next_index = GetCurrentIndex();
         	} while (cur_index != next_index);
         }
         */

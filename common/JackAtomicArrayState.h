@@ -42,7 +42,7 @@ struct AtomicArrayCounter
     
     AtomicArrayCounter()
     {
-    info.fLongVal = 0;
+        info.fLongVal = 0;
     }
 
     AtomicArrayCounter(volatile const AtomicArrayCounter& obj) 
@@ -52,7 +52,7 @@ struct AtomicArrayCounter
 
     AtomicArrayCounter(volatile AtomicArrayCounter& obj) 
     {
-    info.fLongVal = obj.info.fLongVal;
+        info.fLongVal = obj.info.fLongVal;
     }
 
     AtomicArrayCounter& operator=(volatile AtomicArrayCounter& obj)
@@ -241,6 +241,7 @@ class JackAtomicArrayState
         /*!
         \brief Stop write operation : make the next state ready to be used by the RT thread
         */
+        
         void WriteNextStateStop(int state)
         {
             WriteNextStateStopAux(state);
