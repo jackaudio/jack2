@@ -126,16 +126,16 @@ namespace Jack
                 return (res < 0) ? 1 : res;
             }
             
-            jack_time_t CurFrame2Time()
-            {
-                return fCurrentWakeup;
-            }
-            
-            jack_nframes_t CurTime2Frame()
+            jack_nframes_t CurFrame()
             {
                 return fFrames;
             }
-
+                 
+            jack_time_t CurTime()
+            {
+                return fCurrentWakeup;
+            }
+  
     };
     
     class JackAtomicDelayLockedLoop : public JackAtomicState<JackDelayLockedLoop>

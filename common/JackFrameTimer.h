@@ -32,22 +32,40 @@ namespace Jack
 \brief A structure used for time management.
 */
 
-struct EXPORT JackTimer
+class EXPORT JackTimer
 {
-    jack_nframes_t fFrames;
-    jack_time_t	fCurrentWakeup;
-    jack_time_t	fCurrentCallback;
-    jack_time_t	fNextWakeUp;
-    float fSecondOrderIntegrator;
-    bool fInitialized;
 
-    /* not accessed by clients */
+    friend class JackFrameTimer;
+    
+    private: 
+    
+        jack_nframes_t fFrames;
+        jack_time_t	fCurrentWakeup;
+        jack_time_t	fCurrentCallback;
+        jack_time_t	fNextWakeUp;
+        float fSecondOrderIntegrator;
+        bool fInitialized;
+        float fFilterCoefficient;	/* set once, never altered */
 
-    float fFilterCoefficient;	/* set once, never altered */
-
-    JackTimer();
-    ~JackTimer()
-    {}
+    public: 
+    
+        JackTimer();
+        ~JackTimer()
+        {}
+        
+        jack_nframes_t Time2Frames(jack_time_t time, jack_nframes_t buffer_size);
+        jack_time_t Frames2Time(jack_nframes_t frames, jack_nframes_t buffer_size);
+        jack_nframes_t FramesSinceCycleStart(jack_time_t cur_time, jack_nframes_t frames_rate);
+        
+        jack_nframes_t CurFrame()
+        {
+            return fFrames;
+        }
+        
+        jack_time_t CurTime()
+        {
+            return fCurrentWakeup;
+        }
 
 };
 
@@ -57,10 +75,11 @@ struct EXPORT JackTimer
 
 class JackFrameTimer : public JackAtomicState<JackTimer>
 {
+    
     private:
 
         bool fFirstWakeUp;
-        void IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs);
+        void IncFrameTimeAux(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs);
         void InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t period_usecs);
 
     public:
@@ -72,7 +91,7 @@ class JackFrameTimer : public JackAtomicState<JackTimer>
 
         void InitFrameTime();
         void ResetFrameTime(jack_nframes_t frames_rate, jack_time_t callback_usecs, jack_time_t period_usecs);
-        void IncFrameTime(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs);
+        void IncFrameTime(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs);
         void ReadFrameTime(JackTimer* timer);
 };
 

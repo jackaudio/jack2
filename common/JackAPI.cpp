@@ -1237,10 +1237,12 @@ EXPORT jack_nframes_t jack_frames_since_cycle_start(const jack_client_t* ext_cli
 #endif
     JackTimer timer;
     JackEngineControl* control = GetEngineControl();
-    if (!control)
+    if (control) {
+        control->ReadFrameTime(&timer);
+        return timer.FramesSinceCycleStart(GetMicroSeconds(), control->fSampleRate);
+    } else {
         return 0;
-    control->ReadFrameTime(&timer);
-    return (jack_nframes_t) floor((((float)control->fSampleRate) / 1000000.0f) * (GetMicroSeconds() - timer.fCurrentCallback));
+    }
 }
 
 EXPORT jack_time_t jack_get_time()
@@ -1260,13 +1262,9 @@ EXPORT jack_time_t jack_frames_to_time(const jack_client_t* ext_client, jack_nfr
     } else {
         JackTimer timer;
         JackEngineControl* control = GetEngineControl();
-        if (!control)
-            return 0;
-        control->ReadFrameTime(&timer);
-        if (timer.fInitialized) {
-            return timer.fCurrentWakeup +
-                   (long) rint(((double) ((frames - timer.fFrames)) *
-                                ((jack_time_t)(timer.fNextWakeUp - timer.fCurrentWakeup))) / control->fBufferSize);
+        if (control) {
+            control->ReadFrameTime(&timer);
+            return timer.Frames2Time(frames, control->fBufferSize);
         } else {
             return 0;
         }
@@ -1285,13 +1283,9 @@ EXPORT jack_nframes_t jack_time_to_frames(const jack_client_t* ext_client, jack_
     } else {
         JackTimer timer;
         JackEngineControl* control = GetEngineControl();
-        if (!control)
-            return 0;
-        control->ReadFrameTime(&timer);
-        if (timer.fInitialized) {
-            return timer.fFrames +
-                   (long) rint(((double) ((time - timer.fCurrentWakeup)) /
-                                ((jack_time_t)(timer.fNextWakeUp - timer.fCurrentWakeup))) * control->fBufferSize);
+        if (control) {
+            control->ReadFrameTime(&timer);
+            return timer.Time2Frames(time, control->fBufferSize);
         } else {
             return 0;
         }
@@ -1312,7 +1306,7 @@ EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
     JackEngineControl* control = GetEngineControl();
     if (control) {
         control->ReadFrameTime(&timer);
-        return timer.fFrames;
+        return timer.CurFrame();
     } else {
         return 0;
     }

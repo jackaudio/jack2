@@ -40,18 +40,41 @@ JackTimer::JackTimer()
     fSecondOrderIntegrator = 0.0f;
 }
 
+jack_nframes_t JackTimer::Time2Frames(jack_time_t time, jack_nframes_t buffer_size)
+{
+    if (fInitialized) {
+        return fFrames + (long)rint(((double) ((time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * buffer_size);
+    } else {
+        return 0;
+    }
+}
+
+jack_time_t JackTimer::Frames2Time(jack_nframes_t frames, jack_nframes_t buffer_size)
+{
+    if (fInitialized) {
+        return fCurrentWakeup + (long)rint(((double) ((frames - fFrames)) * ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) / buffer_size);
+    } else {
+        return 0;
+    }
+}
+
+jack_nframes_t JackTimer::FramesSinceCycleStart(jack_time_t cur_time, jack_nframes_t frames_rate)
+{
+    return (jack_nframes_t) floor((((float)frames_rate) / 1000000.0f) * (cur_time - fCurrentCallback));
+}
+
 void JackFrameTimer::InitFrameTime()
 {
     fFirstWakeUp = true;
 }
 
-void JackFrameTimer::IncFrameTime(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs)
+void JackFrameTimer::IncFrameTime(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs)
 {
     if (fFirstWakeUp) {
         InitFrameTimeAux(callback_usecs, period_usecs);
         fFirstWakeUp = false;
     } else {
-        IncFrameTimeAux(nframes, callback_usecs, period_usecs);
+        IncFrameTimeAux(buffer_size, callback_usecs, period_usecs);
     }
 }
 
@@ -97,13 +120,13 @@ void JackFrameTimer::InitFrameTimeAux(jack_time_t callback_usecs, jack_time_t pe
     TrySwitchState(); // always succeed since there is only one writer
 }
 
-void JackFrameTimer::IncFrameTimeAux(jack_nframes_t nframes, jack_time_t callback_usecs, jack_time_t period_usecs)
+void JackFrameTimer::IncFrameTimeAux(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs)
 {
     JackTimer* timer = WriteNextStateStart();
     float delta = (int64_t)callback_usecs - (int64_t)timer->fNextWakeUp;
     timer->fCurrentWakeup = timer->fNextWakeUp;
     timer->fCurrentCallback = callback_usecs;
-    timer->fFrames += nframes;
+    timer->fFrames += buffer_size;
     timer->fSecondOrderIntegrator += 0.5f * timer->fFilterCoefficient * delta;
     timer->fNextWakeUp = timer->fCurrentWakeup + period_usecs + (int64_t) floorf((timer->fFilterCoefficient * (delta + timer->fSecondOrderIntegrator)));
     timer->fInitialized = true;
