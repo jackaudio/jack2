@@ -2386,12 +2386,7 @@ jack_nframes_t JackAlsaDriver::frame_time() const
 {
     JackTimer timer;
     fEngineControl->ReadFrameTime(&timer);
-    if (timer.fInitialized) {
-        return timer.fFrames +
-               (long) rint(((double) ((GetMicroSeconds() - timer.fCurrentWakeup)) /
-                            ((jack_time_t)(timer.fNextWakeUp - timer.fCurrentWakeup))) * fEngineControl->fBufferSize);
-    } else
-        return 0;
+    return timer.Time2Frames(fEngineControl->fBufferSize);
 }
 
 jack_nframes_t JackAlsaDriver::last_frame_time() const

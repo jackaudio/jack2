@@ -323,7 +323,7 @@ namespace Jack
 
 	int JackNetMaster::SetProcess ( jack_nframes_t nframes, void* arg )
 	{
-		JackNetMaster* master = static_cast<JackNetMaster*> ( arg );	;
+		JackNetMaster* master = static_cast<JackNetMaster*> ( arg );	
 		return master->Process();
 	}
 
