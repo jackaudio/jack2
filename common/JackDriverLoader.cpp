@@ -241,14 +241,14 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
     jackctl_parameter_t * param = NULL;
     union jackctl_parameter_value value;
 
-    if (argc <= 1) 
+    if (argc <= 1)
         return 0;
-  
+
     const JSList * driver_params = jackctl_driver_get_parameters(driver_ptr);
     if (driver_params == NULL)
         return 1;
 
-    jack_driver_desc_t * desc = jackctl_driver_get_desc(driver_ptr); 
+    jack_driver_desc_t * desc = jackctl_driver_get_desc(driver_ptr);
 
     /* check for help */
     if (strcmp (argv[1], "-h") == 0 || strcmp (argv[1], "--help") == 0) {
@@ -303,7 +303,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
 
         node_ptr = (JSList *)driver_params;
        	while (node_ptr) {
-            param = (jackctl_parameter_t*)node_ptr->data; 
+            param = (jackctl_parameter_t*)node_ptr->data;
             if (opt == jackctl_parameter_get_id(param)) {
                 break;
             }
@@ -318,7 +318,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
 
         if (optarg) {
             switch (jackctl_parameter_get_type(param)) {
-                case JackDriverParamInt:  
+                case JackDriverParamInt:
                     value.i = atoi (optarg);
                     jackctl_parameter_set_value(param, &value);
                     break;
@@ -360,7 +360,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
                 value.i = true;
             } else {
                 value = jackctl_parameter_get_default_value(param);
-            }  
+            }
             jackctl_parameter_set_value(param, &value);
         }
     }
@@ -439,7 +439,7 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 
 #ifdef WIN32
     if ((so_get_descriptor == NULL) && (dlerr = GetLastError()) != 0) {
-        jack_error("%ld", dlerr);
+        jack_log("Jack::jack_drivers_get_descriptor : dll is not a driver, error ld", dlerr);
 #else
     if ((so_get_descriptor == NULL) && (dlerr = dlerror ()) != NULL) {
         jack_error("%s", dlerr);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Grame
+Copyright (C) 2008 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetTool.h"
-#include "JackError.h"
 
 using namespace std;
 
@@ -177,7 +176,7 @@ namespace Jack
 
 	EXPORT void SessionParamsDisplay ( session_params_t* params )
 	{
-		jack_info ( "********************Params********************" );
+		jack_info ( "---->Network parameters of '%s'<----", params->fName );
 		jack_info ( "Protocol revision : %c", params->fProtocolVersion );
 		jack_info ( "MTU : %u", params->fMtu );
 		jack_info ( "Master name : %s", params->fMasterNetName );
@@ -191,7 +190,7 @@ namespace Jack
 		jack_info ( "Packet per period : %u", params->fPeriodSize / params->fFramesPerPacket );
 		jack_info ( "Bitdepth (0 for float) : %u", params->fBitdepth );
 		jack_info ( "Name : %s", params->fName );
-		jack_info ( "**********************************************" );
+		jack_info ( "---------------------------------------------" );
 	}
 
 	EXPORT sync_packet_type_t GetPacketType ( session_params_t* params )
@@ -275,12 +274,42 @@ namespace Jack
 
 // Utility *******************************************************************************************************
 
+	EXPORT int SocketAPIInit()
+	{
+		#ifdef WIN32
+		WORD wVersionRequested = MAKEWORD ( 2, 2 );
+		WSADATA wsaData;
+
+		if ( WSAStartup(wVersionRequested, &wsaData) != 0 )
+		{
+			jack_error ( "WSAStartup error : %s", strerror ( NET_ERROR_CODE ) );
+			return -1;
+		}
+
+		if ( LOBYTE ( wsaData.wVersion ) != 2 || HIBYTE ( wsaData.wVersion ) != 2 )
+		{
+			jack_error ( "Could not find a useable version of Winsock.dll\n" );
+			WSACleanup();
+			return -1;
+		}
+		#endif
+		return 0;
+	}
+
+	EXPORT int SocketAPIEnd()
+	{
+		#ifdef WIN32
+			return WSACleanup();
+		#endif
+		return 0;
+	}
+
 	EXPORT jack_nframes_t SetFramesPerPacket ( session_params_t* params )
 	{
 		if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
 			return ( params->fFramesPerPacket = params->fPeriodSize );
-		size_t period = ( int ) powf ( 2.f, ( int ) log2 ( ( params->fMtu - sizeof ( packet_header_t ) )
-		                               / ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) );
+		size_t period = ( int ) powf ( 2.f, ( int ) ( log ( ( params->fMtu - sizeof ( packet_header_t ) )
+			/ ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) / log ( 2 ) ) );
 		( period > params->fPeriodSize ) ? params->fFramesPerPacket = params->fPeriodSize : params->fFramesPerPacket = period;
 		return params->fFramesPerPacket;
 	}
@@ -298,17 +327,12 @@ namespace Jack
 		return npckt;
 	}
 
-	EXPORT int SetRxTimeout ( int* sockfd, session_params_t* params )
+	EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
 	{
-		int ret;
-		struct timeval timeout;
-		float time = static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate );
-		timeout.tv_sec = ( int ) time;
-		float usec = 1.25 * ( time - timeout.tv_sec ) * 1000000;
-		timeout.tv_usec = ( int ) usec;
-		if ( ( ret = setsockopt ( *sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) ) ) < 0 )
-			return ret;
-		return timeout.tv_usec;
+	    //time in ms : 1,25 * 'one packet time'
+		float time = 1250 * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
+		int ms = ( int ) time;
+		return ( socket->SetTimeOut ( ms ) == SOCKET_ERROR ) ? SOCKET_ERROR : ms;
 	}
 
 // Packet *******************************************************************************************************

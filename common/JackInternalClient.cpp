@@ -52,15 +52,15 @@ static void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
     snprintf(path_to_so, path_len, ADDON_DIR "/%s.dll", so_name);
 }
 
-static void PrintLoadError(const char* so_name) 
-{ 
+static void PrintLoadError(const char* so_name)
+{
     // Retrieve the system error message for the last-error code
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError(); 
+    DWORD dw = GetLastError();
 
     FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
@@ -70,12 +70,12 @@ static void PrintLoadError(const char* so_name)
         0, NULL );
 
     // Display the error message and exit the process
-    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR)); 
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR));
     _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("error loading %s err = %s"), so_name, lpMsgBuf); 
-        
-    jack_error((LPCTSTR)lpDisplayBuf); 
+        TEXT("error loading %s err = %s"), so_name, lpMsgBuf);
+
+    jack_error((LPCTSTR)lpDisplayBuf);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
@@ -145,7 +145,7 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
         jack_error("Cannot open client name = %s", name_res);
         goto error;
     }
-    
+
     SetupDriverSync(false);
     return 0;
 
@@ -219,7 +219,7 @@ int JackLoadableInternalClient::Open(const char* server_name, const char* name, 
             JackInternalClient::Close();
             fFinish = NULL;
         }
-    } 
+    }
     return res;
 }
 

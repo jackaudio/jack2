@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -134,6 +134,7 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
 
 #ifdef WIN32
 
+#ifndef __MINGW32__
 #ifdef __SMP__
 #	define LOCK lock
 #else
@@ -161,6 +162,29 @@ inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
     }
     return c;
 }
+
+#else
+
+#ifdef __SMP__
+#	define LOCK "lock ; "
+#else
+#	define LOCK ""
+#endif
+
+static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
+{
+    register char ret;
+    __asm__ __volatile__ (
+        "# CAS \n\t"
+        LOCK "cmpxchg %2, (%1) \n\t"
+        "sete %0               \n\t"
+    : "=a" (ret)
+                : "c" (addr), "d" (newvalue), "a" (value)
+            );
+    return ret;
+}
+
+#endif
 
 #endif
 

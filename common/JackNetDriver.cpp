@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2008 Grame
+Copyright (C) 2008 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackGraphManager.h"
-#include "driver_interface.h"
 #include "JackDriverLoader.h"
 #include "JackThreadedDriver.h"
 #include "JackWaitThreadedDriver.h"
@@ -36,22 +35,21 @@ namespace Jack
 {
 	JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
 	                               const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name )
-			: JackAudioDriver ( name, alias, engine, table )
+			: JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
 	{
 		fMulticastIP = new char[strlen ( ip ) + 1];
 		strcpy ( fMulticastIP, ip );
-		fUDPPort = port;
 		fParams.fMtu = mtu;
 		fParams.fSendMidiChannels = midi_input_ports;
 		fParams.fReturnMidiChannels = midi_output_ports;
 		strcpy ( fParams.fName, net_name );
-		fSockfd = 0;
+		fSocket.GetName ( fParams.fSlaveNetName );
 	}
 
 	JackNetDriver::~JackNetDriver()
 	{
-		if ( fSockfd )
-			close ( fSockfd );
+		fSocket.Close();
+		SocketAPIEnd();
 		delete fNetAudioCaptureBuffer;
 		delete fNetAudioPlaybackBuffer;
 		delete fNetMidiCaptureBuffer;
@@ -91,14 +89,15 @@ namespace Jack
 	bool JackNetDriver::Init()
 	{
 		jack_log ( "JackNetDriver::Init()" );
-		if ( fSockfd )
+
+		//new loading, but existing socket, restart the driver
+		if ( fSocket.IsSocket() )
 			Restart();
 
 		//set the parameters to send
 		strcpy ( fParams.fPacketType, "params" );
 		fParams.fProtocolVersion = 'a';
 		SetPacketType ( &fParams, SLAVE_AVAILABLE );
-		gethostname ( fParams.fSlaveNetName, 255 );
 		fParams.fSendAudioChannels = fCaptureChannels;
 		fParams.fReturnAudioChannels = fPlaybackChannels;
 
@@ -111,10 +110,10 @@ namespace Jack
 			do
 			{
 				status = GetNetMaster();
-				if ( status == SOCKET_ERROR )
+				if ( status == NET_SOCKET_ERROR )
 					return false;
 			}
-			while ( status != CONNECTED );
+			while ( status != NET_CONNECTED );
 
 			//then tell the master we are ready
 			jack_info ( "Initializing connection with %s...", fParams.fMasterNetName );
@@ -122,7 +121,7 @@ namespace Jack
 			if ( status == NET_ERROR )
 				return false;
 		}
-		while ( status != ROLLING );
+		while ( status != NET_ROLLING );
 
 		//driver parametering
 		if ( SetParams() )
@@ -142,61 +141,39 @@ namespace Jack
 		jack_log ( "JackNetDriver::GetNetMaster()" );
 		//utility
 		session_params_t params;
-		struct sockaddr_in mcast_addr, listen_addr;
-		struct timeval rcv_timeout;
-		rcv_timeout.tv_sec = 2;
-		rcv_timeout.tv_usec = 0;
-		socklen_t addr_len = sizeof ( socket_address_t );
+		int ms_timeout = 2000;
 		int rx_bytes = 0;
 
-		//set the multicast address
-		mcast_addr.sin_family = AF_INET;
-		mcast_addr.sin_port = htons ( fUDPPort );
-		inet_aton ( fMulticastIP, &mcast_addr.sin_addr );
-		memset ( &mcast_addr.sin_zero, 0, 8 );
-
-		//set the listening address
-		listen_addr.sin_family = AF_INET;
-		listen_addr.sin_port = htons ( fUDPPort );
-		listen_addr.sin_addr.s_addr = htonl ( INADDR_ANY );
-		memset ( &listen_addr.sin_zero, 0, 8 );
-
-		//set the master address family
-		fMasterAddr.sin_family = AF_INET;
-
 		//socket
-		if ( fSockfd )
-			close ( fSockfd );
-		if ( ( fSockfd = socket ( AF_INET, SOCK_DGRAM, 0 ) ) < 0 )
+		if ( fSocket.NewSocket() == SOCKET_ERROR )
 		{
-			jack_error ( "Fatal error : network unreachable - %s", strerror ( errno ) );
-			return SOCKET_ERROR;
+			jack_error ( "Fatal error : network unreachable - %s", StrError ( NET_ERROR_CODE ) );
+			return NET_SOCKET_ERROR;
 		}
 
 		//bind the socket
-		if ( bind ( fSockfd, reinterpret_cast<socket_address_t*> ( &listen_addr ), addr_len )  < 0 )
-			jack_error ( "Can't bind the socket : %s", strerror ( errno ) );
+		if ( fSocket.Bind() == SOCKET_ERROR )
+			jack_error ( "Can't bind the socket : %s", StrError ( NET_ERROR_CODE ) );
 
 		//timeout on receive
-		setsockopt ( fSockfd, SOL_SOCKET, SO_RCVTIMEO, &rcv_timeout, sizeof ( rcv_timeout ) );
+		if ( fSocket.SetTimeOut ( ms_timeout ) == SOCKET_ERROR )
+			jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
 		//send 'AVAILABLE' until 'SLAVE_SETUP' received
 		jack_info ( "Waiting for a master..." );
 		do
 		{
 			//send 'available'
-			if ( sendto ( fSockfd, &fParams, sizeof ( session_params_t ), 0,
-			              reinterpret_cast<socket_address_t*> ( &mcast_addr ), addr_len ) < 0 )
-				jack_error ( "Error in data send : %s", strerror ( errno ) );
+			if ( fSocket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
+				jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
 			//filter incoming packets : don't exit while receiving wrong packets
 			do
 			{
-				rx_bytes = recvfrom ( fSockfd, &params, sizeof ( session_params_t ), 0,
-				                      reinterpret_cast<socket_address_t*> ( &fMasterAddr ), &addr_len );
-				if ( ( rx_bytes < 0 ) && ( errno != EAGAIN ) )
+				rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
+				if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
 				{
-					jack_error ( "Can't receive : %s", strerror ( errno ) );
-					return RECV_ERROR;
+					jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
+					return NET_RECV_ERROR;
 				}
 			}
 			while ( ( rx_bytes > 0 )  && strcmp ( params.fPacketType, fParams.fPacketType ) );
@@ -204,16 +181,16 @@ namespace Jack
 		while ( ( GetPacketType ( &params ) != SLAVE_SETUP ) );
 
 		//connect the socket
-		if ( connect ( fSockfd, reinterpret_cast<socket_address_t*> ( &fMasterAddr ), sizeof ( socket_address_t ) )  < 0 )
+		if ( fSocket.Connect() == SOCKET_ERROR )
 		{
-			jack_error ( "Error in connect : %s", strerror ( errno ) );
-			return CONNECT_ERROR;
+			jack_error ( "Error in connect : %s", StrError ( NET_ERROR_CODE ) );
+			return NET_CONNECT_ERROR;
 		}
 
 		//everything is OK, copy parameters and return
 		fParams = params;
 
-		return CONNECTED;
+		return NET_CONNECTED;
 	}
 
 	net_status_t JackNetDriver::SendMasterStartSync()
@@ -221,18 +198,17 @@ namespace Jack
 		jack_log ( "JackNetDriver::GetNetMasterStartSync()" );
 		//tell the master to start
 		SetPacketType ( &fParams, START_MASTER );
-		if ( send ( fSockfd, &fParams, sizeof ( session_params_t ), 0 ) < 0 )
+		if ( fSocket.Send ( &fParams, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
 		{
-			jack_error ( "Error in send : %s", strerror ( errno ) );
-			return ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) ) ? NET_ERROR : SEND_ERROR;
+			jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
+			return ( fSocket.GetError() == NET_CONN_ERROR ) ? NET_ERROR : NET_SEND_ERROR;
 		}
-		return ROLLING;
+		return NET_ROLLING;
 	}
 
 	void JackNetDriver::Restart()
 	{
 		jack_info ( "Restarting driver..." );
-		close ( fSockfd );
 		delete[] fTxBuffer;
 		delete[] fRxBuffer;
 		delete fNetAudioCaptureBuffer;
@@ -321,13 +297,15 @@ namespace Jack
 		char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 		char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 		unsigned long port_flags;
+		int audio_port_index;
+		uint midi_port_index;
 
 		//audio
 		port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-		for ( int port_index = 0; port_index < fCaptureChannels; port_index++ )
+		for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
 		{
-			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:capture_%d", fClientControl.fName, port_index + 1 );
+			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, audio_port_index + 1 );
+			snprintf ( name, sizeof ( name ) - 1, "%s:capture_%d", fClientControl.fName, audio_port_index + 1 );
 			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
@@ -337,14 +315,14 @@ namespace Jack
 			port = fGraphManager->GetPort ( port_id );
 			port->SetAlias ( alias );
 			port->SetLatency ( fEngineControl->fBufferSize + fCaptureLatency );
-			fCapturePortList[port_index] = port_id;
-			jack_log ( "JackNetDriver::AllocPorts() fCapturePortList[%d] port_index = %ld", port_index, port_id );
+			fCapturePortList[audio_port_index] = port_id;
+			jack_log ( "JackNetDriver::AllocPorts() fCapturePortList[%d] audio_port_index = %ld", audio_port_index, port_id );
 		}
 		port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
+		for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
 		{
-			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:playback_%d",fClientControl.fName, port_index + 1 );
+			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, audio_port_index + 1 );
+			snprintf ( name, sizeof ( name ) - 1, "%s:playback_%d",fClientControl.fName, audio_port_index + 1 );
 			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
@@ -354,38 +332,38 @@ namespace Jack
 			port = fGraphManager->GetPort ( port_id );
 			port->SetAlias ( alias );
 			port->SetLatency ( fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) + fPlaybackLatency );
-			fPlaybackPortList[port_index] = port_id;
-			jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] port_index = %ld", port_index, port_id );
+			fPlaybackPortList[audio_port_index] = port_id;
+			jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld", audio_port_index, port_id );
 		}
 		//midi
 		port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
 		{
-			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:midi_capture_%d", fClientControl.fName, port_index + 1 );
+			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, midi_port_index + 1 );
+			snprintf ( name, sizeof ( name ) - 1, "%s:midi_capture_%d", fClientControl.fName, midi_port_index + 1 );
 			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
 				jack_error ( "driver: cannot register port for %s", name );
 				return -1;
 			}
-			fMidiCapturePortList[port_index] = port_id;
-			jack_log ( "JackNetDriver::AllocPorts() fMidiCapturePortList[%d] port_index = %ld", port_index, port_id );
+			fMidiCapturePortList[midi_port_index] = port_id;
+			jack_log ( "JackNetDriver::AllocPorts() fMidiCapturePortList[%d] midi_port_index = %ld", midi_port_index, port_id );
 		}
 
 		port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
 		{
-			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, port_index + 1 );
-			snprintf ( name, sizeof ( name ) - 1, "%s:midi_playback_%d", fClientControl.fName, port_index + 1 );
+			snprintf ( alias, sizeof ( alias ) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, midi_port_index + 1 );
+			snprintf ( name, sizeof ( name ) - 1, "%s:midi_playback_%d", fClientControl.fName, midi_port_index + 1 );
 			if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE,
 			                 static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
 			{
 				jack_error ( "driver: cannot register port for %s", name );
 				return -1;
 			}
-			fMidiPlaybackPortList[port_index] = port_id;
-			jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] port_index = %ld", port_index, port_id );
+			fMidiPlaybackPortList[midi_port_index] = port_id;
+			jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld", midi_port_index, port_id );
 		}
 
 		return 0;
@@ -394,14 +372,16 @@ namespace Jack
 	int JackNetDriver::FreePorts()
 	{
 		jack_log ( "JackNetDriver::FreePorts" );
-		for ( int port_index = 0; port_index < fCaptureChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[port_index] );
-		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[port_index] );
-		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[port_index] );
-		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
-			fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[port_index] );
+		int audio_port_index;
+		uint midi_port_index;
+		for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index] );
+		for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index] );
+		for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index] );
+		for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
+			fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index] );
 		return 0;
 	}
 
@@ -418,21 +398,21 @@ namespace Jack
 	int JackNetDriver::Recv ( size_t size, int flags )
 	{
 		int rx_bytes;
-		if ( ( rx_bytes = recv ( fSockfd, fRxBuffer, size, flags ) ) < 0 )
+		if ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR )
 		{
-			if ( errno == EAGAIN )
+			net_error_t error = fSocket.GetError();
+			if ( error == NET_NO_DATA )
 			{
 				jack_error ( "No incoming data, is the master still running ?" );
 				return 0;
 			}
-			else if ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) )
+			else if ( error == NET_CONN_ERROR )
 			{
-				jack_error ( "Fatal error : %s.", strerror ( errno ) );
-				throw JackDriverException();
+				throw JackDriverException ( "Connection lost." );
 			}
 			else
 			{
-				jack_error ( "Error in receive : %s", strerror ( errno ) );
+				jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
 				return 0;
 			}
 		}
@@ -442,15 +422,15 @@ namespace Jack
 	int JackNetDriver::Send ( size_t size, int flags )
 	{
 		int tx_bytes;
-		if ( ( tx_bytes = send ( fSockfd, fTxBuffer, size, flags ) ) < 0 )
+		if ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR )
 		{
-			if ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) )
+			net_error_t error = fSocket.GetError();
+			if ( error == NET_CONN_ERROR )
 			{
-				jack_error ( "Fatal error : %s.", strerror ( errno ) );
-				throw JackDriverException();
+				throw JackDriverException ( "Connection lost." );
 			}
 			else
-				jack_error ( "Error in send : %s", strerror ( errno ) );
+				jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
 		}
 		return tx_bytes;
 	}
@@ -463,17 +443,20 @@ namespace Jack
 		uint recvd_midi_pckt = 0;
 		packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 		fRxHeader.fIsLastPckt = 'n';
+		uint midi_port_index;
+		int audio_port_index;
 
 		//buffers
-		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
-			fNetMidiCaptureBuffer->fPortBuffer[port_index] = GetMidiInputBuffer ( port_index );
-		for ( int port_index = 0; port_index < fCaptureChannels; port_index++ )
-			fNetAudioCaptureBuffer->fPortBuffer[port_index] = GetInputBuffer ( port_index );
+		for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
+			fNetMidiCaptureBuffer->fPortBuffer[midi_port_index] = GetMidiInputBuffer ( midi_port_index );
+		for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
+			fNetAudioCaptureBuffer->fPortBuffer[audio_port_index] = GetInputBuffer ( audio_port_index );
 
 		//receive sync (launch the cycle)
 		do
 		{
-			if ( ( rx_bytes = Recv ( sizeof ( packet_header_t ), 0 ) ) < 1 )
+			rx_bytes = Recv ( sizeof ( packet_header_t ), 0 );
+			if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
 				return rx_bytes;
 		}
 		while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
@@ -493,14 +476,14 @@ namespace Jack
 					switch ( rx_head->fDataType )
 					{
 						case 'm':	//midi
-							rx_bytes = Recv ( rx_bytes, MSG_DONTWAIT );
+							rx_bytes = Recv ( rx_bytes, 0 );
 							fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
 							fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
 							if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
 								fNetMidiCaptureBuffer->RenderToJackPorts();
 							break;
 						case 'a':	//audio
-							rx_bytes = Recv ( fAudioRxLen, MSG_DONTWAIT );
+							rx_bytes = Recv ( fAudioRxLen, 0 );
 							if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
 								jack_error ( "Packet(s) missing..." );
 							fRxHeader.fCycle = rx_head->fCycle;
@@ -527,12 +510,14 @@ namespace Jack
 		fTxHeader.fCycle = fRxHeader.fCycle;
 		fTxHeader.fSubCycle = 0;
 		fTxHeader.fIsLastPckt = 'n';
+		uint midi_port_index;
+		int audio_port_index;
 
 		//buffers
-		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
-			fNetMidiPlaybackBuffer->fPortBuffer[port_index] = GetMidiOutputBuffer ( port_index );
-		for ( int port_index = 0; port_index < fPlaybackChannels; port_index++ )
-			fNetAudioPlaybackBuffer->fPortBuffer[port_index] = GetOutputBuffer ( port_index );
+		for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
+			fNetMidiPlaybackBuffer->fPortBuffer[midi_port_index] = GetMidiOutputBuffer ( midi_port_index );
+		for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
+			fNetAudioPlaybackBuffer->fPortBuffer[audio_port_index] = GetOutputBuffer ( audio_port_index );
 
 		//midi
 		if ( fParams.fReturnMidiChannels )
@@ -650,9 +635,14 @@ namespace Jack
 
 		EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
 		{
+			if ( SocketAPIInit() < 0 )
+			{
+				jack_error ( "Can't init Socket API, exiting..." );
+				return NULL;
+			}
 			const char* multicast_ip = DEFAULT_MULTICAST_IP;
 			char name[JACK_CLIENT_NAME_SIZE];
-			gethostname ( name, JACK_CLIENT_NAME_SIZE );
+			GetHostName ( name, JACK_CLIENT_NAME_SIZE );
 			int udp_port = DEFAULT_PORT;
 			int mtu = 1500;
 			jack_nframes_t period_size = 128;
@@ -697,7 +687,8 @@ namespace Jack
 			}
 
 			Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu, midi_input_ports, midi_output_ports, name ) );
+			    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
+                        midi_input_ports, midi_output_ports, name ) );
 			if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
 			                    monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
 				return driver;

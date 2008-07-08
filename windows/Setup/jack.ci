@@ -1,0 +1,126 @@
+<*project
+      version = 4 civer = "Free v4.14.3" winver = "2.6/5.1.2600" > 
+   <output> .</>
+   <exename> Jack_v1.90_setup.exe</>
+   <digitsign> </>
+   <appname> Jack v1.90</>
+   <password> </>
+   <addlang> </>
+   <icon> Default - 2</>
+   <selfextr> 1</>
+   <voltype> nolimit</>
+   <volsize> </>
+   <volpattern> disk%i.pak</>
+   <load> </>
+   <loadtime> 1000</>
+   <checktype> admin</>
+   <chkname> </>
+   <chkmsg> </>
+   <dlgfont> Verdana,8</>
+   <lang> English</>
+   <theme> Green</>
+   <iface> leftlogo</>
+   <leftlogo> .\src\logo_installer.bmp</>
+   <logo> </>
+   <vb> </>
+   <dao> </>
+   <background> 0</>
+   <dlgwelcome> 1</>
+   <dlgreadme> .\src\readme_installer.txt</>
+   <dlglic> .\src\gpl_installer.rtf</>
+   <dlgcustpath> </>
+   <dlgenfpath> 0</>
+   <dlgsavepath> 1</>
+   <dlgautoprog> 1</>
+   <dlgfinish> 1</>
+   <comptype> ppmdmax</>
+   <solid> 1</>
+   <srcfolder> </>
+   <ifexist> overnewer</>
+   <runafter> </>
+   <runconfirm> 0</>
+   <uninclude> 1</>
+   <unicon> Uninstall - 2</>
+   <unshortcut> 1</>
+   <unrun> </>
+   <silent> 0</>
+   <unfeed> </>
+   <unautoclose> 1</>
+   <unfinish> 1</>
+   <bl> My Demo</>
+   <blurl> </>
+   <bghead> </>
+   <bgfoot> </> 
+   <bgback> </>
+   <files listview >
+      <_><src>..\Release\bin\libjackmp.a</><dest>inst</><custom>\lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackservermp.a</><dest>inst</><custom>\lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack_connect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack_disconnect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack_load.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack_lsp.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack_metro.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack_unload.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackdmp.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackmp.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackservermp.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libsamplerate-0.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\jack_net.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\jack_portaudio.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\netmanager.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\audioadapter.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\control.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\intclient.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\jack.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\jslist.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\midiport.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\ringbuffer.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\statistics.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\thread.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\transport.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\types.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\QtGui4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\qjackctl\QtXml4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\COPYING</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+
+   </files>
+   <runx listview >
+      
+   </runx>
+   <registry listview >
+      
+   </registry>
+   <shcut listview >
+      <_><shpath>prog</><shname>Jack NetDriver</><tarpath>inst</><tarname>jackdmp.exe</><cmdline>-R -S -d net</><workpath>inst</><workcust></><icon></></>
+<_><shpath>prog</><shname>Jack Portaudio</><tarpath>inst</><tarname>jackdmp.exe</><cmdline>-R -S -d portaudio</><workpath>inst</><workcust></><icon></></>
+<_><shpath>prog</><shname>Jack Control</><tarpath>inst</><tarname>qjackctl.exe</><cmdline></><workpath>inst</><workcust></><icon>jackdmp.exe</></>
+<_><shpath>prog</><shname>Jack Command</><tarpath>sys</><tarname>cmd.exe</><cmdline></><workpath>inst</><workcust></><icon></></>
+
+   </shcut>
+   <ini listview >
+      
+   </ini>
+   <copy listview >
+      
+   </copy>
+   <activex listview >
+      <_><path>inst</><name>JackRouter.dll</></>
+
+   </activex>
+   <font listview >
+      
+   </font>
+   <ext listview >
+      
+   </ext>
+   <mreg listview >
+      
+   </mreg>
+   <macros> Pathadd=</>
+</project>

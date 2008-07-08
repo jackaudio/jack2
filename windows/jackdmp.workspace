@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="jackdmp workspace">
+		<Project filename="libjackservermp.cbp" />
+		<Project filename="libjackmp.cbp" />
+		<Project filename="jackdmp.cbp">
+			<Depends filename="libjackservermp.cbp" />
+		</Project>
+		<Project filename="jack_audioadapter.cbp" active="1">
+			<Depends filename="libjackservermp.cbp" />
+		</Project>
+		<Project filename="jack_portaudio.cbp">
+			<Depends filename="libjackservermp.cbp" />
+		</Project>
+		<Project filename="jack_netdriver.cbp">
+			<Depends filename="libjackservermp.cbp" />
+		</Project>
+		<Project filename="jack_netmanager.cbp">
+			<Depends filename="libjackservermp.cbp" />
+		</Project>
+		<Project filename="jack_load.cbp">
+			<Depends filename="libjackmp.cbp" />
+		</Project>
+		<Project filename="jack_unload.cbp">
+			<Depends filename="libjackmp.cbp" />
+		</Project>
+		<Project filename="jack_lsp.cbp">
+			<Depends filename="libjackmp.cbp" />
+		</Project>
+		<Project filename="jack_metro.cbp">
+			<Depends filename="libjackmp.cbp" />
+		</Project>
+		<Project filename="jack_connect.cbp" />
+		<Project filename="jack_disconnect.cbp">
+			<Depends filename="libjackmp.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

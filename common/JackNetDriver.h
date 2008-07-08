@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2008 Grame
+Copyright (C) 2008 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,9 +31,7 @@ namespace Jack
 		private:
 			session_params_t fParams;
 			char* fMulticastIP;
-			int fUDPPort;
-			int fSockfd;
-			struct sockaddr_in fMasterAddr;
+			JackNetSocket fSocket;
 			uint fNSubProcess;
 
 			jack_port_id_t* fMidiCapturePortList;

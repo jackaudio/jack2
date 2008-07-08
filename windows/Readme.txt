@@ -1,0 +1,54 @@
+-------------------------------
+Jackmp on windows
+-------------------------------
+
+This folder contains all the windows specific sources.
+You will also find two sets of files :
+- VisualC++6 workspace and project files, in order to compile Jack with MSVC
+- Code::Blocks (8.02) workspace and project files, in order to compile Jack with MingW
+
+The built binaries will be located in '/Release/bin' (or '/Debug/bin' if you build the Debug target). Once compiled, you'll find there everything you need :
+- the two 'libjackmp.dll' and 'libjackservermp.dll', client and server jack libraries
+- the 'jackdmp.exe', main application : the jack server
+- the 'jack_xxx.exe' utilities and examples
+- in the jackmp directory, you'll find the driver's DLL's ('jack_portaudio.dll' and 'jack_netdriver.dll') and some tools ( 'netmanager.dll' for example )
+
+In Code::Blocks all the projects are automatically built in a correct order (dll's then apps) by doing 'build->build workspace'.
+In VC6, you'll have to build the projects one by one.
+
+-------------------------------
+Notes about VC and GCC versions
+-------------------------------
+
+The Visual Studio workspace is limited to VC6. Jack will not compile on most recent MSVC's. The fact is recent compilers (MSVC7, 8 or 9) don't agree with some of the Jack sources.
+But now you can compile Jack using GCC, with MingW.
+The project is actually organized in a Code::Blocks workspace. This is a simple and efficient way to compile the whole project.
+
+But for some reasons, you need to compile Jack using a SJLJ version of G++ (available on MingW website).
+Current GCC/G++ version (3.4.5) doesn't includes SJLJ so you'll have to use another one.
+Jack needs the use of SJLJ exceptions instead of DW2 because exceptions are exchanged between DLL's, and DW2 does not allow to throw an exception out of a DLL, so it wouldn't be cought.
+
+The ressources files has been created with ResEdit (ANSI build). VisualStudio uses 'ressource.rc' and 'ressource_vc.h'. The other files are used by MingW.
+
+You can make a small installer ('setup.exe') with CreateInstallFree, a little freeware. For this you have the little script 'jack.ci'.The installer contains everything jack needs to be intagreted in windows (including register entries and shortcuts).
+A binary version of qjackctl is also included.
+
+-------------------------------
+Running Jack on windows
+-------------------------------
+
+You can use two drivers : PortAudio and NetDriver.
+The PortAudio backend allow the use of many soundcards, using ASIO or WMME drivers (any ASIO driver can be seen by PortAudio).
+The NetDriver allow you to use NetJack2 on windows. Thus you can easily exchange midi and audio streams bitween computers (Linux, MacOSX or Windows).
+In both cases, you have to use the minimalist :
+    'jackdmp -R -S -d ...'
+        command. With PortAudio, you can have a list of supported drivers with :
+    'jackdmp -R -S -d portaudio -l'
+
+Other options still stay the same.
+You can also pick a binary of Qjackctl, but this is still in development.
+
+More information at : 'http://www.grame.fr/~letz/jackdmp.html'.
+
+For any question or suggestion, you can refer to the mailing list 'jack-devel@jackaudio.org'
+Enjoy Jack on windows... ;-)

@@ -478,7 +478,8 @@ static int debug = 0;
   if (debug) print_double_string (w, s1, sz1, s2, sz2)
 
 
-extern void printchar ();
+//extern void printchar ();
+void printchar( int i ) {}
 
 /* Print the fastmap in human-readable form.  */
 
@@ -4873,24 +4874,24 @@ regexec (preg, string, nmatch, pmatch, eflags)
    from either regcomp or regexec.   We don't use PREG here.  */
 
 size_t
-regerror (errcode, preg, errbuf, errbuf_size)
-    int errcode;
-    const regex_t *preg;
-    char *errbuf;
-    size_t errbuf_size;
+regerror (errcode_vc, preg, errbuf, errbuf_size)
+    int errcode_vc; 
+    const regex_t *preg; 
+    char *errbuf; 
+    size_t errbuf_size; 
 {
   const char *msg;
   size_t msg_size;
 
-  if (errcode < 0
-      || errcode >= (sizeof (re_error_msg) / sizeof (re_error_msg[0])))
+  if (errcode_vc < 0
+      || errcode_vc >= (sizeof (re_error_msg) / sizeof (re_error_msg[0])))
     /* Only error codes returned by the rest of the code should be passed 
        to this routine.  If we are given anything else, or if other regex
        code generates an invalid error code, then the program has a bug.
        Dump core so we can fix it.  */
     abort ();
 
-  msg = re_error_msg[errcode];
+  msg = re_error_msg[errcode_vc];
 
   /* POSIX doesn't require that we do anything in this case, but why
      not be nice.  */

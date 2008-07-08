@@ -48,7 +48,7 @@ bool JackWaitThreadedDriver::Execute()
         while (!fStarter.fRunning && fThread.GetStatus() == JackThread::kRunning) {
             fDriver->ProcessNull();
         }
-        
+
         // Set RT
         if (fDriver->IsRealTime()) {
             jack_log("JackWaitThreadedDriver::Init IsRealTime");
@@ -57,16 +57,16 @@ bool JackWaitThreadedDriver::Execute()
             if (fThread.AcquireRealTime(GetEngineControl()->fPriority) < 0) {
                 jack_error("AcquireRealTime error");
             } else {
-                set_threaded_log_function(); 
+                set_threaded_log_function();
             }
         }
-        
+
         // Switch to keep running even in case of error
         while (fThread.GetStatus() == JackThread::kRunning) {
             fDriver->Process();
         }
         return false;
-    } catch (JackDriverException e) {
+    } catch (JackDriverException& e) {
         e.PrintMessage();
         jack_log("Driver is restarted");
         fThread.DropRealTime();
@@ -79,7 +79,7 @@ bool JackWaitThreadedDriver::Execute()
         } else {
             return false;
         }
-    }
+	}
 }
 
 } // end of namespace

@@ -11,6 +11,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -23,6 +26,24 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "jack_load"=".\jack_load.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -35,6 +56,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -47,6 +71,39 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "jack_netdriver"=".\jack_netdriver.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libjackservermp
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "jack_netmanager"=".\jack_netmanager.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libjackservermp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -59,6 +116,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackservermp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -71,6 +131,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -83,6 +146,24 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "jack_unload"=".\jack_unload.dsp" - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -95,11 +176,14 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackservermp
+    End Project Dependency
 }}}
 
 ###############################################################################
 
-Project: "jdelay"="..\..\..\..\Jackdmp\src_win32\windows\jdelay.dsp" - Package Owner=<4>
+Project: "jdelay"=".\jdelay.dsp" - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -107,6 +191,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libjackmp
+    End Project Dependency
 }}}
 
 ###############################################################################

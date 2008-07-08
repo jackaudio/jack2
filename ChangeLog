@@ -21,6 +21,14 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-07-08 Stephane Letz  <letz@grame.fr>
+
+	* Merge windows branch back to trunk.
+
+2008-07-05 Stephane Letz  <letz@grame.fr>
+
+	* Netioadapter renamed in audioadapter.
+
 2008-07-04 Stephane Letz  <letz@grame.fr>
 
 	* Netioadapter now adapts for buffer size and sample rate changes.

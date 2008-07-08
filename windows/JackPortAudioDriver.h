@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackPortAudioDriver__
 
 #include "JackAudioDriver.h"
-#include "portaudio.h"
+#include "JackPortAudioDevices.h"
 
 namespace Jack
 {
@@ -35,15 +35,12 @@ class JackPortAudioDriver : public JackAudioDriver
 
     private:
 
+        PortAudioDevices* fPaDevices;
         PaStream* fStream;
         float** fInputBuffer;
         float** fOutputBuffer;
         PaDeviceIndex fInputDevice;
         PaDeviceIndex fOutputDevice;
-
-        void PrintSupportedStandardSampleRates(const PaStreamParameters* inputParameters, const PaStreamParameters* outputParameters);
-        bool GetInputDeviceFromName(const char* name, PaDeviceIndex* device, int* in_max);
-        bool GetOutputDeviceFromName(const char* name, PaDeviceIndex* device, int* out_max);
 
         static int Render(const void* inputBuffer, void* outputBuffer,
                           unsigned long framesPerBuffer,
@@ -53,10 +50,12 @@ class JackPortAudioDriver : public JackAudioDriver
 
     public:
 
-        JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+        JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, PortAudioDevices* pa_devices)
                 : JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputDevice(paNoDevice), fOutputDevice(paNoDevice)
-        {}
+        {
+            fPaDevices = pa_devices;
+        }
 
         virtual ~JackPortAudioDriver()
         {}

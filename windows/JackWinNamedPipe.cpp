@@ -364,6 +364,11 @@ int JackWinAsyncNamedPipeServer::Bind(const char* dir, const char* name, int whi
     }
 }
 
+bool JackWinAsyncNamedPipeServer::Accept()
+{
+    return false;
+}
+
 JackWinNamedPipeClient* JackWinAsyncNamedPipeServer::AcceptClient()
 {
     if (ConnectNamedPipe(fNamedPipe, NULL)) {

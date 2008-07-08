@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="libjackmp" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Win32 Release">
+				<Option output="Release\bin\libjackmp" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DLIBJACKMP_EXPORTS" />
+					<Add option="-DREGEX_MALLOC" />
+					<Add option="-DSTDC_HEADERS" />
+					<Add option="-D__SMP__" />
+					<Add directory="." />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="odbc32" />
+					<Add library="odbccp32" />
+				</Linker>
+			</Target>
+			<Target title="Win32 Debug">
+				<Option output="Debug\bin\libjackmp" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DLIBJACKMP_EXPORTS" />
+					<Add option="-DREGEX_MALLOC" />
+					<Add option="-DSTDC_HEADERS" />
+					<Add option="-D__SMP__" />
+					<Add directory="." />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="odbc32" />
+					<Add library="odbccp32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="..\common\JackAPI.cpp" />
+		<Unit filename="..\common\JackActivationCount.cpp" />
+		<Unit filename="..\common\JackAudioPort.cpp" />
+		<Unit filename="..\common\JackClient.cpp" />
+		<Unit filename="..\common\JackConnectionManager.cpp" />
+		<Unit filename="..\common\JackEngineControl.cpp" />
+		<Unit filename="..\common\JackError.cpp" />
+		<Unit filename="..\common\JackFrameTimer.cpp" />
+		<Unit filename="..\common\JackGlobals.cpp" />
+		<Unit filename="..\common\JackGraphManager.cpp" />
+		<Unit filename="..\common\JackLibAPI.cpp" />
+		<Unit filename="..\common\JackLibClient.cpp" />
+		<Unit filename="..\common\JackMessageBuffer.cpp" />
+		<Unit filename="..\common\JackMidiAPI.cpp" />
+		<Unit filename="..\common\JackMidiPort.cpp" />
+		<Unit filename="..\common\JackPort.cpp" />
+		<Unit filename="..\common\JackPortType.cpp" />
+		<Unit filename="..\common\JackShmMem.cpp" />
+		<Unit filename="..\common\JackTime.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="..\common\JackTools.cpp" />
+		<Unit filename="..\common\JackTransportEngine.cpp" />
+		<Unit filename="..\common\shm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="JackWinNamedPipe.cpp" />
+		<Unit filename="JackWinNamedPipeClientChannel.cpp" />
+		<Unit filename="JackWinProcessSync.cpp" />
+		<Unit filename="JackWinSemaphore.cpp" />
+		<Unit filename="JackWinThread.cpp" />
+		<Unit filename="libjackmp.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="regex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="1" date_declarations="1" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

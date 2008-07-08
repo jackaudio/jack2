@@ -372,7 +372,7 @@ jackctl_setup_signals(
     (void) signal(SIGABRT, do_nothing_handler);
     (void) signal(SIGTERM, do_nothing_handler);
 
-	return waitEvent;
+	return (sigset_t)waitEvent;
 }
 
 void jackctl_wait_signals(sigset_t signals)
@@ -385,7 +385,7 @@ void jackctl_wait_signals(sigset_t signals)
 #else
 
 static
-void 
+void
 do_nothing_handler(int sig)
 {
     /* this is used by the child (active) process, but it never
@@ -451,7 +451,7 @@ jackctl_setup_signals(
     sigaddset(&signals, SIGUSR2);
 
     /* all child threads will inherit this mask unless they
-     * explicitly reset it 
+     * explicitly reset it
      */
 
      pthread_sigmask(SIG_BLOCK, &signals, 0);
@@ -470,9 +470,9 @@ jackctl_setup_signals(
         if (sigismember (&signals, i))
         {
             sigaction(i, &action, 0);
-        } 
+        }
     }
-    
+
     return signals;
 }
 
@@ -494,6 +494,8 @@ jackctl_wait_signals(sigset_t signals)
                 // driver exit
                 waiting = false;
                 break;
+			case SIGTTOU:
+				break;
             default:
                 waiting = false;
                 break;

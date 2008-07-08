@@ -51,11 +51,9 @@ Current limitations
 The netjackmp's development has just started. This prerelease is operational, but involve some serious limitations :
 - You can't set the bitdepth of the transmitted audio samples. Floating point values are used for now. The possibility to use 16 or 24bits data will be included soon, like in netjack. It's important to notice that change the bitdepth id very expensive in processing ressources (because it is a sample to sample operation).
 - The 'inter-slave' communication is not optimized yet. If you connect one slave to another, the network streams go through the master. While sending network addresses to the slaves when they are inter-jack-connected, we could make the slave possibly independant of the master (except for the synchronization, sent over the network). This is the next step of the netjackmp development.
-- This is not actually working on windows, because the windows socket API (the network development tools) aren't the same as under unix systems (linux and macosx).
-- Because of the current development, the parametering of the whole system is minimalistic. For now you can't set another value of the MTU (allowing larger packets, meaning less packet, so less packet loss). The MTU issue is also a quite big one. In fact, the better thing to do seems to include an automatic detection of the MTU (called path MTU discovery) between master and slave. But this detection is quite controversial because it actually needs ICMP messages, which are more and more often unwanted nay blocked or ignored by network devices such as routers or firewalls (for security reasons). So in a first time, the MTU will possibly be a parameter of the master, like it is now in netjack. The fact is in this version, the MTU is set to 1500bytes, and it works fine on local 100mb networks. Future versions will include the possibility to set the MTU, which can be larger on gigabit networks (9000bytes for jumbo frames).
-- Unlike netjack, this version doesn't include transport, this is naturraly planned for the fully operational version.
-- Netjackmp can't use audio hardware to capture or play some sound. All these resampling processes will also be developed soon.
-
+- Because of the current development, the parametering of the whole system is minimalistic.
+- Unlike netjack, this version doesn't include transport, this is naturally planned for the fully operational version.
+- The 'Audio Adapter' is not completely working, there are several improvements to do.
 
 -------------------------------
 How-to use this ?
@@ -64,7 +62,8 @@ How-to use this ?
 Netjackmp is very simple to use. On the master's side, an internal client deals with the slaves, and the slaves themselves are classical jack servers running under a 'network audio driver'.
 The difference between the two versions is that the master now has a manager, which takes care of the slaves, while listening on the multicast address and create a new master as soon as a slave is available. But everything is transparent to the user, that's why it uses multicast (someone says "hello", and anyone who wants to hear it just has to listen).
 
-So, just compile and install jackmp as you are used to, on linux, using 'scons' then 'scons install', on macosx, you can use the xcode project.
+So, just compile and install jackmp as you are used to, on linux, using './waf configure', './waf' and './waf install' as root. On macosx, you can use the xcode project.
+On Windows, you can use the Code::Blocks workspace (you also have a small script to make an all in one installer).
 
 On the master, just launch a classical jack server, the period size doesn't matter.
 Then, load the network manager using jack_load :
@@ -89,4 +88,4 @@ What's next ?
 The development of 'netjackmp' continues and some things are going to change soon (see the 'actual limitations' section).
 If you use it, please report encountered bugs, ideas or anything you think about.
 
-If you have any question, you can subscribe the jackaudio developpers mailing list at http://www.jackaudio.org/ or join the IRC channel 'jack' on FreeNode.
+If you have any question, you can subscribe the jackaudio developers mailing list at http://www.jackaudio.org/ or join the IRC channel 'jack' on FreeNode.

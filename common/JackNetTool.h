@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Grame
+Copyright (C) 2008 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,20 +21,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 #include "JackMidiPort.h"
 #include "JackExports.h"
+#include "JackError.h"
+#include "JackPlatformNetSocket.h"
 
 #include <string>
 #include <algorithm>
 #include <cmath>
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
 
 namespace Jack
 {
@@ -43,7 +35,6 @@ namespace Jack
 	typedef struct sockaddr socket_address_t;
 	typedef struct in_addr address_t;
 	typedef jack_default_audio_sample_t sample_t;
-
 
 //session params ******************************************************************************
 
@@ -72,28 +63,27 @@ namespace Jack
 
 	enum  _net_status
 	{
-		SOCKET_ERROR,
-		CONNECT_ERROR,
+		NET_SOCKET_ERROR = 0,
+		NET_CONNECT_ERROR,
 		NET_ERROR,
-		SEND_ERROR,
-		RECV_ERROR,
-		CONNECTED,
-		ROLLING
+		NET_SEND_ERROR,
+		NET_RECV_ERROR,
+		NET_CONNECTED,
+		NET_ROLLING
 	};
 
 	typedef enum _net_status net_status_t;
-
 
 //sync packet type ****************************************************************************
 
 	enum _sync_packet_type
 	{
-		INVALID,		//...
+		INVALID = 0,	    //...
 		SLAVE_AVAILABLE,	//a slave is available
 		SLAVE_SETUP,		//slave configuration
 		START_MASTER,		//slave is ready, start master
 		START_SLAVE,		//master is ready, activate slave
-		KILL_MASTER		//master must stop
+		KILL_MASTER		    //master must stop
 	};
 
 	typedef enum _sync_packet_type sync_packet_type_t;
@@ -115,9 +105,6 @@ namespace Jack
 		char fIsLastPckt;		//is it the last packet of a given cycle ('y' or 'n')
 		char fFree[13];             	//unused
 	};
-
-#ifndef __NetMidiBuffer__
-#define __NetMidiBuffer__
 
 //midi data ***********************************************************************************
 
@@ -148,12 +135,7 @@ namespace Jack
 			int RenderToNetwork ( int subcycle, size_t total_size );
 	};
 
-#endif
-
 // audio data *********************************************************************************
-
-#ifndef __NetAudioBuffer__
-#define __NetAudioBuffer__
 
 	class EXPORT NetAudioBuffer
 	{
@@ -167,7 +149,7 @@ namespace Jack
 			NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
 			~NetAudioBuffer();
 
-			sample_t** fPortBuffer;	
+			sample_t** fPortBuffer;
 
 			size_t GetSize();
 			//jack<->buffer
@@ -175,10 +157,11 @@ namespace Jack
 			void RenderToJackPorts ( int subcycle );
 	};
 
-#endif
-
 //utility *************************************************************************************
 
+	//socket API management
+	EXPORT int SocketAPIInit();
+	EXPORT int SocketAPIEnd();
 	//n<-->h functions
 	EXPORT void SessionParamsHToN ( session_params_t* params );
 	EXPORT void SessionParamsNToH ( session_params_t* params );
@@ -197,7 +180,7 @@ namespace Jack
 	//get the midi packet number for a given cycle
 	EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size );
 	//set the recv timeout on a socket
-	EXPORT int SetRxTimeout ( int* sockfd, session_params_t* params );
+	EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params );
 	//check if 'next' packet is really the next after 'previous'
 	EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, uint subcycles );
 }

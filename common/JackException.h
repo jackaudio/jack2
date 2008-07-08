@@ -26,45 +26,47 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackExports.h"
 #include "JackError.h"
 
-namespace Jack 
+namespace Jack
 {
 
     class EXPORT JackException : public std::runtime_error {
-     
+
         public:
-        
-            JackException(const std::string& msg) : runtime_error(msg) 
+
+            JackException(const std::string& msg) : std::runtime_error(msg)
             {}
-            JackException(const char* msg) : runtime_error(msg) 
+            JackException(char* msg) : std::runtime_error(msg)
             {}
-      
-            std::string Message() 
+            JackException(const char* msg) : std::runtime_error(msg)
+            {}
+
+            std::string Message()
             {
                 return what();
             }
 
-            void PrintMessage() 
+            void PrintMessage()
             {
                 std::string str = what();
 				if (str != "")
 					jack_info(str.c_str());
             }
     };
-    
+
     class EXPORT JackDriverException : public JackException {
-    
+
         public:
-        
-            JackDriverException(const std::string& msg) : JackException(msg) 
+
+            JackDriverException(const std::string& msg) : JackException(msg)
             {}
-            JackDriverException(const char* msg) : JackException(msg) 
+            JackDriverException(char* msg) : JackException(msg)
             {}
-            
-            JackDriverException() : JackException("") 
+            JackDriverException(const char* msg) : JackException(msg)
             {}
-            
+            JackDriverException() : JackException("")
+            {}
     };
 
-} 
+}
 
 #endif

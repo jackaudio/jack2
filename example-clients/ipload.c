@@ -18,7 +18,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include <getopt.h>
 #include <jack/jack.h>
 #include <jack/intclient.h>
@@ -125,6 +127,7 @@ int
 main (int argc, char *argv[])
 {
 	jack_status_t status;
+	char* name;
 
 	/* parse and validate command arguments */
 	if (parse_args (argc, argv))
@@ -166,8 +169,8 @@ main (int argc, char *argv[])
 	}
 
 	fprintf (stdout, "%s is running.\n", load_name);
-	
-	char* name = jack_get_internal_client_name(client, intclient);
+
+	name = jack_get_internal_client_name(client, intclient);
 	if (name) {
 		printf("client name = %s\n", name);
 		free(name);
@@ -176,18 +179,27 @@ main (int argc, char *argv[])
 	if (wait_opt) {
 		/* define a signal handler to unload the client, then
 		 * wait for it to exit */
-		signal (SIGQUIT, signal_handler);
-		signal (SIGTERM, signal_handler);
-		signal (SIGHUP, signal_handler);
-		signal (SIGINT, signal_handler);
+	#ifdef WIN32
+		signal(SIGINT, signal_handler);
+		signal(SIGABRT, signal_handler);
+		signal(SIGTERM, signal_handler);
+	#else
+		signal(SIGQUIT, signal_handler);
+		signal(SIGTERM, signal_handler);
+		signal(SIGHUP, signal_handler);
+		signal(SIGINT, signal_handler);
+	#endif
 
 		while (1) {
-			sleep (1);
+			#ifdef WIN32
+				Sleep(1000);
+			#else
+				sleep (1);
+			#endif
 		}
 	}
-    
+
     jack_client_close(client);
 	return 0;
 }
-	
-		
+

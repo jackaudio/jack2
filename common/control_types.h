@@ -2,7 +2,7 @@
   JACK control API
 
   Copyright (C) 2008 Nedko Arnaudov
-    
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; version 2 of the License.
@@ -25,7 +25,11 @@
 #include "JackExports.h"
 
 #ifdef WIN32
+#ifdef __MINGW32__
+#include <sys/types.h>
+#else
 typedef HANDLE sigset_t;
+#endif
 #endif
 
 /** Parameter types, intentionally similar to jack_driver_param_type_t */
@@ -159,4 +163,4 @@ jackctl_parameter_get_default_value(
 } /* extern "C" */
 #endif
 
-#endif 
+#endif

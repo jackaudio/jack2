@@ -136,6 +136,7 @@ def build(bld):
             'JackSocketServerChannel.cpp',
             'JackSocketNotifyChannel.cpp',
             'JackSocketServerNotifyChannel.cpp',
+	    'JackNetUnixSocket.cpp',
             ]
 
     if bld.env()['IS_MACOSX']:
@@ -145,6 +146,7 @@ def build(bld):
             '../macosx/JackMachServerNotifyChannel.cpp',
             '../macosx/JackMacEngineRPC.cpp',
             '../macosx/RPC/JackRPCClientUser.c',
+	    'JackNetUnixSocket.cpp',
             ]
 
     serverlib.vnum = bld.env()['JACK_API_VERSION']

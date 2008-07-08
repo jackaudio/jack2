@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Grame
+Copyright (C) 2008 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,34 +30,33 @@ namespace Jack
 {
 //JackNetMaster******************************************************************************************************
 
-	JackNetMaster::JackNetMaster ( JackNetMasterManager* manager, session_params_t& params, struct sockaddr_in& address, struct sockaddr_in& mcast_addr )
+	JackNetMaster::JackNetMaster ( JackNetMasterManager* manager, session_params_t& params ) : fSocket()
 	{
 		jack_log ( "JackNetMaster::JackNetMaster" );
 		//settings
 		fMasterManager = manager;
 		fParams = params;
-		fAddr = address;
-		fMcastAddr = mcast_addr;
+		fSocket.CopyParams ( &fMasterManager->fSocket );
 		fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
 		fClientName = const_cast<char*> ( fParams.fName );
 		fNetJumpCnt = 0;
 		fJackClient = NULL;
-		fSockfd = 0;
 		fRunning = false;
+		uint port_index;
 
 		//jack audio ports
 		fAudioCapturePorts = new jack_port_t* [fParams.fSendAudioChannels];
-		for ( uint port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
 			fAudioCapturePorts[port_index] = NULL;
 		fAudioPlaybackPorts = new jack_port_t* [fParams.fReturnAudioChannels];
-		for ( uint port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
 			fAudioPlaybackPorts[port_index] = NULL;
 		//jack midi ports
 		fMidiCapturePorts = new jack_port_t* [fParams.fSendMidiChannels];
-		for ( uint port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
 			fMidiCapturePorts[port_index] = NULL;
 		fMidiPlaybackPorts = new jack_port_t* [fParams.fReturnMidiChannels];
-		for ( uint port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
+		for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
 			fMidiPlaybackPorts[port_index] = NULL;
 
 		//TX header init
@@ -108,8 +107,7 @@ namespace Jack
 			FreePorts();
 			jack_client_close ( fJackClient );
 		}
-		if ( fSockfd )
-			close ( fSockfd );
+		fSocket.Close();
 		delete fNetAudioCaptureBuffer;
 		delete fNetAudioPlaybackBuffer;
 		delete fNetMidiCaptureBuffer;
@@ -126,27 +124,25 @@ namespace Jack
 	{
 		jack_log ( "JackNetMaster::Init, ID %u.", fParams.fID );
 		session_params_t params;
-		struct timeval timeout;
-		timeout.tv_sec = 1;
-		timeout.tv_usec = 0;
-		size_t attempt = 0;
+		int msec_timeout = 1000;
+		uint attempt = 0;
 		int rx_bytes = 0;
 
 		//socket
-		if ( ( fSockfd = socket ( AF_INET, SOCK_DGRAM, 0 ) ) < 0 )
+		if ( fSocket.NewSocket() == SOCKET_ERROR )
 		{
-			jack_error ( "Can't create socket : %s", strerror ( errno ) );
+			jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
 			return false;
 		}
 
 		//timeout on receive (for init)
-		if ( setsockopt ( fSockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) ) < 0 )
-			jack_error ( "Can't set timeout : %s", strerror ( errno ) );
+		if ( fSocket.SetTimeOut ( msec_timeout ) < 0 )
+			jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
 		//connect
-		if ( connect ( fSockfd, reinterpret_cast<sockaddr*> ( &fAddr ), sizeof ( struct sockaddr ) ) < 0 )
+		if ( fSocket.Connect() == SOCKET_ERROR )
 		{
-			jack_error ( "Can't connect : %s", strerror ( errno ) );
+			jack_error ( "Can't connect : %s", StrError ( NET_ERROR_CODE ) );
 			return false;
 		}
 
@@ -155,9 +151,9 @@ namespace Jack
 		do
 		{
 			SetPacketType ( &fParams, SLAVE_SETUP );
-			if ( send ( fSockfd, &fParams, sizeof ( session_params_t ), 0 ) < 0 )
-				jack_error ( "Error in send : ", strerror ( errno ) );
-			if ( ( ( rx_bytes = recv ( fSockfd, &params, sizeof ( session_params_t ), 0 ) ) < 0 ) && ( errno != EAGAIN ) )
+			if ( fSocket.Send ( &fParams, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
+				jack_error ( "Error in send : ", StrError ( NET_ERROR_CODE ) );
+			if ( ( ( rx_bytes = fSocket.Recv ( &params, sizeof ( session_params_t ), 0 ) ) == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
 			{
 				jack_error ( "Problem with network." );
 				return false;
@@ -171,9 +167,9 @@ namespace Jack
 		}
 
 		//set the new timeout for the socket
-		if ( SetRxTimeout ( &fSockfd, &fParams ) < 0 )
+		if ( SetRxTimeout ( &fSocket, &fParams ) == SOCKET_ERROR )
 		{
-			jack_error ( "Can't set rx timeout : %s", strerror ( errno ) );
+			jack_error ( "Can't set rx timeout : %s", StrError ( NET_ERROR_CODE ) );
 			return false;
 		}
 
@@ -264,30 +260,30 @@ namespace Jack
 		//send a 'multicast euthanasia request' - new socket is required on macosx
 		jack_info ( "Exiting '%s'", fParams.fName );
 		SetPacketType ( &fParams, KILL_MASTER );
-		int mcast_sockfd = socket ( AF_INET, SOCK_DGRAM, 0 );
-		if ( mcast_sockfd < 0 )
-			jack_error ( "Can't create socket : %s", strerror ( errno ) );
-		if ( sendto ( mcast_sockfd, &fParams, sizeof ( session_params_t ), 0,
-		              reinterpret_cast<socket_address_t*> ( &fMcastAddr ), sizeof ( socket_address_t ) ) < 0 )
-			jack_error ( "Can't send suicide request : %s", strerror ( errno ) );
-		close ( mcast_sockfd );
+		JackNetSocket mcast_socket ( fMasterManager->fMulticastIP, fSocket.GetPort() );
+		if ( mcast_socket.NewSocket() == SOCKET_ERROR )
+			jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
+		if ( mcast_socket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMasterManager->fMulticastIP ) == SOCKET_ERROR )
+			jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
+		mcast_socket.Close();
 	}
 
 	int JackNetMaster::Send ( char* buffer, size_t size, int flags )
 	{
 		int tx_bytes;
-		if ( ( tx_bytes = send ( fSockfd, buffer, size, flags ) ) < 0 )
+		if ( ( tx_bytes = fSocket.Send ( buffer, size, flags ) ) == SOCKET_ERROR )
 		{
-			if ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) )
+			net_error_t error = fSocket.GetError();
+			if ( error == NET_CONN_ERROR )
 			{
 				//fatal connection issue, exit
 				jack_error ( "'%s' : %s, please check network connection with '%s'.",
-				             fParams.fName, strerror ( errno ), fParams.fSlaveNetName );
+				             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
 				Exit();
 				return 0;
 			}
 			else
-				jack_error ( "Error in send : %s", strerror ( errno ) );
+				jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
 		}
 		return tx_bytes;
 	}
@@ -295,9 +291,10 @@ namespace Jack
 	int JackNetMaster::Recv ( size_t size, int flags )
 	{
 		int rx_bytes;
-		if ( ( rx_bytes = recv ( fSockfd, fRxBuffer, size, flags ) ) < 0 )
+		if ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR )
 		{
-			if ( errno == EAGAIN )
+			net_error_t error = fSocket.GetError();
+			if ( error == NET_NO_DATA )
 			{
 				//too much receive failure, react...
 				if ( ++fNetJumpCnt == 100 )
@@ -307,16 +304,16 @@ namespace Jack
 				}
 				return 0;
 			}
-			else if ( ( errno == ECONNABORTED ) || ( errno == ECONNREFUSED ) || ( errno == ECONNRESET ) )
+			else if ( error == NET_CONN_ERROR )
 			{
 				//fatal connection issue, exit
 				jack_error ( "'%s' : %s, please check network connection with '%s'.",
-				             fParams.fName, strerror ( errno ), fParams.fSlaveNetName );
+				             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
 				Exit();
 				return 0;
 			}
-			else if ( errno != EAGAIN )
-				jack_error ( "Error in receive : %s", strerror ( errno ) );
+			else
+				jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
 		}
 		return rx_bytes;
 	}
@@ -360,7 +357,7 @@ namespace Jack
 		if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
 			fTxHeader.fIsLastPckt = 'y';
 		tx_bytes = Send ( reinterpret_cast<char*> ( &fTxHeader ), sizeof ( packet_header_t ), 0 );
-		if ( tx_bytes < 1 )
+		if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
 			return tx_bytes;
 
 		//midi
@@ -412,7 +409,7 @@ namespace Jack
 					switch ( rx_head->fDataType )
 					{
 						case 'm':	//midi
-							rx_bytes = Recv ( rx_bytes, MSG_DONTWAIT );
+							rx_bytes = Recv ( rx_bytes, 0 );
 							fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
 							fNetMidiPlaybackBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
 							if ( ++midi_recvd_pckt == rx_head->fNMidiPckt )
@@ -420,7 +417,7 @@ namespace Jack
 							fNetJumpCnt = 0;
 							break;
 						case 'a':	//audio
-							rx_bytes = Recv ( fAudioRxLen, MSG_DONTWAIT );
+							rx_bytes = Recv ( fAudioRxLen, 0 );
 							if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
 								jack_error ( "Packet(s) missing from '%s'...", fParams.fName );
 							fRxHeader.fCycle = rx_head->fCycle;
@@ -439,13 +436,13 @@ namespace Jack
 
 //JackNetMasterManager***********************************************************************************************
 
-	JackNetMasterManager::JackNetMasterManager ( jack_client_t* client )
+	JackNetMasterManager::JackNetMasterManager ( jack_client_t* client ) : fSocket()
 	{
 		jack_log ( "JackNetMasterManager::JackNetMasterManager" );
 		fManagerClient = client;
 		fManagerName = jack_get_client_name ( fManagerClient );
-		fMCastIP = DEFAULT_MULTICAST_IP;
-		fUDPPort = DEFAULT_PORT;
+		fMulticastIP = DEFAULT_MULTICAST_IP;
+		fSocket.SetPort ( DEFAULT_PORT );
 		fGlobalID = 0;
 		fRunning = true;
 
@@ -461,6 +458,8 @@ namespace Jack
 		master_list_t::iterator it;
 		for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
 			delete ( *it );
+		fSocket.Close();
+		SocketAPIEnd();
 	}
 
 	void* JackNetMasterManager::NetManagerThread ( void* arg )
@@ -475,78 +474,57 @@ namespace Jack
 	{
 		jack_log ( "JackNetMasterManager::Run" );
 		//utility variables
-		socklen_t addr_len = sizeof ( socket_address_t );
-		char disable = 0;
-		struct timeval timeout;
-		timeout.tv_sec = 2;
-		timeout.tv_usec = 0;
+		int msec_timeout = 2000;
 		int attempt = 0;
-
-		//network
-		int mcast_sockfd;
-		struct ip_mreq multicast_req;
-		struct sockaddr_in mcast_addr;
-		struct sockaddr_in response_addr;
 
 		//data
 		session_params_t params;
 		int rx_bytes = 0;
 		JackNetMaster* net_master;
 
+		//init socket API (win32)
+		if ( SocketAPIInit() < 0 )
+		{
+			jack_error ( "Can't init Socket API, exiting..." );
+			return;
+		}
+
 		//socket
-		if ( ( mcast_sockfd = socket ( AF_INET, SOCK_DGRAM, 0 ) ) < 0 )
+		if ( fSocket.NewSocket() == SOCKET_ERROR )
 		{
-			jack_error ( "Can't create the network management input socket : %s", strerror ( errno ) );
+			jack_error ( "Can't create the network management input socket : %s", StrError ( NET_ERROR_CODE ) );
 			return;
 		}
 
-		//set the multicast address
-		mcast_addr.sin_family = AF_INET;
-		mcast_addr.sin_port = htons ( fUDPPort );
-		if ( inet_aton ( fMCastIP, &mcast_addr.sin_addr ) < 0 )
+		//bind the socket to the local port
+		if ( fSocket.Bind () == SOCKET_ERROR )
 		{
-			jack_error ( "Cant set multicast address : %s", strerror ( errno ) );
-			close ( mcast_sockfd );
-			return;
-		}
-		memset ( &mcast_addr.sin_zero, 0, 8 );
-
-		//bind the socket to the multicast address
-		if ( bind ( mcast_sockfd, reinterpret_cast<socket_address_t *> ( &mcast_addr ), addr_len ) < 0 )
-		{
-			jack_error ( "Can't bind the network manager socket : %s", strerror ( errno ) );
-			close ( mcast_sockfd );
+			jack_error ( "Can't bind the network manager socket : %s", StrError ( NET_ERROR_CODE ) );
+			fSocket.Close();
 			return;
 		}
 
 		//join multicast group
-		inet_aton ( fMCastIP, &multicast_req.imr_multiaddr );
-		multicast_req.imr_interface.s_addr = htonl ( INADDR_ANY );
-		if ( setsockopt ( mcast_sockfd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &multicast_req, sizeof ( multicast_req ) ) < 0 )
-		{
-			jack_error ( "Can't join multicast group : %s", strerror ( errno ) );
-			close ( mcast_sockfd );
-			return;
-		}
+		if ( fSocket.JoinMCastGroup ( fMulticastIP ) == SOCKET_ERROR )
+			jack_error ( "Can't join multicast group : %s", StrError ( NET_ERROR_CODE ) );
 
-		//disable local loop
-		if ( setsockopt ( mcast_sockfd, IPPROTO_IP, IP_MULTICAST_LOOP, &disable, sizeof ( disable ) ) < 0 )
-			jack_error ( "Can't set multicast loop option : %s", strerror ( errno ) );
+		//local loop
+		if ( fSocket.SetLocalLoop() == SOCKET_ERROR )
+			jack_error ( "Can't set local loop : %s", StrError ( NET_ERROR_CODE ) );
 
 		//set a timeout on the multicast receive (the thread can now be cancelled)
-		if ( setsockopt ( mcast_sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) ) < 0 )
-			jack_error ( "Can't set timeout : %s", strerror ( errno ) );
+		if ( fSocket.SetTimeOut ( msec_timeout ) == SOCKET_ERROR )
+			jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
 		jack_info ( "Waiting for a slave..." );
 
 		//main loop, wait for data, deal with it and wait again
 		do
 		{
-			rx_bytes = recvfrom ( mcast_sockfd, &params, sizeof ( session_params_t ), 0,
-			                      reinterpret_cast<socket_address_t*> ( &response_addr ), &addr_len );
-			if ( ( rx_bytes < 0 ) && ( errno != EAGAIN ) )
+			rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
+			if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
 			{
-				jack_error ( "Error in receive : %s", strerror ( errno ) );
+				jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
 				if ( ++attempt == 10 )
 				{
 					jack_error ( "Can't receive on the socket, exiting net manager." );
@@ -558,7 +536,7 @@ namespace Jack
 				switch ( GetPacketType ( &params ) )
 				{
 					case SLAVE_AVAILABLE:
-						if ( ( net_master = MasterInit ( params, response_addr, mcast_addr ) ) )
+						if ( ( net_master = MasterInit ( params ) ) )
 							SessionParamsDisplay ( &net_master->fParams );
 						else
 							jack_error ( "Can't init new net master..." );
@@ -574,22 +552,21 @@ namespace Jack
 			}
 		}
 		while ( fRunning );
-		close ( mcast_sockfd );
 	}
 
 	void JackNetMasterManager::Exit()
 	{
 		jack_log ( "JackNetMasterManager::Exit" );
 		fRunning = false;
-		pthread_join ( fManagerThread, NULL );
+		jack_client_stop_thread ( fManagerClient, fManagerThread );
 		jack_info ( "Exiting net manager..." );
 	}
 
-	JackNetMaster* JackNetMasterManager::MasterInit ( session_params_t& params, struct sockaddr_in& address, struct sockaddr_in& mcast_addr )
+	JackNetMaster* JackNetMasterManager::MasterInit ( session_params_t& params )
 	{
 		jack_log ( "JackNetMasterManager::MasterInit, Slave : %s", params.fName );
 		//settings
-		gethostname ( params.fMasterNetName, 255 );
+		fSocket.GetName ( params.fMasterNetName );
 		params.fID = ++fGlobalID;
 		params.fSampleRate = jack_get_sample_rate ( fManagerClient );
 		params.fPeriodSize = jack_get_buffer_size ( fManagerClient );
@@ -598,7 +575,7 @@ namespace Jack
 		SetSlaveName ( params );
 
 		//create a new master and add it to the list
-		JackNetMaster* master = new JackNetMaster ( this, params, address, mcast_addr );
+		JackNetMaster* master = new JackNetMaster ( this, params );
 		if ( master->Init() )
 		{
 			fMasterList.push_back ( master );

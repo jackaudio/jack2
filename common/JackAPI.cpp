@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -247,7 +247,7 @@ extern "C"
 }
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 /* missing on Windows : see http://bugs.mysql.com/bug.php?id=15936 */
 inline double rint(double nr)
 {
@@ -270,11 +270,11 @@ static inline bool CheckBufferSize(jack_nframes_t buffer_size)
 static inline void WaitGraphChange()
 {
     /*
-    TLS key that is set only in RT thread, so never waits for pending 
+    TLS key that is set only in RT thread, so never waits for pending
     graph change in RT context (just read the current graph state).
     */
-    
-    if (jack_tls_get(gRealTime) == NULL) {   
+
+    if (jack_tls_get(gRealTime) == NULL) {
         JackGraphManager* manager = GetGraphManager();
         JackEngineControl* control = GetEngineControl();
         assert(manager);
@@ -300,7 +300,7 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
     jack_error("jack_client_new: deprecated");
     int options = JackUseExactName;
-    if (getenv("JACK_START_SERVER") == NULL) 
+    if (getenv("JACK_START_SERVER") == NULL)
         options |= JackNoStartServer;
     return jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
 }
