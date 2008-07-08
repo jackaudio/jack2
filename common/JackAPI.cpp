@@ -247,16 +247,6 @@ extern "C"
 }
 #endif
 
-#if defined(WIN32) && !defined(__MINGW32__)
-/* missing on Windows : see http://bugs.mysql.com/bug.php?id=15936 */
-inline double rint(double nr)
-{
-    double f = floor(nr);
-    double c = ceil(nr);
-    return (((c -nr) >= (nr - f)) ? f : c);
-}
-#endif
-
 static inline bool CheckPort(jack_port_id_t port_index)
 {
     return (port_index > 0 && port_index < PORT_NUM);

@@ -29,6 +29,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+#if defined(WIN32) && !defined(__MINGW32__)
+/* missing on Windows : see http://bugs.mysql.com/bug.php?id=15936 */
+inline double rint(double nr)
+{
+    double f = floor(nr);
+    double c = ceil(nr);
+    return (((c -nr) >= (nr - f)) ? f : c);
+}
+#endif
+
 JackTimer::JackTimer()
 {
     fInitialized = false;

@@ -25,15 +25,16 @@ using namespace std;
 PortAudioDevices::PortAudioDevices()
 {
     PaError err;
+	PaDeviceIndex id;
     if ( ( err = Pa_Initialize() ) == paNoError )
     {
         fNumHostApi = Pa_GetHostApiCount();
         fNumDevice = Pa_GetDeviceCount();
         fDeviceInfo = new PaDeviceInfo*[fNumDevice];
-        for ( PaDeviceIndex id = 0; id < fNumDevice; id++ )
+        for ( id = 0; id < fNumDevice; id++ )
             fDeviceInfo[id] = const_cast<PaDeviceInfo*>(Pa_GetDeviceInfo(id));
         fHostName = new string[fNumHostApi];
-        for ( PaHostApiIndex id = 0; id < fNumHostApi; id++ )
+        for ( id = 0; id < fNumHostApi; id++ )
             fHostName[id] = string ( Pa_GetHostApiInfo(id)->name );
     }
     else
@@ -100,7 +101,7 @@ PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName ( string fullname, PaDevic
     string::size_type separator = fullname.find ( "::", 0 );
     if ( separator == 0 )
         return NULL;
-    char hostname[separator + 9];
+    char* hostname = (char*)malloc(separator + 9);
     fill_n ( hostname, separator + 9, 0 );
     fullname.copy ( hostname, separator );
     //we need the entire hostname, replace shortcuts
@@ -116,6 +117,7 @@ PaDeviceInfo* PortAudioDevices::GetDeviceFromFullName ( string fullname, PaDevic
             ret = fDeviceInfo[dev_id];
         }
     }
+	free(hostname);
     return ret;
 }
 
