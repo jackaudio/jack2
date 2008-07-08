@@ -63,6 +63,7 @@
 				BA222AF20DC883F3001A17F4 /* PBXTargetDependency */,
 				4BD624D30CBCF55700DE782F /* PBXTargetDependency */,
 				BA222AF00DC883EF001A17F4 /* PBXTargetDependency */,
+				4B19B32C0E23636E00DD4A82 /* PBXTargetDependency */,
 				4B5A1BE20CD1CD730005BF74 /* PBXTargetDependency */,
 				4B5A1BCF0CD1CCC80005BF74 /* PBXTargetDependency */,
 				4BFA99440AAAED90009E916C /* PBXTargetDependency */,
@@ -105,6 +106,21 @@
 		4B0206A10DC0BAB400319AF1 /* JackProcessSync.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B02069D0DC0BAB400319AF1 /* JackProcessSync.cpp */; };
 		4B0A28ED0D520852002EFF74 /* tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A28EC0D520852002EFF74 /* tw.c */; };
 		4B0A29260D52108E002EFF74 /* tw.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B0A28EC0D520852002EFF74 /* tw.c */; };
+		4B19B3040E2362BB00DD4A82 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3020E2362BB00DD4A82 /* JackCoreAudioAdapter.cpp */; };
+		4B19B3050E2362BB00DD4A82 /* JackCoreAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3030E2362BB00DD4A82 /* JackCoreAudioAdapter.h */; };
+		4B19B3130E2362E800DD4A82 /* JackAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3060E2362E700DD4A82 /* JackAudioAdapter.cpp */; };
+		4B19B3140E2362E800DD4A82 /* JackAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3070E2362E700DD4A82 /* JackAudioAdapter.h */; };
+		4B19B3150E2362E800DD4A82 /* JackAudioAdapterInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3080E2362E700DD4A82 /* JackAudioAdapterInterface.cpp */; };
+		4B19B3160E2362E800DD4A82 /* JackAudioAdapterInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */; };
+		4B19B3170E2362E800DD4A82 /* JackCallbackAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B30A0E2362E700DD4A82 /* JackCallbackAudioAdapter.cpp */; };
+		4B19B3180E2362E800DD4A82 /* JackCallbackAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30B0E2362E700DD4A82 /* JackCallbackAudioAdapter.h */; };
+		4B19B3190E2362E800DD4A82 /* JackException.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30C0E2362E700DD4A82 /* JackException.h */; };
+		4B19B31A0E2362E800DD4A82 /* JackExports.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30D0E2362E700DD4A82 /* JackExports.h */; };
+		4B19B31B0E2362E800DD4A82 /* JackLibSampleRateResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */; };
+		4B19B31C0E2362E800DD4A82 /* JackLibSampleRateResampler.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30F0E2362E700DD4A82 /* JackLibSampleRateResampler.h */; };
+		4B19B31D0E2362E800DD4A82 /* JackPlatformChannelTransaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3100E2362E700DD4A82 /* JackPlatformChannelTransaction.h */; };
+		4B19B31E0E2362E800DD4A82 /* JackProcessSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3110E2362E700DD4A82 /* JackProcessSync.h */; };
+		4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3120E2362E700DD4A82 /* JackResampler.cpp */; };
 		4B35C41E0D4731D1000DE7AE /* Jackdmp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2250834F06A00C94B91 /* Jackdmp.cpp */; };
 		4B35C4290D4731D1000DE7AE /* JackMachPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B799AD707899652003F3F15 /* JackMachPort.h */; };
 		4B35C42A0D4731D1000DE7AE /* JackError.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1770834EE4800C94B91 /* JackError.h */; };
@@ -590,6 +606,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B0A29230D52108E002EFF74;
 			remoteInfo = "jack_thread_wait 64 bits";
+		};
+		4B19B32B0E23636E00DD4A82 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B19B2F60E23620F00DD4A82 /* audioadapter */;
+			remoteInfo = audioadapter;
 		};
 		4B35C5540D4731D2000DE7AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1151,6 +1174,22 @@
 		4B0A28E60D52073D002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B0A28EC0D520852002EFF74 /* tw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tw.c; path = "../example-clients/tw.c"; sourceTree = SOURCE_ROOT; };
 		4B0A292D0D52108E002EFF74 /* jack_thread_wait */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_thread_wait; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B19B3000E23620F00DD4A82 /* audioadapter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = audioadapter.so; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B19B3020E2362BB00DD4A82 /* JackCoreAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JackCoreAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
+		4B19B3030E2362BB00DD4A82 /* JackCoreAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JackCoreAudioAdapter.h; sourceTree = SOURCE_ROOT; };
+		4B19B3060E2362E700DD4A82 /* JackAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapter.cpp; path = ../common/JackAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
+		4B19B3070E2362E700DD4A82 /* JackAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapter.h; path = ../common/JackAudioAdapter.h; sourceTree = SOURCE_ROOT; };
+		4B19B3080E2362E700DD4A82 /* JackAudioAdapterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterInterface.cpp; path = ../common/JackAudioAdapterInterface.cpp; sourceTree = SOURCE_ROOT; };
+		4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapterInterface.h; path = ../common/JackAudioAdapterInterface.h; sourceTree = SOURCE_ROOT; };
+		4B19B30A0E2362E700DD4A82 /* JackCallbackAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCallbackAudioAdapter.cpp; path = ../common/JackCallbackAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
+		4B19B30B0E2362E700DD4A82 /* JackCallbackAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCallbackAudioAdapter.h; path = ../common/JackCallbackAudioAdapter.h; sourceTree = SOURCE_ROOT; };
+		4B19B30C0E2362E700DD4A82 /* JackException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackException.h; path = ../common/JackException.h; sourceTree = SOURCE_ROOT; };
+		4B19B30D0E2362E700DD4A82 /* JackExports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackExports.h; path = ../common/JackExports.h; sourceTree = SOURCE_ROOT; };
+		4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackLibSampleRateResampler.cpp; path = ../common/JackLibSampleRateResampler.cpp; sourceTree = SOURCE_ROOT; };
+		4B19B30F0E2362E700DD4A82 /* JackLibSampleRateResampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackLibSampleRateResampler.h; path = ../common/JackLibSampleRateResampler.h; sourceTree = SOURCE_ROOT; };
+		4B19B3100E2362E700DD4A82 /* JackPlatformChannelTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackPlatformChannelTransaction.h; path = ../common/JackPlatformChannelTransaction.h; sourceTree = SOURCE_ROOT; };
+		4B19B3110E2362E700DD4A82 /* JackProcessSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackProcessSync.h; path = ../common/JackProcessSync.h; sourceTree = SOURCE_ROOT; };
+		4B19B3120E2362E700DD4A82 /* JackResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackResampler.cpp; path = ../common/JackResampler.cpp; sourceTree = SOURCE_ROOT; };
 		4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4B35C4250D4731D1000DE7AE /* jackdmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jackdmp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C4830D4731D1000DE7AE /* Jackmp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackmp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1429,6 +1468,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B0A29270D52108E002EFF74 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B19B2FB0E23620F00DD4A82 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1964,7 +2010,6 @@
 			isa = PBXGroup;
 			children = (
 				4B05A09D0DF72C6000840F4C /* Additional */,
-				BA222AEA0DC88379001A17F4 /* Net */,
 				4B6BEB4A07A6CCDC00A5DBDA /* Tests */,
 				4B37C20006DF1F900016E567 /* Latency */,
 				4B03383E0797E19900686131 /* Simple clients */,
@@ -2059,6 +2104,7 @@
 				4BFA82B70DF6A9E40087B4E1 /* jack_monitor_client */,
 				4BFA82C30DF6A9E40087B4E1 /* jack_showtime */,
 				4BFA82CF0DF6A9E40087B4E1 /* jack_impulse_grabber */,
+				4B19B3000E23620F00DD4A82 /* audioadapter.so */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2236,6 +2282,28 @@
 			name = MIG_RPC;
 			sourceTree = "<group>";
 		};
+		4B19B3010E23629800DD4A82 /* Adapter */ = {
+			isa = PBXGroup;
+			children = (
+				4B19B3060E2362E700DD4A82 /* JackAudioAdapter.cpp */,
+				4B19B3070E2362E700DD4A82 /* JackAudioAdapter.h */,
+				4B19B3080E2362E700DD4A82 /* JackAudioAdapterInterface.cpp */,
+				4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */,
+				4B19B30A0E2362E700DD4A82 /* JackCallbackAudioAdapter.cpp */,
+				4B19B30B0E2362E700DD4A82 /* JackCallbackAudioAdapter.h */,
+				4B19B30C0E2362E700DD4A82 /* JackException.h */,
+				4B19B30D0E2362E700DD4A82 /* JackExports.h */,
+				4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */,
+				4B19B30F0E2362E700DD4A82 /* JackLibSampleRateResampler.h */,
+				4B19B3100E2362E700DD4A82 /* JackPlatformChannelTransaction.h */,
+				4B19B3110E2362E700DD4A82 /* JackProcessSync.h */,
+				4B19B3120E2362E700DD4A82 /* JackResampler.cpp */,
+				4B19B3020E2362BB00DD4A82 /* JackCoreAudioAdapter.cpp */,
+				4B19B3030E2362BB00DD4A82 /* JackCoreAudioAdapter.h */,
+			);
+			name = Adapter;
+			sourceTree = "<group>";
+		};
 		4B37C20006DF1F900016E567 /* Latency */ = {
 			isa = PBXGroup;
 			children = (
@@ -2368,9 +2436,8 @@
 		4BA550F605E241B800569492 /* Driver */ = {
 			isa = PBXGroup;
 			children = (
+				4B19B3010E23629800DD4A82 /* Adapter */,
 				4B869B3D08C8D21C001CF041 /* driver_interface.h */,
-				BA222ADD0DC882A5001A17F4 /* JackNetDriver.h */,
-				BA222ADC0DC882A5001A17F4 /* JackNetDriver.cpp */,
 				4B869B4208C8D22F001CF041 /* JackDriverLoader.h */,
 				4B869D7F08C9CB00001CF041 /* JackDriverLoader.cpp */,
 				4BF8D1B50834EEE400C94B91 /* JackDriver.h */,
@@ -2379,6 +2446,7 @@
 				4BF70ACA0908EE95008B75AD /* JackLoopbackDriver.cpp */,
 				4BC3988A08B3CF6C00B6F371 /* JackDummyDriver.h */,
 				4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */,
+				BA222AEA0DC88379001A17F4 /* Net */,
 				4BD56D8707968982006D44F9 /* Threaded */,
 				4BD56D8607968979006D44F9 /* Audio */,
 			);
@@ -2560,6 +2628,8 @@
 		BA222AEA0DC88379001A17F4 /* Net */ = {
 			isa = PBXGroup;
 			children = (
+				BA222ADD0DC882A5001A17F4 /* JackNetDriver.h */,
+				BA222ADC0DC882A5001A17F4 /* JackNetDriver.cpp */,
 				BA047C710E14E7540041F3B6 /* JackNetSocket.h */,
 				BA047C720E14E7540041F3B6 /* JackNetUnixSocket.cpp */,
 				BA047C730E14E7540041F3B6 /* JackNetUnixSocket.h */,
@@ -2594,6 +2664,22 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B19B2F70E23620F00DD4A82 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B19B3050E2362BB00DD4A82 /* JackCoreAudioAdapter.h in Headers */,
+				4B19B3140E2362E800DD4A82 /* JackAudioAdapter.h in Headers */,
+				4B19B3160E2362E800DD4A82 /* JackAudioAdapterInterface.h in Headers */,
+				4B19B3180E2362E800DD4A82 /* JackCallbackAudioAdapter.h in Headers */,
+				4B19B3190E2362E800DD4A82 /* JackException.h in Headers */,
+				4B19B31A0E2362E800DD4A82 /* JackExports.h in Headers */,
+				4B19B31C0E2362E800DD4A82 /* JackLibSampleRateResampler.h in Headers */,
+				4B19B31D0E2362E800DD4A82 /* JackPlatformChannelTransaction.h in Headers */,
+				4B19B31E0E2362E800DD4A82 /* JackProcessSync.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3331,6 +3417,23 @@
 			productName = testSem;
 			productReference = 4B0A292D0D52108E002EFF74 /* jack_thread_wait */;
 			productType = "com.apple.product-type.tool";
+		};
+		4B19B2F60E23620F00DD4A82 /* audioadapter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B19B2FC0E23620F00DD4A82 /* Build configuration list for PBXNativeTarget "audioadapter" */;
+			buildPhases = (
+				4B19B2F70E23620F00DD4A82 /* Headers */,
+				4B19B2F90E23620F00DD4A82 /* Sources */,
+				4B19B2FB0E23620F00DD4A82 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = audioadapter;
+			productName = jack_coreaudio;
+			productReference = 4B19B3000E23620F00DD4A82 /* audioadapter.so */;
+			productType = "com.apple.product-type.library.dynamic";
 		};
 		4B35C41B0D4731D1000DE7AE /* jackdmp framework 64bits */ = {
 			isa = PBXNativeTarget;
@@ -4677,6 +4780,7 @@
 				BA222AC50DC88132001A17F4 /* jack_net Universal */,
 				4BD623ED0CBCF0F000DE782F /* inprocess */,
 				BA222AE00DC882DB001A17F4 /* netmanager */,
+				4B19B2F60E23620F00DD4A82 /* audioadapter */,
 				4B35C41B0D4731D1000DE7AE /* jackdmp framework 64bits */,
 				4B35C4270D4731D1000DE7AE /* Jackmp.framework 64 bits */,
 				4B35C4850D4731D1000DE7AE /* Jackservermp.framework 64 bits */,
@@ -5189,6 +5293,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B0A29260D52108E002EFF74 /* tw.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B19B2F90E23620F00DD4A82 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B19B3040E2362BB00DD4A82 /* JackCoreAudioAdapter.cpp in Sources */,
+				4B19B3130E2362E800DD4A82 /* JackAudioAdapter.cpp in Sources */,
+				4B19B3150E2362E800DD4A82 /* JackAudioAdapterInterface.cpp in Sources */,
+				4B19B3170E2362E800DD4A82 /* JackCallbackAudioAdapter.cpp in Sources */,
+				4B19B31B0E2362E800DD4A82 /* JackLibSampleRateResampler.cpp in Sources */,
+				4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5933,6 +6050,11 @@
 			target = 4B0A29230D52108E002EFF74 /* jack_thread_wait 64 bits */;
 			targetProxy = 4B0A292F0D5210C4002EFF74 /* PBXContainerItemProxy */;
 		};
+		4B19B32C0E23636E00DD4A82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B19B2F60E23620F00DD4A82 /* audioadapter */;
+			targetProxy = 4B19B32B0E23636E00DD4A82 /* PBXContainerItemProxy */;
+		};
 		4B35C5530D4731D2000DE7AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4B699D03097D421600A18468 /* jack_external_metro Universal */;
@@ -6457,6 +6579,143 @@
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = jack_thread_wait;
 				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
+		4B19B2FD0E23620F00DD4A82 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_EXTENSION = so;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G4;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = ../common;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = (
+					/usr/local/lib/libsamplerate.a,
+					"-framework",
+					Jackservermp,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreServices,
+					"-framework",
+					AudioUnit,
+				);
+				OTHER_REZFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = netmanager;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4B19B2FE0E23620F00DD4A82 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = i386;
+				COPY_PHASE_STRIP = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_EXTENSION = so;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = ../common;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = (
+					/usr/local/lib/libsamplerate.a,
+					"-framework",
+					Jackservermp,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreServices,
+					"-framework",
+					AudioUnit,
+				);
+				OTHER_REZFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = audioadapter;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4B19B2FF0E23620F00DD4A82 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_EXTENSION = so;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G4;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				HEADER_SEARCH_PATHS = ../common;
+				INSTALL_PATH = /usr/local/lib;
+				LIBRARY_STYLE = DYNAMIC;
+				MACH_O_TYPE = mh_dylib;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackdmp,
+					"-framework",
+					AudioToolBox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreServices,
+					"-framework",
+					AudioUnit,
+				);
+				OTHER_REZFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = inprocess;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -14368,6 +14627,16 @@
 				4B0A292A0D52108E002EFF74 /* Development */,
 				4B0A292B0D52108E002EFF74 /* Deployment */,
 				4B0A292C0D52108E002EFF74 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4B19B2FC0E23620F00DD4A82 /* Build configuration list for PBXNativeTarget "audioadapter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B19B2FD0E23620F00DD4A82 /* Development */,
+				4B19B2FE0E23620F00DD4A82 /* Deployment */,
+				4B19B2FF0E23620F00DD4A82 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;

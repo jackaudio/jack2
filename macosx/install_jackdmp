@@ -18,6 +18,7 @@ sudo cp  jack_net.so /usr/local/lib/jackmp
 
 # Copy tools
 sudo cp  netmanager.so /usr/local/lib/jackmp
+sudo cp  audioadapter.so /usr/local/lib/jackmp
 
 # Create links to jackmp ressources
 cd /usr/local/lib && [ -f libjack.0.dylib ] && sudo mv -f libjack.0.dylib tmp_libjack.0.dylib 
