@@ -58,7 +58,9 @@ class JackPortAudioDriver : public JackAudioDriver
         }
 
         virtual ~JackPortAudioDriver()
-        {}
+        {
+            delete fPaDevices;
+        }
 
         int Open(jack_nframes_t frames_per_cycle,
                  jack_nframes_t rate,

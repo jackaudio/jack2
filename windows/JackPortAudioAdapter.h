@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackAudioAdapter.h"
 #include "portaudio.h"
+#include "jslist.h"
 
 namespace Jack
 {
@@ -43,7 +44,7 @@ namespace Jack
        
 		public:
         
-			JackPortAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+			JackPortAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(input, output, buffer_size, sample_rate)
             {}
 			~JackPortAudioAdapter()

@@ -23,6 +23,10 @@ Romain Moret
 
 2008-07-08 Stephane Letz  <letz@grame.fr>
 
+	* Add jack_get_descriptor in internal clients API.
+
+2008-07-08 Stephane Letz  <letz@grame.fr>
+
 	* Merge windows branch back to trunk.
 
 2008-07-05 Stephane Letz  <letz@grame.fr>

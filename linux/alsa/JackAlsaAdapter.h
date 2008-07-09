@@ -28,6 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPlatformThread.h"
 #include "JackError.h"
 #include "jack.h"
+#include "jslist.h"
 
 namespace Jack
 {
@@ -527,7 +528,7 @@ namespace Jack
        
 	    public:
         
-            JackAlsaAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+            JackAlsaAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(input, output, buffer_size, sample_rate)
                 ,fThread(this), fAudioInterface(input, output, buffer_size, sample_rate)	
             {}

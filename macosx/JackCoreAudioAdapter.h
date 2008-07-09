@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackAudioAdapterInterface.h"
 #include "jack.h"
+#include "jslist.h"
 #include <AudioToolbox/AudioConverter.h>
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
@@ -96,7 +97,7 @@ namespace Jack
     
 		public:
         
-			JackCoreAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+			JackCoreAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(input, output, buffer_size, sample_rate),fInputData(0),fState(false)
             {}
 			~JackCoreAudioAdapter()

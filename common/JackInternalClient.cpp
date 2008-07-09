@@ -200,6 +200,11 @@ JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackS
         jack_error("symbol jack_finish cannot be found in %s", so_name);
         throw - 1;
     }
+    
+    fDescriptor = (JackDriverDescFunction)GetJackProc(fHandle, "jack_get_descriptor");
+    if (!fDescriptor) {
+        jack_info("No jack_get_descriptor entry-point for %s", so_name);
+    }
 }
 
 JackLoadableInternalClient::~JackLoadableInternalClient()

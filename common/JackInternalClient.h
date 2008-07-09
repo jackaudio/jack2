@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackClient.h"
 #include "JackClientControl.h"
+#include "driver_interface.h"
 
 namespace Jack
 {
@@ -80,6 +81,7 @@ class JackInternalClient : public JackClient
 
 typedef int (*InitializeCallback)(jack_client_t*, const char*);
 typedef void (*FinishCallback)(void *);
+typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 
 class JackLoadableInternalClient : public JackInternalClient
 {
@@ -89,6 +91,7 @@ class JackLoadableInternalClient : public JackInternalClient
         HANDLE fHandle;
         InitializeCallback fInitialize;
         FinishCallback fFinish;
+        JackDriverDescFunction fDescriptor;
         char fObjectData[JACK_LOAD_INIT_LIMIT];
 
     public:

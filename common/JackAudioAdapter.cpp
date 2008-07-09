@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAudioAdapter.h"
 #include "JackError.h"
 #include "JackExports.h"
+#include "jslist.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -124,6 +125,7 @@ extern "C"
 	{
         Jack::JackAudioAdapter* adapter;
         const char** ports;
+        const JSList* params = NULL;
         
         jack_log("Loading audioadapter");
         
@@ -147,17 +149,17 @@ extern "C"
      
     #ifdef __linux__
         adapter = new Jack::JackCallbackAudioAdapter(jack_client, 
-            new Jack::JackAlsaAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);
+            new Jack::JackAlsaAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params), input, output);
     #endif
 
     #ifdef WIN32
         adapter = new Jack::JackCallbackAudioAdapter(jack_client, 
-            new Jack::JackPortAudioAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);
+            new Jack::JackPortAudioAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params), input, output);
     #endif
         
     #ifdef __APPLE__
         adapter = new Jack::JackCallbackAudioAdapter(jack_client, 
-            new Jack::JackCoreAudioAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client)), input, output);
+            new Jack::JackCoreAudioAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params), input, output);
     #endif
         
         assert(adapter);

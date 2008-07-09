@@ -94,4 +94,28 @@ int JackAlsaAdapter::SetBufferSize(jack_nframes_t buffer_size)
     return Open();
 }
         
+} // namespace
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "JackExports.h"
+#include "driver_interface.h"
+
+    EXPORT jack_driver_desc_t* jack_get_descriptor()
+    {
+        jack_driver_desc_t *desc;
+        unsigned int i;
+        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+        
+        // TODO : fill parameter description
+        
+        return desc;
+    }
+   
+#ifdef __cplusplus
 }
+#endif
+
