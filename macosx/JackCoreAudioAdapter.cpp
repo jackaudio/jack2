@@ -575,7 +575,7 @@ extern "C"
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
 
         strcpy(desc->name, "coreaudio-adapter");
-        desc->nparams = 8;
+        desc->nparams = 9;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -616,6 +616,14 @@ extern "C"
         desc->params[i].type = JackDriverParamString;
         strcpy(desc->params[i].value.str, "will take default CoreAudio output device");
         strcpy(desc->params[i].short_desc, "Provide playback ports. Optionally set CoreAudio device name");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "rate");
+        desc->params[i].character = 'r';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.ui = 44100U;
+        strcpy(desc->params[i].short_desc, "Sample rate");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;

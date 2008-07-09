@@ -109,7 +109,7 @@ extern "C"
         
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
         strcpy (desc->name, "alsa-adapter");
-        desc->nparams = 7;
+        desc->nparams = 8;
         params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
         
         i = 0;
@@ -136,6 +136,14 @@ extern "C"
         params[i].type = JackDriverParamString;
         strcpy(params[i].value.str, "hw:0");
         strcpy(params[i].short_desc, "ALSA device name");
+        strcpy(params[i].long_desc, params[i].short_desc);
+        
+        i++;
+        strcpy (params[i].name, "rate");
+        params[i].character = 'r';
+        params[i].type = JackDriverParamUInt;
+        params[i].value.ui = 48000U;
+        strcpy(params[i].short_desc, "Sample rate");
         strcpy(params[i].long_desc, params[i].short_desc);
 
         i++;

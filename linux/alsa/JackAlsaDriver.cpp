@@ -2573,7 +2573,6 @@ extern "C"
         strcpy (params[i].short_desc, "Try 16-bit samples before 32-bit");
         strcpy (params[i].long_desc, params[i].short_desc);
 
-
         i++;
         strcpy (params[i].name, "input-latency");
         params[i].character = 'I';
