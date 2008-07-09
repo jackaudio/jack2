@@ -31,7 +31,6 @@
 #include "JackGlobals.h"
 #include "JackClient.h"
 #include "JackEngineControl.h"
-#include "JackException.h"
 
 namespace Jack
 {

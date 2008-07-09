@@ -24,6 +24,7 @@ Romain Moret
 2008-07-08 Stephane Letz  <letz@grame.fr>
 
 	* Add jack_get_descriptor in internal clients API.
+	* Fix JackFreewheelDriver::Process() in case if client time-out : continue processing until a better recovery strategy is chosen.
 
 2008-07-08 Stephane Letz  <letz@grame.fr>
 
