@@ -121,11 +121,10 @@ extern "C"
 #define max(x,y) (((x)>(y)) ? (x) : (y))
 #define min(x,y) (((x)<(y)) ? (x) : (y))
 
-	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
-	{
+    EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
+    {
         Jack::JackAudioAdapter* adapter;
         const char** ports;
-        const JSList* params = NULL;
         
         jack_log("Loading audioadapter");
         
@@ -170,7 +169,14 @@ extern "C"
             delete adapter;
             return 1;
         }
-	}
+    }
+
+	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
+	{
+        const JSList* params = NULL;
+        // TODO : convert load_init to params
+        return jack_internal_initialize(jack_client, params);
+    }
 
 	EXPORT void jack_finish(void* arg)
 	{

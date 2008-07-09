@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackExports.h"
 #include "driver_interface.h"
+#include "jslist.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -634,9 +635,9 @@ extern "C"
         return desc;
     }
     
-	EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
-	{
-		if ( master_manager )
+    EXPORT int jack_internal_initialize ( jack_client_t* jack_client, const JSList* params )
+    {
+        if ( master_manager )
 		{
 			jack_error ( "Master Manager already loaded" );
 			return 1;
@@ -647,6 +648,13 @@ extern "C"
 			master_manager = new Jack::JackNetMasterManager ( jack_client );
 			return ( master_manager ) ? 0 : 1;
 		}
+    }
+    
+	EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
+	{
+        const JSList* params = NULL;
+        // TODO : convert load_init to params
+        return jack_internal_initialize(jack_client, params);
 	}
 
 	EXPORT void jack_finish ( void* arg )
