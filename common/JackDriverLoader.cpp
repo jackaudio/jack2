@@ -370,6 +370,12 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
     return 0;
 }
 
+int
+jack_parse_internal_client_params(jack_driver_desc_t* desc, int argc, char* argv[], JSList** param_ptr)
+{
+    return 0;
+}
+
 jack_driver_desc_t *
 jack_find_driver_descriptor (JSList * drivers, const char * name)
 {

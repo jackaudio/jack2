@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetTool.h"
 #include "thread.h"
 #include "jack.h"
+#include "jslist.h"
 #include <list>
 
 namespace Jack
@@ -104,7 +105,7 @@ namespace Jack
 			void SetSlaveName ( session_params_t& params );
 			int Process();
 		public:
-			JackNetMasterManager ( jack_client_t* jack_client );
+			JackNetMasterManager ( jack_client_t* jack_client, const JSList* params );
 			~JackNetMasterManager();
 
 			void Exit();

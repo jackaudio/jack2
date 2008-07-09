@@ -216,7 +216,6 @@ namespace Jack {
             return;
         }
         //else parse the arg string
-        fArgString+=" ";
         const size_t arg_len=fArgString.length();
         int i=0;
         size_t pos=0;
@@ -224,7 +223,8 @@ namespace Jack {
         size_t copy_start=0;
         size_t copy_length=0;
         vector<string> args;
-
+        //we need a 'space terminated' string
+        fArgString+=" ";
         //first fill a vector with args
         do {
             //find the first non-space character from the actual position
