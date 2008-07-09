@@ -27,7 +27,7 @@ extern "C"
 
 #include <limits.h>
 #include "jslist.h"
-#include "jackExports.h"
+#include "JackExports.h"
 
 #ifdef WIN32
 #include "types.h"
