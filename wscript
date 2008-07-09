@@ -33,6 +33,11 @@ def display_feature(msg, build):
         display_msg(msg, "no", 'YELLOW')
 
 def fetch_svn_revision(path):
+    svn_revision_file = "svnrev"
+    if os.access(svn_revision_file, os.R_OK):
+         f = open(svn_revision_file, 'r')
+         return f.read()
+        
     cmd = "LANG= "
     cmd += "svnversion "
     cmd += path
