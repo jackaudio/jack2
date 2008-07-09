@@ -84,10 +84,8 @@ namespace Jack
                
 		public:
         
-			JackAudioAdapterInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate)
-                :fCaptureChannels(input), 
-                fPlaybackChannels(output), 
-                fBufferSize(buffer_size), 
+			JackAudioAdapterInterface(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+                :fBufferSize(buffer_size), 
                 fSampleRate(sample_rate),
                 fProducerDLL(buffer_size, sample_rate),
                 fConsumerDLL(buffer_size, sample_rate),
@@ -132,6 +130,16 @@ namespace Jack
             }
             
             void ResampleFactor(jack_nframes_t& frame1, jack_nframes_t& frame2);
+            
+            int GetInputs()
+            {
+                return fCaptureChannels;
+            }  
+            
+            int GetOutputs()
+            {
+                return fPlaybackChannels;
+            }   
         
 	};
 }

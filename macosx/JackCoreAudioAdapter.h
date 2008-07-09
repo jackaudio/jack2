@@ -97,10 +97,8 @@ namespace Jack
     
 		public:
         
-			JackCoreAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
-                :JackAudioAdapterInterface(input, output, buffer_size, sample_rate),fInputData(0),fState(false)
-            {}
-			~JackCoreAudioAdapter()
+			JackCoreAudioAdapter( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+         	~JackCoreAudioAdapter()
             {}
             
             virtual int Open();

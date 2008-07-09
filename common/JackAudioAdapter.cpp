@@ -32,15 +32,13 @@ namespace Jack
 {
 
 JackAudioAdapter::JackAudioAdapter(jack_client_t* jack_client, 
-                                    JackAudioAdapterInterface* audio_io, 
-                                    int input, 
-                                    int output)
+                                    JackAudioAdapterInterface* audio_io)
 {
     int i;
     char name[32];
     fJackClient = jack_client;
-    fCaptureChannels = input;
-    fPlaybackChannels = output;
+    fCaptureChannels = audio_io->GetInputs();
+    fPlaybackChannels = audio_io->GetOutputs();
     fAudioAdapter = audio_io;
     
     fCapturePortList = new jack_port_t* [fCaptureChannels];
@@ -120,49 +118,26 @@ extern "C"
 #include "JackPortAudioAdapter.h"
 #endif
 
-#define max(x,y) (((x)>(y)) ? (x) : (y))
-#define min(x,y) (((x)<(y)) ? (x) : (y))
-
 using namespace Jack;
 
     EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
     {
         Jack::JackAudioAdapter* adapter;
-        const char** ports;
-        
         jack_log("Loading audioadapter");
-        
-        // Find out input and output ports numbers
-        int input = 0;
-        if ((ports = jack_get_ports(jack_client, NULL, NULL, JackPortIsPhysical|JackPortIsOutput)) != NULL) {
-            while (ports[input]) input++;
-        }
-        if (ports)
-            free(ports);
-        
-        int output = 0;
-        if ((ports = jack_get_ports(jack_client, NULL, NULL, JackPortIsPhysical|JackPortIsInput)) != NULL) {
-            while (ports[output]) output++;
-        }
-        if (ports)
-            free(ports);
-            
-        input = max(2, input);
-        output = max(2, output);
-     
+         
     #ifdef __linux__
         adapter = new Jack::JackCallbackAudioAdapter(jack_client, 
-            new Jack::JackAlsaAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params), input, output);
+            new Jack::JackAlsaAdapter(jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params));
     #endif
 
     #ifdef WIN32
         adapter = new Jack::JackCallbackAudioAdapter(jack_client, 
-            new Jack::JackPortAudioAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params), input, output);
+            new Jack::JackPortAudioAdapter(jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params));
     #endif
         
     #ifdef __APPLE__
         adapter = new Jack::JackCallbackAudioAdapter(jack_client, 
-            new Jack::JackCoreAudioAdapter(input, output, jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params), input, output);
+            new Jack::JackCoreAudioAdapter(jack_get_buffer_size(jack_client), jack_get_sample_rate(jack_client), params));
     #endif
         
         assert(adapter);

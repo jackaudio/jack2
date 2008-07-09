@@ -528,11 +528,7 @@ namespace Jack
        
 	    public:
         
-            JackAlsaAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
-                :JackAudioAdapterInterface(input, output, buffer_size, sample_rate)
-                ,fThread(this), fAudioInterface(input, output, buffer_size, sample_rate)	
-            {}
-           
+            JackAlsaAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
             ~JackAlsaAdapter()
             {}
             

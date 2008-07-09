@@ -44,10 +44,8 @@ namespace Jack
        
 		public:
         
-			JackPortAudioAdapter(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
-                :JackAudioAdapterInterface(input, output, buffer_size, sample_rate)
-            {}
-			~JackPortAudioAdapter()
+			JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+         	~JackPortAudioAdapter()
             {}
             
             int Open();

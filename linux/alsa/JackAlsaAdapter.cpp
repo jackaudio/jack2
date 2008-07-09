@@ -22,6 +22,52 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+
+ JackAlsaAdapter::JackAlsaAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+                :JackAudioAdapterInterface(buffer_size, sample_rate)
+                ,fThread(this), fAudioInterface(GetInputs(), GetOutputs(), buffer_size, sample_rate)	
+{
+    const JSList* node;
+    const jack_driver_param_t* param;
+    
+    fCaptureChannels = 2;
+    fPlaybackChannels = 2;
+    
+    for (node = params; node; node = jack_slist_next(node)) {
+        param = (const jack_driver_param_t*) node->data;
+        
+        switch (param->character) {
+        
+            case 'i':
+                fCaptureChannels = param->value.ui;
+                break;
+                
+            case 'o':
+                fPlaybackChannels = param->value.ui;
+                break;
+                
+            case 'C':
+                break;
+                
+            case 'P':
+                break;
+                
+            case 'D':
+                break;
+                
+            case 'n':
+                break;
+                
+            case 'd':
+                break;
+                
+            case 'r':
+                SetSampleRate(param->value.ui);
+                break;
+        }
+    }
+}
+
 int JackAlsaAdapter::Open()
 {
     if (fAudioInterface.open() == 0) {

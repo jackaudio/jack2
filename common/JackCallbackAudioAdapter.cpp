@@ -94,11 +94,8 @@ void JackCallbackAudioAdapter::Reset()
     fAudioAdapter->Reset();
 }
 
-JackCallbackAudioAdapter::JackCallbackAudioAdapter(jack_client_t* jack_client, 
-                                                JackAudioAdapterInterface* audio_io, 
-                                                int input, 
-                                                int output)
-                                                : JackAudioAdapter(jack_client, audio_io, input, output)
+JackCallbackAudioAdapter::JackCallbackAudioAdapter(jack_client_t* jack_client, JackAudioAdapterInterface* audio_io)
+                                                : JackAudioAdapter(jack_client, audio_io)
 {
     int i;
      

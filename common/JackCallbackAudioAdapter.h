@@ -42,9 +42,7 @@ namespace Jack
         public:
 
             JackCallbackAudioAdapter(jack_client_t* jack_client, 
-                                    JackAudioAdapterInterface* audio_io, 
-                                    int input, 
-                                    int output);
+                                    JackAudioAdapterInterface* audio_io);
             ~JackCallbackAudioAdapter();
     
     };

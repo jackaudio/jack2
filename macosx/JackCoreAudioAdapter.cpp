@@ -152,6 +152,51 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
     return noErr;
 }
 
+ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+                :JackAudioAdapterInterface(buffer_size, sample_rate),fInputData(0),fState(false)
+{
+
+    const JSList* node;
+    const jack_driver_param_t* param;
+    
+    fCaptureChannels = 2;
+    fPlaybackChannels = 2;
+    
+    for (node = params; node; node = jack_slist_next(node)) {
+        param = (const jack_driver_param_t*) node->data;
+        
+        switch (param->character) {
+        
+            case 'c' :
+                break;
+                
+            case 'i':
+                fCaptureChannels = param->value.ui;
+                break;
+                
+            case 'o':
+                fPlaybackChannels = param->value.ui;
+                break;
+                
+            case 'C':
+                break;
+                
+            case 'P':
+                break;
+                
+            case 'D':
+                break;
+                
+            case 'r':
+                SetSampleRate(param->value.ui);
+                break;
+                
+            case 'l':
+                break;
+        }
+    }
+}
+
 OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
 {
     OSStatus res;

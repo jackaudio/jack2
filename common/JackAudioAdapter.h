@@ -45,9 +45,7 @@ namespace Jack
         public:
 
             JackAudioAdapter(jack_client_t* jack_client, 
-                            JackAudioAdapterInterface* audio_io, 
-                            int input, 
-                            int output);
+                            JackAudioAdapterInterface* audio_io);
             virtual ~JackAudioAdapter();
          
             int Open();
