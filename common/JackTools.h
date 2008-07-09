@@ -38,10 +38,12 @@
 #include <algorithm>
 #include <vector>
 
+#include "JackExports.h"
+
 namespace Jack
 {
 
-struct JackTools
+struct EXPORT JackTools
 {
 
     static int GetPID();
@@ -71,6 +73,7 @@ class EXPORT JackArgParser
         int GetArgc();
         const char** GetArgv();
 };
+
 }
 
 #endif

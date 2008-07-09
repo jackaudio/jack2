@@ -26,6 +26,8 @@ extern "C"
 #endif
 
 #include <limits.h>
+#include "jslist.h"
+#include "jackExports.h"
 
 #ifdef WIN32
 #include "types.h"
@@ -33,7 +35,6 @@ extern "C"
 #else
 #include <inttypes.h>
 #endif
-
 
 #define JACK_DRIVER_NAME_MAX          15
 #define JACK_DRIVER_PARAM_NAME_MAX    15
@@ -87,6 +88,8 @@ extern "C"
     }
     jack_driver_desc_t;
 
+
+EXPORT int jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
 
 #ifdef __cplusplus
 }

@@ -111,4 +111,18 @@ namespace Jack
    	};
 }
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "JackExports.h"
+#include "driver_interface.h"
+
+EXPORT jack_driver_desc_t* jack_get_descriptor();
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

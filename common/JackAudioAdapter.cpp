@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAudioAdapter.h"
 #include "JackError.h"
 #include "JackExports.h"
+#include "JackTools.h"
 #include "jslist.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,6 +106,7 @@ extern "C"
 #endif
 
 #include "JackCallbackAudioAdapter.h"
+#include "driver_interface.h"
 
 #ifdef __linux__
 #include "JackAlsaAdapter.h"
@@ -120,6 +122,8 @@ extern "C"
 
 #define max(x,y) (((x)>(y)) ? (x) : (y))
 #define min(x,y) (((x)<(y)) ? (x) : (y))
+
+using namespace Jack;
 
     EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
     {
@@ -173,8 +177,15 @@ extern "C"
 
 	EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
 	{
-        const JSList* params = NULL;
-        // TODO : convert load_init to params
+        JSList* params = NULL;
+        jack_driver_desc_t *desc = jack_get_descriptor();
+        JackArgParser parser(load_init);
+        
+        if (parser.GetArgc() > 0) {
+            if (jack_parse_driver_params(desc, parser.GetArgc(), (char**)parser.GetArgv(), &params) != 0) 
+            jack_error("Internal client jack_parse_driver_params error");
+        }
+         
         return jack_internal_initialize(jack_client, params);
     }
 
