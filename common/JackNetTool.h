@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackMidiPort.h"
 #include "JackExports.h"
 #include "JackError.h"
+#include "JackTools.h"
 #include "JackPlatformNetSocket.h"
 
 #include <string>

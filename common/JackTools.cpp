@@ -205,9 +205,17 @@ namespace Jack {
     }
 
     JackArgParser::JackArgParser(const char* arg) {
+        jack_log ( "JackArgParser::JackArgParser, arg : '%s'", arg );
+
         fArgc=0;
         fNumArgv=0;
         fArgString=string(arg);
+        //if empty string
+        if (strlen(arg)==0) {
+            fArgv = NULL;
+            return;
+        }
+        //else parse the arg string
         fArgString+=" ";
         const size_t arg_len=fArgString.length();
         int i=0;
@@ -226,7 +234,7 @@ namespace Jack {
             //no more quotes or spaces, consider the end of the string
             if (pos==string::npos)
                 pos=arg_len;
-            //if it's a double quote
+            //if double quote
             if (fArgString.at(pos)=='\"') {
                 //first character : copy the substring
                 if (pos==start) {
@@ -242,7 +250,7 @@ namespace Jack {
                     start=pos;
                 }
             }
-            //if it's a space
+            //if space
             if (fArgString.at(pos)==' ') {
                 copy_start=start;
                 copy_length=pos-copy_start;
@@ -260,12 +268,16 @@ namespace Jack {
             fill_n(fArgv[i],args[i].length()+1,0);
             args[i].copy(fArgv[i],args[i].length());
         }
+
+        //finally count the 'real' options (the ones starting with a '-')
         for (i=0; i<fNumArgv; i++)
             if (fArgv[i][0]=='-')
                 fArgc++;
     }
 
     JackArgParser::~JackArgParser() {
+        for (int i=0; i<fNumArgv; i++)
+            delete[] fArgv[i];
         delete[] fArgv;
     }
 

@@ -20,6 +20,8 @@
 #ifndef __JackTools__
 #define __JackTools__
 
+#include "JackExports.h"
+
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -54,7 +56,7 @@ struct JackTools
 
 };
 
-class JackArgParser
+class EXPORT JackArgParser
 {
     private:
         std::string fArgString;

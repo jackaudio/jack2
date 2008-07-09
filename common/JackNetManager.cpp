@@ -322,7 +322,7 @@ namespace Jack
 
 	int JackNetMaster::SetProcess ( jack_nframes_t nframes, void* arg )
 	{
-		JackNetMaster* master = static_cast<JackNetMaster*> ( arg );	
+		JackNetMaster* master = static_cast<JackNetMaster*> ( arg );
 		return master->Process();
 	}
 
@@ -629,12 +629,12 @@ extern "C"
     {
         jack_driver_desc_t *desc;
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
-     
+
         // TODO
-        
+
         return desc;
     }
-    
+
     EXPORT int jack_internal_initialize ( jack_client_t* jack_client, const JSList* params )
     {
         if ( master_manager )
@@ -649,11 +649,12 @@ extern "C"
 			return ( master_manager ) ? 0 : 1;
 		}
     }
-    
+
 	EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
 	{
         const JSList* params = NULL;
-        // TODO : convert load_init to params
+        Jack::JackArgParser args(load_init);
+        const char** argv = args.GetArgv();
         return jack_internal_initialize(jack_client, params);
 	}
 
