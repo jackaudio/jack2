@@ -32,6 +32,10 @@
 #include <sys/syslimits.h>
 #endif
 
+#include <string>
+#include <algorithm>
+#include <vector>
+
 namespace Jack
 {
 
@@ -48,6 +52,22 @@ struct JackTools
     static int GetTmpdir();
     static void RewriteName(const char* name, char* new_name);
 
+};
+
+class JackArgParser
+{
+    private:
+        std::string fArgString;
+        int fNumArgv;
+        int fArgc;
+        char** fArgv;
+    public:
+        JackArgParser(const char* arg);
+        ~JackArgParser();
+         std::string GetArgString();
+        int GetNumArgv();
+        int GetArgc();
+        const char** GetArgv();
 };
 }
 

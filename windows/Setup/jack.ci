@@ -36,7 +36,7 @@
    <comptype> ppmdmax</>
    <solid> 1</>
    <srcfolder> </>
-   <ifexist> overnewer</>
+   <ifexist> over</>
    <runafter> </>
    <runconfirm> 0</>
    <uninclude> 1</>
@@ -53,8 +53,8 @@
    <bgfoot> </> 
    <bgback> </>
    <files listview >
-      <_><src>..\Release\bin\libjackmp.a</><dest>inst</><custom>\lib</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libjackservermp.a</><dest>inst</><custom>\lib</><ifexist>overnewer</><recurs>0</></>
+      <_><src>..\Release\bin\libjackmp.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackservermp.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_connect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_disconnect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_load.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -68,20 +68,20 @@
 <_><src>..\Release\bin\libjackservermp.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libsamplerate-0.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\jack_net.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\jack_portaudio.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\netmanager.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\audioadapter.dll</><dest>inst</><custom>\jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\control.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\intclient.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\jack.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\jslist.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\midiport.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\ringbuffer.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\statistics.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\thread.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\transport.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\..\common\jack\types.h</><dest>inst</><custom>\includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\jack_net.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\jack_portaudio.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\netmanager.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\audioadapter.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\control.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\intclient.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\jack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\jslist.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\midiport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\ringbuffer.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\statistics.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\thread.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\transport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
