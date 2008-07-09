@@ -107,11 +107,76 @@ extern "C"
     EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t *desc;
+        jack_driver_param_desc_t * params;
         unsigned int i;
+        
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+        strcpy (desc->name, "alsa-adapter");
+        desc->nparams = 7;
+        params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
         
-        // TODO : fill parameter description
-        
+        i = 0;
+        strcpy(params[i].name, "capture");
+        params[i].character = 'C';
+        params[i].type = JackDriverParamString;
+        strcpy (params[i].value.str, "none");
+        strcpy (params[i].short_desc,
+                "Provide capture ports.  Optionally set device");
+        strcpy (params[i].long_desc, params[i].short_desc);
+
+        i++;
+        strcpy(params[i].name, "playback");
+        params[i].character = 'P';
+        params[i].type = JackDriverParamString;
+        strcpy(params[i].value.str, "none");
+        strcpy(params[i].short_desc,
+                "Provide playback ports.  Optionally set device");
+        strcpy(params[i].long_desc, params[i].short_desc);
+
+        i++;
+        strcpy(params[i].name, "device");
+        params[i].character = 'd';
+        params[i].type = JackDriverParamString;
+        strcpy(params[i].value.str, "hw:0");
+        strcpy(params[i].short_desc, "ALSA device name");
+        strcpy(params[i].long_desc, params[i].short_desc);
+
+        i++;
+        strcpy(params[i].name, "nperiods");
+        params[i].character = 'n';
+        params[i].type = JackDriverParamUInt;
+        params[i].value.ui = 2U;
+        strcpy(params[i].short_desc, "Number of periods of playback latency");
+        strcpy(params[i].long_desc, params[i].short_desc);
+
+        i++;
+        strcpy(params[i].name, "duplex");
+        params[i].character = 'D';
+        params[i].type = JackDriverParamBool;
+        params[i].value.i = 1;
+        strcpy(params[i].short_desc,
+                "Provide both capture and playback ports");
+        strcpy(params[i].long_desc, params[i].short_desc);
+
+        i++;
+        strcpy(params[i].name, "inchannels");
+        params[i].character = 'i';
+        params[i].type = JackDriverParamUInt;
+        params[i].value.i = 0;
+        strcpy(params[i].short_desc,
+                "Number of capture channels (defaults to hardware max)");
+        strcpy(params[i].long_desc, params[i].short_desc);
+
+        i++;
+        strcpy(params[i].name, "outchannels");
+        params[i].character = 'o';
+        params[i].type = JackDriverParamUInt;
+        params[i].value.i = 0;
+        strcpy(params[i].short_desc,
+                "Number of playback channels (defaults to hardware max)");
+        strcpy(params[i].long_desc, params[i].short_desc);
+
+        desc->params = params;
         return desc;
     }
    

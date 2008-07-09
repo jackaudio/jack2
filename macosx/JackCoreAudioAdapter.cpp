@@ -571,16 +571,83 @@ extern "C"
 #include "JackExports.h"
 #include "driver_interface.h"
 
-    EXPORT jack_driver_desc_t* jack_get_descriptor()
-    {
+   EXPORT jack_driver_desc_t* jack_get_descriptor() 
+   {
         jack_driver_desc_t *desc;
         unsigned int i;
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
-        
-        // TODO : fill parameter description
-        
+
+        strcpy(desc->name, "coreaudio-adapter");
+        desc->nparams = 8;
+        desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+
+        i = 0;
+        strcpy(desc->params[i].name, "channels");
+        desc->params[i].character = 'c';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Maximum number of channels");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "inchannels");
+        desc->params[i].character = 'i';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Maximum number of input channels");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "outchannels");
+        desc->params[i].character = 'o';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Maximum number of output channels");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "capture");
+        desc->params[i].character = 'C';
+        desc->params[i].type = JackDriverParamString;
+        strcpy(desc->params[i].value.str, "will take default CoreAudio input device");
+        strcpy(desc->params[i].short_desc, "Provide capture ports. Optionally set CoreAudio device name");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "playback");
+        desc->params[i].character = 'P';
+        desc->params[i].type = JackDriverParamString;
+        strcpy(desc->params[i].value.str, "will take default CoreAudio output device");
+        strcpy(desc->params[i].short_desc, "Provide playback ports. Optionally set CoreAudio device name");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "duplex");
+        desc->params[i].character = 'D';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = TRUE;
+        strcpy(desc->params[i].short_desc, "Provide both capture and playback ports");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "device");
+        desc->params[i].character = 'd';
+        desc->params[i].type = JackDriverParamString;
+        strcpy(desc->params[i].value.str, "will take default CoreAudio device name");
+        strcpy(desc->params[i].short_desc, "CoreAudio device name");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "list-devices");
+        desc->params[i].character = 'l';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = TRUE;
+        strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+  
         return desc;
     }
+
    
 #ifdef __cplusplus
 }

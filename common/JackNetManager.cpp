@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetManager.h"
 #include "JackError.h"
 #include "JackExports.h"
+#include "driver_interface.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -622,6 +623,17 @@ static Jack::JackNetMasterManager* master_manager = NULL;
 extern "C"
 {
 #endif
+
+    EXPORT jack_driver_desc_t* jack_get_descriptor()
+    {
+        jack_driver_desc_t *desc;
+        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+     
+        // TODO
+        
+        return desc;
+    }
+    
 	EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
 	{
 		if ( master_manager )

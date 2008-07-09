@@ -1127,7 +1127,8 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_driver_desc_t* driver_get_descriptor() {
+    EXPORT jack_driver_desc_t* driver_get_descriptor() 
+    {
         jack_driver_desc_t *desc;
         unsigned int i;
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
@@ -1251,7 +1252,8 @@ extern "C"
         return desc;
     }
 
-    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
+    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    {
         jack_nframes_t srate = 44100;
         jack_nframes_t frames_per_interrupt = 128;
         int capture = FALSE;

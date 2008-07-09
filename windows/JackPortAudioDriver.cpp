@@ -279,7 +279,6 @@ extern "C"
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
 
         strcpy(desc->name, "portaudio");
-
         desc->nparams = 13;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
