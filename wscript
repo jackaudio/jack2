@@ -136,15 +136,16 @@ def build(bld):
             bld.add_subdirs('linux/dbus')
 
     if bld.env()['BUILD_DOXYGEN_DOCS'] == True:
-        share_dir = Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
-        html_docs_dir = share_dir + '/reference/html/'
+        share_dir = bld.env().get_destdir() + Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
+        html_docs_source_dir = "build/default/html"
+        html_docs_install_dir = share_dir + '/reference/html/'
         if Params.g_commands['install']:
-            if os.path.isdir(html_docs_dir):
+            if os.path.isdir(html_docs_install_dir):
                 Params.pprint('CYAN', "Removing old doxygen documentation installation...")
-                shutil.rmtree(html_docs_dir)
+                shutil.rmtree(html_docs_install_dir)
                 Params.pprint('CYAN', "Removing old doxygen documentation installation done.")
             Params.pprint('CYAN', "Installing doxygen documentation...")
-            shutil.copytree('html', html_docs_dir)
+            shutil.copytree(html_docs_source_dir, html_docs_install_dir)
             Params.pprint('CYAN', "Installing doxygen documentation done.")
         elif Params.g_commands['uninstall']:
             Params.pprint('CYAN', "Uninstalling doxygen documentation...")
@@ -152,12 +153,12 @@ def build(bld):
                 shutil.rmtree(share_dir)
             Params.pprint('CYAN', "Uninstalling doxygen documentation done.")
         elif Params.g_commands['clean']:
-            if os.access('html', os.R_OK):
+            if os.access(html_docs_source_dir, os.R_OK):
                 Params.pprint('CYAN', "Removing doxygen generated documentation...")
-                shutil.rmtree('html')
+                shutil.rmtree(html_docs_source_dir)
                 Params.pprint('CYAN', "Removing doxygen generated documentation done.")
         elif Params.g_commands['build']:
-            if not os.access('html', os.R_OK):
+            if not os.access(html_docs_source_dir, os.R_OK):
                 os.popen("doxygen").read()
             else:
                 Params.pprint('CYAN', "doxygen documentation already built.")
