@@ -43,7 +43,7 @@ extern "C"
     }
 
     /* This should only be called ONCE per process. */
-    extern void InitTime();
+    void InitTime();
 
     static inline void JackSleep(int usec) 
     {
@@ -56,9 +56,9 @@ extern "C"
 
     extern EXPORT LARGE_INTEGER _jack_freq;
 
-    extern EXPORT jack_time_t GetMicroSeconds(void) ;
+    EXPORT jack_time_t GetMicroSeconds(void) ;
 
-    extern void InitTime();
+    void InitTime();
 
     static void JackSleep(int usec) 
     {
@@ -79,15 +79,15 @@ extern "C"
 #ifdef GETCYCLE_TIME
 #include "cycles.h"
     extern jack_time_t __jack_cpu_mhz;
-    extern jack_time_t GetMhz();
-    extern void InitTime();
+    jack_time_t GetMhz();
+    void InitTime();
     static inline jack_time_t GetMicroSeconds(void) 
     {
         return get_cycles() / __jack_cpu_mhz;
     }
 #else
 #include <time.h>
-    extern void InitTime();
+    void InitTime();
     static inline jack_time_t GetMicroSeconds(void) 
     {
         struct timespec ts;
