@@ -26,79 +26,79 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-	class JackNetDriver : public JackAudioDriver
-	{
-		private:
-			session_params_t fParams;
-			char* fMulticastIP;
-			JackNetSocket fSocket;
-			uint fNSubProcess;
+    class JackNetDriver : public JackAudioDriver
+    {
+    private:
+        session_params_t fParams;
+        char* fMulticastIP;
+        JackNetSocket fSocket;
+        uint fNSubProcess;
 
-			jack_port_id_t* fMidiCapturePortList;
-			jack_port_id_t* fMidiPlaybackPortList;
+        jack_port_id_t* fMidiCapturePortList;
+        jack_port_id_t* fMidiPlaybackPortList;
 
-			packet_header_t fTxHeader;
-			packet_header_t fRxHeader;
+        packet_header_t fTxHeader;
+        packet_header_t fRxHeader;
 
-			char* fTxBuffer;
-			char* fRxBuffer;
-			char* fTxData;
-			char* fRxData;
+        char* fTxBuffer;
+        char* fRxBuffer;
+        char* fTxData;
+        char* fRxData;
 
-			NetMidiBuffer* fNetMidiCaptureBuffer;
-			NetMidiBuffer* fNetMidiPlaybackBuffer;
-			NetAudioBuffer* fNetAudioCaptureBuffer;
-			NetAudioBuffer* fNetAudioPlaybackBuffer;
+        NetMidiBuffer* fNetMidiCaptureBuffer;
+        NetMidiBuffer* fNetMidiPlaybackBuffer;
+        NetAudioBuffer* fNetAudioCaptureBuffer;
+        NetAudioBuffer* fNetAudioPlaybackBuffer;
 
-			int fAudioRxLen;
-			int fAudioTxLen;
+        int fAudioRxLen;
+        int fAudioTxLen;
 
-			bool Init();
-			net_status_t GetNetMaster();
-			net_status_t SendMasterStartSync();
-			void Restart();
-			int SetParams();
-			int AllocPorts();
-			int FreePorts();
+        bool Init();
+        net_status_t GetNetMaster();
+        net_status_t SendMasterStartSync();
+        void Restart();
+        int SetParams();
+        int AllocPorts();
+        int FreePorts();
 
-			JackMidiBuffer* GetMidiInputBuffer ( int port_index );
-			JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
+        JackMidiBuffer* GetMidiInputBuffer ( int port_index );
+        JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
 
-			int Recv ( size_t size, int flags );
-			int Send ( size_t size, int flags );
+        int Recv ( size_t size, int flags );
+        int Send ( size_t size, int flags );
 
-		public:
-			JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-			                const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* master_name );
-			~JackNetDriver();
+    public:
+        JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
+                        const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* master_name );
+        ~JackNetDriver();
 
-			int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
-			           int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
-			           const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
+        int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
+                   int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
+                   const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
 
-			int Attach();
-			int Detach();
+        int Attach();
+        int Detach();
 
-			int Read();
-			int Write();
-            
-            // BufferSize can be changed
-            bool IsFixedBufferSize()
-            {
-                return true;
-            }
+        int Read();
+        int Write();
 
-            int SetBufferSize(jack_nframes_t buffer_size)
-            {
-                return -1;
-            }
-            
-            int SetSampleRate(jack_nframes_t sample_rate)
-            {
-                return -1;
-            }
+        // BufferSize can be changed
+        bool IsFixedBufferSize()
+        {
+            return true;
+        }
 
-	};
+        int SetBufferSize(jack_nframes_t buffer_size)
+        {
+            return -1;
+        }
+
+        int SetSampleRate(jack_nframes_t sample_rate)
+        {
+            return -1;
+        }
+
+    };
 }
 
 #endif

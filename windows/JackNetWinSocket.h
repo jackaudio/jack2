@@ -29,74 +29,74 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-	#define E(code, s) { code, s }
-	#define NET_ERROR_CODE WSAGetLastError()
-	#define StrError PrintError
+#define E(code, s) { code, s }
+#define NET_ERROR_CODE WSAGetLastError()
+#define StrError PrintError
 
-	typedef uint32_t uint;
-	typedef int SOCKLEN;
-	
-	EXPORT const char* PrintError ( int error );
+    typedef uint32_t uint;
+    typedef int SOCKLEN;
 
-	//JeckNetWinSocket***************************************************************************
-	class EXPORT JackNetWinSocket
-	{
-		private:
-			int fSockfd;
-			int fPort;
-			SOCKADDR_IN fSendAddr;
-			SOCKADDR_IN fRecvAddr;
-		public:
-			JackNetWinSocket();
-			JackNetWinSocket ( const char* ip, int port );
-			~JackNetWinSocket();
+    EXPORT const char* PrintError ( int error );
 
-			//socket management
-			int NewSocket();
-			int Bind();
-			int BindWith ( const char* ip );
-			int BindWith ( int port );
-			int Connect();
-			int ConnectTo ( const char* ip );
-			void Close();
-			void Reset();
-			bool IsSocket();
+    //JeckNetWinSocket***************************************************************************
+    class EXPORT JackNetWinSocket
+    {
+    private:
+        int fSockfd;
+        int fPort;
+        SOCKADDR_IN fSendAddr;
+        SOCKADDR_IN fRecvAddr;
+    public:
+        JackNetWinSocket();
+        JackNetWinSocket ( const char* ip, int port );
+        ~JackNetWinSocket();
 
-			//IP/PORT management
-			void SetPort ( int port );
-			int GetPort();
+        //socket management
+        int NewSocket();
+        int Bind();
+        int BindWith ( const char* ip );
+        int BindWith ( int port );
+        int Connect();
+        int ConnectTo ( const char* ip );
+        void Close();
+        void Reset();
+        bool IsSocket();
 
-			//address management
-			int SetAddress ( const char* ip, int port );
-			char* GetSendIP();
-			char* GetRecvIP();
+        //IP/PORT management
+        void SetPort ( int port );
+        int GetPort();
 
-			//utility
-			int GetName ( char* name );
-			int JoinMCastGroup ( const char* mcast_ip );
-			void CopyParams ( JackNetWinSocket* socket );
+        //address management
+        int SetAddress ( const char* ip, int port );
+        char* GetSendIP();
+        char* GetRecvIP();
 
-			//options management
-			int SetOption ( int level, int optname, const void* optval, SOCKLEN optlen );
-			int GetOption ( int level, int optname, void* optval, SOCKLEN* optlen );
+        //utility
+        int GetName ( char* name );
+        int JoinMCastGroup ( const char* mcast_ip );
+        void CopyParams ( JackNetWinSocket* socket );
 
-			//timeout
-			int SetTimeOut ( int& msec );
+        //options management
+        int SetOption ( int level, int optname, const void* optval, SOCKLEN optlen );
+        int GetOption ( int level, int optname, void* optval, SOCKLEN* optlen );
 
-			//local loop
-			int SetLocalLoop();
+        //timeout
+        int SetTimeOut ( int& msec );
 
-			//network operations
-			int SendTo ( const void* buffer, size_t nbytes, int flags );
-			int SendTo ( const void* buffer, size_t nbytes, int flags, const char* ip );
-			int Send ( const void* buffer, size_t nbytes, int flags );
-			int RecvFrom ( void* buffer, size_t nbytes, int flags );
-			int Recv ( void* buffer, size_t nbytes, int flags );
-			int CatchHost ( void* buffer, size_t nbytes, int flags );
+        //local loop
+        int SetLocalLoop();
 
-			//error management
-			net_error_t GetError();
-	};
+        //network operations
+        int SendTo ( const void* buffer, size_t nbytes, int flags );
+        int SendTo ( const void* buffer, size_t nbytes, int flags, const char* ip );
+        int Send ( const void* buffer, size_t nbytes, int flags );
+        int RecvFrom ( void* buffer, size_t nbytes, int flags );
+        int Recv ( void* buffer, size_t nbytes, int flags );
+        int CatchHost ( void* buffer, size_t nbytes, int flags );
+
+        //error management
+        net_error_t GetError();
+    };
 }
 
 #endif
