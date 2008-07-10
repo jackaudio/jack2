@@ -118,11 +118,11 @@ namespace Jack
         //data
         char* fBuffer;
         char* fNetBuffer;
+        JackMidiBuffer** fPortBuffer;
+         
     public:
         NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
         ~NetMidiBuffer();
-
-        JackMidiBuffer** fPortBuffer;
 
         void Reset();
         size_t GetSize();
@@ -134,6 +134,8 @@ namespace Jack
         //network<->buffer
         int RenderFromNetwork ( int subcycle, size_t copy_size );
         int RenderToNetwork ( int subcycle, size_t total_size );
+        
+         void SetBuffer(int index, JackMidiBuffer* buffer);
     };
 
 // audio data *********************************************************************************
@@ -146,16 +148,17 @@ namespace Jack
         jack_nframes_t fSubPeriodSize;
         size_t fSubPeriodBytesSize;
         char* fNetBuffer;
+        sample_t** fPortBuffer;
     public:
         NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
         ~NetAudioBuffer();
-
-        sample_t** fPortBuffer;
 
         size_t GetSize();
         //jack<->buffer
         void RenderFromJackPorts ( int subcycle );
         void RenderToJackPorts ( int subcycle );
+        
+        void SetBuffer(int index, sample_t* buffer);
     };
 
 //utility *************************************************************************************

@@ -47,6 +47,11 @@ namespace Jack
     {
         return fMaxBufsize;
     }
+    
+    void NetMidiBuffer::SetBuffer(int index, JackMidiBuffer* buffer)
+    {
+        fPortBuffer[index] = buffer;
+    }
 
     void NetMidiBuffer::DisplayEvents()
     {
@@ -128,6 +133,11 @@ namespace Jack
     size_t NetAudioBuffer::GetSize()
     {
         return fNPorts * fSubPeriodBytesSize;
+    }
+    
+    void NetAudioBuffer::SetBuffer(int index, sample_t* buffer)
+    {
+        fPortBuffer[index] = buffer;
     }
 
     void NetAudioBuffer::RenderFromJackPorts ( int subcycle )

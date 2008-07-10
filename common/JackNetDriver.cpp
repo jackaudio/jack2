@@ -448,9 +448,9 @@ namespace Jack
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
-            fNetMidiCaptureBuffer->fPortBuffer[midi_port_index] = GetMidiInputBuffer ( midi_port_index );
+            fNetMidiCaptureBuffer->SetBuffer(midi_port_index, GetMidiInputBuffer ( midi_port_index ));
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
-            fNetAudioCaptureBuffer->fPortBuffer[audio_port_index] = GetInputBuffer ( audio_port_index );
+            fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer ( audio_port_index ));
 
         //receive sync (launch the cycle)
         do
@@ -515,9 +515,9 @@ namespace Jack
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
-            fNetMidiPlaybackBuffer->fPortBuffer[midi_port_index] = GetMidiOutputBuffer ( midi_port_index );
+            fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, GetMidiOutputBuffer ( midi_port_index ));
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
-            fNetAudioPlaybackBuffer->fPortBuffer[audio_port_index] = GetOutputBuffer ( audio_port_index );
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
 
         //midi
         if ( fParams.fReturnMidiChannels )

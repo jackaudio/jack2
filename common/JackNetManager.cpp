@@ -341,17 +341,17 @@ fail:
         //buffers
         uint port_index;
         for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
-            fNetMidiCaptureBuffer->fPortBuffer[port_index] =
-                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index], fParams.fPeriodSize ) );
+            fNetMidiCaptureBuffer->SetBuffer(port_index,
+                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index], fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
-            fNetAudioCaptureBuffer->fPortBuffer[port_index] =
-                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index], fParams.fPeriodSize ) );
+            fNetAudioCaptureBuffer->SetBuffer(port_index,
+                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index], fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
-            fNetMidiPlaybackBuffer->fPortBuffer[port_index] =
-                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index], fParams.fPeriodSize ) );
+            fNetMidiPlaybackBuffer->SetBuffer(port_index,
+                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index], fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
-            fNetAudioPlaybackBuffer->fPortBuffer[port_index] =
-                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index], fParams.fPeriodSize ) );
+            fNetAudioPlaybackBuffer->SetBuffer(port_index,
+                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index], fParams.fPeriodSize )));
 
         //send ------------------------------------------------------------------------------------------------------------------
         //sync
