@@ -157,8 +157,8 @@ using namespace Jack;
         JackArgParser parser(load_init);
         
         if (parser.GetArgc() > 0) {
-            if (jack_parse_internal_client_params(desc, parser.GetNumArgv(), (char**)parser.GetArgv(), &params) != 0) 
-                jack_error("Internal client jack_parse_driver_params error");
+            if (parser.ParseParams(desc, &params) != 0) 
+                jack_error("Internal client : JackArgParser::ParseParams error.");
         }
          
         return jack_internal_initialize(jack_client, params);

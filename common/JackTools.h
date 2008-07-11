@@ -62,9 +62,8 @@ class EXPORT JackArgParser
 {
     private:
         std::string fArgString;
-        int fNumArgv;
         int fArgc;
-        char** fArgv;
+        std::vector<std::string> fArgv;
 
     public:
         JackArgParser(const char* arg);
@@ -72,7 +71,9 @@ class EXPORT JackArgParser
          std::string GetArgString();
         int GetNumArgv();
         int GetArgc();
-        const char** GetArgv();
+        int GetArgv ( std::vector<std::string>& argv );
+        int GetArgv ( char** argv );
+        void DeleteArgv ( const char** argv );
         int ParseParams ( jack_driver_desc_t* desc, JSList** param_list );
 };
 

@@ -204,25 +204,23 @@ namespace Jack {
         new_name[i] = '\0';
     }
 
-    JackArgParser::JackArgParser ( const char* arg ) {
+    // class JackArgParser ***************************************************
+    JackArgParser::JackArgParser ( const char* arg )
+    {
         jack_log ( "JackArgParser::JackArgParser, arg_string : '%s'", arg );
 
         fArgc = 0;
-        fNumArgv = 0;
         fArgString = string(arg);
         //if empty string
-        if ( strlen(arg) == 0 ) {
-            fArgv = NULL;
+        if ( strlen(arg) == 0 )
             return;
-        }
         //else parse the arg string
         const size_t arg_len = fArgString.length();
-        int i = 0;
+        unsigned int i = 0;
         size_t pos = 0;
         size_t start = 0;
         size_t copy_start = 0;
         size_t copy_length = 0;
-        vector<string> args;
         //we need a 'space terminated' string
         fArgString += " ";
         //first fill a vector with args
@@ -235,7 +233,7 @@ namespace Jack {
             if ( pos == string::npos )
                 pos = arg_len;
             //if double quote
-            if ( fArgString.at(pos) == '\"' ) {
+            if ( fArgString[pos] == '\"' ) {
                 //first character : copy the substring
                 if ( pos == start ) {
                     copy_start = start + 1;
@@ -251,13 +249,14 @@ namespace Jack {
                 }
             }
             //if space
-            if ( fArgString.at(pos) == ' ' ) {
+            if ( fArgString[pos] == ' ' ) {
                 //short option descriptor
-                if ( ( fArgString.at(start) == '-' ) && ( fArgString.at(start + 1) != '-' ) ) {
+                if ( ( fArgString[start] == '-' ) && ( fArgString[start + 1] != '-' ) ) {
                     copy_start = start;
                     copy_length = 2;
                     start += copy_length;
                 }
+                //else copy all the space delimitated string
                 else {
                     copy_start = start;
                     copy_length = pos - copy_start;
@@ -265,50 +264,125 @@ namespace Jack {
 		}
             }
             //then push the substring to the args vector
-            args.push_back ( fArgString.substr ( copy_start,copy_length ) );
+            fArgv.push_back ( fArgString.substr ( copy_start, copy_length ) );
+            jack_log ( "JackArgParser::JackArgParser, add : '%s'", (*fArgv.end()).c_str() );
         } while ( start < arg_len );
 
-        //and then duplicate args into the argv array
-        fNumArgv = args.size();
-        fArgv = new char* [fNumArgv];
-        for ( i = 0; i < fNumArgv; i++ ) {
-            fArgv[i] = new char[args[i].length()];
-            fill_n ( fArgv[i],args[i].length() + 1, 0 );
-            args[i].copy ( fArgv[i], args[i].length() );
-            jack_log ( "JackArgParser::JackArgParser, adding : '%s'", fArgv[i] );
-        }
-
-        //finally count the 'real' options (the ones starting with a '-')
-        for ( i = 0; i < fNumArgv; i++ )
-            if ( fArgv[i][0] == '-' )
+        //finally count the options
+        for ( i = 0; i < fArgv.size(); i++ )
+            if ( fArgv[i].at(0) == '-' )
                 fArgc++;
     }
 
-    JackArgParser::~JackArgParser() {
-        for ( int i = 0; i < fNumArgv; i++ )
-            delete[] fArgv[i];
-        delete[] fArgv;
+    JackArgParser::~JackArgParser()
+    {
     }
 
-    string JackArgParser::GetArgString() {
+    string JackArgParser::GetArgString()
+    {
         return fArgString;
     }
 
-    int JackArgParser::GetNumArgv() {
-        return fNumArgv;
+    int JackArgParser::GetNumArgv()
+    {
+        return fArgv.size();
     }
 
-    int JackArgParser::GetArgc() {
+    int JackArgParser::GetArgc()
+    {
         return fArgc;
     }
 
-    const char** JackArgParser::GetArgv() {
-        return const_cast<const char**>(fArgv);
+    int JackArgParser::GetArgv ( vector<string>& argv )
+    {
+        argv = fArgv;
+        return 0;
+    }
+
+    int JackArgParser::GetArgv ( char** argv )
+    {
+        //argv must be NULL
+        if ( argv )
+            return -1;
+        //else allocate and fill it
+        argv = new char* [fArgv.size()];
+        for ( unsigned int i = 0; i < fArgv.size(); i++ )
+        {
+            argv[i] = new char[fArgv[i].length()];
+            fill_n ( argv[i], fArgv[i].length() + 1, 0 );
+            fArgv[i].copy ( argv[i], fArgv[i].length() );
+        }
+        return 0;
+    }
+
+    void JackArgParser::DeleteArgv ( const char** argv )
+    {
+        unsigned int i;
+        for ( i = 0; i < fArgv.size(); i++ )
+            delete[] argv[i];
+        delete[] argv;
     }
 
     int JackArgParser::ParseParams ( jack_driver_desc_t* desc, JSList** param_list )
     {
-        //TODO : fill the param_list
+        string options_list;
+        unsigned long i = 0;
+        unsigned int param = 0;
+        size_t param_id = 0;
+        JSList* params = NULL;
+        jack_driver_param_t* intclient_param;
+
+        for ( i = 0; i < desc->nparams; i++ )
+            options_list += desc->params[i].character;
+
+        for ( param = 0; param < fArgv.size(); param++ )
+        {
+            if ( fArgv[param][0] == '-' )
+            {
+                //valid option
+                if ( ( param_id = options_list.find_first_of ( fArgv[param].at(1) ) ) != string::npos )
+                {
+                    //TODO : find if (and where)  it's correctly deleted...
+                    intclient_param = new jack_driver_param_t;
+                    intclient_param->character = desc->params[param_id].character;
+
+                    switch ( desc->params[param_id].type )
+                    {
+                        case JackDriverParamInt:
+                            intclient_param->value.i = atoi ( fArgv[param + 1].c_str() );
+                            break;
+                        case JackDriverParamUInt:
+                            intclient_param->value.ui = strtoul ( fArgv[param + 1].c_str(), NULL, 10 );
+                            break;
+                        case JackDriverParamChar:
+                            intclient_param->value.c = fArgv[param + 1][0];
+                            break;
+                        case JackDriverParamString:
+                            fArgv[param + 1].copy ( intclient_param->value.str, min(static_cast<int>(fArgv[param + 1].length()), JACK_DRIVER_PARAM_STRING_MAX) );
+                            break;
+                        case JackDriverParamBool:
+                            if ( ( fArgv[param + 1].compare ( "false" ) == 0 ) ||
+                                    ( fArgv[param + 1].compare ( "off" ) == 0 ) ||
+                                    ( fArgv[param + 1].compare ( "no" ) == 0 ) ||
+                                    ( fArgv[param + 1].compare ( "0" ) == 0 ) ||
+                                    ( fArgv[param + 1].compare ( "(null)" ) == 0 ) )
+                                intclient_param->value.i = false;
+                            else
+                                intclient_param->value.i = true;
+                            break;
+                    }
+                    //add to the list
+                    params = jack_slist_append ( params, intclient_param );
+                }
+                //invalid option
+                else
+                    jack_error ( "Invalid option '%c'", fArgv[param][1] );
+            }
+        }
+
+        if ( param_list )
+            *param_list = params;
+
         return 0;
     }
 

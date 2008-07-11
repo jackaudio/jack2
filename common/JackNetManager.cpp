@@ -456,7 +456,6 @@ fail:
             switch ( param->character )
             {
             case 'a' :
-                jack_info ( "ip : %s", param->value.str );
                 fMulticastIP = strdup ( param->value.str );
                 break;
             case 'p':
@@ -693,8 +692,8 @@ extern "C"
 
         if ( parser.GetArgc() > 0)
         {
-            if ( jack_parse_internal_client_params ( desc, parser.GetNumArgv(), (char**)parser.GetArgv(), &params) != 0 )
-                jack_error ( "Internal client jack_parse_driver_params error" );
+            if ( parser.ParseParams ( desc, &params) < 0 )
+                jack_error ( "Internal client JackArgParser::ParseParams error." );
         }
 
         return jack_internal_initialize(jack_client, params);
