@@ -373,6 +373,73 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
 int
 jack_parse_internal_client_params(jack_driver_desc_t* desc, int argc, char* argv[], JSList** param_ptr)
 {
+    char* options_list;
+    unsigned long i = 0;
+    unsigned int param = 0;
+    unsigned int param_id = 0;
+    JSList* params = NULL;
+    jack_driver_param_t* intclient_param;
+
+    options_list = (char*) calloc ( desc->nparams + 1, sizeof ( char ) );
+
+    for ( i = 0; i < desc->nparams; i++ )
+        sprintf ( ( options_list + i ), "%c", desc->params[i].character );
+
+    for ( param = 0; param < argc; param++ )
+    {
+        if ( argv[param][0] == '-' )
+        {
+            //valid option
+            if ( strchr ( options_list, argv[param][1] ) != NULL )
+            {
+                //associated parameter
+                for ( param_id = 0; param_id < desc->nparams; param_id++ )
+                    if ( argv[param][1] == options_list[param_id] )
+                        break;
+
+                //allocate parameter
+                intclient_param = (jack_driver_param_t*) calloc ( 1, sizeof ( jack_driver_param_t ) );
+                intclient_param->character = desc->params[param_id].character;
+
+                switch ( desc->params[param_id].type )
+                {
+                    case JackDriverParamInt:
+                        intclient_param->value.i = atoi ( argv[param + 1] );
+                        break;
+                    case JackDriverParamUInt:
+                        intclient_param->value.ui = strtoul ( argv[param + 1], NULL, 10 );
+                        break;
+                    case JackDriverParamChar:
+                        intclient_param->value.c = argv[param + 1][0];
+                        break;
+                    case JackDriverParamString:
+                        strncpy ( intclient_param->value.str, argv[param + 1], JACK_DRIVER_PARAM_STRING_MAX );
+                        break;
+                    case JackDriverParamBool:
+                        if ( ( strcmp ( "false", argv[param + 1] ) == 0 ) ||
+                                ( strcmp ( "off", argv[param + 1] ) == 0 ) || 
+                                ( strcmp ( "no", argv[param + 1] ) == 0 ) || 
+                                ( strcmp ( "0", argv[param + 1] ) == 0 ) || 
+                                ( strcmp ( "(null)", argv[param + 1] ) == 0 ) )
+                            intclient_param->value.i = false;
+                        else
+                            intclient_param->value.i = true;
+                        break;
+                }
+                //add to the list
+                params = jack_slist_append ( params, intclient_param );
+            }
+            //invalid option
+            else
+                fprintf ( stderr, "Invalid option '%c'\n", argv[param][1] );
+        }
+    }
+
+    free ( options_list );
+
+    if ( param_ptr )
+        *param_ptr = params;
+
     return 0;
 }
 

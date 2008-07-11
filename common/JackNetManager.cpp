@@ -456,6 +456,7 @@ fail:
             switch ( param->character )
             {
             case 'a' :
+                jack_info ( "ip : %s", param->value.str );
                 fMulticastIP = strdup ( param->value.str );
                 break;
             case 'p':
@@ -481,8 +482,9 @@ fail:
 
     void* JackNetMasterManager::NetManagerThread ( void* arg )
     {
-        jack_info ( "Starting Jack Network Manager." );
         JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*> ( arg );
+        jack_info ( "Starting Jack Network Manager." );
+        jack_info ( "Listening on '%s:%d'", master_manager->fMulticastIP, master_manager->fSocket.GetPort() );
         master_manager->Run();
         return NULL;
     }
@@ -691,7 +693,7 @@ extern "C"
 
         if ( parser.GetArgc() > 0)
         {
-            if ( jack_parse_internal_client_params ( desc, parser.GetArgc(), (char**)parser.GetArgv(), &params) != 0 )
+            if ( jack_parse_internal_client_params ( desc, parser.GetNumArgv(), (char**)parser.GetArgv(), &params) != 0 )
                 jack_error ( "Internal client jack_parse_driver_params error" );
         }
 

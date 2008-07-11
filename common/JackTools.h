@@ -35,6 +35,8 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include "jslist.h"
+#include "driver_interface.h"
 
 #include "JackExports.h"
 
@@ -63,6 +65,7 @@ class EXPORT JackArgParser
         int fNumArgv;
         int fArgc;
         char** fArgv;
+
     public:
         JackArgParser(const char* arg);
         ~JackArgParser();
@@ -70,6 +73,7 @@ class EXPORT JackArgParser
         int GetNumArgv();
         int GetArgc();
         const char** GetArgv();
+        int ParseParams ( jack_driver_desc_t* desc, JSList** param_list );
 };
 
 }

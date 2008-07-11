@@ -204,79 +204,88 @@ namespace Jack {
         new_name[i] = '\0';
     }
 
-    JackArgParser::JackArgParser(const char* arg) {
-        jack_log ( "JackArgParser::JackArgParser, arg : '%s'", arg );
+    JackArgParser::JackArgParser ( const char* arg ) {
+        jack_log ( "JackArgParser::JackArgParser, arg_string : '%s'", arg );
 
-        fArgc=0;
-        fNumArgv=0;
-        fArgString=string(arg);
+        fArgc = 0;
+        fNumArgv = 0;
+        fArgString = string(arg);
         //if empty string
-        if (strlen(arg)==0) {
+        if ( strlen(arg) == 0 ) {
             fArgv = NULL;
             return;
         }
         //else parse the arg string
-        const size_t arg_len=fArgString.length();
-        int i=0;
-        size_t pos=0;
-        size_t start=0;
-        size_t copy_start=0;
-        size_t copy_length=0;
+        const size_t arg_len = fArgString.length();
+        int i = 0;
+        size_t pos = 0;
+        size_t start = 0;
+        size_t copy_start = 0;
+        size_t copy_length = 0;
         vector<string> args;
         //we need a 'space terminated' string
-        fArgString+=" ";
+        fArgString += " ";
         //first fill a vector with args
         do {
             //find the first non-space character from the actual position
-            start=fArgString.find_first_not_of(' ',start);
+            start = fArgString.find_first_not_of ( ' ', start );
             //get the next quote or space position
-            pos=fArgString.find_first_of(" \"",start);
+            pos = fArgString.find_first_of ( " \"" , start );
             //no more quotes or spaces, consider the end of the string
-            if (pos==string::npos)
-                pos=arg_len;
+            if ( pos == string::npos )
+                pos = arg_len;
             //if double quote
-            if (fArgString.at(pos)=='\"') {
+            if ( fArgString.at(pos) == '\"' ) {
                 //first character : copy the substring
-                if (pos==start) {
-                    copy_start=start+1;
-                    pos=fArgString.find('\"',++pos);
-                    copy_length=pos-copy_start;
-                    start=pos+1;
+                if ( pos == start ) {
+                    copy_start = start + 1;
+                    pos = fArgString.find ( '\"', ++pos );
+                    copy_length = pos - copy_start;
+                    start = pos + 1;
                 }
                 //else there is someting before the quote, first copy that
                 else {
-                    copy_start=start;
-                    copy_length=pos-copy_start;
-                    start=pos;
+                    copy_start = start;
+                    copy_length = pos - copy_start;
+                    start = pos;
                 }
             }
             //if space
-            if (fArgString.at(pos)==' ') {
-                copy_start=start;
-                copy_length=pos-copy_start;
-                start=pos+1;
+            if ( fArgString.at(pos) == ' ' ) {
+                //short option descriptor
+                if ( ( fArgString.at(start) == '-' ) && ( fArgString.at(start + 1) != '-' ) ) {
+                    copy_start = start;
+                    copy_length = 2;
+                    start += copy_length;
+                }
+                else {
+                    copy_start = start;
+                    copy_length = pos - copy_start;
+                    start = pos + 1;
+		}
             }
             //then push the substring to the args vector
-            args.push_back(fArgString.substr(copy_start,copy_length));
-        } while(start<arg_len);
+            args.push_back ( fArgString.substr ( copy_start,copy_length ) );
+        } while ( start < arg_len );
 
         //and then duplicate args into the argv array
-        fNumArgv=args.size();
-        fArgv=new char* [fNumArgv];
-        for (i=0; i<fNumArgv; i++) {
-            fArgv[i]=new char[args[i].length()];
-            fill_n(fArgv[i],args[i].length()+1,0);
-            args[i].copy(fArgv[i],args[i].length());
+        fNumArgv = args.size();
+        fArgv = new char* [fNumArgv];
+        for ( i = 0; i < fNumArgv; i++ ) {
+            fArgv[i] = new char[args[i].length()];
+            fill_n ( fArgv[i],args[i].length() + 1, 0 );
+            args[i].copy ( fArgv[i], args[i].length() );
+            jack_log ( "JackArgParser::JackArgParser, adding : '%s'", fArgv[i] );
         }
 
         //finally count the 'real' options (the ones starting with a '-')
-        for (i=0; i<fNumArgv; i++)
-            if (fArgv[i][0]=='-')
+        for ( i = 0; i < fNumArgv; i++ )
+            if ( fArgv[i][0] == '-' )
                 fArgc++;
     }
 
     JackArgParser::~JackArgParser() {
-        for (int i=0; i<fNumArgv; i++)
+        for ( int i = 0; i < fNumArgv; i++ )
             delete[] fArgv[i];
         delete[] fArgv;
     }
@@ -296,5 +305,12 @@ namespace Jack {
     const char** JackArgParser::GetArgv() {
         return const_cast<const char**>(fArgv);
     }
+
+    int JackArgParser::ParseParams ( jack_driver_desc_t* desc, JSList** param_list )
+    {
+        //TODO : fill the param_list
+        return 0;
+    }
+
 }
 
