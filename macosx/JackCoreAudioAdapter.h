@@ -86,11 +86,11 @@ namespace Jack
                         int outchannels,
                         int in_nChannels,
                         int out_nChannels,
-                        jack_nframes_t nframes,
+                        jack_nframes_t buffer_size,
                         jack_nframes_t samplerate,
                         bool strict);
 
-            int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
+            int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
             int SetupBuffers(int inchannels, int outchannels);
             void DisposeBuffers();
             void CloseAUHAL();

@@ -533,7 +533,7 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
     return 0;
 }
 
-int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate)
+int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate)
 {
     OSStatus err = noErr;
     UInt32 outSize;
@@ -541,9 +541,9 @@ int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, ja
 
     // Setting buffer size
     outSize = sizeof(UInt32);
-    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &nframes);
+    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
     if (err != noErr) {
-        jack_error("Cannot set buffer size %ld", nframes);
+        jack_error("Cannot set buffer size %ld", buffer_size);
         printError(err);
         return -1;
     }
@@ -595,7 +595,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                                    int outchannels,
                                    int in_nChannels,
                                    int out_nChannels,
-                                   jack_nframes_t nframes,
+                                   jack_nframes_t buffer_size,
                                    jack_nframes_t samplerate,
                                    bool strict)
 {
@@ -658,7 +658,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
 
     // Set buffer size
     if (capturing && inchannels > 0) {
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*) & nframes, sizeof(UInt32));
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*) & buffer_size, sizeof(UInt32));
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
@@ -668,7 +668,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     }
 
     if (playing && outchannels > 0) {
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, (UInt32*) & nframes, sizeof(UInt32));
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, (UInt32*) & buffer_size, sizeof(UInt32));
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
@@ -871,7 +871,7 @@ void JackCoreAudioDriver::RemoveListeners()
     AudioDeviceRemovePropertyListener(fDeviceID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback);
 }
 
-int JackCoreAudioDriver::Open(jack_nframes_t nframes,
+int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
                               jack_nframes_t samplerate,
                               bool capturing,
                               bool playing,
@@ -905,16 +905,16 @@ int JackCoreAudioDriver::Open(jack_nframes_t nframes,
         return -1;
 
     // Generic JackAudioDriver Open
-    if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
+    if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
         return -1;
 
     if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, true) < 0)
         return -1;
 
-    if (SetupBufferSizeAndSampleRate(nframes, samplerate)  < 0)
+    if (SetupBufferSizeAndSampleRate(buffer_size, samplerate)  < 0)
         return -1;
 
-    if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, nframes, samplerate, true) < 0)
+    if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, buffer_size, samplerate, true) < 0)
         goto error;
 
     if (capturing && inchannels > 0)

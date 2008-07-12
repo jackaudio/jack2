@@ -50,7 +50,7 @@ int JackThreadedDriver::Open()
     return fDriver->Open();
 }
 
-int JackThreadedDriver::Open(jack_nframes_t nframes,
+int JackThreadedDriver::Open(jack_nframes_t buffer_size,
                  jack_nframes_t samplerate,
                  bool capturing,
                  bool playing,
@@ -62,7 +62,7 @@ int JackThreadedDriver::Open(jack_nframes_t nframes,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency)
 {
-    return fDriver->Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+    return fDriver->Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
 int JackThreadedDriver::Close()

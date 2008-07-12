@@ -124,6 +124,7 @@ class JackClientChannelInterface
         {}
         
 };
+
 }
 
 } // end of namespace

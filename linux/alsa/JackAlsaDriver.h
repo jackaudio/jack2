@@ -121,7 +121,7 @@ class JackAlsaDriver : public JackAudioDriver
         virtual ~JackAlsaDriver()
         {}
 
-        int Open(jack_nframes_t nframes,
+        int Open(jack_nframes_t buffer_size,
                  jack_nframes_t user_nperiods,
                  jack_nframes_t samplerate,
                  bool hw_monitoring,
@@ -156,7 +156,7 @@ class JackAlsaDriver : public JackAudioDriver
             return false;
         }
 
-        int SetBufferSize(jack_nframes_t nframes);
+        int SetBufferSize(jack_nframes_t buffer_size);
 
         // jack api emulation for the midi driver
         int is_realtime() const;

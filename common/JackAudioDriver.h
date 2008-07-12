@@ -63,10 +63,10 @@ class EXPORT JackAudioDriver : public JackDriver
         JackAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         virtual ~JackAudioDriver();
 
-        virtual int Open(jack_nframes_t nframes,
+        virtual int Open(jack_nframes_t buffer_size,
                         jack_nframes_t samplerate,
-                        int capturing,
-                        int playing,
+                        bool capturing,
+                        bool playing,
                         int inchannels,
                         int outchannels,
                         bool monitor,

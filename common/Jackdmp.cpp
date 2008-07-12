@@ -262,7 +262,7 @@ int main(int argc, char* argv[])
                 break;
 
             case 'L':
-                param = jackctl_get_parameter(server_parameters, "loopback ports");
+                param = jackctl_get_parameter(server_parameters, "loopback-ports");
                 if (param != NULL) {
                     value.ui = atoi(optarg);
                     jackctl_parameter_set_value(param, &value);

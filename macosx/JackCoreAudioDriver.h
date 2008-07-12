@@ -129,7 +129,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         int SetupBuffers(int inchannels, int outchannels);
         void DisposeBuffers();
 
-        int SetupBufferSizeAndSampleRate(jack_nframes_t nframes, jack_nframes_t samplerate);
+        int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
 
         int OpenAUHAL(bool capturing,
                       bool playing,
@@ -150,8 +150,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         virtual ~JackCoreAudioDriver();
 
-        int Open(jack_nframes_t frames_per_cycle,
-                 jack_nframes_t rate,
+        int Open(jack_nframes_t buffer_size,
+                 jack_nframes_t samplerate,
                  bool capturing,
                  bool playing,
                  int chan_in,

@@ -72,7 +72,7 @@ namespace Jack
         return 0;
     }
 
-    int JackPortAudioDriver::Open(jack_nframes_t nframes,
+    int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
                                   jack_nframes_t samplerate,
                                   bool capturing,
                                   bool playing,
@@ -91,10 +91,10 @@ namespace Jack
         int out_max = 0;
 
         jack_log("JackPortAudioDriver::Open nframes = %ld in = %ld out = %ld capture name = %s playback name = %s samplerate = %ld",
-                 nframes, inchannels, outchannels, capture_driver_uid, playback_driver_uid, samplerate);
+                 buffer_size, inchannels, outchannels, capture_driver_uid, playback_driver_uid, samplerate);
 
         // Generic JackAudioDriver Open
-        if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0)
+        if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0)
         {
             return -1;
         }

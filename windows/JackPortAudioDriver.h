@@ -62,8 +62,8 @@ class JackPortAudioDriver : public JackAudioDriver
             delete fPaDevices;
         }
 
-        int Open(jack_nframes_t frames_per_cycle,
-                 jack_nframes_t rate,
+        int Open(jack_nframes_t buffe_size,
+                 jack_nframes_t samplerate,
                  bool capturing,
                  bool playing,
                  int chan_in,

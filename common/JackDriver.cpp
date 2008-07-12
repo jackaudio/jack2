@@ -86,7 +86,7 @@ int JackDriver::Open()
     return 0;
 }
 
-int JackDriver::Open(jack_nframes_t nframes,
+int JackDriver::Open(jack_nframes_t buffer_size,
                      jack_nframes_t samplerate,
                      bool capturing,
                      bool playing,
@@ -109,7 +109,7 @@ int JackDriver::Open(jack_nframes_t nframes,
 
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
-    fEngineControl->fBufferSize = nframes;
+    fEngineControl->fBufferSize = buffer_size;
     fEngineControl->fSampleRate = samplerate;
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
@@ -124,7 +124,7 @@ int JackDriver::Open(jack_nframes_t nframes,
     if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
 
-    fGraphManager->SetBufferSize(nframes);
+    fGraphManager->SetBufferSize(buffer_size);
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
     return 0;

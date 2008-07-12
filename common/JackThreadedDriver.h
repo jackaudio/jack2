@@ -45,7 +45,7 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         virtual ~JackThreadedDriver();
 
         virtual int Open();
-        virtual int Open(jack_nframes_t nframes,
+        virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
                          bool capturing,
                          bool playing,

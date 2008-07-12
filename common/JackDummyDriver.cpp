@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-int JackDummyDriver::Open(jack_nframes_t nframes,
+int JackDummyDriver::Open(jack_nframes_t buffer_size,
                           jack_nframes_t samplerate,
                           bool capturing,
                           bool playing,
@@ -46,7 +46,7 @@ int JackDummyDriver::Open(jack_nframes_t nframes,
                           jack_nframes_t capture_latency,
                           jack_nframes_t playback_latency)
 {
-    int res = JackAudioDriver::Open(nframes,
+    int res = JackAudioDriver::Open(buffer_size,
                                     samplerate,
                                     capturing,
                                     playing,

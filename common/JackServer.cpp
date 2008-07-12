@@ -107,7 +107,6 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         return -1;
     }
 
-    // Before engine open
     if (fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
         jack_error("Cannot open driver");
         return -1;

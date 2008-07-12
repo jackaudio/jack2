@@ -50,7 +50,7 @@ class EXPORT JackDriverInterface
         {}
         
         virtual int Open() = 0;
-        virtual int Open(jack_nframes_t nframes,
+        virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
                          bool capturing,
                          bool playing,
@@ -142,7 +142,7 @@ class EXPORT JackDriver : public JackDriverClientInterface
         int ProcessSlaves();
       
         virtual int Open();
-        virtual int Open(jack_nframes_t nframes,
+        virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
                          bool capturing,
                          bool playing,
