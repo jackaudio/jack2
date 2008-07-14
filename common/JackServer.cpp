@@ -49,6 +49,15 @@ JackServer* JackServer::fInstance = NULL;
 
 JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
 {
+    if (rt)
+    {
+        jack_info("JACK server starting in realtime mode with priority %ld", priority);
+    }
+    else
+    {
+        jack_info("JACK server starting in non-realtime mode");
+    }
+
     fGraphManager = new JackGraphManager();
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
