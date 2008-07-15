@@ -49,12 +49,9 @@ JackServer* JackServer::fInstance = NULL;
 
 JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
 {
-    if (rt)
-    {
+    if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
-    }
-    else
-    {
+    } else {
         jack_info("JACK server starting in non-realtime mode");
     }
 
