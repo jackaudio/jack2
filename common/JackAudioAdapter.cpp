@@ -178,6 +178,7 @@ namespace Jack
 
 fail:
         FreePorts();
+        return -1;
     }
 
     int JackAudioAdapter::Close()
