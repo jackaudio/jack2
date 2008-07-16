@@ -40,23 +40,22 @@
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug">
-				<Option output="Debug\bin\jackmp\netioadapter" prefix_auto="1" extension_auto="1" />
+				<Option output="Debug\bin\jackmp\audioadapter" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-DBUILD_DLL" />
+					<Add option="-D__SMP__" />
 					<Add directory="..\common" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\windows" />
 				</Compiler>
 				<Linker>
-					<Add library="user32" />
 					<Add library="kernel32" />
+					<Add library="user32" />
 					<Add library="gdi32" />
 					<Add library="winspool" />
 					<Add library="comdlg32" />
@@ -68,19 +67,21 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 					<Add library="portaudio_x86" />
-					<Add library="libsamplerate" />
-					<Add library="libjackservermp" />
 					<Add library="libsamplerate-0" />
-					<Add directory="Release\bin" />
+					<Add library="libjackservermp" />
+					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
 		<Unit filename="..\common\JackAudioAdapter.cpp" />
 		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />
-		<Unit filename="..\common\JackCallbackAudioAdapter.cpp" />
 		<Unit filename="..\common\JackLibSampleRateResampler.cpp" />
 		<Unit filename="..\common\JackResampler.cpp" />
 		<Unit filename="JackPortAudioAdapter.cpp" />
+		<Unit filename="JackPortAudioDevices.cpp" />
 		<Unit filename="jackaudioadapter.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>

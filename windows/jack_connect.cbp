@@ -32,7 +32,7 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 					<Add library="libjackmp" />
-					<Add directory="Release\bin" />
+					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug">
@@ -43,7 +43,8 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add directory="..\windows" />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
 					<Add directory="..\example-clients" />
 				</Compiler>
 				<Linker>

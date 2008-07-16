@@ -34,10 +34,10 @@ int JackPortAudioAdapter::Render(const void* inputBuffer, void* outputBuffer,
     float** paBuffer;
     float* buffer;
     bool failure = false;
-    
-    jack_nframes_t time1, time2; 
+
+    jack_nframes_t time1, time2;
     adapter->ResampleFactor(time1, time2);
-    
+
     paBuffer = (float**)inputBuffer;
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         buffer = (float*)paBuffer[i];
@@ -45,7 +45,7 @@ int JackPortAudioAdapter::Render(const void* inputBuffer, void* outputBuffer,
         if (adapter->fCaptureRingBuffer[i]->WriteResample(buffer, framesPerBuffer) < framesPerBuffer)
             failure = true;
     }
-    
+
     paBuffer = (float**)outputBuffer;
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         buffer = (float*)paBuffer[i];
@@ -53,9 +53,9 @@ int JackPortAudioAdapter::Render(const void* inputBuffer, void* outputBuffer,
         if (adapter->fPlaybackRingBuffer[i]->ReadResample(buffer, framesPerBuffer) < framesPerBuffer)
             failure = true;
     }
-    
-#ifdef DEBUG    
-    adapter->fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1), 
+
+#ifdef DEBUG
+    adapter->fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
 
@@ -70,93 +70,111 @@ int JackPortAudioAdapter::Render(const void* inputBuffer, void* outputBuffer,
 JackPortAudioAdapter::JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(buffer_size, sample_rate)
 {
+	jack_log ( "JackPortAudioAdapter::JackPortAudioAdapter buffer_size = %d, sample_rate = %d", buffer_size, sample_rate );
+
     const JSList* node;
     const jack_driver_param_t* param;
-    
-    fCaptureChannels = 2;
-    fPlaybackChannels = 2;
-    
+	int in_max = 0;
+	int out_max = 0;
+
+    fCaptureChannels = 0;
+    fPlaybackChannels = 0;
+
+	fInputDevice = Pa_GetDefaultInputDevice();
+	fOutputDevice = Pa_GetDefaultOutputDevice();
+
     for (node = params; node; node = jack_slist_next(node)) {
         param = (const jack_driver_param_t*) node->data;
-        
+
         switch (param->character) {
-        
-            case 'c' :
-                break;
-                
+
             case 'i':
                 fCaptureChannels = param->value.ui;
                 break;
-                
+
             case 'o':
                 fPlaybackChannels = param->value.ui;
                 break;
-                
+
             case 'C':
+				if ( fPaDevices.GetInputDeviceFromName(param->value.str, fInputDevice, in_max) < 0 ) {
+					jack_error ( "Can't use %s, taking default input device", param->value.str );
+					fInputDevice = Pa_GetDefaultInputDevice();
+				}
                 break;
-                
+
             case 'P':
+				if ( fPaDevices.GetOutputDeviceFromName(param->value.str, fOutputDevice, out_max) < 0 ) {
+					jack_error ( "Can't use %s, taking default output device", param->value.str );
+					fOutputDevice = Pa_GetDefaultOutputDevice();
+				}
+
                 break;
-                
-            case 'D':
-                break;
-                
+
             case 'r':
                 SetSampleRate(param->value.ui);
                 break;
-                
+
             case 'd':
+				if ( fPaDevices.GetInputDeviceFromName(param->value.str, fInputDevice, in_max) < 0 ) {
+					jack_error ( "Can't use %s, taking default input device", param->value.str );
+				}
+				if ( fPaDevices.GetOutputDeviceFromName(param->value.str, fOutputDevice, out_max) < 0 ) {
+					jack_error ( "Can't use %s, taking default output device", param->value.str );
+				}
                 break;
-                
+
             case 'l':
+				fPaDevices.DisplayDevicesNames();
                 break;
         }
     }
+
+	//max channels
+	if ( in_max == 0 )
+		in_max = fPaDevices.GetDeviceInfo(fInputDevice)->maxInputChannels;
+	if ( out_max == 0 )
+		out_max = fPaDevices.GetDeviceInfo(fOutputDevice)->maxOutputChannels;
+
+	//effective channels
+	if ( ( fCaptureChannels == 0 ) || ( fCaptureChannels > in_max ) )
+		fCaptureChannels = in_max;
+	if ( ( fPlaybackChannels == 0 ) || ( fPlaybackChannels > out_max ) )
+		fPlaybackChannels = out_max;
 }
-        
+
 int JackPortAudioAdapter::Open()
 {
     PaError err;
     PaStreamParameters inputParameters;
     PaStreamParameters outputParameters;
-    PaDeviceIndex inputDevice;
-    PaDeviceIndex outputDevice;
-    
+
     if (JackAudioAdapterInterface::Open() < 0)
         return -1;
-    
-    err = Pa_Initialize();
-    if (err != paNoError) {
-        jack_error("JackPortAudioAdapter::Pa_Initialize error = %s\n", Pa_GetErrorText(err));
-        goto error;
-    }
-    
-    jack_log("JackPortAudioAdapter::Pa_GetDefaultInputDevice %ld", Pa_GetDefaultInputDevice());
-    jack_log("JackPortAudioAdapter::Pa_GetDefaultOutputDevice %ld", Pa_GetDefaultOutputDevice());
-    jack_log("JackPortAudioAdapter::Open fBufferSize = %ld fSampleRate %f", fBufferSize, fSampleRate);
 
-    inputDevice = Pa_GetDefaultInputDevice();
-    outputDevice = Pa_GetDefaultOutputDevice();
-    
-    inputParameters.device = inputDevice;
+	jack_log("JackPortAudioAdapter::Open fInputDevice = %d DeviceName %s", fInputDevice, fPaDevices.GetFullName(fInputDevice).c_str());
+	jack_log("JackPortAudioAdapter::Open fOutputDevice = %d DeviceName %s", fOutputDevice, fPaDevices.GetFullName(fOutputDevice).c_str());
+    jack_log("JackPortAudioAdapter::Open fBufferSize = %u fSampleRate %u", fBufferSize, fSampleRate);
+
+    inputParameters.device = fInputDevice;
     inputParameters.channelCount = fCaptureChannels;
     inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-    inputParameters.suggestedLatency = (inputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-                                       ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
+    inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
+                                       ? fPaDevices.GetDeviceInfo(fInputDevice)->defaultLowInputLatency
                                        : 0;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
-    outputParameters.device = outputDevice;
+    outputParameters.device = fOutputDevice;
     outputParameters.channelCount = fPlaybackChannels;
     outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-    outputParameters.suggestedLatency = (outputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
-                                        ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
+    outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
+                                        ? fPaDevices.GetDeviceInfo(fOutputDevice)->defaultLowOutputLatency
                                         : 0;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
     err = Pa_OpenStream(&fStream,
-                        (inputDevice == paNoDevice) ? 0 : &inputParameters,
-                        (outputDevice == paNoDevice) ? 0 : &outputParameters,
+                        (fInputDevice == paNoDevice) ? 0 : &inputParameters,
+                        (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
                         fSampleRate,
                         fBufferSize,
                         paNoFlag,  // Clipping is on...
@@ -164,20 +182,17 @@ int JackPortAudioAdapter::Open()
                         this);
     if (err != paNoError) {
         jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
-        goto error;
+        return -1;
     }
-    
+
     err = Pa_StartStream(fStream);
     if (err != paNoError) {
          jack_error("Pa_StartStream error = %s", Pa_GetErrorText(err));
-         goto error;
+         return -1;
     }
     jack_log("JackPortAudioAdapter::Open OK");
     return 0;
-     
-error:
-    Pa_Terminate();
-    return -1;
+
 }
 
 int JackPortAudioAdapter::Close()
@@ -190,8 +205,6 @@ int JackPortAudioAdapter::Close()
     jack_log("JackPortAudioAdapter:: Pa_StopStream");
     Pa_CloseStream(fStream);
     jack_log("JackPortAudioAdapter:: Pa_CloseStream");
-    Pa_Terminate();
-    jack_log("JackPortAudioAdapter:: Pa_Terminate");
     return JackAudioAdapterInterface::Close();
 }
 
@@ -216,18 +229,10 @@ extern "C"
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
 
         strcpy(desc->name, "portaudio-adapter");
-        desc->nparams = 9;
+        desc->nparams = 7;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
-        strcpy(desc->params[i].name, "channels");
-        desc->params[i].character = 'c';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Maximum number of channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
         strcpy(desc->params[i].name, "inchannels");
         desc->params[i].character = 'i';
         desc->params[i].type = JackDriverParamInt;
@@ -247,7 +252,7 @@ extern "C"
         strcpy(desc->params[i].name, "capture");
         desc->params[i].character = 'C';
         desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default PortAudio input device");
+        strcpy(desc->params[i].value.str, "default input device");
         strcpy(desc->params[i].short_desc, "Provide capture ports. Optionally set PortAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
@@ -255,18 +260,10 @@ extern "C"
         strcpy(desc->params[i].name, "playback");
         desc->params[i].character = 'P';
         desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default PortAudio output device");
+        strcpy(desc->params[i].value.str, "default output device");
         strcpy(desc->params[i].short_desc, "Provide playback ports. Optionally set PortAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
-        i++;
-        strcpy(desc->params[i].name, "duplex");
-        desc->params[i].character = 'D';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
-        strcpy(desc->params[i].short_desc, "Provide both capture and playback ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
         i++;
         strcpy(desc->params[i].name, "rate");
         desc->params[i].character = 'r';
@@ -274,13 +271,13 @@ extern "C"
         desc->params[i].value.ui = 44100U;
         strcpy(desc->params[i].short_desc, "Sample rate");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "device");
         desc->params[i].character = 'd';
         desc->params[i].type = JackDriverParamString;
         desc->params[i].value.ui = 128U;
-        strcpy(desc->params[i].value.str, "will take default PortAudio device name");
+        strcpy(desc->params[i].value.str, "default device");
         strcpy(desc->params[i].short_desc, "PortAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
@@ -294,7 +291,7 @@ extern "C"
 
         return desc;
     }
-   
+
 #ifdef __cplusplus
 }
 #endif

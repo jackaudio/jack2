@@ -57,18 +57,14 @@ namespace Jack
     int JackPortAudioDriver::Read()
     {
         for (int i = 0; i < fCaptureChannels; i++)
-        {
             memcpy(GetInputBuffer(i), fInputBuffer[i], sizeof(float) * fEngineControl->fBufferSize);
-        }
         return 0;
     }
 
     int JackPortAudioDriver::Write()
     {
         for (int i = 0; i < fPlaybackChannels; i++)
-        {
             memcpy(fOutputBuffer[i], GetOutputBuffer(i), sizeof(float) * fEngineControl->fBufferSize);
-        }
         return 0;
     }
 
@@ -95,9 +91,7 @@ namespace Jack
 
         // Generic JackAudioDriver Open
         if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0)
-        {
             return -1;
-        }
 
         //get devices
         if (capturing)
@@ -123,24 +117,24 @@ namespace Jack
             outchannels = out_max;
         }
 
-        //doesn't have enough in/out channels...exit
+        //too many channels required, take max available
         if (inchannels > in_max)
         {
-            jack_error("This device hasn't required input channels inchannels = %ld in_max = %ld", inchannels, in_max);
-            goto error;
+            jack_error("This device has only %d available input channels.", in_max);
+            inchannels = in_max;
         }
         if (outchannels > out_max)
         {
-            jack_error("This device hasn't required output channels outchannels = %ld out_max = %ld", outchannels, out_max);
-            goto error;
+            jack_error("This device has only %d available output channels.", out_max);
+            outchannels = out_max;
         }
 
-        //in/output streams parametering
+        //in/out streams parametering
         inputParameters.device = fInputDevice;
         inputParameters.channelCount = inchannels;
         inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
         inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-                                           ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
+										   ? fPaDevices->GetDeviceInfo(fInputDevice)->defaultLowInputLatency
                                            : 0;
         inputParameters.hostApiSpecificStreamInfo = NULL;
 
@@ -148,7 +142,7 @@ namespace Jack
         outputParameters.channelCount = outchannels;
         outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
         outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
-                                            ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
+                                            ? fPaDevices->GetDeviceInfo(fOutputDevice)->defaultLowOutputLatency
                                             : 0;
         outputParameters.hostApiSpecificStreamInfo = NULL;
 
@@ -156,7 +150,7 @@ namespace Jack
                             (fInputDevice == paNoDevice) ? 0 : &inputParameters,
                             (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
                             samplerate,
-                            nframes,
+                            buffer_size,
                             paNoFlag,  // Clipping is on...
                             Render,
                             this);

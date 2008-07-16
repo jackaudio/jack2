@@ -20,11 +20,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __PortAudioDevices__
 #define __PortAudioDevices__
 
-#include <iostream>
-#include <cstring>
 #include <cstdio>
 #include <string>
-#include <cstdlib>
 
 #include "portaudio.h"
 #include "pa_asio.h"

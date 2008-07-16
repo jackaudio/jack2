@@ -26,6 +26,7 @@ PortAudioDevices::PortAudioDevices()
 {
     PaError err;
 	PaDeviceIndex id;
+	printf("Initializing PortAudio...\n");
     if ( ( err = Pa_Initialize() ) == paNoError )
     {
         fNumHostApi = Pa_GetHostApiCount();
@@ -201,10 +202,11 @@ int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIn
 void PortAudioDevices::DisplayDevicesNames()
 {
     int def_display;
+    PaDeviceIndex id;
     PaStreamParameters inputParameters, outputParameters;
     printf ( "********************** Devices list, %d detected **********************\n", fNumDevice );
 
-    for ( PaDeviceIndex id = 0; id < fNumDevice; id++ )
+    for ( id = 0; id < fNumDevice; id++ )
     {
         printf ( "-------- device #%d ------------------------------------------------\n", id );
 

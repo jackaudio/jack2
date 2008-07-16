@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackPortAudioAdapter__
 
 #include "JackAudioAdapter.h"
-#include "portaudio.h"
+#include "JackPortAudioDevices.h"
 #include "jslist.h"
 
 namespace Jack
@@ -29,30 +29,31 @@ namespace Jack
 
    	class JackPortAudioAdapter : public JackAudioAdapterInterface
 	{
-    
+
 		private:
-        
+
+			PortAudioDevices fPaDevices;
             PaStream* fStream;
             PaDeviceIndex fInputDevice;
             PaDeviceIndex fOutputDevice;
-            
+
             static int Render(const void* inputBuffer, void* outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
                             PaStreamCallbackFlags statusFlags,
                             void* userData);
-       
+
 		public:
-        
+
 			JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
          	~JackPortAudioAdapter()
             {}
-            
+
             int Open();
             int Close();
-            
+
            int SetBufferSize(jack_nframes_t buffer_size);
-            
+
    	};
 }
 

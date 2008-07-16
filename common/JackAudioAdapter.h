@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackAudioAdapter__
 
 #include "jack.h"
+#include "ringbuffer.h"
 #include "JackAudioAdapterInterface.h"
 
 namespace Jack
@@ -28,29 +29,34 @@ namespace Jack
 
     class JackAudioAdapter
     {
+    private:
+        int fCaptureChannels;
+        int fPlaybackChannels;
 
-        protected:
+        JackResampler** fCaptureRingBuffer;
+        JackResampler** fPlaybackRingBuffer;
 
-            int fCaptureChannels;
-            int fPlaybackChannels;
+        jack_port_t** fCapturePortList;
+        jack_port_t** fPlaybackPortList;
 
-            jack_port_t** fCapturePortList;
-            jack_port_t** fPlaybackPortList;
+        jack_client_t* fJackClient;
+        JackAudioAdapterInterface* fAudioAdapter;
 
-            jack_client_t* fJackClient;
-            JackAudioAdapterInterface* fAudioAdapter;
+        static int Process(jack_nframes_t, void* arg);
+        static int BufferSize(jack_nframes_t buffer_size, void *arg);
+        static int SampleRate(jack_nframes_t sample_rate, void *arg);
 
-            void FreePorts();
+        void FreePorts();
+        void Reset();
 
-        public:
+    public:
+        JackAudioAdapter(jack_client_t* jack_client, JackAudioAdapterInterface* audio_io) :
+				fJackClient(jack_client), fAudioAdapter(audio_io)
+		{}
+        ~JackAudioAdapter();
 
-            JackAudioAdapter(jack_client_t* jack_client, 
-                            JackAudioAdapterInterface* audio_io);
-            virtual ~JackAudioAdapter();
-         
-            int Open();
-            int Close();
-
+        int Open();
+        int Close();
     };
 }
 

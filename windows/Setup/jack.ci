@@ -69,6 +69,7 @@
 <_><src>..\Release\bin\libsamplerate-0.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jackmp\jack_net.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackmp\jack_dummy.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jackmp\jack_portaudio.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jackmp\netmanager.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jackmp\audioadapter.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
