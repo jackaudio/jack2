@@ -112,8 +112,6 @@
 		4B19B3140E2362E800DD4A82 /* JackAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3070E2362E700DD4A82 /* JackAudioAdapter.h */; };
 		4B19B3150E2362E800DD4A82 /* JackAudioAdapterInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3080E2362E700DD4A82 /* JackAudioAdapterInterface.cpp */; };
 		4B19B3160E2362E800DD4A82 /* JackAudioAdapterInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */; };
-		4B19B3170E2362E800DD4A82 /* JackCallbackAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B30A0E2362E700DD4A82 /* JackCallbackAudioAdapter.cpp */; };
-		4B19B3180E2362E800DD4A82 /* JackCallbackAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30B0E2362E700DD4A82 /* JackCallbackAudioAdapter.h */; };
 		4B19B3190E2362E800DD4A82 /* JackException.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30C0E2362E700DD4A82 /* JackException.h */; };
 		4B19B31A0E2362E800DD4A82 /* JackExports.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30D0E2362E700DD4A82 /* JackExports.h */; };
 		4B19B31B0E2362E800DD4A82 /* JackLibSampleRateResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */; };
@@ -1181,8 +1179,6 @@
 		4B19B3070E2362E700DD4A82 /* JackAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapter.h; path = ../common/JackAudioAdapter.h; sourceTree = SOURCE_ROOT; };
 		4B19B3080E2362E700DD4A82 /* JackAudioAdapterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterInterface.cpp; path = ../common/JackAudioAdapterInterface.cpp; sourceTree = SOURCE_ROOT; };
 		4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapterInterface.h; path = ../common/JackAudioAdapterInterface.h; sourceTree = SOURCE_ROOT; };
-		4B19B30A0E2362E700DD4A82 /* JackCallbackAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCallbackAudioAdapter.cpp; path = ../common/JackCallbackAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
-		4B19B30B0E2362E700DD4A82 /* JackCallbackAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCallbackAudioAdapter.h; path = ../common/JackCallbackAudioAdapter.h; sourceTree = SOURCE_ROOT; };
 		4B19B30C0E2362E700DD4A82 /* JackException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackException.h; path = ../common/JackException.h; sourceTree = SOURCE_ROOT; };
 		4B19B30D0E2362E700DD4A82 /* JackExports.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackExports.h; path = ../common/JackExports.h; sourceTree = SOURCE_ROOT; };
 		4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackLibSampleRateResampler.cpp; path = ../common/JackLibSampleRateResampler.cpp; sourceTree = SOURCE_ROOT; };
@@ -1239,7 +1235,7 @@
 		4B3F49070AD8503300491C6E /* jack_cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jack_cpu.c; path = ../tests/jack_cpu.c; sourceTree = SOURCE_ROOT; };
 		4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacEngineRPC.cpp; sourceTree = SOURCE_ROOT; };
 		4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServerLaunch.cpp; path = ../common/JackServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
-		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
+		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackRestartThreadedDriver.h; path = ../common/JackRestartThreadedDriver.h; sourceTree = SOURCE_ROOT; };
 		4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackRestartThreadedDriver.cpp; path = ../common/JackRestartThreadedDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B4F9C8A0DC20C0400706CB0 /* JackMessageBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackMessageBuffer.cpp; path = ../common/JackMessageBuffer.cpp; sourceTree = SOURCE_ROOT; };
@@ -1349,7 +1345,7 @@
 		4BD6240C0CBCF16600DE782F /* inprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = inprocess.c; path = "../example-clients/inprocess.c"; sourceTree = SOURCE_ROOT; };
 		4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTools.cpp; path = ../common/JackTools.cpp; sourceTree = SOURCE_ROOT; };
 		4BE4CC000CDA153400CCF5BB /* JackTools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTools.h; path = ../common/JackTools.h; sourceTree = SOURCE_ROOT; };
-		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
+		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
 		4BE6C6A30A3E096F005A203A /* jack_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jack_test.cpp; path = ../tests/jack_test.cpp; sourceTree = SOURCE_ROOT; };
 		4BE99D300AD7A04800C59091 /* jack_cpu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_cpu; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2289,8 +2285,6 @@
 				4B19B3070E2362E700DD4A82 /* JackAudioAdapter.h */,
 				4B19B3080E2362E700DD4A82 /* JackAudioAdapterInterface.cpp */,
 				4B19B3090E2362E700DD4A82 /* JackAudioAdapterInterface.h */,
-				4B19B30A0E2362E700DD4A82 /* JackCallbackAudioAdapter.cpp */,
-				4B19B30B0E2362E700DD4A82 /* JackCallbackAudioAdapter.h */,
 				4B19B30C0E2362E700DD4A82 /* JackException.h */,
 				4B19B30D0E2362E700DD4A82 /* JackExports.h */,
 				4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */,
@@ -2674,7 +2668,6 @@
 				4B19B3050E2362BB00DD4A82 /* JackCoreAudioAdapter.h in Headers */,
 				4B19B3140E2362E800DD4A82 /* JackAudioAdapter.h in Headers */,
 				4B19B3160E2362E800DD4A82 /* JackAudioAdapterInterface.h in Headers */,
-				4B19B3180E2362E800DD4A82 /* JackCallbackAudioAdapter.h in Headers */,
 				4B19B3190E2362E800DD4A82 /* JackException.h in Headers */,
 				4B19B31A0E2362E800DD4A82 /* JackExports.h in Headers */,
 				4B19B31C0E2362E800DD4A82 /* JackLibSampleRateResampler.h in Headers */,
@@ -5303,7 +5296,6 @@
 				4B19B3040E2362BB00DD4A82 /* JackCoreAudioAdapter.cpp in Sources */,
 				4B19B3130E2362E800DD4A82 /* JackAudioAdapter.cpp in Sources */,
 				4B19B3150E2362E800DD4A82 /* JackAudioAdapterInterface.cpp in Sources */,
-				4B19B3170E2362E800DD4A82 /* JackCallbackAudioAdapter.cpp in Sources */,
 				4B19B31B0E2362E800DD4A82 /* JackLibSampleRateResampler.cpp in Sources */,
 				4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */,
 			);
