@@ -6,8 +6,8 @@
 		<Project filename="jackdmp.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
-		<Project filename="jack_dummy.cbp" active="1" />
-		<Project filename="jack_audioadapter.cbp">
+		<Project filename="jack_dummy.cbp" />
+		<Project filename="jack_audioadapter.cbp" active="1">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_portaudio.cbp">

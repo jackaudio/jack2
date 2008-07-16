@@ -31,7 +31,7 @@ using namespace std;
 
 namespace Jack
 {
-
+//static methods ***********************************************************
     int JackAudioAdapter::Process(jack_nframes_t frames, void* arg)
     {
         JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
@@ -85,16 +85,7 @@ namespace Jack
         return 0;
     }
 
-    void JackAudioAdapter::Reset()
-    {
-        int i;
-        for (i = 0; i < fCaptureChannels; i++)
-            fCaptureRingBuffer[i]->Reset();
-        for (i = 0; i < fPlaybackChannels; i++)
-            fPlaybackRingBuffer[i]->Reset();
-        fAudioAdapter->Reset();
-    }
-
+//JackAudioAdapter *********************************************************
     JackAudioAdapter::~JackAudioAdapter()
     {
         // When called, Close has already been used for the client, thus ports are already unregistered.
@@ -121,6 +112,16 @@ namespace Jack
 
         delete[] fCapturePortList;
         delete[] fPlaybackPortList;
+    }
+
+    void JackAudioAdapter::Reset()
+    {
+        int i;
+        for (i = 0; i < fCaptureChannels; i++)
+            fCaptureRingBuffer[i]->Reset();
+        for (i = 0; i < fPlaybackChannels; i++)
+            fPlaybackRingBuffer[i]->Reset();
+        fAudioAdapter->Reset();
     }
 
     int JackAudioAdapter::Open()

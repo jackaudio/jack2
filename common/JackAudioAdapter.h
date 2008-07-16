@@ -30,6 +30,10 @@ namespace Jack
     class JackAudioAdapter
     {
     private:
+        static int Process(jack_nframes_t, void* arg);
+        static int BufferSize(jack_nframes_t buffer_size, void *arg);
+        static int SampleRate(jack_nframes_t sample_rate, void *arg);
+
         int fCaptureChannels;
         int fPlaybackChannels;
 
@@ -41,10 +45,6 @@ namespace Jack
 
         jack_client_t* fJackClient;
         JackAudioAdapterInterface* fAudioAdapter;
-
-        static int Process(jack_nframes_t, void* arg);
-        static int BufferSize(jack_nframes_t buffer_size, void *arg);
-        static int SampleRate(jack_nframes_t sample_rate, void *arg);
 
         void FreePorts();
         void Reset();

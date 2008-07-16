@@ -210,10 +210,10 @@ namespace Jack {
         jack_log ( "JackArgParser::JackArgParser, arg_string : '%s'", arg );
 
         fArgc = 0;
-        fArgString = string(arg);
         //if empty string
         if ( strlen(arg) == 0 )
             return;
+        fArgString = string(arg);
         //else parse the arg string
         const size_t arg_len = fArgString.length();
         unsigned int i = 0;
@@ -261,11 +261,11 @@ namespace Jack {
                     copy_start = start;
                     copy_length = pos - copy_start;
                     start = pos + 1;
-		}
+				}
             }
             //then push the substring to the args vector
             fArgv.push_back ( fArgString.substr ( copy_start, copy_length ) );
-            jack_log ( "JackArgParser::JackArgParser, add : '%s'", (*fArgv.end()).c_str() );
+            jack_log ( "JackArgParser::JackArgParser, add : '%s'", (*fArgv.rbegin()).c_str() );
         } while ( start < arg_len );
 
         //finally count the options
