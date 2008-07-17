@@ -305,10 +305,10 @@ namespace Jack {
         if ( argv )
             return -1;
         //else allocate and fill it
-        argv = new char* [fArgv.size()];
+        argv = (char**)calloc (fArgv.size(), sizeof(char*));
         for ( unsigned int i = 0; i < fArgv.size(); i++ )
         {
-            argv[i] = new char[fArgv[i].length()];
+            argv[i] = (char*)calloc(fArgv[i].length(), sizeof(char));
             fill_n ( argv[i], fArgv[i].length() + 1, 0 );
             fArgv[i].copy ( argv[i], fArgv[i].length() );
         }
@@ -319,8 +319,8 @@ namespace Jack {
     {
         unsigned int i;
         for ( i = 0; i < fArgv.size(); i++ )
-            delete[] argv[i];
-        delete[] argv;
+            free((void*)argv[i]);
+        free((void*)argv);
     }
 
     int JackArgParser::ParseParams ( jack_driver_desc_t* desc, JSList** param_list )
