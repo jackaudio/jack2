@@ -62,7 +62,7 @@ namespace Jack
                 break;
                 
             case 'r':
-                SetIntSampleRate(param->value.ui);
+                SetAudioSampleRate(param->value.ui);
                 break;
         }
     }

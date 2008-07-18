@@ -124,7 +124,7 @@ namespace Jack
                 return 0;
             }
             
-             virtual int SetIntSampleRate(jack_nframes_t sample_rate)
+             virtual int SetAudioSampleRate(jack_nframes_t sample_rate)
             {
                 fSampleRate = sample_rate;
                 // Consummer (Audio) keeps the same SR
