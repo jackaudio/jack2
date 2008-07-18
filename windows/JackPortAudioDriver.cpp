@@ -188,7 +188,6 @@ error:
         JackAudioDriver::Close();
         jack_log("JackPortAudioDriver::Close");
         Pa_CloseStream(fStream);
-        delete fPaDevices;
         return 0;
     }
 
