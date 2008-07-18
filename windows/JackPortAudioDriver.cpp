@@ -80,7 +80,7 @@ namespace Jack
                                   jack_nframes_t capture_latency,
                                   jack_nframes_t playback_latency)
     {
-        PaError err;
+        PaError err = paNoError;
         PaStreamParameters inputParameters;
         PaStreamParameters outputParameters;
         int in_max = 0;

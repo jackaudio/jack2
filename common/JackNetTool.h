@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackTools.h"
 #include "JackPlatformNetSocket.h"
+#include "types.h"
 
 #include <string>
 #include <algorithm>
@@ -40,21 +41,21 @@ namespace Jack
 
     struct _session_params
     {
-        char fPacketType[7];			//packet type ('param')
-        char fProtocolVersion;			//version
+        char fPacketType[7];		//packet type ('param')
+        char fProtocolVersion;		//version
         uint32_t fPacketID;			//indicates the packet type
-        char fMasterNetName[256];		//master hostname (network)
-        char fSlaveNetName[256];		//slave hostname (network)
+        char fMasterNetName[256];	//master hostname (network)
+        char fSlaveNetName[256];	//slave hostname (network)
         uint32_t fMtu;				//connection mtu
         uint32_t fID;				//slave's ID
-        uint32_t fSendAudioChannels;		//number of master->slave channels
-        uint32_t fReturnAudioChannels;		//number of slave->master channels
+        uint32_t fSendAudioChannels;	//number of master->slave channels
+        uint32_t fReturnAudioChannels;	//number of slave->master channels
         uint32_t fSendMidiChannels;		//number of master->slave midi channels
-        uint32_t fReturnMidiChannels;		//number of slave->master midi channels
+        uint32_t fReturnMidiChannels;	//number of slave->master midi channels
         uint32_t fSampleRate;			//session sample rate
         uint32_t fPeriodSize;			//period size
         uint32_t fFramesPerPacket;		//complete frames per packet
-        uint32_t fBitdepth;			//samples bitdepth (unused)
+        uint32_t fBitdepth;             //samples bitdepth (unused)
         char fName[JACK_CLIENT_NAME_SIZE];	//slave's name
     };
 

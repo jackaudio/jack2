@@ -127,7 +127,7 @@ namespace Jack
              virtual int SetAudioSampleRate(jack_nframes_t sample_rate)
             {
                 fSampleRate = sample_rate;
-                // Consummer (Audio) keeps the same SR
+                // Consumer keeps the same SR
                 fProducerDLL.Init(fBufferSize, fSampleRate);
                 return 0;
             }

@@ -25,6 +25,7 @@ Romain Moret
 
 	* Correct audioadapter when a sample rate value different from jack server one is chosen.
 	* Cleanup in JackTransportEngine, move some code that was in JackClient class.
+	* Remove transport_type.h file, move transport types in types.h file.
 
 2008-07-12 Stephane Letz  <letz@grame.fr>
 
