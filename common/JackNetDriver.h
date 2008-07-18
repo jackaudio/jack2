@@ -34,6 +34,7 @@ namespace Jack
         char* fMulticastIP;
         JackNetSocket fSocket;
         uint fNSubProcess;
+        uint fTransportSync;
 
         jack_port_id_t* fMidiCapturePortList;
         jack_port_id_t* fMidiPlaybackPortList;
@@ -70,7 +71,7 @@ namespace Jack
 
     public:
         JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-                        const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* master_name );
+                        const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* master_name, uint transport_sync );
         ~JackNetDriver();
 
         int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,

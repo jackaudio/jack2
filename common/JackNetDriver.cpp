@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
     JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-                                   const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name )
+                                   const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name, uint transport_sync )
             : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
     {
         fMulticastIP = new char[strlen ( ip ) + 1];
@@ -43,6 +43,7 @@ namespace Jack
         fParams.fReturnMidiChannels = midi_output_ports;
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
+        fTransportSync = transport_sync;
     }
 
     JackNetDriver::~JackNetDriver()
@@ -99,6 +100,10 @@ namespace Jack
         SetPacketType ( &fParams, SLAVE_AVAILABLE );
         fParams.fSendAudioChannels = fCaptureChannels;
         fParams.fReturnAudioChannels = fPlaybackChannels;
+
+        //is transport sync ?
+        if ( fTransportSync )
+            jack_info ( "NetDriver started with Master's Transport Sync." );
 
         //init loop : get a master and start, do it until connection is ok
         net_status_t status;
@@ -566,7 +571,7 @@ namespace Jack
         {
             jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
             strcpy ( desc->name, "net" );
-            desc->nparams = 8;
+            desc->nparams = 9;
             desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
             int i = 0;
@@ -633,6 +638,14 @@ namespace Jack
             strcpy ( desc->params[i].short_desc, "Name of the jack client" );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
+            i++;
+            strcpy ( desc->params[i].name, "transport_sync" );
+            desc->params[i].character  = 't';
+            desc->params[i].type = JackDriverParamUInt;
+            desc->params[i].value.ui = 1U;
+            strcpy ( desc->params[i].short_desc, "Sync transport with master's" );
+            strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+
             return desc;
         }
 
@@ -648,6 +661,7 @@ namespace Jack
             GetHostName ( name, JACK_CLIENT_NAME_SIZE );
             int udp_port = DEFAULT_PORT;
             int mtu = 1500;
+            uint transport_sync = 1;
             jack_nframes_t period_size = 128;
             jack_nframes_t sample_rate = 48000;
             int audio_capture_ports = 2;
@@ -686,12 +700,14 @@ namespace Jack
                     break;
                 case 'n' :
                     strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
+                case 't' :
+                    transport_sync = param->value.ui;
                 }
             }
 
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
-                                          midi_input_ports, midi_output_ports, name ) );
+                                          midi_input_ports, midi_output_ports, name, transport_sync ) );
             if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
                                 monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
                 return driver;

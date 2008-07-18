@@ -191,7 +191,7 @@ namespace Jack
         jack_nframes_t port_latency = jack_get_buffer_size ( fJackClient );
         unsigned long port_flags;
         //audio
-        port_flags = JackPortIsInput | JackPortIsTerminal;
+        port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fSendAudioChannels; i++ )
         {
             sprintf ( name, "to_slave_%d", i+1 );
@@ -199,7 +199,7 @@ namespace Jack
                 goto fail;
 			jack_port_set_latency ( fAudioCapturePorts[i], port_latency );
         }
-        port_flags = JackPortIsOutput | JackPortIsTerminal;
+        port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
         {
             sprintf ( name, "from_slave_%d", i+1 );
@@ -208,7 +208,7 @@ namespace Jack
 			jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency );
         }
         //midi
-        port_flags = JackPortIsInput | JackPortIsTerminal;
+        port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fSendMidiChannels; i++ )
         {
             sprintf ( name, "midi_to_slave_%d", i+1 );
@@ -216,7 +216,7 @@ namespace Jack
                 goto fail;
 			jack_port_set_latency ( fMidiCapturePorts[i], port_latency );
         }
-        port_flags = JackPortIsOutput | JackPortIsTerminal;
+        port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
         {
             sprintf ( name, "midi_from_slave_%d", i+1 );
