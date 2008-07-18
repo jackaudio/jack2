@@ -33,7 +33,7 @@
    <dlgsavepath> 1</>
    <dlgautoprog> 1</>
    <dlgfinish> 1</>
-   <comptype> ppmdmax</>
+   <comptype> deffast</>
    <solid> 1</>
    <srcfolder> </>
    <ifexist> over</>

@@ -21,7 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackExports.h"
 #include "driver_interface.h"
-//#include "JackInternalClient.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -189,31 +188,41 @@ namespace Jack
         //port registering
         uint i;
         char name[24];
+        jack_nframes_t port_latency = jack_get_buffer_size ( fJackClient );
+        unsigned long port_flags;
         //audio
+        port_flags = JackPortIsInput | JackPortIsTerminal;
         for ( i = 0; i < fParams.fSendAudioChannels; i++ )
         {
             sprintf ( name, "to_slave_%d", i+1 );
-            if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0 ) ) == NULL )
+            if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
+			jack_port_set_latency ( fAudioCapturePorts[i], port_latency );
         }
+        port_flags = JackPortIsOutput | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
         {
             sprintf ( name, "from_slave_%d", i+1 );
-            if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 ) ) == NULL )
+            if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
+			jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency );
         }
         //midi
+        port_flags = JackPortIsInput | JackPortIsTerminal;
         for ( i = 0; i < fParams.fSendMidiChannels; i++ )
         {
             sprintf ( name, "midi_to_slave_%d", i+1 );
-            if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0 ) ) == NULL )
+            if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
+			jack_port_set_latency ( fMidiCapturePorts[i], port_latency );
         }
+        port_flags = JackPortIsOutput | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
         {
             sprintf ( name, "midi_from_slave_%d", i+1 );
-            if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0 ) ) == NULL )
+            if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
+			jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency );
         }
 
         fRunning = true;
@@ -463,6 +472,12 @@ fail:
             }
         }
 
+		jack_set_sync_callback ( fManagerClient, SetSyncCallback, this );
+
+        //activate the client
+        if ( jack_activate ( fManagerClient ) != 0 )
+			jack_error ( "Can't activate the network manager client, transport disables." );
+
         //launch the manager thread
         if ( jack_client_create_thread ( fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this ) )
             jack_error ( "Can't create the network manager control thread." );
@@ -479,6 +494,13 @@ fail:
         SocketAPIEnd();
     }
 
+    int JackNetMasterManager::SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg )
+    {
+    	JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*>(arg);
+    	master_manager->SyncCallback ( state, pos );
+		return 1;
+    }
+
     void* JackNetMasterManager::NetManagerThread ( void* arg )
     {
         JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*> ( arg );
@@ -487,6 +509,12 @@ fail:
         master_manager->Run();
         return NULL;
     }
+
+	int JackNetMasterManager::SyncCallback ( jack_transport_state_t state, jack_position_t* pos )
+	{
+		jack_log ( "JackNetMasterManager::SyncCallback" );
+		return 0;
+	}
 
     void JackNetMasterManager::Run()
     {

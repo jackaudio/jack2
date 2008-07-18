@@ -17,7 +17,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "types.h"
 #include "JackConstants.h"
 #include "JackMidiPort.h"
 #include "JackExports.h"
@@ -119,7 +118,7 @@ namespace Jack
         char* fBuffer;
         char* fNetBuffer;
         JackMidiBuffer** fPortBuffer;
-         
+
     public:
         NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
         ~NetMidiBuffer();
@@ -134,7 +133,7 @@ namespace Jack
         //network<->buffer
         int RenderFromNetwork ( int subcycle, size_t copy_size );
         int RenderToNetwork ( int subcycle, size_t total_size );
-        
+
          void SetBuffer(int index, JackMidiBuffer* buffer);
     };
 
@@ -157,7 +156,7 @@ namespace Jack
         //jack<->buffer
         void RenderFromJackPorts ( int subcycle );
         void RenderToJackPorts ( int subcycle );
-        
+
         void SetBuffer(int index, sample_t* buffer);
     };
 

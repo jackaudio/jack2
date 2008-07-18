@@ -17,8 +17,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JACKNETMASTER_H__
-#define __JACKNETMASTER_H__
+#ifndef __JACKNETMANAGER_H__
+#define __JACKNETMANAGER_H__
 
 #include "JackNetTool.h"
 #include "thread.h"
@@ -86,8 +86,8 @@ namespace Jack
     {
         friend class JackNetMaster;
     private:
+		static int SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg );
         static void* NetManagerThread ( void* arg );
-        static int SetProcess ( jack_nframes_t nframes, void* arg );
 
         jack_client_t* fManagerClient;
         const char* fManagerName;
@@ -103,7 +103,8 @@ namespace Jack
         master_list_it_t FindMaster ( uint32_t client_id );
         void KillMaster ( session_params_t* params );
         void SetSlaveName ( session_params_t& params );
-        int Process();
+
+        int SyncCallback ( jack_transport_state_t state, jack_position_t* pos );
     public:
         JackNetMasterManager ( jack_client_t* jack_client, const JSList* params );
         ~JackNetMasterManager();

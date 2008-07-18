@@ -26,7 +26,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackThreadedDriver.h"
 #include "JackWaitThreadedDriver.h"
 #include "JackException.h"
-#include "JackExports.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -314,9 +313,9 @@ namespace Jack
             }
             port = fGraphManager->GetPort ( port_id );
             port->SetAlias ( alias );
-            port->SetLatency ( fEngineControl->fBufferSize + fCaptureLatency );
+            port->SetLatency ( fEngineControl->fBufferSize );
             fCapturePortList[audio_port_index] = port_id;
-            jack_log ( "JackNetDriver::AllocPorts() fCapturePortList[%d] audio_port_index = %ld", audio_port_index, port_id );
+            jack_log ( "JackNetDriver::AllocPorts() fCapturePortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
         }
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
@@ -331,9 +330,9 @@ namespace Jack
             }
             port = fGraphManager->GetPort ( port_id );
             port->SetAlias ( alias );
-            port->SetLatency ( fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) + fPlaybackLatency );
+            port->SetLatency ( fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
             fPlaybackPortList[audio_port_index] = port_id;
-            jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld", audio_port_index, port_id );
+            jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
         }
         //midi
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
@@ -347,8 +346,10 @@ namespace Jack
                 jack_error ( "driver: cannot register port for %s", name );
                 return -1;
             }
+            port = fGraphManager->GetPort ( port_id );
+            port->SetLatency ( fEngineControl->fBufferSize );
             fMidiCapturePortList[midi_port_index] = port_id;
-            jack_log ( "JackNetDriver::AllocPorts() fMidiCapturePortList[%d] midi_port_index = %ld", midi_port_index, port_id );
+            jack_log ( "JackNetDriver::AllocPorts() fMidiCapturePortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
         }
 
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -362,8 +363,10 @@ namespace Jack
                 jack_error ( "driver: cannot register port for %s", name );
                 return -1;
             }
+            port = fGraphManager->GetPort ( port_id );
+            port->SetLatency ( fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
             fMidiPlaybackPortList[midi_port_index] = port_id;
-            jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld", midi_port_index, port_id );
+            jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
         }
 
         return 0;
