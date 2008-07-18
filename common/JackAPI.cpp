@@ -1427,7 +1427,8 @@ EXPORT int jack_transport_locate(jack_client_t* ext_client, jack_nframes_t frame
         jack_error("jack_transport_locate called with a NULL client");
         return -1;
     } else {
-        return client->TransportLocate(frame);
+        client->TransportLocate(frame);
+        return 0;
     }
 }
 
@@ -1469,7 +1470,8 @@ EXPORT int jack_transport_reposition(jack_client_t* ext_client, jack_position_t*
         jack_error("jack_transport_reposition called with a NULL client");
         return -1;
     } else {
-        return client->TransportReposition(pos);
+        client->TransportReposition(pos);
+        return 0;
     }
 }
 

@@ -637,38 +637,31 @@ int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timeba
 }
 
 // Must be RT safe
-int JackClient::RequestNewPos(jack_position_t* pos)
-{
-    JackTransportEngine& transport = GetEngineControl()->fTransport;
-    jack_position_t* request = transport.WriteNextStateStart(2);
-    pos->unique_1 = pos->unique_2 = transport.GenerateUniqueID();
-    JackTransportEngine::TransportCopyPosition(pos, request);
-    jack_log("RequestNewPos pos = %ld", pos->frame);
-    transport.WriteNextStateStop(2);
-    return 0;
-}
 
-int JackClient::TransportLocate(jack_nframes_t frame)
+void JackClient::TransportLocate(jack_nframes_t frame)
 {
     jack_position_t pos;
     pos.frame = frame;
     pos.valid = (jack_position_bits_t)0;
     jack_log("TransportLocate pos = %ld", pos.frame);
-    return RequestNewPos(&pos);
+    GetEngineControl()->fTransport.RequestNewPos(&pos);
 }
 
 int JackClient::TransportReposition(jack_position_t* pos)
 {
     jack_position_t tmp = *pos;
     jack_log("TransportReposition pos = %ld", pos->frame);
-    return (tmp.valid & ~JACK_POSITION_MASK) ? EINVAL : RequestNewPos(&tmp);
+    if (tmp.valid & ~JACK_POSITION_MASK) {
+        return EINVAL;
+    } else {
+        GetEngineControl()->fTransport.RequestNewPos(pos);
+        return 0;
+    }
 }
 
 jack_transport_state_t JackClient::TransportQuery(jack_position_t* pos)
 {
-    if (pos)
-        GetEngineControl()->fTransport.ReadCurrentPos(pos);
-    return GetEngineControl()->fTransport.GetState();
+    return GetEngineControl()->fTransport.Query(pos);
 }
 
 jack_nframes_t JackClient::GetCurrentTransportFrame()

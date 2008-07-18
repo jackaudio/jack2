@@ -245,6 +245,22 @@ void JackTransportEngine::ReadCurrentPos(jack_position_t* pos)
     } while (cur_index != next_index); // Until a coherent state has been read
 }
 
+void JackTransportEngine::RequestNewPos(jack_position_t* pos)
+{
+    jack_position_t* request = WriteNextStateStart(2);
+    pos->unique_1 = pos->unique_2 = GenerateUniqueID();
+    TransportCopyPosition(pos, request);
+    jack_log("RequestNewPos pos = %ld", pos->frame);
+    WriteNextStateStop(2);
+}
+
+jack_transport_state_t JackTransportEngine::Query(jack_position_t* pos)
+{
+    if (pos)
+        ReadCurrentPos(pos);
+    return GetState();
+}
+
 // RT, client
 void JackTransportEngine::TransportCopyPosition(jack_position_t* from, jack_position_t* to)
 {

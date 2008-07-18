@@ -101,7 +101,7 @@ class JackDebugClient : public JackClient
         int SetSyncCallback(JackSyncCallback sync_callback, void* arg);
         int SetSyncTimeout(jack_time_t timeout);
         int SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg);
-        int TransportLocate(jack_nframes_t frame);
+        void TransportLocate(jack_nframes_t frame);
         jack_transport_state_t TransportQuery(jack_position_t* pos);
         jack_nframes_t GetCurrentTransportFrame();
         int TransportReposition(jack_position_t* pos);

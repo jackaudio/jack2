@@ -374,10 +374,10 @@ int JackDebugClient::SetTimebaseCallback(int conditional, JackTimebaseCallback t
     return fClient->SetTimebaseCallback( conditional, timebase_callback, arg);
 }
 
-int JackDebugClient::TransportLocate(jack_nframes_t frame)
+void JackDebugClient::TransportLocate(jack_nframes_t frame)
 {
     CheckClient();
-    return fClient->TransportLocate(frame);
+    fClient->TransportLocate(frame);
 }
 
 jack_transport_state_t JackDebugClient::TransportQuery(jack_position_t* pos)

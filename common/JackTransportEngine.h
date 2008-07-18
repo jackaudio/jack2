@@ -166,6 +166,10 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         {
             return (jack_unique_t)INC_ATOMIC(&fWriteCounter);
         }
+        
+        void RequestNewPos(jack_position_t* pos);
+        
+        jack_transport_state_t Query(jack_position_t* pos);
 
         static void TransportCopyPosition(jack_position_t* from, jack_position_t* to);
 

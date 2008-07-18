@@ -97,8 +97,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 
         void CallSyncCallback();
         void CallTimebaseCallback();
-        int RequestNewPos(jack_position_t* pos);
-
+   
         virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value);
 
         // Fons Adriaensen thread model
@@ -149,7 +148,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int SetSyncCallback(JackSyncCallback sync_callback, void* arg);
         virtual int SetSyncTimeout(jack_time_t timeout);
         virtual int SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg);
-        virtual int TransportLocate(jack_nframes_t frame);
+        virtual void TransportLocate(jack_nframes_t frame);
         virtual jack_transport_state_t TransportQuery(jack_position_t* pos);
         virtual jack_nframes_t GetCurrentTransportFrame();
         virtual int TransportReposition(jack_position_t* pos);

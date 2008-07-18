@@ -24,6 +24,7 @@ Romain Moret
 2008-07-18 Stephane Letz  <letz@grame.fr>
 
 	* Correct audioadapter when a sample rate value different from jack server one is chosen.
+	* Cleanup in JackTransportEngine, move some code that was in JackClient class.
 
 2008-07-12 Stephane Letz  <letz@grame.fr>
 
