@@ -111,7 +111,7 @@ JackPortAudioAdapter::JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nfra
                 break;
 
             case 'r':
-                SetSampleRate(param->value.ui);
+                SetIntSampleRate(param->value.ui);
                 break;
 
             case 'd':

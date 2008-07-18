@@ -81,7 +81,8 @@ void JackAudioAdapterInterface::ResampleFactor(jack_nframes_t& frame1, jack_nfra
         jack_nframes_t time2 = fProducerDLL.Time2Frames(time);
         frame1 = time1;
         frame2 = time2;
-        jack_log("JackAudioAdapterInterface::ResampleFactor src_ratio_input = %f src_ratio_output = %f", double(time1) / double(time2), double(time2) / double(time1));
+        jack_log("JackAudioAdapterInterface::ResampleFactor time1 = %ld time2 = %ld src_ratio_input = %f src_ratio_output = %f", 
+            long(time1), long(time2), double(time1) / double(time2), double(time2) / double(time1));
     }
 }
 

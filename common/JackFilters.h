@@ -116,14 +116,14 @@ namespace Jack
             
             jack_nframes_t Time2Frames(jack_time_t time)
             {
-                jack_nframes_t res = fFrames + (long) rint(((double) (long(time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * fBufferSize);
-                return (res < 0) ? 1 : res;
+                long delta = (long) rint(((double) (long(time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * fBufferSize);
+                return (delta < 0) ? ((fFrames > 0) ? fFrames : 1) : (fFrames + delta);
             }
             
             jack_time_t Frames2Time(jack_nframes_t frames)
             {
-                jack_time_t res = fCurrentWakeup + (long) rint(((double) (long(frames - fFrames)) * ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) / fBufferSize);
-                return (res < 0) ? 1 : res;
+                long delta = (long) rint(((double) (long(frames - fFrames)) * ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) / fBufferSize);
+                return (delta < 0) ? ((fCurrentWakeup > 0) ? fCurrentWakeup : 1) : (fCurrentWakeup + delta);
             }
             
             jack_nframes_t CurFrame()
@@ -203,11 +203,6 @@ namespace Jack
             }
     };
 
-    inline float Range(float min, float max, float val)
-    {
-        return (val < min) ? min : ((val > max) ? max : val);
-    }
- 
 }
 
 #endif

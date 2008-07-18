@@ -26,6 +26,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+    inline float Range(float min, float max, float val)
+    {
+        return (val < min) ? min : ((val > max) ? max : val);
+    }
+
  	class JackLibSampleRateResampler : public JackResampler
 	{
     
@@ -45,7 +50,7 @@ namespace Jack
             void SetRatio(unsigned int num, unsigned int denom)
             {
                 JackResampler::SetRatio(num, denom);
-                fRatio = double(num) / double(denom);
+                fRatio = Range(0.25f, 4.0f, (double(num) / double(denom)));
             }
             
             void Reset();

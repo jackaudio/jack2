@@ -188,7 +188,7 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                 break;
                 
             case 'r':
-                SetSampleRate(param->value.ui);
+                SetIntSampleRate(param->value.ui);
                 break;
                 
             case 'l':

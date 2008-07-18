@@ -67,7 +67,7 @@ unsigned int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned in
              
             res = src_process(fResampler, &src_data);
             if (res != 0) {
-                jack_error("JackLibSampleRateResampler::ReadResample err = %s", src_strerror(res));
+                jack_error("JackLibSampleRateResampler::ReadResample ratio = %f err = %s", fRatio, src_strerror(res));
                 return 0;
             }
                 
@@ -117,7 +117,7 @@ unsigned int JackLibSampleRateResampler::WriteResample(float* buffer, unsigned i
          
             res = src_process(fResampler, &src_data);
             if (res != 0) {
-                jack_error("JackLibSampleRateResampler::ReadResample err = %s", src_strerror(res));
+                jack_error("JackLibSampleRateResampler::ReadResample ratio = %f err = %s", fRatio, src_strerror(res));
                 return 0;
             }
                 
