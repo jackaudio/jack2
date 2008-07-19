@@ -20,8 +20,6 @@
 #ifndef __JackConstants__
 #define __JackConstants__
 
-#include "types.h"
-
 namespace Jack
 {
 

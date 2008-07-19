@@ -21,9 +21,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackTransportEngine__
 #define __JackTransportEngine__
 
-#include "JackClientInterface.h"
-#include "JackConstants.h"
 #include "JackAtomicArrayState.h"
+#include "JackExports.h"
+#include "types.h"
 
 namespace Jack
 {
@@ -87,6 +87,8 @@ We have:
         
 */
 
+class JackClientInterface;
+
 class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
 {
 
@@ -102,10 +104,9 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         SInt32 fWriteCounter;
 
         bool CheckAllRolling(JackClientInterface** table);
-        
         void MakeAllStartingLocating(JackClientInterface** table);
         void MakeAllStopping(JackClientInterface** table);
-         void MakeAllLocating(JackClientInterface** table);
+        void MakeAllLocating(JackClientInterface** table);
         
         void SyncTimeout(jack_nframes_t frame_rate, jack_nframes_t buffer_size);
 
@@ -170,7 +171,7 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         
         jack_transport_state_t Query(jack_position_t* pos);
 
-        static void TransportCopyPosition(jack_position_t* from, jack_position_t* to);
+        static void CopyPosition(jack_position_t* from, jack_position_t* to);
 
 };
 

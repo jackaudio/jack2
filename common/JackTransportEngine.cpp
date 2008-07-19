@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #endif
 
 #include "JackTransportEngine.h"
+#include "JackClientInterface.h"
 #include "JackClientControl.h"
 #include "JackError.h"
 #include "JackTime.h"
@@ -228,7 +229,7 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
     if (fPendingPos) {
         jack_log("New pos = %ld", request->frame);
         jack_position_t* pending = WriteNextStateStart(1);
-        TransportCopyPosition(request, pending);
+        CopyPosition(request, pending);
         WriteNextStateStop(1);
     }
 }
@@ -249,7 +250,7 @@ void JackTransportEngine::RequestNewPos(jack_position_t* pos)
 {
     jack_position_t* request = WriteNextStateStart(2);
     pos->unique_1 = pos->unique_2 = GenerateUniqueID();
-    TransportCopyPosition(pos, request);
+    CopyPosition(pos, request);
     jack_log("RequestNewPos pos = %ld", pos->frame);
     WriteNextStateStop(2);
 }
@@ -262,7 +263,7 @@ jack_transport_state_t JackTransportEngine::Query(jack_position_t* pos)
 }
 
 // RT, client
-void JackTransportEngine::TransportCopyPosition(jack_position_t* from, jack_position_t* to)
+void JackTransportEngine::CopyPosition(jack_position_t* from, jack_position_t* to)
 {
     int tries = 0;
     long timeout = 1000;
