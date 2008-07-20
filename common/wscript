@@ -213,11 +213,6 @@ def build(bld):
          adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "-lasound -lsamplerate")
-
-    if bld.env()['IS_SUN']:
-         adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp']
-         process = create_jack_process_obj(bld, 'audioadapter', adapter_sources, serverlib)
-         process.env.append_value("LINKFLAGS", "-lsamplerate")
  
     #adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', adapter_sources, serverlib)
