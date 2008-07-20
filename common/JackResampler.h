@@ -26,45 +26,49 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    #define DEFAULT_RB_SIZE 16384 * 2	
+#define DEFAULT_RB_SIZE 16384 * 2	
 
-	class JackResampler
-	{
+/*!
+\brief Base class for Resampler.
+*/
+
+class JackResampler
+{
+
+    protected:
     
-		protected:
-        
-            jack_ringbuffer_t* fRingBuffer;
-            unsigned int fNum;
-            unsigned int fDenom;
-               
-		public:
-        
-			JackResampler();
-        	virtual ~JackResampler();
-            
-            virtual void Reset();
-            
-            virtual unsigned int ReadResample(float* buffer, unsigned int frames);
-            virtual unsigned int WriteResample(float* buffer, unsigned int frames);
-            
-            virtual unsigned int Read(float* buffer, unsigned int frames);
-            virtual unsigned int Write(float* buffer, unsigned int frames);
-            
-            virtual unsigned int ReadSpace();
-            virtual unsigned int WriteSpace();
+        jack_ringbuffer_t* fRingBuffer;
+        unsigned int fNum;
+        unsigned int fDenom;
+           
+    public:
     
-            virtual void SetRatio(unsigned int num, unsigned int denom)
-            {
-                fNum = num;
-                fDenom = denom;
-            }
-            virtual void GetRatio(unsigned int& num, unsigned int& denom)
-            {
-                num = fNum;
-                denom = fDenom;
-            }
-     
-        };
+        JackResampler();
+        virtual ~JackResampler();
+        
+        virtual void Reset();
+        
+        virtual unsigned int ReadResample(float* buffer, unsigned int frames);
+        virtual unsigned int WriteResample(float* buffer, unsigned int frames);
+        
+        virtual unsigned int Read(float* buffer, unsigned int frames);
+        virtual unsigned int Write(float* buffer, unsigned int frames);
+        
+        virtual unsigned int ReadSpace();
+        virtual unsigned int WriteSpace();
+
+        virtual void SetRatio(unsigned int num, unsigned int denom)
+        {
+            fNum = num;
+            fDenom = denom;
+        }
+        virtual void GetRatio(unsigned int& num, unsigned int& denom)
+        {
+            num = fNum;
+            denom = fDenom;
+        }
+ 
+    };
 }
 
 #endif

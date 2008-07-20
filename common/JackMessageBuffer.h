@@ -49,6 +49,10 @@ struct JackMessage
     char message[MB_BUFFERSIZE];
 };
 
+/*!
+\brief Message buffer to be used from RT threads.
+*/
+
 class JackMessageBuffer : public JackRunnableInterface
 {
 

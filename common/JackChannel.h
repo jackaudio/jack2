@@ -33,6 +33,7 @@ class JackGraphManager;
 
 namespace detail
 {
+
 /*!
 \brief Inter process channel for server/client bidirectionnal communication : request and (receiving) notifications.
 */

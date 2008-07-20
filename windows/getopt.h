@@ -139,11 +139,6 @@ extern "C"
 
 # ifndef __need_getopt
 
-    // steph
-    /*
-    extern int getopt_long (int __argc, char *const *__argv, const char *__shortopts,
-    		        const struct option *__longopts, int *__longind);
-    */
     extern int getopt_long (int argc, char ** argv, const char * shortopts,
                                 const struct option * longopts, int * longind);
 

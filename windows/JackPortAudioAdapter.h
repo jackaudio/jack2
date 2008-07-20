@@ -27,34 +27,39 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-   	class JackPortAudioAdapter : public JackAudioAdapterInterface
-	{
+/*!
+\brief Audio adapter using PortAudio API.
+*/
 
-		private:
+class JackPortAudioAdapter : public JackAudioAdapterInterface
+{
 
-			PortAudioDevices fPaDevices;
-            PaStream* fStream;
-            PaDeviceIndex fInputDevice;
-            PaDeviceIndex fOutputDevice;
+    private:
 
-            static int Render(const void* inputBuffer, void* outputBuffer,
-                            unsigned long framesPerBuffer,
-                            const PaStreamCallbackTimeInfo* timeInfo,
-                            PaStreamCallbackFlags statusFlags,
-                            void* userData);
+        PortAudioDevices fPaDevices;
+        PaStream* fStream;
+        PaDeviceIndex fInputDevice;
+        PaDeviceIndex fOutputDevice;
 
-		public:
+        static int Render(const void* inputBuffer, void* outputBuffer,
+                        unsigned long framesPerBuffer,
+                        const PaStreamCallbackTimeInfo* timeInfo,
+                        PaStreamCallbackFlags statusFlags,
+                        void* userData);
 
-			JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
-         	~JackPortAudioAdapter()
-            {}
+    public:
 
-            int Open();
-            int Close();
+        JackPortAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+        ~JackPortAudioAdapter()
+        {}
 
-           int SetBufferSize(jack_nframes_t buffer_size);
+        int Open();
+        int Close();
 
-   	};
+       int SetBufferSize(jack_nframes_t buffer_size);
+
+};
+
 }
 
 #ifdef __cplusplus

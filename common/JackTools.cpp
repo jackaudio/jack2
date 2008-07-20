@@ -275,8 +275,7 @@ namespace Jack {
     }
 
     JackArgParser::~JackArgParser()
-    {
-    }
+    {}
 
     string JackArgParser::GetArgString()
     {

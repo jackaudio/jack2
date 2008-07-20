@@ -19,12 +19,16 @@
 */
 
 #ifndef __JackRestartThreadedDriver__
-#define __JackRestartThreadedDriverr__
+#define __JackRestartThreadedDriver__
 
 #include "JackThreadedDriver.h"
 
 namespace Jack
 {
+
+/*!
+\brief Restart a driver after an exception is thrown. 
+*/
 
 class EXPORT JackRestartThreadedDriver : public JackThreadedDriver
 {

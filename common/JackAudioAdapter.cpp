@@ -31,6 +31,7 @@ using namespace std;
 
 namespace Jack
 {
+
 //static methods ***********************************************************
     int JackAudioAdapter::Process(jack_nframes_t frames, void* arg)
     {

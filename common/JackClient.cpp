@@ -399,14 +399,6 @@ jack_nframes_t JackClient::Wait(int status)
     return GetEngineControl()->fBufferSize;
 }
 
-/*
-jack_nframes_t JackClient::Wait(int status)
-{
-	CycleSignal(status);
-	return CycleWait();
-}
-*/
-
 jack_nframes_t JackClient::CycleWait()
 {
     if (!WaitSync())

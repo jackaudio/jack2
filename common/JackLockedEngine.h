@@ -27,7 +27,7 @@ namespace Jack
 {
 
 /*!
-\brief Locked Engine.
+\brief Locked Engine, access to methods is serialized using a mutex.
 */
 
 class EXPORT JackLockedEngine : public JackLockAble

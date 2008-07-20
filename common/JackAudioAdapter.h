@@ -27,9 +27,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    class JackAudioAdapter
-    {
+/*!
+\brief Audio adapter : Jack client side.
+*/
+
+class JackAudioAdapter
+{
     private:
+    
         static int Process(jack_nframes_t, void* arg);
         static int BufferSize(jack_nframes_t buffer_size, void *arg);
         static int SampleRate(jack_nframes_t sample_rate, void *arg);
@@ -50,14 +55,16 @@ namespace Jack
         void Reset();
 
     public:
+    
         JackAudioAdapter(jack_client_t* jack_client, JackAudioAdapterInterface* audio_io) :
-				fJackClient(jack_client), fAudioAdapter(audio_io)
-		{}
+                fJackClient(jack_client), fAudioAdapter(audio_io)
+        {}
         ~JackAudioAdapter();
 
         int Open();
         int Close();
-    };
+};
+
 }
 
 #endif

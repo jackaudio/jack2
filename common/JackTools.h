@@ -43,9 +43,12 @@
 namespace Jack
 {
 
+/*!
+\brief Utility functions.
+*/
+
 struct EXPORT JackTools
 {
-
     static int GetPID();
     static int GetUID();
 
@@ -55,26 +58,31 @@ struct EXPORT JackTools
     static void CleanupFiles(const char* server_name);
     static int GetTmpdir();
     static void RewriteName(const char* name, char* new_name);
-
 };
+
+/*!
+\brief Internal cient command line parser.
+*/
 
 class EXPORT JackArgParser
 {
     private:
+    
         std::string fArgString;
         int fArgc;
         std::vector<std::string> fArgv;
 
     public:
+    
         JackArgParser(const char* arg);
         ~JackArgParser();
          std::string GetArgString();
         int GetNumArgv();
         int GetArgc();
-        int GetArgv ( std::vector<std::string>& argv );
-        int GetArgv ( char** argv );
-        void DeleteArgv ( const char** argv );
-        int ParseParams ( jack_driver_desc_t* desc, JSList** param_list );
+        int GetArgv(std::vector<std::string>& argv);
+        int GetArgv(char** argv);
+        void DeleteArgv(const char** argv);
+        int ParseParams(jack_driver_desc_t* desc, JSList** param_list);
 };
 
 }

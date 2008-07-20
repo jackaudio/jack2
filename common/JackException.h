@@ -29,43 +29,51 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    class EXPORT JackException : public std::runtime_error {
+/*!
+\brief Exception base class.
+*/
 
-        public:
+class EXPORT JackException : public std::runtime_error {
 
-            JackException(const std::string& msg) : std::runtime_error(msg)
-            {}
-            JackException(char* msg) : std::runtime_error(msg)
-            {}
-            JackException(const char* msg) : std::runtime_error(msg)
-            {}
+    public:
 
-            std::string Message()
-            {
-                return what();
-            }
+        JackException(const std::string& msg) : std::runtime_error(msg)
+        {}
+        JackException(char* msg) : std::runtime_error(msg)
+        {}
+        JackException(const char* msg) : std::runtime_error(msg)
+        {}
 
-            void PrintMessage()
-            {
-                std::string str = what();
-				if (str != "")
-					jack_info(str.c_str());
-            }
-    };
+        std::string Message()
+        {
+            return what();
+        }
 
-    class EXPORT JackDriverException : public JackException {
+        void PrintMessage()
+        {
+            std::string str = what();
+            if (str != "")
+                jack_info(str.c_str());
+        }
+};
 
-        public:
+/*!
+\brief Exception possibly thrown by drivers.
+*/
 
-            JackDriverException(const std::string& msg) : JackException(msg)
-            {}
-            JackDriverException(char* msg) : JackException(msg)
-            {}
-            JackDriverException(const char* msg) : JackException(msg)
-            {}
-            JackDriverException() : JackException("")
-            {}
-    };
+class EXPORT JackDriverException : public JackException {
+
+    public:
+
+        JackDriverException(const std::string& msg) : JackException(msg)
+        {}
+        JackDriverException(char* msg) : JackException(msg)
+        {}
+        JackDriverException(const char* msg) : JackException(msg)
+        {}
+        JackDriverException() : JackException("")
+        {}
+};
 
 }
 

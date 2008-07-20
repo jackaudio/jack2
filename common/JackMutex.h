@@ -34,6 +34,10 @@
 namespace Jack
 {
 
+/*!
+\brief Mutex abstraction.
+*/
+
 class JackMutex
 {
 
@@ -116,6 +120,10 @@ class JackMutex
 
 #endif
 };
+
+/*!
+\brief Base class for "lockable" objects.
+*/
 
 class JackLockAble
 {

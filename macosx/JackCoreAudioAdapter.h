@@ -30,83 +30,87 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    typedef	UInt8	CAAudioHardwareDeviceSectionID;
-    #define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
-    #define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
-    #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
-    #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
+typedef	UInt8	CAAudioHardwareDeviceSectionID;
+#define	kAudioDeviceSectionInput	((CAAudioHardwareDeviceSectionID)0x01)
+#define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
+#define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
+#define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
 
-	class JackCoreAudioAdapter : public JackAudioAdapterInterface
-	{
+/*!
+\brief Audio adapter using CoreAudio API.
+*/
+
+class JackCoreAudioAdapter : public JackAudioAdapterInterface
+{
+
+    private:
     
-		private:
+        AudioUnit fAUHAL;
+        AudioBufferList* fInputData;
         
-            AudioUnit fAUHAL;
-            AudioBufferList* fInputData;
-            
-            AudioDeviceID fDeviceID;
-            bool fState;
+        AudioDeviceID fDeviceID;
+        bool fState;
 
-            AudioUnitRenderActionFlags* fActionFags;
-            AudioTimeStamp* fCurrentTime;
-            
-            static	OSStatus Render(void *inRefCon,
-                                    AudioUnitRenderActionFlags *ioActionFlags,
-                                    const AudioTimeStamp *inTimeStamp,
-                                    UInt32 inBusNumber,
-                                    UInt32 inNumberFrames,
-                                    AudioBufferList *ioData);
-                               
-            static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
-                                                    UInt32 inChannel,
-                                                    Boolean	isInput,
-                                                    AudioDevicePropertyID inPropertyID,
-                                                    void* inClientData);
+        AudioUnitRenderActionFlags* fActionFags;
+        AudioTimeStamp* fCurrentTime;
+        
+        static	OSStatus Render(void *inRefCon,
+                                AudioUnitRenderActionFlags *ioActionFlags,
+                                const AudioTimeStamp *inTimeStamp,
+                                UInt32 inBusNumber,
+                                UInt32 inNumberFrames,
+                                AudioBufferList *ioData);
+                           
+        static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
+                                                UInt32 inChannel,
+                                                Boolean	isInput,
+                                                AudioDevicePropertyID inPropertyID,
+                                                void* inClientData);
 
-            OSStatus GetDefaultDevice(AudioDeviceID* id);
-            OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
+        OSStatus GetDefaultDevice(AudioDeviceID* id);
+        OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
 
-            // Setup
-            int SetupDevices(const char* capture_driver_uid,
-                             const char* playback_driver_uid,
-                             char* capture_driver_name,
-                             char* playback_driver_name);
+        // Setup
+        int SetupDevices(const char* capture_driver_uid,
+                         const char* playback_driver_uid,
+                         char* capture_driver_name,
+                         char* playback_driver_name);
 
-            int SetupChannels(bool capturing,
-                              bool playing,
-                              int& inchannels,
-                              int& outchannels,
-                              int& in_nChannels,
-                              int& out_nChannels,
-                              bool strict);
-                              
-            int OpenAUHAL(bool capturing,
-                        bool playing,
-                        int inchannels,
-                        int outchannels,
-                        int in_nChannels,
-                        int out_nChannels,
-                        jack_nframes_t buffer_size,
-                        jack_nframes_t samplerate,
-                        bool strict);
+        int SetupChannels(bool capturing,
+                          bool playing,
+                          int& inchannels,
+                          int& outchannels,
+                          int& in_nChannels,
+                          int& out_nChannels,
+                          bool strict);
+                          
+        int OpenAUHAL(bool capturing,
+                    bool playing,
+                    int inchannels,
+                    int outchannels,
+                    int in_nChannels,
+                    int out_nChannels,
+                    jack_nframes_t buffer_size,
+                    jack_nframes_t samplerate,
+                    bool strict);
 
-            int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
-            int SetupBuffers(int inchannels, int outchannels);
-            void DisposeBuffers();
-            void CloseAUHAL();
+        int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
+        int SetupBuffers(int inchannels, int outchannels);
+        void DisposeBuffers();
+        void CloseAUHAL();
+
+    public:
     
-		public:
+        JackCoreAudioAdapter( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+        ~JackCoreAudioAdapter()
+        {}
         
-			JackCoreAudioAdapter( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
-         	~JackCoreAudioAdapter()
-            {}
-            
-            virtual int Open();
-            virtual int Close();
-            
-            virtual int SetBufferSize(jack_nframes_t buffer_size);
-           
-   	};
+        virtual int Open();
+        virtual int Close();
+        
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
+       
+};
 }
 
 #ifdef __cplusplus

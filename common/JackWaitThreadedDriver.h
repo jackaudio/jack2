@@ -27,6 +27,10 @@
 namespace Jack
 {
     
+/*!
+\brief To be used as a wrapper of JackNetDriver.
+*/
+
 class EXPORT JackWaitThreadedDriver : public JackThreadedDriver
 {
     private:
