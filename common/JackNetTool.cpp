@@ -47,7 +47,7 @@ namespace Jack
     {
         return fMaxBufsize;
     }
-    
+
     void NetMidiBuffer::SetBuffer(int index, JackMidiBuffer* buffer)
     {
         fPortBuffer[index] = buffer;
@@ -134,7 +134,7 @@ namespace Jack
     {
         return fNPorts * fSubPeriodBytesSize;
     }
-    
+
     void NetAudioBuffer::SetBuffer(int index, sample_t* buffer)
     {
         fPortBuffer[index] = buffer;
@@ -159,6 +159,7 @@ namespace Jack
         params->fPacketID = htonl ( params->fPacketID );
         params->fMtu = htonl ( params->fMtu );
         params->fID = htonl ( params->fID );
+        params->fTransportSync = htonl ( params->fTransportSync );
         params->fSendAudioChannels = htonl ( params->fSendAudioChannels );
         params->fReturnAudioChannels = htonl ( params->fReturnAudioChannels );
         params->fSendMidiChannels = htonl ( params->fSendMidiChannels );
@@ -174,6 +175,7 @@ namespace Jack
         params->fPacketID = ntohl ( params->fPacketID );
         params->fMtu = ntohl ( params->fMtu );
         params->fID = ntohl ( params->fID );
+        params->fTransportSync = ntohl ( params->fTransportSync );
         params->fSendAudioChannels = ntohl ( params->fSendAudioChannels );
         params->fReturnAudioChannels = ntohl ( params->fReturnAudioChannels );
         params->fSendMidiChannels = ntohl ( params->fSendMidiChannels );
@@ -186,21 +188,24 @@ namespace Jack
 
     EXPORT void SessionParamsDisplay ( session_params_t* params )
     {
-        jack_info ( "---->Network parameters of '%s'<----", params->fName );
+    	char bitdepth[16];
+    	( params->fBitdepth ) ? sprintf ( bitdepth, "%u", params->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
+        jack_info ( "**************** Network parameters ****************" );
+        jack_info ( "Name : %s", params->fName );
         jack_info ( "Protocol revision : %c", params->fProtocolVersion );
         jack_info ( "MTU : %u", params->fMtu );
         jack_info ( "Master name : %s", params->fMasterNetName );
         jack_info ( "Slave name : %s", params->fSlaveNetName );
         jack_info ( "ID : %u", params->fID );
+        jack_info ( "Transport Sync : %s", (params->fTransportSync) ? "yes" : "no" );
         jack_info ( "Send channels (audio - midi) : %d - %d", params->fSendAudioChannels, params->fSendMidiChannels );
         jack_info ( "Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels );
         jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
         jack_info ( "Period size : %u frames per period", params->fPeriodSize );
         jack_info ( "Frames per packet : %u", params->fFramesPerPacket );
         jack_info ( "Packet per period : %u", params->fPeriodSize / params->fFramesPerPacket );
-        jack_info ( "Bitdepth (0 for float) : %u", params->fBitdepth );
-        jack_info ( "Name : %s", params->fName );
-        jack_info ( "---------------------------------------------" );
+        jack_info ( "Bitdepth : %s", bitdepth );
+        jack_info ( "****************************************************" );
     }
 
     EXPORT sync_packet_type_t GetPacketType ( session_params_t* params )
@@ -269,6 +274,8 @@ namespace Jack
 
     EXPORT void PacketHeaderDisplay ( packet_header_t* header )
     {
+    	char bitdepth[16];
+    	( header->fBitdepth ) ? sprintf ( bitdepth, "%u", header->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
         jack_info ( "********************Header********************" );
         jack_info ( "Data type : %c", header->fDataType );
         jack_info ( "Data stream : %c", header->fDataStream );
@@ -278,7 +285,7 @@ namespace Jack
         jack_info ( "Midi packets : %u", header->fNMidiPckt );
         jack_info ( "Midi data size : %u", header->fMidiDataSize );
         jack_info ( "Last packet : '%c'", header->fIsLastPckt );
-        jack_info ( "Bitdepth : %u (0 for float)", header->fBitdepth );
+        jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "**********************************************" );
     }
 

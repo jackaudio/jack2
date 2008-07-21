@@ -43,7 +43,7 @@ namespace Jack
         fParams.fReturnMidiChannels = midi_output_ports;
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
-        fTransportSync = transport_sync;
+        fParams.fTransportSync = transport_sync;
     }
 
     JackNetDriver::~JackNetDriver()
@@ -102,7 +102,7 @@ namespace Jack
         fParams.fReturnAudioChannels = fPlaybackChannels;
 
         //is transport sync ?
-        if ( fTransportSync )
+        if ( fParams.fTransportSync )
             jack_info ( "NetDriver started with Master's Transport Sync." );
 
         //init loop : get a master and start, do it until connection is ok
@@ -290,6 +290,9 @@ namespace Jack
         fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
         fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
 
+		//payload size
+        fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
+
         return 0;
     }
 
@@ -403,6 +406,18 @@ namespace Jack
         return static_cast<JackMidiBuffer*> ( fGraphManager->GetBuffer ( fMidiPlaybackPortList[port_index], fEngineControl->fBufferSize ) );
     }
 
+    int JackNetDriver::SetSyncPacket()
+    {
+        if ( fParams.fTransportSync )
+        {
+            //set the TransportData
+
+            //copy to TxBuffer
+            memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
+        }
+        return 0;
+    }
+
     int JackNetDriver::Recv ( size_t size, int flags )
     {
         int rx_bytes;
@@ -434,9 +449,7 @@ namespace Jack
         {
             net_error_t error = fSocket.GetError();
             if ( error == NET_CONN_ERROR )
-            {
                 throw JackDriverException ( "Connection lost." );
-            }
             else
                 jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
         }
@@ -463,12 +476,13 @@ namespace Jack
         //receive sync (launch the cycle)
         do
         {
-            rx_bytes = Recv ( sizeof ( packet_header_t ), 0 );
+            rx_bytes = Recv ( fParams.fMtu, 0 );
             if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
                 return rx_bytes;
         }
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
+        //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
         //audio, midi or sync if driver is late
@@ -476,8 +490,7 @@ namespace Jack
         {
             do
             {
-                rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-                if ( rx_bytes < 1 )
+                if ( ( rx_bytes = Recv ( fParams.fMtu, MSG_PEEK ) ) == SOCKET_ERROR )
                     return rx_bytes;
                 if ( rx_bytes && ( rx_head->fDataStream == 's' ) && ( rx_head->fID == fParams.fID ) )
                 {
@@ -526,6 +539,14 @@ namespace Jack
             fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, GetMidiOutputBuffer ( midi_port_index ));
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
+
+        //sync
+        fTxHeader.fDataType = 's';
+        if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
+            fTxHeader.fIsLastPckt = 'y';
+        memset ( fTxData, 0, fPayloadSize );
+        SetSyncPacket();
+        tx_bytes = Send ( fParams.fMtu, 0 );
 
         //midi
         if ( fParams.fReturnMidiChannels )

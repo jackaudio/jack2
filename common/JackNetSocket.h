@@ -29,7 +29,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-	//get host name*********************************	
+	//get host name*********************************
 	EXPORT int GetHostName ( char * name, int size );
 
 	//net errors ***********************************
@@ -38,6 +38,7 @@ namespace Jack
 		NET_CONN_ERROR = 10000,
 		NET_OP_ERROR,
 		NET_NO_DATA,
+		NET_NO_NETWORK,
 		NET_NO_ERROR
 	};
 

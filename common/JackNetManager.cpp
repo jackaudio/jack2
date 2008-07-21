@@ -18,9 +18,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetManager.h"
-#include "JackError.h"
-#include "JackExports.h"
-#include "driver_interface.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -43,6 +40,7 @@ namespace Jack
         fNetJumpCnt = 0;
         fJackClient = NULL;
         fRunning = false;
+        fSyncState = 1;
         uint port_index;
 
         //jack audio ports
@@ -97,6 +95,9 @@ namespace Jack
         //audio netbuffer length
         fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
         fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
+
+        //payload size
+        fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
     }
 
     JackNetMaster::~JackNetMaster()
@@ -197,7 +198,7 @@ namespace Jack
             sprintf ( name, "to_slave_%d", i+1 );
             if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-			jack_port_set_latency ( fAudioCapturePorts[i], port_latency );
+            jack_port_set_latency ( fAudioCapturePorts[i], port_latency );
         }
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
@@ -205,7 +206,7 @@ namespace Jack
             sprintf ( name, "from_slave_%d", i+1 );
             if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-			jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency );
+            jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency );
         }
         //midi
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -214,7 +215,7 @@ namespace Jack
             sprintf ( name, "midi_to_slave_%d", i+1 );
             if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-			jack_port_set_latency ( fMidiCapturePorts[i], port_latency );
+            jack_port_set_latency ( fMidiCapturePorts[i], port_latency );
         }
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
@@ -222,7 +223,7 @@ namespace Jack
             sprintf ( name, "midi_from_slave_%d", i+1 );
             if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-			jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency );
+            jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency );
         }
 
         fRunning = true;
@@ -279,6 +280,18 @@ fail:
         mcast_socket.Close();
     }
 
+    int JackNetMaster::SetSyncPacket()
+    {
+        if ( fParams.fTransportSync )
+        {
+            //set the TransportData
+
+            //copy to TxBuffer
+            memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
+        }
+        return 0;
+    }
+
     int JackNetMaster::Send ( char* buffer, size_t size, int flags )
     {
         int tx_bytes;
@@ -308,7 +321,7 @@ fail:
             if ( error == NET_NO_DATA )
             {
                 //too much receive failure, react...
-                if ( ++fNetJumpCnt == 100 )
+                if ( ++fNetJumpCnt == 50 )
                 {
                     jack_error ( "Connection lost, is %s still running ?", fParams.fName );
                     fNetJumpCnt = 0;
@@ -351,23 +364,25 @@ fail:
         uint port_index;
         for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
             fNetMidiCaptureBuffer->SetBuffer(port_index,
-                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index], fParams.fPeriodSize )));
+                                             static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index], fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
             fNetAudioCaptureBuffer->SetBuffer(port_index,
-                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index], fParams.fPeriodSize )));
+                                              static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index], fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
             fNetMidiPlaybackBuffer->SetBuffer(port_index,
-                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index], fParams.fPeriodSize )));
+                                              static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index], fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
             fNetAudioPlaybackBuffer->SetBuffer(port_index,
-                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index], fParams.fPeriodSize )));
+                                               static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index], fParams.fPeriodSize )));
 
         //send ------------------------------------------------------------------------------------------------------------------
         //sync
         fTxHeader.fDataType = 's';
         if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
             fTxHeader.fIsLastPckt = 'y';
-        tx_bytes = Send ( reinterpret_cast<char*> ( &fTxHeader ), sizeof ( packet_header_t ), 0 );
+        memset ( fTxData, 0, fPayloadSize );
+        SetSyncPacket();
+        tx_bytes = Send ( fTxBuffer, fParams.fMtu, 0 );
         if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
             return tx_bytes;
 
@@ -408,12 +423,25 @@ fail:
         }
 
         //receive ( if there is stg to receive...)-------------------------------------------------------------------------------------
+        //sync
+        if ( fParams.fTransportSync )
+        {
+            do
+            {
+                rx_bytes = Recv ( fParams.fMtu, 0 );
+                if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
+                    return rx_bytes;
+            }
+            while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
+            //then update fSyncState from received sync packet
+        }
+
+
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
         {
             do
             {
-                rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-                if ( rx_bytes < 1 )
+                if ( ( rx_bytes = Recv ( fParams.fMtu, MSG_PEEK ) ) == SOCKET_ERROR )
                     return rx_bytes;
                 if ( rx_bytes && ( rx_head->fDataStream == 'r' ) && ( rx_head->fID == fParams.fID ) )
                 {
@@ -437,6 +465,10 @@ fail:
                         fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fSubCycle );
                         fNetJumpCnt = 0;
                         break;
+                    case 's':	//sync
+                        jack_error ( "NetMaster receive sync packets instead of data." );
+                        fRxHeader.fCycle = rx_head->fCycle;
+                        return 0;
                     }
                 }
             }
@@ -472,11 +504,12 @@ fail:
             }
         }
 
-		jack_set_sync_callback ( fManagerClient, SetSyncCallback, this );
+        //set sync callback
+        jack_set_sync_callback ( fManagerClient, SetSyncCallback, this );
 
-        //activate the client
+        //activate the client (for sync callback)
         if ( jack_activate ( fManagerClient ) != 0 )
-			jack_error ( "Can't activate the network manager client, transport disables." );
+            jack_error ( "Can't activate the network manager client, transport disabled." );
 
         //launch the manager thread
         if ( jack_client_create_thread ( fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this ) )
@@ -496,9 +529,19 @@ fail:
 
     int JackNetMasterManager::SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg )
     {
-    	JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*>(arg);
-    	master_manager->SyncCallback ( state, pos );
-		return 1;
+        JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*>(arg);
+        return master_manager->SyncCallback ( state, pos );
+    }
+
+    int JackNetMasterManager::SyncCallback ( jack_transport_state_t state, jack_position_t* pos )
+    {
+        //check sync state for every master in the list
+        int ret = 1;
+        master_list_it_t it;
+        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
+            if ( ( *it )->fSyncState == 0 )
+                ret = 0;
+        jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
     }
 
     void* JackNetMasterManager::NetManagerThread ( void* arg )
@@ -509,12 +552,6 @@ fail:
         master_manager->Run();
         return NULL;
     }
-
-	int JackNetMasterManager::SyncCallback ( jack_transport_state_t state, jack_position_t* pos )
-	{
-		jack_log ( "JackNetMasterManager::SyncCallback" );
-		return 0;
-	}
 
     void JackNetMasterManager::Run()
     {

@@ -43,33 +43,46 @@ namespace Jack
         int fNetJumpCnt;
         bool fRunning;
 
+		//jack client
         jack_client_t* fJackClient;
         const char* fClientName;
 
+		//jack ports
         jack_port_t** fAudioCapturePorts;
         jack_port_t** fAudioPlaybackPorts;
         jack_port_t** fMidiCapturePorts;
         jack_port_t** fMidiPlaybackPorts;
 
+		//sync and transport
+        int fSyncState;
+        net_transport_data_t fTransportData;
+
+		//network headers
         packet_header_t fTxHeader;
         packet_header_t fRxHeader;
 
+		//network buffers
         char* fTxBuffer;
         char* fRxBuffer;
         char* fTxData;
         char* fRxData;
 
+		//jack buffers
         NetAudioBuffer* fNetAudioCaptureBuffer;
         NetAudioBuffer* fNetAudioPlaybackBuffer;
         NetMidiBuffer* fNetMidiCaptureBuffer;
         NetMidiBuffer* fNetMidiPlaybackBuffer;
 
+		//sizes
         int fAudioTxLen;
         int fAudioRxLen;
+        int fPayloadSize;
 
         bool Init();
         void FreePorts();
         void Exit();
+
+		int SetSyncPacket();
 
         int Send ( char* buffer, size_t size, int flags );
         int Recv ( size_t size, int flags );
@@ -86,7 +99,7 @@ namespace Jack
     {
         friend class JackNetMaster;
     private:
-		static int SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg );
+        static int SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg );
         static void* NetManagerThread ( void* arg );
 
         jack_client_t* fManagerClient;

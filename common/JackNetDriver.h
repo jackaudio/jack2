@@ -33,26 +33,32 @@ namespace Jack
         char* fMulticastIP;
         JackNetSocket fSocket;
         uint fNSubProcess;
-        uint fTransportSync;
+        net_transport_data_t fTransportData;
 
+		//jack ports
         jack_port_id_t* fMidiCapturePortList;
         jack_port_id_t* fMidiPlaybackPortList;
 
+		//headers
         packet_header_t fTxHeader;
         packet_header_t fRxHeader;
 
+		//network buffers
         char* fTxBuffer;
         char* fRxBuffer;
         char* fTxData;
         char* fRxData;
 
+		//jack buffers
         NetMidiBuffer* fNetMidiCaptureBuffer;
         NetMidiBuffer* fNetMidiPlaybackBuffer;
         NetAudioBuffer* fNetAudioCaptureBuffer;
         NetAudioBuffer* fNetAudioPlaybackBuffer;
 
+		//sizes
         int fAudioRxLen;
         int fAudioTxLen;
+        int fPayloadSize;
 
         bool Init();
         net_status_t GetNetMaster();
@@ -67,6 +73,9 @@ namespace Jack
 
         int Recv ( size_t size, int flags );
         int Send ( size_t size, int flags );
+
+		int SetSyncPacket();
+        int TransportSync();
 
     public:
         JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,

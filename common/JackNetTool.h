@@ -33,6 +33,7 @@ namespace Jack
 {
     typedef struct _session_params session_params_t;
     typedef struct _packet_header packet_header_t;
+    typedef struct _net_transport_data net_transport_data_t;
     typedef struct sockaddr socket_address_t;
     typedef struct in_addr address_t;
     typedef jack_default_audio_sample_t sample_t;
@@ -41,21 +42,22 @@ namespace Jack
 
     struct _session_params
     {
-        char fPacketType[7];		//packet type ('param')
-        char fProtocolVersion;		//version
-        uint32_t fPacketID;			//indicates the packet type
-        char fMasterNetName[256];	//master hostname (network)
-        char fSlaveNetName[256];	//slave hostname (network)
-        uint32_t fMtu;				//connection mtu
-        uint32_t fID;				//slave's ID
-        uint32_t fSendAudioChannels;	//number of master->slave channels
-        uint32_t fReturnAudioChannels;	//number of slave->master channels
-        uint32_t fSendMidiChannels;		//number of master->slave midi channels
-        uint32_t fReturnMidiChannels;	//number of slave->master midi channels
-        uint32_t fSampleRate;			//session sample rate
-        uint32_t fPeriodSize;			//period size
-        uint32_t fFramesPerPacket;		//complete frames per packet
-        uint32_t fBitdepth;             //samples bitdepth (unused)
+        char fPacketType[7];				//packet type ('param')
+        char fProtocolVersion;				//version
+        uint32_t fPacketID;					//indicates the packet type
+        char fMasterNetName[256];			//master hostname (network)
+        char fSlaveNetName[256];			//slave hostname (network)
+        uint32_t fMtu;						//connection mtu
+        uint32_t fID;						//slave's ID
+        uint32_t fTransportSync;			//is the transport synced ?
+        uint32_t fSendAudioChannels;		//number of master->slave channels
+        uint32_t fReturnAudioChannels;		//number of slave->master channels
+        uint32_t fSendMidiChannels;			//number of master->slave midi channels
+        uint32_t fReturnMidiChannels;		//number of slave->master midi channels
+        uint32_t fSampleRate;				//session sample rate
+        uint32_t fPeriodSize;				//period size
+        uint32_t fFramesPerPacket;			//complete frames per packet
+        uint32_t fBitdepth;             	//samples bitdepth (unused)
         char fName[JACK_CLIENT_NAME_SIZE];	//slave's name
     };
 
@@ -95,17 +97,26 @@ namespace Jack
     struct _packet_header
     {
         char fPacketType[7];		//packet type ( 'headr' )
-        char fDataType;			//a for audio, m for midi
-        char fDataStream;		//s for send, r for return
-        uint32_t fID;			//to identify the slave
-        uint32_t fBitdepth;		//bitdepth of the data samples
+        char fDataType;				//a for audio, m for midi
+        char fDataStream;			//s for send, r for return
+        uint32_t fID;				//to identify the slave
+        uint32_t fBitdepth;			//bitdepth of the data samples
         uint32_t fMidiDataSize;		//size of midi data (if packet is 'midi typed') in bytes
         uint32_t fNMidiPckt;		//number of midi packets of the cycle
-        uint32_t fCycle;		//process cycle counter
-        uint32_t fSubCycle;		//midi/audio subcycle counter
-        char fIsLastPckt;		//is it the last packet of a given cycle ('y' or 'n')
-        char fFree[13];             	//unused
+        uint32_t fCycle;			//process cycle counter
+        uint32_t fSubCycle;			//midi/audio subcycle counter
+        char fIsLastPckt;			//is it the last packet of a given cycle ('y' or 'n')
+        char fFree[13];             //unused
     };
+
+//transport data ******************************************************************************
+
+	struct _net_transport_data
+	{
+		char fTransportType[10];				//test value ('transport')
+		jack_position_t fCurPos;
+		jack_transport_state_t fCurState;
+	};
 
 //midi data ***********************************************************************************
 
@@ -115,7 +126,6 @@ namespace Jack
         int fNPorts;
         size_t fMaxBufsize;
         int fMaxPcktSize;
-        //data
         char* fBuffer;
         char* fNetBuffer;
         JackMidiBuffer** fPortBuffer;
@@ -135,7 +145,7 @@ namespace Jack
         int RenderFromNetwork ( int subcycle, size_t copy_size );
         int RenderToNetwork ( int subcycle, size_t total_size );
 
-         void SetBuffer(int index, JackMidiBuffer* buffer);
+		void SetBuffer(int index, JackMidiBuffer* buffer);
     };
 
 // audio data *********************************************************************************
