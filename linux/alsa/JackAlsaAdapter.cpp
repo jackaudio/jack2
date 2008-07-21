@@ -55,9 +55,11 @@ namespace Jack
                 break;
                 
             case 'n':
+                fAudioInterface.fPeriod = param->value.ui;
                 break;
                 
             case 'd':
+                fAudioInterface.fCardName = strdup(param->value.str);
                 break;
                 
             case 'r':

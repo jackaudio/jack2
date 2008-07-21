@@ -33,7 +33,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-//inline void* aligned_calloc(size_t nmemb, size_t size) { return (void*)((size_t)(calloc((nmemb * size) + 15, sizeof(char))) + 15 & ~15); }
 inline void* aligned_calloc(size_t nmemb, size_t size) { return (void*)calloc(nmemb, size); }
 
 #define max(x,y) (((x)>(y)) ? (x) : (y))
@@ -104,7 +103,9 @@ class AudioInterface : public AudioParam
     
     unsigned int fChanInputs;
     unsigned int fChanOutputs;
-    
+
+    unsigned int fPeriod;
+ 
     // interleaved mode audiocard buffers
     void* fInputCardBuffer;
     void* fOutputCardBuffer;
@@ -132,6 +133,7 @@ class AudioInterface : public AudioParam
         fOutputDevice 	= 0;
         fInputParams	= 0;
         fOutputParams	= 0;
+        fPeriod = 2;
     }
 
     AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
@@ -244,7 +246,7 @@ class AudioInterface : public AudioParam
     
     int setAudioParams(snd_pcm_t* stream, snd_pcm_hw_params_t* params)
     {	
-        int	err;
+        int err;
 
         // set params record with initial values
         err = snd_pcm_hw_params_any	( stream, params ); 	
@@ -273,7 +275,7 @@ class AudioInterface : public AudioParam
         err = snd_pcm_hw_params_set_period_size	(stream, params, fBuffering, 0); 	
         check_error_msg(err, "period size not available");
         
-        err = snd_pcm_hw_params_set_periods (stream, params, 2, 0); 			
+        err = snd_pcm_hw_params_set_periods (stream, params, fPeriod, 0); 			
         check_error_msg(err, "number of periods not available");
         return 0;
     }
@@ -470,8 +472,8 @@ class AudioInterface : public AudioParam
         snd_ctl_t* ctl_handle;
 
         jack_info("Audio Interface Description :");
-        jack_info("Sampling Frequency : %d, Sample Format : %s, buffering : %d", 
-                fFrequency, snd_pcm_format_name((_snd_pcm_format)fSampleFormat), fBuffering);
+        jack_info("Sampling Frequency : %d, Sample Format : %s, buffering : %d nperiod : %d", 
+                fFrequency, snd_pcm_format_name((_snd_pcm_format)fSampleFormat), fBuffering, fPeriod);
         jack_info("Software inputs : %2d, Software outputs : %2d", fSoftInputs, fSoftOutputs);
         jack_info("Hardware inputs : %2d, Hardware outputs : %2d", fCardInputs, fCardOutputs);
         jack_info("Channel inputs  : %2d, Channel outputs  : %2d", fChanInputs, fChanOutputs);
