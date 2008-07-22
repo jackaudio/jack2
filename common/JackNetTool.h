@@ -29,6 +29,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <algorithm>
 #include <cmath>
 
+using namespace std;
+
 namespace Jack
 {
     typedef struct _session_params session_params_t;
@@ -60,7 +62,6 @@ namespace Jack
         uint32_t fBitdepth;             	//samples bitdepth (unused)
         char fName[JACK_CLIENT_NAME_SIZE];	//slave's name
     };
-
 
 //net status **********************************************************************************
 
@@ -111,12 +112,12 @@ namespace Jack
 
 //transport data ******************************************************************************
 
-	struct _net_transport_data
-	{
-		char fTransportType[10];				//test value ('transport')
-		jack_position_t fCurPos;
-		jack_transport_state_t fCurState;
-	};
+    struct _net_transport_data
+    {
+        char fTransportType[10];				//test value ('transport')
+        jack_position_t fCurPos;
+        jack_transport_state_t fCurState;
+    };
 
 //midi data ***********************************************************************************
 
@@ -145,7 +146,7 @@ namespace Jack
         int RenderFromNetwork ( int subcycle, size_t copy_size );
         int RenderToNetwork ( int subcycle, size_t total_size );
 
-		void SetBuffer(int index, JackMidiBuffer* buffer);
+        void SetBuffer(int index, JackMidiBuffer* buffer);
     };
 
 // audio data *********************************************************************************
@@ -169,6 +170,142 @@ namespace Jack
         void RenderToJackPorts ( int subcycle );
 
         void SetBuffer(int index, sample_t* buffer);
+    };
+
+// net measure ********************************************************************************
+
+    template <class T> struct NetMeasure
+    {
+		uint fTableSize;;
+		T* fTable;
+
+		NetMeasure ( uint table_size = 5 )
+		{
+			fTableSize = table_size;
+			fTable = new T[fTableSize];
+		}
+		~NetMeasure()
+		{
+			delete[] fTable;
+		}
+    };
+
+// net monitor ********************************************************************************
+
+    template <class T> class NetMonitor
+    {
+    private:
+		uint fMeasureCnt;
+		uint fMeasurePoints;
+        NetMeasure<T>* fMeasureTable;
+        uint fTablePos;
+
+        void DisplayMeasure ( NetMeasure<T>& measure )
+        {
+        	string display;
+        	for ( uint m_id = 0; m_id < measure.fTableSize; m_id++ )
+        	{
+        		char* value;
+        		sprintf ( value, "%lu ", measure.fTable[m_id] );
+        		display += string ( value );
+        	}
+			cout << "NetMonitor:: '" << display << "'" << endl;
+        }
+
+
+    public:
+        NetMonitor ( uint measure_cnt = 512, uint measure_points = 5 )
+        {
+        	jack_log ( "JackNetMonitor::JackNetMonitor measure_cnt %u measure_points %u", measure_cnt, measure_points );
+
+        	fMeasureCnt = measure_cnt;
+        	fMeasurePoints = measure_points;
+            fMeasureTable = new NetMeasure<T>[fMeasureCnt];
+            fTablePos = 0;
+            for ( uint i = 0; i < fMeasureCnt; i++ )
+                InitTable();
+        }
+
+        ~NetMonitor()
+        {
+        	jack_log ( "NetMonitor::~NetMonitor" );
+            delete fMeasureTable;
+        }
+
+        uint InitTable()
+        {
+        	uint measure_id;
+			for ( measure_id = 0; measure_id < fMeasureTable[fTablePos].fTableSize; measure_id++ )
+				fMeasureTable[fTablePos].fTable[measure_id] = 0;
+            if ( ++fTablePos == fMeasureCnt )
+                fTablePos = 0;
+            return fTablePos;
+        }
+
+        uint Write ( NetMeasure<T>& measure )
+        {
+            for ( uint m_id = 0; m_id < measure.fTableSize; m_id++ )
+				fMeasureTable[fTablePos].fTable[m_id] = measure.fTable[m_id];
+            if ( ++fTablePos == fMeasureCnt )
+                fTablePos = 0;
+			//DisplayMeasure ( fMeasureTable[fTablePos] );
+            return fTablePos;
+        }
+
+        int Save ( string& filename )
+        {
+            filename += "_netmonitor.log";
+
+        	jack_log ( "JackNetMonitor::Save filename %s", filename.c_str() );
+
+            FILE* file = fopen ( filename.c_str(), "w" );
+
+			//printf each measure with tab separated values
+            for ( uint id = 0; id < fMeasureCnt; id++ )
+            {
+            	for ( uint m_id = 0; m_id < fMeasureTable[id].fTableSize; m_id++ )
+					fprintf ( file, "%lu \t ", fMeasureTable[id].fTable[m_id] );
+				fprintf ( file, "\n" );
+            }
+
+            fclose(file);
+            return 0;
+        }
+
+        int SetPlotFile ( string& name, string* options_list = NULL, uint options_number = 0, string* field_names = NULL, uint field_number )
+        {
+        	string title = name + "_netmonitor";
+            string plot_filename = title + ".plt";
+            string data_filename = title + ".log";
+            FILE* file = fopen ( plot_filename.c_str(), "w" );
+
+            //base options
+            fprintf ( file, "set multiplot\n" );
+            fprintf ( file, "set grid\n" );
+            fprintf ( file, "set title \"%s\"\n", title.c_str() );
+
+            //additional options
+            for ( uint i = 0; i < options_number; i++ )
+            {
+                jack_log ( "JackNetMonitor::SetPlotFile : Add plot option : '%s'", options_list[i].c_str() );
+                fprintf ( file, "%s\n", options_list[i].c_str() );
+            }
+
+            //plot
+            fprintf ( file, "plot " );
+            for ( uint row = 1; row <= field_number; row++ )
+            {
+            	jack_log ( "JackNetMonitor::SetPlotFile - Add plot : file '%s' row '%d' title '%s' field '%s'",
+					data_filename.c_str(), row, name.c_str(), field_names[row-1].c_str() );
+            	fprintf ( file, "\"%s\" using %u title \"%s : %s\" with lines", data_filename.c_str(), row, name.c_str(), field_names[row-1].c_str() );
+            	fprintf ( file, ( row < field_number ) ? "," : "\n" );
+            }
+
+			jack_log ( "JackNetMonitor::SetPlotFile - Saving GnuPlot '.plt' file to '%s'", plot_filename.c_str() );
+
+            fclose ( file );
+            return 0;
+        }
     };
 
 //utility *************************************************************************************

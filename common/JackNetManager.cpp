@@ -27,6 +27,21 @@ using namespace std;
 namespace Jack
 {
 //JackNetMaster******************************************************************************************************
+#ifdef NETMONITOR
+    std::string JackNetMaster::fMonitorPlotOptions[] =
+    {
+        std::string ( "set xlabel \"audio cycles\"" ),
+        std::string ( "set ylabel \"audio frames\"" )
+    };
+    std::string JackNetMaster::fMonitorFieldNames[] =
+    {
+        std::string ( "cycle start" ),
+        std::string ( "sync send" ),
+        std::string ( "send end" ),
+        std::string ( "sync recv" ),
+        std::string ( "end of cycle" )
+    };
+#endif
 
     JackNetMaster::JackNetMaster ( JackNetMasterManager* manager, session_params_t& params ) : fSocket()
     {
@@ -98,6 +113,12 @@ namespace Jack
 
         //payload size
         fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
+
+        //monitor
+#ifdef NETMONITOR
+        std::string plot_file_name = std::string ( fParams.fName );
+        fMonitor.SetPlotFile ( plot_file_name, fMonitorPlotOptions, 2, fMonitorFieldNames, 5 );
+#endif
     }
 
     JackNetMaster::~JackNetMaster()
@@ -120,6 +141,10 @@ namespace Jack
         delete[] fMidiPlaybackPorts;
         delete[] fTxBuffer;
         delete[] fRxBuffer;
+#ifdef NETMONITOR
+		std::string filename = string ( fParams.fName );
+        fMonitor.Save ( filename );
+#endif
     }
 
     bool JackNetMaster::Init()
@@ -360,20 +385,29 @@ fail:
         fTxHeader.fIsLastPckt = 'n';
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
+#ifdef NETMONITOR
+        NetMeasure<jack_nframes_t> measure;
+        measure.fTable[0] = jack_frames_since_cycle_start( fJackClient );
+#endif
+
         //buffers
         uint port_index;
         for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
             fNetMidiCaptureBuffer->SetBuffer(port_index,
-                                             static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index], fParams.fPeriodSize )));
+											static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index],
+                                            fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
             fNetAudioCaptureBuffer->SetBuffer(port_index,
-                                              static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index], fParams.fPeriodSize )));
+                                             static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index],
+                                             fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
             fNetMidiPlaybackBuffer->SetBuffer(port_index,
-                                              static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index], fParams.fPeriodSize )));
+                                             static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index],
+                                             fParams.fPeriodSize )));
         for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
             fNetAudioPlaybackBuffer->SetBuffer(port_index,
-                                               static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index], fParams.fPeriodSize )));
+                                              static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
+                                              fParams.fPeriodSize )));
 
         //send ------------------------------------------------------------------------------------------------------------------
         //sync
@@ -385,6 +419,10 @@ fail:
         tx_bytes = Send ( fTxBuffer, fParams.fMtu, 0 );
         if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
             return tx_bytes;
+
+#ifdef NETMONITOR
+        measure.fTable[1] = jack_frames_since_cycle_start( fJackClient );
+#endif
 
         //midi
         if ( fParams.fSendMidiChannels )
@@ -422,20 +460,23 @@ fail:
             }
         }
 
-        //receive ( if there is stg to receive...)-------------------------------------------------------------------------------------
-        //sync
-        if ( fParams.fTransportSync )
-        {
-            do
-            {
-                rx_bytes = Recv ( fParams.fMtu, 0 );
-                if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
-                    return rx_bytes;
-            }
-            while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
-            //then update fSyncState from received sync packet
-        }
+#ifdef NETMONITOR
+        measure.fTable[2] = jack_frames_since_cycle_start( fJackClient );
+#endif
 
+        //receive --------------------------------------------------------------------------------------------------------------------
+        //sync
+        do
+        {
+            rx_bytes = Recv ( fParams.fMtu, 0 );
+            if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
+                return rx_bytes;
+        }
+        while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
+
+#ifdef NETMONITOR
+        measure.fTable[3] = jack_frames_since_cycle_start( fJackClient );
+#endif
 
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
         {
@@ -474,6 +515,11 @@ fail:
             }
             while ( fRxHeader.fIsLastPckt != 'y' );
         }
+
+#ifdef NETMONITOR
+        measure.fTable[4] = jack_frames_since_cycle_start( fJackClient );
+        fMonitor.Write ( measure );
+#endif
         return 0;
     }
 
@@ -542,6 +588,7 @@ fail:
             if ( ( *it )->fSyncState == 0 )
                 ret = 0;
         jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
+        return ret;
     }
 
     void* JackNetMasterManager::NetManagerThread ( void* arg )

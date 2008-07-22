@@ -35,30 +35,39 @@ namespace Jack
         uint fNSubProcess;
         net_transport_data_t fTransportData;
 
-		//jack ports
+        //jack ports
         jack_port_id_t* fMidiCapturePortList;
         jack_port_id_t* fMidiPlaybackPortList;
 
-		//headers
+        //headers
         packet_header_t fTxHeader;
         packet_header_t fRxHeader;
 
-		//network buffers
+        //network buffers
         char* fTxBuffer;
         char* fRxBuffer;
         char* fTxData;
         char* fRxData;
 
-		//jack buffers
+        //jack buffers
         NetMidiBuffer* fNetMidiCaptureBuffer;
         NetMidiBuffer* fNetMidiPlaybackBuffer;
         NetAudioBuffer* fNetAudioCaptureBuffer;
         NetAudioBuffer* fNetAudioPlaybackBuffer;
 
-		//sizes
+        //sizes
         int fAudioRxLen;
         int fAudioTxLen;
         int fPayloadSize;
+
+        //monitoring
+#ifdef NETMONITOR
+		static std::string fMonitorPlotOptions[];
+		static std::string fMonitorFieldNames[];
+        jack_time_t fUsecCycleStart;
+        NetMeasure<jack_time_t> fMeasure;
+        NetMonitor<jack_time_t> fMonitor;
+#endif
 
         bool Init();
         net_status_t GetNetMaster();
@@ -74,7 +83,7 @@ namespace Jack
         int Recv ( size_t size, int flags );
         int Send ( size_t size, int flags );
 
-		int SetSyncPacket();
+        int SetSyncPacket();
         int TransportSync();
 
     public:
@@ -85,6 +94,10 @@ namespace Jack
         int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
                    int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
                    const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
+
+#ifdef NETMONITOR
+		int Close();
+#endif
 
         int Attach();
         int Detach();

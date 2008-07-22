@@ -7,13 +7,13 @@
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_dummy.cbp" />
-		<Project filename="jack_audioadapter.cbp" active="1">
+		<Project filename="jack_audioadapter.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_portaudio.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
-		<Project filename="jack_netdriver.cbp">
+		<Project filename="jack_netdriver.cbp" active="1">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_netmanager.cbp">

@@ -82,12 +82,67 @@
 					<Add library="ws2_32" />
 				</Linker>
 			</Target>
+			<Target title="Win32 Monitor">
+				<Option output="Release\bin\libjackservermp" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DLIBJACKDMP_EXPORTS" />
+					<Add option="-DREGEX_MALLOC" />
+					<Add option="-DSTDC_HEADERS" />
+					<Add option="-D__SMP__" />
+					<Add option="-DNETMONITOR" />
+					<Add directory="." />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="odbc32" />
+					<Add library="odbccp32" />
+					<Add library="ws2_32" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
+			<Add directory="." />
+			<Add directory="..\common" />
+			<Add directory="..\common\jack" />
 		</Compiler>
 		<Linker>
+			<Add library="kernel32" />
+			<Add library="user32" />
+			<Add library="gdi32" />
+			<Add library="winspool" />
+			<Add library="comdlg32" />
+			<Add library="advapi32" />
+			<Add library="shell32" />
+			<Add library="ole32" />
+			<Add library="oleaut32" />
+			<Add library="uuid" />
+			<Add library="odbc32" />
+			<Add library="odbccp32" />
+			<Add library="ws2_32" />
 			<Add directory="Release\bin" />
 		</Linker>
 		<Unit filename="..\common\JackAPI.cpp" />

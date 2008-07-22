@@ -188,8 +188,8 @@ namespace Jack
 
     EXPORT void SessionParamsDisplay ( session_params_t* params )
     {
-    	char bitdepth[16];
-    	( params->fBitdepth ) ? sprintf ( bitdepth, "%u", params->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
+        char bitdepth[16];
+        ( params->fBitdepth ) ? sprintf ( bitdepth, "%u", params->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
         jack_info ( "**************** Network parameters ****************" );
         jack_info ( "Name : %s", params->fName );
         jack_info ( "Protocol revision : %c", params->fProtocolVersion );
@@ -274,8 +274,8 @@ namespace Jack
 
     EXPORT void PacketHeaderDisplay ( packet_header_t* header )
     {
-    	char bitdepth[16];
-    	( header->fBitdepth ) ? sprintf ( bitdepth, "%u", header->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
+        char bitdepth[16];
+        ( header->fBitdepth ) ? sprintf ( bitdepth, "%u", header->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
         jack_info ( "********************Header********************" );
         jack_info ( "Data type : %c", header->fDataType );
         jack_info ( "Data stream : %c", header->fDataStream );

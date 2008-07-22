@@ -32,6 +32,22 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
+#ifdef NETMONITOR
+    std::string JackNetDriver::fMonitorPlotOptions[] =
+    {
+        std::string ( "set xlabel \"audio cycles\"" ),
+        std::string ( "set ylabel \"usecs\"" )
+    };
+    std::string JackNetDriver::fMonitorFieldNames[] =
+    {
+        std::string ( "cyclestart" ),
+        std::string ( "read end" ),
+        std::string ( "write start" ),
+        std::string ( "sync end" ),
+        std::string ( "send end" )
+    };
+#endif
+
     JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name, uint transport_sync )
             : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
@@ -44,6 +60,12 @@ namespace Jack
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
+
+        //monitor
+#ifdef NETMONITOR
+        std::string plot_file_name = std::string ( fParams.fName );
+        fMonitor.SetPlotFile ( plot_file_name, JackNetDriver::fMonitorPlotOptions, 2, JackNetDriver::fMonitorFieldNames, 5 );
+#endif
     }
 
     JackNetDriver::~JackNetDriver()
@@ -75,6 +97,16 @@ namespace Jack
         fEngineControl->fConstraint = 500 * 1000;
         return res;
     }
+
+
+#ifdef NETMONITOR
+    int JackNetDriver::Close()
+    {
+    	std::string filename = string ( fParams.fName );
+        fMonitor.Save ( filename );
+        return JackDriver::Close();
+    }
+#endif
 
     int JackNetDriver::Attach()
     {
@@ -290,7 +322,7 @@ namespace Jack
         fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
         fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
 
-		//payload size
+        //payload size
         fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
 
         return 0;
@@ -485,6 +517,11 @@ namespace Jack
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
+#ifdef NETMONITOR
+        fUsecCycleStart = GetMicroSeconds();
+        fMeasure.fTable[0] = GetMicroSeconds() - fUsecCycleStart;
+#endif
+
         //audio, midi or sync if driver is late
         if ( fParams.fSendMidiChannels || fParams.fSendAudioChannels )
         {
@@ -522,6 +559,12 @@ namespace Jack
             while ( fRxHeader.fIsLastPckt != 'y' );
         }
         fRxHeader.fCycle = rx_head->fCycle;
+
+
+#ifdef NETMONITOR
+        fMeasure.fTable[1] = GetMicroSeconds() - fUsecCycleStart;
+#endif
+
         return 0;
     }
 
@@ -540,6 +583,10 @@ namespace Jack
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
 
+#ifdef NETMONITOR
+        fMeasure.fTable[2] = GetMicroSeconds() - fUsecCycleStart;
+#endif
+
         //sync
         fTxHeader.fDataType = 's';
         if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
@@ -547,6 +594,10 @@ namespace Jack
         memset ( fTxData, 0, fPayloadSize );
         SetSyncPacket();
         tx_bytes = Send ( fParams.fMtu, 0 );
+
+#ifdef NETMONITOR
+        fMeasure.fTable[3] = GetMicroSeconds() - fUsecCycleStart;
+#endif
 
         //midi
         if ( fParams.fReturnMidiChannels )
@@ -579,6 +630,12 @@ namespace Jack
                 tx_bytes = Send ( fAudioTxLen, 0 );
             }
         }
+
+#ifdef NETMONITOR
+        fMeasure.fTable[4] = GetMicroSeconds() - fUsecCycleStart;
+        fMonitor.Write ( fMeasure );
+#endif
+
         return 0;
     }
 
