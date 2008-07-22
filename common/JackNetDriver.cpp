@@ -33,8 +33,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 #ifdef JACK_MONITOR
-    uint JackNetDriver::fMeasureCnt = 512;
+    uint JackNetDriver::fMeasureCnt = 50;
     uint JackNetDriver::fMeasurePoints = 5;
+    uint JackNetDriver::fMonitorPlotOptionsCnt = 2;
     std::string JackNetDriver::fMonitorPlotOptions[] =
     {
         std::string ( "set xlabel \"audio cycles\"" ),
@@ -65,9 +66,11 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
+		fMonitor = new NetMonitor<jack_time_t> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints );
         fMeasure = new jack_time_t[JackNetDriver::fMeasurePoints];
         std::string plot_file_name = std::string ( fParams.fName );
-        fMonitor.SetPlotFile ( plot_file_name, JackNetDriver::fMonitorPlotOptions, 2, JackNetDriver::fMonitorFieldNames, 5 );
+        fMonitor->SetPlotFile ( plot_file_name, JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
+								JackNetDriver::fMonitorFieldNames, JackNetDriver::fMeasurePoints );
 #endif
     }
 
@@ -86,6 +89,7 @@ namespace Jack
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
 		delete[] fMeasure;
+		delete fMonitor;
 #endif
     }
 
@@ -109,7 +113,7 @@ namespace Jack
     int JackNetDriver::Close()
     {
         std::string filename = string ( fParams.fName );
-        fMonitor.Save ( filename );
+        fMonitor->Save ( filename );
         return JackDriver::Close();
     }
 #endif
@@ -639,7 +643,7 @@ namespace Jack
 
 #ifdef JACK_MONITOR
         fMeasure[4] = GetMicroSeconds() - fUsecCycleStart;
-        fMonitor.Write ( fMeasure );
+        fMonitor->Write ( fMeasure );
 #endif
 
         return 0;

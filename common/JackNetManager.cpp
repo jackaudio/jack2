@@ -28,8 +28,9 @@ namespace Jack
 {
 //JackNetMaster******************************************************************************************************
 #ifdef JACK_MONITOR
-    uint JackNetMaster::fMeasureCnt = 512;
+    uint JackNetMaster::fMeasureCnt = 50;
     uint JackNetMaster::fMeasurePoints = 5;
+    uint JackNetMaster::fMonitorPlotOptionsCnt = 2;
     std::string JackNetMaster::fMonitorPlotOptions[] =
     {
         std::string ( "set xlabel \"audio cycles\"" ),
@@ -118,9 +119,11 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
+		fMonitor = new NetMonitor<jack_nframes_t> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints );
         fMeasure = new jack_nframes_t[JackNetMaster::fMeasurePoints];
         std::string plot_file_name = std::string ( fParams.fName );
-        fMonitor.SetPlotFile ( plot_file_name, fMonitorPlotOptions, 2, fMonitorFieldNames, 5 );
+        fMonitor->SetPlotFile ( plot_file_name, JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
+								JackNetMaster::fMonitorFieldNames, JackNetMaster::fMeasurePoints );
 #endif
     }
 
@@ -146,8 +149,9 @@ namespace Jack
         delete[] fRxBuffer;
 #ifdef JACK_MONITOR
         std::string filename = string ( fParams.fName );
-        fMonitor.Save ( filename );
+        fMonitor->Save ( filename );
         delete[] fMeasure;
+        delete fMonitor;
 #endif
     }
 
@@ -521,7 +525,7 @@ fail:
 
 #ifdef JACK_MONITOR
         fMeasure[4] = jack_frames_since_cycle_start( fJackClient );
-        fMonitor.Write ( fMeasure );
+        fMonitor->Write ( fMeasure );
 #endif
         return 0;
     }

@@ -82,10 +82,11 @@ namespace Jack
 #ifdef JACK_MONITOR
         static uint fMeasureCnt;
         static uint fMeasurePoints;
+        static uint fMonitorPlotOptionsCnt;
         static std::string fMonitorPlotOptions[];
         static std::string fMonitorFieldNames[];
         jack_nframes_t* fMeasure;
-        NetMonitor<jack_nframes_t> fMonitor;
+        NetMonitor<jack_nframes_t>* fMonitor;
 #endif
 
         bool Init();
