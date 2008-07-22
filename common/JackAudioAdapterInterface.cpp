@@ -25,29 +25,70 @@ namespace Jack
 
 void MeasureTable::Write(int time1, int time2, float r1, float r2, int pos1, int pos2)
 {
-	fTable[fCount].time1 = time1;
-	fTable[fCount].time2 = time2;
-	fTable[fCount].r1 = r1;
-	fTable[fCount].r2 = r2;
-	fTable[fCount].pos1 = pos1;
-	fTable[fCount].pos2 = pos2;
-	fCount++;
-	if (fCount == TABLE_MAX)
-		fCount--;
+    int pos = (++fCount) % TABLE_MAX;
+	fTable[pos].time1 = time1;
+	fTable[pos].time2 = time2;
+	fTable[pos].r1 = r1;
+	fTable[pos].r2 = r2;
+	fTable[pos].pos1 = pos1;
+	fTable[pos].pos2 = pos2;
 }
                 
 void MeasureTable::Save()
 {
+    char buffer[1024];
 	FILE* file = fopen("JackAudioAdapter.log", "w");
 
-	for (int i = 1; i < TABLE_MAX; i++) {
+    int MAX = (fCount) % TABLE_MAX - 1;
+	for (int i = 1; i < MAX; i++) {
 		fprintf(file, "%d \t %d \t %d  \t %f \t %f \t %d \t %d \n", 
 		fTable[i].delta, fTable[i+1].time1 - fTable[i].time1, 
 		fTable[i+1].time2 - fTable[i].time2, 
 		fTable[i].r1, fTable[i].r2, fTable[i].pos1, fTable[i].pos2);
 	}
-
-	fclose(file);
+    fclose(file);
+    
+    // Adapter timing 1
+    file = fopen("AdapterTiming1.plot", "w");
+    fprintf(file, "set multiplot\n");
+    fprintf(file, "set grid\n");
+    fprintf(file, "set title \"Audio adapter timing\"\n");
+    fprintf(file, "set xlabel \"audio cycles\"\n");
+    fprintf(file, "set ylabel \"usec\"\n");
+    fprintf(file, "plot ");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer time\" with lines,");
+    fprintf(file, buffer);
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer time\" with lines");
+    fprintf(file, buffer);
+    fclose(file);
+    
+    // Adapter timing 2 
+    file = fopen("AdapterTiming2.plot", "w");
+    fprintf(file, "set multiplot\n");
+    fprintf(file, "set grid\n");
+    fprintf(file, "set title \"Audio adapter timing\"\n");
+    fprintf(file, "set xlabel \"audio cycles\"\n");
+    fprintf(file, "set ylabel \"usec\"\n");
+    fprintf(file, "plot ");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
+    fprintf(file, buffer);
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines");
+    fprintf(file, buffer);
+    fclose(file);
+    
+    // Adapter timing 3
+    file = fopen("AdapterTiming3.plot", "w");
+    fprintf(file, "set multiplot\n");
+    fprintf(file, "set grid\n");
+    fprintf(file, "set title \"Audio adapter timing\"\n");
+    fprintf(file, "set xlabel \"audio cycles\"\n");
+    fprintf(file, "set ylabel \"usec\"\n");
+    fprintf(file, "plot ");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 6 title \"Position in consumer ringbuffer\" with lines,");
+    fprintf(file, buffer);
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Position in producer ringbuffer\" with lines");
+    fprintf(file, buffer);
+    fclose(file);
 }
 
 void JackAudioAdapterInterface::ResetRingBuffers()
