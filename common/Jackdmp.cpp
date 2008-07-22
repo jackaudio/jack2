@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     const JSList * server_parameters;
     const char* server_name = "default";
     jackctl_driver_t * driver_ctl;
-    const char *options = "-ad:P:uvrshVRL:STFl:t:mn:";
+    const char *options = "-ad:P:uvrshVRL:STFl:t:mn:p:";
     struct option long_options[] = {
                                        { "driver", 1, 0, 'd' },
                                        { "verbose", 0, 0, 'v' },
@@ -182,6 +182,7 @@ int main(int argc, char* argv[])
     char *driver_name = NULL;
     char **driver_args = NULL;
     int driver_nargs = 1;
+    int port_max;
     bool show_version = false;
     sigset_t signals;
     jackctl_parameter_t* param;
@@ -206,6 +207,10 @@ int main(int argc, char* argv[])
             case 'd':
                 seen_driver = true;
                 driver_name = optarg;
+                break;
+                
+            case 'p':
+                port_max = (unsigned int)atol(optarg);
                 break;
 
             case 'v':
