@@ -33,6 +33,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 #ifdef JACK_MONITOR
+    uint JackNetDriver::fMeasureCnt = 512;
+    uint JackNetDriver::fMeasurePoints = 5;
     std::string JackNetDriver::fMonitorPlotOptions[] =
     {
         std::string ( "set xlabel \"audio cycles\"" ),
@@ -63,6 +65,7 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
+        fMeasure = new jack_time_t[JackNetDriver::fMeasurePoints];
         std::string plot_file_name = std::string ( fParams.fName );
         fMonitor.SetPlotFile ( plot_file_name, JackNetDriver::fMonitorPlotOptions, 2, JackNetDriver::fMonitorFieldNames, 5 );
 #endif
@@ -81,6 +84,9 @@ namespace Jack
         delete[] fMulticastIP;
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
+#ifdef JACK_MONITOR
+		delete[] fMeasure;
+#endif
     }
 
 //*************************************initialization***********************************************************************
@@ -102,7 +108,7 @@ namespace Jack
 #ifdef JACK_MONITOR
     int JackNetDriver::Close()
     {
-    	std::string filename = string ( fParams.fName );
+        std::string filename = string ( fParams.fName );
         fMonitor.Save ( filename );
         return JackDriver::Close();
     }
@@ -519,7 +525,7 @@ namespace Jack
 
 #ifdef JACK_MONITOR
         fUsecCycleStart = GetMicroSeconds();
-        fMeasure.fTable[0] = GetMicroSeconds() - fUsecCycleStart;
+        fMeasure[0] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
         //audio, midi or sync if driver is late
@@ -562,7 +568,7 @@ namespace Jack
 
 
 #ifdef JACK_MONITOR
-        fMeasure.fTable[1] = GetMicroSeconds() - fUsecCycleStart;
+        fMeasure[1] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
         return 0;
@@ -584,7 +590,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
 
 #ifdef JACK_MONITOR
-        fMeasure.fTable[2] = GetMicroSeconds() - fUsecCycleStart;
+        fMeasure[2] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
         //sync
@@ -596,7 +602,7 @@ namespace Jack
         tx_bytes = Send ( fParams.fMtu, 0 );
 
 #ifdef JACK_MONITOR
-        fMeasure.fTable[3] = GetMicroSeconds() - fUsecCycleStart;
+        fMeasure[3] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
         //midi
@@ -632,7 +638,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fMeasure.fTable[4] = GetMicroSeconds() - fUsecCycleStart;
+        fMeasure[4] = GetMicroSeconds() - fUsecCycleStart;
         fMonitor.Write ( fMeasure );
 #endif
 

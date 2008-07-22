@@ -28,6 +28,8 @@ namespace Jack
 {
 //JackNetMaster******************************************************************************************************
 #ifdef JACK_MONITOR
+    uint JackNetMaster::fMeasureCnt = 512;
+    uint JackNetMaster::fMeasurePoints = 5;
     std::string JackNetMaster::fMonitorPlotOptions[] =
     {
         std::string ( "set xlabel \"audio cycles\"" ),
@@ -116,6 +118,7 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
+        fMeasure = new jack_nframes_t[JackNetMaster::fMeasurePoints];
         std::string plot_file_name = std::string ( fParams.fName );
         fMonitor.SetPlotFile ( plot_file_name, fMonitorPlotOptions, 2, fMonitorFieldNames, 5 );
 #endif
@@ -142,8 +145,9 @@ namespace Jack
         delete[] fTxBuffer;
         delete[] fRxBuffer;
 #ifdef JACK_MONITOR
-		std::string filename = string ( fParams.fName );
+        std::string filename = string ( fParams.fName );
         fMonitor.Save ( filename );
+        delete[] fMeasure;
 #endif
     }
 
@@ -387,7 +391,7 @@ fail:
 
 #ifdef JACK_MONITOR
         NetMeasure<jack_nframes_t> measure;
-        measure.fTable[0] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[0] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
         //buffers
@@ -421,7 +425,7 @@ fail:
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        measure.fTable[1] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[1] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
         //midi
@@ -461,7 +465,7 @@ fail:
         }
 
 #ifdef JACK_MONITOR
-        measure.fTable[2] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[2] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
         //receive --------------------------------------------------------------------------------------------------------------------
@@ -475,7 +479,7 @@ fail:
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
 #ifdef JACK_MONITOR
-        measure.fTable[3] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[3] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
@@ -517,8 +521,8 @@ fail:
         }
 
 #ifdef JACK_MONITOR
-        measure.fTable[4] = jack_frames_since_cycle_start( fJackClient );
-        fMonitor.Write ( measure );
+        fMeasure[4] = jack_frames_since_cycle_start( fJackClient );
+        fMonitor.Write ( fMeasure );
 #endif
         return 0;
     }
