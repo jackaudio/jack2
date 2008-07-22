@@ -32,7 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
     std::string JackNetDriver::fMonitorPlotOptions[] =
     {
         std::string ( "set xlabel \"audio cycles\"" ),
@@ -62,7 +62,7 @@ namespace Jack
         fParams.fTransportSync = transport_sync;
 
         //monitor
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         std::string plot_file_name = std::string ( fParams.fName );
         fMonitor.SetPlotFile ( plot_file_name, JackNetDriver::fMonitorPlotOptions, 2, JackNetDriver::fMonitorFieldNames, 5 );
 #endif
@@ -99,7 +99,7 @@ namespace Jack
     }
 
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
     int JackNetDriver::Close()
     {
     	std::string filename = string ( fParams.fName );
@@ -517,7 +517,7 @@ namespace Jack
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         fUsecCycleStart = GetMicroSeconds();
         fMeasure.fTable[0] = GetMicroSeconds() - fUsecCycleStart;
 #endif
@@ -561,7 +561,7 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
 
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         fMeasure.fTable[1] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
@@ -583,7 +583,7 @@ namespace Jack
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         fMeasure.fTable[2] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
@@ -595,7 +595,7 @@ namespace Jack
         SetSyncPacket();
         tx_bytes = Send ( fParams.fMtu, 0 );
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         fMeasure.fTable[3] = GetMicroSeconds() - fUsecCycleStart;
 #endif
 
@@ -631,7 +631,7 @@ namespace Jack
             }
         }
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         fMeasure.fTable[4] = GetMicroSeconds() - fUsecCycleStart;
         fMonitor.Write ( fMeasure );
 #endif

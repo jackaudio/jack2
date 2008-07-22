@@ -50,6 +50,7 @@ def set_options(opt):
 
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
+    opt.add_option('--monitor', action='store_true', default=False, help='Build with monitoring records')
     opt.sub_options('linux/dbus')
 
 def configure(conf):
@@ -80,6 +81,7 @@ def configure(conf):
     conf.env['JACK_VERSION'] = VERSION
 
     conf.env['BUILD_DOXYGEN_DOCS'] = Params.g_options.doxygen
+    conf.env['BUILD_WITH_MONITOR'] = Params.g_options.monitor
 
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
@@ -93,6 +95,8 @@ def configure(conf):
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
+    if conf.env['BUILD_WITH_MONITOR'] == True:
+        conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h')
 
     display_msg("\n==================")
@@ -101,6 +105,7 @@ def configure(conf):
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
+    display_feature('Build with monitoring records', conf.env['BUILD_WITH_MONITOR'])
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)

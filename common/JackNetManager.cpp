@@ -27,7 +27,7 @@ using namespace std;
 namespace Jack
 {
 //JackNetMaster******************************************************************************************************
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
     std::string JackNetMaster::fMonitorPlotOptions[] =
     {
         std::string ( "set xlabel \"audio cycles\"" ),
@@ -115,7 +115,7 @@ namespace Jack
         fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
 
         //monitor
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         std::string plot_file_name = std::string ( fParams.fName );
         fMonitor.SetPlotFile ( plot_file_name, fMonitorPlotOptions, 2, fMonitorFieldNames, 5 );
 #endif
@@ -141,7 +141,7 @@ namespace Jack
         delete[] fMidiPlaybackPorts;
         delete[] fTxBuffer;
         delete[] fRxBuffer;
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
 		std::string filename = string ( fParams.fName );
         fMonitor.Save ( filename );
 #endif
@@ -385,7 +385,7 @@ fail:
         fTxHeader.fIsLastPckt = 'n';
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         NetMeasure<jack_nframes_t> measure;
         measure.fTable[0] = jack_frames_since_cycle_start( fJackClient );
 #endif
@@ -420,7 +420,7 @@ fail:
         if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
             return tx_bytes;
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         measure.fTable[1] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
@@ -460,7 +460,7 @@ fail:
             }
         }
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         measure.fTable[2] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
@@ -474,7 +474,7 @@ fail:
         }
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         measure.fTable[3] = jack_frames_since_cycle_start( fJackClient );
 #endif
 
@@ -516,7 +516,7 @@ fail:
             while ( fRxHeader.fIsLastPckt != 'y' );
         }
 
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
         measure.fTable[4] = jack_frames_since_cycle_start( fJackClient );
         fMonitor.Write ( measure );
 #endif

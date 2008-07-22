@@ -272,7 +272,7 @@ namespace Jack
             return 0;
         }
 
-        int SetPlotFile ( string& name, string* options_list = NULL, uint options_number = 0, string* field_names = NULL, uint field_number )
+        int SetPlotFile ( string& name, string* options_list = NULL, uint options_number = 0, string* field_names = NULL, uint field_number = 0 )
         {
         	string title = name + "_netmonitor";
             string plot_filename = title + ".plt";

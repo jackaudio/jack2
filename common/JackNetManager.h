@@ -79,7 +79,7 @@ namespace Jack
         int fPayloadSize;
 
         //monitoring
-#ifdef NETMONITOR
+#ifdef JACK_MONITOR
 		static std::string fMonitorPlotOptions[];
 		static std::string fMonitorFieldNames[];
         NetMonitor<jack_nframes_t> fMonitor;
