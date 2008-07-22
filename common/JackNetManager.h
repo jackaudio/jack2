@@ -84,7 +84,7 @@ namespace Jack
         static uint fMeasurePoints;
         static std::string fMonitorPlotOptions[];
         static std::string fMonitorFieldNames[];
-        jack_nframes_t fMeasure[];
+        jack_nframes_t* fMeasure;
         NetMonitor<jack_nframes_t> fMonitor;
 #endif
 

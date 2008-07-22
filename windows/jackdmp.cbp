@@ -89,7 +89,7 @@
 					<Add option="-DNDEBUG" />
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
-					<Add option="-DNETMONITOR" />
+					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
 					<Add directory="..\common" />
 					<Add directory="..\common\jack" />

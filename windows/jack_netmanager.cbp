@@ -76,7 +76,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-DNETMONITOR" />
+					<Add option="-DJACK_MONITOR" />
 					<Add directory="..\common" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\windows" />

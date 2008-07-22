@@ -66,7 +66,7 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
-					<Add option="-DNETMONITOR" />
+					<Add option="-DJACK_MONITOR" />
 				</Compiler>
 			</Target>
 		</Build>

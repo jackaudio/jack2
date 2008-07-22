@@ -390,7 +390,6 @@ fail:
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
 #ifdef JACK_MONITOR
-        NetMeasure<jack_nframes_t> measure;
         fMeasure[0] = jack_frames_since_cycle_start( fJackClient );
 #endif
 

@@ -13,7 +13,7 @@
 		<Project filename="jack_portaudio.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
-		<Project filename="jack_netdriver.cbp" active="1">
+		<Project filename="jack_netdriver.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_netmanager.cbp">
@@ -32,7 +32,7 @@
 			<Depends filename="libjackmp.cbp" />
 		</Project>
 		<Project filename="jack_connect.cbp" />
-		<Project filename="jack_disconnect.cbp">
+		<Project filename="jack_disconnect.cbp" active="1">
 			<Depends filename="libjackmp.cbp" />
 		</Project>
 	</Workspace>

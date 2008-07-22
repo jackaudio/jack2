@@ -82,7 +82,7 @@
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
 					<Add option="-D__SMP__" />
-					<Add option="-DNETMONITOR" />
+					<Add option="-DJACK_MONITOR" />
 					<Add directory="..\common" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\windows" />

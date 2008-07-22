@@ -100,7 +100,7 @@
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
-					<Add option="-DNETMONITOR" />
+					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
 					<Add directory="..\common" />
 					<Add directory="..\common\jack" />
