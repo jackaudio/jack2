@@ -31,18 +31,18 @@ namespace Jack
     uint JackNetMaster::fMeasureCnt = 50;
     uint JackNetMaster::fMeasurePoints = 5;
     uint JackNetMaster::fMonitorPlotOptionsCnt = 2;
-    std::string JackNetMaster::fMonitorPlotOptions[] =
+    string JackNetMaster::fMonitorPlotOptions[] =
     {
-        std::string ( "set xlabel \"audio cycles\"" ),
-        std::string ( "set ylabel \"audio frames\"" )
+        string ( "set xlabel \"audio cycles\"" ),
+        string ( "set ylabel \"% of audio cycle\"" )
     };
-    std::string JackNetMaster::fMonitorFieldNames[] =
+    string JackNetMaster::fMonitorFieldNames[] =
     {
-        std::string ( "cycle start" ),
-        std::string ( "sync send" ),
-        std::string ( "send end" ),
-        std::string ( "sync recv" ),
-        std::string ( "end of cycle" )
+        string ( "cycle start" ),
+        string ( "sync send" ),
+        string ( "send end" ),
+        string ( "sync recv" ),
+        string ( "end of cycle" )
     };
 #endif
 
@@ -119,10 +119,12 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
-		fMonitor = new NetMonitor<jack_nframes_t> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints );
-        fMeasure = new jack_nframes_t[JackNetMaster::fMeasurePoints];
-        std::string plot_file_name = std::string ( fParams.fName );
-        fMonitor->SetPlotFile ( plot_file_name, JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
+		string plot_name = string ( fParams.fName );
+		plot_name += string ( "_master" );
+		//plot_name += ( fEngineControl->fSyncMode ) ? string ( "sync" ) : string ( "async" );
+		fMonitor = new JackGnuPlotMonitor<float> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints, plot_name );
+        fMeasure = new float[JackNetMaster::fMeasurePoints];
+        fMonitor->SetPlotFile ( JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
 								JackNetMaster::fMonitorFieldNames, JackNetMaster::fMeasurePoints );
 #endif
     }
@@ -148,8 +150,7 @@ namespace Jack
         delete[] fTxBuffer;
         delete[] fRxBuffer;
 #ifdef JACK_MONITOR
-        std::string filename = string ( fParams.fName );
-        fMonitor->Save ( filename );
+        fMonitor->Save();
         delete[] fMeasure;
         delete fMonitor;
 #endif
@@ -394,7 +395,8 @@ fail:
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
 #ifdef JACK_MONITOR
-        fMeasure[0] = jack_frames_since_cycle_start( fJackClient );
+		fMeasureId = 0;
+        fMeasure[fMeasureId++] = ( (float)jack_frames_since_cycle_start( fJackClient ) /(float)fParams.fPeriodSize ) * 100.f;
 #endif
 
         //buffers
@@ -428,7 +430,7 @@ fail:
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        fMeasure[1] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[fMeasureId++] = ( (float)jack_frames_since_cycle_start( fJackClient ) /(float)fParams.fPeriodSize ) * 100.f;
 #endif
 
         //midi
@@ -468,7 +470,7 @@ fail:
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[2] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[fMeasureId++] = ( (float)jack_frames_since_cycle_start( fJackClient ) /(float)fParams.fPeriodSize ) * 100.f;
 #endif
 
         //receive --------------------------------------------------------------------------------------------------------------------
@@ -482,7 +484,7 @@ fail:
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
 #ifdef JACK_MONITOR
-        fMeasure[3] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[fMeasureId++] = ( (float)jack_frames_since_cycle_start( fJackClient ) /(float)fParams.fPeriodSize ) * 100.f;
 #endif
 
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
@@ -524,7 +526,7 @@ fail:
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[4] = jack_frames_since_cycle_start( fJackClient );
+        fMeasure[fMeasureId++] = ( (float)jack_frames_since_cycle_start( fJackClient ) /(float)fParams.fPeriodSize ) * 100.f;
         fMonitor->Write ( fMeasure );
 #endif
         return 0;

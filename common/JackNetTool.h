@@ -24,9 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTools.h"
 #include "JackPlatformNetSocket.h"
 #include "types.h"
-
-#include <string>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
@@ -170,128 +167,6 @@ namespace Jack
         void RenderToJackPorts ( int subcycle );
 
         void SetBuffer(int index, sample_t* buffer);
-    };
-
-// net monitor ********************************************************************************
-
-    template <class T> class NetMonitor
-    {
-    private:
-        uint fMeasureCnt;
-        uint fMeasurePoints;
-        T** fMeasureTable;
-        uint fTablePos;
-
-        void DisplayMeasure ( T* measure )
-        {
-            string display;
-            for ( uint m_id = 0; m_id < fMeasurePoints; m_id++ )
-            {
-                char* value;
-                sprintf ( value, "%llu ", measure[m_id] );
-                display += string ( value );
-            }
-            cout << "NetMonitor:: '" << display << "'" << endl;
-        }
-
-
-    public:
-        NetMonitor ( uint measure_cnt = 512, uint measure_points = 5 )
-        {
-            jack_log ( "JackNetMonitor::JackNetMonitor measure_cnt %u measure_points %u", measure_cnt, measure_points );
-
-            fMeasureCnt = measure_cnt;
-            fMeasurePoints = measure_points;
-            fTablePos = 0;
-            //allocate measure table
-            fMeasureTable = new T*[fMeasureCnt];
-            for ( uint i = 0; i < fMeasureCnt; i++ )
-                fMeasureTable[i] = new T[fMeasurePoints];
-            //init measure table
-            for ( uint cnt = 0; cnt < fMeasureCnt; cnt++ )
-                for ( uint point = 0; point < fMeasurePoints; point++ )
-                    fMeasureTable[cnt][point] = 0;
-        }
-
-        ~NetMonitor()
-        {
-            jack_log ( "NetMonitor::~NetMonitor" );
-            for ( uint cnt = 0; cnt < fMeasureCnt; cnt++ )
-                delete[] fMeasureTable[cnt];
-            delete[] fMeasureTable;
-        }
-
-        void InitTable()
-        {
-            for ( uint cnt = 0; cnt < fMeasureCnt; cnt++ )
-                for ( uint point = 0; point < fMeasurePoints; point++ )
-                    fMeasureTable[cnt][point] = 0;
-        }
-
-        uint Write ( T* measure )
-        {
-            for ( uint point = 0; point < fMeasurePoints; point++ )
-                fMeasureTable[fTablePos][point] = measure[point];
-            if ( ++fTablePos == fMeasureCnt )
-                fTablePos = 0;
-            return fTablePos;
-        }
-
-        int Save ( string& filename )
-        {
-            filename += "_netmonitor.log";
-
-            jack_log ( "JackNetMonitor::Save filename %s", filename.c_str() );
-
-            FILE* file = fopen ( filename.c_str(), "w" );
-
-            //print each measure with tab separated values
-            for ( uint cnt = 0; cnt < fMeasureCnt; cnt++ )
-            {
-                for ( uint pt = 0; pt < fMeasurePoints; pt++ )
-                    fprintf ( file, "%llu \t ", fMeasureTable[cnt][pt] );
-                fprintf ( file, "\n" );
-            }
-
-            fclose(file);
-            return 0;
-        }
-
-        int SetPlotFile ( string& name, string* options_list = NULL, uint options_number = 0, string* field_names = NULL, uint field_number = 0 )
-        {
-            //names and file
-            string title = name + "_netmonitor";
-            string plot_filename = title + ".plt";
-            string data_filename = title + ".log";
-            FILE* file = fopen ( plot_filename.c_str(), "w" );
-
-            //base options
-            fprintf ( file, "set multiplot\n" );
-            fprintf ( file, "set grid\n" );
-            fprintf ( file, "set title \"%s\"\n", title.c_str() );
-
-            //additional options
-            for ( uint i = 0; i < options_number; i++ )
-            {
-                jack_log ( "JackNetMonitor::SetPlotFile - Add plot option : '%s'", options_list[i].c_str() );
-                fprintf ( file, "%s\n", options_list[i].c_str() );
-            }
-
-            //plot
-            fprintf ( file, "plot " );
-            for ( uint row = 1; row <= field_number; row++ )
-            {
-                jack_log ( "JackNetMonitor::SetPlotFile - Add plot : file '%s' row '%d' title '%s' field '%s'",
-                    data_filename.c_str(), row, name.c_str(), field_names[row-1].c_str() );
-                fprintf ( file, "\"%s\" using %u title \"%s : %s\" with lines", data_filename.c_str(), row, name.c_str(), field_names[row-1].c_str() );
-                fprintf ( file, ( row < field_number ) ? "," : "\n" );
-            }
-
-            jack_log ( "JackNetMonitor::SetPlotFile - Saving GnuPlot '.plt' file to '%s'", plot_filename.c_str() );
-
-            fclose ( file );
-            return 0;
-        }
     };
 
 //utility *************************************************************************************

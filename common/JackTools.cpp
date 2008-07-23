@@ -23,7 +23,6 @@
 
 #include "JackConstants.h"
 #include "JackTools.h"
-#include "JackError.h"
 #include <stdlib.h>
 #include <stdio.h>
 

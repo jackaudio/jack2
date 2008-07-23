@@ -30,24 +30,26 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
 
+using namespace std;
+
 namespace Jack
 {
 #ifdef JACK_MONITOR
-    uint JackNetDriver::fMeasureCnt = 50;
+    uint JackNetDriver::fMeasureCnt = 64;
     uint JackNetDriver::fMeasurePoints = 5;
     uint JackNetDriver::fMonitorPlotOptionsCnt = 2;
-    std::string JackNetDriver::fMonitorPlotOptions[] =
+    string JackNetDriver::fMonitorPlotOptions[] =
     {
-        std::string ( "set xlabel \"audio cycles\"" ),
-        std::string ( "set ylabel \"usecs\"" )
+        string ( "set xlabel \"audio cycles\"" ),
+        string ( "set ylabel \"% of audio cycle\"" )
     };
-    std::string JackNetDriver::fMonitorFieldNames[] =
+    string JackNetDriver::fMonitorFieldNames[] =
     {
-        std::string ( "cyclestart" ),
-        std::string ( "read end" ),
-        std::string ( "write start" ),
-        std::string ( "sync end" ),
-        std::string ( "send end" )
+        string ( "cyclestart" ),
+        string ( "read end" ),
+        string ( "write start" ),
+        string ( "sync send" ),
+        string ( "send end" )
     };
 #endif
 
@@ -55,6 +57,8 @@ namespace Jack
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name, uint transport_sync )
             : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
     {
+    	jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
+
         fMulticastIP = new char[strlen ( ip ) + 1];
         strcpy ( fMulticastIP, ip );
         fParams.fMtu = mtu;
@@ -63,15 +67,6 @@ namespace Jack
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
-
-        //monitor
-#ifdef JACK_MONITOR
-		fMonitor = new NetMonitor<jack_time_t> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints );
-        fMeasure = new jack_time_t[JackNetDriver::fMeasurePoints];
-        std::string plot_file_name = std::string ( fParams.fName );
-        fMonitor->SetPlotFile ( plot_file_name, JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
-								JackNetDriver::fMonitorFieldNames, JackNetDriver::fMeasurePoints );
-#endif
     }
 
     JackNetDriver::~JackNetDriver()
@@ -88,6 +83,7 @@ namespace Jack
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
+        fMonitor->Save();
 		delete[] fMeasure;
 		delete fMonitor;
 #endif
@@ -107,16 +103,6 @@ namespace Jack
         fEngineControl->fConstraint = 500 * 1000;
         return res;
     }
-
-
-#ifdef JACK_MONITOR
-    int JackNetDriver::Close()
-    {
-        std::string filename = string ( fParams.fName );
-        fMonitor->Save ( filename );
-        return JackDriver::Close();
-    }
-#endif
 
     int JackNetDriver::Attach()
     {
@@ -256,22 +242,26 @@ namespace Jack
     {
         jack_info ( "Restarting driver..." );
         delete[] fTxBuffer;
+        fTxBuffer = NULL;
         delete[] fRxBuffer;
+        fRxBuffer = NULL;
         delete fNetAudioCaptureBuffer;
+        fNetAudioCaptureBuffer = NULL;
         delete fNetAudioPlaybackBuffer;
+        fNetAudioPlaybackBuffer = NULL;
         delete fNetMidiCaptureBuffer;
+        fNetMidiCaptureBuffer = NULL;
         delete fNetMidiPlaybackBuffer;
+        fNetMidiPlaybackBuffer = NULL;
         FreePorts();
         delete[] fMidiCapturePortList;
-        delete[] fMidiPlaybackPortList;
-        fTxBuffer = NULL;
-        fRxBuffer = NULL;
-        fNetAudioCaptureBuffer = NULL;
-        fNetAudioPlaybackBuffer = NULL;
-        fNetMidiCaptureBuffer = NULL;
-        fNetMidiPlaybackBuffer = NULL;
         fMidiCapturePortList = NULL;
+        delete[] fMidiPlaybackPortList;
         fMidiPlaybackPortList = NULL;
+        delete[] fMeasure;
+        fMeasure = NULL;
+        delete fMonitor;
+        fMonitor = NULL;
     }
 
     int JackNetDriver::SetParams()
@@ -334,6 +324,17 @@ namespace Jack
 
         //payload size
         fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
+
+        //monitor
+#ifdef JACK_MONITOR
+		string plot_name = string ( fParams.fName );
+		plot_name += string ( "_slave_" );
+		plot_name += ( fEngineControl->fSyncMode ) ? string ( "sync" ) : string ( "async" );
+		fMonitor = new JackGnuPlotMonitor<float> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints, plot_name );
+        fMeasure = new float[JackNetDriver::fMeasurePoints];
+        fMonitor->SetPlotFile ( JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
+								JackNetDriver::fMonitorFieldNames, JackNetDriver::fMeasurePoints );
+#endif
 
         return 0;
     }
@@ -528,8 +529,8 @@ namespace Jack
         JackDriver::CycleTakeBeginTime();
 
 #ifdef JACK_MONITOR
-        fUsecCycleStart = GetMicroSeconds();
-        fMeasure[0] = GetMicroSeconds() - fUsecCycleStart;
+        fMeasureId = 0;
+		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //audio, midi or sync if driver is late
@@ -572,7 +573,7 @@ namespace Jack
 
 
 #ifdef JACK_MONITOR
-        fMeasure[1] = GetMicroSeconds() - fUsecCycleStart;
+		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         return 0;
@@ -594,7 +595,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
 
 #ifdef JACK_MONITOR
-        fMeasure[2] = GetMicroSeconds() - fUsecCycleStart;
+		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //sync
@@ -606,7 +607,7 @@ namespace Jack
         tx_bytes = Send ( fParams.fMtu, 0 );
 
 #ifdef JACK_MONITOR
-        fMeasure[3] = GetMicroSeconds() - fUsecCycleStart;
+		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //midi
@@ -642,7 +643,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[4] = GetMicroSeconds() - fUsecCycleStart;
+		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
         fMonitor->Write ( fMeasure );
 #endif
 

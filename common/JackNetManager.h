@@ -85,8 +85,9 @@ namespace Jack
         static uint fMonitorPlotOptionsCnt;
         static std::string fMonitorPlotOptions[];
         static std::string fMonitorFieldNames[];
-        jack_nframes_t* fMeasure;
-        NetMonitor<jack_nframes_t>* fMonitor;
+        float* fMeasure;
+        int fMeasureId;
+        JackGnuPlotMonitor<float>* fMonitor;
 #endif
 
         bool Init();
