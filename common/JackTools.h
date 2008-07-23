@@ -37,7 +37,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <strstream>
+#include <sstream>
 #include "jslist.h"
 #include "driver_interface.h"
 
@@ -107,7 +107,7 @@ namespace Jack
             std::string display;
             for ( uint32_t m_id = 0; m_id < fMeasurePoints; m_id++ )
             {
-                std::ostrstream value ( display, measure[m_id] );
+                std::ostringstream value ( display, measure[m_id] );
                 display += std::string ( " " );
             }
             std::cout << "JackGnuPlotMonitor::Display '" << display << "'" << std::endl;

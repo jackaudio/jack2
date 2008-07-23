@@ -41,7 +41,8 @@ def subst_func(tsk):
 def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld.create_obj('cpp', 'shlib')
     process.env['shlib_PATTERN'] = '%s.so'
-    process.includes = ['./jack', '.', '../macosx','../windows', '../linux/alsa']
+    process.defines  = 'HAVE_CONFIG_H'
+    process.includes = ['./jack', '.', '..', '../macosx','../windows', '../linux/alsa']
     process.name     = target
     process.target   = target
     process.source   = sources
@@ -122,8 +123,8 @@ def build(bld):
         'JackLoopbackDriver.cpp',
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
-	'JackRestartThreadedDriver.cpp',
-	'JackWaitThreadedDriver.cpp',
+		'JackRestartThreadedDriver.cpp',
+		'JackWaitThreadedDriver.cpp',
         'JackServerAPI.cpp',
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
@@ -136,7 +137,7 @@ def build(bld):
             'JackSocketServerChannel.cpp',
             'JackSocketNotifyChannel.cpp',
             'JackSocketServerNotifyChannel.cpp',
-	    'JackNetUnixSocket.cpp',
+	    	'JackNetUnixSocket.cpp',
             ]
 
     if bld.env()['IS_MACOSX']:
@@ -146,7 +147,7 @@ def build(bld):
             '../macosx/JackMachServerNotifyChannel.cpp',
             '../macosx/JackMacEngineRPC.cpp',
             '../macosx/RPC/JackRPCClientUser.c',
-	    'JackNetUnixSocket.cpp',
+	    	'JackNetUnixSocket.cpp',
             ]
 
     serverlib.vnum = bld.env()['JACK_API_VERSION']
@@ -198,7 +199,7 @@ def build(bld):
     adapter_sources = [
         'JackResampler.cpp',
         'JackLibSampleRateResampler.cpp',
-	'JackAudioAdapter.cpp',
+		'JackAudioAdapter.cpp',
         'JackAudioAdapterFactory.cpp',
         'JackAudioAdapterInterface.cpp',
         ]

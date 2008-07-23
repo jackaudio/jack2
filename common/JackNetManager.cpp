@@ -17,6 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include "JackNetManager.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
