@@ -258,10 +258,12 @@ namespace Jack
         fMidiCapturePortList = NULL;
         delete[] fMidiPlaybackPortList;
         fMidiPlaybackPortList = NULL;
+#ifdef JACK_MONITOR
         delete[] fMeasure;
         fMeasure = NULL;
         delete fMonitor;
         fMonitor = NULL;
+#endif
     }
 
     int JackNetDriver::SetParams()
