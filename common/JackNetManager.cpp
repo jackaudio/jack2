@@ -32,7 +32,7 @@ namespace Jack
 {
 //JackNetMaster******************************************************************************************************
 #ifdef JACK_MONITOR
-    uint JackNetMaster::fMeasureCnt = 50;
+    uint JackNetMaster::fMeasureCnt = 2048;
     uint JackNetMaster::fMeasurePoints = 5;
     uint JackNetMaster::fMonitorPlotOptionsCnt = 2;
     string JackNetMaster::fMonitorPlotOptions[] =

@@ -102,6 +102,10 @@ namespace Jack
                    int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
                    const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
 
+#ifdef JACK_MONITOR
+		int Close();
+#endif
+
         int Attach();
         int Detach();
 

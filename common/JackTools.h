@@ -200,7 +200,7 @@ namespace Jack
             {
                 jack_log ( "JackGnuPlotMonitor::SetPlotFile - Add plot : file '%s' row '%d' title '%s' field '%s'",
                            data_filename.c_str(), row, name.c_str(), field_names[row-1].c_str() );
-                file << "\"" << data_filename << "\" using " << row << " title \"" << title << " : " << field_names[row-1] << "\" with lines";
+                file << "\"" << data_filename << "\" using " << row << " title \"" << field_names[row-1] << "\" with lines";
                 file << ( ( row < field_number ) ? ", " : "\n" );
             }
 

@@ -35,7 +35,7 @@ using namespace std;
 namespace Jack
 {
 #ifdef JACK_MONITOR
-    uint JackNetDriver::fMeasureCnt = 64;
+    uint JackNetDriver::fMeasureCnt = 2048;
     uint JackNetDriver::fMeasurePoints = 5;
     uint JackNetDriver::fMonitorPlotOptionsCnt = 2;
     string JackNetDriver::fMonitorPlotOptions[] =
@@ -103,6 +103,14 @@ namespace Jack
         fEngineControl->fConstraint = 500 * 1000;
         return res;
     }
+
+#ifdef JACK_MONITOR
+    int JackNetDriver::Close()
+    {
+        fMonitor->Save();
+        return JackDriver::Close();
+    }
+#endif
 
     int JackNetDriver::Attach()
     {
@@ -330,8 +338,8 @@ namespace Jack
         //monitor
 #ifdef JACK_MONITOR
 		string plot_name = string ( fParams.fName );
-		plot_name += string ( "_slave_" );
-		plot_name += ( fEngineControl->fSyncMode ) ? string ( "sync" ) : string ( "async" );
+		plot_name += string ( "_slave" );
+		plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
 		fMonitor = new JackGnuPlotMonitor<float> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetDriver::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
