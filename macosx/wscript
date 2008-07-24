@@ -39,6 +39,7 @@ def build(bld):
     jackd.source = ['../common/Jackdmp.cpp']
     jackd.uselib = 'PTHREAD DL'
     jackd.uselib_local = 'serverlib'
+    jackd.env.append_value("LINKFLAGS", "-framework CoreFoundation")
     jackd.target = 'jackd'
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')

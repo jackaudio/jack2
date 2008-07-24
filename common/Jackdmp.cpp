@@ -43,6 +43,7 @@ are "hard-coded" in the source. A much better approach would be to use the contr
 
 #ifdef __APPLE__
 #include <CoreFoundation/CFNotificationCenter.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 static void notify_server_start(const char* server_name)
 {
