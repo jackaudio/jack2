@@ -48,7 +48,7 @@ namespace Jack
         return fMaxBufsize;
     }
 
-    void NetMidiBuffer::SetBuffer(int index, JackMidiBuffer* buffer)
+    void NetMidiBuffer::SetBuffer ( int index, JackMidiBuffer* buffer )
     {
         fPortBuffer[index] = buffer;
     }
@@ -225,16 +225,16 @@ namespace Jack
     {
         switch ( params->fPacketID )
         {
-        case 0:
-            return SLAVE_AVAILABLE;
-        case 1:
-            return SLAVE_SETUP;
-        case 2:
-            return START_MASTER;
-        case 3:
-            return START_SLAVE;
-        case 4:
-            return KILL_MASTER;
+            case 0:
+                return SLAVE_AVAILABLE;
+            case 1:
+                return SLAVE_SETUP;
+            case 2:
+                return START_MASTER;
+            case 3:
+                return START_SLAVE;
+            case 4:
+                return KILL_MASTER;
         }
         return INVALID;
     }
@@ -243,22 +243,22 @@ namespace Jack
     {
         switch ( packet_type )
         {
-        case INVALID:
-            return -1;
-        case SLAVE_AVAILABLE:
-            params->fPacketID = 0;
-            break;
-        case SLAVE_SETUP:
-            params->fPacketID = 1;
-            break;
-        case START_MASTER:
-            params->fPacketID = 2;
-            break;
-        case START_SLAVE:
-            params->fPacketID = 3;
-            break;
-        case KILL_MASTER:
-            params->fPacketID = 4;
+            case INVALID:
+                return -1;
+            case SLAVE_AVAILABLE:
+                params->fPacketID = 0;
+                break;
+            case SLAVE_SETUP:
+                params->fPacketID = 1;
+                break;
+            case START_MASTER:
+                params->fPacketID = 2;
+                break;
+            case START_SLAVE:
+                params->fPacketID = 3;
+                break;
+            case KILL_MASTER:
+                params->fPacketID = 4;
         }
         return 0;
     }
@@ -310,7 +310,7 @@ namespace Jack
         WORD wVersionRequested = MAKEWORD ( 2, 2 );
         WSADATA wsaData;
 
-        if ( WSAStartup(wVersionRequested, &wsaData) != 0 )
+        if ( WSAStartup ( wVersionRequested, &wsaData ) != 0 )
         {
             jack_error ( "WSAStartup error : %s", strerror ( NET_ERROR_CODE ) );
             return -1;

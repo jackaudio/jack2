@@ -481,7 +481,7 @@ namespace Jack
         do
         {
             rx_bytes = Recv ( fParams.fMtu, 0 );
-            if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
+            if ( rx_bytes == SOCKET_ERROR )
                 return rx_bytes;
         }
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
@@ -502,6 +502,7 @@ namespace Jack
                     {
                         case 'm':   //midi
                             rx_bytes = Recv ( rx_bytes, 0 );
+                            fRxHeader.fCycle = rx_head->fCycle;
                             fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                             fNetMidiPlaybackBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
                             if ( ++midi_recvd_pckt == rx_head->fNMidiPckt )
@@ -519,10 +520,9 @@ namespace Jack
                             fNetJumpCnt = 0;
                             break;
                         case 's':   //sync
+                            rx_bytes = Recv ( rx_bytes, 0 );
                             jack_error ( "NetMaster receive sync packets instead of data." );
-                            fRxHeader.fCycle = rx_head->fCycle;
                             return 0;
-                            break;
                     }
                 }
             }

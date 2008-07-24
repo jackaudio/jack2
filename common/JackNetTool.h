@@ -80,12 +80,12 @@ namespace Jack
 
     enum _sync_packet_type
     {
-        INVALID = 0,	    //...
-        SLAVE_AVAILABLE,	//a slave is available
-        SLAVE_SETUP,		//slave configuration
-        START_MASTER,		//slave is ready, start master
-        START_SLAVE,		//master is ready, activate slave
-        KILL_MASTER		    //master must stop
+        INVALID = 0,        //...
+        SLAVE_AVAILABLE,    //a slave is available
+        SLAVE_SETUP,        //slave configuration
+        START_MASTER,       //slave is ready, start master
+        START_SLAVE,        //master is ready, activate slave
+        KILL_MASTER         //master must stop
     };
 
     typedef enum _sync_packet_type sync_packet_type_t;
@@ -95,24 +95,24 @@ namespace Jack
 
     struct _packet_header
     {
-        char fPacketType[7];		//packet type ( 'headr' )
-        char fDataType;				//a for audio, m for midi
-        char fDataStream;			//s for send, r for return
-        uint32_t fID;				//to identify the slave
-        uint32_t fBitdepth;			//bitdepth of the data samples
-        uint32_t fMidiDataSize;		//size of midi data (if packet is 'midi typed') in bytes
-        uint32_t fNMidiPckt;		//number of midi packets of the cycle
-        uint32_t fCycle;			//process cycle counter
-        uint32_t fSubCycle;			//midi/audio subcycle counter
-        char fIsLastPckt;			//is it the last packet of a given cycle ('y' or 'n')
-        char fFree[13];             //unused
+        char fPacketType[7];        //packet type ( 'headr' )
+        char fDataType;             //a for audio, m for midi
+        char fDataStream;           //s for send, r for return
+        uint32_t fID;               //to identify the slave
+        uint32_t fBitdepth;         //bitdepth of the data samples
+        uint32_t fMidiDataSize;     //size of midi data (if packet is 'midi typed') in bytes
+        uint32_t fNMidiPckt;        //number of midi packets of the cycle
+        uint32_t fCycle;            //process cycle counter
+        uint32_t fSubCycle;         //midi/audio subcycle counter
+        char fIsLastPckt;           //is it the last packet of a given cycle ('y' or 'n')
+        char fASyncWrongCycle;      //is the current async cycle wrong (slave's side; 'y' or 'n')
+        char fFree[29];             //unused
     };
 
 //transport data ******************************************************************************
 
     struct _net_transport_data
     {
-        char fTransportType[10];				//test value ('transport')
         jack_position_t fCurPos;
         jack_transport_state_t fCurState;
     };
@@ -121,55 +121,55 @@ namespace Jack
 
     class EXPORT NetMidiBuffer
     {
-    private:
-        int fNPorts;
-        size_t fMaxBufsize;
-        int fMaxPcktSize;
-        char* fBuffer;
-        char* fNetBuffer;
-        JackMidiBuffer** fPortBuffer;
+        private:
+            int fNPorts;
+            size_t fMaxBufsize;
+            int fMaxPcktSize;
+            char* fBuffer;
+            char* fNetBuffer;
+            JackMidiBuffer** fPortBuffer;
 
-    public:
-        NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
-        ~NetMidiBuffer();
+        public:
+            NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
+            ~NetMidiBuffer();
 
-        void Reset();
-        size_t GetSize();
-        //utility
-        void DisplayEvents();
-        //jack<->buffer
-        int RenderFromJackPorts();
-        int RenderToJackPorts();
-        //network<->buffer
-        int RenderFromNetwork ( int subcycle, size_t copy_size );
-        int RenderToNetwork ( int subcycle, size_t total_size );
+            void Reset();
+            size_t GetSize();
+            //utility
+            void DisplayEvents();
+            //jack<->buffer
+            int RenderFromJackPorts();
+            int RenderToJackPorts();
+            //network<->buffer
+            int RenderFromNetwork ( int subcycle, size_t copy_size );
+            int RenderToNetwork ( int subcycle, size_t total_size );
 
-        void SetBuffer ( int index, JackMidiBuffer* buffer );
-        JackMidiBuffer* GetBuffer ( int index );
+            void SetBuffer ( int index, JackMidiBuffer* buffer );
+            JackMidiBuffer* GetBuffer ( int index );
     };
 
 // audio data *********************************************************************************
 
     class EXPORT NetAudioBuffer
     {
-    private:
-        int fNPorts;
-        jack_nframes_t fPeriodSize;
-        jack_nframes_t fSubPeriodSize;
-        size_t fSubPeriodBytesSize;
-        char* fNetBuffer;
-        sample_t** fPortBuffer;
-    public:
-        NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
-        ~NetAudioBuffer();
+        private:
+            int fNPorts;
+            jack_nframes_t fPeriodSize;
+            jack_nframes_t fSubPeriodSize;
+            size_t fSubPeriodBytesSize;
+            char* fNetBuffer;
+            sample_t** fPortBuffer;
+        public:
+            NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
+            ~NetAudioBuffer();
 
-        size_t GetSize();
-        //jack<->buffer
-        void RenderFromJackPorts ( int subcycle );
-        void RenderToJackPorts ( int subcycle );
+            size_t GetSize();
+            //jack<->buffer
+            void RenderFromJackPorts ( int subcycle );
+            void RenderToJackPorts ( int subcycle );
 
-        void SetBuffer ( int index, sample_t* buffer );
-        sample_t* GetBuffer ( int index );
+            void SetBuffer ( int index, sample_t* buffer );
+            sample_t* GetBuffer ( int index );
     };
 
 //utility *************************************************************************************
