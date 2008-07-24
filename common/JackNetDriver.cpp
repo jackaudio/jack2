@@ -66,6 +66,8 @@ namespace Jack
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
+        fMonitor = NULL;
+        fMeasure = NULL;
     }
 
     JackNetDriver::~JackNetDriver()
@@ -82,7 +84,6 @@ namespace Jack
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
-        fMonitor->Save();
         delete[] fMeasure;
         delete fMonitor;
 #endif
@@ -106,7 +107,8 @@ namespace Jack
 #ifdef JACK_MONITOR
     int JackNetDriver::Close()
     {
-        fMonitor->Save();
+        if ( fMonitor )
+            fMonitor->Save();
         return JackDriver::Close();
     }
 #endif
@@ -298,7 +300,7 @@ namespace Jack
         strcpy ( fTxHeader.fPacketType, "header" );
         fTxHeader.fDataStream = 'r';
         fTxHeader.fID = fParams.fID;
-        fTxHeader.fCycle = 0;
+        fTxHeader.fCycle = 1;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fMidiDataSize = 0;
         fTxHeader.fBitdepth = fParams.fBitdepth;
