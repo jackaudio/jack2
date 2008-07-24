@@ -54,7 +54,7 @@ void MeasureTable::Save()
     fprintf(file, "set grid\n");
     fprintf(file, "set title \"Audio adapter timing\"\n");
     fprintf(file, "set xlabel \"audio cycles\"\n");
-    fprintf(file, "set ylabel \"usec\"\n");
+    fprintf(file, "set ylabel \"frames\"\n");
     fprintf(file, "plot ");
     sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer time\" with lines,");
     fprintf(file, buffer);
@@ -68,7 +68,6 @@ void MeasureTable::Save()
     fprintf(file, "set grid\n");
     fprintf(file, "set title \"Audio adapter timing\"\n");
     fprintf(file, "set xlabel \"audio cycles\"\n");
-    fprintf(file, "set ylabel \"usec\"\n");
     fprintf(file, "plot ");
     sprintf(buffer, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
     fprintf(file, buffer);
@@ -82,7 +81,7 @@ void MeasureTable::Save()
     fprintf(file, "set grid\n");
     fprintf(file, "set title \"Audio adapter timing\"\n");
     fprintf(file, "set xlabel \"audio cycles\"\n");
-    fprintf(file, "set ylabel \"usec\"\n");
+    fprintf(file, "set ylabel \"frames\"\n");
     fprintf(file, "plot ");
     sprintf(buffer, "\"JackAudioAdapter.log\" using 6 title \"Position in consumer ringbuffer\" with lines,");
     fprintf(file, buffer);

@@ -41,7 +41,7 @@ are "hard-coded" in the source. A much better approach would be to use the contr
 - get available drivers and their possible parameters, then prepare to parse them.
 */
 
-#ifdef __APPLE_
+#ifdef __APPLE__
 #include <CoreFoundation/CFNotificationCenter.h>
 
 static void notify_server_start(const char* server_name)

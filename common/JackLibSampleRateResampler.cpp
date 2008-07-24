@@ -27,6 +27,7 @@ JackLibSampleRateResampler::JackLibSampleRateResampler()
 {
     int error;
     fResampler = src_new(SRC_LINEAR, 1, &error);
+    //fResampler = src_new(SRC_SINC_BEST_QUALITY, 1, &error);
     if (error != 0) 
         jack_error("JackLibSampleRateResampler::JackLibSampleRateResampler err = %s", src_strerror(error));
 }
@@ -75,8 +76,8 @@ unsigned int JackLibSampleRateResampler::ReadResample(float* buffer, unsigned in
             written_frames += src_data.output_frames_gen;
             
             if ((src_data.input_frames_used == 0 || src_data.output_frames_gen == 0) && j == 0) {
-                jack_error("Output : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
-                return 0;
+                jack_log("Output : j = %d input_frames_used = %ld output_frames_gen = %ld frames1 = %lu frames2 = %lu"
+                    , j, src_data.input_frames_used, src_data.output_frames_gen, ring_buffer_data[0].len, ring_buffer_data[1].len);
             }
             
             jack_log("Output : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
@@ -125,8 +126,8 @@ unsigned int JackLibSampleRateResampler::WriteResample(float* buffer, unsigned i
             read_frames += src_data.input_frames_used;
             
             if ((src_data.input_frames_used == 0 || src_data.output_frames_gen == 0) && j == 0) {
-                jack_error("Input : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);
-                return 0;
+                jack_log("Input : j = %d input_frames_used = %ld output_frames_gen = %ld frames1 = %lu frames2 = %lu"
+                    , j, src_data.input_frames_used, src_data.output_frames_gen, ring_buffer_data[0].len, ring_buffer_data[1].len);
             }
         
             jack_log("Input : j = %d input_frames_used = %ld output_frames_gen = %ld", j, src_data.input_frames_used, src_data.output_frames_gen);

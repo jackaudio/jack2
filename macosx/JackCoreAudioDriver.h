@@ -72,10 +72,12 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         bool fMonitor;
         float fIOUsage;
-        
+    
+        /*    
     #ifdef MAC_OS_X_VERSION_10_5
         AudioDeviceIOProcID fMesureCallbackID;
     #endif
+        */
     
         static	OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,

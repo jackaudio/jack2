@@ -21,6 +21,10 @@ Romain Moret
   Jackdmp changes log
 ---------------------------
 
+2008-07-14 Stephane Letz  <letz@grame.fr>
+
+	* Fix server client OSX special notification mechanism, CoreAudio driver compilation back for 10.4.
+
 2008-07-18 Stephane Letz  <letz@grame.fr>
 
 	* Correct audioadapter when a sample rate value different from jack server one is chosen.

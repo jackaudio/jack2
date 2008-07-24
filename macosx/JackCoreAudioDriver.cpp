@@ -201,11 +201,16 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
     AudioDeviceStop(driver->fDeviceID, MeasureCallback);
+/*
 #ifdef MAC_OS_X_VERSION_10_5
     AudioDeviceDestroyIOProcID(driver->fDeviceID, driver->fMesureCallbackID);
 #else
     AudioDeviceRemoveIOProc(driver->fDeviceID, MeasureCallback);
 #endif
+*/
+
+    AudioDeviceRemoveIOProc(driver->fDeviceID, MeasureCallback);
+    
     jack_log("JackCoreAudioDriver::MeasureCallback called");
     JackMachThread::GetParams(&driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
     // Setup threadded based log function
@@ -858,11 +863,15 @@ int JackCoreAudioDriver::AddListeners()
 
 void JackCoreAudioDriver::RemoveListeners()
 {
+/*
 #ifdef MAC_OS_X_VERSION_10_5
     AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
 #else
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
 #endif
+*/
+    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
+     
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
@@ -1062,11 +1071,15 @@ int JackCoreAudioDriver::Start()
 {
     jack_log("JackCoreAudioDriver::Start");
     JackAudioDriver::Start();
+/*
 #ifdef MAC_OS_X_VERSION_10_5
     OSStatus err = AudioDeviceCreateIOProcID(fDeviceID, MeasureCallback, this, &fMesureCallbackID);
 #else
     OSStatus err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
 #endif
+*/
+    OSStatus err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
+    
     if (err != noErr)
         return -1;
 
@@ -1087,11 +1100,15 @@ int JackCoreAudioDriver::Stop()
 {
     jack_log("JackCoreAudioDriver::Stop");
     AudioDeviceStop(fDeviceID, MeasureCallback);
+/*
 #ifdef MAC_OS_X_VERSION_10_5
     AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
 #else
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
 #endif
+*/
+    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
+
     return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
 }
 
