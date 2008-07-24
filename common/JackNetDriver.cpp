@@ -35,7 +35,7 @@ using namespace std;
 namespace Jack
 {
 #ifdef JACK_MONITOR
-    uint JackNetDriver::fMeasureCnt = 2048;
+    uint JackNetDriver::fMeasureCnt = 128;
     uint JackNetDriver::fMeasurePoints = 5;
     uint JackNetDriver::fMonitorPlotOptionsCnt = 2;
     string JackNetDriver::fMonitorPlotOptions[] =
@@ -57,7 +57,7 @@ namespace Jack
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports, const char* net_name, uint transport_sync )
             : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
     {
-    	jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
+        jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
 
         fMulticastIP = new char[strlen ( ip ) + 1];
         strcpy ( fMulticastIP, ip );
@@ -84,8 +84,8 @@ namespace Jack
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
         fMonitor->Save();
-		delete[] fMeasure;
-		delete fMonitor;
+        delete[] fMeasure;
+        delete fMonitor;
 #endif
     }
 
@@ -277,11 +277,11 @@ namespace Jack
     int JackNetDriver::SetParams()
     {
         fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
-        JackAudioDriver::SetBufferSize(fParams.fPeriodSize);
-        JackAudioDriver::SetSampleRate(fParams.fSampleRate);
+        JackAudioDriver::SetBufferSize ( fParams.fPeriodSize );
+        JackAudioDriver::SetSampleRate ( fParams.fSampleRate );
 
-        JackDriver::NotifyBufferSize(fParams.fPeriodSize);
-        JackDriver::NotifySampleRate(fParams.fSampleRate);
+        JackDriver::NotifyBufferSize ( fParams.fPeriodSize );
+        JackDriver::NotifySampleRate ( fParams.fSampleRate );
 
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
@@ -337,13 +337,13 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
-		string plot_name = string ( fParams.fName );
-		plot_name += string ( "_slave" );
-		plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
-		fMonitor = new JackGnuPlotMonitor<float> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints, plot_name );
+        string plot_name = string ( fParams.fName );
+        plot_name += string ( "_slave" );
+        plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
+        fMonitor = new JackGnuPlotMonitor<float> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetDriver::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
-								JackNetDriver::fMonitorFieldNames, JackNetDriver::fMeasurePoints );
+                                JackNetDriver::fMonitorFieldNames, JackNetDriver::fMeasurePoints );
 #endif
 
         return 0;
@@ -522,9 +522,9 @@ namespace Jack
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
-            fNetMidiCaptureBuffer->SetBuffer(midi_port_index, GetMidiInputBuffer ( midi_port_index ));
+            fNetMidiCaptureBuffer->SetBuffer ( midi_port_index, GetMidiInputBuffer ( midi_port_index ) );
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
-            fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer ( audio_port_index ));
+            fNetAudioCaptureBuffer->SetBuffer ( audio_port_index, GetInputBuffer ( audio_port_index ) );
 
         //receive sync (launch the cycle)
         do
@@ -540,7 +540,7 @@ namespace Jack
 
 #ifdef JACK_MONITOR
         fMeasureId = 0;
-		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //audio, midi or sync if driver is late
@@ -554,26 +554,26 @@ namespace Jack
                 {
                     switch ( rx_head->fDataType )
                     {
-                    case 'm':	//midi
-                        rx_bytes = Recv ( rx_bytes, 0 );
-                        fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
-                        if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
-                            fNetMidiCaptureBuffer->RenderToJackPorts();
-                        break;
-                    case 'a':	//audio
-                        rx_bytes = Recv ( fAudioRxLen, 0 );
-                        if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
-                            jack_error ( "Packet(s) missing..." );
-                        fRxHeader.fCycle = rx_head->fCycle;
-                        fRxHeader.fSubCycle = rx_head->fSubCycle;
-                        fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
-                        break;
-                    case 's':	//sync
-                        jack_info ( "NetDriver : driver overloaded, skipping receive." );
-                        fRxHeader.fCycle = rx_head->fCycle;
-                        return 0;
+                        case 'm':   //midi
+                            rx_bytes = Recv ( rx_bytes, 0 );
+                            fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
+                            fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
+                            if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
+                                fNetMidiCaptureBuffer->RenderToJackPorts();
+                            break;
+                        case 'a':   //audio
+                            rx_bytes = Recv ( fAudioRxLen, 0 );
+                            if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
+                                jack_error ( "Packet(s) missing..." );
+                            fRxHeader.fCycle = rx_head->fCycle;
+                            fRxHeader.fSubCycle = rx_head->fSubCycle;
+                            fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
+                            fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
+                            break;
+                        case 's':   //sync
+                            jack_info ( "NetDriver : driver overloaded, skipping receive." );
+                            fRxHeader.fCycle = rx_head->fCycle;
+                            return 0;
                     }
                 }
             }
@@ -583,7 +583,7 @@ namespace Jack
 
 
 #ifdef JACK_MONITOR
-		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         return 0;
@@ -592,7 +592,10 @@ namespace Jack
     int JackNetDriver::Write()
     {
         int tx_bytes, copy_size;
-        fTxHeader.fCycle = fRxHeader.fCycle;
+        if ( fEngineControl->fSyncMode )
+            fTxHeader.fCycle = fRxHeader.fCycle;
+        else
+            fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fIsLastPckt = 'n';
         uint midi_port_index;
@@ -600,12 +603,12 @@ namespace Jack
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
-            fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, GetMidiOutputBuffer ( midi_port_index ));
+            fNetMidiPlaybackBuffer->SetBuffer ( midi_port_index, GetMidiOutputBuffer ( midi_port_index ) );
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
-            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer ( audio_port_index ));
+            fNetAudioPlaybackBuffer->SetBuffer ( audio_port_index, GetOutputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //sync
@@ -617,7 +620,7 @@ namespace Jack
         tx_bytes = Send ( fParams.fMtu, 0 );
 
 #ifdef JACK_MONITOR
-		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //midi
@@ -653,7 +656,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-		fMeasure[fMeasureId++] = ( ( (float)(GetMicroSeconds() - JackDriver::fBeginDateUst) ) / (float)fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
         fMonitor->Write ( fMeasure );
 #endif
 
@@ -776,31 +779,31 @@ namespace Jack
                 param = ( const jack_driver_param_t* ) node->data;
                 switch ( param->character )
                 {
-                case 'a' :
-                    multicast_ip = strdup ( param->value.str );
-                    break;
-                case 'p':
-                    udp_port = param->value.ui;
-                    break;
-                case 'M':
-                    mtu = param->value.i;
-                    break;
-                case 'C':
-                    audio_capture_ports = param->value.i;
-                    break;
-                case 'P':
-                    audio_playback_ports = param->value.i;
-                    break;
-                case 'i':
-                    midi_input_ports = param->value.i;
-                    break;
-                case 'o':
-                    midi_output_ports = param->value.i;
-                    break;
-                case 'n' :
-                    strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
-                case 't' :
-                    transport_sync = param->value.ui;
+                    case 'a' :
+                        multicast_ip = strdup ( param->value.str );
+                        break;
+                    case 'p':
+                        udp_port = param->value.ui;
+                        break;
+                    case 'M':
+                        mtu = param->value.i;
+                        break;
+                    case 'C':
+                        audio_capture_ports = param->value.i;
+                        break;
+                    case 'P':
+                        audio_playback_ports = param->value.i;
+                        break;
+                    case 'i':
+                        midi_input_ports = param->value.i;
+                        break;
+                    case 'o':
+                        midi_output_ports = param->value.i;
+                        break;
+                    case 'n' :
+                        strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
+                    case 't' :
+                        transport_sync = param->value.ui;
                 }
             }
 
