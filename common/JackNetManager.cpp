@@ -33,20 +33,19 @@ namespace Jack
 //JackNetMaster******************************************************************************************************
 #ifdef JACK_MONITOR
     uint JackNetMaster::fMeasureCnt = 128;
-    uint JackNetMaster::fMeasurePoints = 5;
+    uint JackNetMaster::fMeasurePoints = 4;
+    string JackNetMaster::fMonitorFieldNames[] =
+    {
+        string ( "sync send" ),
+        string ( "end of send" ),
+        string ( "sync recv" ),
+        string ( "end of cycle" )
+    };
     uint JackNetMaster::fMonitorPlotOptionsCnt = 2;
     string JackNetMaster::fMonitorPlotOptions[] =
     {
         string ( "set xlabel \"audio cycles\"" ),
         string ( "set ylabel \"% of audio cycle\"" )
-    };
-    string JackNetMaster::fMonitorFieldNames[] =
-    {
-        string ( "cycle start" ),
-        string ( "sync send" ),
-        string ( "send end" ),
-        string ( "sync recv" ),
-        string ( "end of cycle" )
     };
 #endif
 
@@ -123,7 +122,7 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
-        fPeriodUsecs = 1000000 * ( fParams.fPeriodSize / fParams.fSampleRate );
+        fPeriodUsecs = ( int ) ( 1000000.f * ( (float)fParams.fPeriodSize / (float)fParams.fSampleRate ) );
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         fMonitor = new JackGnuPlotMonitor<float> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints, plot_name );
@@ -236,7 +235,7 @@ namespace Jack
             sprintf ( name, "to_slave_%d", i+1 );
             if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-            jack_port_set_latency ( fAudioCapturePorts[i], port_latency );
+            jack_port_set_latency ( fAudioCapturePorts[i], 0 );
         }
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
@@ -244,7 +243,7 @@ namespace Jack
             sprintf ( name, "from_slave_%d", i+1 );
             if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-            jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency );
+            jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
         }
         //midi
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -253,7 +252,7 @@ namespace Jack
             sprintf ( name, "midi_to_slave_%d", i+1 );
             if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-            jack_port_set_latency ( fMidiCapturePorts[i], port_latency );
+            jack_port_set_latency ( fMidiCapturePorts[i], 0 );
         }
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
         for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
@@ -261,7 +260,7 @@ namespace Jack
             sprintf ( name, "midi_from_slave_%d", i+1 );
             if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-            jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency );
+            jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
         }
 
         fRunning = true;
@@ -401,7 +400,6 @@ namespace Jack
 #ifdef JACK_MONITOR
         jack_time_t begin_time = jack_get_time();
         fMeasureId = 0;
-        fMeasure[fMeasureId++] = ( ( float ) ( jack_get_time() - begin_time ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         //buffers
@@ -435,7 +433,7 @@ namespace Jack
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( float ) ( jack_get_time() - begin_time ) / ( float ) fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         //midi
@@ -475,7 +473,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( float ) ( jack_get_time() - begin_time ) / ( float ) fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         //receive --------------------------------------------------------------------------------------------------------------------
@@ -489,7 +487,7 @@ namespace Jack
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( float ) ( jack_get_time() - begin_time ) / ( float ) fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
@@ -524,6 +522,7 @@ namespace Jack
                             jack_error ( "NetMaster receive sync packets instead of data." );
                             fRxHeader.fCycle = rx_head->fCycle;
                             return 0;
+                            break;
                     }
                 }
             }
@@ -531,10 +530,12 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        if ( fRxHeader.fCycle - fTxHeader.fCycle )
-            jack_info ( "Monitor::CycleOffset %d", fRxHeader.fCycle - fTxHeader.fCycle );
-        fMeasure[fMeasureId++] = ( ( float ) ( jack_get_time() - begin_time ) / ( float ) fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
         fMonitor->Write ( fMeasure );
+        if ( fParams.fSlaveSyncMode && ( fTxHeader.fCycle - fRxHeader.fCycle ) )
+            jack_log ( "Monitor::SyncModeCycleOffset %d", fTxHeader.fCycle - fRxHeader.fCycle );
+        else if ( !fParams.fSlaveSyncMode && ( ( fTxHeader.fCycle - fRxHeader.fCycle ) != 1 ) )
+            jack_log ( "Monitor::ASyncModeCycleOffset %d", fTxHeader.fCycle - fRxHeader.fCycle );
 #endif
         return 0;
     }

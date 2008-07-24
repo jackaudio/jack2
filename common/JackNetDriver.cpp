@@ -36,20 +36,19 @@ namespace Jack
 {
 #ifdef JACK_MONITOR
     uint JackNetDriver::fMeasureCnt = 128;
-    uint JackNetDriver::fMeasurePoints = 5;
+    uint JackNetDriver::fMeasurePoints = 4;
+    string JackNetDriver::fMonitorFieldNames[] =
+    {
+        string ( "end of read" ),
+        string ( "start of write" ),
+        string ( "sync send" ),
+        string ( "end of write" )
+    };
     uint JackNetDriver::fMonitorPlotOptionsCnt = 2;
     string JackNetDriver::fMonitorPlotOptions[] =
     {
         string ( "set xlabel \"audio cycles\"" ),
         string ( "set ylabel \"% of audio cycle\"" )
-    };
-    string JackNetDriver::fMonitorFieldNames[] =
-    {
-        string ( "cyclestart" ),
-        string ( "read end" ),
-        string ( "write start" ),
-        string ( "sync send" ),
-        string ( "send end" )
     };
 #endif
 
@@ -136,6 +135,7 @@ namespace Jack
         SetPacketType ( &fParams, SLAVE_AVAILABLE );
         fParams.fSendAudioChannels = fCaptureChannels;
         fParams.fReturnAudioChannels = fPlaybackChannels;
+        fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
         //is transport sync ?
         if ( fParams.fTransportSync )
@@ -538,11 +538,6 @@ namespace Jack
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
-#ifdef JACK_MONITOR
-        fMeasureId = 0;
-        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
-#endif
-
         //audio, midi or sync if driver is late
         if ( fParams.fSendMidiChannels || fParams.fSendAudioChannels )
         {
@@ -583,6 +578,7 @@ namespace Jack
 
 
 #ifdef JACK_MONITOR
+        fMeasureId = 0;
         fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
@@ -591,15 +587,16 @@ namespace Jack
 
     int JackNetDriver::Write()
     {
-        int tx_bytes, copy_size;
+        uint midi_port_index;
+        int tx_bytes, copy_size, audio_port_index;
+
+        //tx header
         if ( fEngineControl->fSyncMode )
             fTxHeader.fCycle = fRxHeader.fCycle;
         else
             fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fIsLastPckt = 'n';
-        uint midi_port_index;
-        int audio_port_index;
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )

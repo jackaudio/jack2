@@ -53,6 +53,11 @@ namespace Jack
         fPortBuffer[index] = buffer;
     }
 
+    JackMidiBuffer* NetMidiBuffer::GetBuffer ( int index )
+    {
+        return fPortBuffer[index];
+    }
+
     void NetMidiBuffer::DisplayEvents()
     {
         for ( int port_index = 0; port_index < fNPorts; port_index++ )
@@ -135,9 +140,14 @@ namespace Jack
         return fNPorts * fSubPeriodBytesSize;
     }
 
-    void NetAudioBuffer::SetBuffer(int index, sample_t* buffer)
+    void NetAudioBuffer::SetBuffer ( int index, sample_t* buffer )
     {
         fPortBuffer[index] = buffer;
+    }
+
+    sample_t* NetAudioBuffer::GetBuffer ( int index )
+    {
+        return fPortBuffer[index];
     }
 
     void NetAudioBuffer::RenderFromJackPorts ( int subcycle )
@@ -168,6 +178,7 @@ namespace Jack
         params->fPeriodSize = htonl ( params->fPeriodSize );
         params->fFramesPerPacket = htonl ( params->fFramesPerPacket );
         params->fBitdepth = htonl ( params->fBitdepth );
+        params->fSlaveSyncMode = htonl ( params->fSlaveSyncMode );
     }
 
     EXPORT void SessionParamsNToH ( session_params_t* params )
@@ -184,6 +195,7 @@ namespace Jack
         params->fPeriodSize = ntohl ( params->fPeriodSize );
         params->fFramesPerPacket = ntohl ( params->fFramesPerPacket );
         params->fBitdepth = ntohl ( params->fBitdepth );
+        params->fSlaveSyncMode = ntohl ( params->fSlaveSyncMode );
     }
 
     EXPORT void SessionParamsDisplay ( session_params_t* params )
@@ -197,7 +209,7 @@ namespace Jack
         jack_info ( "Master name : %s", params->fMasterNetName );
         jack_info ( "Slave name : %s", params->fSlaveNetName );
         jack_info ( "ID : %u", params->fID );
-        jack_info ( "Transport Sync : %s", (params->fTransportSync) ? "yes" : "no" );
+        jack_info ( "Transport Sync : %s", ( params->fTransportSync ) ? "yes" : "no" );
         jack_info ( "Send channels (audio - midi) : %d - %d", params->fSendAudioChannels, params->fSendMidiChannels );
         jack_info ( "Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels );
         jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
@@ -205,6 +217,7 @@ namespace Jack
         jack_info ( "Frames per packet : %u", params->fFramesPerPacket );
         jack_info ( "Packet per period : %u", params->fPeriodSize / params->fFramesPerPacket );
         jack_info ( "Bitdepth : %s", bitdepth );
+        jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
         jack_info ( "****************************************************" );
     }
 
