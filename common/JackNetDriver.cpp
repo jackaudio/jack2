@@ -482,7 +482,7 @@ namespace Jack
         if ( rx_bytes == SOCKET_ERROR )
         {
             net_error_t error = fSocket.GetError();
-            //just tell there is no data and return 0 instead of SOCKET_ERROR
+            //no data isn't really an error in realtime processing, so just return 0
             if ( error == NET_NO_DATA )
             {
                 jack_error ( "No data, is the master still running ?" );
@@ -492,7 +492,7 @@ namespace Jack
             else if ( error == NET_CONN_ERROR )
                 throw JackDriverException ( "Connection lost." );
             else
-                jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
+                jack_error ( "Fatal error in receive : %s", StrError ( NET_ERROR_CODE ) );
         }
         return rx_bytes;
     }
@@ -508,7 +508,7 @@ namespace Jack
             if ( error == NET_CONN_ERROR )
                 throw JackDriverException ( "Connection lost." );
             else
-                jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
+                jack_error ( "Fatal error in send : %s", StrError ( NET_ERROR_CODE ) );
         }
         return tx_bytes;
     }
@@ -621,6 +621,8 @@ namespace Jack
         memset ( fTxData, 0, fPayloadSize );
         SetSyncPacket();
         tx_bytes = Send ( fParams.fMtu, 0 );
+        if ( tx_bytes == SOCKET_ERROR )
+            return 0;
 
 #ifdef JACK_MONITOR
         fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;

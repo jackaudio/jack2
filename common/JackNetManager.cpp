@@ -345,6 +345,8 @@ namespace Jack
             }
             else
                 jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
+            //we can't stop the process here, the slave wouldn't see what happens, just return 0
+            return 0;
         }
         return tx_bytes;
     }
@@ -357,24 +359,27 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             if ( error == NET_NO_DATA )
             {
-                //too much receive failure, exit
+                //too much receive failure, react
                 if ( ++fNetJumpCnt == 100 )
                 {
                     jack_error ( "No data from %s...", fParams.fName );
                     fNetJumpCnt = 0;
                 }
-                //we don't want the process to stop here, so just return 0
-                return 0;
             }
             else if ( error == NET_CONN_ERROR )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
-                             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
+                             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );   
+                //ask to the manager to properly remove the master
                 Exit();
             }
             else
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
+            //if we stop the process now, the socket will be closed and deleted to prematurely
+            //so the slave won't see the connection is down - just return 0, thus the master's process don't stop now
+            //by this way, the slave will have enough time to get the ICMP "connection refused" msg
+            return 0;
         }
         return rx_bytes;
     }
@@ -690,8 +695,8 @@ namespace Jack
                         jack_info ( "Waiting for a slave..." );
                         break;
                     case KILL_MASTER:
-                        KillMaster ( &params );
-                        jack_info ( "Waiting for a slave..." );
+                        if ( KillMaster ( &params ) )
+                            jack_info ( "Waiting for a slave..." );
                         break;
                     default:
                         break;
@@ -751,7 +756,7 @@ namespace Jack
         return it;
     }
 
-    void JackNetMasterManager::KillMaster ( session_params_t* params )
+    int JackNetMasterManager::KillMaster ( session_params_t* params )
     {
         jack_log ( "JackNetMasterManager::KillMaster, ID %u.", params->fID );
         master_list_it_t master = FindMaster ( params->fID );
@@ -759,7 +764,9 @@ namespace Jack
         {
             fMasterList.erase ( master );
             delete *master;
+            return 1;
         }
+        return 0;
     }
 }//namespace
 

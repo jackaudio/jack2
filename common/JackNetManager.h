@@ -127,7 +127,7 @@ namespace Jack
             void Run();
             JackNetMaster* MasterInit ( session_params_t& params );
             master_list_it_t FindMaster ( uint32_t client_id );
-            void KillMaster ( session_params_t* params );
+            int KillMaster ( session_params_t* params );
             void SetSlaveName ( session_params_t& params );
 
             int SyncCallback ( jack_transport_state_t state, jack_position_t* pos );
