@@ -98,9 +98,10 @@ void JackShmMem::operator delete(void* p, size_t size)
     jack_destroy_shm(&info);
 }
 
-void JackShmMem::operator delete(void* p)
-{		
-	JackShmMem::operator delete(p, 0);
+void JackShmMem::operator delete(void* obj)
+{	
+    if (obj)	
+        JackShmMem::operator delete(obj, 0);
 }
 
 void LockMemoryImp(void* ptr, size_t size)

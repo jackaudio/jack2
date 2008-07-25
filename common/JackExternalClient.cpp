@@ -76,8 +76,10 @@ int JackExternalClient::Open(const char* name, int pid, int refnum, int* shared_
 int JackExternalClient::Close()
 {
     fChannel.Close();
-    fClientControl->~JackClientControl();
-    JackShmMem::operator delete(fClientControl);
+    if (fClientControl) {
+        fClientControl->~JackClientControl();
+        JackShmMem::operator delete(fClientControl);
+    }
     return 0;
 }
 
