@@ -521,7 +521,7 @@ class AudioInterface : public AudioParam
 };
 
 /*!
-\brief Audio adapter suing ALSA API.
+\brief Audio adapter using ALSA API.
 */
 
 class JackAlsaAdapter : public JackAudioAdapterInterface, public JackRunnableInterface
