@@ -17,8 +17,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackAlsaAdapter__
-#define __JackAlsaAdapter__
+#ifndef __JackNetAdapter__
+#define __JackNetAdapter__
 
 #include <math.h>
 #include <limits.h>
@@ -32,32 +32,32 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-/*!
-\brief Net adapter.
-*/
+    /*!
+    \brief Net adapter.
+    */
 
-class JackNetAdapter : public JackAudioAdapterInterface, public JackRunnableInterface
-{
+    class JackNetAdapter : public JackAudioAdapterInterface, public JackRunnableInterface
+    {
 
-    private:
-        
-        JackThread fThread;
-   
-    public:
-    
-        JackNetAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
-        ~JackNetAdapter()
-        {}
-        
-        virtual int Open();
-        virtual int Close();
-         
-        virtual int SetBufferSize(jack_nframes_t buffer_size);
-        
-        virtual bool Init();
-        virtual bool Execute();
-         
-};
+        private:
+
+            JackThread fThread;
+
+        public:
+
+            JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
+            ~JackNetAdapter()
+            {}
+
+            virtual int Open();
+            virtual int Close();
+
+            virtual int SetBufferSize ( jack_nframes_t buffer_size );
+
+            virtual bool Init();
+            virtual bool Execute();
+
+    };
 
 }
 
@@ -69,7 +69,7 @@ extern "C"
 #include "JackExports.h"
 #include "driver_interface.h"
 
-EXPORT jack_driver_desc_t* jack_get_descriptor();
+    EXPORT jack_driver_desc_t* jack_get_descriptor();
 
 #ifdef __cplusplus
 }

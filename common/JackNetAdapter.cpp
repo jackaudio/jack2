@@ -23,12 +23,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <assert.h>
 
-JackNetAdapter::JackNetAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+JackNetAdapter::JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
 {}
 
 JackNetAdapter::~JackNetAdapter()
 {}
-        
+
 int JackNetAdapter::Open()
 {
     return 0;
@@ -38,13 +38,13 @@ int JackNetAdapter::Close()
 {
     return 0;
 }
-         
-int JackNetAdapter::SetBufferSize(jack_nframes_t buffer_size)
+
+int JackNetAdapter::SetBufferSize ( jack_nframes_t buffer_size )
 {
     return 0;
 }
 
-        
+
 bool JackNetAdapter::Init()
 {
     return true;
@@ -54,7 +54,7 @@ bool JackNetAdapter::Execute()
 {
     return true;
 }
-        
+
 
 #ifdef __cplusplus
 extern "C"
@@ -62,65 +62,70 @@ extern "C"
 #endif
 
 #include "driver_interface.h"
-using namespace Jack;
+    using namespace Jack;
 
     EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t *desc;
         jack_driver_param_desc_t * params;
         unsigned int i;
-        
-        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
-        strcpy (desc->name, "alsa-adapter");
+
+        desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
+        strcpy ( desc->name, "net-adapter" );
         desc->nparams = 2;
-        params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
-        
+        params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
+
         // TODO
-        
+
         desc->params = params;
         return desc;
     }
 
-    EXPORT int jack_internal_initialize(jack_client_t* jack_client, const JSList* params)
+    EXPORT int jack_internal_initialize ( jack_client_t* jack_client, const JSList* params )
     {
-        jack_log("Loading netadapter");
+        jack_log ( "Loading netadapter" );
 
         Jack::JackAudioAdapter* adapter;
-        jack_nframes_t buffer_size = jack_get_buffer_size(jack_client);
-        jack_nframes_t sample_rate = jack_get_sample_rate(jack_client);
+        jack_nframes_t buffer_size = jack_get_buffer_size ( jack_client );
+        jack_nframes_t sample_rate = jack_get_sample_rate ( jack_client );
 
-        adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackNetAdapter(buffer_size, sample_rate, params));
-        assert(adapter);
+        adapter = new Jack::JackAudioAdapter ( jack_client, new Jack::JackNetAdapter ( buffer_size, sample_rate, params ) );
+        assert ( adapter );
 
-        if (adapter->Open() == 0) {
+        if ( adapter->Open() == 0 )
+        {
             return 0;
-        } else {
+        }
+        else
+        {
             delete adapter;
             return 1;
         }
     }
 
-    EXPORT int jack_initialize(jack_client_t* jack_client, const char* load_init)
+    EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
     {
         JSList* params = NULL;
         jack_driver_desc_t *desc = jack_get_descriptor();
 
-        JackArgParser parser(load_init);
+        JackArgParser parser ( load_init );
 
-        if (parser.GetArgc() > 0) {
-            if (parser.ParseParams(desc, &params) != 0)
-                jack_error("Internal client : JackArgParser::ParseParams error.");
+        if ( parser.GetArgc() > 0 )
+        {
+            if ( parser.ParseParams ( desc, &params ) != 0 )
+                jack_error ( "Internal client : JackArgParser::ParseParams error." );
         }
 
-        return jack_internal_initialize(jack_client, params);
+        return jack_internal_initialize ( jack_client, params );
     }
 
-    EXPORT void jack_finish(void* arg)
+    EXPORT void jack_finish ( void* arg )
     {
-        Jack::JackAudioAdapter* adapter = static_cast<Jack::JackAudioAdapter*>(arg);
+        Jack::JackAudioAdapter* adapter = static_cast<Jack::JackAudioAdapter*> ( arg );
 
-        if (adapter) {
-            jack_log("Unloading netadapter");
+        if ( adapter )
+        {
+            jack_log ( "Unloading netadapter" );
             adapter->Close();
             delete adapter;
         }

@@ -66,8 +66,10 @@ namespace Jack
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
+#ifdef JACK_MONITOR
         fMonitor = NULL;
         fMeasure = NULL;
+#enfid
     }
 
     JackNetDriver::~JackNetDriver()

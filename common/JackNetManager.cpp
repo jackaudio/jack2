@@ -125,6 +125,7 @@ namespace Jack
         fPeriodUsecs = ( int ) ( 1000000.f * ( (float)fParams.fPeriodSize / (float)fParams.fSampleRate ) );
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
+        plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
         fMonitor = new JackGnuPlotMonitor<float> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetMaster::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
