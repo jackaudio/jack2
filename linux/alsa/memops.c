@@ -54,6 +54,30 @@ inline unsigned int fast_rand() {
 	return seed;
 }
 
+
+/* functions for native float sample data */
+
+
+void sample_move_floatLE_sSs (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) {
+       while (nsamples--) {
+               *dst = *((float *) src);
+               dst++;
+               src += src_skip;
+       }
+}
+
+void sample_move_dS_floatLE (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state) {
+       while (nsamples--) {
+               *((float *) dst) = *src;
+               dst += dst_skip;
+               src++;
+       }
+}
+
+
+/* functions for native integer sample data */
+
+
 void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 
 {

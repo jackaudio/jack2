@@ -251,6 +251,18 @@ JackAlsaDriver::alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitorin
 void
 JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 {
+    if (SND_PCM_FORMAT_FLOAT_LE == driver->playback_sample_format) {
+           if (driver->playback_interleaved) {
+               driver->channel_copy = memcpy_interleave_d32_s32;
+           } else {
+               driver->channel_copy = memcpy_fake;
+            }
+           driver->read_via_copy = sample_move_floatLE_sSs;
+           driver->write_via_copy = sample_move_dS_floatLE;
+          
+            return;
+    }
+
     switch (driver->playback_sample_bytes) {
         case 2:
             if (driver->playback_interleaved) {
@@ -396,6 +408,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
         int swapped;
     }
     formats[] = {
+                   {"32bit float little-endian", SND_PCM_FORMAT_FLOAT_LE},
                     {"32bit little-endian", SND_PCM_FORMAT_S32_LE, IS_LE},
                     {"32bit big-endian", SND_PCM_FORMAT_S32_BE, IS_BE},
                     {"24bit little-endian", SND_PCM_FORMAT_S24_3LE, IS_LE},
@@ -404,7 +417,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
                     {"16bit big-endian", SND_PCM_FORMAT_S16_BE, IS_BE},
                 };
 #define NUMFORMATS (sizeof(formats)/sizeof(formats[0]))
-#define FIRST_16BIT_FORMAT 4
+#define FIRST_16BIT_FORMAT 5
 
     if ((err = snd_pcm_hw_params_any (handle, hw_params)) < 0)  {
         jack_error ("ALSA: no playback configurations available (%s)",
@@ -778,6 +791,7 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
 
     if (driver->playback_handle) {
         switch (driver->playback_sample_format) {
+           case SND_PCM_FORMAT_FLOAT_LE:
             case SND_PCM_FORMAT_S32_LE:
             case SND_PCM_FORMAT_S24_3LE:
             case SND_PCM_FORMAT_S24_3BE:
@@ -795,6 +809,7 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
 
     if (driver->capture_handle) {
         switch (driver->capture_sample_format) {
+           case SND_PCM_FORMAT_FLOAT_LE:
             case SND_PCM_FORMAT_S32_LE:
             case SND_PCM_FORMAT_S24_3LE:
             case SND_PCM_FORMAT_S24_3BE:
