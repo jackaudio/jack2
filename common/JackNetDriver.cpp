@@ -69,7 +69,7 @@ namespace Jack
 #ifdef JACK_MONITOR
         fMonitor = NULL;
         fMeasure = NULL;
-#enfid
+#endif
     }
 
     JackNetDriver::~JackNetDriver()
