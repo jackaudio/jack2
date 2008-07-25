@@ -122,7 +122,7 @@ namespace Jack
 
         //monitor
 #ifdef JACK_MONITOR
-        fPeriodUsecs = ( int ) ( 1000000.f * ( (float)fParams.fPeriodSize / (float)fParams.fSampleRate ) );
+        fPeriodUsecs = ( int ) ( 1000000.f * ( ( float ) fParams.fPeriodSize / ( float ) fParams.fSampleRate ) );
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
@@ -342,7 +342,6 @@ namespace Jack
                 jack_error ( "'%s' : %s, please check network connection with '%s'.",
                              fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
                 Exit();
-                return 0;
             }
             else
                 jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
@@ -358,21 +357,21 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             if ( error == NET_NO_DATA )
             {
-                //too much receive failure, react...
-                if ( ++fNetJumpCnt == 50 )
+                //too much receive failure, exit
+                if ( ++fNetJumpCnt == 100 )
                 {
-                    jack_error ( "Connection lost, is %s still running ?", fParams.fName );
+                    jack_error ( "No data from %s...", fParams.fName );
                     fNetJumpCnt = 0;
                 }
+                //we don't want the process to stop here, so just return 0
                 return 0;
             }
             else if ( error == NET_CONN_ERROR )
             {
                 //fatal connection issue, exit
-                jack_error ( "'%s' : %s, please check network connection with '%s'.",
+                jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
                              fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
                 Exit();
-                return 0;
             }
             else
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
@@ -451,7 +450,7 @@ namespace Jack
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
                 copy_size = fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
                 tx_bytes = Send ( fTxBuffer, sizeof ( packet_header_t ) + copy_size, 0 );
-                if ( tx_bytes < 1 )
+                if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
                     return tx_bytes;
             }
         }
@@ -468,7 +467,7 @@ namespace Jack
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
                 fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
                 tx_bytes = Send ( fTxBuffer, fAudioTxLen, 0 );
-                if ( tx_bytes < 1 )
+                if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
                     return tx_bytes;
             }
         }

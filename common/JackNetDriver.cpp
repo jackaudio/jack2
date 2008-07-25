@@ -477,34 +477,34 @@ namespace Jack
 
     int JackNetDriver::Recv ( size_t size, int flags )
     {
-        int rx_bytes;
-        if ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR )
+        int rx_bytes = fSocket.Recv ( fRxBuffer, size, flags );
+        //handle errors
+        if ( rx_bytes == SOCKET_ERROR )
         {
             net_error_t error = fSocket.GetError();
+            //just tell there is no data and return 0 instead of SOCKET_ERROR
             if ( error == NET_NO_DATA )
             {
-                jack_error ( "No incoming data, is the master still running ?" );
+                jack_error ( "No data, is the master still running ?" );
                 return 0;
             }
+            //if a network error occurs, this exception will restart the driver
             else if ( error == NET_CONN_ERROR )
-            {
                 throw JackDriverException ( "Connection lost." );
-            }
             else
-            {
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
-                return 0;
-            }
         }
         return rx_bytes;
     }
 
     int JackNetDriver::Send ( size_t size, int flags )
     {
-        int tx_bytes;
-        if ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR )
+        int tx_bytes = fSocket.Send ( fTxBuffer, size, flags );
+        //handle errors
+        if ( tx_bytes == SOCKET_ERROR )
         {
             net_error_t error = fSocket.GetError();
+            //if a network error occurs, this exception will restart the driver
             if ( error == NET_CONN_ERROR )
                 throw JackDriverException ( "Connection lost." );
             else
@@ -534,8 +534,9 @@ namespace Jack
         do
         {
             rx_bytes = Recv ( fParams.fMtu, 0 );
-            if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
-                return rx_bytes;
+            //if error, don't return -1, we need the driver to restart and not to exit
+            if ( rx_bytes == SOCKET_ERROR )
+                return 0;
         }
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
@@ -547,8 +548,9 @@ namespace Jack
         {
             do
             {
-                if ( ( rx_bytes = Recv ( fParams.fMtu, MSG_PEEK ) ) == SOCKET_ERROR )
-                    return rx_bytes;
+                rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+                if ( rx_bytes == SOCKET_ERROR )
+                    return 0;
                 if ( rx_bytes && ( rx_head->fDataStream == 's' ) && ( rx_head->fID == fParams.fID ) )
                 {
                     switch ( rx_head->fDataType )
