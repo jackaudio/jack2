@@ -196,27 +196,38 @@ def build(bld):
 
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 
-    adapter_sources = [
+    net_adapter_sources = [
         'JackResampler.cpp',
         'JackLibSampleRateResampler.cpp',
-		'JackAudioAdapter.cpp',
-        'JackAudioAdapterFactory.cpp',
+   	'JackAudioAdapter.cpp',
         'JackAudioAdapterInterface.cpp',
+        'JackNetAdapter.cpp',
+        ]
+
+    process = create_jack_process_obj(bld, 'netadapter', net_adapter_sources, serverlib)
+    process.env.append_value("LINKFLAGS", "-lsamplerate")
+
+    audio_adapter_sources = [
+        'JackResampler.cpp',
+        'JackLibSampleRateResampler.cpp',
+	'JackAudioAdapter.cpp',
+        'JackAudioAdapterInterface.cpp',
+        'JackAudioAdapterFactory.cpp',
         ]
 
     if bld.env()['IS_MACOSX']:
-         adapter_sources += ['../macosx/JackCoreAudioAdapter.cpp']
-         process = create_jack_process_obj(bld, 'audioadapter', adapter_sources, serverlib)
+         audio_adapter_sources += ['../macosx/JackCoreAudioAdapter.cpp']
+         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "../macosx/libportaudio.a -framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
          process.env.append_value("LINKFLAGS", "-lsamplerate") 
     
     if bld.env()['IS_LINUX']:
-         adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
-         process = create_jack_process_obj(bld, 'audioadapter', adapter_sources, serverlib)
+         audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
+         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "-lasound -lsamplerate")
  
-    #adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
-    #process = create_jack_process_obj(bld, 'audioadapter', adapter_sources, serverlib)
+    #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
+    #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
 	    
     install_files('PREFIX', 'include/jack', 'jack/*.h')
 

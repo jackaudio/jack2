@@ -46,9 +46,8 @@ namespace Jack
         public:
 
             JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
-            ~JackNetAdapter()
-            {}
-
+            ~JackNetAdapter();
+        
             virtual int Open();
             virtual int Close();
 

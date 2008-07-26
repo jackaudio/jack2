@@ -23,8 +23,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <assert.h>
 
+namespace Jack
+{
+
 JackNetAdapter::JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
-{}
+     :JackAudioAdapterInterface(buffer_size, sample_rate),fThread(this)
+{
+    fCaptureChannels = 2;
+    fPlaybackChannels = 2;
+}
 
 JackNetAdapter::~JackNetAdapter()
 {}
@@ -44,7 +51,6 @@ int JackNetAdapter::SetBufferSize ( jack_nframes_t buffer_size )
     return 0;
 }
 
-
 bool JackNetAdapter::Init()
 {
     return true;
@@ -55,6 +61,7 @@ bool JackNetAdapter::Execute()
     return true;
 }
 
+} // namespace Jack
 
 #ifdef __cplusplus
 extern "C"
@@ -62,13 +69,15 @@ extern "C"
 #endif
 
 #include "driver_interface.h"
+#include "JackAudioAdapter.h"
+
     using namespace Jack;
 
     EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t *desc;
         jack_driver_param_desc_t * params;
-        unsigned int i;
+        //unsigned int i;
 
         desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
         strcpy ( desc->name, "net-adapter" );
