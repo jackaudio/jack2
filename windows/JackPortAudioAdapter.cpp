@@ -53,7 +53,7 @@ int JackPortAudioAdapter::Render(const void* inputBuffer, void* outputBuffer,
             failure = true;
     }
 
-#ifdef DEBUG
+#ifdef JACK_MONITOR
     adapter->fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
@@ -196,7 +196,7 @@ int JackPortAudioAdapter::Open()
 
 int JackPortAudioAdapter::Close()
 {
-#ifdef DEBUG
+#ifdef JACK_MONITOR
     fTable.Save();
 #endif
     jack_log("JackPortAudioAdapter::Close");

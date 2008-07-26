@@ -139,7 +139,7 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
              failure = true;
     }
     
-#ifdef DEBUG    
+#ifdef JACK_MONITOR    
     adapter->fTable.Write(time1, time2,  double(time1) / double(time2), double(time2) / double(time1), 
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
@@ -590,7 +590,7 @@ error:
 
 int JackCoreAudioAdapter::Close()
 {
-#ifdef DEBUG    
+#ifdef JACK_MONITOR    
     fTable.Save();
 #endif
     AudioOutputUnitStop(fAUHAL);

@@ -82,7 +82,7 @@ int JackAlsaAdapter::Open()
 
 int JackAlsaAdapter::Close()
 {
-#ifdef DEBUG
+#ifdef JACK_MONITOR
     fTable.Save();
 #endif
     fThread.Stop();
@@ -117,7 +117,7 @@ bool JackAlsaAdapter::Execute()
             failure = true;
     }
 
-#ifdef DEBUG
+#ifdef JACK_MONITOR
     fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
         fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
 #endif
