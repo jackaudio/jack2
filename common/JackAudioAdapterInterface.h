@@ -20,6 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackAudioAdapterInterface__
 #define __JackAudioAdapterInterface__
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include "ringbuffer.h"
 #include "jack.h"
 #include "JackError.h"
@@ -27,9 +31,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackFilters.h"
 #include <samplerate.h>
 
-
 namespace Jack
 {
+
+#ifdef JACK_MONITOR
 
 #define TABLE_MAX 100000
 
@@ -58,6 +63,8 @@ struct MeasureTable
 
 };
 
+#endif
+
 /*!
 \brief Base class for audio adapters.
 */
@@ -67,7 +74,7 @@ class JackAudioAdapterInterface
 
     protected:
 
-    #ifdef DEBUG
+    #ifdef JACK_MONITOR
         MeasureTable fTable;
     #endif
     

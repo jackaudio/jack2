@@ -23,6 +23,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+#ifdef JACK_MONITOR
+
 void MeasureTable::Write(int time1, int time2, float r1, float r2, int pos1, int pos2)
 {
     int pos = (++fCount) % TABLE_MAX;
@@ -56,9 +58,9 @@ void MeasureTable::Save()
     fprintf(file, "set xlabel \"audio cycles\"\n");
     fprintf(file, "set ylabel \"frames\"\n");
     fprintf(file, "plot ");
-    sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer time\" with lines,");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer interrupt period\" with lines,");
     fprintf(file, buffer);
-    sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer time\" with lines");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines");
     fprintf(file, buffer);
     fclose(file);
     
@@ -68,6 +70,7 @@ void MeasureTable::Save()
     fprintf(file, "set grid\n");
     fprintf(file, "set title \"Audio adapter timing\"\n");
     fprintf(file, "set xlabel \"audio cycles\"\n");
+     fprintf(file, "set ylabel \"resampling ratio\"\n");
     fprintf(file, "plot ");
     sprintf(buffer, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
     fprintf(file, buffer);
@@ -83,12 +86,14 @@ void MeasureTable::Save()
     fprintf(file, "set xlabel \"audio cycles\"\n");
     fprintf(file, "set ylabel \"frames\"\n");
     fprintf(file, "plot ");
-    sprintf(buffer, "\"JackAudioAdapter.log\" using 6 title \"Position in consumer ringbuffer\" with lines,");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with lines,");
     fprintf(file, buffer);
-    sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Position in producer ringbuffer\" with lines");
+    sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines");
     fprintf(file, buffer);
     fclose(file);
 }
+
+#endif
 
 void JackAudioAdapterInterface::ResetRingBuffers()
 {
