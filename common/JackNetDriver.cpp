@@ -536,6 +536,10 @@ namespace Jack
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
             fNetAudioCaptureBuffer->SetBuffer ( audio_port_index, GetInputBuffer ( audio_port_index ) );
 
+#ifdef JACK_MONITOR
+		fMeasureId = 0;
+#endif
+
         //receive sync (launch the cycle)
         do
         {
@@ -556,7 +560,7 @@ namespace Jack
             do
             {
                 rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-                //error here, problem with send, just skip the cycle (return -1)
+                //error here, problem with recv, just skip the cycle (return -1)
                 if ( rx_bytes == SOCKET_ERROR )
                     return rx_bytes;
                 if ( rx_bytes && ( rx_head->fDataStream == 's' ) && ( rx_head->fID == fParams.fID ) )
@@ -591,7 +595,7 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
 
 #ifdef JACK_MONITOR
-        fMeasure[0] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
         return 0;
     }
@@ -616,7 +620,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( audio_port_index, GetOutputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-        fMeasure[1] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //sync
@@ -630,7 +634,7 @@ namespace Jack
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        fMeasure[2] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //midi
@@ -670,7 +674,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[3] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
         fMonitor->Write ( fMeasure );
 #endif
 

@@ -3,7 +3,7 @@ NetJack for Jackmp
 -------------------------------
 
 This branche includes a version of netjack designed for jackmp.
-This prerelease is far from being complete and doesn't include some of the features proposed by netjack (no transport yet).
+This prerelease is far from being complete and doesn't include some of the features proposed by netjack (transport isn't completely working yet).
 Indeed, the original concept has been completely redesigned to better fit to the jackmp architecture, but also in order to provide additional capabilities, and ultimately a greater robustness.
 
 This document describes the major changes between those two systems, then a simple how-to for setting up a basic usage of 'netjackmp'.
@@ -51,7 +51,6 @@ Current limitations
 The netjackmp's development has just started. This prerelease is operational, but involve some serious limitations :
 - You can't set the bitdepth of the transmitted audio samples. Floating point values are used for now. The possibility to use 16 or 24bits data will be included soon, like in netjack. It's important to notice that change the bitdepth id very expensive in processing ressources (because it is a sample to sample operation).
 - The 'inter-slave' communication is not optimized yet. If you connect one slave to another, the network streams go through the master. While sending network addresses to the slaves when they are inter-jack-connected, we could make the slave possibly independant of the master (except for the synchronization, sent over the network). This is the next step of the netjackmp development.
-- Because of the current development, the parametering of the whole system is minimalistic.
 - Unlike netjack, this version doesn't include transport, this is naturally planned for the fully operational version.
 - The 'Audio Adapter' is not completely working, there are several improvements to do.
 
@@ -71,14 +70,18 @@ Then, load the network manager using jack_load :
 'jack_load netmanager'
 
 This will load the internal client, which will wait for an available slave (see the message window on qjackctl - or the console output).
+If you want to listen to a specific multicast socket, you can add some options. To spicify a complete command line, you can use :
+'jack_load netmanager -i"-a xxx.xxx.xxx.xxx -p udp_port"'
+If you set another multicast address or port, you have to set the same on the slave's side. The default value should be working in many cases.
 
 On the slave, just launch a new jack server using :
 
-'jackd -R -S -d net'
+'jackd -R -d net'
 
-The '-S' (synchronous) option is mandatory. Indeed, the jack server isn't able to deal with the current cycle produced audio data because when the 'send' is called, data are not necessarily already available. So in a given 'n' cycle, the server will send the data produced at the 'n-1' cycle.
-In this case, there is no effect on latency because all the subcycles of the slave (the previous 4 subcycles for instance) are run in the given master's cycle.
-You can specify some options, like '-n name' (will give a name to the slave, default is the network hostname), '-C input_ports' (the number of master-->slave channels), '-P output_ports' (the number of slave-->master channels), default is 2 ; or '-i midi_in_ports' and '-o midi_out_ports', default is 0. Don't use '-a address' and '-p port', these are here to specify others multicast address and port, but it's not implemented on the master yet.
+As in a standard backend in Jackmp, you can use '-S' (synchronous mode).
+The asynchronous mode (without '-S') allows to send the computed data during the next cycle. You loose a one cycle extra latency, but you improve the masters while allowing it to receive data just after having sent some. In synchronous mode, data are sent back at the end of the cycle, that means after the process.
+You can specify some options, like '-n name' (will give a name to the slave, default is the network hostname), '-C input_ports' (the number of master-->slave channels), '-P output_ports' (the number of slave-->master channels), default is 2 ; or '-i midi_in_ports' and '-o midi_out_ports', default is 0.
+If you set multicast address or port on the master, you can add '-a xxx.xxx.xxx.xxx' and '-p udp_port'.
 
 
 -------------------------------

@@ -11,7 +11,7 @@ The built binaries will be located in '/Release/bin' (or '/Debug/bin' if you bui
 - the two 'libjackmp.dll' and 'libjackservermp.dll', client and server jack libraries
 - the 'jackdmp.exe', main application : the jack server
 - the 'jack_xxx.exe' utilities and examples
-- in the jackmp directory, you'll find the driver's DLL's ('jack_portaudio.dll' and 'jack_netdriver.dll') and some tools ( 'netmanager.dll' for example )
+- in the jackmp directory, you'll find the driver's DLL's ('jack_portaudio.dll' and 'jack_netdriver.dll') and some tools ( 'netmanager.dll', 'audioadapter.dll', 'netadapter.dll' for example )
 
 In Code::Blocks all the projects are automatically built in a correct order (dll's then apps) by doing 'build->build workspace'.
 In VC6, you'll have to build the projects one by one.
@@ -41,7 +41,7 @@ You can use two drivers : PortAudio and NetDriver.
 The PortAudio backend allow the use of many soundcards, using ASIO or WMME drivers (any ASIO driver can be seen by PortAudio).
 The NetDriver allow you to use NetJack2 on windows. Thus you can easily exchange midi and audio streams bitween computers (Linux, MacOSX or Windows).
 In both cases, you have to use the minimalist :
-    'jackdmp -R -S -d ...'
+    'jackdmp -R -d ...'
         command. With PortAudio, you can have a list of supported drivers with :
     'jackdmp -R -S -d portaudio -l'
 
