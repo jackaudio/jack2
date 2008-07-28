@@ -39,6 +39,20 @@ namespace Jack
 
 //session params ******************************************************************************
 
+/**
+\brief This structure containes master/slave connection parameters, it's used to setup the whole system
+
+We have :
+	- some info like version, type and packet id
+	- names
+	- network parameters (hostnames and mtu)
+	- nunber of audio and midi channels
+	- sample rate and buffersize
+	- number of audio frames in one network packet (depends on the channel number)
+	- is the NetDriver in Sync or ASync mode ?
+	- is the NetDriver linked with the master's transport
+*/
+
     struct _session_params
     {
         char fPacketType[7];                //packet type ('param')
@@ -63,6 +77,10 @@ namespace Jack
 
 //net status **********************************************************************************
 
+/**
+\Brief This enum groups network error by type
+*/
+
     enum  _net_status
     {
         NET_SOCKET_ERROR = 0,
@@ -77,6 +95,10 @@ namespace Jack
     typedef enum _net_status net_status_t;
 
 //sync packet type ****************************************************************************
+
+/**
+\Brief This enum indicates the type of a sync packet (used in the initialization phase)
+*/
 
     enum _sync_packet_type
     {
@@ -93,12 +115,31 @@ namespace Jack
 
 //packet header *******************************************************************************
 
+/**
+\Brief This structure is a complete header
+
+A header indicates :
+	- it is a header
+	- the type of data the packet contains (sync, midi or audio)
+	- the path of the packet (send -master->slave- or return -slave->master-)
+	- the unique ID of the slave
+	- the sample's bitdepth (unused for now)
+	- the size of the midi data contains in the packet (indicates how much midi data will be sent)
+	- the number of midi packet(s) : more than one is very unusual, it depends on the midi load
+	- the ID of the current cycle (used to check missing packets)
+	- the ID of the packet subcycle (for audio data)
+	- a flag indicating this packet is the last of the cycle (for sync robustness, it's better to process this way)
+	- a flag indicating if, in async mode, the previous graph was not finished or not
+	- padding to fill 64 bytes
+
+*/
+
     struct _packet_header
     {
         char fPacketType[7];        //packet type ( 'headr' )
-        char fDataType;             //a for audio, m for midi
+        char fDataType;             //a for audio, m for midi and s for sync
         char fDataStream;           //s for send, r for return
-        uint32_t fID;               //to identify the slave
+        uint32_t fID;               //unique ID of the slave
         uint32_t fBitdepth;         //bitdepth of the data samples
         uint32_t fMidiDataSize;     //size of midi data (if packet is 'midi typed') in bytes
         uint32_t fNMidiPckt;        //number of midi packets of the cycle
@@ -111,6 +152,10 @@ namespace Jack
 
 //transport data ******************************************************************************
 
+/**
+\Brief This structure contains transport info
+*/
+
     struct _net_transport_data
     {
         jack_position_t fCurPos;
@@ -118,6 +163,21 @@ namespace Jack
     };
 
 //midi data ***********************************************************************************
+
+/**
+\Brief Midi buffer and operations class
+
+This class is a toolset to manipulate Midi buffers.
+A JackMidiBuffer has a fixed size, which is the same than an audio buffer size.
+An intermediate fixed size buffer allows to uninterleave midi data (from jack ports).
+But for a big majority of the process cycles, this buffer is filled less than 1%,
+Sending over a network 99% of useless data seems completely unappropriate.
+The idea is to count effective midi data, and then send the smallest packet we can.
+To do it, we use an intermediate buffer.
+We have two methods to convert data from jack ports to intermediate buffer,
+And two others to convert this intermediate buffer to a network buffer (header + payload data)
+
+*/
 
     class EXPORT NetMidiBuffer
     {
@@ -149,6 +209,16 @@ namespace Jack
     };
 
 // audio data *********************************************************************************
+
+/**
+\Brief Audio buffer and operations class
+
+This class is a toolset to manipulate audio buffers.
+The manipulation of audio buffers is similar to midi buffer, except those buffers have fixed size.
+The interleaving/uninterleaving operations are simplier here because audio buffers have fixed size,
+So there is no need of an intermediate buffer as in NetMidiBuffer.
+
+*/
 
     class EXPORT NetAudioBuffer
     {

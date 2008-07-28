@@ -30,6 +30,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
+	/**
+	\Brief This class describes the Net Backend
+	*/
+
     class JackNetDriver : public JackAudioDriver
     {
         private:

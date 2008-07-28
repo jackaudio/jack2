@@ -90,6 +90,19 @@ namespace Jack
 
     /*!
     \brief Generic monitoring class. Saves data to GnuPlot files ('.plt' and '.log' datafile)
+
+    This template class allows to manipulate monitoring records, and automatically generate the GnuPlot config and data files.
+    Operations are RT safe because it uses fixed size data buffers.
+    You can set the number of measure points, and the number of records.
+
+    To use it :
+    - create a JackGnuPlotMonitor, you can use the data type you want.
+    - create a temporary array for your measure
+    - once you have filled this array with 'measure points' value, call write() to add it to the record
+    - once you've done with your measurment, just call save() to save your data file
+
+    You can also call SetPlotFile() to automatically generate '.plt' file from an options list.
+
     */
 
     template <class T> class JackGnuPlotMonitor

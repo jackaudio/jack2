@@ -16,7 +16,9 @@
 		<Project filename="jack_netdriver.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
-		<Project filename="jack_netadapter.cbp" active="1" />
+		<Project filename="jack_netadapter.cbp" active="1">
+			<Depends filename="libjackservermp.cbp" />
+		</Project>
 		<Project filename="jack_netmanager.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
