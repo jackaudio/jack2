@@ -345,8 +345,6 @@ namespace Jack
             }
             else
                 jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
-            //we can't stop the process here, the slave wouldn't see what happens, just return 0
-            return 0;
         }
         return tx_bytes;
     }
@@ -360,7 +358,9 @@ namespace Jack
             if ( error == NET_NO_DATA )
             {
                 //too much receive failure, react
-                if ( ++fNetJumpCnt == 100 )
+                if ( ++fNetJumpCnt < 100 )
+                    return 0;
+                else
                 {
                     jack_error ( "No data from %s...", fParams.fName );
                     fNetJumpCnt = 0;
@@ -376,10 +376,6 @@ namespace Jack
             }
             else
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
-            //if we stop the process now, the socket will be closed and deleted to prematurely
-            //so the slave won't see the connection is down - just return 0, thus the master's process don't stop now
-            //by this way, the slave will have enough time to get the ICMP "connection refused" msg
-            return 0;
         }
         return rx_bytes;
     }
@@ -434,7 +430,7 @@ namespace Jack
         memset ( fTxData, 0, fPayloadSize );
         SetSyncPacket();
         tx_bytes = Send ( fTxBuffer, fParams.fMtu, 0 );
-        if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
+        if ( tx_bytes == SOCKET_ERROR )
             return tx_bytes;
 
 #ifdef JACK_MONITOR
@@ -455,7 +451,7 @@ namespace Jack
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
                 copy_size = fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
                 tx_bytes = Send ( fTxBuffer, sizeof ( packet_header_t ) + copy_size, 0 );
-                if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
+                if ( tx_bytes == SOCKET_ERROR )
                     return tx_bytes;
             }
         }
@@ -472,7 +468,7 @@ namespace Jack
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
                 fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
                 tx_bytes = Send ( fTxBuffer, fAudioTxLen, 0 );
-                if ( ( tx_bytes == 0 ) || ( tx_bytes == SOCKET_ERROR ) )
+                if ( tx_bytes == SOCKET_ERROR )
                     return tx_bytes;
             }
         }

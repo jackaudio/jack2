@@ -320,6 +320,8 @@ namespace Jack
             return NET_NO_ERROR;
         case WSAETIMEDOUT:
             return NET_NO_DATA;
+        case WSAEWOULDBLOCK:
+            return NET_NO_DATA;
         case WSAECONNREFUSED:
             return NET_CONN_ERROR;
         case WSAECONNRESET:
