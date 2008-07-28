@@ -303,7 +303,7 @@ namespace Jack
         strcpy ( fTxHeader.fPacketType, "header" );
         fTxHeader.fDataStream = 'r';
         fTxHeader.fID = fParams.fID;
-        fTxHeader.fCycle = 1;
+        fTxHeader.fCycle = 0;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fMidiDataSize = 0;
         fTxHeader.fBitdepth = fParams.fBitdepth;

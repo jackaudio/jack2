@@ -370,7 +370,7 @@ namespace Jack
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
-                             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );   
+                             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
                 //ask to the manager to properly remove the master
                 Exit();
             }
@@ -533,10 +533,8 @@ namespace Jack
 #ifdef JACK_MONITOR
         fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
         fMonitor->Write ( fMeasure );
-        if ( fParams.fSlaveSyncMode && ( fTxHeader.fCycle - fRxHeader.fCycle ) )
-            jack_log ( "Monitor::SyncModeCycleOffset %d", fTxHeader.fCycle - fRxHeader.fCycle );
-        else if ( !fParams.fSlaveSyncMode && ( ( fTxHeader.fCycle - fRxHeader.fCycle ) != 1 ) )
-            jack_log ( "Monitor::ASyncModeCycleOffset %d", fTxHeader.fCycle - fRxHeader.fCycle );
+        if ( fTxHeader.fCycle - fRxHeader.fCycle )
+            jack_log ( "NetMonitor::%s %d", ( fParams.fSlaveSyncMode ) ? "SyncCycleOffset" : "AsyncCycleOffset", fTxHeader.fCycle - fRxHeader.fCycle );
 #endif
         return 0;
     }

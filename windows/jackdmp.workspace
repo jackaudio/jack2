@@ -7,15 +7,16 @@
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_dummy.cbp" />
-		<Project filename="jack_audioadapter.cbp">
+		<Project filename="jack_portaudio.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
-		<Project filename="jack_portaudio.cbp">
+		<Project filename="jack_audioadapter.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_netdriver.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
+		<Project filename="jack_netadapter.cbp" active="1" />
 		<Project filename="jack_netmanager.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
@@ -32,7 +33,7 @@
 			<Depends filename="libjackmp.cbp" />
 		</Project>
 		<Project filename="jack_connect.cbp" />
-		<Project filename="jack_disconnect.cbp" active="1">
+		<Project filename="jack_disconnect.cbp">
 			<Depends filename="libjackmp.cbp" />
 		</Project>
 	</Workspace>

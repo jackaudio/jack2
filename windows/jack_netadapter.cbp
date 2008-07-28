@@ -7,41 +7,123 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Win32 Debug">
-				<Option output="Debug\bin\jack_netadapter" prefix_auto="1" extension_auto="1" />
+				<Option output="Debug\bin\jackmp\netadapter" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
-					<Add option="-DBUILD_DLL" />
 					<Add option="-g" />
+					<Add option="-DBUILD_DLL" />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
 				</Compiler>
 				<Linker>
 					<Add library="user32" />
+					<Add library="kernel32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="odbc32" />
+					<Add library="odbccp32" />
+					<Add library="libjackservermp" />
+					<Add library="libsamplerate-0" />
+					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Release">
-				<Option output="Release\bin\jack_netadapter" prefix_auto="1" extension_auto="1" />
+				<Option output="Release\bin\jackmp\netadapter" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
-				<Option createDefFile="1" />
-				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DBUILD_DLL" />
-					<Add option="-O2" />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
 				</Compiler>
 				<Linker>
-					<Add option="-s" />
 					<Add library="user32" />
+					<Add library="kernel32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="odbc32" />
+					<Add library="odbccp32" />
+					<Add library="libjackservermp" />
+					<Add library="libsamplerate-0" />
+					<Add directory="Release\bin" />
+				</Linker>
+			</Target>
+			<Target title="Win32 Monitor">
+				<Option output="Release\bin\jackmp\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DBUILD_DLL" />
+					<Add directory="..\common" />
+					<Add directory="..\common\jack" />
+				</Compiler>
+				<Linker>
+					<Add library="kernel32" />
+					<Add library="user32" />
+					<Add library="gdi32" />
+					<Add library="winspool" />
+					<Add library="comdlg32" />
+					<Add library="advapi32" />
+					<Add library="shell32" />
+					<Add library="ole32" />
+					<Add library="oleaut32" />
+					<Add library="uuid" />
+					<Add library="odbc32" />
+					<Add library="odbccp32" />
+					<Add library="libjackservermp" />
+					<Add library="libsamplerate-0" />
+					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="main.cpp" />
-		<Unit filename="main.h" />
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="..\common" />
+			<Add directory="..\common\jack" />
+		</Compiler>
+		<Linker>
+			<Add library="kernel32" />
+			<Add library="user32" />
+			<Add library="gdi32" />
+			<Add library="winspool" />
+			<Add library="comdlg32" />
+			<Add library="advapi32" />
+			<Add library="shell32" />
+			<Add library="ole32" />
+			<Add library="oleaut32" />
+			<Add library="uuid" />
+			<Add library="odbc32" />
+			<Add library="odbccp32" />
+			<Add library="libjackservermp" />
+			<Add library="libsamplerate-0" />
+			<Add directory="Release\bin" />
+		</Linker>
+		<Unit filename="..\common\JackAudioAdapter.cpp" />
+		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />
+		<Unit filename="..\common\JackLibSampleRateResampler.cpp" />
+		<Unit filename="..\common\JackNetAdapter.cpp" />
+		<Unit filename="..\common\JackResampler.cpp" />
 		<Extensions>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
