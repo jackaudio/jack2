@@ -786,8 +786,8 @@ int JackFreebobDriver::Attach()
     fCaptureChannels = driver->capture_nchannels_audio;
     fPlaybackChannels = driver->playback_nchannels_audio;
 
-    assert(fCaptureChannels < PORT_NUM);
-    assert(fPlaybackChannels < PORT_NUM);
+    assert(fCaptureChannels < DRIVER_PORT_NUM);
+    assert(fPlaybackChannels < DRIVER_PORT_NUM);
 
     // this makes no sense...
     assert(fCaptureChannels + fPlaybackChannels > 0);

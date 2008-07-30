@@ -2134,8 +2134,8 @@ int JackAlsaDriver::Attach()
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 
-    assert(fCaptureChannels < PORT_NUM);
-    assert(fPlaybackChannels < PORT_NUM);
+    assert(fCaptureChannels < DRIVER_PORT_NUM);
+    assert(fPlaybackChannels < DRIVER_PORT_NUM);
 
     port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
 

@@ -639,8 +639,8 @@ int JackFFADODriver::Attach()
         }
     }
 
-    assert(fCaptureChannels < PORT_NUM);
-    assert(fPlaybackChannels < PORT_NUM);
+    assert(fCaptureChannels < DRIVER_PORT_NUM);
+    assert(fPlaybackChannels < DRIVER_PORT_NUM);
 
     if (ffado_streaming_prepare(driver->dev)) {
         printError("Could not prepare streaming device!");
