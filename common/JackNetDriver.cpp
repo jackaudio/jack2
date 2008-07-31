@@ -54,7 +54,7 @@ namespace Jack
 
     JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                                   const char* net_name, uint transport_sync, char network_master_mode, char network_slave_mode )
+                                   const char* net_name, uint transport_sync, char network_master_mode )
             : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
     {
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
@@ -68,7 +68,6 @@ namespace Jack
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
         fParams.fNetworkMasterMode = network_master_mode;
-        fParams.fNetworkSlaveMode = network_slave_mode;
 #ifdef JACK_MONITOR
         fMonitor = NULL;
         fMeasure = NULL;
@@ -190,6 +189,7 @@ namespace Jack
         session_params_t params;
         int us_timeout = 2000000;
         int rx_bytes = 0;
+        unsigned char loop = 0;
 
         //socket
         if ( fSocket.NewSocket() == SOCKET_ERROR )
@@ -206,6 +206,10 @@ namespace Jack
         if ( fSocket.SetTimeOut ( us_timeout ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
+        //disable local loop
+        if ( fSocket.SetOption ( IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof ( loop ) ) == SOCKET_ERROR )
+            jack_error ( "Can't disable multicast loop : %s", StrError ( NET_ERROR_CODE ) );
+
         //send 'AVAILABLE' until 'SLAVE_SETUP' received
         jack_info ( "Waiting for a master..." );
         do
@@ -213,19 +217,15 @@ namespace Jack
             //send 'available'
             if ( fSocket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
                 jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
-            //filter incoming packets : don't exit while receiving wrong packets
-            do
+            //filter incoming packets : don't exit while no error is detected
+            rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
+            if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
-                rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
-                if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
-                {
-                    jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
-                    return NET_RECV_ERROR;
-                }
+                jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
+                return NET_RECV_ERROR;
             }
-            while ( ( rx_bytes > 0 )  && strcmp ( params.fPacketType, fParams.fPacketType ) );
         }
-        while ( ( GetPacketType ( &params ) != SLAVE_SETUP ) );
+        while ( strcmp ( params.fPacketType, fParams.fPacketType ) && ( GetPacketType ( &params ) != SLAVE_SETUP ) );
 
         //connect the socket
         if ( fSocket.Connect() == SOCKET_ERROR )
@@ -526,10 +526,6 @@ namespace Jack
 
     int JackNetDriver::Read()
     {
-    	//slow mode and first cycle : skip read
-    	if ( ( fParams.fNetworkSlaveMode == 's' ) && ( fRxHeader.fCycle == 0 ) )
-			return 0;
-
         int rx_bytes;
         uint recvd_midi_pckt = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
@@ -779,7 +775,7 @@ namespace Jack
             desc->params[i].value.ui = 's';
             strcpy ( desc->params[i].short_desc, "Slow network add 1 cycle latency" );
             strcpy ( desc->params[i].long_desc, "'s' for slow, 'f' for fast, default is slow.\
-		Fast network will make the master waiting for the current cycle return data." );
+                     Fast network will make the master waiting for the current cycle return data." );
 
             i++;
             strcpy ( desc->params[i].name, "network_slave_mode" );
@@ -788,7 +784,7 @@ namespace Jack
             desc->params[i].value.ui = 's';
             strcpy ( desc->params[i].short_desc, "Slow network add 1 cycle latency" );
             strcpy ( desc->params[i].long_desc, "'s' for slow, 'f' for fast, default is slow.\
-		Fast network will make the slave waiting for the first cycle data." );
+                     Fast network will make the slave waiting for the first cycle data." );
 
             return desc;
         }
@@ -814,7 +810,6 @@ namespace Jack
             int midi_output_ports = 0;
             bool monitor = false;
             char network_master_mode = 's';
-            char network_slave_mode = 's';
 
             const JSList* node;
             const jack_driver_param_t* param;
@@ -850,40 +845,26 @@ namespace Jack
                     case 't' :
                         transport_sync = param->value.ui;
                         break;
-					case 'm' :
-						switch ( param->value.ui )
-						{
-							case 's' :
-								network_master_mode = 's';
-								break;
-							case 'f' :
-								network_master_mode = 'f';
-								break;
-							default :
-								network_master_mode = 's';
-								break;
-						}
-						break;
-					case 's' :
-						switch ( param->value.ui )
-						{
-							case 's' :
-								network_slave_mode = 's';
-								break;
-							case 'f' :
-								network_slave_mode = 'f';
-								break;
-							default :
-								network_slave_mode = 's';
-								break;
-						}
-						break;
+                    case 'N' :
+                        switch ( param->value.ui )
+                        {
+                            case 's' :
+                                network_master_mode = 's';
+                                break;
+                            case 'f' :
+                                network_master_mode = 'f';
+                                break;
+                            default :
+                                network_master_mode = 's';
+                                break;
+                        }
+                        break;
                 }
             }
 
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
-                                          midi_input_ports, midi_output_ports, name, transport_sync, network_master_mode, network_slave_mode ) );
+                                          midi_input_ports, midi_output_ports, name, transport_sync, network_master_mode ) );
             if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
                                 monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
                 return driver;

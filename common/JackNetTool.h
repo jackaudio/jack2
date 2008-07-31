@@ -39,19 +39,19 @@ namespace Jack
 
 //session params ******************************************************************************
 
-/**
-\brief This structure containes master/slave connection parameters, it's used to setup the whole system
+    /**
+    \brief This structure containes master/slave connection parameters, it's used to setup the whole system
 
-We have :
-	- some info like version, type and packet id
-	- names
-	- network parameters (hostnames and mtu)
-	- nunber of audio and midi channels
-	- sample rate and buffersize
-	- number of audio frames in one network packet (depends on the channel number)
-	- is the NetDriver in Sync or ASync mode ?
-	- is the NetDriver linked with the master's transport
-*/
+    We have :
+        - some info like version, type and packet id
+        - names
+        - network parameters (hostnames and mtu)
+        - nunber of audio and midi channels
+        - sample rate and buffersize
+        - number of audio frames in one network packet (depends on the channel number)
+        - is the NetDriver in Sync or ASync mode ?
+        - is the NetDriver linked with the master's transport
+    */
 
     struct _session_params
     {
@@ -73,15 +73,14 @@ We have :
         uint32_t fFramesPerPacket;          //complete frames per packet
         uint32_t fBitdepth;                 //samples bitdepth (unused)
         uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
-        char fNetworkMasterMode;			//fast or slow mode
-        char fNetworkSlaveMode;				//fast or slow mode
+        char fNetworkMasterMode;            //fast or slow mode
     };
 
 //net status **********************************************************************************
 
-/**
-\Brief This enum groups network error by type
-*/
+    /**
+    \Brief This enum groups network error by type
+    */
 
     enum  _net_status
     {
@@ -98,9 +97,9 @@ We have :
 
 //sync packet type ****************************************************************************
 
-/**
-\Brief This enum indicates the type of a sync packet (used in the initialization phase)
-*/
+    /**
+    \Brief This enum indicates the type of a sync packet (used in the initialization phase)
+    */
 
     enum _sync_packet_type
     {
@@ -117,24 +116,24 @@ We have :
 
 //packet header *******************************************************************************
 
-/**
-\Brief This structure is a complete header
+    /**
+    \Brief This structure is a complete header
 
-A header indicates :
-	- it is a header
-	- the type of data the packet contains (sync, midi or audio)
-	- the path of the packet (send -master->slave- or return -slave->master-)
-	- the unique ID of the slave
-	- the sample's bitdepth (unused for now)
-	- the size of the midi data contains in the packet (indicates how much midi data will be sent)
-	- the number of midi packet(s) : more than one is very unusual, it depends on the midi load
-	- the ID of the current cycle (used to check missing packets)
-	- the ID of the packet subcycle (for audio data)
-	- a flag indicating this packet is the last of the cycle (for sync robustness, it's better to process this way)
-	- a flag indicating if, in async mode, the previous graph was not finished or not
-	- padding to fill 64 bytes
+    A header indicates :
+        - it is a header
+        - the type of data the packet contains (sync, midi or audio)
+        - the path of the packet (send -master->slave- or return -slave->master-)
+        - the unique ID of the slave
+        - the sample's bitdepth (unused for now)
+        - the size of the midi data contains in the packet (indicates how much midi data will be sent)
+        - the number of midi packet(s) : more than one is very unusual, it depends on the midi load
+        - the ID of the current cycle (used to check missing packets)
+        - the ID of the packet subcycle (for audio data)
+        - a flag indicating this packet is the last of the cycle (for sync robustness, it's better to process this way)
+        - a flag indicating if, in async mode, the previous graph was not finished or not
+        - padding to fill 64 bytes
 
-*/
+    */
 
     struct _packet_header
     {
@@ -143,8 +142,9 @@ A header indicates :
         char fDataStream;           //s for send, r for return
         uint32_t fID;               //unique ID of the slave
         uint32_t fBitdepth;         //bitdepth of the data samples
-        uint32_t fMidiDataSize;     //size of midi data (if packet is 'midi typed') in bytes
+        uint32_t fMidiDataSize;     //size of midi data in bytes
         uint32_t fNMidiPckt;        //number of midi packets of the cycle
+        uint32_t fPacketSize;       //packet size in bytes
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
         char fIsLastPckt;           //is it the last packet of a given cycle ('y' or 'n')
@@ -154,9 +154,9 @@ A header indicates :
 
 //transport data ******************************************************************************
 
-/**
-\Brief This structure contains transport info
-*/
+    /**
+    \Brief This structure contains transport info
+    */
 
     struct _net_transport_data
     {
@@ -166,20 +166,20 @@ A header indicates :
 
 //midi data ***********************************************************************************
 
-/**
-\Brief Midi buffer and operations class
+    /**
+    \Brief Midi buffer and operations class
 
-This class is a toolset to manipulate Midi buffers.
-A JackMidiBuffer has a fixed size, which is the same than an audio buffer size.
-An intermediate fixed size buffer allows to uninterleave midi data (from jack ports).
-But for a big majority of the process cycles, this buffer is filled less than 1%,
-Sending over a network 99% of useless data seems completely unappropriate.
-The idea is to count effective midi data, and then send the smallest packet we can.
-To do it, we use an intermediate buffer.
-We have two methods to convert data from jack ports to intermediate buffer,
-And two others to convert this intermediate buffer to a network buffer (header + payload data)
+    This class is a toolset to manipulate Midi buffers.
+    A JackMidiBuffer has a fixed size, which is the same than an audio buffer size.
+    An intermediate fixed size buffer allows to uninterleave midi data (from jack ports).
+    But for a big majority of the process cycles, this buffer is filled less than 1%,
+    Sending over a network 99% of useless data seems completely unappropriate.
+    The idea is to count effective midi data, and then send the smallest packet we can.
+    To do it, we use an intermediate buffer.
+    We have two methods to convert data from jack ports to intermediate buffer,
+    And two others to convert this intermediate buffer to a network buffer (header + payload data)
 
-*/
+    */
 
     class EXPORT NetMidiBuffer
     {
@@ -212,15 +212,15 @@ And two others to convert this intermediate buffer to a network buffer (header +
 
 // audio data *********************************************************************************
 
-/**
-\Brief Audio buffer and operations class
+    /**
+    \Brief Audio buffer and operations class
 
-This class is a toolset to manipulate audio buffers.
-The manipulation of audio buffers is similar to midi buffer, except those buffers have fixed size.
-The interleaving/uninterleaving operations are simplier here because audio buffers have fixed size,
-So there is no need of an intermediate buffer as in NetMidiBuffer.
+    This class is a toolset to manipulate audio buffers.
+    The manipulation of audio buffers is similar to midi buffer, except those buffers have fixed size.
+    The interleaving/uninterleaving operations are simplier here because audio buffers have fixed size,
+    So there is no need of an intermediate buffer as in NetMidiBuffer.
 
-*/
+    */
 
     class EXPORT NetAudioBuffer
     {
@@ -264,6 +264,8 @@ So there is no need of an intermediate buffer as in NetMidiBuffer.
     EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
     //step of network initialization
     EXPORT jack_nframes_t SetFramesPerPacket ( session_params_t* params );
+    //step of network initialization
+    EXPORT int GetNetBufferSize ( session_params_t* params );
     //get the midi packet number for a given cycle
     EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size );
     //set the recv timeout on a socket

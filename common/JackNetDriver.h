@@ -30,9 +30,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-	/**
-	\Brief This class describes the Net Backend
-	*/
+    /**
+    \Brief This class describes the Net Backend
+    */
 
     class JackNetDriver : public JackAudioDriver
     {
@@ -100,7 +100,7 @@ namespace Jack
         public:
             JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                             const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                            const char* master_name, uint transport_sync, char network_master_mode, char network_slave_mode );
+                            const char* master_name, uint transport_sync, char network_master_mode );
             ~JackNetDriver();
 
             int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,

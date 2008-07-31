@@ -273,6 +273,8 @@ namespace Jack
             return NET_NO_DATA;
         case ECONNABORTED:
             return NET_CONN_ERROR;
+        case EINVAL:
+            return NET_CONN_ERROR;
         case ECONNREFUSED:
             return NET_CONN_ERROR;
         case ECONNRESET:

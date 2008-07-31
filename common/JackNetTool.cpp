@@ -271,6 +271,7 @@ namespace Jack
         header->fMidiDataSize = htonl ( header->fMidiDataSize );
         header->fBitdepth = htonl ( header->fBitdepth );
         header->fNMidiPckt = htonl ( header->fNMidiPckt );
+        header->fPacketSize = htonl ( header->fPacketSize );
         header->fCycle = ntohl ( header->fCycle );
         header->fSubCycle = htonl ( header->fSubCycle );
     }
@@ -281,6 +282,7 @@ namespace Jack
         header->fMidiDataSize = ntohl ( header->fMidiDataSize );
         header->fBitdepth = ntohl ( header->fBitdepth );
         header->fNMidiPckt = ntohl ( header->fNMidiPckt );
+        header->fPacketSize = ntohl ( header->fPacketSize );
         header->fCycle = ntohl ( header->fCycle );
         header->fSubCycle = ntohl ( header->fSubCycle );
     }
@@ -338,10 +340,21 @@ namespace Jack
     {
         if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
             return ( params->fFramesPerPacket = params->fPeriodSize );
-        size_t period = ( int ) powf ( 2.f, ( int ) ( log ( ( params->fMtu - sizeof ( packet_header_t ) )
+        jack_nframes_t period = ( int ) powf ( 2.f, ( int ) ( log ( ( params->fMtu - sizeof ( packet_header_t ) )
                                        / ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) / log ( 2 ) ) );
         ( period > params->fPeriodSize ) ? params->fFramesPerPacket = params->fPeriodSize : params->fFramesPerPacket = period;
         return params->fFramesPerPacket;
+    }
+
+    EXPORT int GetNetBufferSize ( session_params_t* params )
+    {
+        //audio
+        float audio_size = params->fMtu * ( params->fPeriodSize / params->fFramesPerPacket );
+        //midi
+        float midi_size = params->fMtu * ( max ( params->fSendMidiChannels, params->fReturnMidiChannels ) *
+                                            params->fPeriodSize * sizeof ( sample_t ) / ( params->fMtu - sizeof ( packet_header_t ) ) );
+        //return : sizes of sync + audio + midi
+        return ( params->fMtu + ( int ) audio_size + ( int ) midi_size );
     }
 
     EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size )
@@ -357,18 +370,18 @@ namespace Jack
         return npckt;
     }
 
-	EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
-	{
-		float time;
-		//fast mode, wait for the entire cycle duration
-		if ( params->fNetworkMasterMode == 'f' )
-			time = 900000.f * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
-		//slow mode, just try recv during a subcycle audio packet
-		else
-			time = 1250000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
+    EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
+    {
+        float time;
+        //fast mode, wait for the entire cycle duration
+        if ( params->fNetworkMasterMode == 'f' )
+            time = 900000.f * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
+        //slow mode, just try recv during two subcycle audio packets
+        else
+            time = 2000000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
         int usec = ( int ) time;
-		return socket->SetTimeOut ( usec );
-	}
+        return socket->SetTimeOut ( usec );
+    }
 
 // Packet *******************************************************************************************************
 
