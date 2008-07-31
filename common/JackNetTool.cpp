@@ -359,7 +359,13 @@ namespace Jack
 
 	EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
 	{
-		float time = 1250000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
+		float time;
+		//fast mode, wait for the entire cycle duration
+		if ( params->fNetworkMasterMode == 'f' )
+			time = 900000.f * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
+		//slow mode, just try recv during a subcycle audio packet
+		else
+			time = 1250000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
         int usec = ( int ) time;
 		return socket->SetTimeOut ( usec );
 	}

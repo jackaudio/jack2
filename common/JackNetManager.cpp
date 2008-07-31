@@ -477,8 +477,9 @@ namespace Jack
         //receive --------------------------------------------------------------------------------------------------------------------
         //sync
         rx_bytes == Recv ( sizeof ( packet_header_t ), 0 );
-        //if there is no data to be read, there could be stg wron with the slave, so just finish the cycle while returning 0 to start a new one
-        //if it's a network error, just return SOCKET_ERROR
+        //wait here for sync, switch network mode :
+		//	-fast : this recv will wait for a long time (90% of cycle duration)
+		//	-slow : just wait for a short time, then return, the data will be available at the next cycle
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
 
