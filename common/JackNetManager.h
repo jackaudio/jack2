@@ -44,7 +44,6 @@ namespace Jack
             session_params_t fParams;
             JackNetSocket fSocket;
             uint fNSubProcess;
-            int fNetJumpCnt;
             bool fRunning;
 
             //jack client

@@ -185,7 +185,7 @@ namespace Jack
         jack_log ( "JackNetDriver::GetNetMaster()" );
         //utility
         session_params_t params;
-        int ms_timeout = 2000;
+        float ms_timeout = 2000.f;
         int rx_bytes = 0;
 
         //socket
@@ -536,23 +536,23 @@ namespace Jack
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
             fNetAudioCaptureBuffer->SetBuffer ( audio_port_index, GetInputBuffer ( audio_port_index ) );
 
-#ifdef JACK_MONITOR
-		fMeasureId = 0;
-#endif
-
         //receive sync (launch the cycle)
         do
         {
-            rx_bytes = Recv ( fParams.fMtu, 0 );
-            //no sync received during timeout,
-            //if it's a connection issue, send will detect it, so don't skip the cycle (return 0)
+            rx_bytes = Recv ( sizeof ( packet_header_t ), 0 );
+            //connection issue, send will detect it, so don't skip the cycle (return 0)
             if ( rx_bytes == SOCKET_ERROR )
                 return 0;
         }
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
+#ifdef JACK_MONITOR
+        fMeasureId = 0;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+#endif
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
+
 
         //audio, midi or sync if driver is late
         if ( fParams.fSendMidiChannels || fParams.fSendAudioChannels )
@@ -569,6 +569,7 @@ namespace Jack
                     {
                         case 'm':   //midi
                             rx_bytes = Recv ( rx_bytes, 0 );
+                            fRxHeader.fCycle = rx_head->fCycle;
                             fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                             fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
                             if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
@@ -620,16 +621,17 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( audio_port_index, GetOutputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - fMonTimeRef ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //sync
         fTxHeader.fDataType = 's';
         if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
             fTxHeader.fIsLastPckt = 'y';
-        memset ( fTxData, 0, fPayloadSize );
-        SetSyncPacket();
-        tx_bytes = Send ( fParams.fMtu, 0 );
+        memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
+        //memset ( fTxData, 0, fPayloadSize );
+        //SetSyncPacket();
+        tx_bytes = Send ( sizeof ( packet_header_t ), 0 );
         if ( tx_bytes == SOCKET_ERROR )
             return tx_bytes;
 

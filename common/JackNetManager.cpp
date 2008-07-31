@@ -58,7 +58,6 @@ namespace Jack
         fSocket.CopyParams ( &fMasterManager->fSocket );
         fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
         fClientName = const_cast<char*> ( fParams.fName );
-        fNetJumpCnt = 0;
         fJackClient = NULL;
         fRunning = false;
         fSyncState = 1;
@@ -164,7 +163,7 @@ namespace Jack
     {
         jack_log ( "JackNetMaster::Init, ID %u.", fParams.fID );
         session_params_t params;
-        int msec_timeout = 1000;
+        float msec_timeout = 1000.f;
         uint attempt = 0;
         int rx_bytes = 0;
 
@@ -322,7 +321,7 @@ namespace Jack
     {
         if ( fParams.fTransportSync )
         {
-            //set the TransportData
+            //TODO : set the TransportData
 
             //copy to TxBuffer
             memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
@@ -336,14 +335,14 @@ namespace Jack
         if ( ( tx_bytes = fSocket.Send ( buffer, size, flags ) ) == SOCKET_ERROR )
         {
             net_error_t error = fSocket.GetError();
-            if ( error == NET_CONN_ERROR )
+            if ( fRunning && ( error == NET_CONN_ERROR ) )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, please check network connection with '%s'.",
                              fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
                 Exit();
             }
-            else
+            else if ( fRunning )
                 jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
         }
         return tx_bytes;
@@ -357,16 +356,11 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             if ( error == NET_NO_DATA )
             {
-                //too much receive failure, react
-                if ( ++fNetJumpCnt < 100 )
-                    return 0;
-                else
-                {
-                    jack_error ( "No data from %s...", fParams.fName );
-                    fNetJumpCnt = 0;
-                }
+                //no data isn't really a network error, so just return 0 avalaible read bytes
+                jack_error ( "No data from %s...", fParams.fName );
+                return 0;
             }
-            else if ( error == NET_CONN_ERROR )
+            else if ( fRunning && ( error == NET_CONN_ERROR ) )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
@@ -374,7 +368,7 @@ namespace Jack
                 //ask to the manager to properly remove the master
                 Exit();
             }
-            else
+            else if ( fRunning )
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
         }
         return rx_bytes;
@@ -391,7 +385,9 @@ namespace Jack
         if ( !fRunning )
             return 0;
 
-        int tx_bytes, rx_bytes, copy_size;
+        int tx_bytes = 0;
+        int rx_bytes = 0;
+        int copy_size = 0;
         size_t midi_recvd_pckt = 0;
         fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
@@ -427,9 +423,10 @@ namespace Jack
         fTxHeader.fDataType = 's';
         if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
             fTxHeader.fIsLastPckt = 'y';
-        memset ( fTxData, 0, fPayloadSize );
-        SetSyncPacket();
-        tx_bytes = Send ( fTxBuffer, fParams.fMtu, 0 );
+        memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
+        //memset ( fTxData, 0, fPayloadSize );
+        //SetSyncPacket();
+        tx_bytes = Send ( fTxBuffer, sizeof ( packet_header_t ), 0 );
         if ( tx_bytes == SOCKET_ERROR )
             return tx_bytes;
 
@@ -479,13 +476,11 @@ namespace Jack
 
         //receive --------------------------------------------------------------------------------------------------------------------
         //sync
-        do
-        {
-            rx_bytes = Recv ( fParams.fMtu, 0 );
-            if ( rx_bytes == SOCKET_ERROR )
-                return rx_bytes;
-        }
-        while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
+        rx_bytes == Recv ( sizeof ( packet_header_t ), 0 );
+        //if there is no data to be read, there could be stg wron with the slave, so just finish the cycle while returning 0 to start a new one
+        //if it's a network error, just return SOCKET_ERROR
+        if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
+            return rx_bytes;
 
 #ifdef JACK_MONITOR
         fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
@@ -495,7 +490,8 @@ namespace Jack
         {
             do
             {
-                if ( ( rx_bytes = Recv ( fParams.fMtu, MSG_PEEK ) ) == SOCKET_ERROR )
+                rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+                if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
                     return rx_bytes;
                 if ( rx_bytes && ( rx_head->fDataStream == 'r' ) && ( rx_head->fID == fParams.fID ) )
                 {
@@ -508,7 +504,6 @@ namespace Jack
                             fNetMidiPlaybackBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
                             if ( ++midi_recvd_pckt == rx_head->fNMidiPckt )
                                 fNetMidiPlaybackBuffer->RenderToJackPorts();
-                            fNetJumpCnt = 0;
                             break;
                         case 'a':   //audio
                             rx_bytes = Recv ( fAudioRxLen, 0 );
@@ -518,11 +513,11 @@ namespace Jack
                             fRxHeader.fSubCycle = rx_head->fSubCycle;
                             fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                             fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fSubCycle );
-                            fNetJumpCnt = 0;
                             break;
                         case 's':   //sync
                             rx_bytes = Recv ( rx_bytes, 0 );
-                            jack_error ( "NetMaster receive sync packets instead of data." );
+                            fRxHeader.fCycle = rx_head->fCycle;
+                            fRxHeader.fSubCycle = rx_head->fSubCycle;
                             return 0;
                     }
                 }
@@ -620,7 +615,7 @@ namespace Jack
     {
         jack_log ( "JackNetMasterManager::Run" );
         //utility variables
-        int msec_timeout = 2000;
+        float msec_timeout = 2000.f;
         int attempt = 0;
 
         //data

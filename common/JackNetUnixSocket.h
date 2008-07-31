@@ -80,7 +80,7 @@ namespace Jack
         int GetOption ( int level, int optname, void* optval, socklen_t* optlen );
 
         //timeout
-        int SetTimeOut ( int& msec );
+        int SetTimeOut ( float& msec );
 
         //local loop
         int SetLocalLoop();

@@ -359,10 +359,9 @@ namespace Jack
 
     EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
     {
-        //time in ms : 1,25 * 'one packet time'
-        float time = 1250 * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
-        int ms = ( int ) time;
-        return ( socket->SetTimeOut ( ms ) == SOCKET_ERROR ) ? SOCKET_ERROR : ms;
+        //time in ms, 1.25x cycle duration
+        float time = 1250 * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
+        return ( socket->SetTimeOut ( time ) == SOCKET_ERROR ) ? SOCKET_ERROR : 0;
     }
 
 // Packet *******************************************************************************************************

@@ -37,6 +37,7 @@ namespace Jack
     JackNetUnixSocket::JackNetUnixSocket()
     {
         fSockfd = 0;
+        fPort = 0;
         fSendAddr.sin_family = AF_INET;
         fSendAddr.sin_addr.s_addr = htonl ( INADDR_ANY );
         memset ( &fSendAddr.sin_zero, 0, 8 );
@@ -198,7 +199,7 @@ namespace Jack
     }
 
     //timeout*************************************************************************************************************
-    int JackNetUnixSocket::SetTimeOut ( int& msec )
+    int JackNetUnixSocket::SetTimeOut ( float& msec )
     {
         //negative timeout, or exceeding 10s, return
         if ( ( msec < 0 ) || ( msec > 10000 ) )
@@ -208,13 +209,13 @@ namespace Jack
         if ( msec < 1000 )
         {
             timeout.tv_sec = 0;
-            timeout.tv_usec = msec * 1000;
+            timeout.tv_usec = ( int ) ( msec * 1000.f );
             return SetOption ( SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) );
         }
         //more than 1sec
         if ( msec >= 1000 )
         {
-            float sec = static_cast<float>( msec ) / 1000.0f;
+            float sec = msec / 1000.0f;
             timeout.tv_sec = ( int ) sec;
             float usec = ( sec - timeout.tv_sec ) * 1000000;
             timeout.tv_usec = ( int ) usec;
