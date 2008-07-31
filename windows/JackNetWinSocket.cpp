@@ -263,12 +263,12 @@ namespace Jack
     }
 
     //tiemout************************************************************************************************************
-    int JackNetWinSocket::SetTimeOut ( float& msec )
+    int JackNetWinSocket::SetTimeOut ( int& usec )
     {
         //negative timeout, or exceeding 10s, return
-        if ( ( msec < 0 ) || ( msec > 10000 ) )
+        if ( ( msec < 0 ) || ( usec > 10000000 ) )
             return -1;
-		int time = ( int ) msec;
+		int time = usec / 1000;
         return SetOption ( SOL_SOCKET, SO_RCVTIMEO, &time, sizeof ( time ) );
     }
 

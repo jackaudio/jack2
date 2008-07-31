@@ -28,7 +28,7 @@ namespace Jack
         {
             jack_error ( "Can't get 'hostname' : %s", strerror ( NET_ERROR_CODE ) );
             strcpy ( name, "default" );
-            return -1;
+            return SOCKET_ERROR;
         }
         return 0;
     }
@@ -198,30 +198,28 @@ namespace Jack
         return getsockopt ( fSockfd, level, optname, optval, optlen );
     }
 
-    //timeout*************************************************************************************************************
-    int JackNetUnixSocket::SetTimeOut ( float& msec )
+    //timeout************************************************************************************************************
+    int JackNetUnixSocket::SetTimeOut ( int& us )
     {
-        //negative timeout, or exceeding 10s, return
-        if ( ( msec < 0 ) || ( msec > 10000 ) )
-            return -1;
+        //negative timeout, or exceding 10s, return
+        if ( ( us < 0 ) || ( us > 10000000 ) )
+            return SOCKET_ERROR;
         struct timeval timeout;
         //less than 1sec
-        if ( msec < 1000 )
+        if ( us < 1000000 )
         {
             timeout.tv_sec = 0;
-            timeout.tv_usec = ( int ) ( msec * 1000.f );
-            return SetOption ( SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) );
+            timeout.tv_usec = us;
         }
         //more than 1sec
-        if ( msec >= 1000 )
+        else
         {
-            float sec = msec / 1000.0f;
+            float sec = static_cast<float>( us ) / 1000000.f;
             timeout.tv_sec = ( int ) sec;
-            float usec = ( sec - timeout.tv_sec ) * 1000000;
+            float usec = ( sec - static_cast<float> ( timeout.tv_sec ) ) * 1000000;
             timeout.tv_usec = ( int ) usec;
-            return SetOption ( SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) );
         }
-        return -1;
+        return SetOption ( SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof ( timeout ) );
     }
 
     //local loop**********************************************************************************************************

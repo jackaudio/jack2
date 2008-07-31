@@ -357,12 +357,12 @@ namespace Jack
         return npckt;
     }
 
-    EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
-    {
-        //time in ms, 1.25x cycle duration
-        float time = 1250 * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
-        return ( socket->SetTimeOut ( time ) == SOCKET_ERROR ) ? SOCKET_ERROR : 0;
-    }
+	EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
+	{
+		float time = 1250000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
+        int usec = ( int ) time;
+		return socket->SetTimeOut ( usec );
+	}
 
 // Packet *******************************************************************************************************
 

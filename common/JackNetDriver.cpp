@@ -185,7 +185,7 @@ namespace Jack
         jack_log ( "JackNetDriver::GetNetMaster()" );
         //utility
         session_params_t params;
-        float ms_timeout = 2000.f;
+        int us_timeout = 2000000;
         int rx_bytes = 0;
 
         //socket
@@ -200,7 +200,7 @@ namespace Jack
             jack_error ( "Can't bind the socket : %s", StrError ( NET_ERROR_CODE ) );
 
         //timeout on receive
-        if ( fSocket.SetTimeOut ( ms_timeout ) == SOCKET_ERROR )
+        if ( fSocket.SetTimeOut ( us_timeout ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //send 'AVAILABLE' until 'SLAVE_SETUP' received
@@ -546,10 +546,6 @@ namespace Jack
         }
         while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
 
-#ifdef JACK_MONITOR
-        fMeasureId = 0;
-        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
-#endif
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
@@ -596,6 +592,7 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
 
 #ifdef JACK_MONITOR
+        fMeasureId = 0;
         fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
         return 0;
@@ -621,7 +618,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( audio_port_index, GetOutputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - fMonTimeRef ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
 
         //sync
