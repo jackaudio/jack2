@@ -125,7 +125,7 @@ namespace Jack
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
-        plot_name += ( fParams.fNetworkMasterMode == 'f' ) ? string ( "_fast-network" ) : string ( "_slow-network" );
+        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast-network" ) : string ( "" );
         fMonitor = new JackGnuPlotMonitor<float> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetMaster::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
@@ -253,7 +253,7 @@ namespace Jack
             sprintf ( name, "from_slave_%d", i+1 );
             if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-            jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+            jack_port_set_latency ( fAudioPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
         }
         //midi
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -270,7 +270,7 @@ namespace Jack
             sprintf ( name, "midi_from_slave_%d", i+1 );
             if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 goto fail;
-            jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+            jack_port_set_latency ( fMidiPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
         }
 
         fRunning = true;
@@ -494,28 +494,34 @@ namespace Jack
 #endif
 
         //receive --------------------------------------------------------------------------------------------------------------------
-        //sync
+        //sync : how much data is available ?
         rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-        //wait here for sync, switch network mode :
-        //  -fast : this recv will wait for a long time (90% of cycle duration)
-        //  -slow : just wait for a short time, then return, the data will be available at the next cycle
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
 
-        //slow mode :
-        if ( fParams.fNetworkMasterMode == 's' ) 
+        switch ( fParams.fNetworkMode )
         {
-            if ( rx_head->fCycle == fTxHeader.fCycle )
-                return 0;
-            else 
-                rx_bytes = Recv ( rx_head->fPacketSize, 0);
-        }
-
-        //fast mode :
-        if ( fParams.fNetworkMasterMode == 'f' )
-        {
-            if ( fTxHeader.fCycle - fRxHeader.fCycle )
-                jack_log ( "%s : %s =  %d", fParams.fName, ( fParams.fSlaveSyncMode ) ? "SyncCycleOffset" : "AsyncCycleOffset", fTxHeader.fCycle - fRxHeader.fCycle );
+            case 'n' :  //normal mode
+                //normal use of the network : allow to use full bandwith
+                //    - extra latency is set to one cycle, what corresponds to the time needed to receive streams using full network bandwith
+                //    - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
+                //    - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
+                if ( rx_head->fCycle == fTxHeader.fCycle )
+                    return 0;
+                else
+                {
+                    rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                }
+                break;
+            case 'f' :  //fast mode
+                //fast mode suppose the network bandwith is larger than required for the transmission (only a few channels for example)
+                //    - packets can be quickly received, quickly is here relative to the cycle duration
+                //    - here, receive data, we can't keep it queued on the rx buffer,
+                //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
+                rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                if ( rx_head->fCycle != fTxHeader.fCycle )
+                    jack_error ( "%s, can't stay in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fTxHeader.fCycle - rx_head->fCycle );
+                break;
         }
 
 #ifdef JACK_MONITOR
@@ -526,16 +532,20 @@ namespace Jack
         {
             do
             {
+                //how much data is queued on the rx buffer ?
                 rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
                 if ( rx_bytes == SOCKET_ERROR )
                     return rx_bytes;
-                if ( ++jumpcnt == fNSubProcess )
+                //if no data,
+                if ( ( rx_bytes == 0 ) && ( ++jumpcnt == fNSubProcess ) )
                 {
                     jack_error ( "No data from %s...", fParams.fName );
                     jumpcnt = 0;
                 }
+                //else if data is valid,
                 if ( rx_bytes && ( rx_head->fDataStream == 'r' ) && ( rx_head->fID == fParams.fID ) )
                 {
+                    //read data
                     switch ( rx_head->fDataType )
                     {
                         case 'm':   //midi
@@ -558,8 +568,8 @@ namespace Jack
                             jumpcnt = 0;
                             break;
                         case 's':   //sync
-                            Recv ( rx_head->fPacketSize, 0 );
-                            return 0;
+                            if ( rx_head->fCycle == fTxHeader.fCycle )
+                                return 0;
                     }
                 }
             }

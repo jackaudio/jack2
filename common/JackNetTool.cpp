@@ -218,7 +218,7 @@ namespace Jack
         jack_info ( "Packet per period : %u", params->fPeriodSize / params->fFramesPerPacket );
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
-        jack_info ( "Network mode : %s", ( params->fNetworkMasterMode == 'f' ) ? "fast" : "slow" );
+        jack_info ( "Network mode : %s", ( params->fNetworkMode == 'f' ) ? "fast" : "normal" );
         jack_info ( "****************************************************" );
     }
 
@@ -375,7 +375,7 @@ namespace Jack
     {
         float time;
         //fast mode, wait for the entire cycle duration
-        if ( params->fNetworkMasterMode == 'f' )
+        if ( params->fNetworkMode == 'f' )
             time = 900000.f * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
         //slow mode, just try recv during two subcycle audio packets
         else

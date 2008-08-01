@@ -54,7 +54,7 @@ namespace Jack
 
     JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                                   const char* net_name, uint transport_sync, char network_master_mode )
+                                   const char* net_name, uint transport_sync, char network_mode )
             : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
     {
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
@@ -67,7 +67,7 @@ namespace Jack
         strcpy ( fParams.fName, net_name );
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
-        fParams.fNetworkMasterMode = network_master_mode;
+        fParams.fNetworkMode = network_mode;
 #ifdef JACK_MONITOR
         fMonitor = NULL;
         fMeasure = NULL;
@@ -348,7 +348,7 @@ namespace Jack
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_slave" );
         plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
-        plot_name += ( fParams.fNetworkMasterMode == 'f' ) ? string ( "_fast-network" ) : string ( "_slow-network" );
+        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast-network" ) : string ( "" );
         fMonitor = new JackGnuPlotMonitor<float> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetDriver::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
@@ -400,7 +400,7 @@ namespace Jack
             }
             port = fGraphManager->GetPort ( port_id );
             port->SetAlias ( alias );
-            port->SetLatency ( fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
+            port->SetLatency ( ( fParams.fNetworkMode == 'f' ) ? 0 : fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
             fPlaybackPortList[audio_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
         }
@@ -434,7 +434,7 @@ namespace Jack
                 return -1;
             }
             port = fGraphManager->GetPort ( port_id );
-            port->SetLatency ( fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
+            port->SetLatency ( ( fParams.fNetworkMode == 'f' ) ? 0 : fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
             fMidiPlaybackPortList[midi_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
         }
@@ -614,7 +614,7 @@ namespace Jack
         if ( fEngineControl->fSyncMode )
             fTxHeader.fCycle = fRxHeader.fCycle;
         else
-            fTxHeader.fCycle++;
+            fTxHeader.fCycle = fRxHeader.fCycle - 1;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fIsLastPckt = 'n';
 
@@ -777,10 +777,10 @@ namespace Jack
 
             i++;
             strcpy ( desc->params[i].name, "network_mode" );
-            desc->params[i].character  = 'N';
-            desc->params[i].type = JackDriverParamChar;
-            desc->params[i].value.ui = 's';
-            strcpy ( desc->params[i].short_desc, "Slow network add 1 cycle latency" );
+            desc->params[i].character  = 'f';
+            desc->params[i].type = JackDriverParamString;
+            strcpy ( desc->params[i].value.str, "" );
+            strcpy ( desc->params[i].short_desc, "Fast mode allows a zero latency transmission." );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             return desc;
@@ -806,7 +806,7 @@ namespace Jack
             int midi_input_ports = 0;
             int midi_output_ports = 0;
             bool monitor = false;
-            char network_master_mode = 's';
+            char network_mode = 'n';
 
             const JSList* node;
             const jack_driver_param_t* param;
@@ -842,26 +842,15 @@ namespace Jack
                     case 't' :
                         transport_sync = param->value.ui;
                         break;
-                    case 'N' :
-                        switch ( param->value.ui )
-                        {
-                            case 's' :
-                                network_master_mode = 's';
-                                break;
-                            case 'f' :
-                                network_master_mode = 'f';
-                                break;
-                            default :
-                                network_master_mode = 's';
-                                break;
-                        }
+                    case 'f' :
+                        network_mode = 'f';
                         break;
                 }
             }
 
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
-                                          midi_input_ports, midi_output_ports, name, transport_sync, network_master_mode ) );
+                                          midi_input_ports, midi_output_ports, name, transport_sync, network_mode ) );
             if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
                                 monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
                 return driver;
