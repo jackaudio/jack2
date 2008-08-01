@@ -79,6 +79,16 @@ void JackSocketServerChannel::Close()
 {
     fThread.Kill();
     fRequestListenSocket.Close();
+
+    // Close remaining client sockets
+    std::map<int, std::pair<int, JackClientSocket*> >::iterator it;
+    for (it = fSocketTable.begin(); it != fSocketTable.end(); it++) {
+	 pair<int, JackClientSocket*> elem = (*it).second;
+         JackClientSocket* socket = elem.second;
+         assert(socket);
+         socket->Close();
+         delete socket;
+    }
 }
 
 void JackSocketServerChannel::ClientCreate()

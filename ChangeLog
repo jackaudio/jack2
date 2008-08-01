@@ -25,6 +25,7 @@ Florian Faber
 2008-08-01 Stephane Letz  <letz@grame.fr>
 
 	* Fix desallocation of remaining clients when server quits.
+        * Close remaining client sockets in JackSocketServerChannel::Close.
 
 2008-07-25 Stephane Letz  <letz@grame.fr>
 
