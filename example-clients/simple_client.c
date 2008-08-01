@@ -15,7 +15,6 @@
 #endif
 #include <jack/jack.h>
 
-jack_port_t *input_port;
 jack_port_t *output_port1, *output_port2;
 jack_client_t *client;
 
@@ -39,13 +38,6 @@ static void signal_handler(int sig)
 	exit(0);
 }
 
-/* a simple state machine for this client */
-volatile enum {
-	Init,
-	Run,
-	Exit
-} client_state = Init;
-
 /**
  * The process callback for this JACK application is called in a
  * special realtime thread once for each audio cycle.
@@ -57,11 +49,10 @@ volatile enum {
 int
 process (jack_nframes_t nframes, void *arg)
 {
-	jack_default_audio_sample_t *in, *out1, *out2;
+	jack_default_audio_sample_t *out1, *out2;
 	paTestData *data = (paTestData*)arg;
 	int i;
 
-	in = jack_port_get_buffer (input_port, nframes);
 	out1 = jack_port_get_buffer (output_port1, nframes);
 	out2 = jack_port_get_buffer (output_port2, nframes);
 
@@ -155,9 +146,6 @@ main (int argc, char *argv[])
 
 	/* create two ports */
 
-	input_port = jack_port_register (client, "input",
-					 JACK_DEFAULT_AUDIO_TYPE,
-					 JackPortIsInput, 0);
 	output_port1 = jack_port_register (client, "output1",
 					  JACK_DEFAULT_AUDIO_TYPE,
 					  JackPortIsOutput, 0);
@@ -166,7 +154,7 @@ main (int argc, char *argv[])
 					  JACK_DEFAULT_AUDIO_TYPE,
 					  JackPortIsOutput, 0);
 
-	if ((input_port == NULL) || (output_port1 == NULL) || (output_port2 == NULL)) {
+	if ((output_port1 == NULL) || (output_port2 == NULL)) {
 		fprintf(stderr, "no more JACK ports available\n");
 		exit (1);
 	}
@@ -186,20 +174,7 @@ main (int argc, char *argv[])
 	 * "input" to the backend, and capture ports are "output" from
 	 * it.
 	 */
-
-	ports = jack_get_ports (client, NULL, NULL,
-				JackPortIsPhysical|JackPortIsOutput);
-	if (ports == NULL) {
-		fprintf(stderr, "no physical capture ports\n");
-		exit (1);
-	}
-
-	if (jack_connect (client, ports[0], jack_port_name (input_port))) {
-		fprintf (stderr, "cannot connect input ports\n");
-	}
-
-	free (ports);
-	
+ 	
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsInput);
 	if (ports == NULL) {
@@ -231,7 +206,7 @@ main (int argc, char *argv[])
 
 	/* keep running until the transport stops */
 
-	while (client_state != Exit) {
+	while (1) {
 	#ifdef WIN32 
 		Sleep(1000);
 	#else

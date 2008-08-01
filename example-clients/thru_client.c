@@ -26,14 +26,6 @@ static void signal_handler ( int sig )
     exit ( 0 );
 }
 
-/* a simple state machine for this client */
-volatile enum
-{
-    Init,
-    Run,
-    Exit
-} client_state = Init;
-
 /**
  * The process callback for this JACK application is called in a
  * special realtime thread once for each audio cycle.
@@ -208,7 +200,7 @@ main ( int argc, char *argv[] )
 
     /* keep running until the transport stops */
 
-    while ( client_state != Exit )
+    while (1)
     {
 #ifdef WIN32
         Sleep ( 1000 );
