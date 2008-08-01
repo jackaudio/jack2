@@ -125,6 +125,7 @@ namespace Jack
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
+        plot_name += ( fParams.fNetworkMasterMode == 'f' ) ? string ( "_fast-network" ) : string ( "_slow-network" );
         fMonitor = new JackGnuPlotMonitor<float> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetMaster::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
@@ -425,14 +426,16 @@ namespace Jack
                                                                           fParams.fPeriodSize ) ) );
 
         //send ------------------------------------------------------------------------------------------------------------------
-        //sync
+        //sync : first set header
         fTxHeader.fDataType = 's';
-        //memset ( fTxData, 0, fPayloadSize );
-        //SetSyncPacket();
         if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
             fTxHeader.fIsLastPckt = 'y';
-        fTxHeader.fPacketSize = sizeof ( packet_header_t );
+        fTxHeader.fPacketSize = fParams.fMtu;
         memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
+        //sync : then fill auxiliary data
+        memset ( fTxData, 0, fPayloadSize );
+        SetSyncPacket();
+        //sync : and send
         tx_bytes = Send ( fTxBuffer, fTxHeader.fPacketSize, 0 );
         if ( tx_bytes == SOCKET_ERROR )
             return tx_bytes;
@@ -444,17 +447,21 @@ namespace Jack
         //midi
         if ( fParams.fSendMidiChannels )
         {
+            //set global header fields and get the number of midi packets
             fTxHeader.fDataType = 'm';
             fTxHeader.fMidiDataSize = fNetMidiCaptureBuffer->RenderFromJackPorts();
             fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
             for ( uint subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
             {
+                //fill the packet header fields
                 fTxHeader.fSubCycle = subproc;
                 if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fSendAudioChannels )
                     fTxHeader.fIsLastPckt = 'y';
+                //get the data from buffer
                 fTxHeader.fPacketSize = fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
                 fTxHeader.fPacketSize += sizeof ( packet_header_t );
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
+                //and send
                 tx_bytes = Send ( fTxBuffer, fTxHeader.fPacketSize, 0 );
                 if ( tx_bytes == SOCKET_ERROR )
                     return tx_bytes;
@@ -467,12 +474,15 @@ namespace Jack
             fTxHeader.fDataType = 'a';
             for ( uint subproc = 0; subproc < fNSubProcess; subproc++ )
             {
+                //set the header
                 fTxHeader.fSubCycle = subproc;
                 if ( subproc == ( fNSubProcess - 1 ) )
                     fTxHeader.fIsLastPckt = 'y';
                 fTxHeader.fPacketSize = fAudioTxLen;
-                fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
+                //get the data
+                fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
+                //and send
                 tx_bytes = Send ( fTxBuffer, fTxHeader.fPacketSize, 0 );
                 if ( tx_bytes == SOCKET_ERROR )
                     return tx_bytes;
@@ -485,12 +495,28 @@ namespace Jack
 
         //receive --------------------------------------------------------------------------------------------------------------------
         //sync
-        rx_bytes = Recv ( sizeof ( packet_header_t ), 0 );
+        rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
         //wait here for sync, switch network mode :
         //  -fast : this recv will wait for a long time (90% of cycle duration)
         //  -slow : just wait for a short time, then return, the data will be available at the next cycle
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
+
+        //slow mode :
+        if ( fParams.fNetworkMasterMode == 's' ) 
+        {
+            if ( rx_head->fCycle == fTxHeader.fCycle )
+                return 0;
+            else 
+                rx_bytes = Recv ( rx_head->fPacketSize, 0);
+        }
+
+        //fast mode :
+        if ( fParams.fNetworkMasterMode == 'f' )
+        {
+            if ( fTxHeader.fCycle - fRxHeader.fCycle )
+                jack_log ( "%s : %s =  %d", fParams.fName, ( fParams.fSlaveSyncMode ) ? "SyncCycleOffset" : "AsyncCycleOffset", fTxHeader.fCycle - fRxHeader.fCycle );
+        }
 
 #ifdef JACK_MONITOR
         fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
@@ -543,8 +569,6 @@ namespace Jack
 #ifdef JACK_MONITOR
         fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
         fMonitor->Write ( fMeasure );
-        if ( fTxHeader.fCycle - fRxHeader.fCycle )
-            jack_log ( "NetMonitor::%s %d", ( fParams.fSlaveSyncMode ) ? "SyncCycleOffset" : "AsyncCycleOffset", fTxHeader.fCycle - fRxHeader.fCycle );
 #endif
         return 0;
     }

@@ -348,6 +348,7 @@ namespace Jack
         string plot_name = string ( fParams.fName );
         plot_name += string ( "_slave" );
         plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
+        plot_name += ( fParams.fNetworkMasterMode == 'f' ) ? string ( "_fast-network" ) : string ( "_slow-network" );
         fMonitor = new JackGnuPlotMonitor<float> ( JackNetDriver::fMeasureCnt, JackNetDriver::fMeasurePoints, plot_name );
         fMeasure = new float[JackNetDriver::fMeasurePoints];
         fMonitor->SetPlotFile ( JackNetDriver::fMonitorPlotOptions, JackNetDriver::fMonitorPlotOptionsCnt,
@@ -539,10 +540,14 @@ namespace Jack
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
             fNetAudioCaptureBuffer->SetBuffer ( audio_port_index, GetInputBuffer ( audio_port_index ) );
 
+#ifdef JACK_MONITOR
+        fMeasureId = 0;
+#endif
+
         //receive sync (launch the cycle)
         do
         {
-            rx_bytes = Recv ( sizeof ( packet_header_t ), 0 );
+            rx_bytes = Recv ( fParams.fMtu, 0 );
             //connection issue, send will detect it, so don't skip the cycle (return 0)
             if ( rx_bytes == SOCKET_ERROR )
                 return 0;
@@ -551,7 +556,6 @@ namespace Jack
 
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
-
 
         //audio, midi or sync if driver is late
         if ( fParams.fSendMidiChannels || fParams.fSendAudioChannels )
@@ -567,7 +571,7 @@ namespace Jack
                     switch ( rx_head->fDataType )
                     {
                         case 'm':   //midi
-                            rx_bytes = Recv ( rx_bytes, 0 );
+                            rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                             fRxHeader.fCycle = rx_head->fCycle;
                             fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                             fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
@@ -575,7 +579,7 @@ namespace Jack
                                 fNetMidiCaptureBuffer->RenderToJackPorts();
                             break;
                         case 'a':   //audio
-                            rx_bytes = Recv ( fAudioRxLen, 0 );
+                            rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                             if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
                                 jack_error ( "Packet(s) missing..." );
                             fRxHeader.fCycle = rx_head->fCycle;
@@ -595,16 +599,16 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
 
 #ifdef JACK_MONITOR
-        fMeasureId = 0;
         fMeasure[fMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
 #endif
+
         return 0;
     }
 
     int JackNetDriver::Write()
     {
         uint midi_port_index;
-        int tx_bytes, copy_size, audio_port_index;
+        int tx_bytes, audio_port_index;
 
         //tx header
         if ( fEngineControl->fSyncMode )
@@ -628,10 +632,11 @@ namespace Jack
         fTxHeader.fDataType = 's';
         if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
             fTxHeader.fIsLastPckt = 'y';
+        fTxHeader.fPacketSize = fParams.fMtu;
         memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-        //memset ( fTxData, 0, fPayloadSize );
-        //SetSyncPacket();
-        tx_bytes = Send ( sizeof ( packet_header_t ), 0 );
+        memset ( fTxData, 0, fPayloadSize );
+        SetSyncPacket();
+        tx_bytes = Send ( fTxHeader.fPacketSize, 0 );
         if ( tx_bytes == SOCKET_ERROR )
             return tx_bytes;
 
@@ -650,9 +655,10 @@ namespace Jack
                 fTxHeader.fSubCycle = subproc;
                 if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fReturnAudioChannels )
                     fTxHeader.fIsLastPckt = 'y';
+                fTxHeader.fPacketSize = fNetMidiPlaybackBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
+                fTxHeader.fPacketSize += sizeof ( packet_header_t );
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                copy_size = fNetMidiPlaybackBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-                tx_bytes = Send ( sizeof ( packet_header_t ) + copy_size, 0 );
+                tx_bytes = Send ( fTxHeader.fPacketSize, 0 );
                 if ( tx_bytes == SOCKET_ERROR )
                     return tx_bytes;
             }
@@ -667,9 +673,10 @@ namespace Jack
                 fTxHeader.fSubCycle = subproc;
                 if ( subproc == ( fNSubProcess - 1 ) )
                     fTxHeader.fIsLastPckt = 'y';
-                fNetAudioPlaybackBuffer->RenderFromJackPorts ( subproc );
+                fTxHeader.fPacketSize = fAudioTxLen;
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                tx_bytes = Send ( fAudioTxLen, 0 );
+                fNetAudioPlaybackBuffer->RenderFromJackPorts ( subproc );
+                tx_bytes = Send ( fTxHeader.fPacketSize, 0 );
                 if ( tx_bytes == SOCKET_ERROR )
                     return tx_bytes;
             }
@@ -693,7 +700,7 @@ namespace Jack
         {
             jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
             strcpy ( desc->name, "net" );
-            desc->nparams = 11;
+            desc->nparams = 10;
             desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
             int i = 0;
@@ -769,22 +776,12 @@ namespace Jack
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             i++;
-            strcpy ( desc->params[i].name, "network_master_mode" );
-            desc->params[i].character  = 'm';
+            strcpy ( desc->params[i].name, "network_mode" );
+            desc->params[i].character  = 'N';
             desc->params[i].type = JackDriverParamChar;
             desc->params[i].value.ui = 's';
             strcpy ( desc->params[i].short_desc, "Slow network add 1 cycle latency" );
-            strcpy ( desc->params[i].long_desc, "'s' for slow, 'f' for fast, default is slow.\
-                     Fast network will make the master waiting for the current cycle return data." );
-
-            i++;
-            strcpy ( desc->params[i].name, "network_slave_mode" );
-            desc->params[i].character  = 's';
-            desc->params[i].type = JackDriverParamChar;
-            desc->params[i].value.ui = 's';
-            strcpy ( desc->params[i].short_desc, "Slow network add 1 cycle latency" );
-            strcpy ( desc->params[i].long_desc, "'s' for slow, 'f' for fast, default is slow.\
-                     Fast network will make the slave waiting for the first cycle data." );
+            strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             return desc;
         }
