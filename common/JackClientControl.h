@@ -43,6 +43,7 @@ struct JackClientControl : public JackShmMemAble
     int fRefNum;
     int fPID;
     bool fActive;
+    bool fServer;
 
     JackClientControl(const char* name, int pid, int refnum)
     {
@@ -77,6 +78,7 @@ struct JackClientControl : public JackShmMemAble
         fTransportSync = false;
         fTransportTimebase = false;
         fActive = false;
+        fServer = true;
     }
 
 };

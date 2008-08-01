@@ -118,7 +118,6 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     }
   
     jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
-    fServerRunning = true;
     return 0;
 
 error:

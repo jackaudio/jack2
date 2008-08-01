@@ -75,7 +75,6 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fSyncArg = NULL;
     fTimebaseArg = NULL;
     fThreadFunArg = NULL;
-    fServerRunning = false;
 }
 
 JackClient::~JackClient()
@@ -85,15 +84,17 @@ int JackClient::Close()
 {
     jack_log("JackClient::Close ref = %ld", GetClientControl()->fRefNum);
     int result = 0;
+    
     Deactivate();
     fChannel->Stop();  // Channels is stopped first to avoid receiving notifications while closing
     
     // Request close only is server is still running
-    if (fServerRunning) {
+    if (GetClientControl()->fServer) {
         fChannel->ClientClose(GetClientControl()->fRefNum, &result);
     } else {
         jack_log("JackClient::Close server is shutdown"); 
     }
+    
     fChannel->Close();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
     return result;
@@ -581,9 +582,11 @@ ShutDown is called:
 void JackClient::ShutDown()
 {
     jack_log("ShutDown");
-    fServerRunning = false;
+    
+    GetClientControl()->fServer = false;
+    GetClientControl()->fActive = false;
+    
     if (fShutdown) {
-        GetClientControl()->fActive = false;
         fShutdown(fShutdownArg);
         fShutdown = NULL;
     }
