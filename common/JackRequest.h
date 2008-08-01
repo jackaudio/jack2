@@ -30,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-#define CheckRes(res) {if (res < 0) return res;}
+#define CheckRes(exp) { if ((exp) < 0) return -1;}
 
 /*!
 \brief Request from client to server.

@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-08-01 Stephane Letz  <letz@grame.fr>
+
+	* Fix desallocation of remaining clients when server quits.
+
 2008-07-25 Stephane Letz  <letz@grame.fr>
 
 	* Florian Faber patch for 32 bit float (LE only) support to jack's alsa driver.

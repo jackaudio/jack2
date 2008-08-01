@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include <string.h>
 #include <stdio.h>
+#include <pthread.h>
 
 namespace Jack
 {
@@ -120,9 +121,9 @@ int JackClientSocket::Connect(const char* dir, int which)
 
 int JackClientSocket::Close()
 {
-    jack_log("JackClientSocket::Close");
-    //shutdown(fSocket, SHUT_RDWR);
+    jack_log("JackClientSocket::Close");   
     if (fSocket > 0) {
+        shutdown(fSocket, SHUT_RDWR);
         close(fSocket);
         fSocket = -1;
         return 0;
@@ -272,10 +273,9 @@ JackClientSocket* JackServerSocket::Accept()
 
 int JackServerSocket::Close()
 {
-    //shutdown(fSocket, SHUT_RDWR);
     if (fSocket > 0) {
         jack_log("JackServerSocket::Close %s", fName);
-        //shutdown(fSocket, SHUT_RDWR);
+        shutdown(fSocket, SHUT_RDWR);
         close(fSocket);
         unlink(fName);
         fSocket = -1;
