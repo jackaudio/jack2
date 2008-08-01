@@ -31,23 +31,6 @@ using namespace std;
 namespace Jack
 {
 //JackNetMaster******************************************************************************************************
-#ifdef JACK_MONITOR
-    uint JackNetMaster::fMeasureCnt = 128;
-    uint JackNetMaster::fMeasurePoints = 4;
-    string JackNetMaster::fMonitorFieldNames[] =
-    {
-        string ( "sync send" ),
-        string ( "end of send" ),
-        string ( "sync recv" ),
-        string ( "end of cycle" )
-    };
-    uint JackNetMaster::fMonitorPlotOptionsCnt = 2;
-    string JackNetMaster::fMonitorPlotOptions[] =
-    {
-        string ( "set xlabel \"audio cycles\"" ),
-        string ( "set ylabel \"% of audio cycle\"" )
-    };
-#endif
 
     JackNetMaster::JackNetMaster ( JackNetMasterManager* manager, session_params_t& params ) : fSocket()
     {
@@ -122,14 +105,26 @@ namespace Jack
         //monitor
 #ifdef JACK_MONITOR
         fPeriodUsecs = ( int ) ( 1000000.f * ( ( float ) fParams.fPeriodSize / ( float ) fParams.fSampleRate ) );
-        string plot_name = string ( fParams.fName );
+        string plot_name;
+        plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
         plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast-network" ) : string ( "" );
-        fMonitor = new JackGnuPlotMonitor<float> ( JackNetMaster::fMeasureCnt, JackNetMaster::fMeasurePoints, plot_name );
-        fMeasure = new float[JackNetMaster::fMeasurePoints];
-        fMonitor->SetPlotFile ( JackNetMaster::fMonitorPlotOptions, JackNetMaster::fMonitorPlotOptionsCnt,
-                                JackNetMaster::fMonitorFieldNames, JackNetMaster::fMeasurePoints );
+        fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
+        fNetTimeMeasure = new float[4];
+        string net_time_mon_fields[] =
+        {
+            string ( "sync send" ),
+            string ( "end of send" ),
+            string ( "sync recv" ),
+            string ( "end of cycle" )
+        };
+        string net_time_mon_options[] =
+        {
+            string ( "set xlabel \"audio cycles\"" ),
+            string ( "set ylabel \"% of audio cycle\"" )
+        };
+        fNetTimeMon->SetPlotFile ( net_time_mon_options, 2, net_time_mon_fields, 4 );
 #endif
     }
 
@@ -154,9 +149,9 @@ namespace Jack
         delete[] fTxBuffer;
         delete[] fRxBuffer;
 #ifdef JACK_MONITOR
-        fMonitor->Save();
-        delete[] fMeasure;
-        delete fMonitor;
+        fNetTimeMon->Save();
+        delete[] fNetTimeMeasure;
+        delete fNetTimeMon;
 #endif
     }
 
@@ -345,7 +340,7 @@ namespace Jack
         if ( ( tx_bytes = fSocket.Send ( buffer, size, flags ) ) == SOCKET_ERROR )
         {
             net_error_t error = fSocket.GetError();
-            if ( fRunning && ( error == NET_CONN_ERROR ) )
+            if ( error == NET_CONN_ERROR )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, please check network connection with '%s'.",
@@ -367,7 +362,7 @@ namespace Jack
             //no data isn't really a network error, so just return 0 avalaible read bytes
             if ( error == NET_NO_DATA )
                 return 0;
-            else if ( fRunning && ( error == NET_CONN_ERROR ) )
+            else if ( error == NET_CONN_ERROR )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
@@ -396,6 +391,7 @@ namespace Jack
         int rx_bytes = 0;
         uint midi_recvd_pckt = 0;
         uint jumpcnt = 0;
+        int cycle_offset = 0;
         fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fIsLastPckt = 'n';
@@ -403,7 +399,7 @@ namespace Jack
 
 #ifdef JACK_MONITOR
         jack_time_t begin_time = jack_get_time();
-        fMeasureId = 0;
+        fNetTimeMeasureId = 0;
 #endif
 
         //buffers
@@ -441,7 +437,7 @@ namespace Jack
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         //midi
@@ -490,7 +486,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         //receive --------------------------------------------------------------------------------------------------------------------
@@ -499,33 +495,33 @@ namespace Jack
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
 
+        cycle_offset = rx_head->fCycle - fTxHeader.fCycle;
+
         switch ( fParams.fNetworkMode )
         {
-            case 'n' :  //normal mode
+            case 'n' :
                 //normal use of the network : allow to use full bandwith
-                //    - extra latency is set to one cycle, what corresponds to the time needed to receive streams using full network bandwith
+                //    - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwith
                 //    - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
                 //    - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
-                if ( rx_head->fCycle == fTxHeader.fCycle )
+                if ( cycle_offset == 0 )
                     return 0;
                 else
-                {
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                }
                 break;
-            case 'f' :  //fast mode
+            case 'f' :
                 //fast mode suppose the network bandwith is larger than required for the transmission (only a few channels for example)
                 //    - packets can be quickly received, quickly is here relative to the cycle duration
                 //    - here, receive data, we can't keep it queued on the rx buffer,
                 //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
                 rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                if ( rx_head->fCycle != fTxHeader.fCycle )
-                    jack_error ( "%s, can't stay in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fTxHeader.fCycle - rx_head->fCycle );
+                if ( cycle_offset != 0 )
+                    jack_error ( "%s, can't stay in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
                 break;
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
 #endif
 
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
@@ -577,8 +573,8 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fMeasure[fMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
-        fMonitor->Write ( fMeasure );
+        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Write ( fNetTimeMeasure );
 #endif
         return 0;
     }

@@ -70,14 +70,13 @@ namespace Jack
 
             //monitoring
 #ifdef JACK_MONITOR
-            static uint fMeasureCnt;
-            static uint fMeasurePoints;
-            static uint fMonitorPlotOptionsCnt;
-            static std::string fMonitorPlotOptions[];
-            static std::string fMonitorFieldNames[];
-            float* fMeasure;
-            int fMeasureId;
-            JackGnuPlotMonitor<float>* fMonitor;
+            //time measurment
+            float* fNetTimeMeasure;
+            int fNetTimeMeasureId;
+            JackGnuPlotMonitor<float>* fNetTimeMon;
+            //cycle time measurment
+            jack_time_t fCycleTime;
+            JackGnuPlotMonitor<jack_time_t>* fCycleTimeMon;
 #endif
 
             bool Init();
