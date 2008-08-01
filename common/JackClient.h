@@ -89,6 +89,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         detail::JackClientChannelInterface* fChannel;
         JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
+        bool fServerRunning;
 
         int StartThread();
         void SetupDriverSync(bool freewheel);
@@ -183,6 +184,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
+ 
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.

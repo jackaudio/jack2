@@ -116,8 +116,9 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
-
+  
     jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
+    fServerRunning = true;
     return 0;
 
 error:

@@ -23,9 +23,14 @@ Florian Faber
 ---------------------------
 
 2008-08-01 Stephane Letz  <letz@grame.fr>
-
+	
 	* Fix desallocation of remaining clients when server quits.
-        * Close remaining client sockets in JackSocketServerChannel::Close.
+	* Close remaining client sockets in JackSocketServerChannel::Close.
+	* Correct JackClient::Close() to request server close only if server is running.
+
+2008-07-30 Stephane Letz  <letz@grame.fr>
+
+	* Remove restriction that port connection could be done only if the client was activated.
 
 2008-07-25 Stephane Letz  <letz@grame.fr>
 

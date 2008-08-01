@@ -147,6 +147,7 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
     }
 
     SetupDriverSync(false);
+    fServerRunning = true;
     return 0;
 
 error:

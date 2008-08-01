@@ -30,10 +30,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackChannel.h"
 #include "JackTransportEngine.h"
 #include "driver_interface.h"
+#include "JackLibGlobals.h"
+
 #include <math.h>
 #include <string>
 #include <algorithm>
-#include "JackPlatformThread.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ namespace Jack
 {
 
 #define IsRealTime() ((fProcess != NULL) | (fThreadFun != NULL) | (fSync != NULL) | (fTimebase != NULL))
-        
+
 JackClient::JackClient():fThread(this)
 {}
 
@@ -74,19 +75,25 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fSyncArg = NULL;
     fTimebaseArg = NULL;
     fThreadFunArg = NULL;
+    fServerRunning = false;
 }
 
 JackClient::~JackClient()
-{
-}
+{}
 
 int JackClient::Close()
 {
     jack_log("JackClient::Close ref = %ld", GetClientControl()->fRefNum);
+    int result = 0;
     Deactivate();
-    int result = -1;
     fChannel->Stop();  // Channels is stopped first to avoid receiving notifications while closing
-    fChannel->ClientClose(GetClientControl()->fRefNum, &result);
+    
+    // Request close only is server is still running
+    if (fServerRunning) {
+        fChannel->ClientClose(GetClientControl()->fRefNum, &result);
+    } else {
+        jack_log("JackClient::Close server is shutdown"); 
+    }
     fChannel->Close();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
     return result;
@@ -574,6 +581,7 @@ ShutDown is called:
 void JackClient::ShutDown()
 {
     jack_log("ShutDown");
+    fServerRunning = false;
     if (fShutdown) {
         GetClientControl()->fActive = false;
         fShutdown(fShutdownArg);

@@ -124,13 +124,13 @@ void JackSocketClientChannel::ServerSyncCall(JackRequest* req, JackResult* res, 
     if (req->Write(&fRequestSocket) < 0) {
         jack_error("Could not write request type = %ld", req->fType);
         *result = -1;
-        return ;
+        return;
     }
 
     if (res->Read(&fRequestSocket) < 0) {
         jack_error("Could not read result type = %ld", req->fType);
         *result = -1;
-        return ;
+        return;
     }
 
     *result = res->fResult;

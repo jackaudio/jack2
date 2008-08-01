@@ -137,8 +137,8 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     } else {
         int res = client->Close();
         delete client;
-        jack_log("jack_client_close OK");
         JackLibGlobals::Destroy(); // jack library destruction
+        jack_log("jack_client_close res = %d", res);
         return res;
     }
 }
