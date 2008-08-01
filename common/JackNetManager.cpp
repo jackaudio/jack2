@@ -340,7 +340,7 @@ namespace Jack
         if ( ( tx_bytes = fSocket.Send ( buffer, size, flags ) ) == SOCKET_ERROR )
         {
             net_error_t error = fSocket.GetError();
-            if ( error == NET_CONN_ERROR )
+            if ( fRunning && ( error == NET_CONN_ERROR ) )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, please check network connection with '%s'.",
@@ -362,7 +362,7 @@ namespace Jack
             //no data isn't really a network error, so just return 0 avalaible read bytes
             if ( error == NET_NO_DATA )
                 return 0;
-            else if ( error == NET_CONN_ERROR )
+            else if ( fRunning && ( error == NET_CONN_ERROR ) )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
@@ -495,7 +495,7 @@ namespace Jack
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
 
-        cycle_offset = rx_head->fCycle - fTxHeader.fCycle;
+        cycle_offset = fTxHeader.fCycle - rx_head->fCycle;
 
         switch ( fParams.fNetworkMode )
         {
@@ -515,8 +515,8 @@ namespace Jack
                 //    - here, receive data, we can't keep it queued on the rx buffer,
                 //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
                 rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                if ( cycle_offset != 0 )
-                    jack_error ( "%s, can't stay in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
+                if ( cycle_offset )
+                    jack_error ( "'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
                 break;
         }
 

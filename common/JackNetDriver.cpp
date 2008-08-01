@@ -632,7 +632,7 @@ namespace Jack
         if ( fEngineControl->fSyncMode )
             fTxHeader.fCycle = fRxHeader.fCycle;
         else
-            fTxHeader.fCycle = fRxHeader.fCycle - 1;
+            fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fIsLastPckt = 'n';
 

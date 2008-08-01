@@ -18,6 +18,7 @@ example_programs = {
     'jack_bufsize' : 'bufsize.c',
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
+    'jack_through' : 'through_client.c',
     }
 
 example_libs = {
