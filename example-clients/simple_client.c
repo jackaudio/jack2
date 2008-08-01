@@ -204,7 +204,7 @@ main (int argc, char *argv[])
 	signal(SIGINT, signal_handler);
 #endif
 
-	/* keep running until the transport stops */
+	/* keep running until the Ctrl+C */
 
 	while (1) {
 	#ifdef WIN32 
