@@ -84,8 +84,6 @@ namespace Jack
             //monitoring
 #ifdef JACK_MONITOR
             jack_time_t fPeriodUsecs;
-            float* fNetTimeMeasure;
-            int fNetTimeMeasureId;
             JackGnuPlotMonitor<float>* fNetTimeMon;
 #endif
 

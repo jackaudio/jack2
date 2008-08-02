@@ -110,6 +110,8 @@ namespace Jack
         private:
             uint32_t fMeasureCnt;
             uint32_t fMeasurePoints;
+            uint32_t fMeasureId;
+            T* fCurrentMeasure;
             T** fMeasureTable;
             uint32_t fTablePos;
             std::string fName;
@@ -123,6 +125,7 @@ namespace Jack
                 fMeasurePoints = measure_points;
                 fTablePos = 0;
                 fName = name;
+                fCurrentMeasure = new T[fMeasurePoints];
                 fMeasureTable = new T*[fMeasureCnt];
                 for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
                 {
@@ -137,12 +140,36 @@ namespace Jack
                 for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
                     delete[] fMeasureTable[cnt];
                 delete[] fMeasureTable;
+                delete[] fCurrentMeasure;
             }
 
-            uint32_t Write ( T* measure )
+            T AddNew ( T measure_point )
+            {
+				fMeasureId = 0;
+				return fCurrentMeasure[fMeasureId++] = measure_point;
+            }
+
+			uint32_t New()
+			{
+				return fMeasureId = 0;
+			}
+
+            T Add ( T measure_point )
+            {
+				return fCurrentMeasure[fMeasureId++] = measure_point;
+            }
+
+            uint32_t AddLast ( T measure_point )
+            {
+            	fCurrentMeasure[fMeasureId] = measure_point;
+            	fMeasureId = 0;
+            	return Write();
+            }
+
+            uint32_t Write()
             {
                 for ( uint32_t point = 0; point < fMeasurePoints; point++ )
-                    fMeasureTable[fTablePos][point] = measure[point];
+                    fMeasureTable[fTablePos][point] = fCurrentMeasure[point];
                 if ( ++fTablePos == fMeasureCnt )
                     fTablePos = 0;
                 return fTablePos;

@@ -52,7 +52,7 @@ namespace Jack
         fParams.fNetworkMode = network_mode;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
-        fNetTimeMeasure = NULL;
+        fCycleTimeMon = NULL;
 #endif
     }
 
@@ -70,8 +70,8 @@ namespace Jack
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
-        delete[] fNetTimeMeasure;
         delete fNetTimeMon;
+        delete fCycleTimeMon;
 #endif
     }
 
@@ -259,8 +259,6 @@ namespace Jack
         delete[] fMidiPlaybackPortList;
         fMidiPlaybackPortList = NULL;
 #ifdef JACK_MONITOR
-        delete[] fNetTimeMeasure;
-        fNetTimeMeasure = NULL;
         delete fNetTimeMon;
         fNetTimeMon = NULL;
         delete fCycleTimeMon;
@@ -336,9 +334,8 @@ namespace Jack
         plot_name = string ( fParams.fName );
         plot_name += string ( "_slave" );
         plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
-        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast-network" ) : string ( "" );
+        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast" ) : string ( "_normal" );
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
-        fNetTimeMeasure = new float[4];
         string net_time_mon_fields[] =
         {
             string ( "end of read" ),
@@ -355,16 +352,18 @@ namespace Jack
         //CycleTimeMon
         plot_name.clear();
         plot_name = string ( fParams.fName );
-        plot_name += string ( "_slave_cycle_time" );
+        plot_name += string ( "_slave_cycle_duration" );
+        plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
+        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast" ) : string ( "_normal" );
         fCycleTimeMon = new JackGnuPlotMonitor<jack_time_t> ( 2048, 1, plot_name );
-        string cycle_time_mon_field = string ( "time since last cycle" );
+        string cycle_time_mon_field = string ( "cycle duration" );
         string cycle_time_mon_options[] =
         {
             string ( "set xlabel \"audio cycles\"" ),
             string ( "set ylabel \"usecs\"" )
         };
         fCycleTimeMon->SetPlotFile ( cycle_time_mon_options, 2, &cycle_time_mon_field, 1 );
-        fCycleTime = GetMicroSeconds();
+        fLastCycleBeginDate = GetMicroSeconds();
 #endif
 
         return 0;
@@ -553,7 +552,7 @@ namespace Jack
             fNetAudioCaptureBuffer->SetBuffer ( audio_port_index, GetInputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasureId = 0;
+        fNetTimeMon->New();
 #endif
 
         //receive sync (launch the cycle)
@@ -570,9 +569,9 @@ namespace Jack
         JackDriver::CycleTakeBeginTime();
 
 #ifdef JACK_MONITOR
-        jack_time_t cycle_time = GetMicroSeconds() - fCycleTime;
-        fCycleTimeMon->Write ( &cycle_time );
-        fCycleTime = GetMicroSeconds();
+        fCycleTimeMon->AddNew ( JackDriver::fBeginDateUst - fLastCycleBeginDate );
+        fCycleTimeMon->Write();
+        fLastCycleBeginDate = JackDriver::fBeginDateUst;
 #endif
 
         //audio, midi or sync if driver is late
@@ -617,7 +616,7 @@ namespace Jack
         fRxHeader.fCycle = rx_head->fCycle;
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         return 0;
@@ -643,7 +642,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( audio_port_index, GetOutputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         //sync
@@ -659,7 +658,7 @@ namespace Jack
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         //midi
@@ -701,8 +700,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f;
-        fNetTimeMon->Write ( fNetTimeMeasure );
+        fNetTimeMon->AddLast ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         return 0;

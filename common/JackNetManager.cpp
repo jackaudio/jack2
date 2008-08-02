@@ -111,7 +111,6 @@ namespace Jack
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
         plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast-network" ) : string ( "" );
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
-        fNetTimeMeasure = new float[4];
         string net_time_mon_fields[] =
         {
             string ( "sync send" ),
@@ -150,7 +149,6 @@ namespace Jack
         delete[] fRxBuffer;
 #ifdef JACK_MONITOR
         fNetTimeMon->Save();
-        delete[] fNetTimeMeasure;
         delete fNetTimeMon;
 #endif
     }
@@ -399,7 +397,7 @@ namespace Jack
 
 #ifdef JACK_MONITOR
         jack_time_t begin_time = jack_get_time();
-        fNetTimeMeasureId = 0;
+        fNetTimeMon->New();
 #endif
 
         //buffers
@@ -437,7 +435,7 @@ namespace Jack
             return tx_bytes;
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
         //midi
@@ -486,7 +484,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
         //receive --------------------------------------------------------------------------------------------------------------------
@@ -521,7 +519,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
+        fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
         if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
@@ -573,8 +571,7 @@ namespace Jack
         }
 
 #ifdef JACK_MONITOR
-        fNetTimeMeasure[fNetTimeMeasureId++] = ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f;
-        fNetTimeMon->Write ( fNetTimeMeasure );
+        fNetTimeMon->AddLast ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
         return 0;
     }

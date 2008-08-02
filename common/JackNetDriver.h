@@ -71,11 +71,9 @@ namespace Jack
             //monitoring
 #ifdef JACK_MONITOR
             //time measurment
-            float* fNetTimeMeasure;
-            int fNetTimeMeasureId;
             JackGnuPlotMonitor<float>* fNetTimeMon;
             //cycle time measurment
-            jack_time_t fCycleTime;
+            jack_time_t fLastCycleBeginDate;
             JackGnuPlotMonitor<jack_time_t>* fCycleTimeMon;
 #endif
 
