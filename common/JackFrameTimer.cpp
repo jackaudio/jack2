@@ -116,8 +116,6 @@ void JackFrameTimer::ReadFrameTime(JackTimer* timer)
         cur_index = next_index;
         memcpy(timer, ReadCurrentState(), sizeof(JackTimer));
         next_index = GetCurrentIndex();
-        if (cur_index != next_index)
-            printf("JackFrameTimer::ReadFrameTime loop\n");
     } while (cur_index != next_index); // Until a coherent state has been read
 }
 
