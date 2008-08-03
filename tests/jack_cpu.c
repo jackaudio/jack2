@@ -36,14 +36,12 @@ jack_port_t *input_port;
 jack_port_t *output_port;
 jack_client_t *client;
 unsigned long sr;
-int idle_time = 0;
+jack_nframes_t idle_time = 0;
 int percent_cpu = 0;
 int time_to_run = 0;
 int time_before_run = 0;
 int time_before_exit = 1;
 jack_nframes_t cur_buffer_size;
-jack_nframes_t start_frame;
-jack_nframes_t cur_frame;
 
 /* a simple state machine for this client */
 volatile enum {
@@ -63,12 +61,12 @@ void usage()
 	);
 }
 
-JackBufferSizeCallback update_buffer_size()
+int update_buffer_size(jack_nframes_t nframes, void *arg)
 {
-	cur_buffer_size = jack_get_buffer_size(client);
+	cur_buffer_size = nframes;
 	printf("Buffer size = %d \n", cur_buffer_size);
-	idle_time = (int) (cur_buffer_size * percent_cpu / 100);
-	printf("CPU load applies as %d sample delay.\n",idle_time);
+	idle_time = (jack_nframes_t) (cur_buffer_size * percent_cpu / 100);
+	printf("CPU load applies as %d sample delay.\n", idle_time);
 	return 0;
 }
 
@@ -76,30 +74,29 @@ JackBufferSizeCallback update_buffer_size()
  * The process callback for this JACK application is called in a
  * special realtime thread once for each audio cycle.
  *
- * This client follows a simple rule: when the JACK transport is
- * running, copy the input port to the output.  When it stops, exit.
  */
 
 int process(jack_nframes_t nframes, void *arg)
 {
 	jack_default_audio_sample_t *in, *out;
-	start_frame = jack_frame_time(client);
+	jack_nframes_t start_frame = jack_frame_time(client);
 	
 	in = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port, nframes);
 	out = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port, nframes);
 	memset(out, 0, sizeof (jack_default_audio_sample_t) * nframes); 
-	
+    
 	while ((client_state == Run) && (jack_frame_time(client) < (start_frame + idle_time))) {}
-	return 0;      
+ 	return 0;      
 }
 
 /**
  * JACK calls this shutdown_callback if the server ever shuts down or
  * decides to disconnect the client.
  */
+ 
 void jack_shutdown(void *arg)
 {
-	printf("Jack_cpu has been kicked out by jackd !");
+	printf("Jack_cpu has been kicked out by jackd !\n");
 	exit (1);
 }
 
@@ -108,6 +105,7 @@ int main(int argc, char *argv[])
 	const char **ports;
 	const char *client_name;
 	int got_time = 0;
+    jack_status_t status;
 
 	int option_index;
 	int opt;
@@ -154,12 +152,18 @@ int main(int argc, char *argv[])
 	
 	/* open a client connection to the JACK server */
 
-	client = jack_client_new(client_name);
-	
+	client = jack_client_open (client_name, JackNoStartServer, &status);
+ 	
 	if (client == NULL) {
 		fprintf(stderr, "jack_client_open() failed : is jack server running ?\n");
 		exit(1);
 	}
+    
+    cur_buffer_size = jack_get_buffer_size(client);
+	printf("engine buffer size = %d \n", cur_buffer_size);
+    printf("engine sample rate: %d Hz\n", jack_get_sample_rate(client));
+	idle_time = (jack_nframes_t) (cur_buffer_size * percent_cpu / 100);
+	printf("CPU load applies as %d sample delay.\n", idle_time);
 	
 	/* tell the JACK server to call `process()' whenever
 	   there is work to be done.
@@ -174,12 +178,6 @@ int main(int argc, char *argv[])
 
 	jack_on_shutdown(client, jack_shutdown, 0);
 
-	/* display the current sample rate. 
-	*/
-
-	printf("engine sample rate: %d Hz\n", jack_get_sample_rate(client));
-	printf("computing time in samples : %d \n", idle_time);
-
 	/* create two ports */
 
 	input_port = jack_port_register (client, "input", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
@@ -191,13 +189,11 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	
-	if (jack_set_buffer_size_callback(client, update_buffer_size(), 0) != 0) {
+	if (jack_set_buffer_size_callback(client, update_buffer_size, 0) != 0) {
 		printf("Error when calling buffer_size_callback !");
 		return -1;
 	}
 	
-	if (time_before_run == 0)
-		client_state = Run;
 	/* Tell the JACK server that we are ready to roll.  Our
 	 * process() callback will start running now. */
 	

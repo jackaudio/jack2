@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-08-03 Stephane Letz  <letz@grame.fr>
+	
+	* Fix JackFrameTimer::Time2Frames and JackTimer::Frames2Time, jack_cpu compiled again.
+
 2008-08-01 Stephane Letz  <letz@grame.fr>
 	
 	* Fix desallocation of remaining clients when server quits.

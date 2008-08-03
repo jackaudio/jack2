@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackFrameTimer.h"
 #include "JackError.h"
 #include <math.h>
+#include <stdio.h>
 
 namespace Jack
 {
@@ -53,7 +54,7 @@ JackTimer::JackTimer()
 jack_nframes_t JackTimer::Time2Frames(jack_time_t time, jack_nframes_t buffer_size)
 {
     if (fInitialized) {
-        return fFrames + (long)rint(((double) ((time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * buffer_size);
+        return fFrames + (long)rint(((double) ((long long)(time - fCurrentWakeup)) / ((long long)(fNextWakeUp - fCurrentWakeup))) * buffer_size);
     } else {
         return 0;
     }
@@ -62,7 +63,7 @@ jack_nframes_t JackTimer::Time2Frames(jack_time_t time, jack_nframes_t buffer_si
 jack_time_t JackTimer::Frames2Time(jack_nframes_t frames, jack_nframes_t buffer_size)
 {
     if (fInitialized) {
-        return fCurrentWakeup + (long)rint(((double) ((frames - fFrames)) * ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) / buffer_size);
+        return fCurrentWakeup + (long)rint(((double) ((long long)(frames - fFrames)) * ((long long)(fNextWakeUp - fCurrentWakeup))) / buffer_size);
     } else {
         return 0;
     }
@@ -115,6 +116,8 @@ void JackFrameTimer::ReadFrameTime(JackTimer* timer)
         cur_index = next_index;
         memcpy(timer, ReadCurrentState(), sizeof(JackTimer));
         next_index = GetCurrentIndex();
+        if (cur_index != next_index)
+            printf("JackFrameTimer::ReadFrameTime loop\n");
     } while (cur_index != next_index); // Until a coherent state has been read
 }
 

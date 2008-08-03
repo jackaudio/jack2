@@ -116,13 +116,13 @@ namespace Jack
             
             jack_nframes_t Time2Frames(jack_time_t time)
             {
-                long delta = (long) rint(((double) (long(time - fCurrentWakeup)) / ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) * fBufferSize);
+                long delta = (long) rint(((double) ((long long)(time - fCurrentWakeup)) / ((long long)(fNextWakeUp - fCurrentWakeup))) * fBufferSize);
                 return (delta < 0) ? ((fFrames > 0) ? fFrames : 1) : (fFrames + delta);
             }
             
             jack_time_t Frames2Time(jack_nframes_t frames)
             {
-                long delta = (long) rint(((double) (long(frames - fFrames)) * ((jack_time_t)(fNextWakeUp - fCurrentWakeup))) / fBufferSize);
+                long delta = (long) rint(((double) ((long long)(frames - fFrames)) * ((long long)(fNextWakeUp - fCurrentWakeup))) / fBufferSize);
                 return (delta < 0) ? ((fCurrentWakeup > 0) ? fCurrentWakeup : 1) : (fCurrentWakeup + delta);
             }
             

@@ -68,9 +68,9 @@ namespace Jack
 #define ALL_CLIENTS -1 // for notification
 
 #if defined(__ppc64__) || defined(__x86_64__)
-#define JACK_PROTOCOL_VERSION 5
+#define JACK_PROTOCOL_VERSION 6
 #else
-#define JACK_PROTOCOL_VERSION 4
+#define JACK_PROTOCOL_VERSION 5
 #endif
 
 #define SOCKET_TIME_OUT 5               // in sec
