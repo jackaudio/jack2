@@ -42,6 +42,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+#define AssertRefnum(ref) assert(ref >= 0 && ref < CLIENT_NUM);
+
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
                        JackEngineControl* control)
@@ -328,7 +330,7 @@ void JackEngine::NotifyActivate(int refnum)
 
 int JackEngine::GetInternalClientName(int refnum, char* name_res)
 {
-    assert(refnum >= 0 && refnum < CLIENT_NUM);
+    AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     if (client) {
         strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
@@ -358,7 +360,7 @@ int JackEngine::InternalClientHandle(const char* client_name, int* status, int* 
 
 int JackEngine::InternalClientUnload(int refnum, int* status)
 {
-    assert(refnum >= 0 && refnum < CLIENT_NUM);
+    AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     if (client) {
         int res = client->Close();
@@ -561,7 +563,9 @@ error:
 // Used for external clients
 int JackEngine::ClientExternalClose(int refnum)
 {
+    AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
+    
     if (client)	{
         fEngineControl->fTransport.ResetTimebase(refnum);
         int res = ClientCloseAux(refnum, client, true);
@@ -576,6 +580,7 @@ int JackEngine::ClientExternalClose(int refnum)
 // Used for server internal clients or drivers when the RT thread is stopped
 int JackEngine::ClientInternalClose(int refnum, bool wait)
 {
+    AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     return (client)	? ClientCloseAux(refnum, client, wait) : -1;
 }
@@ -622,6 +627,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 
 int JackEngine::ClientActivate(int refnum, bool state)
 {
+    AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     assert(fClientTable[refnum]);
   
@@ -642,6 +648,7 @@ int JackEngine::ClientActivate(int refnum, bool state)
 // May be called without client
 int JackEngine::ClientDeactivate(int refnum)
 {
+    AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     if (client == NULL)
         return -1;
@@ -681,6 +688,7 @@ int JackEngine::ClientDeactivate(int refnum)
 int JackEngine::PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index)
 {
     jack_log("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d", refnum, name, type, flags, buffer_size);
+    AssertRefnum(refnum);
     assert(fClientTable[refnum]);
     
     // Check if port name already exists
@@ -701,6 +709,7 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
+    AssertRefnum(refnum);
     assert(fClientTable[refnum]);
     
     // Disconnect port ==> notification is sent
@@ -727,6 +736,7 @@ int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
     jack_log("JackEngine::PortConnect src = %d dst = %d", src, dst);
+    AssertRefnum(refnum);
     JackClientInterface* client;
     int ref;
 
@@ -762,6 +772,7 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 {
     jack_log("JackEngine::PortDisconnect src = %s dst = %s", src, dst);
+    AssertRefnum(refnum);
     jack_port_id_t port_src, port_dst;
 
     if (fGraphManager->CheckPorts(src, dst, &port_src, &port_dst) < 0) {
@@ -777,6 +788,7 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
 {
     jack_log("JackEngine::PortDisconnect src = %d dst = %d", src, dst);
+    AssertRefnum(refnum);
 
     if (dst == ALL_PORTS) {
 
