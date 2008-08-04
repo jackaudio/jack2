@@ -116,9 +116,9 @@ namespace Jack
         fParams.fReturnAudioChannels = fPlaybackChannels;
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
-        //is transport sync ?
-        if ( fParams.fTransportSync )
-            jack_info ( "NetDriver started with Master's Transport Sync." );
+		//display some additional infos
+		jack_info ( "NetAdapter started in %s mode %s Master's transport sync.",
+					( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
         if ( !JackNetSlaveInterface::Init() )
             return false;;
@@ -133,6 +133,19 @@ namespace Jack
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
+
+		//register jack ports
+        if ( AllocPorts() != 0 )
+        {
+            jack_error ( "Can't allocate ports." );
+            return false;
+        }
+
+        //set global paramaters
+        SetParams();
+
+        //init done, display parameters
+        SessionParamsDisplay ( &fParams );
 
         //monitor
 #ifdef JACK_MONITOR
@@ -172,15 +185,6 @@ namespace Jack
         fCycleTimeMon->SetPlotFile ( cycle_time_mon_options, 2, &cycle_time_mon_field, 1 );
         fLastCycleBeginDate = GetMicroSeconds();
 #endif
-
-        if ( SetParams() )
-        {
-            jack_error ( "Fatal error : can't alloc net driver ports." );
-            return false;
-        }
-
-        //init done, display parameters
-        SessionParamsDisplay ( &fParams );
 
         return true;
     }
@@ -396,6 +400,7 @@ namespace Jack
         memset ( fTxData, 0, fPayloadSize );
         SetSyncPacket();
 
+		//send sync
         if ( SyncSend() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
@@ -403,6 +408,7 @@ namespace Jack
         fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
+		//send data
         if ( DataSend() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
@@ -538,36 +544,36 @@ namespace Jack
                 param = ( const jack_driver_param_t* ) node->data;
                 switch ( param->character )
                 {
-                    case 'a' :
-                        multicast_ip = strdup ( param->value.str );
-                        break;
-                    case 'p':
-                        udp_port = param->value.ui;
-                        break;
-                    case 'M':
-                        mtu = param->value.i;
-                        break;
-                    case 'C':
-                        audio_capture_ports = param->value.i;
-                        break;
-                    case 'P':
-                        audio_playback_ports = param->value.i;
-                        break;
-                    case 'i':
-                        midi_input_ports = param->value.i;
-                        break;
-                    case 'o':
-                        midi_output_ports = param->value.i;
-                        break;
-                    case 'n' :
-                        strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
-                        break;
-                    case 't' :
-                        transport_sync = param->value.ui;
-                        break;
-                    case 'f' :
-                        network_mode = 'f';
-                        break;
+                case 'a' :
+                    multicast_ip = strdup ( param->value.str );
+                    break;
+                case 'p':
+                    udp_port = param->value.ui;
+                    break;
+                case 'M':
+                    mtu = param->value.i;
+                    break;
+                case 'C':
+                    audio_capture_ports = param->value.i;
+                    break;
+                case 'P':
+                    audio_playback_ports = param->value.i;
+                    break;
+                case 'i':
+                    midi_input_ports = param->value.i;
+                    break;
+                case 'o':
+                    midi_output_ports = param->value.i;
+                    break;
+                case 'n' :
+                    strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
+                    break;
+                case 't' :
+                    transport_sync = param->value.ui;
+                    break;
+                case 'f' :
+                    network_mode = 'f';
+                    break;
                 }
             }
 

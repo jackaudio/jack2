@@ -25,9 +25,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <assert.h>
 #include "JackAudioAdapterInterface.h"
 #include "JackPlatformThread.h"
-#include "JackError.h"
 #include "jack.h"
 #include "jslist.h"
+#include "JackNetSlaveInterface.h"
 
 namespace Jack
 {
@@ -36,42 +36,38 @@ namespace Jack
     \brief Net adapter.
     */
 
-    class JackNetAdapter : public JackAudioAdapterInterface, public JackRunnableInterface
+    class JackNetAdapter : public JackAudioAdapterInterface, public JackNetSlaveInterface, public JackRunnableInterface
     {
 
-        private:
+    private:
+		//jack data
+        net_transport_data_t fTransportData;
 
-            JackThread fThread;
+        //sample buffers
+        sample_t** fSoftCaptureBuffer;
+        sample_t** fSoftPlaybackBuffer;
 
-        public:
+        int SetSyncPacket();
+        int TransportSync();
 
-            JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
-            ~JackNetAdapter();
-        
-            virtual int Open();
-            virtual int Close();
+        bool ProcessSync();
+        bool ProcessAsync();
 
-            virtual int SetBufferSize ( jack_nframes_t buffer_size );
+        JackThread fThread;
 
-            virtual bool Init();
-            virtual bool Execute();
+    public:
 
+        JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
+        ~JackNetAdapter();
+
+        virtual int Open();
+        virtual int Close();
+
+        virtual int SetBufferSize ( jack_nframes_t buffer_size );
+
+        virtual bool Init();
+        virtual bool Execute();
     };
-
 }
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#include "JackExports.h"
-#include "driver_interface.h"
-
-    EXPORT jack_driver_desc_t* jack_get_descriptor();
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif
