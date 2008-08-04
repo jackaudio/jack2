@@ -70,7 +70,7 @@ namespace Jack
         uint32_t fPeriodSize;               //period size
         uint32_t fFramesPerPacket;          //complete frames per packet
         uint32_t fBitdepth;                 //samples bitdepth (unused)
-        uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
+        uint32_t fSlaveSyncMode;           	//is the slave in sync mode ?
         char fNetworkMode;                  //fast or slow mode
     };
 

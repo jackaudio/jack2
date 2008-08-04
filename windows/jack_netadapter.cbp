@@ -128,6 +128,9 @@
 		<Unit filename="..\common\JackLibSampleRateResampler.cpp" />
 		<Unit filename="..\common\JackNetAdapter.cpp" />
 		<Unit filename="..\common\JackResampler.cpp" />
+		<Unit filename="jacknetadapter.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Extensions>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />

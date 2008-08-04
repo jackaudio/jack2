@@ -19,9 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetSlaveInterface.h"
-#include "JackEngineControl.h"
-#include "JackClientControl.h"
-#include "JackGraphManager.h"
 #include "JackException.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
@@ -65,7 +62,7 @@ namespace Jack
         do
         {
             //first, get a master, do it until a valid connection is running
-            jack_info ( "Initializing Net Driver..." );
+            jack_info ( "Initializing Net Slave..." );
             do
             {
                 status = GetNetMaster();

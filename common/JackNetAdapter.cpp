@@ -47,7 +47,7 @@ namespace Jack
         fParams.fReturnMidiChannels = 0;
         fParams.fSampleRate = 48000;
         fParams.fPeriodSize = 128;
-        fParams.fSlaveSyncMode = 0;
+        fParams.fSlaveSyncMode = 1;
         fParams.fNetworkMode = 'n';
 
 		//options parsing
@@ -136,6 +136,7 @@ namespace Jack
 		}
 
 		fThread.AcquireRealTime(85);
+
 		return fThread.StartSync();
     }
 
@@ -159,6 +160,8 @@ namespace Jack
 
     bool JackNetAdapter::Execute()
     {
+    	//the sync mode is the equivalent of driver sync mode : data are sent back right after being computed
+    	//TODO : verify async mode is appropriate here, because of the ringbuffer usage
 		switch ( fParams.fSlaveSyncMode )
 		{
 			case true :
@@ -203,6 +206,9 @@ namespace Jack
 		if ( SyncSend() == SOCKET_ERROR )
 			return false;
 
+		if ( DataSend() == SOCKET_ERROR )
+			return false;
+
 		if ( failure )
 		{
 			jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );
@@ -226,6 +232,9 @@ namespace Jack
 
 		//send
 		if ( SyncSend() == SOCKET_ERROR )
+			return false;
+
+		if ( DataSend() == SOCKET_ERROR )
 			return false;
 
 		if ( failure )

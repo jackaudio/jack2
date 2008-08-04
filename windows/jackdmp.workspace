@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="jackdmp workspace">
-		<Project filename="libjackservermp.cbp" />
+		<Project filename="libjackservermp.cbp" active="1" />
 		<Project filename="libjackmp.cbp" />
 		<Project filename="jackdmp.cbp">
 			<Depends filename="libjackservermp.cbp" />
@@ -16,7 +16,7 @@
 		<Project filename="jack_netdriver.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
-		<Project filename="jack_netadapter.cbp" active="1">
+		<Project filename="jack_netadapter.cbp">
 			<Depends filename="libjackservermp.cbp" />
 		</Project>
 		<Project filename="jack_netmanager.cbp">
