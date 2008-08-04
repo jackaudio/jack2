@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackNetDriver__
 
 #include "JackAudioDriver.h"
-#include "JackNetTool.h"
+#include "JackNetSlaveInterface.h"
 
 #ifdef JACK_MONITOR
 #include "JackFrameTimer.h"
@@ -34,39 +34,13 @@ namespace Jack
     \Brief This class describes the Net Backend
     */
 
-    class JackNetDriver : public JackAudioDriver
+    class JackNetDriver : public JackAudioDriver, public JackNetSlaveInterface
     {
         private:
-            session_params_t fParams;
-            char* fMulticastIP;
-            JackNetSocket fSocket;
-            uint fNSubProcess;
+            //jack data
             net_transport_data_t fTransportData;
-
-            //jack ports
             jack_port_id_t* fMidiCapturePortList;
             jack_port_id_t* fMidiPlaybackPortList;
-
-            //headers
-            packet_header_t fTxHeader;
-            packet_header_t fRxHeader;
-
-            //network buffers
-            char* fTxBuffer;
-            char* fRxBuffer;
-            char* fTxData;
-            char* fRxData;
-
-            //jack buffers
-            NetMidiBuffer* fNetMidiCaptureBuffer;
-            NetMidiBuffer* fNetMidiPlaybackBuffer;
-            NetAudioBuffer* fNetAudioCaptureBuffer;
-            NetAudioBuffer* fNetAudioPlaybackBuffer;
-
-            //sizes
-            int fAudioRxLen;
-            int fAudioTxLen;
-            int fPayloadSize;
 
             //monitoring
 #ifdef JACK_MONITOR
@@ -78,21 +52,15 @@ namespace Jack
 #endif
 
             bool Init();
-            net_status_t GetNetMaster();
-            net_status_t SendMasterStartSync();
             void Restart();
-            int SetParams();
             int AllocPorts();
             int FreePorts();
+            int SetSyncPacket();
+            int TransportSync();
 
             JackMidiBuffer* GetMidiInputBuffer ( int port_index );
             JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
 
-            int Recv ( size_t size, int flags );
-            int Send ( size_t size, int flags );
-
-            int SetSyncPacket();
-            int TransportSync();
 
         public:
             JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,

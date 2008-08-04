@@ -130,6 +130,7 @@ def build(bld):
         'JackServerGlobals.cpp',
         'JackControl.cpp',
         'JackNetTool.cpp',
+        'JackNetSlaveInterface.cpp',
         ]
 
     if bld.env()['IS_LINUX']:

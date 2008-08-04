@@ -37,7 +37,7 @@ namespace Jack
     JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
                                    const char* net_name, uint transport_sync, char network_mode )
-            : JackAudioDriver ( name, alias, engine, table ), fSocket ( ip, port )
+            : JackAudioDriver ( name, alias, engine, table ), JackNetSlaveInterface ( ip, port )
     {
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
 
@@ -59,14 +59,6 @@ namespace Jack
     JackNetDriver::~JackNetDriver()
     {
         fSocket.Close();
-        SocketAPIEnd();
-        delete fNetAudioCaptureBuffer;
-        delete fNetAudioPlaybackBuffer;
-        delete fNetMidiCaptureBuffer;
-        delete fNetMidiPlaybackBuffer;
-        delete[] fTxBuffer;
-        delete[] fRxBuffer;
-        delete[] fMulticastIP;
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
@@ -120,9 +112,6 @@ namespace Jack
             Restart();
 
         //set the parameters to send
-        strcpy ( fParams.fPacketType, "params" );
-        fParams.fProtocolVersion = 'a';
-        SetPacketType ( &fParams, SLAVE_AVAILABLE );
         fParams.fSendAudioChannels = fCaptureChannels;
         fParams.fReturnAudioChannels = fPlaybackChannels;
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
@@ -131,144 +120,10 @@ namespace Jack
         if ( fParams.fTransportSync )
             jack_info ( "NetDriver started with Master's Transport Sync." );
 
-        //init loop : get a master and start, do it until connection is ok
-        net_status_t status;
-        do
-        {
-            //first, get a master, do it until a valid connection is running
-            jack_info ( "Initializing Net Driver..." );
-            do
-            {
-                status = GetNetMaster();
-                if ( status == NET_SOCKET_ERROR )
-                    return false;
-            }
-            while ( status != NET_CONNECTED );
-
-            //then tell the master we are ready
-            jack_info ( "Initializing connection with %s...", fParams.fMasterNetName );
-            status = SendMasterStartSync();
-            if ( status == NET_ERROR )
-                return false;
-        }
-        while ( status != NET_ROLLING );
+        if ( !JackNetSlaveInterface::Init() )
+            return false;;
 
         //driver parametering
-        if ( SetParams() )
-        {
-            jack_error ( "Fatal error : can't alloc net driver ports." );
-            return false;
-        }
-
-        //init done, display parameters
-        SessionParamsDisplay ( &fParams );
-
-        return true;
-    }
-
-    net_status_t JackNetDriver::GetNetMaster()
-    {
-        jack_log ( "JackNetDriver::GetNetMaster()" );
-        //utility
-        session_params_t params;
-        int us_timeout = 2000000;
-        int rx_bytes = 0;
-        unsigned char loop = 0;
-
-        //socket
-        if ( fSocket.NewSocket() == SOCKET_ERROR )
-        {
-            jack_error ( "Fatal error : network unreachable - %s", StrError ( NET_ERROR_CODE ) );
-            return NET_SOCKET_ERROR;
-        }
-
-        //bind the socket
-        if ( fSocket.Bind() == SOCKET_ERROR )
-            jack_error ( "Can't bind the socket : %s", StrError ( NET_ERROR_CODE ) );
-
-        //timeout on receive
-        if ( fSocket.SetTimeOut ( us_timeout ) == SOCKET_ERROR )
-            jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
-
-        //disable local loop
-        if ( fSocket.SetOption ( IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof ( loop ) ) == SOCKET_ERROR )
-            jack_error ( "Can't disable multicast loop : %s", StrError ( NET_ERROR_CODE ) );
-
-        //send 'AVAILABLE' until 'SLAVE_SETUP' received
-        jack_info ( "Waiting for a master..." );
-        do
-        {
-            //send 'available'
-            if ( fSocket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
-                jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
-            //filter incoming packets : don't exit while no error is detected
-            rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
-            if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
-            {
-                jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
-                return NET_RECV_ERROR;
-            }
-        }
-        while ( strcmp ( params.fPacketType, fParams.fPacketType ) && ( GetPacketType ( &params ) != SLAVE_SETUP ) );
-
-        //connect the socket
-        if ( fSocket.Connect() == SOCKET_ERROR )
-        {
-            jack_error ( "Error in connect : %s", StrError ( NET_ERROR_CODE ) );
-            return NET_CONNECT_ERROR;
-        }
-
-        //everything is OK, copy parameters and return
-        fParams = params;
-
-        return NET_CONNECTED;
-    }
-
-    net_status_t JackNetDriver::SendMasterStartSync()
-    {
-        jack_log ( "JackNetDriver::GetNetMasterStartSync()" );
-        //tell the master to start
-        SetPacketType ( &fParams, START_MASTER );
-        if ( fSocket.Send ( &fParams, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
-        {
-            jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
-            return ( fSocket.GetError() == NET_CONN_ERROR ) ? NET_ERROR : NET_SEND_ERROR;
-        }
-        return NET_ROLLING;
-    }
-
-    void JackNetDriver::Restart()
-    {
-        jack_log ( "JackNetDriver::Restart" );
-        jack_info ( "Restarting driver..." );
-        delete[] fTxBuffer;
-        fTxBuffer = NULL;
-        delete[] fRxBuffer;
-        fRxBuffer = NULL;
-        delete fNetAudioCaptureBuffer;
-        fNetAudioCaptureBuffer = NULL;
-        delete fNetAudioPlaybackBuffer;
-        fNetAudioPlaybackBuffer = NULL;
-        delete fNetMidiCaptureBuffer;
-        fNetMidiCaptureBuffer = NULL;
-        delete fNetMidiPlaybackBuffer;
-        fNetMidiPlaybackBuffer = NULL;
-        FreePorts();
-        delete[] fMidiCapturePortList;
-        fMidiCapturePortList = NULL;
-        delete[] fMidiPlaybackPortList;
-        fMidiPlaybackPortList = NULL;
-#ifdef JACK_MONITOR
-        delete fNetTimeMon;
-        fNetTimeMon = NULL;
-        delete fCycleTimeMon;
-        fCycleTimeMon = NULL;
-#endif
-    }
-
-    int JackNetDriver::SetParams()
-    {
-        fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
         JackAudioDriver::SetBufferSize ( fParams.fPeriodSize );
         JackAudioDriver::SetSampleRate ( fParams.fSampleRate );
 
@@ -278,54 +133,6 @@ namespace Jack
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-
-        //register jack ports
-        if ( AllocPorts() != 0 )
-        {
-            jack_error ( "Can't allocate ports." );
-            return -1;
-        }
-
-        //TX header init
-        strcpy ( fTxHeader.fPacketType, "header" );
-        fTxHeader.fDataStream = 'r';
-        fTxHeader.fID = fParams.fID;
-        fTxHeader.fCycle = 0;
-        fTxHeader.fSubCycle = 0;
-        fTxHeader.fMidiDataSize = 0;
-        fTxHeader.fBitdepth = fParams.fBitdepth;
-
-        //RX header init
-        strcpy ( fRxHeader.fPacketType, "header" );
-        fRxHeader.fDataStream = 's';
-        fRxHeader.fID = fParams.fID;
-        fRxHeader.fCycle = 0;
-        fRxHeader.fSubCycle = 0;
-        fRxHeader.fMidiDataSize = 0;
-        fRxHeader.fBitdepth = fParams.fBitdepth;
-
-        //network buffers
-        fTxBuffer = new char[fParams.fMtu];
-        fRxBuffer = new char[fParams.fMtu];
-
-        //net audio/midi buffers
-        fTxData = fTxBuffer + sizeof ( packet_header_t );
-        fRxData = fRxBuffer + sizeof ( packet_header_t );
-
-        //midi net buffers
-        fNetMidiCaptureBuffer = new NetMidiBuffer ( &fParams, fParams.fSendMidiChannels, fRxData );
-        fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fTxData );
-
-        //audio net buffers
-        fNetAudioCaptureBuffer = new NetAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-        fNetAudioPlaybackBuffer = new NetAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-
-        //audio netbuffer length
-        fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
-        fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
-
-        //payload size
-        fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
 
         //monitor
 #ifdef JACK_MONITOR
@@ -366,7 +173,45 @@ namespace Jack
         fLastCycleBeginDate = GetMicroSeconds();
 #endif
 
-        return 0;
+        if ( SetParams() )
+        {
+            jack_error ( "Fatal error : can't alloc net driver ports." );
+            return false;
+        }
+
+        //init done, display parameters
+        SessionParamsDisplay ( &fParams );
+
+        return true;
+    }
+
+    void JackNetDriver::Restart()
+    {
+        jack_log ( "JackNetDriver::Restart" );
+        jack_info ( "Restarting driver..." );
+        delete[] fTxBuffer;
+        fTxBuffer = NULL;
+        delete[] fRxBuffer;
+        fRxBuffer = NULL;
+        delete fNetAudioCaptureBuffer;
+        fNetAudioCaptureBuffer = NULL;
+        delete fNetAudioPlaybackBuffer;
+        fNetAudioPlaybackBuffer = NULL;
+        delete fNetMidiCaptureBuffer;
+        fNetMidiCaptureBuffer = NULL;
+        delete fNetMidiPlaybackBuffer;
+        fNetMidiPlaybackBuffer = NULL;
+        FreePorts();
+        delete[] fMidiCapturePortList;
+        fMidiCapturePortList = NULL;
+        delete[] fMidiPlaybackPortList;
+        fMidiPlaybackPortList = NULL;
+#ifdef JACK_MONITOR
+        delete fNetTimeMon;
+        fNetTimeMon = NULL;
+        delete fCycleTimeMon;
+        fCycleTimeMon = NULL;
+#endif
     }
 
     int JackNetDriver::AllocPorts()
@@ -491,57 +336,10 @@ namespace Jack
         return 0;
     }
 
-//***********************************network operations*************************************************************
-
-    int JackNetDriver::Recv ( size_t size, int flags )
-    {
-        int rx_bytes = fSocket.Recv ( fRxBuffer, size, flags );
-        //handle errors
-        if ( rx_bytes == SOCKET_ERROR )
-        {
-            net_error_t error = fSocket.GetError();
-            //no data isn't really an error in realtime processing, so just return 0
-            if ( error == NET_NO_DATA )
-                jack_error ( "No data, is the master still running ?" );
-            //if a network error occurs, this exception will restart the driver
-            else if ( error == NET_CONN_ERROR )
-            {
-                jack_error ( "Connection lost." );
-                throw JackDriverException();
-            }
-            else
-                jack_error ( "Fatal error in receive : %s", StrError ( NET_ERROR_CODE ) );
-        }
-        return rx_bytes;
-    }
-
-    int JackNetDriver::Send ( size_t size, int flags )
-    {
-        int tx_bytes = fSocket.Send ( fTxBuffer, size, flags );
-        //handle errors
-        if ( tx_bytes == SOCKET_ERROR )
-        {
-            net_error_t error = fSocket.GetError();
-            //if a network error occurs, this exception will restart the driver
-            if ( error == NET_CONN_ERROR )
-            {
-                jack_error ( "Connection lost." );
-                throw JackDriverException();
-            }
-            else
-                jack_error ( "Fatal error in send : %s", StrError ( NET_ERROR_CODE ) );
-        }
-        return tx_bytes;
-    }
-
 //*************************************process************************************************************************
 
     int JackNetDriver::Read()
     {
-        int rx_bytes;
-        uint recvd_midi_pckt = 0;
-        packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
-        fRxHeader.fIsLastPckt = 'n';
         uint midi_port_index;
         int audio_port_index;
 
@@ -556,14 +354,8 @@ namespace Jack
 #endif
 
         //receive sync (launch the cycle)
-        do
-        {
-            rx_bytes = Recv ( fParams.fMtu, 0 );
-            //connection issue, send will detect it, so don't skip the cycle (return 0)
-            if ( rx_bytes == SOCKET_ERROR )
-                return 0;
-        }
-        while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
+        if ( SyncRecv() == SOCKET_ERROR )
+            return 0;
 
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
@@ -575,45 +367,8 @@ namespace Jack
 #endif
 
         //audio, midi or sync if driver is late
-        if ( fParams.fSendMidiChannels || fParams.fSendAudioChannels )
-        {
-            do
-            {
-                rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-                //error here, problem with recv, just skip the cycle (return -1)
-                if ( rx_bytes == SOCKET_ERROR )
-                    return rx_bytes;
-                if ( rx_bytes && ( rx_head->fDataStream == 's' ) && ( rx_head->fID == fParams.fID ) )
-                {
-                    switch ( rx_head->fDataType )
-                    {
-                        case 'm':   //midi
-                            rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                            fRxHeader.fCycle = rx_head->fCycle;
-                            fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                            fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
-                            if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
-                                fNetMidiCaptureBuffer->RenderToJackPorts();
-                            break;
-                        case 'a':   //audio
-                            rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                            if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
-                                jack_error ( "Packet(s) missing..." );
-                            fRxHeader.fCycle = rx_head->fCycle;
-                            fRxHeader.fSubCycle = rx_head->fSubCycle;
-                            fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                            fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
-                            break;
-                        case 's':   //sync
-                            jack_info ( "NetDriver : driver overloaded, skipping receive." );
-                            fRxHeader.fCycle = rx_head->fCycle;
-                            return 0;
-                    }
-                }
-            }
-            while ( fRxHeader.fIsLastPckt != 'y' );
-        }
-        fRxHeader.fCycle = rx_head->fCycle;
+        if ( DataRecv() == SOCKET_ERROR )
+            return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
@@ -625,15 +380,7 @@ namespace Jack
     int JackNetDriver::Write()
     {
         uint midi_port_index;
-        int tx_bytes, audio_port_index;
-
-        //tx header
-        if ( fEngineControl->fSyncMode )
-            fTxHeader.fCycle = fRxHeader.fCycle;
-        else
-            fTxHeader.fCycle++;
-        fTxHeader.fSubCycle = 0;
-        fTxHeader.fIsLastPckt = 'n';
+        int audio_port_index;
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
@@ -646,58 +393,18 @@ namespace Jack
 #endif
 
         //sync
-        fTxHeader.fDataType = 's';
-        if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
-            fTxHeader.fIsLastPckt = 'y';
-        fTxHeader.fPacketSize = fParams.fMtu;
-        memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
         memset ( fTxData, 0, fPayloadSize );
         SetSyncPacket();
-        tx_bytes = Send ( fTxHeader.fPacketSize, 0 );
-        if ( tx_bytes == SOCKET_ERROR )
-            return tx_bytes;
+
+        if ( SyncSend() == SOCKET_ERROR )
+            return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
-        //midi
-        if ( fParams.fReturnMidiChannels )
-        {
-            fTxHeader.fDataType = 'm';
-            fTxHeader.fMidiDataSize = fNetMidiPlaybackBuffer->RenderFromJackPorts();
-            fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
-            for ( uint subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
-            {
-                fTxHeader.fSubCycle = subproc;
-                if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fReturnAudioChannels )
-                    fTxHeader.fIsLastPckt = 'y';
-                fTxHeader.fPacketSize = fNetMidiPlaybackBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-                fTxHeader.fPacketSize += sizeof ( packet_header_t );
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                tx_bytes = Send ( fTxHeader.fPacketSize, 0 );
-                if ( tx_bytes == SOCKET_ERROR )
-                    return tx_bytes;
-            }
-        }
-
-        //audio
-        if ( fParams.fReturnAudioChannels )
-        {
-            fTxHeader.fDataType = 'a';
-            for ( uint subproc = 0; subproc < fNSubProcess; subproc++ )
-            {
-                fTxHeader.fSubCycle = subproc;
-                if ( subproc == ( fNSubProcess - 1 ) )
-                    fTxHeader.fIsLastPckt = 'y';
-                fTxHeader.fPacketSize = fAudioTxLen;
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                fNetAudioPlaybackBuffer->RenderFromJackPorts ( subproc );
-                tx_bytes = Send ( fTxHeader.fPacketSize, 0 );
-                if ( tx_bytes == SOCKET_ERROR )
-                    return tx_bytes;
-            }
-        }
+        if ( DataSend() == SOCKET_ERROR )
+            return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->AddLast ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
@@ -792,7 +499,7 @@ namespace Jack
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             i++;
-            strcpy ( desc->params[i].name, "network_mode" );
+            strcpy ( desc->params[i].name, "fast_mode" );
             desc->params[i].character  = 'f';
             desc->params[i].type = JackDriverParamString;
             strcpy ( desc->params[i].value.str, "" );
