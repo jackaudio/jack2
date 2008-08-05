@@ -48,7 +48,10 @@ namespace Jack
     public:
         JackNetUnixSocket();
         JackNetUnixSocket ( const char* ip, int port );
+        JackNetUnixSocket ( const JackNetUnixSocket& );
         ~JackNetUnixSocket();
+
+        JackNetUnixSocket& operator= ( const JackNetUnixSocket& socket );
 
         //socket management
         int NewSocket();

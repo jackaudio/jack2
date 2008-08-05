@@ -20,7 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JACKNETMANAGER_H__
 #define __JACKNETMANAGER_H__
 
-#include "JackNetTool.h"
+#include "JackNetInterface.h"
 #include "thread.h"
 #include "jack.h"
 #include "jslist.h"
@@ -34,17 +34,11 @@ namespace Jack
 	\Brief This class describes a Net Master
 	*/
 
-    class JackNetMaster
+    class JackNetMaster : public JackNetMasterInterface
     {
-            friend class JackNetMasterManager;
+    	friend class JackNetMasterManager;
         private:
             static int SetProcess ( jack_nframes_t nframes, void* arg );
-
-            JackNetMasterManager* fMasterManager;
-            session_params_t fParams;
-            JackNetSocket fSocket;
-            uint fNSubProcess;
-            bool fRunning;
 
             //jack client
             jack_client_t* fJackClient;
@@ -60,27 +54,6 @@ namespace Jack
             int fSyncState;
             net_transport_data_t fTransportData;
 
-            //network headers
-            packet_header_t fTxHeader;
-            packet_header_t fRxHeader;
-
-            //network buffers
-            char* fTxBuffer;
-            char* fRxBuffer;
-            char* fTxData;
-            char* fRxData;
-
-            //jack buffers
-            NetAudioBuffer* fNetAudioCaptureBuffer;
-            NetAudioBuffer* fNetAudioPlaybackBuffer;
-            NetMidiBuffer* fNetMidiCaptureBuffer;
-            NetMidiBuffer* fNetMidiPlaybackBuffer;
-
-            //sizes
-            int fAudioTxLen;
-            int fAudioRxLen;
-            int fPayloadSize;
-
             //monitoring
 #ifdef JACK_MONITOR
             jack_time_t fPeriodUsecs;
@@ -88,16 +61,15 @@ namespace Jack
 #endif
 
             bool Init();
+            int AllocPorts();
             void FreePorts();
             void Exit();
 
             int SetSyncPacket();
 
-            int Send ( char* buffer, size_t size, int flags );
-            int Recv ( size_t size, int flags );
             int Process();
         public:
-            JackNetMaster ( JackNetMasterManager* manager, session_params_t& params );
+            JackNetMaster ( JackNetSocket& socket, session_params_t& params );
             ~JackNetMaster ();
     };
 
@@ -134,8 +106,6 @@ namespace Jack
         public:
             JackNetMasterManager ( jack_client_t* jack_client, const JSList* params );
             ~JackNetMasterManager();
-
-            void Exit();
     };
 }
 

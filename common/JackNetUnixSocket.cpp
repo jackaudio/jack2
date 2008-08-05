@@ -60,9 +60,28 @@ namespace Jack
         memset ( &fRecvAddr.sin_zero, 0, 8 );
     }
 
+    JackNetUnixSocket::JackNetUnixSocket ( const JackNetUnixSocket& socket )
+    {
+        fSockfd = socket.fSockfd;
+        fPort = socket.fPort;
+        fSendAddr = socket.fSendAddr;
+        fRecvAddr = socket.fRecvAddr;
+    }
+
     JackNetUnixSocket::~JackNetUnixSocket()
     {
         Close();
+    }
+
+    JackNetUnixSocket& JackNetUnixSocket::operator= ( const JackNetUnixSocket& socket )
+    {
+        if ( this != &socket )
+        {
+            fSockfd = 0;
+            fPort = socket.fPort;
+            fSendAddr = socket.fSendAddr;
+            fRecvAddr = socket.fRecvAddr;
+        }
     }
 
     //socket***********************************************************************************************************

@@ -32,17 +32,13 @@ namespace Jack
 {
 //JackNetMaster******************************************************************************************************
 
-    JackNetMaster::JackNetMaster ( JackNetMasterManager* manager, session_params_t& params ) : fSocket()
+    JackNetMaster::JackNetMaster ( JackNetSocket& socket, session_params_t& params )
+            : JackNetMasterInterface ( params, socket )
     {
         jack_log ( "JackNetMaster::JackNetMaster" );
         //settings
-        fMasterManager = manager;
-        fParams = params;
-        fSocket.CopyParams ( &fMasterManager->fSocket );
-        fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
         fClientName = const_cast<char*> ( fParams.fName );
         fJackClient = NULL;
-        fRunning = false;
         fSyncState = 1;
         uint port_index;
 
@@ -61,47 +57,6 @@ namespace Jack
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
             fMidiPlaybackPorts[port_index] = NULL;
 
-        //TX header init
-        strcpy ( fTxHeader.fPacketType, "header" );
-        fTxHeader.fDataStream = 's';
-        fTxHeader.fID = fParams.fID;
-        fTxHeader.fCycle = 0;
-        fTxHeader.fSubCycle = 0;
-        fTxHeader.fMidiDataSize = 0;
-        fTxHeader.fBitdepth = fParams.fBitdepth;
-
-        //RX header init
-        strcpy ( fRxHeader.fPacketType, "header" );
-        fRxHeader.fDataStream = 'r';
-        fRxHeader.fID = fParams.fID;
-        fRxHeader.fCycle = 0;
-        fRxHeader.fSubCycle = 0;
-        fRxHeader.fMidiDataSize = 0;
-        fRxHeader.fBitdepth = fParams.fBitdepth;
-
-        //network buffers
-        fTxBuffer = new char [fParams.fMtu];
-        fRxBuffer = new char [fParams.fMtu];
-
-        //net audio buffers
-        fTxData = fTxBuffer + sizeof ( packet_header_t );
-        fRxData = fRxBuffer + sizeof ( packet_header_t );
-
-        //midi net buffers
-        fNetMidiCaptureBuffer = new NetMidiBuffer ( &fParams, fParams.fSendMidiChannels, fTxData );
-        fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fRxData );
-
-        //audio net buffers
-        fNetAudioCaptureBuffer = new NetAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
-        fNetAudioPlaybackBuffer = new NetAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
-
-        //audio netbuffer length
-        fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
-        fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
-
-        //payload size
-        fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
-
         //monitor
 #ifdef JACK_MONITOR
         fPeriodUsecs = ( int ) ( 1000000.f * ( ( float ) fParams.fPeriodSize / ( float ) fParams.fSampleRate ) );
@@ -109,7 +64,7 @@ namespace Jack
         plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
-        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast-network" ) : string ( "" );
+        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast" ) : string ( "_normal" );
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
         string net_time_mon_fields[] =
         {
@@ -136,17 +91,10 @@ namespace Jack
             FreePorts();
             jack_client_close ( fJackClient );
         }
-        fSocket.Close();
-        delete fNetAudioCaptureBuffer;
-        delete fNetAudioPlaybackBuffer;
-        delete fNetMidiCaptureBuffer;
-        delete fNetMidiPlaybackBuffer;
         delete[] fAudioCapturePorts;
         delete[] fAudioPlaybackPorts;
         delete[] fMidiCapturePorts;
         delete[] fMidiPlaybackPorts;
-        delete[] fTxBuffer;
-        delete[] fRxBuffer;
 #ifdef JACK_MONITOR
         fNetTimeMon->Save();
         delete fNetTimeMon;
@@ -155,70 +103,13 @@ namespace Jack
 
     bool JackNetMaster::Init()
     {
-        jack_log ( "JackNetMaster::Init, ID %u.", fParams.fID );
-        session_params_t params;
-        int usec_timeout = 1000000;
-        uint attempt = 0;
-        int rx_bytes = 0;
-        int rx_bufsize = 0;
-
-        //socket
-        if ( fSocket.NewSocket() == SOCKET_ERROR )
-        {
-            jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
+        //network init
+        if ( !JackNetMasterInterface::Init() )
             return false;
-        }
-
-        //timeout on receive (for init)
-        if ( fSocket.SetTimeOut ( usec_timeout ) < 0 )
-            jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
-
-        //connect
-        if ( fSocket.Connect() == SOCKET_ERROR )
-        {
-            jack_error ( "Can't connect : %s", StrError ( NET_ERROR_CODE ) );
-            return false;
-        }
-
-        //send 'SLAVE_SETUP' until 'START_MASTER' received
-        jack_info ( "Sending parameters to %s ...", fParams.fSlaveNetName );
-        do
-        {
-            SetPacketType ( &fParams, SLAVE_SETUP );
-            if ( fSocket.Send ( &fParams, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
-                jack_error ( "Error in send : ", StrError ( NET_ERROR_CODE ) );
-            if ( ( ( rx_bytes = fSocket.Recv ( &params, sizeof ( session_params_t ), 0 ) ) == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
-            {
-                jack_error ( "Problem with network." );
-                return false;
-            }
-        }
-        while ( ( GetPacketType ( &params ) != START_MASTER ) && ( ++attempt < 5 ) );
-        if ( attempt == 5 )
-        {
-            jack_error ( "Slave doesn't respond, exiting." );
-            return false;
-        }
-
-        //set the new timeout for the socket
-        if ( SetRxTimeout ( &fSocket, &fParams ) == SOCKET_ERROR )
-        {
-            jack_error ( "Can't set rx timeout : %s", StrError ( NET_ERROR_CODE ) );
-            return false;
-        }
-
-        //set the new rx buffer size
-        rx_bufsize = GetNetBufferSize ( &fParams );
-        if ( fSocket.SetOption ( SOL_SOCKET, SO_RCVBUF, &rx_bufsize, sizeof ( rx_bufsize ) ) == SOCKET_ERROR )
-        {
-            jack_error ( "Can't set rx buffer size : %s", StrError ( NET_ERROR_CODE ) );
-            return false;
-        }
 
         //jack client and process
         jack_status_t status;
-        jack_options_t options = JackNullOption;
-        if ( ( fJackClient = jack_client_open ( fClientName, options, &status, NULL ) ) == NULL )
+        if ( ( fJackClient = jack_client_open ( fClientName, JackNullOption, &status, NULL ) ) == NULL )
         {
             jack_error ( "Can't open a new jack client." );
             return false;
@@ -226,46 +117,13 @@ namespace Jack
 
         jack_set_process_callback ( fJackClient, SetProcess, this );
 
-        //port registering
-        uint i;
-        char name[24];
-        jack_nframes_t port_latency = jack_get_buffer_size ( fJackClient );
-        unsigned long port_flags;
-        //audio
-        port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-        for ( i = 0; i < fParams.fSendAudioChannels; i++ )
+        if ( AllocPorts() != 0 )
         {
-            sprintf ( name, "to_slave_%d", i+1 );
-            if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
-                goto fail;
-            jack_port_set_latency ( fAudioCapturePorts[i], 0 );
-        }
-        port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-        for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
-        {
-            sprintf ( name, "from_slave_%d", i+1 );
-            if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
-                goto fail;
-            jack_port_set_latency ( fAudioPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
-        }
-        //midi
-        port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-        for ( i = 0; i < fParams.fSendMidiChannels; i++ )
-        {
-            sprintf ( name, "midi_to_slave_%d", i+1 );
-            if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
-                goto fail;
-            jack_port_set_latency ( fMidiCapturePorts[i], 0 );
-        }
-        port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-        for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
-        {
-            sprintf ( name, "midi_from_slave_%d", i+1 );
-            if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
-                goto fail;
-            jack_port_set_latency ( fMidiPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+            jack_error ( "Can't allocate jack ports." );
+            goto fail;
         }
 
+		//process can now run
         fRunning = true;
 
         //finally activate jack client
@@ -279,11 +137,56 @@ namespace Jack
 
         return true;
 
-    fail:
+fail:
         FreePorts();
         jack_client_close ( fJackClient );
         fJackClient = NULL;
         return false;
+    }
+
+    int JackNetMaster::AllocPorts()
+    {
+    	jack_log ( "JackNetMaster::AllocPorts" );
+
+        uint i;
+        char name[24];
+        jack_nframes_t port_latency = jack_get_buffer_size ( fJackClient );
+        unsigned long port_flags;
+        //audio
+        port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
+        for ( i = 0; i < fParams.fSendAudioChannels; i++ )
+        {
+            sprintf ( name, "to_slave_%d", i+1 );
+            if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
+                return -1;
+            jack_port_set_latency ( fAudioCapturePorts[i], 0 );
+        }
+        port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
+        for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
+        {
+            sprintf ( name, "from_slave_%d", i+1 );
+            if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
+                return -1;
+            jack_port_set_latency ( fAudioPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+        }
+        //midi
+        port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
+        for ( i = 0; i < fParams.fSendMidiChannels; i++ )
+        {
+            sprintf ( name, "midi_to_slave_%d", i+1 );
+            if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
+                return -1;
+            jack_port_set_latency ( fMidiCapturePorts[i], 0 );
+        }
+        port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
+        for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
+        {
+            sprintf ( name, "midi_from_slave_%d", i+1 );
+            if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
+                return -1;
+            jack_port_set_latency ( fMidiPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+        }
+        return 0;
     }
 
     void JackNetMaster::FreePorts()
@@ -304,22 +207,6 @@ namespace Jack
                 jack_port_unregister ( fJackClient, fMidiPlaybackPorts[port_index] );
     }
 
-    void JackNetMaster::Exit()
-    {
-        jack_log ( "JackNetMaster::Exit, ID %u", fParams.fID );
-        //stop process
-        fRunning = false;
-        //send a 'multicast euthanasia request' - new socket is required on macosx
-        jack_info ( "Exiting '%s'", fParams.fName );
-        SetPacketType ( &fParams, KILL_MASTER );
-        JackNetSocket mcast_socket ( fMasterManager->fMulticastIP, fSocket.GetPort() );
-        if ( mcast_socket.NewSocket() == SOCKET_ERROR )
-            jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
-        if ( mcast_socket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMasterManager->fMulticastIP ) == SOCKET_ERROR )
-            jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
-        mcast_socket.Close();
-    }
-
     int JackNetMaster::SetSyncPacket()
     {
         if ( fParams.fTransportSync )
@@ -330,48 +217,6 @@ namespace Jack
             memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
         }
         return 0;
-    }
-
-    int JackNetMaster::Send ( char* buffer, size_t size, int flags )
-    {
-        int tx_bytes;
-        if ( ( tx_bytes = fSocket.Send ( buffer, size, flags ) ) == SOCKET_ERROR )
-        {
-            net_error_t error = fSocket.GetError();
-            if ( fRunning && ( error == NET_CONN_ERROR ) )
-            {
-                //fatal connection issue, exit
-                jack_error ( "'%s' : %s, please check network connection with '%s'.",
-                             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
-                Exit();
-            }
-            else if ( fRunning )
-                jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
-        }
-        return tx_bytes;
-    }
-
-    int JackNetMaster::Recv ( size_t size, int flags )
-    {
-        int rx_bytes;
-        if ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR )
-        {
-            net_error_t error = fSocket.GetError();
-            //no data isn't really a network error, so just return 0 avalaible read bytes
-            if ( error == NET_NO_DATA )
-                return 0;
-            else if ( fRunning && ( error == NET_CONN_ERROR ) )
-            {
-                //fatal connection issue, exit
-                jack_error ( "'%s' : %s, network connection with '%s' broken, exiting.",
-                             fParams.fName, StrError ( NET_ERROR_CODE ), fParams.fSlaveNetName );
-                //ask to the manager to properly remove the master
-                Exit();
-            }
-            else if ( fRunning )
-                jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
-        }
-        return rx_bytes;
     }
 
     int JackNetMaster::SetProcess ( jack_nframes_t nframes, void* arg )
@@ -385,15 +230,8 @@ namespace Jack
         if ( !fRunning )
             return 0;
 
-        int tx_bytes = 0;
-        int rx_bytes = 0;
-        uint midi_recvd_pckt = 0;
-        uint jumpcnt = 0;
-        int cycle_offset = 0;
-        fTxHeader.fCycle++;
-        fTxHeader.fSubCycle = 0;
-        fTxHeader.fIsLastPckt = 'n';
-        packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
+        uint port_index;
+        int res = 0;
 
 #ifdef JACK_MONITOR
         jack_time_t begin_time = jack_get_time();
@@ -401,7 +239,6 @@ namespace Jack
 #endif
 
         //buffers
-        uint port_index;
         for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
             fNetMidiCaptureBuffer->SetBuffer ( port_index,
                                                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index],
@@ -419,156 +256,39 @@ namespace Jack
                                                  static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
                                                                           fParams.fPeriodSize ) ) );
 
-        //send ------------------------------------------------------------------------------------------------------------------
-        //sync : first set header
-        fTxHeader.fDataType = 's';
-        if ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels )
-            fTxHeader.fIsLastPckt = 'y';
-        fTxHeader.fPacketSize = fParams.fMtu;
-        memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-        //sync : then fill auxiliary data
+        //Set the first packet to send
         memset ( fTxData, 0, fPayloadSize );
         SetSyncPacket();
-        //sync : and send
-        tx_bytes = Send ( fTxBuffer, fTxHeader.fPacketSize, 0 );
-        if ( tx_bytes == SOCKET_ERROR )
-            return tx_bytes;
+
+        //send sync
+        if ( SyncSend() == SOCKET_ERROR )
+            return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
-        //midi
-        if ( fParams.fSendMidiChannels )
-        {
-            //set global header fields and get the number of midi packets
-            fTxHeader.fDataType = 'm';
-            fTxHeader.fMidiDataSize = fNetMidiCaptureBuffer->RenderFromJackPorts();
-            fTxHeader.fNMidiPckt = GetNMidiPckt ( &fParams, fTxHeader.fMidiDataSize );
-            for ( uint subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
-            {
-                //fill the packet header fields
-                fTxHeader.fSubCycle = subproc;
-                if ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fSendAudioChannels )
-                    fTxHeader.fIsLastPckt = 'y';
-                //get the data from buffer
-                fTxHeader.fPacketSize = fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-                fTxHeader.fPacketSize += sizeof ( packet_header_t );
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                //and send
-                tx_bytes = Send ( fTxBuffer, fTxHeader.fPacketSize, 0 );
-                if ( tx_bytes == SOCKET_ERROR )
-                    return tx_bytes;
-            }
-        }
-
-        //audio
-        if ( fParams.fSendAudioChannels )
-        {
-            fTxHeader.fDataType = 'a';
-            for ( uint subproc = 0; subproc < fNSubProcess; subproc++ )
-            {
-                //set the header
-                fTxHeader.fSubCycle = subproc;
-                if ( subproc == ( fNSubProcess - 1 ) )
-                    fTxHeader.fIsLastPckt = 'y';
-                fTxHeader.fPacketSize = fAudioTxLen;
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                //get the data
-                fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
-                //and send
-                tx_bytes = Send ( fTxBuffer, fTxHeader.fPacketSize, 0 );
-                if ( tx_bytes == SOCKET_ERROR )
-                    return tx_bytes;
-            }
-        }
+        //send data
+        if ( DataSend() == SOCKET_ERROR )
+            return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
-        //receive --------------------------------------------------------------------------------------------------------------------
-        //sync : how much data is available ?
-        rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-        if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
-            return rx_bytes;
-
-        cycle_offset = fTxHeader.fCycle - rx_head->fCycle;
-
-        switch ( fParams.fNetworkMode )
-        {
-            case 'n' :
-                //normal use of the network : allow to use full bandwith
-                //    - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwith
-                //    - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
-                //    - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
-                if ( cycle_offset == 0 )
-                    return 0;
-                else
-                    rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                break;
-            case 'f' :
-                //fast mode suppose the network bandwith is larger than required for the transmission (only a few channels for example)
-                //    - packets can be quickly received, quickly is here relative to the cycle duration
-                //    - here, receive data, we can't keep it queued on the rx buffer,
-                //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
-                rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                if ( cycle_offset )
-                    jack_error ( "'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
-                break;
-        }
+        //receive sync
+        res = SyncRecv();
+        if ( ( res == 0 ) || ( res == SOCKET_ERROR ) )
+            return res;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
-        if ( fParams.fReturnMidiChannels || fParams.fReturnAudioChannels )
-        {
-            do
-            {
-                //how much data is queued on the rx buffer ?
-                rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-                if ( rx_bytes == SOCKET_ERROR )
-                    return rx_bytes;
-                //if no data,
-                if ( ( rx_bytes == 0 ) && ( ++jumpcnt == fNSubProcess ) )
-                {
-                    jack_error ( "No data from %s...", fParams.fName );
-                    jumpcnt = 0;
-                }
-                //else if data is valid,
-                if ( rx_bytes && ( rx_head->fDataStream == 'r' ) && ( rx_head->fID == fParams.fID ) )
-                {
-                    //read data
-                    switch ( rx_head->fDataType )
-                    {
-                        case 'm':   //midi
-                            Recv ( rx_head->fPacketSize, 0 );
-                            fRxHeader.fCycle = rx_head->fCycle;
-                            fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                            fNetMidiPlaybackBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
-                            if ( ++midi_recvd_pckt == rx_head->fNMidiPckt )
-                                fNetMidiPlaybackBuffer->RenderToJackPorts();
-                            jumpcnt = 0;
-                            break;
-                        case 'a':   //audio
-                            Recv ( rx_head->fPacketSize, 0 );
-                            if ( !IsNextPacket ( &fRxHeader, rx_head, fNSubProcess ) )
-                                jack_error ( "Packet(s) missing from '%s'...", fParams.fName );
-                            fRxHeader.fCycle = rx_head->fCycle;
-                            fRxHeader.fSubCycle = rx_head->fSubCycle;
-                            fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                            fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fSubCycle );
-                            jumpcnt = 0;
-                            break;
-                        case 's':   //sync
-                            if ( rx_head->fCycle == fTxHeader.fCycle )
-                                return 0;
-                    }
-                }
-            }
-            while ( fRxHeader.fIsLastPckt != 'y' );
-        }
+        //receive data
+        res = DataRecv();
+        if ( ( res == 0 ) || ( res == SOCKET_ERROR ) )
+            return res;
 
 #ifdef JACK_MONITOR
         fNetTimeMon->AddLast ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
@@ -595,11 +315,11 @@ namespace Jack
             param = ( const jack_driver_param_t* ) node->data;
             switch ( param->character )
             {
-                case 'a' :
-                    fMulticastIP = strdup ( param->value.str );
-                    break;
-                case 'p':
-                    fSocket.SetPort ( param->value.ui );
+            case 'a' :
+                fMulticastIP = strdup ( param->value.str );
+                break;
+            case 'p':
+                fSocket.SetPort ( param->value.ui );
             }
         }
 
@@ -618,7 +338,10 @@ namespace Jack
     JackNetMasterManager::~JackNetMasterManager()
     {
         jack_log ( "JackNetMasterManager::~JackNetMasterManager" );
-        Exit();
+
+        jack_info ( "Exiting net manager..." );
+        fRunning = false;
+        jack_client_stop_thread ( fManagerClient, fManagerThread );
         master_list_t::iterator it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
             delete ( *it );
@@ -718,31 +441,23 @@ namespace Jack
             {
                 switch ( GetPacketType ( &params ) )
                 {
-                    case SLAVE_AVAILABLE:
-                        if ( ( net_master = MasterInit ( params ) ) )
-                            SessionParamsDisplay ( &net_master->fParams );
-                        else
-                            jack_error ( "Can't init new net master..." );
+                case SLAVE_AVAILABLE:
+                    if ( ( net_master = MasterInit ( params ) ) )
+                        SessionParamsDisplay ( &net_master->fParams );
+                    else
+                        jack_error ( "Can't init new net master..." );
+                    jack_info ( "Waiting for a slave..." );
+                    break;
+                case KILL_MASTER:
+                    if ( KillMaster ( &params ) )
                         jack_info ( "Waiting for a slave..." );
-                        break;
-                    case KILL_MASTER:
-                        if ( KillMaster ( &params ) )
-                            jack_info ( "Waiting for a slave..." );
-                        break;
-                    default:
-                        break;
+                    break;
+                default:
+                    break;
                 }
             }
         }
         while ( fRunning );
-    }
-
-    void JackNetMasterManager::Exit()
-    {
-        jack_log ( "JackNetMasterManager::Exit" );
-        fRunning = false;
-        jack_client_stop_thread ( fManagerClient, fManagerThread );
-        jack_info ( "Exiting net manager..." );
     }
 
     JackNetMaster* JackNetMasterManager::MasterInit ( session_params_t& params )
@@ -758,7 +473,7 @@ namespace Jack
         SetSlaveName ( params );
 
         //create a new master and add it to the list
-        JackNetMaster* master = new JackNetMaster ( this, params );
+        JackNetMaster* master = new JackNetMaster ( fSocket, params );
         if ( master->Init() )
         {
             fMasterList.push_back ( master );

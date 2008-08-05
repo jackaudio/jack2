@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackNetDriver__
 
 #include "JackAudioDriver.h"
-#include "JackNetSlaveInterface.h"
+#include "JackNetInterface.h"
 
 #ifdef JACK_MONITOR
 #include "JackFrameTimer.h"

@@ -49,7 +49,10 @@ namespace Jack
     public:
         JackNetWinSocket();
         JackNetWinSocket ( const char* ip, int port );
+        JackNetWinSocket ( const JackNetWinSocket& );
         ~JackNetWinSocket();
+
+        JackNetWinSocket& operator= ( const JackNetWinSocket& );
 
         //socket management
         int NewSocket();
@@ -74,7 +77,6 @@ namespace Jack
         //utility
         int GetName ( char* name );
         int JoinMCastGroup ( const char* mcast_ip );
-        void CopyParams ( JackNetWinSocket* socket );
 
         //options management
         int SetOption ( int level, int optname, const void* optval, SOCKLEN optlen );

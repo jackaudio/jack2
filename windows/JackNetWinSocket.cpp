@@ -129,9 +129,28 @@ namespace Jack
         memset ( &fRecvAddr.sin_zero, 0, 8 );
     }
 
+    JackNetWinSocket::JackNetWinSocket ( const JackNetWinSocket& socket )
+    {
+        fSockfd = 0;
+        fPort = socket.fPort;
+        fSendAddr = socket.fSendAddr;
+        fRecvAddr = socket.fRecvAddr;
+    }
+
     JackNetWinSocket::~JackNetWinSocket()
     {
         Close();
+    }
+
+    JackNetWinSocket& JackNetWinSocket::operator= ( const JackNetWinSocket& socket )
+    {
+        if ( this != &socket )
+        {
+            fSockfd = 0;
+            fPort = socket.fPort;
+            fSendAddr = socket.fSendAddr;
+            fRecvAddr = socket.fRecvAddr;
+        }
     }
 
     //socket***********************************************************************************************************
@@ -244,13 +263,6 @@ namespace Jack
         return SetOption ( IPPROTO_IP, 12, &multicast_req, sizeof ( multicast_req ) );
     }
 
-    void JackNetWinSocket::CopyParams ( JackNetWinSocket* socket )
-    {
-        fPort = socket->fPort;
-        fSendAddr = socket->fSendAddr;
-        fRecvAddr = socket->fRecvAddr;
-    }
-
     //options************************************************************************************************************
     int JackNetWinSocket::SetOption ( int level, int optname, const void* optval, SOCKLEN optlen )
     {
@@ -268,7 +280,7 @@ namespace Jack
         //negative timeout, or exceeding 10s, return
         if ( ( usec < 0 ) || ( usec > 10000000 ) )
             return SOCKET_ERROR;
-		int time = usec / 1000;
+        int time = usec / 1000;
         return SetOption ( SOL_SOCKET, SO_RCVTIMEO, &time, sizeof ( time ) );
     }
 

@@ -40,8 +40,6 @@ namespace Jack
     {
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
 
-        fMulticastIP = new char[strlen ( ip ) + 1];
-        strcpy ( fMulticastIP, ip );
         fParams.fMtu = mtu;
         fParams.fSendMidiChannels = midi_input_ports;
         fParams.fReturnMidiChannels = midi_output_ports;
@@ -57,7 +55,6 @@ namespace Jack
 
     JackNetDriver::~JackNetDriver()
     {
-        fSocket.Close();
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR

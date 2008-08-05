@@ -124,7 +124,6 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-fexceptions" />
 			<Add directory="." />
 			<Add directory="..\common" />
 			<Add directory="..\common\jack" />
@@ -167,7 +166,7 @@
 		<Unit filename="..\common\JackMessageBuffer.cpp" />
 		<Unit filename="..\common\JackMidiAPI.cpp" />
 		<Unit filename="..\common\JackMidiPort.cpp" />
-		<Unit filename="..\common\JackNetSlaveInterface.cpp" />
+		<Unit filename="..\common\JackNetInterface.cpp" />
 		<Unit filename="..\common\JackNetTool.cpp" />
 		<Unit filename="..\common\JackPort.cpp" />
 		<Unit filename="..\common\JackPortType.cpp" />

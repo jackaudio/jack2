@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPlatformThread.h"
 #include "jack.h"
 #include "jslist.h"
-#include "JackNetSlaveInterface.h"
+#include "JackNetInterface.h"
 
 namespace Jack
 {
