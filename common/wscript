@@ -130,7 +130,7 @@ def build(bld):
         'JackServerGlobals.cpp',
         'JackControl.cpp',
         'JackNetTool.cpp',
-        'JackNetSlaveInterface.cpp',
+        'JackNetInterface.cpp',
         ]
 
     if bld.env()['IS_LINUX']:
@@ -220,16 +220,16 @@ def build(bld):
          audio_adapter_sources += ['../macosx/JackCoreAudioAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "../macosx/libportaudio.a -framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
-         process.env.append_value("LINKFLAGS", "-lsamplerate") 
-    
+         process.env.append_value("LINKFLAGS", "-lsamplerate")
+
     if bld.env()['IS_LINUX']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "-lasound -lsamplerate")
- 
+
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-	    
+
     install_files('PREFIX', 'include/jack', 'jack/*.h')
 
     # process jack.pc.in -> jack.pc
