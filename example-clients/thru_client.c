@@ -15,8 +15,8 @@
 #endif
 #include <jack/jack.h>
 
-jack_port_t *input_port;
-jack_port_t *output_port;
+jack_port_t **input_ports;
+jack_port_t **output_ports;
 jack_client_t *client;
 
 static void signal_handler ( int sig )
@@ -37,13 +37,14 @@ static void signal_handler ( int sig )
 int
 process ( jack_nframes_t nframes, void *arg )
 {
+    int i;
     jack_default_audio_sample_t *in, *out;
-
-    in = jack_port_get_buffer ( input_port, nframes );
-    out = jack_port_get_buffer ( output_port, nframes );
-
-    memcpy ( out, in, nframes * sizeof ( jack_default_audio_sample_t ) );
-
+    for ( i = 0; i < 2; i++ )
+    {
+        in = jack_port_get_buffer ( input_ports[i], nframes );
+        out = jack_port_get_buffer ( output_ports[i], nframes );
+        memcpy ( out, in, nframes * sizeof ( jack_default_audio_sample_t ) );
+    }
     return 0;
 }
 
@@ -54,12 +55,15 @@ process ( jack_nframes_t nframes, void *arg )
 void
 jack_shutdown ( void *arg )
 {
+    free ( input_ports );
+    free ( output_ports );
     exit ( 1 );
 }
 
 int
 main ( int argc, char *argv[] )
 {
+    int i;
     const char **ports;
     const char *client_name;
     const char *server_name = NULL;
@@ -124,19 +128,22 @@ main ( int argc, char *argv[] )
 
     jack_on_shutdown ( client, jack_shutdown, 0 );
 
-    /* create two ports */
+    /* create two ports pairs*/
+    input_ports = ( jack_port_t** ) calloc ( 2, sizeof ( jack_port_t* ) );
+    output_ports = ( jack_port_t** ) calloc ( 2, sizeof ( jack_port_t* ) );
 
-    input_port = jack_port_register ( client, "input",
-                                      JACK_DEFAULT_AUDIO_TYPE,
-                                      JackPortIsInput, 0 );
-    output_port = jack_port_register ( client, "output",
-                                        JACK_DEFAULT_AUDIO_TYPE,
-                                        JackPortIsOutput, 0 );
-
-    if ( ( input_port == NULL ) || ( output_port == NULL ) )
+    char port_name[16];
+    for ( i = 0; i < 2; i++ )
     {
-        fprintf ( stderr, "no more JACK ports available\n" );
-        exit ( 1 );
+        sprintf ( port_name, "input_%d", i + 1 );
+        input_ports[i] = jack_port_register ( client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0 );
+        sprintf ( port_name, "output_%d", i + 1 );
+        output_ports[i] = jack_port_register ( client, port_name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 );
+        if ( ( input_ports[i] == NULL ) || ( output_ports[i] == NULL ) )
+        {
+            fprintf ( stderr, "no more JACK ports available\n" );
+            exit ( 1 );
+        }
     }
 
     /* Tell the JACK server that we are ready to roll.  Our
@@ -156,33 +163,29 @@ main ( int argc, char *argv[] )
      * it.
      */
 
-    ports = jack_get_ports ( client, NULL, NULL,
-                             JackPortIsPhysical|JackPortIsOutput );
+    ports = jack_get_ports ( client, NULL, NULL, JackPortIsPhysical|JackPortIsOutput );
     if ( ports == NULL )
     {
         fprintf ( stderr, "no physical capture ports\n" );
         exit ( 1 );
     }
 
-    if ( jack_connect ( client, ports[0], jack_port_name ( input_port ) ) )
-    {
-        fprintf ( stderr, "cannot connect input ports\n" );
-    }
+    for ( i = 0; i < 2; i++ )
+        if ( jack_connect ( client, ports[i], jack_port_name ( input_ports[i] ) ) )
+            fprintf ( stderr, "cannot connect input ports\n" );
 
     free ( ports );
 
-    ports = jack_get_ports ( client, NULL, NULL,
-                             JackPortIsPhysical|JackPortIsInput );
+    ports = jack_get_ports ( client, NULL, NULL, JackPortIsPhysical|JackPortIsInput );
     if ( ports == NULL )
     {
         fprintf ( stderr, "no physical playback ports\n" );
         exit ( 1 );
     }
 
-    if ( jack_connect ( client, jack_port_name ( output_port ), ports[0] ) )
-    {
-        fprintf ( stderr, "cannot connect output ports\n" );
-    }
+    for ( i = 0; i < 2; i++ )
+        if ( jack_connect ( client, jack_port_name ( output_ports[i] ), ports[i] ) )
+            fprintf ( stderr, "cannot connect input ports\n" );
 
     free ( ports );
 

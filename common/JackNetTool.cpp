@@ -380,8 +380,7 @@ namespace Jack
         //slow mode, just try recv during two subcycle audio packets
         else
             time = 4000000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
-        int usec = ( int ) time;
-        return socket->SetTimeOut ( usec );
+        return socket->SetTimeOut ( static_cast<int> ( time ) );
     }
 
 // Packet *******************************************************************************************************

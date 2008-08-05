@@ -151,6 +151,7 @@ namespace Jack
             fSendAddr = socket.fSendAddr;
             fRecvAddr = socket.fRecvAddr;
         }
+        return *this;
     }
 
     //socket***********************************************************************************************************
@@ -275,7 +276,7 @@ namespace Jack
     }
 
     //tiemout************************************************************************************************************
-    int JackNetWinSocket::SetTimeOut ( int& usec )
+    int JackNetWinSocket::SetTimeOut ( int usec )
     {
         //negative timeout, or exceeding 10s, return
         if ( ( usec < 0 ) || ( usec > 10000000 ) )

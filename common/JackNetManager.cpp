@@ -380,7 +380,6 @@ fail:
     {
         jack_log ( "JackNetMasterManager::Run" );
         //utility variables
-        int usec_timeout = 2000000;
         int attempt = 0;
 
         //data
@@ -419,7 +418,7 @@ fail:
             jack_error ( "Can't set local loop : %s", StrError ( NET_ERROR_CODE ) );
 
         //set a timeout on the multicast receive (the thread can now be cancelled)
-        if ( fSocket.SetTimeOut ( usec_timeout ) == SOCKET_ERROR )
+        if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         jack_info ( "Waiting for a slave..." );

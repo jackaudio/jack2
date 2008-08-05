@@ -149,7 +149,6 @@ namespace Jack
         jack_log ( "JackNetSlaveInterface::GetNetMaster()" );
         //utility
         session_params_t params;
-        int us_timeout = 2000000;
         int rx_bytes = 0;
         unsigned char loop = 0;
 
@@ -165,7 +164,7 @@ namespace Jack
             jack_error ( "Can't bind the socket : %s", StrError ( NET_ERROR_CODE ) );
 
         //timeout on receive
-        if ( fSocket.SetTimeOut ( us_timeout ) == SOCKET_ERROR )
+        if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //disable local loop
@@ -389,7 +388,6 @@ namespace Jack
         jack_log ( "JackNetMasterInterface::Init, ID %u.", fParams.fID );
 
         session_params_t params;
-        int usec_timeout = 1000000;
         uint attempt = 0;
         int rx_bytes = 0;
         int rx_bufsize = 0;
@@ -402,7 +400,7 @@ namespace Jack
         }
 
         //timeout on receive (for init)
-        if ( fSocket.SetTimeOut ( usec_timeout ) < 0 )
+        if ( fSocket.SetTimeOut ( 1000000 ) < 0 )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //connect

@@ -62,7 +62,7 @@ namespace Jack
 
     JackNetUnixSocket::JackNetUnixSocket ( const JackNetUnixSocket& socket )
     {
-        fSockfd = socket.fSockfd;
+        fSockfd = 0;
         fPort = socket.fPort;
         fSendAddr = socket.fSendAddr;
         fRecvAddr = socket.fRecvAddr;
@@ -82,6 +82,7 @@ namespace Jack
             fSendAddr = socket.fSendAddr;
             fRecvAddr = socket.fRecvAddr;
         }
+        return *this;
     }
 
     //socket***********************************************************************************************************
@@ -218,7 +219,7 @@ namespace Jack
     }
 
     //timeout************************************************************************************************************
-    int JackNetUnixSocket::SetTimeOut ( int& us )
+    int JackNetUnixSocket::SetTimeOut ( int us )
     {
         //negative timeout, or exceding 10s, return
         if ( ( us < 0 ) || ( us > 10000000 ) )
