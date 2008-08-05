@@ -342,7 +342,7 @@ namespace Jack
         if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
             return ( params->fFramesPerPacket = params->fPeriodSize );
         jack_nframes_t period = ( int ) powf ( 2.f, ( int ) ( log ( ( params->fMtu - sizeof ( packet_header_t ) )
-                                       / ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) / log ( 2 ) ) );
+                                               / ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) / log ( 2 ) ) );
         ( period > params->fPeriodSize ) ? params->fFramesPerPacket = params->fPeriodSize : params->fFramesPerPacket = period;
         return params->fFramesPerPacket;
     }
@@ -353,7 +353,7 @@ namespace Jack
         float audio_size = params->fMtu * ( params->fPeriodSize / params->fFramesPerPacket );
         //midi
         float midi_size = params->fMtu * ( max ( params->fSendMidiChannels, params->fReturnMidiChannels ) *
-                                            params->fPeriodSize * sizeof ( sample_t ) / ( params->fMtu - sizeof ( packet_header_t ) ) );
+                                           params->fPeriodSize * sizeof ( sample_t ) / ( params->fMtu - sizeof ( packet_header_t ) ) );
         //return : sizes of sync + audio + midi
         return ( params->fMtu + ( int ) audio_size + ( int ) midi_size );
     }

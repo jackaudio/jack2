@@ -38,11 +38,11 @@ namespace Jack
 {
 
 #if defined(__APPLE__) || defined(__linux__)
-	typedef JackNetUnixSocket JackNetSocket;
+    typedef JackNetUnixSocket JackNetSocket;
 #endif
 
 #ifdef WIN32
-	typedef JackNetWinSocket JackNetSocket;
+    typedef JackNetWinSocket JackNetSocket;
 #endif
 
 } // end of namespace

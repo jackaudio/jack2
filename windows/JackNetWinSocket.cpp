@@ -39,63 +39,63 @@ namespace Jack
         char* msg;
     } NetErrorList[] =
     {
-        E(0,                  "No error"),
-        E(WSAEINTR,           "Interrupted system call"),
-        E(WSAEBADF,           "Bad file number"),
-        E(WSAEACCES,          "Permission denied"),
-        E(WSAEFAULT,          "Bad address"),
-        E(WSAEINVAL,          "Invalid argument"),
-        E(WSAEMFILE,          "Too many open sockets"),
-        E(WSAEWOULDBLOCK,     "Operation would block"),
-        E(WSAEINPROGRESS,     "Operation now in progress"),
-        E(WSAEALREADY,        "Operation already in progress"),
-        E(WSAENOTSOCK,        "Socket operation on non-socket"),
-        E(WSAEDESTADDRREQ,    "Destination address required"),
-        E(WSAEMSGSIZE,        "Message too long"),
-        E(WSAEPROTOTYPE,      "Protocol wrong type for socket"),
-        E(WSAENOPROTOOPT,     "Bad protocol option"),
-        E(WSAEPROTONOSUPPORT, "Protocol not supported"),
-        E(WSAESOCKTNOSUPPORT, "Socket type not supported"),
-        E(WSAEOPNOTSUPP,      "Operation not supported on socket"),
-        E(WSAEPFNOSUPPORT,    "Protocol family not supported"),
-        E(WSAEAFNOSUPPORT,    "Address family not supported"),
-        E(WSAEADDRINUSE,      "Address already in use"),
-        E(WSAEADDRNOTAVAIL,   "Can't assign requested address"),
-        E(WSAENETDOWN,        "Network is down"),
-        E(WSAENETUNREACH,     "Network is unreachable"),
-        E(WSAENETRESET,       "Net connection reset"),
-        E(WSAECONNABORTED,    "Software caused connection abort"),
-        E(WSAECONNRESET,      "Connection reset by peer"),
-        E(WSAENOBUFS,         "No buffer space available"),
-        E(WSAEISCONN,         "Socket is already connected"),
-        E(WSAENOTCONN,        "Socket is not connected"),
-        E(WSAESHUTDOWN,       "Can't send after socket shutdown"),
-        E(WSAETOOMANYREFS,    "Too many references, can't splice"),
-        E(WSAETIMEDOUT,       "Connection timed out"),
-        E(WSAECONNREFUSED,    "Connection refused"),
-        E(WSAELOOP,           "Too many levels of symbolic links"),
-        E(WSAENAMETOOLONG,    "File name too long"),
-        E(WSAEHOSTDOWN,       "Host is down"),
-        E(WSAEHOSTUNREACH,    "No route to host"),
-        E(WSAENOTEMPTY,       "Directory not empty"),
-        E(WSAEPROCLIM,        "Too many processes"),
-        E(WSAEUSERS,          "Too many users"),
-        E(WSAEDQUOT,          "Disc quota exceeded"),
-        E(WSAESTALE,          "Stale NFS file handle"),
-        E(WSAEREMOTE,         "Too many levels of remote in path"),
-        E(WSASYSNOTREADY,     "Network system is unavailable"),
-        E(WSAVERNOTSUPPORTED, "Winsock version out of range"),
-        E(WSANOTINITIALISED,  "WSAStartup not yet called"),
-        E(WSAEDISCON,         "Graceful shutdown in progress"),
-        E(WSAHOST_NOT_FOUND,  "Host not found"),
-        E(WSANO_DATA,         "No host data of that type was found"),
+        E ( 0,                  "No error" ),
+        E ( WSAEINTR,           "Interrupted system call" ),
+        E ( WSAEBADF,           "Bad file number" ),
+        E ( WSAEACCES,          "Permission denied" ),
+        E ( WSAEFAULT,          "Bad address" ),
+        E ( WSAEINVAL,          "Invalid argument" ),
+        E ( WSAEMFILE,          "Too many open sockets" ),
+        E ( WSAEWOULDBLOCK,     "Operation would block" ),
+        E ( WSAEINPROGRESS,     "Operation now in progress" ),
+        E ( WSAEALREADY,        "Operation already in progress" ),
+        E ( WSAENOTSOCK,        "Socket operation on non-socket" ),
+        E ( WSAEDESTADDRREQ,    "Destination address required" ),
+        E ( WSAEMSGSIZE,        "Message too long" ),
+        E ( WSAEPROTOTYPE,      "Protocol wrong type for socket" ),
+        E ( WSAENOPROTOOPT,     "Bad protocol option" ),
+        E ( WSAEPROTONOSUPPORT, "Protocol not supported" ),
+        E ( WSAESOCKTNOSUPPORT, "Socket type not supported" ),
+        E ( WSAEOPNOTSUPP,      "Operation not supported on socket" ),
+        E ( WSAEPFNOSUPPORT,    "Protocol family not supported" ),
+        E ( WSAEAFNOSUPPORT,    "Address family not supported" ),
+        E ( WSAEADDRINUSE,      "Address already in use" ),
+        E ( WSAEADDRNOTAVAIL,   "Can't assign requested address" ),
+        E ( WSAENETDOWN,        "Network is down" ),
+        E ( WSAENETUNREACH,     "Network is unreachable" ),
+        E ( WSAENETRESET,       "Net connection reset" ),
+        E ( WSAECONNABORTED,    "Software caused connection abort" ),
+        E ( WSAECONNRESET,      "Connection reset by peer" ),
+        E ( WSAENOBUFS,         "No buffer space available" ),
+        E ( WSAEISCONN,         "Socket is already connected" ),
+        E ( WSAENOTCONN,        "Socket is not connected" ),
+        E ( WSAESHUTDOWN,       "Can't send after socket shutdown" ),
+        E ( WSAETOOMANYREFS,    "Too many references, can't splice" ),
+        E ( WSAETIMEDOUT,       "Connection timed out" ),
+        E ( WSAECONNREFUSED,    "Connection refused" ),
+        E ( WSAELOOP,           "Too many levels of symbolic links" ),
+        E ( WSAENAMETOOLONG,    "File name too long" ),
+        E ( WSAEHOSTDOWN,       "Host is down" ),
+        E ( WSAEHOSTUNREACH,    "No route to host" ),
+        E ( WSAENOTEMPTY,       "Directory not empty" ),
+        E ( WSAEPROCLIM,        "Too many processes" ),
+        E ( WSAEUSERS,          "Too many users" ),
+        E ( WSAEDQUOT,          "Disc quota exceeded" ),
+        E ( WSAESTALE,          "Stale NFS file handle" ),
+        E ( WSAEREMOTE,         "Too many levels of remote in path" ),
+        E ( WSASYSNOTREADY,     "Network system is unavailable" ),
+        E ( WSAVERNOTSUPPORTED, "Winsock version out of range" ),
+        E ( WSANOTINITIALISED,  "WSAStartup not yet called" ),
+        E ( WSAEDISCON,         "Graceful shutdown in progress" ),
+        E ( WSAHOST_NOT_FOUND,  "Host not found" ),
+        E ( WSANO_DATA,         "No host data of that type was found" ),
         { -1, NULL },
     };
 
     EXPORT const char* PrintError ( int error )
     {
         int i;
-        for ( i = 0; NetErrorList[i].code >= 0; ++i)
+        for ( i = 0; NetErrorList[i].code >= 0; ++i )
         {
             if ( error == NetErrorList[i].code )
                 return NetErrorList[i].msg;
@@ -267,12 +267,12 @@ namespace Jack
     //options************************************************************************************************************
     int JackNetWinSocket::SetOption ( int level, int optname, const void* optval, SOCKLEN optlen )
     {
-        return setsockopt ( fSockfd, level, optname, static_cast<const char*>(optval), optlen );
+        return setsockopt ( fSockfd, level, optname, static_cast<const char*> ( optval ), optlen );
     }
 
     int JackNetWinSocket::GetOption ( int level, int optname, void* optval, SOCKLEN* optlen )
     {
-        return getsockopt ( fSockfd, level, optname, static_cast<char*>(optval), optlen );
+        return getsockopt ( fSockfd, level, optname, static_cast<char*> ( optval ), optlen );
     }
 
     //tiemout************************************************************************************************************
@@ -295,7 +295,7 @@ namespace Jack
     //network operations*************************************************************************************************
     int JackNetWinSocket::SendTo ( const void* buffer, size_t nbytes, int flags )
     {
-        return sendto ( fSockfd, reinterpret_cast<const char*>(buffer), nbytes, flags, reinterpret_cast<SOCKADDR*> ( &fSendAddr ), sizeof ( SOCKADDR ) );
+        return sendto ( fSockfd, reinterpret_cast<const char*> ( buffer ), nbytes, flags, reinterpret_cast<SOCKADDR*> ( &fSendAddr ), sizeof ( SOCKADDR ) );
     }
 
     int JackNetWinSocket::SendTo ( const void* buffer, size_t nbytes, int flags, const char* ip )
@@ -306,50 +306,50 @@ namespace Jack
 
     int JackNetWinSocket::Send ( const void* buffer, size_t nbytes, int flags )
     {
-        return send ( fSockfd, reinterpret_cast<const char*>(buffer), nbytes, flags );
+        return send ( fSockfd, reinterpret_cast<const char*> ( buffer ), nbytes, flags );
     }
 
     int JackNetWinSocket::RecvFrom ( void* buffer, size_t nbytes, int flags )
     {
         SOCKLEN addr_len = sizeof ( SOCKADDR );
-        return recvfrom ( fSockfd, reinterpret_cast<char*>(buffer), nbytes, flags, reinterpret_cast<SOCKADDR*> ( &fRecvAddr ), &addr_len );
+        return recvfrom ( fSockfd, reinterpret_cast<char*> ( buffer ), nbytes, flags, reinterpret_cast<SOCKADDR*> ( &fRecvAddr ), &addr_len );
     }
 
     int JackNetWinSocket::Recv ( void* buffer, size_t nbytes, int flags )
     {
-        return recv ( fSockfd, reinterpret_cast<char*>(buffer), nbytes, flags );
+        return recv ( fSockfd, reinterpret_cast<char*> ( buffer ), nbytes, flags );
     }
 
     int JackNetWinSocket::CatchHost ( void* buffer, size_t nbytes, int flags )
     {
         SOCKLEN addr_len = sizeof ( SOCKADDR );
-        return recvfrom ( fSockfd, reinterpret_cast<char*>(buffer), nbytes, flags, reinterpret_cast<SOCKADDR*> ( &fSendAddr ), &addr_len );
+        return recvfrom ( fSockfd, reinterpret_cast<char*> ( buffer ), nbytes, flags, reinterpret_cast<SOCKADDR*> ( &fSendAddr ), &addr_len );
     }
 
     net_error_t JackNetWinSocket::GetError()
     {
         switch ( NET_ERROR_CODE )
         {
-        case WSABASEERR:
-            return NET_NO_ERROR;
-        case WSAETIMEDOUT:
-            return NET_NO_DATA;
-        case WSAEWOULDBLOCK:
-            return NET_NO_DATA;
-        case WSAECONNREFUSED:
-            return NET_CONN_ERROR;
-        case WSAECONNRESET:
-            return NET_CONN_ERROR;
-        case WSAEACCES:
-            return NET_CONN_ERROR;
-        case WSAECONNABORTED:
-            return NET_CONN_ERROR;
-        case WSAEHOSTDOWN:
-            return NET_CONN_ERROR;
-        case WSAEHOSTUNREACH:
-            return NET_CONN_ERROR;
-        default:
-            return NET_OP_ERROR;
+            case WSABASEERR:
+                return NET_NO_ERROR;
+            case WSAETIMEDOUT:
+                return NET_NO_DATA;
+            case WSAEWOULDBLOCK:
+                return NET_NO_DATA;
+            case WSAECONNREFUSED:
+                return NET_CONN_ERROR;
+            case WSAECONNRESET:
+                return NET_CONN_ERROR;
+            case WSAEACCES:
+                return NET_CONN_ERROR;
+            case WSAECONNABORTED:
+                return NET_CONN_ERROR;
+            case WSAEHOSTDOWN:
+                return NET_CONN_ERROR;
+            case WSAEHOSTUNREACH:
+                return NET_CONN_ERROR;
+            default:
+                return NET_OP_ERROR;
         }
     }
 }

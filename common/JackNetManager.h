@@ -30,13 +30,13 @@ namespace Jack
 {
     class JackNetMasterManager;
 
-	/**
-	\Brief This class describes a Net Master
-	*/
+    /**
+    \Brief This class describes a Net Master
+    */
 
     class JackNetMaster : public JackNetMasterInterface
     {
-    	friend class JackNetMasterManager;
+            friend class JackNetMasterManager;
         private:
             static int SetProcess ( jack_nframes_t nframes, void* arg );
 
@@ -76,9 +76,9 @@ namespace Jack
     typedef std::list<JackNetMaster*> master_list_t;
     typedef master_list_t::iterator master_list_it_t;
 
-	/**
-	\Brief This class describer the Network Manager
-	*/
+    /**
+    \Brief This class describer the Network Manager
+    */
 
     class JackNetMasterManager
     {

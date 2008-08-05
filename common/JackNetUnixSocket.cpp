@@ -24,7 +24,7 @@ namespace Jack
     //utility *********************************************************************************************************
     int GetHostName ( char * name, int size )
     {
-        if ( gethostname ( name, size) == SOCKET_ERROR )
+        if ( gethostname ( name, size ) == SOCKET_ERROR )
         {
             jack_error ( "Can't get 'hostname' : %s", strerror ( NET_ERROR_CODE ) );
             strcpy ( name, "default" );
@@ -234,7 +234,7 @@ namespace Jack
         //more than 1sec
         else
         {
-            float sec = static_cast<float>( us ) / 1000000.f;
+            float sec = static_cast<float> ( us ) / 1000000.f;
             timeout.tv_sec = ( int ) sec;
             float usec = ( sec - static_cast<float> ( timeout.tv_sec ) ) * 1000000;
             timeout.tv_usec = ( int ) usec;
@@ -289,22 +289,22 @@ namespace Jack
     {
         switch ( errno )
         {
-        case EAGAIN:
-            return NET_NO_DATA;
-        case ECONNABORTED:
-            return NET_CONN_ERROR;
-        case EINVAL:
-            return NET_CONN_ERROR;
-        case ECONNREFUSED:
-            return NET_CONN_ERROR;
-        case ECONNRESET:
-            return NET_CONN_ERROR;
-        case EHOSTDOWN:
-            return NET_CONN_ERROR;
-        case EHOSTUNREACH:
-            return NET_CONN_ERROR;
-        default:
-            return NET_OP_ERROR;
+            case EAGAIN:
+                return NET_NO_DATA;
+            case ECONNABORTED:
+                return NET_CONN_ERROR;
+            case EINVAL:
+                return NET_CONN_ERROR;
+            case ECONNREFUSED:
+                return NET_CONN_ERROR;
+            case ECONNRESET:
+                return NET_CONN_ERROR;
+            case EHOSTDOWN:
+                return NET_CONN_ERROR;
+            case EHOSTUNREACH:
+                return NET_CONN_ERROR;
+            default:
+                return NET_OP_ERROR;
         }
     }
 }

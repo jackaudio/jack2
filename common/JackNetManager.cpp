@@ -57,6 +57,8 @@ namespace Jack
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
             fMidiPlaybackPorts[port_index] = NULL;
 
+        SetParams();
+
         //monitor
 #ifdef JACK_MONITOR
         fPeriodUsecs = ( int ) ( 1000000.f * ( ( float ) fParams.fPeriodSize / ( float ) fParams.fSampleRate ) );
@@ -123,7 +125,7 @@ namespace Jack
             goto fail;
         }
 
-		//process can now run
+        //process can now run
         fRunning = true;
 
         //finally activate jack client
@@ -137,7 +139,7 @@ namespace Jack
 
         return true;
 
-fail:
+    fail:
         FreePorts();
         jack_client_close ( fJackClient );
         fJackClient = NULL;
@@ -146,7 +148,7 @@ fail:
 
     int JackNetMaster::AllocPorts()
     {
-    	jack_log ( "JackNetMaster::AllocPorts" );
+        jack_log ( "JackNetMaster::AllocPorts" );
 
         uint i;
         char name[24];
@@ -240,21 +242,17 @@ fail:
 
         //buffers
         for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
-            fNetMidiCaptureBuffer->SetBuffer ( port_index,
-                                               static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index],
-                                                                              fParams.fPeriodSize ) ) );
+            fNetMidiCaptureBuffer->SetBuffer ( port_index, static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index],
+                                               fParams.fPeriodSize ) ) );
         for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
-            fNetAudioCaptureBuffer->SetBuffer ( port_index,
-                                                static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index],
-                                                                         fParams.fPeriodSize ) ) );
+            fNetAudioCaptureBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index],
+                                                fParams.fPeriodSize ) ) );
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
-            fNetMidiPlaybackBuffer->SetBuffer ( port_index,
-                                                static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index],
-                                                                               fParams.fPeriodSize ) ) );
+            fNetMidiPlaybackBuffer->SetBuffer ( port_index, static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index],
+                                                fParams.fPeriodSize ) ) );
         for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
-            fNetAudioPlaybackBuffer->SetBuffer ( port_index,
-                                                 static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
-                                                                          fParams.fPeriodSize ) ) );
+            fNetAudioPlaybackBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
+                                                 fParams.fPeriodSize ) ) );
 
         //Set the first packet to send
         memset ( fTxData, 0, fPayloadSize );
@@ -315,11 +313,11 @@ fail:
             param = ( const jack_driver_param_t* ) node->data;
             switch ( param->character )
             {
-            case 'a' :
-                fMulticastIP = strdup ( param->value.str );
-                break;
-            case 'p':
-                fSocket.SetPort ( param->value.ui );
+                case 'a' :
+                    fMulticastIP = strdup ( param->value.str );
+                    break;
+                case 'p':
+                    fSocket.SetPort ( param->value.ui );
             }
         }
 
@@ -440,19 +438,19 @@ fail:
             {
                 switch ( GetPacketType ( &params ) )
                 {
-                case SLAVE_AVAILABLE:
-                    if ( ( net_master = MasterInit ( params ) ) )
-                        SessionParamsDisplay ( &net_master->fParams );
-                    else
-                        jack_error ( "Can't init new net master..." );
-                    jack_info ( "Waiting for a slave..." );
-                    break;
-                case KILL_MASTER:
-                    if ( KillMaster ( &params ) )
+                    case SLAVE_AVAILABLE:
+                        if ( ( net_master = MasterInit ( params ) ) )
+                            SessionParamsDisplay ( &net_master->fParams );
+                        else
+                            jack_error ( "Can't init new net master..." );
                         jack_info ( "Waiting for a slave..." );
-                    break;
-                default:
-                    break;
+                        break;
+                    case KILL_MASTER:
+                        if ( KillMaster ( &params ) )
+                            jack_info ( "Waiting for a slave..." );
+                        break;
+                    default:
+                        break;
                 }
             }
         }

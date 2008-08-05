@@ -31,53 +31,53 @@ namespace Jack
 
     class EXPORT JackNetInterface
     {
-    protected:
-        session_params_t fParams;
-        JackNetSocket fSocket;
-        char* fMulticastIP;
-        uint fNSubProcess;
+        protected:
+            session_params_t fParams;
+            JackNetSocket fSocket;
+            char* fMulticastIP;
+            uint fNSubProcess;
 
-        //headers
-        packet_header_t fTxHeader;
-        packet_header_t fRxHeader;
+            //headers
+            packet_header_t fTxHeader;
+            packet_header_t fRxHeader;
 
-        //network buffers
-        char* fTxBuffer;
-        char* fRxBuffer;
-        char* fTxData;
-        char* fRxData;
+            //network buffers
+            char* fTxBuffer;
+            char* fRxBuffer;
+            char* fTxData;
+            char* fRxData;
 
-        //jack buffers
-        NetMidiBuffer* fNetMidiCaptureBuffer;
-        NetMidiBuffer* fNetMidiPlaybackBuffer;
-        NetAudioBuffer* fNetAudioCaptureBuffer;
-        NetAudioBuffer* fNetAudioPlaybackBuffer;
+            //jack buffers
+            NetMidiBuffer* fNetMidiCaptureBuffer;
+            NetMidiBuffer* fNetMidiPlaybackBuffer;
+            NetAudioBuffer* fNetAudioCaptureBuffer;
+            NetAudioBuffer* fNetAudioPlaybackBuffer;
 
-        //sizes
-        int fAudioRxLen;
-        int fAudioTxLen;
-        int fPayloadSize;
+            //sizes
+            int fAudioRxLen;
+            int fAudioTxLen;
+            int fPayloadSize;
 
-        void SetParams();
+            virtual void SetParams();
 
-        //virtual methods : depends on the sub class master/slave
-        virtual bool Init() = 0;
+            //virtual methods : depends on the sub class master/slave
+            virtual bool Init() = 0;
 
-        virtual int SyncRecv() = 0;
-        virtual int SyncSend() = 0;
-        virtual int DataRecv() = 0;
-        virtual int DataSend() = 0;
+            virtual int SyncRecv() = 0;
+            virtual int SyncSend() = 0;
+            virtual int DataRecv() = 0;
+            virtual int DataSend() = 0;
 
-        virtual int Send ( size_t size, int flags ) = 0;
-        virtual int Recv ( size_t size, int flags ) = 0;
+            virtual int Send ( size_t size, int flags ) = 0;
+            virtual int Recv ( size_t size, int flags ) = 0;
 
-        JackNetInterface()
-        {}
-        JackNetInterface ( const char* ip, int port );
-        JackNetInterface ( session_params_t& params, JackNetSocket& socket );
+            JackNetInterface()
+            {}
+            JackNetInterface ( const char* ip, int port );
+            JackNetInterface ( session_params_t& params, JackNetSocket& socket );
 
-    public:
-        ~JackNetInterface();
+        public:
+            virtual ~JackNetInterface();
     };
 
     /**
@@ -86,28 +86,26 @@ namespace Jack
 
     class EXPORT JackNetSlaveInterface : public JackNetInterface
     {
-    protected:
-        bool Init();
-        net_status_t GetNetMaster();
-        net_status_t SendMasterStartSync();
-        int SyncRecv();
-        int SyncSend();
-        int DataRecv();
-        int DataSend();
+        protected:
+            bool Init();
+            net_status_t GetNetMaster();
+            net_status_t SendMasterStartSync();
+            void SetParams();
+            int SyncRecv();
+            int SyncSend();
+            int DataRecv();
+            int DataSend();
 
-        int Recv ( size_t size, int flags );
-        int Send ( size_t size, int flags );
+            int Recv ( size_t size, int flags );
+            int Send ( size_t size, int flags );
 
-    public:
-        JackNetSlaveInterface()
-        {}
-        JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
-        {
-            fTxHeader.fDataStream = 'r';
-            fRxHeader.fDataStream = 's';
-        }
-        ~JackNetSlaveInterface()
-        {}
+        public:
+            JackNetSlaveInterface()
+            {}
+            JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
+            {}
+            ~JackNetSlaveInterface()
+            {}
     };
 
     /**
@@ -116,29 +114,27 @@ namespace Jack
 
     class EXPORT JackNetMasterInterface : public JackNetInterface
     {
-    protected:
-        bool fRunning;
+        protected:
+            bool fRunning;
 
-        bool Init();
-        void Exit();
-        int SyncRecv();
-        int SyncSend();
-        int DataRecv();
-        int DataSend();
+            bool Init();
+            void SetParams();
+            void Exit();
+            int SyncRecv();
+            int SyncSend();
+            int DataRecv();
+            int DataSend();
 
-        int Send ( size_t size, int flags );
-        int Recv ( size_t size, int flags );
+            int Send ( size_t size, int flags );
+            int Recv ( size_t size, int flags );
 
-    public:
-        JackNetMasterInterface() : fRunning ( false )
-        {}
-        JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket ) : JackNetInterface ( params, socket )
-        {
-            fTxHeader.fDataStream = 's';
-            fRxHeader.fDataStream = 'r';
-        }
-        ~JackNetMasterInterface()
-        {}
+        public:
+            JackNetMasterInterface() : fRunning ( false )
+            {}
+            JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket ) : JackNetInterface ( params, socket )
+            {}
+            ~JackNetMasterInterface()
+            {}
     };
 }
 

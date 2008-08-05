@@ -41,63 +41,63 @@ namespace Jack
     //JeckNetWinSocket***************************************************************************
     class EXPORT JackNetWinSocket
     {
-    private:
-        int fSockfd;
-        int fPort;
-        SOCKADDR_IN fSendAddr;
-        SOCKADDR_IN fRecvAddr;
-    public:
-        JackNetWinSocket();
-        JackNetWinSocket ( const char* ip, int port );
-        JackNetWinSocket ( const JackNetWinSocket& );
-        ~JackNetWinSocket();
+        private:
+            int fSockfd;
+            int fPort;
+            SOCKADDR_IN fSendAddr;
+            SOCKADDR_IN fRecvAddr;
+        public:
+            JackNetWinSocket();
+            JackNetWinSocket ( const char* ip, int port );
+            JackNetWinSocket ( const JackNetWinSocket& );
+            ~JackNetWinSocket();
 
-        JackNetWinSocket& operator= ( const JackNetWinSocket& );
+            JackNetWinSocket& operator= ( const JackNetWinSocket& );
 
-        //socket management
-        int NewSocket();
-        int Bind();
-        int BindWith ( const char* ip );
-        int BindWith ( int port );
-        int Connect();
-        int ConnectTo ( const char* ip );
-        void Close();
-        void Reset();
-        bool IsSocket();
+            //socket management
+            int NewSocket();
+            int Bind();
+            int BindWith ( const char* ip );
+            int BindWith ( int port );
+            int Connect();
+            int ConnectTo ( const char* ip );
+            void Close();
+            void Reset();
+            bool IsSocket();
 
-        //IP/PORT management
-        void SetPort ( int port );
-        int GetPort();
+            //IP/PORT management
+            void SetPort ( int port );
+            int GetPort();
 
-        //address management
-        int SetAddress ( const char* ip, int port );
-        char* GetSendIP();
-        char* GetRecvIP();
+            //address management
+            int SetAddress ( const char* ip, int port );
+            char* GetSendIP();
+            char* GetRecvIP();
 
-        //utility
-        int GetName ( char* name );
-        int JoinMCastGroup ( const char* mcast_ip );
+            //utility
+            int GetName ( char* name );
+            int JoinMCastGroup ( const char* mcast_ip );
 
-        //options management
-        int SetOption ( int level, int optname, const void* optval, SOCKLEN optlen );
-        int GetOption ( int level, int optname, void* optval, SOCKLEN* optlen );
+            //options management
+            int SetOption ( int level, int optname, const void* optval, SOCKLEN optlen );
+            int GetOption ( int level, int optname, void* optval, SOCKLEN* optlen );
 
-        //timeout
-        int SetTimeOut ( int usec );
+            //timeout
+            int SetTimeOut ( int usec );
 
-        //local loop
-        int SetLocalLoop();
+            //local loop
+            int SetLocalLoop();
 
-        //network operations
-        int SendTo ( const void* buffer, size_t nbytes, int flags );
-        int SendTo ( const void* buffer, size_t nbytes, int flags, const char* ip );
-        int Send ( const void* buffer, size_t nbytes, int flags );
-        int RecvFrom ( void* buffer, size_t nbytes, int flags );
-        int Recv ( void* buffer, size_t nbytes, int flags );
-        int CatchHost ( void* buffer, size_t nbytes, int flags );
+            //network operations
+            int SendTo ( const void* buffer, size_t nbytes, int flags );
+            int SendTo ( const void* buffer, size_t nbytes, int flags, const char* ip );
+            int Send ( const void* buffer, size_t nbytes, int flags );
+            int RecvFrom ( void* buffer, size_t nbytes, int flags );
+            int Recv ( void* buffer, size_t nbytes, int flags );
+            int CatchHost ( void* buffer, size_t nbytes, int flags );
 
-        //error management
-        net_error_t GetError();
+            //error management
+            net_error_t GetError();
     };
 }
 
