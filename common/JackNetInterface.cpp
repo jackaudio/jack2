@@ -34,24 +34,21 @@ namespace Jack
     {
         jack_log ( "JackNetInterface::JackNetInterface ip = %s port = %d", ip, port );
 
-        fMulticastIP = new char[strlen ( ip ) + 1];
-        strcpy ( fMulticastIP, ip );
+		fMulticastIP = strdup ( ip );
     }
 
-    JackNetInterface::JackNetInterface ( session_params_t& params, JackNetSocket& socket ) : fSocket ( socket )
+    JackNetInterface::JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip ) : fSocket ( socket )
     {
         jack_log ( "JackNetInterface::JackNetInterface ID = %d", params.fID );
 
         fParams = params;
-        fMulticastIP = new char[strlen ( fSocket.GetSendIP() ) + 1];
-        strcpy ( fMulticastIP, fSocket.GetSendIP() );
+        fMulticastIP = strdup ( multicast_ip );
     }
 
     JackNetInterface::~JackNetInterface()
     {
         jack_log ( "JackNetInterface::~JackNetInterface" );
         fSocket.Close();
-        SocketAPIEnd();
         delete[] fTxBuffer;
         delete[] fRxBuffer;
         delete[] fMulticastIP;
@@ -479,7 +476,7 @@ namespace Jack
 
     void JackNetMasterInterface::Exit()
     {
-        jack_log ( "JackNetMaster::Exit, ID %u", fParams.fID );
+        jack_log ( "JackNetMasterInterface::Exit, ID %u", fParams.fID );
 
         //stop process
         fRunning = false;

@@ -74,7 +74,7 @@ namespace Jack
             JackNetInterface()
             {}
             JackNetInterface ( const char* ip, int port );
-            JackNetInterface ( session_params_t& params, JackNetSocket& socket );
+            JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip );
 
         public:
             virtual ~JackNetInterface();
@@ -105,7 +105,9 @@ namespace Jack
             JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
             {}
             ~JackNetSlaveInterface()
-            {}
+            {
+					SocketAPIEnd();
+			}
     };
 
     /**
@@ -131,7 +133,8 @@ namespace Jack
         public:
             JackNetMasterInterface() : fRunning ( false )
             {}
-            JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket ) : JackNetInterface ( params, socket )
+            JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
+				: JackNetInterface ( params, socket, multicast_ip )
             {}
             ~JackNetMasterInterface()
             {}

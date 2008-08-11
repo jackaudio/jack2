@@ -32,10 +32,11 @@ namespace Jack
 {
 //JackNetMaster******************************************************************************************************
 
-    JackNetMaster::JackNetMaster ( JackNetSocket& socket, session_params_t& params )
-            : JackNetMasterInterface ( params, socket )
+    JackNetMaster::JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip )
+            : JackNetMasterInterface ( params, socket, multicast_ip )
     {
         jack_log ( "JackNetMaster::JackNetMaster" );
+
         //settings
         fClientName = const_cast<char*> ( fParams.fName );
         fJackClient = NULL;
@@ -87,6 +88,7 @@ namespace Jack
     JackNetMaster::~JackNetMaster()
     {
         jack_log ( "JackNetMaster::~JackNetMaster, ID %u.", fParams.fID );
+
         if ( fJackClient )
         {
             jack_deactivate ( fJackClient );
@@ -194,6 +196,7 @@ namespace Jack
     void JackNetMaster::FreePorts()
     {
         jack_log ( "JackNetMaster::FreePorts, ID %u", fParams.fID );
+
         uint port_index;
         for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
             if ( fAudioCapturePorts[port_index] )
@@ -299,6 +302,7 @@ namespace Jack
     JackNetMasterManager::JackNetMasterManager ( jack_client_t* client, const JSList* params ) : fSocket()
     {
         jack_log ( "JackNetMasterManager::JackNetMasterManager" );
+
         fManagerClient = client;
         fManagerName = jack_get_client_name ( fManagerClient );
         fMulticastIP = DEFAULT_MULTICAST_IP;
@@ -460,6 +464,7 @@ namespace Jack
     JackNetMaster* JackNetMasterManager::MasterInit ( session_params_t& params )
     {
         jack_log ( "JackNetMasterManager::MasterInit, Slave : %s", params.fName );
+
         //settings
         fSocket.GetName ( params.fMasterNetName );
         params.fID = ++fGlobalID;
@@ -470,7 +475,7 @@ namespace Jack
         SetSlaveName ( params );
 
         //create a new master and add it to the list
-        JackNetMaster* master = new JackNetMaster ( fSocket, params );
+        JackNetMaster* master = new JackNetMaster ( fSocket, params, fMulticastIP );
         if ( master->Init() )
         {
             fMasterList.push_back ( master );
@@ -483,6 +488,7 @@ namespace Jack
     void JackNetMasterManager::SetSlaveName ( session_params_t& params )
     {
         jack_log ( "JackNetMasterManager::SetSlaveName" );
+
         master_list_it_t it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
             if ( strcmp ( ( *it )->fParams.fName, params.fName ) == 0 )
@@ -492,6 +498,7 @@ namespace Jack
     master_list_it_t JackNetMasterManager::FindMaster ( uint32_t id )
     {
         jack_log ( "JackNetMasterManager::FindMaster, ID %u.", id );
+
         master_list_it_t it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
             if ( ( *it )->fParams.fID == id )
@@ -502,6 +509,7 @@ namespace Jack
     int JackNetMasterManager::KillMaster ( session_params_t* params )
     {
         jack_log ( "JackNetMasterManager::KillMaster, ID %u.", params->fID );
+
         master_list_it_t master = FindMaster ( params->fID );
         if ( master != fMasterList.end() )
         {

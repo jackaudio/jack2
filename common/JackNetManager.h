@@ -69,7 +69,7 @@ namespace Jack
 
             int Process();
         public:
-            JackNetMaster ( JackNetSocket& socket, session_params_t& params );
+            JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip );
             ~JackNetMaster ();
     };
 
