@@ -67,7 +67,18 @@ namespace Jack
         plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
-        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast" ) : string ( "_normal" );
+        switch ( fParams.fNetworkMode )
+        {
+        	case 's' :
+				plot_name += string ( "_slow" );
+				break;
+			case 'n' :
+				plot_name += string ( "_normal" );
+				break;
+			case 'f' :
+				plot_name += string ( "_fast" );
+				break;
+        }
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
         string net_time_mon_fields[] =
         {

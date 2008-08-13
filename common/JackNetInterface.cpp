@@ -311,11 +311,11 @@ namespace Jack
         switch ( fParams.fNetworkMode )
         {
             case 's' :
-                //slow mode : allow to use full bandwidth
-                //  - extra latency is set to two cycles, what is the time needed to send and receive streams using full network bandwidth
-                //  - if the network is two fast, just wait the next cycle, this mode allows the shortest cycle duration for the master
-                //  - this mode will skip the two first cycles, thus it lets time for data to be queued on the socket rx buffer
-                //the slow mode is the safest mode because it wait twice the bandwidth relative time (send and return)
+                //slow mode : allow to use full bandwidth and heavy process on the slave
+                //  - extra latency is set to two cycles, one cycle for send/receive operations + one cycle for heavy process on the slave
+                //  - if the network is two fast, just wait the next cycle, this mode allows a shorter cycle duration for the master
+                //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
+                //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
                 if ( cycle_offset < 2 )
                     return 0;
                 else

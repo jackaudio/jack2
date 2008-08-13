@@ -202,6 +202,19 @@ namespace Jack
     {
         char bitdepth[16];
         ( params->fBitdepth ) ? sprintf ( bitdepth, "%u", params->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
+        char mode[8];
+        switch ( params->fNetworkMode )
+        {
+        	case 's' :
+				strcpy ( mode, "slow" );
+				break;
+			case 'n' :
+				strcpy ( mode, "normal" );
+				break;
+			case 'f' :
+				strcpy ( mode, "fast" );
+				break;
+        }
         jack_info ( "**************** Network parameters ****************" );
         jack_info ( "Name : %s", params->fName );
         jack_info ( "Protocol revision : %c", params->fProtocolVersion );
@@ -218,7 +231,7 @@ namespace Jack
         jack_info ( "Packet per period : %u", params->fPeriodSize / params->fFramesPerPacket );
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
-        jack_info ( "Network mode : %s", ( params->fNetworkMode == 'f' ) ? "fast" : "normal" );
+        jack_info ( "Network mode : %s", mode );
         jack_info ( "****************************************************" );
     }
 

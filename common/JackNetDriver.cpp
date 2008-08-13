@@ -49,7 +49,6 @@ namespace Jack
         fParams.fNetworkMode = network_mode;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
-        fCycleTimeMon = NULL;
 #endif
     }
 
@@ -59,7 +58,6 @@ namespace Jack
         delete[] fMidiPlaybackPortList;
 #ifdef JACK_MONITOR
         delete fNetTimeMon;
-        delete fCycleTimeMon;
 #endif
     }
 
@@ -83,8 +81,6 @@ namespace Jack
     {
         if ( fNetTimeMon )
             fNetTimeMon->Save();
-        if ( fCycleTimeMon )
-            fCycleTimeMon->Save();
         return JackDriver::Close();
     }
 #endif
@@ -150,7 +146,18 @@ namespace Jack
         plot_name = string ( fParams.fName );
         plot_name += string ( "_slave" );
         plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
-        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast" ) : string ( "_normal" );
+        switch ( fParams.fNetworkMode )
+        {
+        	case 's' :
+				plot_name += string ( "_slow" );
+				break;
+			case 'n' :
+				plot_name += string ( "_normal" );
+				break;
+			case 'f' :
+				plot_name += string ( "_fast" );
+				break;
+        }
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
         string net_time_mon_fields[] =
         {
@@ -165,21 +172,6 @@ namespace Jack
             string ( "set ylabel \"% of audio cycle\"" )
         };
         fNetTimeMon->SetPlotFile ( net_time_mon_options, 2, net_time_mon_fields, 4 );
-        //CycleTimeMon
-        plot_name.clear();
-        plot_name = string ( fParams.fName );
-        plot_name += string ( "_slave_cycle_duration" );
-        plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
-        plot_name += ( fParams.fNetworkMode == 'f' ) ? string ( "_fast" ) : string ( "_normal" );
-        fCycleTimeMon = new JackGnuPlotMonitor<jack_time_t> ( 2048, 1, plot_name );
-        string cycle_time_mon_field = string ( "cycle duration" );
-        string cycle_time_mon_options[] =
-        {
-            string ( "set xlabel \"audio cycles\"" ),
-            string ( "set ylabel \"usecs\"" )
-        };
-        fCycleTimeMon->SetPlotFile ( cycle_time_mon_options, 2, &cycle_time_mon_field, 1 );
-        fLastCycleBeginDate = GetMicroSeconds();
 #endif
 
         return true;
@@ -209,8 +201,6 @@ namespace Jack
 #ifdef JACK_MONITOR
         delete fNetTimeMon;
         fNetTimeMon = NULL;
-        delete fCycleTimeMon;
-        fCycleTimeMon = NULL;
 #endif
     }
 
@@ -360,12 +350,6 @@ namespace Jack
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
-#ifdef JACK_MONITOR
-        fCycleTimeMon->AddNew ( JackDriver::fBeginDateUst - fLastCycleBeginDate );
-        fCycleTimeMon->Write();
-        fLastCycleBeginDate = JackDriver::fBeginDateUst;
-#endif
-
         //audio, midi or sync if driver is late
         if ( DataRecv() == SOCKET_ERROR )
             return SOCKET_ERROR;
@@ -503,8 +487,8 @@ namespace Jack
             i++;
             strcpy ( desc->params[i].name, "mode" );
             desc->params[i].character  = 'm';
-            desc->params[i].type = JackDriverParamChar;
-            desc->params[i].value.c = 'n';
+            desc->params[i].type = JackDriverParamString;
+            strcpy ( desc->params[i].value.str, "normal" );
             strcpy ( desc->params[i].short_desc, "Fast (0 latency), Normal (1 cycle latency) or Slow (2 cycles latency)." );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
@@ -513,6 +497,8 @@ namespace Jack
 
         EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
         {
+        	jack_log ( "driver_initialize : net" );
+
             if ( SocketAPIInit() < 0 )
             {
                 jack_error ( "Can't init Socket API, exiting..." );
@@ -568,10 +554,17 @@ namespace Jack
                         transport_sync = param->value.ui;
                         break;
                     case 'm' :
-                        network_mode = param->value.c;
+						if ( strcmp ( param->value.str, "slow" ) == 0 )
+							network_mode = 's';
+						else if ( strcmp ( param->value.str, "normal" ) == 0 )
+							network_mode = 'n';
+						else if ( strcmp ( param->value.str, "fast" ) == 0 )
+							network_mode = 'f';
                         break;
                 }
             }
+
+            jack_info ( "mode : %c", network_mode );
 
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
