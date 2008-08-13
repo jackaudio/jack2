@@ -26,14 +26,14 @@ namespace Jack
 {
 
     JackNetAdapter::JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
-            :JackAudioAdapterInterface(buffer_size, sample_rate), fThread(this)
+            : JackAudioAdapterInterface ( buffer_size, sample_rate ), fThread ( this )
     {
         jack_log ( "JackNetAdapter::JackNetAdapter" );
 
         if ( SocketAPIInit() < 0 )
             jack_error ( "Can't init Socket API, exiting..." );
 
-		//global parametering
+        //global parametering
         fMulticastIP = new char[16];
         strcpy ( fMulticastIP, DEFAULT_MULTICAST_IP );
         fSocket.SetPort ( DEFAULT_PORT );
@@ -50,7 +50,7 @@ namespace Jack
         fParams.fSlaveSyncMode = 1;
         fParams.fNetworkMode = 'n';
 
-		//options parsing
+        //options parsing
         const JSList* node;
         const jack_driver_param_t* param;
         for ( node = params; node; node = jack_slist_next ( node ) )
@@ -58,32 +58,32 @@ namespace Jack
             param = ( const jack_driver_param_t* ) node->data;
             switch ( param->character )
             {
-            case 'a' :
-                fMulticastIP = strdup ( param->value.str );
-                break;
-            case 'p':
-                fSocket.SetPort ( param->value.ui );
-                break;
-            case 'M':
-                fParams.fMtu = param->value.i;
-                break;
-            case 'C':
-                fParams.fSendAudioChannels = param->value.i;
-                break;
-            case 'P':
-                fParams.fReturnAudioChannels = param->value.i;
-                break;
-            case 'n' :
-                strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
-                break;
-            case 't' :
-                fParams.fTransportSync = param->value.ui;
-                break;
-            case 'f' :
-                fParams.fNetworkMode = 'f';
-                break;
-			case 'S' :
-				fParams.fSlaveSyncMode = 1;
+                case 'a' :
+                    fMulticastIP = strdup ( param->value.str );
+                    break;
+                case 'p':
+                    fSocket.SetPort ( param->value.ui );
+                    break;
+                case 'M':
+                    fParams.fMtu = param->value.i;
+                    break;
+                case 'C':
+                    fParams.fSendAudioChannels = param->value.i;
+                    break;
+                case 'P':
+                    fParams.fReturnAudioChannels = param->value.i;
+                    break;
+                case 'n' :
+                    strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
+                    break;
+                case 't' :
+                    fParams.fTransportSync = param->value.ui;
+                    break;
+                case 'f' :
+                    fParams.fNetworkMode = 'f';
+                    break;
+                case 'S' :
+                    fParams.fSlaveSyncMode = 1;
             }
         }
 
@@ -95,49 +95,49 @@ namespace Jack
 
     JackNetAdapter::~JackNetAdapter()
     {
-    	int port_index;
-    	for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-			delete[] fSoftCaptureBuffer[port_index];
-		delete[] fSoftCaptureBuffer;
-    	for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-			delete[] fSoftPlaybackBuffer[port_index];
-		delete[] fSoftPlaybackBuffer;
-	}
+        int port_index;
+        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+            delete[] fSoftCaptureBuffer[port_index];
+        delete[] fSoftCaptureBuffer;
+        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+            delete[] fSoftPlaybackBuffer[port_index];
+        delete[] fSoftPlaybackBuffer;
+    }
 
     int JackNetAdapter::Open()
     {
-		jack_log ( "JackNetAdapter::Open()" );
+        jack_log ( "JackNetAdapter::Open()" );
 
-		int port_index;
+        int port_index;
 
-		//display some additional infos
-		jack_info ( "NetAdapter started in %s mode %s Master's transport sync.",
-					( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
+        //display some additional infos
+        jack_info ( "NetAdapter started in %s mode %s Master's transport sync.",
+                    ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
-		//init network connection
-		if ( !JackNetSlaveInterface::Init() )
-			return -1;
+        //init network connection
+        if ( !JackNetSlaveInterface::Init() )
+            return -1;
 
-		//then set global parameters
-		SetParams();
+        //then set global parameters
+        SetParams();
 
-		//set buffers
-		fSoftCaptureBuffer = new sample_t*[fCaptureChannels];
-		for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-		{
-			fSoftCaptureBuffer[port_index] = new sample_t[fParams.fPeriodSize];
+        //set buffers
+        fSoftCaptureBuffer = new sample_t*[fCaptureChannels];
+        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+        {
+            fSoftCaptureBuffer[port_index] = new sample_t[fParams.fPeriodSize];
             fNetAudioCaptureBuffer->SetBuffer ( port_index, fSoftCaptureBuffer[port_index] );
-		}
-		fSoftPlaybackBuffer = new sample_t*[fPlaybackChannels];
-		for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-		{
-			fSoftPlaybackBuffer[port_index] = new sample_t[fParams.fPeriodSize];
+        }
+        fSoftPlaybackBuffer = new sample_t*[fPlaybackChannels];
+        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+        {
+            fSoftPlaybackBuffer[port_index] = new sample_t[fParams.fPeriodSize];
             fNetAudioPlaybackBuffer->SetBuffer ( port_index, fSoftPlaybackBuffer[port_index] );
-		}
+        }
 
-		fThread.AcquireRealTime(85);
+        fThread.AcquireRealTime ( 85 );
 
-		return fThread.StartSync();
+        return fThread.StartSync();
     }
 
     int JackNetAdapter::Close()
@@ -148,120 +148,120 @@ namespace Jack
 
     int JackNetAdapter::SetBufferSize ( jack_nframes_t buffer_size )
     {
-    	fParams.fPeriodSize = buffer_size;
+        fParams.fPeriodSize = buffer_size;
         return 0;
     }
 
     bool JackNetAdapter::Init()
     {
-    	jack_info ( "Starting NetAdapter." );
+        jack_info ( "Starting NetAdapter." );
         return true;
     }
 
     bool JackNetAdapter::Execute()
     {
-    	//the sync mode is the equivalent of driver sync mode : data are sent back right after being computed
-    	//TODO : verify async mode is appropriate here, because of the ringbuffer usage
-		switch ( fParams.fSlaveSyncMode )
-		{
-			case true :
-				return ProcessSync();
-			case false :
-				return ProcessAsync();
-		}
-		return true;
+        //the sync mode is the equivalent of driver sync mode : data are sent back right after being computed
+        //TODO : verify async mode is appropriate here, because of the ringbuffer usage
+        switch ( fParams.fSlaveSyncMode )
+        {
+            case true :
+                return ProcessSync();
+            case false :
+                return ProcessAsync();
+        }
+        return true;
     }
 
     bool JackNetAdapter::ProcessSync()
     {
-    	bool failure = false;
-    	int port_index;
+        bool failure = false;
+        int port_index;
 
-		//receive
-    	if ( SyncRecv() == SOCKET_ERROR )
-			return true;
+        //receive
+        if ( SyncRecv() == SOCKET_ERROR )
+            return true;
 
-		if ( DataRecv() == SOCKET_ERROR )
-			return false;
+        if ( DataRecv() == SOCKET_ERROR )
+            return false;
 
-		//resample
-		jack_nframes_t time1, time2;
-		ResampleFactor ( time1, time2 );
+        //resample
+        jack_nframes_t time1, time2;
+        ResampleFactor ( time1, time2 );
 
-		for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-		{
-			fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
-			if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
-				failure = true;
-		}
+        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+        {
+            fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
+            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
+                failure = true;
+        }
 
-		for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-		{
-			fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
-			if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
-				failure = true;
-		}
+        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+        {
+            fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
+            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
+                failure = true;
+        }
 
-		//send
-		if ( SyncSend() == SOCKET_ERROR )
-			return false;
+        //send
+        if ( SyncSend() == SOCKET_ERROR )
+            return false;
 
-		if ( DataSend() == SOCKET_ERROR )
-			return false;
+        if ( DataSend() == SOCKET_ERROR )
+            return false;
 
-		if ( failure )
-		{
-			jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );
-			ResetRingBuffers();
-		}
+        if ( failure )
+        {
+            jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );
+            ResetRingBuffers();
+        }
 
-		return true;
+        return true;
     }
 
     bool JackNetAdapter::ProcessAsync()
     {
-    	bool failure = false;
-    	int port_index;
+        bool failure = false;
+        int port_index;
 
-		//receive
-    	if ( SyncRecv() == SOCKET_ERROR )
-			return true;
+        //receive
+        if ( SyncRecv() == SOCKET_ERROR )
+            return true;
 
-		if ( DataRecv() == SOCKET_ERROR )
-			return false;
+        if ( DataRecv() == SOCKET_ERROR )
+            return false;
 
-		//send
-		if ( SyncSend() == SOCKET_ERROR )
-			return false;
+        //send
+        if ( SyncSend() == SOCKET_ERROR )
+            return false;
 
-		if ( DataSend() == SOCKET_ERROR )
-			return false;
+        if ( DataSend() == SOCKET_ERROR )
+            return false;
 
-		if ( failure )
-		{
-			jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );
-			ResetRingBuffers();
-		}
+        if ( failure )
+        {
+            jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );
+            ResetRingBuffers();
+        }
 
-		//resample
-		jack_nframes_t time1, time2;
-		ResampleFactor ( time1, time2 );
+        //resample
+        jack_nframes_t time1, time2;
+        ResampleFactor ( time1, time2 );
 
-		for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-		{
-			fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
-			if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
-				failure = true;
-		}
+        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+        {
+            fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
+            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
+                failure = true;
+        }
 
-		for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-		{
-			fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
-			if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
-				failure = true;
-		}
+        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+        {
+            fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
+            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
+                failure = true;
+        }
 
-		return true;
+        return true;
     }
 
 } // namespace Jack

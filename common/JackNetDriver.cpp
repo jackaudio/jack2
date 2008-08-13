@@ -148,15 +148,15 @@ namespace Jack
         plot_name += ( fEngineControl->fSyncMode ) ? string ( "_sync" ) : string ( "_async" );
         switch ( fParams.fNetworkMode )
         {
-        	case 's' :
-				plot_name += string ( "_slow" );
-				break;
-			case 'n' :
-				plot_name += string ( "_normal" );
-				break;
-			case 'f' :
-				plot_name += string ( "_fast" );
-				break;
+            case 's' :
+                plot_name += string ( "_slow" );
+                break;
+            case 'n' :
+                plot_name += string ( "_normal" );
+                break;
+            case 'f' :
+                plot_name += string ( "_fast" );
+                break;
         }
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
         string net_time_mon_fields[] =
@@ -489,7 +489,7 @@ namespace Jack
             desc->params[i].character  = 'm';
             desc->params[i].type = JackDriverParamString;
             strcpy ( desc->params[i].value.str, "normal" );
-            strcpy ( desc->params[i].short_desc, "Fast (0 latency), Normal (1 cycle latency) or Slow (2 cycles latency)." );
+            strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             return desc;
@@ -497,7 +497,7 @@ namespace Jack
 
         EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
         {
-        	jack_log ( "driver_initialize : net" );
+            jack_log ( "driver_initialize : net" );
 
             if ( SocketAPIInit() < 0 )
             {
@@ -554,12 +554,12 @@ namespace Jack
                         transport_sync = param->value.ui;
                         break;
                     case 'm' :
-						if ( strcmp ( param->value.str, "slow" ) == 0 )
-							network_mode = 's';
-						else if ( strcmp ( param->value.str, "normal" ) == 0 )
-							network_mode = 'n';
-						else if ( strcmp ( param->value.str, "fast" ) == 0 )
-							network_mode = 'f';
+                        if ( strcmp ( param->value.str, "slow" ) == 0 )
+                            network_mode = 's';
+                        else if ( strcmp ( param->value.str, "normal" ) == 0 )
+                            network_mode = 'n';
+                        else if ( strcmp ( param->value.str, "fast" ) == 0 )
+                            network_mode = 'f';
                         break;
                 }
             }
