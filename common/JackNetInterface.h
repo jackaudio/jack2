@@ -106,8 +106,8 @@ namespace Jack
             {}
             ~JackNetSlaveInterface()
             {
-					SocketAPIEnd();
-			}
+                SocketAPIEnd();
+            }
     };
 
     /**
@@ -134,7 +134,7 @@ namespace Jack
             JackNetMasterInterface() : fRunning ( false )
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
-				: JackNetInterface ( params, socket, multicast_ip )
+                    : JackNetInterface ( params, socket, multicast_ip )
             {}
             ~JackNetMasterInterface()
             {}

@@ -501,11 +501,11 @@ namespace Jack
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             i++;
-            strcpy ( desc->params[i].name, "fast_mode" );
-            desc->params[i].character  = 'f';
-            desc->params[i].type = JackDriverParamString;
-            strcpy ( desc->params[i].value.str, "" );
-            strcpy ( desc->params[i].short_desc, "Fast mode allows a zero latency transmission." );
+            strcpy ( desc->params[i].name, "mode" );
+            desc->params[i].character  = 'm';
+            desc->params[i].type = JackDriverParamChar;
+            desc->params[i].value.c = 'n';
+            strcpy ( desc->params[i].short_desc, "Fast (0 latency), Normal (1 cycle latency) or Slow (2 cycles latency)." );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             return desc;
@@ -567,8 +567,8 @@ namespace Jack
                     case 't' :
                         transport_sync = param->value.ui;
                         break;
-                    case 'f' :
-                        network_mode = 'f';
+                    case 'm' :
+                        network_mode = param->value.c;
                         break;
                 }
             }

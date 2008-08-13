@@ -377,7 +377,7 @@ namespace Jack
         //fast mode, wait for the entire cycle duration
         if ( params->fNetworkMode == 'f' )
             time = 900000.f * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
-        //slow mode, just try recv during two subcycle audio packets
+        //normal or slow mode, short timeout on recv
         else
             time = 4000000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
         return socket->SetTimeOut ( static_cast<int> ( time ) );
