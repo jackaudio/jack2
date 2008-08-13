@@ -31,6 +31,30 @@
 #include "jackdbus.h"
 #include "controller_internal.h"
 
+#define JACK_DBUS_IFACE_NAME "org.jackaudio.JackControl"
+
+void
+jack_controller_control_send_signal_server_started()
+{
+
+    jack_dbus_send_signal(
+        JACK_CONTROLLER_OBJECT_PATH,
+        JACK_DBUS_IFACE_NAME,
+        "ServerStarted",
+        DBUS_TYPE_INVALID);
+}
+
+void
+jack_controller_control_send_signal_server_stopped()
+{
+
+    jack_dbus_send_signal(
+        JACK_CONTROLLER_OBJECT_PATH,
+        JACK_DBUS_IFACE_NAME,
+        "ServerStopped",
+        DBUS_TYPE_INVALID);
+}
+
 #define controller_ptr ((struct jack_controller *)call->context)
 
 /*
@@ -65,12 +89,20 @@ jack_control_run_method(
         {
             jack_error ("Failed to start server");
         }
+        else
+        {
+            jack_controller_control_send_signal_server_started();
+        }
     }
     else if (strcmp (call->method_name, "StopServer") == 0)
     {
         if (!jack_controller_stop_server(controller_ptr, call))
         {
             jack_error ("Failed to stop server");
+        }
+        else
+        {
+            jack_controller_control_send_signal_server_stopped();
         }
     }
     else if (strcmp (call->method_name, "GetLoad") == 0)
@@ -227,7 +259,18 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(ResetXruns, NULL)
 JACK_DBUS_METHODS_END
 
-JACK_DBUS_IFACE_BEGIN(g_jack_controller_iface_control, "org.jackaudio.JackControl")
+JACK_DBUS_SIGNAL_ARGUMENTS_BEGIN(ServerStarted)
+JACK_DBUS_SIGNAL_ARGUMENTS_END
+
+JACK_DBUS_SIGNAL_ARGUMENTS_BEGIN(ServerStopped)
+JACK_DBUS_SIGNAL_ARGUMENTS_END
+
+JACK_DBUS_SIGNALS_BEGIN
+    JACK_DBUS_SIGNAL_DESCRIBE(ServerStarted)
+    JACK_DBUS_SIGNAL_DESCRIBE(ServerStopped)
+JACK_DBUS_SIGNALS_END
+
+JACK_DBUS_IFACE_BEGIN(g_jack_controller_iface_control, JACK_DBUS_IFACE_NAME)
     JACK_DBUS_IFACE_HANDLER(jack_control_run_method)
     JACK_DBUS_IFACE_EXPOSE_METHODS
 JACK_DBUS_IFACE_END
