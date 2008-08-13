@@ -205,15 +205,15 @@ namespace Jack
         char mode[8];
         switch ( params->fNetworkMode )
         {
-        	case 's' :
-				strcpy ( mode, "slow" );
-				break;
-			case 'n' :
-				strcpy ( mode, "normal" );
-				break;
-			case 'f' :
-				strcpy ( mode, "fast" );
-				break;
+            case 's' :
+                strcpy ( mode, "slow" );
+                break;
+            case 'n' :
+                strcpy ( mode, "normal" );
+                break;
+            case 'f' :
+                strcpy ( mode, "fast" );
+                break;
         }
         jack_info ( "**************** Network parameters ****************" );
         jack_info ( "Name : %s", params->fName );
@@ -348,68 +348,5 @@ namespace Jack
         return WSACleanup();
 #endif
         return 0;
-    }
-
-    EXPORT jack_nframes_t SetFramesPerPacket ( session_params_t* params )
-    {
-        if ( !params->fSendAudioChannels && !params->fReturnAudioChannels )
-            return ( params->fFramesPerPacket = params->fPeriodSize );
-        jack_nframes_t period = ( int ) powf ( 2.f, ( int ) ( log ( ( params->fMtu - sizeof ( packet_header_t ) )
-                                               / ( max ( params->fReturnAudioChannels, params->fSendAudioChannels ) * sizeof ( sample_t ) ) ) / log ( 2 ) ) );
-        ( period > params->fPeriodSize ) ? params->fFramesPerPacket = params->fPeriodSize : params->fFramesPerPacket = period;
-        return params->fFramesPerPacket;
-    }
-
-    EXPORT int GetNetBufferSize ( session_params_t* params )
-    {
-        //audio
-        float audio_size = params->fMtu * ( params->fPeriodSize / params->fFramesPerPacket );
-        //midi
-        float midi_size = params->fMtu * ( max ( params->fSendMidiChannels, params->fReturnMidiChannels ) *
-                                           params->fPeriodSize * sizeof ( sample_t ) / ( params->fMtu - sizeof ( packet_header_t ) ) );
-        //return : sizes of sync + audio + midi
-        return ( params->fMtu + ( int ) audio_size + ( int ) midi_size );
-    }
-
-    EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size )
-    {
-        //even if there is no midi data, jack need an empty buffer to know there is no event to read
-        //99% of the cases : all data in one packet
-        if ( data_size <= ( params->fMtu - sizeof ( packet_header_t ) ) )
-            return 1;
-        //else, get the number of needed packets (simply slice the biiig buffer)
-        int npckt = data_size / ( params->fMtu - sizeof ( packet_header_t ) );
-        if ( data_size % ( params->fMtu - sizeof ( packet_header_t ) ) )
-            return ++npckt;
-        return npckt;
-    }
-
-    EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params )
-    {
-        float time;
-        //fast mode, wait for the entire cycle duration
-        if ( params->fNetworkMode == 'f' )
-            time = 900000.f * ( static_cast<float> ( params->fPeriodSize ) / static_cast<float> ( params->fSampleRate ) );
-        //normal or slow mode, short timeout on recv
-        else
-            time = 4000000.f * ( static_cast<float> ( params->fFramesPerPacket ) / static_cast<float> ( params->fSampleRate ) );
-        return socket->SetTimeOut ( static_cast<int> ( time ) );
-    }
-
-// Packet *******************************************************************************************************
-
-    EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, uint subcycles )
-    {
-        //ignore first cycle
-        if ( previous->fCycle <= 1 )
-            return true;
-        //same PcktID (cycle), next SubPcktID (subcycle)
-        if ( ( previous->fSubCycle < ( subcycles - 1 ) ) && ( next->fCycle == previous->fCycle ) && ( next->fSubCycle == ( previous->fSubCycle + 1 ) ) )
-            return true;
-        //next PcktID (cycle), SubPcktID reset to 1 (first subcyle)
-        if ( ( next->fCycle == ( previous->fCycle + 1 ) ) && ( previous->fSubCycle == ( subcycles - 1 ) ) && ( next->fSubCycle == 0 ) )
-            return true;
-        //else, next is'nt next, return false
-        return false;
     }
 }

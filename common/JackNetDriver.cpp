@@ -497,8 +497,6 @@ namespace Jack
 
         EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
         {
-            jack_log ( "driver_initialize : net" );
-
             if ( SocketAPIInit() < 0 )
             {
                 jack_error ( "Can't init Socket API, exiting..." );
@@ -563,8 +561,6 @@ namespace Jack
                         break;
                 }
             }
-
-            jack_info ( "mode : %c", network_mode );
 
             Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
                 new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,

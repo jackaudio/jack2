@@ -69,15 +69,15 @@ namespace Jack
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
         switch ( fParams.fNetworkMode )
         {
-        	case 's' :
-				plot_name += string ( "_slow" );
-				break;
-			case 'n' :
-				plot_name += string ( "_normal" );
-				break;
-			case 'f' :
-				plot_name += string ( "_fast" );
-				break;
+            case 's' :
+                plot_name += string ( "_slow" );
+                break;
+            case 'n' :
+                plot_name += string ( "_normal" );
+                break;
+            case 'f' :
+                plot_name += string ( "_fast" );
+                break;
         }
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
         string net_time_mon_fields[] =
@@ -482,7 +482,6 @@ namespace Jack
         params.fSampleRate = jack_get_sample_rate ( fManagerClient );
         params.fPeriodSize = jack_get_buffer_size ( fManagerClient );
         params.fBitdepth = 0;
-        SetFramesPerPacket ( &params );
         SetSlaveName ( params );
 
         //create a new master and add it to the list

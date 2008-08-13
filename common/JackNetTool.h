@@ -260,14 +260,4 @@ namespace Jack
     EXPORT sync_packet_type_t GetPacketType ( session_params_t* params );
     //set the packet type in a session parameters
     EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
-    //step of network initialization
-    EXPORT jack_nframes_t SetFramesPerPacket ( session_params_t* params );
-    //step of network initialization
-    EXPORT int GetNetBufferSize ( session_params_t* params );
-    //get the midi packet number for a given cycle
-    EXPORT int GetNMidiPckt ( session_params_t* params, size_t data_size );
-    //set the recv timeout on a socket
-    EXPORT int SetRxTimeout ( JackNetSocket* socket, session_params_t* params );
-    //check if 'next' packet is really the next after 'previous'
-    EXPORT bool IsNextPacket ( packet_header_t* previous, packet_header_t* next, uint subcycles );
 }

@@ -58,9 +58,14 @@ namespace Jack
             int fAudioTxLen;
             int fPayloadSize;
 
-            virtual void SetParams();
+            //utility methods
+            jack_nframes_t SetFramesPerPacket();
+            int SetNetBufferSize();
+            int GetNMidiPckt();
+            bool IsNextPacket();
 
             //virtual methods : depends on the sub class master/slave
+            virtual void SetParams();
             virtual bool Init() = 0;
 
             virtual int SyncRecv() = 0;
@@ -78,6 +83,37 @@ namespace Jack
 
         public:
             virtual ~JackNetInterface();
+    };
+
+    /**
+    \Brief This class describes the Net Interface for masters (NetMaster)
+    */
+
+    class EXPORT JackNetMasterInterface : public JackNetInterface
+    {
+        protected:
+            bool fRunning;
+
+            bool Init();
+            int SetRxTimeout();
+            void SetParams();
+            void Exit();
+            int SyncRecv();
+            int SyncSend();
+            int DataRecv();
+            int DataSend();
+
+            int Send ( size_t size, int flags );
+            int Recv ( size_t size, int flags );
+
+        public:
+            JackNetMasterInterface() : fRunning ( false )
+            {}
+            JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
+                    : JackNetInterface ( params, socket, multicast_ip )
+            {}
+            ~JackNetMasterInterface()
+            {}
     };
 
     /**
@@ -108,36 +144,6 @@ namespace Jack
             {
                 SocketAPIEnd();
             }
-    };
-
-    /**
-    \Brief This class describes the Net Interface for masters (NetMaster)
-    */
-
-    class EXPORT JackNetMasterInterface : public JackNetInterface
-    {
-        protected:
-            bool fRunning;
-
-            bool Init();
-            void SetParams();
-            void Exit();
-            int SyncRecv();
-            int SyncSend();
-            int DataRecv();
-            int DataSend();
-
-            int Send ( size_t size, int flags );
-            int Recv ( size_t size, int flags );
-
-        public:
-            JackNetMasterInterface() : fRunning ( false )
-            {}
-            JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
-                    : JackNetInterface ( params, socket, multicast_ip )
-            {}
-            ~JackNetMasterInterface()
-            {}
     };
 }
 
