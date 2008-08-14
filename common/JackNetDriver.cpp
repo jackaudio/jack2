@@ -112,7 +112,7 @@ namespace Jack
         jack_info ( "Net driver started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
-		//init network
+        //init network
         if ( !JackNetSlaveInterface::Init() )
             return false;;
 
@@ -563,6 +563,8 @@ namespace Jack
                             network_mode = 's';
                         else if ( strcmp ( param->value.str, "fast" ) == 0 )
                             network_mode = 'f';
+                        else
+                            jack_error ( "Unknown network mode, using 'normal' mode." );
                         break;
                 }
             }

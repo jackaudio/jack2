@@ -221,6 +221,8 @@ namespace Jack
     //timeout************************************************************************************************************
     int JackNetUnixSocket::SetTimeOut ( int us )
     {
+        jack_log ( "JackNetUnixSocket::SetTimeout %d usecs", us );
+
         //negative timeout, or exceding 10s, return
         if ( ( us < 0 ) || ( us > 10000000 ) )
             return SOCKET_ERROR;

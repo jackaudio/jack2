@@ -120,7 +120,7 @@ namespace Jack
         if ( !JackNetMasterInterface::Init() )
             return false;
 
-		//set global parameters
+        //set global parameters
         SetParams();
 
         //jack client and process

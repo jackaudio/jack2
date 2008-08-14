@@ -79,8 +79,15 @@ namespace Jack
                 case 't' :
                     fParams.fTransportSync = param->value.ui;
                     break;
-                case 'f' :
-                    fParams.fNetworkMode = 'f';
+                case 'm' :
+                    if ( strcmp ( param->value.str, "normal" ) == 0 )
+                        fParams.fNetworkMode = 'n';
+                    else if ( strcmp ( param->value.str, "slow" ) == 0 )
+                        fParams.fNetworkMode = 's';
+                    else if ( strcmp ( param->value.str, "fast" ) == 0 )
+                        fParams.fNetworkMode = 'f';
+                    else
+                        jack_error ( "Unknown network mode, using 'normal' mode." );
                     break;
                 case 'S' :
                     fParams.fSlaveSyncMode = 1;
@@ -340,11 +347,11 @@ extern "C"
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( desc->params[i].name, "fast_mode" );
-        desc->params[i].character  = 'f';
+        strcpy ( desc->params[i].name, "mode" );
+        desc->params[i].character  = 'm';
         desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, "" );
-        strcpy ( desc->params[i].short_desc, "Fast mode allows a zero latency transmission." );
+        strcpy ( desc->params[i].value.str, "normal" );
+        strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
