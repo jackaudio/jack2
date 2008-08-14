@@ -111,7 +111,7 @@ namespace Jack
         int port_index;
 
         //display some additional infos
-        jack_info ( "NetAdapter started in %s mode %s Master's transport sync.",
+        jack_info ( "Net adapter started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
         //init network connection

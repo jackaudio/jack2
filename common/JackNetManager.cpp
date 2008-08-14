@@ -58,8 +58,6 @@ namespace Jack
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
             fMidiPlaybackPorts[port_index] = NULL;
 
-        SetParams();
-
         //monitor
 #ifdef JACK_MONITOR
         fPeriodUsecs = ( int ) ( 1000000.f * ( ( float ) fParams.fPeriodSize / ( float ) fParams.fSampleRate ) );
@@ -121,6 +119,9 @@ namespace Jack
         //network init
         if ( !JackNetMasterInterface::Init() )
             return false;
+
+		//set global parameters
+        SetParams();
 
         //jack client and process
         jack_status_t status;

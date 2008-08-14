@@ -119,7 +119,7 @@ namespace Jack
         public:
             JackGnuPlotMonitor ( uint32_t measure_cnt = 512, uint32_t measure_points = 5, std::string name = std::string ( "default" ) )
             {
-                jack_log ( "JackGnuPlotMonitor::JackGnuPlotMonitor measure_cnt %u measure_points %u", measure_cnt, measure_points );
+                jack_log ( "JackGnuPlotMonitor::JackGnuPlotMonitor %u measure points - %u measures", measure_points, measure_cnt );
 
                 fMeasureCnt = measure_cnt;
                 fMeasurePoints = measure_points;
@@ -137,6 +137,7 @@ namespace Jack
             ~JackGnuPlotMonitor()
             {
                 jack_log ( "JackGnuPlotMonitor::~JackGnuPlotMonitor" );
+
                 for ( uint32_t cnt = 0; cnt < fMeasureCnt; cnt++ )
                     delete[] fMeasureTable[cnt];
                 delete[] fMeasureTable;
@@ -210,21 +211,16 @@ namespace Jack
                 file << "set title \"" << title << "\"" << std::endl;
 
                 for ( uint32_t i = 0; i < options_number; i++ )
-                {
-                    jack_log ( "JackGnuPlotMonitor::SetPlotFile - Add plot option : '%s'", options_list[i].c_str() );
                     file << options_list[i] << std::endl;
-                }
 
                 file << "plot ";
                 for ( uint32_t row = 1; row <= field_number; row++ )
                 {
-                    jack_log ( "JackGnuPlotMonitor::SetPlotFile - Add plot : file '%s' row '%d' title '%s' field '%s'",
-                               data_filename.c_str(), row, title.c_str(), field_names[row-1].c_str() );
                     file << "\"" << data_filename << "\" using " << row << " title \"" << field_names[row-1] << "\" with lines";
                     file << ( ( row < field_number ) ? ", " : "\n" );
                 }
 
-                jack_log ( "JackGnuPlotMonitor::SetPlotFile - Save GnuPlot '.plt' file to '%s'", plot_filename.c_str() );
+                jack_log ( "JackGnuPlotMonitor::SetPlotFile - Save GnuPlot file to '%s'", plot_filename.c_str() );
 
                 file.close();
                 return 0;

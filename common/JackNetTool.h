@@ -145,9 +145,9 @@ namespace Jack
         uint32_t fPacketSize;       //packet size in bytes
         uint32_t fCycle;            //process cycle counter
         uint32_t fSubCycle;         //midi/audio subcycle counter
-        char fIsLastPckt;           //is it the last packet of a given cycle ('y' or 'n')
+        uint32_t fIsLastPckt;       //is it the last packet of a given cycle ('y' or 'n')
         char fASyncWrongCycle;      //is the current async cycle wrong (slave's side; 'y' or 'n')
-        char fFree[29];             //unused
+        char fFree[26];             //unused
     };
 
 //transport data ******************************************************************************

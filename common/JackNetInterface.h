@@ -78,7 +78,7 @@ namespace Jack
 
             JackNetInterface()
             {}
-            JackNetInterface ( const char* ip, int port );
+            JackNetInterface ( const char* multicast_ip, int port );
             JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip );
 
         public:
@@ -125,7 +125,7 @@ namespace Jack
         protected:
             bool Init();
             net_status_t GetNetMaster();
-            net_status_t SendMasterStartSync();
+            net_status_t SendStartToMaster();
             void SetParams();
             int SyncRecv();
             int SyncSend();

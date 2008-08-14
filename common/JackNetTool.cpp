@@ -288,6 +288,7 @@ namespace Jack
         header->fPacketSize = htonl ( header->fPacketSize );
         header->fCycle = ntohl ( header->fCycle );
         header->fSubCycle = htonl ( header->fSubCycle );
+        header->fIsLastPckt = htonl ( header->fIsLastPckt );
     }
 
     EXPORT void PacketHeaderNToH ( packet_header_t* header )
@@ -299,6 +300,7 @@ namespace Jack
         header->fPacketSize = ntohl ( header->fPacketSize );
         header->fCycle = ntohl ( header->fCycle );
         header->fSubCycle = ntohl ( header->fSubCycle );
+        header->fIsLastPckt = ntohl ( header->fIsLastPckt );
     }
 
     EXPORT void PacketHeaderDisplay ( packet_header_t* header )
@@ -313,7 +315,7 @@ namespace Jack
         jack_info ( "SubCycle : %u", header->fSubCycle );
         jack_info ( "Midi packets : %u", header->fNMidiPckt );
         jack_info ( "Midi data size : %u", header->fMidiDataSize );
-        jack_info ( "Last packet : '%c'", header->fIsLastPckt );
+        jack_info ( "Last packet : '%s'", ( header->fIsLastPckt ) ? "yes" : "no" );
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "**********************************************" );
     }

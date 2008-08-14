@@ -109,11 +109,15 @@ namespace Jack
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
         //display some additional infos
-        jack_info ( "NetAdapter started in %s mode %s Master's transport sync.",
+        jack_info ( "Net driver started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
+		//init network
         if ( !JackNetSlaveInterface::Init() )
             return false;;
+
+        //set global paramaters
+        SetParams();
 
         //driver parametering
         JackAudioDriver::SetBufferSize ( fParams.fPeriodSize );
@@ -132,9 +136,6 @@ namespace Jack
             jack_error ( "Can't allocate ports." );
             return false;
         }
-
-        //set global paramaters
-        SetParams();
 
         //init done, display parameters
         SessionParamsDisplay ( &fParams );
@@ -180,6 +181,7 @@ namespace Jack
     void JackNetDriver::Restart()
     {
         jack_log ( "JackNetDriver::Restart" );
+
         jack_info ( "Restarting driver..." );
         delete[] fTxBuffer;
         fTxBuffer = NULL;
@@ -207,6 +209,7 @@ namespace Jack
     int JackNetDriver::AllocPorts()
     {
         jack_log ( "JackNetDriver::AllocPorts fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate );
+
         JackPort* port;
         jack_port_id_t port_id;
         char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
@@ -291,6 +294,7 @@ namespace Jack
     int JackNetDriver::FreePorts()
     {
         jack_log ( "JackNetDriver::FreePorts" );
+
         int audio_port_index;
         uint midi_port_index;
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
@@ -502,7 +506,8 @@ namespace Jack
                 jack_error ( "Can't init Socket API, exiting..." );
                 return NULL;
             }
-            const char* multicast_ip = DEFAULT_MULTICAST_IP;
+            char multicast_ip[16];
+            strcpy ( multicast_ip, DEFAULT_MULTICAST_IP );
             char name[JACK_CLIENT_NAME_SIZE];
             GetHostName ( name, JACK_CLIENT_NAME_SIZE );
             int udp_port = DEFAULT_PORT;
@@ -525,7 +530,7 @@ namespace Jack
                 switch ( param->character )
                 {
                     case 'a' :
-                        multicast_ip = strdup ( param->value.str );
+                        strncpy ( multicast_ip, param->value.str, 15 );
                         break;
                     case 'p':
                         udp_port = param->value.ui;
@@ -552,10 +557,10 @@ namespace Jack
                         transport_sync = param->value.ui;
                         break;
                     case 'm' :
-                        if ( strcmp ( param->value.str, "slow" ) == 0 )
-                            network_mode = 's';
-                        else if ( strcmp ( param->value.str, "normal" ) == 0 )
+                        if ( strcmp ( param->value.str, "normal" ) == 0 )
                             network_mode = 'n';
+                        else if ( strcmp ( param->value.str, "slow" ) == 0 )
+                            network_mode = 's';
                         else if ( strcmp ( param->value.str, "fast" ) == 0 )
                             network_mode = 'f';
                         break;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="jackdmp workspace">
-		<Project filename="libjackservermp.cbp" active="1" />
+		<Project filename="libjackservermp.cbp" />
 		<Project filename="libjackmp.cbp" />
 		<Project filename="jackdmp.cbp">
 			<Depends filename="libjackservermp.cbp" />
@@ -35,7 +35,7 @@
 			<Depends filename="libjackmp.cbp" />
 		</Project>
 		<Project filename="jack_connect.cbp" />
-		<Project filename="jack_disconnect.cbp">
+		<Project filename="jack_disconnect.cbp" active="1">
 			<Depends filename="libjackmp.cbp" />
 		</Project>
 	</Workspace>
