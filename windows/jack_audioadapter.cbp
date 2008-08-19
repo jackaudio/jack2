@@ -128,6 +128,7 @@
 			<Add library="libjackservermp" />
 		</Linker>
 		<Unit filename="..\common\JackAudioAdapter.cpp" />
+		<Unit filename="..\common\JackAudioAdapterFactory.cpp" />
 		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />
 		<Unit filename="..\common\JackLibSampleRateResampler.cpp" />
 		<Unit filename="..\common\JackResampler.cpp" />

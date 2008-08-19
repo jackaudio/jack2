@@ -76,7 +76,7 @@ namespace Jack
             virtual int Send ( size_t size, int flags ) = 0;
             virtual int Recv ( size_t size, int flags ) = 0;
 
-            JackNetInterface()
+            JackNetInterface() : fSocket()
             {}
             JackNetInterface ( const char* multicast_ip, int port );
             JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip );
@@ -107,7 +107,7 @@ namespace Jack
             int Recv ( size_t size, int flags );
 
         public:
-            JackNetMasterInterface() : fRunning ( false )
+            JackNetMasterInterface() : JackNetInterface(), fRunning ( false )
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
                     : JackNetInterface ( params, socket, multicast_ip )
@@ -136,7 +136,7 @@ namespace Jack
             int Send ( size_t size, int flags );
 
         public:
-            JackNetSlaveInterface()
+            JackNetSlaveInterface() : JackNetInterface()
             {}
             JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
             {}

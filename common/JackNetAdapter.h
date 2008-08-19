@@ -20,13 +20,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetAdapter__
 #define __JackNetAdapter__
 
-#include <math.h>
-#include <limits.h>
 #include <assert.h>
 #include "JackAudioAdapterInterface.h"
 #include "JackPlatformThread.h"
-#include "jack.h"
-#include "jslist.h"
 #include "JackNetInterface.h"
 
 namespace Jack
@@ -38,20 +34,13 @@ namespace Jack
 
     class JackNetAdapter : public JackAudioAdapterInterface, public JackNetSlaveInterface, public JackRunnableInterface
     {
-
     private:
-		//jack data
+        //jack data
         net_transport_data_t fTransportData;
 
         //sample buffers
         sample_t** fSoftCaptureBuffer;
         sample_t** fSoftPlaybackBuffer;
-
-        int SetSyncPacket();
-        int TransportSync();
-
-        bool ProcessSync();
-        bool ProcessAsync();
 
         JackThread fThread;
 
@@ -60,13 +49,13 @@ namespace Jack
         JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
         ~JackNetAdapter();
 
-        virtual int Open();
-        virtual int Close();
+        int Open();
+        int Close();
 
-        virtual int SetBufferSize ( jack_nframes_t buffer_size );
+        int SetBufferSize ( jack_nframes_t buffer_size );
 
-        virtual bool Init();
-        virtual bool Execute();
+        bool Init();
+        bool Execute();
     };
 }
 
