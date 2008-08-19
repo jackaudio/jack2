@@ -489,6 +489,10 @@
 		4B6C738A0CC60A85001AFFD4 /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737D0CC60A6D001AFFD4 /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B6C738B0CC60A86001AFFD4 /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737E0CC60A6D001AFFD4 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B6F7AEE0CD0CDBD00F48A9D /* JackEngineControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B6F7AEC0CD0CDBD00F48A9D /* JackEngineControl.cpp */; };
+		4B76C76A0E5AB2DB00E2AC21 /* JackNetInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B76C7680E5AB2DB00E2AC21 /* JackNetInterface.cpp */; };
+		4B76C76B0E5AB2DB00E2AC21 /* JackNetInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B76C7690E5AB2DB00E2AC21 /* JackNetInterface.h */; };
+		4B76C76C0E5AB2DB00E2AC21 /* JackNetInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B76C7680E5AB2DB00E2AC21 /* JackNetInterface.cpp */; };
+		4B76C76D0E5AB2DB00E2AC21 /* JackNetInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B76C7690E5AB2DB00E2AC21 /* JackNetInterface.h */; };
 		4B80D7E80BA0D17400F035BB /* JackMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B80D7E50BA0D17400F035BB /* JackMidiPort.h */; };
 		4B80D7E90BA0D17400F035BB /* JackMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E60BA0D17400F035BB /* JackMidiPort.cpp */; };
 		4B80D7EA0BA0D17400F035BB /* JackMidiAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E70BA0D17400F035BB /* JackMidiAPI.cpp */; };
@@ -1277,6 +1281,8 @@
 		4B6C737E0CC60A6D001AFFD4 /* transport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = transport.h; path = ../common/jack/transport.h; sourceTree = SOURCE_ROOT; };
 		4B6C737F0CC60A6D001AFFD4 /* types.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../common/jack/types.h; sourceTree = SOURCE_ROOT; };
 		4B6F7AEC0CD0CDBD00F48A9D /* JackEngineControl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackEngineControl.cpp; path = ../common/JackEngineControl.cpp; sourceTree = SOURCE_ROOT; };
+		4B76C7680E5AB2DB00E2AC21 /* JackNetInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackNetInterface.cpp; path = ../common/JackNetInterface.cpp; sourceTree = SOURCE_ROOT; };
+		4B76C7690E5AB2DB00E2AC21 /* JackNetInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackNetInterface.h; path = ../common/JackNetInterface.h; sourceTree = SOURCE_ROOT; };
 		4B799AD607899652003F3F15 /* JackMachPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachPort.cpp; sourceTree = "<group>"; };
 		4B799AD707899652003F3F15 /* JackMachPort.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JackMachPort.h; sourceTree = "<group>"; };
 		4B80D7E50BA0D17400F035BB /* JackMidiPort.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackMidiPort.h; path = ../common/JackMidiPort.h; sourceTree = SOURCE_ROOT; };
@@ -2625,6 +2631,8 @@
 		BA222AEA0DC88379001A17F4 /* Net */ = {
 			isa = PBXGroup;
 			children = (
+				4B76C7680E5AB2DB00E2AC21 /* JackNetInterface.cpp */,
+				4B76C7690E5AB2DB00E2AC21 /* JackNetInterface.h */,
 				BA222ADD0DC882A5001A17F4 /* JackNetDriver.h */,
 				BA222ADC0DC882A5001A17F4 /* JackNetDriver.cpp */,
 				BA047C710E14E7540041F3B6 /* JackNetSocket.h */,
@@ -3362,6 +3370,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA222ADF0DC882A5001A17F4 /* JackNetDriver.h in Headers */,
+				4B76C76B0E5AB2DB00E2AC21 /* JackNetInterface.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3370,6 +3379,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA222AEE0DC883B3001A17F4 /* JackNetManager.h in Headers */,
+				4B76C76D0E5AB2DB00E2AC21 /* JackNetInterface.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6022,6 +6032,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA222ADE0DC882A5001A17F4 /* JackNetDriver.cpp in Sources */,
+				4B76C76A0E5AB2DB00E2AC21 /* JackNetInterface.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6030,6 +6041,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA222AED0DC883B3001A17F4 /* JackNetManager.cpp in Sources */,
+				4B76C76C0E5AB2DB00E2AC21 /* JackNetInterface.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
