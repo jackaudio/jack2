@@ -616,7 +616,7 @@ namespace Jack
             else if ( error == NET_CONN_ERROR )
             {
                 jack_error ( "Connection lost." );
-                throw JackDriverException();
+                throw JackNetException();
             }
             else
                 jack_error ( "Fatal error in receive : %s", StrError ( NET_ERROR_CODE ) );
@@ -635,7 +635,7 @@ namespace Jack
             if ( error == NET_CONN_ERROR )
             {
                 jack_error ( "Connection lost." );
-                throw JackDriverException();
+                throw JackNetException();
             }
             else
                 jack_error ( "Fatal error in send : %s", StrError ( NET_ERROR_CODE ) );

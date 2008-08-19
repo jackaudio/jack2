@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Grame
+Copyright (C) 2008 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetAdapter.h"
+#include "JackException.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -57,52 +58,48 @@ namespace Jack
             param = ( const jack_driver_param_t* ) node->data;
             switch ( param->character )
             {
-                case 'a' :
-                    if ( strlen ( param->value.str ) < 16 )
-                        strcpy ( fMulticastIP, param->value.str );
-                    else
-                        jack_error ( "Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP );
-                    break;
-                case 'p' :
-                    fSocket.SetPort ( param->value.ui );
-                    break;
-                case 'M' :
-                    fParams.fMtu = param->value.i;
-                    break;
-                case 'C' :
-                    fParams.fSendAudioChannels = param->value.i;
-                    break;
-                case 'P' :
-                    fParams.fReturnAudioChannels = param->value.i;
-                    break;
-                case 'n' :
-                    strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
-                    break;
-                case 't' :
-                    fParams.fTransportSync = param->value.ui;
-                    break;
-                case 'm' :
-                    if ( strcmp ( param->value.str, "normal" ) == 0 )
-                        fParams.fNetworkMode = 'n';
-                    else if ( strcmp ( param->value.str, "slow" ) == 0 )
-                        fParams.fNetworkMode = 's';
-                    else if ( strcmp ( param->value.str, "fast" ) == 0 )
-                        fParams.fNetworkMode = 'f';
-                    else
-                        jack_error ( "Unknown network mode, using 'normal' mode." );
-                    break;
-                case 'S' :
-                    fParams.fSlaveSyncMode = 1;
-                    break;
+            case 'a' :
+                if ( strlen ( param->value.str ) < 16 )
+                    strcpy ( fMulticastIP, param->value.str );
+                else
+                    jack_error ( "Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP );
+                break;
+            case 'p' :
+                fSocket.SetPort ( param->value.ui );
+                break;
+            case 'M' :
+                fParams.fMtu = param->value.i;
+                break;
+            case 'C' :
+                fParams.fSendAudioChannels = param->value.i;
+                break;
+            case 'P' :
+                fParams.fReturnAudioChannels = param->value.i;
+                break;
+            case 'n' :
+                strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
+                break;
+            case 't' :
+                fParams.fTransportSync = param->value.ui;
+                break;
+            case 'm' :
+                if ( strcmp ( param->value.str, "normal" ) == 0 )
+                    fParams.fNetworkMode = 'n';
+                else if ( strcmp ( param->value.str, "slow" ) == 0 )
+                    fParams.fNetworkMode = 's';
+                else if ( strcmp ( param->value.str, "fast" ) == 0 )
+                    fParams.fNetworkMode = 'f';
+                else
+                    jack_error ( "Unknown network mode, using 'normal' mode." );
+                break;
+            case 'S' :
+                fParams.fSlaveSyncMode = 1;
+                break;
             }
         }
 
         fSocket.SetPort ( port );
         fSocket.SetAddress ( fMulticastIP, port );
-
-        jack_info ( "netadapter : this %x", this );
-        jack_info ( "netadapter : input %x", &fCaptureChannels );
-        jack_info ( "netadapter : output %x", &fPlaybackChannels );
 
         SetInputs ( fParams.fSendAudioChannels );
         SetOutputs ( fParams.fReturnAudioChannels );
@@ -182,15 +179,41 @@ namespace Jack
 
     bool JackNetAdapter::Execute()
     {
+        try
+        {
+            // Keep running even in case of error
+            while ( fThread.GetStatus() == JackThread::kRunning )
+                if ( Process() == SOCKET_ERROR )
+                    return false;
+            return false;
+        }
+        catch ( JackNetException& e )
+        {
+            e.PrintMessage();
+            jack_log ( "NetAdapter is restarted." );
+            fThread.DropRealTime();
+            fThread.SetStatus(JackThread::kIniting);
+            if ( Init() )
+            {
+                fThread.SetStatus ( JackThread::kRunning );
+                return true;
+            }
+            else
+                return false;
+        }
+    }
+
+    int JackNetAdapter::Process()
+    {
         bool failure = false;
         int port_index;
 
         //receive
         if ( SyncRecv() == SOCKET_ERROR )
-            return true;
+            return 0;
 
         if ( DataRecv() == SOCKET_ERROR )
-            return false;
+            return SOCKET_ERROR;
 
         //resample
         jack_nframes_t time1, time2;
@@ -213,10 +236,10 @@ namespace Jack
 
         //send
         if ( SyncSend() == SOCKET_ERROR )
-            return false;
+            return SOCKET_ERROR;
 
         if ( DataSend() == SOCKET_ERROR )
-            return false;
+            return SOCKET_ERROR;
 
         if ( failure )
         {

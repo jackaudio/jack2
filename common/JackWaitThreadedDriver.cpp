@@ -66,7 +66,7 @@ bool JackWaitThreadedDriver::Execute()
             fDriver->Process();
         }
         return false;
-    } catch (JackDriverException& e) {
+    } catch (JackNetException& e) {
         e.PrintMessage();
         jack_log("Driver is restarted");
         fThread.DropRealTime();

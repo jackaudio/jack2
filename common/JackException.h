@@ -58,20 +58,20 @@ class EXPORT JackException : public std::runtime_error {
 };
 
 /*!
-\brief Exception possibly thrown by drivers.
+\brief Exception possibly thrown by Net Slaves.
 */
 
-class EXPORT JackDriverException : public JackException {
+class EXPORT JackNetException : public JackException {
 
     public:
 
-        JackDriverException(const std::string& msg) : JackException(msg)
+        JackNetException(const std::string& msg) : JackException(msg)
         {}
-        JackDriverException(char* msg) : JackException(msg)
+        JackNetException(char* msg) : JackException(msg)
         {}
-        JackDriverException(const char* msg) : JackException(msg)
+        JackNetException(const char* msg) : JackException(msg)
         {}
-        JackDriverException() : JackException("")
+        JackNetException() : JackException("")
         {}
 };
 
