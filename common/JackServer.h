@@ -81,7 +81,7 @@ class EXPORT JackServer
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
         int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
-        void DeadClient(int refnum);
+        void ClientKill(int refnum);
 
         // Transport management
         int ReleaseTimebase(int refnum);

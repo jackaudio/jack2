@@ -283,14 +283,14 @@ void JackServer::Notify(int refnum, int notify, int value)
     }
 }
 
-void JackServer::DeadClient(int refnum)
+void JackServer::ClientKill(int refnum)
 {
-    jack_log("JackServer::DeadClient ref = %ld", refnum);
+    jack_log("JackServer::ClientKill ref = %ld", refnum);
     if (fEngine->ClientDeactivate(refnum) < 0) {
-        jack_error("JackServer::DeadClient ref = %ld cannot be removed from the graph !!", refnum);
+        jack_error("JackServer::ClientKill ref = %ld cannot be removed from the graph !!", refnum);
     }
     if (fEngine->ClientExternalClose(refnum) < 0) {
-        jack_error("JackServer::DeadClient ref = %ld cannot be closed", refnum);
+        jack_error("JackServer::ClientKill ref = %ld cannot be closed", refnum);
     }
 }
 

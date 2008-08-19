@@ -121,7 +121,7 @@ void JackMachServerChannel::ClientKill(mach_port_t private_port)
     jack_log("JackMachServerChannel::ClientKill");
     int refnum = fClientTable[private_port];
     assert(refnum > 0);
-    fServer->DeadClient(refnum);
+    fServer->ClientKill(refnum);
     fClientTable.erase(private_port);
 
     // Hum, hum....

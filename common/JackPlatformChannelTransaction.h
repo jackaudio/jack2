@@ -29,7 +29,6 @@ Copyright (C) 2004-2006 Grame
 namespace Jack
 {
 
-
 /*!
 \brief Channel input/output communication.
 */

@@ -75,7 +75,7 @@ class EXPORT JackThreadedDriver : public JackDriverClientInterface, public JackR
         virtual int SetSampleRate(jack_nframes_t sample_rate);
      
         virtual void SetMaster(bool onoff);
-        virtual  bool GetMaster();
+        virtual bool GetMaster();
         virtual void AddSlave(JackDriverInterface* slave);
         virtual void RemoveSlave(JackDriverInterface* slave);
         virtual int ProcessSlaves();

@@ -140,7 +140,7 @@ void JackSocketServerChannel::ClientKill(int fd)
     if (refnum == -1) {  // Should never happen... correspond to a client that started the socket but never opened...
         jack_log("Client was not opened : probably correspond to server_check");
     } else {
-        fServer->DeadClient(refnum);
+        fServer->ClientKill(refnum);
     }
 
     fSocketTable.erase(fd);
