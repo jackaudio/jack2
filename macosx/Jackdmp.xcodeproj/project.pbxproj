@@ -1257,7 +1257,7 @@
 		4B3F49070AD8503300491C6E /* jack_cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jack_cpu.c; path = ../tests/jack_cpu.c; sourceTree = SOURCE_ROOT; };
 		4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacEngineRPC.cpp; sourceTree = SOURCE_ROOT; };
 		4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServerLaunch.cpp; path = ../common/JackServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
-		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
+		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackRestartThreadedDriver.h; path = ../common/JackRestartThreadedDriver.h; sourceTree = SOURCE_ROOT; };
 		4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackRestartThreadedDriver.cpp; path = ../common/JackRestartThreadedDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B4F9C8A0DC20C0400706CB0 /* JackMessageBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackMessageBuffer.cpp; path = ../common/JackMessageBuffer.cpp; sourceTree = SOURCE_ROOT; };
@@ -1372,7 +1372,7 @@
 		4BD6240C0CBCF16600DE782F /* inprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = inprocess.c; path = "../example-clients/inprocess.c"; sourceTree = SOURCE_ROOT; };
 		4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTools.cpp; path = ../common/JackTools.cpp; sourceTree = SOURCE_ROOT; };
 		4BE4CC000CDA153400CCF5BB /* JackTools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTools.h; path = ../common/JackTools.h; sourceTree = SOURCE_ROOT; };
-		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
+		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
 		4BE6C6A30A3E096F005A203A /* jack_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jack_test.cpp; path = ../tests/jack_test.cpp; sourceTree = SOURCE_ROOT; };
 		4BE99D300AD7A04800C59091 /* jack_cpu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_cpu; sourceTree = BUILT_PRODUCTS_DIR; };

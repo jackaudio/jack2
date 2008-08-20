@@ -80,12 +80,14 @@ int JackEngine::Close()
     
     // Close remaining clients (RT is stopped)
     for (int i = 0; i < CLIENT_NUM; i++) {
-        JackClientInterface* client = fClientTable[i];
-        if (client) {
-            jack_log("JackEngine::Close client = %s", client->GetClientControl()->fName);
-            client->Close();
-            delete client;
-            fClientTable[i] = NULL;
+        if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
+            jack_log("JackEngine::Close loadable client = %s", loadable_client->GetClientControl()->fName);
+            loadable_client->Close();
+            delete loadable_client;
+        } else if (JackExternalClient* external_client = dynamic_cast<JackExternalClient*>(fClientTable[i])) {
+            jack_log("JackEngine::Close external client = %s", external_client->GetClientControl()->fName);
+            external_client->Close();
+            delete external_client;
         }
     }
     
