@@ -24,11 +24,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 #include <assert.h>
-#include <signal.h>
-
+#include <cassert>
+#include <csignal>
 #include <sys/types.h>
 #include <getopt.h>
-#include <string.h>
+#include <cstring>
+#include <cstdio>
+
 #include "types.h"
 #include "jack.h"
 #include "JackConstants.h"
