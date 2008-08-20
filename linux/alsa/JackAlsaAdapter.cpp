@@ -22,6 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackAlsaAdapter.h"
+#include "JackServer.h"
+#include "JackEngineControl.h"
 
 namespace Jack
 {
@@ -75,13 +77,17 @@ namespace Jack
 
 int JackAlsaAdapter::Open()
 {
-    if (fAudioInterface.open() == 0) {
-        fAudioInterface.longinfo();
-        fThread.AcquireRealTime(85);
-        return fThread.StartSync();
-    } else {
+    if (fAudioInterface.open() != 0) 
+        return -1;
+    
+    if (fThread.StartSync() < 0) {
+        jack_error("Cannot start audioadapter thread");
         return -1;
     }
+          
+    fAudioInterface.longinfo();
+    fThread.AcquireRealTime(JackServer::fInstance->GetEngineControl()->fPriority);
+    return 0;
 }
 
 int JackAlsaAdapter::Close()
@@ -89,7 +95,28 @@ int JackAlsaAdapter::Close()
 #ifdef JACK_MONITOR
     fTable.Save();
 #endif
-    fThread.Stop();
+    switch (fThread.GetStatus()) {
+            
+        // Kill the thread in Init phase
+        case JackThread::kStarting:
+        case JackThread::kIniting:
+            if (fThread.Kill() < 0) {
+                jack_error("Cannot kill thread");
+                return -1;
+            }
+            break;
+           
+        // Stop when the thread cycle is finished
+        case JackThread::kRunning:
+            if (fThread.Stop() < 0) {
+                jack_error("Cannot stop thread"); 
+                return -1;
+            }
+            break;
+            
+        default:
+            break;
+    }
     return fAudioInterface.close();
 }
 

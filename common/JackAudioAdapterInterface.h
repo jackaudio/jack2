@@ -96,7 +96,9 @@ class JackAudioAdapterInterface
     public:
 
         JackAudioAdapterInterface(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
-            :fBufferSize(buffer_size),
+            :fCaptureChannels(0),
+            fPlaybackChannels(0),
+            fBufferSize(buffer_size),
             fSampleRate(sample_rate),
             fProducerDLL(buffer_size, sample_rate),
             fConsumerDLL(buffer_size, sample_rate),

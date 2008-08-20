@@ -76,8 +76,7 @@ namespace Jack
             virtual int Send ( size_t size, int flags ) = 0;
             virtual int Recv ( size_t size, int flags ) = 0;
 
-            JackNetInterface() : fSocket()
-            {}
+            JackNetInterface();
             JackNetInterface ( const char* multicast_ip, int port );
             JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip );
 

@@ -19,6 +19,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetAdapter.h"
 #include "JackException.h"
+#include "JackServer.h"
+#include "JackEngineControl.h"
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
@@ -110,30 +112,60 @@ namespace Jack
 
     JackNetAdapter::~JackNetAdapter()
     {
+        jack_log ( "JackNetAdapter::~JackNetAdapter" );
         int port_index;
-        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-            delete[] fSoftCaptureBuffer[port_index];
-        delete[] fSoftCaptureBuffer;
-        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-            delete[] fSoftPlaybackBuffer[port_index];
-        delete[] fSoftPlaybackBuffer;
+        if (fSoftCaptureBuffer) {
+            for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+                delete[] fSoftCaptureBuffer[port_index];
+            delete[] fSoftCaptureBuffer;
+        }
+        if (fSoftPlaybackBuffer) {
+            for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+                delete[] fSoftPlaybackBuffer[port_index];
+            delete[] fSoftPlaybackBuffer;
+        }
     }
 
     int JackNetAdapter::Open()
     {
         jack_log ( "JackNetAdapter::Open" );
-
         jack_info ( "Net adapter started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
-        fThread.AcquireRealTime ( 85 );
-
-        return fThread.StartSync();
-    }
+        if (fThread.StartSync() < 0) {
+            jack_error("Cannot start netadapter thread");
+            return -1;
+        }
+            
+        fThread.AcquireRealTime(JackServer::fInstance->GetEngineControl()->fPriority);
+        return 0;
+   }
 
     int JackNetAdapter::Close()
     {
-        fThread.Stop();
+        switch (fThread.GetStatus()) {
+            
+            // Kill the thread in Init phase
+            case JackThread::kStarting:
+            case JackThread::kIniting:
+                if (fThread.Kill() < 0) {
+                    jack_error("Cannot kill thread");
+                    return -1;
+                }
+                break;
+               
+            // Stop when the thread cycle is finished
+            case JackThread::kRunning:
+                if (fThread.Stop() < 0) {
+                    jack_error("Cannot stop thread"); 
+                    return -1;
+                }
+                break;
+                
+            default:
+                break;
+        }
+        
         fSocket.Close();
         return 0;
     }

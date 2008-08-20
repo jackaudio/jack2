@@ -173,7 +173,7 @@ class AudioInterface : public AudioParam
         jack_info("inputs : %ud, outputs : %ud", fCardInputs, fCardOutputs);
 
         // enregistrement des parametres d'entree-sortie
-        err = snd_pcm_hw_params(fInputDevice,  fInputParams);	 	check_error (err);
+        err = snd_pcm_hw_params(fInputDevice,  fInputParams);	check_error (err);
         err = snd_pcm_hw_params(fOutputDevice, fOutputParams);	check_error (err);
 
         // allocation of alsa buffers
