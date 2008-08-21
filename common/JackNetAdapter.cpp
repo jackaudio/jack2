@@ -178,7 +178,7 @@ namespace Jack
 
     int JackNetAdapter::SetBufferSize ( jack_nframes_t buffer_size )
     {
-        fParams.fPeriodSize = buffer_size;
+        JackAudioAdapterInterface::SetHostBufferSize ( buffer_size ); 
         return 0;
     }
 
@@ -208,6 +208,9 @@ namespace Jack
             fSoftPlaybackBuffer[port_index] = new sample_t[fParams.fPeriodSize];
             fNetAudioPlaybackBuffer->SetBuffer ( port_index, fSoftPlaybackBuffer[port_index] );
         }
+
+        //set audio adapter parameters
+        JackAudioAdapterInterface::SetAdaptedBufferSize ( fParams.fPeriodSize );
 
         //init done, display parameters
         SessionParamsDisplay ( &fParams );
@@ -261,39 +264,33 @@ namespace Jack
     {
         bool failure = false;
         int port_index;
-        int rx_bytes, tx_bytes;
 
         //read data from the network
-        //in case of fatal network error, definitely stop the process
-        rx_bytes = Read();
-        if ( rx_bytes == SOCKET_ERROR )
+        //in case of fatal network error, stop the process
+        if ( Read() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
-        //if there is data to resample,
-        if ( rx_bytes )
-        {
-            //get the resample factor,
-            jack_nframes_t time1, time2;
-            ResampleFactor ( time1, time2 );
+        //get the resample factor,
+        jack_nframes_t time1, time2;
+        ResampleFactor ( time1, time2 );
 
-            //resample input data,
-            for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-            {
-                fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
-                if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
-                    failure = true;
-            }
-            //and output data,
-            for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-            {
-                fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
-                if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
-                    failure = true;
-            }
+        //resample input data,
+        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+        {
+            fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
+            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fParams.fPeriodSize ) < fParams.fPeriodSize )
+                failure = true;
+        }
+        //and output data,
+        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+        {
+            fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
+            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fParams.fPeriodSize ) < fParams.fPeriodSize )
+                failure = true;
         }
 
         //then write data to network
-        //in case of failure, definitely stop process
+        //in case of failure, stop process
         if ( Write() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
