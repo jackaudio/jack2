@@ -60,43 +60,43 @@ namespace Jack
             param = ( const jack_driver_param_t* ) node->data;
             switch ( param->character )
             {
-            case 'a' :
-                if ( strlen ( param->value.str ) < 16 )
-                    strcpy ( fMulticastIP, param->value.str );
-                else
-                    jack_error ( "Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP );
-                break;
-            case 'p' :
-                fSocket.SetPort ( param->value.ui );
-                break;
-            case 'M' :
-                fParams.fMtu = param->value.i;
-                break;
-            case 'C' :
-                fParams.fSendAudioChannels = param->value.i;
-                break;
-            case 'P' :
-                fParams.fReturnAudioChannels = param->value.i;
-                break;
-            case 'n' :
-                strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
-                break;
-            case 't' :
-                fParams.fTransportSync = param->value.ui;
-                break;
-            case 'm' :
-                if ( strcmp ( param->value.str, "normal" ) == 0 )
-                    fParams.fNetworkMode = 'n';
-                else if ( strcmp ( param->value.str, "slow" ) == 0 )
-                    fParams.fNetworkMode = 's';
-                else if ( strcmp ( param->value.str, "fast" ) == 0 )
-                    fParams.fNetworkMode = 'f';
-                else
-                    jack_error ( "Unknown network mode, using 'normal' mode." );
-                break;
-            case 'S' :
-                fParams.fSlaveSyncMode = 1;
-                break;
+                case 'a' :
+                    if ( strlen ( param->value.str ) < 16 )
+                        strcpy ( fMulticastIP, param->value.str );
+                    else
+                        jack_error ( "Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP );
+                    break;
+                case 'p' :
+                    fSocket.SetPort ( param->value.ui );
+                    break;
+                case 'M' :
+                    fParams.fMtu = param->value.i;
+                    break;
+                case 'C' :
+                    fParams.fSendAudioChannels = param->value.i;
+                    break;
+                case 'P' :
+                    fParams.fReturnAudioChannels = param->value.i;
+                    break;
+                case 'n' :
+                    strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
+                    break;
+                case 't' :
+                    fParams.fTransportSync = param->value.ui;
+                    break;
+                case 'm' :
+                    if ( strcmp ( param->value.str, "normal" ) == 0 )
+                        fParams.fNetworkMode = 'n';
+                    else if ( strcmp ( param->value.str, "slow" ) == 0 )
+                        fParams.fNetworkMode = 's';
+                    else if ( strcmp ( param->value.str, "fast" ) == 0 )
+                        fParams.fNetworkMode = 'f';
+                    else
+                        jack_error ( "Unknown network mode, using 'normal' mode." );
+                    break;
+                case 'S' :
+                    fParams.fSlaveSyncMode = 1;
+                    break;
             }
         }
 
@@ -113,13 +113,16 @@ namespace Jack
     JackNetAdapter::~JackNetAdapter()
     {
         jack_log ( "JackNetAdapter::~JackNetAdapter" );
+
         int port_index;
-        if (fSoftCaptureBuffer) {
+        if ( fSoftCaptureBuffer )
+        {
             for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
                 delete[] fSoftCaptureBuffer[port_index];
             delete[] fSoftCaptureBuffer;
         }
-        if (fSoftPlaybackBuffer) {
+        if ( fSoftPlaybackBuffer )
+        {
             for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
                 delete[] fSoftPlaybackBuffer[port_index];
             delete[] fSoftPlaybackBuffer;
@@ -129,43 +132,46 @@ namespace Jack
     int JackNetAdapter::Open()
     {
         jack_log ( "JackNetAdapter::Open" );
+
         jack_info ( "Net adapter started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
-        if (fThread.StartSync() < 0) {
-            jack_error("Cannot start netadapter thread");
+        if ( fThread.StartSync() < 0 )
+        {
+            jack_error ( "Cannot start netadapter thread" );
             return -1;
         }
-            
-        fThread.AcquireRealTime(JackServer::fInstance->GetEngineControl()->fPriority);
+
+        fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fPriority - 1 );
         return 0;
-   }
+    }
 
     int JackNetAdapter::Close()
     {
-        switch (fThread.GetStatus()) {
-            
-            // Kill the thread in Init phase
+        jack_log ( "JackNetAdapter::Close" );
+
+        switch ( fThread.GetStatus() )
+        {
+                // Kill the thread in Init phase
             case JackThread::kStarting:
             case JackThread::kIniting:
-                if (fThread.Kill() < 0) {
-                    jack_error("Cannot kill thread");
+                if ( fThread.Kill() < 0 )
+                {
+                    jack_error ( "Cannot kill thread" );
                     return -1;
                 }
                 break;
-               
-            // Stop when the thread cycle is finished
+                // Stop when the thread cycle is finished
             case JackThread::kRunning:
-                if (fThread.Stop() < 0) {
-                    jack_error("Cannot stop thread"); 
+                if ( fThread.Stop() < 0 )
+                {
+                    jack_error ( "Cannot stop thread" );
                     return -1;
                 }
                 break;
-                
             default:
                 break;
         }
-        
         fSocket.Close();
         return 0;
     }
@@ -224,7 +230,7 @@ namespace Jack
             e.PrintMessage();
             jack_log ( "NetAdapter is restarted." );
             fThread.DropRealTime();
-            fThread.SetStatus(JackThread::kIniting);
+            fThread.SetStatus ( JackThread::kIniting );
             if ( Init() )
             {
                 fThread.SetStatus ( JackThread::kRunning );
@@ -235,44 +241,63 @@ namespace Jack
         }
     }
 
+    int JackNetAdapter::Read()
+    {
+        if ( SyncRecv() == SOCKET_ERROR )
+            return 0;
+
+        return DataRecv();
+    }
+
+    int JackNetAdapter::Write()
+    {
+        if ( SyncSend() == SOCKET_ERROR )
+            return SOCKET_ERROR;
+
+        return DataSend();
+    }
+
     int JackNetAdapter::Process()
     {
         bool failure = false;
         int port_index;
+        int rx_bytes, tx_bytes;
 
-        //receive
-        if ( SyncRecv() == SOCKET_ERROR )
-            return 0;
-
-        if ( DataRecv() == SOCKET_ERROR )
+        //read data from the network
+        //in case of fatal network error, definitely stop the process
+        rx_bytes = Read();
+        if ( rx_bytes == SOCKET_ERROR )
             return SOCKET_ERROR;
 
-        //resample
-        jack_nframes_t time1, time2;
-        ResampleFactor ( time1, time2 );
-
-
-        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+        //if there is data to resample,
+        if ( rx_bytes )
         {
-            fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
-            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
-                failure = true;
+            //get the resample factor,
+            jack_nframes_t time1, time2;
+            ResampleFactor ( time1, time2 );
+
+            //resample input data,
+            for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+            {
+                fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
+                if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fBufferSize ) < fBufferSize )
+                    failure = true;
+            }
+            //and output data,
+            for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+            {
+                fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
+                if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
+                    failure = true;
+            }
         }
 
-        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-        {
-            fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
-            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fBufferSize ) < fBufferSize )
-                failure = true;
-        }
-
-        //send
-        if ( SyncSend() == SOCKET_ERROR )
+        //then write data to network
+        //in case of failure, definitely stop process
+        if ( Write() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
-        if ( DataSend() == SOCKET_ERROR )
-            return SOCKET_ERROR;
-
+        //if there was any ringbuffer failure during resampling, reset
         if ( failure )
         {
             jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );

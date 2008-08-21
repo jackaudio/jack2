@@ -42,6 +42,7 @@ namespace Jack
         sample_t** fSoftCaptureBuffer;
         sample_t** fSoftPlaybackBuffer;
 
+        //adapter thread
         JackThread fThread;
 
     public:
@@ -56,6 +57,9 @@ namespace Jack
 
         bool Init();
         bool Execute();
+
+        int Read();
+        int Write();
 
         int Process();
     };
