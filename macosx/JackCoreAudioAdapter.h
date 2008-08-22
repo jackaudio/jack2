@@ -44,23 +44,23 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 {
 
     private:
-    
+
         AudioUnit fAUHAL;
         AudioBufferList* fInputData;
-        
+
         AudioDeviceID fDeviceID;
         bool fState;
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;
-        
+
         static	OSStatus Render(void *inRefCon,
                                 AudioUnitRenderActionFlags *ioActionFlags,
                                 const AudioTimeStamp *inTimeStamp,
                                 UInt32 inBusNumber,
                                 UInt32 inNumberFrames,
                                 AudioBufferList *ioData);
-                           
+
         static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
                                                 UInt32 inChannel,
                                                 Boolean	isInput,
@@ -83,7 +83,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
                           int& in_nChannels,
                           int& out_nChannels,
                           bool strict);
-                          
+
         int OpenAUHAL(bool capturing,
                     bool playing,
                     int inchannels,
@@ -100,16 +100,17 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         void CloseAUHAL();
 
     public:
-    
+
         JackCoreAudioAdapter( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackCoreAudioAdapter()
         {}
-        
+
         virtual int Open();
         virtual int Close();
-        
+
+        virtual int SetSampleRate(jack_nframes_t sample_rate);
         virtual int SetBufferSize(jack_nframes_t buffer_size);
-       
+
 };
 }
 

@@ -70,19 +70,19 @@ namespace Jack
         return 0;
     }
 
-    int JackAudioAdapter::BufferSize(jack_nframes_t buffer_size, void* arg)
+    int JackAudioAdapter::BufferSize ( jack_nframes_t buffer_size, void* arg )
     {
         JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
         adapter->Reset();
-        adapter->fAudioAdapter->SetBufferSize(buffer_size);
+        adapter->fAudioAdapter->SetHostBufferSize ( buffer_size );
         return 0;
     }
 
-    int JackAudioAdapter::SampleRate(jack_nframes_t sample_rate, void* arg)
+    int JackAudioAdapter::SampleRate ( jack_nframes_t sample_rate, void* arg )
     {
         JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
         adapter->Reset();
-        adapter->fAudioAdapter->SetSampleRate(sample_rate);
+        adapter->fAudioAdapter->SetHostSampleRate(sample_rate);
         return 0;
     }
 
@@ -104,12 +104,12 @@ namespace Jack
     void JackAudioAdapter::FreePorts()
     {
         int i;
+        for ( i = 0; i < fCaptureChannels; i++ )
+            if ( fCapturePortList[i] )
+                jack_port_unregister ( fJackClient, fCapturePortList[i] );
         for (i = 0; i < fCaptureChannels; i++)
-            if (fCapturePortList[i])
-                jack_port_unregister(fJackClient, fCapturePortList[i]);
-        for (i = 0; i < fCaptureChannels; i++)
-            if (fPlaybackPortList[i])
-                jack_port_unregister(fJackClient, fPlaybackPortList[i]);
+            if ( fPlaybackPortList[i] )
+                jack_port_unregister  (fJackClient, fPlaybackPortList[i] );
 
         delete[] fCapturePortList;
         delete[] fPlaybackPortList;
@@ -127,7 +127,7 @@ namespace Jack
 
     int JackAudioAdapter::Open()
     {
-        jack_log("JackAudioAdapter::Open()");
+        jack_log("JackAudioAdapter::Open");
 
         int i;
         char name[32];
@@ -138,15 +138,15 @@ namespace Jack
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
-        for (i = 0; i < fCaptureChannels; i++)
+        for ( i = 0; i < fCaptureChannels; i++ )
             fCaptureRingBuffer[i] = new JackLibSampleRateResampler();
-        for (i = 0; i < fPlaybackChannels; i++)
+        for ( i = 0; i < fPlaybackChannels; i++ )
             fPlaybackRingBuffer[i] = new JackLibSampleRateResampler();
         fAudioAdapter->SetRingBuffers(fCaptureRingBuffer, fPlaybackRingBuffer);
         if ( fCaptureChannels )
-			jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
+			jack_log ( "ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace() );
 		if ( fPlaybackChannels )
-			jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace());
+			jack_log ( "WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace() );
 
         //jack ports
         fCapturePortList = new jack_port_t* [fCaptureChannels];
@@ -155,25 +155,25 @@ namespace Jack
         for (i = 0; i < fCaptureChannels; i++)
         {
             sprintf(name, "capture_%d", i+1);
-            if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL)
+            if ( ( fCapturePortList[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0 ) ) == NULL )
                 goto fail;
         }
 
         for (i = 0; i < fPlaybackChannels; i++)
         {
             sprintf(name, "playback_%d", i+1);
-            if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)) == NULL)
+            if ( ( fPlaybackPortList[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0 ) ) == NULL )
                 goto fail;
         }
 
         //callbacks and activation
-        if (jack_set_process_callback(fJackClient, Process, this) < 0)
+        if ( jack_set_process_callback ( fJackClient, Process, this ) < 0 )
             goto fail;
-        if (jack_set_buffer_size_callback(fJackClient, BufferSize, this) < 0)
+        if ( jack_set_buffer_size_callback ( fJackClient, BufferSize, this ) < 0 )
             goto fail;
-        if (jack_set_sample_rate_callback(fJackClient, SampleRate, this) < 0)
+        if ( jack_set_sample_rate_callback ( fJackClient, SampleRate, this ) < 0 )
             goto fail;
-        if (jack_activate(fJackClient) < 0)
+        if ( jack_activate ( fJackClient ) < 0 )
             goto fail;
 
         //ringbuffers and jack clients are ok, we can now open the adapter driver interface

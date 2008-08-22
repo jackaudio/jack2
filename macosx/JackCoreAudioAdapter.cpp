@@ -116,7 +116,7 @@ OSStatus JackCoreAudioAdapter::SRNotificationCallback(AudioDeviceID inDevice,
 
     return noErr;
 }
-            
+
 OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                                         AudioUnitRenderActionFlags *ioActionFlags,
                                         const AudioTimeStamp *inTimeStamp,
@@ -127,27 +127,27 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
     JackCoreAudioAdapter* adapter = static_cast<JackCoreAudioAdapter*>(inRefCon);
     AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
     bool failure = false;
-      
-    jack_nframes_t time1, time2; 
+
+    jack_nframes_t time1, time2;
     adapter->ResampleFactor(time1, time2);
-     
+
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
         adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
         if (adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames) < inNumberFrames)
             failure = true;
     }
-    
+
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
         adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
         if (adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames) < inNumberFrames)
              failure = true;
     }
-    
-#ifdef JACK_MONITOR    
-    adapter->fTable.Write(time1, time2,  double(time1) / double(time2), double(time2) / double(time1), 
+
+#ifdef JACK_MONITOR
+    adapter->fTable.Write(time1, time2,  double(time1) / double(time2), double(time2) / double(time1),
          adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
 #endif
-    
+
     // Reset all ringbuffers in case of failure
     if (failure) {
         jack_error("JackCoreAudioAdapter::Render ringbuffer failure... reset");
@@ -162,39 +162,42 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
 
     const JSList* node;
     const jack_driver_param_t* param;
-    
+
     fCaptureChannels = 2;
     fPlaybackChannels = 2;
-    
+
     for (node = params; node; node = jack_slist_next(node)) {
         param = (const jack_driver_param_t*) node->data;
-        
+
         switch (param->character) {
-        
+
             case 'c' :
                 break;
-                
+
             case 'i':
                 fCaptureChannels = param->value.ui;
                 break;
-                
+
             case 'o':
                 fPlaybackChannels = param->value.ui;
                 break;
-                
+
             case 'C':
                 break;
-                
+
             case 'P':
                 break;
-                
+
             case 'D':
                 break;
-                
+
             case 'r':
-                SetAudioSampleRate(param->value.ui);
+                SetAdaptedSampleRate(param->value.ui);
                 break;
-                
+
+            case 'p':
+                SetAdaptedBufferSize(param->value.ui);
+                break;
             case 'l':
                 break;
         }
@@ -260,7 +263,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
         jack_error("Cannot open default device");
         return -1;
     }
-    
+
     return 0;
 }
 
@@ -273,21 +276,21 @@ int JackCoreAudioAdapter::SetupChannels(bool capturing,
                                         bool strict)
 {
     OSStatus err = noErr;
-    
+
     err = GetTotalChannels(fDeviceID, &in_nChannels, true);
     if (err != noErr) {
         jack_error("Cannot get input channel number");
         printError(err);
         return -1;
     }
-    
+
     err = GetTotalChannels(fDeviceID, &out_nChannels, false);
     if (err != noErr) {
         jack_error("Cannot get output channel number");
         printError(err);
         return -1;
     }
-    
+
     return 0;
 }
 
@@ -350,7 +353,7 @@ int JackCoreAudioAdapter::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, j
 int JackCoreAudioAdapter::SetupBuffers(int inchannels, int outchannels)
 {
     jack_log("JackCoreAudioAdapter::SetupBuffers: input = %ld output = %ld", inchannels, outchannels);
-    
+
     // Prepare buffers
     fInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
     if (fInputData == 0) {
@@ -369,7 +372,7 @@ int JackCoreAudioAdapter::SetupBuffers(int inchannels, int outchannels)
 void JackCoreAudioAdapter::DisposeBuffers()
 {
     if (fInputData) {
-        for (int i = 0; i < fCaptureChannels; i++) 
+        for (int i = 0; i < fCaptureChannels; i++)
             free(fInputData->mBuffers[i].mData);
         free(fInputData);
         fInputData = 0;
@@ -559,13 +562,13 @@ void JackCoreAudioAdapter::CloseAUHAL()
     AudioUnitUninitialize(fAUHAL);
     CloseComponent(fAUHAL);
 }
-  
+
 int JackCoreAudioAdapter::Open()
 {
     OSStatus err;
     int in_nChannels = 0;
     int out_nChannels = 0;
-   
+
     if (SetupDevices("", "", "", "") < 0)
         return -1;
 
@@ -580,11 +583,11 @@ int JackCoreAudioAdapter::Open()
 
     if (SetupBuffers(fCaptureChannels, fPlaybackChannels) < 0)
         goto error;
-        
+
     err = AudioOutputUnitStart(fAUHAL);
     if (err != noErr)
         goto error;
-  
+
     return 0;
 
 error:
@@ -594,7 +597,7 @@ error:
 
 int JackCoreAudioAdapter::Close()
 {
-#ifdef JACK_MONITOR    
+#ifdef JACK_MONITOR
     fTable.Save();
 #endif
     AudioOutputUnitStop(fAUHAL);
@@ -603,9 +606,15 @@ int JackCoreAudioAdapter::Close()
     return 0;
 }
 
-int JackCoreAudioAdapter::SetBufferSize(jack_nframes_t buffer_size)
-{
-    JackAudioAdapterInterface::SetBufferSize(buffer_size);
+
+int JackCoreAudioAdapter::SetSampleRate ( jack_nframes_t sample_rate ) {
+    JackAudioAdapterInterface::SetHostSampleRate ( sample_rate );
+    Close();
+    return Open();
+}
+
+int JackCoreAudioAdapter::SetBufferSize ( jack_nframes_t buffer_size ) {
+    JackAudioAdapterInterface::SetHostBufferSize ( buffer_size );
     Close();
     return Open();
 }
@@ -617,14 +626,14 @@ extern "C"
 {
 #endif
 
-   EXPORT jack_driver_desc_t* jack_get_descriptor() 
+   EXPORT jack_driver_desc_t* jack_get_descriptor()
    {
         jack_driver_desc_t *desc;
         unsigned int i;
         desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
 
         strcpy(desc->name, "coreaudio-adapter");
-        desc->nparams = 9;
+        desc->nparams = 10;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -666,13 +675,21 @@ extern "C"
         strcpy(desc->params[i].value.str, "will take default CoreAudio output device");
         strcpy(desc->params[i].short_desc, "Provide playback ports. Optionally set CoreAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "rate");
         desc->params[i].character = 'r';
         desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 44100U;
         strcpy(desc->params[i].short_desc, "Sample rate");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "periodsize");
+        desc->params[i].character = 'p';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.ui = 512U;
+        strcpy(desc->params[i].short_desc, "Period size");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
@@ -698,11 +715,11 @@ extern "C"
         desc->params[i].value.i = TRUE;
         strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-  
+
         return desc;
     }
 
-   
+
 #ifdef __cplusplus
 }
 #endif

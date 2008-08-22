@@ -72,138 +72,142 @@ namespace Jack
     class JackAudioAdapterInterface
     {
 
-        protected:
+    protected:
 
 #ifdef JACK_MONITOR
-            MeasureTable fTable;
+        MeasureTable fTable;
 #endif
+        //channels
+        int fCaptureChannels;
+        int fPlaybackChannels;
 
-            int fCaptureChannels;
-            int fPlaybackChannels;
+        //host parameters
+        jack_nframes_t fHostBufferSize;
+        jack_nframes_t fHostSampleRate;
 
-            jack_nframes_t fBufferSize;
-            jack_nframes_t fSampleRate;
+        //adapted parameters
+        jack_nframes_t fAdaptedBufferSize;
+        jack_nframes_t fAdaptedSampleRate;
 
-            // DLL
-            JackAtomicDelayLockedLoop fProducerDLL;
-            JackAtomicDelayLockedLoop fConsumerDLL;
+        //delay locked loop
+        JackAtomicDelayLockedLoop fHostDLL;
+        JackAtomicDelayLockedLoop fAdaptedDLL;
 
-            JackResampler** fCaptureRingBuffer;
-            JackResampler** fPlaybackRingBuffer;
+        JackResampler** fCaptureRingBuffer;
+        JackResampler** fPlaybackRingBuffer;
 
-            bool fRunning;
+        bool fRunning;
 
-        public:
+    public:
 
-            JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate )
-                    :fCaptureChannels ( 0 ),
-                    fPlaybackChannels ( 0 ),
-                    fBufferSize ( buffer_size ),
-                    fSampleRate ( sample_rate ),
-                    fProducerDLL ( buffer_size, sample_rate ),
-                    fConsumerDLL ( buffer_size, sample_rate ),
-                    fRunning ( false )
-            {}
-            virtual ~JackAudioAdapterInterface()
-            {}
+        JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ) :
+                fCaptureChannels ( 0 ),
+                fPlaybackChannels ( 0 ),
+                fHostBufferSize ( buffer_size ),
+                fHostSampleRate ( sample_rate ),
+                fAdaptedBufferSize ( buffer_size),
+                fAdaptedSampleRate ( sample_rate ),
+                fHostDLL ( buffer_size, sample_rate ),
+                fAdaptedDLL ( buffer_size, sample_rate ),
+                fRunning ( false )
+        {}
 
-            void SetRingBuffers ( JackResampler** input, JackResampler** output )
-            {
-                fCaptureRingBuffer = input;
-                fPlaybackRingBuffer = output;
-            }
+        virtual ~JackAudioAdapterInterface()
+        {}
 
-            bool IsRunning() {return fRunning;}
+        void SetRingBuffers ( JackResampler** input, JackResampler** output )
+        {
+            fCaptureRingBuffer = input;
+            fPlaybackRingBuffer = output;
+        }
 
-            virtual void Reset() {fRunning = false;}
-            void ResetRingBuffers();
+        bool IsRunning()
+        {
+            return fRunning;
+        }
 
-            virtual int Open();
-            virtual int Close();
+        virtual void Reset()
+        {
+            fRunning = false;
+        }
 
-            virtual int SetBufferSize ( jack_nframes_t buffer_size )
-            {
-                fBufferSize = buffer_size;
-                fConsumerDLL.Init ( fBufferSize, fSampleRate );
-                fProducerDLL.Init ( fBufferSize, fSampleRate );
-                return 0;
-            }
+        void ResetRingBuffers();
 
-            virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
-            {
-                fBufferSize = buffer_size;
-                fConsumerDLL.Init ( fBufferSize, fSampleRate );
-                return 0;
-            }
+        virtual int Open();
+        virtual int Close();
 
-            virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
-            {
-                fProducerDLL.Init ( buffer_size, fSampleRate );
-                return 0;
-            }
+        virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
+        {
+            fHostBufferSize = buffer_size;
+            fHostDLL.Init ( fHostBufferSize, fHostSampleRate );
+            return 0;
+        }
 
-            //TODO : switch the two next methods to SetHost/AdaptedBufferSize in adapters
-            virtual int SetSampleRate ( jack_nframes_t sample_rate )
-            {
-                fSampleRate = sample_rate;
-                fConsumerDLL.Init ( fBufferSize, fSampleRate );
-                // Producer (Audio) keeps the same SR
-                return 0;
-            }
+        virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
+        {
+            fAdaptedBufferSize = buffer_size;
+            fAdaptedDLL.Init ( fAdaptedBufferSize, fAdaptedSampleRate );
+            return 0;
+        }
 
-            virtual int SetAudioSampleRate ( jack_nframes_t sample_rate )
-            {
-                fSampleRate = sample_rate;
-                // Consumer keeps the same SR
-                fProducerDLL.Init ( fBufferSize, fSampleRate );
-                return 0;
-            }
+        virtual int SetBufferSize ( jack_nframes_t buffer_size )
+        {
+            SetHostBufferSize ( buffer_size );
+            SetAdaptedBufferSize ( buffer_size );
+            return 0;
+        }
 
-            //host = driver that hosts the adapter
-            virtual int SetHostSampleRate ( jack_nframes_t sample_rate )
-            {
-                fSampleRate = sample_rate;
-                fConsumerDLL.Init ( fBufferSize, fSampleRate );
-                return 0;
-            }
+        virtual int SetHostSampleRate ( jack_nframes_t sample_rate )
+        {
+            fHostSampleRate = sample_rate;
+            fHostDLL.Init ( fHostBufferSize, fHostSampleRate );
+            return 0;
+        }
 
-            //adapted = driver hosted by the adapter
-            virtual int SetAdaptedSampleRate ( jack_nframes_t sample_rate )
-            {
-                fProducerDLL.Init ( fBufferSize, fSampleRate );
-                return 0;
-            }
+        virtual int SetAdaptedSampleRate ( jack_nframes_t sample_rate )
+        {
+            fAdaptedSampleRate = sample_rate;
+            fAdaptedDLL.Init ( fAdaptedBufferSize, fAdaptedSampleRate );
+            return 0;
+        }
 
-            virtual void SetCallbackTime ( jack_time_t callback_usec )
-            {
-                fConsumerDLL.IncFrame ( callback_usec );
-            }
+        virtual int SetSampleRate ( jack_nframes_t sample_rate )
+        {
+            SetHostSampleRate ( sample_rate );
+            SetAdaptedSampleRate ( sample_rate );
+            return 0;
+        }
 
-            void ResampleFactor ( jack_nframes_t& frame1, jack_nframes_t& frame2 );
+        virtual void SetCallbackTime ( jack_time_t callback_usec )
+        {
+            fHostDLL.IncFrame ( callback_usec );
+        }
 
-            void SetInputs ( int inputs )
-            {
-                jack_log ( "JackAudioAdapterInterface::SetInputs %d", inputs );
-                fCaptureChannels = inputs;
-            }
+        void ResampleFactor ( jack_nframes_t& frame1, jack_nframes_t& frame2 );
 
-            void SetOutputs ( int outputs )
-            {
-                jack_log ( "JackAudioAdapterInterface::SetOutputs %d", outputs );
-                fPlaybackChannels = outputs;
-            }
+        void SetInputs ( int inputs )
+        {
+            jack_log ( "JackAudioAdapterInterface::SetInputs %d", inputs );
+            fCaptureChannels = inputs;
+        }
 
-            int GetInputs()
-            {
-                jack_log ( "JackAudioAdapterInterface::GetInputs %d", fCaptureChannels );
-                return fCaptureChannels;
-            }
+        void SetOutputs ( int outputs )
+        {
+            jack_log ( "JackAudioAdapterInterface::SetOutputs %d", outputs );
+            fPlaybackChannels = outputs;
+        }
 
-            int GetOutputs()
-            {
-                jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
-                return fPlaybackChannels;
-            }
+        int GetInputs()
+        {
+            jack_log ( "JackAudioAdapterInterface::GetInputs %d", fCaptureChannels );
+            return fCaptureChannels;
+        }
+
+        int GetOutputs()
+        {
+            jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
+            return fPlaybackChannels;
+        }
 
     };
 

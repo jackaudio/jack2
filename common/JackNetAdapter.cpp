@@ -178,7 +178,7 @@ namespace Jack
 
     int JackNetAdapter::SetBufferSize ( jack_nframes_t buffer_size )
     {
-        JackAudioAdapterInterface::SetHostBufferSize ( buffer_size ); 
+        JackAudioAdapterInterface::SetHostBufferSize ( buffer_size );
         return 0;
     }
 
@@ -210,7 +210,8 @@ namespace Jack
         }
 
         //set audio adapter parameters
-        JackAudioAdapterInterface::SetAdaptedBufferSize ( fParams.fPeriodSize );
+        SetAdaptedBufferSize ( fParams.fPeriodSize );
+        SetAdaptedSampleRate ( fParams.fSampleRate );
 
         //init done, display parameters
         SessionParamsDisplay ( &fParams );
@@ -278,14 +279,14 @@ namespace Jack
         for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
         {
             fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
-            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fParams.fPeriodSize ) < fParams.fPeriodSize )
+            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fAdaptedBufferSize ) < fAdaptedBufferSize )
                 failure = true;
         }
         //and output data,
         for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
         {
             fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
-            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fParams.fPeriodSize ) < fParams.fPeriodSize )
+            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fAdaptedBufferSize ) < fAdaptedBufferSize )
                 failure = true;
         }
 

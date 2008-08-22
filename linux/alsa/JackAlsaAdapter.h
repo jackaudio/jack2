@@ -49,32 +49,32 @@ class AudioParam
 {
 
   public:
-            
-    const char*     fCardName;					
+
+    const char*     fCardName;
     unsigned int	fFrequency;
-    int             fBuffering; 
-    
+    int             fBuffering;
+
     unsigned int	fSoftInputs;
     unsigned int	fSoftOutputs;
-    
+
   public:
-  
-    AudioParam() : 
+
+    AudioParam() :
         fCardName("hw:0"),
         fFrequency(44100),
         fBuffering(512),
         fSoftInputs(2),
         fSoftOutputs(2)
     {}
-    
-    AudioParam(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
+
+    AudioParam(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) :
         fCardName("hw:0"),
         fFrequency(sample_rate),
         fBuffering(buffer_size),
         fSoftInputs(input),
         fSoftOutputs(output)
     {}
-    
+
     AudioParam&	cardName(const char* n)	{ fCardName = n; 	return *this; }
     AudioParam&	frequency(int f)	{ fFrequency = f; 	return *this; }
     AudioParam&	buffering(int fpb)	{ fBuffering = fpb; 	return *this; }
@@ -89,44 +89,44 @@ class AudioInterface : public AudioParam
 {
 
  public:
- 
-    snd_pcm_t*	fOutputDevice;		
-    snd_pcm_t*	fInputDevice;			
+
+    snd_pcm_t*	fOutputDevice;
+    snd_pcm_t*	fInputDevice;
     snd_pcm_hw_params_t* fInputParams;
     snd_pcm_hw_params_t* fOutputParams;
-    
+
     snd_pcm_format_t fSampleFormat;
     snd_pcm_access_t fSampleAccess;
-    
+
     unsigned int fCardInputs;
     unsigned int fCardOutputs;
-    
+
     unsigned int fChanInputs;
     unsigned int fChanOutputs;
 
     unsigned int fPeriod;
- 
+
     // interleaved mode audiocard buffers
     void* fInputCardBuffer;
     void* fOutputCardBuffer;
-    
+
     // non interleaved mode audiocard buffers
     void* fInputCardChannels[256];
     void* fOutputCardChannels[256];
-    
+
     // non interleaved mod, floating point software buffers
     float* fInputSoftChannels[256];
     float* fOutputSoftChannels[256];
 
  public:
- 
+
     const char*	cardName()	{ return fCardName; }
     int		frequency()		{ return fFrequency; }
     int		buffering()		{ return fBuffering; }
-    
+
     float**		inputSoftChannels()	{ return fInputSoftChannels; }
     float**		outputSoftChannels()	{ return fOutputSoftChannels; }
-    
+
     AudioInterface(const AudioParam& ap = AudioParam()) : AudioParam(ap)
     {
         fInputDevice 	= 0;
@@ -136,7 +136,7 @@ class AudioInterface : public AudioParam
         fPeriod = 2;
     }
 
-    AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) : 
+    AudioInterface(int input, int output, jack_nframes_t buffer_size, jack_nframes_t sample_rate) :
         AudioParam(input, output, buffer_size, sample_rate)
     {
         fInputCardBuffer = 0;
@@ -149,7 +149,7 @@ class AudioInterface : public AudioParam
             fOutputSoftChannels[i] = 0;
         }
     }
-    
+
     /**
      * Open the audio interface
      */
@@ -188,7 +188,7 @@ class AudioInterface : public AudioParam
                 fOutputCardChannels[i] = aligned_calloc(noninterleavedBufferSize(fOutputParams), 1);
             }
         }
-        
+
         // allocation of floating point buffers needed by the dsp code
         fChanInputs = max(fSoftInputs, fCardInputs);		assert (fChanInputs < 256);
         fChanOutputs = max(fSoftOutputs, fCardOutputs);		assert (fChanOutputs < 256);
@@ -208,7 +208,7 @@ class AudioInterface : public AudioParam
         }
         return 0;
     }
-    
+
     int close()
     {
         snd_pcm_hw_params_free(fInputParams);
@@ -240,26 +240,26 @@ class AudioInterface : public AudioParam
             free(fInputCardBuffer);
         if (fOutputCardBuffer)
             free(fOutputCardBuffer);
-           
+
         return 0;
     }
-    
+
     int setAudioParams(snd_pcm_t* stream, snd_pcm_hw_params_t* params)
-    {	
+    {
         int err;
 
         // set params record with initial values
-        err = snd_pcm_hw_params_any	( stream, params ); 	
+        err = snd_pcm_hw_params_any	( stream, params );
         check_error_msg(err, "unable to init parameters")
 
         // set alsa access mode (and fSampleAccess field) either to non interleaved or interleaved
-                
+
         err = snd_pcm_hw_params_set_access (stream, params, SND_PCM_ACCESS_RW_NONINTERLEAVED );
         if (err) {
             err = snd_pcm_hw_params_set_access (stream, params, SND_PCM_ACCESS_RW_INTERLEAVED );
             check_error_msg(err, "unable to set access mode neither to non-interleaved or to interleaved");
         }
-        snd_pcm_hw_params_get_access(params, &fSampleAccess);  
+        snd_pcm_hw_params_get_access(params, &fSampleAccess);
 
         // search for 32-bits or 16-bits format
         err = snd_pcm_hw_params_set_format (stream, params, SND_PCM_FORMAT_S32);
@@ -269,13 +269,13 @@ class AudioInterface : public AudioParam
         }
         snd_pcm_hw_params_get_format(params, &fSampleFormat);
         // set sample frequency
-        snd_pcm_hw_params_set_rate_near (stream, params, &fFrequency, 0); 
+        snd_pcm_hw_params_set_rate_near (stream, params, &fFrequency, 0);
 
         // set period and period size (buffering)
-        err = snd_pcm_hw_params_set_period_size	(stream, params, fBuffering, 0); 	
+        err = snd_pcm_hw_params_set_period_size	(stream, params, fBuffering, 0);
         check_error_msg(err, "period size not available");
-        
-        err = snd_pcm_hw_params_set_periods (stream, params, fPeriod, 0); 			
+
+        err = snd_pcm_hw_params_set_periods (stream, params, fPeriod, 0);
         check_error_msg(err, "number of periods not available");
         return 0;
     }
@@ -298,20 +298,20 @@ class AudioInterface : public AudioParam
     }
 
     /**
-     * Read audio samples from the audio card. Convert samples to floats and take 
+     * Read audio samples from the audio card. Convert samples to floats and take
      * care of interleaved buffers
      */
     int read()
     {
         if (fSampleAccess == SND_PCM_ACCESS_RW_INTERLEAVED) {
-            
-            int count = snd_pcm_readi(fInputDevice, fInputCardBuffer, fBuffering); 	
-            if (count<0) { 
+
+            int count = snd_pcm_readi(fInputDevice, fInputCardBuffer, fBuffering);
+            if (count<0) {
                 display_error_msg(count, "reading samples");
-                int err = snd_pcm_prepare(fInputDevice);	
+                int err = snd_pcm_prepare(fInputDevice);
                 check_error_msg(err, "preparing input stream");
             }
-            
+
             if (fSampleFormat == SND_PCM_FORMAT_S16) {
 
                 short* 	buffer16b = (short*) fInputCardBuffer;
@@ -330,16 +330,16 @@ class AudioInterface : public AudioParam
                     }
                 }
             }
-            
+
         } else if (fSampleAccess == SND_PCM_ACCESS_RW_NONINTERLEAVED) {
-            
-            int count = snd_pcm_readn(fInputDevice, fInputCardChannels, fBuffering); 	
-            if (count < 0) { 
+
+            int count = snd_pcm_readn(fInputDevice, fInputCardChannels, fBuffering);
+            if (count < 0) {
                 display_error_msg(count, "reading samples");
-                int err = snd_pcm_prepare(fInputDevice);	
+                int err = snd_pcm_prepare(fInputDevice);
                 check_error_msg(err, "preparing input stream");
             }
-            
+
             if (fSampleFormat == SND_PCM_FORMAT_S16) {
 
                 for (unsigned int c = 0; c < fCardInputs; c++) {
@@ -358,7 +358,7 @@ class AudioInterface : public AudioParam
                     }
                 }
             }
-            
+
         } else {
             check_error_msg(-10000, "unknow access mode");
         }
@@ -367,15 +367,15 @@ class AudioInterface : public AudioParam
     }
 
     /**
-     * write the output soft channels to the audio card. Convert sample 
+     * write the output soft channels to the audio card. Convert sample
      * format and interleaves buffers when needed
      */
     int write()
     {
         recovery:
-                
+
         if (fSampleAccess == SND_PCM_ACCESS_RW_INTERLEAVED) {
-            
+
             if (fSampleFormat == SND_PCM_FORMAT_S16) {
 
                 short* buffer16b = (short*) fOutputCardBuffer;
@@ -397,17 +397,17 @@ class AudioInterface : public AudioParam
                 }
             }
 
-            int count = snd_pcm_writei(fOutputDevice, fOutputCardBuffer, fBuffering); 	
-            if (count < 0) { 
-                display_error_msg(count, "w3"); 
-                int err = snd_pcm_prepare(fOutputDevice);	
+            int count = snd_pcm_writei(fOutputDevice, fOutputCardBuffer, fBuffering);
+            if (count < 0) {
+                display_error_msg(count, "w3");
+                int err = snd_pcm_prepare(fOutputDevice);
                 check_error_msg(err, "preparing output stream");
                 goto recovery;
             }
-            
-            
+
+
         } else if (fSampleAccess == SND_PCM_ACCESS_RW_NONINTERLEAVED) {
-            
+
             if (fSampleFormat == SND_PCM_FORMAT_S16) {
 
                 for (unsigned int c = 0; c < fCardOutputs; c++) {
@@ -429,21 +429,21 @@ class AudioInterface : public AudioParam
                 }
             }
 
-            int count = snd_pcm_writen(fOutputDevice, fOutputCardChannels, fBuffering); 	
-            if (count<0) { 
-                display_error_msg(count, "w3"); 
-                int err = snd_pcm_prepare(fOutputDevice);	
+            int count = snd_pcm_writen(fOutputDevice, fOutputCardChannels, fBuffering);
+            if (count<0) {
+                display_error_msg(count, "w3");
+                int err = snd_pcm_prepare(fOutputDevice);
                 check_error_msg(err, "preparing output stream");
                 goto recovery;
             }
-            
+
         } else {
             check_error_msg(-10000, "unknow access mode");
         }
 
         return 0;
     }
-  
+
     /**
      *  print short information on the audio device
      */
@@ -455,13 +455,13 @@ class AudioInterface : public AudioParam
         err = snd_ctl_open(&ctl_handle, fCardName, 0);	check_error(err);
         snd_ctl_card_info_alloca(&card_info);
         err = snd_ctl_card_info(ctl_handle, card_info);	check_error(err);
-        jack_info("%s|%d|%d|%d|%d|%s", 
+        jack_info("%s|%d|%d|%d|%d|%s",
                 snd_ctl_card_info_get_driver(card_info),
                 fCardInputs, fCardOutputs,
                 fFrequency, fBuffering,
                 snd_pcm_format_name((_snd_pcm_format)fSampleFormat));
     }
-                    
+
     /**
      *  print more detailled information on the audio device
      */
@@ -472,12 +472,12 @@ class AudioInterface : public AudioParam
         snd_ctl_t* ctl_handle;
 
         jack_info("Audio Interface Description :");
-        jack_info("Sampling Frequency : %d, Sample Format : %s, buffering : %d nperiod : %d", 
+        jack_info("Sampling Frequency : %d, Sample Format : %s, buffering : %d nperiod : %d",
                 fFrequency, snd_pcm_format_name((_snd_pcm_format)fSampleFormat), fBuffering, fPeriod);
         jack_info("Software inputs : %2d, Software outputs : %2d", fSoftInputs, fSoftOutputs);
         jack_info("Hardware inputs : %2d, Hardware outputs : %2d", fCardInputs, fCardOutputs);
         jack_info("Channel inputs  : %2d, Channel outputs  : %2d", fChanInputs, fChanOutputs);
-        
+
         // affichage des infos de la carte
         err = snd_ctl_open (&ctl_handle, fCardName, 0);		check_error(err);
         snd_ctl_card_info_alloca (&card_info);
@@ -489,7 +489,7 @@ class AudioInterface : public AudioParam
         if (fSoftOutputs > 0)	printHWParams(fOutputParams);
         return 0;
     }
-    
+
     void printCardInfo(snd_ctl_card_info_t*	ci)
     {
         jack_info("Card info (address : %p)", ci);
@@ -528,24 +528,25 @@ class JackAlsaAdapter : public JackAudioAdapterInterface, public JackRunnableInt
 {
 
     private:
-        
+
         JackThread fThread;
         AudioInterface fAudioInterface;
-   
+
     public:
-    
+
         JackAlsaAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackAlsaAdapter()
         {}
-        
+
         virtual int Open();
         virtual int Close();
-         
+
+        virtual int SetSampleRate(jack_nframes_t sample_rate);
         virtual int SetBufferSize(jack_nframes_t buffer_size);
-        
+
         virtual bool Init();
         virtual bool Execute();
-         
+
 };
 
 }
