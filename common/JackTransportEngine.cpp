@@ -28,6 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include "JackTime.h"
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 
 using namespace std;
@@ -260,6 +261,20 @@ jack_transport_state_t JackTransportEngine::Query(jack_position_t* pos)
     if (pos)
         ReadCurrentPos(pos);
     return GetState();
+}
+
+jack_nframes_t JackTransportEngine::GetCurrentFrame()
+{
+    jack_position_t pos;
+    ReadCurrentPos(&pos);
+
+    if (fTransportState == JackTransportRolling) {
+        float usecs = GetMicroSeconds() - pos.usecs;
+        jack_nframes_t elapsed = (jack_nframes_t)floor((((float) pos.frame_rate) / 1000000.0f) * usecs);
+        return pos.frame + elapsed;
+    } else {
+        return pos.frame;
+    }
 }
 
 // RT, client

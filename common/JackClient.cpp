@@ -669,16 +669,7 @@ jack_transport_state_t JackClient::TransportQuery(jack_position_t* pos)
 
 jack_nframes_t JackClient::GetCurrentTransportFrame()
 {
-    jack_position_t pos;
-    jack_transport_state_t state = TransportQuery(&pos);
-
-    if (state == JackTransportRolling) {
-        float usecs = GetMicroSeconds() - pos.usecs;
-        jack_nframes_t elapsed = (jack_nframes_t)floor((((float) pos.frame_rate) / 1000000.0f) * usecs);
-        return pos.frame + elapsed;
-    } else {
-        return pos.frame;
-    }
+    return GetEngineControl()->fTransport.GetCurrentFrame();
 }
 
 // Must be RT safe: directly write in the transport shared mem

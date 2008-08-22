@@ -170,6 +170,8 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         void RequestNewPos(jack_position_t* pos);
         
         jack_transport_state_t Query(jack_position_t* pos);
+        
+        jack_nframes_t GetCurrentFrame();
 
         static void CopyPosition(jack_position_t* from, jack_position_t* to);
 
