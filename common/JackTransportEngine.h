@@ -101,6 +101,7 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         int fSyncTimeLeft;
         int fTimeBaseMaster;
         bool fPendingPos;
+        bool fNetworkSync;
         SInt32 fWriteCounter;
 
         bool CheckAllRolling(JackClientInterface** table);
@@ -125,6 +126,11 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         jack_transport_state_t GetState() const
         {
             return fTransportState;
+        }
+        
+        void GetState(jack_transport_state_t state)
+        {
+            fTransportState = state;
         }
 
         int GetTimebaseMaster() const
@@ -174,6 +180,16 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         jack_nframes_t GetCurrentFrame();
 
         static void CopyPosition(jack_position_t* from, jack_position_t* to);
+        
+        bool GetNetworkSync() const
+        {
+            return fNetworkSync;
+        }
+        
+        void SetNetworkSync(bool sync)
+        {
+            fNetworkSync = sync;
+        }
 
 };
 

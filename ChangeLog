@@ -25,6 +25,7 @@ Florian Faber
 2008-08-22 Stephane Letz  <letz@grame.fr>
 	
 	* Move GetCurrentTransportFrame code from JackClient to JackTransportEngine.
+	* Add a fNetworkSync state in JackTransportEngine used in network.
 
 2008-08-03 Stephane Letz  <letz@grame.fr>
 	

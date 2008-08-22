@@ -437,10 +437,11 @@ typedef enum JackStatus jack_status_t;
 typedef enum {
 
     /* the order matters for binary compatibility */
-    JackTransportStopped = 0,  	/**< Transport halted */
-    JackTransportRolling = 1,  	/**< Transport playing */
-    JackTransportLooping = 2,  	/**< For OLD_TRANSPORT, now ignored */
-    JackTransportStarting = 3, 	/**< Waiting for sync ready */
+    JackTransportStopped = 0,       /**< Transport halted */
+    JackTransportRolling = 1,       /**< Transport playing */
+    JackTransportLooping = 2,       /**< For OLD_TRANSPORT, now ignored */
+    JackTransportStarting = 3,      /**< Waiting for sync ready */
+    JackTransportNetStarting = 4, 	/**< Waiting for sync ready on the network*/
 
 } jack_transport_state_t;
 

@@ -489,6 +489,9 @@ static void display_transport_state()
         case JackTransportStarting:
             Log("Transport is starting...\n");
             break;
+        case JackTransportNetStarting:
+            Log("Transport is starting with network sync...\n");
+            break;
     }
 }
 

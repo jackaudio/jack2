@@ -363,8 +363,8 @@ int JackCoreAudioAdapter::SetupBuffers(int inchannels, int outchannels)
     fInputData->mNumberBuffers = inchannels;
     for (int i = 0; i < fCaptureChannels; i++) {
         fInputData->mBuffers[i].mNumberChannels = 1;
-        fInputData->mBuffers[i].mDataByteSize = fBufferSize * sizeof(float);
-        fInputData->mBuffers[i].mData = malloc(fBufferSize * sizeof(float));
+        fInputData->mBuffers[i].mDataByteSize = fAdaptedBufferSize * sizeof(float);
+        fInputData->mBuffers[i].mData = malloc(fAdaptedBufferSize * sizeof(float));
     }
     return 0;
 }
@@ -575,10 +575,10 @@ int JackCoreAudioAdapter::Open()
     if (SetupChannels(true, true, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, true) < 0)
         return -1;
 
-    if (SetupBufferSizeAndSampleRate(fBufferSize, fSampleRate)  < 0)
+    if (SetupBufferSizeAndSampleRate(fAdaptedBufferSize, fAdaptedSampleRate)  < 0)
         return -1;
 
-    if (OpenAUHAL(true, true, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, fBufferSize, fSampleRate, true) < 0)
+    if (OpenAUHAL(true, true, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, fAdaptedBufferSize, fAdaptedSampleRate, true) < 0)
         goto error;
 
     if (SetupBuffers(fCaptureChannels, fPlaybackChannels) < 0)

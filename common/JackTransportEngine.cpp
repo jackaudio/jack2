@@ -45,6 +45,7 @@ JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t
     fTimeBaseMaster = -1;
     fWriteCounter = 0;
     fPendingPos = false;
+    fNetworkSync = false;
 }
 
 // compute the number of cycle for timeout
@@ -196,8 +197,13 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
                 MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
             } else if (--fSyncTimeLeft == 0 || CheckAllRolling(table)) {  // Slow clients may still catch up
-                jack_log("transport starting ==> rolling fSyncTimeLeft = %ld", fSyncTimeLeft);
-                fTransportState = JackTransportRolling;
+                if (fNetworkSync) {
+                    jack_log("transport starting ==> netstarting");
+                    fTransportState = JackTransportNetStarting;
+                } else {
+                    jack_log("transport starting ==> rolling fSyncTimeLeft = %ld", fSyncTimeLeft);
+                    fTransportState = JackTransportRolling;
+                }
             }
             break;
 
