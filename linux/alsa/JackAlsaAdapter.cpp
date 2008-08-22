@@ -133,8 +133,9 @@ namespace Jack
 
     bool JackAlsaAdapter::Init()
     {
-        fAudioInterface.write();
-        fAudioInterface.write();
+        //fill the hardware buffers
+        for ( unsigned int i = 0; i < fAudioInterface.fPeriod; i++ )
+            fAudioInterface.write();
         return true;
     }
 

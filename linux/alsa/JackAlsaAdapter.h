@@ -132,8 +132,6 @@ namespace Jack
             //channels
             unsigned int fCardInputs;
             unsigned int fCardOutputs;
-            unsigned int fChanInputs;
-            unsigned int fChanOutputs;
 
             //stream parameters
             unsigned int fPeriod;
@@ -220,13 +218,11 @@ namespace Jack
                 setAudioParams ( fOutputDevice, fOutputParams );
                 snd_pcm_hw_params_get_channels ( fOutputParams, &fCardOutputs );
 
-                jack_info ( "inputs : %ud, outputs : %ud", fCardInputs, fCardOutputs );
-
-                // enregistrement des parametres d'entree-sortie
+                //set input/output param
                 check_error ( snd_pcm_hw_params ( fInputDevice,  fInputParams ) );
                 check_error ( snd_pcm_hw_params ( fOutputDevice, fOutputParams ) );
 
-                // allocation of alsa buffers
+                //set hardware buffers
                 if ( fSampleAccess == SND_PCM_ACCESS_RW_INTERLEAVED )
                 {
                     fInputCardBuffer = aligned_calloc ( interleavedBufferSize ( fInputParams ), 1 );
@@ -240,20 +236,20 @@ namespace Jack
                         fOutputCardChannels[i] = aligned_calloc ( noninterleavedBufferSize ( fOutputParams ), 1 );
                 }
 
-                // allocation of floating point buffers needed by the dsp code
-                fChanInputs = max ( fSoftInputs, fCardInputs );
-                assert ( fChanInputs < 256 );
-                fChanOutputs = max ( fSoftOutputs, fCardOutputs );
-                assert ( fChanOutputs < 256 );
+                //set floating point buffers needed by the dsp code
+                fSoftInputs = max ( fSoftInputs, fCardInputs );
+                assert ( fSoftInputs < 256 );
+                fSoftOutputs = max ( fSoftOutputs, fCardOutputs );
+                assert ( fSoftOutputs < 256 );
 
-                for ( unsigned int i = 0; i < fChanInputs; i++ )
+                for ( unsigned int i = 0; i < fSoftInputs; i++ )
                 {
                     fInputSoftChannels[i] = ( float* ) aligned_calloc ( fBuffering, sizeof ( float ) );
                     for ( int j = 0; j < fBuffering; j++ )
                         fInputSoftChannels[i][j] = 0.0;
                 }
 
-                for ( unsigned int i = 0; i < fChanOutputs; i++ )
+                for ( unsigned int i = 0; i < fSoftOutputs; i++ )
                 {
                     fOutputSoftChannels[i] = ( float* ) aligned_calloc ( fBuffering, sizeof ( float ) );
                     for ( int j = 0; j < fBuffering; j++ )
@@ -269,11 +265,11 @@ namespace Jack
                 snd_pcm_close ( fInputDevice );
                 snd_pcm_close ( fOutputDevice );
 
-                for ( unsigned int i = 0; i < fChanInputs; i++ )
+                for ( unsigned int i = 0; i < fSoftInputs; i++ )
                     if ( fInputSoftChannels[i] )
                         free ( fInputSoftChannels[i] );
 
-                for ( unsigned int i = 0; i < fChanOutputs; i++ )
+                for ( unsigned int i = 0; i < fSoftOutputs; i++ )
                     if ( fOutputSoftChannels[i] )
                         free ( fOutputSoftChannels[i] );
 
@@ -295,25 +291,25 @@ namespace Jack
 
             int setAudioParams ( snd_pcm_t* stream, snd_pcm_hw_params_t* params )
             {
-                // set params record with initial values
+                //set params record with initial values
                 check_error_msg ( snd_pcm_hw_params_any ( stream, params ), "unable to init parameters" )
 
-                // set alsa access mode (and fSampleAccess field) either to non interleaved or interleaved
+                //set alsa access mode (and fSampleAccess field) either to non interleaved or interleaved
                 if ( snd_pcm_hw_params_set_access ( stream, params, SND_PCM_ACCESS_RW_NONINTERLEAVED ) )
                     check_error_msg ( snd_pcm_hw_params_set_access ( stream, params, SND_PCM_ACCESS_RW_INTERLEAVED ),
                                       "unable to set access mode neither to non-interleaved or to interleaved" );
                 snd_pcm_hw_params_get_access ( params, &fSampleAccess );
 
-                // search for 32-bits or 16-bits format
+                //search for 32-bits or 16-bits format
                 if ( snd_pcm_hw_params_set_format ( stream, params, SND_PCM_FORMAT_S32 ) )
                     check_error_msg ( snd_pcm_hw_params_set_format ( stream, params, SND_PCM_FORMAT_S16 ),
                                       "unable to set format to either 32-bits or 16-bits" );
                 snd_pcm_hw_params_get_format ( params, &fSampleFormat );
 
-                // set sample frequency
+                //set sample frequency
                 snd_pcm_hw_params_set_rate_near ( stream, params, &fFrequency, 0 );
 
-                // set period and period size (buffering)
+                //set period and period size (buffering)
                 check_error_msg ( snd_pcm_hw_params_set_period_size ( stream, params, fBuffering, 0 ), "period size not available" );
                 check_error_msg ( snd_pcm_hw_params_set_periods ( stream, params, fPeriod, 0 ), "number of periods not available" );
 
@@ -354,7 +350,7 @@ namespace Jack
                 {
                     case SND_PCM_ACCESS_RW_INTERLEAVED :
                         count = snd_pcm_readi ( fInputDevice, fInputCardBuffer, fBuffering );
-                        if ( count<0 )
+                        if ( count < 0 )
                         {
                             display_error_msg ( count, "reading samples" );
                             check_error_msg ( snd_pcm_prepare ( fInputDevice ), "preparing input stream" );
@@ -519,11 +515,10 @@ namespace Jack
 
                 //display info
                 jack_info ( "Audio Interface Description :" );
-                jack_info ( "Sampling Frequency : %d, Sample Format : %s, buffering : %d nperiod : %d",
+                jack_info ( "Sampling Frequency : %d, Sample Format : %s, buffering : %d, nperiod : %d",
                             fFrequency, snd_pcm_format_name ( ( _snd_pcm_format ) fSampleFormat ), fBuffering, fPeriod );
                 jack_info ( "Software inputs : %2d, Software outputs : %2d", fSoftInputs, fSoftOutputs );
                 jack_info ( "Hardware inputs : %2d, Hardware outputs : %2d", fCardInputs, fCardOutputs );
-                jack_info ( "Channel inputs  : %2d, Channel outputs  : %2d", fChanInputs, fChanOutputs );
 
                 //get audio card info and display
                 check_error ( snd_ctl_open ( &ctl_handle, fCardName, 0 ) );
@@ -540,7 +535,7 @@ namespace Jack
                 return 0;
             }
 
-            void printCardInfo ( snd_ctl_card_info_t*   ci )
+            void printCardInfo ( snd_ctl_card_info_t* ci )
             {
                 jack_info ( "Card info (address : %p)", ci );
                 jack_info ( "\tID         = %s", snd_ctl_card_info_get_id ( ci ) );
@@ -556,15 +551,15 @@ namespace Jack
             {
                 jack_info ( "HW Params info (address : %p)\n", params );
 #if 0
-                jack_info ( "\tChannels    = %d", snd_pcm_hw_params_get_channels ( params ) );
-                jack_info ( "\tFormat      = %s", snd_pcm_format_name ( ( _snd_pcm_format ) snd_pcm_hw_params_get_format ( params ) ) );
-                jack_info ( "\tAccess      = %s", snd_pcm_access_name ( ( _snd_pcm_access ) snd_pcm_hw_params_get_access ( params ) ) );
-                jack_info ( "\tRate        = %d", snd_pcm_hw_params_get_rate ( params, NULL ) );
-                jack_info ( "\tPeriods     = %d", snd_pcm_hw_params_get_periods ( params, NULL ) );
-                jack_info ( "\tPeriod size = %d", ( int ) snd_pcm_hw_params_get_period_size ( params, NULL ) );
-                jack_info ( "\tPeriod time = %d", snd_pcm_hw_params_get_period_time ( params, NULL ) );
-                jack_info ( "\tBuffer size = %d", ( int ) snd_pcm_hw_params_get_buffer_size ( params ) );
-                jack_info ( "\tBuffer time = %d", snd_pcm_hw_params_get_buffer_time ( params, NULL ) );
+                jack_info ( "\tChannels    = %d", snd_pcm_hw_params_get_channels ( params, NULL ) );
+                jack_info ( "\tFormat      = %s", snd_pcm_format_name ( ( _snd_pcm_format ) snd_pcm_hw_params_get_format ( params, NULL ) ) );
+                jack_info ( "\tAccess      = %s", snd_pcm_access_name ( ( _snd_pcm_access ) snd_pcm_hw_params_get_access ( params, NULL ) ) );
+                jack_info ( "\tRate        = %d", snd_pcm_hw_params_get_rate ( params, NULL, NULL ) );
+                jack_info ( "\tPeriods     = %d", snd_pcm_hw_params_get_periods ( params, NULL, NULL ) );
+                jack_info ( "\tPeriod size = %d", ( int ) snd_pcm_hw_params_get_period_size ( params, NULL, NULL ) );
+                jack_info ( "\tPeriod time = %d", snd_pcm_hw_params_get_period_time ( params, NULL, NULL ) );
+                jack_info ( "\tBuffer size = %d", ( int ) snd_pcm_hw_params_get_buffer_size ( params, NULL ) );
+                jack_info ( "\tBuffer time = %d", snd_pcm_hw_params_get_buffer_time ( params, NULL, NULL ) );
 #endif
                 jack_info ( "--------------" );
             }
