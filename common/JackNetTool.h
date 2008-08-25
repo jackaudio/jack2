@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackTools.h"
 #include "JackPlatformNetSocket.h"
 #include "types.h"
+#include "transport.h"
 #include <cmath>
 
 using namespace std;
@@ -150,16 +151,34 @@ namespace Jack
         char fFree[26];             //unused
     };
 
+//net timebase master
+
+    /**
+    \Brief This enum describes timebase master's type
+    */
+
+    enum _net_timebase_master
+    {
+        NO_TIMEBASEMASTER = 0,
+        TIMEBASEMASTER = 1,
+        CONDITIONAL_TIMEBASEMASTER = 2
+    };
+
+    typedef enum _net_timebase_master net_timebase_master_t;
+
+
 //transport data ******************************************************************************
 
     /**
-    \Brief This structure contains transport info
+    \Brief This structure contains transport data to be sent over the network
     */
 
     struct _net_transport_data
     {
-        jack_position_t fCurPos;
-        jack_transport_state_t fCurState;
+        uint32_t fNewState;             //is it a state change
+        uint32_t fTimebaseMaster;       //is there a new timebase master
+        uint32_t fState;                //current cycle state
+        jack_position_t fPosition;      //current cycle position
     };
 
 //midi data ***********************************************************************************

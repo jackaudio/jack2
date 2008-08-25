@@ -40,7 +40,6 @@ namespace Jack
         //settings
         fClientName = const_cast<char*> ( fParams.fName );
         fJackClient = NULL;
-        fSyncState = 1;
         uint port_index;
 
         //jack audio ports
@@ -113,7 +112,7 @@ namespace Jack
         delete fNetTimeMon;
 #endif
     }
-
+//init--------------------------------------------------------------------------------
     bool JackNetMaster::Init()
     {
         //network init
@@ -160,6 +159,7 @@ namespace Jack
         return false;
     }
 
+//jack ports--------------------------------------------------------------------------
     int JackNetMaster::AllocPorts()
     {
         jack_log ( "JackNetMaster::AllocPorts" );
@@ -224,22 +224,121 @@ namespace Jack
                 jack_port_unregister ( fJackClient, fMidiPlaybackPorts[port_index] );
     }
 
-    int JackNetMaster::SetSyncPacket()
+//transport---------------------------------------------------------------------------
+    int JackNetMaster::SetTransportData()
     {
-        if ( fParams.fTransportSync )
-        {
-            //TODO : set the TransportData
+        //is there a new timebase master ?
+        //TODO : check if any timebase callback has been called (and if it's conditional or not) and set correct value...
+        fTransportData.fTimebaseMaster = NO_TIMEBASEMASTER;
 
-            //copy to TxBuffer
-            memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
+        //update state and position
+        fTransportData.fState = static_cast<uint32_t> ( jack_transport_query ( fJackClient, &fTransportData.fPosition ) );
+
+        //is it a new state ?
+        fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
+        fLastTransportState = fTransportData.fState;
+
+        return 0;
+    }
+
+    int JackNetMaster::DecodeTransportData()
+    {
+        //is the slave a new timebase master ?
+        switch ( fTransportData.fTimebaseMaster )
+        {
+            case NO_TIMEBASEMASTER :
+                break;
+            case TIMEBASEMASTER :
+                jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
+                break;
+            case CONDITIONAL_TIMEBASEMASTER :
+                jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
+                break;
+        }
+
+        //is there a transport state change to handle ?
+        if ( fTransportData.fNewState )
+        {
+            switch ( fTransportData.fState )
+            {
+                case JackTransportStopped :
+                    jack_transport_stop ( fJackClient );
+                    jack_info ( "%s stops transport.", fParams.fName );
+                    break;
+                case JackTransportRolling :
+                    if ( jack_transport_query ( fJackClient, &fTransportData.fPosition ) != JackTransportRolling )
+                        jack_error ( "Problem with transport." );
+                    break;
+                case JackTransportStarting :
+                    if ( jack_transport_reposition ( fJackClient, &fTransportData.fPosition ) < 0 )
+                        return -1;
+                    jack_transport_start ( fJackClient );
+                    jack_info ( "%s start transport.", fParams.fName );
+                    break;
+            }
         }
         return 0;
     }
 
+    void JackNetMaster::SetTimebaseCallback ( jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg )
+    {
+        static_cast<JackNetMaster*> ( arg )->TimebaseCallback ( pos );
+    }
+
+    void JackNetMaster::TimebaseCallback ( jack_position_t* pos )
+    {
+        pos->bar = fTransportData.fPosition.bar;
+        pos->beat = fTransportData.fPosition.beat;
+        pos->tick = fTransportData.fPosition.tick;
+        pos->bar_start_tick = fTransportData.fPosition.bar_start_tick;
+        pos->beats_per_bar = fTransportData.fPosition.beats_per_bar;
+        pos->beat_type = fTransportData.fPosition.beat_type;
+        pos->ticks_per_beat = fTransportData.fPosition.ticks_per_beat;
+        pos->beats_per_minute = fTransportData.fPosition.beats_per_minute;
+    }
+
+//sync--------------------------------------------------------------------------------
+    int JackNetMaster::SetSyncPacket()
+    {
+        //this method contains every step of sync packet informations coding
+        //first : transport
+        if ( fParams.fTransportSync )
+        {
+            if ( SetTransportData() < 0 )
+                return -1;
+            //copy to TxBuffer
+            memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
+        }
+        //then others
+        //...
+        return 0;
+    }
+
+    int JackNetMaster::DecodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations decoding process
+        //first : transport
+        if ( fParams.fTransportSync )
+        {
+            //copy received transport data to transport data structure
+            memcpy ( &fTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            if ( DecodeTransportData() < 0 )
+                return -1;
+        }
+        //then others
+        //...
+        return 0;
+    }
+
+    bool JackNetMaster::IsSlaveReadyToRoll()
+    {
+        return ( fTransportData.fState == JackTransportNetStarting );
+    }
+
+//process-----------------------------------------------------------------------------
     int JackNetMaster::SetProcess ( jack_nframes_t nframes, void* arg )
     {
-        JackNetMaster* master = static_cast<JackNetMaster*> ( arg );
-        return master->Process();
+        return static_cast<JackNetMaster*> ( arg )->Process();
     }
 
     int JackNetMaster::Process()
@@ -297,6 +396,10 @@ namespace Jack
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
+
+        //decode sync
+        if ( DecodeSyncPacket() < 0 )
+            return 0;
 
         //receive data
         res = DataRecv();
@@ -365,8 +468,7 @@ namespace Jack
 
     int JackNetMasterManager::SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg )
     {
-        JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*> ( arg );
-        return master_manager->SyncCallback ( state, pos );
+        return static_cast<JackNetMasterManager*> ( arg )->SyncCallback ( state, pos );
     }
 
     int JackNetMasterManager::SyncCallback ( jack_transport_state_t state, jack_position_t* pos )
@@ -375,7 +477,7 @@ namespace Jack
         int ret = 1;
         master_list_it_t it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            if ( ( *it )->fSyncState == 0 )
+            if ( !( *it )->IsSlaveReadyToRoll())
                 ret = 0;
         jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
         return ret;

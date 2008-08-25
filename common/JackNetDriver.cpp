@@ -47,6 +47,7 @@ namespace Jack
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
         fParams.fNetworkMode = network_mode;
+        fLastTimebaseMaster = -1;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
 #endif
@@ -125,6 +126,9 @@ namespace Jack
 
         JackDriver::NotifyBufferSize ( fParams.fPeriodSize );
         JackDriver::NotifySampleRate ( fParams.fSampleRate );
+
+        //transport engine parametering
+        fEngineControl->fTransport.SetNetworkSync ( true );
 
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
@@ -318,15 +322,90 @@ namespace Jack
         return static_cast<JackMidiBuffer*> ( fGraphManager->GetBuffer ( fMidiPlaybackPortList[port_index], fEngineControl->fBufferSize ) );
     }
 
-    int JackNetDriver::SetSyncPacket()
+    int JackNetDriver::DecodeTransportData()
     {
+        //is there a new timebase master on the master ?
+        int refnum;
+        bool conditional;
+        //release timebase master only if it's a non-conditional request
+        if ( fTransportData.fTimebaseMaster == TIMEBASEMASTER )
+        {
+            fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
+            if ( refnum != -1 )
+                fEngineControl->fTransport.ResetTimebase ( refnum );
+        }
+
+        //is there a tranport state change to handle ?
+        if ( fTransportData.fNewState )
+        {
+            switch ( fTransportData.fState )
+            {
+                case JackTransportStopped :
+                    fEngineControl->fTransport.SetState ( JackTransportStopped );
+                    break;
+                case JackTransportRolling :
+                    fEngineControl->fTransport.SetState ( JackTransportRolling);
+                    break;
+                case JackTransportStarting :
+                    fEngineControl->fTransport.SetCommand ( TransportCommandStart );
+                    break;
+            }
+        }
+
+        return 0;
+    }
+
+    int JackNetDriver::SetTransportData()
+    {
+        //is there a new timebase master ?
+        int refnum;
+        bool conditional;
+        fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
+        if ( refnum != fLastTimebaseMaster )
+        {
+            fTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
+            fLastTimebaseMaster = refnum;
+        }
+
+        //update transport state and position
+        fTransportData.fState = fEngineControl->fTransport.Query ( &fTransportData.fPosition );
+
+        //is it a new state ?
+        fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
+        fLastTransportState = fTransportData.fState;
+
+        return 0;
+    }
+
+    int JackNetDriver::DecodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations decoding process
+        //first : transport
         if ( fParams.fTransportSync )
         {
-            //set the TransportData
+            //copy received transport data to transport data structure
+            memcpy ( &fTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            if ( DecodeTransportData() < 0 )
+                return -1;
+        }
+        //then others
+        //...
+        return 0;
+    }
 
+    int JackNetDriver::SetSyncPacket()
+    {
+        //this method contains every step of sync packet informations coding
+        //first : transport
+        if ( fParams.fTransportSync )
+        {
+            if ( SetTransportData() < 0 )
+                return -1;
             //copy to TxBuffer
             memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
         }
+        //then others
+        //...
         return 0;
     }
 
@@ -353,6 +432,9 @@ namespace Jack
 
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
+
+        //decode transport info
+
 
         //audio, midi or sync if driver is late
         if ( DataRecv() == SOCKET_ERROR )

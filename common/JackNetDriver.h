@@ -39,12 +39,13 @@ namespace Jack
         private:
             //jack data
             net_transport_data_t fTransportData;
+            uint fLastTransportState;
+            int fLastTimebaseMaster;
             jack_port_id_t* fMidiCapturePortList;
             jack_port_id_t* fMidiPlaybackPortList;
 
             //monitoring
 #ifdef JACK_MONITOR
-            //time measurment
             JackGnuPlotMonitor<float>* fNetTimeMon;
 #endif
 
@@ -52,12 +53,17 @@ namespace Jack
             void Restart();
             int AllocPorts();
             int FreePorts();
+
+            //transport
+            int SetTransportData();
+            int DecodeTransportData();
+
+            //sync packet
             int SetSyncPacket();
-            int TransportSync();
+            int DecodeSyncPacket();
 
             JackMidiBuffer* GetMidiInputBuffer ( int port_index );
             JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
-
 
         public:
             JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
@@ -79,7 +85,7 @@ namespace Jack
             int Read();
             int Write();
 
-            // BufferSize can be changed
+            // BufferSize can't be changed
             bool IsFixedBufferSize()
             {
                 return true;

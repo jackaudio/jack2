@@ -39,6 +39,7 @@ namespace Jack
             friend class JackNetMasterManager;
         private:
             static int SetProcess ( jack_nframes_t nframes, void* arg );
+            static void SetTimebaseCallback ( jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg );
 
             //jack client
             jack_client_t* fJackClient;
@@ -51,7 +52,7 @@ namespace Jack
             jack_port_t** fMidiPlaybackPorts;
 
             //sync and transport
-            int fSyncState;
+            uint32_t fLastTransportState;
             net_transport_data_t fTransportData;
 
             //monitoring
@@ -65,12 +66,22 @@ namespace Jack
             void FreePorts();
             void Exit();
 
+            //transport
+            int SetTransportData();
+            int DecodeTransportData();
+
+            //sync packet
             int SetSyncPacket();
+            int DecodeSyncPacket();
 
             int Process();
+            void TimebaseCallback ( jack_position_t* pos);
+
         public:
             JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip );
             ~JackNetMaster ();
+
+            bool IsSlaveReadyToRoll();
     };
 
     typedef std::list<JackNetMaster*> master_list_t;
