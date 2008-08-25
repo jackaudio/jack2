@@ -44,6 +44,7 @@ JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t
     fSyncTimeLeft = 0;
     fTimeBaseMaster = -1;
     fWriteCounter = 0;
+    fConditionnal = false;
     fPendingPos = false;
     fNetworkSync = false;
 }
@@ -71,7 +72,7 @@ int JackTransportEngine::ResetTimebase(int refnum)
 }
 
 // Server
-int JackTransportEngine::SetTimebase(int refnum, bool conditionnal)
+int JackTransportEngine::SetTimebaseMaster(int refnum, bool conditionnal)
 {
     if (conditionnal && fTimeBaseMaster > 0) {
         if (refnum != fTimeBaseMaster) {
@@ -83,9 +84,16 @@ int JackTransportEngine::SetTimebase(int refnum, bool conditionnal)
         }
     } else {
         fTimeBaseMaster = refnum;
+        fConditionnal = conditionnal;
         jack_log("new timebase master: ref = %ld", refnum);
         return 0;
     }
+}
+
+void JackTransportEngine::GetTimebaseMaster(int& refnum, bool& conditionnal)
+{
+    refnum = fTimeBaseMaster;
+    conditionnal = fConditionnal;
 }
 
 // RT

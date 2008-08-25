@@ -102,6 +102,7 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         int fTimeBaseMaster;
         bool fPendingPos;
         bool fNetworkSync;
+        bool fConditionnal;
         SInt32 fWriteCounter;
 
         bool CheckAllRolling(JackClientInterface** table);
@@ -128,16 +129,11 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
             return fTransportState;
         }
         
-        void GetState(jack_transport_state_t state)
+        void SetState(jack_transport_state_t state)
         {
             fTransportState = state;
         }
-
-        int GetTimebaseMaster() const
-        {
-            return fTimeBaseMaster;
-        }
-
+        
         /*
         	\brief 
         */
@@ -146,7 +142,9 @@ class EXPORT JackTransportEngine : public JackAtomicArrayState<jack_position_t>
         /*
         	\brief 
         */
-        int SetTimebase(int refnum, bool conditionnal);
+        int SetTimebaseMaster(int refnum, bool conditionnal);
+        
+        void GetTimebaseMaster(int& refnum, bool& conditionnal);
 
         /*
         	\brief 

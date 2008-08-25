@@ -1331,7 +1331,7 @@ EXPORT pthread_t jack_client_thread_id(jack_client_t* ext_client)
     }
 }
 
-EXPORT char* jack_get_client_name (jack_client_t* ext_client)
+EXPORT char* jack_get_client_name(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();

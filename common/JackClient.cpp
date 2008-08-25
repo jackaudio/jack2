@@ -709,8 +709,12 @@ void JackClient::CallSyncCallback()
 void JackClient::CallTimebaseCallback()
 {
     JackTransportEngine& transport = GetEngineControl()->fTransport;
+    int master;
+    bool unused;
     
-    if (GetClientControl()->fRefNum == transport.GetTimebaseMaster() && fTimebase) { // Client *is* timebase...
+    transport.GetTimebaseMaster(master, unused);
+    
+    if (GetClientControl()->fRefNum == master && fTimebase) { // Client *is* timebase...
     
         jack_transport_state_t transport_state = transport.GetState();
         jack_position_t* cur_pos = transport.WriteNextStateStart(1);

@@ -305,7 +305,7 @@ int JackServer::ReleaseTimebase(int refnum)
 
 int JackServer::SetTimebaseCallback(int refnum, int conditional)
 {
-    return fEngineControl->fTransport.SetTimebase(refnum, conditional);
+    return fEngineControl->fTransport.SetTimebaseMaster(refnum, conditional);
 }
 
 JackLockedEngine* JackServer::GetEngine()
