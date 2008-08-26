@@ -229,10 +229,10 @@ namespace Jack
     {
         //is there a new timebase master ?
         //TODO : check if any timebase callback has been called (and if it's conditional or not) and set correct value...
-        fTransportData.fTimebaseMaster = NO_TIMEBASEMASTER;
+        fTransportData.fTimebaseMaster = NO_CHANGE;
 
         //update state and position
-        fTransportData.fState = static_cast<uint32_t> ( jack_transport_query ( fJackClient, &fTransportData.fPosition ) );
+        fTransportData.fState = static_cast<uint> ( jack_transport_query ( fJackClient, &fTransportData.fPosition ) );
 
         //is it a new state ?
         fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
@@ -245,35 +245,41 @@ namespace Jack
 
     int JackNetMaster::DecodeTransportData()
     {
-        //is the slave a new timebase master ?
-        int timebase;
-        switch ( fTransportData.fTimebaseMaster )
+        //is there timebase master change ?
+        if ( fTransportData.fTimebaseMaster != NO_CHANGE )
         {
-            case NO_TIMEBASEMASTER :
-                break;
-            case TIMEBASEMASTER :
-                timebase = jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
-                if ( timebase < 0 )
-                    jack_error ( "Can't set a new timebase master." );
-                else
-                    jack_info ( "'%s' is the new timebase master.", fParams.fName );
-                break;
-            case CONDITIONAL_TIMEBASEMASTER :
-                timebase = jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
-                if ( timebase < 0 )
-                {
-                    if ( timebase == EBUSY )
-                        jack_error ( "'%s' is already the timebase master.", fParams.fName );
+            int timebase = 0;
+            switch ( fTransportData.fTimebaseMaster )
+            {
+                case RELEASE_TIMEBASEMASTER :
+                    timebase = jack_release_timebase ( fJackClient );
+                    if ( timebase < 0 )
+                        jack_error ( "Can't release timebase master." );
                     else
+                        jack_info ( "'%s' isn't the timebase master anymore.", fParams.fName );
+                    break;
+                case TIMEBASEMASTER :
+                    timebase = jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
+                    if ( timebase < 0 )
                         jack_error ( "Can't set a new timebase master." );
-                }
-                else
-                    jack_info ( "'%s' is the new timebase master.", fParams.fName );
-                break;
+                    else
+                        jack_info ( "'%s' is the new timebase master.", fParams.fName );
+                    break;
+                case CONDITIONAL_TIMEBASEMASTER :
+                    timebase = jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
+                    if ( timebase != EBUSY )
+                    {
+                        if ( timebase < 0 )
+                            jack_error ( "Can't set a new timebase master." );
+                        else
+                            jack_info ( "'%s' is the new timebase master.", fParams.fName );
+                    }
+                    break;
+            }
         }
 
         //is the slave in a new transport state and is this state different from master's ?
-        if ( fTransportData.fNewState && ( fTransportData.fState != (uint)jack_transport_query ( fJackClient, NULL ) ) )
+        if ( fTransportData.fNewState && ( fTransportData.fState != ( uint ) jack_transport_query ( fJackClient, NULL ) ) )
         {
             switch ( fTransportData.fState )
             {
@@ -497,7 +503,7 @@ namespace Jack
         int ret = 1;
         master_list_it_t it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            if ( !( *it )->IsSlaveReadyToRoll() )
+            if ( ! ( *it )->IsSlaveReadyToRoll() )
                 ret = 0;
         jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
         return ret;

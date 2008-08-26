@@ -327,12 +327,12 @@ namespace Jack
 //transport---------------------------------------------------------------------------
     int JackNetDriver::DecodeTransportData()
     {
-        //is there a new timebase master on the master ?
+        //is there a new timebase master on the net master ?
+        // - release timebase master only if it's a non-conditional request
+        // - no change or no request : don't do anything
+        // - conditional request : don't change anything too, the master will know if this slave is actually the timebase master
         int refnum;
         bool conditional;
-        //release timebase master only if it's a non-conditional request
-        //no request (NO_TIMEBASEMASTER) : don't do anything
-        //conditional request : don't change anything to, master will know if this slave is actually the timebase master
         if ( fTransportData.fTimebaseMaster == TIMEBASEMASTER )
         {
             fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
@@ -342,7 +342,7 @@ namespace Jack
         }
 
         //is there a tranport state change to handle ?
-        if ( fTransportData.fNewState && ( fTransportData.fState != (uint)fEngineControl->fTransport.GetState() ) )
+        if ( fTransportData.fNewState && ( fTransportData.fState != ( uint ) fEngineControl->fTransport.GetState() ) )
         {
             switch ( fTransportData.fState )
             {
@@ -367,17 +367,28 @@ namespace Jack
 
     int JackNetDriver::EncodeTransportData()
     {
-        //is there a new timebase master ?
+        //is there a timebase master change ?
         int refnum;
         bool conditional;
         fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
         if ( refnum != fLastTimebaseMaster )
         {
-            fTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
+            //timebase master has released its function
+            if ( refnum == -1 )
+            {
+                fTransportData.fTimebaseMaster = RELEASE_TIMEBASEMASTER;
+                jack_info ( "Sending a timebase master release request." );
+            }
+            //there is a new timebase master
+            else
+            {
+                fTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
+                jack_info ( "Sending a %s timebase master request.", ( conditional ) ? "conditional" : "non-conditional" );
+            }
             fLastTimebaseMaster = refnum;
         }
         else
-            fTransportData.fTimebaseMaster = NO_TIMEBASEMASTER;
+            fTransportData.fTimebaseMaster = NO_CHANGE;
 
         //update transport state and position
         fTransportData.fState = fEngineControl->fTransport.Query ( &fTransportData.fPosition );

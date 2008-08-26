@@ -75,7 +75,7 @@ namespace Jack
             int DecodeSyncPacket();
 
             int Process();
-            void TimebaseCallback ( jack_position_t* pos);
+            void TimebaseCallback ( jack_position_t* pos );
 
         public:
             JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip );

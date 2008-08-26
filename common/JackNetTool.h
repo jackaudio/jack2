@@ -159,9 +159,10 @@ namespace Jack
 
     enum _net_timebase_master
     {
-        NO_TIMEBASEMASTER = 0,
-        TIMEBASEMASTER = 1,
-        CONDITIONAL_TIMEBASEMASTER = 2
+        NO_CHANGE = 0,
+        RELEASE_TIMEBASEMASTER = 1,
+        TIMEBASEMASTER = 2,
+        CONDITIONAL_TIMEBASEMASTER = 3
     };
 
     typedef enum _net_timebase_master net_timebase_master_t;
