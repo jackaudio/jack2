@@ -38,11 +38,13 @@ namespace Jack
     {
         private:
             //jack data
-            net_transport_data_t fTransportData;
-            uint fLastTransportState;
-            int fLastTimebaseMaster;
             jack_port_id_t* fMidiCapturePortList;
             jack_port_id_t* fMidiPlaybackPortList;
+
+            //transport
+            uint fLastTransportState;
+            int fLastTimebaseMaster;
+            net_transport_data_t fTransportData;
 
             //monitoring
 #ifdef JACK_MONITOR
@@ -55,11 +57,11 @@ namespace Jack
             int FreePorts();
 
             //transport
-            int SetTransportData();
+            int EncodeTransportData();
             int DecodeTransportData();
 
             //sync packet
-            int SetSyncPacket();
+            int EncodeSyncPacket();
             int DecodeSyncPacket();
 
             JackMidiBuffer* GetMidiInputBuffer ( int port_index );

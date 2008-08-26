@@ -67,11 +67,11 @@ namespace Jack
             void Exit();
 
             //transport
-            int SetTransportData();
+            int EncodeTransportData();
             int DecodeTransportData();
 
             //sync packet
-            int SetSyncPacket();
+            int EncodeSyncPacket();
             int DecodeSyncPacket();
 
             int Process();

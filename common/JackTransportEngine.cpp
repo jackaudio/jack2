@@ -228,6 +228,9 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
             }
             break;
 
+        case JackTransportNetStarting:
+            break;
+
         default:
             jack_error("Invalid JACK transport state: %d", fTransportState);
     }

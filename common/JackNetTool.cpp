@@ -351,4 +351,20 @@ namespace Jack
 #endif
         return 0;
     }
+
+    EXPORT const char* GetTransportState ( int transport_state )
+    {
+        switch ( transport_state )
+        {
+            case JackTransportRolling :
+                return "rolling";
+            case JackTransportStarting :
+                return "starting";
+            case JackTransportStopped :
+                return "stopped";
+            case JackTransportNetStarting :
+                return "netstarting";
+        }
+        return NULL;
+    }
 }

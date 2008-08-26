@@ -279,4 +279,6 @@ namespace Jack
     EXPORT sync_packet_type_t GetPacketType ( session_params_t* params );
     //set the packet type in a session parameters
     EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
+    //transport utility
+    EXPORT const char* GetTransportState ( int transport_state );
 }

@@ -225,7 +225,7 @@ namespace Jack
     }
 
 //transport---------------------------------------------------------------------------
-    int JackNetMaster::SetTransportData()
+    int JackNetMaster::EncodeTransportData()
     {
         //is there a new timebase master ?
         //TODO : check if any timebase callback has been called (and if it's conditional or not) and set correct value...
@@ -236,6 +236,8 @@ namespace Jack
 
         //is it a new state ?
         fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
+        if ( fTransportData.fNewState )
+            jack_info ( "'%s' : sending transport state '%s'.", fParams.fName, GetTransportState ( fTransportData.fState ) );
         fLastTransportState = fTransportData.fState;
 
         return 0;
@@ -244,36 +246,51 @@ namespace Jack
     int JackNetMaster::DecodeTransportData()
     {
         //is the slave a new timebase master ?
+        int timebase;
         switch ( fTransportData.fTimebaseMaster )
         {
             case NO_TIMEBASEMASTER :
                 break;
             case TIMEBASEMASTER :
-                jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
+                timebase = jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
+                if ( timebase < 0 )
+                    jack_error ( "Can't set a new timebase master." );
+                else
+                    jack_info ( "'%s' is the new timebase master.", fParams.fName );
                 break;
             case CONDITIONAL_TIMEBASEMASTER :
-                jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
+                timebase = jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
+                if ( timebase < 0 )
+                {
+                    if ( timebase == EBUSY )
+                        jack_error ( "'%s' is already the timebase master.", fParams.fName );
+                    else
+                        jack_error ( "Can't set a new timebase master." );
+                }
+                else
+                    jack_info ( "'%s' is the new timebase master.", fParams.fName );
                 break;
         }
 
-        //is there a transport state change to handle ?
-        if ( fTransportData.fNewState )
+        //is the slave in a new transport state and is this state different from master's ?
+        if ( fTransportData.fNewState && ( fTransportData.fState != (uint)jack_transport_query ( fJackClient, NULL ) ) )
         {
             switch ( fTransportData.fState )
             {
                 case JackTransportStopped :
                     jack_transport_stop ( fJackClient );
-                    jack_info ( "%s stops transport.", fParams.fName );
-                    break;
-                case JackTransportRolling :
-                    if ( jack_transport_query ( fJackClient, &fTransportData.fPosition ) != JackTransportRolling )
-                        jack_error ( "Problem with transport." );
+                    jack_info ( "'%s' : transport stops.", fParams.fName );
                     break;
                 case JackTransportStarting :
                     if ( jack_transport_reposition ( fJackClient, &fTransportData.fPosition ) < 0 )
-                        return -1;
+                        jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
-                    jack_info ( "%s start transport.", fParams.fName );
+                    jack_info ( "'%s' : transport starts.", fParams.fName );
+                    break;
+                case JackTransportNetStarting :
+                    jack_info ( "'%s' : transport is ready to roll.", fParams.fName );
+                case JackTransportRolling :
+                    jack_info ( "'%s' : transport is rolling.", fParams.fName );
                     break;
             }
         }
@@ -298,13 +315,16 @@ namespace Jack
     }
 
 //sync--------------------------------------------------------------------------------
-    int JackNetMaster::SetSyncPacket()
+    int JackNetMaster::EncodeSyncPacket()
     {
         //this method contains every step of sync packet informations coding
-        //first : transport
+        //first of all, reset sync packet
+        memset ( fTxData, 0, fPayloadSize );
+
+        //then, first step : transport
         if ( fParams.fTransportSync )
         {
-            if ( SetTransportData() < 0 )
+            if ( EncodeTransportData() < 0 )
                 return -1;
             //copy to TxBuffer
             memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
@@ -368,9 +388,9 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
                                                  fParams.fPeriodSize ) ) );
 
-        //Set the first packet to send
-        memset ( fTxData, 0, fPayloadSize );
-        SetSyncPacket();
+        //encode the first packet
+        if ( EncodeSyncPacket() < 0 )
+            return 0;
 
         //send sync
         if ( SyncSend() == SOCKET_ERROR )
@@ -473,11 +493,11 @@ namespace Jack
 
     int JackNetMasterManager::SyncCallback ( jack_transport_state_t state, jack_position_t* pos )
     {
-        //check sync state for every master in the list
+        //check if each slave is ready to roll
         int ret = 1;
         master_list_it_t it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            if ( !( *it )->IsSlaveReadyToRoll())
+            if ( !( *it )->IsSlaveReadyToRoll() )
                 ret = 0;
         jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
         return ret;

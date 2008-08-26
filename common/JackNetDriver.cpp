@@ -62,8 +62,7 @@ namespace Jack
 #endif
     }
 
-//*************************************initialization***********************************************************************
-
+//open, close, attach and detach------------------------------------------------------
     int JackNetDriver::Open ( jack_nframes_t buffer_size, jack_nframes_t samplerate, bool capturing, bool playing,
                               int inchannels, int outchannels, bool monitor,
                               const char* capture_driver_name, const char* playback_driver_name,
@@ -96,6 +95,7 @@ namespace Jack
         return 0;
     }
 
+//init and restart--------------------------------------------------------------------
     bool JackNetDriver::Init()
     {
         jack_log ( "JackNetDriver::Init()" );
@@ -163,9 +163,10 @@ namespace Jack
                 plot_name += string ( "_fast" );
                 break;
         }
-        fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
+        fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 5, plot_name );
         string net_time_mon_fields[] =
         {
+            string ( "sync decoded" ),
             string ( "end of read" ),
             string ( "start of write" ),
             string ( "sync send" ),
@@ -176,7 +177,7 @@ namespace Jack
             string ( "set xlabel \"audio cycles\"" ),
             string ( "set ylabel \"% of audio cycle\"" )
         };
-        fNetTimeMon->SetPlotFile ( net_time_mon_options, 2, net_time_mon_fields, 4 );
+        fNetTimeMon->SetPlotFile ( net_time_mon_options, 2, net_time_mon_fields, 5 );
 #endif
 
         return true;
@@ -210,6 +211,7 @@ namespace Jack
 #endif
     }
 
+//jack ports and buffers--------------------------------------------------------------
     int JackNetDriver::AllocPorts()
     {
         jack_log ( "JackNetDriver::AllocPorts fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate );
@@ -322,32 +324,40 @@ namespace Jack
         return static_cast<JackMidiBuffer*> ( fGraphManager->GetBuffer ( fMidiPlaybackPortList[port_index], fEngineControl->fBufferSize ) );
     }
 
+//transport---------------------------------------------------------------------------
     int JackNetDriver::DecodeTransportData()
     {
         //is there a new timebase master on the master ?
         int refnum;
         bool conditional;
         //release timebase master only if it's a non-conditional request
+        //no request (NO_TIMEBASEMASTER) : don't do anything
+        //conditional request : don't change anything to, master will know if this slave is actually the timebase master
         if ( fTransportData.fTimebaseMaster == TIMEBASEMASTER )
         {
             fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
             if ( refnum != -1 )
                 fEngineControl->fTransport.ResetTimebase ( refnum );
+            jack_info ( "NetMaster is now the new timebase master." );
         }
 
         //is there a tranport state change to handle ?
-        if ( fTransportData.fNewState )
+        if ( fTransportData.fNewState && ( fTransportData.fState != (uint)fEngineControl->fTransport.GetState() ) )
         {
             switch ( fTransportData.fState )
             {
                 case JackTransportStopped :
-                    fEngineControl->fTransport.SetState ( JackTransportStopped );
-                    break;
-                case JackTransportRolling :
-                    fEngineControl->fTransport.SetState ( JackTransportRolling);
+                    fEngineControl->fTransport.SetCommand ( TransportCommandStop );
+                    jack_info ( "NetMaster : transport stops." );
                     break;
                 case JackTransportStarting :
+                    fEngineControl->fTransport.RequestNewPos ( &fTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
+                    jack_info ( "NetMaster : transport starts." );
+                    break;
+                case JackTransportRolling :
+                    fEngineControl->fTransport.SetState ( JackTransportRolling );
+                    jack_info ( "NetMaster : transport rolls." );
                     break;
             }
         }
@@ -355,7 +365,7 @@ namespace Jack
         return 0;
     }
 
-    int JackNetDriver::SetTransportData()
+    int JackNetDriver::EncodeTransportData()
     {
         //is there a new timebase master ?
         int refnum;
@@ -366,17 +376,22 @@ namespace Jack
             fTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
             fLastTimebaseMaster = refnum;
         }
+        else
+            fTransportData.fTimebaseMaster = NO_TIMEBASEMASTER;
 
         //update transport state and position
         fTransportData.fState = fEngineControl->fTransport.Query ( &fTransportData.fPosition );
 
         //is it a new state ?
         fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
+        if ( fTransportData.fNewState )
+            jack_info ( "Sending transport state '%s'.", GetTransportState ( fTransportData.fState ) );
         fLastTransportState = fTransportData.fState;
 
         return 0;
     }
 
+//network sync------------------------------------------------------------------------
     int JackNetDriver::DecodeSyncPacket()
     {
         //this method contains every step of sync packet informations decoding process
@@ -393,13 +408,15 @@ namespace Jack
         return 0;
     }
 
-    int JackNetDriver::SetSyncPacket()
+    int JackNetDriver::EncodeSyncPacket()
     {
         //this method contains every step of sync packet informations coding
-        //first : transport
+        //first of all, reset sync packet
+        memset ( fTxData, 0, fPayloadSize );
+        //then first step : transport
         if ( fParams.fTransportSync )
         {
-            if ( SetTransportData() < 0 )
+            if ( EncodeTransportData() < 0 )
                 return -1;
             //copy to TxBuffer
             memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
@@ -409,8 +426,7 @@ namespace Jack
         return 0;
     }
 
-//*************************************process************************************************************************
-
+//driver processes--------------------------------------------------------------------
     int JackNetDriver::Read()
     {
         uint midi_port_index;
@@ -433,9 +449,13 @@ namespace Jack
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
-        //decode transport info
+        //decode sync
+        if ( DecodeSyncPacket() < 0 )
+            return 0;
 
-
+#ifdef JACK_MONITOR
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
+#endif
         //audio, midi or sync if driver is late
         if ( DataRecv() == SOCKET_ERROR )
             return SOCKET_ERROR;
@@ -463,8 +483,8 @@ namespace Jack
 #endif
 
         //sync
-        memset ( fTxData, 0, fPayloadSize );
-        SetSyncPacket();
+        if ( EncodeSyncPacket() < 0 )
+            return 0;
 
         //send sync
         if ( SyncSend() == SOCKET_ERROR )
@@ -485,7 +505,7 @@ namespace Jack
         return 0;
     }
 
-//*************************************loader*******************************************************
+//driver loader-----------------------------------------------------------------------
 
 #ifdef __cplusplus
     extern "C"
