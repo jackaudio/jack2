@@ -47,6 +47,15 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         AudioUnit fAUHAL;
         AudioBufferList* fInputData;
+        
+        char fCaptureUID[256];
+        char fPlaybackUID[256];
+        
+        char fCaptureName[256];
+        char fPlaybackName[256];
+        
+        bool fCapturing;
+        bool fPlaying;
 
         AudioDeviceID fDeviceID;
         bool fState;
@@ -69,6 +78,10 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         OSStatus GetDefaultDevice(AudioDeviceID* id);
         OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
+        OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
+        OSStatus GetDefaultInputDevice(AudioDeviceID* id);
+        OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
+        OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
 
         // Setup
         int SetupDevices(const char* capture_driver_uid,
