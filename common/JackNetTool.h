@@ -178,7 +178,7 @@ namespace Jack
     {
         uint32_t fNewState;             //is it a state change
         uint32_t fTimebaseMaster;       //is there a new timebase master
-        uint32_t fState;                //current cycle state
+        int32_t fState;                 //current cycle state
         jack_position_t fPosition;      //current cycle position
     };
 

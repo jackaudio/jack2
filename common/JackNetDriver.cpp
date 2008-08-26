@@ -338,26 +338,26 @@ namespace Jack
             fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
             if ( refnum != -1 )
                 fEngineControl->fTransport.ResetTimebase ( refnum );
-            jack_info ( "NetMaster is now the new timebase master." );
+            jack_info ( "The NetMaster is now the new timebase master." );
         }
 
         //is there a tranport state change to handle ?
-        if ( fSendTransportData.fNewState && ( fSendTransportData.fState != ( uint ) fEngineControl->fTransport.GetState() ) )
+        if ( fSendTransportData.fNewState && ( fSendTransportData.fState != fEngineControl->fTransport.GetState() ) )
         {
             switch ( fSendTransportData.fState )
             {
                 case JackTransportStopped :
                     fEngineControl->fTransport.SetCommand ( TransportCommandStop );
-                    jack_info ( "NetMaster : transport stops." );
+                    jack_info ( "Master stops transport." );
                     break;
                 case JackTransportStarting :
                     fEngineControl->fTransport.RequestNewPos ( &fSendTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
-                    jack_info ( "NetMaster : transport starts." );
+                    jack_info ( "Master starts transport." );
                     break;
                 case JackTransportRolling :
                     fEngineControl->fTransport.SetState ( JackTransportRolling );
-                    jack_info ( "NetMaster : transport rolls." );
+                    jack_info ( "Master is rolling." );
                     break;
             }
         }
@@ -397,7 +397,7 @@ namespace Jack
         fReturnTransportData.fNewState = ( ( fReturnTransportData.fState != fLastTransportState ) &&
                                             ( fReturnTransportData.fState != fSendTransportData.fState ) );
         if ( fReturnTransportData.fNewState )
-            jack_info ( "Sending transport state '%s'.", GetTransportState ( fReturnTransportData.fState ) );
+            jack_info ( "Sending '%s'.", GetTransportState ( fReturnTransportData.fState ) );
         fLastTransportState = fReturnTransportData.fState;
 
         return 0;

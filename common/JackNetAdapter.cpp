@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-    JackNetAdapter::JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
+    JackNetAdapter::JackNetAdapter ( jack_client_t* jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
             : JackAudioAdapterInterface ( buffer_size, sample_rate ), JackNetSlaveInterface(), fThread ( this )
     {
         jack_log ( "JackNetAdapter::JackNetAdapter" );
@@ -42,7 +42,7 @@ namespace Jack
         GetHostName ( fParams.fName, JACK_CLIENT_NAME_SIZE );
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fMtu = 1500;
-        fParams.fTransportSync = 1;
+        fParams.fTransportSync = 0;
         fParams.fSendAudioChannels = 2;
         fParams.fReturnAudioChannels = 2;
         fParams.fSendMidiChannels = 0;
@@ -51,6 +51,7 @@ namespace Jack
         fParams.fPeriodSize = buffer_size;
         fParams.fSlaveSyncMode = 1;
         fParams.fNetworkMode = 'n';
+        fJackClient = jack_client;
 
         //options parsing
         const JSList* node;
@@ -82,7 +83,7 @@ namespace Jack
                     strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
                     break;
                 case 't' :
-                    fParams.fTransportSync = param->value.ui;
+                    //fParams.fTransportSync = param->value.ui;
                     break;
                 case 'm' :
                     if ( strcmp ( param->value.str, "normal" ) == 0 )
@@ -129,6 +130,7 @@ namespace Jack
         }
     }
 
+//open/close--------------------------------------------------------------------------
     int JackNetAdapter::Open()
     {
         jack_log ( "JackNetAdapter::Open" );
@@ -182,6 +184,7 @@ namespace Jack
         return 0;
     }
 
+//thread------------------------------------------------------------------------------
     bool JackNetAdapter::Init()
     {
         jack_log ( "JackNetAdapter::Init" );
@@ -245,9 +248,117 @@ namespace Jack
         }
     }
 
+//transport---------------------------------------------------------------------------
+    int JackNetAdapter::DecodeTransportData()
+    {
+        //TODO : we need here to get the actual timebase master to eventually release it from its duty (see JackNetDriver)
+
+        //is there a new transport state ?
+        if ( fSendTransportData.fNewState && ( fSendTransportData.fState != jack_transport_query ( fJackClient, NULL ) ) )
+        {
+            switch ( fSendTransportData.fState )
+            {
+                case JackTransportStopped :
+                    jack_transport_stop ( fJackClient );
+                    jack_info ( "NetMaster : transport stops." );
+                    break;
+                case JackTransportStarting :
+                    jack_transport_reposition ( fJackClient, &fSendTransportData.fPosition );
+                    jack_transport_start ( fJackClient );
+                    jack_info ( "NetMaster : transport starts." );
+                    break;
+                case JackTransportRolling :
+                    //TODO , we need to :
+                    // - find a way to call TransportEngine->SetNetworkSync()
+                    // - turn the transport state to JackTransportRolling
+                    jack_info ( "NetMaster : transport rolls." );
+                    break;
+            }
+        }
+
+        return 0;
+    }
+
+    int JackNetAdapter::EncodeTransportData()
+    {
+        //is there a timebase master change ?
+        int refnum = -1;
+        bool conditional = 0;
+        //TODO : get the actual timebase master
+        if ( refnum != fLastTimebaseMaster )
+        {
+            //timebase master has released its function
+            if ( refnum == -1 )
+            {
+                fReturnTransportData.fTimebaseMaster = RELEASE_TIMEBASEMASTER;
+                jack_info ( "Sending a timebase master release request." );
+            }
+            //there is a new timebase master
+            else
+            {
+                fReturnTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
+                jack_info ( "Sending a %s timebase master request.", ( conditional ) ? "conditional" : "non-conditional" );
+            }
+            fLastTimebaseMaster = refnum;
+        }
+        else
+            fReturnTransportData.fTimebaseMaster = NO_CHANGE;
+
+        //update transport state and position
+        fReturnTransportData.fState = jack_transport_query ( fJackClient, &fReturnTransportData.fPosition );
+
+        //is it a new state (that the master need to know...) ?
+        fReturnTransportData.fNewState = ( ( fReturnTransportData.fState != fLastTransportState ) &&
+                                            ( fReturnTransportData.fState != fSendTransportData.fState ) );
+        if ( fReturnTransportData.fNewState )
+            jack_info ( "Sending transport state '%s'.", GetTransportState ( fReturnTransportData.fState ) );
+        fLastTransportState = fReturnTransportData.fState;
+
+        return 0;
+    }
+
+//network sync------------------------------------------------------------------------
+    int JackNetAdapter::DecodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations decoding process
+        //first : transport
+        if ( fParams.fTransportSync )
+        {
+            //copy received transport data to transport data structure
+            memcpy ( &fSendTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            if ( DecodeTransportData() < 0 )
+                return -1;
+        }
+        //then others
+        //...
+        return 0;
+    }
+
+    int JackNetAdapter::EncodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations coding
+        //first of all, reset sync packet
+        memset ( fTxData, 0, fPayloadSize );
+        //then first step : transport
+        if ( fParams.fTransportSync )
+        {
+            if ( EncodeTransportData() < 0 )
+                return -1;
+            //copy to TxBuffer
+            memcpy ( fTxData, &fReturnTransportData, sizeof ( net_transport_data_t ) );
+        }
+        //then others
+        //...
+        return 0;
+    }
+
+//read/write operations---------------------------------------------------------------
     int JackNetAdapter::Read()
     {
         if ( SyncRecv() == SOCKET_ERROR )
+            return 0;
+
+        if ( DecodeSyncPacket() < 0 )
             return 0;
 
         return DataRecv();
@@ -255,12 +366,16 @@ namespace Jack
 
     int JackNetAdapter::Write()
     {
+        if ( EncodeSyncPacket() < 0 )
+            return 0;
+
         if ( SyncSend() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
         return DataSend();
     }
 
+//process-----------------------------------------------------------------------------
     int JackNetAdapter::Process()
     {
         bool failure = false;
@@ -306,6 +421,7 @@ namespace Jack
     }
 } // namespace Jack
 
+//loader------------------------------------------------------------------------------
 #ifdef __cplusplus
 extern "C"
 {
@@ -406,7 +522,7 @@ extern "C"
         jack_nframes_t buffer_size = jack_get_buffer_size ( jack_client );
         jack_nframes_t sample_rate = jack_get_sample_rate ( jack_client );
 
-        adapter = new Jack::JackAudioAdapter ( jack_client, new Jack::JackNetAdapter ( buffer_size, sample_rate, params ) );
+        adapter = new Jack::JackAudioAdapter ( jack_client, new Jack::JackNetAdapter ( jack_client, buffer_size, sample_rate, params ) );
         assert ( adapter );
 
         if ( adapter->Open() == 0 )

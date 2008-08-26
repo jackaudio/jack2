@@ -36,7 +36,13 @@ namespace Jack
     {
     private:
         //jack data
-        net_transport_data_t fTransportData;
+        jack_client_t* fJackClient;
+
+        //transport data
+        int fLastTransportState;
+        int fLastTimebaseMaster;
+        net_transport_data_t fSendTransportData;
+        net_transport_data_t fReturnTransportData;
 
         //sample buffers
         sample_t** fSoftCaptureBuffer;
@@ -45,9 +51,17 @@ namespace Jack
         //adapter thread
         JackThread fThread;
 
+        //transport
+        int EncodeTransportData();
+        int DecodeTransportData();
+
+        //sync packet
+        int EncodeSyncPacket();
+        int DecodeSyncPacket();
+
     public:
 
-        JackNetAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
+        JackNetAdapter ( jack_client_t* jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
         ~JackNetAdapter();
 
         int Open();

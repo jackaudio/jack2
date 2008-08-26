@@ -148,7 +148,7 @@ namespace Jack
             goto fail;
         }
 
-        jack_info ( "NetJack new master started." );
+        jack_info ( "New NetMaster started." );
 
         return true;
 
@@ -238,7 +238,7 @@ namespace Jack
         fSendTransportData.fNewState = ( ( fSendTransportData.fState != fLastTransportState ) &&
                                         ( fSendTransportData.fState != fReturnTransportData.fState ) );
         if ( fSendTransportData.fNewState )
-            jack_info ( "'%s' : sending transport state '%s'.", fParams.fName, GetTransportState ( fSendTransportData.fState ) );
+            jack_info ( "Sending '%s' to '%s'.", GetTransportState ( fSendTransportData.fState ), fParams.fName );
         fLastTransportState = fSendTransportData.fState;
 
         return 0;
@@ -280,24 +280,24 @@ namespace Jack
         }
 
         //is the slave in a new transport state and is this state different from master's ?
-        if ( fReturnTransportData.fNewState && ( fReturnTransportData.fState != ( uint ) jack_transport_query ( fJackClient, NULL ) ) )
+        if ( fReturnTransportData.fNewState && ( fReturnTransportData.fState != jack_transport_query ( fJackClient, NULL ) ) )
         {
             switch ( fReturnTransportData.fState )
             {
                 case JackTransportStopped :
                     jack_transport_stop ( fJackClient );
-                    jack_info ( "'%s' : transport stops.", fParams.fName );
+                    jack_info ( "'%s' stops transport.", fParams.fName );
                     break;
                 case JackTransportStarting :
                     if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) < 0 )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
-                    jack_info ( "'%s' : transport starts.", fParams.fName );
+                    jack_info ( "'%s' starts transport.", fParams.fName );
                     break;
                 case JackTransportNetStarting :
-                    jack_info ( "'%s' : transport is ready to roll.", fParams.fName );
+                    jack_info ( "'%s' is ready to roll..", fParams.fName );
                 case JackTransportRolling :
-                    jack_info ( "'%s' : transport is rolling.", fParams.fName );
+                    jack_info ( "'%s' is rolling.", fParams.fName );
                     break;
             }
         }

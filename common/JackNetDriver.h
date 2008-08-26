@@ -42,7 +42,7 @@ namespace Jack
             jack_port_id_t* fMidiPlaybackPortList;
 
             //transport
-            uint fLastTransportState;
+            int fLastTransportState;
             int fLastTimebaseMaster;
             net_transport_data_t fSendTransportData;
             net_transport_data_t fReturnTransportData;

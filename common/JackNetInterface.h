@@ -68,6 +68,14 @@ namespace Jack
             virtual void SetParams();
             virtual bool Init() = 0;
 
+            //transport
+            virtual int EncodeTransportData() = 0;
+            virtual int DecodeTransportData() = 0;
+
+            //sync packet
+            virtual int EncodeSyncPacket() = 0;
+            virtual int DecodeSyncPacket() = 0;
+
             virtual int SyncRecv() = 0;
             virtual int SyncSend() = 0;
             virtual int DataRecv() = 0;
