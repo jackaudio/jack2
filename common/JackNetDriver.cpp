@@ -333,7 +333,7 @@ namespace Jack
         // - conditional request : don't change anything too, the master will know if this slave is actually the timebase master
         int refnum;
         bool conditional;
-        if ( fTransportData.fTimebaseMaster == TIMEBASEMASTER )
+        if ( fSendTransportData.fTimebaseMaster == TIMEBASEMASTER )
         {
             fEngineControl->fTransport.GetTimebaseMaster ( refnum, conditional );
             if ( refnum != -1 )
@@ -342,16 +342,16 @@ namespace Jack
         }
 
         //is there a tranport state change to handle ?
-        if ( fTransportData.fNewState && ( fTransportData.fState != ( uint ) fEngineControl->fTransport.GetState() ) )
+        if ( fSendTransportData.fNewState && ( fSendTransportData.fState != ( uint ) fEngineControl->fTransport.GetState() ) )
         {
-            switch ( fTransportData.fState )
+            switch ( fSendTransportData.fState )
             {
                 case JackTransportStopped :
                     fEngineControl->fTransport.SetCommand ( TransportCommandStop );
                     jack_info ( "NetMaster : transport stops." );
                     break;
                 case JackTransportStarting :
-                    fEngineControl->fTransport.RequestNewPos ( &fTransportData.fPosition );
+                    fEngineControl->fTransport.RequestNewPos ( &fSendTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
                     jack_info ( "NetMaster : transport starts." );
                     break;
@@ -376,28 +376,29 @@ namespace Jack
             //timebase master has released its function
             if ( refnum == -1 )
             {
-                fTransportData.fTimebaseMaster = RELEASE_TIMEBASEMASTER;
+                fReturnTransportData.fTimebaseMaster = RELEASE_TIMEBASEMASTER;
                 jack_info ( "Sending a timebase master release request." );
             }
             //there is a new timebase master
             else
             {
-                fTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
+                fReturnTransportData.fTimebaseMaster = ( conditional ) ? CONDITIONAL_TIMEBASEMASTER : TIMEBASEMASTER;
                 jack_info ( "Sending a %s timebase master request.", ( conditional ) ? "conditional" : "non-conditional" );
             }
             fLastTimebaseMaster = refnum;
         }
         else
-            fTransportData.fTimebaseMaster = NO_CHANGE;
+            fReturnTransportData.fTimebaseMaster = NO_CHANGE;
 
         //update transport state and position
-        fTransportData.fState = fEngineControl->fTransport.Query ( &fTransportData.fPosition );
+        fReturnTransportData.fState = fEngineControl->fTransport.Query ( &fReturnTransportData.fPosition );
 
-        //is it a new state ?
-        fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
-        if ( fTransportData.fNewState )
-            jack_info ( "Sending transport state '%s'.", GetTransportState ( fTransportData.fState ) );
-        fLastTransportState = fTransportData.fState;
+        //is it a new state (that the master need to know...) ?
+        fReturnTransportData.fNewState = ( ( fReturnTransportData.fState != fLastTransportState ) &&
+                                            ( fReturnTransportData.fState != fSendTransportData.fState ) );
+        if ( fReturnTransportData.fNewState )
+            jack_info ( "Sending transport state '%s'.", GetTransportState ( fReturnTransportData.fState ) );
+        fLastTransportState = fReturnTransportData.fState;
 
         return 0;
     }
@@ -410,7 +411,7 @@ namespace Jack
         if ( fParams.fTransportSync )
         {
             //copy received transport data to transport data structure
-            memcpy ( &fTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            memcpy ( &fSendTransportData, fRxData, sizeof ( net_transport_data_t ) );
             if ( DecodeTransportData() < 0 )
                 return -1;
         }
@@ -430,7 +431,7 @@ namespace Jack
             if ( EncodeTransportData() < 0 )
                 return -1;
             //copy to TxBuffer
-            memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
+            memcpy ( fTxData, &fReturnTransportData, sizeof ( net_transport_data_t ) );
         }
         //then others
         //...

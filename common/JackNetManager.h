@@ -53,7 +53,8 @@ namespace Jack
 
             //sync and transport
             uint32_t fLastTransportState;
-            net_transport_data_t fTransportData;
+            net_transport_data_t fSendTransportData;
+            net_transport_data_t fReturnTransportData;
 
             //monitoring
 #ifdef JACK_MONITOR

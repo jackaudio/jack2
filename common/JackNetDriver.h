@@ -44,7 +44,8 @@ namespace Jack
             //transport
             uint fLastTransportState;
             int fLastTimebaseMaster;
-            net_transport_data_t fTransportData;
+            net_transport_data_t fSendTransportData;
+            net_transport_data_t fReturnTransportData;
 
             //monitoring
 #ifdef JACK_MONITOR

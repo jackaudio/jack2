@@ -229,16 +229,17 @@ namespace Jack
     {
         //is there a new timebase master ?
         //TODO : check if any timebase callback has been called (and if it's conditional or not) and set correct value...
-        fTransportData.fTimebaseMaster = NO_CHANGE;
+        fSendTransportData.fTimebaseMaster = NO_CHANGE;
 
         //update state and position
-        fTransportData.fState = static_cast<uint> ( jack_transport_query ( fJackClient, &fTransportData.fPosition ) );
+        fSendTransportData.fState = static_cast<uint> ( jack_transport_query ( fJackClient, &fSendTransportData.fPosition ) );
 
         //is it a new state ?
-        fTransportData.fNewState = ( fTransportData.fState != fLastTransportState );
-        if ( fTransportData.fNewState )
-            jack_info ( "'%s' : sending transport state '%s'.", fParams.fName, GetTransportState ( fTransportData.fState ) );
-        fLastTransportState = fTransportData.fState;
+        fSendTransportData.fNewState = ( ( fSendTransportData.fState != fLastTransportState ) &&
+                                        ( fSendTransportData.fState != fReturnTransportData.fState ) );
+        if ( fSendTransportData.fNewState )
+            jack_info ( "'%s' : sending transport state '%s'.", fParams.fName, GetTransportState ( fSendTransportData.fState ) );
+        fLastTransportState = fSendTransportData.fState;
 
         return 0;
     }
@@ -246,10 +247,10 @@ namespace Jack
     int JackNetMaster::DecodeTransportData()
     {
         //is there timebase master change ?
-        if ( fTransportData.fTimebaseMaster != NO_CHANGE )
+        if ( fReturnTransportData.fTimebaseMaster != NO_CHANGE )
         {
             int timebase = 0;
-            switch ( fTransportData.fTimebaseMaster )
+            switch ( fReturnTransportData.fTimebaseMaster )
             {
                 case RELEASE_TIMEBASEMASTER :
                     timebase = jack_release_timebase ( fJackClient );
@@ -279,16 +280,16 @@ namespace Jack
         }
 
         //is the slave in a new transport state and is this state different from master's ?
-        if ( fTransportData.fNewState && ( fTransportData.fState != ( uint ) jack_transport_query ( fJackClient, NULL ) ) )
+        if ( fReturnTransportData.fNewState && ( fReturnTransportData.fState != ( uint ) jack_transport_query ( fJackClient, NULL ) ) )
         {
-            switch ( fTransportData.fState )
+            switch ( fReturnTransportData.fState )
             {
                 case JackTransportStopped :
                     jack_transport_stop ( fJackClient );
                     jack_info ( "'%s' : transport stops.", fParams.fName );
                     break;
                 case JackTransportStarting :
-                    if ( jack_transport_reposition ( fJackClient, &fTransportData.fPosition ) < 0 )
+                    if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) < 0 )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
                     jack_info ( "'%s' : transport starts.", fParams.fName );
@@ -310,14 +311,14 @@ namespace Jack
 
     void JackNetMaster::TimebaseCallback ( jack_position_t* pos )
     {
-        pos->bar = fTransportData.fPosition.bar;
-        pos->beat = fTransportData.fPosition.beat;
-        pos->tick = fTransportData.fPosition.tick;
-        pos->bar_start_tick = fTransportData.fPosition.bar_start_tick;
-        pos->beats_per_bar = fTransportData.fPosition.beats_per_bar;
-        pos->beat_type = fTransportData.fPosition.beat_type;
-        pos->ticks_per_beat = fTransportData.fPosition.ticks_per_beat;
-        pos->beats_per_minute = fTransportData.fPosition.beats_per_minute;
+        pos->bar = fReturnTransportData.fPosition.bar;
+        pos->beat = fReturnTransportData.fPosition.beat;
+        pos->tick = fReturnTransportData.fPosition.tick;
+        pos->bar_start_tick = fReturnTransportData.fPosition.bar_start_tick;
+        pos->beats_per_bar = fReturnTransportData.fPosition.beats_per_bar;
+        pos->beat_type = fReturnTransportData.fPosition.beat_type;
+        pos->ticks_per_beat = fReturnTransportData.fPosition.ticks_per_beat;
+        pos->beats_per_minute = fReturnTransportData.fPosition.beats_per_minute;
     }
 
 //sync--------------------------------------------------------------------------------
@@ -333,7 +334,7 @@ namespace Jack
             if ( EncodeTransportData() < 0 )
                 return -1;
             //copy to TxBuffer
-            memcpy ( fTxData, &fTransportData, sizeof ( net_transport_data_t ) );
+            memcpy ( fTxData, &fSendTransportData, sizeof ( net_transport_data_t ) );
         }
         //then others
         //...
@@ -347,7 +348,7 @@ namespace Jack
         if ( fParams.fTransportSync )
         {
             //copy received transport data to transport data structure
-            memcpy ( &fTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            memcpy ( &fReturnTransportData, fRxData, sizeof ( net_transport_data_t ) );
             if ( DecodeTransportData() < 0 )
                 return -1;
         }
@@ -358,7 +359,7 @@ namespace Jack
 
     bool JackNetMaster::IsSlaveReadyToRoll()
     {
-        return ( fTransportData.fState == JackTransportNetStarting );
+        return ( fReturnTransportData.fState == JackTransportNetStarting );
     }
 
 //process-----------------------------------------------------------------------------
