@@ -112,7 +112,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         OSStatus GetDefaultInputDevice(AudioDeviceID* id);
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
-        OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
+        OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
 
         // Setup
         int SetupDevices(const char* capture_driver_uid,
@@ -128,7 +128,7 @@ class JackCoreAudioDriver : public JackAudioDriver
                           int& out_nChannels,
                           bool strict);
 
-        int SetupBuffers(int inchannels, int outchannels);
+        int SetupBuffers(int inchannels);
         void DisposeBuffers();
 
         int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);

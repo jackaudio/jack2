@@ -28,6 +28,54 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+static OSStatus DisplayDeviceNames()
+{
+    UInt32 size;
+    Boolean isWritable;
+    int i, deviceNum;
+    OSStatus err;
+    CFStringRef UIname;
+
+    err = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyDevices, &size, &isWritable);
+    if (err != noErr)
+        return err;
+
+    deviceNum = size / sizeof(AudioDeviceID);
+    AudioDeviceID devices[deviceNum];
+
+    err = AudioHardwareGetProperty(kAudioHardwarePropertyDevices, &size, devices);
+    if (err != noErr)
+        return err;
+
+    for (i = 0; i < deviceNum; i++) {
+        char device_name[256];
+        char internal_name[256];
+
+        size = sizeof(CFStringRef);
+        UIname = NULL;
+        err = AudioDeviceGetProperty(devices[i], 0, false, kAudioDevicePropertyDeviceUID, &size, &UIname);
+        if (err == noErr) {
+            CFStringGetCString(UIname, internal_name, 256, CFStringGetSystemEncoding());
+        } else {
+            goto error;
+        }
+
+        size = 256;
+        err = AudioDeviceGetProperty(devices[i], 0, false, kAudioDevicePropertyDeviceName, &size, device_name);
+        if (err != noErr)
+            return err;
+
+        jack_info("Device name = \'%s\', internal_name = \'%s\' (to be used as -C, -P, or -d parameter)", device_name, internal_name);
+    }
+
+    return noErr;
+
+error:
+    if (UIname != NULL)
+        CFRelease(UIname);
+    return err;
+}
+
 static void printError(OSStatus err)
 {
     switch (err) {
@@ -117,6 +165,136 @@ OSStatus JackCoreAudioAdapter::SRNotificationCallback(AudioDeviceID inDevice,
     return noErr;
 }
 
+// A better implementation would try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
+
+OSStatus JackCoreAudioAdapter::DeviceNotificationCallback(AudioDeviceID inDevice,
+        UInt32 inChannel,
+        Boolean	isInput,
+        AudioDevicePropertyID inPropertyID,
+        void* inClientData)
+{
+    JackCoreAudioAdapter* driver = (JackCoreAudioAdapter*)inClientData;
+         
+    switch (inPropertyID) {
+
+        case kAudioDevicePropertyStreamConfiguration:
+        case kAudioDevicePropertyNominalSampleRate: {
+
+            UInt32 outSize = sizeof(Float64);
+            Float64 sampleRate;
+            int in_nChannels = 0;
+            int out_nChannels = 0;
+            char capture_driver_name[256];
+            char playback_driver_name[256];
+    
+            // Stop and restart
+            AudioOutputUnitStop(driver->fAUHAL);
+            driver->RemoveListeners();
+            driver->CloseAUHAL();
+
+            OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
+            if (err != noErr) {
+                jack_error("Cannot get current sample rate");
+                printError(err);
+            }
+            jack_log("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyNominalSampleRate %ld", long(sampleRate));
+
+            if (driver->SetupDevices(driver->fCaptureUID, driver->fPlaybackUID, capture_driver_name, playback_driver_name) < 0)
+                return -1;
+
+            if (driver->SetupChannels(driver->fCapturing, driver->fPlaying, driver->fCaptureChannels, driver->fPlaybackChannels, in_nChannels, out_nChannels, false) < 0)
+                return -1;
+
+            if (driver->SetupBufferSizeAndSampleRate(driver->fAdaptedBufferSize, sampleRate)  < 0)
+                return -1;
+                
+            driver->SetAdaptedSampleRate(sampleRate);
+
+            if (driver->OpenAUHAL(driver->fCapturing,
+                                  driver->fPlaying,
+                                  driver->fCaptureChannels,
+                                  driver->fPlaybackChannels,
+                                  in_nChannels,
+                                  out_nChannels,
+                                  driver->fAdaptedBufferSize,
+                                  sampleRate,
+                                  false) < 0)
+                goto error;
+
+            if (driver->AddListeners() < 0)
+                goto error;
+       
+            AudioOutputUnitStart(driver->fAUHAL);
+            return noErr;
+error:
+            driver->CloseAUHAL();
+            break;
+        }
+    }
+    return noErr;
+}
+
+int JackCoreAudioAdapter::AddListeners()
+{
+    OSStatus err = noErr;
+
+    // Add listeners
+ 
+    err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioHardwarePropertyDevices");
+        printError(err);
+        return -1;
+    }
+
+    err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyNominalSampleRate");
+        printError(err);
+        return -1;
+    }
+
+    err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyDeviceIsRunning");
+        printError(err);
+        return -1;
+    }
+
+    err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyStreamConfiguration");
+        printError(err);
+        return -1;
+    }
+
+    err = AudioDeviceAddPropertyListener(fDeviceID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyStreamConfiguration");
+        printError(err);
+        return -1;
+    }
+
+    return 0;
+}
+
+
+void JackCoreAudioAdapter::RemoveListeners()
+{
+/*
+#ifdef MAC_OS_X_VERSION_10_5
+    AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
+#else
+    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
+#endif
+*/
+    AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
+    AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
+    AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback);
+    AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback);
+    AudioDeviceRemovePropertyListener(fDeviceID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceNotificationCallback);
+}
+
 OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                                         AudioUnitRenderActionFlags *ioActionFlags,
                                         const AudioTimeStamp *inTimeStamp,
@@ -153,19 +331,27 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
         jack_error("JackCoreAudioAdapter::Render ringbuffer failure... reset");
         adapter->ResetRingBuffers();
     }
+
     return noErr;
 }
 
  JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
-                :JackAudioAdapterInterface(buffer_size, sample_rate),fInputData(0),fCapturing(false),fPlaying(false),fState(false)
+                :JackAudioAdapterInterface(buffer_size, sample_rate), fInputData(0), fCapturing(false), fPlaying(false), fState(false)
 {
 
     const JSList* node;
     const jack_driver_param_t* param;
-
-    fCaptureChannels = 2;
-    fPlaybackChannels = 2;
-
+   
+    char captureName[256];
+    char playbackName[256];
+        
+    fCaptureUID[0] = 0;
+    fPlaybackUID[0] = 0;
+    
+    // Default values
+    fCaptureChannels = 0;
+    fPlaybackChannels = 0;
+  
     for (node = params; node; node = jack_slist_next(node)) {
         param = (const jack_driver_param_t*) node->data;
 
@@ -185,12 +371,17 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
 
             case 'C':
                 fCapturing = true;
-                strncpy(fCaptureName, param->value.str, strlen(param->value.str));
+                strncpy(fCaptureUID, param->value.str, 256);
                 break;
 
             case 'P':
                 fPlaying = true;
-                strncpy(fPlaybackName, param->value.str, strlen(param->value.str));
+                strncpy(fPlaybackUID, param->value.str, 256);
+                break;
+                
+            case 'd':
+                strncpy(fCaptureUID, param->value.str, 256);
+                strncpy(fPlaybackUID, param->value.str, 256);
                 break;
 
             case 'D':
@@ -206,9 +397,38 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                 break;
                 
             case 'l':
+                DisplayDeviceNames();
                 break;
         }
     }
+    
+    /* duplex is the default */
+    if (!fCapturing && !fPlaying) {
+        fCapturing = true;
+        fPlaying = true;
+    }
+     
+    int in_nChannels = 0;
+    int out_nChannels = 0;
+    
+    if (SetupDevices(fCaptureUID, fPlaybackUID, captureName, playbackName) < 0)
+        throw -1;
+  
+    if (SetupChannels(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, true) < 0)
+        throw -1;
+ 
+    if (SetupBufferSizeAndSampleRate(fAdaptedBufferSize, fAdaptedSampleRate) < 0)
+        throw -1;
+
+    if (fCapturing && fCaptureChannels > 0)
+        if (SetupBuffers(fCaptureChannels) < 0)
+            throw -1;
+            
+    if (OpenAUHAL(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, fAdaptedBufferSize, fAdaptedSampleRate, true) < 0)
+        throw -1;
+        
+    if (AddListeners() < 0)
+        throw -1;
 }
 
 OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
@@ -236,21 +456,21 @@ OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
     }
 }
 
-OSStatus JackCoreAudioAdapter::GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput)
+OSStatus JackCoreAudioAdapter::GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput)
 {
     OSStatus err = noErr;
     UInt32	outSize;
     Boolean	outWritable;
     AudioBufferList* bufferList = 0;
 
-    *channelCount = 0;
+    channelCount = 0;
     err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, &outWritable);
     if (err == noErr) {
         bufferList = (AudioBufferList*)malloc(outSize);
         err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, bufferList);
         if (err == noErr) {
             for (unsigned int i = 0; i < bufferList->mNumberBuffers; i++)
-                *channelCount += bufferList->mBuffers[i].mNumberChannels;
+                channelCount += bufferList->mBuffers[i].mNumberChannels;
         }
 
         if (bufferList)
@@ -271,7 +491,7 @@ OSStatus JackCoreAudioAdapter::GetDeviceIDFromUID(const char* UID, AudioDeviceID
     } else {
         OSStatus res = AudioHardwareGetProperty(kAudioHardwarePropertyDeviceForUID, &size, &value);
         CFRelease(inIUD);
-        jack_log("get_device_id_from_uid %s %ld ", UID, *id);
+        jack_log("GetDeviceIDFromUID %s %ld", UID, *id);
         return (*id == kAudioDeviceUnknown) ? kAudioHardwareBadDeviceError : res;
     }
 }
@@ -321,7 +541,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
 
     // Duplex
     if (strcmp(capture_driver_uid, "") != 0 && strcmp(playback_driver_uid, "") != 0) {
-        jack_log("JackCoreAudioDriver::Open duplex ");
+        jack_log("JackCoreAudioAdapter::Open duplex");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
             if (GetDefaultDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default device");
@@ -335,7 +555,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
 
         // Capture only
     } else if (strcmp(capture_driver_uid, "") != 0) {
-        jack_log("JackCoreAudioDriver::Open capture only ");
+        jack_log("JackCoreAudioAdapter::Open capture only");
         if (GetDeviceIDFromUID(capture_driver_uid, &fDeviceID) != noErr) {
             if (GetDefaultInputDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default device");
@@ -349,7 +569,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
 
         // Playback only
     } else if (strcmp(playback_driver_uid, "") != 0) {
-        jack_log("JackCoreAudioDriver::Open playback only ");
+        jack_log("JackCoreAudioAdapter::Open playback only");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
             if (GetDefaultOutputDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default device");
@@ -363,7 +583,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
 
         // Use default driver in duplex mode
     } else {
-        jack_log("JackCoreAudioDriver::Open default driver ");
+        jack_log("JackCoreAudioAdapter::Open default driver");
         if (GetDefaultDevice(&fDeviceID) != noErr) {
             jack_error("Cannot open default device");
             return -1;
@@ -375,7 +595,6 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
     }
 
     return 0;
-
 }
 
 int JackCoreAudioAdapter::SetupChannels(bool capturing,
@@ -388,18 +607,44 @@ int JackCoreAudioAdapter::SetupChannels(bool capturing,
 {
     OSStatus err = noErr;
 
-    err = GetTotalChannels(fDeviceID, &in_nChannels, true);
-    if (err != noErr) {
-        jack_error("Cannot get input channel number");
-        printError(err);
-        return -1;
+    if (capturing) {
+        err = GetTotalChannels(fDeviceID, in_nChannels, true);
+        if (err != noErr) {
+            jack_error("Cannot get input channel number");
+            printError(err);
+            return -1;
+        }
     }
 
-    err = GetTotalChannels(fDeviceID, &out_nChannels, false);
-    if (err != noErr) {
-        jack_error("Cannot get output channel number");
-        printError(err);
-        return -1;
+    if (playing) {
+        err = GetTotalChannels(fDeviceID, out_nChannels, false);
+        if (err != noErr) {
+            jack_error("Cannot get output channel number");
+            printError(err);
+            return -1;
+        }
+    }
+
+    if (inchannels > in_nChannels) {
+        jack_error("This device hasn't required input channels inchannels = %ld in_nChannels = %ld", inchannels, in_nChannels);
+        if (strict)
+            return -1;
+    }
+
+    if (outchannels > out_nChannels) {
+        jack_error("This device hasn't required output channels outchannels = %ld out_nChannels = %ld", outchannels, out_nChannels);
+        if (strict)
+            return -1;
+    }
+
+    if (inchannels == 0) {
+        jack_log("Setup max in channels = %ld", in_nChannels);
+        inchannels = in_nChannels;
+    }
+
+    if (outchannels == 0) {
+        jack_log("Setup max out channels = %ld", out_nChannels);
+        outchannels = out_nChannels;
     }
 
     return 0;
@@ -461,9 +706,9 @@ int JackCoreAudioAdapter::SetupBufferSizeAndSampleRate(jack_nframes_t nframes, j
     return 0;
 }
 
-int JackCoreAudioAdapter::SetupBuffers(int inchannels, int outchannels)
+int JackCoreAudioAdapter::SetupBuffers(int inchannels)
 {
-    jack_log("JackCoreAudioAdapter::SetupBuffers: input = %ld output = %ld", inchannels, outchannels);
+    jack_log("JackCoreAudioAdapter::SetupBuffers: input = %ld", inchannels);
 
     // Prepare buffers
     fInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
@@ -504,7 +749,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
     UInt32 enableIO;
     AudioStreamBasicDescription srcFormat, dstFormat;
 
-    jack_log("OpenAUHAL capturing = %ld playing = %ld playing = %ld outchannels = %ld in_nChannels = %ld out_nChannels = %ld ", capturing, playing, inchannels, inchannels, in_nChannels, out_nChannels);
+    jack_log("OpenAUHAL capturing = %ld playing = %ld inchannels = %ld outchannels = %ld in_nChannels = %ld out_nChannels = %ld ", capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels);
 
     // AUHAL
     ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
@@ -676,35 +921,7 @@ void JackCoreAudioAdapter::CloseAUHAL()
 
 int JackCoreAudioAdapter::Open()
 {
-    OSStatus err;
-    int in_nChannels = 0;
-    int out_nChannels = 0;
-    
-    if (SetupDevices(fCaptureUID, fPlaybackUID, fCaptureName, fPlaybackName) < 0)
-        return -1;
-
-    if (SetupChannels(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, true) < 0)
-        return -1;
-
-    if (SetupBufferSizeAndSampleRate(fAdaptedBufferSize, fAdaptedSampleRate)  < 0)
-        return -1;
-
-    if (OpenAUHAL(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, fAdaptedBufferSize, fAdaptedSampleRate, true) < 0)
-        goto error;
-
-    if (fCapturing && fCaptureChannels > 0)
-        if (SetupBuffers(fCaptureChannels, fPlaybackChannels) < 0)
-            goto error;
-
-    err = AudioOutputUnitStart(fAUHAL);
-    if (err != noErr)
-        goto error;
-
-    return 0;
-
-error:
-    Close();
-    return -1;
+    return (AudioOutputUnitStart(fAUHAL) != noErr)  ? -1 : 0;
 }
 
 int JackCoreAudioAdapter::Close()

@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-08-26 Stephane Letz  <letz@grame.fr>
+	
+	* Better parameter handling in JackCoreAudioAdapter.
+
 2008-08-22 Stephane Letz  <letz@grame.fr>
 	
 	* Move GetCurrentTransportFrame code from JackClient to JackTransportEngine.

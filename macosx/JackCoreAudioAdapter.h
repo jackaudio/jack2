@@ -50,10 +50,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         
         char fCaptureUID[256];
         char fPlaybackUID[256];
-        
-        char fCaptureName[256];
-        char fPlaybackName[256];
-        
+         
         bool fCapturing;
         bool fPlaying;
 
@@ -75,9 +72,14 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
                                                 Boolean	isInput,
                                                 AudioDevicePropertyID inPropertyID,
                                                 void* inClientData);
+        static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
+                                                    UInt32 inChannel,
+                                                    Boolean	isInput,
+                                                    AudioDevicePropertyID inPropertyID,
+                                                    void* inClientData);
 
         OSStatus GetDefaultDevice(AudioDeviceID* id);
-        OSStatus GetTotalChannels(AudioDeviceID device, int* channelCount, bool isInput);
+        OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
         OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
         OSStatus GetDefaultInputDevice(AudioDeviceID* id);
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
@@ -108,9 +110,12 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
                     bool strict);
 
         int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
-        int SetupBuffers(int inchannels, int outchannels);
+        int SetupBuffers(int inchannels);
         void DisposeBuffers();
         void CloseAUHAL();
+        
+        int AddListeners();
+        void RemoveListeners();
 
     public:
 

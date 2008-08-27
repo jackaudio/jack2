@@ -127,13 +127,13 @@ namespace Jack
 
     int JackAudioAdapter::Open()
     {
-        jack_log("JackAudioAdapter::Open");
-
         int i;
         char name[32];
 
         fCaptureChannels = fAudioAdapter->GetInputs();
         fPlaybackChannels = fAudioAdapter->GetOutputs();
+        
+        jack_log("JackAudioAdapter::Open fCaptureChannels %d fPlaybackChannels %d", fCaptureChannels, fPlaybackChannels);
 
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];

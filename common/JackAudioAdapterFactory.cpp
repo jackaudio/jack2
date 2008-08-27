@@ -51,26 +51,31 @@ extern "C"
         Jack::JackAudioAdapter* adapter;
         jack_nframes_t buffer_size = jack_get_buffer_size(jack_client);
         jack_nframes_t sample_rate = jack_get_sample_rate(jack_client);
+        
+        try {
 
-#ifdef __linux__
-        adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackAlsaAdapter(buffer_size, sample_rate, params));
-#endif
+    #ifdef __linux__
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackAlsaAdapter(buffer_size, sample_rate, params));
+    #endif
 
-#ifdef WIN32
-        adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPortAudioAdapter(buffer_size, sample_rate, params));
-#endif
+    #ifdef WIN32
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackPortAudioAdapter(buffer_size, sample_rate, params));
+    #endif
 
-#ifdef __APPLE__
-        adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackCoreAudioAdapter(buffer_size, sample_rate, params));
-#endif
-
-        assert(adapter);
-
-        if (adapter->Open() == 0)
-            return 0;
-        else
-        {
-            delete adapter;
+    #ifdef __APPLE__
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackCoreAudioAdapter(buffer_size, sample_rate, params));
+    #endif
+           assert(adapter);
+       
+            if (adapter->Open() == 0)
+                return 0;
+            else
+            {
+                delete adapter;
+                return 1;
+            }
+         
+        } catch (...) {
             return 1;
         }
     }
