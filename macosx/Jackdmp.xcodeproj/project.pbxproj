@@ -64,6 +64,7 @@
 				4BD624D30CBCF55700DE782F /* PBXTargetDependency */,
 				BA222AF00DC883EF001A17F4 /* PBXTargetDependency */,
 				4B19B32C0E23636E00DD4A82 /* PBXTargetDependency */,
+				4B224B340E65BA330066BE5B /* PBXTargetDependency */,
 				4B5A1BE20CD1CD730005BF74 /* PBXTargetDependency */,
 				4B5A1BCF0CD1CCC80005BF74 /* PBXTargetDependency */,
 				4BFA99440AAAED90009E916C /* PBXTargetDependency */,
@@ -633,6 +634,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B19B2F60E23620F00DD4A82;
 			remoteInfo = audioadapter;
+		};
+		4B224B330E65BA330066BE5B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B5E08BF0E5B66EE00BEE4E0 /* netadapter */;
+			remoteInfo = netadapter;
 		};
 		4B35C5540D4731D2000DE7AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -6142,6 +6150,11 @@
 			target = 4B19B2F60E23620F00DD4A82 /* audioadapter */;
 			targetProxy = 4B19B32B0E23636E00DD4A82 /* PBXContainerItemProxy */;
 		};
+		4B224B340E65BA330066BE5B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B5E08BF0E5B66EE00BEE4E0 /* netadapter */;
+			targetProxy = 4B224B330E65BA330066BE5B /* PBXContainerItemProxy */;
+		};
 		4B35C5530D4731D2000DE7AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4B699D03097D421600A18468 /* jack_external_metro Universal */;
@@ -10797,10 +10810,7 @@
 		4B5E08D20E5B66EE00BEE4E0 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					ppc,
-				);
+				ARCHS = i386;
 				COPY_PHASE_STRIP = NO;
 				DEBUGGING_SYMBOLS = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -10817,7 +10827,7 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					/usr/local/lib/libsamplerate.a,
 					"-framework",
@@ -10846,10 +10856,7 @@
 		4B5E08D30E5B66EE00BEE4E0 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				ARCHS = i386;
 				COPY_PHASE_STRIP = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -10864,7 +10871,7 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
 				OTHER_LDFLAGS = (
 					/usr/local/lib/libsamplerate.a,
 					"-framework",
