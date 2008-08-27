@@ -66,7 +66,7 @@ extern "C"
             adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackCoreAudioAdapter(buffer_size, sample_rate, params));
     #endif
            assert(adapter);
-       
+           
             if (adapter->Open() == 0)
                 return 0;
             else
@@ -93,7 +93,9 @@ extern "C"
                 jack_error("Internal client : JackArgParser::ParseParams error.");
         }
 
-        return jack_internal_initialize(jack_client, params);
+        int res = jack_internal_initialize(jack_client, params);
+        parser.FreeParams(params);
+        return res;
     }
 
     EXPORT void jack_finish(void* arg)

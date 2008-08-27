@@ -22,6 +22,7 @@
 #endif
 
 #include "JackConstants.h"
+#include "JackDriverLoader.h"
 #include "JackTools.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -381,6 +382,19 @@ namespace Jack {
             *param_list = params;
 
         return 0;
+    }
+    
+    void JackArgParser::FreeParams ( JSList* param_list )
+    {
+        JSList *node_ptr = param_list;
+        JSList *next_node_ptr;
+    
+        while (node_ptr) {
+            next_node_ptr = node_ptr->next;
+            free(node_ptr->data);
+            free(node_ptr);
+            node_ptr = next_node_ptr;
+        }
     }
 
 }

@@ -79,20 +79,40 @@ bool JackServerGlobals::Init()
     if (JackServer::fInstance != NULL) 
         return true;
         
+    int realtime = 0;
+    int client_timeout = 0; /* msecs; if zero, use period size. */
+    int realtime_priority = 10;
+    int verbose_aux = 0;
+    int do_mlock = 1;
+    unsigned int port_max = 128;
+    int loopback = 0;
+    int do_unlock = 0;
+    int temporary = 0;
+    
+    int opt = 0;
+    int option_index = 0;
+    int seen_driver = 0;
+    char *driver_name = NULL;
+    char **driver_args = NULL;
+    JSList* driver_params;
+    int driver_nargs = 1;
+    JSList* drivers = NULL;
+    int show_version = 0;
+    int sync = 0;
+    int rc, i;
+    int ret;
+
+    FILE* fp = 0;
+    char filename[255];
+    char buffer[255];
+    int argc = 0;
+    char* argv[32];
+      
     // Otherwise first client starts the server
     if (fClientCount++ == 0) {
 
         jack_log("JackServerGlobals Init");
-        int realtime = 0;
-        int client_timeout = 0; /* msecs; if zero, use period size. */
-        int realtime_priority = 10;
-        int verbose_aux = 0;
-        int do_mlock = 1;
-        unsigned int port_max = 128;
-        int loopback = 0;
-        int do_unlock = 0;
-        int temporary = 0;
-
+      
         jack_driver_desc_t* driver_desc;
         const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:";
         static struct option long_options[] = {
@@ -114,25 +134,7 @@ bool JackServerGlobals::Init()
                                                   { "sync", 0, 0, 'S' },
                                                   { 0, 0, 0, 0 }
                                               };
-        int opt = 0;
-        int option_index = 0;
-        int seen_driver = 0;
-        char *driver_name = NULL;
-        char **driver_args = NULL;
-        JSList* driver_params;
-        int driver_nargs = 1;
-        JSList* drivers = NULL;
-        int show_version = 0;
-        int sync = 0;
-        int rc, i;
-        int ret;
-
-        FILE* fp = 0;
-        char filename[255];
-        char buffer[255];
-        int argc = 0;
-        char* argv[32];
-
+ 
         snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
         fp = fopen(filename, "r");
 
@@ -305,10 +307,14 @@ bool JackServerGlobals::Init()
             goto error;
         }
     }
-
+    
+    if (driver_params)
+        jack_free_driver_params(driver_params);
     return true;
 
 error:
+    if (driver_params)
+        jack_free_driver_params(driver_params);
     fClientCount--;
     return false;
 }

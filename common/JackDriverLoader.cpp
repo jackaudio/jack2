@@ -90,6 +90,19 @@ jack_print_driver_param_usage (jack_driver_desc_t * desc, unsigned long param, F
     fprintf (file, "%s\n", desc->params[param].long_desc);
 }
 
+EXPORT void jack_free_driver_params(JSList * driver_params)
+{
+    JSList *node_ptr = driver_params;
+    JSList *next_node_ptr;
+    
+    while (node_ptr) {
+        next_node_ptr = node_ptr->next;
+        free(node_ptr->data);
+        free(node_ptr);
+        node_ptr = next_node_ptr;
+    }
+}
+
 int
 jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr)
 {

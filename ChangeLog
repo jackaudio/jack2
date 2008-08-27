@@ -25,6 +25,7 @@ Florian Faber
 2008-08-26 Stephane Letz  <letz@grame.fr>
 	
 	* Better parameter handling in JackCoreAudioAdapter.
+	* Fix memory leaks.
 
 2008-08-22 Stephane Letz  <letz@grame.fr>
 	

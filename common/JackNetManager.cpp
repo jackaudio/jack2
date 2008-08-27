@@ -749,7 +749,9 @@ extern "C"
                 jack_error ( "Internal client JackArgParser::ParseParams error." );
         }
 
-        return jack_internal_initialize ( jack_client, params );
+        int res = jack_internal_initialize(jack_client, params);
+        parser.FreeParams(params);
+        return res;
     }
 
     EXPORT void jack_finish ( void* arg )
