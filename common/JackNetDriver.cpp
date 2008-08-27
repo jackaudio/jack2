@@ -238,6 +238,7 @@ namespace Jack
             }
             port = fGraphManager->GetPort ( port_id );
             port->SetAlias ( alias );
+            //port latency
             port->SetLatency ( fEngineControl->fBufferSize );
             fCapturePortList[audio_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fCapturePortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
@@ -255,7 +256,19 @@ namespace Jack
             }
             port = fGraphManager->GetPort ( port_id );
             port->SetAlias ( alias );
-            port->SetLatency ( ( fParams.fNetworkMode == 'f' ) ? 0 : fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
+            //port latency
+            switch ( fParams.fNetworkMode )
+            {
+                case 'f' :
+                    port->SetLatency ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    break;
+                case 'n' :
+                    port->SetLatency ( fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    break;
+                case 's' :
+                    port->SetLatency ( 2 * fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    break;
+            }
             fPlaybackPortList[audio_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
         }
@@ -272,6 +285,7 @@ namespace Jack
                 return -1;
             }
             port = fGraphManager->GetPort ( port_id );
+            //port latency
             port->SetLatency ( fEngineControl->fBufferSize );
             fMidiCapturePortList[midi_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fMidiCapturePortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
@@ -289,7 +303,19 @@ namespace Jack
                 return -1;
             }
             port = fGraphManager->GetPort ( port_id );
-            port->SetLatency ( ( fParams.fNetworkMode == 'f' ) ? 0 : fEngineControl->fBufferSize + ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) );
+            //port latency
+            switch ( fParams.fNetworkMode )
+            {
+                case 'f' :
+                    port->SetLatency ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    break;
+                case 'n' :
+                    port->SetLatency ( fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) ;
+                    break;
+                case 's' :
+                    port->SetLatency ( 2 * fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    break;
+            }
             fMidiPlaybackPortList[midi_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
         }
@@ -395,7 +421,7 @@ namespace Jack
 
         //is it a new state (that the master need to know...) ?
         fReturnTransportData.fNewState = ( ( fReturnTransportData.fState != fLastTransportState ) &&
-                                            ( fReturnTransportData.fState != fSendTransportData.fState ) );
+                                           ( fReturnTransportData.fState != fSendTransportData.fState ) );
         if ( fReturnTransportData.fNewState )
             jack_info ( "Sending '%s'.", GetTransportState ( fReturnTransportData.fState ) );
         fLastTransportState = fReturnTransportData.fState;

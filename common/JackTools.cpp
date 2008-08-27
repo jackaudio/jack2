@@ -340,8 +340,7 @@ namespace Jack {
                 //valid option
                 if ( ( param_id = options_list.find_first_of ( fArgv[param].at(1) ) ) != string::npos )
                 {
-                    //TODO : find if (and where)  it's correctly deleted...
-                    intclient_param = new jack_driver_param_t;
+                    intclient_param = static_cast<jack_driver_param_t*> ( calloc ( 1, sizeof ( jack_driver_param_t) ) );
                     intclient_param->character = desc->params[param_id].character;
 
                     switch ( desc->params[param_id].type )

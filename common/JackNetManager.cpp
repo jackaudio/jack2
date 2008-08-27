@@ -175,6 +175,7 @@ namespace Jack
             sprintf ( name, "to_slave_%d", i+1 );
             if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 return -1;
+            //port latency
             jack_port_set_latency ( fAudioCapturePorts[i], 0 );
         }
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
@@ -183,7 +184,19 @@ namespace Jack
             sprintf ( name, "from_slave_%d", i+1 );
             if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, port_flags, 0 ) ) == NULL )
                 return -1;
-            jack_port_set_latency ( fAudioPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+            //port latency
+            switch ( fParams.fNetworkMode )
+            {
+                case 'f' :
+                    jack_port_set_latency ( fAudioPlaybackPorts[i], ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    break;
+                case 'n' :
+                    jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    break;
+                case 's' :
+                    jack_port_set_latency ( fAudioPlaybackPorts[i], 2 * port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    break;
+            }
         }
         //midi
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -192,6 +205,7 @@ namespace Jack
             sprintf ( name, "midi_to_slave_%d", i+1 );
             if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 return -1;
+            //port latency
             jack_port_set_latency ( fMidiCapturePorts[i], 0 );
         }
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
@@ -200,7 +214,19 @@ namespace Jack
             sprintf ( name, "midi_from_slave_%d", i+1 );
             if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, port_flags, 0 ) ) == NULL )
                 return -1;
-            jack_port_set_latency ( fMidiPlaybackPorts[i], ( fParams.fNetworkMode == 'f' ) ? 0 : port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+            //port latency
+            switch ( fParams.fNetworkMode )
+            {
+                case 'f' :
+                    jack_port_set_latency ( fMidiPlaybackPorts[i], ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    break;
+                case 'n' :
+                    jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    break;
+                case 's' :
+                    jack_port_set_latency ( fMidiPlaybackPorts[i], 2 * port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    break;
+            }
         }
         return 0;
     }
@@ -236,7 +262,7 @@ namespace Jack
 
         //is it a new state ?
         fSendTransportData.fNewState = ( ( fSendTransportData.fState != fLastTransportState ) &&
-                                        ( fSendTransportData.fState != fReturnTransportData.fState ) );
+                                         ( fSendTransportData.fState != fReturnTransportData.fState ) );
         if ( fSendTransportData.fNewState )
             jack_info ( "Sending '%s' to '%s'.", GetTransportState ( fSendTransportData.fState ), fParams.fName );
         fLastTransportState = fSendTransportData.fState;
