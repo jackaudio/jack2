@@ -359,10 +359,8 @@ jackctl_internals_load(
     }
 
     while (descriptor_node_ptr != NULL)
-    {
-        jack_log("jackctl_internals_load");
-        
-        internal_ptr = (struct jackctl_internal *)malloc(sizeof(struct jackctl_driver));
+    {     
+        internal_ptr = (struct jackctl_internal *)malloc(sizeof(struct jackctl_internal));
         if (internal_ptr == NULL)
         {
             jack_error("memory allocation of jackctl_driver structure failed.");
