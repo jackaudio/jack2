@@ -155,40 +155,47 @@ int JackServer::Close()
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
 {
-    JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
-    assert(client);
-    return InternalClientLoadAux(client, client_name, options, int_ref, status);
-}
-
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status)
-{
-    JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, parameters);
-    assert(client);
-    return InternalClientLoadAux(client, client_name, options, int_ref, status);
-}
-
-int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* client_name, int options, int* int_ref, int* status)
-{
     try {
-        // Clear status
-        *status = 0;
-        int res = client->Open(JACK_DEFAULT_SERVER_NAME, client_name, (jack_options_t)options, (jack_status_t*)status);
-        if (res < 0) {
-            delete client;
-            int my_status1 = *status | JackFailure;
-            *status = (jack_status_t)my_status1;
-            *int_ref = 0;
-        } else {
-            *int_ref = client->GetClientControl()->fRefNum;
-        }
+        JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
+        assert(client);
+        return InternalClientLoadAux(client, client_name, options, int_ref, status);
     } catch (...) {
         int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;
         *int_ref = 0;
+        return -1;
     }
-
-    return 0;
 }
+
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status)
+{
+    try {
+        JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, parameters);
+        assert(client);
+        return InternalClientLoadAux(client, client_name, options, int_ref, status);
+    } catch (...) {
+        int my_status1 = *status | JackFailure;
+        *status = (jack_status_t)my_status1;
+        *int_ref = 0;
+        return -1;
+    }
+}
+
+int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* client_name, int options, int* int_ref, int* status)
+{
+    // Clear status
+    *status = 0;
+    if (client->Open(JACK_DEFAULT_SERVER_NAME, client_name, (jack_options_t)options, (jack_status_t*)status) < 0) {
+        delete client;
+        int my_status1 = *status | JackFailure;
+        *status = (jack_status_t)my_status1;
+        *int_ref = 0;
+        return -1;
+    } else {
+        *int_ref = client->GetClientControl()->fRefNum;
+        return 0;
+    }
+ }
 
 int JackServer::Start()
 {

@@ -193,7 +193,6 @@ void JackLoadableInternalClient::Init(const char* so_name)
     BuildClientPath(path_to_so, sizeof(path_to_so), so_name);
  
     fHandle = LoadJackModule(path_to_so);
-
     jack_log("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s", path_to_so);
 
     if (fHandle == 0) {
