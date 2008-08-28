@@ -757,6 +757,7 @@ fail:
 EXPORT void jackctl_server_destroy(jackctl_server *server_ptr)
 {
     jackctl_server_free_drivers(server_ptr);
+    jackctl_server_free_internals(server_ptr);
     jackctl_server_free_parameters(server_ptr);
     free(server_ptr);
 }
