@@ -172,21 +172,6 @@ JackClientControl* JackInternalClient::GetClientControl() const
     return const_cast<JackClientControl*>(&fClientControl);
 }
 
-JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data)
-        : JackInternalClient(server, table)
-{
-    snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
-    fParameters = NULL;
-    Init(so_name);
-}
-
-JackLoadableInternalClient::JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters)
-        : JackInternalClient(server, table)
-{
-    fParameters = parameters;
-    Init(so_name);
-}
-
 void JackLoadableInternalClient::Init(const char* so_name)
 {
     char path_to_so[PATH_MAX + 1];
@@ -198,18 +183,6 @@ void JackLoadableInternalClient::Init(const char* so_name)
     if (fHandle == 0) {
         PrintLoadError(so_name);
         throw - 1;
-    }
-
-    fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
-    if (!fInitialize) {
-        UnloadJackModule(fHandle);
-        jack_error("symbol jack_initialize cannot be found in %s", so_name);
-        throw - 1;
-    }
-    
-    fInternalInitialize = (InternalInitializeCallback)GetJackProc(fHandle, "jack_internal_initialize");
-    if (!fInternalInitialize) {
-        jack_info("No jack_internal_initialize entry-point for %s", so_name);
     }
 
     fFinish = (FinishCallback)GetJackProc(fHandle, "jack_finish");
@@ -225,6 +198,44 @@ void JackLoadableInternalClient::Init(const char* so_name)
     }
 }
 
+void JackLoadableInternalClient1::Init(const char* so_name)
+{
+    JackLoadableInternalClient::Init(so_name);
+    
+    fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
+    if (!fInitialize) {
+        UnloadJackModule(fHandle);
+        jack_error("symbol jack_initialize cannot be found in %s", so_name);
+        throw - 1;
+    }
+}
+
+void JackLoadableInternalClient2::Init(const char* so_name)
+{
+    JackLoadableInternalClient::Init(so_name);
+    
+    fInitialize = (InternalInitializeCallback)GetJackProc(fHandle, "jack_internal_initialize");
+    if (!fInitialize) {
+        UnloadJackModule(fHandle);
+        jack_error("symbol jack_internal_initialize cannot be found in %s", so_name);
+        throw - 1;
+    }
+}
+
+JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data)
+        : JackLoadableInternalClient(server, table)
+{
+    snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);
+    Init(so_name);
+}
+
+JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters)
+        : JackLoadableInternalClient(server, table)
+{
+    fParameters = parameters;
+    Init(so_name);
+}
+
 JackLoadableInternalClient::~JackLoadableInternalClient()
 {
     if (fFinish)
@@ -232,9 +243,10 @@ JackLoadableInternalClient::~JackLoadableInternalClient()
     UnloadJackModule(fHandle);
 }
 
-int JackLoadableInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
+int JackLoadableInternalClient1::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
+    
     if (JackInternalClient::Open(server_name, name, options, status) == 0) {
         if (fInitialize((jack_client_t*)this, fObjectData) == 0) {
             res = 0;
@@ -243,6 +255,23 @@ int JackLoadableInternalClient::Open(const char* server_name, const char* name, 
             fFinish = NULL;
         }
     }
+    
+    return res;
+}
+
+int JackLoadableInternalClient2::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
+{
+    int res = -1;
+    
+    if (JackInternalClient::Open(server_name, name, options, status) == 0) {
+        if (fInitialize((jack_client_t*)this, fParameters) == 0) {
+            res = 0;
+        } else {
+            JackInternalClient::Close();
+            fFinish = NULL;
+        }
+    }
+    
     return res;
 }
 

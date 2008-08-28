@@ -87,23 +87,58 @@ typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 class JackLoadableInternalClient : public JackInternalClient
 {
 
-    private:
+    protected:
 
         HANDLE fHandle;
-        InitializeCallback fInitialize;
-        InternalInitializeCallback fInternalInitialize;
         FinishCallback fFinish;
         JackDriverDescFunction fDescriptor;
+         
+        virtual void Init(const char* so_name);
+
+    public:
+
+        JackLoadableInternalClient(JackServer* server, JackSynchro* table)
+            :JackInternalClient(server, table), fHandle(NULL), fFinish(NULL), fDescriptor(NULL)
+        {}
+        virtual ~JackLoadableInternalClient();
+
+};
+
+class JackLoadableInternalClient1 : public JackLoadableInternalClient
+{
+
+    private:
+
+        InitializeCallback fInitialize;
         char fObjectData[JACK_LOAD_INIT_LIMIT];
+         
+        void Init(const char* so_name);
+
+    public:
+
+        JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data);
+        virtual ~JackLoadableInternalClient1()
+        {}
+
+        int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
+
+};
+
+class JackLoadableInternalClient2 : public JackLoadableInternalClient
+{
+
+    private:
+
+        InternalInitializeCallback fInitialize;
         const JSList* fParameters;
         
         void Init(const char* so_name);
 
     public:
 
-        JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data);
-        JackLoadableInternalClient(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters);
-        virtual ~JackLoadableInternalClient();
+        JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters);
+        virtual ~JackLoadableInternalClient2()
+        {}
 
         int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
