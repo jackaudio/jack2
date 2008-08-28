@@ -293,7 +293,7 @@ jack_controller_create(
     }
     
     internals = (JSList *)jackctl_server_get_internals_list(controller_ptr->server);
-    controller_ptr->drivers_count = jack_slist_length(internals);
+    controller_ptr->internals_count = jack_slist_length(internals);
     controller_ptr->internal_names = malloc(controller_ptr->internals_count * sizeof(const char *));
     if (controller_ptr->internal_names == NULL)
     {
@@ -302,7 +302,7 @@ jack_controller_create(
     }
 
     internal_name_target = controller_ptr->internal_names;
-    node_ptr = jackctl_server_get_drivers_list(controller_ptr->server);
+    node_ptr = jackctl_server_get_internals_list(controller_ptr->server);
     while (node_ptr != NULL)
     {
         *internal_name_target = jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data);

@@ -61,7 +61,7 @@ typedef struct _jack_driver_info
 jack_driver_info_t;
 
 jack_driver_desc_t * jack_find_driver_descriptor (JSList * drivers, const char * name);
-jack_driver_desc_t * jack_drivers_get_descriptor (JSList * drivers, const char * sofile);
+//jack_driver_desc_t * jack_drivers_get_descriptor (JSList * drivers, const char * sofile);
 
 JSList * jack_drivers_load (JSList * drivers);
 JSList * jack_internals_load (JSList * internals);

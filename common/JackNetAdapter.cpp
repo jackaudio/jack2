@@ -435,7 +435,7 @@ extern "C"
     EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
-        strcpy ( desc->name, "net" );
+        strcpy ( desc->name, "netadapter" );
         desc->nparams = 9;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 

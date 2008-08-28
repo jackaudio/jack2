@@ -211,11 +211,11 @@ extern "C"
         jack_driver_desc_t *desc;
         jack_driver_param_desc_t * params;
         unsigned int i;
-
-        desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
-        strcpy ( desc->name, "alsa-adapter" );
+        
+        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+        strcpy (desc->name, "audioadapter"); // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         desc->nparams = 9;
-        params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
+        params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
         strcpy ( params[i].name, "capture" );

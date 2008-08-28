@@ -699,7 +699,7 @@ extern "C"
         jack_driver_desc_t *desc;
         desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
 
-        strcpy ( desc->name, "netmanager" );
+        strcpy ( desc->name, "netmanager" ); // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         desc->nparams = 2;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
