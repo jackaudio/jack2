@@ -298,7 +298,7 @@ jack_controller_create(
     if (controller_ptr->internal_names == NULL)
     {
         jack_error("Ran out of memory trying to allocate internals names array");
-        goto fail_destroy_server;
+        goto fail_free_driver_names_array;
     }
 
     internal_name_target = controller_ptr->internal_names;
@@ -320,16 +320,18 @@ jack_controller_create(
             &controller_ptr->dbus_descriptor))
     {
         jack_error("Ran out of memory trying to register D-Bus object path");
-        goto fail_free_names_array;
+        goto fail_free_internal_names_array;
     }
 
     jack_controller_settings_load(controller_ptr);
 
     return controller_ptr;
 
-fail_free_names_array:
-    free(controller_ptr->driver_names);
+fail_free_internal_names_array:
     free(controller_ptr->internal_names);
+
+fail_free_driver_names_array:
+    free(controller_ptr->driver_names);
 
 fail_destroy_server:
     jackctl_server_destroy(controller_ptr->server);

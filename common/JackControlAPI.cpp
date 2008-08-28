@@ -743,10 +743,13 @@ EXPORT jackctl_server_t * jackctl_server_create()
     
     if (!jackctl_internals_load(server_ptr))
     {
-        goto fail_free_parameters;
+        goto fail_free_drivers;
     }
 
     return server_ptr;
+    
+fail_free_drivers:
+    jackctl_server_free_drivers(server_ptr);
 
 fail_free_parameters:
     jackctl_server_free_parameters(server_ptr);

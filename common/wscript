@@ -96,7 +96,7 @@ def build(bld):
             ]
         includes.append('../linux')
         uselib.append('RT')
-	uselib.append('DL')
+        uselib.append('DL')
 
     if bld.env()['IS_MACOSX']:
         common_libsources += [
