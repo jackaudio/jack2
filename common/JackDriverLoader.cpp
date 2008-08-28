@@ -26,11 +26,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #pragma warning (disable : 4786)
 #endif
 
+/*
 #ifndef WIN32
 #ifndef ADDON_DIR
 #include "config.h"
 #endif
 #endif
+*/
 
 #include "JackDriverLoader.h"
 #include "JackConstants.h"
@@ -452,10 +454,10 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
 
 #ifdef WIN32
     if ((so_get_descriptor == NULL) && (dlerr = GetLastError()) != 0) {
-        jack_log("Jack::jack_drivers_get_descriptor : dll is not a driver, error ld", dlerr);
+        jack_error("jack_drivers_get_descriptor err = %ld", dlerr);
 #else
     if ((so_get_descriptor == NULL) && (dlerr = dlerror ()) != NULL) {
-        jack_error("%s", dlerr);
+        jack_error("jack_drivers_get_descriptor err = %s", dlerr);
 #endif
 
         UnloadDriverModule(dlhandle);
@@ -608,6 +610,124 @@ jack_drivers_load (JSList * drivers) {
 
     if (!driver_list) {
         jack_error ("could not find any drivers in %s!\n", driver_dir);
+        return NULL;
+    }
+
+    return driver_list;
+}
+
+#endif
+
+#ifdef WIN32
+
+JSList *
+jack_internals_load (JSList * internals) {
+    char * driver_dir;
+    char driver_dir_storage[512];
+    char dll_filename[512];
+    WIN32_FIND_DATA filedata;
+    HANDLE file;
+    const char * ptr = NULL;
+    JSList * driver_list = NULL;
+    jack_driver_desc_t * desc;
+
+    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+        // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
+        GetCurrentDirectory(512, driver_dir_storage);
+        strcat(driver_dir_storage, "/");
+        strcat(driver_dir_storage, ADDON_DIR);
+        driver_dir = driver_dir_storage;
+    }
+
+    sprintf(dll_filename, "%s/*.dll", driver_dir);
+
+    file = (HANDLE )FindFirstFile(dll_filename, &filedata);
+
+    if (file == INVALID_HANDLE_VALUE) {
+        jack_error("error");
+        return NULL;
+    }
+
+    do {
+        ptr = strrchr (filedata.cFileName, '.');
+        if (!ptr) {
+            continue;
+        }
+        ptr++;
+        if (strncmp ("dll", ptr, 3) != 0) {
+            continue;
+        }
+
+        desc = jack_drivers_get_descriptor (internals, filedata.cFileName);
+        if (desc) {
+            driver_list = jack_slist_append (driver_list, desc);
+        }
+
+    } while (FindNextFile(file, &filedata));
+
+    if (!driver_list) {
+        jack_error ("could not find any internals in %s!\n", driver_dir);
+        return NULL;
+    }
+
+    return driver_list;
+}
+
+#else
+
+JSList *
+jack_internals_load (JSList * internals) {
+    struct dirent * dir_entry;
+    DIR * dir_stream;
+    const char * ptr;
+    int err;
+    JSList * driver_list = NULL;
+    jack_driver_desc_t * desc;
+
+    const char* driver_dir;
+    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+        driver_dir = ADDON_DIR;
+    }
+
+    /* search through the driver_dir and add get descriptors
+    from the .so files in it */
+    dir_stream = opendir (driver_dir);
+    if (!dir_stream) {
+        jack_error ("could not open driver directory %s: %s\n",
+                    driver_dir, strerror (errno));
+        return NULL;
+    }
+
+    while ((dir_entry = readdir(dir_stream))) {
+
+        /* check the filename is of the right format */
+        if (strncmp ("jack_", dir_entry->d_name, 5) != 0) {
+            continue;
+        }
+
+        ptr = strrchr (dir_entry->d_name, '.');
+        if (!ptr) {
+            continue;
+        }
+        ptr++;
+        if (strncmp ("so", ptr, 2) != 0) {
+            continue;
+        }
+
+        desc = jack_drivers_get_descriptor (internals, dir_entry->d_name);
+        if (desc) {
+            driver_list = jack_slist_append (driver_list, desc);
+        }
+    }
+
+    err = closedir (dir_stream);
+    if (err) {
+        jack_error ("error closing internal directory %s: %s\n",
+                    driver_dir, strerror (errno));
+    }
+
+    if (!driver_list) {
+        jack_error ("could not find any internals in %s!\n", driver_dir);
         return NULL;
     }
 

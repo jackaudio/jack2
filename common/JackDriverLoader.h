@@ -62,7 +62,10 @@ jack_driver_info_t;
 
 jack_driver_desc_t * jack_find_driver_descriptor (JSList * drivers, const char * name);
 jack_driver_desc_t * jack_drivers_get_descriptor (JSList * drivers, const char * sofile);
+
 JSList * jack_drivers_load (JSList * drivers);
+JSList * jack_internals_load (JSList * internals);
+
 jack_driver_info_t * jack_load_driver (jack_driver_desc_t * driver_desc);
 EXPORT int jackctl_parse_driver_params (jackctl_driver * driver_ptr, int argc, char* argv[]);
 EXPORT void jack_free_driver_params(JSList * param_ptr);

@@ -527,6 +527,7 @@ EXPORT jackctl_server_t * jackctl_server_create()
     }
 
     server_ptr->drivers = NULL;
+    server_ptr->internals = NULL;
     server_ptr->parameters = NULL;
     server_ptr->engine = NULL;
 
@@ -958,4 +959,73 @@ EXPORT bool jackctl_server_unload_internal(
     jackctl_internal * internal)
 {
     return false;
+}
+
+static int
+jackctl_internals_load(
+    struct jackctl_server * server_ptr)
+{
+    struct jackctl_driver * internal_ptr;
+    JSList *node_ptr;
+    JSList *descriptor_node_ptr;
+
+    descriptor_node_ptr = jack_internals_load(NULL);
+    if (descriptor_node_ptr == NULL)
+    {
+        jack_error("could not find any drivers in direver directory!");
+        return false;
+    }
+
+    while (descriptor_node_ptr != NULL)
+    {
+        internal_ptr = (struct jackctl_driver *)malloc(sizeof(struct jackctl_driver));
+        if (internal_ptr == NULL)
+        {
+            jack_error("memory allocation of jackctl_driver structure failed.");
+            goto next;
+        }
+
+        internal_ptr->desc_ptr = (jack_driver_desc_t *)descriptor_node_ptr->data;
+        internal_ptr->parameters = NULL;
+        internal_ptr->set_parameters = NULL;
+
+        if (!jackctl_add_driver_parameters(internal_ptr))
+        {
+            assert(internal_ptr->parameters == NULL);
+            free(internal_ptr);
+            goto next;
+        }
+
+        server_ptr->internals = jack_slist_append(server_ptr->internals, internal_ptr);
+
+    next:
+        node_ptr = descriptor_node_ptr;
+        descriptor_node_ptr = descriptor_node_ptr->next;
+        free(node_ptr);
+    }
+
+    return true;
+}
+
+static
+void
+jackctl_server_free_internals(
+    struct jackctl_server * server_ptr)
+{
+    JSList * next_node_ptr;
+    struct jackctl_driver * internal_ptr;
+
+    while (server_ptr->internals)
+    {
+        next_node_ptr = server_ptr->internals->next;
+        internal_ptr = (struct jackctl_driver *)server_ptr->internals->data;
+
+        jackctl_free_driver_parameters(internal_ptr);
+        free(internal_ptr->desc_ptr->params);
+        free(internal_ptr->desc_ptr);
+        free(internal_ptr);
+
+        free(server_ptr->internals);
+        server_ptr->internals = next_node_ptr;
+    }
 }
