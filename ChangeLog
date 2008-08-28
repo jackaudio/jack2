@@ -27,6 +27,10 @@ Florian Faber
 	* Better parameter handling in JackCoreAudioAdapter.
 	* Fix memory leaks.
 
+2008-08-23 Stephane Letz  <letz@grame.fr>
+	
+	* Implements internal clients management API.
+
 2008-08-22 Stephane Letz  <letz@grame.fr>
 	
 	* Move GetCurrentTransportFrame code from JackClient to JackTransportEngine.
