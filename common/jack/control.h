@@ -315,7 +315,7 @@ jackctl_parameter_get_default_value(
     
 /** 
  * Call this function to get list of available internal clients. List node data
- * pointers is a internal client object handle (::jackctl_driver_t).
+ * pointers is a internal client object handle (::jackctl_internal_t).
  * 
  * @param server server object handle to get internal clients for
  *
@@ -336,7 +336,7 @@ jackctl_server_get_internals_list(
  */
 const char *
 jackctl_internal_get_name(
-	jackctl_driver_t * internal);
+	jackctl_internal_t * internal);
 
 /** 
  * Call this function to get list of internal parameters. List node data

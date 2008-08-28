@@ -65,6 +65,9 @@ typedef struct jackctl_server jackctl_server_t;
 /** opaque type for driver object */
 typedef struct jackctl_driver jackctl_driver_t;
 
+/** opaque type for internal client object */
+typedef struct jackctl_internal jackctl_internal_t;
+
 /** opaque type for parameter object */
 typedef struct jackctl_parameter jackctl_parameter_t;
 
@@ -155,6 +158,30 @@ jackctl_parameter_set_value(
 EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
+    
+EXPORT union jackctl_parameter_value 
+jackctl_parameter_get_default_value(
+    jackctl_parameter *parameter_ptr);
+    
+EXPORT const JSList * 
+jackctl_server_get_internals_list(
+    jackctl_server *server_ptr);
+    
+EXPORT const char * 
+jackctl_internal_get_name(
+    jackctl_internal *internal_ptr);
+    
+EXPORT const JSList * 
+jackctl_internal_get_parameters(
+    jackctl_internal *internal_ptr);
+    
+EXPORT bool jackctl_server_load_internal(
+    jackctl_server * server,
+    jackctl_internal * internal);
+    
+EXPORT bool jackctl_server_unload_internal(
+    jackctl_server * server,
+    jackctl_internal * internal);
 
 #if 0
 { /* Adjust editor indent */

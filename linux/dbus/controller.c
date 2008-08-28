@@ -247,7 +247,9 @@ jack_controller_create(
     struct jack_controller *controller_ptr;
     const JSList * node_ptr;
     const char ** driver_name_target;
+    const char ** internal_name_target;
     JSList * drivers;
+    JSList * internals;
     DBusObjectPathVTable vtable =
     {
         jack_dbus_message_handler_unregister,
@@ -289,6 +291,24 @@ jack_controller_create(
         node_ptr = jack_slist_next(node_ptr);
         driver_name_target++;
     }
+    
+    internals = (JSList *)jackctl_server_get_internals_list(controller_ptr->server);
+    controller_ptr->drivers_count = jack_slist_length(internals);
+    controller_ptr->internal_names = malloc(controller_ptr->internals_count * sizeof(const char *));
+    if (controller_ptr->internal_names == NULL)
+    {
+        jack_error("Ran out of memory trying to allocate internals names array");
+        goto fail_destroy_server;
+    }
+
+    internal_name_target = controller_ptr->internal_names;
+    node_ptr = jackctl_server_get_drivers_list(controller_ptr->server);
+    while (node_ptr != NULL)
+    {
+        *internal_name_target = jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data);
+        node_ptr = jack_slist_next(node_ptr);
+        internal_name_target++;
+    }
 
     controller_ptr->dbus_descriptor.context = controller_ptr;
     controller_ptr->dbus_descriptor.interfaces = g_jackcontroller_interfaces;
@@ -300,15 +320,16 @@ jack_controller_create(
             &controller_ptr->dbus_descriptor))
     {
         jack_error("Ran out of memory trying to register D-Bus object path");
-        goto fail_free_driver_names_array;
+        goto fail_free_names_array;
     }
 
     jack_controller_settings_load(controller_ptr);
 
     return controller_ptr;
 
-fail_free_driver_names_array:
+fail_free_names_array:
     free(controller_ptr->driver_names);
+    free(controller_ptr->internal_names);
 
 fail_destroy_server:
     jackctl_server_destroy(controller_ptr->server);
@@ -332,6 +353,7 @@ jack_controller_destroy(
     }
 
     free(controller_ptr->driver_names);
+    free(controller_ptr->internal_names);
 
     jackctl_server_destroy(controller_ptr->server);
 

@@ -99,7 +99,12 @@ struct jackctl_driver
     JSList * set_parameters;
 };
 
-typedef jackctl_driver jackctl_internal;
+struct jackctl_internal
+{
+    jack_driver_desc_t * desc_ptr;
+    JSList * parameters;
+    JSList * set_parameters;
+};
 
 struct jackctl_parameter
 {
@@ -277,7 +282,7 @@ jackctl_drivers_load(
     descriptor_node_ptr = jack_drivers_load(NULL);
     if (descriptor_node_ptr == NULL)
     {
-        jack_error("could not find any drivers in direver directory!");
+        jack_error("could not find any drivers in driver directory!");
         return false;
     }
 
@@ -961,24 +966,25 @@ EXPORT bool jackctl_server_unload_internal(
     return false;
 }
 
+
 static int
 jackctl_internals_load(
     struct jackctl_server * server_ptr)
 {
-    struct jackctl_driver * internal_ptr;
+    struct jackctl_internal * internal_ptr;
     JSList *node_ptr;
     JSList *descriptor_node_ptr;
 
     descriptor_node_ptr = jack_internals_load(NULL);
     if (descriptor_node_ptr == NULL)
     {
-        jack_error("could not find any drivers in direver directory!");
+        jack_error("could not find any internals in driver directory!");
         return false;
     }
 
     while (descriptor_node_ptr != NULL)
     {
-        internal_ptr = (struct jackctl_driver *)malloc(sizeof(struct jackctl_driver));
+        internal_ptr = (struct jackctl_internal *)malloc(sizeof(struct jackctl_driver));
         if (internal_ptr == NULL)
         {
             jack_error("memory allocation of jackctl_driver structure failed.");
@@ -989,7 +995,7 @@ jackctl_internals_load(
         internal_ptr->parameters = NULL;
         internal_ptr->set_parameters = NULL;
 
-        if (!jackctl_add_driver_parameters(internal_ptr))
+        if (!jackctl_add_driver_parameters((struct jackctl_driver *)internal_ptr))
         {
             assert(internal_ptr->parameters == NULL);
             free(internal_ptr);
@@ -1013,14 +1019,14 @@ jackctl_server_free_internals(
     struct jackctl_server * server_ptr)
 {
     JSList * next_node_ptr;
-    struct jackctl_driver * internal_ptr;
+    struct jackctl_internal * internal_ptr;
 
     while (server_ptr->internals)
     {
         next_node_ptr = server_ptr->internals->next;
-        internal_ptr = (struct jackctl_driver *)server_ptr->internals->data;
+        internal_ptr = (struct jackctl_internal *)server_ptr->internals->data;
 
-        jackctl_free_driver_parameters(internal_ptr);
+        jackctl_free_driver_parameters((struct jackctl_driver *)internal_ptr);
         free(internal_ptr->desc_ptr->params);
         free(internal_ptr->desc_ptr);
         free(internal_ptr);

@@ -500,6 +500,25 @@ jack_drivers_get_descriptor (JSList * drivers, const char * sofile)
     return descriptor;
 }
 
+static bool check_symbol(const char* filename, const char* symbol)
+{   
+    void * dlhandle;
+    bool res = false;
+    
+    if ((dlhandle = LoadDriverModule(filename)) == NULL) {
+#ifdef WIN32
+        jack_error ("could not open driver .dll '%s': %ld\n", filename, GetLastError());
+#else
+        jack_error ("could not open driver .so '%s': %s\n", filename, dlerror());
+#endif
+     } else {
+        res = (GetProc(dlhandle, symbol)) ? true : false;
+        UnloadDriverModule(dlhandle);
+    }
+    
+    return res;
+}
+
 #ifdef WIN32
 
 JSList *
@@ -649,6 +668,12 @@ jack_internals_load (JSList * internals) {
     }
 
     do {
+    
+        /* check if dll is an internal client */
+        if (!check_symbol(filedata.cFileName, "jack_internal_initialize")) {
+             continue;
+        }
+        
         ptr = strrchr (filedata.cFileName, '.');
         if (!ptr) {
             continue;
@@ -657,6 +682,7 @@ jack_internals_load (JSList * internals) {
         if (strncmp ("dll", ptr, 3) != 0) {
             continue;
         }
+        
 
         desc = jack_drivers_get_descriptor (internals, filedata.cFileName);
         if (desc) {
@@ -700,11 +726,11 @@ jack_internals_load (JSList * internals) {
 
     while ((dir_entry = readdir(dir_stream))) {
 
-        /* check the filename is of the right format */
-        if (strncmp ("jack_", dir_entry->d_name, 5) != 0) {
-            continue;
+         /* check if dll is an internal client */
+        if (!check_symbol(dir_entry->d_name, "jack_internal_initialize")) {
+             continue;
         }
-
+        
         ptr = strrchr (dir_entry->d_name, '.');
         if (!ptr) {
             continue;

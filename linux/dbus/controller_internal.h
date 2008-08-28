@@ -39,6 +39,9 @@ struct jack_controller
 
     const char **driver_names;
     unsigned int drivers_count;
+    
+    const char **internal_names;
+    unsigned int internals_count;
 
     /* current driver, NULL if not driver is selected */
     jackctl_driver_t *driver;
