@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="jack">
+		<Project filename="libjackserver.cbp" />
+		<Project filename="jackd.cbp">
+			<Depends filename="libjackserver.cbp" />
+		</Project>
+		<Project filename="jack_portaudio.cbp" active="1">
+			<Depends filename="libjackserver.cbp" />
+			<Depends filename="jackd.cbp" />
+		</Project>
+		<Project filename="jack_netdriver.cbp">
+			<Depends filename="libjackserver.cbp" />
+			<Depends filename="jackd.cbp" />
+		</Project>
+		<Project filename="jack_dummy.cbp">
+			<Depends filename="libjackserver.cbp" />
+			<Depends filename="jackd.cbp" />
+		</Project>
+		<Project filename="jack_netmanager.cbp">
+			<Depends filename="libjackserver.cbp" />
+			<Depends filename="jackd.cbp" />
+			<Depends filename="jack_netdriver.cbp" />
+			<Depends filename="jack_netadapter.cbp" />
+		</Project>
+		<Project filename="jack_audioadapter.cbp">
+			<Depends filename="libjackserver.cbp" />
+			<Depends filename="jackd.cbp" />
+		</Project>
+		<Project filename="jack_netadapter.cbp">
+			<Depends filename="libjackserver.cbp" />
+			<Depends filename="jackd.cbp" />
+		</Project>
+		<Project filename="libjack.cbp" />
+		<Project filename="jack_load.cbp">
+			<Depends filename="jackd.cbp" />
+			<Depends filename="libjack.cbp" />
+		</Project>
+		<Project filename="jack_unload.cbp">
+			<Depends filename="jackd.cbp" />
+			<Depends filename="libjack.cbp" />
+		</Project>
+		<Project filename="jack_lsp.cbp">
+			<Depends filename="jackd.cbp" />
+			<Depends filename="libjack.cbp" />
+		</Project>
+		<Project filename="jack_metro.cbp">
+			<Depends filename="jackd.cbp" />
+			<Depends filename="libjack.cbp" />
+		</Project>
+		<Project filename="jack_connect.cbp">
+			<Depends filename="jackd.cbp" />
+			<Depends filename="libjack.cbp" />
+		</Project>
+		<Project filename="jack_disconnect.cbp">
+			<Depends filename="jackd.cbp" />
+			<Depends filename="libjack.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

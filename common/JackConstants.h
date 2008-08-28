@@ -51,7 +51,7 @@ namespace Jack
 #ifdef WIN32
 #define jack_server_dir "server"
 #define jack_client_dir "client"
-#define ADDON_DIR "jackmp"
+#define ADDON_DIR "jack"
 #elif __APPLE__
 #define jack_server_dir "/tmp"
 #define jack_client_dir "/tmp"

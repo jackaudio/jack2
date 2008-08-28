@@ -32,7 +32,7 @@
 					<Add library="uuid" />
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
-					<Add library="libjackmp" />
+					<Add library="libjack" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -62,7 +62,7 @@
 					<Add library="uuid" />
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
-					<Add library="libjackmp" />
+					<Add library="libjack" />
 					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
@@ -93,7 +93,7 @@
 					<Add library="uuid" />
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
-					<Add library="libjackmp" />
+					<Add library="libjack" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -114,7 +114,7 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjackmp" />
+			<Add library="libjack" />
 		</Linker>
 		<Unit filename="..\example-clients\metro.c">
 			<Option compilerVar="CC" />

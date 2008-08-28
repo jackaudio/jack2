@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Win32 Release">
-				<Option output="Release\bin\jackmp\netmanager" prefix_auto="1" extension_auto="1" />
+				<Option output="Release\bin\jack\netmanager" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -33,12 +33,12 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 					<Add library="ws2_32" />
-					<Add library="libjackservermp" />
+					<Add library="libjackserver" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug">
-				<Option output="Debug\bin\jackmp\netmanager" prefix_auto="1" extension_auto="1" />
+				<Option output="Debug\bin\jack\netmanager" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -64,12 +64,12 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 					<Add library="ws2_32" />
-					<Add library="libjackservermp" />
+					<Add library="libjackserver" />
 					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Monitor">
-				<Option output="Release\bin\jackmp\netmanager" prefix_auto="1" extension_auto="1" />
+				<Option output="Release\bin\jack\netmanager" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -96,7 +96,7 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 					<Add library="ws2_32" />
-					<Add library="libjackservermp" />
+					<Add library="libjackserver" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -119,7 +119,7 @@
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
 			<Add library="ws2_32" />
-			<Add library="libjackservermp" />
+			<Add library="libjackserver" />
 		</Linker>
 		<Unit filename="..\common\JackNetManager.cpp" />
 		<Unit filename="jacknetmanager.rc">

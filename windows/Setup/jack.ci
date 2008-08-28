@@ -53,27 +53,27 @@
    <bgfoot> </> 
    <bgback> </>
    <files listview >
-      <_><src>..\Release\bin\libjackmp.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libjackservermp.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
+      <_><src>..\Release\bin\libjack.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjack.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackserver.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackserver.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_connect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_disconnect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_load.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_lsp.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_metro.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_unload.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackdmp.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libjackmp.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libjackservermp.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjack.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackserver.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libsamplerate-0.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\jack_net.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\jack_dummy.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\jack_portaudio.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\netmanager.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\audioadapter.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\jackmp\netadapter.dll</><dest>inst</><custom>jackmp</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\jack_dummy.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\jack_portaudio.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\netmanager.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\audioadapter.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\netadapter.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\control.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\intclient.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\jack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
@@ -84,6 +84,8 @@
 <_><src>..\..\common\jack\thread.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\transport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -99,8 +101,8 @@
       
    </registry>
    <shcut listview >
-      <_><shpath>prog</><shname>Jack NetDriver</><tarpath>inst</><tarname>jackdmp.exe</><cmdline>-R -S -d net</><workpath>inst</><workcust></><icon></></>
-<_><shpath>prog</><shname>Jack Portaudio</><tarpath>inst</><tarname>jackdmp.exe</><cmdline>-R -S -d portaudio</><workpath>inst</><workcust></><icon></></>
+      <_><shpath>prog</><shname>Jack NetDriver</><tarpath>inst</><tarname>jackd.exe</><cmdline>-R -S -d net</><workpath>inst</><workcust></><icon></></>
+<_><shpath>prog</><shname>Jack Portaudio</><tarpath>inst</><tarname>jackd.exe</><cmdline>-R -S -d portaudio</><workpath>inst</><workcust></><icon></></>
 <_><shpath>prog</><shname>Jack Control</><tarpath>inst</><tarname>qjackctl.exe</><cmdline></><workpath>inst</><workcust></><icon>jackdmp.exe</></>
 <_><shpath>prog</><shname>Jack Command</><tarpath>sys</><tarname>cmd.exe</><cmdline></><workpath>inst</><workcust></><icon></></>
 
