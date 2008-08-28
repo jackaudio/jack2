@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackDriverLoader__
 
 #include "driver_interface.h"
-#include "control_types.h"
+#include "JackControlAPI.h"
 #include "JackPlatformSynchro.h"
 
 

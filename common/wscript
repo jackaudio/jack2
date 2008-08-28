@@ -129,7 +129,7 @@ def build(bld):
         'JackServerAPI.cpp',
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
-        'JackControl.cpp',
+        'JackControlAPI.cpp',
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         ]

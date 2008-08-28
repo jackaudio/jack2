@@ -43,7 +43,7 @@
 #include "JackServer.h"
 #include "shm.h"
 #include "JackTools.h"
-#include "control_types.h"
+#include "JackControlAPI.h"
 #include "JackLockedEngine.h"
 
 using namespace Jack;
