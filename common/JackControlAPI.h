@@ -2,6 +2,7 @@
   JACK control API
 
   Copyright (C) 2008 Nedko Arnaudov
+  Copyright (C) 2008 Grame
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -18,8 +19,8 @@
 
 */
 
-#ifndef __control_types__
-#define __control_types__
+#ifndef __JackControlAPI__
+#define __JackControlAPI__
 
 #include "jslist.h"
 #include "JackExports.h"
