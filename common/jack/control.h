@@ -3,6 +3,7 @@
   JACK control API
 
   Copyright (C) 2008 Nedko Arnaudov
+  Copyright (C) 2008 GRAME
     
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -98,7 +99,6 @@ jackctl_setup_signals(
  * 
  * @param signals signals set to wait on
  */
-
 void
 jackctl_wait_signals(
     sigset_t signals);
@@ -112,6 +112,7 @@ jackctl_wait_signals(
  */
 jackctl_server_t *
 jackctl_server_create();
+
 /** 
  * Call this function to destroy server object.
  * 
@@ -327,7 +328,7 @@ jackctl_server_get_internals_list(
 	jackctl_server_t * server);
 
 /** 
- * Call this function to get name of internal.
+ * Call this function to get name of internal client.
  * 
  * @param internal internal object handle to get name of
  *
@@ -352,7 +353,7 @@ jackctl_internal_get_parameters(
 	jackctl_internal_t * internal);
 
 /** 
- * Call this function to load one internal client
+ * Call this function to load one internal client.
  * 
  * @param server server object handle
  * @param internal internal to use
@@ -365,7 +366,7 @@ jackctl_server_load_internal(
     jackctl_internal_t * internal);
 
 /** 
- * Call this function to unload one internal client
+ * Call this function to unload one internal client.
  * 
  * @param server server object handle
  * @param internal internal to unload
