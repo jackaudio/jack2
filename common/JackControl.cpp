@@ -50,6 +50,7 @@ using namespace Jack;
 struct jackctl_server
 {
     JSList * drivers;
+    JSList * internals;
     JSList * parameters;
 
     class JackServer * engine;
@@ -97,6 +98,8 @@ struct jackctl_driver
     JSList * parameters;
     JSList * set_parameters;
 };
+
+typedef jackctl_driver jackctl_internal;
 
 struct jackctl_parameter
 {
@@ -808,7 +811,7 @@ EXPORT const JSList * jackctl_driver_get_parameters(jackctl_driver *driver_ptr)
     return driver_ptr->parameters;
 }
 
-EXPORT jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver_t * driver_ptr)
+EXPORT jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver *driver_ptr)
 {
     return driver_ptr->desc_ptr;
 }
@@ -924,4 +927,35 @@ EXPORT bool jackctl_parameter_set_value(jackctl_parameter *parameter_ptr, const 
 EXPORT union jackctl_parameter_value jackctl_parameter_get_default_value(jackctl_parameter *parameter_ptr)
 {
     return *parameter_ptr->default_value_ptr;
+}
+
+// Internals clients
+
+EXPORT const JSList * jackctl_server_get_internals_list(jackctl_server *server_ptr)
+{
+    return server_ptr->internals;
+}
+
+EXPORT const char * jackctl_internal_get_name(jackctl_internal *internal_ptr)
+{
+    return internal_ptr->desc_ptr->name;
+}
+
+EXPORT const JSList * jackctl_internal_get_parameters(jackctl_internal *internal_ptr)
+{
+    return internal_ptr->parameters;
+}
+
+EXPORT bool jackctl_server_load_internal(
+    jackctl_server * server,
+    jackctl_internal * internal)
+{
+    return false;
+}
+
+EXPORT bool jackctl_server_unload_internal(
+    jackctl_server * server,
+    jackctl_internal * internal)
+{
+    return false;
 }

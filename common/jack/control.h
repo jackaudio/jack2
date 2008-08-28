@@ -67,6 +67,9 @@ typedef struct jackctl_server jackctl_server_t;
 /** opaque type for driver object */
 typedef struct jackctl_driver jackctl_driver_t;
 
+/** opaque type for internal client object */
+typedef struct jackctl_internal jackctl_internal_t;
+
 /** opaque type for parameter object */
 typedef struct jackctl_parameter jackctl_parameter_t;
 
@@ -309,6 +312,70 @@ jackctl_parameter_set_value(
 union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
+    
+/** 
+ * Call this function to get list of available internal clients. List node data
+ * pointers is a internal client object handle (::jackctl_driver_t).
+ * 
+ * @param server server object handle to get internal clients for
+ *
+ * @return Single linked list of internal client object handles. Must not be
+ * modified. Always same for same server object.
+ */
+const JSList *
+jackctl_server_get_internals_list(
+	jackctl_server_t * server);
+
+/** 
+ * Call this function to get name of internal.
+ * 
+ * @param internal internal object handle to get name of
+ *
+ * @return internal name. Must not be modified. Always same for same
+ * driver object.
+ */
+const char *
+jackctl_internal_get_name(
+	jackctl_driver_t * internal);
+
+/** 
+ * Call this function to get list of internal parameters. List node data
+ * pointers is a parameter object handle (::jackctl_parameter_t).
+ * 
+ * @param internal internal object handle to get parameters for
+ *
+ * @return Single linked list of parameter object handles. Must not be
+ * modified. Always same for same internal object.
+ */
+const JSList *
+jackctl_internal_get_parameters(
+	jackctl_internal_t * internal);
+
+/** 
+ * Call this function to load one internal client
+ * 
+ * @param server server object handle
+ * @param internal internal to use
+ * 
+ * @return success status: true - success, false - fail
+ */
+bool
+jackctl_server_load_internal(
+    jackctl_server_t * server,
+    jackctl_internal_t * internal);
+
+/** 
+ * Call this function to unload one internal client
+ * 
+ * @param server server object handle
+ * @param internal internal to unload
+ * 
+ * @return success status: true - success, false - fail
+ */
+bool
+jackctl_server_unload_internal(
+    jackctl_server_t * server,
+    jackctl_internal_t * internal);
 
 /** 
  * Call this function to log an error message.
