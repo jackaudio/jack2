@@ -29,7 +29,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackGlobals.h"
 #include "JackPlatformSynchro.h"
-#include "JackPlatformSynchro.h"
 #include "JackPlatformServerChannel.h"
 
 
@@ -40,6 +39,7 @@ class JackGraphManager;
 class JackDriverClientInterface;
 struct JackEngineControl;
 class JackLockedEngine;
+class JackLoadableInternalClient;
 
 /*!
 \brief The Jack server.
@@ -62,6 +62,8 @@ class EXPORT JackServer
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
         long fLoopback;
+        
+        int InternalClientLoadAux(JackLoadableInternalClient* client, const char* client_name, int options, int* int_ref, int* status);
 
     public:
 
@@ -81,6 +83,7 @@ class EXPORT JackServer
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
         int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status);
+        int InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status);
         void ClientKill(int refnum);
 
         // Transport management

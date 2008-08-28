@@ -155,11 +155,23 @@ int JackServer::Close()
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
 {
+    JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
+    assert(client);
+    return InternalClientLoadAux(client, client_name, options, int_ref, status);
+}
+
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status)
+{
+    JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, parameters);
+    assert(client);
+    return InternalClientLoadAux(client, client_name, options, int_ref, status);
+}
+
+int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* client_name, int options, int* int_ref, int* status)
+{
     try {
         // Clear status
         *status = 0;
-        JackLoadableInternalClient* client = new JackLoadableInternalClient(fInstance, GetSynchroTable(), so_name, objet_data);
-        assert(client);
         int res = client->Open(JACK_DEFAULT_SERVER_NAME, client_name, (jack_options_t)options, (jack_status_t*)status);
         if (res < 0) {
             delete client;

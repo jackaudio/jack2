@@ -44,6 +44,7 @@
 #include "shm.h"
 #include "JackTools.h"
 #include "control_types.h"
+#include "JackLockedEngine.h"
 
 using namespace Jack;
 
@@ -104,6 +105,7 @@ struct jackctl_internal
     jack_driver_desc_t * desc_ptr;
     JSList * parameters;
     JSList * set_parameters;
+    int refnum;
 };
 
 struct jackctl_parameter
@@ -1033,14 +1035,21 @@ EXPORT bool jackctl_server_load_internal(
     jackctl_server * server,
     jackctl_internal * internal)
 {
-    return false;
+    int status;
+    server->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, &status);
+    return (internal->refnum > 0);
 }
 
 EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server,
     jackctl_internal * internal)
 {
-    return false;
+    int status;
+    if (internal->refnum > 0) {
+        return (server->engine->GetEngine()->InternalClientUnload(internal->refnum, &status));
+    } else {
+        return false;
+    }
 }
 
 

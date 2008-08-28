@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
 
     driver_ctl = jackctl_server_get_driver(server_ctl, driver_name);
     if (driver_ctl == NULL) {
-	fprintf(stderr, "Unkown driver \"%s\"\n", driver_name);
+        fprintf(stderr, "Unkown driver \"%s\"\n", driver_name);
         goto fail_free;
     }
 

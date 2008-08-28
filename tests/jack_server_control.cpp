@@ -26,7 +26,33 @@
 #include <jack/jack.h>
 #include <jack/control.h>
 
-jackctl_server_t * server;
+static jackctl_driver_t * jackctl_server_get_driver(jackctl_server_t *server, const char *driver_name)
+{
+    const JSList * node_ptr = jackctl_server_get_drivers_list(server);
+
+    while (node_ptr) {
+        if (strcmp(jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data), driver_name) == 0) {
+            return (jackctl_driver_t *)node_ptr->data;
+        }
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
+}
+
+static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server, const char *internal_name)
+{
+    const JSList * node_ptr = jackctl_server_get_internals_list(server);
+
+    while (node_ptr) {
+        if (strcmp(jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data), internal_name) == 0) {
+            return (jackctl_internal_t *)node_ptr->data;
+        }
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
+}
 
 static void print_value(union jackctl_parameter_value value, jackctl_param_type_t type)
 {
@@ -85,9 +111,11 @@ static void print_internal(jackctl_internal_t * internal)
 
 int main(int argc, char *argv[])
 {
+    jackctl_server_t * server;
     const JSList * drivers;
     const JSList * internals;
     const JSList * node_ptr;
+    sigset_t signals;
      
 	server = jackctl_server_create();
     
@@ -113,6 +141,12 @@ int main(int argc, char *argv[])
         node_ptr = jack_slist_next(node_ptr);
     }
     
+    jackctl_server_start(server, jackctl_server_get_driver(server, "dummy"));
+    jackctl_server_load_internal(server, jackctl_server_get_internal(server, "audioadapter"));
+     
+    signals = jackctl_setup_signals(0);
+    jackctl_wait_signals(signals);
+     
     jackctl_server_destroy(server);
     return 0;
 }
