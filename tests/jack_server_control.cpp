@@ -109,6 +109,15 @@ static void print_internal(jackctl_internal_t * internal)
     print_parameters(jackctl_internal_get_parameters(internal));
 }
 
+static void usage()
+{
+	fprintf (stderr, "\n"
+					"usage: jack_server_control \n"
+					"              [ --driver OR -d driver_name ]\n"
+					"              [ --client OR -c client_name ]\n"
+	);
+}
+
 int main(int argc, char *argv[])
 {
     jackctl_server_t * server;
@@ -116,7 +125,30 @@ int main(int argc, char *argv[])
     const JSList * internals;
     const JSList * node_ptr;
     sigset_t signals;
-     
+    int opt, option_index;
+    char* driver_name = "dummy";
+    char* client_name = "audioadapter";
+
+    const char *options = "d:c:";
+	struct option long_options[] = {
+		{"driver", 1, 0, 'd'},
+		{"client", 1, 0, 'c'},
+	};
+    
+ 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
+		switch (opt) {
+			case 'd':
+				driver_name = optarg;
+				break;
+			case 'c':
+				client_name = optarg;
+				break;
+            default:
+				usage();
+                exit(0);
+		}
+	}
+    
 	server = jackctl_server_create();
     
     printf("\n========================== \n");
@@ -141,8 +173,8 @@ int main(int argc, char *argv[])
         node_ptr = jack_slist_next(node_ptr);
     }
     
-    jackctl_server_start(server, jackctl_server_get_driver(server, "dummy"));
-    jackctl_server_load_internal(server, jackctl_server_get_internal(server, "audioadapter"));
+    jackctl_server_start(server, jackctl_server_get_driver(server, driver_name));
+    jackctl_server_load_internal(server, jackctl_server_get_internal(server, client_name));
      
     signals = jackctl_setup_signals(0);
     jackctl_wait_signals(signals);

@@ -332,7 +332,7 @@ jackctl_server_get_internals_list(
  * @param internal internal object handle to get name of
  *
  * @return internal name. Must not be modified. Always same for same
- * driver object.
+ * internal object.
  */
 const char *
 jackctl_internal_get_name(
