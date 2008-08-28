@@ -83,11 +83,14 @@ int JackEngine::Close()
         if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
             jack_log("JackEngine::Close loadable client = %s", loadable_client->GetClientControl()->fName);
             loadable_client->Close();
+            // Close does not delete the pointer for internal clients
+            fClientTable[i] = NULL;
             delete loadable_client;
         } else if (JackExternalClient* external_client = dynamic_cast<JackExternalClient*>(fClientTable[i])) {
             jack_log("JackEngine::Close external client = %s", external_client->GetClientControl()->fName);
             external_client->Close();
-            delete external_client;
+            // Close deletes the pointer for external clients
+            fClientTable[i] = NULL;
         }
     }
     
