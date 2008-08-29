@@ -26,6 +26,7 @@
 #include "JackTools.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #ifdef WIN32
 #include <process.h>
@@ -38,7 +39,8 @@ namespace Jack {
 #define DEFAULT_TMP_DIR "/tmp"
     char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
 
-    int JackTools::GetPID() {
+    int JackTools::GetPID() 
+    {
 #ifdef WIN32
         return  _getpid();
 #else
@@ -46,7 +48,8 @@ namespace Jack {
 #endif
     }
 
-    int JackTools::GetUID() {
+    int JackTools::GetUID() 
+    {
 #ifdef WIN32
         return  _getpid();
         //#error "No getuid function available"
@@ -55,7 +58,8 @@ namespace Jack {
 #endif
     }
 
-    const char* JackTools::DefaultServerName() {
+    const char* JackTools::DefaultServerName() 
+    {
         const char* server_name;
         if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
             server_name = JACK_DEFAULT_SERVER_NAME;
@@ -65,22 +69,26 @@ namespace Jack {
     /* returns the name of the per-user subdirectory of jack_tmpdir */
 #ifdef WIN32
 
-    char* JackTools::UserDir() {
+    char* JackTools::UserDir() 
+    {
         return "";
     }
 
-    char* JackTools::ServerDir(const char* server_name, char* server_dir) {
+    char* JackTools::ServerDir(const char* server_name, char* server_dir) 
+    {
         return "";
     }
 
     void JackTools::CleanupFiles(const char* server_name) {}
 
-    int JackTools::GetTmpdir() {
+    int JackTools::GetTmpdir() 
+    {
         return 0;
     }
 
 #else
-    char* JackTools::UserDir() {
+    char* JackTools::UserDir() 
+    {
         static char user_dir[PATH_MAX + 1] = "";
 
         /* format the path name on the first call */
@@ -96,7 +104,8 @@ namespace Jack {
     }
 
     /* returns the name of the per-server subdirectory of jack_user_dir() */
-    char* JackTools::ServerDir(const char* server_name, char* server_dir) {
+    char* JackTools::ServerDir(const char* server_name, char* server_dir) 
+    {
         /* format the path name into the suppled server_dir char array,
         * assuming that server_dir is at least as large as PATH_MAX+1 */
 
@@ -104,7 +113,8 @@ namespace Jack {
         return server_dir;
     }
 
-    void JackTools::CleanupFiles(const char* server_name) {
+    void JackTools::CleanupFiles(const char* server_name) 
+    {
         DIR* dir;
         struct dirent *dirent;
         char dir_name[PATH_MAX + 1] = "";
@@ -322,7 +332,7 @@ namespace Jack {
         free((void*)argv);
     }
 
-    int JackArgParser::ParseParams ( jack_driver_desc_t* desc, JSList** param_list )
+    void JackArgParser::ParseParams ( jack_driver_desc_t* desc, JSList** param_list )
     {
         string options_list;
         unsigned long i = 0;
@@ -347,26 +357,27 @@ namespace Jack {
                     switch ( desc->params[param_id].type )
                     {
                         case JackDriverParamInt:
-                            intclient_param->value.i = atoi ( fArgv[param + 1].c_str() );
+                            if (param + 1 < fArgv.size()) // something to parse
+                                intclient_param->value.i = atoi ( fArgv[param + 1].c_str() );
                             break;
+                            
                         case JackDriverParamUInt:
-                            intclient_param->value.ui = strtoul ( fArgv[param + 1].c_str(), NULL, 10 );
+                            if (param + 1 < fArgv.size()) // something to parse
+                                intclient_param->value.ui = strtoul ( fArgv[param + 1].c_str(), NULL, 10 );
                             break;
+                            
                         case JackDriverParamChar:
-                            intclient_param->value.c = fArgv[param + 1][0];
+                            if (param + 1 < fArgv.size()) // something to parse
+                                intclient_param->value.c = fArgv[param + 1][0];
                             break;
+                            
                         case JackDriverParamString:
-                            fArgv[param + 1].copy ( intclient_param->value.str, min(static_cast<int>(fArgv[param + 1].length()), JACK_DRIVER_PARAM_STRING_MAX) );
+                            if (param + 1 < fArgv.size()) // something to parse
+                                fArgv[param + 1].copy ( intclient_param->value.str, min(static_cast<int>(fArgv[param + 1].length()), JACK_DRIVER_PARAM_STRING_MAX) );
                             break;
+                            
                         case JackDriverParamBool:
-                            if ( ( fArgv[param + 1].compare ( "false" ) == 0 ) ||
-                                    ( fArgv[param + 1].compare ( "off" ) == 0 ) ||
-                                    ( fArgv[param + 1].compare ( "no" ) == 0 ) ||
-                                    ( fArgv[param + 1].compare ( "0" ) == 0 ) ||
-                                    ( fArgv[param + 1].compare ( "(null)" ) == 0 ) )
-                                intclient_param->value.i = false;
-                            else
-                                intclient_param->value.i = true;
+                            intclient_param->value.i = true;
                             break;
                     }
                     //add to the list
@@ -378,10 +389,8 @@ namespace Jack {
             }
         }
 
-        if ( param_list )
-            *param_list = params;
-
-        return 0;
+        assert(param_list);
+        *param_list = params;
     }
     
     void JackArgParser::FreeParams ( JSList* param_list )

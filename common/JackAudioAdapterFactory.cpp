@@ -86,13 +86,9 @@ extern "C"
         jack_driver_desc_t *desc = jack_get_descriptor();
 
         JackArgParser parser(load_init);
-
-        if (parser.GetArgc() > 0)
-        {
-            if (parser.ParseParams(desc, &params) != 0)
-                jack_error("Internal client : JackArgParser::ParseParams error.");
-        }
-
+        if (parser.GetArgc() > 0) 
+            parser.ParseParams(desc, &params);
+    
         int res = jack_internal_initialize(jack_client, params);
         parser.FreeParams(params);
         return res;
@@ -102,8 +98,7 @@ extern "C"
     {
         Jack::JackAudioAdapter* adapter = static_cast<Jack::JackAudioAdapter*>(arg);
 
-        if (adapter)
-        {
+        if (adapter) {
             jack_log("Unloading audioadapter");
             adapter->Close();
             delete adapter;

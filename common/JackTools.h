@@ -85,7 +85,7 @@ namespace Jack
             int GetArgv ( std::vector<std::string>& argv );
             int GetArgv ( char** argv );
             void DeleteArgv ( const char** argv );
-            int ParseParams ( jack_driver_desc_t* desc, JSList** param_list );
+            void ParseParams ( jack_driver_desc_t* desc, JSList** param_list );
             void FreeParams ( JSList* param_list );
     };
 
