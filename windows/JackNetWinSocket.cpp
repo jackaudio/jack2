@@ -290,8 +290,8 @@ namespace Jack
     //local loop*********************************************************************************************************
     int JackNetWinSocket::SetLocalLoop()
     {
-        char enable = 1;
-        return SetOption ( IPPROTO_IP, IP_MULTICAST_LOOP, &enable, sizeof ( enable ) );
+        char disable = 0;
+        return SetOption ( IPPROTO_IP, IP_MULTICAST_LOOP, &disable, sizeof ( disable ) );
     }
 
     //network operations*************************************************************************************************

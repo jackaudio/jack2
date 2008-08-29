@@ -76,7 +76,6 @@ namespace Jack
             //utility
             int GetName ( char* name );
             int JoinMCastGroup ( const char* mcast_ip );
-            void CopyParams ( JackNetUnixSocket* socket );
 
             //options management
             int SetOption ( int level, int optname, const void* optval, socklen_t optlen );
@@ -85,7 +84,7 @@ namespace Jack
             //timeout
             int SetTimeOut ( int us );
 
-            //local loop
+            //disable local loop
             int SetLocalLoop();
 
             //network operations

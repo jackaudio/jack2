@@ -36,6 +36,9 @@ namespace Jack
             jack_error ( "Can't init Socket API, exiting..." );
 
         //global parametering
+        //we can't call JackNetSlaveInterface constructor with some parameters before
+        //because we don't have full parametering right now
+        //parameters will be parsed from the param list, and then JackNetSlaveInterface will be filled with proper values
         fMulticastIP = new char[16];
         strcpy ( fMulticastIP, DEFAULT_MULTICAST_IP );
         uint port = DEFAULT_PORT;
@@ -101,12 +104,15 @@ namespace Jack
             }
         }
 
+        //set the socket parameters
         fSocket.SetPort ( port );
         fSocket.SetAddress ( fMulticastIP, port );
 
+        //set the audio adapter interface channel values
         SetInputs ( fParams.fSendAudioChannels );
         SetOutputs ( fParams.fReturnAudioChannels );
 
+        //soft buffers will be allocated later (once network initialization done)
         fSoftCaptureBuffer = NULL;
         fSoftPlaybackBuffer = NULL;
     }
@@ -355,6 +361,8 @@ namespace Jack
 //read/write operations---------------------------------------------------------------
     int JackNetAdapter::Read()
     {
+        //don't return -1 in case of sync recv failure
+        //we need the process to continue for network error detection
         if ( SyncRecv() == SOCKET_ERROR )
             return 0;
 

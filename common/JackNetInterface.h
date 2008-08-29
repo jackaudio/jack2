@@ -130,6 +130,8 @@ namespace Jack
     class EXPORT JackNetSlaveInterface : public JackNetInterface
     {
         protected:
+            static uint fSlaveCounter;
+
             bool Init();
             net_status_t GetNetMaster();
             net_status_t SendStartToMaster();
@@ -144,12 +146,18 @@ namespace Jack
 
         public:
             JackNetSlaveInterface() : JackNetInterface()
-            {}
+            {
+                fSlaveCounter++;
+            }
             JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
-            {}
+            {
+                fSlaveCounter++;
+            }
             ~JackNetSlaveInterface()
             {
-                SocketAPIEnd();
+                //close Socket API with the last slave
+                if ( --fSlaveCounter == 0 )
+                    SocketAPIEnd();
             }
     };
 }

@@ -200,13 +200,6 @@ namespace Jack
         return SetOption ( IPPROTO_IP, IP_ADD_MEMBERSHIP, &multicast_req, sizeof ( multicast_req ) );
     }
 
-    void JackNetUnixSocket::CopyParams ( JackNetUnixSocket* socket )
-    {
-        fPort = socket->fPort;
-        fSendAddr = socket->fSendAddr;
-        fRecvAddr = socket->fRecvAddr;
-    }
-
     //options************************************************************************************************************
     int JackNetUnixSocket::SetOption ( int level, int optname, const void* optval, socklen_t optlen )
     {
@@ -227,6 +220,7 @@ namespace Jack
         if ( ( us < 0 ) || ( us > 10000000 ) )
             return SOCKET_ERROR;
         struct timeval timeout;
+
         //less than 1sec
         if ( us < 1000000 )
         {

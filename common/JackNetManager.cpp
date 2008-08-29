@@ -322,6 +322,7 @@ namespace Jack
                     break;
                 case JackTransportNetStarting :
                     jack_info ( "'%s' is ready to roll..", fParams.fName );
+                    break;
                 case JackTransportRolling :
                     jack_info ( "'%s' is rolling.", fParams.fName );
                     break;
@@ -362,7 +363,7 @@ namespace Jack
             //copy to TxBuffer
             memcpy ( fTxData, &fSendTransportData, sizeof ( net_transport_data_t ) );
         }
-        //then others
+        //then others (freewheel etc.)
         //...
         return 0;
     }
@@ -571,7 +572,7 @@ namespace Jack
         }
 
         //bind the socket to the local port
-        if ( fSocket.Bind () == SOCKET_ERROR )
+        if ( fSocket.Bind() == SOCKET_ERROR )
         {
             jack_error ( "Can't bind the network manager socket : %s", StrError ( NET_ERROR_CODE ) );
             fSocket.Close();

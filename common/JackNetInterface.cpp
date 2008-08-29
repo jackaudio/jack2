@@ -67,6 +67,7 @@ namespace Jack
     JackNetInterface::~JackNetInterface()
     {
         jack_log ( "JackNetInterface::~JackNetInterface" );
+
         fSocket.Close();
         delete[] fTxBuffer;
         delete[] fRxBuffer;
@@ -247,14 +248,13 @@ namespace Jack
 
     int JackNetMasterInterface::SetRxTimeout()
     {
+        jack_log ( "JackNetMasterInterface::SetRxTimeout" );
+
         float time = 0;
-        //slow mode, very short timeout on recv
-        if ( fParams.fNetworkMode == 's' )
+        //slow or normal mode, short timeout on recv (2 audio subcycles)
+        if ( ( fParams.fNetworkMode == 's' ) || ( fParams.fNetworkMode == 'n' ) )
             time = 2000000.f * ( static_cast<float> ( fParams.fFramesPerPacket ) / static_cast<float> ( fParams.fSampleRate ) );
-        //normal mode, short timeout on recv
-        else if ( fParams.fNetworkMode == 'n' )
-            time = 4000000.f * ( static_cast<float> ( fParams.fFramesPerPacket ) / static_cast<float> ( fParams.fSampleRate ) );
-        //fast mode, wait for the entire cycle duration
+        //fast mode, wait for 75% of the entire cycle duration
         else if ( fParams.fNetworkMode == 'f' )
             time = 750000.f * ( static_cast<float> ( fParams.fPeriodSize ) / static_cast<float> ( fParams.fSampleRate ) );
         return fSocket.SetTimeOut ( static_cast<int> ( time ) );
@@ -302,16 +302,16 @@ namespace Jack
     int JackNetMasterInterface::Send ( size_t size, int flags )
     {
         int tx_bytes;
-        if ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR )
+        if ( ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
         {
             net_error_t error = fSocket.GetError();
-            if ( fRunning && ( error == NET_CONN_ERROR ) )
+            if ( error == NET_CONN_ERROR )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
                 Exit();
             }
-            else if ( fRunning )
+            else
                 jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
         }
         return tx_bytes;
@@ -320,20 +320,20 @@ namespace Jack
     int JackNetMasterInterface::Recv ( size_t size, int flags )
     {
         int rx_bytes;
-        if ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR )
+        if ( ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
         {
             net_error_t error = fSocket.GetError();
             //no data isn't really a network error, so just return 0 avalaible read bytes
             if ( error == NET_NO_DATA )
                 return 0;
-            else if ( fRunning && ( error == NET_CONN_ERROR ) )
+            else if ( error == NET_CONN_ERROR )
             {
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
                 //ask to the manager to properly remove the master
                 Exit();
             }
-            else if ( fRunning )
+            else
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
         }
         return rx_bytes;
@@ -494,6 +494,8 @@ namespace Jack
 
 // JackNetSlaveInterface ************************************************************************************************
 
+    uint JackNetSlaveInterface::fSlaveCounter = 0;
+
     bool JackNetSlaveInterface::Init()
     {
         jack_log ( "JackNetSlaveInterface::Init()" );
@@ -533,7 +535,6 @@ namespace Jack
         //utility
         session_params_t params;
         int rx_bytes = 0;
-        unsigned char loop = 0;
 
         //socket
         if ( fSocket.NewSocket() == SOCKET_ERROR )
@@ -551,7 +552,7 @@ namespace Jack
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //disable local loop
-        if ( fSocket.SetOption ( IPPROTO_IP, IP_MULTICAST_LOOP, &loop, sizeof ( loop ) ) == SOCKET_ERROR )
+        if ( fSocket.SetLocalLoop() == SOCKET_ERROR )
             jack_error ( "Can't disable multicast loop : %s", StrError ( NET_ERROR_CODE ) );
 
         //send 'AVAILABLE' until 'SLAVE_SETUP' received

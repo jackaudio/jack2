@@ -115,7 +115,7 @@ namespace Jack
 
         //init network
         if ( !JackNetSlaveInterface::Init() )
-            return false;;
+            return false;
 
         //set global paramaters
         SetParams();
@@ -488,6 +488,7 @@ namespace Jack
         JackDriver::CycleTakeBeginTime();
 
         //decode sync
+        //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
         if ( DecodeSyncPacket() < 0 )
             return 0;
 

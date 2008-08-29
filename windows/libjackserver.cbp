@@ -153,7 +153,7 @@
 		<Unit filename="..\common\JackAudioPort.cpp" />
 		<Unit filename="..\common\JackClient.cpp" />
 		<Unit filename="..\common\JackConnectionManager.cpp" />
-		<Unit filename="..\common\JackControl.cpp" />
+		<Unit filename="..\common\JackControlAPI.cpp" />
 		<Unit filename="..\common\JackDriver.cpp" />
 		<Unit filename="..\common\JackDriverLoader.cpp" />
 		<Unit filename="..\common\JackEngine.cpp" />

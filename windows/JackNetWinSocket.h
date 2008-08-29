@@ -85,7 +85,7 @@ namespace Jack
             //timeout
             int SetTimeOut ( int usec );
 
-            //local loop
+            //disable local loop
             int SetLocalLoop();
 
             //network operations
