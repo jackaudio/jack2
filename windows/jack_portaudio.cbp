@@ -25,21 +25,6 @@
 					<Add directory="..\common\jack" />
 				</Compiler>
 				<Linker>
-					<Add library="kernel32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winspool" />
-					<Add library="comdlg32" />
-					<Add library="advapi32" />
-					<Add library="shell32" />
-					<Add library="ole32" />
-					<Add library="oleaut32" />
-					<Add library="uuid" />
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-					<Add library="libjackserver" />
-					<Add library="portaudio_x86" />
-					<Add directory="Release\bin" />
 					<Add directory="..\windows" />
 				</Linker>
 			</Target>
@@ -62,20 +47,6 @@
 					<Add directory="..\common\jack" />
 				</Compiler>
 				<Linker>
-					<Add library="kernel32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winspool" />
-					<Add library="comdlg32" />
-					<Add library="advapi32" />
-					<Add library="shell32" />
-					<Add library="ole32" />
-					<Add library="oleaut32" />
-					<Add library="uuid" />
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-					<Add library="libjackserver" />
-					<Add library="portaudio_x86" />
 					<Add directory="Debug\bin" />
 					<Add directory="..\windows" />
 				</Linker>
@@ -100,20 +71,6 @@
 					<Add directory="..\common\jack" />
 				</Compiler>
 				<Linker>
-					<Add library="kernel32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winspool" />
-					<Add library="comdlg32" />
-					<Add library="advapi32" />
-					<Add library="shell32" />
-					<Add library="ole32" />
-					<Add library="oleaut32" />
-					<Add library="uuid" />
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-					<Add library="libjackserver" />
-					<Add library="portaudio_x86" />
 					<Add directory="Release\bin" />
 					<Add directory="..\windows" />
 				</Linker>
@@ -135,7 +92,7 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjackserver" />
+			<Add library="libjackservermp" />
 			<Add library="portaudio_x86" />
 		</Linker>
 		<Unit filename="JackPortAudioDevices.cpp" />

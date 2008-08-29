@@ -19,19 +19,6 @@
 					<Add directory="..\example-clients" />
 				</Compiler>
 				<Linker>
-					<Add library="kernel32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winspool" />
-					<Add library="comdlg32" />
-					<Add library="advapi32" />
-					<Add library="shell32" />
-					<Add library="ole32" />
-					<Add library="oleaut32" />
-					<Add library="uuid" />
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-					<Add library="libjack" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -48,19 +35,6 @@
 					<Add directory="..\example-clients" />
 				</Compiler>
 				<Linker>
-					<Add library="kernel32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winspool" />
-					<Add library="comdlg32" />
-					<Add library="advapi32" />
-					<Add library="shell32" />
-					<Add library="ole32" />
-					<Add library="oleaut32" />
-					<Add library="uuid" />
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-					<Add library="libjack" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -78,19 +52,6 @@
 					<Add directory="..\example-clients" />
 				</Compiler>
 				<Linker>
-					<Add library="kernel32" />
-					<Add library="user32" />
-					<Add library="gdi32" />
-					<Add library="winspool" />
-					<Add library="comdlg32" />
-					<Add library="advapi32" />
-					<Add library="shell32" />
-					<Add library="ole32" />
-					<Add library="oleaut32" />
-					<Add library="uuid" />
-					<Add library="odbc32" />
-					<Add library="odbccp32" />
-					<Add library="libjack" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -111,7 +72,7 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjack" />
+			<Add library="libjackmp" />
 		</Linker>
 		<Unit filename="..\example-clients\connect.c">
 			<Option compilerVar="CC" />
