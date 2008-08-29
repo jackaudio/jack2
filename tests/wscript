@@ -8,7 +8,6 @@ test_programs = {
     'testSem': ['testSem.cpp'],
     'jack_test': ['jack_test.cpp'],
     'jack_cpu': ['jack_cpu.c'],
-    'jack_server_control': ['jack_server_control.cpp'],
     }
 
 def build(bld):
@@ -23,10 +22,7 @@ def build(bld):
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
 	    prog.env.append_value("LINKFLAGS", "")
-        if test_program == 'jack_server_control':
-             prog.uselib_local = 'serverlib'
-        else:
-             prog.uselib_local = 'clientlib'
+            prog.uselib_local = 'clientlib'
         prog.target = test_program
         #if test_program != 'jack_test':
         #    prog.inst_var = 0

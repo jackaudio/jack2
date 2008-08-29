@@ -19,6 +19,7 @@ example_programs = {
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
     'jack_thru' : 'thru_client.c',
+    'jack_server_control' : 'jack_server_control.cpp',
     }
 
 example_libs = {
@@ -55,10 +56,9 @@ def configure(conf):
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
 def build(bld):
-
-   
     for example_program, example_program_source in example_programs.items():
-        prog = bld.create_obj('cc', 'program')
+        prog = bld.create_obj('cpp', 'program')
+        prog.features.append('cc')
         prog.includes = ['../common/jack', '../common']
         prog.source = example_program_source
         if bld.env()['IS_MACOSX']:
@@ -67,7 +67,10 @@ def build(bld):
             prog.env.append_value("LINKFLAGS", "")
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT'
-        prog.uselib_local = 'clientlib'
+        if example_program == 'jack_server_control':
+            prog.uselib_local = 'serverlib'
+        else:
+            prog.uselib_local = 'clientlib'              
         prog.target = example_program
    
     #if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT']
