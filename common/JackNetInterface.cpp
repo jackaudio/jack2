@@ -15,14 +15,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
 */
 
 #include "JackNetInterface.h"
 #include "JackException.h"
-
-#define DEFAULT_MULTICAST_IP "225.3.19.154"
-#define DEFAULT_PORT 19000
 
 using namespace std;
 
@@ -196,7 +192,7 @@ namespace Jack
         }
 
         //timeout on receive (for init)
-        if ( fSocket.SetTimeOut ( 1000000 ) < 0 )
+        if ( fSocket.SetTimeOut ( MASTER_INIT_TIMEOUT ) < 0 )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //connect
@@ -222,8 +218,8 @@ namespace Jack
                 return false;
             }
         }
-        while ( ( GetPacketType ( &params ) != START_MASTER ) && ( ++attempt < 5 ) );
-        if ( attempt == 5 )
+        while ( ( GetPacketType ( &params ) != START_MASTER ) && ( ++attempt < SLAVE_SETUP_RETRY ) );
+        if ( attempt == SLAVE_SETUP_RETRY )
         {
             jack_error ( "Slave doesn't respond, exiting." );
             return false;
@@ -415,6 +411,7 @@ namespace Jack
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 break;
+                
             case 'n' :
                 //normal use of the network :
                 //  - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwidth
@@ -425,6 +422,7 @@ namespace Jack
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 break;
+                
             case 'f' :
                 //fast mode suppose the network bandwith is larger than required for the transmission (only a few channels for example)
                 //    - packets can be quickly received, quickly is here relative to the cycle duration
@@ -435,6 +433,7 @@ namespace Jack
                     jack_error ( "'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
                 break;
         }
+        
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }
@@ -473,6 +472,7 @@ namespace Jack
                             fNetMidiPlaybackBuffer->RenderToJackPorts();
                         jumpcnt = 0;
                         break;
+                        
                     case 'a':   //audio
                         Recv ( rx_head->fPacketSize, 0 );
                         if ( !IsNextPacket() )
@@ -483,6 +483,7 @@ namespace Jack
                         fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fSubCycle );
                         jumpcnt = 0;
                         break;
+                        
                     case 's':   //sync
                         if ( rx_head->fCycle == fTxHeader.fCycle )
                             return 0;
@@ -548,7 +549,7 @@ namespace Jack
             jack_error ( "Can't bind the socket : %s", StrError ( NET_ERROR_CODE ) );
 
         //timeout on receive
-        if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
+        if ( fSocket.SetTimeOut ( SLAVE_INIT_TIMEOUT ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //disable local loop
@@ -708,6 +709,7 @@ namespace Jack
                         if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
                             fNetMidiCaptureBuffer->RenderToJackPorts();
                         break;
+                        
                     case 'a':   //audio
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                         if ( !IsNextPacket() )
@@ -717,6 +719,7 @@ namespace Jack
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
                         break;
+                        
                     case 's':   //sync
                         jack_info ( "NetSlave : overloaded, skipping receive." );
                         return 0;

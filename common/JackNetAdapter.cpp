@@ -14,16 +14,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
 */
 
 #include "JackNetAdapter.h"
 #include "JackException.h"
 #include "JackServer.h"
 #include "JackEngineControl.h"
-
-#define DEFAULT_MULTICAST_IP "225.3.19.154"
-#define DEFAULT_PORT 19000
 
 namespace Jack
 {
@@ -150,7 +146,6 @@ namespace Jack
             return -1;
         }
 
-        fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fPriority - 1 );
         return 0;
     }
 
@@ -221,10 +216,15 @@ namespace Jack
         //set audio adapter parameters
         SetAdaptedBufferSize ( fParams.fPeriodSize );
         SetAdaptedSampleRate ( fParams.fSampleRate );
-
+        
+        if (fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fPriority - 1 ) < 0) {
+            jack_error("AcquireRealTime error");
+        } else {
+            set_threaded_log_function();
+        }
+  
         //init done, display parameters
         SessionParamsDisplay ( &fParams );
-
         return true;
     }
 

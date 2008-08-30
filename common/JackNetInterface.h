@@ -162,4 +162,10 @@ namespace Jack
     };
 }
 
+#define DEFAULT_MULTICAST_IP "225.3.19.154"
+#define DEFAULT_PORT 19000
+#define SLAVE_SETUP_RETRY 5
+#define MASTER_INIT_TIMEOUT 1000000     // in usec
+#define SLAVE_INIT_TIMEOUT 2000000      // in usec
+
 #endif
