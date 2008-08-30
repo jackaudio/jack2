@@ -281,13 +281,6 @@ int JackCoreAudioAdapter::AddListeners()
 
 void JackCoreAudioAdapter::RemoveListeners()
 {
-/*
-#ifdef MAC_OS_X_VERSION_10_5
-    AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
-#else
-    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
-#endif
-*/
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback);
