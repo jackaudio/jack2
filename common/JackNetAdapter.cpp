@@ -28,9 +28,6 @@ namespace Jack
     {
         jack_log ( "JackNetAdapter::JackNetAdapter" );
 
-        if ( SocketAPIInit() < 0 )
-            jack_error ( "Can't init Socket API, exiting..." );
-
         //global parametering
         //we can't call JackNetSlaveInterface constructor with some parameters before
         //because we don't have full parametering right now
@@ -165,6 +162,7 @@ namespace Jack
                 }
                 break;
                 // Stop when the thread cycle is finished
+                
             case JackThread::kRunning:
                 if ( fThread.Stop() < 0 )
                 {
@@ -172,6 +170,7 @@ namespace Jack
                     return -1;
                 }
                 break;
+                
             default:
                 break;
         }
@@ -268,11 +267,13 @@ namespace Jack
                     jack_transport_stop ( fJackClient );
                     jack_info ( "NetMaster : transport stops." );
                     break;
+                    
                 case JackTransportStarting :
                     jack_transport_reposition ( fJackClient, &fSendTransportData.fPosition );
                     jack_transport_start ( fJackClient );
                     jack_info ( "NetMaster : transport starts." );
                     break;
+                    
                 case JackTransportRolling :
                     //TODO , we need to :
                     // - find a way to call TransportEngine->SetNetworkSync()
@@ -405,6 +406,7 @@ namespace Jack
             if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fAdaptedBufferSize ) < fAdaptedBufferSize )
                 failure = true;
         }
+        
         //and output data,
         for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
         {
@@ -529,15 +531,21 @@ extern "C"
         Jack::JackAudioAdapter* adapter;
         jack_nframes_t buffer_size = jack_get_buffer_size ( jack_client );
         jack_nframes_t sample_rate = jack_get_sample_rate ( jack_client );
+        
+        try {
+        
+            adapter = new Jack::JackAudioAdapter ( jack_client, new Jack::JackNetAdapter ( jack_client, buffer_size, sample_rate, params ) );
+            assert ( adapter );
 
-        adapter = new Jack::JackAudioAdapter ( jack_client, new Jack::JackNetAdapter ( jack_client, buffer_size, sample_rate, params ) );
-        assert ( adapter );
-
-        if ( adapter->Open() == 0 )
-            return 0;
-        else
-        {
-            delete adapter;
+            if ( adapter->Open() == 0 )
+                return 0;
+            else
+            {
+                delete adapter;
+                return 1;
+            }
+            
+        } catch (...) {
             return 1;
         }
     }

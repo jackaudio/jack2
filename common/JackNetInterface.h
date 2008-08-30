@@ -147,11 +147,23 @@ namespace Jack
         public:
             JackNetSlaveInterface() : JackNetInterface()
             {
-                fSlaveCounter++;
+                //open Socket API with the first slave
+                if (fSlaveCounter++ == 0) {
+                    if (SocketAPIInit() < 0) {
+                        jack_error ( "Can't init Socket API, exiting..." );
+                        throw -1;
+                    }
+                }
             }
             JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
             {
-                fSlaveCounter++;
+                //open Socket API with the first slave
+                if (fSlaveCounter++ == 0) {
+                    if (SocketAPIInit() < 0) {
+                        jack_error ( "Can't init Socket API, exiting..." );
+                        throw -1;
+                    }
+                }
             }
             ~JackNetSlaveInterface()
             {
@@ -164,7 +176,9 @@ namespace Jack
 
 #define DEFAULT_MULTICAST_IP "225.3.19.154"
 #define DEFAULT_PORT 19000
+
 #define SLAVE_SETUP_RETRY 5
+
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
 #define SLAVE_INIT_TIMEOUT 2000000      // in usec
 

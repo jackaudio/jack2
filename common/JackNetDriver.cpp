@@ -152,9 +152,11 @@ namespace Jack
             case 's' :
                 plot_name += string ( "_slow" );
                 break;
+                
             case 'n' :
                 plot_name += string ( "_normal" );
                 break;
+                
             case 'f' :
                 plot_name += string ( "_fast" );
                 break;
@@ -372,11 +374,13 @@ namespace Jack
                     fEngineControl->fTransport.SetCommand ( TransportCommandStop );
                     jack_info ( "Master stops transport." );
                     break;
+                    
                 case JackTransportStarting :
                     fEngineControl->fTransport.RequestNewPos ( &fSendTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
                     jack_info ( "Master starts transport." );
                     break;
+                    
                 case JackTransportRolling :
                     fEngineControl->fTransport.SetState ( JackTransportRolling );
                     jack_info ( "Master is rolling." );
@@ -638,11 +642,6 @@ namespace Jack
 
         EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
         {
-            if ( SocketAPIInit() < 0 )
-            {
-                jack_error ( "Can't init Socket API, exiting..." );
-                return NULL;
-            }
             char multicast_ip[16];
             strcpy ( multicast_ip, DEFAULT_MULTICAST_IP );
             char name[JACK_CLIENT_NAME_SIZE];
@@ -706,15 +705,23 @@ namespace Jack
                 }
             }
 
-            Jack::JackDriverClientInterface* driver = new Jack::JackWaitThreadedDriver (
-                new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
-                                          midi_input_ports, midi_output_ports, name, transport_sync, network_mode ) );
-            if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
-                                monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
-                return driver;
-
-            delete driver;
-            return NULL;
+            try {
+            
+                Jack::JackDriverClientInterface* driver = 
+                    new Jack::JackWaitThreadedDriver(
+                        new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
+                                          midi_input_ports, midi_output_ports, name, transport_sync, network_mode));
+                    if (driver->Open (period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
+                                monitor, "from_master_", "to_master_", 0, 0) == 0) {
+                    return driver;
+                } else {
+                    delete driver;
+                    return NULL;
+                }
+                
+            } catch (...) {
+                return NULL;
+            }   
         }
 
 #ifdef __cplusplus

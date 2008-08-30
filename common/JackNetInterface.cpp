@@ -719,7 +719,7 @@ namespace Jack
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
                         break;
-                        
+         
                     case 's':   //sync
                         jack_info ( "NetSlave : overloaded, skipping receive." );
                         return 0;
