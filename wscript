@@ -7,6 +7,8 @@ import commands
 from Configure import g_maxlen
 #g_maxlen = 40
 import shutil
+import Task
+import re
 
 VERSION='1.9.0'
 APPNAME='jack'
@@ -32,16 +34,29 @@ def display_feature(msg, build):
     else:
         display_msg(msg, "no", 'YELLOW')
 
-def fetch_svn_revision(path):
-    svn_revision_file = "svnrev"
-    if os.access(svn_revision_file, os.R_OK):
-         f = open(svn_revision_file, 'r')
-         return f.read()
-        
-    cmd = "LANG= "
-    cmd += "svnversion "
-    cmd += path
-    return commands.getoutput(cmd)
+def create_svnversion_gen(bld, header='svnversion.h', define=None):
+    cmd = '../svnversion_regenerate.sh ${TGT}'
+    if define:
+        cmd += " " + define
+    cls = Task.simple_task_type('svnversion', cmd, color='BLUE')
+    cls.must_run = lambda self: True
+    #cls.before = 'cxx'
+
+    def sg(self):
+        rt = Params.h_file(self.m_outputs[0].abspath(self.env()))
+        return rt
+    cls.signature = sg
+
+    #def se(self):
+    #    r = sg(self)
+    #    return (r, r, r, r, r)
+    #cls.cache_sig = property(sg, None)
+    cls.cache_sig = None
+
+    tsk = cls('svnversion', bld.env().copy())
+    tsk.m_inputs = []
+    tsk.m_outputs = [bld.path.find_or_declare(header)]
+    tsk.prio = 1 # execute this task first
 
 def set_options(opt):
     # options provided by the modules
@@ -91,7 +106,6 @@ def configure(conf):
         conf.define('MACH_RPC_MACH_SEMA', 1)
     conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
-    conf.define('JACK_SVNREVISION', fetch_svn_revision('.'))
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
@@ -99,9 +113,23 @@ def configure(conf):
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h')
 
-    display_msg("\n==================")
-    display_msg("JACK %s %s" % (VERSION, conf.get_define('JACK_SVNREVISION')))
+    svnrev = None
+    if os.access('svnversion.h', os.R_OK):
+        data = file('svnversion.h').read()
+        m = re.match(r'^#define SVN_VERSION "([^"]*)"$', data)
+        if m != None:
+            svnrev = m.group(1)
+
     print
+    display_msg("==================")
+    version_msg = "JACK " + VERSION
+    if svnrev:
+        version_msg += " exported from r" + svnrev
+    else:
+        version_msg += " svn revision will checked and eventually updated during build"
+    print version_msg
+    print
+
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
@@ -130,6 +158,9 @@ def configure(conf):
     print
 
 def build(bld):
+    if not os.access('svnversion.h', os.R_OK):
+        create_svnversion_gen(bld)
+
     # process subfolders from here
     bld.add_subdirs('common')
     if bld.env()['IS_LINUX']:
@@ -172,3 +203,7 @@ def build(bld):
                 os.popen("doxygen").read()
             else:
                 Params.pprint('CYAN', "doxygen documentation already built.")
+
+def dist_hook():
+    os.remove('svnversion_regenerate.sh')
+    os.system('../svnversion_regenerate.sh svnversion.h')

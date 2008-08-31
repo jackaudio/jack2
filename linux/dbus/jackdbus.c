@@ -42,6 +42,7 @@
 #include "jack/jslist.h"
 #include "jack/control.h"
 #include "sigsegv.h"
+#include "svnversion.h"
 
 FILE *g_logfile;
 char *g_jackdbus_config_dir;
@@ -760,7 +761,7 @@ main (int argc, char **argv)
     setup_sigsegv();
 
     jack_info("------------------");
-    jack_info("Controller activated. Version %s (%s) built on %s", jack_get_version_string(), JACK_SVNREVISION, timestamp_str);
+    jack_info("Controller activated. Version %s (%s) built on %s", jack_get_version_string(), SVN_VERSION, timestamp_str);
 
     if (!dbus_threads_init_default())
     {
