@@ -64,7 +64,7 @@ def build(bld):
         return
 
     obj = bld.create_obj('cc', 'program')
-    obj.includes = ['.', '../../common', '../../common/jack']
+    obj.includes = ['.', '../..', '../../build/default/', '../../common', '../../common/jack']
     obj.source = [
         'jackdbus.c',
         'controller.c',
