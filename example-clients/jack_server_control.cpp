@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
     const JSList * node_ptr;
     sigset_t signals;
     int opt, option_index;
-    char* driver_name = "dummy";
-    char* client_name = "audioadapter";
+    const char* driver_name = "dummy";
+    const char* client_name = "audioadapter";
 
     const char *options = "d:c:";
 	struct option long_options[] = {
