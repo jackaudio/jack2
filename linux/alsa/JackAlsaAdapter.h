@@ -381,17 +381,21 @@ namespace Jack
                         {
                             short* chan16b;
                             for ( c = 0; c < fCardInputs; c++ )
+                            {
                                 chan16b = ( short* ) fInputCardChannels[c];
-                            for ( s = 0; s < fBuffering; s++ )
-                                fInputSoftChannels[c][s] = float ( chan16b[s] ) * ( 1.0/float ( SHRT_MAX ) );
+                                for ( s = 0; s < fBuffering; s++ )
+                                    fInputSoftChannels[c][s] = float ( chan16b[s] ) * ( 1.0/float ( SHRT_MAX ) );
+                            }
                         }
                         else   // SND_PCM_FORMAT_S32
                         {
                             long* chan32b;
                             for ( c = 0; c < fCardInputs; c++ )
+                            {
                                 chan32b = ( long* ) fInputCardChannels[c];
-                            for ( s = 0; s < fBuffering; s++ )
-                                fInputSoftChannels[c][s] = float ( chan32b[s] ) * ( 1.0/float ( LONG_MAX ) );
+                                for ( s = 0; s < fBuffering; s++ )
+                                    fInputSoftChannels[c][s] = float ( chan32b[s] ) * ( 1.0/float ( LONG_MAX ) );
+                            }
                         }
                         break;
                     default :
