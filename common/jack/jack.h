@@ -437,6 +437,23 @@ extern "C"
 				    JackPortConnectCallback
 				    connect_callback, void *arg);
 
+	 /**
+	 * Tell the JACK server to call @a rename_callback whenever a
+	 * port is renamed, passing @a arg as a parameter.
+	 *
+	 * All "notification events" are received in a seperated non RT thread,
+	 * the code in the supplied function does not need to be
+     * suitable for real-time execution.
+     *
+     * NOTE: this function cannot be called while the client is activated 
+     * (after jack_activate has been called.)
+     *
+	 * @return 0 on success, otherwise a non-zero error code
+	 */
+	int jack_set_port_rename_callback (jack_client_t *,
+				    JackPortRenameCallback
+				    rename_callback, void *arg);
+
     /**
      * Tell the JACK server to call @a graph_callback whenever the
      * processing graph is reordered, passing @a arg as a parameter.

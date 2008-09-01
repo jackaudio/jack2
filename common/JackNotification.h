@@ -41,7 +41,8 @@ enum NotificationType {
     kPortRegistrationOffCallback = 10,
     kPortConnectCallback = 11,
     kPortDisconnectCallback = 12,
-    kRealTimeCallback = 13,
+    kPortRenameCallback = 13,
+    kRealTimeCallback = 14,
     kMaxNotification
 };
 

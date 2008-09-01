@@ -64,7 +64,8 @@ struct JackRequest
         kInternalClientHandle = 28,
         kInternalClientLoad = 29,
         kInternalClientUnload = 30,
-        kNotification = 31
+        kPortRename = 31,
+        kNotification = 32
     };
 
     RequestType fType;
@@ -585,6 +586,44 @@ struct JackPortDisconnectRequest : public JackRequest
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         CheckRes(trans->Write(&fSrc, sizeof(jack_port_id_t)));
         CheckRes(trans->Write(&fDst, sizeof(jack_port_id_t)));
+        return 0;
+
+    }
+};
+
+/*!
+\brief PortRename request.
+*/
+
+struct JackPortRenameRequest : public JackRequest
+{
+
+    int fRefNum;
+    jack_port_id_t fPort;
+    char fName[JACK_PORT_NAME_SIZE + 1];
+
+    JackPortRenameRequest()
+    {}
+    JackPortRenameRequest(int refnum, jack_port_id_t port, const char* name)
+        : JackRequest(JackRequest::kPortRename), fRefNum(refnum), fPort(port)
+    {
+        strcpy(fName, name);
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(trans->Read(&fRefNum, sizeof(int)));
+        CheckRes(trans->Read(&fPort, sizeof(jack_port_id_t)));
+        CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fRefNum, sizeof(int)));
+        CheckRes(trans->Write(&fPort, sizeof(jack_port_id_t)));
+        CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
         return 0;
 
     }

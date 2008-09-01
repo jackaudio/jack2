@@ -229,6 +229,13 @@ void JackWinNamedPipeClientChannel::PortDisconnect(int refnum, jack_port_id_t sr
     ServerSyncCall(&req, &res, result);
 }
 
+void JackWinNamedPipeClientChannel::PortRename(int refnum, jack_port_id_t port, const char* name, int* result)
+{
+    JackPortRenameRequest req(refnum, port, name);
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackWinNamedPipeClientChannel::SetBufferSize(jack_nframes_t buffer_size, int* result)
 {
     JackSetBufferSizeRequest req(buffer_size);

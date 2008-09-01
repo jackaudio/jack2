@@ -26,7 +26,7 @@ typedef function_table_entry 	*function_table_t;
 #endif /* AUTOTEST */
 
 #ifndef	JackRPCEngine_MSG_COUNT
-#define	JackRPCEngine_MSG_COUNT	20
+#define	JackRPCEngine_MSG_COUNT	21
 #endif	/* JackRPCEngine_MSG_COUNT */
 
 #include <mach/std_types.h>
@@ -207,6 +207,21 @@ kern_return_t rpc_jack_port_disconnect_name
 	int refnum,
 	client_port_name_t src,
 	client_port_name_t dst,
+	int *result
+);
+
+/* Routine rpc_jack_port_rename */
+#ifdef	mig_external
+mig_external
+#else
+extern
+#endif	/* mig_external */
+kern_return_t rpc_jack_port_rename
+(
+	mach_port_t server_port,
+	int refnum,
+	int src,
+	client_port_name_t name,
 	int *result
 );
 
@@ -516,6 +531,20 @@ __END_DECLS
 	typedef struct {
 		mach_msg_header_t Head;
 		NDR_record_t NDR;
+		int refnum;
+		int src;
+		client_port_name_t name;
+	} __Request__rpc_jack_port_rename_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
 		int buffer_size;
 	} __Request__rpc_jack_set_buffer_size_t;
 #ifdef  __MigPackStructs
@@ -645,6 +674,7 @@ union __RequestUnion__JackRPCEngine_subsystem {
 	__Request__rpc_jack_port_disconnect_t Request_rpc_jack_port_disconnect;
 	__Request__rpc_jack_port_connect_name_t Request_rpc_jack_port_connect_name;
 	__Request__rpc_jack_port_disconnect_name_t Request_rpc_jack_port_disconnect_name;
+	__Request__rpc_jack_port_rename_t Request_rpc_jack_port_rename;
 	__Request__rpc_jack_set_buffer_size_t Request_rpc_jack_set_buffer_size;
 	__Request__rpc_jack_set_freewheel_t Request_rpc_jack_set_freewheel;
 	__Request__rpc_jack_release_timebase_t Request_rpc_jack_release_timebase;
@@ -821,6 +851,19 @@ union __RequestUnion__JackRPCEngine_subsystem {
 		NDR_record_t NDR;
 		kern_return_t RetCode;
 		int result;
+	} __Reply__rpc_jack_port_rename_t;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int result;
 	} __Reply__rpc_jack_set_buffer_size_t;
 #ifdef  __MigPackStructs
 #pragma pack()
@@ -952,6 +995,7 @@ union __ReplyUnion__JackRPCEngine_subsystem {
 	__Reply__rpc_jack_port_disconnect_t Reply_rpc_jack_port_disconnect;
 	__Reply__rpc_jack_port_connect_name_t Reply_rpc_jack_port_connect_name;
 	__Reply__rpc_jack_port_disconnect_name_t Reply_rpc_jack_port_disconnect_name;
+	__Reply__rpc_jack_port_rename_t Reply_rpc_jack_port_rename;
 	__Reply__rpc_jack_set_buffer_size_t Reply_rpc_jack_set_buffer_size;
 	__Reply__rpc_jack_set_freewheel_t Reply_rpc_jack_set_freewheel;
 	__Reply__rpc_jack_release_timebase_t Reply_rpc_jack_release_timebase;
@@ -977,15 +1021,16 @@ union __ReplyUnion__JackRPCEngine_subsystem {
     { "rpc_jack_port_disconnect", 1008 },\
     { "rpc_jack_port_connect_name", 1009 },\
     { "rpc_jack_port_disconnect_name", 1010 },\
-    { "rpc_jack_set_buffer_size", 1011 },\
-    { "rpc_jack_set_freewheel", 1012 },\
-    { "rpc_jack_release_timebase", 1013 },\
-    { "rpc_jack_set_timebase_callback", 1014 },\
-    { "rpc_jack_get_internal_clientname", 1015 },\
-    { "rpc_jack_internal_clienthandle", 1016 },\
-    { "rpc_jack_internal_clientload", 1017 },\
-    { "rpc_jack_internal_clientunload", 1018 },\
-    { "rpc_jack_client_rt_notify", 1019 }
+    { "rpc_jack_port_rename", 1011 },\
+    { "rpc_jack_set_buffer_size", 1012 },\
+    { "rpc_jack_set_freewheel", 1013 },\
+    { "rpc_jack_release_timebase", 1014 },\
+    { "rpc_jack_set_timebase_callback", 1015 },\
+    { "rpc_jack_get_internal_clientname", 1016 },\
+    { "rpc_jack_internal_clienthandle", 1017 },\
+    { "rpc_jack_internal_clientload", 1018 },\
+    { "rpc_jack_internal_clientunload", 1019 },\
+    { "rpc_jack_client_rt_notify", 1020 }
 #endif
 
 #ifdef __AfterMigUserHeader

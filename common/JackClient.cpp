@@ -41,6 +41,8 @@ using namespace std;
 namespace Jack
 {
 
+JackClient* JackClient::fClientTable[CLIENT_NUM] = {};
+
 #define IsRealTime() ((fProcess != NULL) | (fThreadFun != NULL) | (fSync != NULL) | (fTimebase != NULL))
 
 JackClient::JackClient():fThread(this)
@@ -59,6 +61,7 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fFreewheel = NULL;
     fPortRegistration = NULL;
     fPortConnect = NULL;
+    fPortRename = NULL;
     fTimebase = NULL;
     fSync = NULL;
     fThreadFun = NULL;
@@ -72,6 +75,7 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fClientRegistrationArg = NULL;
     fPortRegistrationArg = NULL;
     fPortConnectArg = NULL;
+    fPortRenameArg = NULL;
     fSyncArg = NULL;
     fTimebaseArg = NULL;
     fThreadFunArg = NULL;
@@ -97,6 +101,7 @@ int JackClient::Close()
     
     fChannel->Close();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
+    fClientTable[GetClientControl()->fRefNum] = NULL;
     return result;
 }
 
@@ -236,6 +241,12 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 jack_log("JackClient::kPortDisconnectCallback src = %ld dst = %ld", value1, value2);
                 if (fPortConnect)
                     fPortConnect(value1, value2, 0, fPortConnectArg);
+                break;
+                
+             case kPortRenameCallback:
+                jack_log("JackClient::kPortRenameCallback src = %ld dst = %ld", value1, value2);
+                if (fPortRename)
+                    fPortRename(value1, GetGraphManager()->GetPort(value1)->GetName(), fPortRenameArg);
                 break;
 
             case kXRunCallback:
@@ -552,6 +563,13 @@ int JackClient::PortIsMine(jack_port_id_t port_index)
 {
     JackPort* port = GetGraphManager()->GetPort(port_index);
     return GetClientControl()->fRefNum == port->GetRefNum();
+}
+
+int JackClient::PortRename(jack_port_id_t port_index, const char* name)
+{
+    int result = -1;
+    fChannel->PortRename(GetClientControl()->fRefNum, port_index, name, &result);
+    return result;
 }
 
 //--------------------
@@ -876,6 +894,19 @@ int JackClient::SetPortConnectCallback(JackPortConnectCallback callback, void *a
         GetClientControl()->fCallback[kPortDisconnectCallback] = (callback != NULL);
         fPortConnectArg = arg;
         fPortConnect = callback;
+        return 0;
+    }
+}
+
+int JackClient::SetPortRenameCallback(JackPortRenameCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+        GetClientControl()->fCallback[kPortRenameCallback] = (callback != NULL);
+        fPortRenameArg = arg;
+        fPortRename = callback;
         return 0;
     }
 }

@@ -319,6 +319,11 @@ void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
     NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, port_index, 0);
 }
 
+void JackEngine::NotifyPortRename(jack_port_id_t port)
+{
+    NotifyClients(kPortRenameCallback, false, port, 0);
+}
+
 void JackEngine::NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff)
 {
     NotifyClients((onoff ? kPortConnectCallback : kPortDisconnectCallback), false, src, dst);
@@ -826,6 +831,15 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
     }
 }
 
+int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
+{
+    if (fGraphManager->GetPort(port)->SetName(name) == 0) {
+        NotifyPortRename(port);
+        return 0;
+    } else {
+        return -1;
+    }
+}
 
 } // end of namespace
 

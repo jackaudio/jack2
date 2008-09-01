@@ -85,34 +85,41 @@ routine rpc_jack_port_unregister(
 routine rpc_jack_port_connect(
 	server_port	: mach_port_t;
 	refnum		: int;
-	src         : int;
-	dst         : int;
+	src         	: int;
+	dst         	: int;
 	out result 	: int);
 	
 routine rpc_jack_port_disconnect(
 	server_port	: mach_port_t;
 	refnum		: int;
-	src         : int;
-	dst         : int;
+	src         	: int;
+	dst         	: int;
 	out result 	: int);
     
 routine rpc_jack_port_connect_name(
 	server_port	: mach_port_t;
 	refnum		: int;
-	src         : client_port_name_t;
-	dst         : client_port_name_t;
+	src         	: client_port_name_t;
+	dst         	: client_port_name_t;
 	out result 	: int);
 	
 routine rpc_jack_port_disconnect_name(
 	server_port	: mach_port_t;
 	refnum		: int;
-	src         : client_port_name_t;
-	dst         : client_port_name_t;
+	src         	: client_port_name_t;
+	dst         	: client_port_name_t;
 	out result 	: int);
 	
+routine rpc_jack_port_rename(
+	server_port	: mach_port_t;
+	refnum		: int;
+	src         	: int;
+	name        	: client_port_name_t;
+	out result 	: int);
+
 routine rpc_jack_set_buffer_size(
 	server_port	: mach_port_t;
-	buffer_size : int;
+	buffer_size 	: int;
 	out result 	: int);
 	
 routine rpc_jack_set_freewheel(
@@ -142,9 +149,9 @@ routine rpc_jack_internal_clienthandle(
 	server_port	: mach_port_t;
 	refnum		: int;
 	client_name	: client_name_t;
-	out int_ref : int;
+	out int_ref 	: int;
 	out status	: int;
-	out result : int);
+	out result 	: int);
 	
 routine rpc_jack_internal_clientload(
 	server_port	: mach_port_t;
@@ -154,7 +161,7 @@ routine rpc_jack_internal_clientload(
 	objet_data	: objet_data_t;
 	options		: int;
 	out status	: int;
-	out int_ref : int;
+	out int_ref 	: int;
 	out result	: int);
 	
 routine rpc_jack_internal_clientunload(
@@ -168,7 +175,7 @@ simpleroutine rpc_jack_client_rt_notify(
 	client_port	: mach_port_t;
 	refnum		: int;
 	notify		: int;
-    value		: int;
+    	value		: int;
 	waittime timeout : int);
 
 	

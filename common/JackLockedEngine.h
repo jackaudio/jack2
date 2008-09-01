@@ -144,6 +144,12 @@ class EXPORT JackLockedEngine : public JackLockAble
             JackLock lock(this);
             return fEngine.PortDisconnect(refnum, src, dst);
         }
+        
+        int PortRename(int refnum, jack_port_id_t port, const char* name)
+        {
+            JackLock lock(this);
+            return fEngine.PortRename(refnum, port, name);
+        }
 
         // Graph
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)

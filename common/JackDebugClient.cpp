@@ -488,6 +488,12 @@ int JackDebugClient::SetPortConnectCallback(JackPortConnectCallback callback, vo
     return fClient->SetPortConnectCallback(callback, arg);
 }
 
+int JackDebugClient::SetPortRenameCallback(JackPortRenameCallback callback, void *arg)
+{
+    CheckClient();
+    return fClient->SetPortRenameCallback(callback, arg);
+}
+
 JackClientControl* JackDebugClient::GetClientControl() const
 {
     CheckClient();

@@ -221,13 +221,24 @@ typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int 
 
 /**
  * Prototype for the client supplied function that is called
+ * whenever the port name has been changed.
+ *
+ * @param port the port that has been renamed
+ * @param new_name the new name
+ * @param arg pointer to a client supplied structure
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* new_name, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
  * whenever jackd starts or stops freewheeling.
  *
  * @param starting non-zero if we start starting to freewheel, zero otherwise
  * @param arg pointer to a client supplied structure
  */
 typedef void (*JackFreewheelCallback)(int starting, void *arg);
-
 
 /**
  * Used for the type argument of jack_port_register() for default

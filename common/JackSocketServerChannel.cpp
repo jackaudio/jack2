@@ -286,6 +286,17 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 jack_error("JackRequest::DisconnectPorts write error ref = %d", req.fRefNum);
             break;
         }
+        
+        case JackRequest::kPortRename: {
+            jack_log("JackRequest::kPortRename");
+            JackPortRenameRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0)
+                res.fResult = fServer->GetEngine()->PortRename(req.fRefNum, req.fPort, req.fName);
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::PortRename write error ref = %d", req.fRefNum);
+            break;
+        }
 
         case JackRequest::kSetBufferSize: {
             jack_log("JackRequest::SetBufferSize");

@@ -75,6 +75,8 @@ class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface,
 
         void PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
         void PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
+        
+        void PortRename(int refnum, jack_port_id_t port, const char* name, int* result);
 
         void SetBufferSize(jack_nframes_t buffer_size, int* result);
         void SetFreewheel(int onoff, int* result);

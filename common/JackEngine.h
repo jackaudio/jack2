@@ -69,6 +69,7 @@ class EXPORT JackEngine
         void NotifyClients(int event, int sync, int value1, int value2);
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
+        void NotifyPortRename(jack_port_id_t src);
         void NotifyActivate(int refnum);
 
     public:
@@ -106,6 +107,8 @@ class EXPORT JackEngine
 
         int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
         int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
+        
+        int PortRename(int refnum, jack_port_id_t port, const char* name);
 
         // Graph
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);

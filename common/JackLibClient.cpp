@@ -117,6 +117,7 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
         goto error;
     }
   
+    fClientTable[GetClientControl()->fRefNum] = this;
     jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
     return 0;
 

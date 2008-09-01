@@ -113,6 +113,9 @@ extern "C"
     EXPORT int jack_set_port_connect_callback (jack_client_t *,
             JackPortConnectCallback
             connect_callback, void *arg);
+    EXPORT int jack_set_port_rename_callback (jack_client_t *,
+				    JackPortRenameCallback
+				    rename_callback, void *arg);
     EXPORT int jack_set_graph_order_callback (jack_client_t *,
             JackGraphOrderCallback graph_callback,
             void *);
@@ -552,7 +555,13 @@ EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
         return -1;
     } else {
         JackGraphManager* manager = GetGraphManager();
-        return (manager ? manager->GetPort(myport)->SetName(name) : -1);
+        if (manager) {
+            JackClient* client = JackClient::fClientTable[manager->GetPort(myport)->GetRefNum()];
+            assert(client);
+            return client->PortRename(myport, name);
+        } else {
+            return -1;
+        }
     }
 }
 
@@ -883,6 +892,20 @@ EXPORT int jack_set_port_connect_callback(jack_client_t* ext_client, JackPortCon
         return -1;
     } else {
         return client->SetPortConnectCallback(portconnect_callback, arg);
+    }
+}
+
+EXPORT int jack_set_port_rename_callback(jack_client_t* ext_client, JackPortRenameCallback rename_callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+    JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_set_port_rename_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->SetPortRenameCallback(rename_callback, arg);
     }
 }
 

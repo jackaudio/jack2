@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Wed May 21 10:43:25 2008
+ * stub generated Mon Sep  1 17:42:28 2008
  * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
@@ -3435,6 +3435,267 @@ mig_external kern_return_t rpc_jack_port_disconnect_name
 
 #if ( __MigTypeCheck || __NDR_convert__ )
 #if __MIG_check__Reply__JackRPCEngine_subsystem__
+#if !defined(__MIG_check__Reply__rpc_jack_port_rename_t__defined)
+#define __MIG_check__Reply__rpc_jack_port_rename_t__defined
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__kern_return_t((kern_return_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__kern_return_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode(a, f) \
+	__NDR_convert__int_rep__kern_return_t((kern_return_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined */
+
+
+#ifndef __NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined
+#if	defined(__NDR_convert__int_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__int_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__int_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__int32_t__defined)
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined */
+
+
+
+#ifndef __NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined
+#if	defined(__NDR_convert__char_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__char_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__char_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__int32_t__defined)
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined */
+
+
+
+#ifndef __NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined
+#if	defined(__NDR_convert__float_rep__JackRPCEngine__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__float_rep__int((int *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCEngine__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__float_rep__JackRPCEngine__int32_t((int32_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__int32_t__defined)
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined
+#define	__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result(a, f) \
+	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined */
+
+
+
+mig_internal kern_return_t __MIG_check__Reply__rpc_jack_port_rename_t(__Reply__rpc_jack_port_rename_t *Out0P)
+{
+
+	typedef __Reply__rpc_jack_port_rename_t __Reply;
+#if	__MigTypeCheck
+	unsigned int msgh_size;
+#endif	/* __MigTypeCheck */
+	if (Out0P->Head.msgh_id != 1111) {
+	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
+		{ return MIG_SERVER_DIED; }
+	    else
+		{ return MIG_REPLY_MISMATCH; }
+	}
+
+#if	__MigTypeCheck
+	msgh_size = Out0P->Head.msgh_size;
+
+	if ((Out0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	    ((msgh_size != (mach_msg_size_t)sizeof(__Reply)) &&
+	     (msgh_size != (mach_msg_size_t)sizeof(mig_reply_error_t) ||
+	      Out0P->RetCode == KERN_SUCCESS)))
+		{ return MIG_TYPE_ERROR ; }
+#endif	/* __MigTypeCheck */
+
+	if (Out0P->RetCode != KERN_SUCCESS) {
+#ifdef	__NDR_convert__mig_reply_error_t__defined
+		__NDR_convert__mig_reply_error_t((mig_reply_error_t *)Out0P);
+#endif	/* __NDR_convert__mig_reply_error_t__defined */
+		return ((mig_reply_error_t *)Out0P)->RetCode;
+	}
+
+#if	defined(__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined) || \
+	defined(__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined)
+	if (Out0P->NDR.int_rep != NDR_record.int_rep) {
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode(&Out0P->RetCode, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__RetCode__defined */
+#if defined(__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined)
+		__NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result(&Out0P->result, Out0P->NDR.int_rep);
+#endif /* __NDR_convert__int_rep__Reply__rpc_jack_port_rename_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__int_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined)
+	if (Out0P->NDR.char_rep != NDR_record.char_rep) {
+#if defined(__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined)
+		__NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result(&Out0P->result, Out0P->NDR.char_rep);
+#endif /* __NDR_convert__char_rep__Reply__rpc_jack_port_rename_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__char_rep...) */
+
+#if	0 || \
+	defined(__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined)
+	if (Out0P->NDR.float_rep != NDR_record.float_rep) {
+#if defined(__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined)
+		__NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result(&Out0P->result, Out0P->NDR.float_rep);
+#endif /* __NDR_convert__float_rep__Reply__rpc_jack_port_rename_t__result__defined */
+	}
+#endif	/* defined(__NDR_convert__float_rep...) */
+
+	return MACH_MSG_SUCCESS;
+}
+#endif /* !defined(__MIG_check__Reply__rpc_jack_port_rename_t__defined) */
+#endif /* __MIG_check__Reply__JackRPCEngine_subsystem__ */
+#endif /* ( __MigTypeCheck || __NDR_convert__ ) */
+
+
+/* Routine rpc_jack_port_rename */
+mig_external kern_return_t rpc_jack_port_rename
+(
+	mach_port_t server_port,
+	int refnum,
+	int src,
+	client_port_name_t name,
+	int *result
+)
+{
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		int refnum;
+		int src;
+		client_port_name_t name;
+	} Request;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int result;
+		mach_msg_trailer_t trailer;
+	} Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+
+#ifdef  __MigPackStructs
+#pragma pack(4)
+#endif
+	typedef struct {
+		mach_msg_header_t Head;
+		NDR_record_t NDR;
+		kern_return_t RetCode;
+		int result;
+	} __Reply;
+#ifdef  __MigPackStructs
+#pragma pack()
+#endif
+	/*
+	 * typedef struct {
+	 * 	mach_msg_header_t Head;
+	 * 	NDR_record_t NDR;
+	 * 	kern_return_t RetCode;
+	 * } mig_reply_error_t;
+	 */
+
+	union {
+		Request In;
+		Reply Out;
+	} Mess;
+
+	Request *InP = &Mess.In;
+	Reply *Out0P = &Mess.Out;
+
+	mach_msg_return_t msg_result;
+
+#ifdef	__MIG_check__Reply__rpc_jack_port_rename_t__defined
+	kern_return_t check_result;
+#endif	/* __MIG_check__Reply__rpc_jack_port_rename_t__defined */
+
+	__DeclareSendRpc(1011, "rpc_jack_port_rename")
+
+	InP->NDR = NDR_record;
+
+	InP->refnum = refnum;
+
+	InP->src = src;
+
+	(void) mig_strncpy(InP->name, name, 128);
+
+	InP->Head.msgh_bits =
+		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
+	/* msgh_size passed as argument */
+	InP->Head.msgh_request_port = server_port;
+	InP->Head.msgh_reply_port = mig_get_reply_port();
+	InP->Head.msgh_id = 1011;
+
+	__BeforeSendRpc(1011, "rpc_jack_port_rename")
+	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
+	__AfterSendRpc(1011, "rpc_jack_port_rename")
+	if (msg_result != MACH_MSG_SUCCESS) {
+		__MachMsgErrorWithoutTimeout(msg_result);
+		{ return msg_result; }
+	}
+
+
+#if	defined(__MIG_check__Reply__rpc_jack_port_rename_t__defined)
+	check_result = __MIG_check__Reply__rpc_jack_port_rename_t((__Reply__rpc_jack_port_rename_t *)Out0P);
+	if (check_result != MACH_MSG_SUCCESS)
+		{ return check_result; }
+#endif	/* defined(__MIG_check__Reply__rpc_jack_port_rename_t__defined) */
+
+	*result = Out0P->result;
+
+	return KERN_SUCCESS;
+}
+
+#if ( __MigTypeCheck || __NDR_convert__ )
+#if __MIG_check__Reply__JackRPCEngine_subsystem__
 #if !defined(__MIG_check__Reply__rpc_jack_set_buffer_size_t__defined)
 #define __MIG_check__Reply__rpc_jack_set_buffer_size_t__defined
 #ifndef __NDR_convert__int_rep__Reply__rpc_jack_set_buffer_size_t__RetCode__defined
@@ -3523,7 +3784,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_set_buffer_size_t(__Repl
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1111) {
+	if (Out0P->Head.msgh_id != 1112) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -3653,7 +3914,7 @@ mig_external kern_return_t rpc_jack_set_buffer_size
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_set_buffer_size_t__defined */
 
-	__DeclareSendRpc(1011, "rpc_jack_set_buffer_size")
+	__DeclareSendRpc(1012, "rpc_jack_set_buffer_size")
 
 	InP->NDR = NDR_record;
 
@@ -3664,11 +3925,11 @@ mig_external kern_return_t rpc_jack_set_buffer_size
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1011;
+	InP->Head.msgh_id = 1012;
 
-	__BeforeSendRpc(1011, "rpc_jack_set_buffer_size")
+	__BeforeSendRpc(1012, "rpc_jack_set_buffer_size")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1011, "rpc_jack_set_buffer_size")
+	__AfterSendRpc(1012, "rpc_jack_set_buffer_size")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -3776,7 +4037,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_set_freewheel_t(__Reply_
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1112) {
+	if (Out0P->Head.msgh_id != 1113) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -3906,7 +4167,7 @@ mig_external kern_return_t rpc_jack_set_freewheel
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_set_freewheel_t__defined */
 
-	__DeclareSendRpc(1012, "rpc_jack_set_freewheel")
+	__DeclareSendRpc(1013, "rpc_jack_set_freewheel")
 
 	InP->NDR = NDR_record;
 
@@ -3917,11 +4178,11 @@ mig_external kern_return_t rpc_jack_set_freewheel
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1012;
+	InP->Head.msgh_id = 1013;
 
-	__BeforeSendRpc(1012, "rpc_jack_set_freewheel")
+	__BeforeSendRpc(1013, "rpc_jack_set_freewheel")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1012, "rpc_jack_set_freewheel")
+	__AfterSendRpc(1013, "rpc_jack_set_freewheel")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -4029,7 +4290,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_release_timebase_t(__Rep
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1113) {
+	if (Out0P->Head.msgh_id != 1114) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -4159,7 +4420,7 @@ mig_external kern_return_t rpc_jack_release_timebase
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_release_timebase_t__defined */
 
-	__DeclareSendRpc(1013, "rpc_jack_release_timebase")
+	__DeclareSendRpc(1014, "rpc_jack_release_timebase")
 
 	InP->NDR = NDR_record;
 
@@ -4170,11 +4431,11 @@ mig_external kern_return_t rpc_jack_release_timebase
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1013;
+	InP->Head.msgh_id = 1014;
 
-	__BeforeSendRpc(1013, "rpc_jack_release_timebase")
+	__BeforeSendRpc(1014, "rpc_jack_release_timebase")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1013, "rpc_jack_release_timebase")
+	__AfterSendRpc(1014, "rpc_jack_release_timebase")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -4282,7 +4543,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_set_timebase_callback_t(
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1114) {
+	if (Out0P->Head.msgh_id != 1115) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -4414,7 +4675,7 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_set_timebase_callback_t__defined */
 
-	__DeclareSendRpc(1014, "rpc_jack_set_timebase_callback")
+	__DeclareSendRpc(1015, "rpc_jack_set_timebase_callback")
 
 	InP->NDR = NDR_record;
 
@@ -4427,11 +4688,11 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1014;
+	InP->Head.msgh_id = 1015;
 
-	__BeforeSendRpc(1014, "rpc_jack_set_timebase_callback")
+	__BeforeSendRpc(1015, "rpc_jack_set_timebase_callback")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1014, "rpc_jack_set_timebase_callback")
+	__AfterSendRpc(1015, "rpc_jack_set_timebase_callback")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -4602,7 +4863,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_get_internal_clientname_
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1115) {
+	if (Out0P->Head.msgh_id != 1116) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -4749,7 +5010,7 @@ mig_external kern_return_t rpc_jack_get_internal_clientname
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined */
 
-	__DeclareSendRpc(1015, "rpc_jack_get_internal_clientname")
+	__DeclareSendRpc(1016, "rpc_jack_get_internal_clientname")
 
 	InP->NDR = NDR_record;
 
@@ -4762,11 +5023,11 @@ mig_external kern_return_t rpc_jack_get_internal_clientname
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1015;
+	InP->Head.msgh_id = 1016;
 
-	__BeforeSendRpc(1015, "rpc_jack_get_internal_clientname")
+	__BeforeSendRpc(1016, "rpc_jack_get_internal_clientname")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1015, "rpc_jack_get_internal_clientname")
+	__AfterSendRpc(1016, "rpc_jack_get_internal_clientname")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -5002,7 +5263,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_internal_clienthandle_t(
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1116) {
+	if (Out0P->Head.msgh_id != 1117) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -5164,7 +5425,7 @@ mig_external kern_return_t rpc_jack_internal_clienthandle
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_internal_clienthandle_t__defined */
 
-	__DeclareSendRpc(1016, "rpc_jack_internal_clienthandle")
+	__DeclareSendRpc(1017, "rpc_jack_internal_clienthandle")
 
 	InP->NDR = NDR_record;
 
@@ -5177,11 +5438,11 @@ mig_external kern_return_t rpc_jack_internal_clienthandle
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1016;
+	InP->Head.msgh_id = 1017;
 
-	__BeforeSendRpc(1016, "rpc_jack_internal_clienthandle")
+	__BeforeSendRpc(1017, "rpc_jack_internal_clienthandle")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1016, "rpc_jack_internal_clienthandle")
+	__AfterSendRpc(1017, "rpc_jack_internal_clienthandle")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -5419,7 +5680,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_internal_clientload_t(__
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1117) {
+	if (Out0P->Head.msgh_id != 1118) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -5587,7 +5848,7 @@ mig_external kern_return_t rpc_jack_internal_clientload
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_internal_clientload_t__defined */
 
-	__DeclareSendRpc(1017, "rpc_jack_internal_clientload")
+	__DeclareSendRpc(1018, "rpc_jack_internal_clientload")
 
 	InP->NDR = NDR_record;
 
@@ -5606,11 +5867,11 @@ mig_external kern_return_t rpc_jack_internal_clientload
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1017;
+	InP->Head.msgh_id = 1018;
 
-	__BeforeSendRpc(1017, "rpc_jack_internal_clientload")
+	__BeforeSendRpc(1018, "rpc_jack_internal_clientload")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1017, "rpc_jack_internal_clientload")
+	__AfterSendRpc(1018, "rpc_jack_internal_clientload")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -5785,7 +6046,7 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_internal_clientunload_t(
 #if	__MigTypeCheck
 	unsigned int msgh_size;
 #endif	/* __MigTypeCheck */
-	if (Out0P->Head.msgh_id != 1118) {
+	if (Out0P->Head.msgh_id != 1119) {
 	    if (Out0P->Head.msgh_id == MACH_NOTIFY_SEND_ONCE)
 		{ return MIG_SERVER_DIED; }
 	    else
@@ -5932,7 +6193,7 @@ mig_external kern_return_t rpc_jack_internal_clientunload
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_internal_clientunload_t__defined */
 
-	__DeclareSendRpc(1018, "rpc_jack_internal_clientunload")
+	__DeclareSendRpc(1019, "rpc_jack_internal_clientunload")
 
 	InP->NDR = NDR_record;
 
@@ -5945,11 +6206,11 @@ mig_external kern_return_t rpc_jack_internal_clientunload
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
 	InP->Head.msgh_reply_port = mig_get_reply_port();
-	InP->Head.msgh_id = 1018;
+	InP->Head.msgh_id = 1019;
 
-	__BeforeSendRpc(1018, "rpc_jack_internal_clientunload")
+	__BeforeSendRpc(1019, "rpc_jack_internal_clientunload")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_RCV_MSG|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), (mach_msg_size_t)sizeof(Reply), InP->Head.msgh_reply_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
-	__AfterSendRpc(1018, "rpc_jack_internal_clientunload")
+	__AfterSendRpc(1019, "rpc_jack_internal_clientunload")
 	if (msg_result != MACH_MSG_SUCCESS) {
 		__MachMsgErrorWithoutTimeout(msg_result);
 		{ return msg_result; }
@@ -6013,7 +6274,7 @@ mig_external kern_return_t rpc_jack_client_rt_notify
 	kern_return_t check_result;
 #endif	/* __MIG_check__Reply__rpc_jack_client_rt_notify_t__defined */
 
-	__DeclareSendSimple(1019, "rpc_jack_client_rt_notify")
+	__DeclareSendSimple(1020, "rpc_jack_client_rt_notify")
 
 	InP->NDR = NDR_record;
 
@@ -6028,11 +6289,11 @@ mig_external kern_return_t rpc_jack_client_rt_notify
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = client_port;
 	InP->Head.msgh_reply_port = MACH_PORT_NULL;
-	InP->Head.msgh_id = 1019;
+	InP->Head.msgh_id = 1020;
 
-	__BeforeSendSimple(1019, "rpc_jack_client_rt_notify")
+	__BeforeSendSimple(1020, "rpc_jack_client_rt_notify")
 	msg_result = mach_msg(&InP->Head, MACH_SEND_MSG|MACH_SEND_TIMEOUT|MACH_MSG_OPTION_NONE, (mach_msg_size_t)sizeof(Request), 0, MACH_PORT_NULL, timeout, MACH_PORT_NULL);
-	__AfterSendSimple(1019, "rpc_jack_client_rt_notify")
+	__AfterSendSimple(1020, "rpc_jack_client_rt_notify")
 
 	if (msg_result == MACH_SEND_TIMED_OUT) {
 	}

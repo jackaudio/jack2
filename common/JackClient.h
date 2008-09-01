@@ -65,6 +65,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackFreewheelCallback fFreewheel;
         JackPortRegistrationCallback fPortRegistration;
         JackPortConnectCallback fPortConnect;
+        JackPortRenameCallback fPortRename;
         JackTimebaseCallback fTimebase;
         JackSyncCallback fSync;
         JackThreadCallback fThreadFun;
@@ -80,6 +81,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fFreewheelArg;
         void* fPortRegistrationArg;
         void* fPortConnectArg;
+        void* fPortRenameArg;
         void* fTimebaseArg;
         void* fSyncArg;
         void* fThreadFunArg;
@@ -142,6 +144,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int PortDisconnect(jack_port_id_t src);
 
         virtual int PortIsMine(jack_port_id_t port_index);
+        
+        virtual int PortRename(jack_port_id_t port_index, const char* name);
 
         // Transport
         virtual int ReleaseTimebase();
@@ -167,6 +171,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         virtual int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
         virtual int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
+        virtual int SetPortRenameCallback(JackPortRenameCallback callback, void *arg);
 
         // Internal clients
         virtual char* GetInternalClientName(int ref);
@@ -184,6 +189,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
+        
+        static JackClient* fClientTable[CLIENT_NUM];
  
 };
 

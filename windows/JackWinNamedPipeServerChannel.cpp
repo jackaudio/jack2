@@ -220,6 +220,16 @@ bool JackClientPipeThread::HandleRequest()
                 res.Write(fPipe);
                 break;
             }
+            
+            case JackRequest::kPortRename: {
+                jack_log("JackRequest::kPortRename");
+                JackPortRenameRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0)
+                    res.fResult = fServer->GetEngine()->PortRename(req.fRefNum, req.fPort, req.fName);
+                res.Write(fPipe);
+                break;
+            }
 
             case JackRequest::kSetBufferSize: {
                 jack_log("JackRequest::SetBufferSize");

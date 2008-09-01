@@ -139,6 +139,15 @@ rpc_type server_rpc_jack_port_disconnect(mach_port_t private_port, int refnum, i
     return KERN_SUCCESS;
 }
 
+rpc_type server_rpc_jack_port_rename(mach_port_t private_port, int refnum, int port, client_port_name_t name, int* result)
+{
+    jack_log("server_rpc_jack_port_rename");
+    JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
+    assert(channel);
+    *result = channel->GetEngine()->PortRename(refnum, port, name);
+    return KERN_SUCCESS;
+}
+
 //------------------------
 // Buffer size, freewheel
 //------------------------

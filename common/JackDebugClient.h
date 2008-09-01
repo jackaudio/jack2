@@ -119,6 +119,7 @@ class JackDebugClient : public JackClient
         int SetFreewheelCallback(JackFreewheelCallback callback, void* arg);
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
         int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
+        int SetPortRenameCallback(JackPortRenameCallback callback, void *arg);
 
         // Internal clients
         char* GetInternalClientName(int ref);
