@@ -833,12 +833,9 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 
 int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 {
-    if (fGraphManager->GetPort(port)->SetName(name) == 0) {
-        NotifyPortRename(port);
-        return 0;
-    } else {
-        return -1;
-    }
+    fGraphManager->GetPort(port)->SetName(name);
+    NotifyPortRename(port);
+    return 0;
 }
 
 } // end of namespace

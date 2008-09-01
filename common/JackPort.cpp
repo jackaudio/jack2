@@ -28,7 +28,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <stdio.h>
 #include <assert.h>
 
-
 namespace Jack
 {
 
@@ -193,12 +192,11 @@ const char* JackPort::GetType() const
     return type->name;
 }
 
-int JackPort::SetName(const char* new_name)
+void JackPort::SetName(const char* new_name)
 {
     char* colon = strchr(fName, ':');
     int len = sizeof(fName) - ((int) (colon - fName)) - 2;
     snprintf(colon + 1, len, "%s", new_name);
-    return 0;
 }
 
 bool JackPort::NameEquals(const char* target)

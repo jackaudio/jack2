@@ -80,7 +80,7 @@ class EXPORT JackPort
         void Release();
         const char* GetName() const;
         const char* GetShortName() const;
-        int	SetName(const char* name);
+        void SetName(const char* name);
 
         int GetAliases(char* const aliases[2]);
         int SetAlias(const char* alias);
