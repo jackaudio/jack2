@@ -244,7 +244,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
                 
              case kPortRenameCallback:
-                jack_log("JackClient::kPortRenameCallback src = %ld dst = %ld", value1, value2);
+                jack_log("JackClient::kPortRenameCallback port = %ld");
                 if (fPortRename)
                     fPortRename(value1, GetGraphManager()->GetPort(value1)->GetName(), fPortRenameArg);
                 break;

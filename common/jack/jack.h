@@ -416,7 +416,7 @@ extern "C"
      *
      * @return 0 on success, otherwise a non-zero error code
      */
-    int jack_set_port_registration_callback (jack_client_t *,
+     int jack_set_port_registration_callback (jack_client_t *,
             JackPortRegistrationCallback
             registration_callback, void *arg);
 			

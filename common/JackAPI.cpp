@@ -555,8 +555,9 @@ EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
         return -1;
     } else {
         JackGraphManager* manager = GetGraphManager();
-        if (manager) {
-            JackClient* client = JackClient::fClientTable[manager->GetPort(myport)->GetRefNum()];
+        int refnum;
+        if (manager && ((refnum = manager->GetPort(myport)->GetRefNum()) > 0)) {
+            JackClient* client = JackClient::fClientTable[refnum];
             assert(client);
             return client->PortRename(myport, name);
         } else {
