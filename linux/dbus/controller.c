@@ -273,6 +273,7 @@ jack_controller_create(
 
     controller_ptr->client = NULL;
     controller_ptr->started = false;
+    controller_ptr->driver = NULL;
 
     drivers = (JSList *)jackctl_server_get_drivers_list(controller_ptr->server);
     controller_ptr->drivers_count = jack_slist_length(drivers);
