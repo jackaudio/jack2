@@ -196,8 +196,13 @@ jack_control_run_method(
             */
             goto exit;
         }
-        type = DBUS_TYPE_BOOLEAN;
-        arg.boolean = jack_controller_load_internal(controller_ptr, internal_name) ? TRUE : FALSE;
+    
+        if (!jack_controller_load_internal(controller_ptr, internal_name)) {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_GENERIC,
+                "jack_controller_load_internal failed for internal (%s)", internal_name);
+        }
     }
     else if (strcmp (call->method_name, "UnloadInternal") == 0)
     {
@@ -210,8 +215,13 @@ jack_control_run_method(
             */
             goto exit;
         }
-        type = DBUS_TYPE_BOOLEAN;
-        arg.boolean = jack_controller_unload_internal(controller_ptr, internal_name) ? TRUE : FALSE;
+        
+        if (!jack_controller_unload_internal(controller_ptr, internal_name)) {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_GENERIC,
+                "jack_controller_unload_internal failed for internal (%s)", internal_name);
+        }
     }
     else
     {
@@ -275,12 +285,10 @@ JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(LoadInternal)
     JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
-     JACK_DBUS_METHOD_ARGUMENT("result", "b", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(UnlooadInternal)
     JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
-    JACK_DBUS_METHOD_ARGUMENT("result", "b", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHODS_BEGIN
