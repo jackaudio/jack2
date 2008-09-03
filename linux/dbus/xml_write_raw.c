@@ -297,7 +297,7 @@ jack_controller_settings_save(
         node_ptr = jack_slist_next(node_ptr);
     }
 
-    if (!jack_controller_settings_write_string(fd, " </internal>\n", dbus_call_context_ptr))
+    if (!jack_controller_settings_write_string(fd, " </internals>\n", dbus_call_context_ptr))
     {
         goto exit_close;
     }

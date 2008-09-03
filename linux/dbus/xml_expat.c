@@ -171,7 +171,7 @@ jack_controller_settings_callback_elstart(void *data, const char *el, const char
     {
         if ((attr[0] == NULL || attr[2] != NULL) || strcmp(attr[0], "name") != 0)
         {
-            jack_error("<driver> XML element must contain exactly one attribute, named \"name\"");
+            jack_error("<internal> XML element must contain exactly one attribute, named \"name\"");
             context_ptr->error = XML_TRUE;
             return;
         }
