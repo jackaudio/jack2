@@ -340,6 +340,57 @@ jack_dbus_get_method_args_string_and_variant(
 }
 
 /*
+ * Read two strings and a variant argument from a method call.
+ * If the operation fails construct an error and return false,
+ * otherwise return true.
+ */
+bool
+jack_dbus_get_method_args_two_strings_and_variant(
+    struct jack_dbus_method_call *call,
+    const char **arg1,
+    const char **arg2,
+    message_arg_t *arg3,
+    int *type_ptr)
+{
+    DBusMessageIter iter, sub_iter;
+
+    /* First we want a string... */
+    if (dbus_message_iter_init (call->message, &iter)
+        && dbus_message_iter_get_arg_type (&iter) == DBUS_TYPE_STRING)
+    {
+        dbus_message_iter_get_basic (&iter, arg1);
+        dbus_message_iter_next (&iter);
+        
+        /* ...and then a second string. */
+        if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_STRING)
+        {
+            return false;
+        }
+        
+        /* Got what we wanted. */
+        dbus_message_iter_get_basic (&iter, arg2);
+        dbus_message_iter_next (&iter);
+
+        /* ...and then a variant. */
+        if (dbus_message_iter_get_arg_type (&iter) == DBUS_TYPE_VARIANT)
+        {
+            dbus_message_iter_recurse (&iter, &sub_iter);
+            dbus_message_iter_get_basic (&sub_iter, arg3);
+            *type_ptr = dbus_message_iter_get_arg_type (&sub_iter);
+
+            /* Got what we wanted. */
+            return true;
+        }
+    }
+
+    jack_dbus_error (call, JACK_DBUS_ERROR_INVALID_ARGS,
+                     "Invalid arguments to method \"%s\"",
+                     call->method_name);
+
+    return false;
+}
+
+/*
  * Append a variant type to a D-Bus message.
  * Return false if something fails, true otherwise.
  */

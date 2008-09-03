@@ -76,7 +76,7 @@ jack_control_run_method(
 
     if (strcmp (call->method_name, "Exit") == 0)
     {
-                g_exit_command = TRUE;
+        g_exit_command = TRUE;
     }
     else if (strcmp (call->method_name, "IsStarted") == 0)
     {
@@ -185,6 +185,34 @@ jack_control_run_method(
     {
         controller_ptr->xruns = 0;
     }
+    else if (strcmp (call->method_name, "LoadInternal") == 0)
+    {
+        const char *internal_name;
+
+        if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &internal_name, DBUS_TYPE_INVALID))
+        {
+            /* The method call had invalid arguments meaning that
+            * get_method_args() has constructed an error for us.
+            */
+            goto exit;
+        }
+        type = DBUS_TYPE_BOOLEAN;
+        arg.boolean = jack_controller_load_internal(controller_ptr, internal_name) ? TRUE : FALSE;
+    }
+    else if (strcmp (call->method_name, "UnloadInternal") == 0)
+    {
+        const char *internal_name;
+
+        if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &internal_name, DBUS_TYPE_INVALID))
+        {
+            /* The method call had invalid arguments meaning that
+            * get_method_args() has constructed an error for us.
+            */
+            goto exit;
+        }
+        type = DBUS_TYPE_BOOLEAN;
+        arg.boolean = jack_controller_unload_internal(controller_ptr, internal_name) ? TRUE : FALSE;
+    }
     else
     {
         return false;
@@ -245,6 +273,16 @@ JACK_DBUS_METHOD_ARGUMENTS_END
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(ResetXruns)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(LoadInternal)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+     JACK_DBUS_METHOD_ARGUMENT("result", "b", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(UnlooadInternal)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("result", "b", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(IsStarted, NULL)
     JACK_DBUS_METHOD_DESCRIBE(StartServer, NULL)
@@ -257,6 +295,8 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(SetBufferSize, NULL)
     JACK_DBUS_METHOD_DESCRIBE(IsRealtime, NULL)
     JACK_DBUS_METHOD_DESCRIBE(ResetXruns, NULL)
+    JACK_DBUS_METHOD_DESCRIBE(LoadInternal, NULL)
+    JACK_DBUS_METHOD_DESCRIBE(UnlooadInternal, NULL)
 JACK_DBUS_METHODS_END
 
 JACK_DBUS_SIGNAL_ARGUMENTS_BEGIN(ServerStarted)

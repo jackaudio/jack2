@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-09-03 Stephane Letz  <letz@grame.fr>
+	
+	* Implement DBUS entry points to handle internal clients, add new commands in jack_control."
+
 2008-09-01 Stephane Letz  <letz@grame.fr>
 	
 	* Add new jack_set_port_rename_callback API, jack_port_set_name is now a server request that call port rename callbacks.

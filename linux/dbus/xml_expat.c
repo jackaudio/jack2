@@ -46,12 +46,14 @@ jack_controller_settings_uninit()
 {
 }
 
-#define PARSE_CONTEXT_ROOT     0
-#define PARSE_CONTEXT_JACK     1
-#define PARSE_CONTEXT_ENGINE   1
-#define PARSE_CONTEXT_DRIVERS  2
-#define PARSE_CONTEXT_DRIVER   3
-#define PARSE_CONTEXT_OPTION   4
+#define PARSE_CONTEXT_ROOT        0
+#define PARSE_CONTEXT_JACK        1
+#define PARSE_CONTEXT_ENGINE      1
+#define PARSE_CONTEXT_DRIVERS     2
+#define PARSE_CONTEXT_DRIVER      3
+#define PARSE_CONTEXT_OPTION      4
+#define PARSE_CONTEXT_INTERNALS   5
+#define PARSE_CONTEXT_INTERNAL    6
 
 #define MAX_STACK_DEPTH       10
 
@@ -62,6 +64,7 @@ struct parse_context
     unsigned int element[MAX_STACK_DEPTH];
     signed int depth;
     jackctl_driver_t *driver;
+    jackctl_internal_t *internal;
     char option[JACK_PARAM_STRING_MAX+1];
     int option_used;
     char *name;
@@ -95,6 +98,7 @@ void
 jack_controller_settings_callback_elstart(void *data, const char *el, const char **attr)
 {
     jackctl_driver_t *driver;
+    jackctl_internal_t *internal;
 
     if (context_ptr->error)
     {
@@ -128,6 +132,13 @@ jack_controller_settings_callback_elstart(void *data, const char *el, const char
         context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_DRIVERS;
         return;
     }
+    
+    if (strcmp(el, "internals") == 0)
+    {
+        //jack_info("<internals>");
+        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_INTERNALS;
+        return;
+    }
 
     if (strcmp(el, "driver") == 0)
     {
@@ -155,6 +166,34 @@ jack_controller_settings_callback_elstart(void *data, const char *el, const char
 
         return;
     }
+    
+    if (strcmp(el, "internal") == 0)
+    {
+        if ((attr[0] == NULL || attr[2] != NULL) || strcmp(attr[0], "name") != 0)
+        {
+            jack_error("<driver> XML element must contain exactly one attribute, named \"name\"");
+            context_ptr->error = XML_TRUE;
+            return;
+        }
+
+        //jack_info("<internal>");
+        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_INTERNAL;
+
+        internal = jack_controller_find_internal(context_ptr->controller_ptr->server, attr[1]);
+        if (internal == NULL)
+        {
+            jack_error("ignoring settings for unknown internal \"%s\"", attr[1]);
+        }
+        else
+        {
+            jack_info("setting for internal \"%s\" found", attr[1]);
+        }
+
+        context_ptr->internal = internal;
+
+        return;
+    }
+
 
     if (strcmp(el, "option") == 0)
     {
@@ -211,6 +250,15 @@ jack_controller_settings_callback_elend(void *data, const char *el)
             context_ptr->driver != NULL)
         {
             jack_controller_settings_set_driver_option(context_ptr->driver, context_ptr->name, context_ptr->option);
+        }
+        
+        if (context_ptr->depth == 3 &&
+            context_ptr->element[0] == PARSE_CONTEXT_JACK &&
+            context_ptr->element[1] == PARSE_CONTEXT_INTERNALS &&
+            context_ptr->element[2] == PARSE_CONTEXT_INTERNAL &&
+            context_ptr->internal != NULL)
+        {
+            jack_controller_settings_set_internal_option(context_ptr->internal, context_ptr->name, context_ptr->option);
         }
     }
 

@@ -58,6 +58,11 @@ jackctl_driver_t *
 jack_controller_find_driver(
     jackctl_server_t *server,
     const char *driver_name);
+    
+jackctl_internal_t *
+jack_controller_find_internal(
+    jackctl_server_t *server,
+    const char *internal_name);
 
 jackctl_parameter_t *
 jack_controller_find_parameter(
@@ -79,9 +84,25 @@ jack_controller_select_driver(
     struct jack_controller *controller_ptr,
     const char * driver_name);
 
+bool
+jack_controller_load_internal(
+    struct jack_controller *controller_ptr,
+    const char * internal_name);
+
+bool
+jack_controller_unload_internal(
+    struct jack_controller *controller_ptr,
+    const char * internal_name);
+
 void
 jack_controller_settings_set_driver_option(
     jackctl_driver_t *driver,
+    const char *option_name,
+    const char *option_value);
+
+void
+jack_controller_settings_set_internal_option(
+    jackctl_internal_t *internal,
     const char *option_name,
     const char *option_value);
 
@@ -108,6 +129,12 @@ bool
 jack_controller_settings_save_driver_options(
     void *context,
     jackctl_driver_t *driver,
+    void *dbus_call_context_ptr);
+
+bool
+jack_controller_settings_save_internal_options(
+    void *context,
+    jackctl_internal_t *internal,
     void *dbus_call_context_ptr);
 
 bool

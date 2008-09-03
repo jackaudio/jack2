@@ -216,6 +216,87 @@ jack_controller_settings_write_drivers(
 }
 
 bool
+jack_controller_settings_write_internal(
+    struct jack_controller * controller_ptr,
+    xmlTextWriterPtr writer,
+    jackctl_internal internal,
+    void *dbus_call_context_ptr)
+{
+/*  if (xmlTextWriterWriteComment(writer, BAD_CAST "driver parameters") == -1) */
+/*  { */
+/*      jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "xmlTextWriterWriteComment() failed."); */
+/*      return false; */
+/*  } */
+
+    if (xmlTextWriterStartElement(writer, BAD_CAST "internal") == -1)
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "xmlTextWriterStartElement() failed.");
+        return false;
+    }
+
+    if (xmlTextWriterWriteAttribute(writer, BAD_CAST "name", BAD_CAST jackctl_internal_get_name(driver)) == -1)
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "xmlTextWriterWriteAttribute() failed.");
+        return false;
+    }
+
+    if (!jack_controller_settings_save_internal_options(writer, internal, dbus_call_context_ptr))
+    {
+        return false;
+    }
+
+    if (xmlTextWriterEndElement(writer) == -1)
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "xmlTextWriterEndElement() failed.");
+        return false;
+    }
+
+    return true;
+}
+
+bool
+jack_controller_settings_write_internals(
+    struct jack_controller * controller_ptr,
+    xmlTextWriterPtr writer,
+    void *dbus_call_context_ptr)
+{
+    const JSList * node_ptr;
+    jackctl_driver internal;
+
+    if (xmlTextWriterStartElement(writer, BAD_CAST "internals") == -1)
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "xmlTextWriterStartElement() failed.");
+        return false;
+    }
+
+    node_ptr = jackctl_server_get_internals_list(controller_ptr->server);
+
+    while (node_ptr != NULL)
+    {
+        internal = (jackctl_internal)node_ptr->data;
+
+        if (!jack_controller_settings_write_internal(
+                controller_ptr,
+                writer,
+                internal,
+                dbus_call_context_ptr))
+        {
+            return false;
+        }
+
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    if (xmlTextWriterEndElement(writer) == -1)
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "xmlTextWriterEndElement() failed.");
+        return false;
+    }
+
+    return true;
+}
+
+bool
 jack_controller_settings_save(
     struct jack_controller * controller_ptr,
     void *dbus_call_context_ptr)
@@ -292,6 +373,11 @@ jack_controller_settings_save(
     }
 
     if (!jack_controller_settings_write_drivers(controller_ptr, writer, dbus_call_context_ptr))
+    {
+        goto fail_free_writter;
+    }
+    
+    if (!jack_controller_settings_write_internals(controller_ptr, writer, dbus_call_context_ptr))
     {
         goto fail_free_writter;
     }
@@ -467,6 +553,91 @@ exit:
 }
 
 void
+jack_controller_settings_read_internal(
+    struct jack_controller * controller_ptr,
+    xmlXPathContextPtr xpath_ctx_ptr,
+    jackctl_internal internal)
+{
+    char *xpath;
+    size_t xpath_len;
+    xmlXPathObjectPtr xpath_obj_ptr;
+    xmlBufferPtr content_buffer_ptr;
+    int i;
+    const char *option_name;
+    const char *option_value;
+    const char *internal_name;
+
+    internal_name = jackctl_internal_get_name(internal);
+
+    jack_info("reading options for internal \"%s\"", internal_name);
+
+    xpath_len = snprintf(NULL, 0, XPATH_DRIVER_OPTIONS_EXPRESSION, internal_name);
+
+    xpath = malloc(xpath_len);
+    if (xpath == NULL)
+    {
+        jack_error("Out of memory.");
+        goto exit;
+    }
+
+    snprintf(xpath, xpath_len, XPATH_DRIVER_OPTIONS_EXPRESSION, internal_name);
+
+    //jack_info("xpath = \"%s\"", xpath);
+
+    /* Evaluate xpath expression */
+    xpath_obj_ptr = xmlXPathEvalExpression((const xmlChar *)xpath, xpath_ctx_ptr);
+    if (xpath_obj_ptr == NULL)
+    {
+        jack_error("Unable to evaluate XPath expression \"%s\"", xpath);
+        goto free_xpath;
+    }
+
+    if (xpath_obj_ptr->nodesetval == NULL || xpath_obj_ptr->nodesetval->nodeNr == 0)
+    {
+        //jack_info("XPath \"%s\" evaluation returned no data", xpath);
+        goto free_xpath_obj;
+    }
+
+    content_buffer_ptr = xmlBufferCreate();
+    if (content_buffer_ptr == NULL)
+    {
+        jack_error("xmlBufferCreate() failed.");
+        goto free_xpath_obj;
+    }
+
+    for (i = 0 ; i < xpath_obj_ptr->nodesetval->nodeNr ; i++)
+    {
+        //jack_info("driver option \"%s\" at index %d", xmlGetProp(xpath_obj_ptr->nodesetval->nodeTab[i], BAD_CAST "name"), i);
+
+        if (xmlNodeBufGetContent(content_buffer_ptr, xpath_obj_ptr->nodesetval->nodeTab[i]) == -1)
+        {
+            jack_error("xmlNodeBufGetContent() failed.");
+            goto next_option;
+        }
+
+        option_name = (const char *)xmlGetProp(xpath_obj_ptr->nodesetval->nodeTab[i], BAD_CAST "name");
+        option_value = (const char *)xmlBufferContent(content_buffer_ptr);
+
+        jack_controller_settings_set_internal_option(internal, option_name, option_value);
+
+    next_option:
+        xmlBufferEmpty(content_buffer_ptr);
+    }
+
+//free_buffer:
+    xmlBufferFree(content_buffer_ptr);
+
+free_xpath_obj:
+    xmlXPathFreeObject(xpath_obj_ptr);
+
+free_xpath:
+    free(xpath);
+
+exit:
+    return;
+}
+
+void
 jack_controller_settings_read_drivers(
     struct jack_controller * controller_ptr,
     xmlXPathContextPtr xpath_ctx_ptr)
@@ -515,6 +686,55 @@ exit:
 }
 
 void
+jack_controller_settings_read_internals(
+    struct jack_controller * controller_ptr,
+    xmlXPathContextPtr xpath_ctx_ptr)
+{
+    xmlXPathObjectPtr xpath_obj_ptr;
+    int i;
+    const char *internal_name;
+    jackctl_internal internal;
+
+    /* Evaluate xpath expression */
+    xpath_obj_ptr = xmlXPathEvalExpression((const xmlChar *)XPATH_DRIVERS_EXPRESSION, xpath_ctx_ptr);
+    if (xpath_obj_ptr == NULL)
+    {
+        jack_error("Unable to evaluate XPath expression \"%s\"", XPATH_DRIVERS_EXPRESSION);
+        goto exit;
+    }
+
+    if (xpath_obj_ptr->nodesetval == NULL || xpath_obj_ptr->nodesetval->nodeNr == 0)
+    {
+        jack_error("XPath \"%s\" evaluation returned no data", XPATH_DRIVERS_EXPRESSION);
+        goto free_xpath_obj;
+    }
+
+    for (i = 0 ; i < xpath_obj_ptr->nodesetval->nodeNr ; i++)
+    {
+        internal_name = (const char *)xmlGetProp(xpath_obj_ptr->nodesetval->nodeTab[i], BAD_CAST "name");
+
+        driver = jack_controller_find_internal(controller_ptr->server, driver_name);
+        if (driver == NULL)
+        {
+            jack_error("ignoring settings for unknown internal \"%s\"", internal_name);
+        }
+        else
+        {
+            jack_info("setting for internal \"%s\" found", internal_name);
+
+            jack_controller_settings_read_internal(controller_ptr, xpath_ctx_ptr, driver);
+        }
+    }
+
+free_xpath_obj:
+    xmlXPathFreeObject(xpath_obj_ptr);
+
+exit:
+    return;
+}
+
+
+void
 jack_controller_settings_load(
     struct jack_controller * controller_ptr)
 {
@@ -555,6 +775,7 @@ jack_controller_settings_load(
 
     jack_controller_settings_read_engine(controller_ptr, xpath_ctx_ptr);
     jack_controller_settings_read_drivers(controller_ptr, xpath_ctx_ptr);
+    jack_controller_settings_read_internals(controller_ptr, xpath_ctx_ptr);
 
     xmlXPathFreeContext(xpath_ctx_ptr);
 

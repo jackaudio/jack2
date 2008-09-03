@@ -154,6 +154,62 @@ jack_controller_settings_set_driver_option(
 }
 
 void
+jack_controller_settings_set_internal_option(
+    jackctl_internal_t *internal,
+    const char *option_name,
+    const char *option_value)
+{
+    jackctl_parameter_t *parameter;
+    jackctl_param_type_t type;
+    int value_int;
+    unsigned int value_uint;
+    union jackctl_parameter_value value;
+
+    jack_info("setting internal option \"%s\" to value \"%s\"", option_name, option_value);
+
+    parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), option_name);
+    if (parameter == NULL)
+    {
+        jack_error(
+            "Unknown parameter \"%s\" of internal \"%s\"",
+            option_name,
+            jackctl_internal_get_name(internal));
+        return;
+    }
+
+    type = jackctl_parameter_get_type(parameter);
+
+    switch (type)
+    {
+    case JackParamInt:
+        jack_controller_settings_set_sint_option(option_value, &value_int);
+        value.i = value_int;
+        break;
+    case JackParamUInt:
+        jack_controller_settings_set_uint_option(option_value, &value_uint);
+        value.ui = value_uint;
+        break;
+    case JackParamChar:
+        jack_controller_settings_set_char_option(option_value, &value.c);
+        break;
+    case JackParamString:
+        jack_controller_settings_set_string_option(option_value, value.str, sizeof(value.str));
+        break;
+    case JackParamBool:
+        jack_controller_settings_set_bool_option(option_value, &value_int);
+        value.i = value_int;
+        break;
+    default:
+        jack_error("Parameter \"%s\" of internal \"%s\" is of unknown type %d",
+               jackctl_parameter_get_name(parameter),
+               jackctl_internal_get_name(internal),
+               type);
+    }
+
+    jackctl_parameter_set_value(parameter, &value);
+}
+
+void
 jack_controller_settings_set_engine_option(
     struct jack_controller *controller_ptr,
     const char *option_name,
@@ -314,4 +370,13 @@ jack_controller_settings_save_driver_options(
     void *dbus_call_context_ptr)
 {
     return jack_controller_settings_save_options(context, jackctl_driver_get_parameters(driver), dbus_call_context_ptr);
+}
+
+bool
+jack_controller_settings_save_internal_options(
+    void *context,
+    jackctl_internal_t *internal,
+    void *dbus_call_context_ptr)
+{
+    return jack_controller_settings_save_options(context, jackctl_internal_get_parameters(internal), dbus_call_context_ptr);
 }

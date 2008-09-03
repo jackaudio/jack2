@@ -764,6 +764,241 @@ jack_controller_dbus_set_engine_parameter_value(
     jack_dbus_construct_method_return_empty(call);
 }
 
+static
+void
+jack_controller_dbus_get_available_internals(
+    struct jack_dbus_method_call *call)
+{
+    jack_dbus_construct_method_return_array_of_strings(
+        call,
+        controller_ptr->internals_count,
+        controller_ptr->internal_names);
+}
+
+/*
+ * Execute GetInternalParametersInfo method call.
+ */
+static
+void
+jack_controller_dbus_get_internal_parameters_info(
+    struct jack_dbus_method_call *call)
+{
+    const char *internal_name;
+    jackctl_internal_t * internal;
+
+    if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &internal_name, DBUS_TYPE_INVALID))
+    {
+        /* The method call had invalid arguments meaning that
+         * get_method_args() has constructed an error for us.
+         */
+        return;
+    }
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+            "Unknown internal \"%s\"",
+            internal_name);
+        return;
+    }
+
+    jack_controller_get_parameters_info(call, jackctl_internal_get_parameters(internal));
+}
+
+/*
+ * Execute GetInternalParameterInfo method call.
+ */
+static
+void
+jack_controller_dbus_get_internal_parameter_info(
+    struct jack_dbus_method_call *call)
+{
+    const char *internal_name;
+    const char *parameter_name;
+    jackctl_parameter_t *parameter;
+    jackctl_internal_t * internal;
+
+    if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &internal_name, DBUS_TYPE_STRING, &parameter_name, DBUS_TYPE_INVALID))
+    {
+        /* The method call had invalid arguments meaning that
+         * get_method_args() has constructed an error for us.
+         */
+        return;
+    }
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+            "Unknown internal \"%s\"",
+            internal_name);
+        return;
+    }
+
+    parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), parameter_name);
+    if (parameter == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER,
+            "Unknown parameter \"%s\" for driver \"%s\"",
+            parameter_name,
+            jackctl_driver_get_name(controller_ptr->driver));
+        return;
+    }
+
+    jack_controller_get_parameter_info(call, parameter);
+}
+
+/*
+ * Execute GetInternalParameterValue method call.
+ */
+static void
+jack_controller_dbus_get_internal_parameter_value(
+    struct jack_dbus_method_call *call)
+{
+    const char *internal_name;
+    const char *parameter_name;
+    jackctl_parameter_t *parameter;
+    jackctl_internal_t * internal;
+    int type;
+    union jackctl_parameter_value jackctl_value;
+    union jackctl_parameter_value jackctl_default_value;
+    message_arg_t value;
+    message_arg_t default_value;
+
+    if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &internal_name, DBUS_TYPE_STRING, &parameter_name, DBUS_TYPE_INVALID))
+    {
+        /* The method call had invalid arguments meaning that
+         * get_method_args() has constructed an error for us.
+         */
+        return;
+    }
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+            "Unknown internal \"%s\"",
+            internal_name);
+        return;
+    }
+
+    parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), parameter_name);
+    if (parameter == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER,
+            "Unknown parameter \"%s\" for driver \"%s\"",
+            parameter,
+            jackctl_driver_get_name(controller_ptr->driver));
+        return;
+    }
+    
+    type = jackctl_parameter_get_type(parameter);
+    jackctl_default_value = jackctl_parameter_get_default_value(parameter);
+    jackctl_value = jackctl_parameter_get_value(parameter);
+
+    jack_controller_jack_to_dbus_variant(type, &jackctl_value, &value);
+    jack_controller_jack_to_dbus_variant(type, &jackctl_default_value, &default_value);
+
+    /* Construct the reply. */
+    jack_dbus_construct_method_return_parameter(
+        call,
+        (dbus_bool_t)(jackctl_parameter_is_set(parameter) ? TRUE : FALSE),
+        PARAM_TYPE_JACK_TO_DBUS(type),
+        PARAM_TYPE_JACK_TO_DBUS_SIGNATURE(type),
+        default_value,
+        value);
+}
+
+static
+void
+jack_controller_dbus_set_internal_parameter_value(
+    struct jack_dbus_method_call *call)
+{
+    const char *internal_name;
+    const char *parameter_name;
+    jackctl_internal_t * internal;
+    message_arg_t arg;
+    int arg_type;
+    jackctl_parameter_t *parameter;
+    jackctl_param_type_t type;
+    union jackctl_parameter_value value;
+
+    if (!jack_dbus_get_method_args_two_strings_and_variant(call, &internal_name, &parameter_name, &arg, &arg_type))
+    {
+        /* The method call had invalid arguments meaning that
+         * jack_dbus_get_method_args_two_strings_and_variant() has constructed
+         * an error for us.
+         */
+        return;
+    }
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+       jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+            "Unknown internal \"%s\"",
+            internal_name);
+        return;
+    }
+
+    parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), parameter_name);
+    if (parameter == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER,
+            "Unknown parameter \"%s\" for driver \"%s\"",
+            parameter,
+            jackctl_driver_get_name(controller_ptr->driver));
+        return;
+    }
+
+    type = jackctl_parameter_get_type(parameter);
+
+    if (PARAM_TYPE_JACK_TO_DBUS(type) != arg_type)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_INVALID_ARGS,
+            "Engine parameter value type mismatch: was expecting '%c', got '%c'",
+            (char)PARAM_TYPE_JACK_TO_DBUS(type),
+            (char)arg_type);
+        return;
+    }
+
+    if (!jack_controller_dbus_to_jack_variant(
+            arg_type,
+            &arg,
+            &value))
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_INVALID_ARGS,
+            "Cannot convert engine parameter value");
+        return;
+    }
+
+    jackctl_parameter_set_value(parameter, &value);
+
+    jack_controller_settings_save_auto(controller_ptr);
+
+    jack_dbus_construct_method_return_empty(call);
+}
+
+
 #undef controller_ptr
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetAvailableDrivers)
@@ -820,6 +1055,35 @@ JACK_DBUS_METHOD_ARGUMENTS_BEGIN(SetEngineParameterValue)
     JACK_DBUS_METHOD_ARGUMENT("value", "v", false)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetAvailableInternals)
+    JACK_DBUS_METHOD_ARGUMENT("internals_list", "as", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetInternalParametersInfo)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter_info_array", "a(ysss)", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetInternalParameterInfo)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter_info", "(ysss)", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetInternalParameterValue)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("is_set", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("default", "v", true)
+    JACK_DBUS_METHOD_ARGUMENT("value", "v", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(SetInternalParameterValue)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("value", "v", false)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(GetAvailableDrivers, jack_controller_dbus_get_available_drivers)
     JACK_DBUS_METHOD_DESCRIBE(GetSelectedDriver, jack_controller_dbus_get_selected_driver)
@@ -832,6 +1096,11 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParameterInfo, jack_controller_dbus_get_engine_parameter_info)
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParameterValue, jack_controller_dbus_get_engine_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetEngineParameterValue, jack_controller_dbus_set_engine_parameter_value)
+    JACK_DBUS_METHOD_DESCRIBE(GetAvailableInternals, jack_controller_dbus_get_available_internals)
+    JACK_DBUS_METHOD_DESCRIBE(GetInternalParametersInfo, jack_controller_dbus_get_internal_parameters_info)
+    JACK_DBUS_METHOD_DESCRIBE(GetInternalParameterInfo, jack_controller_dbus_get_internal_parameter_info)
+    JACK_DBUS_METHOD_DESCRIBE(GetInternalParameterValue, jack_controller_dbus_get_internal_parameter_value)
+    JACK_DBUS_METHOD_DESCRIBE(SetInternalParameterValue, jack_controller_dbus_set_internal_parameter_value)
 JACK_DBUS_METHODS_END
 
 JACK_DBUS_IFACE_BEGIN(g_jack_controller_iface_configure, "org.jackaudio.JackConfigure")

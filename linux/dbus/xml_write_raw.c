@@ -116,6 +116,7 @@ jack_controller_settings_save(
     struct save_context context;
     const JSList * node_ptr;
     jackctl_driver_t *driver;
+    jackctl_internal_t *internal;
 
     time(&timestamp);
     ctime_r(&timestamp, timestamp_str);
@@ -186,6 +187,8 @@ jack_controller_settings_save(
     {
         goto exit_close;
     }
+    
+    /* engine */
 
     if (!jack_controller_settings_write_string(fd, " <engine>\n", dbus_call_context_ptr))
     {
@@ -203,6 +206,8 @@ jack_controller_settings_save(
         goto exit_close;
     }
 
+    /* drivers */
+    
     if (!jack_controller_settings_write_string(fd, " <drivers>\n", dbus_call_context_ptr))
     {
         goto exit_close;
@@ -245,6 +250,54 @@ jack_controller_settings_save(
     }
 
     if (!jack_controller_settings_write_string(fd, " </drivers>\n", dbus_call_context_ptr))
+    {
+        goto exit_close;
+    }
+    
+    /* internals */
+    
+    if (!jack_controller_settings_write_string(fd, " <internals>\n", dbus_call_context_ptr))
+    {
+        goto exit_close;
+    }
+
+    node_ptr = jackctl_server_get_internals_list(controller_ptr->server);
+
+    while (node_ptr != NULL)
+    {
+        internal = (jackctl_internal_t *)node_ptr->data;
+
+        if (!jack_controller_settings_write_string(fd, "  <internal name=\"", dbus_call_context_ptr))
+        {
+            goto exit_close;
+        }
+
+        if (!jack_controller_settings_write_string(fd, jackctl_internal_get_name(internal), dbus_call_context_ptr))
+        {
+            goto exit_close;
+        }
+
+        if (!jack_controller_settings_write_string(fd, "\">\n", dbus_call_context_ptr))
+        {
+            goto exit_close;
+        }
+
+        context.indent = "   ";
+
+        if (!jack_controller_settings_save_internal_options(&context, internal, dbus_call_context_ptr))
+        {
+            goto exit_close;
+        }
+
+        if (!jack_controller_settings_write_string(fd, "  </internal>\n", dbus_call_context_ptr))
+        {
+            goto exit_close;
+        }
+
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    if (!jack_controller_settings_write_string(fd, " </internal>\n", dbus_call_context_ptr))
     {
         goto exit_close;
     }

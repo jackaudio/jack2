@@ -62,6 +62,28 @@ jack_controller_find_driver(
     return NULL;
 }
 
+jackctl_internal_t *
+jack_controller_find_internal(
+    jackctl_server_t *server,
+    const char *internal_name)
+{
+    const JSList * node_ptr;
+
+    node_ptr = jackctl_server_get_internals_list(server);
+
+    while (node_ptr)
+    {
+        if (strcmp(jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data), internal_name) == 0)
+        {
+            return node_ptr->data;
+        }
+
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
+}
+
 jackctl_parameter_t *
 jack_controller_find_parameter(
     const JSList * parameters_list,
@@ -342,6 +364,42 @@ fail_free:
 
 fail:
     return NULL;
+}
+
+bool
+jack_controller_load_internal(
+    struct jack_controller *controller_ptr,
+    const char * internal_name)
+{
+    jackctl_internal_t *internal;
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+        return false;
+    }
+
+    jack_info("internal \"%s\" selected", internal_name);
+
+    return jackctl_server_load_internal(controller_ptr->server, internal);
+}
+
+bool
+jack_controller_unload_internal(
+    struct jack_controller *controller_ptr,
+    const char * internal_name)
+{
+    jackctl_internal_t *internal;
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+        return false;
+    }
+
+    jack_info("internal \"%s\" selected", internal_name);
+
+    return jackctl_server_unload_internal(controller_ptr->server, internal);
 }
 
 #define controller_ptr ((struct jack_controller *)context)

@@ -50,6 +50,7 @@ jack_controller_settings_uninit();
 #define JACK_DBUS_ERROR_NEED_DRIVER                 "org.jackaudio.Error.NeedDriver"
 #define JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER    "org.jackaudio.Error.UnknownDriverParameter"
 #define JACK_DBUS_ERROR_UNKNOWN_ENGINE_PARAMETER    "org.jackaudio.Error.UnknownEngineParameter"
+#define JACK_DBUS_ERROR_UNKNOWN_INTERNAL            "org.jackaudio.Error.UnknownInternal"
 #define JACK_DBUS_ERROR_INVALID_ARGS                "org.jackaudio.Error.InvalidArgs"
 #define JACK_DBUS_ERROR_GENERIC                     "org.jackaudio.Error.Generic"
 #define JACK_DBUS_ERROR_FATAL                       "org.jackaudio.Error.Fatal"
@@ -245,6 +246,14 @@ jack_dbus_get_method_args_string_and_variant(
     message_arg_t *arg2,
     int *type_ptr);
 
+bool
+jack_dbus_get_method_args_two_strings_and_variant(
+    struct jack_dbus_method_call *call,
+    const char **arg1,
+    const char **arg2,
+    message_arg_t *arg3,
+    int *type_ptr);
+    
 bool
 jack_dbus_message_append_variant(
     DBusMessageIter *iter,

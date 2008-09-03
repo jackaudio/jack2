@@ -84,19 +84,25 @@ def main():
     if len(sys.argv) == 1:
         print "Usage: %s [command] [command] ..." % os.path.basename(sys.argv[0])
         print "Commands:"
-        print "    exit                 - exit jack dbus service (stops jack server if currently running)"
-        print "    status               - check whether jack server is started, return value is 0 if runing and 1 otherwise"
-        print "    start                - start jack server if not currently started"
-        print "    stop                 - stop jack server if currenly started"
-        print "    dl                   - get list of available drivers"
-        print "    dg                   - get currently selected driver"
-        print "    ds <driver>          - select driver"
-        print "    dp                   - get parameters of currently selected driver"
-        print "    dpd <param>          - get long description for driver parameter"
-        print "    dps <param> <value>  - set driver parameter"
-        print "    ep                   - get engine parameters"
-        print "    epd <param>          - get long description for engine parameter"
-        print "    eps <param> <value>  - set engine parameter"
+        print "    exit                       - exit jack dbus service (stops jack server if currently running)"
+        print "    status                     - check whether jack server is started, return value is 0 if runing and 1 otherwise"
+        print "    start                      - start jack server if not currently started"
+        print "    stop                       - stop jack server if currenly started"
+        print "    dl                         - get list of available drivers"
+        print "    dg                         - get currently selected driver"
+        print "    ds <driver>                - select driver"
+        print "    dp                         - get parameters of currently selected driver"
+        print "    dpd <param>                - get long description for driver parameter"
+        print "    dps <param> <value>        - set driver parameter"
+        print "    il                         - get list of available internals"
+        print "    ip <name>                  - get parameters of given internal"
+        print "    ipd <name> <param>         - get long description for internal parameter"
+        print "    ips <name> <param> <value> - set internal parameter"
+        print "    iload <name>               - load internal"
+        print "    iunload <name>             - unload internal"
+        print "    ep                         - get engine parameters"
+        print "    epd <param>                - get long description for engine parameter"
+        print "    eps <param> <value>        - set engine parameter"
         sys.exit(0)
     
     bus = dbus.SessionBus()
@@ -179,7 +185,7 @@ def main():
                     print "%20s: %s (%s:%s:%s:%s)" %(name, descr, typestr, isset, default, value)
             elif arg == 'dpd':
                 if index >= len(sys.argv):
-                    print "get driver parameter long description command requires driver name argument"
+                    print "get driver parameter long description command requires parameter name argument"
                     sys.exit()
 
                 param = sys.argv[index]
@@ -190,7 +196,7 @@ def main():
                 print long_descr,
             elif arg == 'dps':
                 if index + 1 >= len(sys.argv):
-                    print "driver parameter set command requires parametr name and value arguments"
+                    print "driver parameter set command requires parameter name and value arguments"
                     sys.exit()
 
                 param = sys.argv[index]
@@ -226,7 +232,7 @@ def main():
                     print "%20s: %s (%s:%s:%s:%s)" %(name, descr, typestr, isset, default, value)
             elif arg == 'epd':
                 if index >= len(sys.argv):
-                    print "get engine parameter long description command requires driver name argument"
+                    print "get engine parameter long description command requires parameter name argument"
                     sys.exit()
 
                 param_name = sys.argv[index]
@@ -238,7 +244,7 @@ def main():
                 print long_descr,
             elif arg == 'eps':
                 if index + 1 >= len(sys.argv):
-                    print "engine parameter set command requires parametr name and value arguments"
+                    print "engine parameter set command requires parameter name and value arguments"
                     sys.exit()
 
                 param = sys.argv[index]
@@ -250,6 +256,88 @@ def main():
 
                 type_char, name, short_descr, long_descr = configure_iface.GetEngineParameterInfo(param)
                 configure_iface.SetEngineParameterValue(param, python_type_to_jackdbus_type(value, type_char))
+            elif arg == 'il':
+                print "--- internals list"
+                internals = configure_iface.GetAvailableInternals()
+                for internal in internals:
+                    print internal
+            elif arg == 'ip':
+                print "--- get internal parameters (type:isset:default:value)"
+
+ 		if index >= len(sys.argv):
+                    print "internal parameters command requires internal name argument"
+                    sys.exit()
+
+                internal_name = sys.argv[index]
+                index += 1
+                params = configure_iface.GetInternalParametersInfo(internal_name)
+                
+                #print params
+                for param in params:
+                    typestr = dbus_typesig_to_type_string(param[0])
+                    name = param[1]
+                    #print name
+                    descr = param[2]
+                    #print descr
+                    isset, default, value = configure_iface.GetInternalParameterValue(internal_name, name)
+                    #print typestr
+                    if bool(isset):
+                        isset = "set"
+                    else:
+                        isset = "notset"
+                    value = dbus_type_to_python_type(value)
+                    default = dbus_type_to_python_type(default)
+
+                    print "%20s: %s (%s:%s:%s:%s)" %(name, descr, typestr, isset, default, value)
+            elif arg == 'ipd':
+	        if index + 1 >= len(sys.argv):
+                    print "get internal parameter long description command requires internal and parameter name arguments"
+                    sys.exit()
+
+                name = sys.argv[index]
+                index += 1
+                param = sys.argv[index]
+                index += 1
+
+                print "--- get internal parameter description (%s)" % param
+                type_char, name, short_descr, long_descr = configure_iface.GetInternalParameterInfo(name, param)
+                print long_descr
+ 	    elif arg == 'ips':
+	        if index + 2 >= len(sys.argv):
+                    print "get internal parameter long description command requires internal, parameter name and value arguments"
+                    sys.exit()
+
+                internal_name = sys.argv[index]
+                index += 1
+                param = sys.argv[index]
+                index += 1
+		value = sys.argv[index]
+                index += 1
+		
+		print "--- internal param set \"%s\" -> \"%s\"" % (param, value)
+
+                type_char, name, short_descr, long_descr = configure_iface.GetInternalParameterInfo(internal_name, param)
+                configure_iface.SetInternalParameterValue(internal_name, param, python_type_to_jackdbus_type(value, type_char))
+            elif arg == 'iload':
+                print "--- load internal"
+
+ 		if index >= len(sys.argv):
+                    print "load internal command requires internal name argument"
+                    sys.exit()
+
+                name = sys.argv[index]
+                index += 1
+                result = control_iface.LoadInternal(name)
+            elif arg == 'iunload':
+                print "--- unload internal"
+
+ 		if index >= len(sys.argv):
+                    print "unload internal command requires internal name argument"
+                    sys.exit()
+
+                name = sys.argv[index]
+                index += 1
+                result = control_iface.UnloadInternal(name)
             else:
                 print "Unknown command '%s'" % arg
         except dbus.DBusException, e:
