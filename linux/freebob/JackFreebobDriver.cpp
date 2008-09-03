@@ -948,7 +948,9 @@ extern "C"
 
         desc = (jack_driver_desc_t *)calloc (1, sizeof (jack_driver_desc_t));
 
-        strcpy (desc->name, "freebob");
+        strcpy (desc->name, "freebob");                                // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+        strcpy(desc->desc, "Linux FreeBob API based audio backend");   // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        
         desc->nparams = 11;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));

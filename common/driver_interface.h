@@ -39,6 +39,7 @@ extern "C"
 #define JACK_DRIVER_NAME_MAX          15
 #define JACK_DRIVER_PARAM_NAME_MAX    15
 #define JACK_DRIVER_PARAM_STRING_MAX  63
+#define JACK_DRIVER_PARAM_DESC        255
 
     /** Driver parameter types */
     typedef enum
@@ -81,8 +82,9 @@ extern "C"
 
     /** A struct for describing a jack driver */
     typedef struct {
-        char name[JACK_DRIVER_NAME_MAX + 1];        /**< The driver's canonical name */
-        char file[PATH_MAX + 1];                    /**< The filename of the driver's shared object file */
+        char name[JACK_DRIVER_NAME_MAX + 1];      /**< The driver's canonical name */
+        char desc[JACK_DRIVER_PARAM_DESC + 1];    /**< The driver's extended description */
+        char file[PATH_MAX + 1];                  /**< The filename of the driver's shared object file */
         uint32_t nparams;                         /**< The number of parameters the driver has */
         jack_driver_param_desc_t * params;        /**< An array of parameter descriptors */
     }

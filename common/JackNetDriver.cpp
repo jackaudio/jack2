@@ -553,7 +553,10 @@ namespace Jack
         EXPORT jack_driver_desc_t* driver_get_descriptor ()
         {
             jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
-            strcpy ( desc->name, "net" );
+            
+            strcpy(desc->name, "net");                                // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+            strcpy(desc->desc, "netjack slave backend component");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+            
             desc->nparams = 10;
             desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 

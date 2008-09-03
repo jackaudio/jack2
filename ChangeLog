@@ -25,6 +25,7 @@ Florian Faber
 2008-09-03 Stephane Letz  <letz@grame.fr>
 	
 	* Implement DBUS entry points to handle internal clients, add new commands in jack_control."
+	* Add new "desc" (extended description) in jack_driver_desc_t, to be used by backends and internal clients."
 
 2008-09-01 Stephane Letz  <letz@grame.fr>
 	
