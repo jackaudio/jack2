@@ -110,19 +110,10 @@ typedef DWORD jack_tls_key;
 typedef pthread_key_t jack_tls_key;
 #endif
 
-/*
 EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr);
 EXPORT bool jack_tls_free_key(jack_tls_key key);
 
 EXPORT bool jack_tls_set(jack_tls_key key, void *data_ptr);
 EXPORT void *jack_tls_get(jack_tls_key key);
-*/
-
-bool jack_tls_allocate_key(jack_tls_key *key_ptr);
-bool jack_tls_free_key(jack_tls_key key);
-
-bool jack_tls_set(jack_tls_key key, void *data_ptr);
-void *jack_tls_get(jack_tls_key key);
-
 
 #endif
