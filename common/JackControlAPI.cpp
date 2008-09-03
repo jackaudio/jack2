@@ -1034,21 +1034,25 @@ EXPORT const JSList * jackctl_internal_get_parameters(jackctl_internal *internal
 }
 
 EXPORT bool jackctl_server_load_internal(
-    jackctl_server * server,
+    jackctl_server * server_ptr,
     jackctl_internal * internal)
 {
     int status;
-    server->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, &status);
-    return (internal->refnum > 0);
+    if (server_ptr->engine != NULL) {
+        server_ptr->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, &status);
+        return (internal->refnum > 0);
+    } else {
+        return false;
+    }
 }
 
 EXPORT bool jackctl_server_unload_internal(
-    jackctl_server * server,
+    jackctl_server * server_ptr,
     jackctl_internal * internal)
 {
     int status;
-    if (internal->refnum > 0) {
-        return (server->engine->GetEngine()->InternalClientUnload(internal->refnum, &status));
+    if (server_ptr->engine != NULL && internal->refnum > 0) {
+        return (server_ptr->engine->GetEngine()->InternalClientUnload(internal->refnum, &status));
     } else {
         return false;
     }
