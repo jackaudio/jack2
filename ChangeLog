@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-09-04 Stephane Letz  <letz@grame.fr>
+	
+	* Correct JackNetDriver initialization.
+
 2008-09-03 Stephane Letz  <letz@grame.fr>
 	
 	* Implement DBUS entry points to handle internal clients, add new commands in jack_control."

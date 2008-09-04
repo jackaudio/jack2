@@ -31,11 +31,15 @@ namespace Jack
 {
     JackNetDriver::JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                    const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                                   const char* net_name, uint transport_sync, char network_mode )
+                                   char* net_name, uint transport_sync, char network_mode )
             : JackAudioDriver ( name, alias, engine, table ), JackNetSlaveInterface ( ip, port )
     {
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
-
+        
+        // Use the hostname if no name parameter was given
+        if (strcmp(net_name, "") == 0)
+           GetHostName(net_name, JACK_CLIENT_NAME_SIZE);
+         
         fParams.fMtu = mtu;
         fParams.fSendMidiChannels = midi_input_ports;
         fParams.fReturnMidiChannels = midi_output_ports;
@@ -647,8 +651,7 @@ namespace Jack
         {
             char multicast_ip[16];
             strcpy ( multicast_ip, DEFAULT_MULTICAST_IP );
-            char name[JACK_CLIENT_NAME_SIZE];
-            GetHostName ( name, JACK_CLIENT_NAME_SIZE );
+            char net_name[JACK_CLIENT_NAME_SIZE];
             int udp_port = DEFAULT_PORT;
             int mtu = 1500;
             uint transport_sync = 1;
@@ -660,9 +663,11 @@ namespace Jack
             int midi_output_ports = 0;
             bool monitor = false;
             char network_mode = 'n';
-
             const JSList* node;
             const jack_driver_param_t* param;
+            
+            net_name[0] = 0;
+            
             for ( node = params; node; node = jack_slist_next ( node ) )
             {
                 param = ( const jack_driver_param_t* ) node->data;
@@ -690,7 +695,7 @@ namespace Jack
                         midi_output_ports = param->value.i;
                         break;
                     case 'n' :
-                        strncpy ( name, param->value.str, JACK_CLIENT_NAME_SIZE );
+                        strncpy ( net_name, param->value.str, JACK_CLIENT_NAME_SIZE );
                         break;
                     case 't' :
                         transport_sync = param->value.ui;
@@ -713,7 +718,7 @@ namespace Jack
                 Jack::JackDriverClientInterface* driver = 
                     new Jack::JackWaitThreadedDriver(
                         new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
-                                          midi_input_ports, midi_output_ports, name, transport_sync, network_mode));
+                                          midi_input_ports, midi_output_ports, net_name, transport_sync, network_mode));
                     if (driver->Open (period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
                                 monitor, "from_master_", "to_master_", 0, 0) == 0) {
                     return driver;
