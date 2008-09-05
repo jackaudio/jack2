@@ -224,6 +224,13 @@ pthread_t JackWinThread::GetThreadID()
 
 void JackWinThread::Terminate()
 {
+    jack_log("JackWinThread::Terminate");
+    ExitThread(0);
+}
+
+void ThreadExit()
+{
+    jack_log("ThreadExit");
     ExitThread(0);
 }
 

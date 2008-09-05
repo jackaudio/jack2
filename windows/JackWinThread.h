@@ -71,6 +71,8 @@ class EXPORT JackWinThread : public detail::JackThreadInterface
 
 };
 
+void ThreadExit();
+
 } // end of namespace
 
 #endif

@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetInterface.h"
 #include "JackException.h"
+#include "JackPlatformPlug.h"
 
 using namespace std;
 
@@ -284,6 +285,7 @@ namespace Jack
 
         //stop process
         fRunning = false;
+        
         //send a 'multicast euthanasia request' - new socket is required on macosx
         jack_info ( "Exiting '%s'", fParams.fName );
         SetPacketType ( &fParams, KILL_MASTER );
@@ -293,6 +295,9 @@ namespace Jack
         if ( mcast_socket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
             jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
         mcast_socket.Close();
+        
+        // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+        ThreadExit();
     }
 
     int JackNetMasterInterface::Send ( size_t size, int flags )
@@ -487,6 +492,7 @@ namespace Jack
                     case 's':   //sync
                         if ( rx_head->fCycle == fTxHeader.fCycle )
                             return 0;
+                        break;
                 }
             }
         }

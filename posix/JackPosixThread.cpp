@@ -261,6 +261,13 @@ void JackPosixThread::Terminate()
     pthread_exit(0);
 }
 
+void ThreadExit()
+{
+    jack_log("ThreadExit");
+    pthread_exit(0);
+}
+
+
 } // end of namespace
 
 EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr)
