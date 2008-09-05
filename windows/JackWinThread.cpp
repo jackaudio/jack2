@@ -59,7 +59,7 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
 }
 
 JackWinThread::JackWinThread(JackRunnableInterface* runnable)
-        : JackThread(runnable, 0, false, 0)
+        : JackThreadInterface(runnable, 0, false, 0)
 {
     fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     fThread = NULL;

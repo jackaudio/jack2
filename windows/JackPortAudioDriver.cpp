@@ -31,7 +31,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackError.h"
 #include "JackTime.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include <iostream>
 #include <assert.h>
 
@@ -263,7 +263,7 @@ extern "C"
 {
 #endif
 
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
     EXPORT jack_driver_desc_t* driver_get_descriptor()
     {

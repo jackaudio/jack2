@@ -15,8 +15,9 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add directory="..\example-clients" />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -30,8 +31,9 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add directory="..\example-clients" />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -46,8 +48,9 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add directory="..\example-clients" />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />

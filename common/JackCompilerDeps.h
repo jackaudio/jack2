@@ -17,14 +17,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackExports__
-#define __JackExports__
+#ifndef __JackCompilerDeps__
+#define __JackCompilerDeps__
 
-#ifdef WIN32
-#define	EXPORT __declspec(dllexport)
-#else
-#define	EXPORT __attribute__ ((visibility("default")))
-#endif
+#include "JackCompilerDeps_os.h"
 
 #endif
-

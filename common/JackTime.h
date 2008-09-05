@@ -22,86 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackTime__
 
 #include "types.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#if defined(__APPLE__)
-
-#include <mach/mach_time.h>
-#include <unistd.h>
-
-    extern EXPORT double __jack_time_ratio;
-
-    static inline jack_time_t GetMicroSeconds(void) 
-    {
-        return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
-    }
-
-    /* This should only be called ONCE per process. */
-    void InitTime();
-
-    static inline void JackSleep(int usec) 
-    {
-        usleep(usec);
-    }
-
-#endif
-
-#ifdef WIN32
-
-    extern EXPORT LARGE_INTEGER _jack_freq;
-
-    EXPORT jack_time_t GetMicroSeconds(void) ;
-
-    void InitTime();
-
-    static void JackSleep(int usec) 
-    {
-        Sleep(usec / 1000);
-    }
-
-#endif
-
-#ifdef linux
-
-#include <unistd.h>
-
-    static inline void JackSleep(long usec) 
-    {
-        usleep(usec);
-    }
-
-#ifdef GETCYCLE_TIME
-#include "cycles.h"
-    extern jack_time_t __jack_cpu_mhz;
-    jack_time_t GetMhz();
-    void InitTime();
-    static inline jack_time_t GetMicroSeconds(void) 
-    {
-        return get_cycles() / __jack_cpu_mhz;
-    }
-#else
-#include <time.h>
-    void InitTime();
-    static inline jack_time_t GetMicroSeconds(void) 
-    {
-        struct timespec ts;
-        clock_gettime(CLOCK_MONOTONIC, &ts);
-        return (jack_time_t)ts.tv_sec * 1000000 + ts.tv_nsec / 1000;
-    }
-#endif
-
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
+#include "JackTime_os.h"
 
 #endif
 

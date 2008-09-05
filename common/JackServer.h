@@ -21,15 +21,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackServer__
 #define __JackServer__
 
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "driver_interface.h"
 #include "JackDriverLoader.h"
 #include "JackConnectionManager.h"
 #include "jslist.h"
 
 #include "JackGlobals.h"
-#include "JackPlatformSynchro.h"
-#include "JackPlatformServerChannel.h"
+#include "JackPlatformPlug.h"
 
 
 namespace Jack

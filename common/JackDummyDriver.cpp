@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGraphManager.h"
 #include "JackDriverLoader.h"
 #include "JackThreadedDriver.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include <iostream>
 #include <unistd.h>
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Romain Moret at Grame
+Copyright (C) 2004-2006 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,34 +17,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackPlatformNetSocket__
-#define __JackPlatformNetSocket__
+#ifndef __JackSystemDeps_POSIX__
+#define __JackSystemDeps_POSIX__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <inttypes.h>
+#include <sys/types.h>
+#include <signal.h>
+
 #endif
-
-// OSX and LINUX
-#if defined(__APPLE__) || defined (__linux__)
-#include "JackNetUnixSocket.h"
-#endif
-
-// WINDOWS
-#ifdef WIN32
-#include "JackNetWinSocket.h"
-#endif
-
-namespace Jack
-{
-
-#if defined(__APPLE__) || defined(__linux__)
-    typedef JackNetUnixSocket JackNetSocket;
-#endif
-
-#ifdef WIN32
-    typedef JackNetWinSocket JackNetSocket;
-#endif
-
-} // end of namespace
-
-#endif /* __JackPlatformNetSocket__ */

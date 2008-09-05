@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackProcessSync__
 #define __JackProcessSync__
 
-#include "JackPlatformSynchro.h"
+#include "JackPlatformPlug.h"
 #include <pthread.h>
 #include <sys/time.h>
 #include <unistd.h>

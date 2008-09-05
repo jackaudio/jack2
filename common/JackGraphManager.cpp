@@ -33,11 +33,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-static inline jack_nframes_t MAX(jack_nframes_t a, jack_nframes_t b)
-{
-    return (a < b) ? b : a;
-}
-
 static void AssertPort(jack_port_id_t port_index)
 {
     if (port_index >= PORT_NUM) {
@@ -240,7 +235,7 @@ jack_nframes_t JackGraphManager::ComputeTotalLatencyAux(jack_port_id_t port_inde
             jack_nframes_t this_latency = (dst_port->fFlags & JackPortIsTerminal)
                                           ? dst_port->GetLatency()
                                           : ComputeTotalLatencyAux(dst_index, port_index, manager, hop_count + 1);
-            max_latency = MAX(max_latency, this_latency);
+            max_latency = ((max_latency > this_latency) ? max_latency : this_latency);
         }
     }
 

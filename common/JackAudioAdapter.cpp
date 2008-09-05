@@ -20,7 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAudioAdapter.h"
 #include "JackLibSampleRateResampler.h"
 #include "JackError.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "JackTools.h"
 #include "jslist.h"
 #include <stdio.h>

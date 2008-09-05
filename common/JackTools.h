@@ -40,7 +40,7 @@
 #include "jslist.h"
 #include "driver_interface.h"
 
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "JackError.h"
 
 namespace Jack

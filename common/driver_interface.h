@@ -27,14 +27,9 @@ extern "C"
 
 #include <limits.h>
 #include "jslist.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
-#ifdef WIN32
-#include "types.h"
-#define PATH_MAX 1024
-#else
-#include <inttypes.h>
-#endif
+#include "JackSystemDeps.h"
 
 #define JACK_DRIVER_NAME_MAX          15
 #define JACK_DRIVER_PARAM_NAME_MAX    15

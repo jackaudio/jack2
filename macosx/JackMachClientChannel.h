@@ -22,12 +22,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackChannel.h"
 #include "JackMachPort.h"
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
+#include <map>
 
 namespace Jack
 {
-
-class JackLibClient;
 
 /*!
 \brief JackClientChannel using Mach IPC.
@@ -92,6 +91,7 @@ class JackMachClientChannel : public detail::JackClientChannelInterface, public 
         bool Execute();
 };
 
+extern std::map<mach_port_t, JackClient*> gClientTable;
 
 } // end of namespace
 

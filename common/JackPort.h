@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "types.h"
 #include "JackConstants.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
 namespace Jack
 {
@@ -56,15 +56,7 @@ class EXPORT JackPort
         bool fInUse;
         jack_port_id_t fTied;   // Locally tied source port
 
-#ifdef WIN32
-        //__declspec(align(16)) float fBuffer[BUFFER_SIZE_MAX];
-        float fBuffer[BUFFER_SIZE_MAX];
-#elif __GNUC__
-        float fBuffer[BUFFER_SIZE_MAX] __attribute__((aligned(64)));  // 16 bytes alignment for vector code, 64 bytes better for cache loads/stores
-#else
-#warning Buffer will not be aligned on 16 bytes boundaries : vector based code (Altivec of SSE) will fail
-        float fBuffer[BUFFER_SIZE_MAX];
-#endif
+        MEM_ALIGN(float fBuffer[BUFFER_SIZE_MAX], 64);  // 16 bytes alignment for vector code, 64 bytes better for cache loads/stores
 
         bool IsUsed() const;
 

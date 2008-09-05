@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackActivationCount.h"
 #include "JackError.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
 #include <assert.h>
 

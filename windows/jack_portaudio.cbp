@@ -21,8 +21,9 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="..\windows" />
@@ -44,8 +45,9 @@
 					<Add option="-D_USRDLL" />
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -68,8 +70,9 @@
 					<Add option="-DJACK_PORTAUDIO_EXPORTS" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />

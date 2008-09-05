@@ -56,10 +56,14 @@ def configure(conf):
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
 def build(bld):
+    if bld.env()['IS_LINUX']:
+        os_incdir = ['../linux', '../posix']
+    if bld.env()['IS_MACOSX']:
+        os_incdir = ['../macosx', '../posix']
     for example_program, example_program_source in example_programs.items():
         prog = bld.create_obj('cpp', 'program')
         prog.features.append('cc')
-        prog.includes = ['../common/jack', '../common']
+        prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
         if bld.env()['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
@@ -76,7 +80,7 @@ def build(bld):
     #if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT']
     if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True and bld.env()['IS_LINUX'] == True:
         prog = bld.create_obj('cc', 'program')
-        prog.includes = ['../common/jack', '../common']
+        prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
         if bld.env()['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
@@ -91,7 +95,7 @@ def build(bld):
 
     if bld.env()['BUILD_EXAMPLE_CLIENT_REC'] == True:
         prog = bld.create_obj('cc', 'program')
-        prog.includes = ['../common/jack', '../common']
+        prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
         if bld.env()['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
@@ -107,7 +111,7 @@ def build(bld):
     for example_lib, example_lib_source in example_libs.items():
         lib = bld.create_obj('cc', 'shlib')
         lib.env['shlib_PATTERN'] = '%s.so'
-        lib.includes = ['../common/jack', '../common']
+        lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
 	if bld.env()['IS_MACOSX']:

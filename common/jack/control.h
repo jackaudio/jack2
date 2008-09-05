@@ -30,10 +30,7 @@
 #define JACKCTL_H__2EEDAD78_DF4C_4B26_83B7_4FF1A446A47E__INCLUDED
 
 #include <jack/jslist.h>
-
-#ifdef WIN32
-typedef unsigned long sigset_t;
-#endif
+#include <jack/systemdeps.h>
 
 /** Parameter types, intentionally similar to jack_driver_param_type_t */
 typedef enum

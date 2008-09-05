@@ -23,7 +23,7 @@
 #define __JackControlAPI__
 
 #include "jslist.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
 #ifdef WIN32
 #ifdef __MINGW32__

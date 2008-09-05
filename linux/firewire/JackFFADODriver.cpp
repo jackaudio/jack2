@@ -44,7 +44,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
 namespace Jack
 {

@@ -26,7 +26,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackConstants.h"
 #include "JackConnectionManager.h"
 #include "JackAtomicState.h"
-#include "JackPlatformSynchro.h"
+#include "JackPlatformPlug.h"
+#include "JackSystemDeps.h"
+
 
 namespace Jack
 {

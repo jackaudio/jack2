@@ -23,11 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <assert.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "driver_interface.h"
 
 #ifdef __linux__
@@ -40,6 +35,11 @@ extern "C"
 
 #ifdef WIN32
 #include "JackPortAudioAdapter.h"
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
     using namespace Jack;

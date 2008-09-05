@@ -22,8 +22,13 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
-2008-09-04 Stephane Letz  <letz@grame.fr>
+2008-08-05 Stephane Letz  <letz@grame.fr>
 	
+	* Merge Michael Voigt "drops" branch after reorganization step.
+
+2008-08-04 Stephane Letz  <letz@grame.fr>
+	
+	* Michael Voigt 4th source reorganization patch.
 	* Correct JackNetDriver initialization.
 
 2008-09-03 Stephane Letz  <letz@grame.fr>
@@ -33,7 +38,16 @@ Florian Faber
 
 2008-09-01 Stephane Letz  <letz@grame.fr>
 	
+	* Michael Voigt third source reorganization patch.
 	* Add new jack_set_port_rename_callback API, jack_port_set_name is now a server request that call port rename callbacks.
+
+2008-08-31 Stephane Letz  <letz@grame.fr>
+	
+	* Michael Voigt second source reorganization patch.
+
+2008-08-28 Stephane Letz  <letz@grame.fr>
+	
+	* Michael Voigt first source reorganization patch.
 
 2008-08-26 Stephane Letz  <letz@grame.fr>
 	

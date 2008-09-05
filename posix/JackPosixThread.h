@@ -35,7 +35,7 @@ namespace Jack
 \brief The POSIX thread base class.
 */
 
-class EXPORT JackPosixThread : public detail::JackThread
+class EXPORT JackPosixThread : public detail::JackThreadInterface
 {
 
     protected:
@@ -46,10 +46,10 @@ class EXPORT JackPosixThread : public detail::JackThread
     public:
 
         JackPosixThread(JackRunnableInterface* runnable, bool real_time, int priority, int cancellation)
-                : JackThread(runnable, priority, real_time, cancellation), fThread((pthread_t)NULL)
+                : JackThreadInterface(runnable, priority, real_time, cancellation), fThread((pthread_t)NULL)
         {}
         JackPosixThread(JackRunnableInterface* runnable, int cancellation = PTHREAD_CANCEL_ASYNCHRONOUS)
-                : JackThread(runnable, 0, false, cancellation), fThread((pthread_t)NULL)
+                : JackThreadInterface(runnable, 0, false, cancellation), fThread((pthread_t)NULL)
         {}
 
         int Start();

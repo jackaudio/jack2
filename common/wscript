@@ -42,7 +42,11 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
     process = bld.create_obj('cpp', 'shlib')
     process.env['shlib_PATTERN'] = '%s.so'
     process.defines  = 'HAVE_CONFIG_H'
-    process.includes = ['./jack', '.', '..', '../macosx','../windows', '../linux/alsa']
+    if bld.env()['IS_MACOSX']:
+        env_includes = ['../macosx', '../posix']
+    if bld.env()['IS_LINUX']:
+	env_includes = ['../linux', '../posix', '../linux/alsa']
+    process.includes = ['.'] + env_includes + ['jack', '..']
     process.name     = target
     process.target   = target
     process.source   = sources
@@ -72,10 +76,8 @@ def build(bld):
         'JackMidiPort.cpp',
         'JackMidiAPI.cpp',
         'JackEngineControl.cpp',
-        'JackPosixThread.cpp',
         'JackShmMem.cpp',
         'shm.c',
-        'JackSocket.cpp',
         'JackTime.c',
         'JackGlobals.cpp',
         'JackDebugClient.cpp',
@@ -83,7 +85,6 @@ def build(bld):
         'timestamps.c',
         'JackTools.cpp',
         'JackMessageBuffer.cpp',
-        'JackProcessSync.cpp',
         ]
 
     includes = ['.', './jack', '..']
@@ -91,20 +92,25 @@ def build(bld):
 
     if bld.env()['IS_LINUX']:
         common_libsources += [
-            'JackPosixSemaphore.cpp',
-            'JackFifo.cpp',
+            '../posix/JackPosixThread.cpp',
+            '../posix/JackPosixSemaphore.cpp',
+            '../posix/JackFifo.cpp',
+            '../posix/JackProcessSync.cpp',
+            '../posix/JackSocket.cpp',
             ]
-        includes.append('../linux')
+        includes = ['../linux', '../posix'] + includes
         uselib.append('RT')
         uselib.append('DL')
 
     if bld.env()['IS_MACOSX']:
         common_libsources += [
-            '../macosx/JackMachSemaphore.cpp',
+            '../posix/JackProcessSync.cpp',
+            '../posix/JackPosixThread.cpp',
             '../macosx/JackMachThread.cpp',
+            '../macosx/JackMachSemaphore.cpp',
             '../macosx/JackMachPort.cpp',
             ]
-        includes += ['../macosx', '../macosx/RPC']
+        includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
 
     serverlib = bld.create_obj('cpp', 'shlib')
     serverlib.features.append('cc')
@@ -124,8 +130,8 @@ def build(bld):
         'JackLoopbackDriver.cpp',
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
-		'JackRestartThreadedDriver.cpp',
-		'JackWaitThreadedDriver.cpp',
+	'JackRestartThreadedDriver.cpp',
+	'JackWaitThreadedDriver.cpp',
         'JackServerAPI.cpp',
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
@@ -136,10 +142,10 @@ def build(bld):
 
     if bld.env()['IS_LINUX']:
         serverlib.source += [
-            'JackSocketServerChannel.cpp',
-            'JackSocketNotifyChannel.cpp',
-            'JackSocketServerNotifyChannel.cpp',
-	    	'JackNetUnixSocket.cpp',
+            '../posix/JackSocketServerChannel.cpp',
+            '../posix/JackSocketNotifyChannel.cpp',
+            '../posix/JackSocketServerNotifyChannel.cpp',
+            '../posix/JackNetUnixSocket.cpp',
             ]
 
     if bld.env()['IS_MACOSX']:
@@ -149,7 +155,7 @@ def build(bld):
             '../macosx/JackMachServerNotifyChannel.cpp',
             '../macosx/JackMacEngineRPC.cpp',
             '../macosx/RPC/JackRPCClientUser.c',
-	    	'JackNetUnixSocket.cpp',
+            '../posix/JackNetUnixSocket.cpp',
             ]
 
     serverlib.vnum = bld.env()['JACK_API_VERSION']
@@ -178,7 +184,7 @@ def build(bld):
 
     if bld.env()['IS_LINUX']:
         clientlib.source += [
-            'JackSocketClientChannel.cpp',
+            '../posix/JackSocketClientChannel.cpp',
             ]
 
     if bld.env()['IS_MACOSX']:

@@ -25,13 +25,7 @@ extern "C"
 {
 #endif
 
-#ifdef WIN32
-	#include <windows.h>
-    typedef HANDLE pthread_t;
-#else
-	#include <pthread.h>
-#endif
-
+#include <jack/systemdeps.h>
 
     /** @file thread.h
      *

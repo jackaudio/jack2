@@ -47,14 +47,12 @@
 	#include "JackFifo.h"
 #endif
 
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 
 #define ITER 100000
 
 #define SERVER "serveur1"
 #define CLIENT "client1"
-
-#include "JackPlatformSynchro.h"
 
 using namespace Jack;
 

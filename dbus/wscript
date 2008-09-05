@@ -64,7 +64,12 @@ def build(bld):
         return
 
     obj = bld.create_obj('cc', 'program')
-    obj.includes = ['.', '../../', '../../common', '../../common/jack']
+    if bld.env()['IS_LINUX']:
+        sysdeps_dbus_include = ['../linux', '../posix']
+    if bld.env()['IS_MACOSX']:
+        sysdeps_dbus_include = ['../macosx', '../posix']
+
+    obj.includes = sysdeps_dbus_include + ['.', '../', '../common', '../common/jack']
     obj.source = [
         'jackdbus.c',
         'controller.c',

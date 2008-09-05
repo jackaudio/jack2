@@ -22,7 +22,7 @@
 #define __JackThreadedDriver__
 
 #include "JackDriver.h"
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 
 namespace Jack
 {

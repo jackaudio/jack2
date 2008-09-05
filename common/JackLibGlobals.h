@@ -22,12 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackShmMem.h"
 #include "JackEngineControl.h"
-#ifdef __APPLE__
-#include "JackMachPort.h"
-#include <map>
-#endif
 #include "JackGlobals.h"
-#include "JackPlatformSynchro.h"
+#include "JackPlatformPlug.h"
 #include "JackGraphManager.h"
 #include "JackMessageBuffer.h"
 #include "JackTime.h"
@@ -48,9 +44,6 @@ struct JackLibGlobals
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
     JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
-#ifdef __APPLE__
-    std::map<mach_port_t, JackClient*> fClientTable;        /*! Client table */
-#endif
  
     static int fClientCount;
     static JackLibGlobals* fGlobals;

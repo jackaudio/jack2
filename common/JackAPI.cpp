@@ -29,7 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackClientControl.h"
 #include "JackGlobals.h"
 #include "JackTime.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "JackPortType.h"
 
 #ifdef __APPLE__

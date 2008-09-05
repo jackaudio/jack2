@@ -21,26 +21,8 @@
 #ifndef __jack_types_h__
 #define __jack_types_h__
 
-#ifdef WIN32
-#include <windows.h>
-#ifndef __MINGW32__
-    #define vsnprintf _vsnprintf
-    #define snprintf _snprintf
-    typedef char int8_t;
-	typedef unsigned char uint8_t;
-	typedef short int16_t;
-	typedef unsigned short uint16_t;
-	typedef long int32_t;
-	typedef unsigned long uint32_t;
-	typedef LONGLONG int64_t;
-	typedef ULONGLONG uint64_t;
-#else
-	#include <stdint.h>
-#endif
+#include <jack/systemdeps.h>
 
-#else
-	#include <inttypes.h>
-#endif
 
 typedef int32_t jack_shmsize_t;
 
@@ -59,11 +41,7 @@ typedef uint32_t	jack_nframes_t;
  * monotonic clock with units of microseconds.
  */
 
-#ifdef WIN32
-typedef int64_t jack_time_t;
-#else
-typedef uint64_t jack_time_t;
-#endif
+typedef _jack_time_t jack_time_t;
 
 /**
  *  Maximum size of @a load_init string passed to an internal client
@@ -475,7 +453,7 @@ typedef enum {
 #define EXTENDED_TIME_INFO
 
 typedef struct {
-    
+
     /* these four cannot be set from clients: the server sets them */
     jack_unique_t	unique_1;	/**< unique ID */
     jack_time_t		usecs;		/**< monotonic, free-rolling */
@@ -488,7 +466,7 @@ typedef struct {
     int32_t		bar;		/**< current bar */
     int32_t		beat;		/**< current beat-within-bar */
     int32_t		tick;		/**< current tick-within-beat */
-    double		bar_start_tick;            
+    double		bar_start_tick;
 
     float		beats_per_bar;	/**< time signature "numerator" */
     float		beat_type;	/**< time signature "denominator" */
@@ -499,15 +477,15 @@ typedef struct {
     double		frame_time;	/**< current time in seconds */
     double		next_time;	/**< next sequential frame_time
                          (unless repositioned) */
-  
+
     /* JackBBTFrameOffset fields: */
     jack_nframes_t	bbt_offset;	/**< frame offset for the BBT fields
                          (the given bar, beat, and tick
                          values actually refer to a time
                          frame_offset frames before the
-                         start of the cycle), should 
-                         be assumed to be 0 if 
-                         JackBBTFrameOffset is not 
+                         start of the cycle), should
+                         be assumed to be 0 if
+                         JackBBTFrameOffset is not
                          set. If JackBBTFrameOffset is
                          set and this value is zero, the BBT
                          time refers to the first frame of this

@@ -6,7 +6,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = 'HAVE_CONFIG_H'
-    driver.includes = ['.', '../common', '../common/jack']
+    driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources
     driver.inst_var = bld.env()['ADDON_DIR']
@@ -21,7 +21,7 @@ def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = 'HAVE_CONFIG_H'
-    driver.includes = ['.', '../common', '../common/jack']
+    driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources
     driver.inst_var = bld.env()['ADDON_DIR']
@@ -34,7 +34,7 @@ def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
 
 def build(bld):
     jackd = bld.create_obj('cpp', 'program')
-    jackd.includes = ['.', '../common/jack', '../common']
+    jackd.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     jackd.defines = 'HAVE_CONFIG_H'
     jackd.source = ['../common/Jackdmp.cpp']
     jackd.uselib = 'PTHREAD DL'

@@ -25,7 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <string.h>
 #include <errno.h>
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "types.h"
 
 #ifdef __cplusplus

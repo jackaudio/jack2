@@ -24,8 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGraphManager.h"
 #include "JackSynchro.h"
 #include "JackTransportEngine.h"
-#include "JackPlatformProcessSync.h"
-#include "JackPlatformServerNotifyChannel.h"
+#include "JackPlatformPlug.h"
 
 namespace Jack
 {

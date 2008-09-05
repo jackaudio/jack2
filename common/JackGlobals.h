@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackGlobals__
 #define __JackGlobals__
 
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 
 extern jack_tls_key gRealTime;
 extern jack_tls_key g_key_log_function;

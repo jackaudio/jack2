@@ -21,16 +21,8 @@
 #ifndef __JackThread__
 #define __JackThread__
 
-#include "JackExports.h"
-
-#ifdef WIN32
-#include <windows.h>
-typedef HANDLE pthread_t;
-typedef ULONGLONG UInt64;
-#else
-#include <pthread.h>
-typedef unsigned long long UInt64;
-#endif
+#include "JackCompilerDeps.h"
+#include "JackTypes.h"
 
 namespace Jack
 {
@@ -65,7 +57,7 @@ class JackRunnableInterface
 namespace detail
 {
 
-class EXPORT JackThread
+class EXPORT JackThreadInterface
 {
 
     public:
@@ -82,7 +74,7 @@ class EXPORT JackThread
         
     public:
         
-        JackThread(JackRunnableInterface* runnable, int priority, bool real_time, int cancellation):
+        JackThreadInterface(JackRunnableInterface* runnable, int priority, bool real_time, int cancellation):
         fRunnable(runnable), fPriority(priority), fRealTime(real_time), fStatus(kIdle), fCancellation(cancellation)
         {}
          
@@ -98,17 +90,28 @@ class EXPORT JackThread
         void SetParams(UInt64 period, UInt64 computation, UInt64 constraint) // Empty implementation, will only make sense on OSX...
         {}
         
+        int Start();
+        int StartSync();
+        int Kill();
+        int Stop();
+        void Terminate();
+
+        int AcquireRealTime();
+        int AcquireRealTime(int priority);
+        int DropRealTime();
+
+        pthread_t GetThreadID();
+
+        static int AcquireRealTimeImp(pthread_t thread, int priority);
+        static int DropRealTimeImp(pthread_t thread);
+        static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+        static int StopImp(pthread_t thread);
+        static int KillImp(pthread_t thread);
 };
     
 }
 
 } // end of namespace
-
-#if defined(WIN32)
-typedef DWORD jack_tls_key;
-#else
-typedef pthread_key_t jack_tls_key;
-#endif
 
 EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr);
 EXPORT bool jack_tls_free_key(jack_tls_key key);

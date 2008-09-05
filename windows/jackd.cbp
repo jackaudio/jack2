@@ -21,8 +21,9 @@
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -42,8 +43,9 @@
 					<Add option="-D_CONSOLE" />
 					<Add option="-D_MBCS" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -65,8 +67,9 @@
 					<Add option="-D_MBCS" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />

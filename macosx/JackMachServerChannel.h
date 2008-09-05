@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackMachServerChannel__
 
 #include "JackChannel.h"
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 #include "JackMachPort.h"
 #include <map>
 

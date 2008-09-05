@@ -24,7 +24,7 @@
 #include "types.h"
 #include "JackClientInterface.h"
 #include "JackConstants.h"
-#include "JackPlatformSynchro.h"
+#include "JackPlatformPlug.h"
 #include "JackClientControl.h"
 #include <list>
 

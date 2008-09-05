@@ -1,4 +1,5 @@
 /*
+Copyright (C) 2001 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -17,35 +18,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackPlatformProcessSync__
-#define __JackPlatformProcessSync__
+#ifndef __JackShmMem_WIN32__
+#define __JackShmMem_WIN32__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h" 
-#endif 
+#include <windows.h>
 
-// OSX
-#if defined(__APPLE__)
-#include "JackProcessSync.h"
+#define CHECK_MLOCK(ptr, size) (VirtualLock((ptr), (size)) != 0)
+#define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
+#define CHECK_MLOCKALL()(false)
+#define CHECK_MUNLOCKALL()(false)
+
 #endif
-
-// WINDOWS
-#ifdef WIN32
-#include "JackWinProcessSync.h"
-#endif
-
-// LINUX
-#ifdef __linux__
-#include "JackProcessSync.h"
-#endif
-
-namespace Jack
-{
-
-#ifdef WIN32
-typedef JackWinProcessSync JackProcessSync;
-#endif
-
-} // end of namespace
-
-#endif /* __JackPlatformProcessSync__ */

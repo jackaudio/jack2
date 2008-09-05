@@ -23,7 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdexcept>
 #include <iostream>
 #include <string>
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "JackError.h"
 
 namespace Jack

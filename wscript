@@ -66,7 +66,7 @@ def set_options(opt):
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--monitor', action='store_true', default=False, help='Build with monitoring records')
-    opt.sub_options('linux/dbus')
+    opt.sub_options('dbus')
 
 def configure(conf):
     platform = conf.detect_platform()
@@ -86,7 +86,7 @@ def configure(conf):
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
     if Params.g_options.dbus:
-        conf.sub_config('linux/dbus')
+        conf.sub_config('dbus')
     conf.sub_config('example-clients')
 
     conf.env['LIB_PTHREAD'] = ['pthread']
@@ -100,10 +100,6 @@ def configure(conf):
 
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
-    if conf.env['IS_LINUX']:
-        conf.define('SOCKET_RPC_FIFO_SEMA', 1)
-    if conf.env['IS_MACOSX']:
-        conf.define('MACH_RPC_MACH_SEMA', 1)
     conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
@@ -166,7 +162,7 @@ def build(bld):
     if bld.env()['IS_LINUX']:
         bld.add_subdirs('linux')
         if bld.env()['BUILD_JACKDBUS'] == True:
-            bld.add_subdirs('linux/dbus')
+            bld.add_subdirs('dbus')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
     if bld.env()['IS_MACOSX']:
@@ -174,7 +170,7 @@ def build(bld):
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
         if bld.env()['BUILD_JACKDBUS'] == True:
-            bld.add_subdirs('linux/dbus')
+            bld.add_subdirs('dbus')
 
     if bld.env()['BUILD_DOXYGEN_DOCS'] == True:
         share_dir = bld.env().get_destdir() + Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'

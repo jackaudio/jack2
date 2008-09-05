@@ -14,9 +14,9 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add directory="..\common" />
-					<Add directory="..\common\jack" />
 					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -30,9 +30,9 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-					<Add directory="..\common" />
-					<Add directory="..\common\jack" />
 					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -47,9 +47,9 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DJACK_MONITOR" />
-					<Add directory="..\common" />
-					<Add directory="..\common\jack" />
 					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />

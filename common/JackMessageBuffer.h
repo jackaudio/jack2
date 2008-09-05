@@ -30,10 +30,9 @@
 #ifndef __JackMessageBuffer__
 #define __JackMessageBuffer__
 
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 #include "JackMutex.h"
 #include "JackAtomic.h"
-#include "JackPlatformProcessSync.h"
 
 namespace Jack
 {

@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTime.h"
 #include "JackLibGlobals.h"
 #include "JackGlobals.h"
-#include "JackPlatformClientChannel.h"
+#include "JackPlatformPlug.h"
 #include "JackTools.h"
 
 namespace Jack

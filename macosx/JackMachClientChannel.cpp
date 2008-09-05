@@ -33,6 +33,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+std::map<mach_port_t, JackClient*> gClientTable;
+
 JackMachClientChannel::JackMachClientChannel():fPrivatePort(0),fThread(this)
 {}
 
@@ -89,14 +91,14 @@ int JackMachClientChannel::Open(const char* server_name, const char* name, char*
         return -1;
     }
 
-    JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()] = client;
+    gClientTable[fClientPort.GetPort()] = client;
     return 0;
 }
 
 void JackMachClientChannel::Close()
 {
     jack_log("JackMachClientChannel::Close");
-    JackLibGlobals::fGlobals->fClientTable.erase(fClientPort.GetPort());
+    gClientTable.erase(fClientPort.GetPort());
     fServerPort.DisconnectPort();
     fClientPort.DestroyPort();
 
@@ -314,7 +316,7 @@ void JackMachClientChannel::InternalClientUnload(int refnum, int int_ref, int* s
 bool JackMachClientChannel::Init()
 {
     jack_log("JackMachClientChannel::Init");
-    JackClient* client = JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()];
+    JackClient* client = gClientTable[fClientPort.GetPort()];
     return client->Init();
 }
 
@@ -323,7 +325,7 @@ bool JackMachClientChannel::Execute()
     kern_return_t res;
     if ((res = mach_msg_server(JackRPCClient_server, 1024, fClientPort.GetPort(), 0)) != KERN_SUCCESS) {
         jack_error("JackMachClientChannel::Execute err = %s", mach_error_string(res));
-        JackClient* client = JackLibGlobals::fGlobals->fClientTable[fClientPort.GetPort()];
+        JackClient* client = gClientTable[fClientPort.GetPort()];
         client->ShutDown();
         return false;
     } else {

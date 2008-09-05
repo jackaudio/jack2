@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackExternalClient__
 
 #include "JackClientInterface.h"
-#include "JackPlatformNotifyChannel.h"
+#include "JackPlatformPlug.h"
 
 namespace Jack
 {

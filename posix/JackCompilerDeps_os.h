@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2005 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,43 +17,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#ifndef __JackPlatformThread__
-#define __JackPlatformThread__
+#ifndef __JackCompilerDeps_POSIX__
+#define __JackCompilerDeps_POSIX__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h" 
-#endif 
-
-// OSX
-#if defined(__APPLE__)
-#include "JackMachThread.h"
+#if __GNUC__
+	#define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
+	#define	EXPORT __attribute__((visibility("default")))
+#else 
+	#define MEM_ALIGN(x,y) x
+	#define	EXPORT
+#endif
+	
 #endif
 
-// WINDOWS
-#ifdef WIN32
-#include "JackWinThread.h"
-#endif
-
-// LINUX
-#ifdef __linux__
-#include "JackPosixThread.h"
-#endif
-
-namespace Jack
-{
-
-#ifdef WIN32
-typedef JackWinThread JackThread;
-#endif
-
-#ifdef __linux__
-typedef JackPosixThread JackThread;
-#endif
-
-#if defined(__APPLE__)
-typedef JackMachThread JackThread;
-#endif
-
-} // end of namespace
-
-#endif /* __JackPlatformThread__ */

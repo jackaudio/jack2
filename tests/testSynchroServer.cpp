@@ -47,7 +47,7 @@
 	#include "JackFifo.h"
 #endif
 
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 
 #define ITER 1000
 

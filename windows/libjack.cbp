@@ -26,8 +26,9 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -64,8 +65,9 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -103,8 +105,9 @@
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />
-					<Add directory="..\common" />
+					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />

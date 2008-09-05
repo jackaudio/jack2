@@ -30,7 +30,7 @@
 #include <sys/mman.h>
 #endif /* USE_MLOCK */
 #include "jack/ringbuffer.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
 /* Create a new ringbuffer to hold at least `sz' bytes of data. The
    actual buffer size is rounded up to the next power of two.  */

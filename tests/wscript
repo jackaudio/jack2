@@ -14,7 +14,10 @@ def build(bld):
     for test_program, test_program_sources in test_programs.items():
         prog = bld.create_obj('cpp', 'program')
         prog.features.append('cc')
-        prog.includes = ['../macosx', '../common/jack', '../common']
+	if bld.env()['IS_MACOSX']:
+	    prog.includes = ['../macosx', '../posix', '../common/jack', '../common']
+	if bld.env()['IS_LINUX']:
+	    prog.includes = ['../linux', '../posix', '../common/jack', '../common']
         prog.source = test_program_sources
         if bld.env()['IS_LINUX']:
             prog.uselib = 'RT'

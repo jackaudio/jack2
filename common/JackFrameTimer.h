@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackFrameTimer__
 
 #include "JackAtomicState.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "types.h"
 
 namespace Jack

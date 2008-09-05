@@ -41,8 +41,8 @@ namespace Jack
         char buffer[1024];
         FILE* file = fopen("JackAudioAdapter.log", "w");
 
-        int MAX = (fCount) % TABLE_MAX - 1;
-        for (int i = 1; i < MAX; i++)
+        int max = (fCount) % TABLE_MAX - 1;
+        for (int i = 1; i < max; i++)
         {
             fprintf(file, "%d \t %d \t %d  \t %f \t %f \t %d \t %d \n",
                     fTable[i].delta, fTable[i+1].time1 - fTable[i].time1,

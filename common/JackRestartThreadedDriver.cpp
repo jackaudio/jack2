@@ -22,9 +22,7 @@
 #include "config.h"
 #endif
 
-#ifdef WIN32
-#pragma warning (disable : 4786)
-#endif
+#include "JackSystemDeps.h"
 
 #include "JackRestartThreadedDriver.h"
 #include "JackException.h"

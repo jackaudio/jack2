@@ -25,7 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <assert.h>
 #include <alsa/asoundlib.h>
 #include "JackAudioAdapterInterface.h"
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 #include "JackError.h"
 #include "jack.h"
 #include "jslist.h"
@@ -603,7 +603,7 @@ extern "C"
 {
 #endif
 
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "driver_interface.h"
 
     EXPORT jack_driver_desc_t* jack_get_descriptor();

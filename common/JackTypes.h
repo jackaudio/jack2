@@ -30,14 +30,7 @@ typedef unsigned long UInt32;
 typedef signed long   SInt32;
 #endif
 
-#ifdef WIN32
-#include <windows.h>
-typedef ULONGLONG UInt64;
-typedef unsigned short uint16_t;
-#else
-#include <stdint.h>
-typedef unsigned long long UInt64;
-#endif
+#include "JackTypes_os.h"
 
 typedef uint16_t jack_int_t;  // Internal type for ports and refnum
 

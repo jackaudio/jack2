@@ -22,9 +22,7 @@ This program is free software; you can redistribute it and/or modify
 #include "config.h"
 #endif
 
-#ifdef WIN32
-#pragma warning (disable : 4786)
-#endif
+#include "JackSystemDeps.h"
 
 #include "JackGraphManager.h"
 #include "JackInternalClient.h"
@@ -33,7 +31,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackServerGlobals.h"
 #include "JackServerLaunch.h"
 #include "JackTools.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 #include "JackLockedEngine.h"
 
 #ifdef __cplusplus

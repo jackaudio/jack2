@@ -4,7 +4,7 @@
 #include <limits.h>
 #include <sys/types.h>
 #include "types.h"
-#include "JackExports.h"
+#include "JackCompilerDeps.h"
 
 
 #define TRUE 1

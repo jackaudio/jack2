@@ -29,7 +29,7 @@
 #include "JackPosixSemaphore.h"
 #include "JackFifo.h"
 
-#include "JackPlatformThread.h"
+#include "JackPlatformPlug.h"
 
 #define ITER 500000
 

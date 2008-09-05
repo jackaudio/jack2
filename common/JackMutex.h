@@ -22,105 +22,13 @@
 #ifndef __JackMutex__
 #define __JackMutex__
 
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <pthread.h>
-#endif
+#include "JackMutex_os.h"
 
 #include <assert.h>
 #include "JackError.h"
 
 namespace Jack
 {
-
-/*!
-\brief Mutex abstraction.
-*/
-
-class JackMutex
-{
-
-    private:
-
-#ifdef WIN32
-        HANDLE fMutex;
-#else
-        pthread_mutex_t fMutex;
-#endif
-
-    public:
-
-#ifdef WIN32
-
-        JackMutex()
-        {
-            // In recursive mode by default
-            fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
-        }
-        ~JackMutex()
-        {
-            CloseHandle(fMutex);
-        }
-
-        void Lock()
-        {
-            DWORD dwWaitResult = WaitForSingleObject(fMutex, INFINITE);
-        }
-
-        bool Trylock()
-        {
-           return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
-        }
-
-        void Unlock()
-        {
-            ReleaseMutex(fMutex);
-        }
-
-#else
-
-        JackMutex()
-        {
-            // Use recursive mutex
-            pthread_mutexattr_t mutex_attr;
-            int res;
-            res = pthread_mutexattr_init(&mutex_attr);
-            assert(res == 0);
-            res = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
-            assert(res == 0);
-            res = pthread_mutex_init(&fMutex, &mutex_attr);
-            assert(res == 0);
-            res = pthread_mutexattr_destroy(&mutex_attr);
-            assert(res == 0);
-        }
-        ~JackMutex()
-        {
-            pthread_mutex_destroy(&fMutex);
-        }
-
-        void Lock()
-        {
-            int res = pthread_mutex_lock(&fMutex);
-            if (res != 0)
-                jack_error("JackMutex::Lock res = %d", res);
-        }
-
-        bool Trylock()
-        {
-            return (pthread_mutex_trylock(&fMutex) == 0);
-        }
-
-        void Unlock()
-        {
-            int res = pthread_mutex_unlock(&fMutex);
-            if (res != 0)
-                jack_error("JackMutex::Unlock res = %d", res);
-        }
-
-#endif
-};
-
 /*!
 \brief Base class for "lockable" objects.
 */

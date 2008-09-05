@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackActivationCount__
 #define __JackActivationCount__
 
-#include "JackPlatformSynchro.h"
+#include "JackPlatformPlug.h"
 #include "JackTime.h"
 #include "JackTypes.h"
 

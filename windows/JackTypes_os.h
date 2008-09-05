@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2006 Grame
+  Copyright (C) 2001 Paul Davis
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
@@ -17,29 +17,14 @@ Copyright (C) 2004-2006 Grame
 
 */
 
-#ifndef __JackPlatformChannelTransaction__
-#define __JackPlatformChannelTransaction__
+#ifndef __JackTypes_WIN32__
+#define __JackTypes_WIN32__
 
-#ifdef WIN32
-#include "JackWinNamedPipe.h"
-#else
-#include "JackSocket.h"
-#endif
+#include <windows.h>
 
-namespace Jack
-{
-
-/*!
-\brief Channel input/output communication.
-*/
-
-#ifdef WIN32
-typedef JackWinNamedPipe JackChannelTransaction;
-#else
-typedef JackClientSocket JackChannelTransaction;
-#endif
-
-} // end of namespace
+typedef ULONGLONG UInt64;
+typedef unsigned short uint16_t;
+typedef DWORD jack_tls_key;
 
 #endif
 

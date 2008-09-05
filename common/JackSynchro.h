@@ -94,6 +94,7 @@ class JackSynchro
         }
 
 };
+
 }
 
 } // end of namespace
