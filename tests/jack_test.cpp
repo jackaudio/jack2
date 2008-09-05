@@ -1856,7 +1856,7 @@ int main (int argc, char *argv[])
 	/**
      * Checking alternate thread model
     */
-	Log("Testing jack_frame_time...\n");
+	Log("Testing alternate thread model...\n");
 	jack_deactivate(client1);
 	jack_set_process_callback(client1, NULL, NULL);  // remove callback
 	jack_set_process_thread(client1, jack_thread, client1);
