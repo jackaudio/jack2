@@ -261,12 +261,11 @@ void JackPosixThread::Terminate()
     pthread_exit(0);
 }
 
-void ThreadExit()
+EXPORT void ThreadExit()
 {
     jack_log("ThreadExit");
     pthread_exit(0);
 }
-
 
 } // end of namespace
 

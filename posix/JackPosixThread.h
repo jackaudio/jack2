@@ -71,7 +71,7 @@ class EXPORT JackPosixThread : public detail::JackThreadInterface
         static int KillImp(pthread_t thread);
 };
 
-void ThreadExit();
+EXPORT void ThreadExit();
 
 } // end of namespace
 
