@@ -26,11 +26,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef __MINGW32__
 	#include <stdint.h>
-        #include <sys/types.h>
+    #include <sys/types.h>
 #else
 	#define __inline__ inline
 	#define vsnprintf _vsnprintf
-    	#define snprintf _snprintf
+    #define snprintf _snprintf
 
    	typedef char int8_t;
 	typedef unsigned char uint8_t;
@@ -40,11 +40,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 	typedef unsigned long uint32_t;
 	typedef LONGLONG int64_t;
 	typedef ULONGLONG uint64_t;
-
 #endif
 
 	typedef HANDLE pthread_t;
-        typedef int64_t _jack_time_t;
+    typedef int64_t _jack_time_t;
 
 #endif // WIN32 */
 
@@ -57,6 +56,5 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 typedef uint64_t _jack_time_t;
 
 #endif // __APPLE__ || __linux__ */
-
 
 #endif
