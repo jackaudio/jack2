@@ -46,7 +46,7 @@ rpc_type server_rpc_jack_client_check(mach_port_t private_port, client_name_t na
 
 rpc_type server_rpc_jack_client_open(mach_port_t server_port, client_name_t name, int pid, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    jack_log("rpc_jack_client_new %s", name);
+    jack_log("rpc_jack_client_opne name = %s", name);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[server_port];
     assert(channel);
     channel->ClientOpen((char*)name, pid, private_port, shared_engine, shared_client, shared_graph, result);
@@ -87,7 +87,7 @@ rpc_type server_rpc_jack_client_deactivate(mach_port_t private_port, int refnum,
 
 rpc_type server_rpc_jack_port_register(mach_port_t private_port, int refnum, client_port_name_t name, client_port_type_t type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
 {
-    jack_log("rpc_jack_port_register %ld %s", refnum, name);
+    jack_log("rpc_jack_port_register ref = %ld name = %s", refnum, name);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
     *result = channel->GetEngine()->PortRegister(refnum, name, type, flags, buffer_size, port_index);
@@ -96,7 +96,7 @@ rpc_type server_rpc_jack_port_register(mach_port_t private_port, int refnum, cli
 
 rpc_type server_rpc_jack_port_unregister(mach_port_t private_port, int refnum, int port, int* result)
 {
-    jack_log("rpc_jack_port_unregister %ld %ld ", refnum, port);
+    jack_log("rpc_jack_port_unregister ref = %ld port = %ld ", refnum, port);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
     *result = channel->GetEngine()->PortUnRegister(refnum, port);
