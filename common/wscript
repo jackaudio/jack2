@@ -43,7 +43,7 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
     process.env['shlib_PATTERN'] = '%s.so'
     process.defines  = 'HAVE_CONFIG_H'
     if bld.env()['IS_MACOSX']:
-        env_includes = ['../macosx', '../posix']
+        env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env()['IS_LINUX']:
 	env_includes = ['../linux', '../posix', '../linux/alsa']
     process.includes = ['.'] + env_includes + ['jack', '..']
@@ -224,7 +224,7 @@ def build(bld):
         ]
 
     if bld.env()['IS_MACOSX']:
-         audio_adapter_sources += ['../macosx/JackCoreAudioAdapter.cpp']
+         audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "../macosx/libportaudio.a -framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
          process.env.append_value("LINKFLAGS", "-lsamplerate")

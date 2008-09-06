@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-08-06 Stephane Letz  <letz@grame.fr>
+	
+	* Correct driver hierarchy on macosx and windows targets.
+
 2008-08-05 Stephane Letz  <letz@grame.fr>
 	
 	* Merge Michael Voigt "drops" branch after reorganization step.
@@ -33,8 +37,8 @@ Florian Faber
 
 2008-09-03 Stephane Letz  <letz@grame.fr>
 	
-	* Implement DBUS entry points to handle internal clients, add new commands in jack_control."
-	* Add new "desc" (extended description) in jack_driver_desc_t, to be used by backends and internal clients."
+	* Implement DBUS entry points to handle internal clients, add new commands in jack_control.
+	* Add new "desc" (extended description) in jack_driver_desc_t, to be used by backends and internal clients.
 
 2008-09-01 Stephane Letz  <letz@grame.fr>
 	

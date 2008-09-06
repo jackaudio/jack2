@@ -99,8 +99,8 @@
 			<Add library="portaudio_x86" />
 			<Add library="libjackservermp" />
 		</Linker>
-		<Unit filename="JackPortAudioDevices.cpp" />
-		<Unit filename="JackPortAudioDriver.cpp" />
+		<Unit filename="portaudio\JackPortAudioDevices.cpp" />
+		<Unit filename="portaudio\JackPortAudioDriver.cpp" />
 		<Unit filename="jackportaudio.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
