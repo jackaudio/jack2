@@ -19,6 +19,7 @@
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -37,6 +38,7 @@
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -56,6 +58,7 @@
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -87,11 +90,11 @@
 		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />
 		<Unit filename="..\common\JackLibSampleRateResampler.cpp" />
 		<Unit filename="..\common\JackResampler.cpp" />
-		<Unit filename="portaudio\JackPortAudioAdapter.cpp" />
-		<Unit filename="portaudio\JackPortAudioDevices.cpp" />
 		<Unit filename="jackaudioadapter.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="portaudio\JackPortAudioAdapter.cpp" />
+		<Unit filename="portaudio\JackPortAudioDevices.cpp" />
 		<Extensions>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />

@@ -24,6 +24,7 @@
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
 					<Add directory="..\windows" />
@@ -48,6 +49,7 @@
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -73,6 +75,7 @@
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="portaudio" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -99,11 +102,11 @@
 			<Add library="portaudio_x86" />
 			<Add library="libjackservermp" />
 		</Linker>
-		<Unit filename="portaudio\JackPortAudioDevices.cpp" />
-		<Unit filename="portaudio\JackPortAudioDriver.cpp" />
 		<Unit filename="jackportaudio.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="portaudio\JackPortAudioDevices.cpp" />
+		<Unit filename="portaudio\JackPortAudioDriver.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
