@@ -304,7 +304,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT    =  common macosx linux/alsa windows common/jack/control.h
+INPUT    =  common posix macosx linux linux/alsa windows common/jack/control.h
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
