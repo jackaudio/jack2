@@ -15,7 +15,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld.create_obj('cpp', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
-    driver.defines = 'HAVE_CONFIG_H'
+    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources

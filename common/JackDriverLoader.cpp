@@ -438,9 +438,9 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
 #ifdef WIN32
-        jack_error ("could not open driver .dll '%s': %ld\n", filename, GetLastError());
+        jack_error ("could not open driver .dll '%s': %ld", filename, GetLastError());
 #else
-        jack_error ("could not open driver .so '%s': %s\n", filename, dlerror());
+        jack_error ("could not open driver .so '%s': %s", filename, dlerror());
 #endif
 
         free(filename);
@@ -464,7 +464,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
     }
 
     if ((descriptor = so_get_descriptor ()) == NULL) {
-        jack_error("driver from '%s' returned NULL descriptor\n", filename);
+        jack_error("driver from '%s' returned NULL descriptor", filename);
         UnloadDriverModule(dlhandle);
         free(filename);
         return NULL;
@@ -472,11 +472,11 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
 
 #ifdef WIN32
     if ((err = UnloadDriverModule(dlhandle)) == 0) {
-        jack_error ("error closing driver .so '%s': %ld\n", filename, GetLastError ());
+        jack_error ("error closing driver .so '%s': %ld", filename, GetLastError ());
     }
 #else
     if ((err = UnloadDriverModule(dlhandle)) != 0) {
-        jack_error ("error closing driver .so '%s': %s\n", filename, dlerror ());
+        jack_error ("error closing driver .so '%s': %s", filename, dlerror ());
     }
 #endif
 
@@ -485,7 +485,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
         other_descriptor = (jack_driver_desc_t *) node->data;
 
         if (strcmp(descriptor->name, other_descriptor->name) == 0) {
-            jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first\n",
+            jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first",
                        other_descriptor->file, filename, other_descriptor->name);
             /* FIXME: delete the descriptor */
             free(filename);
@@ -523,9 +523,9 @@ static bool check_symbol(const char* sofile, const char* symbol)
 
     if ((dlhandle = LoadDriverModule(filename)) == NULL) {
 #ifdef WIN32
-        jack_error ("could not open component .dll '%s': %ld\n", filename, GetLastError());
+        jack_error ("could not open component .dll '%s': %ld", filename, GetLastError());
 #else
-        jack_error ("could not open component .so '%s': %s\n", filename, dlerror());
+        jack_error ("could not open component .so '%s': %s", filename, dlerror());
 #endif
      } else {
         res = (GetProc(dlhandle, symbol)) ? true : false;
@@ -562,7 +562,7 @@ jack_drivers_load (JSList * drivers) {
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
-        jack_error("error");
+        jack_error("error invalid handle");
         return NULL;
     }
 
@@ -584,7 +584,7 @@ jack_drivers_load (JSList * drivers) {
     } while (FindNextFile(file, &filedata));
 
     if (!driver_list) {
-        jack_error ("could not find any drivers in %s!\n", driver_dir);
+        jack_error ("could not find any drivers in %s!", driver_dir);
         return NULL;
     }
 
@@ -611,7 +611,7 @@ jack_drivers_load (JSList * drivers) {
     from the .so files in it */
     dir_stream = opendir (driver_dir);
     if (!dir_stream) {
-        jack_error ("could not open driver directory %s: %s\n",
+        jack_error ("could not open driver directory %s: %s",
                     driver_dir, strerror (errno));
         return NULL;
     }
@@ -640,12 +640,12 @@ jack_drivers_load (JSList * drivers) {
 
     err = closedir (dir_stream);
     if (err) {
-        jack_error ("error closing driver directory %s: %s\n",
+        jack_error ("error closing driver directory %s: %s",
                     driver_dir, strerror (errno));
     }
 
     if (!driver_list) {
-        jack_error ("could not find any drivers in %s!\n", driver_dir);
+        jack_error ("could not find any drivers in %s!", driver_dir);
         return NULL;
     }
 
@@ -708,7 +708,7 @@ jack_internals_load (JSList * internals) {
     } while (FindNextFile(file, &filedata));
 
     if (!driver_list) {
-        jack_error ("could not find any internals in %s!\n", driver_dir);
+        jack_error ("could not find any internals in %s!", driver_dir);
         return NULL;
     }
 
@@ -769,7 +769,7 @@ jack_internals_load (JSList * internals) {
     }
 
     if (!driver_list) {
-        jack_error ("could not find any internals in %s!\n", driver_dir);
+        jack_error ("could not find any internals in %s!", driver_dir);
         return NULL;
     }
 
