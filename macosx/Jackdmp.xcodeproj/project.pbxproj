@@ -1208,7 +1208,7 @@
 		4B3F49070AD8503300491C6E /* jack_cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jack_cpu.c; path = ../tests/jack_cpu.c; sourceTree = SOURCE_ROOT; };
 		4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacEngineRPC.cpp; sourceTree = SOURCE_ROOT; };
 		4B44FAE50C7598370033A72C /* JackServerLaunch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackServerLaunch.cpp; path = ../common/JackServerLaunch.cpp; sourceTree = SOURCE_ROOT; };
-		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
+		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackRestartThreadedDriver.h; path = ../common/JackRestartThreadedDriver.h; sourceTree = SOURCE_ROOT; };
 		4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackRestartThreadedDriver.cpp; path = ../common/JackRestartThreadedDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B4E9AF80E5F1090000A3278 /* JackControlAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackControlAPI.cpp; path = ../common/JackControlAPI.cpp; sourceTree = SOURCE_ROOT; };
@@ -1324,7 +1324,7 @@
 		4BD6240C0CBCF16600DE782F /* inprocess.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = inprocess.c; path = "../example-clients/inprocess.c"; sourceTree = SOURCE_ROOT; };
 		4BE4CBFF0CDA153400CCF5BB /* JackTools.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackTools.cpp; path = ../common/JackTools.cpp; sourceTree = SOURCE_ROOT; };
 		4BE4CC000CDA153400CCF5BB /* JackTools.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTools.h; path = ../common/JackTools.h; sourceTree = SOURCE_ROOT; };
-		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
+		4BE50F8F0B01EE8000C05E63 /* Jackwrapper-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Jackwrapper-Info.plist"; sourceTree = "<group>"; };
 		4BE5FECB0E725C090020B576 /* JackCoreAudioDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreAudioDriver.cpp; path = coreaudio/JackCoreAudioDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackCoreAudioDriver.h; path = coreaudio/JackCoreAudioDriver.h; sourceTree = SOURCE_ROOT; };
 		4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreAudioAdapter.cpp; path = coreaudio/JackCoreAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
@@ -6577,6 +6577,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					.,
 					../posix,
 					../common/jack,
 					../common,
@@ -6624,6 +6625,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					.,
 					../posix,
 					../common/jack,
 					../common,
@@ -12700,6 +12702,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					.,
 					../common/jack,
 					../posix,
 					../common,
@@ -12750,6 +12753,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					.,
 					../common/jack,
 					../posix,
 					../common,
