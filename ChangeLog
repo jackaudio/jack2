@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-08-08 Stephane Letz  <letz@grame.fr>
+	
+	* Better symbols export for server and client side libraries. 
+
 2008-08-06 Stephane Letz  <letz@grame.fr>
 	
 	* Correct driver hierarchy on macosx and windows targets.

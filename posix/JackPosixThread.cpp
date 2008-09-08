@@ -261,7 +261,7 @@ void JackPosixThread::Terminate()
     pthread_exit(0);
 }
 
-EXPORT void ThreadExit()
+SERVER_EXPORT void ThreadExit()
 {
     jack_log("ThreadExit");
     pthread_exit(0);
@@ -269,7 +269,7 @@ EXPORT void ThreadExit()
 
 } // end of namespace
 
-EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr)
+bool jack_tls_allocate_key(jack_tls_key *key_ptr)
 {
     int ret;
     
@@ -283,7 +283,7 @@ EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr)
     return true;
 }
 
-EXPORT bool jack_tls_free_key(jack_tls_key key)
+bool jack_tls_free_key(jack_tls_key key)
 {
     int ret;
     
@@ -297,7 +297,7 @@ EXPORT bool jack_tls_free_key(jack_tls_key key)
     return true;
 }
 
-EXPORT bool jack_tls_set(jack_tls_key key, void *data_ptr)
+bool jack_tls_set(jack_tls_key key, void *data_ptr)
 {
     int ret;
     
@@ -311,7 +311,7 @@ EXPORT bool jack_tls_set(jack_tls_key key, void *data_ptr)
     return true;
 }
 
-EXPORT void *jack_tls_get(jack_tls_key key)
+void *jack_tls_get(jack_tls_key key)
 {
     return pthread_getspecific(key);
 }

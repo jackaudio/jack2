@@ -199,7 +199,7 @@ namespace Jack
 
     */
 
-    class EXPORT NetMidiBuffer
+    class SERVER_EXPORT NetMidiBuffer
     {
         private:
             int fNPorts;
@@ -240,7 +240,7 @@ namespace Jack
 
     */
 
-    class EXPORT NetAudioBuffer
+    class SERVER_EXPORT NetAudioBuffer
     {
         private:
             int fNPorts;
@@ -265,21 +265,21 @@ namespace Jack
 //utility *************************************************************************************
 
     //socket API management
-    EXPORT int SocketAPIInit();
-    EXPORT int SocketAPIEnd();
+    SERVER_EXPORT int SocketAPIInit();
+    SERVER_EXPORT int SocketAPIEnd();
     //n<-->h functions
-    EXPORT void SessionParamsHToN ( session_params_t* params );
-    EXPORT void SessionParamsNToH ( session_params_t* params );
-    EXPORT void PacketHeaderHToN ( packet_header_t* header );
-    EXPORT void PacketHeaderNToH ( packet_header_t* header );
+    SERVER_EXPORT void SessionParamsHToN ( session_params_t* params );
+    SERVER_EXPORT void SessionParamsNToH ( session_params_t* params );
+    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* header );
+    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* header );
     //display session parameters
-    EXPORT void SessionParamsDisplay ( session_params_t* params );
+    SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params );
     //display packet header
-    EXPORT void PacketHeaderDisplay ( packet_header_t* header );
+    SERVER_EXPORT void PacketHeaderDisplay ( packet_header_t* header );
     //get the packet type from a sesion parameters
-    EXPORT sync_packet_type_t GetPacketType ( session_params_t* params );
+    SERVER_EXPORT sync_packet_type_t GetPacketType ( session_params_t* params );
     //set the packet type in a session parameters
-    EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
+    SERVER_EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
     //transport utility
-    EXPORT const char* GetTransportState ( int transport_state );
+    SERVER_EXPORT const char* GetTransportState ( int transport_state );
 }

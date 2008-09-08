@@ -947,7 +947,7 @@ extern "C"
 {
 #endif
 
-   EXPORT jack_driver_desc_t* jack_get_descriptor()
+   SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
    {
         jack_driver_desc_t *desc;
         unsigned int i;

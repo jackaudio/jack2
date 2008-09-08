@@ -35,7 +35,7 @@ namespace Jack
 \brief The POSIX thread base class.
 */
 
-class EXPORT JackPosixThread : public detail::JackThreadInterface
+class SERVER_EXPORT JackPosixThread : public detail::JackThreadInterface
 {
 
     protected:
@@ -71,7 +71,7 @@ class EXPORT JackPosixThread : public detail::JackThreadInterface
         static int KillImp(pthread_t thread);
 };
 
-EXPORT void ThreadExit();
+SERVER_EXPORT void ThreadExit();
 
 } // end of namespace
 

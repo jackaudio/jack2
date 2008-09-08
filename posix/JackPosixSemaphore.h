@@ -33,7 +33,7 @@ namespace Jack
 \brief Inter process synchronization using POSIX semaphore.
 */
 
-class EXPORT JackPosixSemaphore : public detail::JackSynchro
+class SERVER_EXPORT JackPosixSemaphore : public detail::JackSynchro
 {
 
     private:

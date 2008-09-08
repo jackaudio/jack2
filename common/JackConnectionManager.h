@@ -372,7 +372,7 @@ struct JackClientTiming
 </UL>
 */
 
-class EXPORT JackConnectionManager
+class SERVER_EXPORT JackConnectionManager
 {
 
     private:

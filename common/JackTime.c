@@ -42,7 +42,7 @@ void InitTime()
 
 #ifdef WIN32
 
-EXPORT LARGE_INTEGER _jack_freq;
+SERVER_EXPORT LARGE_INTEGER _jack_freq;
 
 void InitTime()
 {

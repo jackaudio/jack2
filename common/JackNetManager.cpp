@@ -691,7 +691,7 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_driver_desc_t* jack_get_descriptor()
+    SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t *desc;
         desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
@@ -721,7 +721,7 @@ extern "C"
         return desc;
     }
 
-    EXPORT int jack_internal_initialize ( jack_client_t* jack_client, const JSList* params )
+    SERVER_EXPORT int jack_internal_initialize ( jack_client_t* jack_client, const JSList* params )
     {
         if ( master_manager )
         {
@@ -736,7 +736,7 @@ extern "C"
         }
     }
 
-    EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
+    SERVER_EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
     {
         JSList* params = NULL;
         jack_driver_desc_t* desc = jack_get_descriptor();
@@ -750,7 +750,7 @@ extern "C"
         return res;
     }
 
-    EXPORT void jack_finish ( void* arg )
+    SERVER_EXPORT void jack_finish ( void* arg )
     {
         if (master_manager) {
             jack_log ( "Unloading Master Manager" );

@@ -2448,7 +2448,7 @@ extern "C"
         return 0;
     }
 
-    EXPORT const jack_driver_desc_t* driver_get_descriptor () 
+    SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor () 
     {
         jack_driver_desc_t * desc;
         jack_driver_param_desc_t * params;
@@ -2624,7 +2624,7 @@ extern "C"
         return desc;
     }
 
-    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
     {
         jack_nframes_t srate = 48000;
         jack_nframes_t frames_per_interrupt = 1024;

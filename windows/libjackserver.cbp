@@ -24,6 +24,7 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
+					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -49,6 +50,7 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
+					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
 					<Add directory="." />
 					<Add directory="..\windows" />
@@ -74,6 +76,7 @@
 					<Add option="-DLIBJACKDMP_EXPORTS" />
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
+					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="." />

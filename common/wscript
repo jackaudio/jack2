@@ -114,7 +114,7 @@ def build(bld):
 
     serverlib = bld.create_obj('cpp', 'shlib')
     serverlib.features.append('cc')
-    serverlib.defines = 'HAVE_CONFIG_H'
+    serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
     serverlib.name         = 'serverlib'
     serverlib.target       = 'jackserver'

@@ -140,7 +140,7 @@ extern "C"
 #include "JackCompilerDeps.h"
 #include "driver_interface.h"
 
-EXPORT jack_driver_desc_t* jack_get_descriptor();
+SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor();
 
 #ifdef __cplusplus
 }

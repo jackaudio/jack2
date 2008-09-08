@@ -228,7 +228,7 @@ void JackWinThread::Terminate()
     ExitThread(0);
 }
 
-EXPORT void ThreadExit()
+SERVER_EXPORT void ThreadExit()
 {
     jack_log("ThreadExit");
     ExitThread(0);
@@ -236,7 +236,7 @@ EXPORT void ThreadExit()
 
 } // end of namespace
 
-EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr)
+bool jack_tls_allocate_key(jack_tls_key *key_ptr)
 {
     DWORD key;
     
@@ -251,7 +251,7 @@ EXPORT bool jack_tls_allocate_key(jack_tls_key *key_ptr)
     return true;
 }
 
-EXPORT bool jack_tls_free_key(jack_tls_key key)
+bool jack_tls_free_key(jack_tls_key key)
 {
     if (!TlsFree(key))
     {
@@ -262,7 +262,7 @@ EXPORT bool jack_tls_free_key(jack_tls_key key)
     return true;
 }
 
-EXPORT bool jack_tls_set(jack_tls_key key, void *data_ptr)
+bool jack_tls_set(jack_tls_key key, void *data_ptr)
 {
     if (!TlsSetValue(key, data_ptr))
     {
@@ -273,7 +273,7 @@ EXPORT bool jack_tls_set(jack_tls_key key, void *data_ptr)
     return true;
 }
 
-EXPORT void *jack_tls_get(jack_tls_key key)
+void *jack_tls_get(jack_tls_key key)
 {
     return TlsGetValue(key);
 }

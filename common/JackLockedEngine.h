@@ -30,7 +30,7 @@ namespace Jack
 \brief Locked Engine, access to methods is serialized using a mutex.
 */
 
-class EXPORT JackLockedEngine : public JackLockAble
+class SERVER_EXPORT JackLockedEngine : public JackLockAble
 {
     private:
 

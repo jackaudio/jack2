@@ -36,7 +36,7 @@ namespace Jack
 \brief Inter process synchronization using using Mach semaphore.
 */
 
-class EXPORT JackMachSemaphore : public detail::JackSynchro
+class SERVER_EXPORT JackMachSemaphore : public detail::JackSynchro
 {
 
     private:

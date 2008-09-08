@@ -37,7 +37,7 @@ namespace Jack
     typedef struct in_addr address_t;
 
     //JackNetUnixSocket********************************************
-    class EXPORT JackNetUnixSocket
+    class SERVER_EXPORT JackNetUnixSocket
     {
         private:
             int fSockfd;

@@ -50,7 +50,7 @@ namespace Jack
     \brief Utility functions.
     */
 
-    struct EXPORT JackTools
+    struct SERVER_EXPORT JackTools
     {
         static int GetPID();
         static int GetUID();
@@ -67,7 +67,7 @@ namespace Jack
     \brief Internal cient command line parser.
     */
 
-    class EXPORT JackArgParser
+    class SERVER_EXPORT JackArgParser
     {
         private:
 

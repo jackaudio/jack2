@@ -39,7 +39,7 @@ struct JackEngineControl;
 \brief The base interface for drivers.
 */
     
-class EXPORT JackDriverInterface
+class SERVER_EXPORT JackDriverInterface
 {
 
     public:
@@ -91,14 +91,14 @@ class EXPORT JackDriverInterface
  \brief The base interface for drivers clients.
  */
 
-class EXPORT JackDriverClientInterface : public JackDriverInterface, public JackClientInterface
+class SERVER_EXPORT JackDriverClientInterface : public JackDriverInterface, public JackClientInterface
 {};
 
 /*!
  \brief The base class for drivers.
  */
 
-class EXPORT JackDriver : public JackDriverClientInterface
+class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 {
     
     protected:

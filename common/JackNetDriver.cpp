@@ -554,7 +554,7 @@ namespace Jack
     extern "C"
     {
 #endif
-        EXPORT jack_driver_desc_t* driver_get_descriptor ()
+        SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor ()
         {
             jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
             
@@ -647,7 +647,7 @@ namespace Jack
             return desc;
         }
 
-        EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
+        SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize ( Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params )
         {
             char multicast_ip[16];
             strcpy ( multicast_ip, DEFAULT_MULTICAST_IP );

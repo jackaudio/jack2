@@ -29,7 +29,7 @@ namespace Jack
     \Brief This class describes the basic Net Interface, used by both master and slave
     */
 
-    class EXPORT JackNetInterface
+    class SERVER_EXPORT JackNetInterface
     {
         protected:
             session_params_t fParams;
@@ -96,7 +96,7 @@ namespace Jack
     \Brief This class describes the Net Interface for masters (NetMaster)
     */
 
-    class EXPORT JackNetMasterInterface : public JackNetInterface
+    class SERVER_EXPORT JackNetMasterInterface : public JackNetInterface
     {
         protected:
             bool fRunning;
@@ -127,7 +127,7 @@ namespace Jack
     \Brief This class describes the Net Interface for slaves (NetDriver and NetAdapter)
     */
 
-    class EXPORT JackNetSlaveInterface : public JackNetInterface
+    class SERVER_EXPORT JackNetSlaveInterface : public JackNetInterface
     {
         protected:
             static uint fSlaveCounter;

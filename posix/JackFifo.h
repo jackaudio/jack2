@@ -32,7 +32,7 @@ namespace Jack
 \brief Inter process synchronization using Fifo.
 */
 
-class EXPORT JackFifo : public detail::JackSynchro
+class SERVER_EXPORT JackFifo : public detail::JackSynchro
 {
 
     private:

@@ -32,7 +32,7 @@ namespace Jack
 \brief A structure used for time management.
 */
 
-class EXPORT JackTimer
+class SERVER_EXPORT JackTimer
 {
 
     friend class JackFrameTimer;

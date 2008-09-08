@@ -31,11 +31,11 @@ namespace Jack
 \brief To be used as a wrapper of JackNetDriver.
 */
 
-class EXPORT JackWaitThreadedDriver : public JackThreadedDriver
+class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
 {
     private:
     
-        struct EXPORT JackDriverStarter : public JackRunnableInterface 
+        struct SERVER_EXPORT JackDriverStarter : public JackRunnableInterface 
         {
         
                 JackDriver* fDriver;

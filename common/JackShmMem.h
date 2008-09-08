@@ -34,8 +34,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-EXPORT void LockMemoryImp(void* ptr, size_t size);
-EXPORT void UnlockMemoryImp(void* ptr, size_t size);
+SERVER_EXPORT void LockMemoryImp(void* ptr, size_t size);
+SERVER_EXPORT void UnlockMemoryImp(void* ptr, size_t size);
 
 class JackMem
 {
@@ -120,7 +120,7 @@ class JackShmMemAble
 A class which objects need to be allocated in shared memory derives from this class.
 */
 
-class EXPORT JackShmMem : public JackShmMemAble
+class SERVER_EXPORT JackShmMem : public JackShmMemAble
 {
 
      protected:

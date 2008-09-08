@@ -33,7 +33,7 @@ namespace Jack
 \brief Exception base class.
 */
 
-class EXPORT JackException : public std::runtime_error {
+class SERVER_EXPORT JackException : public std::runtime_error {
 
     public:
 
@@ -61,7 +61,7 @@ class EXPORT JackException : public std::runtime_error {
 \brief Exception possibly thrown by Net Slaves.
 */
 
-class EXPORT JackNetException : public JackException {
+class SERVER_EXPORT JackNetException : public JackException {
 
     public:
 

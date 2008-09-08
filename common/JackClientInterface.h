@@ -32,7 +32,7 @@ struct JackClientControl;
 \brief Client interface.
 */
 
-class EXPORT JackClientInterface
+class SERVER_EXPORT JackClientInterface
 {
 
      public:

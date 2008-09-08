@@ -87,7 +87,7 @@ extern "C"
     jack_driver_desc_t;
 
 
-EXPORT int jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
+SERVER_EXPORT int jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
 
 #ifdef __cplusplus
 }

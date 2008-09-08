@@ -39,7 +39,7 @@ void change_thread_log_function(jack_log_function_t log_function)
     }
 }
 
-EXPORT void set_threaded_log_function()
+SERVER_EXPORT void set_threaded_log_function()
 {   
     change_thread_log_function(Jack::JackMessageBufferAdd);
 }
@@ -94,7 +94,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
     log_function(level, buffer);
 }
 
-EXPORT void jack_error(const char *fmt, ...)
+SERVER_EXPORT void jack_error(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -102,7 +102,7 @@ EXPORT void jack_error(const char *fmt, ...)
 	va_end(ap);
 }
 
-EXPORT void jack_info(const char *fmt, ...)
+SERVER_EXPORT void jack_info(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -110,7 +110,7 @@ EXPORT void jack_info(const char *fmt, ...)
 	va_end(ap);
 }
 
-EXPORT void jack_log(const char *fmt,...)
+SERVER_EXPORT void jack_log(const char *fmt,...)
 {
 	if (jack_verbose) {
 		va_list ap;
@@ -132,5 +132,5 @@ static void default_jack_info_callback (const char *desc)
     fflush(stdout);
 }
 
-EXPORT void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
-EXPORT void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;
+SERVER_EXPORT void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
+SERVER_EXPORT void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;

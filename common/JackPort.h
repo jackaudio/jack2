@@ -35,7 +35,7 @@ namespace Jack
 \brief Base class for port.
 */
 
-class EXPORT JackPort
+class SERVER_EXPORT JackPort
 {
 
         friend class JackGraphManager;

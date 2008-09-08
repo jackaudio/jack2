@@ -36,10 +36,10 @@ namespace Jack
     typedef uint32_t uint;
     typedef int SOCKLEN;
 
-    EXPORT const char* PrintError ( int error );
+    SERVER_EXPORT const char* PrintError ( int error );
 
     //JeckNetWinSocket***************************************************************************
-    class EXPORT JackNetWinSocket
+    class SERVER_EXPORT JackNetWinSocket
     {
         private:
             int fSockfd;

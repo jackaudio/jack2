@@ -809,7 +809,7 @@ extern "C"
 {
 #endif
 
-    EXPORT const jack_driver_desc_t *
+    SERVER_EXPORT const jack_driver_desc_t *
     driver_get_descriptor () {
         jack_driver_desc_t * desc;
         jack_driver_param_desc_t * params;
@@ -916,7 +916,7 @@ extern "C"
         return desc;
     }
 
-    EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
         const JSList * node;
         const jack_driver_param_t * param;
 

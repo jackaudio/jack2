@@ -164,7 +164,7 @@ namespace Jack
 
 // SessionParams ************************************************************************************
 
-    EXPORT void SessionParamsHToN ( session_params_t* params )
+    SERVER_EXPORT void SessionParamsHToN ( session_params_t* params )
     {
         params->fPacketID = htonl ( params->fPacketID );
         params->fMtu = htonl ( params->fMtu );
@@ -181,7 +181,7 @@ namespace Jack
         params->fSlaveSyncMode = htonl ( params->fSlaveSyncMode );
     }
 
-    EXPORT void SessionParamsNToH ( session_params_t* params )
+    SERVER_EXPORT void SessionParamsNToH ( session_params_t* params )
     {
         params->fPacketID = ntohl ( params->fPacketID );
         params->fMtu = ntohl ( params->fMtu );
@@ -198,7 +198,7 @@ namespace Jack
         params->fSlaveSyncMode = ntohl ( params->fSlaveSyncMode );
     }
 
-    EXPORT void SessionParamsDisplay ( session_params_t* params )
+    SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params )
     {
         char bitdepth[16];
         ( params->fBitdepth ) ? sprintf ( bitdepth, "%u", params->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
@@ -235,7 +235,7 @@ namespace Jack
         jack_info ( "****************************************************" );
     }
 
-    EXPORT sync_packet_type_t GetPacketType ( session_params_t* params )
+    SERVER_EXPORT sync_packet_type_t GetPacketType ( session_params_t* params )
     {
         switch ( params->fPacketID )
         {
@@ -253,7 +253,7 @@ namespace Jack
         return INVALID;
     }
 
-    EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type )
+    SERVER_EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type )
     {
         switch ( packet_type )
         {
@@ -279,7 +279,7 @@ namespace Jack
 
 // Packet header **********************************************************************************
 
-    EXPORT void PacketHeaderHToN ( packet_header_t* header )
+    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* header )
     {
         header->fID = htonl ( header->fID );
         header->fMidiDataSize = htonl ( header->fMidiDataSize );
@@ -291,7 +291,7 @@ namespace Jack
         header->fIsLastPckt = htonl ( header->fIsLastPckt );
     }
 
-    EXPORT void PacketHeaderNToH ( packet_header_t* header )
+    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* header )
     {
         header->fID = ntohl ( header->fID );
         header->fMidiDataSize = ntohl ( header->fMidiDataSize );
@@ -303,7 +303,7 @@ namespace Jack
         header->fIsLastPckt = ntohl ( header->fIsLastPckt );
     }
 
-    EXPORT void PacketHeaderDisplay ( packet_header_t* header )
+    SERVER_EXPORT void PacketHeaderDisplay ( packet_header_t* header )
     {
         char bitdepth[16];
         ( header->fBitdepth ) ? sprintf ( bitdepth, "%u", header->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
@@ -322,7 +322,7 @@ namespace Jack
 
 // Utility *******************************************************************************************************
 
-    EXPORT int SocketAPIInit()
+    SERVER_EXPORT int SocketAPIInit()
     {
 #ifdef WIN32
         WORD wVersionRequested = MAKEWORD ( 2, 2 );
@@ -344,7 +344,7 @@ namespace Jack
         return 0;
     }
 
-    EXPORT int SocketAPIEnd()
+    SERVER_EXPORT int SocketAPIEnd()
     {
 #ifdef WIN32
         return WSACleanup();
@@ -352,7 +352,7 @@ namespace Jack
         return 0;
     }
 
-    EXPORT const char* GetTransportState ( int transport_state )
+    SERVER_EXPORT const char* GetTransportState ( int transport_state )
     {
         switch ( transport_state )
         {

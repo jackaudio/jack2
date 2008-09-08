@@ -30,7 +30,7 @@ namespace Jack
 \brief The base class for audio drivers: drivers with audio ports.
 */
 
-class EXPORT JackAudioDriver : public JackDriver
+class SERVER_EXPORT JackAudioDriver : public JackDriver
 {
 
     private:

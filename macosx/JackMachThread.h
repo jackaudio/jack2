@@ -78,7 +78,7 @@ namespace Jack
 \brief Darwin threads. Real-time threads are actually "time constraint" threads.
 */
 
-class EXPORT JackMachThread : public JackPosixThread
+class SERVER_EXPORT JackMachThread : public JackPosixThread
 {
 
     private:

@@ -26,9 +26,9 @@ extern "C"
 {
 #endif
 
-    extern EXPORT LARGE_INTEGER _jack_freq;
+    extern SERVER_EXPORT LARGE_INTEGER _jack_freq;
 
-    EXPORT jack_time_t GetMicroSeconds(void) ;
+    SERVER_EXPORT jack_time_t GetMicroSeconds(void) ;
 
     void InitTime();
 

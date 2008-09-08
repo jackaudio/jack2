@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
     //utility *********************************************************************************************************
-    EXPORT int GetHostName ( char * name, int size )
+    SERVER_EXPORT int GetHostName ( char * name, int size )
     {
         if ( gethostname ( name, size ) == SOCKET_ERROR )
         {
@@ -92,7 +92,7 @@ namespace Jack
         { -1, NULL },
     };
 
-    EXPORT const char* PrintError ( int error )
+    SERVER_EXPORT const char* PrintError ( int error )
     {
         int i;
         for ( i = 0; NetErrorList[i].code >= 0; ++i )

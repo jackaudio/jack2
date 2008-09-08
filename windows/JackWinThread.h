@@ -36,7 +36,7 @@ typedef DWORD (WINAPI *ThreadCallback)(void *arg);
 \brief Windows threads.
 */
 
-class EXPORT JackWinThread : public detail::JackThreadInterface
+class SERVER_EXPORT JackWinThread : public detail::JackThreadInterface
 {
 
     private:
@@ -71,7 +71,7 @@ class EXPORT JackWinThread : public detail::JackThreadInterface
 
 };
 
-EXPORT void ThreadExit();
+SERVER_EXPORT void ThreadExit();
 
 } // end of namespace
 

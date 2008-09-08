@@ -40,7 +40,7 @@ class JackGraphManager;
 \brief Engine control in shared memory.
 */
 
-struct EXPORT JackEngineControl : public JackShmMem
+struct SERVER_EXPORT JackEngineControl : public JackShmMem
 {
     // Shared state
     jack_nframes_t fBufferSize;
