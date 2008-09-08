@@ -22,8 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #if __GNUC__
 	#define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
-	#define	EXPORT __attribute__ ((visibility("default")))
-#else 
+	#define	EXPORT __declspec(dllexport)
+#else
 	//#define MEM_ALIGN(x,y) __declspec(align(y)) x
 	#define MEM_ALIGN(x,y) x
 	#define	EXPORT __declspec(dllexport)

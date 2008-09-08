@@ -99,8 +99,8 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="portaudio_x86" />
 			<Add library="libjackservermp" />
+			<Add library="portaudio_x86" />
 		</Linker>
 		<Unit filename="jackportaudio.rc">
 			<Option compilerVar="WINDRES" />
