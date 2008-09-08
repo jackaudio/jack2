@@ -89,7 +89,7 @@ namespace Jack {
 #else
     char* JackTools::UserDir() 
     {
-        static char user_dir[PATH_MAX + 1] = "";
+        static char user_dir[JACK_PATH_MAX + 1] = "";
 
         /* format the path name on the first call */
         if (user_dir[0] == '\0') {
@@ -107,9 +107,9 @@ namespace Jack {
     char* JackTools::ServerDir(const char* server_name, char* server_dir) 
     {
         /* format the path name into the suppled server_dir char array,
-        * assuming that server_dir is at least as large as PATH_MAX+1 */
+        * assuming that server_dir is at least as large as JACK_PATH_MAX + 1 */
 
-        snprintf(server_dir, PATH_MAX + 1, "%s/%s", UserDir(), server_name);
+        snprintf(server_dir, JACK_PATH_MAX + 1, "%s/%s", UserDir(), server_name);
         return server_dir;
     }
 
@@ -117,7 +117,7 @@ namespace Jack {
     {
         DIR* dir;
         struct dirent *dirent;
-        char dir_name[PATH_MAX + 1] = "";
+        char dir_name[JACK_PATH_MAX + 1] = "";
         ServerDir(server_name, dir_name);
 
         /* On termination, we remove all files that jackd creates so
@@ -144,7 +144,7 @@ namespace Jack {
         /* unlink all the files in this directory, they are mine */
         while ((dirent = readdir(dir)) != NULL) {
 
-            char fullpath[PATH_MAX + 1];
+            char fullpath[JACK_PATH_MAX + 1];
 
             if ((strcmp(dirent->d_name, ".") == 0) || (strcmp (dirent->d_name, "..") == 0)) {
                 continue;
@@ -175,7 +175,7 @@ namespace Jack {
     int JackTools::GetTmpdir() {
         FILE* in;
         size_t len;
-        char buf[PATH_MAX + 2]; /* allow tmpdir to live anywhere, plus newline, plus null */
+        char buf[JACK_PATH_MAX + 2]; /* allow tmpdir to live anywhere, plus newline, plus null */
 
         if ((in = popen("jackd -l", "r")) == NULL) {
             return -1;

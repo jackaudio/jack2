@@ -173,7 +173,7 @@ JackClientControl* JackInternalClient::GetClientControl() const
 
 void JackLoadableInternalClient::Init(const char* so_name)
 {
-    char path_to_so[PATH_MAX + 1];
+    char path_to_so[JACK_PATH_MAX + 1];
     BuildClientPath(path_to_so, sizeof(path_to_so), so_name);
  
     fHandle = LoadJackModule(path_to_so);

@@ -493,7 +493,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
         }
     }
 
-    strncpy(descriptor->file, filename, PATH_MAX);
+    strncpy(descriptor->file, filename, JACK_PATH_MAX);
     free(filename);
     return descriptor;
 }
