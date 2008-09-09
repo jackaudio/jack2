@@ -85,7 +85,7 @@
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
 			<Add library="libsamplerate-0" />
-			<Add library="libjackservermp" />
+			<Add library="libjackserver" />
 			<Add library="portaudio_x86" />
 		</Linker>
 		<Unit filename="..\common\JackAudioAdapter.cpp" />

@@ -77,7 +77,7 @@
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
 			<Add library="ws2_32" />
-			<Add library="libjackservermp" />
+			<Add library="libjackserver" />
 		</Linker>
 		<Unit filename="..\common\JackNetManager.cpp" />
 		<Unit filename="jacknetmanager.rc">
