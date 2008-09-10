@@ -925,6 +925,7 @@ int JackCoreAudioAdapter::Close()
     AudioOutputUnitStop(fAUHAL);
     DisposeBuffers();
     CloseAUHAL();
+    RemoveListeners();
     return 0;
 }
 

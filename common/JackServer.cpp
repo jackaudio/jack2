@@ -160,7 +160,7 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
 	int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;
         *int_ref = 0;
-	return -1;
+        return -1;
     }
 
     return InternalClientLoadAux(client, client_name, options, int_ref, status);
@@ -172,10 +172,10 @@ int JackServer::InternalClientLoad(const char* client_name, const char* so_name,
     assert(client);
  
     if (client->Init(so_name) < 0) {
-	int my_status1 = *status | JackFailure;
+        int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;
         *int_ref = 0;
-	return -1;
+        return -1;
     }
 
     return InternalClientLoadAux(client, client_name, options, int_ref, status);

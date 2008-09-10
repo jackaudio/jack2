@@ -201,7 +201,7 @@ int JackLoadableInternalClient::Init(const char* so_name)
 int JackLoadableInternalClient1::Init(const char* so_name)
 {
     if (JackLoadableInternalClient::Init(so_name) < 0) {
-	return -1;
+        return -1;
     }
     
     fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
@@ -217,7 +217,7 @@ int JackLoadableInternalClient1::Init(const char* so_name)
 int JackLoadableInternalClient2::Init(const char* so_name)
 {
     if (JackLoadableInternalClient::Init(so_name) < 0) {
-	return -1;
+        return -1;
     }
     
     fInitialize = (InternalInitializeCallback)GetJackProc(fHandle, "jack_internal_initialize");
