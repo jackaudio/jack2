@@ -48,6 +48,8 @@ namespace Jack
         fParams.fTransportSync = transport_sync;
         fParams.fNetworkMode = network_mode;
         fLastTimebaseMaster = -1;
+        fMidiCapturePortList = NULL;
+        fMidiPlaybackPortList = NULL;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
 #endif
@@ -120,20 +122,6 @@ namespace Jack
         //set global paramaters
         SetParams();
 
-        //driver parametering
-        JackAudioDriver::SetBufferSize ( fParams.fPeriodSize );
-        JackAudioDriver::SetSampleRate ( fParams.fSampleRate );
-
-        JackDriver::NotifyBufferSize ( fParams.fPeriodSize );
-        JackDriver::NotifySampleRate ( fParams.fSampleRate );
-
-        //transport engine parametering
-        fEngineControl->fTransport.SetNetworkSync ( true );
-
-        //allocate midi ports lists
-        fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
-        fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-
         //register jack ports
         if ( AllocPorts() != 0 )
         {
@@ -181,6 +169,21 @@ namespace Jack
         };
         fNetTimeMon->SetPlotFile ( net_time_mon_options, 2, net_time_mon_fields, 5 );
 #endif
+        //driver parametering
+        JackAudioDriver::SetBufferSize ( fParams.fPeriodSize );
+        JackAudioDriver::SetSampleRate ( fParams.fSampleRate );
+
+        JackDriver::NotifyBufferSize ( fParams.fPeriodSize );
+        JackDriver::NotifySampleRate ( fParams.fSampleRate );
+
+        //transport engine parametering
+        fEngineControl->fTransport.SetNetworkSync ( true );
+
+        //allocate midi ports lists
+        fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
+        fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
+        assert(fMidiCapturePortList);
+        assert(fMidiPlaybackPortList);
 
         return true;
     }

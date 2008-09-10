@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetInterface.h"
 #include "JackException.h"
 #include "JackPlatformPlug.h"
+#include <assert.h>
 
 using namespace std;
 
@@ -169,6 +170,8 @@ namespace Jack
         //network buffers
         fTxBuffer = new char[fParams.fMtu];
         fRxBuffer = new char[fParams.fMtu];
+        assert(fTxBuffer);
+        assert(fRxBuffer);
 
         //net audio/midi buffers'addresses
         fTxData = fTxBuffer + sizeof ( packet_header_t );
@@ -269,10 +272,14 @@ namespace Jack
         //midi net buffers
         fNetMidiCaptureBuffer = new NetMidiBuffer ( &fParams, fParams.fSendMidiChannels, fTxData );
         fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fRxData );
+        assert(fNetMidiCaptureBuffer);
+        assert(fNetMidiPlaybackBuffer);
 
         //audio net buffers
         fNetAudioCaptureBuffer = new NetAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
         fNetAudioPlaybackBuffer = new NetAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+        assert(fNetAudioCaptureBuffer);
+        assert(fNetAudioPlaybackBuffer);
 
         //audio netbuffer length
         fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
