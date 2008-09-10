@@ -92,8 +92,6 @@ class JackLoadableInternalClient : public JackInternalClient
         HANDLE fHandle;
         FinishCallback fFinish;
         JackDriverDescFunction fDescriptor;
-         
-        virtual void Init(const char* so_name);
 
     public:
 
@@ -101,6 +99,8 @@ class JackLoadableInternalClient : public JackInternalClient
             :JackInternalClient(server, table), fHandle(NULL), fFinish(NULL), fDescriptor(NULL)
         {}
         virtual ~JackLoadableInternalClient();
+
+        virtual int Init(const char* so_name);
 
 };
 
@@ -111,15 +111,14 @@ class JackLoadableInternalClient1 : public JackLoadableInternalClient
 
         InitializeCallback fInitialize;
         char fObjectData[JACK_LOAD_INIT_LIMIT];
-         
-        void Init(const char* so_name);
-
+    
     public:
 
         JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data);
         virtual ~JackLoadableInternalClient1()
         {}
 
+        int Init(const char* so_name);
         int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
 };
@@ -131,15 +130,14 @@ class JackLoadableInternalClient2 : public JackLoadableInternalClient
 
         InternalInitializeCallback fInitialize;
         const JSList* fParameters;
-        
-        void Init(const char* so_name);
-
+  
     public:
 
         JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters);
         virtual ~JackLoadableInternalClient2()
         {}
 
+        int Init(const char* so_name);
         int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
 };

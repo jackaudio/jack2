@@ -39,6 +39,8 @@ namespace Jack
         fCaptureChannels = 2;
         fPlaybackChannels = 2;
 
+        fAudioInterface.fPeriod = 2;
+
         for ( node = params; node; node = jack_slist_next ( node ) )
         {
             param = ( const jack_driver_param_t* ) node->data;

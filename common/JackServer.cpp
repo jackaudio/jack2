@@ -153,30 +153,32 @@ int JackServer::Close()
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
 {
-    try {
-        JackLoadableInternalClient* client = new JackLoadableInternalClient1(fInstance, GetSynchroTable(), so_name, objet_data);
-        assert(client);
-        return InternalClientLoadAux(client, client_name, options, int_ref, status);
-    } catch (...) {
-        int my_status1 = *status | JackFailure;
+    JackLoadableInternalClient* client = new JackLoadableInternalClient1(fInstance, GetSynchroTable(), so_name, objet_data);
+    assert(client);
+
+    if (client->Init(so_name) < 0) {
+	int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;
         *int_ref = 0;
-        return -1;
+	return -1;
     }
-}
+
+    return InternalClientLoadAux(client, client_name, options, int_ref, status);
+ }
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status)
 {
-    try {
-        JackLoadableInternalClient* client = new JackLoadableInternalClient2(fInstance, GetSynchroTable(), so_name, parameters);
-        assert(client);
-        return InternalClientLoadAux(client, client_name, options, int_ref, status);
-    } catch (...) {
-        int my_status1 = *status | JackFailure;
+    JackLoadableInternalClient* client = new JackLoadableInternalClient2(fInstance, GetSynchroTable(), so_name, parameters);
+    assert(client);
+ 
+    if (client->Init(so_name) < 0) {
+	int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;
         *int_ref = 0;
-        return -1;
+	return -1;
     }
+
+    return InternalClientLoadAux(client, client_name, options, int_ref, status);
 }
 
 int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* client_name, int options, int* int_ref, int* status)
