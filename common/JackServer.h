@@ -62,7 +62,7 @@ class SERVER_EXPORT JackServer
         bool fFreewheel;
         long fLoopback;
         
-        int InternalClientLoadAux(JackLoadableInternalClient* client, const char* client_name, int options, int* int_ref, int* status);
+        int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status);
 
     public:
 
