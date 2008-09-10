@@ -22,10 +22,10 @@
 #ifndef __JackMutex__
 #define __JackMutex__
 
-#include "JackMutex_os.h"
-
 #include <assert.h>
 #include "JackError.h"
+#include "JackPlatformPlug.h"
+
 
 namespace Jack
 {

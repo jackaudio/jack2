@@ -19,56 +19,69 @@
  grame@grame.fr
 */
 
-#ifndef __JackMutex_WIN32__
-#define __JackMutex_WIN32__
+#ifndef __JackPosixMutex__
+#define __JackPosixMutex__
 
-#include <windows.h>
+#include <pthread.h>
 
 #include <assert.h>
 #include "JackError.h"
 
 namespace Jack
 {
-
 /*!
 \brief Mutex abstraction.
 */
 
-class JackMutex
+class JackPosixMutex
 {
 
     private:
 
-        HANDLE fMutex;
+        pthread_mutex_t fMutex;
 
     public:
 
-        JackMutex()
+        JackPosixMutex()
         {
-            // In recursive mode by default
-            fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
+            // Use recursive mutex
+            pthread_mutexattr_t mutex_attr;
+            int res;
+            res = pthread_mutexattr_init(&mutex_attr);
+            assert(res == 0);
+            res = pthread_mutexattr_settype(&mutex_attr, PTHREAD_MUTEX_RECURSIVE);
+            assert(res == 0);
+            res = pthread_mutex_init(&fMutex, &mutex_attr);
+            assert(res == 0);
+            res = pthread_mutexattr_destroy(&mutex_attr);
+            assert(res == 0);
         }
-        ~JackMutex()
+        ~JackPosixMutex()
         {
-            CloseHandle(fMutex);
+            pthread_mutex_destroy(&fMutex);
         }
 
         void Lock()
         {
-            DWORD dwWaitResult = WaitForSingleObject(fMutex, INFINITE);
+            int res = pthread_mutex_lock(&fMutex);
+            if (res != 0)
+                jack_error("JackPosixMutex::Lock res = %d", res);
         }
 
         bool Trylock()
         {
-           return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
+            return (pthread_mutex_trylock(&fMutex) == 0);
         }
 
         void Unlock()
         {
-            ReleaseMutex(fMutex);
+            int res = pthread_mutex_unlock(&fMutex);
+            if (res != 0)
+                jack_error("JackPosixMutex::Unlock res = %d", res);
         }
 
 };
+
 
 } // namespace
 

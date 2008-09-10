@@ -22,9 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 namespace Jack
 {
-    struct JackRequest;
+        struct JackRequest;
 	struct JackResult;
-    
+ 
+        class JackPosixMutex;
 	class JackPosixThread;
 	class JackFifo;
 
@@ -35,6 +36,10 @@ namespace Jack
 	class JackClientSocket;
 	class JackNetUnixSocket;
 }
+
+/* __JackPlatformMutex__ */
+#include "JackPosixMutex.h"
+namespace Jack {typedef JackPosixMutex JackMutex; }
 
 /* __JackPlatformThread__ */
 #include "JackPosixThread.h"

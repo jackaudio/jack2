@@ -24,7 +24,8 @@ namespace Jack
 {
     struct JackRequest;
 	struct JackResult;
-    
+
+	class JackWinMutex;
 	class JackWinThread;
 	class JackWinSemaphore;
 	class JackWinProcessSync;
@@ -35,6 +36,10 @@ namespace Jack
 	class JackWinNamedPipe;
 	class JackNetWinSocket;
 }
+
+/* __JackPlatformMutex__ */
+#include "JackWinMutex.h"
+namespace Jack {typedef JackWinMutex JackMutex; }
 
 /* __JackPlatformThread__ */
 #include "JackWinThread.h"

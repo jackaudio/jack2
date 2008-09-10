@@ -21,7 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackPlatformPlug_APPLE__
 
 namespace Jack
-{
+{       
+	class JackPosixMutex;
 	class JackMachThread;
 	class JackMachSemaphore;
 
@@ -31,6 +32,10 @@ namespace Jack
 	class JackMachNotifyChannel;
 	class JackNetUnixSocket;
 }
+
+/* __JackPlatformMutex__ */
+#include "JackPosixMutex.h"
+namespace Jack {typedef JackPosixMutex JackMutex; }
 
 /* __JackPlatformThread__ */
 #include "JackMachThread.h"
