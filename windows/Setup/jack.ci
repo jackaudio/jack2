@@ -26,7 +26,7 @@
    <dao> </>
    <background> 0</>
    <dlgwelcome> 1</>
-   <dlgreadme> .\src\readme_installer.txt</>
+   <dlgreadme> .\src\README.txt</>
    <dlglic> .\src\gpl_installer.rtf</>
    <dlgcustpath> </>
    <dlgenfpath> 0</>
@@ -94,6 +94,7 @@
 <_><src>.\qjackctl\QtGui4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtXml4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\COPYING</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\README.txt</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 
    </files>
    <runx listview >

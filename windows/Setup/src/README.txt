@@ -1,13 +1,58 @@
-To launch Jack with default drivers, start 'Jack Portaudio' or 'Jack NetDriver'.
-Once Jack Server Started, you can launch QJackctl with the 'Jack Control' shortcut.
+JACK on Windows
+=============================================
 
-'Jack Command' starts a terminal from your installation folder. You can get a list of available Portaudio drivers with :
+This installer will install everything to use Jack Audio Connection Kit (JACK) (www.jackaudio.org) on Windows.
 
-'jackd -d portaudio -l'
 
-And then just launch :
+QJACKCTL on Windows
+=============================================
 
-'jackd -R -S -d portaudio -d "your driver's name"
+This is a latest version of Rui Nuno Capela QJACKCTL application (http://qjackctl.sourceforge.net/) compiled on Windows. 
+It is compiled from the latest CVS version which is using QT4 framework. To uses it:
 
-More options with 'jackd'.
-To use the Jack Router, just select the 'JackRouter' asio driver in your audio software.
+- start qjackctl.exe and configure it the following way:
+
+	- in Setup/Setting, use "jackd -S" at the "Server Path" item. WARNING: on Windows the "-S" parameter is *mandatory* to have the jack server correctly working!!
+
+	- in Setup/Setting, use "portaudio" at the "Driver" item
+
+	- in Setup/Misc, check the "Start JACK audio server at application startup" box
+
+- quit qjackctl.exe and start is again, it should now launch the jack server. Quitting the qjackctl.exe will now close the jack server.
+
+Starting the jack server with another audio device installed on the machine (like an ASIO card) can now be done directly in qjackctl. 
+A ">" button at the right of the interface button allows to list the name of all available devices, driven either by "MME", "Direct Sound", or "ASIO".
+Alternatively using the following command allows to display the names of available devices:
+
+- jackd -d portaudio -l to display the entire list of available audio devices. (jackd -d portaudio -h will display all portaudio driver features)
+
+Then start jackd with the device you want, by using its name, for example:
+
+- jackd -R -S -d portaudio -d "ASIO::MOTU Audio ASIO", then start qjackctl. qjackctl will see the jackd server already running and then can be 
+used normally.
+
+
+JackRouter JACK /ASIO driver
+=============================================
+
+JackRouter is an ASIO driver that allows any ASIO compatible application to become a JACK client, thus exchange audio with any other "native" or "Jackified" application. 
+This driver is registered in the system by the installer and becomes available in the list of ASIO drivers when the JACK server is running. A "JackRouter.ini" configuration
+file allows the application to confgiure how the JackRouter driver behaves.
+
+	- [IO]: the application can obtain any number if JACK input/output ports (not necessarilly equal to the audio card input/output number). [Note that some applications
+impose their input/output channel number].
+
+	- [AUTO_CONNECT] : when 1, the application JACK port will automatically be connected to the machine input/output JACK ports.
+
+
+Known problems:
+=============================================
+
+- starting/stopping the server several times in qjackctl does not work correctly. You'll have to quit qjacckctl and launch it again.
+
+
+=============================================
+Grame : Computer Music Research Laboratory
+Web : http://www.grame.fr/Research
+E-mail : letz@grame.fr
+=============================================
