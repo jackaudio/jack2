@@ -48,7 +48,7 @@ class PortAudioDevices
         std::string GetHostFromDevice(PaDeviceIndex id);
         std::string GetFullName(PaDeviceIndex id);
         std::string GetFullName(std::string hostname, std::string devicename);
-        PaDeviceInfo* GetDeviceFromFullName(std::string fullname, PaDeviceIndex& id);
+        PaDeviceInfo* GetDeviceFromFullName(std::string fullname, PaDeviceIndex& id, bool isInput );
         void PrintSupportedStandardSampleRates(const PaStreamParameters* inputParameters, const PaStreamParameters* outputParameters);
         int GetInputDeviceFromName(const char* name, PaDeviceIndex& device, int& in_max);
         int GetOutputDeviceFromName(const char* name, PaDeviceIndex& device, int& out_max);

@@ -89,7 +89,6 @@
 <_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>.\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtGui4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>

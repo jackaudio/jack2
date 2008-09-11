@@ -105,6 +105,8 @@ namespace Jack
                 goto error;
         }
 
+        jack_log("JackPortAudioDriver::Open fInputDevice = %d, fOutputDevice %d", fInputDevice, fOutputDevice);
+
         //default channels number required
         if (inchannels == 0)
         {
@@ -156,7 +158,7 @@ namespace Jack
                             this);
         if (err != paNoError)
         {
-            jack_error("Pa_OpenStream error = %s\n", Pa_GetErrorText(err));
+            jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             goto error;
         }
 
@@ -214,7 +216,7 @@ error:
 
         if ((err = Pa_CloseStream(fStream)) != paNoError)
         {
-            jack_error("Pa_CloseStream error = %s\n", Pa_GetErrorText(err));
+            jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
             return -1;
         }
 
@@ -246,7 +248,7 @@ error:
 
         if (err != paNoError)
         {
-            jack_error("Pa_OpenStream error = %s\n", Pa_GetErrorText(err));
+            jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             return -1;
         }
         else
@@ -273,7 +275,7 @@ extern "C"
 
         strcpy(desc->name, "portaudio");                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "PortAudio API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-          
+
         desc->nparams = 13;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
