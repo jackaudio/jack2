@@ -35,11 +35,11 @@ namespace Jack
             : JackAudioDriver ( name, alias, engine, table ), JackNetSlaveInterface ( ip, port )
     {
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
-        
+
         // Use the hostname if no name parameter was given
         if (strcmp(net_name, "") == 0)
            GetHostName(net_name, JACK_CLIENT_NAME_SIZE);
-         
+
         fParams.fMtu = mtu;
         fParams.fSendMidiChannels = midi_input_ports;
         fParams.fReturnMidiChannels = midi_output_ports;
@@ -70,12 +70,24 @@ namespace Jack
                               const char* capture_driver_name, const char* playback_driver_name,
                               jack_nframes_t capture_latency, jack_nframes_t playback_latency )
     {
-        int res = JackAudioDriver::Open ( buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor,
-                                          capture_driver_name, playback_driver_name, capture_latency, playback_latency );
-        fEngineControl->fPeriod = 0;
-        fEngineControl->fComputation = 500 * 1000;
-        fEngineControl->fConstraint = 500 * 1000;
-        return res;
+        if (JackAudioDriver::Open(buffer_size,
+                                samplerate,
+                                capturing,
+                                playing,
+                                inchannels,
+                                outchannels,
+                                monitor,
+                                capture_driver_name,
+                                playback_driver_name,
+                                capture_latency,
+                                playback_latency ) == 0) {
+            fEngineControl->fPeriod = 0;
+            fEngineControl->fComputation = 500 * 1000;
+            fEngineControl->fConstraint = 500 * 1000;
+            return 0;
+        } else {
+            return -1;
+        }
     }
 
 #ifdef JACK_MONITOR
@@ -144,11 +156,11 @@ namespace Jack
             case 's' :
                 plot_name += string ( "_slow" );
                 break;
-                
+
             case 'n' :
                 plot_name += string ( "_normal" );
                 break;
-                
+
             case 'f' :
                 plot_name += string ( "_fast" );
                 break;
@@ -381,13 +393,13 @@ namespace Jack
                     fEngineControl->fTransport.SetCommand ( TransportCommandStop );
                     jack_info ( "Master stops transport." );
                     break;
-                    
+
                 case JackTransportStarting :
                     fEngineControl->fTransport.RequestNewPos ( &fSendTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
                     jack_info ( "Master starts transport." );
                     break;
-                    
+
                 case JackTransportRolling :
                     fEngineControl->fTransport.SetState ( JackTransportRolling );
                     jack_info ( "Master is rolling." );
@@ -560,10 +572,10 @@ namespace Jack
         SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor ()
         {
             jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
-            
+
             strcpy(desc->name, "net");                                // size MUST be less then JACK_DRIVER_NAME_MAX + 1
             strcpy(desc->desc, "netjack slave backend component");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-            
+
             desc->nparams = 10;
             desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
@@ -668,9 +680,9 @@ namespace Jack
             char network_mode = 'n';
             const JSList* node;
             const jack_driver_param_t* param;
-            
+
             net_name[0] = 0;
-            
+
             for ( node = params; node; node = jack_slist_next ( node ) )
             {
                 param = ( const jack_driver_param_t* ) node->data;
@@ -717,8 +729,8 @@ namespace Jack
             }
 
             try {
-            
-                Jack::JackDriverClientInterface* driver = 
+
+                Jack::JackDriverClientInterface* driver =
                     new Jack::JackWaitThreadedDriver(
                         new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
                                           midi_input_ports, midi_output_ports, net_name, transport_sync, network_mode));
@@ -729,10 +741,10 @@ namespace Jack
                     delete driver;
                     return NULL;
                 }
-                
+
             } catch (...) {
                 return NULL;
-            }   
+            }
         }
 
 #ifdef __cplusplus

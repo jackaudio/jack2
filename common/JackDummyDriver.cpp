@@ -46,21 +46,24 @@ int JackDummyDriver::Open(jack_nframes_t buffer_size,
                           jack_nframes_t capture_latency,
                           jack_nframes_t playback_latency)
 {
-    int res = JackAudioDriver::Open(buffer_size,
-                                    samplerate,
-                                    capturing,
-                                    playing,
-                                    inchannels,
-                                    outchannels,
-                                    monitor,
-                                    capture_driver_name,
-                                    playback_driver_name,
-                                    capture_latency,
-                                    playback_latency);
-    fEngineControl->fPeriod = 0;
-    fEngineControl->fComputation = 500 * 1000;
-    fEngineControl->fConstraint = 500 * 1000;
-    return res;
+    if (JackAudioDriver::Open(buffer_size,
+                            samplerate,
+                            capturing,
+                            playing,
+                            inchannels,
+                            outchannels,
+                            monitor,
+                            capture_driver_name,
+                            playback_driver_name,
+                            capture_latency,
+                            playback_latency) == 0) {
+        fEngineControl->fPeriod = 0;
+        fEngineControl->fComputation = 500 * 1000;
+        fEngineControl->fConstraint = 500 * 1000;
+        return 0;
+    } else {
+        return -1;
+    }
 }
 
 int JackDummyDriver::Process()
@@ -92,7 +95,7 @@ extern "C"
         desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
         strcpy(desc->name, "dummy");                  // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Timer based backend");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-        
+
         desc->nparams = 6;
         desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
 
