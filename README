@@ -2,7 +2,7 @@
 jackdmp for Linux, MacOSX and Windows
 --------------------------------------
 
-jackdmp is a C++ version of the Jack low-latency audio server for multi-processor machines. It is a new implementation of the jack server core features that aims in removing some limitations of the current design. The activation system has been changed for a data flow model and lock-free programming techniques for graph access have been used to have a more dynamic and robust system.
+jackdmp is a C++ version of the JACK low-latency audio server for multi-processor machines. It is a new implementation of the JACK server core features that aims in removing some limitations of the current design. The activation system has been changed for a data flow model and lock-free programming techniques for graph access have been used to have a more dynamic and robust system.
 
 - jackdmp use a new client activation model that allows simultaneous client execution (on a smp machine) when parallel clients exist in the graph (client that have the same inputs). This activation model allows to better use available CPU on a smp machine, but also works on mono-processor machine.
 
@@ -37,6 +37,7 @@ Important compilation options :
 - the --dbus flag must be defined at configure time to compile the jackdbus executable. If the "automatic start server option" is used by clients, jackd server will be started using the dbus service.
 
 
+----------------------------
 Known problems, limitations
 ----------------------------
 
@@ -52,7 +53,7 @@ The package contains :
 
  - the compiled binaries with "install" and "remove" scripts located in bin/osx
  - the source code with an XCode project
- - the component needed to use CoreAudio applications with Jack (the JackRouter Jack/CoreAudio bridge)
+ - the component needed to use CoreAudio applications with JACK (the JackRouter JACK/CoreAudio bridge)
 
 Starting with 0.70 version, the OSX project can compile 32/64 bits binaries for PPC and Intel machines. On a 64 bits machine, using the "jackdmp" in a terminal will start the 64 bits version. Using the "arch" command possibly allows to force starting in 32 bits (see man arch). The JackPilot and JackRouter binaries are now also released as 32/64 bits versions for PPC and Intel machines. By default the JackPilot application will start in 32 bits mode (even on a 64 bits machine) and launch the 32 bits jackdmp. Unchecking the "Launch in 32 bits mode" box in the JackPilot info (GetInfo = %I in the Finder...) allows to start JackPilot in 64 bits then launch the 64 bits jackdmp version. Very few audio applications are already 64 bits aware: Apple AU Lab (included in Developer tools) can be launched in 64 bit, here again by unchecking the "Launch in 32 bits mode" box in the AU Lab info.
 
@@ -60,8 +61,9 @@ WARNING !! WARNING !!
 
 Users of the "official" JackOSX package (found at www.jackosx.com) MUST uninstall JackOSX (using the script located in /Applications/Jack) before installing and testing jackdmp. The "official" JackOSX package can then be re-installed by using the JackOSX installer again. 
 
+---------------------------------
 Mac Intel special considerations
---------------------------------
+---------------------------------
 
 - New Mac Intel use 2 different coreaudio device for input/output. Jackdmp cannot directly handle 2 devices to do duplex processing. An "aggregate" device has to be built in this case. 
 
@@ -85,17 +87,27 @@ The published version uses named event for server/client synchronization. Named 
 
 The binary elements are :
 
-- jackdmp.exe : the jack server
+- jackd.exe : the JACK server
 
-- libjackservermp.dll (and associated libjackservermp.lib library) : the server code, shared by the jackdmp server and drivers.
+- libjackserver.dll (and associated libjackserver.lib library) : the server code, shared by the jackdmp server and drivers.
 
-- libjackmp.dll (and associated libjackmp.lib library) : the jack library code, to be linked against by clients.
+- libjack.dll (and associated libjack.lib library) : the jack library code, to be linked against by clients.
 
 - jack_portaudio.dll : the PortAudio based backend. The backend components (currently "jack_portaudio.dll" only) are searched for in a "jackmp" folder located with the "jackdmp.exe" server.
 
-- jack_connect.exe, jack_disconnect.exe, jack_lsp.exe, jack_metro.exe tools.
+- jack_dummy.dll :  the "dummy" driver.
 
-- JackRouter.dll version 0.17 : an ASIO/jack driver that allows ASIO compatible applications to become jack clients and access the jack server. ASIO "jackified" applications appear with their names. Ableton Live, Samplitude, Reason, Arturia applications have been successfully tested. To install it, use "regsvr32 JackRouter.dll" in a terminal (use regsvr32 /u JackRouter.dll to uninstall). [VISTA special note: regsvr32 has to be used with "administrator" priviledges to properly register JackRouter.dll (Start Menu -> All Programs -> Accessories -> Right Click on Command Prompt -> Run As Administrator)]. A JackRouter.ini file is used by the driver to read parameters : an [IO] section allows to setup the number of input/output jack ports for the application and a [AUTO_CONNECT] section allows to setup jack ports autoconnection mode to machine input/output.
+- jack_net.dll : the NetJack driver.
+
+- netmanager.dll : the "in server" client NetJack Manager.
+
+- audioadapter.dll : the network to audio card adapter (to be used on a slave machine started with the NetJack driver).
+
+- netadapter.dll : the network to audio card adapter (to be used on a slave machine started with an audio driver).
+
+- jack_connect.exe, jack_disconnect.exe, jack_lsp.exe, jack_metro.exe, jack_load.exe, jack_unload.exe tools.
+
+- JackRouter.dll : an ASIO/JACK driver that allows ASIO compatible applications to become JACK clients and access the JACK server. ASIO "jackified" applications appear with their names. Ableton Live, Samplitude, Reason, Arturia applications have been successfully tested. To install it, use "regsvr32 JackRouter.dll" in a terminal (use regsvr32 /u JackRouter.dll to uninstall). [VISTA special note: regsvr32 has to be used with "administrator" priviledges to properly register JackRouter.dll (Start Menu -> All Programs -> Accessories -> Right Click on Command Prompt -> Run As Administrator)]. A JackRouter.ini file is used by the driver to read parameters : an [IO] section allows to setup the number of input/output jack ports for the application and a [AUTO_CONNECT] section allows to setup jack ports autoconnection mode to machine input/output.
 
 All dll are compiled in "release" mode. The "Debug" folder contains debug version of all dlls and libraries. MSVCRTD.dll and MSVCP60D.dll debug dll are also included.
 
@@ -103,14 +115,15 @@ WARNING !! WARNING !!
 
 Depending of the used interface and driver settings, the PortAudio layer may add additionnal buffering between the real card interrupt and the jack server callback. This usually result in *unregular* calls of the jack server callback (for example if jack server used a 256 frames buffer and the card used a 512 frames, the jack server callback will be called twice every card interrupt). For proper functionning of jack server and clients in this case, the jack server has to be started in "synchronous" mode, using the "-S" parameter.
 
+----------------------------
 Known problems, limitations
 ----------------------------
 
 - Thread handling in still not completely working : jack clients may "hang" when quitting.
 
-------------------------
+----------------------------
 Automatic server launch
-------------------------
+----------------------------
 
 Starting from the 0.64 version, automatic server launch from client is implemented : when the server is not yet running, and if the client uses the "jack_client_open" API, the server will be started automatically. The server configuration is saved in a ".jackdrc" file located in the user home folder. The Qjackctl tool allows to save its configuration in this . jackdrc (setting can be done in Qjackctl Setup/Misc). If no configuration file is found, a default setup will be used. 
 
@@ -140,6 +153,7 @@ Documentation
 
 - doxygen generated documentation of the C++ code.
 
+---------
 Versions
 ---------
 
@@ -183,6 +197,7 @@ Note : To experiment with the -S option, jackdmp must be launched in a console.
 
 This is a work in progress but the implementation is now stable enough to be tested. jackdmp has been used successfully with the following applications : Ardour, Hydrogen, Jamin, Qjackctl, Jack-Rack, SooperLooper, AlsaPlayer...  
 
+------------------------------------
 General known problems, limitations
 ------------------------------------
 

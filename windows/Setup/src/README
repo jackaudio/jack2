@@ -29,20 +29,16 @@ Alternatively using the following command allows to display the names of availab
 
 Then start jackd with the device you want, by using its name, for example:
 
-- jackd -R -S -d portaudio -d "ASIO::MOTU Audio ASIO", then start qjackctl. qjackctl will see the jackd server already running and then can be 
-used normally.
+- jackd -R -S -d portaudio -d "ASIO::MOTU Audio ASIO", then start qjackctl. qjackctl will see the jackd server already running and then can be used normally.
 
 
 =============================================
 JackRouter JACK/ASIO driver
 =============================================
 
-JackRouter is an ASIO driver that allows any ASIO compatible application to become a JACK client, thus exchange audio with any other "native" or "Jackified" application. 
-This driver is registered in the system by the installer and becomes available in the list of ASIO drivers when the JACK server is running. A "JackRouter.ini" configuration
-file allows the application to confgiure how the JackRouter driver behaves.
+JackRouter is an ASIO driver that allows any ASIO compatible application to become a JACK client, thus exchange audio with any other "native" or "Jackified" application. This driver is registered in the system by the installer and becomes available in the list of ASIO drivers when the JACK server is running. A "JackRouter.ini" configuration file allows the application to confgiure how the JackRouter driver behaves.
 
-	- [IO]: the application can obtain any number if JACK input/output ports (not necessarilly equal to the audio card input/output number). [Note that some applications
-impose their input/output channel number].
+	- [IO]: the application can obtain any number if JACK input/output ports (not necessarilly equal to the audio card input/output number). [Note that some applications force their input/output channel number].
 
 	- [AUTO_CONNECT] : when 1, the application JACK port will automatically be connected to the machine input/output JACK ports.
 
