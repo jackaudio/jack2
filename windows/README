@@ -41,9 +41,9 @@ You can use two drivers : PortAudio and NetDriver.
 The PortAudio backend allow the use of many soundcards, using ASIO or WMME drivers (any ASIO driver can be seen by PortAudio).
 The NetDriver allow you to use NetJack2 on windows. Thus you can easily exchange midi and audio streams bitween computers (Linux, MacOSX or Windows).
 In both cases, you have to use the minimalist :
-    'jackdmp -R -d ...'
+    'jackd -R -d ...'
         command. With PortAudio, you can have a list of supported drivers with :
-    'jackdmp -R -S -d portaudio -l'
+    'jackd -R -S -d portaudio -l'
 
 Other options still stay the same.
 You can also pick a binary of Qjackctl, but this is still in development.
