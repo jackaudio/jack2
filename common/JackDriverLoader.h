@@ -24,25 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackControlAPI.h"
 #include "JackPlatformPlug.h"
-
-
-#ifdef WIN32
-
-#include <windows.h>
-#define DRIVER_HANDLE HINSTANCE
-#define LoadDriverModule(name) LoadLibrary((name))
-#define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
-#define GetProc(handle, name) GetProcAddress(((HMODULE)handle),(name))
-
-#else
-
-#include <dlfcn.h>
-#define DRIVER_HANDLE void*
-#define LoadDriverModule(name) dlopen((name), RTLD_NOW | RTLD_GLOBAL)
-#define UnloadDriverModule(handle) dlclose((handle))
-#define GetProc(handle, name) dlsym((handle), (name))
-
-#endif
+#include "JackSystemDeps.h"
 
 namespace Jack
 {

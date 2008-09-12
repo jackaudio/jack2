@@ -22,6 +22,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <windows.h>
 
+#define DRIVER_HANDLE HINSTANCE
+#define LoadDriverModule(name) LoadLibrary((name))
+#define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
+#define GetProc(handle, name) GetProcAddress(((HMODULE)handle),(name))
+
 #pragma warning (disable : 4786)
 
 #define ENOBUFS 55

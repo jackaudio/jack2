@@ -23,15 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackSystemDeps.h"
-
-/*
-#ifndef WIN32
-#ifndef ADDON_DIR
-#include "config.h"
-#endif
-#endif
-*/
-
 #include "JackDriverLoader.h"
 #include "JackConstants.h"
 #include "JackError.h"

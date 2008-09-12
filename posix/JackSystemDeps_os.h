@@ -23,5 +23,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <inttypes.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <dlfcn.h>
+
+#define DRIVER_HANDLE void*
+#define LoadDriverModule(name) dlopen((name), RTLD_NOW | RTLD_GLOBAL)
+#define UnloadDriverModule(handle) dlclose((handle))
+#define GetProc(handle, name) dlsym((handle), (name))
 
 #endif
