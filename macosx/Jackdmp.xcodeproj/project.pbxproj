@@ -13748,6 +13748,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
+					.,
 					../posix,
 					../common/jack,
 					../common,
@@ -13787,6 +13788,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = (
+					.,
 					../posix,
 					../common/jack,
 					../common,
