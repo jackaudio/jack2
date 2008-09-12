@@ -1,9 +1,10 @@
+=============================================
 JACK on Windows
 =============================================
 
 This installer will install everything to use Jack Audio Connection Kit (JACK) (www.jackaudio.org) on Windows.
 
-
+=============================================
 QJACKCTL on Windows
 =============================================
 
@@ -32,7 +33,8 @@ Then start jackd with the device you want, by using its name, for example:
 used normally.
 
 
-JackRouter JACK /ASIO driver
+=============================================
+JackRouter JACK/ASIO driver
 =============================================
 
 JackRouter is an ASIO driver that allows any ASIO compatible application to become a JACK client, thus exchange audio with any other "native" or "Jackified" application. 
@@ -45,10 +47,11 @@ impose their input/output channel number].
 	- [AUTO_CONNECT] : when 1, the application JACK port will automatically be connected to the machine input/output JACK ports.
 
 
+=============================================
 Known problems:
 =============================================
 
-- starting/stopping the server several times in qjackctl does not work correctly. You'll have to quit qjacckctl and launch it again.
+- starting/stopping the server several times in QJACKCTL does not work correctly. You'll have to quit qjacckctl and launch it again.
 
 
 =============================================
