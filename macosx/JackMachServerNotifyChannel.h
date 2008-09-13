@@ -42,8 +42,8 @@ class JackMachServerNotifyChannel
         JackMachServerNotifyChannel()
         {}
 
-        int Open(const char* server_name);         // Open the Server/Client connection
-        void Close();       // Close the Server/Client connection
+        int Open(const char* server_name);  // Open the Server/Client connection
+        void Close();                       // Close the Server/Client connection
 
         void Notify(int refnum, int notify, int value);
 };

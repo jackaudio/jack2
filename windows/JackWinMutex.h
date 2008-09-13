@@ -24,9 +24,6 @@
 
 #include <windows.h>
 
-#include <assert.h>
-#include "JackError.h"
-
 namespace Jack
 {
 /*!

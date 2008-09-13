@@ -41,7 +41,7 @@ class JackMachServerChannel : public JackRunnableInterface
     private:
 
         JackMachPortSet fServerPort;    /*! Mach port to communicate with the server : from client to server */
-        JackThread fThread;			/*! Thread to execute the event loop */
+        JackThread fThread;             /*! Thread to execute the event loop */
         JackServer* fServer;
         std::map<mach_port_t, int> fClientTable;
 
@@ -53,7 +53,7 @@ class JackMachServerChannel : public JackRunnableInterface
         ~JackMachServerChannel();
 
         int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
-        void Close();                   // Close the Server/Client connection
+        void Close();                                           // Close the Server/Client connection
 
         JackLockedEngine* GetEngine();
         JackServer* GetServer();
