@@ -16,10 +16,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackNetManager.h"
 
 using namespace std;
@@ -696,9 +692,9 @@ extern "C"
         jack_driver_desc_t *desc;
         desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
 
-        strcpy(desc->name, "netmanager");                           // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "netjack multi-cast master component");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-     
+        strcpy ( desc->name, "netmanager" );                        // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+        strcpy ( desc->desc, "netjack multi-cast master component" );  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+
         desc->nparams = 2;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
@@ -740,19 +736,20 @@ extern "C"
     {
         JSList* params = NULL;
         jack_driver_desc_t* desc = jack_get_descriptor();
-        
-        Jack::JackArgParser parser(load_init);
-        if (parser.GetArgc() > 0)
-            parser.ParseParams(desc, &params);
-  
-        int res = jack_internal_initialize(jack_client, params);
-        parser.FreeParams(params);
+
+        Jack::JackArgParser parser ( load_init );
+        if ( parser.GetArgc() > 0 )
+            parser.ParseParams ( desc, &params );
+
+        int res = jack_internal_initialize ( jack_client, params );
+        parser.FreeParams ( params );
         return res;
     }
 
     SERVER_EXPORT void jack_finish ( void* arg )
     {
-        if (master_manager) {
+        if ( master_manager )
+        {
             jack_log ( "Unloading Master Manager" );
             delete master_manager;
             master_manager = NULL;

@@ -37,8 +37,8 @@ namespace Jack
         jack_log ( "JackNetDriver::JackNetDriver ip %s, port %d", ip, port );
 
         // Use the hostname if no name parameter was given
-        if (strcmp(net_name, "") == 0)
-           GetHostName(net_name, JACK_CLIENT_NAME_SIZE);
+        if ( strcmp ( net_name, "" ) == 0 )
+            GetHostName ( net_name, JACK_CLIENT_NAME_SIZE );
 
         fParams.fMtu = mtu;
         fParams.fSendMidiChannels = midi_input_ports;
@@ -70,22 +70,25 @@ namespace Jack
                               const char* capture_driver_name, const char* playback_driver_name,
                               jack_nframes_t capture_latency, jack_nframes_t playback_latency )
     {
-        if (JackAudioDriver::Open(buffer_size,
-                                samplerate,
-                                capturing,
-                                playing,
-                                inchannels,
-                                outchannels,
-                                monitor,
-                                capture_driver_name,
-                                playback_driver_name,
-                                capture_latency,
-                                playback_latency ) == 0) {
+        if ( JackAudioDriver::Open ( buffer_size,
+                                     samplerate,
+                                     capturing,
+                                     playing,
+                                     inchannels,
+                                     outchannels,
+                                     monitor,
+                                     capture_driver_name,
+                                     playback_driver_name,
+                                     capture_latency,
+                                     playback_latency ) == 0 )
+        {
             fEngineControl->fPeriod = 0;
             fEngineControl->fComputation = 500 * 1000;
             fEngineControl->fConstraint = 500 * 1000;
             return 0;
-        } else {
+        }
+        else
+        {
             return -1;
         }
     }
@@ -194,8 +197,8 @@ namespace Jack
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-        assert(fMidiCapturePortList);
-        assert(fMidiPlaybackPortList);
+        assert ( fMidiCapturePortList );
+        assert ( fMidiPlaybackPortList );
 
         return true;
     }
@@ -573,8 +576,8 @@ namespace Jack
         {
             jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
 
-            strcpy(desc->name, "net");                                // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-            strcpy(desc->desc, "netjack slave backend component");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+            strcpy ( desc->name, "net" );                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+            strcpy ( desc->desc, "netjack slave backend component" ); // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
             desc->nparams = 10;
             desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
@@ -728,21 +731,27 @@ namespace Jack
                 }
             }
 
-            try {
+            try
+            {
 
                 Jack::JackDriverClientInterface* driver =
-                    new Jack::JackWaitThreadedDriver(
-                        new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
-                                          midi_input_ports, midi_output_ports, net_name, transport_sync, network_mode));
-                    if (driver->Open (period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
-                                monitor, "from_master_", "to_master_", 0, 0) == 0) {
+                    new Jack::JackWaitThreadedDriver (
+                    new Jack::JackNetDriver ( "system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
+                                              midi_input_ports, midi_output_ports, net_name, transport_sync, network_mode ) );
+                if ( driver->Open ( period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports,
+                                    monitor, "from_master_", "to_master_", 0, 0 ) == 0 )
+                {
                     return driver;
-                } else {
+                }
+                else
+                {
                     delete driver;
                     return NULL;
                 }
 
-            } catch (...) {
+            }
+            catch ( ... )
+            {
                 return NULL;
             }
         }

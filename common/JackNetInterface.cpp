@@ -170,8 +170,8 @@ namespace Jack
         //network buffers
         fTxBuffer = new char[fParams.fMtu];
         fRxBuffer = new char[fParams.fMtu];
-        assert(fTxBuffer);
-        assert(fRxBuffer);
+        assert ( fTxBuffer );
+        assert ( fRxBuffer );
 
         //net audio/midi buffers'addresses
         fTxData = fTxBuffer + sizeof ( packet_header_t );
@@ -272,14 +272,14 @@ namespace Jack
         //midi net buffers
         fNetMidiCaptureBuffer = new NetMidiBuffer ( &fParams, fParams.fSendMidiChannels, fTxData );
         fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fRxData );
-        assert(fNetMidiCaptureBuffer);
-        assert(fNetMidiPlaybackBuffer);
+        assert ( fNetMidiCaptureBuffer );
+        assert ( fNetMidiPlaybackBuffer );
 
         //audio net buffers
         fNetAudioCaptureBuffer = new NetAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
         fNetAudioPlaybackBuffer = new NetAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
-        assert(fNetAudioCaptureBuffer);
-        assert(fNetAudioPlaybackBuffer);
+        assert ( fNetAudioCaptureBuffer );
+        assert ( fNetAudioPlaybackBuffer );
 
         //audio netbuffer length
         fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
@@ -292,7 +292,7 @@ namespace Jack
 
         //stop process
         fRunning = false;
-        
+
         //send a 'multicast euthanasia request' - new socket is required on macosx
         jack_info ( "Exiting '%s'", fParams.fName );
         SetPacketType ( &fParams, KILL_MASTER );
@@ -302,7 +302,7 @@ namespace Jack
         if ( mcast_socket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
             jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
         mcast_socket.Close();
-        
+
         // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
         ThreadExit();
     }
@@ -423,7 +423,7 @@ namespace Jack
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 break;
-                
+
             case 'n' :
                 //normal use of the network :
                 //  - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwidth
@@ -434,7 +434,7 @@ namespace Jack
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 break;
-                
+
             case 'f' :
                 //fast mode suppose the network bandwith is larger than required for the transmission (only a few channels for example)
                 //    - packets can be quickly received, quickly is here relative to the cycle duration
@@ -445,7 +445,7 @@ namespace Jack
                     jack_error ( "'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
                 break;
         }
-        
+
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }
@@ -484,7 +484,7 @@ namespace Jack
                             fNetMidiPlaybackBuffer->RenderToJackPorts();
                         jumpcnt = 0;
                         break;
-                        
+
                     case 'a':   //audio
                         Recv ( rx_head->fPacketSize, 0 );
                         if ( !IsNextPacket() )
@@ -495,7 +495,7 @@ namespace Jack
                         fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fSubCycle );
                         jumpcnt = 0;
                         break;
-                        
+
                     case 's':   //sync
                         if ( rx_head->fCycle == fTxHeader.fCycle )
                             return 0;
@@ -722,7 +722,7 @@ namespace Jack
                         if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
                             fNetMidiCaptureBuffer->RenderToJackPorts();
                         break;
-                        
+
                     case 'a':   //audio
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                         if ( !IsNextPacket() )
@@ -732,7 +732,7 @@ namespace Jack
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
                         break;
-         
+
                     case 's':   //sync
                         jack_info ( "NetSlave : overloaded, skipping receive." );
                         return 0;

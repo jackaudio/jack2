@@ -21,6 +21,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetInterface__
 #define __JackNetInterface__
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "JackNetTool.h"
 
 namespace Jack
@@ -148,8 +152,10 @@ namespace Jack
             JackNetSlaveInterface() : JackNetInterface()
             {
                 //open Socket API with the first slave
-                if (fSlaveCounter++ == 0) {
-                    if (SocketAPIInit() < 0) {
+                if ( fSlaveCounter++ == 0 )
+                {
+                    if ( SocketAPIInit() < 0 )
+                    {
                         jack_error ( "Can't init Socket API, exiting..." );
                         throw -1;
                     }
@@ -158,8 +164,10 @@ namespace Jack
             JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
             {
                 //open Socket API with the first slave
-                if (fSlaveCounter++ == 0) {
-                    if (SocketAPIInit() < 0) {
+                if ( fSlaveCounter++ == 0 )
+                {
+                    if ( SocketAPIInit() < 0 )
+                    {
                         jack_error ( "Can't init Socket API, exiting..." );
                         throw -1;
                     }
