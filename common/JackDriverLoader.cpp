@@ -769,20 +769,20 @@ jack_internals_load (JSList * internals) {
 
 #endif
 
-jack_driver_info_t *
-jack_load_driver (jack_driver_desc_t * driver_desc) {
+Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver_desc, 
+                                                    Jack::JackLockedEngine* engine, 
+                                                    Jack::JackSynchro* synchro, 
+                                                    const JSList* params)
+{
 #ifdef WIN32
     int errstr;
 #else
     const char * errstr;
 #endif
 
-    jack_driver_info_t *info;
-
-    info = (jack_driver_info_t *) calloc (1, sizeof (*info));
-    info->handle = LoadDriverModule (driver_desc->file);
-
-    if (info->handle == NULL) {
+    fHandle = LoadDriverModule (driver_desc->file);
+    
+    if (fHandle == NULL) {
 #ifdef WIN32
         if ((errstr = GetLastError ()) != 0) {
             jack_error ("can't load \"%s\": %ld", driver_desc->file,
@@ -794,31 +794,22 @@ jack_load_driver (jack_driver_desc_t * driver_desc) {
 #endif
 
         } else {
-            jack_error ("bizarre error loading driver shared "
-                        "object %s", driver_desc->file);
+            jack_error ("bizarre error loading driver shared object %s", driver_desc->file);
         }
-        goto fail;
+        return NULL;
     }
 
-    info->initialize = (initialize)GetProc(info->handle, "driver_initialize");
+    fInitialize = (driverInitialize)GetProc(fHandle, "driver_initialize");
 
 #ifdef WIN32
-    if ((info->initialize == NULL) && (errstr = GetLastError ()) != 0) {
+    if ((fInitialize == NULL) && (errstr = GetLastError ()) != 0) {
 #else
-    if ((info->initialize == NULL) && (errstr = dlerror ()) != 0) {
+    if ((fInitialize == NULL) && (errstr = dlerror ()) != 0) {
 #endif
-        jack_error ("no initialize function in shared object %s\n",
-                    driver_desc->file);
-        goto fail;
+        jack_error("no initialize function in shared object %s\n", driver_desc->file);
+        return NULL;
     }
 
-    return info;
-
-fail:
-    if (info->handle) {
-        UnloadDriverModule(info->handle);
-    }
-    free (info);
-    return NULL;
+    return fInitialize(engine, synchro, params);
 }
 

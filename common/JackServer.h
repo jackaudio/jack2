@@ -25,11 +25,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackDriverLoader.h"
 #include "JackConnectionManager.h"
-#include "jslist.h"
-
 #include "JackGlobals.h"
 #include "JackPlatformPlug.h"
-
+#include "jslist.h"
 
 namespace Jack
 {
@@ -49,7 +47,7 @@ class SERVER_EXPORT JackServer
 
     private:
 
-        jack_driver_info_t* fDriverInfo;
+        JackDriverInfo* fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
         JackDriverClientInterface* fLoopbackDriver;

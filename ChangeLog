@@ -22,6 +22,10 @@ Florian Faber
   Jackdmp changes log
 ---------------------------
 
+2008-08-17 Stephane Letz  <letz@grame.fr>
+	
+	* New JackDriverInfo class to cleanup driver loading code.
+
 2008-08-08 Stephane Letz  <letz@grame.fr>
 	
 	* Better symbols export for server and client side libraries. 

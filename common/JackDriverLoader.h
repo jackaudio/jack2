@@ -33,21 +33,35 @@ namespace Jack
 };
 
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
-typedef Jack::JackDriverClientInterface* (*initialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
+typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
 
-typedef struct _jack_driver_info
+class JackDriverInfo
 {
-    Jack::JackDriverClientInterface* (*initialize)(Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
-    DRIVER_HANDLE handle;
-}
-jack_driver_info_t;
+
+    private:
+    
+        driverInitialize fInitialize;
+        DRIVER_HANDLE fHandle;
+        
+    public:
+    
+        JackDriverInfo():fInitialize(NULL),fHandle(NULL)
+        {}
+        ~JackDriverInfo()
+        {
+            if (fHandle)
+                UnloadDriverModule(fHandle);
+        }
+        
+        Jack::JackDriverClientInterface* Open(jack_driver_desc_t* driver_desc, Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
+    
+};
 
 jack_driver_desc_t * jack_find_driver_descriptor (JSList * drivers, const char * name);
 
 JSList * jack_drivers_load (JSList * drivers);
 JSList * jack_internals_load (JSList * internals);
 
-jack_driver_info_t * jack_load_driver (jack_driver_desc_t * driver_desc);
 SERVER_EXPORT int jackctl_parse_driver_params (jackctl_driver * driver_ptr, int argc, char* argv[]);
 SERVER_EXPORT void jack_free_driver_params(JSList * param_ptr);
 

@@ -23,7 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackSystemDeps.h"
-
 #include "JackServer.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
@@ -58,10 +57,10 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
     fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
+    fDriverInfo = new JackDriverInfo();
+    fAudioDriver = NULL;
     fFreewheel = false;
     fLoopback = loopback;
-    fDriverInfo = NULL;
-    fAudioDriver = NULL;
     fInstance = this; // Unique instance
     jack_verbose = verbose;
 }
@@ -74,10 +73,7 @@ JackServer::~JackServer()
     delete fLoopbackDriver;
     delete fEngine;
     delete fEngineControl;
-    if (fDriverInfo) {
-        UnloadDriverModule(fDriverInfo->handle);
-        free(fDriverInfo);
-    }
+    delete fDriverInfo;
 }
 
 int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
@@ -95,11 +91,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close2;
     }
 
-    if ((fDriverInfo = jack_load_driver(driver_desc)) == NULL) {
-        goto fail_close3;
-    }
-
-    if ((fAudioDriver = fDriverInfo->initialize(fEngine, GetSynchroTable(), driver_params)) == NULL) {
+    if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
         jack_error("Cannot initialize driver");
         goto fail_close3;
     }
