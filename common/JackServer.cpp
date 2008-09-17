@@ -139,20 +139,20 @@ fail_close6:
     fLoopbackDriver->Close();
 
 fail_close5:
-     fFreewheelDriver->Close();
+    fFreewheelDriver->Close();
 
 fail_close4:
-     fAudioDriver->Close();
+    fAudioDriver->Close();
 
 fail_close3:
-     fEngine->Close();
+    fEngine->Close();
  
 fail_close2:     
     fChannel.Close();
 
 fail_close1:     
-     JackMessageBuffer::Destroy();
-     return -1;
+    JackMessageBuffer::Destroy();
+    return -1;
 }
 
 int JackServer::Close()
