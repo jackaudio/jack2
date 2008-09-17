@@ -57,7 +57,6 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
     fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
-    fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
     fFreewheel = false;
     fLoopback = loopback;
@@ -73,7 +72,6 @@ JackServer::~JackServer()
     delete fLoopbackDriver;
     delete fEngine;
     delete fEngineControl;
-    delete fDriverInfo;
 }
 
 int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
@@ -91,7 +89,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close2;
     }
 
-    if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
+    if ((fAudioDriver = fDriverInfo.Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
         jack_error("Cannot initialize driver");
         goto fail_close3;
     }

@@ -28,7 +28,6 @@ extern "C"
 #include <limits.h>
 #include "jslist.h"
 #include "JackCompilerDeps.h"
-
 #include "JackSystemDeps.h"
 
 #define JACK_DRIVER_NAME_MAX          15

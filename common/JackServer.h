@@ -47,7 +47,7 @@ class SERVER_EXPORT JackServer
 
     private:
 
-        JackDriverInfo* fDriverInfo;
+        JackDriverInfo fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
         JackDriverClientInterface* fLoopbackDriver;
