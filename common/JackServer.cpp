@@ -80,8 +80,6 @@ JackServer::~JackServer()
     }
 }
 
-// TODO : better handling of intermediate failing cases...
-
 int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
     // TODO: move that in reworked JackServerGlobals::Init()
@@ -89,43 +87,43 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
   
     if (fChannel.Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
-        return -1;
+        goto fail_close1;
     }
-
+  
     if (fEngine->Open() != 0) {
         jack_error("Cannot open engine");
-        return -1;
+        goto fail_close2;
     }
 
     if ((fDriverInfo = jack_load_driver(driver_desc)) == NULL) {
-        return -1;
+        goto fail_close3;
     }
 
     if ((fAudioDriver = fDriverInfo->initialize(fEngine, GetSynchroTable(), driver_params)) == NULL) {
         jack_error("Cannot initialize driver");
-        return -1;
+        goto fail_close3;
     }
-
+ 
     if (fFreewheelDriver->Open() != 0) { // before engine open
         jack_error("Cannot open driver");
-        return -1;
+        goto fail_close4;
     }
-
+    
     if (fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
         jack_error("Cannot open driver");
-        return -1;
+        goto fail_close5;
     }
 
     if (fAudioDriver->Attach() != 0) {
         jack_error("Cannot attach audio driver");
-        return -1;
+        goto fail_close6;
     }
-
+   
     if (fLoopback > 0 && fLoopbackDriver->Attach() != 0) {
         jack_error("Cannot attach loopback driver");
-        return -1;
+        goto fail_close7;
     }
-
+ 
     fFreewheelDriver->SetMaster(false);
     fAudioDriver->SetMaster(true);
     if (fLoopback > 0)
@@ -133,6 +131,28 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
     InitTime();
     return 0;
+
+fail_close7:     
+    fAudioDriver->Detach();
+  
+fail_close6:     
+    fLoopbackDriver->Close();
+
+fail_close5:
+     fFreewheelDriver->Close();
+
+fail_close4:
+     fAudioDriver->Close();
+
+fail_close3:
+     fEngine->Close();
+ 
+fail_close2:     
+    fChannel.Close();
+
+fail_close1:     
+     JackMessageBuffer::Destroy();
+     return -1;
 }
 
 int JackServer::Close()
