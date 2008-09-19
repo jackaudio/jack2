@@ -140,9 +140,6 @@
 		<Unit filename="..\common\JackServerGlobals.cpp" />
 		<Unit filename="..\common\JackShmMem.cpp" />
 		<Unit filename="..\common\JackThreadedDriver.cpp" />
-		<Unit filename="..\common\JackTime.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="..\common\JackTools.cpp" />
 		<Unit filename="..\common\JackTransportEngine.cpp" />
 		<Unit filename="..\common\JackWaitThreadedDriver.cpp" />
@@ -161,6 +158,9 @@
 		<Unit filename="JackWinProcessSync.cpp" />
 		<Unit filename="JackWinSemaphore.cpp" />
 		<Unit filename="JackWinThread.cpp" />
+		<Unit filename="JackWinTime.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="getopt.c">
 			<Option compilerVar="CC" />
 		</Unit>

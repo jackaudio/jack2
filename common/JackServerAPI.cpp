@@ -23,7 +23,6 @@ This program is free software; you can redistribute it and/or modify
 #endif
 
 #include "JackSystemDeps.h"
-
 #include "JackGraphManager.h"
 #include "JackInternalClient.h"
 #include "JackServer.h"

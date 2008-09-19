@@ -785,12 +785,10 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
     if (fHandle == NULL) {
 #ifdef WIN32
         if ((errstr = GetLastError ()) != 0) {
-            jack_error ("can't load \"%s\": %ld", driver_desc->file,
-                        errstr);
+            jack_error ("can't load \"%s\": %ld", driver_desc->file, errstr);
 #else
         if ((errstr = dlerror ()) != 0) {
-            jack_error ("can't load \"%s\": %s", driver_desc->file,
-                        errstr);
+            jack_error ("can't load \"%s\": %s", driver_desc->file, errstr);
 #endif
 
         } else {

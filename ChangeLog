@@ -17,28 +17,33 @@ Nedko Arnaudov
 Fernando Lopez-Lezcano
 Romain Moret
 Florian Faber
+Michael Voigt
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
 
-2008-08-17 Stephane Letz  <letz@grame.fr>
+2008-08-19 Stephane Letz  <letz@grame.fr>
+	
+	* Michael Voigt JackTime patch.
+
+2008-09-17 Stephane Letz  <letz@grame.fr>
 	
 	* New JackDriverInfo class to cleanup driver loading code.
 
-2008-08-08 Stephane Letz  <letz@grame.fr>
+2008-09-08 Stephane Letz  <letz@grame.fr>
 	
 	* Better symbols export for server and client side libraries. 
 
-2008-08-06 Stephane Letz  <letz@grame.fr>
+2008-09-06 Stephane Letz  <letz@grame.fr>
 	
 	* Correct driver hierarchy on macosx and windows targets.
 
-2008-08-05 Stephane Letz  <letz@grame.fr>
+2008-09-05 Stephane Letz  <letz@grame.fr>
 	
 	* Merge Michael Voigt "drops" branch after reorganization step.
 
-2008-08-04 Stephane Letz  <letz@grame.fr>
+2008-09-04 Stephane Letz  <letz@grame.fr>
 	
 	* Michael Voigt 4th source reorganization patch.
 	* Correct JackNetDriver initialization.

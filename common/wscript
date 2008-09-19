@@ -78,7 +78,6 @@ def build(bld):
         'JackEngineControl.cpp',
         'JackShmMem.cpp',
         'shm.c',
-        'JackTime.c',
         'JackGlobals.cpp',
         'JackDebugClient.cpp',
         'JackTransportEngine.cpp',
@@ -97,6 +96,7 @@ def build(bld):
             '../posix/JackFifo.cpp',
             '../posix/JackProcessSync.cpp',
             '../posix/JackSocket.cpp',
+	    '../linux/JackLinuxTime.c',
             ]
         includes = ['../linux', '../posix'] + includes
         uselib.append('RT')
@@ -109,6 +109,7 @@ def build(bld):
             '../macosx/JackMachThread.cpp',
             '../macosx/JackMachSemaphore.cpp',
             '../macosx/JackMachPort.cpp',
+	    '../macosx/JackMachTime.c',
             ]
         includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
 

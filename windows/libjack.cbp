@@ -160,9 +160,6 @@
 		<Unit filename="..\common\JackPort.cpp" />
 		<Unit filename="..\common\JackPortType.cpp" />
 		<Unit filename="..\common\JackShmMem.cpp" />
-		<Unit filename="..\common\JackTime.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="..\common\JackTools.cpp" />
 		<Unit filename="..\common\JackTransportEngine.cpp" />
 		<Unit filename="..\common\shm.c">
@@ -173,6 +170,9 @@
 		<Unit filename="JackWinProcessSync.cpp" />
 		<Unit filename="JackWinSemaphore.cpp" />
 		<Unit filename="JackWinThread.cpp" />
+		<Unit filename="JackWinTime.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="libjack.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>

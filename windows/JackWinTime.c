@@ -13,40 +13,34 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
+along with this program; if not, write to the Free Software 
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackTime_APPLE__
-#define __JackTime_APPLE__
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 
-#ifdef __cplusplus
-extern "C"
+#include "JackTime.h"
+#include "JackError.h"
+
+static LARGE_INTEGER _jack_freq;
+
+SERVER_EXPORT JackSleep(long usec) 
 {
-#endif
-
-#include <mach/mach_time.h>
-#include <unistd.h>
-
-    extern EXPORT double __jack_time_ratio;
-
-    static inline jack_time_t GetMicroSeconds(void) 
-    {
-        return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
-    }
-
-    /* This should only be called ONCE per process. */
-    void InitTime();
-
-    static inline void JackSleep(int usec) 
-    {
-        usleep(usec);
-    }
-
-#ifdef __cplusplus
+	Sleep(usec / 1000);
 }
-#endif
 
+SERVER_EXPORT void InitTime()
+{
+	QueryPerformanceFrequency(&_jack_freq);
+	_jack_freq.QuadPart = _jack_freq.QuadPart / 1000000; // by usec
+}
 
-#endif
+SERVER_EXPORT jack_time_t GetMicroSeconds(void) 
+{
+	LARGE_INTEGER t1;
+	QueryPerformanceCounter(&t1);
+	return (jack_time_t)(((double)t1.QuadPart) / ((double)_jack_freq.QuadPart));		
+}

@@ -13,34 +13,36 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software
+along with this program; if not, write to the Free Software 
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackTime_WIN32__
-#define __JackTime_WIN32__
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 
-#ifdef __cplusplus
-extern "C"
+#include "JackTime.h"
+#include "JackError.h"
+#include <mach/mach_time.h>
+#include <unistd.h>
+
+double __jack_time_ratio;
+
+SERVER_EXPORT void JackSleep(long usec) 
 {
-#endif
-
-    extern SERVER_EXPORT LARGE_INTEGER _jack_freq;
-
-    SERVER_EXPORT jack_time_t GetMicroSeconds(void) ;
-
-    void InitTime();
-
-    static void JackSleep(int usec) 
-    {
-        Sleep(usec / 1000);
-    }
-
-#ifdef __cplusplus
+	usleep(usec);
 }
-#endif
 
+/* This should only be called ONCE per process. */
+SERVER_EXPORT void InitTime()
+{
+	mach_timebase_info_data_t info;
+	mach_timebase_info(&info);
+	__jack_time_ratio = ((float)info.numer / info.denom) / 1000;
+}
 
-#endif
-
+SERVER_EXPORT jack_time_t GetMicroSeconds(void) 
+{
+    return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
+}

@@ -32,16 +32,16 @@
 #include <sys/syslimits.h>
 #endif
 
+#include "jslist.h"
+#include "driver_interface.h"
+#include "JackCompilerDeps.h"
+#include "JackError.h"
+
 #include <string>
 #include <algorithm>
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include "jslist.h"
-#include "driver_interface.h"
-
-#include "JackCompilerDeps.h"
-#include "JackError.h"
 
 namespace Jack
 {
