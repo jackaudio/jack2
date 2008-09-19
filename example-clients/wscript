@@ -118,7 +118,7 @@ def build(bld):
             lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             lib.env.append_value("LINKFLAGS", "")
-        lib.uselib_local = 'clientlib'
+        lib.uselib_local = 'serverlib'
         lib.inst_var = bld.env()['ADDON_DIR']
         lib.inst_dir = '/'
 
