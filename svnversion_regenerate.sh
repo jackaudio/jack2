@@ -25,7 +25,24 @@ else
   DEFINE=SVN_VERSION
 fi
 
-REV=`svnversion 2> /dev/null`
+if test -d .svn
+then
+  REV=`svnversion 2> /dev/null`
+else
+  if test -d .git
+  then
+    git status >/dev/null # updates dirty state
+    REV=`git show | grep '^ *git-svn-id:' | sed 's/.*@\([0-9]*\) .*/\1/'`
+    if test ${REV}
+    then
+      test -z "$(git diff-index --name-only HEAD)" || REV="${REV}M"
+    else
+      REV=0+`git rev-parse HEAD`
+      test -z "$(git diff-index --name-only HEAD)" || REV="${REV}-dirty"
+    fi
+  fi
+fi
+
 if test -z ${REV}
 then
   REV="unknown"
@@ -34,12 +51,12 @@ fi
 echo "#define ${DEFINE} \"${REV}\"" > ${TEMP_FILE}
 if test ! -f ${OUTPUT_FILE}
 then
-  echo "Generated ${OUTPUT_FILE} (r${REV})"
+  echo "Generated ${OUTPUT_FILE} (${REV})"
   cp ${TEMP_FILE} ${OUTPUT_FILE}
   if test $? -ne 0; then exit 1; fi
 else
   if ! cmp -s ${OUTPUT_FILE} ${TEMP_FILE}
-  then echo "Regenerated ${OUTPUT_FILE} (r${REV})"
+  then echo "Regenerated ${OUTPUT_FILE} (${REV})"
     cp ${TEMP_FILE} ${OUTPUT_FILE}
     if test $? -ne 0; then exit 1; fi
   fi
