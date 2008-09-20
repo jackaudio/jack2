@@ -69,7 +69,7 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
         void ClientActivate(int refnum, int state, int* result);
         void ClientDeactivate(int refnum, int* result);
 
-        void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result);
+        void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result);
         void PortUnRegister(int refnum, jack_port_id_t port_index, int* result);
 
         void PortConnect(int refnum, const char* src, const char* dst, int* result);
