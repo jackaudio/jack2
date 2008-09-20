@@ -185,7 +185,8 @@ int main(int argc, char* argv[])
     char *driver_name = NULL;
     char **driver_args = NULL;
     int driver_nargs = 1;
-    int port_max;
+    int port_max = 512;
+    int do_mlock = 1;
     bool show_version = false;
     sigset_t signals;
     jackctl_parameter_t* param;
@@ -214,6 +215,10 @@ int main(int argc, char* argv[])
                 
             case 'p':
                 port_max = (unsigned int)atol(optarg);
+                break;
+                
+            case 'm':
+                do_mlock = 0;
                 break;
 
             case 'v':
