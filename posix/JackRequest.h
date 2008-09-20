@@ -429,7 +429,7 @@ struct JackPortUnRegisterRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        CheckRes(trans->Read(&fPortIndex, sizeof(int)));
+        CheckRes(trans->Read(&fPortIndex, sizeof(jack_port_id_t)));
         return 0;
     }
 
@@ -437,7 +437,7 @@ struct JackPortUnRegisterRequest : public JackRequest
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        CheckRes(trans->Write(&fPortIndex, sizeof(int)));
+        CheckRes(trans->Write(&fPortIndex, sizeof(jack_port_id_t)));
         return 0;
     }
 };
