@@ -244,7 +244,7 @@ struct JackClientOpenResult : public JackResult
         CheckRes(trans->Read(&fSharedEngine, sizeof(int)));
         CheckRes(trans->Read(&fSharedClient, sizeof(int)));
         CheckRes(trans->Read(&fSharedGraph, sizeof(int)));
-         return 0;
+        return 0;
     }
 
     int Write(JackChannelTransaction* trans)
@@ -392,7 +392,7 @@ struct JackPortRegisterRequest : public JackRequest
 struct JackPortRegisterResult : public JackResult
 {
 
-    unsigned int fPortIndex;
+    jack_port_id_t fPortIndex;
 
     JackPortRegisterResult(): JackResult(), fPortIndex(NO_PORT)
     {}
@@ -418,11 +418,11 @@ struct JackPortUnRegisterRequest : public JackRequest
 {
 
     int fRefNum;
-    int fPortIndex;
+    jack_port_id_t fPortIndex;
 
     JackPortUnRegisterRequest()
     {}
-    JackPortUnRegisterRequest(int refnum, int index)
+    JackPortUnRegisterRequest(int refnum, jack_port_id_t index)
         : JackRequest(JackRequest::kUnRegisterPort), fRefNum(refnum), fPortIndex(index)
     {}
 
