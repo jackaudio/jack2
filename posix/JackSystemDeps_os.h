@@ -30,4 +30,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define UnloadDriverModule(handle) dlclose((handle))
 #define GetProc(handle, name) dlsym((handle), (name))
 
+#define JACK_DEBUG (getenv("JACK_CLIENT_DEBUG") && strcmp(getenv("JACK_CLIENT_DEBUG"), "on") == 0)
+
 #endif

@@ -31,14 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTime.h"
 #include "JackCompilerDeps.h"
 #include "JackPortType.h"
-
-#ifdef __APPLE__
-#include "JackMachThread.h"
-#elif WIN32
-#include "JackWinThread.h"
-#else
-#include "JackPosixThread.h"
-#endif
+#include "JackPlatformPlug.h"
 #include <math.h>
 
 #ifdef __CLIENTDEBUG__
@@ -1588,14 +1581,8 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 // thread.h
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 {
-#ifdef __APPLE__
     JackEngineControl* control = GetEngineControl();
-    return (control ? JackMachThread::AcquireRealTimeImp(thread, GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint) : -1);
-#elif WIN32
-    return JackWinThread::AcquireRealTimeImp(thread, priority);
-#else
-    return JackPosixThread::AcquireRealTimeImp(thread, priority);
-#endif
+    return (control ? JackThread::AcquireRealTimeImp(thread, priority, GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint) : -1);
 }
 
 EXPORT int jack_client_create_thread(jack_client_t* client,
@@ -1605,42 +1592,22 @@ EXPORT int jack_client_create_thread(jack_client_t* client,
                                      void *(*start_routine)(void*),
                                      void *arg)
 {
-#ifdef __APPLE__
-    return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
-#elif WIN32
-    return JackWinThread::StartImp(thread, priority, realtime, (ThreadCallback)start_routine, arg);
-#else
-    return JackPosixThread::StartImp(thread, priority, realtime, start_routine, arg);
-#endif
+    return JackThread::StartImp(thread, priority, realtime, start_routine, arg);
 }
 
 EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
 {
-#ifdef __APPLE__
-    return JackMachThread::DropRealTimeImp(thread);
-#elif WIN32
-    return JackWinThread::DropRealTimeImp(thread);
-#else
-    return JackPosixThread::DropRealTimeImp(thread);
-#endif
+    return JackThread::DropRealTimeImp(thread);
 }
 
 EXPORT int jack_client_stop_thread(jack_client_t* client, pthread_t thread)
 {
-#ifdef WIN32
-    return JackWinThread::StopImp(thread);
-#else
-    return JackPosixThread::StopImp(thread);
-#endif
+    return JackThread::StopImp(thread);
 }
 
 EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread)
 {
-#ifdef WIN32
-    return JackWinThread::KillImp(thread);
-#else
-    return JackPosixThread::KillImp(thread);
-#endif
+    return JackThread::KillImp(thread);
 }
 
 // intclient.h

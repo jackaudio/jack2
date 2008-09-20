@@ -27,9 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackChannel.h"
 #include "JackLibGlobals.h"
 #include "JackGlobals.h"
-#include "JackServerLaunch.h"
 #include "JackCompilerDeps.h"
 #include "JackTools.h"
+#include "JackSystemDeps.h"
+#include "JackServerLaunch.h"
 
 using namespace Jack;
 
@@ -81,30 +82,25 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     }
 
     /* parse variable arguments */
-    if (ap)
+    if (ap) {
         jack_varargs_parse(options, ap, &va);
-    else
+    } else {
         jack_varargs_init(&va);
+    }
         
     JackLibGlobals::Init(); // jack library initialisation
 
-#ifndef WIN32
     if (try_start_server(&va, options, status)) {
         jack_error("jack server is not running or cannot be started");
         JackLibGlobals::Destroy(); // jack library destruction
         return 0;
     }
-#endif
 
-#ifndef WIN32
-    char* jack_debug = getenv("JACK_CLIENT_DEBUG");
-    if (jack_debug && strcmp(jack_debug, "on") == 0)
+    if (JACK_DEBUG) {
         client = new JackDebugClient(new JackLibClient(GetSynchroTable())); // Debug mode
-    else
+    } else {
         client = new JackLibClient(GetSynchroTable());
-#else
-    client = new JackLibClient(GetSynchroTable());
-#endif
+    }
 
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {

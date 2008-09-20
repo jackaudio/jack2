@@ -28,7 +28,6 @@ This program is free software; you can redistribute it and/or modify
 #include "JackServer.h"
 #include "JackDebugClient.h"
 #include "JackServerGlobals.h"
-#include "JackServerLaunch.h"
 #include "JackTools.h"
 #include "JackCompilerDeps.h"
 #include "JackLockedEngine.h"
@@ -83,10 +82,11 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
     }
 
     /* parse variable arguments */
-    if (ap)
+    if (ap) {
         jack_varargs_parse(options, ap, &va);
-    else
+    } else {
         jack_varargs_init(&va);
+    }
 
     g_nostart = (options & JackNoStartServer) != 0;
     if (!g_nostart) {
@@ -97,15 +97,11 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
         }
     }
 
-#ifndef WIN32
-    char* jack_debug = getenv("JACK_CLIENT_DEBUG");
-    if (jack_debug && strcmp(jack_debug, "on") == 0)
+    if (JACK_DEBUG) {
         client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
-    else
+    } else {
         client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
-#else
-    client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
-#endif
+    }
 
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {

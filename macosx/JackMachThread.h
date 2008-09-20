@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 /*
-	Copyright: 	© Copyright 2002 Apple Computer, Inc. All rights reserved.
+	Copyright: 	Copyright 2002 Apple Computer, Inc. All rights reserved.
 
 	Disclaimer:	IMPORTANT:  This Apple software is supplied to you by Apple Computer, Inc.
 	("Apple") in consideration of your agreement to the following terms, and your
@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 	please do not use, install, modify or redistribute this Apple software.
 
 	In consideration of your agreement to abide by the following terms, and subject
-	to these terms, Apple grants you a personal, non-exclusive license, under Apple’s
+	to these terms, Apple grants you a personal, non-exclusive license, under Apple
 	copyrights in this original Apple software (the "Apple Software"), to use,
 	reproduce, modify and redistribute the Apple Software, with or without
 	modifications, in source and/or binary forms; provided that if you redistribute
@@ -111,6 +111,10 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
         static int SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint);
 
         static int AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint);
+        static int AcquireRealTimeImp(pthread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
+		{ 
+            return JackMachThread::AcquireRealTimeImp(thread, period, computation, constraint); 
+        }
         static int DropRealTimeImp(pthread_t thread);
 };
 

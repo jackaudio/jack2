@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include "types.h"
 
 #ifdef __cplusplus
 extern "C"

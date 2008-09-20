@@ -180,12 +180,12 @@ def build(bld):
     clientlib.source += [
         'JackLibClient.cpp',
         'JackLibAPI.cpp',
-        'JackServerLaunch.cpp',
         ]
 
     if bld.env()['IS_LINUX']:
         clientlib.source += [
             '../posix/JackSocketClientChannel.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
             ]
 
     if bld.env()['IS_MACOSX']:
@@ -193,6 +193,7 @@ def build(bld):
             '../macosx/JackMachClientChannel.cpp',
             '../macosx/RPC/JackRPCEngineUser.c',
             '../macosx/JackMacLibClientRPC.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
             ]
 
     clientlib.vnum = bld.env()['JACK_API_VERSION']

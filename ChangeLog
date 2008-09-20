@@ -23,9 +23,13 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-08-20 Stephane Letz  <letz@grame.fr>
+	
+	* Michael Voigt JackAPI cleanup patch.
+
 2008-08-19 Stephane Letz  <letz@grame.fr>
 	
-	* Michael Voigt JackTime patch.
+	* Michael Voigt JackTime cleanup patch.
 
 2008-09-17 Stephane Letz  <letz@grame.fr>
 	

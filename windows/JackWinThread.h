@@ -64,7 +64,15 @@ class SERVER_EXPORT JackWinThread : public detail::JackThreadInterface
         pthread_t GetThreadID();
 
         static int AcquireRealTimeImp(pthread_t thread, int priority);
+        static int AcquireRealTimeImp(pthread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
+        { 
+            return JackWinThread::AcquireRealTimeImp(thread, priority); 
+        }
         static int DropRealTimeImp(pthread_t thread);
+        static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
+        { 
+            return JackWinThread::StartImp(thread, priority, realtime, (ThreadCallback) start_routine, arg); 
+        }
         static int StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg);
         static int StopImp(pthread_t thread);
         static int KillImp(pthread_t thread);
