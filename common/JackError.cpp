@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 Paul Davis 
+    Copyright (C) 2001 Paul Davis
 	Copyright (C) 2004-2008 Grame
     Copyright (C) 2008 Nedko Arnaudov
 
@@ -40,7 +40,7 @@ void change_thread_log_function(jack_log_function_t log_function)
 }
 
 SERVER_EXPORT void set_threaded_log_function()
-{   
+{
     change_thread_log_function(Jack::JackMessageBufferAdd);
 }
 
@@ -68,7 +68,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
     char buffer[300];
     size_t len;
     jack_log_function_t log_function;
-   
+
     if (prefix != NULL) {
         len = strlen(prefix);
         memcpy(buffer, prefix, len);

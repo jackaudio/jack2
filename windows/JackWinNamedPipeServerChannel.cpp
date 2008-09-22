@@ -21,10 +21,6 @@ Copyright (C) 2004-2006 Grame
 #include "config.h"
 #endif
 
-#ifdef WIN32
-#pragma warning (disable : 4786)
-#endif
-
 #include "JackWinNamedPipeServerChannel.h"
 #include "JackNotification.h"
 #include "JackRequest.h"
@@ -44,7 +40,7 @@ HANDLE JackClientPipeThread::fMutex = NULL;  // never released....
 // fRefNum = -1 correspond to already removed client
 
 JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
-    : fPipe(pipe), fServer(NULL), fRefNum(0), fThread(this)
+    : fPipe(pipe), fServer(NULL), fThread(this), fRefNum(0)
 {
     if (fMutex == NULL)
         fMutex = CreateMutex(NULL, FALSE, NULL);
@@ -74,7 +70,7 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
     jack_log("JackClientPipeThread::Close %x %ld", this, fRefNum);
     /*
     	TODO : solve WIN32 thread Kill issue
-    	This would hang.. since Close will be followed by a delete, 
+    	This would hang.. since Close will be followed by a delete,
     	all ressources will be desallocated at the end.
     */
 
@@ -220,7 +216,7 @@ bool JackClientPipeThread::HandleRequest()
                 res.Write(fPipe);
                 break;
             }
-            
+
             case JackRequest::kPortRename: {
                 jack_log("JackRequest::kPortRename");
                 JackPortRenameRequest req;
@@ -405,9 +401,9 @@ error:
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
-    	This would hang the server... since we are quitting it, its not really problematic, 
+    	This would hang the server... since we are quitting it, its not really problematic,
     	all ressources will be desallocated at the end.
-    	
+
     	fRequestListenPipe.Close();
         fThread.Stop();
     */

@@ -24,8 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "varargs.h"
 #include "types.h"
 
-int server_connect(char* name);
 int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* status);
-int start_server(const char* server_name, jack_options_t options);
 
 #endif

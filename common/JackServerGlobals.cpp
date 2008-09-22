@@ -21,10 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "config.h"
 #endif
 
-#ifdef WIN32
-#pragma warning (disable : 4786)
-#endif
-
 #include "JackServerGlobals.h"
 #include "JackTools.h"
 #include "shm.h"
@@ -76,9 +72,9 @@ int JackServerGlobals::Delete()
 bool JackServerGlobals::Init()
 {
     // Server already started
-    if (JackServer::fInstance != NULL) 
+    if (JackServer::fInstance != NULL)
         return true;
-        
+
     int realtime = 0;
     int client_timeout = 0; /* msecs; if zero, use period size. */
     int realtime_priority = 10;
@@ -88,7 +84,7 @@ bool JackServerGlobals::Init()
     int loopback = 0;
     int do_unlock = 0;
     int temporary = 0;
-    
+
     int opt = 0;
     int option_index = 0;
     int seen_driver = 0;
@@ -107,12 +103,12 @@ bool JackServerGlobals::Init()
     char buffer[255];
     int argc = 0;
     char* argv[32];
-      
+
     // Otherwise first client starts the server
     if (fClientCount++ == 0) {
 
         jack_log("JackServerGlobals Init");
-      
+
         jack_driver_desc_t* driver_desc;
         const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:";
         static struct option long_options[] = {
@@ -134,7 +130,7 @@ bool JackServerGlobals::Init()
                                                   { "sync", 0, 0, 'S' },
                                                   { 0, 0, 0, 0 }
                                               };
- 
+
         snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
         fp = fopen(filename, "r");
 
@@ -307,7 +303,7 @@ bool JackServerGlobals::Init()
             goto error;
         }
     }
-    
+
     if (driver_params)
         jack_free_driver_params(driver_params);
     return true;

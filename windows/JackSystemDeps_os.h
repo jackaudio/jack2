@@ -27,12 +27,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
 #define GetProc(handle, name) GetProcAddress(((HMODULE)handle),(name))
 
-#pragma warning (disable : 4786)
-
 #define ENOBUFS 55
 
 #define JACK_DEBUG false
-#define try_start_server 0
 
 #endif
 

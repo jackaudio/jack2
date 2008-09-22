@@ -39,7 +39,7 @@ using namespace Jack;
 
 #include <dbus/dbus.h>
 
-int start_server_dbus(const char* server_name)
+static int start_server_dbus(const char* server_name)
 {
     DBusError err;
     DBusConnection *conn;

@@ -50,7 +50,7 @@ class JackWinMutex
 
         void Lock()
         {
-            DWORD dwWaitResult = WaitForSingleObject(fMutex, INFINITE);
+			WaitForSingleObject(fMutex, INFINITE);
         }
 
         bool Trylock()
