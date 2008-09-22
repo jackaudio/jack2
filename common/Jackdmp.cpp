@@ -187,6 +187,7 @@ int main(int argc, char* argv[])
     int driver_nargs = 1;
     int port_max = 512;
     int do_mlock = 1;
+    int do_unlock = 0;
     bool show_version = false;
     sigset_t signals;
     jackctl_parameter_t* param;
@@ -219,6 +220,10 @@ int main(int argc, char* argv[])
                 
             case 'm':
                 do_mlock = 0;
+                break;
+                
+            case 'u':
+                do_unlock = 1;
                 break;
 
             case 'v':
