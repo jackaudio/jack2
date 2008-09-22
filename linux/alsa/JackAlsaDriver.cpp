@@ -2373,7 +2373,7 @@ int JackAlsaDriver::create_thread(pthread_t *thread, int priority, int realtime,
 
 jack_port_id_t JackAlsaDriver::port_register(const char *port_name, const char *port_type, unsigned long flags, unsigned long buffer_size)
 {
-    unsigned int port_index;
+    jack_port_id_t port_index;
     int res = fEngine->PortRegister(fClientControl.fRefNum, port_name, port_type, flags, buffer_size, &port_index);
     return (res == 0) ? port_index : 0;
 }

@@ -98,7 +98,7 @@ class SERVER_EXPORT JackEngine
         int InternalClientUnload(int refnum, int* status);
 
         // Port management
-        int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port);
+        int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port);
         int PortUnRegister(int refnum, jack_port_id_t port);
 
         int PortConnect(int refnum, const char* src, const char* dst);

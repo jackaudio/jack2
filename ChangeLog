@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-08-22 Stephane Letz  <letz@grame.fr>
+	
+	* Cleanup jack_port_id_t/jack_port_t mess, should work again on 64 bits machines."
+
 2008-08-20 Stephane Letz  <letz@grame.fr>
 	
 	* Michael Voigt JackAPI cleanup patch.

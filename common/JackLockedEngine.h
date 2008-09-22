@@ -112,7 +112,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
         }
 
         // Port management
-        int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, unsigned int* port)
+        int PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port)
         {
             JackLock lock(this);
             return fEngine.PortRegister(refnum, name, type, flags, buffer_size, port);
