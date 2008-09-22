@@ -170,7 +170,7 @@ static void start_server_aux(const char* server_name)
 
 #endif
 
-int start_server(const char* server_name, jack_options_t options)
+static int start_server(const char* server_name, jack_options_t options)
 {
     if ((options & JackNoStartServer) || getenv("JACK_NO_START_SERVER")) {
         return 1;
@@ -209,7 +209,7 @@ int start_server(const char* server_name, jack_options_t options)
 #endif
 }
 
-int server_connect(char* server_name)
+static int server_connect(char* server_name)
 {
     JackClientChannel channel;
     int res = channel.ServerCheck(server_name);
