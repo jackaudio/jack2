@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -101,7 +101,28 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     void* buffer;
 
     // Copy first buffer
+#ifdef __SSE__
+    jack_nframes_t frames_group = nframes / 4;
+    jack_nframes_t remaining_frames = nframes % 4;
+
+    float * source = static_cast<float*>(src_buffers[0]);
+    float * target = static_cast<float*>(mixbuffer);
+
+    while (frames_group > 0)
+    {
+        __m128 vec = _mm_load_ps(source);
+        _mm_store_ps(target, vec);
+        source += 4;
+        target += 4;
+        --frames_group;
+    }
+
+    for (jack_nframes_t i = 0; i != remaining_frames; ++i)
+        target[i] = source[i];
+
+#else
     memcpy(mixbuffer, src_buffers[0], nframes * sizeof(float));
+#endif
 
     // Mix remaining buffers
     for (int i = 1; i < src_count; ++i) {

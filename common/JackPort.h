@@ -58,7 +58,10 @@ class SERVER_EXPORT JackPort
 
         MEM_ALIGN(float fBuffer[BUFFER_SIZE_MAX], 64);  // 16 bytes alignment for vector code, 64 bytes better for cache loads/stores
 
-        bool IsUsed() const;
+        bool IsUsed() const
+        {
+            return fInUse;
+        }
 
         // RT
         void ClearBuffer(jack_nframes_t frames);

@@ -77,11 +77,6 @@ void JackPort::Release()
     fAlias2[0] = '\0';
 }
 
-bool JackPort::IsUsed() const
-{
-    return fInUse;
-}
-
 float* JackPort::GetBuffer()
 {
     return fBuffer;
