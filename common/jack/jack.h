@@ -193,7 +193,7 @@ extern "C"
      * on.  It should be called before jack_client_activate().
      */
     void jack_on_shutdown (jack_client_t *client,
-                           void (*function)(void *arg), void *arg);
+                           JackShutdownCallback shutdown_callback, void *arg);
 
     /**
      * Tell the Jack server to call @a process_callback whenever there is

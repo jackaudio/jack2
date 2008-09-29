@@ -40,8 +40,6 @@ class JackEngine;
 struct JackClientControl;
 struct JackEngineControl;
 
-typedef void (*JackShutdownCallback)(void *arg);
-
 /*!
 \brief The base class for clients: share part of the implementation for JackInternalClient and JackLibClient.
 */

@@ -215,6 +215,14 @@ typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* new_name,
 typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown.
+ *
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackShutdownCallback)(void *arg);
+
+/**
  * Used for the type argument of jack_port_register() for default
  * audio ports and midi ports.
  */

@@ -113,8 +113,8 @@ bool JackFifo::TimedWait(long usec)
         return Wait();
     } else {
         jack_error("JackFifo::TimedWait name = %s usec = %ld err = %s", fName, usec, strerror(errno));
-	// Wait failure but we still continue...
-  	return true;
+        // Wait failure but we still continue...
+        return true;
     }
 }
 #endif

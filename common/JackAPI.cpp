@@ -45,6 +45,9 @@ extern "C"
 {
 #endif
 
+    typedef void (*print_function)(const char *);
+    typedef void *(*thread_routine)(void*);
+
     EXPORT
     void
     jack_get_version(
@@ -72,7 +75,7 @@ extern "C"
     EXPORT void jack_internal_client_close (const char *client_name);
     EXPORT int jack_is_realtime (jack_client_t *client);
     EXPORT void jack_on_shutdown (jack_client_t *client,
-                                  void (*function)(void *arg), void *arg);
+                                  JackShutdownCallback shutdown_callback, void *arg);
     EXPORT int jack_set_process_callback (jack_client_t *client,
                                           JackProcessCallback process_callback,
                                           void *arg);
@@ -179,8 +182,8 @@ extern "C"
     EXPORT jack_nframes_t jack_last_frame_time (const jack_client_t *client);
     EXPORT float jack_cpu_load (jack_client_t *client);
     EXPORT pthread_t jack_client_thread_id (jack_client_t *);
-    EXPORT void jack_set_error_function (void (*func)(const char *));
-    EXPORT void jack_set_info_function (void (*func)(const char *));
+    EXPORT void jack_set_error_function (print_function);
+    EXPORT void jack_set_info_function (print_function);
 
     EXPORT float jack_get_max_delayed_usecs (jack_client_t *client);
     EXPORT float jack_get_xrun_delayed_usecs (jack_client_t *client);
@@ -215,7 +218,7 @@ extern "C"
                                           pthread_t *thread,
                                           int priority,
                                           int realtime, 	// boolean
-                                          void *(*start_routine)(void*),
+                                          thread_routine routine,
                                           void *arg);
     EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
     
@@ -272,12 +275,12 @@ static inline void WaitGraphChange()
     }
 }
 
-EXPORT void jack_set_error_function (void (*func)(const char *))
+EXPORT void jack_set_error_function (print_function func)
 {
     jack_error_callback = func;
 }
 
-EXPORT void jack_set_info_function (void (*func)(const char *))
+EXPORT void jack_set_info_function (print_function func)
 {
     jack_info_callback = func;
 }
@@ -798,7 +801,7 @@ EXPORT int jack_is_realtime(jack_client_t* ext_client)
     }
 }
 
-EXPORT void jack_on_shutdown(jack_client_t* ext_client, void (*function)(void* arg), void* arg)
+EXPORT void jack_on_shutdown(jack_client_t* ext_client, JackShutdownCallback callback, void* arg)
 {
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
@@ -807,7 +810,7 @@ EXPORT void jack_on_shutdown(jack_client_t* ext_client, void (*function)(void* a
     if (client == NULL) {
         jack_error("jack_on_shutdown called with a NULL client");
     } else {
-        client->OnShutdown(function, arg);
+        client->OnShutdown(callback, arg);
     }
 }
 
@@ -1724,10 +1727,10 @@ EXPORT int jack_client_create_thread(jack_client_t* client,
                                      pthread_t *thread,
                                      int priority,
                                      int realtime,  	/* boolean */
-                                     void *(*start_routine)(void*),
+                                     thread_routine routine,
                                      void *arg)
 {
-    return JackThread::StartImp(thread, priority, realtime, start_routine, arg);
+    return JackThread::StartImp(thread, priority, realtime, routine, arg);
 }
 
 EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
