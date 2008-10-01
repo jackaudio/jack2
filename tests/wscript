@@ -8,6 +8,7 @@ test_programs = {
     'testSem': ['testSem.cpp'],
     'jack_test': ['jack_test.cpp'],
     'jack_cpu': ['jack_cpu.c'],
+    'jdelay': ['jdelay.cpp'],
     }
 
 def build(bld):
