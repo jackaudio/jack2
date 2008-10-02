@@ -26,6 +26,7 @@ Michael Voigt
 2008-10-02 Stephane Letz  <letz@grame.fr>
 	
 	* Correct file permission for jack-shm-registry POSIX shared memory segment.
+	* Checking for libsamplerate in waf, fix ticket #89." 
 
 2008-09-22 Stephane Letz  <letz@grame.fr>
 	

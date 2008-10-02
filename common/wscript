@@ -6,6 +6,16 @@ import os
 
 def configure(conf):
     conf.check_tool('misc')
+    e = conf.create_header_configurator()
+    e.name = 'samplerate.h'
+    e.define = 'HAVE_SAMPLERATE'
+    e.run()
+   
+    if conf.is_defined('HAVE_SAMPLERATE'):
+        conf.env['LIB_SAMPLERATE'] = ['samplerate']
+
+    conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
+
 
 # by default waf subst tool uses @VAR@ while scons legacy is ${VAR}
 # so we use same template as scons for now
@@ -214,8 +224,9 @@ def build(bld):
         'JackNetAdapter.cpp',
         ]
 
-    process = create_jack_process_obj(bld, 'netadapter', net_adapter_sources, serverlib)
-    process.env.append_value("LINKFLAGS", "-lsamplerate")
+    if bld.env()['BUILD_ADAPTER'] == True:
+        process = create_jack_process_obj(bld, 'netadapter', net_adapter_sources, serverlib)
+        process.uselib = 'SAMPLERATE'
 
     audio_adapter_sources = [
         'JackResampler.cpp',
@@ -225,16 +236,16 @@ def build(bld):
         'JackAudioAdapterFactory.cpp',
         ]
 
-    if bld.env()['IS_MACOSX']:
+    if bld.env()['BUILD_ADAPTER'] and bld.env()['IS_MACOSX']:
          audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.env.append_value("LINKFLAGS", "../macosx/libportaudio.a -framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
-         process.env.append_value("LINKFLAGS", "-lsamplerate")
+         process.env.append_value("LINKFLAGS", "-framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
+         process.uselib = 'SAMPLERATE'
 
-    if bld.env()['IS_LINUX']:
+    if bld.env()['BUILD_ADAPTER'] and bld.env()['IS_LINUX']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
-         process.env.append_value("LINKFLAGS", "-lasound -lsamplerate")
+         process.uselib = ['ALSA', 'SAMPLERATE']
 
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
