@@ -36,7 +36,6 @@
 #include "hardware.h"
 #include "driver.h"
 #include "memops.h"
-
 #include "alsa_midi.h"
 
 typedef void (*ReadCopyFunction)  (jack_default_audio_sample_t *dst, char *src,

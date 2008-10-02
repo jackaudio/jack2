@@ -18,10 +18,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackServerLaunch.h"
 
 int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* status)

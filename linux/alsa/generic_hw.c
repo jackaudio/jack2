@@ -18,10 +18,6 @@
     $Id: generic_hw.c,v 1.2 2005/08/29 10:36:28 letz Exp $
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "hardware.h"
 #include "alsa_driver.h"
 

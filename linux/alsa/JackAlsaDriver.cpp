@@ -18,13 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include <iostream>
 #include <unistd.h>
-
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
@@ -44,16 +39,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackLockedEngine.h"
-
+#include "JackPosixThread.h"
+#include "JackCompilerDeps.h"
 #include "hammerfall.h"
 #include "hdsp.h"
 #include "ice1712.h"
 #include "usx2y.h"
 #include "generic.h"
 #include "memops.h"
-
-#include "JackPosixThread.h"
-#include "JackCompilerDeps.h"
 
 namespace Jack
 {

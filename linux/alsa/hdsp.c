@@ -19,10 +19,6 @@
     $Id: hdsp.c,v 1.3 2005/09/29 14:51:59 letz Exp $
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "hardware.h"
 #include "alsa_driver.h"
 #include "hdsp.h"

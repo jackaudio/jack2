@@ -18,22 +18,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackSystemDeps.h"
 #include "JackDriverLoader.h"
 #include "JackConstants.h"
 #include "JackError.h"
 #include <getopt.h>
 #include <stdio.h>
+#include <errno.h>
 
 #ifndef WIN32
 #include <dirent.h>
 #endif
-
-#include <errno.h>
 
 jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver_t * driver);
 

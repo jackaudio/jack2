@@ -18,10 +18,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackSystemDeps.h"
 #include "JackDriver.h"
 #include "JackTime.h"

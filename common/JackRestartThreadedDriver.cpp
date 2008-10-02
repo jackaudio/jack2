@@ -18,12 +18,7 @@
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackSystemDeps.h"
-
 #include "JackRestartThreadedDriver.h"
 #include "JackException.h"
 

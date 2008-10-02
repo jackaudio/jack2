@@ -18,10 +18,6 @@
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "hardware.h"
 #include "alsa_driver.h"
 #include "usx2y.h"

@@ -18,10 +18,6 @@ This program is free software; you can redistribute it and/or modify
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackSystemDeps.h"
 #include "JackGraphManager.h"
 #include "JackInternalClient.h"

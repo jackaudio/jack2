@@ -18,10 +18,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 /* Required for clock_nanosleep(). Thanks, Nedko */
 #define _GNU_SOURCE
 
@@ -33,9 +29,9 @@
 #include <limits.h>
 #include <ctype.h>
 #include <alsa/asoundlib.h>
-#include <jack/ringbuffer.h>
-#include <jack/midiport.h>
 
+#include "ringbuffer.h"
+#include "midiport.h"
 #include "alsa_midi_impl.h"
 #include "midi_pack.h"
 #include "midi_unpack.h"

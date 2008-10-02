@@ -19,6 +19,7 @@
 #ifndef __jack_alsa_midi_impl_h__
 #define __jack_alsa_midi_impl_h__
 
+#include "JackConstants.h"
 
 #ifdef JACKMP
 
@@ -59,11 +60,10 @@ extern "C"
 
 #else // usual jack
 
-#include "jack/jack.h"
-#include "jack/thread.h"
+#include "jack.h"
+#include "thread.h"
 
 #endif
-
 
 #if defined(STANDALONE)
 #define MESSAGE(...) fprintf(stderr, __VA_ARGS__)
@@ -80,8 +80,6 @@ extern "C"
 #define debug_log(...)
 #endif
 
-
 #include "alsa_midi.h"
-
 
 #endif /* __jack_alsa_midi_impl_h__ */

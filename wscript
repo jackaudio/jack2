@@ -66,6 +66,8 @@ def set_options(opt):
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--monitor', action='store_true', default=False, help='Build with monitoring records')
+    opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
+    opt.add_option('--ports', default=512, type="int", dest="ports", help='Maximum number of ports')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -98,6 +100,9 @@ def configure(conf):
     conf.env['BUILD_DOXYGEN_DOCS'] = Params.g_options.doxygen
     conf.env['BUILD_WITH_MONITOR'] = Params.g_options.monitor
 
+    conf.define('CLIENT_NUM', Params.g_options.clients)
+    conf.define('PORT_NUM', Params.g_options. ports)
+
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
     conf.define('__SMP__', 1)
@@ -124,12 +129,15 @@ def configure(conf):
     else:
         version_msg += " svn revision will checked and eventually updated during build"
     print version_msg
-    print
 
+    print "Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM']
+    print "Build with a maximum of %d ports" % conf.env['PORT_NUM']
+ 
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with monitoring records', conf.env['BUILD_WITH_MONITOR'])
+    
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)

@@ -20,10 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackAudioAdapterInterface__
 #define __JackAudioAdapterInterface__
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "ringbuffer.h"
 #include "jack.h"
 #include "JackError.h"

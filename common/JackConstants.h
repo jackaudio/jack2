@@ -20,8 +20,12 @@
 #ifndef __JackConstants__
 #define __JackConstants__
 
-namespace Jack
-{
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+//namespace Jack
+//{
 
 #define VERSION "1.90"
 
@@ -32,14 +36,19 @@ namespace Jack
 
 #define JACK_CLIENT_NAME_SIZE 64
 
-#define FIRST_AVAILABLE_PORT 1
+#ifndef PORT_NUM
 #define PORT_NUM 512
+#endif
+
 #define DRIVER_PORT_NUM 256
 #define PORT_NUM_FOR_CLIENT 256
+#define FIRST_AVAILABLE_PORT 1
 
 #define CONNECTION_NUM_FOR_PORT 256
 
+#ifndef CLIENT_NUM
 #define CLIENT_NUM 64
+#endif
 
 #define AUDIO_DRIVER_REFNUM   0                     // Audio driver is initialized first, it will get the refnum 0
 #define FREEWHEEL_DRIVER_REFNUM   1                 // Freewheel driver is initialized second, it will get the refnum 1
@@ -82,6 +91,6 @@ namespace Jack
 #define EMPTY   0xFFFD
 #define FREE	0xFFFC
 
-} // end of namespace
+//} // end of namespace
 
 #endif
