@@ -685,7 +685,7 @@ jack_create_registry (jack_shm_info_t *ri)
 {
 	/* registry must be locked */
 	int shm_fd;
-
+  
 	strncpy (registry_id, "/jack-shm-registry", sizeof (registry_id));
 
 	if ((shm_fd = shm_open (registry_id, O_RDWR|O_CREAT, 0666)) < 0) {
@@ -694,6 +694,11 @@ jack_create_registry (jack_shm_info_t *ri)
 			    strerror (errno));
 		return rc;
 	}
+ 
+        /* Previous shm_open result depends of the actual value of umask, force correct file permisssion here */
+        if (fchmod(shm_fd, 0666) < 0) {
+	    jack_error ("Cannot chmod registry size (%s)", strerror (errno));	
+        }
 
 	/* Set the desired segment size.  NOTE: the non-conformant Mac
 	 * OS X POSIX shm only allows ftruncate() on segment creation.

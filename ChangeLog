@@ -23,15 +23,19 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
-2008-08-22 Stephane Letz  <letz@grame.fr>
+2008-10-02 Stephane Letz  <letz@grame.fr>
+	
+	* Correct file permission for jack-shm-registry POSIX shared memory segment.
+
+2008-09-22 Stephane Letz  <letz@grame.fr>
 	
 	* Cleanup jack_port_id_t/jack_port_t mess, should work again on 64 bits machines."
 
-2008-08-20 Stephane Letz  <letz@grame.fr>
+2008-09-20 Stephane Letz  <letz@grame.fr>
 	
 	* Michael Voigt JackAPI cleanup patch.
 
-2008-08-19 Stephane Letz  <letz@grame.fr>
+2008-09-19 Stephane Letz  <letz@grame.fr>
 	
 	* Michael Voigt JackTime cleanup patch.
 
