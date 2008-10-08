@@ -105,7 +105,6 @@ def configure(conf):
 
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
-    conf.define('__SMP__', 1)
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:

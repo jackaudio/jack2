@@ -52,11 +52,7 @@ static inline int CAS(register UInt32 value, register UInt32 newvalue, register 
 
 #if defined(__i386__) || defined(__x86_64__)
 
-#ifdef __SMP__
-#	define LOCK "lock ; "
-#else
-#	define LOCK ""
-#endif
+#define LOCK "lock ; "
 
 static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {

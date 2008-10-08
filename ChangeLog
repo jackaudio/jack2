@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-10-08 Stephane Letz  <letz@grame.fr>
+	
+	* Fix a SMP related bug introduced in rev 2957 : remove the __SMP__ flag and define LOCK for SMP in all cases.
+
 2008-10-02 Stephane Letz  <letz@grame.fr>
 	
 	* Correct file permission for jack-shm-registry POSIX shared memory segment.

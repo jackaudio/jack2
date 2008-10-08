@@ -55,11 +55,7 @@ inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void * addr)
 
 #else
 
-#ifdef __SMP__
-#	define LOCK "lock ; "
-#else
-#	define LOCK ""
-#endif
+#define LOCK "lock ; "
 
 static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {

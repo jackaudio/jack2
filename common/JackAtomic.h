@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackAtomic__
 
 #include "JackTypes.h"
-
 #include "JackAtomic_os.h"
 
 static inline long INC_ATOMIC(volatile SInt32* val)
