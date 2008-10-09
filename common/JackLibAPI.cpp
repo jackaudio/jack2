@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTools.h"
 #include "JackSystemDeps.h"
 #include "JackServerLaunch.h"
+#include <assert.h>
 
 using namespace Jack;
 
@@ -112,27 +113,33 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
+    assert(gOpenMutex);
+    gOpenMutex->Lock();
     va_list ap;
     va_start(ap, status);
     jack_client_t* res = jack_client_open_aux(ext_client_name, options, status, ap);
     va_end(ap);
+    gOpenMutex->Unlock();
     return res;
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)
 {
+    assert(gOpenMutex);
+    gOpenMutex->Lock();
+    int res = -1;
     jack_log("jack_client_close");
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_client_close called with a NULL client");
-        return -1;
     } else {
-        int res = client->Close();
+        res = client->Close();
         delete client;
         JackLibGlobals::Destroy(); // jack library destruction
         jack_log("jack_client_close res = %d", res);
-        return res;
     }
+    gOpenMutex->Unlock();
+    return res;
 }
 
 EXPORT int jack_get_client_pid(const char *name)

@@ -24,9 +24,6 @@
 #include "config.h"
 #endif
 
-//namespace Jack
-//{
-
 #define VERSION "1.90"
 
 #define BUFFER_SIZE_MAX 8192
@@ -90,7 +87,5 @@
 
 #define EMPTY   0xFFFD
 #define FREE	0xFFFC
-
-//} // end of namespace
 
 #endif

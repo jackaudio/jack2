@@ -390,7 +390,7 @@ EXPORT const char* jack_port_type(const jack_port_t* port)
     }
 }
 
-EXPORT jack_port_type_id_t jack_port_type_id (const jack_port_t *port)
+EXPORT jack_port_type_id_t jack_port_type_id(const jack_port_t *port)
 {
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();

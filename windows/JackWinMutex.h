@@ -55,7 +55,7 @@ class JackWinMutex
 
         bool Trylock()
         {
-           return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
+            return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
         }
 
         void Unlock()

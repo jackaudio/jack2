@@ -49,7 +49,7 @@ extern "C"
 using namespace Jack;
 
 // beware!!! things can go nasty if one client is started with JackNoStartServer and another without it
-bool g_nostart;
+static bool g_nostart;
 
 EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
@@ -115,29 +115,35 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
+    assert(gOpenMutex);
+    gOpenMutex->Lock();
     va_list ap;
     va_start(ap, status);
-    jack_client_t* res =  jack_client_open_aux(ext_client_name, options, status, ap);
+    jack_client_t* res = jack_client_open_aux(ext_client_name, options, status, ap);
     va_end(ap);
+    gOpenMutex->Unlock();
     return res;
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)
 {
+    assert(gOpenMutex);
+    gOpenMutex->Lock();
+    int res = -1;
     jack_log("jack_client_close");
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_client_close called with a NULL client");
-        return -1;
     } else {
-        int res = client->Close();
+        res = client->Close();
         delete client;
         if (!g_nostart) {
             JackServerGlobals::Destroy();	// jack server destruction
         }
         jack_log("jack_client_close res = %d", res);
-        return res;
     }
+    gOpenMutex->Unlock();
+    return res;
 }
 
 EXPORT int jack_get_client_pid(const char *name)
