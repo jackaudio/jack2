@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2003 Bob Ham <rah@bash.sh>
+  Copyright (C) 2008 Nedko Arnaudov <nedko@arnaudov.name>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
@@ -55,6 +56,21 @@ extern "C"
         char str[JACK_DRIVER_PARAM_STRING_MAX + 1];
     } jack_driver_param_value_t;
 
+    typedef struct {
+        bool range;             /**< if true - constraint is a range (min-max), if false - it is an enumeration */
+
+        union {
+            struct {
+                jack_driver_param_value_t min;
+                jack_driver_param_value_t max;
+            } range;
+
+            struct {
+                uint32_t count;
+                jack_driver_param_value_t * possible_values_array;
+            } enumeration;
+        } constraint;
+    } jack_driver_param_constraint_desc_t;
 
     /** A driver parameter descriptor */
     typedef struct {
@@ -62,6 +78,7 @@ extern "C"
         char character;                    /**< The parameter's character (for getopt, etc) */
         jack_driver_param_type_t type;     /**< The parameter's type */
         jack_driver_param_value_t value;   /**< The parameter's (default) value */
+        jack_driver_param_constraint_desc_t * constraint; /**< Pointer to parameter constraint descriptor. NULL if there is no constraint */
         char short_desc[64];               /**< A short (~30 chars) description for the user */
         char long_desc[1024];              /**< A longer description for the user */
     }
