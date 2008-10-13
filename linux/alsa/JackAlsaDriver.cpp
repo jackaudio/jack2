@@ -2413,6 +2413,115 @@ extern "C"
 {
 #endif
 
+static
+void
+fill_device(
+    jack_driver_param_constraint_desc_t ** constraint_ptr_ptr,
+    uint32_t * array_size_ptr,
+    const char * device_id,
+    const char * device_description)
+{
+    jack_driver_param_value_enum_t * possible_value_ptr;
+
+    //jack_info("%6s - %s", device_id, device_description);
+
+    if (*constraint_ptr_ptr == NULL)
+    {
+        *constraint_ptr_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
+        *array_size_ptr = 0;
+    }
+
+    if ((*constraint_ptr_ptr)->constraint.enumeration.count == *array_size_ptr)
+    {
+        *array_size_ptr += 10;
+        (*constraint_ptr_ptr)->constraint.enumeration.possible_values_array =
+            (jack_driver_param_value_enum_t *)realloc(
+                (*constraint_ptr_ptr)->constraint.enumeration.possible_values_array,
+                sizeof(jack_driver_param_value_enum_t) * *array_size_ptr);
+    }
+
+    possible_value_ptr = (*constraint_ptr_ptr)->constraint.enumeration.possible_values_array + (*constraint_ptr_ptr)->constraint.enumeration.count;
+    (*constraint_ptr_ptr)->constraint.enumeration.count++;
+    strcpy(possible_value_ptr->value.str, device_id);
+    strcpy(possible_value_ptr->short_desc, device_description);
+}
+
+static
+jack_driver_param_constraint_desc_t *
+enum_alsa_devices()
+{
+    snd_ctl_t * handle;
+    snd_ctl_card_info_t * info;
+    snd_pcm_info_t * pcminfo_capture;
+    snd_pcm_info_t * pcminfo_playback;
+    int card_no = -1;
+    char card_id[JACK_DRIVER_PARAM_STRING_MAX + 1];
+    char device_id[JACK_DRIVER_PARAM_STRING_MAX + 1];
+    char description[64];
+    int device_no;
+    bool has_capture;
+    bool has_playback;
+    jack_driver_param_constraint_desc_t * constraint_ptr;
+    uint32_t array_size;
+
+    snd_ctl_card_info_alloca(&info);
+    snd_pcm_info_alloca(&pcminfo_capture);
+    snd_pcm_info_alloca(&pcminfo_playback);
+
+    constraint_ptr = NULL;
+
+    while(snd_card_next(&card_no) >= 0 && card_no >= 0)
+    {
+        sprintf(card_id, "hw:%d", card_no);
+
+        if (snd_ctl_open(&handle, card_id, 0) >= 0 &&
+            snd_ctl_card_info(handle, info) >= 0)
+        {
+            fill_device(&constraint_ptr, &array_size, card_id, snd_ctl_card_info_get_name(info));
+
+            device_no = -1;
+
+            while (snd_ctl_pcm_next_device(handle, &device_no) >= 0 && device_no != -1)
+            {
+                sprintf(device_id, "%s,%d", card_id, device_no);
+
+                snd_pcm_info_set_device(pcminfo_capture, device_no);
+                snd_pcm_info_set_subdevice(pcminfo_capture, 0);
+                snd_pcm_info_set_stream(pcminfo_capture, SND_PCM_STREAM_CAPTURE);
+                has_capture = snd_ctl_pcm_info(handle, pcminfo_capture) >= 0;
+
+                snd_pcm_info_set_device(pcminfo_playback, device_no);
+                snd_pcm_info_set_subdevice(pcminfo_playback, 0);
+                snd_pcm_info_set_stream(pcminfo_playback, SND_PCM_STREAM_PLAYBACK);
+                has_playback = snd_ctl_pcm_info(handle, pcminfo_playback) >= 0;
+
+                if (has_capture && has_playback)
+                {
+                    snprintf(description, sizeof(description),"%s (duplex)", snd_pcm_info_get_name(pcminfo_capture));
+                }
+                else if (has_capture)
+                {
+                    snprintf(description, sizeof(description),"%s (capture)", snd_pcm_info_get_name(pcminfo_capture));
+                }
+                else if (has_playback)
+                {
+                    snprintf(description, sizeof(description),"%s (playback)", snd_pcm_info_get_name(pcminfo_playback));
+                }
+                else
+                {
+                    continue;
+                }
+
+                fill_device(&constraint_ptr, &array_size, device_id, description);
+            }
+
+            snd_ctl_close(handle);
+        }
+    }
+
+    return constraint_ptr;
+}
+
     static int
     dither_opt (char c, DitherAlgorithm* dither) 
     {
@@ -2480,6 +2589,7 @@ extern "C"
         strcpy (params[i].value.str, "hw:0");
         strcpy (params[i].short_desc, "ALSA device name");
         strcpy (params[i].long_desc, params[i].short_desc);
+        params[i].constraint = enum_alsa_devices();
 
         i++;
         strcpy (params[i].name, "rate");
