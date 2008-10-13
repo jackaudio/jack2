@@ -39,7 +39,7 @@ extern "C"
 
 #define JACK_CONSTRAINT_FLAG_RANGE       ((uint32_t)1) /**< if set, constraint is a range (min-max) */
 #define JACK_CONSTRAINT_FLAG_STRICT      ((uint32_t)2) /**< if set, constraint is strict, i.e. supplying non-matching value will not work */
-#define JACK_CONSTRAINT_FLAG_FAKE_VALUE  ((uint32_t)2) /**< if set, values have no user meaningful meaning */
+#define JACK_CONSTRAINT_FLAG_FAKE_VALUE  ((uint32_t)4) /**< if set, values have no user meaningful meaning */
 
     /** Driver parameter types */
     typedef enum
