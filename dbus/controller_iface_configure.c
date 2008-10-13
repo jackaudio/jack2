@@ -800,6 +800,39 @@ jack_controller_dbus_get_engine_parameter_info(
 }
 
 /*
+ * Execute GetEngineParameterConstraint method call.
+ */
+static
+void
+jack_controller_dbus_get_engine_parameter_constraint(
+    struct jack_dbus_method_call *call)
+{
+    const char *parameter_name;
+    jackctl_parameter_t *parameter;
+
+    if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &parameter_name, DBUS_TYPE_INVALID))
+    {
+        /* The method call had invalid arguments meaning that
+         * jack_dbus_get_method_args() has constructed an error for us.
+         */
+        return;
+    }
+
+    parameter = jack_controller_find_parameter(jackctl_server_get_parameters(controller_ptr->server), parameter_name);
+    if (parameter == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_ENGINE_PARAMETER,
+            "Unknown engine parameter \"%s\"",
+            parameter);
+        return;
+    }
+
+    jack_controller_get_parameter_constraint(call, parameter);
+}
+
+/*
  * Execute GetDriverParameterValue method call.
  */
 static
@@ -1007,6 +1040,53 @@ jack_controller_dbus_get_internal_parameter_info(
 }
 
 /*
+ * Execute GetInternalParameterConstraint method call.
+ */
+static
+void
+jack_controller_dbus_get_internal_parameter_constraint(
+    struct jack_dbus_method_call *call)
+{
+    const char *internal_name;
+    const char *parameter_name;
+    jackctl_parameter_t *parameter;
+    jackctl_internal_t * internal;
+
+    if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &internal_name, DBUS_TYPE_STRING, &parameter_name, DBUS_TYPE_INVALID))
+    {
+        /* The method call had invalid arguments meaning that
+         * get_method_args() has constructed an error for us.
+         */
+        return;
+    }
+
+    internal = jack_controller_find_internal(controller_ptr->server, internal_name);
+    if (internal == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+            "Unknown internal \"%s\"",
+            internal_name);
+        return;
+    }
+
+    parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), parameter_name);
+    if (parameter == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER,
+            "Unknown parameter \"%s\" for driver \"%s\"",
+            parameter_name,
+            jackctl_driver_get_name(controller_ptr->driver));
+        return;
+    }
+
+    jack_controller_get_parameter_constraint(call, parameter);
+}
+
+/*
  * Execute GetInternalParameterValue method call.
  */
 static void
@@ -1202,6 +1282,14 @@ JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetEngineParameterInfo)
     JACK_DBUS_METHOD_ARGUMENT("parameter_info", "(ysss)", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetEngineParameterConstraint)
+    JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("is_range", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_strict", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_fake_value", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("values", "a(vs)", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetEngineParameterValue)
     JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
     JACK_DBUS_METHOD_ARGUMENT("is_set", "b", true)
@@ -1229,6 +1317,15 @@ JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetInternalParameterInfo)
     JACK_DBUS_METHOD_ARGUMENT("parameter_info", "(ysss)", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetInternalParameterConstraint)
+    JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("is_range", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_strict", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_fake_value", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("values", "a(vs)", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetInternalParameterValue)
     JACK_DBUS_METHOD_ARGUMENT("internal", "s", false)
     JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
@@ -1253,12 +1350,14 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterValue, jack_controller_dbus_get_driver_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetDriverParameterValue, jack_controller_dbus_set_driver_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParametersInfo, jack_controller_dbus_get_engine_parameters_info)
+    JACK_DBUS_METHOD_DESCRIBE(GetEngineParameterConstraint, jack_controller_dbus_get_engine_parameter_constraint)
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParameterInfo, jack_controller_dbus_get_engine_parameter_info)
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParameterValue, jack_controller_dbus_get_engine_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetEngineParameterValue, jack_controller_dbus_set_engine_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(GetAvailableInternals, jack_controller_dbus_get_available_internals)
     JACK_DBUS_METHOD_DESCRIBE(GetInternalParametersInfo, jack_controller_dbus_get_internal_parameters_info)
     JACK_DBUS_METHOD_DESCRIBE(GetInternalParameterInfo, jack_controller_dbus_get_internal_parameter_info)
+    JACK_DBUS_METHOD_DESCRIBE(GetInternalParameterConstraint, jack_controller_dbus_get_internal_parameter_constraint)
     JACK_DBUS_METHOD_DESCRIBE(GetInternalParameterValue, jack_controller_dbus_get_internal_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetInternalParameterValue, jack_controller_dbus_set_internal_parameter_value)
 JACK_DBUS_METHODS_END
