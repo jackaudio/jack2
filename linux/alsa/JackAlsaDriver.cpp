@@ -2522,6 +2522,77 @@ enum_alsa_devices()
     return constraint_ptr;
 }
 
+static
+jack_driver_param_constraint_desc_t *
+get_midi_driver_constraint()
+{
+    jack_driver_param_constraint_desc_t * constraint_ptr;
+    jack_driver_param_value_enum_t * possible_value_ptr;
+
+    //jack_info("%6s - %s", device_id, device_description);
+
+    constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
+    constraint_ptr->flags = JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE;
+
+    constraint_ptr->constraint.enumeration.possible_values_array = (jack_driver_param_value_enum_t *)malloc(3 * sizeof(jack_driver_param_value_enum_t));
+    constraint_ptr->constraint.enumeration.count = 3;
+
+    possible_value_ptr = constraint_ptr->constraint.enumeration.possible_values_array;
+
+    strcpy(possible_value_ptr->value.str, "none");
+    strcpy(possible_value_ptr->short_desc, "no MIDI driver");
+
+    possible_value_ptr++;
+
+    strcpy(possible_value_ptr->value.str, "seq");
+    strcpy(possible_value_ptr->short_desc, "ALSA Sequencer driver");
+
+    possible_value_ptr++;
+
+    strcpy(possible_value_ptr->value.str, "raw");
+    strcpy(possible_value_ptr->short_desc, "ALSA RawMIDI driver");
+
+    return constraint_ptr;
+}
+
+static
+jack_driver_param_constraint_desc_t *
+get_dither_constraint()
+{
+    jack_driver_param_constraint_desc_t * constraint_ptr;
+    jack_driver_param_value_enum_t * possible_value_ptr;
+
+    //jack_info("%6s - %s", device_id, device_description);
+
+    constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
+    constraint_ptr->flags = JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE;
+
+    constraint_ptr->constraint.enumeration.possible_values_array = (jack_driver_param_value_enum_t *)malloc(4 * sizeof(jack_driver_param_value_enum_t));
+    constraint_ptr->constraint.enumeration.count = 4;
+
+    possible_value_ptr = constraint_ptr->constraint.enumeration.possible_values_array;
+
+    possible_value_ptr->value.c = 'n';
+    strcpy(possible_value_ptr->short_desc, "none");
+
+    possible_value_ptr++;
+
+    possible_value_ptr->value.c = 'r';
+    strcpy(possible_value_ptr->short_desc, "rectangular");
+
+    possible_value_ptr++;
+
+    possible_value_ptr->value.c = 's';
+    strcpy(possible_value_ptr->short_desc, "shaped");
+
+    possible_value_ptr++;
+
+    possible_value_ptr->value.c = 't';
+    strcpy(possible_value_ptr->short_desc, "triangular");
+
+    return constraint_ptr;
+}
+
     static int
     dither_opt (char c, DitherAlgorithm* dither) 
     {
@@ -2668,6 +2739,7 @@ enum_alsa_devices()
                 "  r - rectangular\n"
                 "  s - shaped\n"
                 "  t - triangular");
+        params[i].constraint = get_dither_constraint();
 
         i++;
         strcpy (params[i].name, "inchannels");
@@ -2722,6 +2794,7 @@ enum_alsa_devices()
                 " none - no MIDI driver\n"
                 " seq - ALSA Sequencer driver\n"
                 " raw - ALSA RawMIDI driver\n");
+        params[i].constraint = get_midi_driver_constraint();
 
         desc->params = params;
         return desc;
