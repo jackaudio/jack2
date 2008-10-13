@@ -910,23 +910,6 @@ EXPORT const char * jackctl_parameter_get_short_description(jackctl_parameter *p
 
 EXPORT const char * jackctl_parameter_get_long_description(jackctl_parameter *parameter_ptr)
 {
-    if (parameter_ptr->constraint_ptr)
-    {
-        if (parameter_ptr->constraint_ptr->range)
-        {
-        }
-        else
-        {
-            uint32_t i;
-            for (i = 0 ; i < parameter_ptr->constraint_ptr->constraint.enumeration.count ; i++)
-            {
-                jack_info("%s", parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[i].value.str);
-                jack_info("%s", parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[i].short_desc);
-                //jack_info("%6s - %s", device_id, device_description);
-            }
-        }
-    }
-
     return parameter_ptr->long_description;
 }
 
