@@ -164,6 +164,34 @@ EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
     jackctl_parameter *parameter_ptr);
     
+EXPORT bool
+jackctl_parameter_has_range_constraint(
+	jackctl_parameter_t * parameter_ptr);
+
+EXPORT bool
+jackctl_parameter_has_enum_constraint(
+	jackctl_parameter_t * parameter_ptr);
+
+EXPORT uint32_t
+jackctl_parameter_get_enum_constraints_count(
+	jackctl_parameter_t * parameter_ptr);
+
+EXPORT union jackctl_parameter_value
+jackctl_parameter_get_enum_constraint_value(
+	jackctl_parameter_t * parameter_ptr,
+	uint32_t index);
+
+EXPORT const char *
+jackctl_parameter_get_enum_constraint_description(
+	jackctl_parameter_t * parameter_ptr,
+	uint32_t index);
+
+EXPORT void
+jackctl_parameter_get_range_constraint(
+	jackctl_parameter_t * parameter_ptr,
+	union jackctl_parameter_value * min_ptr,
+	union jackctl_parameter_value * max_ptr);
+
 EXPORT const JSList * 
 jackctl_server_get_internals_list(
     jackctl_server *server_ptr);
