@@ -57,6 +57,11 @@ extern "C"
     } jack_driver_param_value_t;
 
     typedef struct {
+        jack_driver_param_value_t value;
+        char short_desc[64];               /**< A short (~30 chars) description for the user */
+    } jack_driver_param_value_enum_t;
+
+    typedef struct {
         bool range;             /**< if true - constraint is a range (min-max), if false - it is an enumeration */
 
         union {
@@ -67,7 +72,7 @@ extern "C"
 
             struct {
                 uint32_t count;
-                jack_driver_param_value_t * possible_values_array;
+                jack_driver_param_value_enum_t * possible_values_array;
             } enumeration;
         } constraint;
     } jack_driver_param_constraint_desc_t;
