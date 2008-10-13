@@ -979,6 +979,11 @@ EXPORT union jackctl_parameter_value jackctl_parameter_get_enum_constraint_value
     return jackctl_value;
 }
 
+EXPORT const char * jackctl_parameter_get_enum_constraint_description(jackctl_parameter *parameter_ptr, uint32_t index)
+{
+    return parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[index].short_desc;
+}
+
 EXPORT void jackctl_parameter_get_range_constraint(jackctl_parameter *parameter_ptr, union jackctl_parameter_value * min_ptr, union jackctl_parameter_value * max_ptr)
 {
     switch (parameter_ptr->type)
@@ -995,11 +1000,6 @@ EXPORT void jackctl_parameter_get_range_constraint(jackctl_parameter *parameter_
         jack_error("bad driver parameter type %i (range constraint)", (int)parameter_ptr->type);
         assert(0);
     }
-}
-
-EXPORT const char * jackctl_parameter_get_enum_constraint_description(jackctl_parameter *parameter_ptr, uint32_t index)
-{
-    return parameter_ptr->constraint_ptr->constraint.enumeration.possible_values_array[index].short_desc;
 }
 
 EXPORT jackctl_param_type_t jackctl_parameter_get_type(jackctl_parameter *parameter_ptr)
