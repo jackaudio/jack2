@@ -409,6 +409,147 @@ fail:
     jack_error ("Ran out of memory trying to construct method return");
 }
 
+static
+void
+jack_controller_get_parameter_constraint(
+    struct jack_dbus_method_call * call,
+    jackctl_parameter_t * parameter)
+{
+    uint32_t index;
+    uint32_t count;
+	union jackctl_parameter_value min;
+	union jackctl_parameter_value max;
+    union jackctl_parameter_value jackctl_value;
+    DBusMessageIter iter, array_iter, struct_iter;
+    const char * descr;
+    jackctl_param_type_t type;
+    message_arg_t value;
+
+    jack_info("jack_controller_get_parameter_constraint() called.");
+
+    call->reply = dbus_message_new_method_return(call->message);
+    if (!call->reply)
+    {
+        goto fail;
+    }
+
+    dbus_message_iter_init_append(call->reply, &iter);
+
+    value.boolean = jackctl_parameter_has_range_constraint(parameter);
+
+    /* Append the is_set argument. */
+    if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &value))
+    {
+        goto fail_unref;
+    }
+
+    if (value.boolean)
+    {
+        jack_info("parameter with range constraint");
+
+        jackctl_parameter_get_range_constraint(parameter, &min, &max);
+        return;
+    }
+
+    count = jackctl_parameter_get_enum_constraints_count(parameter);
+
+    /* Open the array. */
+    if (!dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "(vs)", &array_iter))
+    {
+        goto fail_unref;
+    }
+
+    /* Append enum values to the array. */
+    for (index = 0 ; index < count ; index++)
+    {
+        jackctl_value = jackctl_parameter_get_enum_constraint_value(parameter, index);
+        descr = jackctl_parameter_get_enum_constraint_description(parameter, index);
+
+        type = jackctl_parameter_get_type(parameter);
+        jack_controller_jack_to_dbus_variant(type, &jackctl_value, &value);
+
+        /* Open the struct. */
+        if (!dbus_message_iter_open_container(&array_iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
+        {
+            goto fail_close_unref;
+        }
+
+        if (!jack_dbus_message_append_variant(&struct_iter, PARAM_TYPE_JACK_TO_DBUS(type), PARAM_TYPE_JACK_TO_DBUS_SIGNATURE(type), &value))
+        {
+            goto fail_close2_unref;
+        }
+
+        if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &descr))
+        {
+            goto fail_close2_unref;
+        }
+
+        /* Close the struct. */
+        if (!dbus_message_iter_close_container(&array_iter, &struct_iter))
+        {
+            goto fail_close_unref;
+        }
+    }
+
+    /* Close the array. */
+    if (!dbus_message_iter_close_container(&iter, &array_iter))
+    {
+        goto fail_unref;
+    }
+
+    return;
+
+fail_close2_unref:
+    dbus_message_iter_close_container(&array_iter, &struct_iter);
+
+fail_close_unref:
+    dbus_message_iter_close_container(&iter, &array_iter);
+
+fail_unref:
+    dbus_message_unref(call->reply);
+    call->reply = NULL;
+
+fail:
+    jack_error ("Ran out of memory trying to construct method return");
+}
+
+static
+void
+jack_controller_dbus_get_driver_parameter_constrinat(
+    struct jack_dbus_method_call * call)
+{
+    const char * parameter_name;
+    jackctl_parameter_t * parameter;
+
+    if (controller_ptr->driver == NULL)
+    {
+        jack_dbus_error (call, JACK_DBUS_ERROR_NEED_DRIVER, "No driver selected");
+        return;
+    }
+
+    if (!jack_dbus_get_method_args(call, DBUS_TYPE_STRING, &parameter_name, DBUS_TYPE_INVALID))
+    {
+        /* The method call had invalid arguments meaning that
+         * jack_dbus_get_method_args() has constructed an error for us.
+         */
+        return;
+    }
+
+    parameter = jack_controller_find_parameter(jackctl_driver_get_parameters(controller_ptr->driver), parameter_name);
+    if (parameter == NULL)
+    {
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER,
+            "Unknown parameter \"%s\" for driver \"%s\"",
+            parameter_name,
+            jackctl_driver_get_name(controller_ptr->driver));
+        return;
+    }
+
+    jack_controller_get_parameter_constraint(call, parameter);
+}
+
 /*
  * Execute GetDriverParametersInfo method call.
  */
@@ -1022,6 +1163,11 @@ JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterInfo)
     JACK_DBUS_METHOD_ARGUMENT("parameter_info", "(ysss)", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterConstraint)
+    JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
+    JACK_DBUS_METHOD_ARGUMENT("parameter_info", "ba(vs)", true)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterValue)
     JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
     JACK_DBUS_METHOD_ARGUMENT("is_set", "b", true)
@@ -1090,6 +1236,7 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(SelectDriver, jack_controller_dbus_select_driver)
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParametersInfo, jack_controller_dbus_get_driver_parameters_info)
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterInfo, jack_controller_dbus_get_driver_parameter_info)
+    JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterConstraint, jack_controller_dbus_get_driver_parameter_constrinat)
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterValue, jack_controller_dbus_get_driver_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetDriverParameterValue, jack_controller_dbus_set_driver_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParametersInfo, jack_controller_dbus_get_engine_parameters_info)
