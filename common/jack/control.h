@@ -311,38 +311,99 @@ union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
     
+/** 
+ * Call this function check whether parameter has range constraint.
+ * 
+ * @param parameter object handle of parameter to check
+ *
+ * @return whether parameter has range constraint.
+ */
 bool
 jackctl_parameter_has_range_constraint(
 	jackctl_parameter_t * parameter_ptr);
 
+/** 
+ * Call this function check whether parameter has enumeration constraint.
+ * 
+ * @param parameter object handle of parameter to check
+ *
+ * @return whether parameter has enumeration constraint.
+ */
 bool
 jackctl_parameter_has_enum_constraint(
 	jackctl_parameter_t * parameter_ptr);
 
+/** 
+ * Call this function get how many enumeration values parameter has.
+ * 
+ * @param parameter object handle of parameter
+ *
+ * @return number of enumeration values
+ */
 uint32_t
 jackctl_parameter_get_enum_constraints_count(
 	jackctl_parameter_t * parameter_ptr);
 
+/** 
+ * Call this function to get parameter enumeration value.
+ * 
+ * @param parameter object handle of parameter
+ * @param index index of parameter enumeration value
+ *
+ * @return enumeration value.
+ */
 union jackctl_parameter_value
 jackctl_parameter_get_enum_constraint_value(
 	jackctl_parameter_t * parameter_ptr,
 	uint32_t index);
 
+/** 
+ * Call this function to get parameter enumeration value description.
+ * 
+ * @param parameter object handle of parameter
+ * @param index index of parameter enumeration value
+ *
+ * @return enumeration value description.
+ */
 const char *
 jackctl_parameter_get_enum_constraint_description(
 	jackctl_parameter_t * parameter_ptr,
 	uint32_t index);
 
+/** 
+ * Call this function to get parameter range.
+ * 
+ * @param parameter object handle of parameter
+ * @param min_ptr pointer to variable receiving parameter minimum value
+ * @param max_ptr pointer to variable receiving parameter maximum value
+ */
 void
 jackctl_parameter_get_range_constraint(
 	jackctl_parameter_t * parameter_ptr,
 	union jackctl_parameter_value * min_ptr,
 	union jackctl_parameter_value * max_ptr);
 
+/** 
+ * Call this function to check whether parameter constraint is strict,
+ * i.e. whether supplying non-matching value will not work for sure.
+ * 
+ * @param parameter parameter object handle to check
+ *
+ * @return whether parameter constraint is strict.
+ */
 bool
 jackctl_parameter_constraint_is_strict(
 	jackctl_parameter_t * parameter_ptr);
 
+/** 
+ * Call this function to check whether parameter has fake values,
+ * i.e. values have no user meaningful meaning and only value
+ * description is meaningful to user.
+ * 
+ * @param parameter parameter object handle to check
+ *
+ * @return whether parameter constraint is strict.
+ */
 bool
 jackctl_parameter_constraint_is_fake_value(
 	jackctl_parameter_t * parameter_ptr);
