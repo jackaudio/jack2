@@ -1175,7 +1175,10 @@ JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterConstraint)
     JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
-    JACK_DBUS_METHOD_ARGUMENT("parameter_info", "bbba(vs)", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_range", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_strict", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("is_fake_value", "b", true)
+    JACK_DBUS_METHOD_ARGUMENT("values", "a(vs)", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterValue)
