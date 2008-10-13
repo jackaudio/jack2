@@ -311,6 +311,30 @@ union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
     
+
+bool
+jackctl_parameter_has_range_constraint(
+	jackctl_parameter_t * parameter_ptr);
+
+bool
+jackctl_parameter_has_enum_constraint(
+	jackctl_parameter_t * parameter_ptr);
+
+uint32_t
+jackctl_parameter_get_enum_constraints_count(
+	jackctl_parameter_t * parameter_ptr);
+
+union jackctl_parameter_value
+jackctl_parameter_get_enum_constraint_value(
+	jackctl_parameter_t * parameter_ptr,
+	uint32_t index);
+
+void
+jackctl_parameter_get_range_constraint(
+	jackctl_parameter_t * parameter_ptr,
+	union jackctl_parameter_value * min_ptr,
+	union jackctl_parameter_value * max_ptr);
+
 /** 
  * Call this function to get list of available internal clients. List node data
  * pointers is a internal client object handle (::jackctl_internal_t).
