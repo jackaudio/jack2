@@ -192,6 +192,14 @@ jackctl_parameter_get_range_constraint(
 	union jackctl_parameter_value * min_ptr,
 	union jackctl_parameter_value * max_ptr);
 
+EXPORT bool
+jackctl_parameter_constraint_is_strict(
+	jackctl_parameter_t * parameter_ptr);
+
+EXPORT bool
+jackctl_parameter_constraint_is_fake_value(
+	jackctl_parameter_t * parameter_ptr);
+
 EXPORT const JSList * 
 jackctl_server_get_internals_list(
     jackctl_server *server_ptr);

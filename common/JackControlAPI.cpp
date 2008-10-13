@@ -915,12 +915,12 @@ EXPORT const char * jackctl_parameter_get_long_description(jackctl_parameter *pa
 
 EXPORT bool jackctl_parameter_has_range_constraint(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->constraint_ptr != NULL && parameter_ptr->constraint_ptr->range;
+    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) != 0;
 }
 
 EXPORT bool jackctl_parameter_has_enum_constraint(jackctl_parameter *parameter_ptr)
 {
-    return parameter_ptr->constraint_ptr != NULL && !parameter_ptr->constraint_ptr->range;
+    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_RANGE) == 0;
 }
 
 EXPORT uint32_t jackctl_parameter_get_enum_constraints_count(jackctl_parameter *parameter_ptr)
@@ -983,6 +983,16 @@ EXPORT void jackctl_parameter_get_range_constraint(jackctl_parameter *parameter_
         jack_error("bad driver parameter type %i (range constraint)", (int)parameter_ptr->type);
         assert(0);
     }
+}
+
+EXPORT bool jackctl_parameter_constraint_is_strict(jackctl_parameter_t * parameter_ptr)
+{
+    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_STRICT) != 0;
+}
+
+EXPORT bool jackctl_parameter_constraint_is_fake_value(jackctl_parameter_t * parameter_ptr)
+{
+    return parameter_ptr->constraint_ptr != NULL && (parameter_ptr->constraint_ptr->flags & JACK_CONSTRAINT_FLAG_FAKE_VALUE) != 0;
 }
 
 EXPORT jackctl_param_type_t jackctl_parameter_get_type(jackctl_parameter *parameter_ptr)

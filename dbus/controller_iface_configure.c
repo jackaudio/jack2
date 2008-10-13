@@ -424,8 +424,7 @@ jack_controller_get_parameter_constraint(
     const char * descr;
     jackctl_param_type_t type;
     message_arg_t value;
-
-    jack_info("jack_controller_get_parameter_constraint() called.");
+    bool is_range;
 
     call->reply = dbus_message_new_method_return(call->message);
     if (!call->reply)
@@ -435,15 +434,26 @@ jack_controller_get_parameter_constraint(
 
     dbus_message_iter_init_append(call->reply, &iter);
 
-    value.boolean = jackctl_parameter_has_range_constraint(parameter);
-
-    /* Append the is_set argument. */
+    is_range = jackctl_parameter_has_range_constraint(parameter);
+    value.boolean = is_range;
     if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &value))
     {
         goto fail_unref;
     }
 
-    if (value.boolean)
+    value.boolean = jackctl_parameter_constraint_is_strict(parameter);
+    if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &value))
+    {
+        goto fail_unref;
+    }
+
+    value.boolean = jackctl_parameter_constraint_is_fake_value(parameter);
+    if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &value))
+    {
+        goto fail_unref;
+    }
+
+    if (is_range)
     {
         jack_info("parameter with range constraint");
 
@@ -515,7 +525,7 @@ fail:
 
 static
 void
-jack_controller_dbus_get_driver_parameter_constrinat(
+jack_controller_dbus_get_driver_parameter_constraint(
     struct jack_dbus_method_call * call)
 {
     const char * parameter_name;
@@ -1165,7 +1175,7 @@ JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterConstraint)
     JACK_DBUS_METHOD_ARGUMENT("parameter", "s", false)
-    JACK_DBUS_METHOD_ARGUMENT("parameter_info", "ba(vs)", true)
+    JACK_DBUS_METHOD_ARGUMENT("parameter_info", "bbba(vs)", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetDriverParameterValue)
@@ -1236,7 +1246,7 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(SelectDriver, jack_controller_dbus_select_driver)
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParametersInfo, jack_controller_dbus_get_driver_parameters_info)
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterInfo, jack_controller_dbus_get_driver_parameter_info)
-    JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterConstraint, jack_controller_dbus_get_driver_parameter_constrinat)
+    JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterConstraint, jack_controller_dbus_get_driver_parameter_constraint)
     JACK_DBUS_METHOD_DESCRIBE(GetDriverParameterValue, jack_controller_dbus_get_driver_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetDriverParameterValue, jack_controller_dbus_set_driver_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(GetEngineParametersInfo, jack_controller_dbus_get_engine_parameters_info)

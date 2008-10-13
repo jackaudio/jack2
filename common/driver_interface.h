@@ -37,6 +37,10 @@ extern "C"
 #define JACK_DRIVER_PARAM_DESC        255
 #define JACK_PATH_MAX                 511
 
+#define JACK_CONSTRAINT_FLAG_RANGE       ((uint32_t)1) /**< if set, constraint is a range (min-max) */
+#define JACK_CONSTRAINT_FLAG_STRICT      ((uint32_t)2) /**< if set, constraint is strict, i.e. supplying non-matching value will not work */
+#define JACK_CONSTRAINT_FLAG_FAKE_VALUE  ((uint32_t)2) /**< if set, values have no user meaningful meaning */
+
     /** Driver parameter types */
     typedef enum
     {
@@ -62,18 +66,18 @@ extern "C"
     } jack_driver_param_value_enum_t;
 
     typedef struct {
-        uint32_t range;         /**< if not 0 - constraint is a range (min-max), if zero - it is an enumeration */
+        uint32_t flags;         /**< JACK_CONSTRAINT_FLAG_XXX */
 
         union {
             struct {
                 jack_driver_param_value_t min;
                 jack_driver_param_value_t max;
-            } range;
+            } range;            /**< valid when JACK_CONSTRAINT_FLAG_RANGE flag is set */
 
             struct {
                 uint32_t count;
                 jack_driver_param_value_enum_t * possible_values_array;
-            } enumeration;
+            } enumeration;      /**< valid when JACK_CONSTRAINT_FLAG_RANGE flag is not set */
         } constraint;
     } jack_driver_param_constraint_desc_t;
 
