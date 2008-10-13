@@ -426,6 +426,8 @@ jack_controller_get_parameter_constraint(
     message_arg_t value;
     bool is_range;
 
+    type = jackctl_parameter_get_type(parameter);
+
     call->reply = dbus_message_new_method_return(call->message);
     if (!call->reply)
     {
@@ -453,30 +455,17 @@ jack_controller_get_parameter_constraint(
         goto fail_unref;
     }
 
-    if (is_range)
-    {
-        jack_info("parameter with range constraint");
-
-        jackctl_parameter_get_range_constraint(parameter, &min, &max);
-        return;
-    }
-
-    count = jackctl_parameter_get_enum_constraints_count(parameter);
-
     /* Open the array. */
     if (!dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "(vs)", &array_iter))
     {
         goto fail_unref;
     }
 
-    /* Append enum values to the array. */
-    for (index = 0 ; index < count ; index++)
+    if (is_range)
     {
-        jackctl_value = jackctl_parameter_get_enum_constraint_value(parameter, index);
-        descr = jackctl_parameter_get_enum_constraint_description(parameter, index);
+        jack_info("parameter with range constraint");
 
-        type = jackctl_parameter_get_type(parameter);
-        jack_controller_jack_to_dbus_variant(type, &jackctl_value, &value);
+        jackctl_parameter_get_range_constraint(parameter, &min, &max);
 
         /* Open the struct. */
         if (!dbus_message_iter_open_container(&array_iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
@@ -484,10 +473,14 @@ jack_controller_get_parameter_constraint(
             goto fail_close_unref;
         }
 
+        jack_controller_jack_to_dbus_variant(type, &min, &value);
+
         if (!jack_dbus_message_append_variant(&struct_iter, PARAM_TYPE_JACK_TO_DBUS(type), PARAM_TYPE_JACK_TO_DBUS_SIGNATURE(type), &value))
         {
             goto fail_close2_unref;
         }
+
+        descr = "min";
 
         if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &descr))
         {
@@ -498,6 +491,67 @@ jack_controller_get_parameter_constraint(
         if (!dbus_message_iter_close_container(&array_iter, &struct_iter))
         {
             goto fail_close_unref;
+        }
+
+        /* Open the struct. */
+        if (!dbus_message_iter_open_container(&array_iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
+        {
+            goto fail_close_unref;
+        }
+
+        jack_controller_jack_to_dbus_variant(type, &max, &value);
+ 
+        if (!jack_dbus_message_append_variant(&struct_iter, PARAM_TYPE_JACK_TO_DBUS(type), PARAM_TYPE_JACK_TO_DBUS_SIGNATURE(type), &value))
+        {
+            goto fail_close2_unref;
+        }
+
+        descr = "max";
+
+        if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &descr))
+        {
+            goto fail_close2_unref;
+        }
+
+        /* Close the struct. */
+        if (!dbus_message_iter_close_container(&array_iter, &struct_iter))
+        {
+            goto fail_close_unref;
+        }
+    }
+    else
+    {
+        count = jackctl_parameter_get_enum_constraints_count(parameter);
+
+        /* Append enum values to the array. */
+        for (index = 0 ; index < count ; index++)
+        {
+            jackctl_value = jackctl_parameter_get_enum_constraint_value(parameter, index);
+            descr = jackctl_parameter_get_enum_constraint_description(parameter, index);
+
+            jack_controller_jack_to_dbus_variant(type, &jackctl_value, &value);
+
+            /* Open the struct. */
+            if (!dbus_message_iter_open_container(&array_iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
+            {
+                goto fail_close_unref;
+            }
+
+            if (!jack_dbus_message_append_variant(&struct_iter, PARAM_TYPE_JACK_TO_DBUS(type), PARAM_TYPE_JACK_TO_DBUS_SIGNATURE(type), &value))
+            {
+                goto fail_close2_unref;
+            }
+
+            if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &descr))
+            {
+                goto fail_close2_unref;
+            }
+
+            /* Close the struct. */
+            if (!dbus_message_iter_close_container(&array_iter, &struct_iter))
+            {
+                goto fail_close_unref;
+            }
         }
     }
 
