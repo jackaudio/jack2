@@ -62,7 +62,7 @@ extern "C"
     } jack_driver_param_value_enum_t;
 
     typedef struct {
-        bool range;             /**< if true - constraint is a range (min-max), if false - it is an enumeration */
+        uint32_t range;         /**< if not 0 - constraint is a range (min-max), if zero - it is an enumeration */
 
         union {
             struct {
