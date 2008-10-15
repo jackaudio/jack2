@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-10-15 Stephane Letz  <letz@grame.fr>
+	
+	* Fix a conflict with Audio Hijack in JackCoreAudioDriver. 
+
 2008-10-09 Stephane Letz  <letz@grame.fr>
 	
 	* Use a mutex to make jack_client_open/jack_client_close thread safe, remove use of jack_init/jack_uninit.

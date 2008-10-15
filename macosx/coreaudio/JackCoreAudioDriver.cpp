@@ -197,18 +197,10 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
     AudioDeviceStop(driver->fDeviceID, MeasureCallback);
-/*
-#ifdef MAC_OS_X_VERSION_10_5
-    AudioDeviceDestroyIOProcID(driver->fDeviceID, driver->fMesureCallbackID);
-#else
-    AudioDeviceRemoveIOProc(driver->fDeviceID, MeasureCallback);
-#endif
-*/
-
-    AudioDeviceRemoveIOProc(driver->fDeviceID, MeasureCallback);
     
     jack_log("JackCoreAudioDriver::MeasureCallback called");
     JackMachThread::GetParams(&driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
+    
     // Setup threadded based log function
     set_threaded_log_function();
     return noErr;
