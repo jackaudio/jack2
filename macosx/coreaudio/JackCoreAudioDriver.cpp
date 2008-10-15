@@ -851,15 +851,6 @@ int JackCoreAudioDriver::AddListeners()
 
 void JackCoreAudioDriver::RemoveListeners()
 {
-/*
-#ifdef MAC_OS_X_VERSION_10_5
-    AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
-#else
-    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
-#endif
-*/
-    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
-     
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
@@ -1096,7 +1087,6 @@ int JackCoreAudioDriver::Stop()
 #endif
 */
     AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
-
     return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
 }
 
