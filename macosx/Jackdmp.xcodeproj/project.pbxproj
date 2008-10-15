@@ -6922,6 +6922,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -6988,6 +6989,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -7113,6 +7115,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -7179,6 +7182,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -9564,6 +9568,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../common/jack,
 					../posix,
 					.,
@@ -9614,6 +9619,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../common/jack,
 					../posix,
 					.,
@@ -11170,6 +11176,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -11230,6 +11237,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -11342,6 +11350,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -11402,6 +11411,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				GENERATE_PKGINFO_FILE = NO;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../posix,
 					RPC,
 					../common/jack,
@@ -12950,6 +12960,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../common/jack,
 					.,
 					../posix,
@@ -12998,6 +13009,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					../common/jack,
 					.,
 					../posix,
@@ -14673,6 +14685,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					.,
 					../common/jack,
 					../posix,
@@ -14721,6 +14734,7 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G4;
 				HEADER_SEARCH_PATHS = (
+					../common,
 					.,
 					../common/jack,
 					../posix,
