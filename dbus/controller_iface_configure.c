@@ -463,8 +463,6 @@ jack_controller_get_parameter_constraint(
 
     if (is_range)
     {
-        jack_info("parameter with range constraint");
-
         jackctl_parameter_get_range_constraint(parameter, &min, &max);
 
         /* Open the struct. */
