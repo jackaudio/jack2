@@ -591,6 +591,29 @@ jackctl_wait_signals(sigset_t signals)
 }
 #endif
 
+static
+jack_driver_param_constraint_desc_t *
+get_realtime_priority_constraint()
+{
+    jack_driver_param_constraint_desc_t * constraint_ptr;
+    int min, max;
+
+    if (!jack_get_thread_realtime_priority_range(&min, &max))
+    {
+        return NULL;
+    }
+
+    //jack_info("realtime priority range is (%d,%d)", min, max);
+
+    constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
+    constraint_ptr->flags = JACK_CONSTRAINT_FLAG_RANGE;
+
+    constraint_ptr->constraint.range.min.i = min;
+    constraint_ptr->constraint.range.max.i = max;
+
+    return constraint_ptr;
+}
+
 EXPORT jackctl_server_t * jackctl_server_create()
 {
     struct jackctl_server * server_ptr;
@@ -645,7 +668,8 @@ EXPORT jackctl_server_t * jackctl_server_create()
             JackParamInt,
             &server_ptr->realtime_priority,
             &server_ptr->default_realtime_priority,
-            value) == NULL)
+            value,
+            get_realtime_priority_constraint()) == NULL)
     {
         goto fail_free_parameters;
     }

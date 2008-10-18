@@ -232,6 +232,11 @@ SERVER_EXPORT void ThreadExit()
 
 } // end of namespace
 
+bool jack_get_thread_realtime_priority_range(int * min_ptr, int * max_ptr)
+{
+    return false;
+}
+
 bool jack_tls_allocate_key(jack_tls_key *key_ptr)
 {
     DWORD key;

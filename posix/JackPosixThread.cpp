@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include "JackTime.h"
 #include <string.h> // for memset
+#include <unistd.h> // for _POSIX_PRIORITY_SCHEDULING check
+
+#define JACK_SCHED_POLICY SCHED_RR
+//#define JACK_SCHED_POLICY SCHED_FIFO
 
 namespace Jack
 {
@@ -114,8 +118,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
             return -1;
     	}
     
-        //if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_FIFO))) {
-        if ((res = pthread_attr_setschedpolicy(&attributes, SCHED_RR))) {
+        if ((res = pthread_attr_setschedpolicy(&attributes, JACK_SCHED_POLICY))) {
             jack_error("Cannot set RR scheduling class for RT thread res = %d err = %s", res, strerror(errno));
             return -1;
         }
@@ -216,9 +219,7 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
     memset(&rtparam, 0, sizeof(rtparam));
     rtparam.sched_priority = priority;
 
-    //if ((res = pthread_setschedparam(fThread, SCHED_FIFO, &rtparam)) != 0) {
-
-    if ((res = pthread_setschedparam(thread, SCHED_RR, &rtparam)) != 0) {
+    if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY, &rtparam)) != 0) {
         jack_error("Cannot use real-time scheduling (RR/%d) "
                    "(%d: %s)", rtparam.sched_priority, res,
                    strerror(res));
@@ -264,6 +265,34 @@ SERVER_EXPORT void ThreadExit()
 }
 
 } // end of namespace
+
+bool jack_get_thread_realtime_priority_range(int * min_ptr, int * max_ptr)
+{
+#if defined(_POSIX_PRIORITY_SCHEDULING) && !defined(__APPLE__)
+    int min, max;
+
+    min = sched_get_priority_min(JACK_SCHED_POLICY);
+    if (min == -1)
+    {
+        jack_error("sched_get_priority_min() failed.");
+        return false;
+    }
+
+    max = sched_get_priority_max(JACK_SCHED_POLICY);
+    if (max == -1)
+    {
+        jack_error("sched_get_priority_max() failed.");
+        return false;
+    }
+
+    *min_ptr = min;
+    *max_ptr = max;
+
+    return true;
+#else
+    return false;
+#endif
+}
 
 bool jack_tls_allocate_key(jack_tls_key *key_ptr)
 {

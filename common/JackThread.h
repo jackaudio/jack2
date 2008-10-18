@@ -114,6 +114,8 @@ class SERVER_EXPORT JackThreadInterface
 
 } // end of namespace
 
+bool jack_get_thread_realtime_priority_range(int * min_ptr, int * max_ptr);
+
 bool jack_tls_allocate_key(jack_tls_key *key_ptr);
 bool jack_tls_free_key(jack_tls_key key);
 
