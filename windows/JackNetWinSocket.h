@@ -40,7 +40,7 @@ namespace Jack
     struct _win_net_error
     {
         int code;
-        char* msg;
+        std::string msg;
     };
 
     SERVER_EXPORT const char* PrintError ( int error );

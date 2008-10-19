@@ -27,43 +27,43 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-/*!
-\brief Audio adapter : Jack client side.
-*/
+    /*!
+    \brief Audio adapter : Jack client side.
+    */
 
-class JackAudioAdapter
-{
-    private:
+    class JackAudioAdapter
+    {
+        private:
 
-        static int Process(jack_nframes_t, void* arg);
-        static int BufferSize(jack_nframes_t buffer_size, void *arg);
-        static int SampleRate(jack_nframes_t sample_rate, void *arg);
+            static int Process ( jack_nframes_t, void* arg );
+            static int BufferSize ( jack_nframes_t buffer_size, void *arg );
+            static int SampleRate ( jack_nframes_t sample_rate, void *arg );
 
-        int fCaptureChannels;
-        int fPlaybackChannels;
+            int fCaptureChannels;
+            int fPlaybackChannels;
 
-        JackResampler** fCaptureRingBuffer;
-        JackResampler** fPlaybackRingBuffer;
+            JackResampler** fCaptureRingBuffer;
+            JackResampler** fPlaybackRingBuffer;
 
-        jack_port_t** fCapturePortList;
-        jack_port_t** fPlaybackPortList;
+            jack_port_t** fCapturePortList;
+            jack_port_t** fPlaybackPortList;
 
-        jack_client_t* fJackClient;
-        JackAudioAdapterInterface* fAudioAdapter;
+            jack_client_t* fJackClient;
+            JackAudioAdapterInterface* fAudioAdapter;
 
-        void FreePorts();
-        void Reset();
+            void FreePorts();
+            void Reset();
 
-    public:
+        public:
 
-        JackAudioAdapter(jack_client_t* jack_client, JackAudioAdapterInterface* audio_io) :
-                fJackClient(jack_client), fAudioAdapter(audio_io)
-        {}
-        ~JackAudioAdapter();
+            JackAudioAdapter ( jack_client_t* jack_client, JackAudioAdapterInterface* audio_io ) :
+                    fJackClient ( jack_client ), fAudioAdapter ( audio_io )
+            {}
+            ~JackAudioAdapter();
 
-        int Open();
-        int Close();
-};
+            int Open();
+            int Close();
+    };
 
 }
 

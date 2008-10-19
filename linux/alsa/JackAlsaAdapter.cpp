@@ -17,6 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #include "JackAlsaAdapter.h"
 #include "JackServer.h"
 #include "JackEngineControl.h"
@@ -209,14 +213,14 @@ extern "C"
         jack_driver_desc_t *desc;
         jack_driver_param_desc_t * params;
         unsigned int i;
-        
-        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
-        
-        strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-     
+
+        desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
+
+        strcpy ( desc->name, "audioadapter" );                         // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+        strcpy ( desc->desc, "netjack audio <==> net backend adapter" );  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+
         desc->nparams = 9;
-        params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+        params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         i = 0;
         strcpy ( params[i].name, "capture" );
