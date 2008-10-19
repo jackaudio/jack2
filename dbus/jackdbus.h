@@ -47,10 +47,8 @@ jack_controller_settings_uninit();
 #define JACK_DBUS_ERROR_UNKNOWN_METHOD              "org.jackaudio.Error.UnknownMethod"
 #define JACK_DBUS_ERROR_SERVER_NOT_RUNNING          "org.jackaudio.Error.ServerNotRunning"
 #define JACK_DBUS_ERROR_UNKNOWN_DRIVER              "org.jackaudio.Error.UnknownDriver"
-#define JACK_DBUS_ERROR_NEED_DRIVER                 "org.jackaudio.Error.NeedDriver"
-#define JACK_DBUS_ERROR_UNKNOWN_DRIVER_PARAMETER    "org.jackaudio.Error.UnknownDriverParameter"
-#define JACK_DBUS_ERROR_UNKNOWN_ENGINE_PARAMETER    "org.jackaudio.Error.UnknownEngineParameter"
 #define JACK_DBUS_ERROR_UNKNOWN_INTERNAL            "org.jackaudio.Error.UnknownInternal"
+#define JACK_DBUS_ERROR_UNKNOWN_PARAMETER           "org.jackaudio.Error.UnknownParameter"
 #define JACK_DBUS_ERROR_INVALID_ARGS                "org.jackaudio.Error.InvalidArgs"
 #define JACK_DBUS_ERROR_GENERIC                     "org.jackaudio.Error.Generic"
 #define JACK_DBUS_ERROR_FATAL                       "org.jackaudio.Error.Fatal"
@@ -127,6 +125,32 @@ typedef union
 static const                                                                            \
 struct jack_dbus_interface_method_argument_descriptor method_name ## _arguments[] =     \
 {
+
+#define JACK_DBUS_METHOD_ARGUMENTS_BEGIN_EX(method_name, descr)                         \
+static const                                                                            \
+struct jack_dbus_interface_method_argument_descriptor method_name ## _arguments[] =     \
+{
+
+#define JACK_DBUS_METHOD_ARGUMENT(argument_name, argument_type, argument_direction_out) \
+        {                                                                               \
+                .name = argument_name,                                                  \
+                .type = argument_type,                                                  \
+                .direction_out = argument_direction_out                                 \
+        },
+
+#define JACK_DBUS_METHOD_ARGUMENT_IN(argument_name, argument_type, descr)               \
+        {                                                                               \
+                .name = argument_name,                                                  \
+                .type = argument_type,                                                  \
+                .direction_out = false                                                  \
+        },
+
+#define JACK_DBUS_METHOD_ARGUMENT_OUT(argument_name, argument_type, descr)              \
+        {                                                                               \
+                .name = argument_name,                                                  \
+                .type = argument_type,                                                  \
+                .direction_out = true                                                  \
+        },
 
 #define JACK_DBUS_METHOD_ARGUMENT(argument_name, argument_type, argument_direction_out) \
         {                                                                               \

@@ -43,11 +43,13 @@ struct jack_controller
     const char **internal_names;
     unsigned int internals_count;
 
-    /* current driver, NULL if not driver is selected */
     jackctl_driver_t *driver;
+    bool driver_set;            /* whether driver is manually set, if false - DEFAULT_DRIVER is auto set */
 
     struct jack_dbus_object_descriptor dbus_descriptor;
 };
+
+#define DEFAULT_DRIVER "dummy"
 
 #define JACK_CONF_HEADER_TEXT                       \
     "JACK settings, as persisted by D-Bus object.\n"        \

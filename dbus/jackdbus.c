@@ -750,6 +750,12 @@ jack_dbus_error(
     jack_error_callback(buffer);
     if (dbus_call_context_ptr != NULL)
     {
+        if (((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply != NULL)
+        {
+            dbus_message_unref(((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply);
+            ((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply = NULL;
+        }
+
         ((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply = dbus_message_new_error(
             ((struct jack_dbus_method_call *)dbus_call_context_ptr)->message,
             error_name,
