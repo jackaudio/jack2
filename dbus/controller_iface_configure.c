@@ -1966,6 +1966,189 @@ jack_controller_dbus_set_parameter_value(
         call->method_name);
 }
 
+static
+void
+jack_controller_reset_parameter_value(
+    struct jack_dbus_method_call * call,
+    jackctl_parameter_t * parameter)
+{
+    jackctl_parameter_reset(parameter);
+
+    jack_controller_settings_save_auto(controller_ptr);
+
+    jack_dbus_construct_method_return_empty(call);
+}
+
+static
+void
+jack_controller_reset_parameter_value_engine_driver(
+    struct jack_dbus_method_call * call)
+{
+    if (!jack_controller_select_driver(controller_ptr, DEFAULT_DRIVER))
+    {
+        /* Couldn't find driver with the specified name. */
+        jack_dbus_error(
+            call,
+            JACK_DBUS_ERROR_UNKNOWN_DRIVER,
+            "Default driver '%s' is unknown");
+        return;
+    }
+
+    controller_ptr->driver_set = false;
+
+    jack_controller_settings_save_auto(controller_ptr);
+
+    jack_dbus_construct_method_return_empty(call);
+}
+
+static
+void
+jack_controller_dbus_reset_parameter_value(
+    struct jack_dbus_method_call * call)
+{
+    const char * address[3];
+    jackctl_internal_t * internal;
+    jackctl_driver_t * driver;
+    jackctl_parameter_t * parameter;
+
+    //jack_info("jack_controller_dbus_reset_parameter_value() called");
+
+    if (!jack_controller_dbus_get_parameter_address(call, address))
+    {
+        /* The method call had invalid arguments meaning that
+         * jack_controller_dbus_get_parameter_address() has
+         * constructed an error for us. */
+        return;
+    }
+
+    //jack_info("address is '%s':'%s':'%s'", address[0], address[1], address[2]);
+
+    if (address[0] != NULL &&
+        address[1] != NULL &&
+        address[2] == NULL &&
+        strcmp(address[0], PTNODE_ENGINE) == 0) /* engine parameters requested */
+    {
+        if (strcmp(address[1], ENGINE_DRIVER_PARAMETER_NAME) == 0)
+        {
+            jack_controller_reset_parameter_value_engine_driver(call);
+
+            return;
+        }
+
+        parameter = jack_controller_find_parameter(jackctl_server_get_parameters(controller_ptr->server), address[1]);
+        if (parameter == NULL)
+        {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_UNKNOWN_PARAMETER,
+                "Unknown engine parameter '%s'",
+                address[1]);
+            return;
+        }
+
+        jack_controller_reset_parameter_value(call, parameter);
+
+        return;
+    }
+
+    if (address[0] != NULL &&
+        address[1] != NULL &&
+        address[2] == NULL &&
+        strcmp(address[0], PTNODE_DRIVER) == 0) /* current driver parameters requested */
+    {
+        parameter = jack_controller_find_parameter(jackctl_driver_get_parameters(controller_ptr->driver), address[1]);
+        if (parameter == NULL)
+        {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_UNKNOWN_PARAMETER,
+                "Unknown parameter '%s' for driver '%s'",
+                address[1],
+                jackctl_driver_get_name(controller_ptr->driver));
+            return;
+        }
+
+        jack_controller_reset_parameter_value(call, parameter);
+
+        return;
+    }
+
+    if (address[0] != NULL &&
+        address[1] != NULL &&
+        address[2] != NULL &&
+        strcmp(address[0], PTNODE_DRIVERS) == 0)
+    {
+        driver = jack_controller_find_driver(controller_ptr->server, address[1]);
+        if (driver == NULL)
+        {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+                "Unknown driver '%s'",
+                address[1]);
+            return;
+        }
+
+        parameter = jack_controller_find_parameter(jackctl_driver_get_parameters(driver), address[2]);
+        if (parameter == NULL)
+        {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_UNKNOWN_PARAMETER,
+                "Unknown parameter '%s' for driver '%s'",
+                address[2],
+                address[1]);
+            return;
+        }
+
+        jack_controller_reset_parameter_value(call, parameter);
+
+        return;
+    }
+
+    if (address[0] != NULL &&
+        address[1] != NULL &&
+        address[2] != NULL &&
+        strcmp(address[0], PTNODE_INTERNALS) == 0)
+    {
+        internal = jack_controller_find_internal(controller_ptr->server, address[1]);
+        if (internal == NULL)
+        {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_UNKNOWN_INTERNAL,
+                "Unknown internal '%s'",
+                address[1]);
+            return;
+        }
+
+        parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), address[2]);
+        if (parameter == NULL)
+        {
+            jack_dbus_error(
+                call,
+                JACK_DBUS_ERROR_UNKNOWN_PARAMETER,
+                "Unknown parameter '%s' for internal '%s'",
+                address[2],
+                address[1]);
+            return;
+        }
+
+        jack_controller_reset_parameter_value(call, parameter);
+
+        return;
+    }
+
+    jack_dbus_error(
+        call,
+        JACK_DBUS_ERROR_INVALID_ARGS,
+        "Invalid container address '%s':'%s':'%s' supplied to method '%s'.",
+        address[0],
+        address[1],
+        address[2],
+        call->method_name);
+}
+
 #undef controller_ptr
 
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN_EX(ReadContainer, "Get names of child parameters or containers")
@@ -2004,6 +2187,10 @@ JACK_DBUS_METHOD_ARGUMENTS_BEGIN_EX(SetParameterValue, "Set value of parameter")
     JACK_DBUS_METHOD_ARGUMENT_IN("value", "v", "New value for parameter")
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN_EX(ResetParameterValue, "Reset parameter to default value")
+    JACK_DBUS_METHOD_ARGUMENT_IN("parameter", "as", "Address of parameter")
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(ReadContainer, jack_controller_dbus_read_container)
     JACK_DBUS_METHOD_DESCRIBE(GetParametersInfo, jack_controller_dbus_get_parameters_info)
@@ -2011,6 +2198,7 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(GetParameterConstraint, jack_controller_dbus_get_parameter_constraint)
     JACK_DBUS_METHOD_DESCRIBE(GetParameterValue, jack_controller_dbus_get_parameter_value)
     JACK_DBUS_METHOD_DESCRIBE(SetParameterValue, jack_controller_dbus_set_parameter_value)
+    JACK_DBUS_METHOD_DESCRIBE(ResetParameterValue, jack_controller_dbus_reset_parameter_value)
 JACK_DBUS_METHODS_END
 
 /*
