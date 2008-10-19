@@ -5,6 +5,12 @@ JACK on Windows
 This installer will install everything to use Jack Audio Connection Kit (JACK) (www.jackaudio.org) on Windows.
 
 =============================================
+Microsoft Runtime Libraries
+=============================================
+
+In order to use this software, you will need the Microsoft Vusual C++ 2008 redistributable package. This package is freely available on the Microsoft download center. Please be sure you install the correct version (2008). This package is required by portaudio to run windows specific audio drivers (MME, DSound and ASIO).
+
+=============================================
 QJACKCTL on Windows
 =============================================
 
