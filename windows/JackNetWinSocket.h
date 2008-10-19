@@ -35,6 +35,13 @@ namespace Jack
 
     typedef uint32_t uint;
     typedef int SOCKLEN;
+    typedef struct _win_net_error win_net_error_t;
+
+    struct _win_net_error
+    {
+        int code;
+        char* msg;
+    };
 
     SERVER_EXPORT const char* PrintError ( int error );
 

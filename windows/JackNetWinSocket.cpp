@@ -33,11 +33,7 @@ namespace Jack
         return 0;
     }
 
-    struct
-    {
-        int code;
-        char* msg;
-    } NetErrorList[] =
+    win_net_error_t NetErrorList[] =
     {
         E ( 0,                  "No error" ),
         E ( WSAEINTR,           "Interrupted system call" ),

@@ -204,7 +204,6 @@ int PortAudioDevices::GetOutputDeviceFromName(const char* devicename, PaDeviceIn
 
 void PortAudioDevices::DisplayDevicesNames()
 {
-    int def_display;
     PaDeviceIndex id;
     PaStreamParameters inputParameters, outputParameters;
     jack_info ( "********************** Devices list, %d detected **********************", fNumDevice );
