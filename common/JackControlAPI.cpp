@@ -1039,14 +1039,14 @@ EXPORT union jackctl_parameter_value jackctl_parameter_get_value(jackctl_paramet
     return *parameter_ptr->value_ptr;
 }
 
-EXPORT bool jackctl_parameter_reset_value(jackctl_parameter *parameter_ptr)
+EXPORT bool jackctl_parameter_reset(jackctl_parameter *parameter_ptr)
 {
     if (!parameter_ptr->is_set)
     {
         return true;
     }
 
-    parameter_ptr->is_set = true;
+    parameter_ptr->is_set = false;
 
     *parameter_ptr->value_ptr = *parameter_ptr->default_value_ptr;
 
