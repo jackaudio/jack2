@@ -94,7 +94,7 @@ namespace Jack
         for ( i = 0; NetErrorList[i].code >= 0; ++i )
         {
             if ( error == NetErrorList[i].code )
-                return NetErrorList[i].msg.c_str();
+                return NetErrorList[i].msg;
         }
         return strerror ( error );
     }
