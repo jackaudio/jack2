@@ -79,7 +79,13 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         int Connect(jack_port_id_t src_index, jack_port_id_t dst_index);
         int Disconnect(jack_port_id_t src_index, jack_port_id_t dst_index);
         int IsConnected(jack_port_id_t port_src, jack_port_id_t port_dst);
-        int GetConnectionsNum(jack_port_id_t port_index);
+
+        // RT, client
+        int GetConnectionsNum(jack_port_id_t port_index)
+        {
+            JackConnectionManager* manager = ReadCurrentState();
+            return manager->Connections(port_index);
+        }
 
         const char** GetConnections(jack_port_id_t port_index);
         void GetConnections(jack_port_id_t port_index, jack_int_t* connections);  // TODO

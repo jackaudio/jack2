@@ -94,11 +94,17 @@ class SERVER_EXPORT JackPort
 
         int RequestMonitor(bool onoff);
         int EnsureMonitor(bool onoff);
-        bool MonitoringInput();
+        bool MonitoringInput()
+        {
+            return (fMonitorRequests > 0);
+        }
 
-        float* GetBuffer();
+        float* GetBuffer()
+        {
+            return fBuffer;
+        }
+
         int GetRefNum() const;
-
 };
 
 

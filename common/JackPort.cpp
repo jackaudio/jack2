@@ -73,11 +73,6 @@ void JackPort::Release()
     fAlias2[0] = '\0';
 }
 
-float* JackPort::GetBuffer()
-{
-    return fBuffer;
-}
-
 int JackPort::GetRefNum() const
 {
     return fRefNum;
@@ -152,11 +147,6 @@ int JackPort::EnsureMonitor(bool onoff)
     }
 
     return 0;
-}
-
-bool JackPort::MonitoringInput()
-{
-    return (fMonitorRequests > 0);
 }
 
 const char* JackPort::GetName() const

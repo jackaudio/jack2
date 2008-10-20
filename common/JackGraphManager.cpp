@@ -56,13 +56,6 @@ float* JackGraphManager::GetBuffer(jack_port_id_t port_index)
     return fPortArray[port_index].GetBuffer();
 }
 
-// RT, client
-int JackGraphManager::GetConnectionsNum(jack_port_id_t port_index)
-{
-    JackConnectionManager* manager = ReadCurrentState();
-    return manager->Connections(port_index);
-}
-
 // Server
 void JackGraphManager::InitRefNum(int refnum)
 {

@@ -26,6 +26,7 @@ Michael Voigt
 2008-10-15 Stephane Letz  <letz@grame.fr>
 	
 	* Fix a crash in JackEngine::Close when backend cannot be loaded.
+	* Tim Blechmann optimization patch.
 
 2008-10-15 Stephane Letz  <letz@grame.fr>
 	

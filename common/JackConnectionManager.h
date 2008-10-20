@@ -396,8 +396,20 @@ class SERVER_EXPORT JackConnectionManager
         int Disconnect(jack_port_id_t port_src, jack_port_id_t port_dst);
         bool IsConnected(jack_port_id_t port_src, jack_port_id_t port_dst) const;
 
-        jack_int_t Connections(jack_port_id_t port_index) const;
-        jack_port_id_t GetPort(jack_port_id_t port_index, int connection) const;
+        /*!
+          \brief Get the connection number of a given port.
+        */
+        jack_int_t Connections(jack_port_id_t port_index) const
+        {
+            return fConnection[port_index].GetItemCount();
+        }
+
+        jack_port_id_t GetPort(jack_port_id_t port_index, int connection) const
+        {
+            assert(connection < CONNECTION_NUM_FOR_PORT);
+            return (jack_port_id_t)fConnection[port_index].GetItem(connection);
+        }
+
         const jack_int_t* GetConnections(jack_port_id_t port_index) const;
 
         bool IncFeedbackConnection(jack_port_id_t port_src, jack_port_id_t port_dst);

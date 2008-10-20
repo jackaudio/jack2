@@ -127,20 +127,6 @@ bool JackConnectionManager::IsConnected(jack_port_id_t port_src, jack_port_id_t 
 }
 
 /*!
-\brief Get the connection number of a given port.
-*/
-jack_int_t JackConnectionManager::Connections(jack_port_id_t port_index) const
-{
-    return fConnection[port_index].GetItemCount();
-}
-
-jack_port_id_t JackConnectionManager::GetPort(jack_port_id_t port_index, int connection) const
-{
-    assert(connection < CONNECTION_NUM_FOR_PORT);
-    return (jack_port_id_t)fConnection[port_index].GetItem(connection);
-}
-
-/*!
 \brief Get the connection port array.
 */
 const jack_int_t* JackConnectionManager::GetConnections(jack_port_id_t port_index) const
