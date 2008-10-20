@@ -25,6 +25,10 @@ Michael Voigt
 
 2008-10-15 Stephane Letz  <letz@grame.fr>
 	
+	* Fix a crash in JackEngine::Close when backend cannot be loaded.
+
+2008-10-15 Stephane Letz  <letz@grame.fr>
+	
 	* Fix a conflict with Audio Hijack in JackCoreAudioDriver. 
 
 2008-10-09 Stephane Letz  <letz@grame.fr>

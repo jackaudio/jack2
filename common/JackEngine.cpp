@@ -71,7 +71,7 @@ int JackEngine::Close()
     fChannel.Close();
     
     // Close remaining clients (RT is stopped)
-    for (int i = 0; i < CLIENT_NUM; i++) {
+    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
             jack_log("JackEngine::Close loadable client = %s", loadable_client->GetClientControl()->fName);
             loadable_client->Close();
