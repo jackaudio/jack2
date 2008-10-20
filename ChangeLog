@@ -27,6 +27,7 @@ Michael Voigt
 	
 	* Fix a crash in JackEngine::Close when backend cannot be loaded.
 	* Tim Blechmann optimization patch.
+	* Backport of latest Paul alsa_seqmidi changes.
 
 2008-10-15 Stephane Letz  <letz@grame.fr>
 	

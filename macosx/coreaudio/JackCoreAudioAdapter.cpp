@@ -602,6 +602,8 @@ int JackCoreAudioAdapter::SetupChannels(bool capturing,
             jack_error("Cannot get input channel number");
             printError(err);
             return -1;
+        } else {
+            jack_log("Max input channels : %d", in_nChannels);
         }
     }
 
@@ -611,6 +613,8 @@ int JackCoreAudioAdapter::SetupChannels(bool capturing,
             jack_error("Cannot get output channel number");
             printError(err);
             return -1;
+        } else {
+            jack_log("Max output channels : %d", out_nChannels);
         }
     }
 
@@ -730,7 +734,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
                                     int outchannels,
                                     int in_nChannels,
                                     int out_nChannels,
-                                    jack_nframes_t nframes,
+                                    jack_nframes_t buffer_size,
                                     jack_nframes_t samplerate,
                                     bool strict)
 {
@@ -740,6 +744,11 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
 
     jack_log("OpenAUHAL capturing = %ld playing = %ld inchannels = %ld outchannels = %ld in_nChannels = %ld out_nChannels = %ld ", capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels);
 
+    if (inchannels == 0 && outchannels == 0) {
+        jack_error("No input and output channels...");
+        return -1;
+    }
+         
     // AUHAL
     ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
     Component HALOutput = FindNextComponent(NULL, &cd);
@@ -759,27 +768,48 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
     }
 
     // Start I/O
-    enableIO = 1;
     if (capturing && inchannels > 0) {
-        jack_log("Setup AUHAL input");
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, sizeof(enableIO));
-        if (err1 != noErr) {
-            jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input");
-            printError(err1);
-            if (strict)
-                return -1;
-        }
+        enableIO = 1;
+        jack_log("Setup AUHAL input on");
+    } else {
+        enableIO = 0;
+        jack_log("Setup AUHAL input off");
+    }
+    
+    err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, sizeof(enableIO));
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input");
+        printError(err1);
+        if (strict)
+            return -1;
     }
 
     if (playing && outchannels > 0) {
-        jack_log("Setup AUHAL output");
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(enableIO));
-        if (err1 != noErr) {
-            jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO,kAudioUnitScope_Output");
-            printError(err1);
-            if (strict)
-                return -1;
-        }
+        enableIO = 1;
+        jack_log("Setup AUHAL output on");
+    } else {
+        enableIO = 0;
+        jack_log("Setup AUHAL output off");
+    }
+    
+    err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(enableIO));
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO,kAudioUnitScope_Output");
+        printError(err1);
+        if (strict)
+            return -1;
+    }
+    
+    AudioDeviceID currAudioDeviceID;
+    UInt32 size;
+    err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
+        printError(err1);
+        if (strict)
+            return -1;
+    } else {
+        jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
     }
 
     // Setup up choosen device, in both input and output cases
@@ -790,10 +820,20 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
         if (strict)
             return -1;
     }
+    
+    err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
+        printError(err1);
+        if (strict)
+            return -1;
+    } else {
+        jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
+    }
 
     // Set buffer size
     if (capturing && inchannels > 0) {
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*) & nframes, sizeof(UInt32));
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*)&buffer_size, sizeof(UInt32));
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
@@ -803,7 +843,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
     }
 
     if (playing && outchannels > 0) {
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, (UInt32*) & nframes, sizeof(UInt32));
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, (UInt32*)&buffer_size, sizeof(UInt32));
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);

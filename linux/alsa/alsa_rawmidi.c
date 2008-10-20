@@ -44,7 +44,7 @@ enum {
 #define NFRAMES_INF INT_MAX
 
 enum {
-#ifndef DEBUG
+#ifndef JACK_MIDI_DEBUG
 	MAX_PFDS = 64,
 	MAX_PORTS = MAX_PFDS-1,
 	MAX_EVENTS = 4096,

@@ -121,10 +121,10 @@ typedef struct alsa_midi_event alsa_midi_event_t;
 
 struct process_info {
 	int dir;
-	int64_t nframes;
-	int64_t period_start;
-	uint32_t sample_rate;
-	int64_t cur_frames;
+	jack_nframes_t nframes;
+	jack_nframes_t period_start;
+	jack_nframes_t sample_rate;
+	jack_nframes_t cur_frames;
 	int64_t alsa_time;
 };
 
@@ -137,21 +137,21 @@ static void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_in
 typedef struct {
 	int alsa_mask;
 	int jack_caps;
-	char name[4];
+	char name[9];
 	port_jack_func jack_func;
 } port_type_t;
 
 static port_type_t port_type[2] = {
 	{
 		SND_SEQ_PORT_CAP_SUBS_READ,
-		JackPortIsOutput|JackPortIsPhysical|JackPortIsTerminal,
-		"in",
+		JackPortIsOutput,
+		"playback",
 		do_jack_input
 	},
 	{
 		SND_SEQ_PORT_CAP_SUBS_WRITE,
-		JackPortIsInput|JackPortIsPhysical|JackPortIsTerminal,
-		"out",
+		JackPortIsInput,
+		"capture",
 		do_jack_output
 	}
 };
@@ -278,7 +278,7 @@ int alsa_seqmidi_attach(alsa_midi_t *m)
 	snd_seq_set_client_name(self->seq, self->alsa_name);
 	self->port_id = snd_seq_create_simple_port(self->seq, "port",
 		SND_SEQ_PORT_CAP_READ|SND_SEQ_PORT_CAP_WRITE
-#ifndef DEBUG
+#ifndef JACK_MIDI_DEBUG
 		|SND_SEQ_PORT_CAP_NO_EXPORT
 #endif
 		,SND_SEQ_PORT_TYPE_APPLICATION);
@@ -459,37 +459,53 @@ void port_free(alsa_seqmidi_t *self, port_t *port)
 static
 port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const snd_seq_port_info_t *info)
 {
+	snd_seq_client_info_t* client_info;
 	port_t *port;
 	char *c;
 	int err;
-	char name[64];
+	int jack_caps;
 
 	port = calloc(1, sizeof(port_t));
 	if (!port)
 		return NULL;
 
 	port->remote = addr;
-	
-	if (port_type[type].jack_caps & JackPortIsOutput)
-		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++self->midi_in_cnt);
-	else 
-		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++self->midi_out_cnt);
-	
-	snprintf(port->name, sizeof(port->name), "%s-%d-%d-%s",
-		port_type[type].name, addr.client, addr.port, snd_seq_port_info_get_name(info));
-	
+
+	snd_seq_client_info_alloca (&client_info);
+	snd_seq_get_any_client_info (self->seq, addr.client, client_info);
+
+	snprintf(port->name, sizeof(port->name), "%s/midi_%s_%d",
+		 snd_seq_client_info_get_name(client_info), port_type[type].name, addr.port+1);
+
 	// replace all offending characters by -
 	for (c = port->name; *c; ++c)
-		if (!isalnum(*c))
+		if (!isalnum(*c) && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')')
 			*c = '-';
 
-	port->jack_port = jack_port_register(self->jack,
-		name, JACK_DEFAULT_MIDI_TYPE, port_type[type].jack_caps, 0);
+	jack_caps = port_type[type].jack_caps;
 
+	/* mark anything that looks like a hardware port as physical&terminal */
+
+	if (snd_seq_port_info_get_type (info) & (SND_SEQ_PORT_TYPE_HARDWARE|SND_SEQ_PORT_TYPE_PORT|SND_SEQ_PORT_TYPE_SPECIFIC)) {
+		jack_caps |= (JackPortIsPhysical|JackPortIsTerminal);
+	}
+			
+	port->jack_port = jack_port_register(self->jack,
+		port->name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
 	if (!port->jack_port)
 		goto failed;
-		
-	jack_port_set_alias(port->jack_port, port->name);
+
+	/* generate an alias */
+
+	snprintf(port->name, sizeof(port->name), "%s:midi/%s_%d",
+		 snd_seq_client_info_get_name (client_info), port_type[type].name, addr.port+1);
+
+	// replace all offending characters by -
+	for (c = port->name; *c; ++c)
+		if (!isalnum(*c) && *c != '/' && *c != '_' && *c != ':' && *c != '(' && *c != ')')
+			*c = '-';
+
+	jack_port_set_alias (port->jack_port, port->name);
 
 	if (type == PORT_INPUT)
 		err = alsa_connect_from(self, port->remote.client, port->remote.port);
@@ -540,7 +556,7 @@ void update_port(alsa_seqmidi_t *self, snd_seq_addr_t addr, const snd_seq_port_i
 	if (port_caps & SND_SEQ_PORT_CAP_NO_EXPORT)
 		return;
 	update_port_type(self, PORT_INPUT, addr, port_caps, info);
-	update_port_type(self, PORT_OUTPUT, addr, port_caps, info);
+	update_port_type(self, PORT_OUTPUT,addr, port_caps, info);
 }
 
 static
@@ -558,13 +574,15 @@ static
 void update_ports(alsa_seqmidi_t *self)
 {
 	snd_seq_addr_t addr;
+	snd_seq_port_info_t *info;
 	int size;
 
+	snd_seq_port_info_alloca(&info);
+
 	while ((size = jack_ringbuffer_read(self->port_add, (char*)&addr, sizeof(addr)))) {
-		snd_seq_port_info_t *info;
+		
 		int err;
 
-		snd_seq_port_info_alloca(&info);
 		assert (size == sizeof(addr));
 		assert (addr.client != self->client_id);
 		if ((err=snd_seq_get_any_port_info(self->seq, addr.client, addr.port, info))>=0) {
@@ -638,6 +656,12 @@ void set_process_info(struct process_info *info, alsa_seqmidi_t *self, int dir, 
 	snd_seq_get_queue_status(self->seq, self->queue, status);
 	alsa_time = snd_seq_queue_status_get_real_time(status);
 	info->alsa_time = alsa_time->tv_sec * NSEC_PER_SEC + alsa_time->tv_nsec;
+
+	if (info->period_start + info->nframes < info->cur_frames) {
+		int periods_lost = (info->cur_frames - info->period_start) / info->nframes; 
+		info->period_start += periods_lost * info->nframes;
+		debug_log("xrun detected: %d periods lost\n", periods_lost);
+	}
 }
 
 static
@@ -645,7 +669,7 @@ void add_ports(stream_t *str)
 {
 	port_t *port;
 	while (jack_ringbuffer_read(str->new_ports, (char*)&port, sizeof(port))) {
-		debug_log("jack: inserted port %s", port->name);
+		debug_log("jack: inserted port %s\n", port->name);
 		port_insert(str->ports, port);
 	}
 }
@@ -696,7 +720,7 @@ void do_jack_input(alsa_seqmidi_t *self, port_t *port, struct process_info *info
 	alsa_midi_event_t ev;
 	while (jack_ringbuffer_read(port->early_events, (char*)&ev, sizeof(ev))) {
 		jack_midi_data_t* buf;
-		int64_t time = ev.time - info->period_start;
+		jack_nframes_t time = ev.time - info->period_start;
 		if (time < 0)
 			time = 0;
 		else if (time >= info->nframes)
@@ -754,8 +778,8 @@ void input_event(alsa_seqmidi_t *self, snd_seq_event_t *alsa_event, struct proce
 		return;
 
 	// fixup NoteOn with vel 0
-	if (data[0] == 0x90 && data[2] == 0x00) {
-		data[0] = 0x80;
+	if ((data[0] & 0xF0) == 0x90 && data[2] == 0x00) {
+		data[0] = 0x80 + (data[0] & 0x0F);
 		data[2] = 0x40;
 	}
 
@@ -835,16 +859,28 @@ void do_jack_output(alsa_seqmidi_t *self, port_t *port, struct process_info* inf
 		snd_seq_ev_set_source(&alsa_event, self->port_id);
 		snd_seq_ev_set_dest(&alsa_event, port->remote.client, port->remote.port);
 
-		frame_offset = jack_event.time + info->period_start + info->nframes - info->cur_frames;
+		/* NOTE: in case of xrun it could become negative, so it is essential to use signed type! */
+		frame_offset = (int64_t)jack_event.time + info->period_start + info->nframes - info->cur_frames;
+		if (frame_offset < 0) {
+			frame_offset = info->nframes + jack_event.time;
+			error_log("internal xrun detected: frame_offset = %"PRId64"\n", frame_offset);
+		}
+		/* Ken Ellinwood reported problems with this assert.
+		 * Seems, magic 2 should be replaced with nperiods. */
+		//FIXME: assert (frame_offset < info->nframes*2);
+		//if (frame_offset < info->nframes * info->nperiods)
+		//        debug_log("alsa_out: BLAH-BLAH-BLAH");
+
 		out_time = info->alsa_time + (frame_offset * NSEC_PER_SEC) / info->sample_rate;
 
 		debug_log("alsa_out: frame_offset = %lld, info->alsa_time = %lld, out_time = %lld, port->last_out_time = %lld",
 			frame_offset, info->alsa_time, out_time, port->last_out_time);
 
 		// we should use absolute time to prevent reordering caused by rounding errors
-		if (out_time < port->last_out_time)
+		if (out_time < port->last_out_time) {
+			debug_log("alsa_out: limiting out_time %lld at %lld", out_time, port->last_out_time);
 			out_time = port->last_out_time;
-		else
+		} else
 			port->last_out_time = out_time;
 
 		out_rt.tv_nsec = out_time % NSEC_PER_SEC;

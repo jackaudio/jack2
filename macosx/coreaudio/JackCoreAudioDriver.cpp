@@ -31,6 +31,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
+static void Print4CharCode(char* msg, long c)
+{
+    UInt32 __4CC_number = (c);
+    char __4CC_string[5];
+    *((SInt32*)__4CC_string) = EndianU32_NtoB(__4CC_number);		
+    __4CC_string[4] = 0;
+    jack_log("%s'%s'", (msg), __4CC_string);
+}
+
 static void printError(OSStatus err)
 {
     switch (err) {
@@ -95,7 +104,7 @@ static void printError(OSStatus err)
             jack_log("error code : kAudioHardwareUnsupportedOperationError");
             break;
         default:
-            jack_log("error code : unknown");
+            Print4CharCode("error code : unknown", err);
             break;
     }
 }
@@ -245,6 +254,14 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
             break;
 
         case kAudioDevicePropertyStreamConfiguration:
+            jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server may not work correctly anymore...");
+            return kAudioHardwareUnsupportedOperationError;
+            
+         case kAudioDevicePropertyNominalSampleRate: 
+            jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server may not work correctly anymore...");
+            return kAudioHardwareUnsupportedOperationError;
+          
+        /*
         case kAudioDevicePropertyNominalSampleRate: {
 
             UInt32 outSize = sizeof(Float64);
@@ -254,7 +271,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
             char capture_driver_name[256];
             char playback_driver_name[256];
             CFStringRef ref;
-
+     
             // Stop and restart
             driver->Stop();
             driver->RemoveListeners();
@@ -306,6 +323,7 @@ error:
             driver->CloseAUHAL();
             break;
         }
+        */
     }
     return noErr;
 }
@@ -425,6 +443,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
     if (strcmp(capture_driver_uid, "") != 0 && strcmp(playback_driver_uid, "") != 0) {
         jack_log("JackCoreAudioDriver::Open duplex");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
+            jack_log("Will take default in/out");
             if (GetDefaultDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default device");
                 return -1;
@@ -439,6 +458,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
     } else if (strcmp(capture_driver_uid, "") != 0) {
         jack_log("JackCoreAudioDriver::Open capture only");
         if (GetDeviceIDFromUID(capture_driver_uid, &fDeviceID) != noErr) {
+            jack_log("Will take default input");
             if (GetDefaultInputDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default device");
                 return -1;
@@ -453,6 +473,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
     } else if (strcmp(playback_driver_uid, "") != 0) {
         jack_log("JackCoreAudioDriver::Open playback only");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
+            jack_log("Will take default output");
             if (GetDefaultOutputDevice(&fDeviceID) != noErr) {
                 jack_error("Cannot open default device");
                 return -1;
@@ -479,6 +500,9 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
     return 0;
 }
 
+/*
+Return the max possible input channels in in_nChannels and output channels in out_nChannels.
+*/
 int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchannels, int& outchannels, int& in_nChannels, int& out_nChannels, bool strict)
 {
     OSStatus err = noErr;
@@ -489,6 +513,8 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
             jack_error("Cannot get input channel number");
             printError(err);
             return -1;
+        } else {
+            jack_log("Max input channels : %d", in_nChannels);
         }
     }
 
@@ -498,6 +524,8 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
             jack_error("Cannot get output channel number");
             printError(err);
             return -1;
+        } else {
+            jack_log("Max output channels : %d", out_nChannels);
         }
     }
 
@@ -598,6 +626,11 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
 
     jack_log("OpenAUHAL capturing = %ld playing = %ld inchannels = %ld outchannels = %ld in_nChannels = %ld out_nChannels = %ld ", capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels);
 
+    if (inchannels == 0 && outchannels == 0) {
+        jack_error("No input and output channels...");
+        return -1;
+    }
+         
     // AUHAL
     ComponentDescription cd = {kAudioUnitType_Output, kAudioUnitSubType_HALOutput, kAudioUnitManufacturer_Apple, 0, 0};
     Component HALOutput = FindNextComponent(NULL, &cd);
@@ -617,27 +650,48 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     }
 
     // Start I/O
-    enableIO = 1;
     if (capturing && inchannels > 0) {
-        jack_log("Setup AUHAL input");
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, sizeof(enableIO));
-        if (err1 != noErr) {
-            jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input");
-            printError(err1);
-            if (strict)
-                return -1;
-        }
+        enableIO = 1;
+        jack_log("Setup AUHAL input on");
+    } else {
+        enableIO = 0;
+        jack_log("Setup AUHAL input off");
+    }
+    
+    err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input, 1, &enableIO, sizeof(enableIO));
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input");
+        printError(err1);
+        if (strict)
+            return -1;
     }
 
     if (playing && outchannels > 0) {
-        jack_log("Setup AUHAL output");
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(enableIO));
-        if (err1 != noErr) {
-            jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO,kAudioUnitScope_Output");
-            printError(err1);
-            if (strict)
-                return -1;
-        }
+        enableIO = 1;
+        jack_log("Setup AUHAL output on");
+    } else {
+        enableIO = 0;
+        jack_log("Setup AUHAL output off");
+    }
+    
+    err1 = AudioUnitSetProperty(fAUHAL, kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Output, 0, &enableIO, sizeof(enableIO));
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO,kAudioUnitScope_Output");
+        printError(err1);
+        if (strict)
+            return -1;
+    }
+    
+    AudioDeviceID currAudioDeviceID;
+    UInt32 size;
+    err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
+        printError(err1);
+        if (strict)
+            return -1;
+    } else {
+        jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
     }
 
     // Setup up choosen device, in both input and output cases
@@ -648,10 +702,20 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (strict)
             return -1;
     }
+    
+    err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
+    if (err1 != noErr) {
+        jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
+        printError(err1);
+        if (strict)
+            return -1;
+    } else {
+        jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
+    }
 
     // Set buffer size
     if (capturing && inchannels > 0) {
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*) & buffer_size, sizeof(UInt32));
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*)&buffer_size, sizeof(UInt32));
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
@@ -661,7 +725,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     }
 
     if (playing && outchannels > 0) {
-        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, (UInt32*) & buffer_size, sizeof(UInt32));
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 0, (UInt32*)&buffer_size, sizeof(UInt32));
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
