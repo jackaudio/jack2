@@ -34,7 +34,7 @@
    <dlgautoprog> 1</>
    <dlgfinish> 1</>
    <comptype> defnorm</>
-   <solid> 1</>
+   <solid> 0</>
    <srcfolder> </>
    <ifexist> over</>
    <runafter> </>
