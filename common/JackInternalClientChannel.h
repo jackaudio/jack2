@@ -98,6 +98,10 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fEngine->PortDisconnect(refnum, src, dst);
         }
+        void PortRename(int refnum, jack_port_id_t port, const char* name, int* result)
+        {
+            *result = fEngine->PortRename(refnum, port, name);
+        }
 
         void SetBufferSize(jack_nframes_t buffer_size, int* result)
         {
@@ -116,6 +120,26 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         void SetTimebaseCallback(int refnum, int conditional, int* result)
         {
             *result = fServer->SetTimebaseCallback(refnum, conditional);
+        }
+        
+        void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
+        {
+            *result = fEngine->GetInternalClientName(int_ref, name_res);
+        }
+
+        void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
+        {
+            *result = fEngine->InternalClientHandle(client_name, status, int_ref);
+        }
+
+        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+        {
+            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status);	
+        }
+
+        void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
+        {
+            *result = fEngine->InternalClientUnload(int_ref, status);
         }
 
 };

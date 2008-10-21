@@ -20,8 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackAudioAdapter__
 #define __JackAudioAdapter__
 
-#include "jack.h"
-#include "ringbuffer.h"
 #include "JackAudioAdapterInterface.h"
 
 namespace Jack
