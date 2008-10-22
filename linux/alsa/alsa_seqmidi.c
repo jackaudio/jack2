@@ -464,6 +464,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	char *c;
 	int err;
 	int jack_caps;
+        char name[128];
 
 	port = calloc(1, sizeof(port_t));
 	if (!port)
@@ -474,7 +475,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	snd_seq_client_info_alloca (&client_info);
 	snd_seq_get_any_client_info (self->seq, addr.client, client_info);
 
-	snprintf(port->name, sizeof(port->name), "%s/midi_%s_%d",
+	snprintf(port->name, sizeof(port->name), "alsa_pcm:%s/midi_%s_%d",
 		 snd_seq_client_info_get_name(client_info), port_type[type].name, addr.port+1);
 
 	// replace all offending characters by -
@@ -489,11 +490,18 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	if (snd_seq_port_info_get_type (info) & (SND_SEQ_PORT_TYPE_HARDWARE|SND_SEQ_PORT_TYPE_PORT|SND_SEQ_PORT_TYPE_SPECIFIC)) {
 		jack_caps |= (JackPortIsPhysical|JackPortIsTerminal);
 	}
+
+	if (jack_caps & JackPortIsOutput)
+		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++self->midi_in_cnt);
+	else 
+		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++self->midi_out_cnt);
 			
 	port->jack_port = jack_port_register(self->jack,
-		port->name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
+		name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
 	if (!port->jack_port)
 		goto failed;
+
+	jack_port_set_alias (port->jack_port, port->name);
 
 	/* generate an alias */
 

@@ -424,7 +424,7 @@ void midi_port_init(const alsa_rawmidi_t *midi, midi_port_t *port, snd_rawmidi_i
 static
 inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type, const char *alias)
 {
-	char name[64];
+	char name[128];
 	
 	if (type & JackPortIsOutput)
 		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++midi->midi_in_cnt);
