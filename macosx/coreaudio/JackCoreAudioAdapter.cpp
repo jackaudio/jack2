@@ -801,7 +801,7 @@ int JackCoreAudioAdapter::OpenAUHAL(bool capturing,
     }
     
     AudioDeviceID currAudioDeviceID;
-    UInt32 size;
+    UInt32 size = sizeof(AudioDeviceID);
     err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
