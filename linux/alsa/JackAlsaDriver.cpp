@@ -204,11 +204,11 @@ JackAlsaDriver::alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitorin
         if ((err = alsa_driver_ice1712_hardware (driver)) != 0) {
             return err;
         }
-    } else if (!strcmp(driver->alsa_driver, "USB US-X2Y")) {
+    } /*else if (!strcmp(driver->alsa_driver, "USB US-X2Y")) {
         if ((err = alsa_driver_usx2y_hardware (driver)) != 0) {
             return err;
         }
-    } else {
+    } */else {
         if ((err = alsa_driver_generic_hardware (driver)) != 0) {
             return err;
         }
