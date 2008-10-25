@@ -1990,7 +1990,8 @@ jack_controller_reset_parameter_value_engine_driver(
         jack_dbus_error(
             call,
             JACK_DBUS_ERROR_UNKNOWN_DRIVER,
-            "Default driver '%s' is unknown");
+            "Default driver '%s' is unknown",
+            DEFAULT_DRIVER);
         return;
     }
 
