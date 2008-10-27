@@ -25,23 +25,23 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <windows.h>
 
 #ifdef __MINGW32__
-    #include <stdint.h>
-    #include <sys/types.h>
+#include <stdint.h>
+#include <sys/types.h>
 #else
-    #define __inline__ inline
-    #define vsnprintf _vsnprintf
-    #define snprintf _snprintf
-    typedef char int8_t;
-    typedef unsigned char uint8_t;
-    typedef short int16_t;
-    typedef unsigned short uint16_t;
-    typedef long int32_t;
-    typedef unsigned long uint32_t;
-    typedef LONGLONG int64_t;
-    typedef ULONGLONG uint64_t;
+#define __inline__ inline
+//#define vsnprintf _vsnprintf
+//#define snprintf _snprintf
+typedef char int8_t;
+typedef unsigned char uint8_t;
+typedef short int16_t;
+typedef unsigned short uint16_t;
+typedef long int32_t;
+typedef unsigned long uint32_t;
+typedef LONGLONG int64_t;
+typedef ULONGLONG uint64_t;
 #endif
-    typedef HANDLE pthread_t;
-    typedef int64_t _jack_time_t;
+typedef HANDLE pthread_t;
+typedef int64_t _jack_time_t;
 #endif // WIN32 */
 
 #if defined(__APPLE__) || defined(__linux__)
