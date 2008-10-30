@@ -132,8 +132,14 @@ namespace Jack
         if ( !JackNetSlaveInterface::Init() )
             return false;
 
-        //set global paramaters
+        //set global parameters
         SetParams();
+         
+        //allocate midi ports lists
+        fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
+        fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
+        assert ( fMidiCapturePortList );
+        assert ( fMidiPlaybackPortList );
 
         //register jack ports
         if ( AllocPorts() != 0 )
@@ -191,13 +197,6 @@ namespace Jack
 
         //transport engine parametering
         fEngineControl->fTransport.SetNetworkSync ( true );
-
-        //allocate midi ports lists
-        fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
-        fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-        assert ( fMidiCapturePortList );
-        assert ( fMidiPlaybackPortList );
-
         return true;
     }
 

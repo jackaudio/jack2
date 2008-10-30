@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-10-30 Stephane Letz  <letz@grame.fr>
+	
+	* Fix Midi port initialization in JackNetDriver.
+
 2008-10-15 Stephane Letz  <letz@grame.fr>
 	
 	* Fix a crash in JackEngine::Close when backend cannot be loaded.
