@@ -26,8 +26,9 @@ Michael Voigt
 2008-10-30 Stephane Letz  <letz@grame.fr>
 	
 	* Fix Midi port initialization in JackNetDriver.
+	* Correct JackClient::ShutDown.
 
-2008-10-15 Stephane Letz  <letz@grame.fr>
+2008-10-23 Stephane Letz  <letz@grame.fr>
 	
 	* Fix a crash in JackEngine::Close when backend cannot be loaded.
 	* Tim Blechmann optimization patch.

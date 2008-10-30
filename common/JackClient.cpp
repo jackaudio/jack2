@@ -597,8 +597,11 @@ void JackClient::ShutDown()
 {
     jack_log("ShutDown");
     
-    GetClientControl()->fServer = false;
-    GetClientControl()->fActive = false;
+    // Be sure client is already started 
+    if (GetClientControl()) {
+        GetClientControl()->fServer = false;
+        GetClientControl()->fActive = false;
+    }
     
     if (fShutdown) {
         fShutdown(fShutdownArg);
