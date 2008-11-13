@@ -1,4 +1,4 @@
-/* -*- Mode: C++ ; c-basic-offset: 4 -*- */
+// u/* -*- Mode: C++ ; c-basic-offset: 4 -*- */
 /*
   JACK control API implementation
 
@@ -1153,7 +1153,7 @@ EXPORT bool jackctl_server_unload_internal(
 {
     int status;
     if (server_ptr->engine != NULL && internal->refnum > 0) {
-        return (server_ptr->engine->GetEngine()->InternalClientUnload(internal->refnum, &status));
+        return ((server_ptr->engine->GetEngine()->InternalClientUnload(internal->refnum, &status)) == 0);
     } else {
         return false;
     }
