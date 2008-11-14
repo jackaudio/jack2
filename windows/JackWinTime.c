@@ -18,16 +18,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
+#include <windows.h>
 #include "JackTime.h"
 #include "JackError.h"
 
 static LARGE_INTEGER _jack_freq;
 
-SERVER_EXPORT JackSleep(long usec) 
+SERVER_EXPORT void JackSleep(long usec) 
 {
 	Sleep(usec / 1000);
 }
