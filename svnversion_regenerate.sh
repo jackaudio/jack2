@@ -16,7 +16,8 @@ TEMP_FILE="${OUTPUT_FILE}.tmp"
 #echo $OUTPUT_FILE
 #echo $TEMP_FILE
 
-pushd .. > /dev/null
+OLDPWD=`pwd`
+cd ..
 
 if test $# -eq 2
 then
@@ -62,7 +63,7 @@ else
   fi
 fi
 
-popd > /dev/null
+cd "${OLDPWD}"
 
 rm ${TEMP_FILE}
 
