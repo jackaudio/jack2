@@ -31,11 +31,11 @@ int JackWinNamedPipe::Read(void* data, int len)
 {
     DWORD read;
     BOOL res = ReadFile(fNamedPipe, data, len, &read, NULL);
-    if (read != (DWORD)len) {
+    if (res && read == (DWORD)len) {
+        return 0;
+    } else {
         jack_error("Cannot read named pipe err = %ld", GetLastError());
         return -1;
-    } else {
-        return 0;
     }
 }
 
@@ -43,11 +43,11 @@ int JackWinNamedPipe::Write(void* data, int len)
 {
     DWORD written;
     BOOL res = WriteFile(fNamedPipe, data, len, &written, NULL);
-    if (written != (DWORD)len) {
+    if (res && written == (DWORD)len) {
+        return 0;
+    } else {
         jack_error("Cannot write named pipe err = %ld", GetLastError());
         return -1;
-    } else {
-        return 0;
     }
 }
 
@@ -113,7 +113,7 @@ void JackWinNamedPipeClient::SetWriteTimeOut(long sec)
 {}
 
 JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
-        : JackWinNamedPipeClient(), fIOState(kIdle), fPendingIO(false)
+        : JackWinNamedPipeClient(), fPendingIO(false), fIOState(kIdle)
 {
     fIOState = kIdle;
     fOverlap.hEvent = CreateEvent(NULL,     // default security attribute
@@ -123,7 +123,7 @@ JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
 }
 
 JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient(HANDLE pipe, bool pending)
-        : JackWinNamedPipeClient(pipe), fIOState(kIdle), fPendingIO(pending)
+        : JackWinNamedPipeClient(pipe), fPendingIO(pending), fIOState(kIdle)
 {
     fOverlap.hEvent = CreateEvent(NULL,     // default security attribute
                                   TRUE,     // manual-reset event
@@ -173,6 +173,9 @@ int JackWinAsyncNamedPipeClient::FinishIO()
                 return -1;
             }
             fIOState = kReading;
+            break;
+
+        default:
             break;
     }
 
