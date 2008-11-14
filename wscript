@@ -9,6 +9,7 @@ g_maxlen = 40
 import shutil
 import Task
 import re
+import Logs
 
 VERSION='1.9.0'
 APPNAME='jack'
@@ -34,29 +35,25 @@ def display_feature(msg, build):
     else:
         display_msg(msg, "no", 'YELLOW')
 
-def create_svnversion_gen(bld, header='svnversion.h', define=None):
+def create_svnversion_task(bld, header='svnversion.h', define=None):
+    import Constants, Build
+
     cmd = '../svnversion_regenerate.sh ${TGT}'
     if define:
         cmd += " " + define
-    cls = Task.simple_task_type('svnversion', cmd, color='BLUE')
-    cls.must_run = lambda self: True
-    #cls.before = 'cxx'
 
-    def sg(self):
-        rt = Utils.h_file(self.outputs[0].abspath(self.env()))
-        return rt
-    cls.signature = sg
+    cls = Task.simple_task_type('svnversion', cmd, color='BLUE', before='cc')
+    cls.runnable_status = lambda self: Constants.RUN_ME
 
-    #def se(self):
-    #    r = sg(self)
-    #    return (r, r, r, r, r)
-    #cls.cache_sig = property(sg, None)
-    cls.cache_sig = None
+    def post_run(self):
+        sg = Utils.h_file(self.outputs[0].abspath(self.env))
+        print sg.encode('hex')
+        Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
+    cls.post_run = post_run
 
-    tsk = cls('svnversion')
+    tsk = cls(bld.env.copy())
     tsk.inputs = []
     tsk.outputs = [bld.path.find_or_declare(header)]
-    tsk.prio = 1 # execute this task first
 
 def set_options(opt):
     # options provided by the modules
@@ -146,24 +143,23 @@ def configure(conf):
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
         #display_msg('Settings persistence', xxx)
 
-        if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]:
+        if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS_SERVICES_DIR_REAL']:
             print
-            print Logs.g_colors['RED'] + "WARNING: D-Bus session services directory as reported by pkg-config is"
-            print Logs.g_colors['RED'] + "WARNING:",
-            print Logs.g_colors['CYAN'] + conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]
-            print Logs.g_colors['RED'] + 'WARNING: but service file will be installed in'
-            print Logs.g_colors['RED'] + "WARNING:",
-            print Logs.g_colors['CYAN'] + conf.env['DBUS_SERVICES_DIR']
-            print Logs.g_colors['RED'] + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
+            print Logs.colors.RED + "WARNING: D-Bus session services directory as reported by pkg-config is"
+            print Logs.colors.RED + "WARNING:",
+            print Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR_REAL']
+            print Logs.colors.RED + 'WARNING: but service file will be installed in'
+            print Logs.colors.RED + "WARNING:",
+            print Logs.colors.CYAN + conf.env['DBUS_SERVICES_DIR']
+            print Logs.colors.RED + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
             print 'WARNING: You can override dbus service install directory'
             print 'WARNING: with --enable-pkg-config-dbus-service-dir option to this script'
-            print Logs.g_colors['NORMAL'],
+            print Logs.colors.NORMAL,
     print
 
 def build(bld):
-    # Needs a fix : nedko ??
-    #if not os.access('svnversion.h', os.R_OK):
-    #    create_svnversion_gen(bld)
+    if not os.access('svnversion.h', os.R_OK):
+        create_svnversion_task(bld)
 
     # process subfolders from here
     bld.add_subdirs('common')

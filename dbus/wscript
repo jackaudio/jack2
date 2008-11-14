@@ -4,17 +4,24 @@
 import os.path
 import Options
 import re # subst_func
+import Logs
 
 def set_options(opt):
     opt.add_option('--enable-pkg-config-dbus-service-dir', action='store_true', default=False, help='force D-Bus service install dir to be one returned by pkg-config')
 
 def configure(conf):
-    # conf.check_pkg('dbus-1', pkgvars=['session_bus_services_dir'])
-    # Needs a fix : nedko ??
-    conf.check_cfg(package='dbus-1', pkgvars=['session_bus_services_dir'])
+    if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs'):
+        return
+
+    dbus_dir = conf.check_cfg(package='dbus-1', args='--variable=session_bus_services_dir')
+    if not dbus_dir:
+        return
+
+    dbus_dir = dbus_dir.strip()
+    conf.env['DBUS_SERVICES_DIR_REAL'] = dbus_dir
 
     if Options.options.enable_pkg_config_dbus_service_dir:
-        conf.env['DBUS_SERVICES_DIR'] = conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]
+        conf.env['DBUS_SERVICES_DIR'] = dbus_dir
     else:
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
