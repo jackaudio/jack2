@@ -2,30 +2,31 @@
 # encoding: utf-8
 
 def create_jack_driver_obj(bld, target, sources, uselib = None):
-    driver = bld.create_obj('cpp', 'shlib')
+    driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources
-    driver.inst_var = bld.env()['ADDON_DIR']
-    driver.inst_dir = '/'
+    driver.install_path = '${ADDON_DIR}/'
     driver.uselib_local = 'serverlib'
     if uselib:
         driver.uselib = uselib
     return driver
 
 def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
-    driver = bld.create_obj('cpp', 'shlib')
+    driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = 'HAVE_CONFIG_H'
     driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources
-    driver.inst_var = bld.env()['ADDON_DIR']
-    driver.inst_dir = '/'
+    #steph
+    #driver.inst_var = bld.env['ADDON_DIR']
+    #driver.inst_dir = '/'
+    driver.install_path = '${ADDON_DIR}/'
     driver.uselib_local = 'serverlib'
     driver.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreServices -framework AudioUnit")
     if uselib:
@@ -33,7 +34,7 @@ def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
     return driver
 
 def build(bld):
-    jackd = bld.create_obj('cpp', 'program')
+    jackd = bld.new_task_gen('cxx', 'program')
     jackd.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     jackd.defines = 'HAVE_CONFIG_H'
     jackd.source = ['../common/Jackdmp.cpp']
@@ -48,7 +49,7 @@ def build(bld):
     
     portaudio_src = [
         '../windows/JackPortAudioDriver.cpp',
-	'../windows/JackPortAudioDevices.cpp',
+        '../windows/JackPortAudioDevices.cpp',
     	]
 
     #create_jack_audio_driver_obj(bld, 'portaudio', portaudio_src)

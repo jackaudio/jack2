@@ -1,3 +1,3 @@
 [D-BUS Service]
 Name=org.jackaudio.service
-Exec=${BINDIR}/jackdbus auto
+Exec=@BINDIR@/jackdbus auto

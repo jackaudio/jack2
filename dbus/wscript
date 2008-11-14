@@ -1,72 +1,40 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-import Params
 import os.path
+import Options
 import re # subst_func
 
 def set_options(opt):
     opt.add_option('--enable-pkg-config-dbus-service-dir', action='store_true', default=False, help='force D-Bus service install dir to be one returned by pkg-config')
 
 def configure(conf):
-    conf.check_pkg('dbus-1', pkgvars=['session_bus_services_dir'])
+    # conf.check_pkg('dbus-1', pkgvars=['session_bus_services_dir'])
+    # Needs a fix : nedko ??
+    conf.check_cfg(package='dbus-1', pkgvars=['session_bus_services_dir'])
 
-    if Params.g_options.enable_pkg_config_dbus_service_dir:
+    if Options.options.enable_pkg_config_dbus_service_dir:
         conf.env['DBUS_SERVICES_DIR'] = conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]
     else:
         conf.env['DBUS_SERVICES_DIR'] = os.path.normpath(conf.env['PREFIX'] + '/share/dbus-1/services')
 
     conf.check_tool('misc')
 
-    e = conf.create_header_configurator()
-    e.name = 'expat.h'
-    e.define = 'HAVE_EXPAT'
-    e.run()
+    conf.check(header_name='expat.h', define_name="HAVE_EXPAT")
 
     if conf.is_defined('HAVE_EXPAT'):
         conf.env['LIB_EXPAT'] = ['expat']
 
     conf.env['BUILD_JACKDBUS'] = conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1')
 
-# by default waf subst tool uses @VAR@ while scons legacy is ${VAR}
-# so we use same template as scons for now
-def subst_func(tsk):
-    "Substitutes variables in a .in file"
-
-    m4_re = re.compile('\$\{(\w+)\}', re.M)
-
-    env = tsk.env()
-    infile = tsk.m_inputs[0].abspath(env)
-    outfile = tsk.m_outputs[0].abspath(env)
-
-    file = open(infile, 'r')
-    code = file.read()
-    file.close()
-
-    s = m4_re.sub(r'%(\1)s', code)
-
-    dict = tsk.dict
-    if not dict:
-        names = m4_re.findall(code)
-        for i in names:
-            if env[i] and type(env[i]) is types.ListType :
-                dict[i] = " ".join(env[i])
-            else: dict[i] = env[i]
-
-    file = open(outfile, 'w')
-    file.write(s % dict)
-    file.close()
-
-    return 0
-
 def build(bld):
-    if bld.env()["BUILD_JACKDBUS"] != True:
+    if bld.env["BUILD_JACKDBUS"] != True:
         return
 
-    obj = bld.create_obj('cc', 'program')
-    if bld.env()['IS_LINUX']:
+    obj = bld.new_task_gen('cc', 'program')
+    if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         sysdeps_dbus_include = ['../macosx', '../posix']
 
     obj.includes = sysdeps_dbus_include + ['.', '../', '../common', '../common/jack']
@@ -85,18 +53,18 @@ def build(bld):
         'xml_write_raw.c',
         'sigsegv.c',
         ]
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
         obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         obj.uselib = 'PTHREAD DL DBUS-1 EXPAT'
     obj.uselib_local = 'serverlib'
     obj.target       = 'jackdbus'
 
     # process org.jackaudio.service.in -> org.jackaudio.service
-    obj = bld.create_obj('subst')
+    import misc
+    obj = bld.new_task_gen('subst')
     obj.source = 'org.jackaudio.service.in'
     obj.target = 'org.jackaudio.service'
-    obj.dict = {'BINDIR': bld.env()['PREFIX'] + '/bin'}
-    obj.inst_var = bld.env()['DBUS_SERVICES_DIR']
-    obj.inst_dir = '/'
-    obj.fun = subst_func # @VAR@ -> ${VAR}
+    obj.dict = {'BINDIR': bld.env['PREFIX'] + '/bin'}
+    obj.install_path = '${DBUS_SERVICES_DIR}/'
+    obj.fun = misc.subst_func

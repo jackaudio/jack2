@@ -2,10 +2,10 @@
 # encoding: utf-8
 
 import os
-import Params
+import Utils
+import Options
 import commands
-from Configure import g_maxlen
-#g_maxlen = 40
+g_maxlen = 40
 import shutil
 import Task
 import re
@@ -24,7 +24,7 @@ def display_msg(msg, status = None, color = None):
     g_maxlen = max(g_maxlen, len(msg))
     if status:
         print "%s :" % msg.ljust(g_maxlen),
-        Params.pprint(color, status)
+        Utils.pprint(color, status)
     else:
         print "%s" % msg.ljust(g_maxlen)
 
@@ -43,7 +43,7 @@ def create_svnversion_gen(bld, header='svnversion.h', define=None):
     #cls.before = 'cxx'
 
     def sg(self):
-        rt = Params.h_file(self.m_outputs[0].abspath(self.env()))
+        rt = Utils.h_file(self.outputs[0].abspath(self.env()))
         return rt
     cls.signature = sg
 
@@ -53,9 +53,9 @@ def create_svnversion_gen(bld, header='svnversion.h', define=None):
     #cls.cache_sig = property(sg, None)
     cls.cache_sig = None
 
-    tsk = cls('svnversion', bld.env().copy())
-    tsk.m_inputs = []
-    tsk.m_outputs = [bld.path.find_or_declare(header)]
+    tsk = cls('svnversion')
+    tsk.inputs = []
+    tsk.outputs = [bld.path.find_or_declare(header)]
     tsk.prio = 1 # execute this task first
 
 def set_options(opt):
@@ -71,15 +71,15 @@ def set_options(opt):
     opt.sub_options('dbus')
 
 def configure(conf):
-    platform = conf.detect_platform()
+    platform = Utils.detect_platform()
     conf.env['IS_MACOSX'] = platform == 'darwin'
     conf.env['IS_LINUX'] = platform == 'linux'
 
     if conf.env['IS_LINUX']:
-        Params.pprint('CYAN', "Linux detected")
+        Utils.pprint('CYAN', "Linux detected")
 
     if conf.env['IS_MACOSX']:
-        Params.pprint('CYAN', "MacOS X detected")
+        Utils.pprint('CYAN', "MacOS X detected")
 
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
@@ -87,7 +87,7 @@ def configure(conf):
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
-    if Params.g_options.dbus:
+    if Options.options.dbus:
         conf.sub_config('dbus')
     conf.sub_config('example-clients')
 
@@ -97,11 +97,11 @@ def configure(conf):
     conf.env['JACK_API_VERSION'] = JACK_API_VERSION
     conf.env['JACK_VERSION'] = VERSION
 
-    conf.env['BUILD_DOXYGEN_DOCS'] = Params.g_options.doxygen
-    conf.env['BUILD_WITH_MONITOR'] = Params.g_options.monitor
+    conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
+    conf.env['BUILD_WITH_MONITOR'] = Options.options.monitor
 
-    conf.define('CLIENT_NUM', Params.g_options.clients)
-    conf.define('PORT_NUM', Params.g_options. ports)
+    conf.define('CLIENT_NUM', Options.options.clients)
+    conf.define('PORT_NUM', Options.options. ports)
 
     conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
     conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
@@ -148,64 +148,65 @@ def configure(conf):
 
         if conf.env['DBUS_SERVICES_DIR'] != conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]:
             print
-            print Params.g_colors['RED'] + "WARNING: D-Bus session services directory as reported by pkg-config is"
-            print Params.g_colors['RED'] + "WARNING:",
-            print Params.g_colors['CYAN'] + conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]
-            print Params.g_colors['RED'] + 'WARNING: but service file will be installed in'
-            print Params.g_colors['RED'] + "WARNING:",
-            print Params.g_colors['CYAN'] + conf.env['DBUS_SERVICES_DIR']
-            print Params.g_colors['RED'] + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
+            print Logs.g_colors['RED'] + "WARNING: D-Bus session services directory as reported by pkg-config is"
+            print Logs.g_colors['RED'] + "WARNING:",
+            print Logs.g_colors['CYAN'] + conf.env['DBUS-1_SESSION_BUS_SERVICES_DIR'][0]
+            print Logs.g_colors['RED'] + 'WARNING: but service file will be installed in'
+            print Logs.g_colors['RED'] + "WARNING:",
+            print Logs.g_colors['CYAN'] + conf.env['DBUS_SERVICES_DIR']
+            print Logs.g_colors['RED'] + 'WARNING: You may need to adjust your D-Bus configuration after installing jackdbus'
             print 'WARNING: You can override dbus service install directory'
             print 'WARNING: with --enable-pkg-config-dbus-service-dir option to this script'
-            print Params.g_colors['NORMAL'],
+            print Logs.g_colors['NORMAL'],
     print
 
 def build(bld):
-    if not os.access('svnversion.h', os.R_OK):
-        create_svnversion_gen(bld)
+    # Needs a fix : nedko ??
+    #if not os.access('svnversion.h', os.R_OK):
+    #    create_svnversion_gen(bld)
 
     # process subfolders from here
     bld.add_subdirs('common')
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
-        if bld.env()['BUILD_JACKDBUS'] == True:
+        if bld.env['BUILD_JACKDBUS'] == True:
             bld.add_subdirs('dbus')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         bld.add_subdirs('macosx')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
-        if bld.env()['BUILD_JACKDBUS'] == True:
+        if bld.env['BUILD_JACKDBUS'] == True:
             bld.add_subdirs('dbus')
 
-    if bld.env()['BUILD_DOXYGEN_DOCS'] == True:
-        share_dir = bld.env().get_destdir() + Params.g_build.env()['PREFIX'] + '/share/jack-audio-connection-kit'
+    if bld.env['BUILD_DOXYGEN_DOCS'] == True:
+        share_dir = bld.env.get_destdir() + Build.bld.env()['PREFIX'] + '/share/jack-audio-connection-kit'
         html_docs_source_dir = "build/default/html"
         html_docs_install_dir = share_dir + '/reference/html/'
-        if Params.g_commands['install']:
+        if Options.commands['install']:
             if os.path.isdir(html_docs_install_dir):
-                Params.pprint('CYAN', "Removing old doxygen documentation installation...")
+                Utils.pprint('CYAN', "Removing old doxygen documentation installation...")
                 shutil.rmtree(html_docs_install_dir)
-                Params.pprint('CYAN', "Removing old doxygen documentation installation done.")
-            Params.pprint('CYAN', "Installing doxygen documentation...")
+                Utils.pprint('CYAN', "Removing old doxygen documentation installation done.")
+            Utils.pprint('CYAN', "Installing doxygen documentation...")
             shutil.copytree(html_docs_source_dir, html_docs_install_dir)
-            Params.pprint('CYAN', "Installing doxygen documentation done.")
-        elif Params.g_commands['uninstall']:
-            Params.pprint('CYAN', "Uninstalling doxygen documentation...")
+            Utils.pprint('CYAN', "Installing doxygen documentation done.")
+        elif Options.commands['uninstall']:
+            Utils.pprint('CYAN', "Uninstalling doxygen documentation...")
             if os.path.isdir(share_dir):
                 shutil.rmtree(share_dir)
-            Params.pprint('CYAN', "Uninstalling doxygen documentation done.")
-        elif Params.g_commands['clean']:
+            Utils.pprint('CYAN', "Uninstalling doxygen documentation done.")
+        elif Options.commands['clean']:
             if os.access(html_docs_source_dir, os.R_OK):
-                Params.pprint('CYAN', "Removing doxygen generated documentation...")
+                Utils.pprint('CYAN', "Removing doxygen generated documentation...")
                 shutil.rmtree(html_docs_source_dir)
-                Params.pprint('CYAN', "Removing doxygen generated documentation done.")
-        elif Params.g_commands['build']:
+                Utils.pprint('CYAN', "Removing doxygen generated documentation done.")
+        elif Options.commands['build']:
             if not os.access(html_docs_source_dir, os.R_OK):
                 os.popen("doxygen").read()
             else:
-                Params.pprint('CYAN', "doxygen documentation already built.")
+                Utils.pprint('CYAN', "doxygen documentation already built.")
 
 def dist_hook():
     os.remove('svnversion_regenerate.sh')

@@ -27,26 +27,17 @@ example_libs = {
     }
 
 def configure(conf):
-    e = conf.create_header_configurator()
-    e.name = 'sndfile.h'
-    e.define = 'HAVE_SNDFILE'
-    e.run()
-
+    e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE")
+ 
     if conf.is_defined('HAVE_SNDFILE'):
         conf.env['LIB_SNDFILE'] = ['sndfile']
 
-    e = conf.create_header_configurator()
-    e.name = 'ncurses.h'
-    e.define = 'HAVE_NCURSES'
-    e.run()
+    e = conf.check_cc(header_name='ncurses.h', define_name="HAVE_NCURSES")
 
     if conf.is_defined('HAVE_NCURSES'):
         conf.env['LIB_NCURSES'] = ['ncurses']
 
-    e = conf.create_library_configurator()
-    e.name = 'readline'
-    e.define = 'HAVE_READLINE'
-    e.run()
+    e = conf.check_cc(lib='readline', define_name="HAVE_READLINE")
 
     if conf.is_defined('HAVE_READLINE'):
         conf.env['LIB_READLINE'] = ['readline']
@@ -56,20 +47,20 @@ def configure(conf):
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
 def build(bld):
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
         os_incdir = ['../linux', '../posix']
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         os_incdir = ['../macosx', '../posix']
     for example_program, example_program_source in example_programs.items():
-        prog = bld.create_obj('cpp', 'program')
+        prog = bld.new_task_gen('cxx', 'program')
         prog.features.append('cc')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = example_program_source
-        if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             prog.env.append_value("LINKFLAGS", "")
-        if bld.env()['IS_LINUX']:
+        if bld.env['IS_LINUX']:
             prog.uselib = 'RT'
         if example_program == 'jack_server_control':
             prog.uselib_local = 'serverlib'
@@ -77,51 +68,50 @@ def build(bld):
             prog.uselib_local = 'clientlib'              
         prog.target = example_program
    
-    #if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT']
-    if bld.env()['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True and bld.env()['IS_LINUX'] == True:
-        prog = bld.create_obj('cc', 'program')
+    #if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']
+    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True and bld.env['IS_LINUX'] == True:
+        prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
-        if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             prog.env.append_value("LINKFLAGS", "")
-        if bld.env()['IS_LINUX']:
+        if bld.env['IS_LINUX']:
             prog.uselib = 'RT READLINE NCURSES'
-        if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
 	    prog.uselib = 'READLINE NCURSES'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
-    if bld.env()['BUILD_EXAMPLE_CLIENT_REC'] == True:
-        prog = bld.create_obj('cc', 'program')
+    if bld.env['BUILD_EXAMPLE_CLIENT_REC'] == True:
+        prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
-        if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             prog.env.append_value("LINKFLAGS", "")
-        if bld.env()['IS_LINUX']:
+        if bld.env['IS_LINUX']:
             prog.uselib = 'RT SNDFILE'
-        if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
             prog.uselib = 'SNDFILE'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_rec'
 
     for example_lib, example_lib_source in example_libs.items():
-        lib = bld.create_obj('cc', 'shlib')
+        lib = bld.new_task_gen('cc', 'shlib')
         lib.env['shlib_PATTERN'] = '%s.so'
         lib.includes = os_incdir + ['../common/jack', '../common']
         lib.target = example_lib
         lib.source = example_lib_source
-	if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
             lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             lib.env.append_value("LINKFLAGS", "")
         lib.uselib_local = 'serverlib'
-        lib.inst_var = bld.env()['ADDON_DIR']
-        lib.inst_dir = '/'
+        lib.install_path = '${ADDON_DIR}/'
 
-    symlink_as('PREFIX', 'jack_connect', 'bin/jack_disconnect')
+    bld.symlink_as('${PREFIX}/jack_connect', 'bin/jack_disconnect')
 
-    install_files('PREFIX', 'bin', 'jack_control', chmod=0755)
+    bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0755)

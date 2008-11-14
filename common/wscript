@@ -1,72 +1,39 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+import Build
 import re
 import os
 
 def configure(conf):
-    conf.check_tool('misc')
-    e = conf.create_header_configurator()
-    e.name = 'samplerate.h'
-    e.define = 'HAVE_SAMPLERATE'
-    e.run()
+    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
    
     if conf.is_defined('HAVE_SAMPLERATE'):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
     conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
 
-
-# by default waf subst tool uses @VAR@ while scons legacy is ${VAR}
-# so we use same template as scons for now
-def subst_func(tsk):
-    "Substitutes variables in a .in file"
-
-    m4_re = re.compile('\$\{(\w+)\}', re.M)
-
-    env = tsk.env()
-    infile = tsk.m_inputs[0].abspath(env)
-    outfile = tsk.m_outputs[0].abspath(env)
-
-    file = open(infile, 'r')
-    code = file.read()
-    file.close()
-
-    s = m4_re.sub(r'%(\1)s', code)
-
-    dict = tsk.dict
-    if not dict:
-        names = m4_re.findall(code)
-        for i in names:
-            if env[i] and type(env[i]) is types.ListType :
-                dict[i] = " ".join(env[i])
-            else: dict[i] = env[i]
-
-    file = open(outfile, 'w')
-    file.write(s % dict)
-    file.close()
-
-    return 0
-
 def create_jack_process_obj(bld, target, sources, uselib = None):
-    process = bld.create_obj('cpp', 'shlib')
+    process = bld.new_task_gen('cxx', 'shlib')
     process.env['shlib_PATTERN'] = '%s.so'
     process.defines  = ['HAVE_CONFIG_H','SERVER_SIDE']
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
 	env_includes = ['../linux', '../posix', '../linux/alsa']
     process.includes = ['.'] + env_includes + ['jack', '..']
     process.name     = target
     process.target   = target
     process.source   = sources
     process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
         process.env.append_value("LINKFLAGS", "")
-    process.inst_var = bld.env()['ADDON_DIR']
-    process.inst_dir = '/'
+    #steph
+    #process.inst_var = bld.env['ADDON_DIR']
+    #process.inst_dir = '/'
+    process.install_path = '${ADDON_DIR}/'
     process.uselib_local = uselib.name
     return process
 
@@ -99,7 +66,7 @@ def build(bld):
     includes = ['.', './jack', '..']
     uselib = ["PTHREAD"]
 
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
         common_libsources += [
             '../posix/JackPosixThread.cpp',
             '../posix/JackPosixSemaphore.cpp',
@@ -112,7 +79,7 @@ def build(bld):
         uselib.append('RT')
         uselib.append('DL')
 
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         common_libsources += [
             '../posix/JackProcessSync.cpp',
             '../posix/JackPosixThread.cpp',
@@ -123,7 +90,7 @@ def build(bld):
             ]
         includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
 
-    serverlib = bld.create_obj('cpp', 'shlib')
+    serverlib = bld.new_task_gen('cxx', 'shlib')
     serverlib.features.append('cc')
     serverlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     serverlib.includes = includes
@@ -141,8 +108,8 @@ def build(bld):
         'JackLoopbackDriver.cpp',
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
-	'JackRestartThreadedDriver.cpp',
-	'JackWaitThreadedDriver.cpp',
+        'JackRestartThreadedDriver.cpp',
+        'JackWaitThreadedDriver.cpp',
         'JackServerAPI.cpp',
         'JackDriverLoader.cpp',
         'JackServerGlobals.cpp',
@@ -151,7 +118,7 @@ def build(bld):
         'JackNetInterface.cpp',
         ]
 
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
         serverlib.source += [
             '../posix/JackSocketServerChannel.cpp',
             '../posix/JackSocketNotifyChannel.cpp',
@@ -159,7 +126,7 @@ def build(bld):
             '../posix/JackNetUnixSocket.cpp',
             ]
 
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         serverlib.source += [
             '../macosx/JackMachServerChannel.cpp',
             '../macosx/JackMachNotifyChannel.cpp',
@@ -169,19 +136,19 @@ def build(bld):
             '../posix/JackNetUnixSocket.cpp',
             ]
 
-    serverlib.vnum = bld.env()['JACK_API_VERSION']
+    serverlib.vnum = bld.env['JACK_API_VERSION']
     serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
         serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
 	serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
-    clientlib = bld.create_obj('cpp', 'shlib')
+    clientlib = bld.new_task_gen('cxx', 'shlib')
     clientlib.features.append('cc')
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.uselib = uselib
-    if bld.env()['BUILD_JACKDBUS'] == True:
+    if bld.env['BUILD_JACKDBUS'] == True:
         clientlib.uselib.append('DBUS-1')
     clientlib.includes = includes
     clientlib.name         = 'clientlib'
@@ -192,13 +159,13 @@ def build(bld):
         'JackLibAPI.cpp',
         ]
 
-    if bld.env()['IS_LINUX']:
+    if bld.env['IS_LINUX']:
         clientlib.source += [
             '../posix/JackSocketClientChannel.cpp',
             '../posix/JackPosixServerLaunch.cpp',
             ]
 
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         clientlib.source += [
             '../macosx/JackMachClientChannel.cpp',
             '../macosx/RPC/JackRPCEngineUser.c',
@@ -206,9 +173,9 @@ def build(bld):
             '../posix/JackPosixServerLaunch.cpp',
             ]
 
-    clientlib.vnum = bld.env()['JACK_API_VERSION']
+    clientlib.vnum = bld.env['JACK_API_VERSION']
     clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
-    if bld.env()['IS_MACOSX']:
+    if bld.env['IS_MACOSX']:
         clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
 	clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
@@ -219,30 +186,30 @@ def build(bld):
     net_adapter_sources = [
         'JackResampler.cpp',
         'JackLibSampleRateResampler.cpp',
-   	'JackAudioAdapter.cpp',
+        'JackAudioAdapter.cpp',
         'JackAudioAdapterInterface.cpp',
         'JackNetAdapter.cpp',
         ]
 
-    if bld.env()['BUILD_ADAPTER'] == True:
+    if bld.env['BUILD_ADAPTER'] == True:
         process = create_jack_process_obj(bld, 'netadapter', net_adapter_sources, serverlib)
         process.uselib = 'SAMPLERATE'
 
     audio_adapter_sources = [
         'JackResampler.cpp',
         'JackLibSampleRateResampler.cpp',
-	'JackAudioAdapter.cpp',
+        'JackAudioAdapter.cpp',
         'JackAudioAdapterInterface.cpp',
         'JackAudioAdapterFactory.cpp',
         ]
 
-    if bld.env()['BUILD_ADAPTER'] and bld.env()['IS_MACOSX']:
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_MACOSX']:
          audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.env.append_value("LINKFLAGS", "-framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
          process.uselib = 'SAMPLERATE'
 
-    if bld.env()['BUILD_ADAPTER'] and bld.env()['IS_LINUX']:
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.uselib = ['ALSA', 'SAMPLERATE']
@@ -250,18 +217,20 @@ def build(bld):
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
 
-    install_files('PREFIX', 'include/jack', 'jack/*.h')
+    bld.install_files('${PREFIX}/include/jack', 'jack/*.h')
 
     # process jack.pc.in -> jack.pc
-    obj = bld.create_obj('subst')
+    import misc
+    obj = bld.new_task_gen('subst')
     obj.source = '../jack.pc.in'
     obj.target = 'jack.pc'
-    obj.dict = {'PREFIX': bld.env()['PREFIX'],
-                'LIBDIR': os.path.normpath(bld.env()['PREFIX'] + '/lib'),
-                'INCLUDEDIR': os.path.normpath(bld.env()['PREFIX'] + '/include'),
+    obj.dict = {'PREFIX': bld.env['PREFIX'],
+                'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
+                'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
                 'SERVERLIB': serverlib.target,
-                'JACK_VERSION': bld.env()['JACK_VERSION'],
+                'JACK_VERSION': bld.env['JACK_VERSION'],
                 }
-    obj.inst_var = bld.env()['PREFIX']
-    obj.inst_dir = '/lib/pkgconfig/'
-    obj.fun = subst_func # @VAR@ -> ${VAR}
+    obj.install_path = '${PREFIX}/lib/pkgconfig/'
+    #steph  
+    #obj.fun = subst_func # @VAR@ -> ${VAR}
+    obj.fun = misc.subst_func

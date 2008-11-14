@@ -13,16 +13,16 @@ test_programs = {
 
 def build(bld):
     for test_program, test_program_sources in test_programs.items():
-        prog = bld.create_obj('cpp', 'program')
+        prog = bld.new_task_gen('cxx', 'program')
         prog.features.append('cc')
-	if bld.env()['IS_MACOSX']:
+	if bld.env['IS_MACOSX']:
 	    prog.includes = ['../macosx', '../posix', '../common/jack', '../common']
-	if bld.env()['IS_LINUX']:
+	if bld.env['IS_LINUX']:
 	    prog.includes = ['../linux', '../posix', '../common/jack', '../common']
         prog.source = test_program_sources
-        if bld.env()['IS_LINUX']:
+        if bld.env['IS_LINUX']:
             prog.uselib = 'RT'
-        if bld.env()['IS_MACOSX']:
+        if bld.env['IS_MACOSX']:
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
 	    prog.env.append_value("LINKFLAGS", "")

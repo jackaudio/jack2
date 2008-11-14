@@ -2,31 +2,30 @@
 # encoding: utf-8
 
 def configure(conf):
-    conf.check_pkg('alsa', vnum = '1.0.0')
+    conf.check_cfg(package='alsa', atleast_version='1.0.0', args='--cflags --libs')
     conf.env['BUILD_DRIVER_ALSA'] = conf.is_defined('HAVE_ALSA')
 
-    conf.check_pkg('libfreebob', vnum = '1.0.0')
+    conf. check_cfg(package='libfreebob', atleast_version='1.0.0', args='--cflags --libs')
     conf.env['BUILD_DRIVER_FREEBOB'] = conf.is_defined('HAVE_LIBFREEBOB')
 
-    conf.check_pkg('libffado', vnum = '1.999.17')
+    conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs')
     conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
 
 def create_jack_driver_obj(bld, target, sources, uselib = None):
-    driver = bld.create_obj('cpp', 'shlib')
+    driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources
-    driver.inst_var = bld.env()['ADDON_DIR']
-    driver.inst_dir = '/'
+    driver.install_path = '${ADDON_DIR}/'
     if uselib:
         driver.uselib = uselib
     return driver
 
 def build(bld):
-    jackd = bld.create_obj('cpp', 'program')
+    jackd = bld.new_task_gen('cxx', 'program')
     jackd.includes = ['../linux', '../posix', '../common/jack', '../common']
     jackd.defines = 'HAVE_CONFIG_H'
     jackd.source = ['../common/Jackdmp.cpp']
@@ -36,7 +35,7 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 
-    if bld.env()['BUILD_DRIVER_ALSA'] == True:
+    if bld.env['BUILD_DRIVER_ALSA'] == True:
         create_jack_driver_obj(bld, 'alsa', ['alsa/JackAlsaDriver.cpp',
                                              'alsa/alsa_rawmidi.c',
                                              'alsa/alsa_seqmidi.c',
@@ -48,10 +47,10 @@ def build(bld):
                                              'alsa/ice1712.c'
                                              ], "ALSA")
 
-    if bld.env()['BUILD_DRIVER_FREEBOB'] == True:
+    if bld.env['BUILD_DRIVER_FREEBOB'] == True:
         create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")
 
-    if bld.env()['BUILD_DRIVER_FFADO'] == True:
+    if bld.env['BUILD_DRIVER_FFADO'] == True:
         create_jack_driver_obj(bld, 'firewire', 'firewire/JackFFADODriver.cpp', "LIBFFADO")
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
