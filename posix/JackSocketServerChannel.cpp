@@ -240,7 +240,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kConnectNamePorts: {
-            jack_log("JackRequest::ConnectPorts");
+            jack_log("JackRequest::ConnectNamePorts");
             JackPortConnectNameRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -251,7 +251,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kDisconnectNamePorts: {
-            jack_log("JackRequest::DisconnectPorts");
+            jack_log("JackRequest::DisconnectNamePorts");
             JackPortDisconnectNameRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -284,7 +284,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
         
         case JackRequest::kPortRename: {
-            jack_log("JackRequest::kPortRename");
+            jack_log("JackRequest::PortRename");
             JackPortRenameRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -317,7 +317,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kReleaseTimebase: {
-            jack_log("JackRequest::kReleaseTimebase");
+            jack_log("JackRequest::ReleaseTimebase");
             JackReleaseTimebaseRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -328,7 +328,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kSetTimebaseCallback: {
-            jack_log("JackRequest::kSetTimebaseCallback");
+            jack_log("JackRequest::SetTimebaseCallback");
             JackSetTimebaseCallbackRequest req;
             JackResult res;
             if (req.Read(socket) == 0)
@@ -339,7 +339,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kGetInternalClientName: {
-            jack_log("JackRequest::kGetInternalClientName");
+            jack_log("JackRequest::GetInternalClientName");
             JackGetInternalClientNameRequest req;
             JackGetInternalClientNameResult res;
             if (req.Read(socket) == 0)
@@ -350,7 +350,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kInternalClientHandle: {
-            jack_log("JackRequest::kInternalClientHandle");
+            jack_log("JackRequest::InternalClientHandle");
             JackInternalClientHandleRequest req;
             JackInternalClientHandleResult res;
             if (req.Read(socket) == 0)
@@ -361,7 +361,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kInternalClientLoad: {
-            jack_log("JackRequest::kInternalClientLoad");
+            jack_log("JackRequest::InternalClientLoad");
             JackInternalClientLoadRequest req;
             JackInternalClientLoadResult res;
             if (req.Read(socket) == 0)
@@ -372,7 +372,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kInternalClientUnload: {
-            jack_log("JackRequest::kInternalClientUnload");
+            jack_log("JackRequest::InternalClientUnload");
             JackInternalClientUnloadRequest req;
             JackInternalClientUnloadResult res;
             if (req.Read(socket) == 0)

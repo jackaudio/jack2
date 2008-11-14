@@ -174,7 +174,7 @@ bool JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kConnectNamePorts: {
-                jack_log("JackRequest::ConnectPorts");
+                jack_log("JackRequest::ConnectNamePorts");
                 JackPortConnectNameRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -184,7 +184,7 @@ bool JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kDisconnectNamePorts: {
-                jack_log("JackRequest::DisconnectPorts");
+                jack_log("JackRequest::DisconnectNamePorts");
                 JackPortDisconnectNameRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
@@ -214,7 +214,7 @@ bool JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kPortRename: {
-                jack_log("JackRequest::kPortRename");
+                jack_log("JackRequest::PortRename");
                 JackPortRenameRequest req;
                 JackResult res;
                 if (req.Read(fPipe) == 0)
