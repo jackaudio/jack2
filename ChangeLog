@@ -23,7 +23,11 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
-2008-10-13 Stephane Letz  <letz@grame.fr>
+2008-11-14 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.1 started, fix symbols export in ringbuffer.c, cleanup on Windows.
+
+2008-11-13 Stephane Letz  <letz@grame.fr>
 
 	* Fix jackctl_server_unload_internal.
 

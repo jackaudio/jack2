@@ -25,8 +25,42 @@
 #ifdef USE_MLOCK
 #include <sys/mman.h>
 #endif /* USE_MLOCK */
-#include "jack/ringbuffer.h"
 #include "JackCompilerDeps.h"
+
+// TODO : what to do with Paul fixes done av rev 3014 (http://trac.jackaudio.org/changeset/3014)
+
+typedef struct {
+    char *buf;
+    size_t len;
+}
+jack_ringbuffer_data_t ;
+
+typedef struct {
+    char	*buf;
+    volatile size_t write_ptr;
+    volatile size_t read_ptr;
+    size_t	size;
+    size_t	size_mask;
+    int	mlocked;
+}
+jack_ringbuffer_t ;
+
+EXPORT jack_ringbuffer_t *jack_ringbuffer_create(size_t sz);
+EXPORT void jack_ringbuffer_free(jack_ringbuffer_t *rb);
+EXPORT void jack_ringbuffer_get_read_vector(const jack_ringbuffer_t *rb,
+                                         jack_ringbuffer_data_t *vec);
+EXPORT void jack_ringbuffer_get_write_vector(const jack_ringbuffer_t *rb,
+                                          jack_ringbuffer_data_t *vec);
+EXPORT size_t jack_ringbuffer_read(jack_ringbuffer_t *rb, char *dest, size_t cnt);
+EXPORT size_t jack_ringbuffer_peek(jack_ringbuffer_t *rb, char *dest, size_t cnt);
+EXPORT void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
+EXPORT size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
+EXPORT int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
+EXPORT void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
+EXPORT size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
+                                 size_t cnt);
+void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
+size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);                                                                
 
 /* Create a new ringbuffer to hold at least `sz' bytes of data. The
    actual buffer size is rounded up to the next power of two.  */
