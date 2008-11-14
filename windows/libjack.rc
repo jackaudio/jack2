@@ -11,8 +11,8 @@
 //
 LANGUAGE LANG_FRENCH, SUBLANG_DEFAULT
 1 VERSIONINFO
-    FILEVERSION     1,9,0,0
-    PRODUCTVERSION  1,9,0,0
+    FILEVERSION     1,9,1,0
+    PRODUCTVERSION  1,9,1,0
     FILEOS          VOS_UNKNOWN
     FILETYPE        VFT_DLL
 BEGIN
@@ -23,14 +23,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
             VALUE "FileDescription", "Jack client library for Windows\0"
-            VALUE "FileVersion", "1, 9, 0, 0\0"
+            VALUE "FileVersion", "1, 9, 1, 0\0"
             VALUE "InternalName", "libjack\0"
             VALUE "LegalCopyright", "Copyright Grame © 2006-2008\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "libjack.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "libjack\0"
-            VALUE "ProductVersion", "1, 9, 0, 0\0"
+            VALUE "ProductVersion", "1, 9, 1, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
