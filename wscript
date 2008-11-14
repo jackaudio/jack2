@@ -47,7 +47,7 @@ def create_svnversion_task(bld, header='svnversion.h', define=None):
 
     def post_run(self):
         sg = Utils.h_file(self.outputs[0].abspath(self.env))
-        print sg.encode('hex')
+        #print sg.encode('hex')
         Build.bld.node_sigs[self.env.variant()][self.outputs[0].id] = sg
     cls.post_run = post_run
 
