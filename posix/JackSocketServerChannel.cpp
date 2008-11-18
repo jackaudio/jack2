@@ -162,13 +162,13 @@ bool JackSocketServerChannel::HandleRequest(int fd)
     switch (header.fType) {
 
         case JackRequest::kClientCheck: {
-            jack_log("JackRequest::kClientCheck");
+            jack_log("JackRequest::ClientCheck");
             JackClientCheckRequest req;
             JackClientCheckResult res;
             if (req.Read(socket) == 0)
                 res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
             if (res.Write(socket) < 0)
-                jack_error("JackRequest::kClientCheck write error name = %s", req.fName);
+                jack_error("JackRequest::ClientCheck write error name = %s", req.fName);
             break;
         }
 
@@ -323,7 +323,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             if (req.Read(socket) == 0)
                 res.fResult = fServer->ReleaseTimebase(req.fRefNum);
             if (res.Write(socket) < 0)
-                jack_error("JackRequest::kReleaseTimebase write error ref = %d", req.fRefNum);
+                jack_error("JackRequest::ReleaseTimebase write error ref = %d", req.fRefNum);
             break;
         }
 
