@@ -29,6 +29,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTime.h"
 #include "JackError.h"
 #include <assert.h>
+#include <signal.h>
 
 namespace Jack
 {
@@ -43,7 +44,8 @@ struct JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
-    JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
+    JackSynchro fSynchroTable[CLIENT_NUM];                      /*! Shared synchro table */
+    sigset_t fProcessSignals;
  
     static int fClientCount;
     static JackLibGlobals* fGlobals;
@@ -54,6 +56,16 @@ struct JackLibGlobals
         JackMessageBuffer::Create();
         fGraphManager = -1;
         fEngineControl = -1;
+
+        // Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server.
+    #ifdef WIN32
+        // TODO
+    #else
+        sigset_t signals;
+        sigemptyset(&signals);
+        sigaddset(&signals, SIGPIPE);
+        sigprocmask(SIG_BLOCK, &signals, &fProcessSignals);
+    #endif       
     }
 
     ~JackLibGlobals()
@@ -63,6 +75,13 @@ struct JackLibGlobals
             fSynchroTable[i].Disconnect();
         }
         JackMessageBuffer::Destroy();
+
+       // Restore old signal mask
+    #ifdef WIN32
+       // TODO
+    #else
+       sigprocmask(SIG_BLOCK, &fProcessSignals, 0);
+    #endif   
     }
 
     static void Init()
