@@ -274,7 +274,6 @@
 		4B35C5490D4731D1000DE7AE /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B35C5570D4731D2000DE7AE /* freewheel.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1710834EE0F00C94B91 /* freewheel.c */; };
 		4B35C5630D4731D2000DE7AE /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
-		4B35C56F0D4731D2000DE7AE /* external_metro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1750834EE3600C94B91 /* external_metro.cpp */; };
 		4B35C57D0D4731D2000DE7AE /* testAtomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */; };
 		4B35C58D0D4731D2000DE7AE /* testSem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2470834F20600C94B91 /* testSem.cpp */; };
 		4B35C59F0D4731D2000DE7AE /* zombie.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1670834EDD900C94B91 /* zombie.c */; };
@@ -449,7 +448,6 @@
 		4B699CB4097D421600A18468 /* metro.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D16B0834EDF000C94B91 /* metro.c */; };
 		4B699CC4097D421600A18468 /* lsp.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1690834EDE600C94B91 /* lsp.c */; };
 		4B699CF6097D421600A18468 /* freewheel.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1710834EE0F00C94B91 /* freewheel.c */; };
-		4B699D06097D421600A18468 /* external_metro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1750834EE3600C94B91 /* external_metro.cpp */; };
 		4B699D18097D421600A18468 /* testAtomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */; };
 		4B699D2C097D421600A18468 /* testSem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2470834F20600C94B91 /* testSem.cpp */; };
 		4B699D42097D421600A18468 /* zombie.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1670834EDD900C94B91 /* zombie.c */; };
@@ -1351,7 +1349,6 @@
 		4BF8D1690834EDE600C94B91 /* lsp.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = lsp.c; path = "..//example-clients/lsp.c"; sourceTree = SOURCE_ROOT; };
 		4BF8D16B0834EDF000C94B91 /* metro.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = metro.c; path = "../example-clients/metro.c"; sourceTree = SOURCE_ROOT; };
 		4BF8D1710834EE0F00C94B91 /* freewheel.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = freewheel.c; path = "../example-clients/freewheel.c"; sourceTree = SOURCE_ROOT; };
-		4BF8D1750834EE3600C94B91 /* external_metro.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = external_metro.cpp; path = "../example-clients/external_metro.cpp"; sourceTree = SOURCE_ROOT; };
 		4BF8D1770834EE4800C94B91 /* JackError.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackError.h; path = ../common/JackError.h; sourceTree = SOURCE_ROOT; };
 		4BF8D1830834EE5800C94B91 /* JackTime.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackTime.h; path = ../common/JackTime.h; sourceTree = SOURCE_ROOT; };
 		4BF8D1870834EE7900C94B91 /* JackShmMem.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackShmMem.h; path = ../common/JackShmMem.h; sourceTree = SOURCE_ROOT; };
@@ -2111,7 +2108,6 @@
 				4BF8D1690834EDE600C94B91 /* lsp.c */,
 				4BF8D16B0834EDF000C94B91 /* metro.c */,
 				4BF8D1710834EE0F00C94B91 /* freewheel.c */,
-				4BF8D1750834EE3600C94B91 /* external_metro.cpp */,
 				4B363F3D0DEB0C31001F72D9 /* showtime.c */,
 			);
 			name = "Simple clients";
@@ -5454,7 +5450,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B35C56F0D4731D2000DE7AE /* external_metro.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5809,7 +5804,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B699D06097D421600A18468 /* external_metro.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

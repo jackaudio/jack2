@@ -17,12 +17,13 @@
 */
 
 #include "external_metro.h"
+#include <stdio.h>
 
 typedef jack_default_audio_sample_t sample_t;
 
 const double PI = 3.14;
 
-static int process_audio (jack_nframes_t nframes, void* arg)
+int ExternalMetro::process_audio (jack_nframes_t nframes, void* arg)
 {
     ExternalMetro* metro = (ExternalMetro*)arg;
     sample_t *buffer = (sample_t *) jack_port_get_buffer (metro->output_port, nframes);
@@ -41,6 +42,11 @@ static int process_audio (jack_nframes_t nframes, void* arg)
     return 0;
 }
 
+void ExternalMetro::shutdown (void* arg)
+{
+    printf("shutdown called..\n");
+}
+
 ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, char* client_name)
 {
     sample_t scale;
@@ -48,6 +54,8 @@ ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
     double *amp;
     int attack_percent = 1, decay_percent = 10;
     char *bpm_string = "bpm";
+    jack_options_t options = JackNullOption;
+	jack_status_t status;
 
     offset = 0;
 
@@ -56,12 +64,13 @@ ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
         client_name = (char *) malloc (9 * sizeof (char));
         strcpy (client_name, "metro");
     }
-    if ((client = jack_client_new (client_name)) == 0) {
+    if ((client = jack_client_open (client_name, options, &status)) == 0) {
         fprintf (stderr, "jack server not running?\n");
-        return ;
+        return;
     }
 
     jack_set_process_callback (client, process_audio, this);
+    jack_on_shutdown (client, shutdown, this);
     output_port = jack_port_register (client, bpm_string, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
     input_port = jack_port_register (client, "metro_in", JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
 
@@ -127,14 +136,16 @@ int main (int argc, char *argv[])
     ExternalMetro* client3 = NULL;
     ExternalMetro* client4 = NULL;
     ExternalMetro* client5 = NULL;
-
+    
+    printf("Testing multiple Jack clients in one process: open 5 metro clients...\n");
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
     client2 = new ExternalMetro(600, 0.4, 20, 150, "t2");
     client3 = new ExternalMetro(1000, 0.4, 20, 110, "t3");
 	client4 = new ExternalMetro(400, 0.4, 20, 200, "t4");
     client5 = new ExternalMetro(1500, 0.4, 20, 150, "t5");
 
-    while ((getchar() != 'q')) {
+    printf("Type 'c' to close alls client and go to next test...\n");
+    while ((getchar() != 'c')) {
         sleep(1);
     };
 
@@ -143,4 +154,32 @@ int main (int argc, char *argv[])
     delete client3;
     delete client4;
     delete client5;
+    
+    printf("Testing quiting the server while a client is running...\n");
+    client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
+    
+    printf("Now quit the server, shutdown callback should be called...\n");
+    printf("Type 'c' move on...\n");
+    while ((getchar() != 'c')) {
+        sleep(1);
+    };
+    
+    printf("Closing client...\n");
+    delete client1;
+    
+    printf("Now start the server again...\n"); 
+    printf("Type 'c' move on...\n");
+    while ((getchar() != 'c')) {
+        sleep(1);
+    };
+    
+    printf("Opening a new client....\n"); 
+    client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
+    
+    printf("Type 'q' to quit...\n");
+    while ((getchar() != 'q')) {
+        sleep(1);
+    };
+    delete client1;
+    return 0;
 }

@@ -58,6 +58,8 @@ extern "C"
         ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, char* client_name);
         virtual ~ExternalMetro();
 
+        static int process_audio (jack_nframes_t nframes, void* arg);
+        static void shutdown (void* arg);
     };
 
 #ifdef __cplusplus
