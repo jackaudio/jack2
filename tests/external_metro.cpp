@@ -1,6 +1,6 @@
 /*
  Copyright (C) 2002 Anthony Van Groningen
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,15 @@
 typedef jack_default_audio_sample_t sample_t;
 
 const double PI = 3.14;
+
+static void JackSleep(int sec)
+{
+	#ifdef WIN32
+		Sleep(sec * 1000);
+	#else
+		sleep(sec);
+	#endif
+}
 
 int ExternalMetro::process_audio (jack_nframes_t nframes, void* arg)
 {
@@ -88,7 +97,7 @@ ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
         fprintf (stderr, "invalid duration (tone length = %" PRIu32
         	 ", wave length = %" PRIu32 "\n", tone_length,
         	 wave_length);
-        */ 
+        */
         return ;
     }
     if (attack_length + decay_length > (int)tone_length) {
@@ -136,7 +145,7 @@ int main (int argc, char *argv[])
     ExternalMetro* client3 = NULL;
     ExternalMetro* client4 = NULL;
     ExternalMetro* client5 = NULL;
-    
+
     printf("Testing multiple Jack clients in one process: open 5 metro clients...\n");
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
     client2 = new ExternalMetro(600, 0.4, 20, 150, "t2");
@@ -146,7 +155,7 @@ int main (int argc, char *argv[])
 
     printf("Type 'c' to close alls client and go to next test...\n");
     while ((getchar() != 'c')) {
-        sleep(1);
+        JackSleep(1);
     };
 
     delete client1;
@@ -154,31 +163,31 @@ int main (int argc, char *argv[])
     delete client3;
     delete client4;
     delete client5;
-    
+
     printf("Testing quiting the server while a client is running...\n");
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
-    
+
     printf("Now quit the server, shutdown callback should be called...\n");
     printf("Type 'c' move on...\n");
     while ((getchar() != 'c')) {
-        sleep(1);
+        JackSleep(1);
     };
-    
+
     printf("Closing client...\n");
     delete client1;
-    
-    printf("Now start the server again...\n"); 
+
+    printf("Now start the server again...\n");
     printf("Type 'c' move on...\n");
     while ((getchar() != 'c')) {
-        sleep(1);
+        JackSleep(1);
     };
-    
-    printf("Opening a new client....\n"); 
+
+    printf("Opening a new client....\n");
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
-    
+
     printf("Type 'q' to quit...\n");
     while ((getchar() != 'q')) {
-        sleep(1);
+        JackSleep(1);
     };
     delete client1;
     return 0;

@@ -42,6 +42,9 @@
 		<Project filename="jack_disconnect.cbp">
 			<Depends filename="libjack.cbp" />
 		</Project>
-		<Project filename="jack_test.cbp" active="1" />
+		<Project filename="jack_test.cbp" />
+		<Project filename="multiple_metro.cbp" active="1">
+			<Depends filename="libjack.cbp" />
+		</Project>
 	</Workspace>
 </CodeBlocks_workspace_file>
