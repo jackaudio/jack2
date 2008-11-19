@@ -153,7 +153,7 @@ int main (int argc, char *argv[])
 	client4 = new ExternalMetro(400, 0.4, 20, 200, "t4");
     client5 = new ExternalMetro(1500, 0.4, 20, 150, "t5");
 
-    printf("Type 'c' to close alls client and go to next test...\n");
+    printf("Type 'c' to close all clients and go to next test...\n");
     while ((getchar() != 'c')) {
         JackSleep(1);
     };
@@ -164,11 +164,11 @@ int main (int argc, char *argv[])
     delete client4;
     delete client5;
 
-    printf("Testing quiting the server while a client is running...\n");
+    printf("Testing quitting the server while a client is running...\n");
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
 
     printf("Now quit the server, shutdown callback should be called...\n");
-    printf("Type 'c' move on...\n");
+    printf("Type 'c' to move on...\n");
     while ((getchar() != 'c')) {
         JackSleep(1);
     };
@@ -177,7 +177,7 @@ int main (int argc, char *argv[])
     delete client1;
 
     printf("Now start the server again...\n");
-    printf("Type 'c' move on...\n");
+    printf("Type 'c' ro move on...\n");
     while ((getchar() != 'c')) {
         JackSleep(1);
     };
