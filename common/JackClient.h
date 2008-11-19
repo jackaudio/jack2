@@ -104,8 +104,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         inline bool WaitSync();
         inline void SignalSync();
         inline int CallProcessCallback();
-        inline int End();
-        inline int Error();
+        inline void End();
+        inline void Error();
 
     public:
 

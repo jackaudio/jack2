@@ -216,7 +216,12 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
- * whenever jackd is shutdown.
+ * whenever jackd is shutdown. Note that after server shutdown, 
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
  *
  * @param arg pointer to a client supplied structure
  */

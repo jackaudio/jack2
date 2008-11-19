@@ -407,17 +407,17 @@ jack_nframes_t JackClient::Wait(int status)
         CallTimebaseCallback();
     SignalSync();
     if (status != 0)
-        return End();
+        End();      // Terminates the thread
     if (!WaitSync())
-        return Error();
+        Error();    // Terminates the thread
     CallSyncCallback();
     return GetEngineControl()->fBufferSize;
 }
 
 jack_nframes_t JackClient::CycleWait()
 {
-    if (!WaitSync())
-        return Error();
+    if (!WaitSync()) 
+        Error();   // Terminates the thread
     CallSyncCallback();
     return GetEngineControl()->fBufferSize;
 }
@@ -427,8 +427,8 @@ void JackClient::CycleSignal(int status)
     if (status == 0)
         CallTimebaseCallback();
     SignalSync();
-    if (status != 0)
-        End();
+    if (status != 0) 
+        End();     // Terminates the thread
 }
 
 inline int JackClient::CallProcessCallback()
@@ -455,7 +455,7 @@ inline void JackClient::SignalSync()
     }
 }
 
-inline int JackClient::End()
+inline void JackClient::End()
 {
     jack_log("JackClient::Execute end name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
@@ -463,10 +463,10 @@ inline int JackClient::End()
     fThread.DropRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
-    return 0; 
+    fThread.Terminate();
 }
 
-inline int JackClient::Error()
+inline void JackClient::Error()
 {
     jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
@@ -475,7 +475,7 @@ inline int JackClient::Error()
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     ShutDown();
-    return 0; 
+    fThread.Terminate();
 }
 
 //-----------------
@@ -600,7 +600,6 @@ void JackClient::ShutDown()
     // Be sure client is already started 
     if (GetClientControl()) {
         GetClientControl()->fServer = false;
-        GetClientControl()->fActive = false;
     }
     
     if (fShutdown) {
