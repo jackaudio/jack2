@@ -32,7 +32,7 @@
  */
 
 #include "JackConstants.h"
- 
+
 #ifdef WIN32
 #include <process.h>
 #else
@@ -56,6 +56,17 @@
 
 #include "shm.h"
 #include "JackError.h"
+
+static int GetUID() 
+{
+#ifdef WIN32
+    return  _getpid();
+    //#error "No getuid function available"
+#else
+    return getuid();
+#endif
+}
+
 
 #ifdef USE_POSIX_SHM
 static jack_shmtype_t jack_shmtype = shm_POSIX;
@@ -263,14 +274,8 @@ jack_shm_validate_registry ()
 static void
 jack_set_server_prefix (const char *server_name)
 {
-#ifdef WIN32
 	snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
-		  "jack-%d:%s:", _getpid (), server_name);  // steph TO CHECK
-#else
-	snprintf (jack_shm_server_prefix, sizeof (jack_shm_server_prefix),
-		  "/jack-%d:%s:", getuid (), server_name);
-#endif
-
+		  "jack-%d:%s:", GetUID(), server_name); 
 }
 
 /* gain server addressability to shared memory registration segment
@@ -770,7 +775,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	 * registry index for uniqueness and ignore the shm_name
 	 * parameter.  Bah!
 	 */
-	snprintf (name, sizeof (name), "/jackmp-%d", registry->index);
+	snprintf (name, sizeof (name), "/jack-%d-%d", GetUID(), registry->index);
 
 	if (strlen (name) >= sizeof (registry->id)) {
 		jack_error ("shm segment name too long %s", name);
@@ -959,7 +964,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 		goto unlock;
 	}
 
-	snprintf (name, sizeof (name), "jack-%d", registry->index);
+	snprintf (name, sizeof (name), "jack-%d-%d", GetUID(), registry->index);
 
 	if (strlen (name) >= sizeof (registry->id)) {
 		jack_error ("shm segment name too long %s", name);

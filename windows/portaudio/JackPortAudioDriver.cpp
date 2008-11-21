@@ -173,6 +173,7 @@ namespace Jack
         return 0;
 
 error:
+        JackAudioDriver::Close();
         jack_error ( "Can't open default PortAudio device : %s", Pa_GetErrorText(err) );
         return -1;
     }

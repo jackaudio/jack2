@@ -2262,6 +2262,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         fPlaybackChannels = ((alsa_driver_t *)fDriver)->playback_nchannels;
         return 0;
     } else {
+        JackAudioDriver::Close();
         return -1;
     }
 }

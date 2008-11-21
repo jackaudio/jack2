@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+#include "JackTools.h"
 #include "JackMachServerChannel.h"
 #include "JackRPCEngineServer.c"
 #include "JackError.h"
@@ -41,7 +42,7 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 {
     jack_log("JackMachServerChannel::Open");
     char jack_server_entry_name[512];
-    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s.%d_%s", jack_server_entry, JackTools::GetUID(), server_name);
 
     if (!fServerPort.AllocatePort(jack_server_entry_name, 16)) { // 16 is the max possible value
         jack_error("Cannot check in Jack server");

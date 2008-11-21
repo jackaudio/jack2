@@ -827,6 +827,7 @@ int JackFreebobDriver::Open(freebob_jack_settings_t *params)
         fPlaybackChannels = ((freebob_driver_t *)fDriver)->playback_nchannels_audio;
         return 0;
     } else {
+        JackAudioDriver::Close();
         return -1;
     }
 }

@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackMachServerNotifyChannel.h"
 #include "JackRPCEngineUser.c"
+#include "JackTools.h"
 #include "JackConstants.h"
 #include "JackError.h"
 #include <stdio.h>
@@ -30,7 +31,7 @@ int JackMachServerNotifyChannel::Open(const char* server_name)
 {
     jack_log("JackMachServerChannel::Open");
     char jack_server_entry_name[512];
-    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s.%d_%s", jack_server_entry, JackTools::GetUID(), server_name);
 
     if (!fClientPort.ConnectPort(jack_server_entry_name)) {
         jack_error("Cannot connect to server port");

@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackMachClientChannel.h"
 #include "JackRPCEngine.h"
+#include "JackTools.h"
 #include "JackRPCClientServer.c"
 #include "JackError.h"
 #include "JackLibClient.h"
@@ -43,7 +44,7 @@ int JackMachClientChannel::ServerCheck(const char* server_name)
 {
     jack_log("JackMachClientChannel::ServerCheck = %s", server_name);
     char jack_server_entry_name[512];
-    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s.%d_%s", jack_server_entry, JackTools::GetUID(), server_name);
 
     // Connect to server
     if (!fServerPort.ConnectPort(jack_server_entry_name)) {
@@ -58,7 +59,7 @@ int JackMachClientChannel::Open(const char* server_name, const char* name, char*
 {
     jack_log("JackMachClientChannel::Open name = %s", name);
     char jack_server_entry_name[512];
-    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s_%s", jack_server_entry, server_name);
+    snprintf(jack_server_entry_name, sizeof(jack_server_entry_name), "%s.%d_%s", jack_server_entry, JackTools::GetUID(), server_name);
 
     // Connect to server
     if (!fServerPort.ConnectPort(jack_server_entry_name)) {

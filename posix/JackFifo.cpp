@@ -17,11 +17,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
 #include "JackFifo.h"
+#include "JackTools.h"
 #include "JackError.h"
 #include "JackConstants.h"
 #include <sys/types.h>
@@ -35,7 +32,7 @@ namespace Jack
 
 void JackFifo::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "%s/jack_fifo.%s_%s", jack_client_dir, server_name, name);
+    sprintf(res, "%s/jack_fifo.%d_%s_%s", jack_client_dir, JackTools::GetUID(), server_name, name);
 }
 
 bool JackFifo::Signal()

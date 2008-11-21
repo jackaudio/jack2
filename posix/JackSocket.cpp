@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackSocket.h"
+#include "JackTools.h"
 #include "JackError.h"
 #include <string.h>
 #include <stdio.h>
@@ -67,7 +68,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
     addr.sun_family = AF_UNIX;
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
+    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d_%d", dir, name, JackTools::GetUID(), which);
     jack_log("Connect: addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -96,7 +97,7 @@ int JackClientSocket::Connect(const char* dir, int which)
     }
 
     addr.sun_family = AF_UNIX;
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%d", dir, which);
+    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%d_%d", dir, JackTools::GetUID(), which);
     jack_log("Connect: addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -170,7 +171,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     addr.sun_family = AF_UNIX;
 
     // TO CORRECT: always reuse the same name for now...
-    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d", dir, name, which);
+    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d_%d", dir, name, JackTools::GetUID(), which);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
     /*
     if (access(addr.sun_path, F_OK) == 0) {
@@ -221,7 +222,7 @@ int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation
     */
 
     // TO CORRECT: always reuse the same name for now...
-    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%d", dir, which);
+    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%d_%d", dir, JackTools::GetUID(), which);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
     /*
     if (access(addr.sun_path, F_OK) == 0) {
@@ -258,7 +259,7 @@ JackClientSocket* JackServerSocket::Accept()
     memset(&client_addr, 0, sizeof(client_addr));
     client_addrlen = sizeof(client_addr);
 
-    int fd = accept(fSocket, (struct sockaddr*) & client_addr, &client_addrlen);
+    int fd = accept(fSocket, (struct sockaddr*)&client_addr, &client_addrlen);
     if (fd < 0) {
         jack_error("Cannot accept new connection err = %s", strerror(errno));
         return 0;

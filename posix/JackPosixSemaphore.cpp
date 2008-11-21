@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackPosixSemaphore.h"
+#include "JackTools.h"
 #include "JackConstants.h"
 #include "JackError.h"
 #include <fcntl.h>
@@ -29,7 +30,7 @@ namespace Jack
 
 void JackPosixSemaphore::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "jack_sem.%s_%s", server_name, name);
+    sprintf(res, "jack_sem.%d_%s_%s", JackTools::GetUID(), server_name, name);
 }
 
 bool JackPosixSemaphore::Signal()

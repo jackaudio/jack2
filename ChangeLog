@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-11-31 Stephane Letz  <letz@grame.fr>
+
+	* Better isolation of server and clients system resources to allow starting the server in several user account at the same time.
+
 2008-11-19 Stephane Letz  <letz@grame.fr>
 
 	* Libjack shutdown handler does not "deactivate" (fActive = false) the client anymore, so that jack_deactivate correctly does the job later on.

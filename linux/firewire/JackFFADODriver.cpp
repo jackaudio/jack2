@@ -695,6 +695,7 @@ int JackFFADODriver::Open(ffado_jack_settings_t *params)
         //fPlaybackChannels = ((ffado_driver_t *)fDriver)->playback_nchannels_audio;
         return 0;
     } else {
+        JackAudioDriver::Close();
         return -1;
     }
 }
