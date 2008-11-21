@@ -67,6 +67,14 @@ static int GetUID()
 #endif
 }
 
+static int GetPID() 
+{
+#ifdef WIN32
+    return  _getpid();
+#else
+    return getpid();
+#endif
+}
 
 #ifdef USE_POSIX_SHM
 static jack_shmtype_t jack_shmtype = shm_POSIX;
@@ -105,7 +113,6 @@ static jack_shm_info_t registry_info = { /* SHM info for the registry */
 	.index = JACK_SHM_NULL_INDEX,
 	.attached_at = MAP_FAILED
 };
-
 #endif
 
 /* pointers to registry header and array */
@@ -137,7 +144,6 @@ static int semid = -1;
 
 #ifdef WIN32  
 
-// steph  TODO
 static void
 semaphore_init () {}
 
@@ -408,14 +414,8 @@ jack_release_shm_entry (jack_shm_registry_index_t index)
 void
 jack_release_shm_info (jack_shm_registry_index_t index)
 {
-#ifdef WIN32
-	int	my_pid = _getpid();
-#else
-    pid_t my_pid = getpid();
-#endif
-
 	/* must NOT have the registry locked */
-	if (jack_shm_registry[index].allocator == my_pid) {
+	if (jack_shm_registry[index].allocator == GetPID()) {
 		jack_shm_lock_registry ();
 		jack_release_shm_entry (index);
 		jack_shm_unlock_registry ();
@@ -434,12 +434,6 @@ jack_register_server (const char *server_name, int new_registry)
 {
 	int i, res = 0;
 
-#ifdef WIN32
-	int	my_pid = _getpid();
-#else
-    pid_t my_pid = getpid();
-#endif
-
 	jack_set_server_prefix (server_name);
 
 	if (jack_server_initialize_shm (new_registry))
@@ -457,7 +451,7 @@ jack_register_server (const char *server_name, int new_registry)
 			     JACK_SERVER_NAME_SIZE) != 0)
 			continue;	/* no match */
 
-		if (jack_shm_header->server[i].pid == my_pid){
+		if (jack_shm_header->server[i].pid == GetPID()){
 			res = 0; /* it's me */
 			goto unlock;
 		}
@@ -486,9 +480,8 @@ jack_register_server (const char *server_name, int new_registry)
 		goto unlock;
 	}
 
-
 	/* claim it */
-	jack_shm_header->server[i].pid = my_pid;
+	jack_shm_header->server[i].pid = GetPID();
 	strncpy (jack_shm_header->server[i].name,
 		 jack_shm_server_prefix,
 		 JACK_SERVER_NAME_SIZE);
@@ -503,17 +496,10 @@ void
 jack_unregister_server (const char *server_name /* unused */)
 {
 	int i;
-
-#ifdef WIN32
-	int	my_pid = _getpid();
-#else
-    pid_t my_pid = getpid();
-#endif
-
 	jack_shm_lock_registry ();
 
 	for (i = 0; i < MAX_SERVERS; i++) {
-		if (jack_shm_header->server[i].pid == my_pid) {
+		if (jack_shm_header->server[i].pid == GetPID()) {
 			memset (&jack_shm_header->server[i], 0,
 				sizeof (jack_shm_server_t));
 		}
@@ -530,12 +516,6 @@ jack_cleanup_shm ()
 	int destroy;
 	jack_shm_info_t copy;
 
-#ifdef WIN32
-	int	my_pid = _getpid();
-#else
-    pid_t my_pid = getpid();
-#endif
-
 	jack_shm_lock_registry ();
 		
 	for (i = 0; i < MAX_SHM_ID; i++) {
@@ -550,7 +530,7 @@ jack_cleanup_shm ()
 			continue;
 
 		/* is this my shm segment? */
-		if (r->allocator == my_pid) {
+		if (r->allocator == GetPID()) {
 
 			/* allocated by this process, so unattach 
 			   and destroy. */

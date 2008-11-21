@@ -177,7 +177,7 @@ int main (int argc, char *argv[])
     delete client1;
 
     printf("Now start the server again...\n");
-    printf("Type 'c' ro move on...\n");
+    printf("Type 'c' to move on...\n");
     while ((getchar() != 'c')) {
         JackSleep(1);
     };
