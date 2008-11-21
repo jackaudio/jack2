@@ -27,7 +27,7 @@ namespace Jack
 
 void JackWinSemaphore::BuildName(const char* name, const char* server_name, char* res)
 {
-    sprintf(res, "jack_pipe.%d_%s_%s", JackTools::GetUID(), server_name, name);
+    sprintf(res, "jack_pipe.%s_%s", server_name, name);
 }
 
 bool JackWinSemaphore::Signal()
