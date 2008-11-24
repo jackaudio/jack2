@@ -23,9 +23,6 @@ def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
     driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources
-    #steph
-    #driver.inst_var = bld.env['ADDON_DIR']
-    #driver.inst_dir = '/'
     driver.install_path = '${ADDON_DIR}/'
     driver.uselib_local = 'serverlib'
     driver.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreServices -framework AudioUnit")

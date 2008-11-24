@@ -9,7 +9,7 @@ test_programs = {
     'jack_test': ['jack_test.cpp'],
     'jack_cpu': ['jack_cpu.c'],
     'jdelay': ['jdelay.cpp'],
-    'multiple_metro' : ['external_metro.cpp'],
+    'jack_multiple_metro' : ['external_metro.cpp'],
     }
 
 def build(bld):

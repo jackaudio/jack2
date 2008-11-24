@@ -19,7 +19,7 @@ example_programs = {
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
     'jack_thru' : 'thru_client.c',
-    'jack_server_control' : 'jack_server_control.cpp',
+    'jack_server_control' : 'server_control.cpp',
     }
 
 example_libs = {
@@ -112,6 +112,6 @@ def build(bld):
         lib.uselib_local = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'
 
-    bld.symlink_as('${PREFIX}/jack_connect', 'bin/jack_disconnect')
+    bld.symlink_as('${PREFIX}/bin/jack_disconnect', 'jack_connect')
 
     bld.install_files('${PREFIX}/bin', 'jack_control', chmod=0755)
