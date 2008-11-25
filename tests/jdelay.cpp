@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 Fons Adriaensen <fons.adriaensen@skynet.be>
+    Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
     
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,12 +23,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 #include <jack/jack.h>
-#ifdef WIN32
-	#define M_PI 3.141562653
-#else
-	#include <unistd.h>
-#endif
+
 
 class Freq
 {
@@ -91,6 +88,7 @@ MTDM::MTDM (void) : _cnt (0), _inv (0)
     }
 }
 
+
 int MTDM::process (size_t len, float *ip, float *op)
 {
     int    i;
@@ -103,7 +101,7 @@ int MTDM::process (size_t len, float *ip, float *op)
 	vip = *ip++;
 	for (i = 0, F = _freq; i < 5; i++, F++)
 	{
-	    a = 2 * M_PI * (F->p & 0xFFFF) / 65536.0; 
+	    a = 2 * (float) M_PI * (F->p & 65535) / 65536.0; 
 	    F->p += F->f;
 	    c =  cosf (a); 
 	    s = -sinf (a); 
@@ -126,6 +124,7 @@ int MTDM::process (size_t len, float *ip, float *op)
 
     return 0;
 }
+
 
 int MTDM::resolve (void)
 {
@@ -159,88 +158,77 @@ int MTDM::resolve (void)
     return 0;
 }
 
+
 // --------------------------------------------------------------------------------
+
+
 static MTDM            mtdm;
 static jack_client_t  *jack_handle;
 static jack_port_t    *jack_capt;
 static jack_port_t    *jack_play;
 
-static void jack_shutdown (void *arg)
-{
-    exit (1);
-}
 
-static int jack_callback (jack_nframes_t nframes, void *arg)
+int jack_callback (jack_nframes_t nframes, void *arg)
 {
     float *ip, *op;
 
     ip = (float *)(jack_port_get_buffer (jack_capt, nframes));
     op = (float *)(jack_port_get_buffer (jack_play, nframes));
-    return mtdm.process (nframes, ip, op);;
+    mtdm.process (nframes, ip, op);
+    return 0;
 }
+
 
 int main (int ac, char *av [])
 {
- 	const char** ports;
+    float          t;
+    jack_status_t  s;
 
-    if ((jack_handle = jack_client_new ("jdelay")) == 0)
+    jack_handle = jack_client_open ("jack_delay", JackNoStartServer, &s);
+    if (jack_handle == 0)
     {
-        fprintf (stderr, "Can't connect to JACK\n");
-        return 1;
+        fprintf (stderr, "Can't connect to Jack, is the server running ?\n");
+        exit (1);
     }
 
     jack_set_process_callback (jack_handle, jack_callback, 0);
-    jack_on_shutdown (jack_handle, jack_shutdown, 0);
+
     jack_capt = jack_port_register (jack_handle, "in",  JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
     jack_play = jack_port_register (jack_handle, "out", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
+    printf ("capture latency  = %d\n",
+            jack_port_get_latency (jack_port_by_name (jack_handle, "system:capture_1")));
+    printf ("playback_latency = %d\n",
+            jack_port_get_latency (jack_port_by_name (jack_handle, "system:playback_1")));
+
+    t = 1000.0f / jack_get_sample_rate (jack_handle);
+
     if (jack_activate (jack_handle))
     {
-        fprintf(stderr, "Can't activate JACK");
+        fprintf(stderr, "Can't activate Jack");
         return 1;
-    }
-
-	if ((ports = jack_get_ports(jack_handle, NULL, NULL, JackPortIsPhysical | JackPortIsOutput)) == NULL) {
-        printf("Cannot find any physical capture ports\n");
-    } else {
-		for (int i = 0; i < 8 && ports[i] ; i++) {
-			jack_connect(jack_handle, ports[i], jack_port_name(jack_capt));
-		}
-        free(ports);
-    }
-
-    if ((ports = jack_get_ports(jack_handle, NULL, NULL, JackPortIsPhysical | JackPortIsInput)) == NULL) {
-        printf("Cannot find any physical playback ports");
-    } else {
-		for (int i = 0; i < 8 && ports[i]; i++) {
-			jack_connect(jack_handle, jack_port_name(jack_play), ports[i]);
-		}
-		free(ports);
     }
 
     while (1)
     {
-#ifdef WIN32
-	Sleep (250);
-#else
-	usleep (250000);
-#endif
+        usleep (250000);
 
-	if (mtdm.resolve () < 0) printf ("Signal below threshold...\n");
-	else 
-	{
-	    if (mtdm.err () > 0.3) 
-	    {
-		mtdm.invert ();
-		mtdm.resolve ();
-	    }
-	    printf ("%10.3lf frames", mtdm.del ());
-	    if (mtdm.err () > 0.2) printf (" ??");
-            if (mtdm.inv ()) printf (" Inv");
-	    printf ("\n");
-	}
+        if (mtdm.resolve () < 0) printf ("Signal below threshold...\n");
+        else 
+        {
+            if (mtdm.err () > 0.3) 
+            {
+            mtdm.invert ();
+            mtdm.resolve ();
+            }
+            printf ("%10.3lf frames %10.3lf ms", mtdm.del (), mtdm.del () * t);
+            if (mtdm.err () > 0.2) printf (" ??");
+                if (mtdm.inv ()) printf (" Inv");
+            printf ("\n");
+        }
     }
 
     return 0;
 }
 
+// --------------------------------------------------------------------------------

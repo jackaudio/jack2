@@ -2,13 +2,14 @@
 # encoding: utf-8
 
 test_programs = {
+    # For testing purposes
     #'synchroClient': ['testSynchroClient.cpp'],
     #'synchroServer': ['testSynchroServer.cpp'],
     #'synchroServerClient': ['testSynchroServerClient.cpp'],
-    'testSem': ['testSem.cpp'],
-    'jack_test': ['jack_test.cpp'],
-    'jack_cpu': ['jack_cpu.c'],
-    'jdelay': ['jdelay.cpp'],
+    #'testSem': ['testSem.cpp'],
+    'jack_test': ['test.cpp'],
+    'jack_cpu': ['cpu.c'],
+    'jack_delay': ['jdelay.cpp'],
     'jack_multiple_metro' : ['external_metro.cpp'],
     }
 

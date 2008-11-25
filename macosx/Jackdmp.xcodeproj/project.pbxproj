@@ -277,8 +277,8 @@
 		4B35C57D0D4731D2000DE7AE /* testAtomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */; };
 		4B35C58D0D4731D2000DE7AE /* testSem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2470834F20600C94B91 /* testSem.cpp */; };
 		4B35C59F0D4731D2000DE7AE /* zombie.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1670834EDD900C94B91 /* zombie.c */; };
-		4B35C5AB0D4731D2000DE7AE /* jack_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */; };
-		4B35C5B70D4731D2000DE7AE /* jack_cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* jack_cpu.c */; };
+		4B35C5AB0D4731D2000DE7AE /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* test.cpp */; };
+		4B35C5B70D4731D2000DE7AE /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* cpu.c */; };
 		4B35C5C30D4731D2000DE7AE /* ipload.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BA692B20CBE4C2D00EAD520 /* ipload.c */; };
 		4B35C5CF0D4731D2000DE7AE /* ipunload.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BA692D60CBE4CC600EAD520 /* ipunload.c */; };
 		4B35C5DA0D4731D2000DE7AE /* JackError.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF8D1770834EE4800C94B91 /* JackError.h */; };
@@ -298,7 +298,7 @@
 		4B363F230DEB0AB0001F72D9 /* monitor_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F220DEB0AB0001F72D9 /* monitor_client.c */; };
 		4B363F3E0DEB0C31001F72D9 /* showtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F3D0DEB0C31001F72D9 /* showtime.c */; };
 		4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
-		4B3F49080AD8503300491C6E /* jack_cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* jack_cpu.c */; };
+		4B3F49080AD8503300491C6E /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* cpu.c */; };
 		4B4CA9750E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */; };
 		4B4CA9760E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B4CA9740E02CF9600F4BFDA /* JackRestartThreadedDriver.cpp */; };
 		4B4CA9770E02CF9600F4BFDA /* JackRestartThreadedDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */; };
@@ -565,7 +565,7 @@
 		4BE5FECE0E725C090020B576 /* JackCoreAudioDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FECC0E725C090020B576 /* JackCoreAudioDriver.h */; };
 		4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */; };
 		4BE5FED20E725C320020B576 /* JackCoreAudioAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */; };
-		4BE6C6AD0A3E0A65005A203A /* jack_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */; };
+		4BE6C6AD0A3E0A65005A203A /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BE6C6AC0A3E0A65005A203A /* test.cpp */; };
 		4BF4BAB10E3480AB00403CDF /* JackAudioAdapterFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF4BAB00E3480AB00403CDF /* JackAudioAdapterFactory.cpp */; };
 		4BF520530CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
 		4BF520540CB8D0E80037470E /* timestamps.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF520520CB8D0E80037470E /* timestamps.c */; };
@@ -1210,7 +1210,7 @@
 		4B37C20306DF1FBE0016E567 /* CALatencyLog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CALatencyLog.cpp; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.cpp; sourceTree = "<absolute>"; };
 		4B37C20406DF1FBE0016E567 /* CALatencyLog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CALatencyLog.h; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h; sourceTree = "<absolute>"; };
 		4B37C20906DF1FE20016E567 /* latency.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = latency.c; path = /Developer/Examples/CoreAudio/PublicUtility/latency.c; sourceTree = "<absolute>"; };
-		4B3F49070AD8503300491C6E /* jack_cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = jack_cpu.c; path = ../tests/jack_cpu.c; sourceTree = SOURCE_ROOT; };
+		4B3F49070AD8503300491C6E /* cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = cpu.c; path = ../tests/cpu.c; sourceTree = SOURCE_ROOT; };
 		4B4259E5076B635E00C1ECE1 /* JackMacEngineRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacEngineRPC.cpp; sourceTree = SOURCE_ROOT; };
 		4B464301076CAC7700E5077C /* Jack-Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = "Jack-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4B4CA9730E02CF9600F4BFDA /* JackRestartThreadedDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackRestartThreadedDriver.h; path = ../common/JackRestartThreadedDriver.h; sourceTree = SOURCE_ROOT; };
@@ -1332,7 +1332,7 @@
 		4BE5FECF0E725C320020B576 /* JackCoreAudioAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreAudioAdapter.cpp; path = coreaudio/JackCoreAudioAdapter.cpp; sourceTree = SOURCE_ROOT; };
 		4BE5FED00E725C320020B576 /* JackCoreAudioAdapter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackCoreAudioAdapter.h; path = coreaudio/JackCoreAudioAdapter.h; sourceTree = SOURCE_ROOT; };
 		4BE6C6A30A3E096F005A203A /* jack_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_test; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jack_test.cpp; path = ../tests/jack_test.cpp; sourceTree = SOURCE_ROOT; };
+		4BE6C6AC0A3E0A65005A203A /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test.cpp; path = ../tests/test.cpp; sourceTree = SOURCE_ROOT; };
 		4BE99D300AD7A04800C59091 /* jack_cpu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_cpu; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BF3937C0626BF3600CC67FA /* JackMacLibClientRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMacLibClientRPC.cpp; sourceTree = SOURCE_ROOT; };
 		4BF4BAB00E3480AB00403CDF /* JackAudioAdapterFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterFactory.cpp; path = ../common/JackAudioAdapterFactory.cpp; sourceTree = SOURCE_ROOT; };
@@ -2262,7 +2262,7 @@
 		4B6BEB4A07A6CCDC00A5DBDA /* Tests */ = {
 			isa = PBXGroup;
 			children = (
-				4B3F49070AD8503300491C6E /* jack_cpu.c */,
+				4B3F49070AD8503300491C6E /* cpu.c */,
 				4BFA99A90AAAF40C009E916C /* jdelay.cpp */,
 				4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */,
 				4BF8D2470834F20600C94B91 /* testSem.cpp */,
@@ -2270,7 +2270,7 @@
 				4BA577FB08BF8E4600F82DE1 /* testSynchroServer.cpp */,
 				4BBD13CC08C71EB40079F7FF /* testSynchroServerClient.cpp */,
 				4BFA5E9E0DEC4DD900FA4CDB /* testMutex.cpp */,
-				4BE6C6AC0A3E0A65005A203A /* jack_test.cpp */,
+				4BE6C6AC0A3E0A65005A203A /* test.cpp */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -5481,7 +5481,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B35C5AB0D4731D2000DE7AE /* jack_test.cpp in Sources */,
+				4B35C5AB0D4731D2000DE7AE /* test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5489,7 +5489,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B35C5B70D4731D2000DE7AE /* jack_cpu.c in Sources */,
+				4B35C5B70D4731D2000DE7AE /* cpu.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5916,7 +5916,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BE6C6AD0A3E0A65005A203A /* jack_test.cpp in Sources */,
+				4BE6C6AD0A3E0A65005A203A /* test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5924,7 +5924,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B3F49080AD8503300491C6E /* jack_cpu.c in Sources */,
+				4B3F49080AD8503300491C6E /* cpu.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

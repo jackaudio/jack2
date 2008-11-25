@@ -77,7 +77,7 @@
 			<Add library="odbccp32" />
 			<Add library="libjack" />
 		</Linker>
-		<Unit filename="..\tests\jack_test.cpp">
+		<Unit filename="..\tests\test.cpp">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>

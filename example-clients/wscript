@@ -69,7 +69,7 @@ def build(bld):
         prog.target = example_program
    
     #if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']
-    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True and bld.env['IS_LINUX'] == True:
+    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
         prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
