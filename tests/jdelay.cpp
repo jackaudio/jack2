@@ -16,16 +16,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 // --------------------------------------------------------------------------------
-
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
 #include <jack/jack.h>
-
 
 class Freq
 {
@@ -39,7 +36,6 @@ public:
     float xf;
     float yf;
 };
-
 
 class MTDM
 {
@@ -61,7 +57,6 @@ private:
     int     _inv;
     Freq    _freq [5];
 };
-
 
 MTDM::MTDM (void) : _cnt (0), _inv (0)
 {
@@ -87,7 +82,6 @@ MTDM::MTDM (void) : _cnt (0), _inv (0)
 	F->xf = F->yf = 0.0f;
     }
 }
-
 
 int MTDM::process (size_t len, float *ip, float *op)
 {
@@ -125,7 +119,6 @@ int MTDM::process (size_t len, float *ip, float *op)
     return 0;
 }
 
-
 int MTDM::resolve (void)
 {
     int     i, k, m;
@@ -158,15 +151,12 @@ int MTDM::resolve (void)
     return 0;
 }
 
-
 // --------------------------------------------------------------------------------
-
 
 static MTDM            mtdm;
 static jack_client_t  *jack_handle;
 static jack_port_t    *jack_capt;
 static jack_port_t    *jack_play;
-
 
 int jack_callback (jack_nframes_t nframes, void *arg)
 {
@@ -177,7 +167,6 @@ int jack_callback (jack_nframes_t nframes, void *arg)
     mtdm.process (nframes, ip, op);
     return 0;
 }
-
 
 int main (int ac, char *av [])
 {
@@ -211,15 +200,19 @@ int main (int ac, char *av [])
 
     while (1)
     {
-        usleep (250000);
-
+ 
+    #ifdef WIN32 
+        Sleep (250); 
+    #else 
+        usleep (250000); 
+ 	#endif        
         if (mtdm.resolve () < 0) printf ("Signal below threshold...\n");
         else 
         {
             if (mtdm.err () > 0.3) 
             {
-            mtdm.invert ();
-            mtdm.resolve ();
+                mtdm.invert ();
+                mtdm.resolve ();
             }
             printf ("%10.3lf frames %10.3lf ms", mtdm.del (), mtdm.del () * t);
             if (mtdm.err () > 0.2) printf (" ??");
