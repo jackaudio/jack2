@@ -193,13 +193,11 @@ jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
   }
 
   memcpy (dest, &(rb->buf[rb->read_ptr]), n1);
-  rb->read_ptr += n1;
-  rb->read_ptr &= rb->size_mask;
+  rb->read_ptr = (rb->read_ptr + n1) & rb->size_mask;
 
   if (n2) {
     memcpy (dest + n1, &(rb->buf[rb->read_ptr]), n2);
-    rb->read_ptr += n2;
-    rb->read_ptr &= rb->size_mask;
+    rb->read_ptr = (rb->read_ptr + n2) & rb->size_mask;
   }
 
   return to_read;
@@ -237,13 +235,10 @@ jack_ringbuffer_peek (jack_ringbuffer_t * rb, char *dest, size_t cnt)
   }
 
   memcpy (dest, &(rb->buf[tmp_read_ptr]), n1);
-  tmp_read_ptr += n1;
-  tmp_read_ptr &= rb->size_mask;
+  tmp_read_ptr = (tmp_read_ptr + n1) & rb->size_mask;
 
   if (n2) {
     memcpy (dest + n1, &(rb->buf[tmp_read_ptr]), n2);
-    tmp_read_ptr += n2;
-    tmp_read_ptr &= rb->size_mask;
   }
 
   return to_read;
@@ -277,13 +272,11 @@ jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
   }
 
   memcpy (&(rb->buf[rb->write_ptr]), src, n1);
-  rb->write_ptr += n1;
-  rb->write_ptr &= rb->size_mask;
+  rb->write_ptr = (rb->write_ptr + n1) & rb->size_mask;
 
   if (n2) {
     memcpy (&(rb->buf[rb->write_ptr]), src + n1, n2);
-    rb->write_ptr += n2;
-    rb->write_ptr &= rb->size_mask;
+    rb->write_ptr = (rb->write_ptr + n2) & rb->size_mask;
   }
 
   return to_write;
@@ -294,8 +287,8 @@ jack_ringbuffer_write (jack_ringbuffer_t * rb, const char *src, size_t cnt)
 EXPORT void
 jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
-  rb->read_ptr += cnt;
-  rb->read_ptr &= rb->size_mask;
+  size_t tmp = (rb->read_ptr + cnt) & rb->size_mask;
+  rb->read_ptr = tmp;
 }
 
 /* Advance the write pointer `cnt' places. */
@@ -303,8 +296,8 @@ jack_ringbuffer_read_advance (jack_ringbuffer_t * rb, size_t cnt)
 EXPORT void
 jack_ringbuffer_write_advance (jack_ringbuffer_t * rb, size_t cnt)
 {
-  rb->write_ptr += cnt;
-  rb->write_ptr &= rb->size_mask;
+  size_t tmp = (rb->write_ptr + cnt) & rb->size_mask;
+  rb->write_ptr = tmp;
 }
 
 /* The non-copying data reader.  `vec' is an array of two places.  Set

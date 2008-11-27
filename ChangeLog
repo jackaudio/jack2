@@ -23,7 +23,11 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
-2008-11-31 Stephane Letz  <letz@grame.fr>
+2008-11-27 Stephane Letz  <letz@grame.fr>
+
+	* Report ringbuffer.c fixes from jack1.
+
+2008-11-21 Stephane Letz  <letz@grame.fr>
 
 	* Better isolation of server and clients system resources to allow starting the server in several user account at the same time.
 
