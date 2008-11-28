@@ -177,7 +177,7 @@ def build(bld):
             bld.add_subdirs('dbus')
 
     if bld.env['BUILD_DOXYGEN_DOCS'] == True:
-        share_dir = bld.env.get_destdir() + Build.bld.env()['PREFIX'] + '/share/jack-audio-connection-kit'
+        share_dir = bld.env.get_destdir() + bld.env['PREFIX'] + '/share/jack-audio-connection-kit'
         html_docs_source_dir = "build/default/html"
         html_docs_install_dir = share_dir + '/reference/html/'
         if Options.commands['install']:
