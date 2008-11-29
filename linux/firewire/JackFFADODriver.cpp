@@ -147,7 +147,7 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                 /* use the silent buffer if there is no valid jack buffer */
                 if (!buf) buf = (jack_default_audio_sample_t*)driver->nullbuffer;
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(buf));
-
+                ffado_streaming_playback_stream_onoff(driver->dev, chn, 1);
             } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
                 jack_nframes_t nevents;
                 jack_nframes_t i;
