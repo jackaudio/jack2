@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Sep  1 17:42:28 2008
+ * stub generated Fri Dec 12 14:50:06 2008
  * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
@@ -109,6 +109,10 @@
 #endif
 	typedef struct {
 		mach_msg_header_t Head;
+		/* start of the kernel processed data */
+		mach_msg_body_t msgh_body;
+		mach_msg_port_descriptor_t callback_port;
+		/* end of the kernel processed data */
 		NDR_record_t NDR;
 		client_name_t client_name;
 		int pid;
@@ -905,9 +909,16 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_open_t(__attrib
 
 	typedef __Request__rpc_jack_client_open_t __Request;
 #if	__MigTypeCheck
-	if ((In0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	if (!(In0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
+	    (In0P->msgh_body.msgh_descriptor_count != 1) ||
 	    (In0P->Head.msgh_size != (mach_msg_size_t)sizeof(__Request)))
 		return MIG_BAD_ARGUMENTS;
+#endif	/* __MigTypeCheck */
+
+#if	__MigTypeCheck
+	if (In0P->callback_port.type != MACH_MSG_PORT_DESCRIPTOR ||
+	    In0P->callback_port.disposition != 17)
+		return MIG_TYPE_ERROR;
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined) || \
@@ -964,6 +975,7 @@ kern_return_t server_rpc_jack_client_open
 	mach_port_t server_port,
 	client_name_t client_name,
 	int pid,
+	mach_port_t callback_port,
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
@@ -981,6 +993,10 @@ mig_internal novalue _Xrpc_jack_client_open
 #endif
 	typedef struct {
 		mach_msg_header_t Head;
+		/* start of the kernel processed data */
+		mach_msg_body_t msgh_body;
+		mach_msg_port_descriptor_t callback_port;
+		/* end of the kernel processed data */
 		NDR_record_t NDR;
 		client_name_t client_name;
 		int pid;
@@ -1034,7 +1050,7 @@ mig_internal novalue _Xrpc_jack_client_open
 #endif	/* UseStaticTemplates */
 
 
-	RetCode = server_rpc_jack_client_open(In0P->Head.msgh_request_port, In0P->client_name, In0P->pid, &OutP->private_port.name, &OutP->shared_engine, &OutP->shared_client, &OutP->shared_graph, &OutP->result);
+	RetCode = server_rpc_jack_client_open(In0P->Head.msgh_request_port, In0P->client_name, In0P->pid, In0P->callback_port.name, &OutP->private_port.name, &OutP->shared_engine, &OutP->shared_client, &OutP->shared_graph, &OutP->result);
 	if (RetCode != KERN_SUCCESS) {
 		MIG_RETURN_ERROR(OutP, RetCode);
 	}
@@ -6626,7 +6642,7 @@ const struct server_JackRPCEngine_subsystem {
 	(vm_address_t)0,
 	{
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_open, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_open_t)},
+            (mig_stub_routine_t) _Xrpc_jack_client_open, 9, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_open_t)},
           { (mig_impl_routine_t) 0,
             (mig_stub_routine_t) _Xrpc_jack_client_check, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_check_t)},
           { (mig_impl_routine_t) 0,

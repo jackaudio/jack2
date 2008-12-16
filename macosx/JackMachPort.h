@@ -54,6 +54,7 @@ class JackMachPort
         virtual bool DisconnectPort();
         virtual bool DestroyPort();
         virtual mach_port_t GetPort();
+        virtual void SetPort(mach_port_t port);
 };
 
 /*!

@@ -41,6 +41,8 @@ class JackMachClientChannel : public detail::JackClientChannelInterface, public 
         JackMachPort fServerPort;    /*! Mach port to communicate with the server : from client to server */
         mach_port_t	fPrivatePort;
         JackThread	fThread;		 /*! Thread to execute the event loop */
+        
+        static boolean_t MessageHandler(mach_msg_header_t* Request, mach_msg_header_t* Reply);
 
     public:
 

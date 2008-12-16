@@ -34,7 +34,8 @@ type objet_data_t = c_string[1024];
 routine rpc_jack_client_open(
 	server_port	: mach_port_t;
 	client_name	: client_name_t;
-    	pid         : int;
+	pid         : int;
+	callback_port : mach_port_make_send_t;
 	out private_port : mach_port_make_send_t;
 	out shared_engine : int;
 	out shared_client : int;
