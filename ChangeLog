@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-11-16 Stephane Letz  <letz@grame.fr>
+
+	* Client and library global context cleanup in case of incorrect shutdown handling (that is applications not correctly closing client after server has shutdown).
+
 2008-11-27 Stephane Letz  <letz@grame.fr>
 
 	* Report ringbuffer.c fixes from jack1.

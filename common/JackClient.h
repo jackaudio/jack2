@@ -87,8 +87,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         detail::JackClientChannelInterface* fChannel;
         JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
-        bool fServerRunning;
-
+  
         int StartThread();
         void SetupDriverSync(bool freewheel);
         bool IsActive();
@@ -98,7 +97,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
    
         virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value);
 
-        // Fons Adriaensen thread model
         inline bool WaitFirstSync();
         inline void ExecuteThread();
         inline bool WaitSync();
@@ -140,7 +138,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int PortDisconnect(jack_port_id_t src);
 
         virtual int PortIsMine(jack_port_id_t port_index);
-        
         virtual int PortRename(jack_port_id_t port_index, const char* name);
 
         // Transport
@@ -185,9 +182,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
-        
-        static JackClient* fClientTable[CLIENT_NUM];
- 
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.

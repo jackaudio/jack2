@@ -174,7 +174,7 @@ namespace Jack
 
 error:
         JackAudioDriver::Close();
-        jack_error ( "Can't open default PortAudio device : %s", Pa_GetErrorText(err) );
+        jack_error("Can't open default PortAudio device : %s", Pa_GetErrorText(err));
         return -1;
     }
 
@@ -436,8 +436,7 @@ extern "C"
 
             case 'P':
                 playback = TRUE;
-                if (strcmp(param->value.str, "none") != 0)
-                {
+                if (strcmp(param->value.str, "none") != 0) {
                     playback_pcm_name = strdup(param->value.str);
                 }
                 break;
@@ -469,8 +468,7 @@ extern "C"
         }
 
         // duplex is the default
-        if (!capture && !playback)
-        {
+        if (!capture && !playback) {
             capture = TRUE;
             playback = TRUE;
         }

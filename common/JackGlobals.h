@@ -21,11 +21,24 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackGlobals__
 
 #include "JackPlatformPlug.h"
+#include "JackConstants.h"
+#include "JackClient.h"
 
-using namespace Jack;
+namespace Jack
+{
 
-extern jack_tls_key gRealTime;
-extern jack_tls_key g_key_log_function;
-extern JackMutex* gOpenMutex;
+// Globals used for client management on server or libray side.
+
+struct JackGlobals {
+
+    static jack_tls_key fRealTime;
+    static jack_tls_key fKeyLogFunction;
+    static JackMutex* fOpenMutex;
+    static bool fServerRunning;
+    static JackClient* fClientTable[];
+    
+};
+
+} // end of namespace
 
 #endif

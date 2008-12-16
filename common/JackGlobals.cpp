@@ -19,10 +19,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackGlobals.h"
 
-jack_tls_key gRealTime;
-static bool gKeyRealtimeInitialized = jack_tls_allocate_key(&gRealTime);
+namespace Jack
+{
 
-jack_tls_key g_key_log_function;
-static bool g_key_log_function_initialized = jack_tls_allocate_key(&g_key_log_function);
+jack_tls_key JackGlobals::fRealTime;
+static bool gKeyRealtimeInitialized = jack_tls_allocate_key(&JackGlobals::fRealTime);
 
-JackMutex* gOpenMutex = new JackMutex();
+jack_tls_key JackGlobals::fKeyLogFunction;
+static bool fKeyLogFunctionInitialized = jack_tls_allocate_key(&JackGlobals::fKeyLogFunction);
+
+JackMutex* JackGlobals::fOpenMutex = new JackMutex();
+bool JackGlobals::fServerRunning = false;
+JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
+
+} // end of namespace

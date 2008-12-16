@@ -259,7 +259,7 @@ static inline void WaitGraphChange()
     graph change in RT context (just read the current graph state).
     */
 
-    if (jack_tls_get(gRealTime) == NULL) {
+    if (jack_tls_get(JackGlobals::fRealTime) == NULL) {
         JackGraphManager* manager = GetGraphManager();
         JackEngineControl* control = GetEngineControl();
         assert(manager);
@@ -283,14 +283,14 @@ EXPORT void jack_set_info_function (print_function func)
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
-    assert(gOpenMutex);
-    gOpenMutex->Lock();
+    assert(JackGlobals::fOpenMutex);
+    JackGlobals::fOpenMutex->Lock();
     jack_error("jack_client_new: deprecated");
     int options = JackUseExactName;
     if (getenv("JACK_START_SERVER") == NULL)
         options |= JackNoStartServer;
     jack_client_t* res = jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
-    gOpenMutex->Unlock();
+    JackGlobals::fOpenMutex->Unlock();
     return res;
 }
 
@@ -628,7 +628,7 @@ EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
         JackGraphManager* manager = GetGraphManager();
         int refnum;
         if (manager && ((refnum = manager->GetPort(myport)->GetRefNum()) > 0)) {
-            JackClient* client = JackClient::fClientTable[refnum];
+            JackClient* client = JackGlobals::fClientTable[refnum];
             assert(client);
             return client->PortRename(myport, name);
         } else {

@@ -37,8 +37,6 @@ using namespace std;
 namespace Jack
 {
 
-JackClient* JackClient::fClientTable[CLIENT_NUM] = {};
-
 #define IsRealTime() ((fProcess != NULL) | (fThreadFun != NULL) | (fSync != NULL) | (fTimebase != NULL))
 
 JackClient::JackClient():fThread(this)
@@ -88,8 +86,8 @@ int JackClient::Close()
     Deactivate();
     fChannel->Stop();  // Channels is stopped first to avoid receiving notifications while closing
     
-    // Request close only is server is still running
-    if (GetClientControl()->fServer) {
+    // Request close only if server is still running
+    if (JackGlobals::fServerRunning) {
         fChannel->ClientClose(GetClientControl()->fRefNum, &result);
     } else {
         jack_log("JackClient::Close server is shutdown"); 
@@ -97,7 +95,7 @@ int JackClient::Close()
     
     fChannel->Close();
     fSynchroTable[GetClientControl()->fRefNum].Disconnect();
-    fClientTable[GetClientControl()->fRefNum] = NULL;
+    JackGlobals::fClientTable[GetClientControl()->fRefNum] = NULL;
     return result;
 }
 
@@ -359,7 +357,7 @@ int JackClient::StartThread()
 */
 bool JackClient::Execute()
 {
-    if (!jack_tls_set(gRealTime, this)) 
+    if (!jack_tls_set(JackGlobals::fRealTime, this)) 
         jack_error("failed to set thread realtime key");
         
     if (GetEngineControl()->fRealTime) 
@@ -596,11 +594,7 @@ ShutDown is called:
 void JackClient::ShutDown()
 {
     jack_log("ShutDown");
-    
-    // Be sure client is already started 
-    if (GetClientControl()) {
-        GetClientControl()->fServer = false;
-    }
+    JackGlobals::fServerRunning = false;
     
     if (fShutdown) {
         fShutdown(fShutdownArg);

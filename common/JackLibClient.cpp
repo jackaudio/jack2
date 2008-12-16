@@ -70,7 +70,7 @@ JackLibClient::~JackLibClient()
 int JackLibClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
-    jack_log("JackLibClient::Open %s", name);
+    jack_log("JackLibClient::Open name = %s", name);
 
     snprintf(fServerName, sizeof(fServerName), server_name);
 
@@ -113,7 +113,8 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
         goto error;
     }
   
-    fClientTable[GetClientControl()->fRefNum] = this;
+    JackGlobals::fClientTable[GetClientControl()->fRefNum] = this;
+    JackGlobals::fServerRunning = true;
     jack_log("JackLibClient::Open name = %s refnum = %ld", name_res, GetClientControl()->fRefNum);
     return 0;
 

@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackGraphManager.h"
 #include "JackMessageBuffer.h"
 #include "JackTime.h"
+#include "JackClient.h"
 #include "JackError.h"
 #include <assert.h>
 #include <signal.h>
@@ -44,7 +45,7 @@ struct JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
-    JackSynchro fSynchroTable[CLIENT_NUM];                      /*! Shared synchro table */
+    JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
     sigset_t fProcessSignals;
  
     static int fClientCount;
@@ -86,6 +87,26 @@ struct JackLibGlobals
 
     static void Init()
     {
+        if (!JackGlobals::fServerRunning && fClientCount > 0) {
+        
+            // Cleanup remaining clients
+            jack_error("Jack server was closed but clients are still allocated, cleanup...");
+            for (int i = 0; i < CLIENT_NUM; i++) {
+                JackClient* client = JackGlobals::fClientTable[i];
+                if (client) {
+                    jack_error("Cleanup client ref = %d", i);
+                    client->Close();
+                    delete client;
+                    JackGlobals::fClientTable[CLIENT_NUM] = NULL;
+                }
+            }
+            
+            // Cleanup global context
+            fClientCount = 0;
+            delete fGlobals;
+            fGlobals = NULL;
+        }
+        
         if (fClientCount++ == 0 && !fGlobals) {
             jack_log("JackLibGlobals Init %x", fGlobals);
             InitTime();

@@ -27,8 +27,6 @@
 #endif /* USE_MLOCK */
 #include "JackCompilerDeps.h"
 
-// TODO : what to do with Paul fixes done av rev 3014 (http://trac.jackaudio.org/changeset/3014)
-
 typedef struct {
     char *buf;
     size_t len;

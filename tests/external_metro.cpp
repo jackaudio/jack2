@@ -75,7 +75,7 @@ ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
     }
     if ((client = jack_client_open (client_name, options, &status)) == 0) {
         fprintf (stderr, "jack server not running?\n");
-        return;
+        throw -1;
     }
 
     jack_set_process_callback (client, process_audio, this);
@@ -184,6 +184,21 @@ int main (int argc, char *argv[])
 
     printf("Opening a new client....\n");
     client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
+    
+    printf("Now quit the server, shutdown callback should be called...\n");
+    printf("Type 'c' to move on...\n");
+    while ((getchar() != 'c')) {
+        JackSleep(1);
+    };
+
+    printf("Simulating client not correctly closed...\n");
+    
+    printf("Opening a new client....\n"); 
+    try {
+        client1 = new ExternalMetro(1200, 0.4, 20, 80, "t1");
+    } catch (int num) {
+        printf("Cannot open a new client since old one was not closed correctly... OK\n"); 
+    }
 
     printf("Type 'q' to quit...\n");
     while ((getchar() != 'q')) {

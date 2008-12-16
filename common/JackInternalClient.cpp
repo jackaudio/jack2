@@ -141,7 +141,9 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
     }
 
     SetupDriverSync(false);
-    fClientTable[fClientControl.fRefNum] = this;
+    JackGlobals::fClientTable[fClientControl.fRefNum] = this;
+    JackGlobals::fServerRunning = true;
+    jack_log("JackInternalClient::Open name = %s refnum = %ld", name_res, fClientControl.fRefNum);
     return 0;
 
 error:

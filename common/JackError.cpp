@@ -27,9 +27,11 @@
 
 int jack_verbose = 0;
 
+using namespace Jack;
+
 void change_thread_log_function(jack_log_function_t log_function)
 {
-    if (!jack_tls_set(g_key_log_function, (void*)log_function))
+    if (!jack_tls_set(JackGlobals::fKeyLogFunction, (void*)log_function))
     {
         jack_error("failed to set thread log function");
     }
@@ -37,7 +39,7 @@ void change_thread_log_function(jack_log_function_t log_function)
 
 SERVER_EXPORT void set_threaded_log_function()
 {
-    change_thread_log_function(Jack::JackMessageBufferAdd);
+    change_thread_log_function(JackMessageBufferAdd);
 }
 
 void jack_log_function(int level, const char *message)
@@ -74,7 +76,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
 
     vsnprintf(buffer + len, sizeof(buffer) - len, fmt, ap);
 
-    log_function = (jack_log_function_t)jack_tls_get(g_key_log_function);
+    log_function = (jack_log_function_t)jack_tls_get(JackGlobals::fKeyLogFunction);
 
     /* if log function is not overriden for thread, use default one */
     if (log_function == NULL)

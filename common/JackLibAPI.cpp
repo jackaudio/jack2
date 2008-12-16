@@ -113,20 +113,20 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
-    assert(gOpenMutex);
-    gOpenMutex->Lock();
+    assert(JackGlobals::fOpenMutex);
+    JackGlobals::fOpenMutex->Lock();
     va_list ap;
     va_start(ap, status);
     jack_client_t* res = jack_client_open_aux(ext_client_name, options, status, ap);
     va_end(ap);
-    gOpenMutex->Unlock();
+    JackGlobals::fOpenMutex->Unlock();
     return res;
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)
 {
-    assert(gOpenMutex);
-    gOpenMutex->Lock();
+    assert(JackGlobals::fOpenMutex);
+    JackGlobals::fOpenMutex->Lock();
     int res = -1;
     jack_log("jack_client_close");
     JackClient* client = (JackClient*)ext_client;
@@ -138,7 +138,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
         JackLibGlobals::Destroy(); // jack library destruction
         jack_log("jack_client_close res = %d", res);
     }
-    gOpenMutex->Unlock();
+    JackGlobals::fOpenMutex->Unlock();
     return res;
 }
 
