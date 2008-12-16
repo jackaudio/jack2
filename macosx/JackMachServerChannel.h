@@ -59,9 +59,7 @@ class JackMachServerChannel : public JackRunnableInterface
         JackServer* GetServer();
 
         void ClientCheck(char* name, char* name_res, int protocol, int options, int* status, int* result);
-        //void ClientOpen(char* name, int pid, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        void ClientOpen(char* name, int pid, mach_port_t callback_port, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-
+        void ClientOpen(char* name, int pid, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientClose(mach_port_t private_port, int refnum);
         void ClientKill(mach_port_t private_port);
 

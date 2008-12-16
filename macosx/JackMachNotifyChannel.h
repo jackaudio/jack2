@@ -30,8 +30,6 @@ namespace Jack
 \brief JackNotifyChannel using Mach IPC.
 */
 
-extern mach_port_t gCallback_port;
-
 class JackMachNotifyChannel
 {
 

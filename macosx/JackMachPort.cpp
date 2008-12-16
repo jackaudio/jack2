@@ -29,7 +29,6 @@ bool JackMachPort::AllocatePort(const char* name, int queue)
 {
     mach_port_t task = mach_task_self();
     kern_return_t res;
-    mach_port_t old_port;
 
     if ((res = task_get_bootstrap_port(task, &fBootPort)) != KERN_SUCCESS) {
         jack_error("AllocatePort: Can't find bootstrap mach port err = %s", mach_error_string(res));
@@ -40,44 +39,16 @@ bool JackMachPort::AllocatePort(const char* name, int queue)
         jack_error("AllocatePort: can't allocate mach port err = %s", mach_error_string(res));
         return false;
     }
-   
+
     if ((res = mach_port_insert_right(task, fServerPort, fServerPort, MACH_MSG_TYPE_MAKE_SEND)) != KERN_SUCCESS) {
         jack_error("AllocatePort: error inserting mach rights err = %s", mach_error_string(res));
         return false;
     }
-    
-    if ((res = mach_port_request_notification(task, fServerPort, MACH_NOTIFY_NO_SENDERS,
-               1, fServerPort, MACH_MSG_TYPE_MAKE_SEND_ONCE, &old_port)) != KERN_SUCCESS) {
-        jack_error("AddPort: error in mach_port_request_notification err = %s", mach_error_string(res));
-        return false;
-    }
-    
-    /*
-    
-    if ((res = mach_port_request_notification(task, fServerPort, MACH_NOTIFY_PORT_DESTROYED,
-               0, fServerPort, MACH_MSG_TYPE_MAKE_SEND_ONCE, &old_port)) != KERN_SUCCESS) {
-        jack_error("AddPort: error in mach_port_request_notification MACH_NOTIFY_PORT_DESTROYED err = %s", mach_error_string(res));
-        return false;
-    }
-    */
-    
-   
 
-    /*
-     
-    if ((res = mach_port_request_notification(task, fServerPort, MACH_NOTIFY_DEAD_NAME,
-               1, fServerPort, MACH_MSG_TYPE_MAKE_SEND_ONCE, &old_port)) != KERN_SUCCESS) {
-        jack_error("AddPort: error in mach_port_request_notification MACH_NOTIFY_DEAD_NAME err = %s", mach_error_string(res));
-        return false;
-    }
-    */
-    
-   /*
     if ((res = bootstrap_register(fBootPort, (char*)name, fServerPort)) != KERN_SUCCESS) {
         jack_error("Allocate: can't check in mach port name = %s err = %s", name, mach_error_string(res));
         return false;
     }
-    */
 
     mach_port_limits_t qlimits;
     mach_msg_type_number_t info_cnt = MACH_PORT_LIMITS_INFO_COUNT;
@@ -109,7 +80,6 @@ bool JackMachPort::AllocatePort(const char* name)
 bool JackMachPort::ConnectPort(const char* name)
 {
     kern_return_t res;
-    mach_port_t old_port;
 
     jack_log("JackMachPort::ConnectPort %s", name);
 
@@ -122,13 +92,6 @@ bool JackMachPort::ConnectPort(const char* name)
         jack_error("ConnectPort: can't find mach server port name = %s err = %s", name, mach_error_string(res));
         return false;
     }
-    /*
-     if ((res = mach_port_request_notification(mach_task_self(), fServerPort, MACH_NOTIFY_DEAD_NAME,
-               0, fServerPort, MACH_MSG_TYPE_MAKE_SEND_ONCE, &old_port)) != KERN_SUCCESS) {
-        jack_error("AddPort: error in mach_port_request_notification MACH_NOTIFY_DEAD_NAME err = %s", mach_error_string(res));
-        return false;
-    }
-    */
 
     return true;
 }
@@ -178,11 +141,6 @@ bool JackMachPort::DestroyPort()
 mach_port_t JackMachPort::GetPort()
 {
     return fServerPort;
-}
-
-void JackMachPort::SetPort(mach_port_t port)
-{
-   fServerPort = port;
 }
 
 bool JackMachPortSet::AllocatePort(const char* name, int queue)

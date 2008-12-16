@@ -54,7 +54,6 @@ kern_return_t rpc_jack_client_open
 	mach_port_t server_port,
 	client_name_t client_name,
 	int pid,
-	mach_port_t callback_port,
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
@@ -382,10 +381,6 @@ __END_DECLS
 #endif
 	typedef struct {
 		mach_msg_header_t Head;
-		/* start of the kernel processed data */
-		mach_msg_body_t msgh_body;
-		mach_msg_port_descriptor_t callback_port;
-		/* end of the kernel processed data */
 		NDR_record_t NDR;
 		client_name_t client_name;
 		int pid;

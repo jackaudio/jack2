@@ -138,7 +138,7 @@ void JackMachClientChannel::ClientCheck(const char* name, char* name_res, int pr
 
 void JackMachClientChannel::ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    kern_return_t res = rpc_jack_client_open(fServerPort.GetPort(), (char*)name, pid, fClientPort.GetPort(), &fPrivatePort, shared_engine, shared_client, shared_graph, result);
+    kern_return_t res = rpc_jack_client_open(fServerPort.GetPort(), (char*)name, pid, &fPrivatePort, shared_engine, shared_client, shared_graph, result);
     if (res != KERN_SUCCESS) {
         *result = -1;
         jack_error("JackMachClientChannel::ClientOpen err = %s", mach_error_string(res));
@@ -317,21 +317,6 @@ bool JackMachClientChannel::Init()
     return client->Init();
 }
 
-boolean_t JackMachClientChannel::MessageHandler(mach_msg_header_t* Request, mach_msg_header_t* Reply)
-{
-    printf("JackMachClientChannel::MessageHandler  %d\n", Request->msgh_id);
-    if (Request->msgh_id == MACH_NOTIFY_NO_SENDERS) {
-        jack_error("JackMachClientChannel::MessageHandler fails...");
-        //JackClient* client = gClientTable[fClientPort.GetPort()];
-        //client->ShutDown();
-        return false;
-    } else {
-        JackRPCClient_server(Request, Reply);
-    }
-    return true;
-}
-
-/*
 bool JackMachClientChannel::Execute()
 {
     kern_return_t res;
@@ -339,20 +324,6 @@ bool JackMachClientChannel::Execute()
         jack_error("JackMachClientChannel::Execute err = %s", mach_error_string(res));
         JackClient* client = gClientTable[fClientPort.GetPort()];
         client->ShutDown();
-        return false;
-    } else {
-        return true;
-    }
-}
-*/
-
-bool JackMachClientChannel::Execute()
-{
-    kern_return_t res;
-    if ((res = mach_msg_server(MessageHandler, 1024, fClientPort.GetPort(), 0)) != KERN_SUCCESS) {
-        jack_error("JackMachClientChannel::Execute err = %s", mach_error_string(res));
-        //JackClient* client = gClientTable[fClientPort.GetPort()];
-        //client->ShutDown();
         return false;
     } else {
         return true;

@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-mach_port_t gCallback_port;
-
 // Server side : server to client
 
 int JackMachNotifyChannel::Open(const char* name)
@@ -36,20 +34,14 @@ int JackMachNotifyChannel::Open(const char* name)
 
     char buf[256];
     snprintf(buf, sizeof(buf) - 1, "%s:%s", jack_client_entry, name);
-    
-    printf("gCallback_port %d\n", gCallback_port);
-    
-    fClientPort.SetPort(gCallback_port);
 
     // Connect to client notification port using client name
-    /*
     if (!fClientPort.ConnectPort(buf)) {
         jack_error("Cannot connect client port");
         return -1;
     } else {
         return 0;
     }
-    */
 }
 
 void JackMachNotifyChannel::Close()

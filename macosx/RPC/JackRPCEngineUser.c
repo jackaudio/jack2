@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Fri Dec 12 14:50:06 2008
+ * stub generated Mon Sep  1 17:42:28 2008
  * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
  * OPTIONS: 
  */
@@ -476,7 +476,6 @@ mig_external kern_return_t rpc_jack_client_open
 	mach_port_t server_port,
 	client_name_t client_name,
 	int pid,
-	mach_port_t callback_port,
 	mach_port_t *private_port,
 	int *shared_engine,
 	int *shared_client,
@@ -490,10 +489,6 @@ mig_external kern_return_t rpc_jack_client_open
 #endif
 	typedef struct {
 		mach_msg_header_t Head;
-		/* start of the kernel processed data */
-		mach_msg_body_t msgh_body;
-		mach_msg_port_descriptor_t callback_port;
-		/* end of the kernel processed data */
 		NDR_record_t NDR;
 		client_name_t client_name;
 		int pid;
@@ -564,33 +559,13 @@ mig_external kern_return_t rpc_jack_client_open
 
 	__DeclareSendRpc(1000, "rpc_jack_client_open")
 
-#if	UseStaticTemplates
-	const static mach_msg_port_descriptor_t callback_portTemplate = {
-		/* name = */		MACH_PORT_NULL,
-		/* pad1 = */		0,
-		/* pad2 = */		0,
-		/* disp = */		20,
-		/* type = */		MACH_MSG_PORT_DESCRIPTOR,
-	};
-#endif	/* UseStaticTemplates */
-
-	InP->msgh_body.msgh_descriptor_count = 1;
-#if	UseStaticTemplates
-	InP->callback_port = callback_portTemplate;
-	InP->callback_port.name = callback_port;
-#else	/* UseStaticTemplates */
-	InP->callback_port.name = callback_port;
-	InP->callback_port.disposition = 20;
-	InP->callback_port.type = MACH_MSG_PORT_DESCRIPTOR;
-#endif	/* UseStaticTemplates */
-
 	InP->NDR = NDR_record;
 
 	(void) mig_strncpy(InP->client_name, client_name, 128);
 
 	InP->pid = pid;
 
-	InP->Head.msgh_bits = MACH_MSGH_BITS_COMPLEX|
+	InP->Head.msgh_bits =
 		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
 	/* msgh_size passed as argument */
 	InP->Head.msgh_request_port = server_port;
