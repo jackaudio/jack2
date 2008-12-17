@@ -19,14 +19,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackSystemDeps.h"
-
-#ifndef WIN32
-#ifndef ADDON_DIR
-#include "config.h"
-#endif
-#endif
-
 #include "JackGraphManager.h"
+#include "JackConstants.h"
 #include "JackInternalClient.h"
 #include "JackLockedEngine.h"
 #include "JackServer.h"
@@ -79,7 +73,10 @@ static void PrintLoadError(const char* so_name)
 
 static void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 {
-    snprintf(path_to_so, path_len, ADDON_DIR "/%s.so", so_name);
+    const char* driver_dir;
+    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) 
+        driver_dir = ADDON_DIR;
+    snprintf(path_to_so, path_len, "%s/%s.so", driver_dir, so_name);
 }
 
 #endif

@@ -20,7 +20,6 @@
 #include <string.h>
 #include <getopt.h>
 #include <jack/jack.h>
-//#include <config.h>
 
 char * my_name;
 
