@@ -60,6 +60,7 @@ def set_options(opt):
     opt.tool_options('compiler_cxx')
     opt.tool_options('compiler_cc')
 
+    opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--monitor', action='store_true', default=False, help='Build with monitoring records')
@@ -100,11 +101,16 @@ def configure(conf):
     conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
     conf.env['BUILD_WITH_MONITOR'] = Options.options.monitor
 
+    if Options.options.libdir:
+        conf.env['LIBDIR'] = Options.options.libdir
+    else:
+        conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib/'
+
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM', Options.options. ports)
 
-    conf.define('ADDON_DIR', os.path.normpath(conf.env['PREFIX'] + '/lib/jack'))
-    conf.define('JACK_LOCATION', os.path.normpath(conf.env['PREFIX'] + '/bin'))
+    conf.define('ADDON_DIR', os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack')))
+    conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
     conf.define('USE_POSIX_SHM', 1)
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
@@ -133,6 +139,7 @@ def configure(conf):
     print "Build with a maximum of %d ports" % conf.env['PORT_NUM']
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
+    display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with monitoring records', conf.env['BUILD_WITH_MONITOR'])

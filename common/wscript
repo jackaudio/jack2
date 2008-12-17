@@ -94,6 +94,7 @@ def build(bld):
     serverlib.name         = 'serverlib'
     serverlib.target       = 'jackserver'
     serverlib.uselib = uselib
+    serverlib.install_path = '${LIBDIR}'
     serverlib.source = [] + common_libsources
     serverlib.source += [
         'JackAudioDriver.cpp',
@@ -145,6 +146,7 @@ def build(bld):
     clientlib.features.append('cc')
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.uselib = uselib
+    clientlib.install_path = '${LIBDIR}'
     if bld.env['BUILD_JACKDBUS'] == True:
         clientlib.uselib.append('DBUS-1')
     clientlib.includes = includes
@@ -222,10 +224,10 @@ def build(bld):
     obj.source = '../jack.pc.in'
     obj.target = 'jack.pc'
     obj.dict = {'PREFIX': bld.env['PREFIX'],
-                'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
+                'LIBDIR': bld.env['LIBDIR'],
                 'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
                 'SERVERLIB': serverlib.target,
                 'JACK_VERSION': bld.env['JACK_VERSION'],
                 }
-    obj.install_path = '${PREFIX}/lib/pkgconfig/'
+    obj.install_path = '${LIBDIR}/pkgconfig/'
     obj.fun = misc.subst_func
