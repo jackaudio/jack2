@@ -23,15 +23,15 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
-2008-11-18 Stephane Letz  <letz@grame.fr>
+2008-12-18 Stephane Letz  <letz@grame.fr>
 
 	* For ALSA driver, synchronize with latest jack1 memops functions. 
 
-2008-11-17 Stephane Letz  <letz@grame.fr>
+2008-12-17 Stephane Letz  <letz@grame.fr>
 
 	* Use JACK_DRIVER_DIR variable in internal clients loader.
 
-2008-11-16 Stephane Letz  <letz@grame.fr>
+2008-12-16 Stephane Letz  <letz@grame.fr>
 
 	* Client and library global context cleanup in case of incorrect shutdown handling (that is applications not correctly closing client after server has shutdown).
 
