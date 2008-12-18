@@ -249,11 +249,11 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
                driver->channel_copy = memcpy_interleave_d32_s32;
            } else {
                driver->channel_copy = memcpy_fake;
-            }
+           }
            driver->read_via_copy = sample_move_floatLE_sSs;
            driver->write_via_copy = sample_move_dS_floatLE;
           
-            return;
+           return;
     }
 
     switch (driver->playback_sample_bytes) {
@@ -300,33 +300,10 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
                 driver->channel_copy = memcpy_fake;
             }
 
-            switch (driver->dither) {
-                case Rectangular:
-                    jack_log("Rectangular dithering at 16 bits");
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_dither_rect_d24_sSs :
-                                             sample_move_dither_rect_d24_sS;
-                    break;
+            driver->write_via_copy = driver->quirk_bswap?
+				sample_move_d24_sSs: 
+				sample_move_d24_sS;
 
-                case Triangular:
-                    jack_log("Triangular dithering at 16 bits");
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_dither_tri_d24_sSs :
-                                             sample_move_dither_tri_d24_sS;
-                    break;
-
-                case Shaped:
-                    jack_log("Noise-shaped dithering at 16 bits");
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_dither_shaped_d24_sSs :
-                                             sample_move_dither_shaped_d24_sS;
-                    break;
-
-                default:
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_d24_sSs : sample_move_d24_sS;
-                    break;
-            }
             break;
 
         case 4:
@@ -336,34 +313,14 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
                 driver->channel_copy = memcpy_fake;
             }
 
-            switch (driver->dither) {
-                case Rectangular:
-                    jack_log("Rectangular dithering at 16 bits");
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_dither_rect_d32u24_sSs :
-                                             sample_move_dither_rect_d32u24_sS;
-                    break;
-
-                case Triangular:
-                    jack_log("Triangular dithering at 16 bits");
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_dither_tri_d32u24_sSs :
-                                             sample_move_dither_tri_d32u24_sS;
-                    break;
-
-                case Shaped:
-                    jack_log("Noise-shaped dithering at 16 bits");
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_dither_shaped_d32u24_sSs :
-                                             sample_move_dither_shaped_d32u24_sS;
-                    break;
-
-                default:
-                    driver->write_via_copy = driver->quirk_bswap ?
-                                             sample_move_d32u24_sSs : sample_move_d32u24_sS;
-                    break;
-            }
+            driver->write_via_copy = driver->quirk_bswap?
+				sample_move_d32u24_sSs: 
+				sample_move_d32u24_sS;
             break;
+	
+	default:
+	    jack_error ("impossible sample width (%d) discovered!", driver->playback_sample_bytes);
+	    exit (1);
     }
 
     switch (driver->capture_sample_bytes) {
@@ -2463,7 +2420,7 @@ enum_alsa_devices()
     bool has_capture;
     bool has_playback;
     jack_driver_param_constraint_desc_t * constraint_ptr;
-    uint32_t array_size;
+    uint32_t array_size = 0;
 
     snd_ctl_card_info_alloca(&info);
     snd_pcm_info_alloca(&pcminfo_capture);

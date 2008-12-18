@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2008-11-18 Stephane Letz  <letz@grame.fr>
+
+	* For ALSA driver, synchronize with latest jack1 memops functions. 
+
 2008-11-17 Stephane Letz  <letz@grame.fr>
 
 	* Use JACK_DRIVER_DIR variable in internal clients loader.
