@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "jack.h"
 #include "JackError.h"
 #include "JackResampler.h"
+#include "JackConstants.h"
 #include "JackFilters.h"
 #include <samplerate.h>
 
