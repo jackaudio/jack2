@@ -794,7 +794,7 @@ void input_event(alsa_seqmidi_t *self, snd_seq_event_t *alsa_event, struct proce
 	alsa_time = alsa_event->time.time.tv_sec * NSEC_PER_SEC + alsa_event->time.time.tv_nsec;
 	time_offset = info->alsa_time - alsa_time;
 	frame_offset = (info->sample_rate * time_offset) / NSEC_PER_SEC;
-	event_frame = info->cur_frames - info->period_start - frame_offset + info->nframes;
+	event_frame = (int64_t)info->cur_frames - info->period_start - frame_offset + info->nframes;
 
 	debug_log("input: %d bytes at event_frame = %d", (int)size, (int)event_frame);
 
