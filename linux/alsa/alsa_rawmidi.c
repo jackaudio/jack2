@@ -674,6 +674,7 @@ midi_port_t** scan_port_add(scan_t *scan, const alsa_id_t *id, midi_port_t **lis
 static
 midi_port_t** scan_port_open(alsa_rawmidi_t *midi, midi_port_t **list)
 {
+	int ret;
 	midi_stream_t *str;
 	midi_port_t *port;
 
@@ -683,7 +684,8 @@ midi_port_t** scan_port_open(alsa_rawmidi_t *midi, midi_port_t **list)
 	if (jack_ringbuffer_write_space(str->jack.new_ports) < sizeof(port))
 		goto fail_0;
 
-	if (midi_port_open(midi, port))
+	ret = midi_port_open(midi, port);
+	if (ret)
 		goto fail_1;
 	if ((str->port_init)(midi, port))
 		goto fail_2;
@@ -699,7 +701,7 @@ midi_port_t** scan_port_open(alsa_rawmidi_t *midi, midi_port_t **list)
  fail_1:
 	midi_port_close(midi, port);
 	port->state = PORT_ZOMBIFIED;
-	error_log("scan: can't open port %s %s, zombified", port->dev, port->name);
+	error_log("scan: can't open port %s %s, error code %d, zombified", port->dev, port->name, ret);
 	return &port->next;
  fail_0:
 	error_log("scan: can't open port %s %s", port->dev, port->name);
