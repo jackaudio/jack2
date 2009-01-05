@@ -95,7 +95,7 @@ namespace Jack
         fAudioInterface.longinfo();
 
         //turn the thread realtime
-        fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fPriority );
+        fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fClientPriority );
 
         return 0;
     }
