@@ -28,6 +28,11 @@ extern "C" {
 #include <jack/types.h>
 
 /**
+ * @defgroup TransportControl Transport and Timebase control
+ * @{
+ */
+
+/**
  * Called by the timebase master to release itself from that
  * responsibility.
  *
@@ -206,7 +211,7 @@ void jack_transport_start (jack_client_t *client);
  * @param client the JACK client structure.
  */
 void jack_transport_stop (jack_client_t *client);
-	
+
 /**
  * Gets the current transport info structure (deprecated).
  *
@@ -232,6 +237,8 @@ void jack_get_transport_info (jack_client_t *client,
 void jack_set_transport_info (jack_client_t *client,
 			      jack_transport_info_t *tinfo);
 
+/*@}*/
+	
 #ifdef __cplusplus
 }
 #endif

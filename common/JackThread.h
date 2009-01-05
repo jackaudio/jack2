@@ -50,12 +50,12 @@ class JackRunnableInterface
         virtual bool Execute() = 0;  /*! Must be implemented by subclasses */
 };
 
+namespace detail
+{
+
 /*!
  \brief The thread base class.
  */
-
-namespace detail
-{
 
 class SERVER_EXPORT JackThreadInterface
 {

@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-05 Stephane Letz  <letz@grame.fr>
+
+	* Synchronize jack2 public headers with jack1 ones. 
+
 2008-12-18 Stephane Letz  <letz@grame.fr>
 
 	* For ALSA driver, synchronize with latest jack1 memops functions. 

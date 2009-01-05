@@ -78,6 +78,11 @@ extern "C" {
 } /* Adjust editor indent */
 #endif
 
+/**
+ * @defgroup ServerControl Controling the server
+ * @{
+ */
+
 /** 
  * Call this function to setup process signal handling. As a general
  * rule, it is required for proper operation for the server object.
@@ -320,7 +325,7 @@ jackctl_parameter_get_default_value(
  */
 bool
 jackctl_parameter_has_range_constraint(
-	jackctl_parameter_t * parameter_ptr);
+	jackctl_parameter_t * parameter);
 
 /** 
  * Call this function check whether parameter has enumeration constraint.
@@ -331,7 +336,7 @@ jackctl_parameter_has_range_constraint(
  */
 bool
 jackctl_parameter_has_enum_constraint(
-	jackctl_parameter_t * parameter_ptr);
+	jackctl_parameter_t * parameter);
 
 /** 
  * Call this function get how many enumeration values parameter has.
@@ -342,7 +347,7 @@ jackctl_parameter_has_enum_constraint(
  */
 uint32_t
 jackctl_parameter_get_enum_constraints_count(
-	jackctl_parameter_t * parameter_ptr);
+	jackctl_parameter_t * parameter);
 
 /** 
  * Call this function to get parameter enumeration value.
@@ -354,7 +359,7 @@ jackctl_parameter_get_enum_constraints_count(
  */
 union jackctl_parameter_value
 jackctl_parameter_get_enum_constraint_value(
-	jackctl_parameter_t * parameter_ptr,
+	jackctl_parameter_t * parameter,
 	uint32_t index);
 
 /** 
@@ -367,7 +372,7 @@ jackctl_parameter_get_enum_constraint_value(
  */
 const char *
 jackctl_parameter_get_enum_constraint_description(
-	jackctl_parameter_t * parameter_ptr,
+	jackctl_parameter_t * parameter,
 	uint32_t index);
 
 /** 
@@ -379,7 +384,7 @@ jackctl_parameter_get_enum_constraint_description(
  */
 void
 jackctl_parameter_get_range_constraint(
-	jackctl_parameter_t * parameter_ptr,
+	jackctl_parameter_t * parameter,
 	union jackctl_parameter_value * min_ptr,
 	union jackctl_parameter_value * max_ptr);
 
@@ -393,7 +398,7 @@ jackctl_parameter_get_range_constraint(
  */
 bool
 jackctl_parameter_constraint_is_strict(
-	jackctl_parameter_t * parameter_ptr);
+	jackctl_parameter_t * parameter);
 
 /** 
  * Call this function to check whether parameter has fake values,
@@ -406,7 +411,7 @@ jackctl_parameter_constraint_is_strict(
  */
 bool
 jackctl_parameter_constraint_is_fake_value(
-	jackctl_parameter_t * parameter_ptr);
+	jackctl_parameter_t * parameter);
 
 /** 
  * Call this function to get list of available internal clients. List node data
@@ -502,6 +507,8 @@ void
 jack_log(
 	const char *format,
 	...);
+
+/* @} */
 
 #if 0
 { /* Adjust editor indent */

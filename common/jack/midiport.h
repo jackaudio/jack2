@@ -42,6 +42,11 @@ typedef struct _jack_midi_event
 } jack_midi_event_t;
 
 
+/**
+ * @defgroup MIDIAPI Reading and writing MIDI data 
+ * @{
+ */
+
 /* Get number of events in a port buffer.
  *
  * @param port_buffer Port buffer from which to retrieve event.
@@ -142,6 +147,7 @@ jack_midi_event_write(void                   *port_buffer,
 jack_nframes_t
 jack_midi_get_lost_event_count(void           *port_buffer);
 
+/*@}*/
 
 #ifdef __cplusplus
 }
