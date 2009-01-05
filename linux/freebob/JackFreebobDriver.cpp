@@ -682,7 +682,7 @@ int JackFreebobDriver::Attach()
     /* packetizer thread options */
     driver->device_options.realtime = (fEngineControl->fRealTime ? 1 : 0);
 
-    driver->device_options.packetizer_priority = fEngineControl->fPriority +
+    driver->device_options.packetizer_priority = fEngineControl->fServerPriority +
             FREEBOB_RT_PRIORITY_PACKETIZER_RELATIVE;
     if (driver->device_options.packetizer_priority > 98) {
         driver->device_options.packetizer_priority = 98;

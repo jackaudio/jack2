@@ -216,7 +216,7 @@ namespace Jack
         SetAdaptedBufferSize ( fParams.fPeriodSize );
         SetAdaptedSampleRate ( fParams.fSampleRate );
         
-        if (fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fPriority - 1 ) < 0) {
+        if (fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fClientPriority ) < 0) {
             jack_error("AcquireRealTime error");
         } else {
             set_threaded_log_function();

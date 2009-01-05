@@ -344,7 +344,7 @@ int JackClient::StartThread()
     }
 
     if (GetEngineControl()->fRealTime) {
-        if (fThread.AcquireRealTime(GetEngineControl()->fPriority - 1) < 0) {
+        if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
             jack_error("AcquireRealTime error");
         }
     }

@@ -53,7 +53,9 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     float fXrunDelayedUsecs;
     bool fTimeOut;
     bool fRealTime;
-    int fPriority;
+    int fServerPriority;
+    int fClientPriority;
+    int fMaxClientPriority;
     char fServerName[64];
     JackTransportEngine fTransport;
     bool fVerbose;
@@ -87,7 +89,9 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fTimeOut = (timeout > 0);
         fTimeOutUsecs = timeout * 1000;
         fRealTime = rt;
-        fPriority = priority;
+        fServerPriority = priority;
+        fClientPriority = (rt) ? priority - 5 : 0;
+        fMaxClientPriority = (rt) ? priority - 1 : 0;
         fVerbose = verbose;
         fPrevCycleTime = 0;
         fCurCycleTime = 0;

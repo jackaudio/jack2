@@ -209,6 +209,8 @@ extern "C"
     EXPORT void jack_set_transport_info (jack_client_t *client,
                                          jack_transport_info_t *tinfo);
 
+    EXPORT int jack_client_real_time_priority (jack_client_t*);
+    EXPORT int jack_client_max_real_time_priority (jack_client_t*);
     EXPORT int jack_acquire_real_time_scheduling (pthread_t thread, int priority);
     EXPORT int jack_client_create_thread (jack_client_t* client,
                                           pthread_t *thread,
@@ -218,8 +220,8 @@ extern "C"
                                           void *arg);
     EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
     
-    EXPORT int jack_client_stop_thread(jack_client_t* client, pthread_t thread);
-    EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread);
+    EXPORT int jack_client_stop_thread (jack_client_t* client, pthread_t thread);
+    EXPORT int jack_client_kill_thread (jack_client_t* client, pthread_t thread);
 
     EXPORT char * jack_get_internal_client_name (jack_client_t *client,
             jack_intclient_t intclient);
@@ -1717,6 +1719,36 @@ EXPORT void jack_reset_max_delayed_usecs(jack_client_t* ext_client)
 }
 
 // thread.h
+EXPORT int jack_client_real_time_priority(jack_client_t* ext_client)
+{
+#ifdef __CLIENTDEBUG__
+    JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_client_real_time_priority called with a NULL client");
+        return -1;
+    } else {
+        JackEngineControl* control = GetEngineControl();
+        return (control->fRealTime) ? control->fClientPriority : -1;
+    }
+}
+
+EXPORT int jack_client_max_real_time_priority(jack_client_t* ext_client)
+{
+#ifdef __CLIENTDEBUG__
+    JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_client_max_real_time_priority called with a NULL client");
+        return -1;
+    } else {
+        JackEngineControl* control = GetEngineControl();
+       return (control->fRealTime) ? control->fMaxClientPriority : -1;
+    }
+} 
+ 
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 {
     JackEngineControl* control = GetEngineControl();

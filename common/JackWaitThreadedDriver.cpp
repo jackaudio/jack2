@@ -47,7 +47,7 @@ bool JackWaitThreadedDriver::Execute()
             jack_log("JackWaitThreadedDriver::Init IsRealTime");
             // Will do "something" on OSX only...
             fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-            if (fThread.AcquireRealTime(GetEngineControl()->fPriority) < 0) {
+            if (fThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
                 jack_error("AcquireRealTime error");
             } else {
                 set_threaded_log_function();

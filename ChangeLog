@@ -26,6 +26,7 @@ Michael Voigt
 2009-01-05 Stephane Letz  <letz@grame.fr>
 
 	* Synchronize jack2 public headers with jack1 ones. 
+	* Implement jack_client_real_time_priority and jack_client_max_real_time_priority API.
 
 2008-12-18 Stephane Letz  <letz@grame.fr>
 
