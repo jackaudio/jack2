@@ -105,8 +105,8 @@ jack_controller_settings_set_driver_option(
 {
     jackctl_parameter_t *parameter;
     jackctl_param_type_t type;
-    int value_int;
-    unsigned int value_uint;
+    int value_int = 0;
+    unsigned int value_uint = 0;
     union jackctl_parameter_value value;
 
     jack_info("setting driver option \"%s\" to value \"%s\"", option_name, option_value);
@@ -161,8 +161,8 @@ jack_controller_settings_set_internal_option(
 {
     jackctl_parameter_t *parameter;
     jackctl_param_type_t type;
-    int value_int;
-    unsigned int value_uint;
+    int value_int = 0;
+    unsigned int value_uint = 0;
     union jackctl_parameter_value value;
 
     jack_info("setting internal option \"%s\" to value \"%s\"", option_name, option_value);
@@ -217,8 +217,8 @@ jack_controller_settings_set_engine_option(
 {
     jackctl_parameter_t *parameter;
     jackctl_param_type_t type;
-    int value_int;
-    unsigned int value_uint;
+    int value_int = 0;
+    unsigned int value_uint = 0;
     union jackctl_parameter_value value;
 
     jack_info("setting engine option \"%s\" to value \"%s\"", option_name, option_value);
