@@ -24,6 +24,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
+/*  
+ TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames, 
+ probably also use BUFFER_SIZE_MAX in everything related to MIDI events 
+ handling (see MidiBufferInit in JackMidiPort.cpp)
+*/
+
 namespace Jack
 {
     // JackNetInterface*******************************************

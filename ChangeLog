@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-07 Stephane Letz  <letz@grame.fr>
+
+	* Use up to BUFFER_SIZE_MAX frames in midi ports, fix for ticket #117.
+
 2009-01-05 Stephane Letz  <letz@grame.fr>
 
 	* Synchronize jack2 public headers with jack1 ones. 
