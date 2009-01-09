@@ -183,7 +183,7 @@ typedef void (*JackClientRegistrationCallback)(const char* name, int val, void *
 
 /**
  * Prototype for the client supplied function that is called
- * whenever a client is registered or unregistered.
+ * whenever a port is connected or disconnected.
  *
  * @param a one of two ports connected or disconnected
  * @param b one of two ports connected or disconnected
