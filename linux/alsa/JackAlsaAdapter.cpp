@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackAlsaAdapter.h"
-#include "JackServer.h"
+#include "JackServerGlobals.h"
 #include "JackEngineControl.h"
 
 namespace Jack
@@ -95,7 +95,7 @@ namespace Jack
         fAudioInterface.longinfo();
 
         //turn the thread realtime
-        fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fClientPriority );
+        fThread.AcquireRealTime ( JackServerGlobals::fInstance->GetEngineControl()->fClientPriority );
 
         return 0;
     }
