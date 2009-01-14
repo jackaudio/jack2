@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-14 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup server starting code for clients directly linked with libjackserver.so.
+
 2009-01-07 Stephane Letz  <letz@grame.fr>
 
 	* Use up to BUFFER_SIZE_MAX frames in midi ports, fix for ticket #117.

@@ -93,7 +93,6 @@ class SERVER_EXPORT JackServer
         JackSynchro* GetSynchroTable();
         JackGraphManager* GetGraphManager();
 
-        static JackServer* fInstance; // Unique instance
 };
 
 } // end of namespace

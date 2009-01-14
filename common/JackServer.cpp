@@ -19,7 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackSystemDeps.h"
-#include "JackServer.h"
+#include "JackServerGlobals.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
 #include "JackLoopbackDriver.h"
@@ -38,8 +38,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackServer* JackServer::fInstance = NULL;
-
 JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
 {
     if (rt) {
@@ -56,7 +54,8 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fAudioDriver = NULL;
     fFreewheel = false;
     fLoopback = loopback;
-    fInstance = this; // Unique instance
+    JackServerGlobals::fInstance = this;   // Unique instance
+    JackServerGlobals::fUserCount = 1;     // One user
     jack_verbose = verbose;
 }
 
@@ -159,14 +158,14 @@ int JackServer::Close()
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
 {
-    JackLoadableInternalClient* client = new JackLoadableInternalClient1(fInstance, GetSynchroTable(), so_name, objet_data);
+    JackLoadableInternalClient* client = new JackLoadableInternalClient1(JackServerGlobals::fInstance, GetSynchroTable(), so_name, objet_data);
     assert(client);
     return InternalClientLoadAux(client, so_name, client_name, options, int_ref, status);
  }
 
 int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status)
 {
-    JackLoadableInternalClient* client = new JackLoadableInternalClient2(fInstance, GetSynchroTable(), so_name, parameters);
+    JackLoadableInternalClient* client = new JackLoadableInternalClient2(JackServerGlobals::fInstance, GetSynchroTable(), so_name, parameters);
     assert(client);
     return InternalClientLoadAux(client, so_name, client_name, options, int_ref, status);
 }

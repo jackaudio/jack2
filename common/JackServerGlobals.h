@@ -34,11 +34,11 @@ class JackClient;
 \brief Global server static structure: singleton kind of pattern.
 */
 
-struct JackServerGlobals
+struct SERVER_EXPORT JackServerGlobals
 {
-    static unsigned int fClientCount;
-    static JackServer* fServer;
-
+    static JackServer* fInstance;
+    static unsigned int fUserCount;
+ 
     JackServerGlobals();
     ~JackServerGlobals();
 
@@ -54,8 +54,8 @@ struct JackServerGlobals
                      int priority,
                      int loopback,
                      int verbose);
-    static int Stop();
-    static int Delete();
+    static void Stop();
+    static void Delete();
 };
 
 } // end of namespace

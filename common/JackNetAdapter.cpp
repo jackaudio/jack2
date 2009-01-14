@@ -18,7 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetAdapter.h"
 #include "JackException.h"
-#include "JackServer.h"
+#include "JackServerGlobals.h"
 #include "JackEngineControl.h"
 
 namespace Jack
@@ -216,7 +216,7 @@ namespace Jack
         SetAdaptedBufferSize ( fParams.fPeriodSize );
         SetAdaptedSampleRate ( fParams.fSampleRate );
         
-        if (fThread.AcquireRealTime ( JackServer::fInstance->GetEngineControl()->fClientPriority ) < 0) {
+        if (fThread.AcquireRealTime ( JackServerGlobals::fInstance->GetEngineControl()->fClientPriority ) < 0) {
             jack_error("AcquireRealTime error");
         } else {
             set_threaded_log_function();

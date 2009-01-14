@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackSystemDeps.h"
+#include "JackServerGlobals.h"
 #include "JackGraphManager.h"
 #include "JackConstants.h"
 #include "JackInternalClient.h"
@@ -87,17 +88,17 @@ JackEngineControl* JackInternalClient::fEngineControl = NULL;
 // Used for external C API (JackAPI.cpp)
 JackGraphManager* GetGraphManager()
 {
-    return JackServer::fInstance->GetGraphManager();
+    return JackServerGlobals::fInstance->GetGraphManager();
 }
 
 JackEngineControl* GetEngineControl()
 {
-    return JackServer::fInstance->GetEngineControl();
+    return JackServerGlobals::fInstance->GetEngineControl();
 }
 
 JackSynchro* GetSynchroTable()
 {
-    return JackServer::fInstance->GetSynchroTable();
+    return JackServerGlobals::fInstance->GetSynchroTable();
 }
 
 JackInternalClient::JackInternalClient(JackServer* server, JackSynchro* table): JackClient(table)

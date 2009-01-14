@@ -48,9 +48,6 @@ extern "C"
 
 using namespace Jack;
 
-// beware!!! things can go nasty if one client is started with JackNoStartServer and another without it
-static bool g_nostart;
-
 EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
     jack_varargs_t va;		/* variable arguments */
@@ -84,27 +81,22 @@ EXPORT jack_client_t* jack_client_open_aux(const char* ext_client_name, jack_opt
         jack_varargs_init(&va);
     }
 
-    g_nostart = (options & JackNoStartServer) != 0;
-    if (!g_nostart) {
-        if (!JackServerGlobals::Init()) { // jack server initialisation
-            int my_status1 = (JackFailure | JackServerError);
-            *status = (jack_status_t)my_status1;
-            return NULL;
-        }
+    if (!JackServerGlobals::Init()) { // jack server initialisation
+        int my_status1 = (JackFailure | JackServerError);
+        *status = (jack_status_t)my_status1;
+        return NULL;
     }
-
+ 
     if (JACK_DEBUG) {
-        client = new JackDebugClient(new JackInternalClient(JackServer::fInstance, GetSynchroTable())); // Debug mode
+        client = new JackDebugClient(new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable())); // Debug mode
     } else {
-        client = new JackInternalClient(JackServer::fInstance, GetSynchroTable());
+        client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
     }
 
     int res = client->Open(va.server_name, client_name, options, status);
     if (res < 0) {
         delete client;
-        if (!g_nostart) {
-            JackServerGlobals::Destroy(); // jack server destruction
-        }
+        JackServerGlobals::Destroy(); // jack server destruction
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
@@ -137,9 +129,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     } else {
         res = client->Close();
         delete client;
-        if (!g_nostart) {
-            JackServerGlobals::Destroy();	// jack server destruction
-        }
+        JackServerGlobals::Destroy();	// jack server destruction
         jack_log("jack_client_close res = %d", res);
     }
     JackGlobals::fOpenMutex->Unlock();
@@ -148,8 +138,8 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
 
 EXPORT int jack_get_client_pid(const char *name)
 {
-    return (JackServer::fInstance != NULL) 
-        ? JackServer::fInstance->GetEngine()->GetClientPID(name)
+    return (JackServerGlobals::fInstance != NULL) 
+        ? JackServerGlobals::fInstance->GetEngine()->GetClientPID(name)
         : 0;
 }
 

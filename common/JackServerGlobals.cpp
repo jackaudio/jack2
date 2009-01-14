@@ -28,8 +28,8 @@ static char* server_name = NULL;
 namespace Jack
 {
 
-unsigned int JackServerGlobals::fClientCount = 0;
-JackServer* JackServerGlobals::fServer = NULL;
+JackServer* JackServerGlobals::fInstance; 
+unsigned int JackServerGlobals::fUserCount;
 
 int JackServerGlobals::Start(const char* server_name,
                              jack_driver_desc_t* driver_desc,
@@ -43,34 +43,27 @@ int JackServerGlobals::Start(const char* server_name,
                              int verbose)
 {
     jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
-    fServer = new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);
-    int res = fServer->Open(driver_desc, driver_params);
-    return (res < 0) ? res : fServer->Start();
+    new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);  // Will setup fInstance and fUserCount globals
+    int res = fInstance->Open(driver_desc, driver_params);
+    return (res < 0) ? res : fInstance->Start();
 }
 
-int JackServerGlobals::Stop()
+void JackServerGlobals::Stop()
 {
-    fServer->Stop();
-    fServer->Close();
     jack_log("Jackdmp: server close");
-    delete fServer;
-    jack_log("Jackdmp: delete server");
-    return 0;
+    fInstance->Stop();
+    fInstance->Close();
 }
 
-int JackServerGlobals::Delete()
+void JackServerGlobals::Delete()
 {
-    delete fServer;
     jack_log("Jackdmp: delete server");
-    return 0;
+    delete fInstance;
+    fInstance = NULL;
 }
 
 bool JackServerGlobals::Init()
 {
-    // Server already started
-    if (JackServer::fInstance != NULL)
-        return true;
-
     int realtime = 0;
     int client_timeout = 0; /* msecs; if zero, use period size. */
     int realtime_priority = 10;
@@ -86,7 +79,7 @@ bool JackServerGlobals::Init()
     int seen_driver = 0;
     char *driver_name = NULL;
     char **driver_args = NULL;
-    JSList* driver_params;
+    JSList* driver_params = NULL;
     int driver_nargs = 1;
     JSList* drivers = NULL;
     int show_version = 0;
@@ -99,17 +92,16 @@ bool JackServerGlobals::Init()
     char buffer[255];
     int argc = 0;
     char* argv[32];
-
-    // Otherwise first client starts the server
-    if (fClientCount++ == 0) {
+    
+    // First user starts the server
+    if (fUserCount++ == 0) {
 
         jack_log("JackServerGlobals Init");
 
         jack_driver_desc_t* driver_desc;
         const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:";
         static struct option long_options[] = {
-                                                  { "driver", 1, 0, 'd'
-                                                  },
+                                                  { "driver", 1, 0, 'd' },
                                                   { "verbose", 0, 0, 'v' },
                                                   { "help", 0, 0, 'h' },
                                                   { "port-max", 1, 0, 'p' },
@@ -307,15 +299,16 @@ bool JackServerGlobals::Init()
 error:
     if (driver_params)
         jack_free_driver_params(driver_params);
-    fClientCount--;
+    fUserCount--;
     return false;
 }
 
 void JackServerGlobals::Destroy()
 {
-    if (--fClientCount == 0) {
+    if (--fUserCount == 0) {
         jack_log("JackServerGlobals Destroy");
         Stop();
+        Delete();
         jack_cleanup_shm();
         JackTools::CleanupFiles(server_name);
         jack_unregister_server(server_name);
