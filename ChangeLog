@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-17 Stephane Letz  <letz@grame.fr>
+
+	* JackMessageBuffer was using thread "Stop" scheme in destructor, now use the safer thread "Kill" way. 
+
 2009-01-14 Stephane Letz  <letz@grame.fr>
 
 	* Cleanup server starting code for clients directly linked with libjackserver.so.

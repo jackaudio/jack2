@@ -1,12 +1,4 @@
 /*
- * messagebuffer.h -- realtime-safe message interface for jackd.
- *
- *  This function is included in libjack so backend drivers can use
- *  it, *not* for external client processes.  The VERBOSE() and
- *  MESSAGE() macros are realtime-safe.
- */
-
-/*
  *  Copyright (C) 2004 Rui Nuno Capela, Steve Harris
  *  Copyright (C) 2008 Nedko Arnaudov
  *  Copyright (C) 2008 Grame
@@ -49,9 +41,7 @@ JackMessageBuffer::~JackMessageBuffer()
     } else {
         jack_info("no message buffer overruns"); 
     }
-    fThread.SetStatus(JackThread::kIdle);
-    fSignal.Signal();
-    fThread.Stop();
+    fThread.Kill();
     Flush();
 }
 
