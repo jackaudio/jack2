@@ -100,6 +100,7 @@ namespace Jack
     }
 #endif
 
+    // Attach and Detach are defined as empty methods: port allocation is done when driver actually start (that is in Init)
     int JackNetDriver::Attach()
     {
         return 0;
