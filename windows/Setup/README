@@ -8,6 +8,6 @@ Just use : 'lib /DEF:libjackserver.def /OUT:libjackserver.lib' and 'lib /DEF:lib
 Or you can also use dlltool, from mingw suite :
 Just use : 'dlltool -l libjackserver.lib -D libjackserver.dll -d libjackserver.def' and 'dlltool -l libjack.lib -D libjack.dll -d libjack.def'
 
-Once all binaries available, just execute the script in 'CreateInstall' to make 'setup.exe'.
+Once all binaries are available, just execute the script in 'CreateInstall' to make 'setup.exe'.
 The setup will copy all binaries to a specified folder, register the JackRouter (in order to have it in the ASIO drivers list) and create some shortcuts in the start menu.
 It's a good and proper way to get jack installed on windows.
