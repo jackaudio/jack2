@@ -1309,6 +1309,9 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 
 		poll_ret = jack_get_microseconds ();
 
+		// steph
+		fBeginDateUst = poll_ret;
+
 		if (extra_fd < 0) {
 			if (driver->poll_next && poll_ret > driver->poll_next) {
 				*delayed_usecs = poll_ret - driver->poll_next;

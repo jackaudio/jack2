@@ -105,7 +105,7 @@ namespace Jack
         midi_size = fParams.fMtu * ( max ( fParams.fSendMidiChannels, fParams.fReturnMidiChannels ) *
                                      fParams.fPeriodSize * sizeof ( sample_t ) / ( fParams.fMtu - sizeof ( packet_header_t ) ) );
         //bufsize = sync + audio + midi
-        bufsize = fParams.fMtu + ( int ) audio_size + ( int ) midi_size;
+        bufsize = 10 * (fParams.fMtu + ( int ) audio_size + ( int ) midi_size);
 
         //tx buffer
         if ( fSocket.SetOption ( SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof ( bufsize ) ) == SOCKET_ERROR )

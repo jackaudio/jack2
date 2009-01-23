@@ -172,7 +172,7 @@ bool JackDriver::IsRealTime() const
 
 void JackDriver::CycleIncTime()
 {
-	fEngineControl->CycleIncTime(fBeginDateUst);
+    fEngineControl->CycleIncTime(fBeginDateUst);
 }
 
 void JackDriver::CycleTakeBeginTime()
