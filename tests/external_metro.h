@@ -55,7 +55,7 @@ extern "C"
         sample_t *wave;
         long offset ;
 
-        ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, char* client_name);
+        ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, const char* client_name = "metro");
         virtual ~ExternalMetro();
 
         static int process_audio (jack_nframes_t nframes, void* arg);

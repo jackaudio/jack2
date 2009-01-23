@@ -56,23 +56,18 @@ void ExternalMetro::shutdown (void* arg)
     printf("shutdown called..\n");
 }
 
-ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, char* client_name)
+ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, const char* client_name)
 {
     sample_t scale;
     int i, attack_length, decay_length;
     double *amp;
     int attack_percent = 1, decay_percent = 10;
-    char *bpm_string = "bpm";
+    const char *bpm_string = "bpm";
     jack_options_t options = JackNullOption;
-	jack_status_t status;
-
+    jack_status_t status;
     offset = 0;
 
     /* Initial Jack setup, get sample rate */
-    if (!client_name) {
-        client_name = (char *) malloc (9 * sizeof (char));
-        strcpy (client_name, "metro");
-    }
     if ((client = jack_client_open (client_name, options, &status)) == 0) {
         fprintf (stderr, "jack server not running?\n");
         throw -1;
