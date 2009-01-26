@@ -59,7 +59,7 @@ namespace Jack
             int fPayloadSize;
 
             //utility methods
-            jack_nframes_t SetFramesPerPacket();
+            void SetFramesPerPacket();
             int SetNetBufferSize();
             int GetNMidiPckt();
             bool IsNextPacket();
@@ -185,5 +185,7 @@ namespace Jack
 
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
 #define SLAVE_INIT_TIMEOUT 2000000      // in usec
+
+#define MAX_LATENCY 4
 
 #endif
