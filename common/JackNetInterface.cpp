@@ -521,7 +521,7 @@ namespace Jack
                         if ( rx_head->fCycle == fTxHeader.fCycle )
                             return 0;
                         */
-                        jack_info ( "NetMaster : overloaded, skipping receive." );
+                        jack_info("NetMaster : overloaded, skipping receive from '%s'", fParams.fName);
                         return 0;
                 }
             }
