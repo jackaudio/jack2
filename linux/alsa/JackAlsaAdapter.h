@@ -211,13 +211,18 @@ namespace Jack
                 //get hardware input parameters
                 check_error ( snd_pcm_hw_params_malloc ( &fInputParams ) );
                 setAudioParams ( fInputDevice, fInputParams );
-                snd_pcm_hw_params_get_channels ( fInputParams, &fCardInputs );
-
+           
                 //get hardware output parameters
                 check_error ( snd_pcm_hw_params_malloc ( &fOutputParams ) )
                 setAudioParams ( fOutputDevice, fOutputParams );
-                snd_pcm_hw_params_get_channels ( fOutputParams, &fCardOutputs );
-
+                
+                // set the number of physical input and output channels close to what we need
+                fCardInputs 	= fSoftInputs;
+                fCardOutputs 	= fSoftOutputs;
+  
+                snd_pcm_hw_params_set_channels_near(fInputDevice, fInputParams, &fCardInputs);
+                snd_pcm_hw_params_set_channels_near(fOutputDevice, fOutputParams, &fCardOutputs);
+     
                 //set input/output param
                 check_error ( snd_pcm_hw_params ( fInputDevice,  fInputParams ) );
                 check_error ( snd_pcm_hw_params ( fOutputDevice, fOutputParams ) );
