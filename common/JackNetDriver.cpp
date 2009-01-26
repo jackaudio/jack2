@@ -656,7 +656,7 @@ namespace Jack
             strcpy ( desc->params[i].name, "mode" );
             desc->params[i].character  = 'm';
             desc->params[i].type = JackDriverParamString;
-            strcpy ( desc->params[i].value.str, "normal" );
+            strcpy ( desc->params[i].value.str, "slow" );
             strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
@@ -678,7 +678,7 @@ namespace Jack
             int midi_input_ports = 0;
             int midi_output_ports = 0;
             bool monitor = false;
-            char network_mode = 'n';
+            char network_mode = 's';
             const JSList* node;
             const jack_driver_param_t* param;
 

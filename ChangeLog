@@ -28,6 +28,7 @@ Michael Voigt
 	* Fix JackNetInterface::SetNetBufferSize for socket buffer size computation and JackNetMasterInterface::DataRecv if synch packet is received, various cleanup.
 	* Fix in JackAlsaAdapter::Open.
 	* Simplify audio packet order verification.
+	* Set default mode to 'slow' in JackNetDriver and JackNetAdapter.
 
 2009-01-19 Stephane Letz  <letz@grame.fr>
 

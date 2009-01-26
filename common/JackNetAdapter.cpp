@@ -512,7 +512,7 @@ extern "C"
         strcpy ( desc->params[i].name, "mode" );
         desc->params[i].character  = 'm';
         desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, "normal" );
+        strcpy ( desc->params[i].value.str, "slow" );
         strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
