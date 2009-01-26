@@ -433,6 +433,8 @@ namespace Jack
                      return 0;
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                if (cycle_offset > 2) 
+                    jack_info("'%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset );
                 break;
 
             case 'n' :
