@@ -82,7 +82,7 @@ struct JackMidiBuffer
     uint32_t lost_events;
     uint32_t mix_index;
 
-    JackMidiEvent events[0];
+    JackMidiEvent events[1]; // Using 0 size does not compile with older GCC versions, so use 1 here.
 
     int IsValid() const
     {

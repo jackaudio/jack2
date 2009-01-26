@@ -26,6 +26,8 @@ Michael Voigt
 2009-01-26 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackNetInterface::SetNetBufferSize for socket buffer size computation and JackNetMasterInterface::DataRecv if synch packet is received, various cleanup.
+	* Fix in JackAlsaAdapter::Open.
+	* Simplify audio packet order verification.
 
 2009-01-19 Stephane Letz  <letz@grame.fr>
 
