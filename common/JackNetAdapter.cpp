@@ -46,7 +46,7 @@ namespace Jack
         fParams.fSampleRate = sample_rate;
         fParams.fPeriodSize = buffer_size;
         fParams.fSlaveSyncMode = 1;
-        fParams.fNetworkMode = 'n';
+        fParams.fNetworkMode = 's';
         fJackClient = jack_client;
 
         //options parsing
