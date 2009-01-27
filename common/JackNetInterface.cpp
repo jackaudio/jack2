@@ -360,10 +360,11 @@ namespace Jack
     
     bool JackNetMasterInterface::IsSynched()
     {
-        if (fParams.fNetworkMode == 's')
+        if (fParams.fNetworkMode == 's') {
             return (fCycleOffset < 3);
-        else 
+        } else {
             return true;
+        }
     }
     
     int JackNetMasterInterface::SyncSend()

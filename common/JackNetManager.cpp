@@ -437,7 +437,7 @@ namespace Jack
     #endif
     
         } else {
-            jack_error("Connection is not synched, skip cycle...\n");
+            jack_error("Connection is not synched, skip cycle...");
         }
 
         //receive sync
