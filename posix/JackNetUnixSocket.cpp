@@ -287,18 +287,17 @@ namespace Jack
         {
             case EAGAIN:
                 return NET_NO_DATA;
+                
             case ECONNABORTED:
-                return NET_CONN_ERROR;
-            case EINVAL:
-                return NET_CONN_ERROR;
             case ECONNREFUSED:
-                return NET_CONN_ERROR;
             case ECONNRESET:
-                return NET_CONN_ERROR;
+            case EINVAL:
             case EHOSTDOWN:
-                return NET_CONN_ERROR;
             case EHOSTUNREACH:
+            case ENETDOWN:
+            case ENETUNREACH:
                 return NET_CONN_ERROR;
+                
             default:
                 return NET_OP_ERROR;
         }

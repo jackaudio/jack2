@@ -331,7 +331,7 @@ namespace Jack
                 Exit();
             }
             else
-                jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
+                jack_error ( "Error in master send : %s", StrError ( NET_ERROR_CODE ) );
         }
         return tx_bytes;
     }
@@ -353,7 +353,7 @@ namespace Jack
                 Exit();
             }
             else
-                jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
+                jack_error ( "Error in master receive : %s", StrError ( NET_ERROR_CODE ) );
         }
         return rx_bytes;
     }
@@ -691,7 +691,7 @@ namespace Jack
                 throw JackNetException();
             }
             else
-                jack_error ( "Fatal error in receive : %s", StrError ( NET_ERROR_CODE ) );
+                jack_error ( "Fatal error in slave receive : %s", StrError ( NET_ERROR_CODE ) );
         }
         return rx_bytes;
     }
@@ -710,7 +710,7 @@ namespace Jack
                 throw JackNetException();
             }
             else
-                jack_error ( "Fatal error in send : %s", StrError ( NET_ERROR_CODE ) );
+                jack_error ( "Fatal error in slave send : %s", StrError ( NET_ERROR_CODE ) );
         }
         return tx_bytes;
     }
