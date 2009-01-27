@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-27 Stephane Letz  <letz@grame.fr>
+
+	* Better recovery of network overload situations, now "resynchronize" by skipping cycles."
+
 2009-01-26 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackNetInterface::SetNetBufferSize for socket buffer size computation and JackNetMasterInterface::DataRecv if synch packet is received, various cleanup.

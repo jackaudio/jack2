@@ -414,25 +414,31 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
                                                  fParams.fPeriodSize ) ) );
 
-        //encode the first packet
-        if ( EncodeSyncPacket() < 0 )
-            return 0;
+        if (IsSynched()) {  // only send if connection is "synched"
+        
+            //encode the first packet
+            if ( EncodeSyncPacket() < 0 )
+                return 0;
 
-        //send sync
-        if ( SyncSend() == SOCKET_ERROR )
-            return SOCKET_ERROR;
+            //send sync
+            if ( SyncSend() == SOCKET_ERROR )
+                return SOCKET_ERROR;
 
-#ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
-#endif
+    #ifdef JACK_MONITOR
+            fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+    #endif
 
-        //send data
-        if ( DataSend() == SOCKET_ERROR )
-            return SOCKET_ERROR;
+            //send data
+            if ( DataSend() == SOCKET_ERROR )
+                return SOCKET_ERROR;
 
-#ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
-#endif
+    #ifdef JACK_MONITOR
+            fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+    #endif
+    
+        } else {
+            jack_error("Connection is not synched, skip cycle...\n");
+        }
 
         //receive sync
         res = SyncRecv();

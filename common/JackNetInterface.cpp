@@ -357,7 +357,15 @@ namespace Jack
         }
         return rx_bytes;
     }
-
+    
+    bool JackNetMasterInterface::IsSynched()
+    {
+        if (fParams.fNetworkMode == 's')
+            return (fCycleOffset < 3);
+        else 
+            return true;
+    }
+    
     int JackNetMasterInterface::SyncSend()
     {
         fTxHeader.fCycle++;
@@ -411,14 +419,13 @@ namespace Jack
 
     int JackNetMasterInterface::SyncRecv()
     {
-        int rx_bytes = 0;
-        int cycle_offset = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
-        rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+        int rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+        
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
 
-        cycle_offset = fTxHeader.fCycle - rx_head->fCycle;
+        fCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
       
         switch ( fParams.fNetworkMode )
         {
@@ -428,13 +435,14 @@ namespace Jack
                 //  - if the network is two fast, just wait the next cycle, this mode allows a shorter cycle duration for the master
                 //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
                 //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
-                
-                if ( cycle_offset < 2 )
+                if (fCycleOffset < 2)
                      return 0;
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                if (cycle_offset > 2) 
-                    jack_log("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset);
+                    
+                if (fCycleOffset > 2) {
+                    jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
+                }
                 break;
 
             case 'n' :
@@ -442,12 +450,13 @@ namespace Jack
                 //  - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwidth
                 //  - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
                 //  - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
-                if ( cycle_offset < 1 )
+                if (fCycleOffset < 1)
                     return 0;
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                if (cycle_offset != 1) 
-                    jack_info("'%s' can't run in normal network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset);
+                    
+                if (fCycleOffset != 1) 
+                    jack_info("'%s' can't run in normal network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 break;
 
             case 'f' :
@@ -456,8 +465,9 @@ namespace Jack
                 //    - here, receive data, we can't keep it queued on the rx buffer,
                 //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
                 rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                if (cycle_offset != 0)
-                    jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, cycle_offset);
+                
+                if (fCycleOffset != 0)
+                    jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 break;
         }
 
@@ -507,8 +517,9 @@ namespace Jack
                         // SL: 25/01/09
                         // if ( !IsNextPacket() )
                         //    jack_error ( "Packet(s) missing from '%s'...", fParams.fName );
-                        if (recvd_audio_pckt++ != rx_head->fSubCycle)
-                            jack_error ( "Packet(s) missing from '%s'...", fParams.fName );
+                        if (recvd_audio_pckt++ != rx_head->fSubCycle) {
+                            jack_error("Packet(s) missing from '%s'...", fParams.fSlaveNetName);
+                        }
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
@@ -752,8 +763,9 @@ namespace Jack
                         //SL: 25/01/09
                         // if ( !IsNextPacket() )
                         //    jack_error ( "Packet(s) missing..." );
-                        if (recvd_audio_pckt++ != rx_head->fSubCycle)
-                            jack_error ( "Packet(s) missing from '%s'...", fParams.fName );
+                        if (recvd_audio_pckt++ != rx_head->fSubCycle) {
+                            jack_error("Packet(s) missing from '%s'...", fParams.fMasterNetName);
+                        }
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;

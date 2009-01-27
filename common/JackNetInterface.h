@@ -100,6 +100,7 @@ namespace Jack
     {
         protected:
             bool fRunning;
+            int fCycleOffset;
 
             bool Init();
             int SetRxTimeout();
@@ -112,9 +113,11 @@ namespace Jack
 
             int Send ( size_t size, int flags );
             int Recv ( size_t size, int flags );
+            
+            bool IsSynched();
 
         public:
-            JackNetMasterInterface() : JackNetInterface(), fRunning ( false )
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0)
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
                     : JackNetInterface ( params, socket, multicast_ip )
