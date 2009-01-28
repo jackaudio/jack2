@@ -53,7 +53,7 @@ namespace Jack
         - is the NetDriver linked with the master's transport
         
     Data encoding : headers (session_params and packet_header) are encoded using HTN kind of functions but float data
-    are kept in LITLE_ENDIAN formet (to avoing 2 conversion in the more common LITLE_ENDIAN <==> LITLE_ENDIAN connection scheme.
+    are kept in LITTLE_ENDIAN format (to avoid 2 conversions in the more common LITTLE_ENDIAN <==> LITTLE_ENDIAN connection case).
     */
 
     struct _session_params

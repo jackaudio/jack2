@@ -404,13 +404,13 @@ namespace Jack
     {
         switch ( transport_state )
         {
-            case JackTransportRolling :
+            case JackTransportRolling:
                 return "rolling";
-            case JackTransportStarting :
+            case JackTransportStarting:
                 return "starting";
-            case JackTransportStopped :
+            case JackTransportStopped:
                 return "stopped";
-            case JackTransportNetStarting :
+            case JackTransportNetStarting:
                 return "netstarting";
         }
         return NULL;
