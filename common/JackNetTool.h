@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPlatformPlug.h"
 #include "types.h"
 #include "transport.h"
+#include <netinet/in.h>
 #include <cmath>
 
 using namespace std;
