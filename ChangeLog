@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-28 Stephane Letz  <letz@grame.fr>
+
+	* Support for BIG_ENDIAN machines in NetJack2.
+
 2009-01-27 Stephane Letz  <letz@grame.fr>
 
 	* Better recovery of network overload situations, now "resynchronize" by skipping cycles."

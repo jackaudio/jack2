@@ -195,7 +195,7 @@ namespace Jack
     {
         jack_log ( "JackNetMasterInterface::Init, ID %u.", fParams.fID );
 
-        session_params_t params;
+        session_params_t host_params;
         uint attempt = 0;
         int rx_bytes = 0;
 
@@ -224,16 +224,23 @@ namespace Jack
         jack_info ( "Sending parameters to %s ...", fParams.fSlaveNetName );
         do
         {
+            session_params_t net_params;
             SetPacketType ( &fParams, SLAVE_SETUP );
-            if ( fSocket.Send ( &fParams, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
+            SessionParamsHToN(&fParams, &net_params);
+            
+            if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
                 jack_error ( "Error in send : ", StrError ( NET_ERROR_CODE ) );
-            if ( ( ( rx_bytes = fSocket.Recv ( &params, sizeof ( session_params_t ), 0 ) ) == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
+                
+            memset(&net_params, 0, sizeof ( session_params_t ));
+            if ( ( ( rx_bytes = fSocket.Recv ( &net_params, sizeof ( session_params_t ), 0 ) ) == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Problem with network." );
                 return false;
             }
+            
+            SessionParamsNToH(&net_params, &host_params);
         }
-        while ( ( GetPacketType ( &params ) != START_MASTER ) && ( ++attempt < SLAVE_SETUP_RETRY ) );
+        while ( ( GetPacketType ( &host_params ) != START_MASTER ) && ( ++attempt < SLAVE_SETUP_RETRY ) );
         if ( attempt == SLAVE_SETUP_RETRY )
         {
             jack_error ( "Slave doesn't respond, exiting." );
@@ -308,32 +315,19 @@ namespace Jack
         jack_info ( "Exiting '%s'", fParams.fName );
         SetPacketType ( &fParams, KILL_MASTER );
         JackNetSocket mcast_socket ( fMulticastIP, fSocket.GetPort() );
+        
+        session_params_t net_params;
+        SessionParamsHToN(&fParams, &net_params);
+
         if ( mcast_socket.NewSocket() == SOCKET_ERROR )
             jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
-        if ( mcast_socket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
+        if ( mcast_socket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
             jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
+            
         mcast_socket.Close();
 
         // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
         ThreadExit();
-    }
-
-    int JackNetMasterInterface::Send ( size_t size, int flags )
-    {
-        int tx_bytes;
-        if ( ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
-        {
-            net_error_t error = fSocket.GetError();
-            if ( error == NET_CONN_ERROR )
-            {
-                //fatal connection issue, exit
-                jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
-                Exit();
-            }
-            else
-                jack_error ( "Error in master send : %s", StrError ( NET_ERROR_CODE ) );
-        }
-        return tx_bytes;
     }
 
     int JackNetMasterInterface::Recv ( size_t size, int flags )
@@ -355,7 +349,31 @@ namespace Jack
             else
                 jack_error ( "Error in master receive : %s", StrError ( NET_ERROR_CODE ) );
         }
+        
+        packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
+        PacketHeaderNToH(header, header);
         return rx_bytes;
+    }
+    
+    int JackNetMasterInterface::Send ( size_t size, int flags )
+    {
+        int tx_bytes;
+        packet_header_t* header = reinterpret_cast<packet_header_t*>(fTxBuffer);
+        PacketHeaderHToN(header, header);
+        
+        if ( ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
+        {
+            net_error_t error = fSocket.GetError();
+            if ( error == NET_CONN_ERROR )
+            {
+                //fatal connection issue, exit
+                jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
+                Exit();
+            }
+            else
+                jack_error ( "Error in master send : %s", StrError ( NET_ERROR_CODE ) );
+        }
+        return tx_bytes;
     }
     
     bool JackNetMasterInterface::IsSynched()
@@ -582,7 +600,7 @@ namespace Jack
     {
         jack_log ( "JackNetSlaveInterface::GetNetMaster()" );
         //utility
-        session_params_t params;
+        session_params_t host_params;
         int rx_bytes = 0;
 
         //socket
@@ -609,20 +627,25 @@ namespace Jack
         do
         {
             //send 'available'
-            if ( fSocket.SendTo ( &fParams, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
+            session_params_t net_params;
+            SessionParamsHToN(&fParams, &net_params);
+            if ( fSocket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
                 jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
+                
             //filter incoming packets : don't exit while no error is detected
-            rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
+            memset(&net_params, 0, sizeof ( session_params_t ));
+            rx_bytes = fSocket.CatchHost ( &net_params, sizeof ( session_params_t ), 0 );
+            SessionParamsNToH(&net_params, &host_params);
             if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
                 return NET_RECV_ERROR;
             }
         }
-        while ( strcmp ( params.fPacketType, fParams.fPacketType ) && ( GetPacketType ( &params ) != SLAVE_SETUP ) );
+        while ( strcmp ( host_params.fPacketType, fParams.fPacketType )  && ( GetPacketType ( &host_params ) != SLAVE_SETUP ) );
 
         //everything is OK, copy parameters
-        fParams = params;
+        fParams = host_params;
 
         //set the new buffer sizes
         if ( SetNetBufferSize() == SOCKET_ERROR )
@@ -643,8 +666,10 @@ namespace Jack
         jack_log ( "JackNetSlaveInterface::SendStartToMaster" );
 
         //tell the master to start
+        session_params_t net_params;
         SetPacketType ( &fParams, START_MASTER );
-        if ( fSocket.Send ( &fParams, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
+        SessionParamsHToN(&fParams, &net_params);
+        if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
         {
             jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
             return ( fSocket.GetError() == NET_CONN_ERROR ) ? NET_ERROR : NET_SEND_ERROR;
@@ -693,12 +718,18 @@ namespace Jack
             else
                 jack_error ( "Fatal error in slave receive : %s", StrError ( NET_ERROR_CODE ) );
         }
+        
+        packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
+        PacketHeaderNToH(header, header);
         return rx_bytes;
     }
 
     int JackNetSlaveInterface::Send ( size_t size, int flags )
     {
+        packet_header_t* header = reinterpret_cast<packet_header_t*>(fTxBuffer);
+        PacketHeaderHToN(header, header);
         int tx_bytes = fSocket.Send ( fTxBuffer, size, flags );
+         
         //handle errors
         if ( tx_bytes == SOCKET_ERROR )
         {

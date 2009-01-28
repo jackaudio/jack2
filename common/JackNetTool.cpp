@@ -150,6 +150,48 @@ namespace Jack
         return fPortBuffer[index];
     }
 
+#ifdef BIG_ENDIAN
+
+    static inline float SwapFloat(float f)
+    {
+          union
+          {
+            float f;
+            unsigned char b[4];
+          } dat1, dat2;
+
+          dat1.f = f;
+          dat2.b[0] = dat1.b[3];
+          dat2.b[1] = dat1.b[2];
+          dat2.b[2] = dat1.b[1];
+          dat2.b[3] = dat1.b[0];
+          return dat2.f;
+    }
+
+    void NetAudioBuffer::RenderFromJackPorts ( int subcycle )
+    {
+        for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+            float* src = (float*)(fPortBuffer[port_index] + subcycle * fSubPeriodSize);
+            float* dst = (float*)(fNetBuffer + port_index * fSubPeriodBytesSize);
+            for (unsigned int sample = 0; sample < fSubPeriodBytesSize / sizeof(float); sample++) {
+                dst[sample] = SwapFloat(src[sample]);
+            }
+        }
+    }
+
+    void NetAudioBuffer::RenderToJackPorts ( int subcycle )
+    {
+        for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+            float* src = (float*)(fNetBuffer + port_index * fSubPeriodBytesSize);
+            float* dst = (float*)(fPortBuffer[port_index] + subcycle * fSubPeriodSize);
+            for (unsigned int sample = 0; sample < fSubPeriodBytesSize / sizeof(float); sample++) {
+                dst[sample] = SwapFloat(src[sample]);
+            }
+        }    
+    }
+    
+#else
+
     void NetAudioBuffer::RenderFromJackPorts ( int subcycle )
     {
         for ( int port_index = 0; port_index < fNPorts; port_index++ )
@@ -162,40 +204,44 @@ namespace Jack
             memcpy ( fPortBuffer[port_index] + subcycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize );
     }
 
+#endif
+
 // SessionParams ************************************************************************************
 
-    SERVER_EXPORT void SessionParamsHToN ( session_params_t* params )
+    SERVER_EXPORT void SessionParamsHToN ( session_params_t* src_params, session_params_t* dst_params )
     {
-        params->fPacketID = htonl ( params->fPacketID );
-        params->fMtu = htonl ( params->fMtu );
-        params->fID = htonl ( params->fID );
-        params->fTransportSync = htonl ( params->fTransportSync );
-        params->fSendAudioChannels = htonl ( params->fSendAudioChannels );
-        params->fReturnAudioChannels = htonl ( params->fReturnAudioChannels );
-        params->fSendMidiChannels = htonl ( params->fSendMidiChannels );
-        params->fReturnMidiChannels = htonl ( params->fReturnMidiChannels );
-        params->fSampleRate = htonl ( params->fSampleRate );
-        params->fPeriodSize = htonl ( params->fPeriodSize );
-        params->fFramesPerPacket = htonl ( params->fFramesPerPacket );
-        params->fBitdepth = htonl ( params->fBitdepth );
-        params->fSlaveSyncMode = htonl ( params->fSlaveSyncMode );
+        memcpy(dst_params, src_params, sizeof(session_params_t));
+        dst_params->fPacketID = htonl ( src_params->fPacketID );
+        dst_params->fMtu = htonl ( src_params->fMtu );
+        dst_params->fID = htonl ( src_params->fID );
+        dst_params->fTransportSync = htonl ( src_params->fTransportSync );
+        dst_params->fSendAudioChannels = htonl ( src_params->fSendAudioChannels );
+        dst_params->fReturnAudioChannels = htonl ( src_params->fReturnAudioChannels );
+        dst_params->fSendMidiChannels = htonl ( src_params->fSendMidiChannels );
+        dst_params->fReturnMidiChannels = htonl ( src_params->fReturnMidiChannels );
+        dst_params->fSampleRate = htonl ( src_params->fSampleRate );
+        dst_params->fPeriodSize = htonl ( src_params->fPeriodSize );
+        dst_params->fFramesPerPacket = htonl ( src_params->fFramesPerPacket );
+        dst_params->fBitdepth = htonl ( src_params->fBitdepth );
+        dst_params->fSlaveSyncMode = htonl ( src_params->fSlaveSyncMode );
     }
 
-    SERVER_EXPORT void SessionParamsNToH ( session_params_t* params )
+    SERVER_EXPORT void SessionParamsNToH (  session_params_t* src_params, session_params_t* dst_params )
     {
-        params->fPacketID = ntohl ( params->fPacketID );
-        params->fMtu = ntohl ( params->fMtu );
-        params->fID = ntohl ( params->fID );
-        params->fTransportSync = ntohl ( params->fTransportSync );
-        params->fSendAudioChannels = ntohl ( params->fSendAudioChannels );
-        params->fReturnAudioChannels = ntohl ( params->fReturnAudioChannels );
-        params->fSendMidiChannels = ntohl ( params->fSendMidiChannels );
-        params->fReturnMidiChannels = ntohl ( params->fReturnMidiChannels );
-        params->fSampleRate = ntohl ( params->fSampleRate );
-        params->fPeriodSize = ntohl ( params->fPeriodSize );
-        params->fFramesPerPacket = ntohl ( params->fFramesPerPacket );
-        params->fBitdepth = ntohl ( params->fBitdepth );
-        params->fSlaveSyncMode = ntohl ( params->fSlaveSyncMode );
+        memcpy(dst_params, src_params, sizeof(session_params_t));
+        dst_params->fPacketID = ntohl ( src_params->fPacketID );
+        dst_params->fMtu = ntohl ( src_params->fMtu );
+        dst_params->fID = ntohl ( src_params->fID );
+        dst_params->fTransportSync = ntohl ( src_params->fTransportSync );
+        dst_params->fSendAudioChannels = ntohl ( src_params->fSendAudioChannels );
+        dst_params->fReturnAudioChannels = ntohl ( src_params->fReturnAudioChannels );
+        dst_params->fSendMidiChannels = ntohl ( src_params->fSendMidiChannels );
+        dst_params->fReturnMidiChannels = ntohl ( src_params->fReturnMidiChannels );
+        dst_params->fSampleRate = ntohl ( src_params->fSampleRate );
+        dst_params->fPeriodSize = ntohl ( src_params->fPeriodSize );
+        dst_params->fFramesPerPacket = ntohl ( src_params->fFramesPerPacket );
+        dst_params->fBitdepth = ntohl ( src_params->fBitdepth );
+        dst_params->fSlaveSyncMode = ntohl ( src_params->fSlaveSyncMode );
     }
 
     SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params )
@@ -279,28 +325,30 @@ namespace Jack
 
 // Packet header **********************************************************************************
 
-    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* header )
+    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* src_header, packet_header_t* dst_header )
     {
-        header->fID = htonl ( header->fID );
-        header->fMidiDataSize = htonl ( header->fMidiDataSize );
-        header->fBitdepth = htonl ( header->fBitdepth );
-        header->fNMidiPckt = htonl ( header->fNMidiPckt );
-        header->fPacketSize = htonl ( header->fPacketSize );
-        header->fCycle = ntohl ( header->fCycle );
-        header->fSubCycle = htonl ( header->fSubCycle );
-        header->fIsLastPckt = htonl ( header->fIsLastPckt );
+        memcpy(dst_header, src_header, sizeof(packet_header_t));
+        dst_header->fID = htonl ( src_header->fID );
+        dst_header->fMidiDataSize = htonl ( src_header->fMidiDataSize );
+        dst_header->fBitdepth = htonl ( src_header->fBitdepth );
+        dst_header->fNMidiPckt = htonl ( src_header->fNMidiPckt );
+        dst_header->fPacketSize = htonl ( src_header->fPacketSize );
+        dst_header->fCycle = htonl ( src_header->fCycle );
+        dst_header->fSubCycle = htonl ( src_header->fSubCycle );
+        dst_header->fIsLastPckt = htonl ( src_header->fIsLastPckt );
     }
 
-    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* header )
+    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* src_header, packet_header_t* dst_header )
     {
-        header->fID = ntohl ( header->fID );
-        header->fMidiDataSize = ntohl ( header->fMidiDataSize );
-        header->fBitdepth = ntohl ( header->fBitdepth );
-        header->fNMidiPckt = ntohl ( header->fNMidiPckt );
-        header->fPacketSize = ntohl ( header->fPacketSize );
-        header->fCycle = ntohl ( header->fCycle );
-        header->fSubCycle = ntohl ( header->fSubCycle );
-        header->fIsLastPckt = ntohl ( header->fIsLastPckt );
+        memcpy(dst_header, src_header, sizeof(packet_header_t));
+        dst_header->fID = ntohl ( src_header->fID );
+        dst_header->fMidiDataSize = ntohl ( src_header->fMidiDataSize );
+        dst_header->fBitdepth = ntohl ( src_header->fBitdepth );
+        dst_header->fNMidiPckt = ntohl ( src_header->fNMidiPckt );
+        dst_header->fPacketSize = ntohl ( src_header->fPacketSize );
+        dst_header->fCycle = ntohl ( src_header->fCycle );
+        dst_header->fSubCycle = ntohl ( src_header->fSubCycle );
+        dst_header->fIsLastPckt = ntohl ( src_header->fIsLastPckt );
     }
 
     SERVER_EXPORT void PacketHeaderDisplay ( packet_header_t* header )

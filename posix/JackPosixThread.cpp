@@ -220,7 +220,7 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
     rtparam.sched_priority = priority;
 
     if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY, &rtparam)) != 0) {
-        jack_error("Cannot use real-time scheduling (RR/%d) "
+        jack_error("Cannot use real-time scheduling (RR/%d)"
                    "(%d: %s)", rtparam.sched_priority, res,
                    strerror(res));
         return -1;
@@ -241,7 +241,7 @@ int JackPosixThread::DropRealTimeImp(pthread_t thread)
     rtparam.sched_priority = 0;
 
     if ((res = pthread_setschedparam(thread, SCHED_OTHER, &rtparam)) != 0) {
-        jack_error("Cannot switch to normal scheduling priority(%s)\n", strerror(errno));
+        jack_error("Cannot switch to normal scheduling priority(%s)", strerror(errno));
         return -1;
     }
     return 0;

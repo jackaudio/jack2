@@ -551,7 +551,7 @@ namespace Jack
         int attempt = 0;
 
         //data
-        session_params_t params;
+        session_params_t host_params;
         int rx_bytes = 0;
         JackNetMaster* net_master;
 
@@ -594,7 +594,9 @@ namespace Jack
         //main loop, wait for data, deal with it and wait again
         do
         {
-            rx_bytes = fSocket.CatchHost ( &params, sizeof ( session_params_t ), 0 );
+            session_params_t net_params;
+            rx_bytes = fSocket.CatchHost ( &net_params, sizeof ( session_params_t ), 0 );
+            SessionParamsNToH(&net_params, &host_params);
             if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
@@ -606,17 +608,17 @@ namespace Jack
             }
             if ( rx_bytes == sizeof ( session_params_t ) )
             {
-                switch ( GetPacketType ( &params ) )
+                switch ( GetPacketType ( &host_params ) )
                 {
                     case SLAVE_AVAILABLE:
-                        if ( ( net_master = MasterInit ( params ) ) )
+                        if ( ( net_master = MasterInit ( host_params ) ) )
                             SessionParamsDisplay ( &net_master->fParams );
                         else
                             jack_error ( "Can't init new net master..." );
                         jack_info ( "Waiting for a slave..." );
                         break;
                     case KILL_MASTER:
-                        if ( KillMaster ( &params ) )
+                        if ( KillMaster ( &host_params ) )
                             jack_info ( "Waiting for a slave..." );
                         break;
                     default:

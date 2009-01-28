@@ -51,6 +51,9 @@ namespace Jack
         - number of audio frames in one network packet (depends on the channel number)
         - is the NetDriver in Sync or ASync mode ?
         - is the NetDriver linked with the master's transport
+        
+    Data encoding : headers (session_params and packet_header) are encoded using HTN kind of functions but float data
+    are kept in LITLE_ENDIAN formet (to avoing 2 conversion in the more common LITLE_ENDIAN <==> LITLE_ENDIAN connection scheme.
     */
 
     struct _session_params
@@ -269,10 +272,10 @@ namespace Jack
     SERVER_EXPORT int SocketAPIInit();
     SERVER_EXPORT int SocketAPIEnd();
     //n<-->h functions
-    SERVER_EXPORT void SessionParamsHToN ( session_params_t* params );
-    SERVER_EXPORT void SessionParamsNToH ( session_params_t* params );
-    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* header );
-    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* header );
+    SERVER_EXPORT void SessionParamsHToN ( session_params_t* src_params, session_params_t* dst_params );
+    SERVER_EXPORT void SessionParamsNToH ( session_params_t* src_params, session_params_t* dst_params );
+    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* src_header, packet_header_t* dst_header );
+    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* src_header, packet_header_t* dst_header );
     //display session parameters
     SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params );
     //display packet header
