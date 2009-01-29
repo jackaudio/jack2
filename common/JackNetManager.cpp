@@ -633,6 +633,12 @@ namespace Jack
     JackNetMaster* JackNetMasterManager::MasterInit ( session_params_t& params )
     {
         jack_log ( "JackNetMasterManager::MasterInit, Slave : %s", params.fName );
+        
+        //check MASTER <<==> SLAVE network protocol coherency
+        if (params.fProtocolVersion != MASTER_PROTOCOL) {
+            jack_error ( "Error : slave is running with a different protocol %s", params.fName );
+            return NULL;
+        }
 
         //settings
         fSocket.GetName ( params.fMasterNetName );

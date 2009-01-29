@@ -272,7 +272,7 @@ namespace Jack
         }
         jack_info ( "**************** Network parameters ****************" );
         jack_info ( "Name : %s", params->fName );
-        jack_info ( "Protocol revision : %c", params->fProtocolVersion );
+        jack_info ( "Protocol revision : %d", params->fProtocolVersion );
         jack_info ( "MTU : %u", params->fMtu );
         jack_info ( "Master name : %s", params->fMasterNetName );
         jack_info ( "Slave name : %s", params->fSlaveNetName );

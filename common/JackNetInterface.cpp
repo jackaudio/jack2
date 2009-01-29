@@ -569,7 +569,7 @@ namespace Jack
 
         //set the parameters to send
         strcpy ( fParams.fPacketType, "params" );
-        fParams.fProtocolVersion = 'a';
+        fParams.fProtocolVersion = SLAVE_PROTOCOL;
         SetPacketType ( &fParams, SLAVE_AVAILABLE );
 
         //init loop : get a master and start, do it until connection is ok
