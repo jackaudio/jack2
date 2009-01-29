@@ -217,6 +217,11 @@ namespace Jack
         SetAdaptedBufferSize ( fParams.fPeriodSize );
         SetAdaptedSampleRate ( fParams.fSampleRate );
         
+        // Will do "something" on OSX only...
+        fThread.SetParams(JackServerGlobals::fInstance->GetEngineControl()->fPeriod, 
+                        JackServerGlobals::fInstance->GetEngineControl()->fComputation, 
+                        JackServerGlobals::fInstance->GetEngineControl()->fConstraint);
+        
         if (fThread.AcquireRealTime ( JackServerGlobals::fInstance->GetEngineControl()->fClientPriority ) < 0) {
             jack_error("AcquireRealTime error");
         } else {
@@ -428,7 +433,7 @@ namespace Jack
             ResetRingBuffers();
         }
 
-        return true;
+        return 0;
     }
 } // namespace Jack
 

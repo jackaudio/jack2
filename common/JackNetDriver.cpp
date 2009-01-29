@@ -126,7 +126,7 @@ namespace Jack
         fParams.fSlaveSyncMode = fEngineControl->fSyncMode;
 
         //display some additional infos
-        jack_info ( "Net driver started in %s mode %s Master's transport sync.",
+        jack_info ( "NetDriver started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
         //init network
