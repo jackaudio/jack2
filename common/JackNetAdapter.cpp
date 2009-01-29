@@ -20,6 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackException.h"
 #include "JackServerGlobals.h"
 #include "JackEngineControl.h"
+#include "JackArgParser.h"
 
 namespace Jack
 {
@@ -134,7 +135,7 @@ namespace Jack
     {
         jack_log ( "JackNetAdapter::Open" );
 
-        jack_info ( "Net adapter started in %s mode %s Master's transport sync.",
+        jack_info ( "NetAdapter started in %s mode %s Master's transport sync.",
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
         if ( fThread.StartSync() < 0 )
@@ -556,14 +557,18 @@ extern "C"
     SERVER_EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
     {
         JSList* params = NULL;
-        jack_driver_desc_t *desc = jack_get_descriptor();
+        bool parse_params = true;
+        int res = 1;
+        jack_driver_desc_t* desc = jack_get_descriptor();
 
-        JackArgParser parser(load_init);
-        if (parser.GetArgc() > 0)
-            parser.ParseParams (desc, &params);
-     
-        int res = jack_internal_initialize(jack_client, params);
-        parser.FreeParams(params);
+        Jack::JackArgParser parser ( load_init );
+        if ( parser.GetArgc() > 0 )
+            parse_params = parser.ParseParams ( desc, &params );
+
+        if (parse_params) {
+            res = jack_internal_initialize ( jack_client, params );
+            parser.FreeParams ( params );
+        }
         return res;
     }
 

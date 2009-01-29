@@ -64,32 +64,6 @@ namespace Jack
     };
 
     /*!
-    \brief Internal cient command line parser.
-    */
-
-    class SERVER_EXPORT JackArgParser
-    {
-        private:
-
-            std::string fArgString;
-            int fArgc;
-            std::vector<std::string> fArgv;
-
-        public:
-
-            JackArgParser ( const char* arg );
-            ~JackArgParser();
-            std::string GetArgString();
-            int GetNumArgv();
-            int GetArgc();
-            int GetArgv ( std::vector<std::string>& argv );
-            int GetArgv ( char** argv );
-            void DeleteArgv ( const char** argv );
-            void ParseParams ( jack_driver_desc_t* desc, JSList** param_list );
-            void FreeParams ( JSList* param_list );
-    };
-
-    /*!
     \brief Generic monitoring class. Saves data to GnuPlot files ('.plt' and '.log' datafile)
 
     This template class allows to manipulate monitoring records, and automatically generate the GnuPlot config and data files.

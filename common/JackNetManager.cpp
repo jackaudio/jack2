@@ -17,6 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackNetManager.h"
+#include "JackArgParser.h"
 
 using namespace std;
 
@@ -743,14 +744,18 @@ extern "C"
     SERVER_EXPORT int jack_initialize ( jack_client_t* jack_client, const char* load_init )
     {
         JSList* params = NULL;
+        bool parse_params = true;
+        int res = 1;
         jack_driver_desc_t* desc = jack_get_descriptor();
 
         Jack::JackArgParser parser ( load_init );
         if ( parser.GetArgc() > 0 )
-            parser.ParseParams ( desc, &params );
+            parse_params = parser.ParseParams ( desc, &params );
 
-        int res = jack_internal_initialize ( jack_client, params );
-        parser.FreeParams ( params );
+        if (parse_params) {
+            res = jack_internal_initialize ( jack_client, params );
+            parser.FreeParams ( params );
+        }
         return res;
     }
 

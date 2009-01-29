@@ -114,6 +114,7 @@ def build(bld):
         'JackControlAPI.cpp',
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
+        'JackArgParser.cpp',
         ]
 
     if bld.env['IS_LINUX']:

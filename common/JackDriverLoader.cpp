@@ -32,8 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 jack_driver_desc_t * jackctl_driver_get_desc(jackctl_driver_t * driver);
 
-static void
-jack_print_driver_options (jack_driver_desc_t * desc, FILE *file)
+SERVER_EXPORT void jack_print_driver_options (jack_driver_desc_t* desc, FILE* file)
 {
     unsigned long i;
     char arg_default[JACK_DRIVER_PARAM_STRING_MAX + 1];
