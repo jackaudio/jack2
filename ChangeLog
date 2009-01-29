@@ -26,6 +26,7 @@ Michael Voigt
 2009-01-29 Stephane Letz  <letz@grame.fr>
 
 	* Support for "-h" option in internal clients to print the parameters. 
+	* Support for BIG_ENDIAN machines in NetJack2 for MIDI ports.
 
 2009-01-28 Stephane Letz  <letz@grame.fr>
 

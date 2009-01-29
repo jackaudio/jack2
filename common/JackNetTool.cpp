@@ -76,12 +76,17 @@ namespace Jack
         size_t copy_size;
         for ( int port_index = 0; port_index < fNPorts; port_index++ )
         {
+            char* write_pos = fBuffer + pos;
+            
             copy_size = sizeof ( JackMidiBuffer ) + fPortBuffer[port_index]->event_count * sizeof ( JackMidiEvent );
             memcpy ( fBuffer + pos, fPortBuffer[port_index], copy_size );
             pos += copy_size;
             memcpy ( fBuffer + pos, fPortBuffer[port_index] + ( fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos ),
                      fPortBuffer[port_index]->write_pos );
             pos += fPortBuffer[port_index]->write_pos;
+            
+            JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(write_pos);
+            MidiBufferHToN(midi_buffer, midi_buffer);
         }
         return pos;
     }
@@ -92,6 +97,9 @@ namespace Jack
         int copy_size;
         for ( int port_index = 0; port_index < fNPorts; port_index++ )
         {
+            JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(fBuffer + pos);
+            MidiBufferNToH(midi_buffer, midi_buffer);
+            
             copy_size = sizeof ( JackMidiBuffer ) + reinterpret_cast<JackMidiBuffer*> ( fBuffer + pos )->event_count * sizeof ( JackMidiEvent );
             memcpy ( fPortBuffer[port_index], fBuffer + pos, copy_size );
             pos += copy_size;
@@ -101,7 +109,7 @@ namespace Jack
         }
         return pos;
     }
-
+    
     int NetMidiBuffer::RenderFromNetwork ( int subcycle, size_t copy_size )
     {
         memcpy ( fBuffer + subcycle * fMaxPcktSize, fNetBuffer, copy_size );
@@ -115,6 +123,7 @@ namespace Jack
         memcpy ( fNetBuffer, fBuffer + subcycle * fMaxPcktSize, copy_size );
         return copy_size;
     }
+
 
 // net audio buffer *********************************************************************************
 
@@ -150,7 +159,7 @@ namespace Jack
         return fPortBuffer[index];
     }
 
-#ifdef BIG_ENDIAN
+#ifdef __BIG_ENDIAN__
 
     static inline float SwapFloat(float f)
     {
@@ -366,6 +375,28 @@ namespace Jack
         jack_info ( "Last packet : '%s'", ( header->fIsLastPckt ) ? "yes" : "no" );
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "**********************************************" );
+    }
+    
+    SERVER_EXPORT void MidiBufferHToN ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer )
+    {
+        dst_buffer->magic = htonl(src_buffer->magic);
+        dst_buffer->buffer_size = htonl(src_buffer->buffer_size);
+        dst_buffer->nframes = htonl(src_buffer->nframes);
+        dst_buffer->write_pos = htonl(src_buffer->write_pos);
+        dst_buffer->event_count = htonl(src_buffer->event_count);
+        dst_buffer->lost_events = htonl(src_buffer->lost_events);
+        dst_buffer->mix_index = htonl(src_buffer->mix_index);
+    }
+    
+    SERVER_EXPORT void MidiBufferNToH ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer )
+    {
+        dst_buffer->magic = ntohl(src_buffer->magic);
+        dst_buffer->buffer_size = ntohl(src_buffer->buffer_size);
+        dst_buffer->nframes = ntohl(src_buffer->nframes);
+        dst_buffer->write_pos = ntohl(src_buffer->write_pos);
+        dst_buffer->event_count = ntohl(src_buffer->event_count);
+        dst_buffer->lost_events = ntohl(src_buffer->lost_events);
+        dst_buffer->mix_index = ntohl(src_buffer->mix_index);
     }
 
 // Utility *******************************************************************************************************
