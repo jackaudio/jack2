@@ -92,10 +92,7 @@ namespace Jack
                     else
                         jack_error ( "Unknown network mode, using 'normal' mode." );
                     break;
-                case 'S' :
-                    fParams.fSlaveSyncMode = 1;
-                    break;
-            }
+             }
         }
 
         //set the socket parameters
@@ -455,7 +452,7 @@ extern "C"
         strcpy(desc->name, "netadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack net <==> audio backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 9;
+        desc->nparams = 8;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         int i = 0;
@@ -520,14 +517,6 @@ extern "C"
         desc->params[i].type = JackDriverParamString;
         strcpy ( desc->params[i].value.str, "slow" );
         strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-
-        i++;
-        strcpy ( desc->params[i].name, "sync_mode" );
-        desc->params[i].character  = 'S';
-        desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, "" );
-        strcpy ( desc->params[i].short_desc, "Sync mode (same as driver's sync mode) ?" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         return desc;
