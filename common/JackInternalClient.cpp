@@ -226,13 +226,13 @@ int JackLoadableInternalClient2::Init(const char* so_name)
     return 0;
 }
 
-JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data)
+JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data)
         : JackLoadableInternalClient(server, table)
 {
     snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);   
 }
 
-JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters)
+JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters)
         : JackLoadableInternalClient(server, table)
 {
     fParameters = parameters;

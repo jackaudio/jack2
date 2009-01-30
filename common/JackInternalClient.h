@@ -114,7 +114,7 @@ class JackLoadableInternalClient1 : public JackLoadableInternalClient
     
     public:
 
-        JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* so_name, const char* object_data);
+        JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data);
         virtual ~JackLoadableInternalClient1()
         {}
 
@@ -133,7 +133,7 @@ class JackLoadableInternalClient2 : public JackLoadableInternalClient
   
     public:
 
-        JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const char* so_name, const JSList*  parameters);
+        JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters);
         virtual ~JackLoadableInternalClient2()
         {}
 
