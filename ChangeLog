@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-01-30 Stephane Letz  <letz@grame.fr>
+
+	* In NetJack2, fix a bug when capture or playback only channels are used.
+
 2009-01-29 Stephane Letz  <letz@grame.fr>
 
 	* Support for "-h" option in internal clients to print the parameters. 

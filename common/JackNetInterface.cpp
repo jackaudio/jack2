@@ -300,8 +300,8 @@ namespace Jack
         assert ( fNetAudioPlaybackBuffer );
 
         //audio netbuffer length
-        fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
-        fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
+        fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
+        fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
     }
 
     void JackNetMasterInterface::Exit()
@@ -390,7 +390,7 @@ namespace Jack
         fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
-        fTxHeader.fIsLastPckt = ( !fParams.fSendMidiChannels && !fParams.fSendAudioChannels ) ?  1 : 0;
+        fTxHeader.fIsLastPckt = ( fParams.fSendMidiChannels == 0 && fParams.fSendAudioChannels == 0) ?  1 : 0;
         fTxHeader.fPacketSize = fParams.fMtu;
         memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
         return Send ( fTxHeader.fPacketSize, 0 );
@@ -400,7 +400,7 @@ namespace Jack
     {
         uint subproc;
         //midi
-        if ( fParams.fSendMidiChannels )
+        if ( fParams.fSendMidiChannels > 0)
         {
             //set global header fields and get the number of midi packets
             fTxHeader.fDataType = 'm';
@@ -409,7 +409,7 @@ namespace Jack
             for ( subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
             {
                 fTxHeader.fSubCycle = subproc;
-                fTxHeader.fIsLastPckt = ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fSendAudioChannels ) ? 1 : 0;
+                fTxHeader.fIsLastPckt = ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && (fParams.fSendAudioChannels == 0)) ? 1 : 0;
                 fTxHeader.fPacketSize = sizeof ( packet_header_t ) + fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
                 memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
                 if ( Send ( fTxHeader.fPacketSize, 0 ) == SOCKET_ERROR )
@@ -418,9 +418,11 @@ namespace Jack
         }
 
         //audio
-        if ( fParams.fSendAudioChannels )
+        if ( fParams.fSendAudioChannels > 0)
         {
             fTxHeader.fDataType = 'a';
+            fTxHeader.fMidiDataSize = 0;
+            fTxHeader.fNMidiPckt = 0;
             for ( subproc = 0; subproc < fNSubProcess; subproc++ )
             {
                 fTxHeader.fSubCycle = subproc;
@@ -823,7 +825,7 @@ namespace Jack
             fTxHeader.fCycle++;
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
-        fTxHeader.fIsLastPckt = ( !fParams.fReturnMidiChannels && !fParams.fReturnAudioChannels ) ?  1 : 0;
+        fTxHeader.fIsLastPckt = ( fParams.fReturnMidiChannels == 0 && fParams.fReturnAudioChannels == 0) ?  1 : 0;
         fTxHeader.fPacketSize = fParams.fMtu;
         memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
         return Send ( fTxHeader.fPacketSize, 0 );
@@ -834,7 +836,7 @@ namespace Jack
         uint subproc;
 
         //midi
-        if ( fParams.fReturnMidiChannels )
+        if ( fParams.fReturnMidiChannels > 0)
         {
             fTxHeader.fDataType = 'm';
             fTxHeader.fMidiDataSize = fNetMidiPlaybackBuffer->RenderFromJackPorts();
@@ -851,9 +853,11 @@ namespace Jack
         }
 
         //audio
-        if ( fParams.fReturnAudioChannels )
+        if ( fParams.fReturnAudioChannels > 0)
         {
             fTxHeader.fDataType = 'a';
+            fTxHeader.fMidiDataSize = 0;
+            fTxHeader.fNMidiPckt = 0;
             for ( subproc = 0; subproc < fNSubProcess; subproc++ )
             {
                 fTxHeader.fSubCycle = subproc;
