@@ -23,7 +23,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPlatformPlug.h"
 #include "types.h"
 #include "transport.h"
+#ifndef WIN32
 #include <netinet/in.h>
+#endif
 #include <cmath>
 
 using namespace std;
@@ -51,11 +53,11 @@ namespace Jack
         - number of audio frames in one network packet (depends on the channel number)
         - is the NetDriver in Sync or ASync mode ?
         - is the NetDriver linked with the master's transport
-        
+
     Data encoding : headers (session_params and packet_header) are encoded using HTN kind of functions but float data
     are kept in LITTLE_ENDIAN format (to avoid 2 conversions in the more common LITTLE_ENDIAN <==> LITTLE_ENDIAN connection case).
     */
-    
+
     #define MASTER_PROTOCOL 1
     #define SLAVE_PROTOCOL 1
 
