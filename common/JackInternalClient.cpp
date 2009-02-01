@@ -82,8 +82,6 @@ static void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
     }
     
     snprintf(path_to_so, path_len, "%s/%s.so", internal_dir, so_name);
-    
-    printf("internal_dir path_to_so %s %s\n", internal_dir, path_to_so);
 }
 
 #endif
