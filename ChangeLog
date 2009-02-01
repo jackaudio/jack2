@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-01 Stephane Letz  <letz@grame.fr>
+
+	* Add a JACK_INTERNAL_DIR environment variable to be used for internal clients.
+
 2009-01-30 Stephane Letz  <letz@grame.fr>
 
 	* In NetJack2, fix a bug when capture or playback only channels are used.

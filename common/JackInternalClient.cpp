@@ -74,10 +74,16 @@ static void PrintLoadError(const char* so_name)
 
 static void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
 {
-    const char* driver_dir;
-    if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) 
-        driver_dir = ADDON_DIR;
-    snprintf(path_to_so, path_len, "%s/%s.so", driver_dir, so_name);
+    const char* internal_dir;
+    if ((internal_dir = getenv("JACK_INTERNAL_DIR")) == 0) {
+        if ((internal_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+            internal_dir = ADDON_DIR;
+        }
+    }
+    
+    snprintf(path_to_so, path_len, "%s/%s.so", internal_dir, so_name);
+    
+    printf("internal_dir path_to_so %s %s\n", internal_dir, path_to_so);
 }
 
 #endif
