@@ -674,11 +674,13 @@ int JackClient::TransportReposition(jack_position_t* pos)
 
 jack_transport_state_t JackClient::TransportQuery(jack_position_t* pos)
 {
+    jack_log("TransportQuery");
     return GetEngineControl()->fTransport.Query(pos);
 }
 
 jack_nframes_t JackClient::GetCurrentTransportFrame()
 {
+    jack_log("GetCurrentTransportFrame");
     return GetEngineControl()->fTransport.GetCurrentFrame();
 }
 
@@ -733,7 +735,7 @@ void JackClient::CallTimebaseCallback()
             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, true, fTimebaseArg); 
             GetClientControl()->fTransportTimebase = false; // Callback is called only once with "new_pos" = true 
         } else if (transport_state == JackTransportRolling) {
-             fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
+            fTimebase(transport_state, GetEngineControl()->fBufferSize, cur_pos, false, fTimebaseArg);
         } 
         
         transport.WriteNextStateStop(1);

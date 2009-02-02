@@ -58,9 +58,9 @@ On the slave, just launch a new jack server using :
 
 As in a standard backend in Jackmp, you can use '-S' (synchronous mode). The asynchronous mode (without '-S') allows to send the computed data during the next cycle. In synchronous mode, data are sent back at the end of the cycle, that means after the process. You can specify some options, like '-n name' (will give a name to the slave, default is the network hostname), '-C input_ports' (the number of master-->slave channels), '-P output_ports' (the number of slave-->master channels), default is 2 ; or '-i midi_in_ports' and '-o midi_out_ports', default is 0. If you set multicast address or port on the master, you can add '-a xxx.xxx.xxx.xxx' and '-p udp_port'.
 
-You can also use others network mode, with '-m' option (fast, normal or slow). Fast mode allow a zero latency transmission. This mode means the master waits for its returned data from the slave in the current cycle. This mode is appropriated for 'small' transmissions (only a few channels with a light process on the slave). Normal (default) mode brings one cycle latency. It allow a normal use of the network.
+You can also use others network mode, with '-m' option (fast, normal or slow). Fast mode allow a zero latency transmission. This mode means the master waits for its returned data from the slave in the current cycle. This mode is appropriated for 'small' transmissions (only a few channels with a light process on the slave). Normal mode brings one cycle latency. It allow a normal use of the network.
 
-Slow mode allow a full usage of the whole system. Slow mode brings a two cycles additional latency. This mode allows to send a lot of data on the network, but it also takes into account some process time on the slave, thus the data aren't expected on the master before two cycles, so it's not necessary to wait for them.
+Slow mode (default) allows a full usage of the whole system. Slow mode brings a two cycles additional latency. This mode allows to send a lot of data on the network, but it also takes into account some process time on the slave, thus the data aren't expected on the master before two cycles, so it's not necessary to wait for them.
 
 For additional informations, you can go to the NetJack2 Wiki at : http://trac.jackaudio.org/wiki/WalkThrough/User/NetJack2.
 
@@ -68,7 +68,6 @@ For additional informations, you can go to the NetJack2 Wiki at : http://trac.ja
 -------------------------------
 What's next ?
 -------------------------------
-
 
 The development of netjack continues and some things are always moving... If you use it, please report encountered bugs, ideas or anything you think about.
 
