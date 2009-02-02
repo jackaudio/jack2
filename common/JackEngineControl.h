@@ -98,7 +98,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fSpareUsecs = 0;
         fMaxUsecs = 0;
         ResetRollingUsecs();
-        snprintf(fServerName, sizeof(fServerName), server_name);
+        strncpy(fServerName, server_name, sizeof(fServerName));
         fPeriod = 0;
         fComputation = 0;
         fConstraint = 0;

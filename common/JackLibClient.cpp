@@ -72,7 +72,7 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     int shared_engine, shared_client, shared_graph, result;
     jack_log("JackLibClient::Open name = %s", name);
 
-    snprintf(fServerName, sizeof(fServerName), server_name);
+    strncpy(fServerName, server_name, sizeof(fServerName));
 
     // Open server/client channel
     char name_res[JACK_CLIENT_NAME_SIZE + 1];

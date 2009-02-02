@@ -121,7 +121,7 @@ int JackInternalClient::Open(const char* server_name, const char* name, jack_opt
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
     jack_log("JackInternalClient::Open name = %s", name);
 
-    snprintf(fServerName, sizeof(fServerName), server_name);
+    strncpy(fServerName, server_name, sizeof(fServerName));
 
     fChannel->ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
@@ -233,7 +233,7 @@ int JackLoadableInternalClient2::Init(const char* so_name)
 JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data)
         : JackLoadableInternalClient(server, table)
 {
-    snprintf(fObjectData, JACK_LOAD_INIT_LIMIT, object_data);   
+    strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);   
 }
 
 JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters)
