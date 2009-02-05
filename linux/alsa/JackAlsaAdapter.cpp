@@ -224,81 +224,81 @@ extern "C"
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         i = 0;
-        strcpy ( params[i].name, "capture" );
-        params[i].character = 'C';
-        params[i].type = JackDriverParamString;
-        strcpy ( params[i].value.str, "none" );
-        strcpy ( params[i].short_desc,
+        strcpy ( desc->params[i].name, "capture" );
+        desc->params[i].character = 'C';
+        desc->params[i].type = JackDriverParamString;
+        strcpy ( desc->params[i].value.str, "none" );
+        strcpy ( desc->params[i].short_desc,
                  "Provide capture ports.  Optionally set device" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "playback" );
-        params[i].character = 'P';
-        params[i].type = JackDriverParamString;
-        strcpy ( params[i].value.str, "none" );
-        strcpy ( params[i].short_desc,
+        strcpy ( desc->params[i].name, "playback" );
+        desc->params[i].character = 'P';
+        desc->params[i].type = JackDriverParamString;
+        strcpy ( desc->params[i].value.str, "none" );
+        strcpy ( desc->params[i].short_desc,
                  "Provide playback ports.  Optionally set device" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "device" );
-        params[i].character = 'd';
-        params[i].type = JackDriverParamString;
-        strcpy ( params[i].value.str, "hw:0" );
-        strcpy ( params[i].short_desc, "ALSA device name" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].name, "device" );
+        desc->params[i].character = 'd';
+        desc->params[i].type = JackDriverParamString;
+        strcpy ( desc->params[i].value.str, "hw:0" );
+        strcpy ( desc->params[i].short_desc, "ALSA device name" );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "rate" );
-        params[i].character = 'r';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.ui = 48000U;
-        strcpy ( params[i].short_desc, "Sample rate" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].name, "rate" );
+        desc->params[i].character = 'r';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.ui = 48000U;
+        strcpy ( desc->params[i].short_desc, "Sample rate" );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "periodsize" );
-        params[i].character = 'p';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.ui = 512U;
-        strcpy ( params[i].short_desc, "Period size" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].name, "periodsize" );
+        desc->params[i].character = 'p';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.ui = 512U;
+        strcpy ( desc->params[i].short_desc, "Period size" );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "nperiods" );
-        params[i].character = 'n';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.ui = 2U;
-        strcpy ( params[i].short_desc, "Number of periods of playback latency" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].name, "nperiods" );
+        desc->params[i].character = 'n';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.ui = 2U;
+        strcpy ( desc->params[i].short_desc, "Number of periods of playback latency" );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "duplex" );
-        params[i].character = 'D';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = 1;
-        strcpy ( params[i].short_desc,
+        strcpy ( desc->params[i].name, "duplex" );
+        desc->params[i].character = 'D';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = 1;
+        strcpy ( desc->params[i].short_desc,
                  "Provide both capture and playback ports" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "inchannels" );
-        params[i].character = 'i';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.i = 0;
-        strcpy ( params[i].short_desc,
+        strcpy ( desc->params[i].name, "inchannels" );
+        desc->params[i].character = 'i';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.i = 0;
+        strcpy ( desc->params[i].short_desc,
                  "Number of capture channels (defaults to hardware max)" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( params[i].name, "outchannels" );
-        params[i].character = 'o';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.i = 0;
-        strcpy ( params[i].short_desc,
+        strcpy ( desc->params[i].name, "outchannels" );
+        desc->params[i].character = 'o';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.i = 0;
+        strcpy ( desc->params[i].short_desc,
                  "Number of playback channels (defaults to hardware max)" );
-        strcpy ( params[i].long_desc, params[i].short_desc );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
         
     
         i++;
