@@ -120,6 +120,7 @@ static void usage()
 int main(int argc, char *argv[])
 {
     jackctl_server_t * server;
+    const JSList * parameters;
     const JSList * drivers;
     const JSList * internals;
     const JSList * node_ptr;
@@ -149,6 +150,13 @@ int main(int argc, char *argv[])
 	}
     
 	server = jackctl_server_create();
+    parameters = jackctl_server_get_parameters(server);
+    
+    printf("\n========================== \n");
+    printf("List of server parameters \n");
+    printf("========================== \n");
+    
+    print_parameters(parameters);
     
     printf("\n========================== \n");
     printf("List of drivers \n");
