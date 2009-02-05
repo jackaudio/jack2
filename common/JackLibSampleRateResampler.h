@@ -46,6 +46,7 @@ class JackLibSampleRateResampler : public JackResampler
     public:
     
         JackLibSampleRateResampler();
+        JackLibSampleRateResampler(unsigned int quality);
         virtual ~JackLibSampleRateResampler();
         
         unsigned int ReadResample(float* buffer, unsigned int frames);

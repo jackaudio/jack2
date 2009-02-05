@@ -27,7 +27,37 @@ JackLibSampleRateResampler::JackLibSampleRateResampler()
 {
     int error;
     fResampler = src_new(SRC_LINEAR, 1, &error);
-    //fResampler = src_new(SRC_SINC_BEST_QUALITY, 1, &error);
+    if (error != 0) 
+        jack_error("JackLibSampleRateResampler::JackLibSampleRateResampler err = %s", src_strerror(error));
+}
+
+JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality)
+    :JackResampler(),fRatio(1)
+{
+     switch (quality) {
+       case 0:
+            quality = SRC_LINEAR;
+            break;
+        case 1:
+            quality = SRC_ZERO_ORDER_HOLD;
+            break;
+        case 2:
+            quality = SRC_SINC_FASTEST;
+            break;
+        case 3:
+            quality = SRC_SINC_MEDIUM_QUALITY;
+            break;
+        case 4:
+            quality = SRC_SINC_BEST_QUALITY;
+            break;
+        default: 
+            quality = SRC_LINEAR;
+            jack_error("Out of range resample quality");
+            break;
+    }
+
+    int error;
+    fResampler = src_new(quality, 1, &error);
     if (error != 0) 
         jack_error("JackLibSampleRateResampler::JackLibSampleRateResampler err = %s", src_strerror(error));
 }

@@ -71,6 +71,9 @@ namespace Jack
                 case 'p':
                     SetAdaptedBufferSize ( param->value.ui );
                     break;
+                case 'q':
+                    fQuality = param->value.ui;
+                    break;
             }
         }
 
@@ -211,16 +214,14 @@ extern "C"
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t *desc;
-        jack_driver_param_desc_t * params;
         unsigned int i;
-
         desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
 
         strcpy ( desc->name, "audioadapter" );                         // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy ( desc->desc, "netjack audio <==> net backend adapter" );  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-        desc->nparams = 9;
-        params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
+        desc->nparams = 10;
+        desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         i = 0;
         strcpy ( params[i].name, "capture" );
@@ -298,8 +299,16 @@ extern "C"
         strcpy ( params[i].short_desc,
                  "Number of playback channels (defaults to hardware max)" );
         strcpy ( params[i].long_desc, params[i].short_desc );
+        
+    
+        i++;
+        strcpy(desc->params[i].name, "quality");
+        desc->params[i].character = 'q';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
-        desc->params = params;
         return desc;
     }
 

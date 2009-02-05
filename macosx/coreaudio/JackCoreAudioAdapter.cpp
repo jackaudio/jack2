@@ -388,6 +388,10 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
             case 'l':
                 DisplayDeviceNames();
                 break;
+                
+            case 'q':
+                fQuality = param->value.ui;
+                break;
         }
     }
     
@@ -993,7 +997,7 @@ extern "C"
         strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
      
-        desc->nparams = 10;
+        desc->nparams = 11;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1074,6 +1078,14 @@ extern "C"
         desc->params[i].type = JackDriverParamBool;
         desc->params[i].value.i = TRUE;
         strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "quality");
+        desc->params[i].character = 'q';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;

@@ -92,6 +92,8 @@ namespace Jack
 
         JackResampler** fCaptureRingBuffer;
         JackResampler** fPlaybackRingBuffer;
+        
+        unsigned int fQuality;
 
         bool fRunning;
 
@@ -106,6 +108,7 @@ namespace Jack
                 fAdaptedSampleRate ( sample_rate ),
                 fHostDLL ( buffer_size, sample_rate ),
                 fAdaptedDLL ( buffer_size, sample_rate ),
+                fQuality(0),
                 fRunning ( false )
         {}
 
@@ -129,6 +132,11 @@ namespace Jack
         }
 
         void ResetRingBuffers();
+        
+        unsigned int GetQuality()
+        {
+            return fQuality;
+        }
 
         virtual int Open();
         virtual int Close();

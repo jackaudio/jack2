@@ -139,9 +139,9 @@ namespace Jack
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
         for ( i = 0; i < fCaptureChannels; i++ )
-            fCaptureRingBuffer[i] = new JackLibSampleRateResampler();
+            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fAudioAdapter->GetQuality());
         for ( i = 0; i < fPlaybackChannels; i++ )
-            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler();
+            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fAudioAdapter->GetQuality());
         fAudioAdapter->SetRingBuffers ( fCaptureRingBuffer, fPlaybackRingBuffer );
         if ( fCaptureChannels )
             jack_log ( "ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace() );

@@ -231,7 +231,7 @@ int JackAudioDriver::ProcessSync()
 {
     // Read input buffers for the current cycle
     if (Read() < 0) { 
-        jack_error("ProcessSync: read error, skip cycle");
+        jack_error("JackAudioDriver::ProcessSync: read error, skip cycle");
         return 0;   // Skip cycle, but continue processing...
     }
 

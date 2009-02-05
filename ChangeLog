@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-05 Stephane Letz  <letz@grame.fr>
+
+	* Add a resample quality parameter in audioadapter.
+
 2009-02-01 Stephane Letz  <letz@grame.fr>
 
 	* Add a JACK_INTERNAL_DIR environment variable to be used for internal clients.
