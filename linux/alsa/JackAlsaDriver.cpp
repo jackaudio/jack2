@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#define __STDC_FORMAT_MACROS   // For inttypes.h to work in C++
+
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
@@ -46,6 +48,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "usx2y.h"
 #include "generic.h"
 #include "memops.h"
+
+
 
 namespace Jack
 {
@@ -428,7 +432,8 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 					       &frame_rate, NULL) ;
 	driver->frame_rate = frame_rate ;
 	if (err < 0) {
-		jack_error ("ALSA: cannot set sample/frame rate to ld% for %s", driver->frame_rate,
+		jack_error ("ALSA: cannot set sample/frame rate to %"
+			    PRIu32 " for %s", driver->frame_rate,
 			    stream_name);
 		return -1;
 	}
@@ -472,7 +477,8 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 						      driver->frames_per_cycle,
 						      0))
 	    < 0) {
-		jack_error ("ALSA: cannot set period size to ld% frames for %s", driver->frames_per_cycle,
+		jack_error ("ALSA: cannot set period size to %" PRIu32
+			    " frames for %s", driver->frames_per_cycle,
 			    stream_name);
 		return -1;
 	}
@@ -507,7 +513,8 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 						      *nperiodsp *
 						      driver->frames_per_cycle))
 	    < 0) {
-		jack_error ("ALSA: cannot set buffer length to ld% for %s",
+		jack_error ("ALSA: cannot set buffer length to %" PRIu32
+			    " for %s",
 			    *nperiodsp * driver->frames_per_cycle,
 			    stream_name);
 		return -1;
@@ -601,12 +608,9 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
     driver->frames_per_cycle = frames_per_cycle;
     driver->user_nperiods = user_nperiods;
 
-
-    /* // steph
     jack_info ("configuring for %" PRIu32 "Hz, period = %"
 		 PRIu32 " frames (%.1f ms), buffer = %" PRIu32 " periods",
 		 rate, frames_per_cycle, (((float)frames_per_cycle / (float) rate) * 1000.0f), user_nperiods);
-    */
 
     if (driver->capture_handle) {
         if (alsa_driver_configure_stream (
@@ -700,12 +704,10 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
             || (access == SND_PCM_ACCESS_MMAP_COMPLEX);
 
         if (p_period_size != driver->frames_per_cycle) {
-            /*
             jack_error ("alsa_pcm: requested an interrupt every %"
             	    PRIu32
             	    " frames but got %u frames for playback",
             	    driver->frames_per_cycle, p_period_size);
-            	    */
             return -1;
         }
     }
@@ -726,12 +728,10 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
 
 
         if (c_period_size != driver->frames_per_cycle) {
-            /* // steph
             jack_error ("alsa_pcm: requested an interrupt every %"
             	    PRIu32
             	    " frames but got %uc frames for capture",
             	    driver->frames_per_cycle, p_period_size);
-            */
             return -1;
         }
     }
@@ -1396,7 +1396,8 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 		}
 		
 		if (poll_result == 0) {
-			jack_error ("ALSA: poll time out, polled for %ld usecs",
+			jack_error ("ALSA: poll time out, polled for %" PRIu64
+				    " usecs",
 				    poll_ret - poll_enter);
 			*status = -5;
 			return 0;
@@ -1553,9 +1554,9 @@ JackAlsaDriver::alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 
         if ((err = snd_pcm_mmap_commit (driver->capture_handle,
                                         offset, contiguous)) < 0) {
-            // steph
-            // jack_error ("ALSA: could not complete read of %"
-            //	PRIu32 " frames: error = %d\n", contiguous, err);
+         
+            jack_error ("ALSA: could not complete read of %"
+            		PRIu32 " frames: error = %d\n", contiguous, err);
             jack_error ("ALSA: could not complete read of %d frames: error = %d", contiguous, err);
             return -1;
         }
@@ -1694,9 +1695,8 @@ JackAlsaDriver::alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes
 
         if ((err = snd_pcm_mmap_commit (driver->playback_handle,
                                         offset, contiguous)) < 0) {
-            // steph
-            // jack_error ("ALSA: could not complete playback of %"
-            //	PRIu32 " frames: error = %d", contiguous, err);
+            jack_error ("ALSA: could not complete playback of %"
+            		PRIu32 " frames: error = %d", contiguous, err);
             jack_error ("ALSA: could not complete playback of %d frames: error = %d", contiguous, err);
             if (err != EPIPE && err != ESTRPIPE)
                 return -1;
@@ -1805,9 +1805,8 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
 
     alsa_driver_t *driver;
 
-    /*
-    printf ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
-    	"|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s\n",
+    jack_info ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
+    	"|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s",
     	playing ? playback_alsa_device : "-",
     	capturing ? capture_alsa_device : "-", 
     	frames_per_cycle, user_nperiods, rate,
@@ -1816,8 +1815,7 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
     	hw_metering ? "hwmeter":"swmeter",
     	soft_mode ? "soft-mode":"-",
     	shorts_first ? "16bit":"32bit");
-    	*/
-
+ 
     driver = (alsa_driver_t *) calloc (1, sizeof (alsa_driver_t));
 
     jack_driver_nt_init ((jack_driver_nt_t *) driver);
