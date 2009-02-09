@@ -26,6 +26,7 @@ Michael Voigt
 2009-02-09 Stephane Letz  <letz@grame.fr>
 
 	* Use PRIu32 kind of macro in JackAlsaDriver again.
+	* Now correctly return an error if JackServer::SetBufferSize could not change the buffer size (and was just restoring the current one).
 
 2009-02-05 Stephane Letz  <letz@grame.fr>
 
