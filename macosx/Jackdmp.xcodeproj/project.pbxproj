@@ -8942,8 +8942,9 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = (
-					../posix,
 					.,
+					../common/jack,
+					../posix,
 					../common,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;

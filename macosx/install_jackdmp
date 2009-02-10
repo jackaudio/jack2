@@ -1,8 +1,8 @@
 # Install jackdmp and owerwrite jack installation
 
 # Plug-ins
-[ -f Panda.framework ] && sudo cp -r Panda.framework /Library/Frameworks
-[ -f JackRouter.plugin ] && sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
+[ -d Panda.framework ] && sudo cp -r Panda.framework /Library/Frameworks
+[ -d JackRouter.plugin ] && sudo cp -r JackRouter.plugin /Library/Audio/Plug-Ins/HAL/
 
 # Copy libraries and exe
 sudo cp -r Jackmp.framework /Library/Frameworks/  
@@ -14,11 +14,12 @@ sudo cp jackdmp /usr/local/bin
 sudo install -d  /usr/local/lib/jackmp 
 sudo cp  jack_coreaudio.so  /usr/local/lib/jackmp 
 sudo cp  jack_dummy.so  /usr/local/lib/jackmp
-sudo cp  jack_net.so /usr/local/lib/jackmp
+[ -f jack_net.so ] && sudo cp jack_net.so /usr/local/lib/jackmp
 
 # Copy tools
-sudo cp  netmanager.so /usr/local/lib/jackmp
-sudo cp  audioadapter.so /usr/local/lib/jackmp
+[ -f netmanager.so ] && sudo cp  netmanager.so /usr/local/lib/jackmp
+[ -f netadapter.so ] && sudo cp  netadapter.so /usr/local/lib/jackmp
+[ -f audioadapter.so ] && sudo cp  audioadapter.so /usr/local/lib/jackmp
 
 # Create links to jackmp ressources
 cd /usr/local/lib && [ -f libjack.0.dylib ] && sudo mv -f libjack.0.dylib tmp_libjack.0.dylib 
