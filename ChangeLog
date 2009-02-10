@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-11 Stephane Letz  <letz@grame.fr>
+
+	* Add a resample quality parameter in netadapter.
+
 2009-02-09 Stephane Letz  <letz@grame.fr>
 
 	* Use PRIu32 kind of macro in JackAlsaDriver again.

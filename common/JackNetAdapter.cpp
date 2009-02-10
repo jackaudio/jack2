@@ -92,6 +92,9 @@ namespace Jack
                     else
                         jack_error ( "Unknown network mode, using 'normal' mode." );
                     break;
+                case 'q':
+                    fQuality = param->value.ui;
+                    break;
              }
         }
 
@@ -452,7 +455,7 @@ extern "C"
         strcpy(desc->name, "netadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack net <==> audio backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 8;
+        desc->nparams = 9;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         int i = 0;
@@ -518,6 +521,14 @@ extern "C"
         strcpy ( desc->params[i].value.str, "slow" );
         strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        
+        i++;
+        strcpy(desc->params[i].name, "quality");
+        desc->params[i].character = 'q';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;
     }
