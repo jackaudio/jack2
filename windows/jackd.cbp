@@ -51,7 +51,7 @@
 					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Monitor">
+			<Target title="Win32 Profiling">
 				<Option output="Release\bin\jackd" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="1" />

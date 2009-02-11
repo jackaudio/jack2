@@ -64,7 +64,7 @@
 					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Monitor">
+			<Target title="Win32 Profiling">
 				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="3" />
@@ -128,6 +128,9 @@
 		<Unit filename="..\common\JackDriverLoader.cpp" />
 		<Unit filename="..\common\JackEngine.cpp" />
 		<Unit filename="..\common\JackEngineControl.cpp" />
+		<Unit filename="..\common\JackEngineProfiling.cpp">
+			<Option target="Win32 Profiling" />
+		</Unit>
 		<Unit filename="..\common\JackError.cpp" />
 		<Unit filename="..\common\JackExternalClient.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />

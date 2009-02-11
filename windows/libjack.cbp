@@ -84,7 +84,7 @@
 					<Add library="odbccp32" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Monitor">
+			<Target title="Win32 Profiling">
 				<Option output="Release\bin\libjack" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="3" />
@@ -148,6 +148,9 @@
 		<Unit filename="..\common\JackClient.cpp" />
 		<Unit filename="..\common\JackConnectionManager.cpp" />
 		<Unit filename="..\common\JackEngineControl.cpp" />
+		<Unit filename="..\common\JackEngineProfiling.cpp">
+			<Option target="Win32 Profiling" />
+		</Unit>
 		<Unit filename="..\common\JackError.cpp" />
 		<Unit filename="..\common\JackFrameTimer.cpp" />
 		<Unit filename="..\common\JackGlobals.cpp" />
