@@ -102,7 +102,17 @@ void JackShmMem::operator delete(void* obj)
 
 void LockMemoryImp(void* ptr, size_t size)
 {
-    if (CHECK_MLOCK(ptr, size)) {
+    if (CHECK_MLOCK((char*)ptr, size)) {
+        jack_log("Succeeded in locking %u byte memory area", size);
+    } else {
+        jack_error("Cannot lock down memory area (%s)", strerror(errno));
+    }
+}
+
+void InitLockMemoryImp(void* ptr, size_t size)
+{
+    if (CHECK_MLOCK((char*)ptr, size)) {
+        memset(ptr, 0, size);
         jack_log("Succeeded in locking %u byte memory area", size);
     } else {
         jack_error("Cannot lock down memory area (%s)", strerror(errno));
@@ -111,7 +121,7 @@ void LockMemoryImp(void* ptr, size_t size)
 
 void UnlockMemoryImp(void* ptr, size_t size)
 {
-    if (CHECK_MUNLOCK(ptr, size)) {
+    if (CHECK_MUNLOCK((char*)ptr, size)) {
         jack_log("Succeeded in unlocking %u byte memory area", size);
     } else {
         jack_error("Cannot unlock down memory area (%s)", strerror(errno));

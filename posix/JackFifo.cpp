@@ -121,28 +121,27 @@ bool JackFifo::Allocate(const char* name, const char* server_name, int value)
 {
     struct stat statbuf;
     BuildName(name, server_name, fName);
-
     jack_log("JackFifo::Allocate name = %s", fName);
 
-    if (stat(fName, &statbuf)) {
-        if (errno == ENOENT) {
+    if (stat(fName, &statbuf) < 0) {
+        if (errno == ENOENT || errno == EPERM) {
             if (mkfifo(fName, 0666) < 0) {
-                jack_error("Cannot create inter-client FIFO [%s] (%s)\n", name, strerror(errno));
+                jack_error("Cannot create inter-client FIFO name = %s err = %s", name, strerror(errno));
                 return false;
             }
         } else {
-            jack_error("Cannot check on FIFO %s\n", name);
+            jack_error("Cannot check on FIFO %s", name);
             return false;
         }
     } else {
         if (!S_ISFIFO(statbuf.st_mode)) {
-            jack_error("FIFO (%s) already exists, but is not a FIFO!\n", name);
+            jack_error("FIFO name = %s already exists, but is not a FIFO", name);
             return false;
         }
     }
 
     if ((fFifo = open(fName, O_RDWR | O_CREAT, 0666)) < 0) {
-        jack_error("Cannot open fifo [%s] (%s)", name, strerror(errno));
+        jack_error("Cannot open FIFO name = %s err = %s", name, strerror(errno));
         return false;
     } else {
         fPoll.fd = fFifo;

@@ -35,7 +35,10 @@ namespace Jack
 {
 
 SERVER_EXPORT void LockMemoryImp(void* ptr, size_t size);
+SERVER_EXPORT void InitLockMemoryImp(void* ptr, size_t size);
 SERVER_EXPORT void UnlockMemoryImp(void* ptr, size_t size);
+SERVER_EXPORT void LockAllMemory();
+SERVER_EXPORT void UnlockAllMemory();
 
 class JackMem
 {

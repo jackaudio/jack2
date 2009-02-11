@@ -91,6 +91,7 @@ class SERVER_EXPORT JackEngine
         int ClientDeactivate(int refnum);
     
         int GetClientPID(const char* name);
+        int GetClientRefNum(const char* name);
     
         // Internal client management
         int GetInternalClientName(int int_ref, char* name_res);

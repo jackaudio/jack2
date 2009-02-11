@@ -21,15 +21,18 @@ def create_jack_process_obj(bld, target, sources, uselib = None):
         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
     if bld.env['IS_LINUX']:
 	env_includes = ['../linux', '../posix', '../linux/alsa']
+    if bld.env['IS_SUN']:
+        env_includes = ['../solaris', '../posix', '../solaris/oss']
     process.includes = ['.'] + env_includes + ['jack', '..']
     process.name     = target
     process.target   = target
     process.source   = sources
-    process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    if bld.env['IS_LINUX']:
+        process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     if bld.env['IS_MACOSX']:
         process.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #process.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
-        process.env.append_value("LINKFLAGS", "")
+        process.env.append_value("CPPFLAGS", "-fvisibility=hidden")
     process.install_path = '${ADDON_DIR}/'
     process.uselib_local = uselib.name
     return process
@@ -58,6 +61,7 @@ def build(bld):
         'timestamps.c',
         'JackTools.cpp',
         'JackMessageBuffer.cpp',
+        'JackEngineProfiling.cpp',
         ]
 
     includes = ['.', './jack', '..']
@@ -70,11 +74,22 @@ def build(bld):
             '../posix/JackFifo.cpp',
             '../posix/JackProcessSync.cpp',
             '../posix/JackSocket.cpp',
-	    '../linux/JackLinuxTime.c',
+            '../linux/JackLinuxTime.c',
             ]
         includes = ['../linux', '../posix'] + includes
         uselib.append('RT')
         uselib.append('DL')
+
+    if bld.env['IS_SUN']:
+        common_libsources += [
+           '../posix/JackPosixThread.cpp',
+           '../posix/JackFifo.cpp',
+           '../posix/JackProcessSync.cpp',
+           '../posix/JackSocket.cpp',
+           '../solaris/JackSolarisTime.c',
+           ]
+        includes = ['../solaris', '../posix'] + includes
+        uselib.append('RT')
 
     if bld.env['IS_MACOSX']:
         common_libsources += [
@@ -83,7 +98,7 @@ def build(bld):
             '../macosx/JackMachThread.cpp',
             '../macosx/JackMachSemaphore.cpp',
             '../macosx/JackMachPort.cpp',
-	    '../macosx/JackMachTime.c',
+            '../macosx/JackMachTime.c',
             ]
         includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
 
@@ -125,6 +140,14 @@ def build(bld):
             '../posix/JackNetUnixSocket.cpp',
             ]
 
+    if bld.env['IS_SUN']:
+        serverlib.source += [
+            '../posix/JackSocketServerChannel.cpp',
+            '../posix/JackSocketNotifyChannel.cpp',
+            '../posix/JackSocketServerNotifyChannel.cpp',
+            '../posix/JackNetUnixSocket.cpp',
+            ]
+
     if bld.env['IS_MACOSX']:
         serverlib.source += [
             '../macosx/JackMachServerChannel.cpp',
@@ -136,12 +159,19 @@ def build(bld):
             ]
 
     serverlib.vnum = bld.env['JACK_API_VERSION']
-    serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+    if bld.env['IS_LINUX']:
+        serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
     if bld.env['IS_MACOSX']:
+        serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
         serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
         serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
-	serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
+        serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
+
+    if bld.env['IS_SUN']:
+        serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
     clientlib = bld.new_task_gen('cxx', 'shlib')
     clientlib.features.append('cc')
@@ -165,6 +195,12 @@ def build(bld):
             '../posix/JackPosixServerLaunch.cpp',
             ]
 
+    if bld.env['IS_SUN']:
+        clientlib.source += [
+            '../posix/JackSocketClientChannel.cpp',
+            '../posix/JackPosixServerLaunch.cpp',
+            ]
+
     if bld.env['IS_MACOSX']:
         clientlib.source += [
             '../macosx/JackMachClientChannel.cpp',
@@ -174,14 +210,23 @@ def build(bld):
             ]
 
     clientlib.vnum = bld.env['JACK_API_VERSION']
-    clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+
+    if bld.env['IS_LINUX']:
+        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+    
     if bld.env['IS_MACOSX']:
+        clientlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
         clientlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
-        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
-	clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
+        #clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc"
+        clientlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
         clientlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
+    if bld.env['IS_SUN']:
+        clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
+
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
+
+    create_jack_process_obj(bld, 'profiler', 'JackProfiler.cpp', serverlib)
 
     net_adapter_sources = [
         'JackResampler.cpp',
@@ -201,7 +246,7 @@ def build(bld):
         'JackAudioAdapter.cpp',
         'JackAudioAdapterInterface.cpp',
         'JackAudioAdapterFactory.cpp',
-        ]
+         ]
 
     if bld.env['BUILD_ADAPTER'] and bld.env['IS_MACOSX']:
          audio_adapter_sources += ['../macosx/coreaudio/JackCoreAudioAdapter.cpp']
@@ -213,6 +258,11 @@ def build(bld):
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.uselib = ['ALSA', 'SAMPLERATE']
+
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
+         audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
+         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
+         process.uselib = 'SAMPLERATE'
 
     #audio_adapter_sources += ['../windows/JackPortAudioAdapter.cpp']
     #process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)

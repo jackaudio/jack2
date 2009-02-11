@@ -42,10 +42,11 @@ class JackClientSocket
     private:
 
         int fSocket;
-
+        int fTimeOut;
+   
     public:
 
-        JackClientSocket(): fSocket( -1)
+        JackClientSocket(): fSocket( -1),fTimeOut(0)
         {}
         JackClientSocket(int socket);
 

@@ -180,10 +180,10 @@ error:
 
     int JackPortAudioDriver::Close()
     {
-        JackAudioDriver::Close();
+        int res = JackAudioDriver::Close();
         jack_log("JackPortAudioDriver::Close");
         Pa_CloseStream(fStream);
-        return 0;
+        return res;
     }
 
     int JackPortAudioDriver::Start()
@@ -348,7 +348,6 @@ extern "C"
         strcpy(desc->params[i].name, "device");
         desc->params[i].character = 'd';
         desc->params[i].type = JackDriverParamString;
-        desc->params[i].value.ui = 128U;
         strcpy(desc->params[i].value.str, "will take default PortAudio device name");
         strcpy(desc->params[i].short_desc, "PortAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
@@ -386,8 +385,8 @@ extern "C"
         jack_nframes_t frames_per_interrupt = 512;
         const char* capture_pcm_name = "";
         const char* playback_pcm_name = "";
-        int capture = FALSE;
-        int playback = FALSE;
+        bool capture = false;
+        bool playback = false;
         int chan_in = 0;
         int chan_out = 0;
         bool monitor = false;
@@ -410,26 +409,25 @@ extern "C"
                 break;
 
             case 'D':
-                capture = TRUE;
-                playback = TRUE;
+                capture = true;
+                playback = true;
                 break;
 
             case 'c':
-                chan_in = chan_out = (int) param->value.ui;
+                chan_in = chan_out = (int)param->value.ui;
                 break;
 
             case 'i':
-                chan_in = (int) param->value.ui;
+                chan_in = (int)param->value.ui;
                 break;
 
             case 'o':
-                chan_out = (int) param->value.ui;
+                chan_out = (int)param->value.ui;
                 break;
 
             case 'C':
-                capture = TRUE;
-                if (strcmp(param->value.str, "none") != 0)
-                {
+                capture = true;
+                if (strcmp(param->value.str, "none") != 0) {
                     capture_pcm_name = strdup(param->value.str);
                 }
                 break;
@@ -450,7 +448,7 @@ extern "C"
                 break;
 
             case 'p':
-                frames_per_interrupt = (unsigned int) param->value.ui;
+                frames_per_interrupt = (unsigned int)param->value.ui;
                 break;
 
             case 'I':
@@ -469,8 +467,8 @@ extern "C"
 
         // duplex is the default
         if (!capture && !playback) {
-            capture = TRUE;
-            playback = TRUE;
+            capture = true;
+            playback = true;
         }
 
         Jack::JackDriverClientInterface* driver = new Jack::JackPortAudioDriver("system", "portaudio", engine, table, pa_devices);

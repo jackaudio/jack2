@@ -23,7 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #if defined (__APPLE__)
 #include <Accelerate/Accelerate.h>
-#elif defined (__SSE__)
+#elif defined (__SSE__) && !defined (__sun__)
 #include <xmmintrin.h>
 #endif
 
@@ -46,7 +46,7 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
     frames = frames % 4;
 
     while (frames_group > 0) {
-#ifdef __SSE__
+#if defined (__SSE__) && !defined (__sun__) 
         __m128 vec = _mm_add_ps(_mm_load_ps(mixbuffer), _mm_load_ps(buffer));
         _mm_store_ps(mixbuffer, vec);
 
@@ -97,7 +97,7 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     void* buffer;
 
     // Copy first buffer
-#ifdef __SSE__
+#if defined (__SSE__) && !defined (__sun__) 
     jack_nframes_t frames_group = nframes / 4;
     jack_nframes_t remaining_frames = nframes % 4;
 

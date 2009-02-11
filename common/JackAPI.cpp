@@ -1098,7 +1098,11 @@ EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char* po
         jack_error("jack_port_register called with a NULL port name or a NULL port_type");
         return NULL;
     } else {
+#if defined(__x86_64__) || defined(__ppc64__)
+        return (jack_port_t *)((uint64_t)client->PortRegister(port_name, port_type, flags, buffer_size));
+#else
         return (jack_port_t *)client->PortRegister(port_name, port_type, flags, buffer_size);
+#endif
     }
 }
 
@@ -1349,7 +1353,11 @@ EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* por
         if (!manager)
             return NULL;
         int res = manager->GetPort(portname); // returns a port index at least > 1
+#if defined(__x86_64__) || defined(__ppc64__)
+        return (res == NO_PORT) ? NULL : (jack_port_t*)((uint64_t)res);
+#else
         return (res == NO_PORT) ? NULL : (jack_port_t*)res;
+#endif
     }
 }
 
@@ -1359,7 +1367,11 @@ EXPORT jack_port_t* jack_port_by_id(jack_client_t* ext_client, jack_port_id_t id
     JackLibGlobals::CheckContext();
 #endif
     /* jack_port_t* type is actually the port index */
+#if defined(__x86_64__) || defined(__ppc64__)
+    return (jack_port_t*)((uint64_t)id);
+#else
     return (jack_port_t*)id;
+#endif
 }
 
 EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)

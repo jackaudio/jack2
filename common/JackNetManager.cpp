@@ -508,10 +508,9 @@ namespace Jack
     JackNetMasterManager::~JackNetMasterManager()
     {
         jack_log ( "JackNetMasterManager::~JackNetMasterManager" );
-
         jack_info ( "Exiting net manager..." );
         fRunning = false;
-        jack_client_stop_thread ( fManagerClient, fManagerThread );
+        jack_client_kill_thread ( fManagerClient, fManagerThread );
         master_list_t::iterator it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
             delete ( *it );

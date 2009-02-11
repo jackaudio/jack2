@@ -53,8 +53,8 @@ process (jack_nframes_t nframes, void *arg)
 	paTestData *data = (paTestData*)arg;
 	int i;
 
-	out1 = jack_port_get_buffer (output_port1, nframes);
-	out2 = jack_port_get_buffer (output_port2, nframes);
+	out1 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port1, nframes);
+	out2 = (jack_default_audio_sample_t*)jack_port_get_buffer (output_port2, nframes);
 
 	for( i=0; i<nframes; i++ )
     {
@@ -94,7 +94,8 @@ main (int argc, char *argv[])
 		client_name = argv[1];
 		if (argc >= 3) {	/* server name specified? */
 			server_name = argv[2];
-			options |= JackServerName;
+            int my_option = JackNullOption | JackServerName;
+			options = (jack_options_t)my_option;
 		}
 	} else {			/* use basename of argv[0] */
 		client_name = strrchr(argv[0], '/');

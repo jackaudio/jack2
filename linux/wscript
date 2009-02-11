@@ -40,7 +40,7 @@ def build(bld):
                                              'alsa/alsa_rawmidi.c',
                                              'alsa/alsa_seqmidi.c',
                                              'alsa/alsa_midi_jackmp.cpp',
-                                             'alsa/memops.c',
+                                             '../common/memops.c',
                                              'alsa/generic_hw.c',
                                              'alsa/hdsp.c',
                                              'alsa/hammerfall.c',

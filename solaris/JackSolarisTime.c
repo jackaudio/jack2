@@ -19,26 +19,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackTime.h"
-#include "JackError.h"
-#include <mach/mach_time.h>
 #include <unistd.h>
-
-static double __jack_time_ratio;
+#include <time.h>
 
 SERVER_EXPORT void JackSleep(long usec) 
 {
-	usleep(usec);
+    usleep(usec);
 }
 
-/* This should only be called ONCE per process. */
 SERVER_EXPORT void InitTime()
-{
-	mach_timebase_info_data_t info;
-	mach_timebase_info(&info);
-	__jack_time_ratio = ((float)info.numer / info.denom) / 1000;
-}
-
+{}
+	
 SERVER_EXPORT jack_time_t GetMicroSeconds(void) 
 {
-    return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
+    return (jack_time_t)(gethrtime() / 1000);
 }
+

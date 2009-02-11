@@ -23,8 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdlib.h>
 #include <assert.h>
 
-#include "driver_interface.h"
-
 #ifdef __linux__
 #include "JackAlsaAdapter.h"
 #endif
@@ -35,6 +33,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef WIN32
 #include "JackPortAudioAdapter.h"
+#endif
+
+#if defined(__sun__) || defined(sun)
+#include "JackOSSAdapter.h"
 #endif
 
 #ifdef __cplusplus
@@ -65,6 +67,11 @@ extern "C"
     #ifdef __APPLE__
             adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackCoreAudioAdapter(buffer_size, sample_rate, params));
     #endif
+
+    #if defined(__sun__) || defined(sun)
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackOSSAdapter(buffer_size, sample_rate, params));
+    #endif
+   
            assert(adapter);
            
             if (adapter->Open() == 0)

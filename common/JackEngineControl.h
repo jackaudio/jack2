@@ -24,8 +24,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackShmMem.h"
 #include "JackFrameTimer.h"
 #include "JackTransportEngine.h"
+#include "JackConstants.h"
 #include "types.h"
 #include <stdio.h>
+
+#ifdef JACK_MONITOR
+#include "JackEngineProfiling.h"
+#endif
 
 namespace Jack
 {
@@ -78,6 +83,10 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
 
     // Timer
     JackFrameTimer fFrameTimer;
+    
+#ifdef JACK_MONITOR
+    JackEngineProfiling fProfiler;
+#endif   
 
     JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, const char* server_name)
     {
@@ -105,6 +114,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fMaxDelayedUsecs = 0.f;
         fXrunDelayedUsecs = 0.f;
     }
+    
     ~JackEngineControl()
     {}
 

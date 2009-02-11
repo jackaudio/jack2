@@ -63,7 +63,9 @@ def set_options(opt):
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
-    opt.add_option('--monitor', action='store_true', default=False, help='Build with monitoring records')
+    opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
+    opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
+    opt.add_option('--ports', default=512, type="int", dest="ports", help='Maximum number of ports')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports', default=512, type="int", dest="ports", help='Maximum number of ports')
     opt.sub_options('dbus')
@@ -72,6 +74,7 @@ def configure(conf):
     platform = Utils.detect_platform()
     conf.env['IS_MACOSX'] = platform == 'darwin'
     conf.env['IS_LINUX'] = platform == 'linux'
+    conf.env['IS_SUN'] = platform == 'sunos'
 
     if conf.env['IS_LINUX']:
         Utils.pprint('CYAN', "Linux detected")
@@ -79,9 +82,26 @@ def configure(conf):
     if conf.env['IS_MACOSX']:
         Utils.pprint('CYAN', "MacOS X detected")
 
-    conf.check_tool('compiler_cxx')
-    conf.check_tool('compiler_cc')
+    if conf.env['IS_SUN']:
+        Utils.pprint('CYAN', "SunOS detected")
 
+    if conf.env['IS_LINUX']:
+        conf.check_tool('compiler_cxx')
+        conf.check_tool('compiler_cc')
+
+    if conf.env['IS_MACOSX']:
+        conf.check_tool('compiler_cxx')
+        conf.check_tool('compiler_cc')
+
+    # waf 1.5 : check_tool('compiler_cxx') and check_tool('compiler_cc') do not work correctly, so explicit use of gcc and g++
+    if conf.env['IS_SUN']:
+        conf.check_tool('g++')
+        conf.check_tool('gcc')
+
+    #if conf.env['IS_SUN']:
+    #   conf.check_tool('compiler_cxx')
+    #   conf.check_tool('compiler_cc')
+ 
     conf.env.append_unique('CXXFLAGS', '-O3 -Wall')
     conf.env.append_unique('CCFLAGS', '-O3 -Wall')
 
@@ -99,7 +119,7 @@ def configure(conf):
     conf.env['JACK_VERSION'] = VERSION
 
     conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
-    conf.env['BUILD_WITH_MONITOR'] = Options.options.monitor
+    conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
 
     if Options.options.libdir:
         conf.env['LIBDIR'] = Options.options.libdir
@@ -115,7 +135,7 @@ def configure(conf):
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
-    if conf.env['BUILD_WITH_MONITOR'] == True:
+    if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
     conf.write_config_header('config.h')
 
@@ -142,7 +162,8 @@ def configure(conf):
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
-    display_feature('Build with monitoring records', conf.env['BUILD_WITH_MONITOR'])
+    display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
+    
     
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
@@ -171,16 +192,24 @@ def build(bld):
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 
-    # process subfolders from here
+   # process subfolders from here
     bld.add_subdirs('common')
     if bld.env['IS_LINUX']:
         bld.add_subdirs('linux')
-        if bld.env['BUILD_JACKDBUS'] == True:
-            bld.add_subdirs('dbus')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
+        if bld.env['BUILD_JACKDBUS'] == True:
+           bld.add_subdirs('dbus')
+  
     if bld.env['IS_MACOSX']:
         bld.add_subdirs('macosx')
+        bld.add_subdirs('example-clients')
+        bld.add_subdirs('tests')
+        if bld.env['BUILD_JACKDBUS'] == True:
+            bld.add_subdirs('dbus')
+
+    if bld.env['IS_SUN']:
+        bld.add_subdirs('solaris')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
         if bld.env['BUILD_JACKDBUS'] == True:

@@ -26,8 +26,11 @@
 #define __jack_jslist_h__
 
 #include <stdlib.h>
-
 #include <jack/systemdeps.h>
+
+#ifdef sun
+#define __inline__
+#endif
 
 typedef struct _JSList JSList;
 

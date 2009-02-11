@@ -21,7 +21,6 @@
 */
 
 #ifndef WIN32
-#include <stdbool.h>
 #include <stdint.h>
 #include <dirent.h>
 #include <pthread.h>
@@ -42,6 +41,7 @@
 #include "JackTools.h"
 #include "JackControlAPI.h"
 #include "JackLockedEngine.h"
+#include "JackConstants.h"
 
 using namespace Jack;
 
@@ -561,7 +561,11 @@ jackctl_wait_signals(sigset_t signals)
     bool waiting = true;
 
     while (waiting) {
+    #if defined(sun) && !defined(__sun__) // SUN compiler only, to check
+        sigwait(&signals);
+    #else
         sigwait(&signals, &sig);
+    #endif
         fprintf(stderr, "jack main caught signal %d\n", sig);
 
         switch (sig) {

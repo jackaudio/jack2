@@ -21,17 +21,21 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackCompilerDeps_POSIX__
 
 #if __GNUC__
-	#define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
-	#define	EXPORT __attribute__((visibility("default")))
+    #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
+    #define EXPORT __attribute__((visibility("default")))
     #ifdef SERVER_SIDE
-        #define SERVER_EXPORT __attribute__((visibility("default")))
+        #if (__GNUC__< 4)
+            #define SERVER_EXPORT 
+        #else
+            #define SERVER_EXPORT __attribute__((visibility("default")))
+        #endif	
     #else
         #define SERVER_EXPORT
     #endif
 #else 
-	#define MEM_ALIGN(x,y) x
-	#define	EXPORT
-    #define	SERVER_EXPORT
+    #define MEM_ALIGN(x,y) x
+    #define EXPORT
+    #define SERVER_EXPORT
 #endif
 	
 #endif

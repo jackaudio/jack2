@@ -1,5 +1,4 @@
 /*
-Copyright (C) 2001-2003 Paul Davis
 Copyright (C) 2004-2008 Grame
 
 This program is free software; you can redistribute it and/or modify
@@ -13,32 +12,21 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackTime.h"
-#include "JackError.h"
-#include <mach/mach_time.h>
-#include <unistd.h>
+#ifndef __JackAtomic_sun__
+#define __JackAtomic_sun__
 
-static double __jack_time_ratio;
+#include "JackTypes.h"
+#include <atomic.h>
 
-SERVER_EXPORT void JackSleep(long usec) 
+static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {
-	usleep(usec);
+     return (atomic_cas_32((uint32_t*)addr, value, newvalue) == value);
 }
 
-/* This should only be called ONCE per process. */
-SERVER_EXPORT void InitTime()
-{
-	mach_timebase_info_data_t info;
-	mach_timebase_info(&info);
-	__jack_time_ratio = ((float)info.numer / info.denom) / 1000;
-}
+#endif
 
-SERVER_EXPORT jack_time_t GetMicroSeconds(void) 
-{
-    return (jack_time_t) (mach_absolute_time () * __jack_time_ratio);
-}

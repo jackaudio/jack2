@@ -29,8 +29,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sys/types.h>
 #else
 #define __inline__ inline
-//#define vsnprintf _vsnprintf
-//#define snprintf _snprintf
 typedef char int8_t;
 typedef unsigned char uint8_t;
 typedef short int16_t;
@@ -44,7 +42,7 @@ typedef HANDLE pthread_t;
 typedef int64_t _jack_time_t;
 #endif // WIN32 */
 
-#if defined(__APPLE__) || defined(__linux__)
+#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun) 
 
 #include <inttypes.h>
 #include <pthread.h>

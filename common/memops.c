@@ -30,9 +30,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>
+#ifdef __linux__
 #include <endian.h>
-
+#endif
 #include "memops.h"
+
+#if defined (__SSE2__) && !defined (__sun__)
+#include <emmintrin.h>
+#endif
 
 /* Notes about these *_SCALING values.
 
@@ -162,14 +167,12 @@
 /* Linear Congruential noise generator. From the music-dsp list
  * less random than rand(), but good enough and 10x faster 
  */
+static unsigned int seed = 22222;
 
 inline unsigned int fast_rand() {
-	static unsigned int seed = 22222;
 	seed = (seed * 96314165) + 907633515;
-
 	return seed;
 }
-
 
 /* functions for native float sample data */
 
@@ -222,7 +225,6 @@ void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsign
 
 		float_24u32 (*src, z);
 
-
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 		dst[0]=(char)(z>>24);
 		dst[1]=(char)(z>>16);
@@ -241,11 +243,57 @@ void sample_move_d32u24_sSs (char *dst, jack_default_audio_sample_t *src, unsign
 
 void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
+#if defined (__SSE2__) && !defined (__sun__)
+	__m128 int_max = _mm_set1_ps(SAMPLE_24BIT_MAX_F);
+	__m128 int_min = _mm_sub_ps(_mm_setzero_ps(), int_max);
+	__m128 factor = int_max;
+
+	unsigned long unrolled = nsamples / 4;
+	nsamples = nsamples & 3;
+
+	while (unrolled--) {
+		__m128 in = _mm_load_ps(src);
+		__m128 scaled = _mm_mul_ps(in, factor);
+		__m128 clipped = _mm_min_ps(int_max, _mm_max_ps(scaled, int_min));
+
+		__m128i y = _mm_cvttps_epi32(clipped);
+		__m128i shifted = _mm_slli_epi32(y, 8);
+
+		__m128i shuffled1 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(0, 3, 2, 1));
+		__m128i shuffled2 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(1, 0, 3, 2));
+		__m128i shuffled3 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(2, 1, 0, 3));
+
+		_mm_store_ss((float*)dst, (__m128)shifted);
+		dst += dst_skip;
+		_mm_store_ss((float*)dst, (__m128)shuffled1);
+		dst += dst_skip;
+		_mm_store_ss((float*)dst, (__m128)shuffled2);
+		dst += dst_skip;
+		_mm_store_ss((float*)dst, (__m128)shuffled3);
+		dst += dst_skip;
+
+		src+= 4;
+	}
+
+	while (nsamples--) {
+		__m128 in = _mm_load_ss(src);
+		__m128 scaled = _mm_mul_ss(in, factor);
+		__m128 clipped = _mm_min_ss(int_max, _mm_max_ss(scaled, int_min));
+
+		int y = _mm_cvttss_si32(clipped);
+		*((int *) dst) = y<<8;
+
+		dst += dst_skip;
+		src++;
+	}
+
+#else
 	while (nsamples--) {
 		float_24u32 (*src, *((int32_t*) dst));
 		dst += dst_skip;
 		src++;
 	}
+#endif
 }	
 
 void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
@@ -279,6 +327,34 @@ void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsign
 
 void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
+#if defined (__SSE2__) && !defined (__sun__)
+	unsigned long unrolled = nsamples / 4;
+	static float inv_sample_max_24bit = 1.0 / SAMPLE_24BIT_SCALING;
+	__m128 factor = _mm_set1_ps(inv_sample_max_24bit);
+	while (unrolled--)
+	{
+		int i1 = *((int *) src);
+		src+= src_skip;
+		int i2 = *((int *) src);
+		src+= src_skip;
+		int i3 = *((int *) src);
+		src+= src_skip;
+		int i4 = *((int *) src);
+		src+= src_skip;
+
+		__m128i src = _mm_set_epi32(i1, i2, i3, i4);
+		__m128i shifted = _mm_srai_epi32(src, 8);
+
+		__m128 as_float = _mm_cvtepi32_ps(shifted);
+		__m128 divided = _mm_mul_ps(as_float, factor);
+
+		_mm_storeu_ps(dst, divided);
+
+		dst += 4;
+	}
+	nsamples = nsamples & 3;
+#endif
+
 	/* ALERT: signed sign-extension portability !!! */
 
 	while (nsamples--) {
@@ -579,7 +655,6 @@ void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned 
 }	
 
 void sample_move_dS_s16 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) 
-	
 {
 	/* ALERT: signed sign-extension portability !!! */
 	while (nsamples--) {
@@ -652,7 +727,6 @@ memcpy_interleave_d16_s16 (char *dst, char *src, unsigned long src_bytes,
 void 
 memcpy_interleave_d24_s24 (char *dst, char *src, unsigned long src_bytes,
 			   unsigned long dst_skip_bytes, unsigned long src_skip_bytes)
-
 {
 	while (src_bytes) {
 		memcpy(dst, src, 3);
@@ -665,7 +739,6 @@ memcpy_interleave_d24_s24 (char *dst, char *src, unsigned long src_bytes,
 void 
 memcpy_interleave_d32_s32 (char *dst, char *src, unsigned long src_bytes,
 			   unsigned long dst_skip_bytes, unsigned long src_skip_bytes)
-
 {
 	while (src_bytes) {
 		*((int *) dst) = *((int *) src);

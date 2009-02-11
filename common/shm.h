@@ -28,6 +28,10 @@ extern "C"
      */
 #ifdef USE_POSIX_SHM
 
+#ifndef NAME_MAX
+#define NAME_MAX            255
+#endif
+
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX
 #endif

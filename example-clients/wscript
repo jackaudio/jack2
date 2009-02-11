@@ -19,6 +19,7 @@ example_programs = {
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
     'jack_thru' : 'thru_client.c',
+    'jack_cpu_load' : 'cpu_load.c',
     'jack_server_control' : 'server_control.cpp',
     }
 
@@ -51,6 +52,8 @@ def build(bld):
         os_incdir = ['../linux', '../posix']
     if bld.env['IS_MACOSX']:
         os_incdir = ['../macosx', '../posix']
+    if bld.env['IS_SUN']:
+        os_incdir = ['../solaris', '../posix']
     for example_program, example_program_source in example_programs.items():
         prog = bld.new_task_gen('cxx', 'program')
         prog.features.append('cc')
@@ -62,6 +65,8 @@ def build(bld):
             prog.env.append_value("LINKFLAGS", "")
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT'
+        if bld.env['IS_SUN']:
+            prog.env.append_value("LINKFLAGS", "-lm")
         if example_program == 'jack_server_control':
             prog.uselib_local = 'serverlib'
         else:
@@ -92,10 +97,9 @@ def build(bld):
             prog.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #prog.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             prog.env.append_value("LINKFLAGS", "")
+            prog.uselib = 'SNDFILE'
         if bld.env['IS_LINUX']:
             prog.uselib = 'RT SNDFILE'
-        if bld.env['IS_MACOSX']:
-            prog.uselib = 'SNDFILE'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_rec'
 
@@ -109,6 +113,8 @@ def build(bld):
             lib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
             #lib.env.append_value("LINKFLAGS", "-arch i386 -arch ppc")
             lib.env.append_value("LINKFLAGS", "")
+        if bld.env['IS_SUN']:
+	        lib.env.append_value("LINKFLAGS", "-lm")
         lib.uselib_local = 'serverlib'
         lib.install_path = '${ADDON_DIR}/'
 

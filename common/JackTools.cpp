@@ -28,6 +28,7 @@
 #include <process.h>
 #endif
 
+
 using namespace std;
 
 namespace Jack {
@@ -38,7 +39,7 @@ namespace Jack {
     int JackTools::GetPID() 
     {
 #ifdef WIN32
-        return  _getpid();
+        return _getpid();
 #else
         return getpid();
 #endif

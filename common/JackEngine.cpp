@@ -467,6 +467,17 @@ int JackEngine::GetClientPID(const char* name)
     return 0;
 }
 
+int JackEngine::GetClientRefNum(const char* name)
+{
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
+            return client->GetClientControl()->fRefNum;
+    }
+    
+    return -1;
+}
+
 // Used for external clients
 int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {

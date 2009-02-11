@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-static inline _jack_time_t JACK_MAX(_jack_time_t a, _jack_time_t b)
+static inline jack_time_t JACK_MAX(jack_time_t a, jack_time_t b)
 {
     return (a < b) ? b : a;
 }
@@ -46,6 +46,9 @@ void JackEngineControl::CycleBegin(JackClientInterface** table,
 {
     fTransport.CycleBegin(fSampleRate, cur_cycle_begin);
     CalcCPULoad(table, manager, cur_cycle_begin, prev_cycle_end);
+#ifdef JACK_MONITOR
+    fProfiler.Profile(table, manager, fPeriodUsecs, cur_cycle_begin, prev_cycle_end);
+#endif
 }
 
 void JackEngineControl::CycleEnd(JackClientInterface** table)

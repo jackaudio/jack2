@@ -226,6 +226,7 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
         return fAudioDriver->Start();
     } else { // Failure: try to restore current value
         jack_error("Cannot SetBufferSize for audio driver, restore current value %ld", current_buffer_size);
+        fAudioDriver->SetBufferSize(current_buffer_size);
         fFreewheelDriver->SetBufferSize(current_buffer_size);
         fEngineControl->InitFrameTime();
         fAudioDriver->Start();

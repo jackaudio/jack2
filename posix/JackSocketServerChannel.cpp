@@ -154,7 +154,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
     // Read header
     JackRequest header;
     if (header.Read(socket) < 0) {
-        jack_error("HandleRequest: cannot read header");
+        jack_log("HandleRequest: cannot read header");
+        ClientKill(fd);  // TO CHECK SOLARIS
         return false;
     }
 
@@ -391,7 +392,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         default:
-            jack_log("Unknown request %ld", header.fType);
+            jack_error("Unknown request %ld", header.fType);
             break;
     }
 
@@ -449,7 +450,7 @@ bool JackSocketServerChannel::Execute()
                 ClientKill(fd);
             } else if (fPollTable[i].revents & POLLIN) {
                 if (!HandleRequest(fd)) 
-                    jack_error("Could not handle external client request");
+                    jack_log("Could not handle external client request");
             }
         }
 

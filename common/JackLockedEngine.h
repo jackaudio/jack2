@@ -196,7 +196,13 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             JackLock lock(this);
             return fEngine.GetClientPID(name);
         }
-
+        
+        int GetClientRefNum(const char* name)
+        {
+            JackLock lock(this);
+            return fEngine.GetClientRefNum(name);
+        }
+        
 };
 
 } // end of namespace

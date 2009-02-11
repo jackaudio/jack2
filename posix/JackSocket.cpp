@@ -18,17 +18,57 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackSocket.h"
+#include "JackConstants.h"
 #include "JackTools.h"
 #include "JackError.h"
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <fcntl.h>
 
 namespace Jack
 {
 
-JackClientSocket::JackClientSocket(int socket): fSocket(socket)
+JackClientSocket::JackClientSocket(int socket): fSocket(socket),fTimeOut(0)
 {}
+
+#if defined(__sun__) || defined(sun)
+
+void JackClientSocket::SetReadTimeOut(long sec)
+{
+    int	flags;
+    fTimeOut = sec;
+    
+    if ((flags = fcntl(fSocket, F_GETFL, 0)) < 0) {
+		jack_error("JackClientSocket::SetReadTimeOut error in fcntl F_GETFL");
+		return;
+	}
+    
+	flags |= O_NONBLOCK;
+	if (fcntl(fSocket, F_SETFL, flags) < 0) {
+		jack_error("JackClientSocket::SetReadTimeOut error in fcntl F_SETFL");
+		return;
+	}
+}
+
+void JackClientSocket::SetWriteTimeOut(long sec)
+{
+    int	flags;
+    fTimeOut = sec;
+    
+    if ((flags = fcntl(fSocket, F_GETFL, 0)) < 0) {
+		jack_error("JackClientSocket::SetWriteTimeOut error in fcntl F_GETFL");
+		return;
+	}
+    
+	flags |= O_NONBLOCK;
+	if (fcntl(fSocket, F_SETFL, flags) < 0) {
+		jack_error("JackClientSocket::SetWriteTimeOut error in fcntl F_SETFL");
+		return;
+	}
+}
+
+#else
 
 void JackClientSocket::SetReadTimeOut(long sec)
 {
@@ -50,11 +90,15 @@ void JackClientSocket::SetWriteTimeOut(long sec)
     }
 }
 
+#endif
+
 void JackClientSocket::SetNonBlocking(bool onoff)
 {   
-    int flag = (onoff) ? 1 : 0;
-    if (ioctl(fSocket, FIONBIO, &flag) < 0) {
-        jack_error("SetNonBlocking fd = %ld err = %s", fSocket, strerror(errno));
+    if (onoff) {
+        long flags = 0;
+        if (fcntl(fSocket, F_SETFL, flags | O_NONBLOCK) < 0) {
+            jack_error("SetNonBlocking fd = %ld err = %s", fSocket, strerror(errno));
+        }
     }
 }
 
@@ -131,11 +175,40 @@ int JackClientSocket::Close()
 
 int JackClientSocket::Read(void* data, int len)
 {
-    if (read(fSocket, data, len) != len) {
-        jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
+    int res;
+
+#if defined(__sun__) || defined(sun)
+    if (fTimeOut > 0) {
+
+        struct timeval tv;
+	    fd_set fdset;
+        ssize_t	res;
+    
+        tv.tv_sec = fTimeOut;
+	    tv.tv_usec = 0;
+    
+	    FD_ZERO(&fdset);
+	    FD_SET(fSocket, &fdset);
+    
+	    do {
+		    res = select(fSocket + 1, &fdset, NULL, NULL, &tv);
+	    } while (res < 0 && errno == EINTR);
+    
+	    if (res < 0) {
+		    return res;
+        } else if (res == 0) {
+		    return -1;
+	    }
+    }
+#endif
+        
+    if ((res = read(fSocket, data, len)) != len) {
         if (errno == EWOULDBLOCK) {
             jack_error("JackClientSocket::Read time out");
             return 0;  // For a non blocking socket, a read failure is not considered as an error
+        } else if (res != 0) {
+            jack_error("Cannot read socket fd = %d err = %s", fSocket, strerror(errno));
+            return 0;
         } else {
             return -1;
         }
@@ -146,11 +219,40 @@ int JackClientSocket::Read(void* data, int len)
 
 int JackClientSocket::Write(void* data, int len)
 {
-    if (write(fSocket, data, len) != len) {
-        jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
+    int res;
+
+#if defined(__sun__) || defined(sun)
+    if (fTimeOut > 0) {
+ 
+        struct timeval tv;
+	    fd_set fdset;
+        ssize_t res;
+    
+        tv.tv_sec = fTimeOut;
+	    tv.tv_usec = 0;
+    
+	    FD_ZERO(&fdset);
+	    FD_SET(fSocket, &fdset);
+    
+	    do {
+		    res = select(fSocket + 1, NULL, &fdset, NULL, &tv);
+	    } while (res < 0 && errno == EINTR);
+    
+	    if (res < 0) {
+		    return res;
+        } else if (res == 0) {
+		   return -1;
+	    }
+   }
+#endif
+
+    if ((res = write(fSocket, data, len)) != len) {
         if (errno == EWOULDBLOCK) {
             jack_log("JackClientSocket::Write time out");
             return 0;  // For a non blocking socket, a write failure is not considered as an error
+        } else if (res != 0) {
+            jack_error("Cannot write socket fd = %ld err = %s", fSocket, strerror(errno));
+            return 0;
         } else {
             return -1;
         }

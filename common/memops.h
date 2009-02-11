@@ -27,6 +27,10 @@ extern "C"
 {
 #endif
 
+#ifdef sun
+#define __inline__
+#endif
+
 typedef	enum  {
 	None,
 	Rectangular,
@@ -87,7 +91,6 @@ void sample_merge_d32u24_sS          (char *dst, jack_default_audio_sample_t *sr
 
 static __inline__ void
 sample_merge (jack_default_audio_sample_t *dst, jack_default_audio_sample_t *src, unsigned long cnt)
-
 {
 	while (cnt--) {
 		*dst += *src;
@@ -98,7 +101,6 @@ sample_merge (jack_default_audio_sample_t *dst, jack_default_audio_sample_t *src
 
 static __inline__ void
 sample_memcpy (jack_default_audio_sample_t *dst, jack_default_audio_sample_t *src, unsigned long cnt)
-
 {
 	memcpy (dst, src, cnt * sizeof (jack_default_audio_sample_t));
 }

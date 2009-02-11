@@ -42,9 +42,14 @@ namespace Jack
         private:
             int fSockfd;
             int fPort;
+            int fTimeOut;
 
             struct sockaddr_in fSendAddr;
             struct sockaddr_in fRecvAddr;
+        #if defined(__sun__) || defined(sun)
+            int WaitRead();
+            int WaitWrite();
+        #endif
         public:
             JackNetUnixSocket();
             JackNetUnixSocket ( const char* ip, int port );

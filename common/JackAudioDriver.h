@@ -33,16 +33,15 @@ namespace Jack
 class SERVER_EXPORT JackAudioDriver : public JackDriver
 {
 
-    private:
+    protected:
 
-        int ProcessAsync();
-        int ProcessSync();
         void ProcessGraphAsync();
         void ProcessGraphSync();
         void WaitUntilNextCycle();
 
-    protected:
-
+        virtual int ProcessAsync();
+        virtual int ProcessSync();
+  
         int fCaptureChannels;
         int fPlaybackChannels;
 

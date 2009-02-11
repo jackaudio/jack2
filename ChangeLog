@@ -25,6 +25,10 @@ Michael Voigt
 
 2009-02-11 Stephane Letz  <letz@grame.fr>
 
+	* Merge Solaris branch back on trunk.
+
+2009-02-10 Stephane Letz  <letz@grame.fr>
+
 	* Add a resample quality parameter in netadapter.
 
 2009-02-09 Stephane Letz  <letz@grame.fr>
@@ -76,6 +80,14 @@ Michael Voigt
 
 	* Cleanup server starting code for clients directly linked with libjackserver.so.
 
+2009-01-09 Stephane Letz  <letz@grame.fr>
+
+	* JackProfiler scan already running clients (so can now be added anytime in the graph).
+
+2009-01-09 Stephane Letz  <letz@grame.fr>
+
+	* New JackProfiler class for real-time server monitoring. 
+
 2009-01-07 Stephane Letz  <letz@grame.fr>
 
 	* Use up to BUFFER_SIZE_MAX frames in midi ports, fix for ticket #117.
@@ -88,6 +100,8 @@ Michael Voigt
 2008-12-18 Stephane Letz  <letz@grame.fr>
 
 	* For ALSA driver, synchronize with latest jack1 memops functions. 
+    	* Use memops functions in JackOSSDriver.
+	* Use memops functions in JackOSSAdapter.
 
 2008-12-17 Stephane Letz  <letz@grame.fr>
 
@@ -95,15 +109,37 @@ Michael Voigt
 
 2008-12-16 Stephane Letz  <letz@grame.fr>
 
+	* Fix JackOSSDriver::SetBufferSize (was crashing when restoring old size), fix ticket #111.
+        * Force memory page in of profiling array in JackOSSDriver::Open.
+	* Cleanup profiling code.
 	* Client and library global context cleanup in case of incorrect shutdown handling (that is applications not correctly closing client after server has shutdown).
+
+2008-12-08 Stephane Letz  <letz@grame.fr>
+
+	* Forbid JackOSSDriver to run in "aynchronous" mode, correct DSP CPU computation.
+
+2008-12-04 Stephane Letz  <letz@grame.fr>
+
+	* More profiling in JackOSSDriver: sample conversion duration is measured. 
+
+2008-12-02 Stephane Letz  <letz@grame.fr>
+
+	* Optimize JackOSSDriver: no samples conversion if ports are not connected.
+
+2008-12-01 Stephane Letz  <letz@grame.fr>
+
+	* Force preload of memory table in JackEngineProfiling.
 
 2008-11-27 Stephane Letz  <letz@grame.fr>
 
+	* Add timing profiling code in JackOSSDriver.
 	* Report ringbuffer.c fixes from jack1.
 
 2008-11-21 Stephane Letz  <letz@grame.fr>
 
+	* Report ringbuffer.c fixes from jack1.
 	* Better isolation of server and clients system resources to allow starting the server in several user account at the same time.
+        * Correct ressource cleanup in case of driver open failure.
 
 2008-11-19 Stephane Letz  <letz@grame.fr>
 
@@ -119,12 +155,13 @@ Michael Voigt
 	* Fix jackctl_server_unload_internal.
 
 2008-10-30 Stephane Letz  <letz@grame.fr>
-	
-	* Fix Midi port initialization in JackNetDriver.
-	* Correct JackClient::ShutDown.
 
+	* Correct JackClient::ShutDown.
+        * TimeOut management in JackNetUnixSocket on Solaris.
+ 
 2008-10-23 Stephane Letz  <letz@grame.fr>
 	
+	* In JackOSSDriver, vmix mode is used by default, exclusif (O_EXCL) mode can be selected with -e option.
 	* Fix a crash in JackEngine::Close when backend cannot be loaded.
 	* Tim Blechmann optimization patch.
 	* Backport of latest Paul alsa_seqmidi changes.
@@ -146,6 +183,38 @@ Michael Voigt
 	* Correct file permission for jack-shm-registry POSIX shared memory segment.
 	* Checking for libsamplerate in waf, fix ticket #89." 
         * Header cleanup, add --clients and --ports options in configure.
+
+2008-09-22 Stephane Letz  <letz@grame.fr>
+	
+        * Socket time out implementation on Solaris.
+	* Fix a conflict with Audio Hijack in JackCoreAudioDriver. 
+
+2008-10-10 Stephane Letz  <letz@grame.fr>
+	
+	* Improve OSS backend : SNDCTL_DSP_SETFRAGMENT must be done before, use of AFMT_S16_LE kind of values. 
+
+2008-10-09 Stephane Letz  <letz@grame.fr>
+	
+	* First version of OSS backend.
+	* Use a mutex to make jack_client_open/jack_client_close thread safe, remove use of jack_init/jack_uninit.
+
+2008-10-08 Stephane Letz  <letz@grame.fr>
+	
+	* Fix a SMP related bug introduced in rev 2957 : remove the __SMP__ flag and define LOCK for SMP in all cases.
+
+2008-10-03 Stephane Letz  <letz@grame.fr>
+	
+	* Add engine profiling tools.
+
+2008-10-02 Stephane Letz  <letz@grame.fr>
+	
+	* Correct file permission for jack-shm-registry POSIX shared memory segment.
+	* Checking for libsamplerate in waf, fix ticket #89." 
+        * Header cleanup, add --clients and --ports options in configure.
+
+2008-10-01 Stephane Letz  <letz@grame.fr>
+
+   	* First Solaris version.
 
 2008-09-22 Stephane Letz  <letz@grame.fr>
 	
