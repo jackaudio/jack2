@@ -539,10 +539,15 @@ int JackOSSDriver::OpenAux()
     }
 
     // In duplex mode, check that input and output use the same buffer size
+    /*
+
+    // 10/02/09 : desactivated for now, needs more check (only needed when *same* device is used for input and output ??)
+
     if ((fRWMode & kRead) && (fRWMode & kWrite) && (fInputBufferSize != fOutputBufferSize)) {
        jack_error("JackOSSDriver::OpenAux input and output buffer size are not the same!!");
        return -1;
     }
+    */
 
     DisplayDeviceInfo();  
     return 0;
@@ -613,7 +618,7 @@ int JackOSSDriver::Read()
     count = ::read(fInFD, fInputBuffer, fInputBufferSize);  
  
 #ifdef JACK_MONITOR
-    if (count > 0 && count != fInputBufferSize)
+    if (count > 0 && count != (int)fInputBufferSize)
         jack_log("JackOSSDriver::Read count = %ld", count / (fSampleSize * fCaptureChannels));
     gCycleTable.fTable[gCycleCount].fAfterRead = GetMicroSeconds();
 #endif
@@ -635,7 +640,7 @@ int JackOSSDriver::Read()
     if (count < 0) {
         jack_log("JackOSSDriver::Read error = %s", strerror(errno));
         return -1;
-    } else if (count < fInputBufferSize) {
+    } else if (count < (int)fInputBufferSize) {
         jack_error("JackOSSDriver::Read error bytes read = %ld", count);
         return -1;
     } else {
@@ -676,7 +681,7 @@ int JackOSSDriver::Write()
         // Prefill ouput buffer
         for (int i = 0; i < fNperiods; i++) {
            count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
-           if (count < fOutputBufferSize) {
+           if (count < (int)fOutputBufferSize) {
                 jack_error("JackOSSDriver::Write error bytes written = %ld", count);
                 return -1;
             }
@@ -712,7 +717,7 @@ int JackOSSDriver::Write()
     count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
 
   #ifdef JACK_MONITOR
-    if (count > 0 && count != fOutputBufferSize)
+    if (count > 0 && count != (int)fOutputBufferSize)
         jack_log("JackOSSDriver::Write count = %ld", count / (fSampleSize * fPlaybackChannels));
     gCycleTable.fTable[gCycleCount].fAfterWrite = GetMicroSeconds();
     gCycleCount = (gCycleCount == CYCLE_POINTS - 1) ? gCycleCount: gCycleCount + 1;
@@ -735,7 +740,7 @@ int JackOSSDriver::Write()
     if (count < 0) {
         jack_log("JackOSSDriver::Write error = %s", strerror(errno));
         return -1;
-    } else if (count < fOutputBufferSize) {
+    } else if (count < (int)fOutputBufferSize) {
         jack_error("JackOSSDriver::Write error bytes written = %ld", count);
         return -1;
     } else {
