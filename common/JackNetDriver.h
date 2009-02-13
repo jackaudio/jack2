@@ -44,9 +44,7 @@ namespace Jack
             //transport
             int fLastTransportState;
             int fLastTimebaseMaster;
-            net_transport_data_t fSendTransportData;
-            net_transport_data_t fReturnTransportData;
-
+  
             //monitoring
 #ifdef JACK_MONITOR
             JackGnuPlotMonitor<float>* fNetTimeMon;
@@ -60,10 +58,6 @@ namespace Jack
             //transport
             int EncodeTransportData();
             int DecodeTransportData();
-
-            //sync packet
-            int EncodeSyncPacket();
-            int DecodeSyncPacket();
 
             JackMidiBuffer* GetMidiInputBuffer ( int port_index );
             JackMidiBuffer* GetMidiOutputBuffer ( int port_index );

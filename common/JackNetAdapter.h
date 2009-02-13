@@ -41,9 +41,7 @@ namespace Jack
         //transport data
         int fLastTransportState;
         int fLastTimebaseMaster;
-        net_transport_data_t fSendTransportData;
-        net_transport_data_t fReturnTransportData;
-
+     
         //sample buffers
         sample_t** fSoftCaptureBuffer;
         sample_t** fSoftPlaybackBuffer;
@@ -54,10 +52,6 @@ namespace Jack
         //transport
         int EncodeTransportData();
         int DecodeTransportData();
-
-        //sync packet
-        int EncodeSyncPacket();
-        int DecodeSyncPacket();
 
     public:
 

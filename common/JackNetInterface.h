@@ -133,16 +133,28 @@ namespace Jack
     class SERVER_EXPORT JackNetSlaveInterface : public JackNetInterface
     {
         protected:
+        
             static uint fSlaveCounter;
+            
+            net_transport_data_t fSendTransportData;
+            net_transport_data_t fReturnTransportData;
 
             bool Init();
+            
             net_status_t GetNetMaster();
             net_status_t SendStartToMaster();
+            
             void SetParams();
+            
             int SyncRecv();
             int SyncSend();
+            
             int DataRecv();
             int DataSend();
+            
+            //sync packet
+            int EncodeSyncPacket();
+            int DecodeSyncPacket();
 
             int Recv ( size_t size, int flags );
             int Send ( size_t size, int flags );
