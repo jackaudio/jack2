@@ -38,7 +38,7 @@ namespace Jack
         uint port = DEFAULT_PORT;
         GetHostName ( fParams.fName, JACK_CLIENT_NAME_SIZE );
         fSocket.GetName ( fParams.fSlaveNetName );
-        fParams.fMtu = 1500;
+        fParams.fMtu = DEFAULT_MTU;
         fParams.fTransportSync = 0;
         fParams.fSendAudioChannels = 2;
         fParams.fReturnAudioChannels = 2;
@@ -470,7 +470,7 @@ extern "C"
         strcpy ( desc->params[i].name, "udp_net_port" );
         desc->params[i].character = 'p';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = 19000;
+        desc->params[i].value.i = DEFAULT_PORT;
         strcpy ( desc->params[i].short_desc, "UDP port" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
@@ -478,7 +478,7 @@ extern "C"
         strcpy ( desc->params[i].name, "mtu" );
         desc->params[i].character = 'M';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = 1500;
+        desc->params[i].value.i = DEFAULT_MTU;
         strcpy ( desc->params[i].short_desc, "MTU to the master" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 

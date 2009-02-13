@@ -592,7 +592,7 @@ namespace Jack
             strcpy ( desc->params[i].name, "udp_net_port" );
             desc->params[i].character = 'p';
             desc->params[i].type = JackDriverParamInt;
-            desc->params[i].value.i = 19000;
+            desc->params[i].value.i = DEFAULT_PORT;
             strcpy ( desc->params[i].short_desc, "UDP port" );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
@@ -600,7 +600,7 @@ namespace Jack
             strcpy ( desc->params[i].name, "mtu" );
             desc->params[i].character = 'M';
             desc->params[i].type = JackDriverParamInt;
-            desc->params[i].value.i = 1500;
+            desc->params[i].value.i = DEFAULT_MTU;
             strcpy ( desc->params[i].short_desc, "MTU to the master" );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
@@ -669,7 +669,7 @@ namespace Jack
             strcpy ( multicast_ip, DEFAULT_MULTICAST_IP );
             char net_name[JACK_CLIENT_NAME_SIZE];
             int udp_port = DEFAULT_PORT;
-            int mtu = 1500;
+            int mtu = DEFAULT_MTU;
             uint transport_sync = 1;
             jack_nframes_t period_size = 128;
             jack_nframes_t sample_rate = 48000;
