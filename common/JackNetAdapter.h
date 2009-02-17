@@ -20,7 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackNetAdapter__
 #define __JackNetAdapter__
 
-#include <assert.h>
 #include "JackAudioAdapterInterface.h"
 #include "JackNetInterface.h"
 

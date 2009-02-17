@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackEngineControl.h"
 #include "JackArgParser.h"
+#include <assert.h>
 
 namespace Jack
 {
