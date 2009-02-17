@@ -32,7 +32,7 @@ namespace Jack
 class JackWinMutex
 {
 
-    private:
+    protected:
 
         HANDLE fMutex;
 
@@ -43,7 +43,8 @@ class JackWinMutex
             // In recursive mode by default
             fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
         }
-        ~JackWinMutex()
+        
+        virtual ~JackWinMutex()
         {
             CloseHandle(fMutex);
         }

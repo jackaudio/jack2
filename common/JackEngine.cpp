@@ -86,7 +86,6 @@ int JackEngine::Close()
         }
     }
     
-    fSignal.Destroy();
     return 0;
 }
     
@@ -135,7 +134,7 @@ void JackEngine::ProcessNext(jack_time_t cur_cycle_begin)
     fLastSwitchUsecs = cur_cycle_begin;
     if (fGraphManager->RunNextGraph())	// True if the graph actually switched to a new state
         fChannel.Notify(ALL_CLIENTS, kGraphOrderCallback, 0);
-    fSignal.SignalAll();                // Signal for threads waiting for next cycle
+    fSignal.Signal();                   // Signal for threads waiting for next cycle
 }
 
 void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
@@ -148,7 +147,7 @@ void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
 bool JackEngine::Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)
 {
     bool res = true;
-
+ 
     // Cycle  begin
     fEngineControl->CycleBegin(fClientTable, fGraphManager, cur_cycle_begin, prev_cycle_end);
 
@@ -173,7 +172,6 @@ bool JackEngine::Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end
     fEngineControl->CycleEnd(fClientTable);
     return res;
 }
-
 
 /*
 Client that finish *after* the callback date are considered late even if their output buffers may have been
@@ -501,7 +499,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
         goto error;
     }
 
-    if (!fSignal.TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
+    if (!fSignal.LockedTimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
         goto error;
@@ -546,7 +544,7 @@ int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl
         goto error;
     }
 
-    if (wait && !fSignal.TimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
+    if (wait && !fSignal.LockedTimedWait(DRIVER_OPEN_TIMEOUT * 1000000)) {
         // Failure if RT thread is not running (problem with the driver...)
         jack_error("Driver is not running");
         goto error;
@@ -624,7 +622,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 
     // Wait until next cycle to be sure client is not used anymore
     if (wait) {
-        if (!fSignal.TimedWait(fEngineControl->fTimeOutUsecs * 2)) { // Must wait at least until a switch occurs in Process, even in case of graph end failure
+        if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 2)) { // Must wait at least until a switch occurs in Process, even in case of graph end failure
             jack_error("JackEngine::ClientCloseAux wait error ref = %ld", refnum);
         }
     }
@@ -649,7 +647,7 @@ int JackEngine::ClientActivate(int refnum, bool state)
         fGraphManager->Activate(refnum);
  
     // Wait for graph state change to be effective
-    if (!fSignal.TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
+    if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {
@@ -686,7 +684,7 @@ int JackEngine::ClientDeactivate(int refnum)
     fLastSwitchUsecs = 0; // Force switch to occur next cycle, even when called with "dead" clients
 
     // Wait for graph state change to be effective
-    if (!fSignal.TimedWait(fEngineControl->fTimeOutUsecs * 10)) {
+    if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientDeactivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {

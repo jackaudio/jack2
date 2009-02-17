@@ -144,6 +144,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
         return -1;
     }
 
+    pthread_attr_destroy(&attributes);
     return 0;
 }
 

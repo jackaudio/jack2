@@ -20,7 +20,7 @@ This program is free software; you can redistribute it and/or modify
 #ifndef __JackWinProcessSync__
 #define __JackWinProcessSync__
 
-#include <windows.h>
+#include "JackWinMutex.h"
 
 namespace Jack
 {
@@ -29,7 +29,7 @@ namespace Jack
 \brief  A synchronization primitive built using a condition variable.
 */
 
-class JackWinProcessSync
+class JackWinProcessSync : public JackWinMutex
 {
 
     private:
@@ -38,7 +38,7 @@ class JackWinProcessSync
 
     public:
 
-        JackWinProcessSync()
+        JackWinProcessSync():JackWinMutex()
         {
             fEvent = (HANDLE)CreateEvent(NULL, FALSE, FALSE, NULL);
         }
@@ -46,34 +46,18 @@ class JackWinProcessSync
         {
             CloseHandle(fEvent);
         }
-
-        bool Allocate(const char* name)
-        {
-            return true;
-        }
-
-        bool Connect(const char* name)
-        {
-            return true;
-        }
-
-        void Destroy()
-        {}
-
-        bool TimedWait(long usec);
-  
-        void Wait();
-  
-        void Signal()
-        {
-            SetEvent(fEvent);
-        }
         
-        void SignalAll()
-        {
-            SetEvent(fEvent);
-        }
-
+        bool TimedWait(long usec);
+        bool LockedTimedWait(long usec);
+        
+        void Wait();
+        void LockedWait();
+         
+        void Signal();
+        void LockedSignal();
+         
+        void SignalAll();
+        void LockedSignalAll();
 };
 
 } // end of namespace

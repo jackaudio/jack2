@@ -23,6 +23,68 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+void JackProcessSync::Signal()
+{
+    int res = pthread_cond_signal(&fCond);
+    if (res != 0)
+        jack_error("pthread_cond_signal error err = %s", strerror(res));
+}
+
+void JackProcessSync::LockedSignal()
+{
+    int res;
+    res = pthread_mutex_lock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_lock error err = %s", strerror(res));
+    res = pthread_cond_signal(&fCond);
+    if (res != 0)
+        jack_error("pthread_cond_signal error err = %s", strerror(res));
+    res = pthread_mutex_unlock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_unlock error err = %s", strerror(res));
+}
+
+void JackProcessSync::SignalAll()
+{
+    int res = pthread_cond_broadcast(&fCond);
+    if (res != 0)
+        jack_error("pthread_cond_broadcast error err = %s", strerror(res));
+}
+
+void  JackProcessSync::LockedSignalAll()
+{
+    int res;
+    res = pthread_mutex_lock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_lock error err = %s", strerror(res));
+    res = pthread_cond_broadcast(&fCond);
+    if (res != 0)
+        jack_error("pthread_cond_broadcast error err = %s", strerror(res));
+    res = pthread_mutex_unlock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_unlock error err = %s", strerror(res));
+}
+
+void JackProcessSync::Wait()
+{
+    int res;
+    if ((res = pthread_cond_wait(&fCond, &fMutex)) != 0)
+        jack_error("pthread_cond_wait error err = %s", strerror(errno));
+ }
+
+void JackProcessSync::LockedWait()
+{
+    int res;
+    res = pthread_mutex_lock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_lock error err = %s", strerror(res));
+    if ((res = pthread_cond_wait(&fCond, &fMutex)) != 0)
+        jack_error("pthread_cond_wait error err = %s", strerror(errno));
+    res = pthread_mutex_unlock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_unlock error err = %s", strerror(res));
+}
+
 bool JackProcessSync::TimedWait(long usec)
 {
     struct timeval T0, T1;
@@ -30,7 +92,6 @@ bool JackProcessSync::TimedWait(long usec)
     struct timeval now;
     int res;
 
-    pthread_mutex_lock(&fLock);
     jack_log("JackProcessSync::TimedWait time out = %ld", usec);
     gettimeofday(&T0, 0);
 
@@ -38,38 +99,49 @@ bool JackProcessSync::TimedWait(long usec)
     unsigned int next_date_usec = now.tv_usec + usec;
     time.tv_sec = now.tv_sec + (next_date_usec / 1000000);
     time.tv_nsec = (next_date_usec % 1000000) * 1000;
-    res = pthread_cond_timedwait(&fCond, &fLock, &time);
+    res = pthread_cond_timedwait(&fCond, &fMutex, &time);
     if (res != 0)
         jack_error("pthread_cond_timedwait error usec = %ld err = %s", usec, strerror(res));
 
     gettimeofday(&T1, 0);
-    pthread_mutex_unlock(&fLock);
     jack_log("JackProcessSync::TimedWait finished delta = %5.1lf",
              (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
     return (res == 0);
 }
 
-void JackProcessSync::Wait()
-{
-    int res;
-    pthread_mutex_lock(&fLock);
-    //jack_log("JackProcessSync::Wait...");
-    if ((res = pthread_cond_wait(&fCond, &fLock)) != 0)
-        jack_error("pthread_cond_wait error err = %s", strerror(errno));
-    pthread_mutex_unlock(&fLock);
-    //jack_log("JackProcessSync::Wait finished");
-}
-
-bool JackInterProcessSync::TimedWait(long usec)
+bool JackProcessSync::LockedTimedWait(long usec)
 {
     struct timeval T0, T1;
-    //jack_log("JackInterProcessSync::TimedWait...");
+    timespec time;
+    struct timeval now;
+    int res;
+
+    res = pthread_mutex_lock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_lock error err = %s", usec, strerror(res));
+        
+    jack_log("JackProcessSync::TimedWait time out = %ld", usec);
     gettimeofday(&T0, 0);
-    bool res = fSynchro->TimedWait(usec);
+
+    gettimeofday(&now, 0);
+    unsigned int next_date_usec = now.tv_usec + usec;
+    time.tv_sec = now.tv_sec + (next_date_usec / 1000000);
+    time.tv_nsec = (next_date_usec % 1000000) * 1000;
+    res = pthread_cond_timedwait(&fCond, &fMutex, &time);
+    if (res != 0)
+        jack_error("pthread_cond_timedwait error usec = %ld err = %s", usec, strerror(res));
+
     gettimeofday(&T1, 0);
-    //jack_log("JackInterProcessSync::TimedWait finished delta = %5.1lf", (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
-    return res;
+    
+    pthread_mutex_unlock(&fMutex);
+    if (res != 0)
+        jack_error("pthread_mutex_unlock error err = %s", usec, strerror(res));
+        
+    jack_log("JackProcessSync::TimedWait finished delta = %5.1lf",
+             (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
+    return (res == 0);
 }
+
 
 } // end of namespace
 

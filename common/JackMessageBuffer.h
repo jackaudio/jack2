@@ -58,12 +58,12 @@ class JackMessageBuffer : public JackRunnableInterface
     private:
     
         JackMessage fBuffers[MB_BUFFERS];
-        JackMutex fMutex;
         JackThread fThread;
-        JackProcessSync fSignal;
+        JackProcessSync fGuard;
         volatile unsigned int fInBuffer;
         volatile unsigned int fOutBuffer;
         SInt32 fOverruns;
+        bool fRunning;
 
         void Flush();
  	    

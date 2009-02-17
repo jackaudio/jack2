@@ -23,17 +23,67 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-bool JackWinProcessSync::TimedWait(long usec)
+void JackWinProcessSync::Signal()
 {
-	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
-	return (res == WAIT_OBJECT_0);
+    SetEvent(fEvent);
 }
-	
+
+void JackWinProcessSync::LockedSignal()
+{
+    WaitForSingleObject(fMutex, INFINITE);
+    SetEvent(fEvent);
+    ReleaseMutex(fMutex);
+}
+
+void JackWinProcessSync::SignalAll()
+{
+    SetEvent(fEvent);
+}
+
+void JackWinProcessSync::SignalAll()
+{
+    WaitForSingleObject(fMutex, INFINITE);
+    SetEvent(fEvent);
+    ReleaseMutex(fMutex);
+}
+
 void JackWinProcessSync::Wait()
 {
 	WaitForSingleObject(fEvent, INFINITE);
 }
+
+void JackWinProcessSync::LockedWait()
+{
+    WaitForSingleObject(fMutex, INFINITE);
+    ReleaseMutex(fMutex);
+	HANDLE handles[] = { fMutex, fEvent };
+	DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
+	if (res != WAIT_OBJECT_0) && ( res != WAIT_TIMEOUT))
+        jack_error("LockedWait error err = %d", GetLastError());
+    ResetEvent(fEvent);
+}
+
+bool JackWinProcessSync::TimedWait(long usec)
+{
+    DWORD res = WaitForSingleObject(fEvent, usec / 1000);
+    if (res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
+        jack_error("TimedWait error err = %d", GetLastError());
+  	return (res == WAIT_OBJECT_0);
+}
 	
+bool JackWinProcessSync::LockedTimedWait(long usec)
+{
+    WaitForSingleObject(fMutex, INFINITE);
+    ReleaseMutex(fMutex);
+    HANDLE handles[] = { fMutex, fEvent };
+	DWORD res = WaitForMultipleObjects(2, handles, true, usec / 1000);
+    if (res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
+        jack_error("TimedWait error err = %d", GetLastError());
+    ResetEvent(fEvent);
+	return (res == WAIT_OBJECT_0);
+}
+	
+
 } // end of namespace
 
 

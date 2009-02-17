@@ -23,7 +23,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "jack.h"
 #include "JackAtomicState.h"
 #include <math.h>
-#include <stdio.h>
 
 namespace Jack
 {

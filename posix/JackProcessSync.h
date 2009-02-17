@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackProcessSync__
 
 #include "JackPlatformPlug.h"
-#include <pthread.h>
+#include "JackPosixMutex.h"
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -32,109 +32,38 @@ namespace Jack
 \brief  A synchronization primitive built using a condition variable.
 */
 
-class JackProcessSync
+class JackProcessSync : public JackPosixMutex
 {
 
     private:
 
-        pthread_mutex_t fLock;  // Mutex
         pthread_cond_t fCond;   // Condition variable
 
     public:
 
-        JackProcessSync()
+        JackProcessSync():JackPosixMutex()
         {
-            pthread_mutex_init(&fLock, NULL);
             pthread_cond_init(&fCond, NULL);
         }
 
         ~JackProcessSync()
         {
-            pthread_mutex_destroy(&fLock);
             pthread_cond_destroy(&fCond);
         }
 
-        bool Allocate(const char* name)
-        {
-            return true;
-        }
-
-        bool Connect(const char* name)
-        {
-            return true;
-        }
-
-        void Destroy()
-        {}
-
         bool TimedWait(long usec);
-  
-        void Wait();
+        bool LockedTimedWait(long usec);
         
-        void Signal()
-        {
-            pthread_mutex_lock(&fLock);
-            pthread_cond_signal(&fCond);
-            pthread_mutex_unlock(&fLock);
-        }
-     
-        void SignalAll()
-        {
-            //pthread_mutex_lock(&fLock);
-            pthread_cond_broadcast(&fCond);
-            //pthread_mutex_unlock(&fLock);
-        }
-
+        void Wait();
+        void LockedWait();
+         
+        void Signal();
+        void LockedSignal();
+         
+        void SignalAll();
+        void LockedSignalAll();
+  
 };
-
-/*!
-\brief  A synchronization primitive built using an inter-process synchronization object.
-*/
-
-class JackInterProcessSync
-{
-
-    private:
-
-        JackSynchro* fSynchro;
-
-    public:
-
-        JackInterProcessSync(JackSynchro* synchro): fSynchro(synchro)
-        {}
-        ~JackInterProcessSync()
-        {
-            delete fSynchro;
-        }
-
-        bool Allocate(const char* name)
-        {
-            return fSynchro->Allocate(name, "", 0);
-        }
-
-        void Destroy()
-        {
-            fSynchro->Destroy();
-        }
-
-        bool Connect(const char* name)
-        {
-            return fSynchro->Connect(name, "");
-        }
-
-        bool TimedWait(long usec);
-
-        void Wait()
-        {
-            fSynchro->Wait();
-        }
-
-        void SignalAll()
-        {
-            fSynchro->SignalAll();
-        }
-};
-
 
 } // end of namespace
 

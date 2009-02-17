@@ -23,9 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackCompilerDeps.h"
 #include "JackSynchro.h"
 #include <mach/mach.h>
-#include <mach/mach_types.h>
-#include <mach/message.h>
-#include <mach/mach_error.h>
 #include <servers/bootstrap.h>
 #include <mach/semaphore.h>
 

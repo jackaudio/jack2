@@ -23,10 +23,14 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-16 Stephane Letz  <letz@grame.fr>
+
+	* Rework the mutex/signal classes. Use them in JackMessageBuffer.
+
 2009-02-11 Stephane Letz  <letz@grame.fr>
 
 	* Merge Solaris branch back on trunk.
-    * Equality of input and output buffer size removed (for now) in JackOSSDriver.
+        * Equality of input and output buffer size removed (for now) in JackOSSDriver.
 
 2009-02-10 Stephane Letz  <letz@grame.fr>
 

@@ -31,6 +31,7 @@ JackMessageBuffer* JackMessageBuffer::fInstance = NULL;
 JackMessageBuffer::JackMessageBuffer()
     :fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0)
 {
+    fRunning = true;
     fThread.StartSync();
 }
 
@@ -41,7 +42,11 @@ JackMessageBuffer::~JackMessageBuffer()
     } else {
         jack_info("no message buffer overruns"); 
     }
-    fThread.Kill();
+    fGuard.Lock();
+    fRunning = false;
+    fGuard.Signal();
+    fGuard.Unlock();
+    fThread.Stop();
     Flush();
 }
 
@@ -55,12 +60,12 @@ void JackMessageBuffer::Flush()
 
 void JackMessageBuffer::AddMessage(int level, const char *message)
 {
-    if (fMutex.Trylock()) {
+    if (fGuard.Trylock()) {
         fBuffers[fInBuffer].level = level;
         strncpy(fBuffers[fInBuffer].message, message, MB_BUFFERSIZE);
         fInBuffer = MB_NEXT(fInBuffer);
-        fSignal.SignalAll();
-        fMutex.Unlock();
+        fGuard.Signal();
+        fGuard.Unlock();
     } else {            /* lock collision */
         INC_ATOMIC(&fOverruns);
     }
@@ -68,11 +73,13 @@ void JackMessageBuffer::AddMessage(int level, const char *message)
          
 bool JackMessageBuffer::Execute()
 {
-    fSignal.Wait();
-    fMutex.Lock();
-    Flush();
-    fMutex.Unlock();
-    return true;	
+    while (fRunning) {
+        fGuard.Lock();
+        fGuard.Wait();
+        Flush();
+        fGuard.Unlock();
+    }
+    return false;	
 }
 
 void JackMessageBuffer::Create() 

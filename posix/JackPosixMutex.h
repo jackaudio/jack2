@@ -23,7 +23,7 @@
 #define __JackPosixMutex__
 
 #include <pthread.h>
-
+#include <stdio.h>
 #include <assert.h>
 #include "JackError.h"
 
@@ -36,7 +36,7 @@ namespace Jack
 class JackPosixMutex
 {
 
-    private:
+    protected:
 
         pthread_mutex_t fMutex;
 
@@ -56,7 +56,8 @@ class JackPosixMutex
             res = pthread_mutexattr_destroy(&mutex_attr);
             assert(res == 0);
         }
-        ~JackPosixMutex()
+        
+        virtual ~JackPosixMutex()
         {
             pthread_mutex_destroy(&fMutex);
         }

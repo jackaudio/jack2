@@ -34,8 +34,6 @@ void JackMachSemaphore::BuildName(const char* name, const char* server_name, cha
 
 bool JackMachSemaphore::Signal()
 {
-    kern_return_t res;
-
     if (!fSemaphore) {
         jack_error("JackMachSemaphore::Signal name = %s already desallocated!!", fName);
         return false;
@@ -44,6 +42,7 @@ bool JackMachSemaphore::Signal()
     if (fFlush)
         return true;
 
+    kern_return_t res;
     if ((res = semaphore_signal(fSemaphore)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::Signal name = %s err = %s", fName, mach_error_string(res));
     }
@@ -52,8 +51,6 @@ bool JackMachSemaphore::Signal()
 
 bool JackMachSemaphore::SignalAll()
 {
-    kern_return_t res;
-
     if (!fSemaphore) {
         jack_error("JackMachSemaphore::SignalAll name = %s already desallocated!!", fName);
         return false;
@@ -61,6 +58,8 @@ bool JackMachSemaphore::SignalAll()
 
     if (fFlush)
         return true;
+        
+    kern_return_t res;
     // When signaled several times, do not accumulate signals...
     if ((res = semaphore_signal_all(fSemaphore)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::SignalAll name = %s err = %s", fName, mach_error_string(res));
@@ -70,13 +69,12 @@ bool JackMachSemaphore::SignalAll()
 
 bool JackMachSemaphore::Wait()
 {
-    kern_return_t res;
-
     if (!fSemaphore) {
         jack_error("JackMachSemaphore::Wait name = %s already desallocated!!", fName);
         return false;
     }
 
+    kern_return_t res;
     if ((res = semaphore_wait(fSemaphore)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::Wait name = %s err = %s", fName, mach_error_string(res));
     }
@@ -85,15 +83,15 @@ bool JackMachSemaphore::Wait()
 
 bool JackMachSemaphore::TimedWait(long usec)
 {
-    kern_return_t res;
-    mach_timespec time;
-    time.tv_sec = usec / 1000000;
-    time.tv_nsec = (usec % 1000000) * 1000;
-
     if (!fSemaphore) {
         jack_error("JackMachSemaphore::TimedWait name = %s already desallocated!!", fName);
         return false;
     }
+    
+    kern_return_t res;
+    mach_timespec time;
+    time.tv_sec = usec / 1000000;
+    time.tv_nsec = (usec % 1000000) * 1000;
 
     if ((res = semaphore_timedwait(fSemaphore, time)) != KERN_SUCCESS) {
         jack_error("JackMachSemaphore::TimedWait name = %s usec = %ld err = %s", fName, usec, mach_error_string(res));

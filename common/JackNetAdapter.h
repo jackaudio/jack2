@@ -22,7 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <assert.h>
 #include "JackAudioAdapterInterface.h"
-#include "JackPlatformPlug.h"
 #include "JackNetInterface.h"
 
 namespace Jack
