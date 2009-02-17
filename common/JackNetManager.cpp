@@ -397,7 +397,7 @@ namespace Jack
         int res = 0;
 
 #ifdef JACK_MONITOR
-        jack_time_t begin_time = jack_get_time();
+        jack_time_t begin_time = GetMicroSeconds();
         fNetTimeMon->New();
 #endif
 
@@ -426,7 +426,7 @@ namespace Jack
                 return SOCKET_ERROR;
 
     #ifdef JACK_MONITOR
-            fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+            fNetTimeMon->Add ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
     #endif
 
             //send data
@@ -434,7 +434,7 @@ namespace Jack
                 return SOCKET_ERROR;
 
     #ifdef JACK_MONITOR
-            fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+            fNetTimeMon->Add ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
     #endif
     
         } else {
@@ -447,7 +447,7 @@ namespace Jack
             return res;
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+        fNetTimeMon->Add ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
 
         //decode sync
@@ -460,7 +460,7 @@ namespace Jack
             return res;
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->AddLast ( ( ( ( float ) ( jack_get_time() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+        fNetTimeMon->AddLast ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
 #endif
         return 0;
     }

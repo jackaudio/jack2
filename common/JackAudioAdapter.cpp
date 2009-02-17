@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackCompilerDeps.h"
 #include "JackTools.h"
+#include "JackTime.h"
 #include "jslist.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +45,7 @@ namespace Jack
             return 0;
 
         // DLL
-        adapter->fAudioAdapter->SetCallbackTime ( jack_get_time() );
+        adapter->fAudioAdapter->SetCallbackTime (GetMicroSeconds());
 
         // Push/pull from ringbuffer
         for ( i = 0; i < adapter->fCaptureChannels; i++ )

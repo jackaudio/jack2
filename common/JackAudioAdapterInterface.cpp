@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackAudioAdapter.h"
+#include "JackTime.h"  
 #include <stdio.h>
 
 namespace Jack
@@ -107,7 +108,7 @@ namespace Jack
 
     void JackAudioAdapterInterface::ResampleFactor ( jack_nframes_t& frame1, jack_nframes_t& frame2 )
     {
-        jack_time_t time = jack_get_time();
+        jack_time_t time = GetMicroSeconds();
 
         if ( !fRunning )
         {
