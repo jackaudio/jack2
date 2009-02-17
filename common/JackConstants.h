@@ -57,7 +57,7 @@
 #ifdef WIN32
 #define jack_server_dir "server"
 #define jack_client_dir "client"
-#define ADDON_DIR "jackmp"
+#define ADDON_DIR "jack"
 #endif
 
 #ifdef __APPLE__
