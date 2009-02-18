@@ -26,6 +26,7 @@ Michael Voigt
 2009-02-17 Stephane Letz  <letz@grame.fr>
 
 	* Fix the mutex/signal classes on Windows.
+        * Client incorrect re-naming fixed: now done at fifo level only.
 
 2009-02-16 Stephane Letz  <letz@grame.fr>
 
@@ -34,7 +35,7 @@ Michael Voigt
 2009-02-11 Stephane Letz  <letz@grame.fr>
 
 	* Merge Solaris branch back on trunk.
-      * Equality of input and output buffer size removed (for now) in JackOSSDriver.
+        * Equality of input and output buffer size removed (for now) in JackOSSDriver.
 
 2009-02-10 Stephane Letz  <letz@grame.fr>
 

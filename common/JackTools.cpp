@@ -169,7 +169,8 @@ namespace Jack {
         }
     }
 
-    int JackTools::GetTmpdir() {
+    int JackTools::GetTmpdir() 
+    {
         FILE* in;
         size_t len;
         char buf[JACK_PATH_MAX + 2]; /* allow tmpdir to live anywhere, plus newline, plus null */
@@ -200,7 +201,8 @@ namespace Jack {
     }
 #endif
 
-    void JackTools::RewriteName(const char* name, char* new_name) {
+    void JackTools::RewriteName(const char* name, char* new_name) 
+    {
         size_t i;
         for (i = 0; i < strlen(name); i++) {
             if ((name[i] == '/') || (name[i] == '\\'))

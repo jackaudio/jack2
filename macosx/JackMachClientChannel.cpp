@@ -80,7 +80,7 @@ int JackMachClientChannel::Open(const char* server_name, const char* name, char*
     }
 
     // Prepare local port using client name
-    char buf[JACK_CLIENT_NAME_SIZE];
+    char buf[JACK_CLIENT_NAME_SIZE + 1];
     snprintf(buf, sizeof(buf) - 1, "%s:%s", jack_client_entry, name_res);
 
     if (!fClientPort.AllocatePort(buf, 16)) {

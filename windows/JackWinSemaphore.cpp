@@ -18,6 +18,7 @@ This program is free software; you can redistribute it and/or modify
 */
 
 #include "JackWinSemaphore.h"
+#include "JackConstants.h"
 #include "JackTools.h"
 #include "JackError.h"
 #include <stdio.h>
@@ -25,9 +26,11 @@ This program is free software; you can redistribute it and/or modify
 namespace Jack
 {
 
-void JackWinSemaphore::BuildName(const char* name, const char* server_name, char* res)
+void JackWinSemaphore::BuildName(const char* client_name, const char* server_name, char* res)
 {
-    sprintf(res, "jack_pipe.%s_%s", server_name, name);
+    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    JackTools::RewriteName(client_name, ext_client_name);
+    sprintf(res, "jack_pipe.%s_%s", server_name, ext_client_name);
 }
 
 bool JackWinSemaphore::Signal()

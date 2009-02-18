@@ -77,7 +77,6 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
         goto error;
     }
 
-
     fClient = obj;
     return 0;
 

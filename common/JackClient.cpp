@@ -926,7 +926,7 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
 
 char* JackClient::GetInternalClientName(int ref)
 {
-    char name_res[JACK_CLIENT_NAME_SIZE];
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
     int result = -1;
     fChannel->GetInternalClientName(GetClientControl()->fRefNum, ref, name_res, &result);
 

@@ -632,7 +632,7 @@ namespace Jack
         {
             char multicast_ip[16];
             strcpy ( multicast_ip, DEFAULT_MULTICAST_IP );
-            char net_name[JACK_CLIENT_NAME_SIZE];
+            char net_name[JACK_CLIENT_NAME_SIZE + 1];
             int udp_port = DEFAULT_PORT;
             int mtu = DEFAULT_MTU;
             uint transport_sync = 1;
