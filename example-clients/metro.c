@@ -54,7 +54,6 @@ static void signal_handler(int sig)
 
 static void
 usage ()
-
 {
 	fprintf (stderr, "\n"
 "usage: jack_metro \n"
@@ -79,7 +78,6 @@ process_silence (jack_nframes_t nframes)
 static void
 process_audio (jack_nframes_t nframes) 
 {
-
 	sample_t *buffer = (sample_t *) jack_port_get_buffer (output_port, nframes);
 	jack_nframes_t frames_left = nframes;
 		
@@ -115,7 +113,6 @@ process (jack_nframes_t nframes, void *arg)
 int
 main (int argc, char *argv[])
 {
-	
 	sample_t scale;
 	int i, attack_length, decay_length;
 	double *amp;
