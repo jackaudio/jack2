@@ -50,6 +50,34 @@ void JackWinProcessSync::LockedSignalAll()
 void JackWinProcessSync::Wait()
 {
     ReleaseMutex(fMutex);
+	WaitForSingleObject(fEvent, INFINITE);
+}
+
+void JackWinProcessSync::LockedWait()
+{
+    /* Does it make sense on Windows, use non-locked version for now... */
+	Wait();
+}
+
+bool JackWinProcessSync::TimedWait(long usec)
+{
+    ReleaseMutex(fMutex);
+	DWORD res = WaitForSingleObject(fEvent, usec / 1000);
+	return (res == WAIT_OBJECT_0);
+}
+
+bool JackWinProcessSync::LockedTimedWait(long usec)
+{
+    /* Does it make sense on Windows, use non-locked version for now...*/
+    return TimedWait(usec);
+}
+
+/*
+Code from CAGuard.cpp : does ot sees to work as expected..
+
+void JackWinProcessSync::Wait()
+{
+    ReleaseMutex(fMutex);
 	HANDLE handles[] = { fMutex, fEvent };
 	DWORD res = WaitForMultipleObjects(2, handles, true, INFINITE);
 	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
@@ -59,8 +87,6 @@ void JackWinProcessSync::Wait()
 
 void JackWinProcessSync::LockedWait()
 {
-    /*
-    Does it make sense on Windows, use non-locked version for now...
     WaitForSingleObject(fMutex, INFINITE);
     ReleaseMutex(fMutex);
 	HANDLE handles[] = { fMutex, fEvent };
@@ -68,8 +94,6 @@ void JackWinProcessSync::LockedWait()
 	if ((res != WAIT_OBJECT_0) && (res != WAIT_TIMEOUT))
         jack_error("LockedWait error err = %d", GetLastError());
     ResetEvent(fEvent);
-    */
-    Wait();
 }
 
 bool JackWinProcessSync::TimedWait(long usec)
@@ -84,8 +108,6 @@ bool JackWinProcessSync::TimedWait(long usec)
 
 bool JackWinProcessSync::LockedTimedWait(long usec)
 {
-    /*
-    Does it make sense on Windows, use non-locked version for now...
     WaitForSingleObject(fMutex, INFINITE);
     ReleaseMutex(fMutex);
     HANDLE handles[] = { fMutex, fEvent };
@@ -94,10 +116,8 @@ bool JackWinProcessSync::LockedTimedWait(long usec)
         jack_error("LockedTimedWait error err = %d", GetLastError());
     ResetEvent(fEvent);
 	return (res == WAIT_OBJECT_0);
-	*/
-    return TimedWait(usec);
 }
-
+*/
 
 } // end of namespace
 
