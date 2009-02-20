@@ -34,7 +34,6 @@ namespace Jack
         //we can't call JackNetSlaveInterface constructor with some parameters before
         //because we don't have full parametering right now
         //parameters will be parsed from the param list, and then JackNetSlaveInterface will be filled with proper values
-        fMulticastIP = new char[16];
         strcpy ( fMulticastIP, DEFAULT_MULTICAST_IP );
         uint port = DEFAULT_PORT;
         GetHostName ( fParams.fName, JACK_CLIENT_NAME_SIZE );
@@ -60,10 +59,10 @@ namespace Jack
             switch ( param->character )
             {
                 case 'a' :
-                    if ( strlen ( param->value.str ) < 16 )
-                        strcpy ( fMulticastIP, param->value.str );
+                    if (strlen (param->value.str) < 32)
+                        strcpy(fMulticastIP, param->value.str);
                     else
-                        jack_error ( "Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP );
+                        jack_error("Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP);
                     break;
                 case 'p' :
                     fSocket.SetPort ( param->value.ui );

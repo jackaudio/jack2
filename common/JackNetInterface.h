@@ -34,7 +34,7 @@ namespace Jack
         protected:
             session_params_t fParams;
             JackNetSocket fSocket;
-            char* fMulticastIP;
+            char fMulticastIP[32];
             uint fNSubProcess;
 
             //headers

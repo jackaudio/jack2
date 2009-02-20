@@ -101,7 +101,7 @@ namespace Jack
 
             jack_client_t* fManagerClient;
             const char* fManagerName;
-            const char* fMulticastIP;
+            char fMulticastIP[32];
             JackNetSocket fSocket;
             pthread_t fManagerThread;
             master_list_t fMasterList;

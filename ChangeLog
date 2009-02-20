@@ -26,6 +26,7 @@ Michael Voigt
 2009-02-20 Stephane Letz  <letz@grame.fr>
 
 	* Add InitConnection and InitRendering methods in JackNetSlaveInterface, better packet type checking in JackNetSlaveInterface::SyncRecv.
+	* Change fMulticastIP handling in JackNetInterface.
 
 2009-02-17 Stephane Letz  <letz@grame.fr>
 

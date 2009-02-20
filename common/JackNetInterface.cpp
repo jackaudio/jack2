@@ -36,7 +36,6 @@ namespace Jack
 
     JackNetInterface::JackNetInterface() : fSocket()
     {
-        fMulticastIP = NULL;
         fTxBuffer = NULL;
         fRxBuffer = NULL;
         fNetAudioCaptureBuffer = NULL;
@@ -47,7 +46,7 @@ namespace Jack
 
     JackNetInterface::JackNetInterface ( const char* multicast_ip, int port ) : fSocket ( multicast_ip, port )
     {
-        fMulticastIP = strdup ( multicast_ip );
+        strcpy(fMulticastIP, multicast_ip);
         fTxBuffer = NULL;
         fRxBuffer = NULL;
         fNetAudioCaptureBuffer = NULL;
@@ -59,7 +58,7 @@ namespace Jack
     JackNetInterface::JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip ) : fSocket ( socket )
     {
         fParams = params;
-        fMulticastIP = strdup ( multicast_ip );
+        strcpy(fMulticastIP, multicast_ip);
         fTxBuffer = NULL;
         fRxBuffer = NULL;
         fNetAudioCaptureBuffer = NULL;
@@ -75,7 +74,6 @@ namespace Jack
         fSocket.Close();
         delete[] fTxBuffer;
         delete[] fRxBuffer;
-        delete[] fMulticastIP;
         delete fNetAudioCaptureBuffer;
         delete fNetAudioPlaybackBuffer;
         delete fNetMidiCaptureBuffer;

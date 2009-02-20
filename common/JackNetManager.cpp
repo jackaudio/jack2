@@ -474,7 +474,7 @@ namespace Jack
 
         fManagerClient = client;
         fManagerName = jack_get_client_name ( fManagerClient );
-        fMulticastIP = DEFAULT_MULTICAST_IP;
+        strcpy(fMulticastIP, DEFAULT_MULTICAST_IP);
         fSocket.SetPort ( DEFAULT_PORT );
         fGlobalID = 0;
         fRunning = true;
@@ -487,7 +487,10 @@ namespace Jack
             switch ( param->character )
             {
                 case 'a' :
-                    fMulticastIP = strdup ( param->value.str );
+                    if (strlen (param->value.str) < 32)
+                        strcpy(fMulticastIP, param->value.str);
+                    else
+                        jack_error("Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP);
                     break;
                 case 'p':
                     fSocket.SetPort ( param->value.ui );
