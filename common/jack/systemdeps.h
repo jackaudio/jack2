@@ -24,32 +24,42 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <windows.h>
 
-#ifdef __MINGW32__
-#include <stdint.h>
-#include <sys/types.h>
-#else
-#define __inline__ inline
-typedef char int8_t;
-typedef unsigned char uint8_t;
-typedef short int16_t;
-typedef unsigned short uint16_t;
-typedef long int32_t;
-typedef unsigned long uint32_t;
-typedef LONGLONG int64_t;
-typedef ULONGLONG uint64_t;
+#ifdef _MSC_VER     /* Microsoft compiler */
+    #define __inline__ inline
+    #ifndef int8_t
+        typedef char int8_t;
+        typedef unsigned char uint8_t;
+        typedef short int16_t;
+        typedef unsigned short uint16_t;
+        typedef long int32_t;
+        typedef unsigned long uint32_t;
+        typedef LONGLONG int64_t;
+        typedef ULONGLONG uint64_t;
+    #endif
+    #ifndef pthread_t
+        typedef HANDLE pthread_t;
+    #endif
+#elif __MINGW32__   /* MINGW */
+    #include <stdint.h>
+    #include <sys/types.h>
+    #ifndef pthread_t
+        typedef HANDLE pthread_t;
+    #endif
+#else               /* other compilers ...*/
+    #include <inttypes.h>
+    #include <pthread.h>
+    #include <sys/types.h>
 #endif
-typedef HANDLE pthread_t;
+
 typedef int64_t _jack_time_t;
-#endif // WIN32 */
 
-#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun) 
+#endif /* WIN32 */
 
-#include <inttypes.h>
-#include <pthread.h>
-#include <sys/types.h>
-
-typedef uint64_t _jack_time_t;
-
-#endif // __APPLE__ || __linux__ */
+#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun)
+    #include <inttypes.h>
+    #include <pthread.h>
+    #include <sys/types.h>
+    typedef uint64_t _jack_time_t;
+#endif /* __APPLE__ || __linux__ || __sun__ || sun */
 
 #endif

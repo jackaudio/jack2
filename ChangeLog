@@ -27,6 +27,7 @@ Michael Voigt
 
 	* Add InitConnection and InitRendering methods in JackNetSlaveInterface, better packet type checking in JackNetSlaveInterface::SyncRecv.
 	* Change fMulticastIP handling in JackNetInterface.
+      * Cleanup systemdeps.h on Windows.
 
 2009-02-17 Stephane Letz  <letz@grame.fr>
 
