@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-20 Stephane Letz  <letz@grame.fr>
+
+	* Add InitConnection and InitRendering methods in JackNetSlaveInterface, better packet type checking in JackNetSlaveInterface::SyncRecv.
+
 2009-02-17 Stephane Letz  <letz@grame.fr>
 
 	* Fix the mutex/signal classes on Windows.

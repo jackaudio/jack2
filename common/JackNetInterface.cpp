@@ -597,6 +597,48 @@ namespace Jack
 
         return true;
     }
+    
+    // Separate the connection protocol into two separated step
+    
+    bool JackNetSlaveInterface::InitConnection()
+    {
+        jack_log ( "JackNetSlaveInterface::InitConnection()" );
+
+        //set the parameters to send
+        strcpy (fParams.fPacketType, "params");
+        fParams.fProtocolVersion = SLAVE_PROTOCOL;
+        SetPacketType (&fParams, SLAVE_AVAILABLE);
+
+        net_status_t status;
+        do
+        {
+            //get a master
+            status = GetNetMaster();
+            if (status == NET_SOCKET_ERROR)
+                return false;
+        }
+        while (status != NET_CONNECTED);
+  
+        return true;
+    }
+    
+    bool JackNetSlaveInterface::InitRendering()
+    {
+        jack_log("JackNetSlaveInterface::InitRendering()");
+
+        net_status_t status;
+        do
+        {
+            //then tell the master we are ready
+            jack_info("Initializing connection with %s...", fParams.fMasterNetName);
+            status = SendStartToMaster();
+            if (status == NET_ERROR)
+                return false;
+        }
+        while (status != NET_ROLLING);   
+        
+        return true;
+    }
 
     net_status_t JackNetSlaveInterface::GetNetMaster()
     {
@@ -760,7 +802,8 @@ namespace Jack
             if ( rx_bytes == SOCKET_ERROR )
                 return rx_bytes;
         }
-        while ( !rx_bytes && ( rx_head->fDataType != 's' ) );
+        while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
+        
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }

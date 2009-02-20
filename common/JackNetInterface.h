@@ -140,6 +140,8 @@ namespace Jack
             net_transport_data_t fReturnTransportData;
 
             bool Init();
+            bool InitConnection();
+            bool InitRendering();
             
             net_status_t GetNetMaster();
             net_status_t SendStartToMaster();
