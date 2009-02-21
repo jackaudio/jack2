@@ -112,6 +112,11 @@ namespace Jack
     }
 
 //init and restart--------------------------------------------------------------------
+    /*
+        JackNetDriver is wrapped in a JackWaitThreadedDriver decorator that behaves 
+        as a "dummy driver, until Init method returns.
+    */
+    
     bool JackNetDriver::Init()
     {
         jack_log ( "JackNetDriver::Init()" );

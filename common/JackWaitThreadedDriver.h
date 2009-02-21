@@ -28,7 +28,11 @@ namespace Jack
 {
     
 /*!
-\brief To be used as a wrapper of JackNetDriver.
+\brief To be used as a wrapper of JackNetDriver. 
+
+The idea is to behave as the "dummy" driver, until the network connection is really started and processing starts. 
+The Execute method will call the ProcessNull() methods until the decorated driver Init method returns.
+A helper JackDriverStarter thread is used for that purpose.
 */
 
 class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
@@ -60,7 +64,7 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
                 // JackRunnableInterface interface
                 bool Execute()
                 {
-                    // Blocks until driver is started...
+                    // Blocks until decorated driver is started (that is when it's Init method returns).
                     fDriver->Init();
                     fRunning = true;
                     return false;
