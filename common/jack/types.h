@@ -40,8 +40,7 @@ typedef uint32_t	jack_nframes_t;
  * Type used to represent the value of free running
  * monotonic clock with units of microseconds.
  */
-
-typedef _jack_time_t jack_time_t;
+typedef uint64_t jack_time_t;
 
 /**
  *  Maximum size of @a load_init string passed to an internal client

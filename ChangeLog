@@ -23,11 +23,15 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-23 Stephane Letz  <letz@grame.fr>
+
+	* Another fix in systemdeps.h and types.h: jack_time_t now uniquely defined in types.h.
+
 2009-02-20 Stephane Letz  <letz@grame.fr>
 
 	* Add InitConnection and InitRendering methods in JackNetSlaveInterface, better packet type checking in JackNetSlaveInterface::SyncRecv.
 	* Change fMulticastIP handling in JackNetInterface.
-      * Cleanup systemdeps.h on Windows.
+        * Cleanup systemdeps.h on Windows.
 
 2009-02-17 Stephane Letz  <letz@grame.fr>
 

@@ -51,15 +51,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #include <sys/types.h>
 #endif
 
-typedef int64_t _jack_time_t;
-
 #endif /* WIN32 */
 
 #if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun)
     #include <inttypes.h>
     #include <pthread.h>
     #include <sys/types.h>
-    typedef uint64_t _jack_time_t;
 #endif /* __APPLE__ || __linux__ || __sun__ || sun */
 
 #endif
