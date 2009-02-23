@@ -42,6 +42,8 @@ namespace Jack
         fNetAudioPlaybackBuffer = NULL;
         fNetMidiCaptureBuffer = NULL;
         fNetMidiPlaybackBuffer = NULL;
+        memset(&fSendTransportData, 0, sizeof(net_transport_data_t));
+        memset(&fReturnTransportData, 0, sizeof(net_transport_data_t));
     }
 
     JackNetInterface::JackNetInterface ( const char* multicast_ip, int port ) : fSocket ( multicast_ip, port )
@@ -53,6 +55,8 @@ namespace Jack
         fNetAudioPlaybackBuffer = NULL;
         fNetMidiCaptureBuffer = NULL;
         fNetMidiPlaybackBuffer = NULL;
+        memset(&fSendTransportData, 0, sizeof(net_transport_data_t));
+        memset(&fReturnTransportData, 0, sizeof(net_transport_data_t));
     }
 
     JackNetInterface::JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip ) : fSocket ( socket )
@@ -65,6 +69,8 @@ namespace Jack
         fNetAudioPlaybackBuffer = NULL;
         fNetMidiCaptureBuffer = NULL;
         fNetMidiPlaybackBuffer = NULL;
+        memset(&fSendTransportData, 0, sizeof(net_transport_data_t));
+        memset(&fReturnTransportData, 0, sizeof(net_transport_data_t));
     }
 
     JackNetInterface::~JackNetInterface()
@@ -557,6 +563,41 @@ namespace Jack
             }
         }
         return rx_bytes;
+    }
+    
+    int JackNetMasterInterface::EncodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations coding
+        //first of all, reset sync packet
+        memset ( fTxData, 0, fPayloadSize );
+
+        //then, first step : transport
+        if ( fParams.fTransportSync )
+        {
+            if ( EncodeTransportData() < 0 )
+                return -1;
+            //copy to TxBuffer
+            memcpy ( fTxData, &fSendTransportData, sizeof ( net_transport_data_t ) );
+        }
+        //then others (freewheel etc.)
+        //...
+        return 0;
+    }
+
+    int JackNetMasterInterface::DecodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations decoding process
+        //first : transport
+        if ( fParams.fTransportSync )
+        {
+            //copy received transport data to transport data structure
+            memcpy ( &fReturnTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            if ( DecodeTransportData() < 0 )
+                return -1;
+        }
+        //then others
+        //...
+        return 0;
     }
 
 // JackNetSlaveInterface ************************************************************************************************

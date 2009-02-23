@@ -40,6 +40,10 @@ namespace Jack
             //headers
             packet_header_t fTxHeader;
             packet_header_t fRxHeader;
+            
+            // transport
+            net_transport_data_t fSendTransportData;
+            net_transport_data_t fReturnTransportData;
 
             //network buffers
             char* fTxBuffer;
@@ -105,11 +109,18 @@ namespace Jack
             bool Init();
             int SetRxTimeout();
             void SetParams();
+            
             void Exit();
+            
             int SyncRecv();
             int SyncSend();
+            
             int DataRecv();
             int DataSend();
+            
+             //sync packet
+            int EncodeSyncPacket();
+            int DecodeSyncPacket();
 
             int Send ( size_t size, int flags );
             int Recv ( size_t size, int flags );
@@ -135,10 +146,7 @@ namespace Jack
         protected:
         
             static uint fSlaveCounter;
-            
-            net_transport_data_t fSendTransportData;
-            net_transport_data_t fReturnTransportData;
-
+       
             bool Init();
             bool InitConnection();
             bool InitRendering();

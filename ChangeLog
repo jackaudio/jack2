@@ -26,6 +26,7 @@ Michael Voigt
 2009-02-23 Stephane Letz  <letz@grame.fr>
 
 	* Another fix in systemdeps.h and types.h: jack_time_t now uniquely defined in types.h.
+	* Move generic code and data in JackNetInterface and JackNetMasterInterface classes.
 
 2009-02-20 Stephane Letz  <letz@grame.fr>
 

@@ -71,10 +71,6 @@ namespace Jack
             int EncodeTransportData();
             int DecodeTransportData();
 
-            //sync packet
-            int EncodeSyncPacket();
-            int DecodeSyncPacket();
-
             int Process();
             void TimebaseCallback ( jack_position_t* pos );
 
