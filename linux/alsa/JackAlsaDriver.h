@@ -40,6 +40,8 @@ class JackAlsaDriver : public JackAudioDriver
     private:
 
         jack_driver_t* fDriver;
+        void* fReservedCaptureDevice;
+        void* fReservedPlaybackDevice;
     
         void alsa_driver_release_channel_dependent_memory(alsa_driver_t *driver);
         int alsa_driver_check_capabilities(alsa_driver_t *driver);
@@ -116,7 +118,11 @@ class JackAlsaDriver : public JackAudioDriver
 
     public:
 
-        JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table): JackAudioDriver(name, alias, engine, table)
+        JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
+		: JackAudioDriver(name, alias, engine, table)
+		,fDriver(NULL)
+		,fReservedCaptureDevice(NULL)
+		,fReservedPlaybackDevice(NULL)
         {}
         virtual ~JackAlsaDriver()
         {}

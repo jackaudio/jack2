@@ -27,6 +27,7 @@ Michael Voigt
 
 	* Another fix in systemdeps.h and types.h: jack_time_t now uniquely defined in types.h.
 	* Move generic code and data in JackNetInterface and JackNetMasterInterface classes.
+        * First version of D-Bus based audio device rerservation.
 
 2009-02-20 Stephane Letz  <letz@grame.fr>
 

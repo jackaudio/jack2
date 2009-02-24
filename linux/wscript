@@ -16,7 +16,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
-    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack']
+    driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
     driver.target = target
     driver.source = sources
     driver.install_path = '${ADDON_DIR}/'
@@ -26,7 +26,7 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
 
 def build(bld):
     jackd = bld.new_task_gen('cxx', 'program')
-    jackd.includes = ['../linux', '../posix', '../common/jack', '../common']
+    jackd.includes = ['../linux', '../posix', '../common/jack', '../common', '../dbus']
     jackd.defines = 'HAVE_CONFIG_H'
     jackd.source = ['../common/Jackdmp.cpp']
     jackd.uselib = 'PTHREAD DL RT'
