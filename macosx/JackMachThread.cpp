@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+
 #include "JackMachThread.h"
 #include "JackError.h"
 
@@ -30,9 +31,16 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
         // REAL-TIME / TIME-CONSTRAINT THREAD
         thread_time_constraint_policy_data_t	theTCPolicy;
 
+#ifdef TARGET_OS_IPHONE
+        theTCPolicy.period =  0;
+        theTCPolicy.computation = 0;
+        theTCPolicy.constraint =  0;
+#else
         theTCPolicy.period = AudioConvertNanosToHostTime(period);
         theTCPolicy.computation = AudioConvertNanosToHostTime(computation);
         theTCPolicy.constraint = AudioConvertNanosToHostTime(constraint);
+
+#endif
         theTCPolicy.preemptible = true;
         kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) & theTCPolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
         jack_log("JackMachThread::thread_policy_set res = %ld", res);
@@ -130,9 +138,16 @@ int JackMachThread::GetParams(UInt64* period, UInt64* computation, UInt64* const
                                           &count,
                                           &get_default);
     if (res == KERN_SUCCESS) {
+    #ifdef TARGET_OS_IPHONE
+        *period = 0;
+        *computation = 0;
+        *constraint = 0;
+    #else
         *period = AudioConvertHostTimeToNanos(theTCPolicy.period);
         *computation = AudioConvertHostTimeToNanos(theTCPolicy.computation);
         *constraint = AudioConvertHostTimeToNanos(theTCPolicy.constraint);
+    #endif
+      
         jack_log("JackMachThread::GetParams period = %ld computation = %ld constraint = %ld", long(*period / 1000.0f), long(*computation / 1000.0f), long(*constraint / 1000.0f));
         return 0;
     } else {

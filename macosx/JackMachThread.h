@@ -66,7 +66,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <mach/thread_policy.h>
 #include <mach/thread_act.h>
+#ifndef TARGET_OS_IPHONE
 #include <CoreAudio/HostTime.h>
+#endif
 
 #define THREAD_SET_PRIORITY         0
 #define THREAD_SCHEDULED_PRIORITY   1

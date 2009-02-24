@@ -26,6 +26,7 @@ Michael Voigt
 2009-02-24 Stephane Letz  <letz@grame.fr>
 
 	* New libjacknet library with net.h and JackNetAPI.cpp files. New netmaster.c and netmaster.c examples.
+	* Add iPhone sources and project.
 
 2009-02-23 Stephane Letz  <letz@grame.fr>
 
