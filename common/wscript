@@ -184,11 +184,11 @@ def build(bld):
     netlib.source = ['JackNetAPI.cpp', 'JackNetInterface.cpp', 'JackNetTool.cpp', 'JackAudioAdapterInterface.cpp', 'JackResampler.cpp', 'ringbuffer.c']
 
     if bld.env['IS_LINUX']:
-        netlib.source += ['./posix/JackNetUnixSocket.cpp','./posix/JackPosixThread.cpp']
+        netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../linux/JackLinuxTime.c']
         netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
     if bld.env['IS_SUN']:
-        netlib.source += ['./posix/JackNetUnixSocket.cpp','./posix/JackPosixThread.cpp']
+        netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../solaris/JackSolarisTime.c']
         netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
        
 

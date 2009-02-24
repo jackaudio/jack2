@@ -111,6 +111,8 @@ main (int argc, char *argv[])
         fprintf(stderr, "jack server not running?\n");
 		return 1;
 	}
+
+    printf("Slave is running...\n");
     
     /* install a signal handler to properly quits jack client */
 #ifdef WIN32

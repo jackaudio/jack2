@@ -1004,26 +1004,17 @@ SERVER_EXPORT int jack_adapter_pull_output(jack_adapter_t * adapter, int channel
 
 SERVER_EXPORT void jack_error(const char *fmt, ...)
 {
-    va_list ap;
-	va_start(ap, fmt);
     // TODO
-	va_end(ap);
 }
 
 SERVER_EXPORT void jack_info(const char *fmt, ...)
 {
-    va_list ap;
-	va_start(ap, fmt);
-    // TODO
-	va_end(ap);
+   // TODO
 }
 
 SERVER_EXPORT void jack_log(const char *fmt, ...)
 {
-    va_list ap;
-    va_start(ap, fmt);
     // TODO
-    va_end(ap);
 }
 
 //#endif

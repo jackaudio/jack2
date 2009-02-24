@@ -126,6 +126,8 @@ main (int argc, char *argv[])
 		return 1;
 	}
 
+    printf("Slave is found and running...\n");
+
     jack_set_net_slave_process_callback(net, net_process, NULL);
     if (jack_net_slave_activate(net) != 0) {
     	fprintf(stderr, "Cannot sactivate client\n");
