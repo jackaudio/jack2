@@ -49,6 +49,10 @@ usage ()
 "              [ -p port (default = %d)]\n", DEFAULT_MULTICAST_IP, DEFAULT_PORT);
 }
 
+static void net_shutdown(void* data)
+{
+    printf("Restarting...\n");
+}
 
 static int net_process(jack_nframes_t buffer_size,
                             int audio_input, 
@@ -129,6 +133,8 @@ main (int argc, char *argv[])
     printf("Slave is found and running...\n");
 
     jack_set_net_slave_process_callback(net, net_process, NULL);
+    jack_set_net_slave_shutdown_callback(net, net_shutdown, NULL);
+
     if (jack_net_slave_activate(net) != 0) {
     	fprintf(stderr, "Cannot sactivate client\n");
 		return 1;

@@ -145,8 +145,16 @@ main (int argc, char *argv[])
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
         
-        jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL);
-        jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL);
+        if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
+            printf("jack_net_master_send failure, exiting\n");
+            break;
+        }
+        
+        if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
+            printf("jack_net_master_recv failure, exiting\n");
+            break;
+        }
+
         usleep(wait_usec);
 	};
     
