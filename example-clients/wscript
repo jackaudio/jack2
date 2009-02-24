@@ -21,6 +21,8 @@ example_programs = {
     'jack_thru' : 'thru_client.c',
     'jack_cpu_load' : 'cpu_load.c',
     'jack_server_control' : 'server_control.cpp',
+    'jack_net_slave' : 'netslave.c',
+    'jack_net_master' : 'netmaster.c',
     }
 
 example_libs = {
@@ -69,8 +71,13 @@ def build(bld):
             prog.env.append_value("LINKFLAGS", "-lm")
         if example_program == 'jack_server_control':
             prog.uselib_local = 'serverlib'
+        elif example_program == 'jack_net_slave':
+            prog.uselib_local = 'netlib'
+	elif example_program == 'jack_net_master':
+            prog.uselib_local = 'netlib'
         else:
-            prog.uselib_local = 'clientlib'              
+            prog.uselib_local = 'clientlib' 
+                     
         prog.target = example_program
    
     #if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']
