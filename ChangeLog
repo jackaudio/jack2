@@ -29,6 +29,7 @@ Michael Voigt
         * For audio device reservation, add card_to_num function.
         * Fix buffer size and sample rate handling in JackAlsaAdapter.
         * Add control for adapter ringbuffer size.
+	* Fix JackAlsaAdapter.h for 64 bits compilation.
 
 2009-02-23 Stephane Letz  <letz@grame.fr>
 
