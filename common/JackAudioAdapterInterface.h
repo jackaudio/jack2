@@ -215,6 +215,8 @@ namespace Jack
             jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
             return fPlaybackChannels;
         }
+        
+        void PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
 
     };
 

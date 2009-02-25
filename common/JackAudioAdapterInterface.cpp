@@ -141,5 +141,38 @@ namespace Jack
     {
         return 0;
     }
+    
+    void JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames)
+    {
+        bool failure = false;
+
+        jack_time_t time1, time2;
+        ResampleFactor(time1, time2);
+
+        for (int i = 0; i < fCaptureChannels; i++) {
+            fCaptureRingBuffer[i]->SetRatio(time1, time2);
+            if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], inNumberFrames) < inNumberFrames)
+                failure = true;
+        }
+
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            fPlaybackRingBuffer[i]->SetRatio(time2, time1);
+            if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], inNumberFrames) < inNumberFrames)
+                 failure = true;
+        }
+
+    #ifdef JACK_MONITOR
+        fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
+             fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
+    #endif
+
+        // Reset all ringbuffers in case of failure
+        if (failure) {
+            jack_error("JackAudioAdapterInterface::PushAndPull ringbuffer failure... reset");
+            ResetRingBuffers();
+        }
+    }
+
+
 
 } // namespace

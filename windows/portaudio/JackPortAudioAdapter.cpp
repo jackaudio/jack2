@@ -26,51 +26,19 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-
-    int JackPortAudioAdapter::Render ( const void* inputBuffer,
-                                        void* outputBuffer,
-                                        unsigned long framesPerBuffer,
-                                        const PaStreamCallbackTimeInfo* timeInfo,
-                                        PaStreamCallbackFlags statusFlags,
-                                        void* userData)
+  
+    int JackPortAudioAdapter::Render(const void* inputBuffer,
+                                    void* outputBuffer,
+                                    unsigned long framesPerBuffer,
+                                    const PaStreamCallbackTimeInfo* timeInfo,
+                                    PaStreamCallbackFlags statusFlags,
+                                    void* userData)
     {
         JackPortAudioAdapter* adapter = static_cast<JackPortAudioAdapter*>(userData);
-        float** paBuffer;
-        bool failure = false;
-
-        jack_time_t time1, time2;
-        adapter->ResampleFactor ( time1, time2 );
-
-        paBuffer = (float**)inputBuffer;
-        for ( int i = 0; i < adapter->fCaptureChannels; i++ )
-        {
-            adapter->fCaptureRingBuffer[i]->SetRatio ( time1, time2 );
-            if (adapter->fCaptureRingBuffer[i]->WriteResample ( (float*)paBuffer[i], framesPerBuffer ) < framesPerBuffer )
-                failure = true;
-        }
-
-        paBuffer = (float**)outputBuffer;
-        for ( int i = 0; i < adapter->fPlaybackChannels; i++ )
-        {
-            adapter->fPlaybackRingBuffer[i]->SetRatio ( time2, time1 );
-            if ( adapter->fPlaybackRingBuffer[i]->ReadResample ( (float*)paBuffer[i], framesPerBuffer ) < framesPerBuffer )
-                failure = true;
-        }
-
-#ifdef JACK_MONITOR
-        adapter->fTable.Write ( time1, time2, double(time1) / double(time2), double(time2) / double(time1),
-                              adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace() );
-#endif
-
-        // Reset all ringbuffers in case of failure
-        if ( failure )
-        {
-            jack_error ( "JackPortAudioAdapter::Render ringbuffer failure... reset" );
-            adapter->ResetRingBuffers();
-        }
-        return paContinue;
+        adapter->PushAndPull((float**)inputBuffer, (float**)outputBuffer, framesPerBuffer);
+        return noErr;
     }
-
+    
     JackPortAudioAdapter::JackPortAudioAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
             : JackAudioAdapterInterface ( buffer_size, sample_rate )
     {
