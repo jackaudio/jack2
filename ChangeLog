@@ -23,6 +23,11 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-25 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackNetDriver::Close method.
+        * For audio device reservation, add card_to_num function.
+
 2009-02-24 Stephane Letz  <letz@grame.fr>
 
 	* New libjacknet library with net.h and JackNetAPI.cpp files. New netmaster.c and netmaster.c examples.
@@ -32,6 +37,7 @@ Michael Voigt
 
 	* Another fix in systemdeps.h and types.h: jack_time_t now uniquely defined in types.h.
 	* Move generic code and data in JackNetInterface and JackNetMasterInterface classes.
+        * First version of D-Bus based audio device rerservation.
 
 2009-02-20 Stephane Letz  <letz@grame.fr>
 

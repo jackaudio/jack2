@@ -124,7 +124,7 @@ namespace Jack
 
 struct JackNetExtMaster : public JackNetMasterInterface {
         
-    //sample buffers
+    // Data buffers
     float** fAudioCaptureBuffer;
     float** fAudioPlaybackBuffer;
     
@@ -142,8 +142,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         assert(strlen(ip) < 32);
         strcpy(fMulticastIP, ip);
         fSocket.SetPort(port);
-        fRequest.buffer_size =  request->buffer_size;
-        fRequest.sample_rate =  request->sample_rate;
+        fRequest.buffer_size = request->buffer_size;
+        fRequest.sample_rate = request->sample_rate;
     }
                 
     virtual ~JackNetExtMaster()
@@ -391,8 +391,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     {
         return 0;
     }
-
-
+    
 };
 
 struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterface {

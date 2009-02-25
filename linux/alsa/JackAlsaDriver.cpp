@@ -49,7 +49,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "generic.h"
 #include "memops.h"
 
-
+#include "audio_reserve.h"
 
 namespace Jack
 {
@@ -2138,6 +2138,23 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
+#if defined(JACK_DBUS)
+static int card_to_num(const char* device) 
+{
+    const char* t;
+    int i;
+
+    if ((t = strchr(device, ':')))
+       device = t + 1;
+
+    if ((i = snd_card_get_index(device)) < 0) {
+       i = atoi(device);
+    }
+
+    return i;
+}
+#endif
+
 int JackAlsaDriver::Open(jack_nframes_t nframes,
                          jack_nframes_t user_nperiods,
                          jack_nframes_t samplerate,
@@ -2169,6 +2186,29 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
         midi = alsa_seqmidi_new((jack_client_t*)this, 0);
     else if (strcmp(midi_driver_name, "raw") == 0)
         midi = alsa_rawmidi_new((jack_client_t*)this);
+
+#if defined(JACK_DBUS)
+    if (audio_reservation_init() < 0) {
+	jack_error("Audio device reservation service not available....");
+    } else if (strcmp(capture_driver_name, playback_driver_name) == 0) {    // Same device for input and output 
+	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
+    	if (fReservedCaptureDevice == NULL) {
+        	jack_error("Error audio device %s not available...", capture_driver_name);
+        	return -1;
+    	}
+    } else {
+    	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
+    	if (fReservedCaptureDevice == NULL) {
+        	jack_error("Error capture audio device %s not available...", capture_driver_name);
+        	return -1;
+    	}
+    	fReservedPlaybackDevice = audio_acquire(card_to_num(playback_driver_name));
+    	if (fReservedPlaybackDevice == NULL) {
+        	jack_error("Error playback audio device %s not available...", playback_driver_name);
+        	return -1;
+    	}
+    }
+#endif
 
     fDriver = alsa_driver_new ("alsa_pcm", (char*)playback_driver_name, (char*)capture_driver_name,
                                NULL,
@@ -2203,6 +2243,11 @@ int JackAlsaDriver::Close()
 {
     JackAudioDriver::Close();
     alsa_driver_delete((alsa_driver_t*)fDriver);
+#if defined(JACK_DBUS)
+    audio_release(fReservedCaptureDevice);
+    audio_release(fReservedPlaybackDevice);
+    audio_reservation_finish();
+#endif
     return 0;
 }
 

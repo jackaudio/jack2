@@ -576,8 +576,8 @@ jackctl_wait_signals(sigset_t signals)
                 // driver exit
                 waiting = false;
                 break;
-			case SIGTTOU:
-				break;
+            case SIGTTOU:
+                break;
             default:
                 waiting = false;
                 break;

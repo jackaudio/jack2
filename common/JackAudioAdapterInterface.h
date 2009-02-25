@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackResampler.h"
 #include "JackFilters.h"
+#include "JackConstants.h"
 
 namespace Jack
 {
