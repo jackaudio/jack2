@@ -90,7 +90,8 @@ namespace Jack
         JackResampler** fPlaybackRingBuffer;
         
         unsigned int fQuality;
-
+        unsigned int fRingbufferSize;
+      
         bool fRunning;
 
     public:
@@ -104,8 +105,8 @@ namespace Jack
                 fAdaptedSampleRate ( sample_rate ),
                 fHostDLL ( buffer_size, sample_rate ),
                 fAdaptedDLL ( buffer_size, sample_rate ),
-                fQuality(0),
-                fRunning ( false )
+                fQuality(0), fRingbufferSize(DEFAULT_RB_SIZE),
+                fRunning(false)
         {}
 
         virtual ~JackAudioAdapterInterface()
@@ -128,6 +129,11 @@ namespace Jack
         }
 
         void ResetRingBuffers();
+        
+        unsigned int GetRingbufferSize()
+        {
+            return fRingbufferSize;
+        }
         
         unsigned int GetQuality()
         {

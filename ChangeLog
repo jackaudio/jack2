@@ -28,6 +28,7 @@ Michael Voigt
 	* Fix JackNetDriver::Close method.
         * For audio device reservation, add card_to_num function.
         * Fix buffer size and sample rate handling in JackAlsaAdapter.
+        * Add control for adapter ringbuffer size.
 
 2009-02-23 Stephane Letz  <letz@grame.fr>
 

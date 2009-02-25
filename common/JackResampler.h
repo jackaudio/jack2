@@ -40,10 +40,11 @@ class JackResampler
         jack_ringbuffer_t* fRingBuffer;
         unsigned int fNum;
         unsigned int fDenom;
-           
+       
     public:
     
         JackResampler();
+        JackResampler(unsigned int ringbuffer_size);
         virtual ~JackResampler();
         
         virtual void Reset();

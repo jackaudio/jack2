@@ -181,6 +181,10 @@ JackOSSAdapter::JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample
             case 'q':
                 fQuality = param->value.ui;
                 break;
+                
+            case 'g':
+                fRingbufferSize = param->value.ui;
+                break;
 
            }
     }
@@ -755,6 +759,14 @@ extern "C"
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "ring-buffer");
+        desc->params[i].character = 'g';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 32768)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
     
         return desc;

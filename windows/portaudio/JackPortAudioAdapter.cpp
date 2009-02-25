@@ -128,6 +128,9 @@ namespace Jack
             case 'q':
                 fQuality = param->value.ui;
                 break;
+            case 'g':
+                fRingbufferSize = param->value.ui;
+                break;
             }
         }
 
@@ -247,7 +250,7 @@ extern "C"
         strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
      
-        desc->nparams = 9;
+        desc->nparams = 10;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -321,6 +324,14 @@ extern "C"
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "ring-buffer");
+        desc->params[i].character = 'g';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 32768)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;

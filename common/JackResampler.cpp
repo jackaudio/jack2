@@ -28,6 +28,12 @@ JackResampler::JackResampler():fNum(1),fDenom(1)
     jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * DEFAULT_RB_SIZE) / 2);
 }
 
+JackResampler::JackResampler(unsigned int ringbuffer_size):fNum(1),fDenom(1)
+{
+    fRingBuffer = jack_ringbuffer_create(sizeof(float) * ringbuffer_size);
+    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * ringbuffer_size) / 2);
+}
+
 JackResampler::~JackResampler()
 {
     if (fRingBuffer)
