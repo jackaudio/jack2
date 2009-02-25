@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-25 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackNetDriver::Close method.
+
 2009-02-23 Stephane Letz  <letz@grame.fr>
 
 	* Another fix in systemdeps.h and types.h: jack_time_t now uniquely defined in types.h.

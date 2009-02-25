@@ -91,14 +91,15 @@ namespace Jack
         }
     }
 
-#ifdef JACK_MONITOR
     int JackNetDriver::Close()
     {
+#ifdef JACK_MONITOR
         if ( fNetTimeMon )
             fNetTimeMon->Save();
+#endif
+        FreeAll();
         return JackDriver::Close();
     }
-#endif
 
     // Attach and Detach are defined as empty methods: port allocation is done when driver actually start (that is in Init)
     int JackNetDriver::Attach()
@@ -122,8 +123,10 @@ namespace Jack
         jack_log ( "JackNetDriver::Init()" );
 
         //new loading, but existing socket, restart the driver
-        if ( fSocket.IsSocket() )
-            Restart();
+        if (fSocket.IsSocket()) {
+            jack_info( "Restarting driver..." );
+            FreeAll();
+        }
 
         //set the parameters to send
         fParams.fSendAudioChannels = fCaptureChannels;
@@ -206,28 +209,28 @@ namespace Jack
         return true;
     }
 
-    void JackNetDriver::Restart()
+    void JackNetDriver::FreeAll()
     {
-        jack_log ( "JackNetDriver::Restart" );
-
-        jack_info ( "Restarting driver..." );
-        delete[] fTxBuffer;
-        fTxBuffer = NULL;
-        delete[] fRxBuffer;
-        fRxBuffer = NULL;
-        delete fNetAudioCaptureBuffer;
-        fNetAudioCaptureBuffer = NULL;
-        delete fNetAudioPlaybackBuffer;
-        fNetAudioPlaybackBuffer = NULL;
-        delete fNetMidiCaptureBuffer;
-        fNetMidiCaptureBuffer = NULL;
-        delete fNetMidiPlaybackBuffer;
-        fNetMidiPlaybackBuffer = NULL;
         FreePorts();
+        
+        delete[] fTxBuffer;
+        delete[] fRxBuffer;
+        delete fNetAudioCaptureBuffer;
+        delete fNetAudioPlaybackBuffer;
+        delete fNetMidiCaptureBuffer;
+        delete fNetMidiPlaybackBuffer;
         delete[] fMidiCapturePortList;
-        fMidiCapturePortList = NULL;
         delete[] fMidiPlaybackPortList;
+        
+        fTxBuffer = NULL;
+        fRxBuffer = NULL;
+        fNetAudioCaptureBuffer = NULL;
+        fNetAudioPlaybackBuffer = NULL;
+        fNetMidiCaptureBuffer = NULL;
+        fNetMidiPlaybackBuffer = NULL;
+        fMidiCapturePortList = NULL;
         fMidiPlaybackPortList = NULL;
+        
 #ifdef JACK_MONITOR
         delete fNetTimeMon;
         fNetTimeMon = NULL;

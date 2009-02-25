@@ -31,7 +31,7 @@ namespace Jack
 \brief To be used as a wrapper of JackNetDriver. 
 
 The idea is to behave as the "dummy" driver, until the network connection is really started and processing starts. 
-The Execute method will call the ProcessNull() methods until the decorated driver Init method returns.
+The Execute method will call the ProcessNull method until the decorated driver Init method returns.
 A helper JackDriverStarter thread is used for that purpose.
 */
 
