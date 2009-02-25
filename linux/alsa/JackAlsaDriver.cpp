@@ -2138,13 +2138,13 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
-static int card_to_num(const char *device) 
+static int card_to_num(const char* device) 
 {
     const char* t;
     int i;
 
     if ((t = strchr(device, ':')))
-       device = t+1;
+       device = t + 1;
 
     if ((i = snd_card_get_index(device)) < 0) {
        i = atoi(device);
@@ -2187,7 +2187,7 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
 
 #if defined(JACK_DBUS)
     if (audio_reservation_init() < 0) {
-	jack_error("Audio reservation sevice not available....");
+	jack_error("Audio device reservation service not available....");
     } else if (strcmp(capture_driver_name, playback_driver_name) == 0) {    // Same device for input and output 
 	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
     	if (fReservedCaptureDevice == NULL) {
