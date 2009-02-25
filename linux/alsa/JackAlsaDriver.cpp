@@ -2138,6 +2138,21 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
+static int card_to_num(const char *device) 
+{
+    const char* t;
+    int i;
+
+    if ((t = strchr(device, ':')))
+       device = t+1;
+
+    if ((i = snd_card_get_index(device)) < 0) {
+       i = atoi(device);
+    }
+
+    return i;
+}
+
 int JackAlsaDriver::Open(jack_nframes_t nframes,
                          jack_nframes_t user_nperiods,
                          jack_nframes_t samplerate,
@@ -2174,18 +2189,18 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     if (audio_reservation_init() < 0) {
 	jack_error("Audio reservation sevice not available....");
     } else if (strcmp(capture_driver_name, playback_driver_name) == 0) {    // Same device for input and output 
-	fReservedCaptureDevice = audio_acquire(0);
+	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
     	if (fReservedCaptureDevice == NULL) {
         	jack_error("Error audio device %s not available...", capture_driver_name);
         	return -1;
     	}
     } else {
-    	fReservedCaptureDevice = audio_acquire(0);
+    	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
     	if (fReservedCaptureDevice == NULL) {
         	jack_error("Error capture audio device %s not available...", capture_driver_name);
         	return -1;
     	}
-    	fReservedPlaybackDevice = audio_acquire(0);
+    	fReservedPlaybackDevice = audio_acquire(card_to_num(playback_driver_name));
     	if (fReservedPlaybackDevice == NULL) {
         	jack_error("Error playback audio device %s not available...", playback_driver_name);
         	return -1;

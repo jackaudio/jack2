@@ -47,6 +47,7 @@ SERVER_EXPORT int audio_reservation_finish()
 {
     if (connection) 
         dbus_connection_unref(connection);
+    return 0;
 }
 
 SERVER_EXPORT void* audio_acquire(int num)

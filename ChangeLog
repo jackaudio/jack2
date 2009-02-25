@@ -26,6 +26,7 @@ Michael Voigt
 2009-02-25 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackNetDriver::Close method.
+        * For audio device reservation, add card_to_num function.
 
 2009-02-23 Stephane Letz  <letz@grame.fr>
 
