@@ -356,13 +356,17 @@ namespace Jack
         int audio_port_index;
         uint midi_port_index;
         for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
-            fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index] );
+            if (fCapturePortList[audio_port_index] > 0)
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index] );
         for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
-            fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index] );
+            if (fPlaybackPortList[audio_port_index] > 0)
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index] );
         for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
-            fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index] );
+            if (fMidiCapturePortList[midi_port_index] > 0)
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index] );
         for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
-            fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index] );
+            if (fMidiPlaybackPortList[midi_port_index] > 0)
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index] );
         return 0;
     }
 
