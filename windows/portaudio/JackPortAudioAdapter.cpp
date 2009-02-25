@@ -38,7 +38,7 @@ namespace Jack
         float** paBuffer;
         bool failure = false;
 
-        jack_nframes_t time1, time2;
+        jack_time_t time1, time2;
         adapter->ResampleFactor ( time1, time2 );
 
         paBuffer = (float**)inputBuffer;

@@ -604,7 +604,7 @@ bool JackOSSAdapter::Execute()
         return false;
 
     bool failure = false;
-    jack_nframes_t time1, time2; 
+    jack_time_t time1, time2; 
     ResampleFactor(time1, time2);
   
     for (int i = 0; i < fCaptureChannels; i++) {

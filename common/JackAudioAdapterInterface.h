@@ -184,7 +184,7 @@ namespace Jack
             fHostDLL.IncFrame ( callback_usec );
         }
 
-        void ResampleFactor ( jack_nframes_t& frame1, jack_nframes_t& frame2 );
+        void ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 );
 
         void SetInputs ( int inputs )
         {

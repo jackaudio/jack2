@@ -106,7 +106,7 @@ namespace Jack
             fPlaybackRingBuffer[i]->Reset();
     }
 
-    void JackAudioAdapterInterface::ResampleFactor ( jack_nframes_t& frame1, jack_nframes_t& frame2 )
+    void JackAudioAdapterInterface::ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 )
     {
         jack_time_t time = GetMicroSeconds();
 

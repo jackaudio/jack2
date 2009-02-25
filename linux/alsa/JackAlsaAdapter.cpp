@@ -66,9 +66,11 @@ namespace Jack
                     fAudioInterface.fCardName = strdup ( param->value.str );
                     break;
                 case 'r':
+		    fAudioInterface.fFrequency = param->value.ui;
                     SetAdaptedSampleRate ( param->value.ui );
                     break;
                 case 'p':
+		    fAudioInterface.fBuffering = param->value.ui;
                     SetAdaptedBufferSize ( param->value.ui );
                     break;
                 case 'q':
@@ -153,7 +155,7 @@ namespace Jack
         bool failure = false;
 
         //compute resampling factor
-        jack_nframes_t time1, time2;
+        jack_time_t time1, time2;
         ResampleFactor ( time1, time2 );
 
         //resample inputs

@@ -295,7 +295,7 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
     AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
     bool failure = false;
 
-    jack_nframes_t time1, time2;
+    jack_time_t time1, time2;
     adapter->ResampleFactor(time1, time2);
 
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
