@@ -244,9 +244,10 @@ JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, Jac
 
 JackLoadableInternalClient::~JackLoadableInternalClient()
 {
-    if (fFinish)
+    if (fFinish != NULL)
         fFinish(fProcessArg);
-    UnloadJackModule(fHandle);
+    if (fHandle != NULL)
+        UnloadJackModule(fHandle);
 }
 
 int JackLoadableInternalClient1::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
