@@ -2138,6 +2138,7 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
+#if defined(JACK_DBUS)
 static int card_to_num(const char* device) 
 {
     const char* t;
@@ -2152,6 +2153,7 @@ static int card_to_num(const char* device)
 
     return i;
 }
+#endif
 
 int JackAlsaDriver::Open(jack_nframes_t nframes,
                          jack_nframes_t user_nperiods,
