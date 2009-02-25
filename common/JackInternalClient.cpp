@@ -179,20 +179,20 @@ int JackLoadableInternalClient::Init(const char* so_name)
     fHandle = LoadJackModule(path_to_so);
     jack_log("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s", path_to_so);
 
-    if (fHandle == 0) {
+    if (fHandle == NULL) {
         PrintLoadError(so_name);
         return -1;
     }
 
     fFinish = (FinishCallback)GetJackProc(fHandle, "jack_finish");
-    if (!fFinish) {
+    if (fFinish == NULL) {
         UnloadJackModule(fHandle);
         jack_error("symbol jack_finish cannot be found in %s", so_name);
         return -1;
     }
 
     fDescriptor = (JackDriverDescFunction)GetJackProc(fHandle, "jack_get_descriptor");
-    if (!fDescriptor) {
+    if (fDescriptor == NULL) {
         jack_info("No jack_get_descriptor entry-point for %s", so_name);
     }
     return 0;
@@ -205,7 +205,7 @@ int JackLoadableInternalClient1::Init(const char* so_name)
     }
     
     fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
-    if (!fInitialize) {
+    if (fInitialize == NULL) {
         UnloadJackModule(fHandle);
         jack_error("symbol jack_initialize cannot be found in %s", so_name);
         return -1;
@@ -221,7 +221,7 @@ int JackLoadableInternalClient2::Init(const char* so_name)
     }
     
     fInitialize = (InternalInitializeCallback)GetJackProc(fHandle, "jack_internal_initialize");
-    if (!fInitialize) {
+    if (fInitialize == NULL) {
         UnloadJackModule(fHandle);
         jack_error("symbol jack_internal_initialize cannot be found in %s", so_name);
         return -1;
