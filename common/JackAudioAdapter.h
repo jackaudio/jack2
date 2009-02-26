@@ -37,12 +37,6 @@ namespace Jack
             static int BufferSize ( jack_nframes_t buffer_size, void *arg );
             static int SampleRate ( jack_nframes_t sample_rate, void *arg );
 
-            int fCaptureChannels;
-            int fPlaybackChannels;
-
-            JackResampler** fCaptureRingBuffer;
-            JackResampler** fPlaybackRingBuffer;
-
             jack_port_t** fCapturePortList;
             jack_port_t** fPlaybackPortList;
 

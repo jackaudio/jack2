@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackAudioAdapter.h"
+#include "JackLibSampleRateResampler.h"
 #include "JackTime.h"  
 #include <stdio.h>
 
@@ -96,13 +97,12 @@ namespace Jack
     }
 
 #endif
-
+        
     void JackAudioAdapterInterface::ResetRingBuffers()
     {
-        int i;
-        for (i = 0; i < fCaptureChannels; i++)
+        for (int i = 0; i < fCaptureChannels; i++)
             fCaptureRingBuffer[i]->Reset();
-        for (i = 0; i < fPlaybackChannels; i++)
+        for (int i = 0; i < fPlaybackChannels; i++)
             fPlaybackRingBuffer[i]->Reset();
     }
 
@@ -110,17 +110,14 @@ namespace Jack
     {
         jack_time_t time = GetMicroSeconds();
 
-        if ( !fRunning )
-        {
+        if (!fRunning) {
             // Init DLL
             fRunning = true;
-            fHostDLL.Init ( time );
-            fAdaptedDLL.Init ( time );
+            fHostDLL.Init(time);
+            fAdaptedDLL.Init(time);
             frame1 = 1;
             frame2 = 1;
-        }
-        else
-        {
+        } else {
             // DLL
             fAdaptedDLL.IncFrame(time);
             jack_nframes_t time1 = fHostDLL.Time2Frames(time);
@@ -131,24 +128,47 @@ namespace Jack
                      long(time1), long(time2), double(time1) / double(time2), double(time2) / double(time1));
         }
     }
-
-    int JackAudioAdapterInterface::Open()
+    
+    void JackAudioAdapterInterface::Reset()
     {
-        return 0;
+        ResetRingBuffers();
+        fRunning = false;
     }
 
-    int JackAudioAdapterInterface::Close()
+    void JackAudioAdapterInterface::Create()
     {
-        return 0;
+        //ringbuffers
+        fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
+        fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
+        for (int i = 0; i < fCaptureChannels; i++ )
+            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality, fRingbufferSize);
+        for (int i = 0; i < fPlaybackChannels; i++ )
+            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality, fRingbufferSize);
+
+        if (fCaptureChannels > 0)
+            jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
+        if (fPlaybackChannels > 0)
+            jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace());
+    }
+
+    void JackAudioAdapterInterface::Destroy()
+    {
+        for (int i = 0; i < fCaptureChannels; i++ )
+            delete ( fCaptureRingBuffer[i] );
+        for (int i = 0; i < fPlaybackChannels; i++ )
+            delete ( fPlaybackRingBuffer[i] );
+
+        delete[] fCaptureRingBuffer;
+        delete[] fPlaybackRingBuffer;
     }
     
     void JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames)
     {
         bool failure = false;
-
         jack_time_t time1, time2;
         ResampleFactor(time1, time2);
 
+        // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
             fCaptureRingBuffer[i]->SetRatio(time1, time2);
             if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], inNumberFrames) < inNumberFrames)
@@ -173,6 +193,27 @@ namespace Jack
         }
     }
 
+    void JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames) 
+    {
+        bool failure = false;
+        SetCallbackTime(GetMicroSeconds());
 
+        // Push/pull from ringbuffer
+        for (int i = 0; i < fCaptureChannels; i++) {
+            if (fCaptureRingBuffer[i]->Read(inputBuffer[i], inNumberFrames) < inNumberFrames)
+                failure = true;
+        }
+
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], inNumberFrames) < inNumberFrames)
+                failure = true;
+        }
+
+        // Reset all ringbuffers in case of failure
+        if (failure) {
+            jack_error("JackCallbackAudioAdapter::PullAndPush ringbuffer failure... reset");
+            Reset();
+        }
+    }
 
 } // namespace
