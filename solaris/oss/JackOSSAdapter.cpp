@@ -506,7 +506,7 @@ error:
  
 int JackOSSAdapter::Close()
 {
-#ifdef DEBUG
+#ifdef JACK_MONITOR
     fTable.Save();
 #endif
 
@@ -604,38 +604,16 @@ int JackOSSAdapter::Write()
 
 bool JackOSSAdapter::Execute()
 {
+    //read data from audio interface
     if (Read() < 0)
         return false;
-
-    bool failure = false;
-    jack_time_t time1, time2; 
-    ResampleFactor(time1, time2);
-  
-    for (int i = 0; i < fCaptureChannels; i++) {
-        fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        if (fCaptureRingBuffer[i]->WriteResample(fInputSampleBuffer[i], fAdaptedBufferSize) < fAdaptedBufferSize)
-            failure = true;
-    }
-    
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        if (fPlaybackRingBuffer[i]->ReadResample(fOutputSampleBuffer[i], fAdaptedBufferSize) < fAdaptedBufferSize)
-            failure = true;
-    }
-
-#ifdef DEBUG
-    fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
-        fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
-#endif
         
+    PushAndPull(fInputSampleBuffers, fOutputSampleBuffer, fAdaptedBufferSize);
+        
+    //write data to audio interface
     if (Write() < 0)
         return false;
-     
-    // Reset all ringbuffers in case of failure
-    if (failure) {
-        jack_error("JackOSSAdapter::Execute ringbuffer failure... reset");
-        ResetRingBuffers();
-    }
+   
     return true;
 }
 

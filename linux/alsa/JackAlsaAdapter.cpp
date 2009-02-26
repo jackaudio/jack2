@@ -152,45 +152,14 @@ namespace Jack
     bool JackAlsaAdapter::Execute()
     {
         //read data from audio interface
-        if ( fAudioInterface.read() < 0 )
+        if (fAudioInterface.read() < 0)
             return false;
-
-        bool failure = false;
-
-        //compute resampling factor
-        jack_time_t time1, time2;
-        ResampleFactor ( time1, time2 );
-
-        //resample inputs
-        for ( int i = 0; i < fCaptureChannels; i++ )
-        {
-            fCaptureRingBuffer[i]->SetRatio ( time1, time2 );
-            if ( fCaptureRingBuffer[i]->WriteResample ( fAudioInterface.fInputSoftChannels[i], fAdaptedBufferSize ) < fAdaptedBufferSize )
-                failure = true;
-        }
-        //resample outputs
-        for ( int i = 0; i < fPlaybackChannels; i++ )
-        {
-            fPlaybackRingBuffer[i]->SetRatio ( time2, time1 );
-            if ( fPlaybackRingBuffer[i]->ReadResample ( fAudioInterface.fOutputSoftChannels[i], fAdaptedBufferSize ) < fAdaptedBufferSize )
-                failure = true;
-        }
-
-#ifdef JACK_MONITOR
-        fTable.Write ( time1, time2, double ( time1 ) / double ( time2 ), double ( time2 ) / double ( time1 ),
-                       fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace() );
-#endif
+            
+        PushAndPull(fAudioInterface.fInputSoftChannels, fAudioInterface.fOutputSoftChannels, fAdaptedBufferSize);
 
         //write data to audio interface
-        if ( fAudioInterface.write() < 0 )
+        if (fAudioInterface.write() < 0)
             return false;
-
-        //reset all ringbuffers in case of failure
-        if ( failure )
-        {
-            jack_error ( "JackAlsaAdapter::Execute ringbuffer failure... reset" );
-            ResetRingBuffers();
-        }
 
         return true;
     }
