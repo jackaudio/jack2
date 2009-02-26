@@ -40,6 +40,7 @@ class JackResampler
         jack_ringbuffer_t* fRingBuffer;
         unsigned int fNum;
         unsigned int fDenom;
+        unsigned int fRingBufferSize;
        
     public:
     
