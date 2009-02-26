@@ -608,7 +608,7 @@ bool JackOSSAdapter::Execute()
     if (Read() < 0)
         return false;
         
-    PushAndPull(fInputSampleBuffers, fOutputSampleBuffer, fAdaptedBufferSize);
+    PushAndPull(fInputSampleBuffer, fOutputSampleBuffer, fAdaptedBufferSize);
         
     //write data to audio interface
     if (Write() < 0)

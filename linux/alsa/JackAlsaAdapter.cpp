@@ -273,7 +273,6 @@ extern "C"
         strcpy ( desc->params[i].short_desc,
                  "Number of playback channels (defaults to hardware max)" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-        
     
         i++;
         strcpy(desc->params[i].name, "quality");
