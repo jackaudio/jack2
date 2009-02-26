@@ -196,7 +196,7 @@ namespace Jack
     void JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames) 
     {
         bool failure = false;
-        SetCallbackTime(GetMicroSeconds());
+        fHostDLL.IncFrame(GetMicroSeconds());
 
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {

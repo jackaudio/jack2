@@ -97,11 +97,6 @@ namespace Jack
         void ResetRingBuffers();
         void ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 );
         
-        virtual void SetCallbackTime ( jack_time_t callback_usec )
-        {
-            fHostDLL.IncFrame ( callback_usec );
-        }
-
     public:
 
          JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ):
