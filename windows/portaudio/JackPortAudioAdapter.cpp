@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack
 {
-  
+
     int JackPortAudioAdapter::Render(const void* inputBuffer,
                                     void* outputBuffer,
                                     unsigned long framesPerBuffer,
@@ -36,9 +36,9 @@ namespace Jack
     {
         JackPortAudioAdapter* adapter = static_cast<JackPortAudioAdapter*>(userData);
         adapter->PushAndPull((float**)inputBuffer, (float**)outputBuffer, framesPerBuffer);
-        return noErr;
+        return paContinue;
     }
-    
+
     JackPortAudioAdapter::JackPortAudioAdapter ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
             : JackAudioAdapterInterface ( buffer_size, sample_rate )
     {
@@ -217,7 +217,7 @@ extern "C"
 
         strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-     
+
         desc->nparams = 10;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
@@ -285,7 +285,7 @@ extern "C"
         desc->params[i].value.i = TRUE;
         strcpy(desc->params[i].short_desc, "Display available PortAudio devices");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "quality");
         desc->params[i].character = 'q';
@@ -293,7 +293,7 @@ extern "C"
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';
