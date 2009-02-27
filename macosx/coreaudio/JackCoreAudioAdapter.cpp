@@ -948,7 +948,7 @@ int JackCoreAudioAdapter::Open()
 int JackCoreAudioAdapter::Close()
 {
 #ifdef JACK_MONITOR
-    fTable.Save();
+    fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
     AudioOutputUnitStop(fAUHAL);
     DisposeBuffers();

@@ -23,9 +23,13 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-27 Stephane Letz  <letz@grame.fr>
+
+	* Improve generated gnuplot files for adapting code.
+
 2009-02-25 Stephane Letz  <letz@grame.fr>
 
-	*  Major cleanup in adapter code.
+	* Major cleanup in adapter code.
 
 2009-02-25 Stephane Letz  <letz@grame.fr>
 

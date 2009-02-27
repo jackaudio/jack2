@@ -507,9 +507,8 @@ error:
 int JackOSSAdapter::Close()
 {
 #ifdef JACK_MONITOR
-    fTable.Save();
+    fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
-
     fThread.Stop();
     CloseAux();  
     return 0;

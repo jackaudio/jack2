@@ -38,7 +38,7 @@ namespace Jack
         fTable[pos].pos2 = pos2;
     }
 
-    void MeasureTable::Save()
+    void MeasureTable::Save(unsigned int fHostBufferSize, unsigned int fHostSampleRate, unsigned int fAdaptedSampleRate, unsigned int fAdaptedBufferSize)
     {
         char buffer[1024];
         FILE* file = fopen("JackAudioAdapter.log", "w");
@@ -57,6 +57,22 @@ namespace Jack
         file = fopen("AdapterTiming1.plot", "w");
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
+        fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
+            ,float(fHostSampleRate)/1000.f, fHostBufferSize, float(fAdaptedSampleRate)/1000.f, fAdaptedBufferSize);
+        fprintf(file, "set xlabel \"audio cycles\"\n");
+        fprintf(file, "set ylabel \"frames\"\n");
+        fprintf(file, "plot ");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer interrupt period\" with lines,");
+        fprintf(file, buffer);
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines");
+        fprintf(file, buffer);
+        
+        fprintf(file, "\n unset multiplot\n");  
+        fprintf(file, "set output 'AdapterTiming1.pdf\n");
+        fprintf(file, "set terminal pdf\n");
+        
+        fprintf(file, "set multiplot\n");
+        fprintf(file, "set grid\n");
         fprintf(file, "set title \"Audio adapter timing\"\n");
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
@@ -65,10 +81,27 @@ namespace Jack
         fprintf(file, buffer);
         sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines");
         fprintf(file, buffer);
+        
         fclose(file);
 
         // Adapter timing 2
         file = fopen("AdapterTiming2.plot", "w");
+        fprintf(file, "set multiplot\n");
+        fprintf(file, "set grid\n");
+        fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
+            ,float(fHostSampleRate)/1000.f, fHostBufferSize, float(fAdaptedSampleRate)/1000.f, fAdaptedBufferSize);
+        fprintf(file, "set xlabel \"audio cycles\"\n");
+        fprintf(file, "set ylabel \"resampling ratio\"\n");
+        fprintf(file, "plot ");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
+        fprintf(file, buffer);
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines");
+        fprintf(file, buffer);
+        
+        fprintf(file, "\n unset multiplot\n");  
+        fprintf(file, "set output 'AdapterTiming2.pdf\n");
+        fprintf(file, "set terminal pdf\n");
+        
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"Audio adapter timing\"\n");
@@ -79,10 +112,27 @@ namespace Jack
         fprintf(file, buffer);
         sprintf(buffer, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines");
         fprintf(file, buffer);
+        
         fclose(file);
 
         // Adapter timing 3
         file = fopen("AdapterTiming3.plot", "w");
+        fprintf(file, "set multiplot\n");
+        fprintf(file, "set grid\n");
+        fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
+            ,float(fHostSampleRate)/1000.f, fHostBufferSize, float(fAdaptedSampleRate)/1000.f, fAdaptedBufferSize);
+         fprintf(file, "set xlabel \"audio cycles\"\n");
+        fprintf(file, "set ylabel \"frames\"\n");
+        fprintf(file, "plot ");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with lines,");
+        fprintf(file, buffer);
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines");
+        fprintf(file, buffer);
+        
+        fprintf(file, "\n unset multiplot\n");  
+        fprintf(file, "set output 'AdapterTiming3.pdf\n");
+        fprintf(file, "set terminal pdf\n");
+        
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"Audio adapter timing\"\n");
@@ -93,6 +143,7 @@ namespace Jack
         fprintf(file, buffer);
         sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines");
         fprintf(file, buffer);
+        
         fclose(file);
     }
 

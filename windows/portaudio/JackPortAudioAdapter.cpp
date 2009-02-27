@@ -178,7 +178,7 @@ namespace Jack
     int JackPortAudioAdapter::Close()
     {
 #ifdef JACK_MONITOR
-        fTable.Save();
+        fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
         jack_log ( "JackPortAudioAdapter::Close" );
         Pa_StopStream ( fStream );

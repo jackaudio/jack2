@@ -51,8 +51,8 @@ namespace Jack
         MeasureTable() :fCount ( 0 )
         {}
 
-        void Write ( int time1, int time2, float r1, float r2, int pos1, int pos2 );
-        void Save();
+        void Write(int time1, int time2, float r1, float r2, int pos1, int pos2);
+        void Save(unsigned int fHostBufferSize, unsigned int fHostSampleRate, unsigned int fAdaptedSampleRate, unsigned int fAdaptedBufferSize);
 
     };
 
