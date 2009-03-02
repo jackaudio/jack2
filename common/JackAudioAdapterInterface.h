@@ -202,8 +202,8 @@ namespace Jack
             return fPlaybackChannels;
         }
         
-        void PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
-        void PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
+        int PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
+        int PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
 
     };
 

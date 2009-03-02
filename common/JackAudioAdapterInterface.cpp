@@ -213,7 +213,7 @@ namespace Jack
         delete[] fPlaybackRingBuffer;
     }
     
-    void JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames)
+    int JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames)
     {
         bool failure = false;
         jack_time_t time1, time2;
@@ -241,10 +241,13 @@ namespace Jack
         if (failure) {
             jack_error("JackAudioAdapterInterface::PushAndPull ringbuffer failure... reset");
             ResetRingBuffers();
+            return -1;
+        } else {
+            return 0;
         }
     }
 
-    void JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames) 
+    int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames) 
     {
         bool failure = false;
         fHostDLL.IncFrame(GetMicroSeconds());
@@ -264,6 +267,9 @@ namespace Jack
         if (failure) {
             jack_error("JackCallbackAudioAdapter::PullAndPush ringbuffer failure... reset");
             Reset();
+            return -1;
+        } else {
+            return 0;
         }
     }
 
