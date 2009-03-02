@@ -255,7 +255,10 @@ typedef struct _jack_adapter jack_adapter_t;
  *
  * @return 0 on success, otherwise a non-zero error code
  */  
-jack_adapter_t* jack_create_adapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate);
+jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size, 
+                                    jack_nframes_t host_sample_rate,
+                                    jack_nframes_t adapted_buffer_size,
+                                    jack_nframes_t adapted_sample_rate);
 
 /**
  * Destroy an adapter.

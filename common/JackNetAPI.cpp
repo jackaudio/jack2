@@ -106,7 +106,10 @@ extern "C"
     
     typedef struct _jack_adapter jack_adapter_t;
     
-    SERVER_EXPORT jack_adapter_t* jack_create_adapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate);
+    SERVER_EXPORT jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size, 
+                                                    jack_nframes_t host_sample_rate,
+                                                    jack_nframes_t adapted_buffer_size,
+                                                    jack_nframes_t adapted_sample_rate);
     SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter);
 
     SERVER_EXPORT int jack_adapter_push_input(jack_adapter_t* adapter, int channels, float** buffers);
@@ -731,8 +734,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 struct JackNetAdapter : public JackAudioAdapterInterface {
 
 
-    JackNetAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
-        :JackAudioAdapterInterface(buffer_size, sample_rate)
+    JackNetAdapter(jack_nframes_t host_buffer_size, 
+                    jack_nframes_t host_sample_rate,
+                    jack_nframes_t adapted_buffer_size,
+                    jack_nframes_t adapted_sample_rate)
+        :JackAudioAdapterInterface(host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate)
     {
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
@@ -962,9 +968,12 @@ SERVER_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output,
 
 // Adapter API
 
-SERVER_EXPORT jack_adapter_t* jack_create_adapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate)
+SERVER_EXPORT jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size, 
+                                                jack_nframes_t host_sample_rate,
+                                                jack_nframes_t adapted_buffer_size,
+                                                jack_nframes_t adapted_sample_rate)
 {
-    return (jack_adapter_t*)new JackNetAdapter(buffer_size, sample_rate);
+    return (jack_adapter_t*)new JackNetAdapter(host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate);
 }
 
 SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)

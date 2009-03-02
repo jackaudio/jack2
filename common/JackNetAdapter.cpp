@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
     JackNetAdapter::JackNetAdapter ( jack_client_t* jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
-            : JackAudioAdapterInterface ( buffer_size, sample_rate ), JackNetSlaveInterface(), fThread ( this )
+            : JackAudioAdapterInterface ( buffer_size, sample_rate), JackNetSlaveInterface(), fThread ( this )
     {
         jack_log ( "JackNetAdapter::JackNetAdapter" );
 

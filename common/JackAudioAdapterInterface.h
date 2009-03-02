@@ -95,15 +95,31 @@ namespace Jack
 
     public:
 
-        JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ) :
+        JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
+                                    jack_nframes_t host_sample_rate) :
                 fCaptureChannels ( 0 ),
                 fPlaybackChannels ( 0 ),
-                fHostBufferSize ( buffer_size ),
-                fHostSampleRate ( sample_rate ),
-                fAdaptedBufferSize ( buffer_size),
-                fAdaptedSampleRate ( sample_rate ),
-                fHostDLL ( buffer_size, sample_rate ),
-                fAdaptedDLL ( buffer_size, sample_rate ),
+                fHostBufferSize ( host_buffer_size ),
+                fHostSampleRate ( host_sample_rate ),
+                fAdaptedBufferSize ( host_buffer_size),
+                fAdaptedSampleRate ( host_sample_rate ),
+                fHostDLL ( host_buffer_size, host_sample_rate ),
+                fAdaptedDLL ( host_buffer_size, host_sample_rate ),
+                fQuality(0),
+                fRunning ( false )
+        {}
+        JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
+                                    jack_nframes_t host_sample_rate,
+                                    jack_nframes_t adapted_buffer_size,
+                                    jack_nframes_t adapted_sample_rate ) :
+                fCaptureChannels ( 0 ),
+                fPlaybackChannels ( 0 ),
+                fHostBufferSize ( host_buffer_size ),
+                fHostSampleRate ( host_sample_rate ),
+                fAdaptedBufferSize ( adapted_buffer_size),
+                fAdaptedSampleRate ( adapted_sample_rate ),
+                fHostDLL ( host_buffer_size, host_sample_rate ),
+                fAdaptedDLL ( adapted_buffer_size, adapted_sample_rate ),
                 fQuality(0),
                 fRunning ( false )
         {}
