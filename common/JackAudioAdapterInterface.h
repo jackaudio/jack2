@@ -51,8 +51,8 @@ namespace Jack
         MeasureTable() :fCount ( 0 )
         {}
 
-        void Write ( int time1, int time2, float r1, float r2, int pos1, int pos2 );
-        void Save();
+        void Write(int time1, int time2, float r1, float r2, int pos1, int pos2);
+        void Save(unsigned int fHostBufferSize, unsigned int fHostSampleRate, unsigned int fAdaptedSampleRate, unsigned int fAdaptedBufferSize);
 
     };
 
@@ -90,9 +90,13 @@ namespace Jack
         JackResampler** fPlaybackRingBuffer;
         
         unsigned int fQuality;
-
+        unsigned int fRingbufferSize;
+      
         bool fRunning;
-
+        
+        void ResetRingBuffers();
+        void ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 );
+        
     public:
 
         JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
@@ -106,6 +110,7 @@ namespace Jack
                 fHostDLL ( host_buffer_size, host_sample_rate ),
                 fAdaptedDLL ( host_buffer_size, host_sample_rate ),
                 fQuality(0),
+                fRingbufferSize(DEFAULT_RB_SIZE),
                 fRunning ( false )
         {}
         JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
@@ -121,37 +126,32 @@ namespace Jack
                 fHostDLL ( host_buffer_size, host_sample_rate ),
                 fAdaptedDLL ( adapted_buffer_size, adapted_sample_rate ),
                 fQuality(0),
+                fRingbufferSize(DEFAULT_RB_SIZE),
                 fRunning ( false )
         {}
 
         virtual ~JackAudioAdapterInterface()
         {}
 
-        void SetRingBuffers ( JackResampler** input, JackResampler** output )
-        {
-            fCaptureRingBuffer = input;
-            fPlaybackRingBuffer = output;
-        }
-
         bool IsRunning()
         {
             return fRunning;
         }
 
-        virtual void Reset()
-        {
-            fRunning = false;
-        }
-
-        void ResetRingBuffers();
+        virtual void Reset();
+       
+        virtual void Create();
+        virtual void Destroy();
         
-        unsigned int GetQuality()
+        virtual int Open()
         {
-            return fQuality;
+            return 0;
         }
-
-        virtual int Open();
-        virtual int Close();
+        
+        virtual int Close()
+        {
+            return 0;
+        }
 
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
@@ -194,14 +194,7 @@ namespace Jack
             SetAdaptedSampleRate ( sample_rate );
             return 0;
         }
-
-        virtual void SetCallbackTime ( jack_time_t callback_usec )
-        {
-            fHostDLL.IncFrame ( callback_usec );
-        }
-
-        void ResampleFactor ( jack_nframes_t& frame1, jack_nframes_t& frame2 );
-
+      
         void SetInputs ( int inputs )
         {
             jack_log ( "JackAudioAdapterInterface::SetInputs %d", inputs );
@@ -225,6 +218,9 @@ namespace Jack
             jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
             return fPlaybackChannels;
         }
+        
+        int PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int frames);
+        int PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames);
 
     };
 

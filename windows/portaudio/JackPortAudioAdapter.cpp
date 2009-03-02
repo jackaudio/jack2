@@ -27,47 +27,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-    int JackPortAudioAdapter::Render ( const void* inputBuffer,
-                                        void* outputBuffer,
-                                        unsigned long framesPerBuffer,
-                                        const PaStreamCallbackTimeInfo* timeInfo,
-                                        PaStreamCallbackFlags statusFlags,
-                                        void* userData)
+    int JackPortAudioAdapter::Render(const void* inputBuffer,
+                                    void* outputBuffer,
+                                    unsigned long framesPerBuffer,
+                                    const PaStreamCallbackTimeInfo* timeInfo,
+                                    PaStreamCallbackFlags statusFlags,
+                                    void* userData)
     {
         JackPortAudioAdapter* adapter = static_cast<JackPortAudioAdapter*>(userData);
-        float** paBuffer;
-        bool failure = false;
-
-        jack_nframes_t time1, time2;
-        adapter->ResampleFactor ( time1, time2 );
-
-        paBuffer = (float**)inputBuffer;
-        for ( int i = 0; i < adapter->fCaptureChannels; i++ )
-        {
-            adapter->fCaptureRingBuffer[i]->SetRatio ( time1, time2 );
-            if (adapter->fCaptureRingBuffer[i]->WriteResample ( (float*)paBuffer[i], framesPerBuffer ) < framesPerBuffer )
-                failure = true;
-        }
-
-        paBuffer = (float**)outputBuffer;
-        for ( int i = 0; i < adapter->fPlaybackChannels; i++ )
-        {
-            adapter->fPlaybackRingBuffer[i]->SetRatio ( time2, time1 );
-            if ( adapter->fPlaybackRingBuffer[i]->ReadResample ( (float*)paBuffer[i], framesPerBuffer ) < framesPerBuffer )
-                failure = true;
-        }
-
-#ifdef JACK_MONITOR
-        adapter->fTable.Write ( time1, time2, double(time1) / double(time2), double(time2) / double(time1),
-                              adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace() );
-#endif
-
-        // Reset all ringbuffers in case of failure
-        if ( failure )
-        {
-            jack_error ( "JackPortAudioAdapter::Render ringbuffer failure... reset" );
-            adapter->ResetRingBuffers();
-        }
+        adapter->PushAndPull((float**)inputBuffer, (float**)outputBuffer, framesPerBuffer);
         return paContinue;
     }
 
@@ -127,6 +95,9 @@ namespace Jack
                 break;
             case 'q':
                 fQuality = param->value.ui;
+                break;
+            case 'g':
+                fRingbufferSize = param->value.ui;
                 break;
             }
         }
@@ -207,7 +178,7 @@ namespace Jack
     int JackPortAudioAdapter::Close()
     {
 #ifdef JACK_MONITOR
-        fTable.Save();
+        fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
         jack_log ( "JackPortAudioAdapter::Close" );
         Pa_StopStream ( fStream );
@@ -246,8 +217,8 @@ extern "C"
 
         strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-     
-        desc->nparams = 9;
+
+        desc->nparams = 10;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -314,13 +285,21 @@ extern "C"
         desc->params[i].value.i = TRUE;
         strcpy(desc->params[i].short_desc, "Display available PortAudio devices");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "quality");
         desc->params[i].character = 'q';
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "ring-buffer");
+        desc->params[i].character = 'g';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 32768)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;

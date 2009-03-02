@@ -46,7 +46,7 @@ class JackLibSampleRateResampler : public JackResampler
     public:
     
         JackLibSampleRateResampler();
-        JackLibSampleRateResampler(unsigned int quality);
+        JackLibSampleRateResampler(unsigned int quality, unsigned int ringbuffer_size);
         virtual ~JackLibSampleRateResampler();
         
         unsigned int ReadResample(float* buffer, unsigned int frames);
@@ -55,7 +55,7 @@ class JackLibSampleRateResampler : public JackResampler
         void SetRatio(unsigned int num, unsigned int denom)
         {
             JackResampler::SetRatio(num, denom);
-            fRatio = Range(0.25f, 4.0f, (double(num) / double(denom)));
+            fRatio = Range(0.25, 4.0, (double(num) / double(denom)));
         }
         
         void Reset();

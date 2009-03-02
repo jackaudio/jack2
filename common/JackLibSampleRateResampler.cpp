@@ -31,8 +31,8 @@ JackLibSampleRateResampler::JackLibSampleRateResampler()
         jack_error("JackLibSampleRateResampler::JackLibSampleRateResampler err = %s", src_strerror(error));
 }
 
-JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality)
-    :JackResampler(),fRatio(1)
+JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality, unsigned int ringbuffer_size)
+    :JackResampler(ringbuffer_size),fRatio(1)
 {
      switch (quality) {
        case 0:

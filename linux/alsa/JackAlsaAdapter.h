@@ -182,6 +182,17 @@ namespace Jack
                 fInputParams    = 0;
                 fOutputParams   = 0;
                 fPeriod = 2;
+                
+                fInputCardBuffer = 0;
+                fOutputCardBuffer = 0;
+                
+                for ( int i = 0; i < 256; i++ )
+                {
+                    fInputCardChannels[i] = 0;
+                    fOutputCardChannels[i] = 0;
+                    fInputSoftChannels[i] = 0;
+                    fOutputSoftChannels[i] = 0;
+                }
             }
 
             AudioInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ) :
@@ -369,10 +380,10 @@ namespace Jack
                         }
                         else   // SND_PCM_FORMAT_S32
                         {
-                            long* buffer32b = ( long* ) fInputCardBuffer;
+                            int32_t* buffer32b = ( int32_t* ) fInputCardBuffer;
                             for ( s = 0; s < fBuffering; s++ )
                                 for ( c = 0; c < fCardInputs; c++ )
-                                    fInputSoftChannels[c][s] = float ( buffer32b[c + s*fCardInputs] ) * ( 1.0/float ( LONG_MAX ) );
+                                    fInputSoftChannels[c][s] = float ( buffer32b[c + s*fCardInputs] ) * ( 1.0/float ( INT_MAX ) );
                         }
                         break;
                     case SND_PCM_ACCESS_RW_NONINTERLEAVED :
@@ -394,12 +405,12 @@ namespace Jack
                         }
                         else   // SND_PCM_FORMAT_S32
                         {
-                            long* chan32b;
+                            int32_t* chan32b;
                             for ( c = 0; c < fCardInputs; c++ )
                             {
-                                chan32b = ( long* ) fInputCardChannels[c];
+                                chan32b = ( int32_t* ) fInputCardChannels[c];
                                 for ( s = 0; s < fBuffering; s++ )
-                                    fInputSoftChannels[c][s] = float ( chan32b[s] ) * ( 1.0/float ( LONG_MAX ) );
+                                    fInputSoftChannels[c][s] = float ( chan32b[s] ) * ( 1.0/float ( INT_MAX ) );
                             }
                         }
                         break;
@@ -436,13 +447,13 @@ namespace Jack
                         }
                         else   // SND_PCM_FORMAT_S32
                         {
-                            long* buffer32b = ( long* ) fOutputCardBuffer;
+                            int32_t* buffer32b = ( int32_t* ) fOutputCardBuffer;
                             for ( f = 0; f < fBuffering; f++ )
                             {
                                 for ( unsigned int c = 0; c < fCardOutputs; c++ )
                                 {
                                     float x = fOutputSoftChannels[c][f];
-                                    buffer32b[c + f * fCardOutputs] = long ( max ( min ( x, 1.0 ), -1.0 ) * float ( LONG_MAX ) );
+                                    buffer32b[c + f * fCardOutputs] = int32_t ( max ( min ( x, 1.0 ), -1.0 ) * float ( INT_MAX ) );
                                 }
                             }
                         }
@@ -472,11 +483,11 @@ namespace Jack
                         {
                             for ( c = 0; c < fCardOutputs; c++ )
                             {
-                                long* chan32b = ( long* ) fOutputCardChannels[c];
+                                int32_t* chan32b = ( int32_t* ) fOutputCardChannels[c];
                                 for ( f = 0; f < fBuffering; f++ )
                                 {
                                     float x = fOutputSoftChannels[c][f];
-                                    chan32b[f] = long ( max ( min ( x,1.0 ),-1.0 ) * float ( LONG_MAX ) ) ;
+                                    chan32b[f] = int32_t ( max ( min ( x,1.0 ),-1.0 ) * float ( INT_MAX ) ) ;
                                 }
                             }
                         }

@@ -34,7 +34,7 @@ namespace Jack
 
 typedef jack_default_audio_sample_t jack_sample_t;
 
-#define OSS_DRIVER_N_PARAMS	12
+#define OSS_DRIVER_N_PARAMS	13
 #define OSS_DRIVER_DEF_DEV	"/dev/dsp"
 #define OSS_DRIVER_DEF_FS	48000
 #define OSS_DRIVER_DEF_BLKSIZE	1024

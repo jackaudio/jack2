@@ -182,9 +182,15 @@ def build(bld):
     netlib.includes = includes
     netlib.name         = 'netlib'
     netlib.target       = 'jacknet'
-    netlib.uselib = uselib
+    netlib.uselib = 'SAMPLERATE'
     netlib.install_path = '${LIBDIR}'
-    netlib.source = ['JackNetAPI.cpp', 'JackNetInterface.cpp', 'JackNetTool.cpp', 'JackAudioAdapterInterface.cpp', 'JackResampler.cpp', 'ringbuffer.c']
+    netlib.source = ['JackNetAPI.cpp', 
+		'JackNetInterface.cpp', 
+		'JackNetTool.cpp', 
+		'JackAudioAdapterInterface.cpp', 
+		'JackLibSampleRateResampler.cpp',
+		'JackResampler.cpp', 
+		'ringbuffer.c']
 
     if bld.env['IS_LINUX']:
         netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../linux/JackLinuxTime.c']

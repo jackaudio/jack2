@@ -255,7 +255,8 @@ typedef struct _jack_adapter jack_adapter_t;
  *
  * @return 0 on success, otherwise a non-zero error code
  */  
-jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size, 
+jack_adapter_t* jack_create_adapter(int input, int output,
+                                    jack_nframes_t host_buffer_size, 
                                     jack_nframes_t host_sample_rate,
                                     jack_nframes_t adapted_buffer_size,
                                     jack_nframes_t adapted_sample_rate);
@@ -268,32 +269,18 @@ jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size,
 int jack_destroy_adapter(jack_adapter_t* adapter);
 
 /**
- * Push input to ringbuffer
+ * Push input to and pull output from ringbuffer
  *
  * @return 0 on success, otherwise a non-zero error code
  */  
-int jack_adapter_push_input(jack_adapter_t * adapter, int channels, float** buffers);
+int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 /**
- * Pull input from ringbuffer
+ * Pull input to and push output from ringbuffer
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_adapter_pull_input(jack_adapter_t * adapter, int channels, float** buffers);
-  
-/**
- * Push output to ringbuffer
- *
- * @return error code.
- */  
-int jack_adapter_push_output(jack_adapter_t * adapter, int channels, float** buffers);
-
-/**
- * Pull output from ringbuffer
- *
- * @return 0 on success, otherwise a non-zero error code
- */
-int jack_adapter_pull_output(jack_adapter_t * adapter, int channels, float** buffers);
+int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 
 #ifdef __cplusplus

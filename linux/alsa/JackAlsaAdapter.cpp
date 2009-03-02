@@ -66,13 +66,18 @@ namespace Jack
                     fAudioInterface.fCardName = strdup ( param->value.str );
                     break;
                 case 'r':
+                    fAudioInterface.fFrequency = param->value.ui;
                     SetAdaptedSampleRate ( param->value.ui );
                     break;
                 case 'p':
+                    fAudioInterface.fBuffering = param->value.ui;
                     SetAdaptedBufferSize ( param->value.ui );
                     break;
                 case 'q':
                     fQuality = param->value.ui;
+                    break;
+                case 'g':
+                    fRingbufferSize = param->value.ui;
                     break;
             }
         }
@@ -106,7 +111,7 @@ namespace Jack
     int JackAlsaAdapter::Close()
     {
 #ifdef JACK_MONITOR
-        fTable.Save();
+        fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
         switch ( fThread.GetStatus() )
         {
@@ -147,45 +152,14 @@ namespace Jack
     bool JackAlsaAdapter::Execute()
     {
         //read data from audio interface
-        if ( fAudioInterface.read() < 0 )
+        if (fAudioInterface.read() < 0)
             return false;
-
-        bool failure = false;
-
-        //compute resampling factor
-        jack_nframes_t time1, time2;
-        ResampleFactor ( time1, time2 );
-
-        //resample inputs
-        for ( int i = 0; i < fCaptureChannels; i++ )
-        {
-            fCaptureRingBuffer[i]->SetRatio ( time1, time2 );
-            if ( fCaptureRingBuffer[i]->WriteResample ( fAudioInterface.fInputSoftChannels[i], fAdaptedBufferSize ) < fAdaptedBufferSize )
-                failure = true;
-        }
-        //resample outputs
-        for ( int i = 0; i < fPlaybackChannels; i++ )
-        {
-            fPlaybackRingBuffer[i]->SetRatio ( time2, time1 );
-            if ( fPlaybackRingBuffer[i]->ReadResample ( fAudioInterface.fOutputSoftChannels[i], fAdaptedBufferSize ) < fAdaptedBufferSize )
-                failure = true;
-        }
-
-#ifdef JACK_MONITOR
-        fTable.Write ( time1, time2, double ( time1 ) / double ( time2 ), double ( time2 ) / double ( time1 ),
-                       fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace() );
-#endif
+            
+        PushAndPull(fAudioInterface.fInputSoftChannels, fAudioInterface.fOutputSoftChannels, fAdaptedBufferSize);
 
         //write data to audio interface
-        if ( fAudioInterface.write() < 0 )
+        if (fAudioInterface.write() < 0)
             return false;
-
-        //reset all ringbuffers in case of failure
-        if ( failure )
-        {
-            jack_error ( "JackAlsaAdapter::Execute ringbuffer failure... reset" );
-            ResetRingBuffers();
-        }
 
         return true;
     }
@@ -220,7 +194,7 @@ extern "C"
         strcpy ( desc->name, "audioadapter" );                         // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy ( desc->desc, "netjack audio <==> net backend adapter" );  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-        desc->nparams = 10;
+        desc->nparams = 11;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         i = 0;
@@ -299,7 +273,6 @@ extern "C"
         strcpy ( desc->params[i].short_desc,
                  "Number of playback channels (defaults to hardware max)" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-        
     
         i++;
         strcpy(desc->params[i].name, "quality");
@@ -307,6 +280,14 @@ extern "C"
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "ring-buffer");
+        desc->params[i].character = 'g';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 32768)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;

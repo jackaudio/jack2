@@ -367,7 +367,7 @@ namespace Jack
             return SOCKET_ERROR;
 
         //get the resample factor,
-        jack_nframes_t time1, time2;
+        jack_time_t time1, time2;
         ResampleFactor ( time1, time2 );
 
         //resample input data,

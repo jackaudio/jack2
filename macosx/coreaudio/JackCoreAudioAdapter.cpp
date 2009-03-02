@@ -293,38 +293,22 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
 {
     JackCoreAudioAdapter* adapter = static_cast<JackCoreAudioAdapter*>(inRefCon);
     AudioUnitRender(adapter->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, adapter->fInputData);
-    bool failure = false;
-
-    jack_nframes_t time1, time2;
-    adapter->ResampleFactor(time1, time2);
-
+    
+    float* inputBuffer[adapter->fCaptureChannels];
+    float* outputBuffer[adapter->fPlaybackChannels];
+ 
     for (int i = 0; i < adapter->fCaptureChannels; i++) {
-        adapter->fCaptureRingBuffer[i]->SetRatio(time1, time2);
-        if (adapter->fCaptureRingBuffer[i]->WriteResample((float*)adapter->fInputData->mBuffers[i].mData, inNumberFrames) < inNumberFrames)
-            failure = true;
+        inputBuffer[i] = (float*)adapter->fInputData->mBuffers[i].mData;
     }
-
     for (int i = 0; i < adapter->fPlaybackChannels; i++) {
-        adapter->fPlaybackRingBuffer[i]->SetRatio(time2, time1);
-        if (adapter->fPlaybackRingBuffer[i]->ReadResample((float*)ioData->mBuffers[i].mData, inNumberFrames) < inNumberFrames)
-             failure = true;
+        outputBuffer[i] = (float*)ioData->mBuffers[i].mData;
     }
-
-#ifdef JACK_MONITOR
-    adapter->fTable.Write(time1, time2,  double(time1) / double(time2), double(time2) / double(time1),
-         adapter->fCaptureRingBuffer[0]->ReadSpace(),  adapter->fPlaybackRingBuffer[0]->WriteSpace());
-#endif
-
-    // Reset all ringbuffers in case of failure
-    if (failure) {
-        jack_error("JackCoreAudioAdapter::Render ringbuffer failure... reset");
-        adapter->ResetRingBuffers();
-    }
-
+    
+    adapter->PushAndPull((float**)inputBuffer, (float**)outputBuffer, inNumberFrames);
     return noErr;
 }
 
- JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
+JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params)
                 :JackAudioAdapterInterface(buffer_size, sample_rate), fInputData(0), fCapturing(false), fPlaying(false), fState(false)
 {
 
@@ -391,6 +375,10 @@ OSStatus JackCoreAudioAdapter::Render(void *inRefCon,
                 
             case 'q':
                 fQuality = param->value.ui;
+                break;
+                
+             case 'g':
+                fRingbufferSize = param->value.ui;
                 break;
         }
     }
@@ -960,7 +948,7 @@ int JackCoreAudioAdapter::Open()
 int JackCoreAudioAdapter::Close()
 {
 #ifdef JACK_MONITOR
-    fTable.Save();
+    fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
     AudioOutputUnitStop(fAUHAL);
     DisposeBuffers();
@@ -997,7 +985,7 @@ extern "C"
         strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
      
-        desc->nparams = 11;
+        desc->nparams = 12;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1086,6 +1074,14 @@ extern "C"
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "ring-buffer");
+        desc->params[i].character = 'g';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 32768)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;

@@ -106,18 +106,16 @@ extern "C"
     
     typedef struct _jack_adapter jack_adapter_t;
     
-    SERVER_EXPORT jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size, 
+    SERVER_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
+                                                    jack_nframes_t host_buffer_size, 
                                                     jack_nframes_t host_sample_rate,
                                                     jack_nframes_t adapted_buffer_size,
                                                     jack_nframes_t adapted_sample_rate);
     SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter);
 
-    SERVER_EXPORT int jack_adapter_push_input(jack_adapter_t* adapter, int channels, float** buffers);
-    SERVER_EXPORT int jack_adapter_pull_input(jack_adapter_t* adapter, int channels, float** buffers);
-    
-    SERVER_EXPORT int jack_adapter_push_output(jack_adapter_t* adapter, int channels, float** buffers);
-    SERVER_EXPORT int jack_adapter_pull_output(jack_adapter_t* adapter, int channels, float** buffers);
-       
+    SERVER_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
+    SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
+         
 #ifdef __cplusplus
 }
 #endif
@@ -734,144 +732,39 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 struct JackNetAdapter : public JackAudioAdapterInterface {
 
 
-    JackNetAdapter(jack_nframes_t host_buffer_size, 
+    JackNetAdapter(int input, int output,
+                    jack_nframes_t host_buffer_size, 
                     jack_nframes_t host_sample_rate,
                     jack_nframes_t adapted_buffer_size,
                     jack_nframes_t adapted_sample_rate)
         :JackAudioAdapterInterface(host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate)
     {
+        fCaptureChannels = input;
+        fPlaybackChannels = output;
+        Create();
+    }
+    
+    void JackNetAdapter::Create()
+    {
+        //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
-        
-        /*
-        for (i = 0; i < fCaptureChannels; i++)
-            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fAudioAdapter->GetQuality());
-        for (i = 0; i < fPlaybackChannels; i++)
-            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fAudioAdapter->GetQuality());
-        */
-        
-        int i;
-        for (i = 0; i < fCaptureChannels; i++)
-            fCaptureRingBuffer[i] = new JackResampler();
-        for (i = 0; i < fPlaybackChannels; i++)
-            fPlaybackRingBuffer[i] = new JackResampler();
+        for (int i = 0; i < fCaptureChannels; i++ )
+            fCaptureRingBuffer[i] = new JackResampler(fRingbufferSize);
+        for (int i = 0; i < fPlaybackChannels; i++ )
+            fPlaybackRingBuffer[i] = new JackResampler(fRingbufferSize);
+
+        if (fCaptureChannels > 0)
+            jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
+        if (fPlaybackChannels > 0)
+            jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace());
     }
 
     virtual ~JackNetAdapter()
     {
-        int i;
-        for (i = 0; i < fCaptureChannels; i++)
-            delete (fCaptureRingBuffer[i]);
-        for (i = 0; i < fPlaybackChannels; i++)
-            delete(fPlaybackRingBuffer[i] );
-
-        delete[] fCaptureRingBuffer;
-        delete[] fPlaybackRingBuffer;
+        Destroy();
     }
      
-    void Reset()
-    {
-        int i;
-        for (i = 0; i < fCaptureChannels; i++)
-            fCaptureRingBuffer[i]->Reset();
-        for (i = 0; i < fPlaybackChannels; i++)
-            fPlaybackRingBuffer[i]->Reset();
-     }
-   
-    int PushInput(int audio_input, float** audio_input_buffer)
-    {
-        bool failure = false;
-        int port_index;
-        
-        // Get the resample factor,
-        jack_nframes_t time1, time2;
-        ResampleFactor(time1, time2);
-
-        // Resample input data,
-        for (port_index = 0; port_index < audio_input; port_index++) {
-            fCaptureRingBuffer[port_index]->SetRatio(time1, time2);
-            if (fCaptureRingBuffer[port_index]->WriteResample(audio_input_buffer[port_index], fAdaptedBufferSize) < fAdaptedBufferSize)
-                failure = true;
-        }
-        
-        if (failure) {
-            ResetRingBuffers();
-            return -1;
-        }
-        
-        return 0;
-    }
-    
-    int PullInput(int audio_input, float** audio_input_buffer)
-    {
-       bool failure = false;
-       int port_index;
-        
-        // DLL
-        SetCallbackTime(GetMicroSeconds());
-
-        // Push/pull from ringbuffer
-        for (port_index = 0; port_index < audio_input; port_index++) {
-            if (fCaptureRingBuffer[port_index]->Read(audio_input_buffer[port_index], fHostBufferSize) < fHostBufferSize)
-                failure = true;
-        }
-        
-        // Reset all ringbuffers in case of failure
-        if (failure) {
-            Reset();
-            return -1;
-        }
-        
-        return 0;
-    }
-    
-    int PushOutput(int audio_input, float** audio_input_buffer)
-    {
-       bool failure = false;
-       int port_index;
-        
-        // DLL
-        SetCallbackTime(GetMicroSeconds());
-
-        // Push/pull from ringbuffer
-        for (port_index = 0; port_index < audio_input; port_index++) {
-            if (fPlaybackRingBuffer[port_index]->Write(audio_input_buffer[port_index], fHostBufferSize) < fHostBufferSize)
-                failure = true;
-        }
-        
-        // Reset all ringbuffers in case of failure
-        if (failure) {
-            Reset();
-            return -1;
-        }
-        
-        return 0;
-    }
-
-    int PullOutput(int audio_output, float** audio_output_buffer)
-    {
-        bool failure = false;
-        int port_index;
-
-        //get the resample factor,
-        jack_nframes_t time1, time2;
-        ResampleFactor(time1, time2);
-
-        //resample output data,
-        for (port_index = 0; port_index < fPlaybackChannels; port_index++) {
-            fPlaybackRingBuffer[port_index]->SetRatio(time2, time1);
-            if (fPlaybackRingBuffer[port_index]->ReadResample(audio_output_buffer[port_index], fAdaptedBufferSize) < fAdaptedBufferSize)
-                failure = true;
-        }
-        
-        if (failure) {
-            ResetRingBuffers();
-            return -1;
-        }
-        
-        return 0;
-    }
-
 };
 
 
@@ -968,12 +861,13 @@ SERVER_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output,
 
 // Adapter API
 
-SERVER_EXPORT jack_adapter_t* jack_create_adapter(jack_nframes_t host_buffer_size, 
+SERVER_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
+                                                jack_nframes_t host_buffer_size, 
                                                 jack_nframes_t host_sample_rate,
                                                 jack_nframes_t adapted_buffer_size,
                                                 jack_nframes_t adapted_sample_rate)
 {
-    return (jack_adapter_t*)new JackNetAdapter(host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate);
+    return (jack_adapter_t*)new JackNetAdapter(input, output, host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate);
 }
 
 SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)
@@ -982,30 +876,18 @@ SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)
     return 0;
 }
 
-SERVER_EXPORT int jack_adapter_push_input(jack_adapter_t * adapter, int channels, float** buffers)
+SERVER_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)
 {
     JackNetAdapter* slave = (JackNetAdapter*)adapter;
-    return slave->PushInput(channels, buffers);
+    return slave->PushAndPull(input, output, frames);
 }
 
-SERVER_EXPORT int jack_adapter_pull_input(jack_adapter_t * adapter, int channels, float** buffers)
+SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)
 {
     JackNetAdapter* slave = (JackNetAdapter*)adapter;
-    return slave->PullInput(channels, buffers);
-}
-    
-SERVER_EXPORT int jack_adapter_push_output(jack_adapter_t * adapter, int channels, float** buffers)
-{
-    JackNetAdapter* slave = (JackNetAdapter*)adapter;
-    return slave->PushOutput(channels, buffers);
+    return slave->PullAndPush(input, output, frames);
 }
 
-SERVER_EXPORT int jack_adapter_pull_output(jack_adapter_t * adapter, int channels, float** buffers)
-{
-    JackNetAdapter* slave = (JackNetAdapter*)adapter;
-    return slave->PullOutput(channels, buffers);
-}
-    
 
 // Empty code for now..
 //#ifdef TARGET_OS_IPHONE

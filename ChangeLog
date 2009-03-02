@@ -23,10 +23,21 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-02-27 Stephane Letz  <letz@grame.fr>
+
+	* Improve generated gnuplot files for adapting code.
+
+2009-02-25 Stephane Letz  <letz@grame.fr>
+
+	* Major cleanup in adapter code.
+
 2009-02-25 Stephane Letz  <letz@grame.fr>
 
 	* Fix JackNetDriver::Close method.
         * For audio device reservation, add card_to_num function.
+        * Fix buffer size and sample rate handling in JackAlsaAdapter.
+        * Add control for adapter ringbuffer size.
+	* Fix JackAlsaAdapter.h for 64 bits compilation.
 
 2009-02-24 Stephane Letz  <letz@grame.fr>
 
@@ -37,7 +48,7 @@ Michael Voigt
 
 	* Another fix in systemdeps.h and types.h: jack_time_t now uniquely defined in types.h.
 	* Move generic code and data in JackNetInterface and JackNetMasterInterface classes.
-        * First version of D-Bus based audio device rerservation.
+        * First version of D-Bus based audio device reservation.
 
 2009-02-20 Stephane Letz  <letz@grame.fr>
 
