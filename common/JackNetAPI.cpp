@@ -744,7 +744,7 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
         Create();
     }
     
-    void JackNetAdapter::Create()
+    void Create()
     {
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];

@@ -18,7 +18,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackAudioAdapter.h"
+#ifdef __APPLE__
 #include <TargetConditionals.h>
+#endif
 #ifndef TARGET_OS_IPHONE
 #include "JackLibSampleRateResampler.h"
 #endif
