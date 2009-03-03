@@ -23,6 +23,10 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-03-03 Stephane Letz  <letz@grame.fr>
+
+	* More robust profiling tools when clients come and go.
+
 2009-03-01 Stephane Letz  <letz@grame.fr>
 
 	* Raise default port number to 1024.

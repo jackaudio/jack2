@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-JackEngineProfiling::JackEngineProfiling():fAudioCycle(0)
+JackEngineProfiling::JackEngineProfiling():fAudioCycle(0),fMeasuredClient(0)
 {
     jack_info("Engine profiling activated, beware %ld MBytes are needed to record profiling points...", sizeof(fProfileTable) / (1024 * 1024));
     
@@ -36,66 +36,60 @@ JackEngineProfiling::JackEngineProfiling():fAudioCycle(0)
 
 JackEngineProfiling::~JackEngineProfiling()
 {
-    // Window monitoring
-    int max_client = 0;
-    char buffer[1024];
-    char* nameTable[CLIENT_NUM];
     FILE* file = fopen("JackEngineProfiling.log", "w");
+    char buffer[1024];
     
     jack_info("Write server and clients timing data...");
 
     if (file == NULL) {
         jack_error("JackEngineProfiling::Save cannot open JackEngineProfiling.log file");
     } else {
-  
-        for (int i = 2; i < TIME_POINTS; i++) {
-            bool header = true;
-            bool printed = false;
-            int count = 0;
-            for (int j = REAL_REFNUM; j < CLIENT_NUM; j++) {
-                if (fProfileTable[i].fClientTable[j].fRefNum > 0) {
-                    long d1 = long(fProfileTable[i - 1].fCurCycleBegin - fProfileTable[i - 2].fCurCycleBegin);
-                    long d2 = long(fProfileTable[i].fPrevCycleEnd - fProfileTable[i - 1].fCurCycleBegin);
-                    if (d1 > 0 && fProfileTable[i].fClientTable[j].fStatus != NotTriggered) {  // Valid cycle
-                        count++;
-                        nameTable[count] = fNameTable[fProfileTable[i].fClientTable[j].fRefNum];
-                        
-                        // driver delta and end cycle
-                        if (header) {
-                            fprintf(file, "%ld \t %ld \t", d1, d2);
-                            header = false;
-                        }
-                        long d5 = long(fProfileTable[i].fClientTable[j].fSignaledAt - fProfileTable[i - 1].fCurCycleBegin);
-                        long d6 = long(fProfileTable[i].fClientTable[j].fAwakeAt - fProfileTable[i - 1].fCurCycleBegin);
-                        long d7 = long(fProfileTable[i].fClientTable[j].fFinishedAt - fProfileTable[i - 1].fCurCycleBegin);
-                        
-                        // ref, signal, start, end, scheduling, duration, status
-                        fprintf(file, "%d \t %ld \t %ld \t  %ld \t %ld \t  %ld \t %d \t", 
-                                fProfileTable[i].fClientTable[j].fRefNum,
-                                ((d5 > 0) ? d5 : 0),
-                                ((d6 > 0) ? d6 : 0),
-                                ((d7 > 0) ? d7 : 0),
-                                ((d6 > 0 && d5 > 0) ? (d6 - d5) : 0),
-                                ((d7 > 0 && d6 > 0) ? (d7 - d6) : 0),
-                                fProfileTable[i].fClientTable[j].fStatus);
-                        printed = true;
-                    }
-                }
-                max_client = (count > max_client) ? count : max_client;
-            }
-            if (printed) {
-                fprintf(file, "\n");
-            } else if (fProfileTable[i].fAudioCycle > 0) {  // Driver timing only
-                long d1 = long(fProfileTable[i].fCurCycleBegin - fProfileTable[i - 1].fCurCycleBegin);
-                long d2 = long(fProfileTable[i].fPrevCycleEnd - fProfileTable[i - 1].fCurCycleBegin);
-                if (d1 > 0) {  // Valid cycle
-                    fprintf(file, "%ld \t %ld \n", d1, d2);
+    
+        // For each measured point
+        for (int i = 3; i < TIME_POINTS; i++) {
+            
+            // Driver timing values
+            //long d1 = long(fProfileTable[i].fCurCycleBegin - fProfileTable[i - 1].fCurCycleBegin);
+            long d1 = long(fProfileTable[i - 1].fCurCycleBegin - fProfileTable[i - 2].fCurCycleBegin);
+            long d2 = long(fProfileTable[i].fPrevCycleEnd - fProfileTable[i - 1].fCurCycleBegin);
+            
+            if (d1 <= 0 || fProfileTable[i].fAudioCycle <= 0)
+                continue; // Skip non valid cycles
+                
+            // Print driver delta and end cycle
+            fprintf(file, "%ld \t %ld \t", d1, d2);
+             
+            // For each measured client
+            for (unsigned int j = 0; j < fMeasuredClient; j++) { 
+            
+                int ref = fIntervalTable[j].fRefNum;
+            
+                // Is valid client cycle 
+                 if (fProfileTable[i].fClientTable[ref].fStatus != NotTriggered) {
+             
+                    long d5 = long(fProfileTable[i].fClientTable[ref].fSignaledAt - fProfileTable[i - 1].fCurCycleBegin);
+                    long d6 = long(fProfileTable[i].fClientTable[ref].fAwakeAt - fProfileTable[i - 1].fCurCycleBegin);
+                    long d7 = long(fProfileTable[i].fClientTable[ref].fFinishedAt - fProfileTable[i - 1].fCurCycleBegin);
+             
+                    // Print ref, signal, start, end, scheduling, duration, status
+                    fprintf(file, "%d \t %ld \t %ld \t %ld \t %ld \t %ld \t %d \t", 
+                            ref,
+                            ((d5 > 0) ? d5 : 0),
+                            ((d6 > 0) ? d6 : 0),
+                            ((d7 > 0) ? d7 : 0),
+                            ((d6 > 0 && d5 > 0) ? (d6 - d5) : 0),
+                            ((d7 > 0 && d6 > 0) ? (d7 - d6) : 0),
+                            fProfileTable[i].fClientTable[ref].fStatus);
+                } else { // Print tabs
+                     fprintf(file, "\t  \t  \t  \t  \t  \t \t");
                 }
             }
+            
+            // Terminate line
+            fprintf(file, "\n");
         }
-        fclose(file);
     }
-  
+    
     // Driver period
     file = fopen("Timing1.plot", "w");
 
@@ -145,9 +139,9 @@ JackEngineProfiling::~JackEngineProfiling()
     
         fclose(file);
     }
-   
+        
     // Clients end date
-    if (max_client > 0) {
+    if (fMeasuredClient > 0) {
         file = fopen("Timing3.plot", "w");
         if (file == NULL) {
             jack_error("JackEngineProfiling::Save cannot open Timing3.log file");
@@ -158,21 +152,20 @@ JackEngineProfiling::~JackEngineProfiling()
             fprintf(file, "set title \"Clients end date\"\n");
             fprintf(file, "set xlabel \"audio cycles\"\n");
             fprintf(file, "set ylabel \"usec\"\n");
-        
             fprintf(file, "plot ");
-            for (int i = 0; i < max_client; i++) {
+            for (unsigned int i = 0; i < fMeasuredClient; i++) {
                 if (i == 0) {
-                    if ((i + 1) == max_client) {
+                    if (i + 1 == fMeasuredClient) { // Last client
                         sprintf(buffer, "\"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines,\"JackEngineProfiling.log\" using %d title \"%s\" with lines", 
-                        ((i + 1) * 7) - 1 , nameTable[(i + 1)]);
+                        ((i + 1) * 7) - 1 , fIntervalTable[i].fName);
                     } else {
                         sprintf(buffer, "\"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines,\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", 
-                        ((i + 1) * 7) - 1 , nameTable[(i + 1)]);
+                        ((i + 1) * 7) - 1 , fIntervalTable[i].fName);
                     }
-                } else if ((i + 1) == max_client) { // Last client
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) - 1 , nameTable[(i + 1)]);
+                } else if (i + 1 == fMeasuredClient) { // Last client
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) - 1 , fIntervalTable[i].fName);
                 } else {
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) - 1, nameTable[(i + 1)]);
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) - 1, fIntervalTable[i].fName);
                 }
                 fprintf(file, buffer);
             }
@@ -187,28 +180,29 @@ JackEngineProfiling::~JackEngineProfiling()
             fprintf(file, "set xlabel \"audio cycles\"\n");
             fprintf(file, "set ylabel \"usec\"\n");
             fprintf(file, "plot ");
-            for (int i = 0; i < max_client; i++) {
+            for (unsigned int i = 0; i < fMeasuredClient; i++) {
                 if (i == 0) {
-                    if ((i + 1) == max_client) {
+                    if ((i + 1) == fMeasuredClient) { // Last client
                         sprintf(buffer, "\"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines,\"JackEngineProfiling.log\" using %d title \"%s\" with lines", 
-                        ((i + 1) * 7) - 1 , nameTable[(i + 1)]);
+                        ((i + 1) * 7) - 1 , fIntervalTable[i].fName);
                     } else {
                         sprintf(buffer, "\"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines,\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", 
-                        ((i + 1) * 7) - 1 , nameTable[(i + 1)]);
+                        ((i + 1) * 7) - 1 , fIntervalTable[i].fName);
                     }
-                } else if ((i + 1) == max_client) { // Last client
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) - 1 , nameTable[(i + 1)]);
+                } else if ((i + 1) == fMeasuredClient) { // Last client
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) - 1 , fIntervalTable[i].fName);
                 } else {
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) - 1, nameTable[(i + 1)]);
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) - 1, fIntervalTable[i].fName);
                 }
                 fprintf(file, buffer);
             }
+             
             fclose(file);
         }
     }
-    
+
     // Clients scheduling
-    if (max_client > 0) {
+    if (fMeasuredClient > 0) {
         file = fopen("Timing4.plot", "w");
 
         if (file == NULL) {
@@ -221,11 +215,11 @@ JackEngineProfiling::~JackEngineProfiling()
             fprintf(file, "set xlabel \"audio cycles\"\n");
             fprintf(file, "set ylabel \"usec\"\n");
             fprintf(file, "plot ");
-            for (int i = 0; i < max_client; i++) {
-                if ((i + 1) == max_client) // Last client
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7), nameTable[(i + 1)]);
+            for (unsigned int i = 0; i < fMeasuredClient; i++) {
+                if ((i + 1) == fMeasuredClient) // Last client
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7), fIntervalTable[i].fName);
                 else
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7), nameTable[(i + 1)]);
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7), fIntervalTable[i].fName);
                 fprintf(file, buffer);
             }
             
@@ -239,11 +233,11 @@ JackEngineProfiling::~JackEngineProfiling()
             fprintf(file, "set xlabel \"audio cycles\"\n");
             fprintf(file, "set ylabel \"usec\"\n");
             fprintf(file, "plot ");
-            for (int i = 0; i < max_client; i++) {
-                if ((i + 1) == max_client) // Last client
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7), nameTable[(i + 1)]);
+            for (unsigned int i = 0; i < fMeasuredClient; i++) {
+                if ((i + 1) == fMeasuredClient) // Last client
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7), fIntervalTable[i].fName);
                 else
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7), nameTable[(i + 1)]);
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7), fIntervalTable[i].fName);
                 fprintf(file, buffer);
             }
             fclose(file);
@@ -251,7 +245,7 @@ JackEngineProfiling::~JackEngineProfiling()
     }
     
      // Clients duration
-    if (max_client > 0) {
+    if (fMeasuredClient > 0) {
         file = fopen("Timing5.plot", "w");
 
         if (file == NULL) {
@@ -264,11 +258,11 @@ JackEngineProfiling::~JackEngineProfiling()
             fprintf(file, "set xlabel \"audio cycles\"\n");
             fprintf(file, "set ylabel \"usec\"\n");
             fprintf(file, "plot ");
-            for (int i = 0; i < max_client; i++) {
-                if ((i + 1) == max_client) // Last client
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) + 1, nameTable[(i + 1)]);
+            for (unsigned int i = 0; i < fMeasuredClient; i++) {
+                if ((i + 1) == fMeasuredClient) // Last client
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) + 1, fIntervalTable[i].fName);
                 else
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) + 1, nameTable[(i + 1)]);
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) + 1, fIntervalTable[i].fName);
                 fprintf(file, buffer);
             }
             
@@ -282,16 +276,27 @@ JackEngineProfiling::~JackEngineProfiling()
             fprintf(file, "set xlabel \"audio cycles\"\n");
             fprintf(file, "set ylabel \"usec\"\n");
             fprintf(file, "plot ");
-            for (int i = 0; i < max_client; i++) {
-                if ((i + 1) == max_client) // Last client
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) + 1, nameTable[(i + 1)]);
+            for (unsigned int i = 0; i < fMeasuredClient; i++) {
+                if ((i + 1) == fMeasuredClient) // Last client
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines", ((i + 1) * 7) + 1, fIntervalTable[i].fName);
                 else
-                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) + 1, nameTable[(i + 1)]);
+                    sprintf(buffer, "\"JackEngineProfiling.log\" using %d title \"%s\" with lines,", ((i + 1) * 7) + 1, fIntervalTable[i].fName);
                 fprintf(file, buffer);
             }
             fclose(file);
         }
     }
+}
+
+bool JackEngineProfiling::CheckClient(const char* name, int cur_point)
+{
+    for (int i = 0; i < MEASURED_CLIENTS; i++) {
+       if (strcmp(fIntervalTable[i].fName, name) == 0) {
+            fIntervalTable[i].fEndInterval = cur_point;
+            return true;
+        }
+    }
+    return false;
 }
 
 void JackEngineProfiling::Profile(JackClientInterface** table, 
@@ -311,8 +316,16 @@ void JackEngineProfiling::Profile(JackClientInterface** table,
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         JackClientTiming* timing = manager->GetClientTiming(i);
-        if (client && client->GetClientControl()->fActive) {
-            strcpy(fNameTable[i], client->GetClientControl()->fName);
+        if (client && client->GetClientControl()->fActive && client->GetClientControl()->fCallback[kRealTimeCallback]) {
+           
+            if (!CheckClient(client->GetClientControl()->fName, fAudioCycle)) {
+                // Keep new measured client
+                fIntervalTable[fMeasuredClient].fRefNum = i;
+                strcpy(fIntervalTable[fMeasuredClient].fName, client->GetClientControl()->fName);
+                fIntervalTable[fMeasuredClient].fBeginInterval = fAudioCycle;
+                fIntervalTable[fMeasuredClient].fEndInterval = fAudioCycle;
+                fMeasuredClient++;
+            }
             fProfileTable[fAudioCycle].fClientTable[i].fRefNum = i;
             fProfileTable[fAudioCycle].fClientTable[i].fSignaledAt = timing->fSignaledAt;
             fProfileTable[fAudioCycle].fClientTable[i].fAwakeAt = timing->fAwakeAt;
