@@ -218,7 +218,7 @@ extern "C"
         strcpy(desc->params[i].name, "cpu-load");
         desc->params[i].character = 'c';
         desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
+        desc->params[i].value.i = FALSE;
         strcpy(desc->params[i].short_desc, "Show DSP CPU load");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
         
@@ -226,7 +226,7 @@ extern "C"
         strcpy(desc->params[i].name, "driver-period");
         desc->params[i].character = 'p';
         desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
+        desc->params[i].value.i = FALSE;
         strcpy(desc->params[i].short_desc, "Show driver period");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
         
@@ -234,7 +234,7 @@ extern "C"
         strcpy(desc->params[i].name, "driver-end-time");
         desc->params[i].character = 'e';
         desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
+        desc->params[i].value.i = FALSE;
         strcpy(desc->params[i].short_desc, "Show driver end time");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
