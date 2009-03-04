@@ -260,7 +260,7 @@ namespace Jack
     }
 
 //transport---------------------------------------------------------------------------
-    int JackNetAdapter::DecodeTransportData()
+    void JackNetAdapter::DecodeTransportData()
     {
         //TODO : we need here to get the actual timebase master to eventually release it from its duty (see JackNetDriver)
 
@@ -288,11 +288,9 @@ namespace Jack
                     break;
             }
         }
-
-        return 0;
     }
 
-    int JackNetAdapter::EncodeTransportData()
+    void JackNetAdapter::EncodeTransportData()
     {
         //is there a timebase master change ?
         int refnum = -1;
@@ -326,8 +324,6 @@ namespace Jack
         if ( fReturnTransportData.fNewState )
             jack_info ( "Sending transport state '%s'.", GetTransportState ( fReturnTransportData.fState ) );
         fLastTransportState = fReturnTransportData.fState;
-
-        return 0;
     }
 
 //read/write operations---------------------------------------------------------------
@@ -338,17 +334,14 @@ namespace Jack
         if ( SyncRecv() == SOCKET_ERROR )
             return 0;
 
-        if ( DecodeSyncPacket() < 0 )
-            return 0;
-
+        DecodeSyncPacket();
         return DataRecv();
     }
 
     int JackNetAdapter::Write()
     {
-        if ( EncodeSyncPacket() < 0 )
-            return 0;
-
+        EncodeSyncPacket();
+     
         if ( SyncSend() == SOCKET_ERROR )
             return SOCKET_ERROR;
 

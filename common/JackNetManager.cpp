@@ -245,7 +245,7 @@ namespace Jack
     }
 
 //transport---------------------------------------------------------------------------
-    int JackNetMaster::EncodeTransportData()
+    void JackNetMaster::EncodeTransportData()
     {
         //is there a new timebase master ?
         //TODO : check if any timebase callback has been called (and if it's conditional or not) and set correct value...
@@ -260,11 +260,9 @@ namespace Jack
         if ( fSendTransportData.fNewState )
             jack_info ( "Sending '%s' to '%s'.", GetTransportState ( fSendTransportData.fState ), fParams.fName );
         fLastTransportState = fSendTransportData.fState;
+   }
 
-        return 0;
-    }
-
-    int JackNetMaster::DecodeTransportData()
+    void JackNetMaster::DecodeTransportData()
     {
         //is there timebase master change ?
         if ( fReturnTransportData.fTimebaseMaster != NO_CHANGE )
@@ -322,7 +320,6 @@ namespace Jack
                     break;
             }
         }
-        return 0;
     }
 
     void JackNetMaster::SetTimebaseCallback ( jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg )
@@ -385,9 +382,8 @@ namespace Jack
         if (IsSynched()) {  // only send if connection is "synched"
         
             //encode the first packet
-            if ( EncodeSyncPacket() < 0 )
-                return 0;
-
+            EncodeSyncPacket();
+   
             //send sync
             if ( SyncSend() == SOCKET_ERROR )
                 return SOCKET_ERROR;
@@ -418,9 +414,8 @@ namespace Jack
 #endif
 
         //decode sync
-        if ( DecodeSyncPacket() < 0 )
-            return 0;
-
+        DecodeSyncPacket();
+  
         //receive data
         res = DataRecv();
         if ( ( res == 0 ) || ( res == SOCKET_ERROR ) )

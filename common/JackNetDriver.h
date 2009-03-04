@@ -57,8 +57,8 @@ namespace Jack
             int FreePorts();
 
             //transport
-            int EncodeTransportData();
-            int DecodeTransportData();
+            void EncodeTransportData();
+            void DecodeTransportData();
 
             JackMidiBuffer* GetMidiInputBuffer ( int port_index );
             JackMidiBuffer* GetMidiOutputBuffer ( int port_index );

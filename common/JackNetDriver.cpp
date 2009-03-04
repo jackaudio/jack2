@@ -381,7 +381,7 @@ namespace Jack
     }
 
 //transport---------------------------------------------------------------------------
-    int JackNetDriver::DecodeTransportData()
+    void JackNetDriver::DecodeTransportData()
     {
         //is there a new timebase master on the net master ?
         // - release timebase master only if it's a non-conditional request
@@ -397,9 +397,10 @@ namespace Jack
             jack_info ( "The NetMaster is now the new timebase master." );
         }
 
-        //is there a tranport state change to handle ?
+        //is there a transport state change to handle ?
         if ( fSendTransportData.fNewState && ( fSendTransportData.fState != fEngineControl->fTransport.GetState() ) )
         {
+           
             switch ( fSendTransportData.fState )
             {
                 case JackTransportStopped :
@@ -419,11 +420,9 @@ namespace Jack
                     break;
             }
         }
-
-        return 0;
     }
 
-    int JackNetDriver::EncodeTransportData()
+    void JackNetDriver::EncodeTransportData()
     {
         //is there a timebase master change ?
         int refnum;
@@ -457,8 +456,6 @@ namespace Jack
         if ( fReturnTransportData.fNewState )
             jack_info ( "Sending '%s'.", GetTransportState ( fReturnTransportData.fState ) );
         fLastTransportState = fReturnTransportData.fState;
-
-        return 0;
     }
 
 //driver processes--------------------------------------------------------------------
@@ -486,9 +483,8 @@ namespace Jack
 
         //decode sync
         //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
-        if ( DecodeSyncPacket() < 0 )
-            return 0;
-
+        DecodeSyncPacket();
+ 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
@@ -519,9 +515,8 @@ namespace Jack
 #endif
 
         //sync
-        if ( EncodeSyncPacket() < 0 )
-            return 0;
-
+        EncodeSyncPacket();
+   
         //send sync
         if ( SyncSend() == SOCKET_ERROR )
             return SOCKET_ERROR;

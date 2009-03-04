@@ -48,8 +48,8 @@ namespace Jack
         JackThread fThread;
 
         //transport
-        int EncodeTransportData();
-        int DecodeTransportData();
+        void EncodeTransportData();
+        void DecodeTransportData();
 
     public:
 

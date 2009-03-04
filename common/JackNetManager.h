@@ -68,8 +68,8 @@ namespace Jack
             void Exit();
 
             //transport
-            int EncodeTransportData();
-            int DecodeTransportData();
+            void EncodeTransportData();
+            void DecodeTransportData();
 
             int Process();
             void TimebaseCallback ( jack_position_t* pos );
