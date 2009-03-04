@@ -292,4 +292,5 @@ namespace Jack
     SERVER_EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type );
     //transport utility
     SERVER_EXPORT const char* GetTransportState ( int transport_state );
+    SERVER_EXPORT void NetTransportDataDisplay ( net_transport_data_t* data );
 }

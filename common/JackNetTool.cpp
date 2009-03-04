@@ -377,6 +377,15 @@ namespace Jack
         jack_info ( "**********************************************" );
     }
     
+    SERVER_EXPORT void NetTransportDataDisplay ( net_transport_data_t* data )
+    {
+        jack_info ( "********************Network Transport********************" );
+        jack_info ( "Transport new state : %u", data->fNewState );
+        jack_info ( "Transport timebase master : %u", data->fTimebaseMaster );
+        jack_info ( "Transport cycle state : %u", data->fState );
+        jack_info ( "**********************************************" );
+    }
+   
     SERVER_EXPORT void MidiBufferHToN ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer )
     {
         dst_buffer->magic = htonl(src_buffer->magic);
