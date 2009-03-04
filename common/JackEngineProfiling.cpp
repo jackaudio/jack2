@@ -46,11 +46,10 @@ JackEngineProfiling::~JackEngineProfiling()
     } else {
     
         // For each measured point
-        for (int i = 3; i < TIME_POINTS; i++) {
+        for (int i = 2; i < TIME_POINTS; i++) {
             
             // Driver timing values
-            //long d1 = long(fProfileTable[i].fCurCycleBegin - fProfileTable[i - 1].fCurCycleBegin);
-            long d1 = long(fProfileTable[i - 1].fCurCycleBegin - fProfileTable[i - 2].fCurCycleBegin);
+            long d1 = long(fProfileTable[i].fCurCycleBegin - fProfileTable[i - 1].fCurCycleBegin);
             long d2 = long(fProfileTable[i].fPrevCycleEnd - fProfileTable[i - 1].fCurCycleBegin);
             
             if (d1 <= 0 || fProfileTable[i].fAudioCycle <= 0)
