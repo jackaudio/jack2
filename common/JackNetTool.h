@@ -29,6 +29,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
+#ifndef htonll
+#ifdef __BIG_ENDIAN__
+#define htonll(x)   (x)
+#define ntohll(x)   (x)
+#else
+#define htonll(x)   ((((uint64_t)htonl(x)) << 32) + htonl(x >> 32))
+#define ntohll(x)   ((((uint64_t)ntohl(x)) << 32) + ntohl(x >> 32))
+#endif
+#endif
+
 namespace Jack
 {
     typedef struct _session_params session_params_t;
@@ -282,6 +292,8 @@ namespace Jack
     SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* src_header, packet_header_t* dst_header );
     SERVER_EXPORT void MidiBufferHToN ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer );
     SERVER_EXPORT void MidiBufferNToH ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer );
+    SERVER_EXPORT void TransportDataHToN ( net_transport_data_t* src_params, net_transport_data_t* dst_params );
+    SERVER_EXPORT void TransportDataNToH ( net_transport_data_t* src_params, net_transport_data_t* dst_params );
     //display session parameters
     SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params );
     //display packet header

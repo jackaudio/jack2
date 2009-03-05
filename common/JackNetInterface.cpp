@@ -574,6 +574,7 @@ namespace Jack
         //then, first step : transport
         if (fParams.fTransportSync) {
             EncodeTransportData();
+            TransportDataHToN( &fSendTransportData,  &fSendTransportData);
             //copy to TxBuffer
             memcpy ( fTxData, &fSendTransportData, sizeof ( net_transport_data_t ) );
         }
@@ -588,6 +589,7 @@ namespace Jack
         if (fParams.fTransportSync) {
             //copy received transport data to transport data structure
             memcpy ( &fReturnTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            TransportDataNToH( &fReturnTransportData,  &fReturnTransportData);
             DecodeTransportData();
         }
         //then others
@@ -949,19 +951,6 @@ namespace Jack
     }
     
     //network sync------------------------------------------------------------------------
-    void JackNetSlaveInterface::DecodeSyncPacket()
-    {
-        //this method contains every step of sync packet informations decoding process
-        //first : transport
-        if (fParams.fTransportSync) {
-            //copy received transport data to transport data structure
-            memcpy ( &fSendTransportData, fRxData, sizeof ( net_transport_data_t ) );
-            DecodeTransportData();
-        }
-        //then others
-        //...
-    }
-
     void JackNetSlaveInterface::EncodeSyncPacket()
     {
         //this method contains every step of sync packet informations coding
@@ -970,8 +959,23 @@ namespace Jack
         //then first step : transport
         if (fParams.fTransportSync) {
             EncodeTransportData();
+            TransportDataHToN( &fReturnTransportData,  &fReturnTransportData);
             //copy to TxBuffer
             memcpy ( fTxData, &fReturnTransportData, sizeof ( net_transport_data_t ) );
+        }
+        //then others
+        //...
+    }
+    
+    void JackNetSlaveInterface::DecodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations decoding process
+        //first : transport
+        if (fParams.fTransportSync) {
+            //copy received transport data to transport data structure
+            memcpy ( &fSendTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            TransportDataNToH( &fSendTransportData,  &fSendTransportData);
+            DecodeTransportData();
         }
         //then others
         //...
