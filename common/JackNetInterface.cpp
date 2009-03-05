@@ -565,39 +565,35 @@ namespace Jack
         return rx_bytes;
     }
     
-    int JackNetMasterInterface::EncodeSyncPacket()
+    void JackNetMasterInterface::EncodeSyncPacket()
     {
         //this method contains every step of sync packet informations coding
         //first of all, reset sync packet
         memset ( fTxData, 0, fPayloadSize );
 
         //then, first step : transport
-        if ( fParams.fTransportSync )
-        {
-            if ( EncodeTransportData() < 0 )
-                return -1;
+        if (fParams.fTransportSync) {
+            EncodeTransportData();
+            TransportDataHToN( &fSendTransportData,  &fSendTransportData);
             //copy to TxBuffer
             memcpy ( fTxData, &fSendTransportData, sizeof ( net_transport_data_t ) );
         }
         //then others (freewheel etc.)
         //...
-        return 0;
     }
 
-    int JackNetMasterInterface::DecodeSyncPacket()
+    void JackNetMasterInterface::DecodeSyncPacket()
     {
         //this method contains every step of sync packet informations decoding process
         //first : transport
-        if ( fParams.fTransportSync )
-        {
+        if (fParams.fTransportSync) {
             //copy received transport data to transport data structure
             memcpy ( &fReturnTransportData, fRxData, sizeof ( net_transport_data_t ) );
-            if ( DecodeTransportData() < 0 )
-                return -1;
+            TransportDataNToH( &fReturnTransportData,  &fReturnTransportData);
+            DecodeTransportData();
         }
         //then others
         //...
-        return 0;
     }
 
 // JackNetSlaveInterface ************************************************************************************************
@@ -955,38 +951,34 @@ namespace Jack
     }
     
     //network sync------------------------------------------------------------------------
-    int JackNetSlaveInterface::DecodeSyncPacket()
-    {
-        //this method contains every step of sync packet informations decoding process
-        //first : transport
-        if ( fParams.fTransportSync )
-        {
-            //copy received transport data to transport data structure
-            memcpy ( &fSendTransportData, fRxData, sizeof ( net_transport_data_t ) );
-            if ( DecodeTransportData() < 0 )
-                return -1;
-        }
-        //then others
-        //...
-        return 0;
-    }
-
-    int JackNetSlaveInterface::EncodeSyncPacket()
+    void JackNetSlaveInterface::EncodeSyncPacket()
     {
         //this method contains every step of sync packet informations coding
         //first of all, reset sync packet
         memset ( fTxData, 0, fPayloadSize );
         //then first step : transport
-        if ( fParams.fTransportSync )
-        {
-            if ( EncodeTransportData() < 0 )
-                return -1;
+        if (fParams.fTransportSync) {
+            EncodeTransportData();
+            TransportDataHToN( &fReturnTransportData,  &fReturnTransportData);
             //copy to TxBuffer
             memcpy ( fTxData, &fReturnTransportData, sizeof ( net_transport_data_t ) );
         }
         //then others
         //...
-        return 0;
+    }
+    
+    void JackNetSlaveInterface::DecodeSyncPacket()
+    {
+        //this method contains every step of sync packet informations decoding process
+        //first : transport
+        if (fParams.fTransportSync) {
+            //copy received transport data to transport data structure
+            memcpy ( &fSendTransportData, fRxData, sizeof ( net_transport_data_t ) );
+            TransportDataNToH( &fSendTransportData,  &fSendTransportData);
+            DecodeTransportData();
+        }
+        //then others
+        //...
     }
 
 }

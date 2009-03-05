@@ -377,6 +377,15 @@ namespace Jack
         jack_info ( "**********************************************" );
     }
     
+    SERVER_EXPORT void NetTransportDataDisplay ( net_transport_data_t* data )
+    {
+        jack_info ( "********************Network Transport********************" );
+        jack_info ( "Transport new state : %u", data->fNewState );
+        jack_info ( "Transport timebase master : %u", data->fTimebaseMaster );
+        jack_info ( "Transport cycle state : %u", data->fState );
+        jack_info ( "**********************************************" );
+    }
+   
     SERVER_EXPORT void MidiBufferHToN ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer )
     {
         dst_buffer->magic = htonl(src_buffer->magic);
@@ -397,6 +406,56 @@ namespace Jack
         dst_buffer->event_count = ntohl(src_buffer->event_count);
         dst_buffer->lost_events = ntohl(src_buffer->lost_events);
         dst_buffer->mix_index = ntohl(src_buffer->mix_index);
+    }
+    
+    SERVER_EXPORT void TransportDataHToN ( net_transport_data_t* src_params, net_transport_data_t* dst_params )
+    {
+        dst_params->fNewState = htonl(src_params->fNewState);
+        dst_params->fTimebaseMaster = htonl(src_params->fTimebaseMaster);
+        dst_params->fState = htonl(src_params->fState);
+        dst_params->fPosition.unique_1 = htonll(src_params->fPosition.unique_1);
+        dst_params->fPosition.usecs = htonl(src_params->fPosition.usecs);
+        dst_params->fPosition.frame_rate = htonl(src_params->fPosition.frame_rate);
+        dst_params->fPosition.frame = htonl(src_params->fPosition.frame);
+        dst_params->fPosition.bar = htonl(src_params->fPosition.bar);
+        dst_params->fPosition.beat = htonl(src_params->fPosition.beat);
+        dst_params->fPosition.tick = htonl(src_params->fPosition.tick);
+        dst_params->fPosition.bar_start_tick = htonll((uint64_t)src_params->fPosition.bar_start_tick);
+        dst_params->fPosition.beats_per_bar = htonl(src_params->fPosition.beats_per_bar);
+        dst_params->fPosition.beat_type = htonl(src_params->fPosition.beat_type);
+        dst_params->fPosition.ticks_per_beat = htonll((uint64_t)src_params->fPosition.ticks_per_beat);
+        dst_params->fPosition.beats_per_minute = htonll((uint64_t)src_params->fPosition.beats_per_minute);
+        dst_params->fPosition.frame_time = htonll((uint64_t)src_params->fPosition.frame_time);
+        dst_params->fPosition.next_time = htonll((uint64_t)src_params->fPosition.next_time);
+        dst_params->fPosition.bbt_offset = htonl(src_params->fPosition.bbt_offset);
+        dst_params->fPosition.audio_frames_per_video_frame = htonl(src_params->fPosition.audio_frames_per_video_frame);
+        dst_params->fPosition.video_offset = htonl(src_params->fPosition.video_offset);
+        dst_params->fPosition.unique_2 = htonll(src_params->fPosition.unique_2);
+    }
+    
+    SERVER_EXPORT void TransportDataNToH ( net_transport_data_t* src_params, net_transport_data_t* dst_params )
+    {
+        dst_params->fNewState = ntohl(src_params->fNewState);
+        dst_params->fTimebaseMaster =  ntohl(src_params->fTimebaseMaster);
+        dst_params->fState = ntohl(src_params->fState);
+        dst_params->fPosition.unique_1 = ntohll(src_params->fPosition.unique_1);
+        dst_params->fPosition.usecs = ntohl(src_params->fPosition.usecs);
+        dst_params->fPosition.frame_rate = ntohl(src_params->fPosition.frame_rate);
+        dst_params->fPosition.frame = ntohl(src_params->fPosition.frame);
+        dst_params->fPosition.bar = ntohl(src_params->fPosition.bar);
+        dst_params->fPosition.beat = ntohl(src_params->fPosition.beat);
+        dst_params->fPosition.tick = ntohl(src_params->fPosition.tick);
+        dst_params->fPosition.bar_start_tick = ntohll((uint64_t)src_params->fPosition.bar_start_tick);
+        dst_params->fPosition.beats_per_bar = ntohl(src_params->fPosition.beats_per_bar);
+        dst_params->fPosition.beat_type = ntohl(src_params->fPosition.beat_type);
+        dst_params->fPosition.ticks_per_beat = ntohll((uint64_t)src_params->fPosition.ticks_per_beat);
+        dst_params->fPosition.beats_per_minute = ntohll((uint64_t)src_params->fPosition.beats_per_minute);
+        dst_params->fPosition.frame_time = ntohll((uint64_t)src_params->fPosition.frame_time);
+        dst_params->fPosition.next_time = ntohll((uint64_t)src_params->fPosition.next_time);
+        dst_params->fPosition.bbt_offset = ntohl(src_params->fPosition.bbt_offset);
+        dst_params->fPosition.audio_frames_per_video_frame = ntohl(src_params->fPosition.audio_frames_per_video_frame);
+        dst_params->fPosition.video_offset = ntohl(src_params->fPosition.video_offset);
+        dst_params->fPosition.unique_2 = ntohll(src_params->fPosition.unique_2);
     }
 
 // Utility *******************************************************************************************************

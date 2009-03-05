@@ -66,8 +66,8 @@
 <_><src>..\Release\bin\jack_metro.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack_unload.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libjack.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libjackserver.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjack.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjackserver.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libsamplerate-0.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>

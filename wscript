@@ -65,9 +65,9 @@ def set_options(opt):
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
-    opt.add_option('--ports', default=512, type="int", dest="ports", help='Maximum number of ports')
+    opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
-    opt.add_option('--ports', default=512, type="int", dest="ports", help='Maximum number of ports')
+    opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
     opt.sub_options('dbus')
 
 def configure(conf):

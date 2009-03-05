@@ -223,34 +223,7 @@ void JackOSSDriver::DisplayDeviceInfo()
             if (cap & DSP_CAP_BIND) 	jack_info(" DSP_CAP_BIND");
         }
     }
-    /*
-    TODO
-
-    ai_in.dev = fInFD;
-    jack_log("JackOSSDriver::DisplayDeviceInfo input fInFD = %d", ai_in.dev);
-    if (ioctl(fInFD, SNDCTL_AUDIOINFO, &ai_in) != -1) {
-        jack_info("Using audio engine %d = %s for input", ai_in.dev, ai_in.name);
-        if (ai_in.iformats & AFMT_S24_NE)
-            jack_info("Available input format : AFMT_S24_NE");
-        if (ai_in.iformats & AFMT_S16_NE)
-            jack_info("Available input format : AFMT_S16_NE");
-        if (ai_in.iformats & AFMT_S32_NE)
-            jack_info("Available input format : AFMT_S32_NE");
-    }
-    
-    ai_out.dev = fOutFD;
-    jack_log("JackOSSDriver::DisplayDeviceInfo output fOutFD = %d", ai_out.dev);
-    if (ioctl(fOutFD, SNDCTL_AUDIOINFO, &ai_out) != -1) {
-        jack_info("Using audio engine %d = %s for output", ai_out.dev, ai_out.name);
-        if (ai_out.oformats & AFMT_S24_NE)
-            jack_info("Available output format : AFMT_S24_NE");
-        if (ai_out.oformats & AFMT_S16_NE)
-            jack_info("Available output format : AFMT_S16_NE");
-        if (ai_out.oformats & AFMT_S32_NE)
-            jack_info("Available output format : AFMT_S32_NE");
-    }
-    */
-    
+     
     if (ai_in.rate_source != ai_out.rate_source) {
         jack_info("Warning : input and output are not necessarily driven by the same clock!");
     }
@@ -541,7 +514,7 @@ int JackOSSDriver::OpenAux()
     // In duplex mode, check that input and output use the same buffer size
     /*
 
-    // 10/02/09 : desactivated for now, needs more check (only needed when *same* device is used for input and output ??)
+    10/02/09 : desactivated for now, needs more check (only needed when *same* device is used for input and output ??)
 
     if ((fRWMode & kRead) && (fRWMode & kWrite) && (fInputBufferSize != fOutputBufferSize)) {
        jack_error("JackOSSDriver::OpenAux input and output buffer size are not the same!!");
@@ -583,32 +556,6 @@ int JackOSSDriver::Read()
     }
     
     ssize_t count;
-/*
-    // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html
-    if (fFirstCycle) {
-    
-        fFirstCycle = false;
-        memset(fOutputBuffer, 0, fOutputBufferSize);
-
-        // Prefill ouput buffer
-        for (int i = 0; i < fNperiods; i++) {
-            count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
-            if (count < fOutputBufferSize) {
-                jack_error("JackOSSDriver::Write error bytes written = %ld", count);
-                return -1;
-            }
-        }
-        
-        int delay;
-        if (ioctl(fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
-            jack_error("JackOSSDriver::Write error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
-            return -1;
-        }
-        
-        delay /= fSampleSize * fPlaybackChannels;
-        jack_info("JackOSSDriver::Write output latency frames = %ld", delay);
-    }
-*/
 
 #ifdef JACK_MONITOR
     gCycleTable.fTable[gCycleCount].fBeforeRead =  GetMicroSeconds();

@@ -31,6 +31,7 @@ namespace Jack
 #define TIME_POINTS 250000
 #define FAILURE_TIME_POINTS 10000
 #define FAILURE_WINDOW 10
+#define MEASURED_CLIENTS 32
 
 /*!
 \brief Timing stucture for a client.
@@ -43,6 +44,32 @@ struct JackTimingMeasureClient
     jack_time_t	fAwakeAt;
     jack_time_t	fFinishedAt;
     jack_client_state_t fStatus;
+    
+    JackTimingMeasureClient() 
+        :fRefNum(-1),
+        fSignaledAt(0),
+        fAwakeAt(0),
+        fFinishedAt(0),
+        fStatus((jack_client_state_t)0)
+    {}
+};
+
+/*!
+\brief Timing interval in the global table for a given client
+*/
+
+struct JackTimingClientInterval
+{
+    int fRefNum;
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    int fBeginInterval;
+    int fEndInterval;
+    
+    JackTimingClientInterval()
+         :fRefNum(-1),
+         fBeginInterval(-1),
+         fEndInterval(-1)
+    {}
 };
 
 /*!
@@ -56,6 +83,13 @@ struct JackTimingMeasure
     jack_time_t fCurCycleBegin;
     jack_time_t fPrevCycleEnd;
     JackTimingMeasureClient fClientTable[CLIENT_NUM];
+    
+    JackTimingMeasure()
+        :fAudioCycle(0), 
+        fPeriodUsecs(0),
+        fCurCycleBegin(0),
+        fPrevCycleEnd(0)
+    {}
 };
 
 /*!
@@ -71,9 +105,13 @@ class SERVER_EXPORT JackEngineProfiling
     private:
     
         JackTimingMeasure fProfileTable[TIME_POINTS];
-        char fNameTable[CLIENT_NUM][JACK_CLIENT_NAME_SIZE + 1];
+        JackTimingClientInterval fIntervalTable[MEASURED_CLIENTS];
+         
         unsigned int fAudioCycle;
-  
+        unsigned int fMeasuredClient;
+        
+        bool CheckClient(const char* name, int cur_point);
+        
     public:
     
         JackEngineProfiling();

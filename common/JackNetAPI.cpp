@@ -354,9 +354,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
          if (SyncRecv() == SOCKET_ERROR)
              return 0;
 
-         if (DecodeSyncPacket() < 0)
-             return 0;
-
+         DecodeSyncPacket();
+         
          return DataRecv();
      }
 
@@ -373,9 +372,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
              fNetMidiCaptureBuffer->SetBuffer(port_index, ((JackMidiBuffer**)midi_output_buffer)[port_index]);
          }
       
-         if (EncodeSyncPacket() < 0)
-             return 0;
-
+         EncodeSyncPacket();
+     
          if (SyncSend() == SOCKET_ERROR)
              return SOCKET_ERROR;
 
@@ -383,15 +381,11 @@ struct JackNetExtMaster : public JackNetMasterInterface {
      }
      
     // Transport
-    int EncodeTransportData()
-    {
-        return 0;
-    }
+    void EncodeTransportData()
+    {}
     
-    int DecodeTransportData()
-    {
-        return 0;
-    }
+    void DecodeTransportData()
+    {}
     
 };
 
@@ -574,15 +568,11 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     }
        
     // Transport
-    int EncodeTransportData()
-    {
-        return 0;
-    }
+    void EncodeTransportData()
+    {}
     
-    int DecodeTransportData()
-    {
-        return 0;
-    }
+    void DecodeTransportData()
+    {}
     
     bool Init() 
     {
@@ -624,17 +614,15 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         if (SyncRecv() == SOCKET_ERROR)
             return 0;
 
-        if (DecodeSyncPacket() < 0)
-            return 0;
-
+        DecodeSyncPacket();
+   
         return DataRecv();
     }
 
     int Write()
     {
-        if (EncodeSyncPacket() < 0)
-            return 0;
-
+        EncodeSyncPacket();
+    
         if (SyncSend() == SOCKET_ERROR)
             return SOCKET_ERROR;
 

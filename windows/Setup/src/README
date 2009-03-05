@@ -28,7 +28,7 @@ It is compiled from the latest CVS version which is using QT4 framework. To uses
 - quit qjackctl.exe and start is again, it should now launch the jack server. Quitting the qjackctl.exe will now close the jack server.
 
 Starting the jack server with another audio device installed on the machine (like an ASIO card) can now be done directly in qjackctl. 
-A ">" button at the right of the interface button allows to list the name of all available devices, driven either by "MME", "Direct Sound", or "ASIO".
+A ">" button at the right of the interface button allows to list the name of all available devices, driven either by "MME", "DirectSound", or "ASIO".
 Alternatively using the following command allows to display the names of available devices:
 
 - jackd -d portaudio -l to display the entire list of available audio devices. (jackd -d portaudio -h will display all portaudio driver features)

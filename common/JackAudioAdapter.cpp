@@ -69,6 +69,24 @@ namespace Jack
     }
 
 //JackAudioAdapter *********************************************************
+
+     JackAudioAdapter::JackAudioAdapter (jack_client_t* jack_client, JackAudioAdapterInterface* audio_io, const JSList* params, bool system) 
+        :fJackClient(jack_client), fAudioAdapter(audio_io)
+    {
+        const JSList* node;
+        const jack_driver_param_t* param;
+        fAutoConnect = false;
+        
+        for (node = params; node; node = jack_slist_next(node)) {
+            param = (const jack_driver_param_t*) node->data;
+            switch (param->character) {
+                case 'c':
+                    fAutoConnect = param->value.i;
+                    break;
+            }
+        }
+    }
+            
     JackAudioAdapter::~JackAudioAdapter()
     {
         // When called, Close has already been used for the client, thus ports are already unregistered.
@@ -86,6 +104,27 @@ namespace Jack
 
         delete[] fCapturePortList;
         delete[] fPlaybackPortList;
+    }
+    
+    void JackAudioAdapter::ConnectPorts()
+    {
+        const char **ports;
+         
+        ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        if (ports != NULL) {
+            for (int i = 0; i < fAudioAdapter->GetInputs() && ports[i]; i++) {
+                jack_connect(fJackClient,jack_port_name(fCapturePortList[i]),  ports[i]);
+            }
+            free(ports);
+        }
+        
+        ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+        if (ports != NULL) {
+            for (int i = 0; i < fAudioAdapter->GetOutputs() && ports[i]; i++) {
+                jack_connect(fJackClient, ports[i], jack_port_name(fPlaybackPortList[i]));
+            }
+            free(ports);
+        }
     }
 
     void JackAudioAdapter::Reset()
@@ -126,6 +165,9 @@ namespace Jack
             goto fail;
         if ( jack_activate ( fJackClient ) < 0 )
             goto fail;
+            
+        if (fAutoConnect)
+            ConnectPorts();
 
         // Ring buffer are now allocated..
         return fAudioAdapter->Open();

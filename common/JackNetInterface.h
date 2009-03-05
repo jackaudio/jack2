@@ -73,12 +73,12 @@ namespace Jack
             virtual bool Init() = 0;
 
             //transport
-            virtual int EncodeTransportData() = 0;
-            virtual int DecodeTransportData() = 0;
+            virtual void EncodeTransportData() = 0;
+            virtual void DecodeTransportData() = 0;
 
             //sync packet
-            virtual int EncodeSyncPacket() = 0;
-            virtual int DecodeSyncPacket() = 0;
+            virtual void EncodeSyncPacket() = 0;
+            virtual void DecodeSyncPacket() = 0;
 
             virtual int SyncRecv() = 0;
             virtual int SyncSend() = 0;
@@ -119,8 +119,8 @@ namespace Jack
             int DataSend();
             
              //sync packet
-            int EncodeSyncPacket();
-            int DecodeSyncPacket();
+            void EncodeSyncPacket();
+            void DecodeSyncPacket();
 
             int Send ( size_t size, int flags );
             int Recv ( size_t size, int flags );
@@ -163,8 +163,8 @@ namespace Jack
             int DataSend();
             
             //sync packet
-            int EncodeSyncPacket();
-            int DecodeSyncPacket();
+            void EncodeSyncPacket();
+            void DecodeSyncPacket();
 
             int Recv ( size_t size, int flags );
             int Send ( size_t size, int flags );

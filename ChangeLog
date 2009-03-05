@@ -23,6 +23,19 @@ Michael Voigt
   Jackdmp changes log
 ---------------------------
 
+2009-03-05 Stephane Letz  <letz@grame.fr>
+
+	* Support for BIG_ENDIAN machines in NetJack2 for transport data.
+	* Add auto_connect parameter in netmanager and netadapter.
+
+2009-03-03 Stephane Letz  <letz@grame.fr>
+
+	* More robust profiling tools when clients come and go.
+
+2009-03-01 Stephane Letz  <letz@grame.fr>
+
+	* Raise default port number to 1024.
+
 2009-02-27 Stephane Letz  <letz@grame.fr>
 
 	* Improve generated gnuplot files for adapting code.
