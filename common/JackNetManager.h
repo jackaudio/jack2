@@ -53,14 +53,14 @@ namespace Jack
 
             //sync and transport
             int fLastTransportState;
-      
+     
             //monitoring
 #ifdef JACK_MONITOR
             jack_time_t fPeriodUsecs;
             JackGnuPlotMonitor<float>* fNetTimeMon;
 #endif
 
-            bool Init();
+            bool Init(bool auto_connect);
             int AllocPorts();
             void FreePorts();
             void Exit();
@@ -71,9 +71,10 @@ namespace Jack
 
             int Process();
             void TimebaseCallback ( jack_position_t* pos );
+            void ConnectPorts();
 
         public:
-            JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip );
+            JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip);
             ~JackNetMaster ();
 
             bool IsSlaveReadyToRoll();
@@ -101,6 +102,7 @@ namespace Jack
             master_list_t fMasterList;
             uint32_t fGlobalID;
             bool fRunning;
+            bool fAutoConnect;
 
             void Run();
             JackNetMaster* MasterInit ( session_params_t& params );
@@ -110,7 +112,7 @@ namespace Jack
 
             int SyncCallback ( jack_transport_state_t state, jack_position_t* pos );
         public:
-            JackNetMasterManager ( jack_client_t* jack_client, const JSList* params );
+            JackNetMasterManager ( jack_client_t* jack_client, const JSList* params);
             ~JackNetMasterManager();
     };
 }

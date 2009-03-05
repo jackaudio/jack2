@@ -351,48 +351,21 @@ namespace Jack
 //process-----------------------------------------------------------------------------
     int JackNetAdapter::Process()
     {
-        bool failure = false;
-        int port_index;
-
         //read data from the network
         //in case of fatal network error, stop the process
-        if ( Read() == SOCKET_ERROR )
+        if (Read() == SOCKET_ERROR)
             return SOCKET_ERROR;
-
-        //get the resample factor,
-        jack_time_t time1, time2;
-        ResampleFactor ( time1, time2 );
-
-        //resample input data,
-        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-        {
-            fCaptureRingBuffer[port_index]->SetRatio ( time1, time2 );
-            if ( fCaptureRingBuffer[port_index]->WriteResample ( fSoftCaptureBuffer[port_index], fAdaptedBufferSize ) < fAdaptedBufferSize )
-                failure = true;
-        }
-        
-        //and output data,
-        for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
-        {
-            fPlaybackRingBuffer[port_index]->SetRatio ( time2, time1 );
-            if ( fPlaybackRingBuffer[port_index]->ReadResample ( fSoftPlaybackBuffer[port_index], fAdaptedBufferSize ) < fAdaptedBufferSize )
-                failure = true;
-        }
+            
+        PushAndPull(fSoftCaptureBuffer, fSoftPlaybackBuffer, fAdaptedBufferSize);
 
         //then write data to network
         //in case of failure, stop process
-        if ( Write() == SOCKET_ERROR )
+        if (Write() == SOCKET_ERROR)
             return SOCKET_ERROR;
-
-        //if there was any ringbuffer failure during resampling, reset
-        if ( failure )
-        {
-            jack_error ( "JackNetAdapter::Execute ringbuffer failure...reset." );
-            ResetRingBuffers();
-        }
 
         return 0;
     }
+    
 } // namespace Jack
 
 //loader------------------------------------------------------------------------------
@@ -413,7 +386,7 @@ extern "C"
         strcpy(desc->name, "netadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack net <==> audio backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 9;
+        desc->nparams = 10;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         int i = 0;
@@ -487,6 +460,14 @@ extern "C"
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy ( desc->params[i].name, "auto_connect" );
+        desc->params[i].character = 'c';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = false;
+        strcpy ( desc->params[i].short_desc, "Auto connect netmaster to system ports" );
+        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         return desc;
     }
@@ -501,7 +482,7 @@ extern "C"
         
         try {
         
-            adapter = new Jack::JackAudioAdapter ( jack_client, new Jack::JackNetAdapter ( jack_client, buffer_size, sample_rate, params ) );
+            adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackNetAdapter(jack_client, buffer_size, sample_rate, params), params, false);
             assert ( adapter );
 
             if ( adapter->Open() == 0 )

@@ -26,6 +26,7 @@ Michael Voigt
 2009-03-05 Stephane Letz  <letz@grame.fr>
 
 	* Support for BIG_ENDIAN machines in NetJack2 for transport data.
+	* Add auto_connect parameter in netmanager and netadapter.
 
 2009-03-03 Stephane Letz  <letz@grame.fr>
 

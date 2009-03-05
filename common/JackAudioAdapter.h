@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackAudioAdapter__
 
 #include "JackAudioAdapterInterface.h"
+#include "driver_interface.h"
 
 namespace Jack
 {
@@ -42,15 +43,15 @@ namespace Jack
 
             jack_client_t* fJackClient;
             JackAudioAdapterInterface* fAudioAdapter;
+            bool fAutoConnect;
 
             void FreePorts();
+            void ConnectPorts();
             void Reset();
 
         public:
 
-            JackAudioAdapter ( jack_client_t* jack_client, JackAudioAdapterInterface* audio_io ) :
-                    fJackClient ( jack_client ), fAudioAdapter ( audio_io )
-            {}
+            JackAudioAdapter(jack_client_t* jack_client, JackAudioAdapterInterface* audio_io, const JSList* params = NULL, bool system = false);
             ~JackAudioAdapter();
 
             int Open();
