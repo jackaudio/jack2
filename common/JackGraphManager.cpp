@@ -542,7 +542,7 @@ int JackGraphManager::Connect(jack_port_id_t port_src, jack_port_id_t port_dst)
         jack_error("JackGraphManager::Connect failed port_src = %ld port_dst = %ld", port_src, port_dst);
         goto end;
     }
-    manager->Connect(port_dst, port_src);
+    res = manager->Connect(port_dst, port_src);
     if (res < 0) {
         jack_error("JackGraphManager::Connect failed port_dst = %ld port_src = %ld", port_dst, port_src);
         goto end;
@@ -583,12 +583,12 @@ int JackGraphManager::Disconnect(jack_port_id_t port_src, jack_port_id_t port_ds
         goto end;
     }
 
-    manager->Disconnect(port_src, port_dst);
+    res = manager->Disconnect(port_src, port_dst);
     if (res < 0) {
         jack_error("JackGraphManager::Disconnect failed port_src = %ld port_dst = %ld", port_src, port_dst);
         goto end;
     }
-    manager->Disconnect(port_dst, port_src);
+    res = manager->Disconnect(port_dst, port_src);
     if (res < 0) {
         jack_error("JackGraphManager::Disconnect failed port_dst = %ld port_src = %ld", port_dst, port_src);
         goto end;
