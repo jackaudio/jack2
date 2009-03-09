@@ -18,10 +18,15 @@ Fernando Lopez-Lezcano
 Romain Moret
 Florian Faber
 Michael Voigt
+Torben Hohn  
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2009-03-09 Stephane Letz  <letz@grame.fr>
+
+	* Use Torben Hohn PI controler code for adapters (in progress).
 
 2009-03-05 Stephane Letz  <letz@grame.fr>
 

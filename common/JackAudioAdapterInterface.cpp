@@ -53,6 +53,7 @@ namespace Jack
         }
         fclose(file);
 
+        /* No used for now
         // Adapter timing 1
         file = fopen("AdapterTiming1.plot", "w");
         fprintf(file, "set multiplot\n");
@@ -83,6 +84,7 @@ namespace Jack
         fprintf(file, buffer);
         
         fclose(file);
+        */
 
         // Adapter timing 2
         file = fopen("AdapterTiming2.plot", "w");
@@ -157,30 +159,7 @@ namespace Jack
             fPlaybackRingBuffer[i]->Reset();
     }
 
-    void JackAudioAdapterInterface::ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 )
-    {
-        jack_time_t time = GetMicroSeconds();
-
-        if (!fRunning) {
-            // Init DLL
-            fRunning = true;
-            fHostDLL.Init(time);
-            fAdaptedDLL.Init(time);
-            frame1 = 1;
-            frame2 = 1;
-        } else {
-            // DLL
-            fAdaptedDLL.IncFrame(time);
-            jack_nframes_t time1 = fHostDLL.Time2Frames(time);
-            jack_nframes_t time2 = fAdaptedDLL.Time2Frames(time);
-            frame1 = time1;
-            frame2 = time2;
-            jack_log("JackAudioAdapterInterface::ResampleFactor time1 = %ld time2 = %ld src_ratio_input = %f src_ratio_output = %f",
-                     long(time1), long(time2), double(time1) / double(time2), double(time2) / double(time1));
-        }
-    }
-    
-    void JackAudioAdapterInterface::Reset()
+     void JackAudioAdapterInterface::Reset()
     {
         ResetRingBuffers();
         fRunning = false;
@@ -216,25 +195,31 @@ namespace Jack
     int JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames)
     {
         bool failure = false;
-        jack_time_t time1, time2;
-        ResampleFactor(time1, time2);
-
+        fRunning = true;
+        
+        /*
+        Finer estimation of the position in the ringbuffer ??
+        int delta_frames = (int)(float(long(GetMicroSeconds() - fPullAndPushTime)) * float(fAdaptedSampleRate)) / 1000000.f;
+        double ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetOffset() - delta_frames);
+        */
+         
+        double ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetOffset());
+    
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
-            fCaptureRingBuffer[i]->SetRatio(time1, time2);
+            fCaptureRingBuffer[i]->SetRatio(ratio);
             if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], inNumberFrames) < inNumberFrames)
                 failure = true;
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fPlaybackRingBuffer[i]->SetRatio(time2, time1);
+            fPlaybackRingBuffer[i]->SetRatio(1 / ratio);
             if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], inNumberFrames) < inNumberFrames)
                  failure = true;
         }
 
     #ifdef JACK_MONITOR
-        fTable.Write(time1, time2, double(time1) / double(time2), double(time2) / double(time1),
-             fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
+        fTable.Write(0, 0, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
     #endif
 
         // Reset all ringbuffers in case of failure
@@ -250,8 +235,8 @@ namespace Jack
     int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames) 
     {
         bool failure = false;
-        fHostDLL.IncFrame(GetMicroSeconds());
-
+        fPullAndPushTime = GetMicroSeconds();
+  
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
             if (fCaptureRingBuffer[i]->Read(inputBuffer[i], inNumberFrames) < inNumberFrames)

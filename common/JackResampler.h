@@ -26,8 +26,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-#define DEFAULT_RB_SIZE 16384 * 2	
+#define DEFAULT_RB_SIZE 16384	
 
+inline float Range(float min, float max, float val)
+{
+    return (val < min) ? min : ((val > max) ? max : val);
+}
+    
 /*!
 \brief Base class for Resampler.
 */
@@ -38,8 +43,7 @@ class JackResampler
     protected:
     
         jack_ringbuffer_t* fRingBuffer;
-        unsigned int fNum;
-        unsigned int fDenom;
+        double fRatio;
         unsigned int fRingBufferSize;
        
     public:
@@ -58,16 +62,20 @@ class JackResampler
         
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
-
-        virtual void SetRatio(unsigned int num, unsigned int denom)
+        
+        unsigned int GetOffset()
         {
-            fNum = num;
-            fDenom = denom;
+            return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
         }
-        virtual void GetRatio(unsigned int& num, unsigned int& denom)
+
+        void SetRatio(double ratio)
         {
-            num = fNum;
-            denom = fDenom;
+            fRatio = Range(0.25, 4.0, ratio);
+        }
+        
+        double GetRatio()
+        {
+            return fRatio;
         }
  
     };

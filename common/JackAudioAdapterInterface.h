@@ -82,20 +82,19 @@ namespace Jack
         jack_nframes_t fAdaptedBufferSize;
         jack_nframes_t fAdaptedSampleRate;
 
-        //delay locked loop
-        JackAtomicDelayLockedLoop fHostDLL;
-        JackAtomicDelayLockedLoop fAdaptedDLL;
+        //PI controler
+        JackPIControler fPIControler;
 
         JackResampler** fCaptureRingBuffer;
         JackResampler** fPlaybackRingBuffer;
         
         unsigned int fQuality;
         unsigned int fRingbufferSize;
+        jack_time_t fPullAndPushTime;
       
         bool fRunning;
         
         void ResetRingBuffers();
-        void ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 );
         
     public:
 
@@ -106,10 +105,10 @@ namespace Jack
             fHostSampleRate ( sample_rate ),
             fAdaptedBufferSize ( buffer_size),
             fAdaptedSampleRate ( sample_rate ),
-            fHostDLL ( buffer_size, sample_rate ),
-            fAdaptedDLL ( buffer_size, sample_rate ),
+            fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
             fQuality(0), fRingbufferSize(DEFAULT_RB_SIZE),
+            fPullAndPushTime(0),
             fRunning(false)
         {}
 
@@ -139,14 +138,12 @@ namespace Jack
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
             fHostBufferSize = buffer_size;
-            fHostDLL.Init ( fHostBufferSize, fHostSampleRate );
             return 0;
         }
 
         virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
         {
             fAdaptedBufferSize = buffer_size;
-            fAdaptedDLL.Init ( fAdaptedBufferSize, fAdaptedSampleRate );
             return 0;
         }
 
@@ -160,14 +157,14 @@ namespace Jack
         virtual int SetHostSampleRate ( jack_nframes_t sample_rate )
         {
             fHostSampleRate = sample_rate;
-            fHostDLL.Init ( fHostBufferSize, fHostSampleRate );
+            fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
             return 0;
         }
 
         virtual int SetAdaptedSampleRate ( jack_nframes_t sample_rate )
         {
             fAdaptedSampleRate = sample_rate;
-            fAdaptedDLL.Init ( fAdaptedBufferSize, fAdaptedSampleRate );
+            fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
             return 0;
         }
 
