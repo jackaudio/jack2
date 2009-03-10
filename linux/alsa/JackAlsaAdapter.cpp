@@ -287,7 +287,7 @@ extern "C"
         desc->params[i].character = 'g';
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 32768)");
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 16384)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;

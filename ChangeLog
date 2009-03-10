@@ -24,6 +24,10 @@ Torben Hohn
   Jackdmp changes log
 ---------------------------
 
+2009-03-10 Stephane Letz  <letz@grame.fr>
+
+	* Add -g (ring-buffer) parameter to netadapter.
+
 2009-03-09 Stephane Letz  <letz@grame.fr>
 
 	* Use Torben Hohn PI controler code for adapters (in progress).
