@@ -90,6 +90,7 @@ namespace Jack
         
         unsigned int fQuality;
         unsigned int fRingbufferSize;
+        unsigned int fRingbufferCurSize;
         jack_time_t fPullAndPushTime;
       
         bool fRunning;
@@ -108,6 +109,7 @@ namespace Jack
             fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
             fQuality(0), fRingbufferSize(DEFAULT_RB_SIZE),
+            fRingbufferCurSize(0),
             fPullAndPushTime(0),
             fRunning(false)
         {}

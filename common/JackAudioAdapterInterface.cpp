@@ -153,10 +153,16 @@ namespace Jack
         
     void JackAudioAdapterInterface::ResetRingBuffers()
     {
+        if (fRingbufferSize == 0) {
+            fRingbufferCurSize *=2;
+            if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+                fRingbufferCurSize = DEFAULT_RB_SIZE;
+        } 
+        
         for (int i = 0; i < fCaptureChannels; i++)
-            fCaptureRingBuffer[i]->Reset();
+            fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
         for (int i = 0; i < fPlaybackChannels; i++)
-            fPlaybackRingBuffer[i]->Reset();
+            fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
     }
 
      void JackAudioAdapterInterface::Reset()
@@ -170,11 +176,22 @@ namespace Jack
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
-        for (int i = 0; i < fCaptureChannels; i++ )
-            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality, fRingbufferSize);
-        for (int i = 0; i < fPlaybackChannels; i++ )
-            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality, fRingbufferSize);
-
+        
+        fRingbufferCurSize = (fRingbufferSize == 0) ? DEFAULT_ADAPTATIVE_SIZE : DEFAULT_RB_SIZE;
+        
+        if (fRingbufferSize == 0) {
+            jack_info("Ringbuffer automatic adaptative mode");
+        }
+        
+        for (int i = 0; i < fCaptureChannels; i++ ) {
+            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
+            fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+        for (int i = 0; i < fPlaybackChannels; i++ ) {
+            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
+            fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+     
         if (fCaptureChannels > 0)
             jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
         if (fPlaybackChannels > 0)
@@ -213,7 +230,7 @@ namespace Jack
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fPlaybackRingBuffer[i]->SetRatio(1 / ratio);
+            fPlaybackRingBuffer[i]->SetRatio(1/ratio);
             if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], inNumberFrames) < inNumberFrames)
                  failure = true;
         }

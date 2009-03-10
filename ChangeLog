@@ -27,6 +27,7 @@ Torben Hohn
 2009-03-10 Stephane Letz  <letz@grame.fr>
 
 	* Add -g (ring-buffer) parameter to netadapter.
+	* Automatic adaptative ringbuffer size mode when -g = 0.
 
 2009-03-09 Stephane Letz  <letz@grame.fr>
 

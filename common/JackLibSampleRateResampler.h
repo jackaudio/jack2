@@ -40,13 +40,13 @@ class JackLibSampleRateResampler : public JackResampler
     public:
     
         JackLibSampleRateResampler();
-        JackLibSampleRateResampler(unsigned int quality, unsigned int ringbuffer_size);
+        JackLibSampleRateResampler(unsigned int quality);
         virtual ~JackLibSampleRateResampler();
         
         unsigned int ReadResample(float* buffer, unsigned int frames);
         unsigned int WriteResample(float* buffer, unsigned int frames);
         
-        void Reset();
+        void Reset(unsigned int new_size);
           
     };
 }
