@@ -151,6 +151,10 @@ namespace Jack
     {
         jack_log ( "JackNetAdapter::Close" );
 
+#ifdef JACK_MONITOR
+        fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
+#endif
+
         switch ( fThread.GetStatus() )
         {
                 // Kill the thread in Init phase
