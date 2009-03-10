@@ -286,7 +286,13 @@ namespace Jack
     //local loop*********************************************************************************************************
     int JackNetWinSocket::SetLocalLoop()
     {
-        char disable = 0;
+        //char disable = 0;
+        /*
+        see http://msdn.microsoft.com/en-us/library/aa916098.aspx
+        Default value is TRUE. When TRUE, data that is sent from the local interface to the multicast group to
+        which the socket is joined, including data sent from the same socket, will be echoed to its receive buffer.
+        */
+        char disable = 1;
         return SetOption ( IPPROTO_IP, IP_MULTICAST_LOOP, &disable, sizeof ( disable ) );
     }
 

@@ -342,7 +342,7 @@ void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigne
 		int i4 = *((int *) src);
 		src+= src_skip;
 
-		__m128i src = _mm_set_epi32(i1, i2, i3, i4);
+		__m128i src = _mm_set_epi32(i4, i3, i2, i1);
 		__m128i shifted = _mm_srai_epi32(src, 8);
 
 		__m128 as_float = _mm_cvtepi32_ps(shifted);

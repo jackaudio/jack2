@@ -23,7 +23,7 @@ namespace Jack
 {
 
 JackLibSampleRateResampler::JackLibSampleRateResampler()
-    :JackResampler(),fRatio(1)
+    :JackResampler()
 {
     int error;
     fResampler = src_new(SRC_LINEAR, 1, &error);
@@ -32,7 +32,7 @@ JackLibSampleRateResampler::JackLibSampleRateResampler()
 }
 
 JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality, unsigned int ringbuffer_size)
-    :JackResampler(ringbuffer_size),fRatio(1)
+    :JackResampler(ringbuffer_size)
 {
      switch (quality) {
        case 0:

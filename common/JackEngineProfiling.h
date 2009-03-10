@@ -28,7 +28,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-#define TIME_POINTS 250000
+#define TIME_POINTS 125000
 #define FAILURE_TIME_POINTS 10000
 #define FAILURE_WINDOW 10
 #define MEASURED_CLIENTS 32

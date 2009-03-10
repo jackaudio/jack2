@@ -95,6 +95,9 @@ namespace Jack
                 case 'q':
                     fQuality = param->value.ui;
                     break;
+                case 'g':
+                    fRingbufferSize = param->value.ui;
+                    break;
              }
         }
 
@@ -150,6 +153,10 @@ namespace Jack
     int JackNetAdapter::Close()
     {
         jack_log ( "JackNetAdapter::Close" );
+
+#ifdef JACK_MONITOR
+        fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
+#endif
 
         switch ( fThread.GetStatus() )
         {
@@ -386,7 +393,7 @@ extern "C"
         strcpy(desc->name, "netadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack net <==> audio backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 10;
+        desc->nparams = 11;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
         int i = 0;
@@ -414,7 +421,7 @@ extern "C"
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( desc->params[i].name, "input_ports" );
+        strcpy ( desc->params[i].name, "input-ports" );
         desc->params[i].character = 'C';
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.i = 2;
@@ -422,7 +429,7 @@ extern "C"
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( desc->params[i].name, "output_ports" );
+        strcpy ( desc->params[i].name, "output-ports" );
         desc->params[i].character = 'P';
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.i = 2;
@@ -430,7 +437,7 @@ extern "C"
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( desc->params[i].name, "client_name" );
+        strcpy ( desc->params[i].name, "client-name" );
         desc->params[i].character = 'n';
         desc->params[i].type = JackDriverParamString;
         strcpy ( desc->params[i].value.str, "'hostname'" );
@@ -438,7 +445,7 @@ extern "C"
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
         i++;
-        strcpy ( desc->params[i].name, "transport_sync" );
+        strcpy ( desc->params[i].name, "transport-sync" );
         desc->params[i].character  = 't';
         desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 1U;
@@ -462,13 +469,21 @@ extern "C"
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
         
         i++;
-        strcpy ( desc->params[i].name, "auto_connect" );
+        strcpy(desc->params[i].name, "ring-buffer");
+        desc->params[i].character = 'g';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 16384)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy ( desc->params[i].name, "auto-connect" );
         desc->params[i].character = 'c';
         desc->params[i].type = JackDriverParamBool;
         desc->params[i].value.i = false;
         strcpy ( desc->params[i].short_desc, "Auto connect netmaster to system ports" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-
+    
         return desc;
     }
 

@@ -26,11 +26,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-inline float Range(float min, float max, float val)
-{
-    return (val < min) ? min : ((val > max) ? max : val);
-}
-    
 /*!
 \brief Resampler using "libsamplerate" (http://www.mega-nerd.com/SRC/).
 */
@@ -41,7 +36,6 @@ class JackLibSampleRateResampler : public JackResampler
     private:
     
         SRC_STATE* fResampler;
-        double fRatio;
            
     public:
     
@@ -51,12 +45,6 @@ class JackLibSampleRateResampler : public JackResampler
         
         unsigned int ReadResample(float* buffer, unsigned int frames);
         unsigned int WriteResample(float* buffer, unsigned int frames);
-         
-        void SetRatio(unsigned int num, unsigned int denom)
-        {
-            JackResampler::SetRatio(num, denom);
-            fRatio = Range(0.25, 4.0, (double(num) / double(denom)));
-        }
         
         void Reset();
           

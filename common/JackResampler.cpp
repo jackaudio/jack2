@@ -23,13 +23,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackResampler::JackResampler():fNum(1),fDenom(1)
+JackResampler::JackResampler()
+    :fRatio(1),fRingBufferSize(DEFAULT_RB_SIZE)
 {
-    fRingBuffer = jack_ringbuffer_create(sizeof(float) * DEFAULT_RB_SIZE);
-    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * DEFAULT_RB_SIZE) / 2);
+    fRingBuffer = jack_ringbuffer_create(sizeof(float) * fRingBufferSize);
+    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize) / 2);
 }
 
-JackResampler::JackResampler(unsigned int ringbuffer_size):fNum(1),fDenom(1),fRingBufferSize(ringbuffer_size)
+JackResampler::JackResampler(unsigned int ringbuffer_size)
+    :fRatio(1),fRingBufferSize(ringbuffer_size)
 {
     fRingBuffer = jack_ringbuffer_create(sizeof(float) * fRingBufferSize);
     jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize) / 2);

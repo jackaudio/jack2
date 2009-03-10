@@ -50,10 +50,10 @@ JackRouter is an ASIO driver that allows any ASIO compatible application to beco
 
 
 =============================================
-Known problems:
+Known problems
 =============================================
 
-- starting/stopping the server several times in QJACKCTL does not work correctly. You'll have to quit qjacckctl and launch it again.
+- starting/stopping the server several times in QJACKCTL does not work correctly. You'll have to quit qjackctl and launch it again.
 
 
 =============================================

@@ -82,36 +82,34 @@ namespace Jack
         jack_nframes_t fAdaptedBufferSize;
         jack_nframes_t fAdaptedSampleRate;
 
-        //delay locked loop
-        JackAtomicDelayLockedLoop fHostDLL;
-        JackAtomicDelayLockedLoop fAdaptedDLL;
+        //PI controler
+        JackPIControler fPIControler;
 
         JackResampler** fCaptureRingBuffer;
         JackResampler** fPlaybackRingBuffer;
         
         unsigned int fQuality;
         unsigned int fRingbufferSize;
+        jack_time_t fPullAndPushTime;
       
         bool fRunning;
         
         void ResetRingBuffers();
-        void ResampleFactor ( jack_time_t& frame1, jack_time_t& frame2 );
         
     public:
 
-        JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
-                                    jack_nframes_t host_sample_rate) :
-                fCaptureChannels ( 0 ),
-                fPlaybackChannels ( 0 ),
-                fHostBufferSize ( host_buffer_size ),
-                fHostSampleRate ( host_sample_rate ),
-                fAdaptedBufferSize ( host_buffer_size),
-                fAdaptedSampleRate ( host_sample_rate ),
-                fHostDLL ( host_buffer_size, host_sample_rate ),
-                fAdaptedDLL ( host_buffer_size, host_sample_rate ),
-                fQuality(0),
-                fRingbufferSize(DEFAULT_RB_SIZE),
-                fRunning ( false )
+         JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ):
+            fCaptureChannels ( 0 ),
+            fPlaybackChannels ( 0 ),
+            fHostBufferSize ( buffer_size ),
+            fHostSampleRate ( sample_rate ),
+            fAdaptedBufferSize ( buffer_size),
+            fAdaptedSampleRate ( sample_rate ),
+            fPIControler(sample_rate / sample_rate, 256),
+            fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
+            fQuality(0), fRingbufferSize(DEFAULT_RB_SIZE),
+            fPullAndPushTime(0),
+            fRunning(false)
         {}
         JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
                                     jack_nframes_t host_sample_rate,
@@ -123,10 +121,10 @@ namespace Jack
                 fHostSampleRate ( host_sample_rate ),
                 fAdaptedBufferSize ( adapted_buffer_size),
                 fAdaptedSampleRate ( adapted_sample_rate ),
-                fHostDLL ( host_buffer_size, host_sample_rate ),
-                fAdaptedDLL ( adapted_buffer_size, adapted_sample_rate ),
+                fPIControler(host_sample_rate / host_sample_rate, 256),
                 fQuality(0),
                 fRingbufferSize(DEFAULT_RB_SIZE),
+                fPullAndPushTime(0),
                 fRunning ( false )
         {}
 
@@ -156,14 +154,12 @@ namespace Jack
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
             fHostBufferSize = buffer_size;
-            fHostDLL.Init ( fHostBufferSize, fHostSampleRate );
             return 0;
         }
 
         virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
         {
             fAdaptedBufferSize = buffer_size;
-            fAdaptedDLL.Init ( fAdaptedBufferSize, fAdaptedSampleRate );
             return 0;
         }
 
@@ -177,14 +173,14 @@ namespace Jack
         virtual int SetHostSampleRate ( jack_nframes_t sample_rate )
         {
             fHostSampleRate = sample_rate;
-            fHostDLL.Init ( fHostBufferSize, fHostSampleRate );
+            fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
             return 0;
         }
 
         virtual int SetAdaptedSampleRate ( jack_nframes_t sample_rate )
         {
             fAdaptedSampleRate = sample_rate;
-            fAdaptedDLL.Init ( fAdaptedBufferSize, fAdaptedSampleRate );
+            fPIControler.Init(double(fHostSampleRate) / double(fAdaptedSampleRate));
             return 0;
         }
 
