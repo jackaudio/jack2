@@ -154,7 +154,7 @@ namespace Jack
     void JackAudioAdapterInterface::ResetRingBuffers()
     {
         if (fRingbufferSize == 0) {
-            fRingbufferCurSize *=2;
+            fRingbufferCurSize *= 2;
             if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
                 fRingbufferCurSize = DEFAULT_RB_SIZE;
         } 
@@ -209,7 +209,7 @@ namespace Jack
         delete[] fPlaybackRingBuffer;
     }
     
-    int JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames)
+    int JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int frames)
     {
         bool failure = false;
         fRunning = true;
@@ -225,13 +225,13 @@ namespace Jack
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
             fCaptureRingBuffer[i]->SetRatio(ratio);
-            if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], inNumberFrames) < inNumberFrames)
+            if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], frames) < frames)
                 failure = true;
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
             fPlaybackRingBuffer[i]->SetRatio(1/ratio);
-            if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], inNumberFrames) < inNumberFrames)
+            if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames)
                  failure = true;
         }
 
@@ -249,19 +249,19 @@ namespace Jack
         }
     }
 
-    int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames) 
+    int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames) 
     {
         bool failure = false;
         fPullAndPushTime = GetMicroSeconds();
   
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
-            if (fCaptureRingBuffer[i]->Read(inputBuffer[i], inNumberFrames) < inNumberFrames)
+            if (fCaptureRingBuffer[i]->Read(inputBuffer[i], frames) < frames)
                 failure = true;
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], inNumberFrames) < inNumberFrames)
+            if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], frames) < frames)
                 failure = true;
         }
 
