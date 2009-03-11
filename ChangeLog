@@ -24,6 +24,10 @@ Torben Hohn
   Jackdmp changes log
 ---------------------------
 
+2009-03-11 Stephane Letz  <letz@grame.fr>
+
+        * Client incorrect re-naming fixed: now done at socket level also.
+
 2009-03-10 Stephane Letz  <letz@grame.fr>
 
 	* Add -g (ring-buffer) parameter to netadapter.

@@ -29,6 +29,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+static void BuildName(const char* client_name, char* res, const char* dir, int which)
+{
+    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    JackTools::RewriteName(client_name, ext_client_name);
+    sprintf(res, "%s/jack_%s_%d_%d", dir, ext_client_name, JackTools::GetUID(), which);
+}
+
 JackClientSocket::JackClientSocket(int socket): fSocket(socket),fTimeOut(0)
 {}
 
@@ -112,36 +119,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
     addr.sun_family = AF_UNIX;
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d_%d", dir, name, JackTools::GetUID(), which);
-    jack_log("Connect: addr.sun_path %s", addr.sun_path);
-
-    if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        jack_error("Cannot connect to server socket err = %s", strerror(errno));
-        close(fSocket);
-        return -1;
-    }
-
-#ifdef __APPLE__
-    int on = 1 ;
-    if (setsockopt(fSocket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
-        jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fSocket, strerror(errno));
-    }
-#endif
-
-    return 0;
-}
-
-int JackClientSocket::Connect(const char* dir, int which)
-{
-    struct sockaddr_un addr;
-
-    if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error("Cannot create socket err = %s", strerror(errno));
-        return -1;
-    }
-
-    addr.sun_family = AF_UNIX;
-    snprintf(addr.sun_path, sizeof(addr.sun_path) - 1, "%s/jack_%d_%d", dir, JackTools::GetUID(), which);
+    BuildName(name, addr.sun_path, dir, which);
     jack_log("Connect: addr.sun_path %s", addr.sun_path);
 
     if (connect(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -271,67 +249,9 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     }
 
     addr.sun_family = AF_UNIX;
-
-    // TO CORRECT: always reuse the same name for now...
-    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%s_%d_%d", dir, name, JackTools::GetUID(), which);
+    BuildName(name, fName, dir, which);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
-    /*
-    if (access(addr.sun_path, F_OK) == 0) {
-    	goto error;
-    }
-    */
-
-    jack_log("Bind: addr.sun_path %s", addr.sun_path);
-    unlink(fName); // Security...
-
-    if (bind(fSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        jack_error("Cannot bind server to socket err = %s", strerror(errno));
-        goto error;
-    }
-
-    if (listen(fSocket, 1) < 0) {
-        jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
-        goto error;
-    }
-
-    return 0;
-
-error:
-    unlink(fName);
-    close(fSocket);
-    return -1;
-}
-
-int JackServerSocket::Bind(const char* dir, int which) // A revoir : utilisation de "which"
-{
-    struct sockaddr_un addr;
-
-    if ((fSocket = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-        jack_error("Cannot create server socket err = %s", strerror(errno));
-        return -1;
-    }
-
-    addr.sun_family = AF_UNIX;
-
-    /*
-    for (int i = 0; i < 999; i++) {
-    	snprintf(addr.sun_path, sizeof(addr.sun_path) - 1,"%s/jack_%d", dir, i);
-    	snprintf(fName, sizeof(addr.sun_path) - 1,"%s/jack_%d", dir, i);
-    	if (access(addr.sun_path, F_OK) != 0) {
-    		break;
-    	}
-    }
-    */
-
-    // TO CORRECT: always reuse the same name for now...
-    snprintf(fName, sizeof(addr.sun_path) - 1, "%s/jack_%d_%d", dir, JackTools::GetUID(), which);
-    strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
-    /*
-    if (access(addr.sun_path, F_OK) == 0) {
-    	goto error;
-    }
-    */
-
+  
     jack_log("Bind: addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 

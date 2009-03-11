@@ -50,7 +50,6 @@ class JackClientSocket
         {}
         JackClientSocket(int socket);
 
-        int Connect(const char* dir, int which);
         int Connect(const char* dir, const char* name, int which);
         int Close();
         int Read(void* data, int len);
@@ -69,13 +68,16 @@ class JackClientSocket
 \brief Server socket.
 */
 
+#define SOCKET_MAX_NAME_SIZE 256
+
+
 class JackServerSocket
 {
 
     private:
 
         int fSocket;
-        char fName[256];
+        char fName[SOCKET_MAX_NAME_SIZE];
 
     public:
 
@@ -84,7 +86,6 @@ class JackServerSocket
         ~JackServerSocket()
         {}
 
-        int Bind(const char* dir, int which);
         int Bind(const char* dir, const char* name, int which);
         JackClientSocket* Accept();
         int Close();
