@@ -104,7 +104,6 @@ namespace Jack
 
         //turn the thread realtime
         fThread.AcquireRealTime ( JackServerGlobals::fInstance->GetEngineControl()->fClientPriority );
-
         return 0;
     }
 

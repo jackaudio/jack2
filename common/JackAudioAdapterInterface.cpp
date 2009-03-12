@@ -186,7 +186,7 @@ namespace Jack
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
         
         if (fAdaptative)  {
-            jack_info("Ringbuffer automatic adaptative mode");
+            jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
         } else {
             fRingbufferCurSize = DEFAULT_RB_SIZE;
             jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);

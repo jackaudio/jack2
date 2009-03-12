@@ -494,9 +494,16 @@ int JackOSSAdapter::Open()
     }
 
     DisplayDeviceInfo(); 
-    
+
+    //start adapter thread
+    if (fThread.StartSync() < 0) {
+        jack_error ( "Cannot start audioadapter thread" );
+        return -1;
+    }
+  
+    //turn the thread realtime
     fThread.AcquireRealTime(JackServerGlobals::fInstance->GetEngineControl()->fClientPriority);
-    return fThread.StartSync();
+    return 0;
     
 error:
     CloseAux();

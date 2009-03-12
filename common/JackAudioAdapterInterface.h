@@ -144,20 +144,16 @@ namespace Jack
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
             fHostBufferSize = buffer_size;
-            if (fAdaptative) {
+            if (fAdaptative) 
                 AdaptRingBufferSize();
-                ResetRingBuffers();
-            }
             return 0;
         }
 
         virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
         {
             fAdaptedBufferSize = buffer_size;
-            if (fAdaptative) {
+            if (fAdaptative) 
                 AdaptRingBufferSize();
-                ResetRingBuffers();
-            }
             return 0;
         }
 
