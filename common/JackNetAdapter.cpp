@@ -96,7 +96,7 @@ namespace Jack
                     fQuality = param->value.ui;
                     break;
                 case 'g':
-                    fRingbufferSize = param->value.ui;
+                    fAdaptative = false;
                     break;
              }
         }
@@ -242,27 +242,24 @@ namespace Jack
 
     bool JackNetAdapter::Execute()
     {
-        try
-        {
+        try {
             // Keep running even in case of error
-            while ( fThread.GetStatus() == JackThread::kRunning )
-                if ( Process() == SOCKET_ERROR )
+            while (fThread.GetStatus() == JackThread::kRunning)
+                if (Process() == SOCKET_ERROR)
                     return false;
             return false;
-        }
-        catch ( JackNetException& e )
-        {
+        } catch (JackNetException& e) {
             e.PrintMessage();
-            jack_log ( "NetAdapter is restarted." );
+            jack_info("NetAdapter is restarted.");
+            Reset();
             fThread.DropRealTime();
-            fThread.SetStatus ( JackThread::kIniting );
-            if ( Init() )
-            {
-                fThread.SetStatus ( JackThread::kRunning );
+            fThread.SetStatus(JackThread::kIniting);
+            if (Init()) {
+                fThread.SetStatus(JackThread::kRunning);
                 return true;
-            }
-            else
+            } else {
                 return false;
+            }
         }
     }
 
@@ -471,10 +468,10 @@ extern "C"
         i++;
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 32768;
-        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames");
-        strcpy(desc->params[i].long_desc, "Resampling ringbuffer size in frames (default = 32768, 0 for automatic mode)");
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = false;
+        strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
+        strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (false = automatic adaptative)");
         
         i++;
         strcpy ( desc->params[i].name, "auto-connect" );

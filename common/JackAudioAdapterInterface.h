@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackResampler.h"
 #include "JackFilters.h"
 #include "JackConstants.h"
+#include <stdio.h>
 
 namespace Jack
 {
@@ -89,13 +90,15 @@ namespace Jack
         JackResampler** fPlaybackRingBuffer;
         
         unsigned int fQuality;
-        unsigned int fRingbufferSize;
         unsigned int fRingbufferCurSize;
         jack_time_t fPullAndPushTime;
       
         bool fRunning;
+        bool fAdaptative;
         
         void ResetRingBuffers();
+        void AdaptRingBufferSize();
+        void GrowRingBufferSize();
         
     public:
 
@@ -108,10 +111,11 @@ namespace Jack
             fAdaptedSampleRate ( sample_rate ),
             fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
-            fQuality(0), fRingbufferSize(DEFAULT_RB_SIZE),
-            fRingbufferCurSize(0),
+            fQuality(0),
+            fRingbufferCurSize(DEFAULT_ADAPTATIVE_SIZE),
             fPullAndPushTime(0),
-            fRunning(false)
+            fRunning(false),
+            fAdaptative(true)
         {}
 
         virtual ~JackAudioAdapterInterface()
@@ -140,12 +144,20 @@ namespace Jack
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
             fHostBufferSize = buffer_size;
+            if (fAdaptative) {
+                AdaptRingBufferSize();
+                ResetRingBuffers();
+            }
             return 0;
         }
 
         virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
         {
             fAdaptedBufferSize = buffer_size;
+            if (fAdaptative) {
+                AdaptRingBufferSize();
+                ResetRingBuffers();
+            }
             return 0;
         }
 
@@ -203,7 +215,7 @@ namespace Jack
         
         int PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
         int PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
-
+  
     };
 
 }

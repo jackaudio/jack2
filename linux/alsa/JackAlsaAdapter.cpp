@@ -77,7 +77,7 @@ namespace Jack
                     fQuality = param->value.ui;
                     break;
                 case 'g':
-                    fRingbufferSize = param->value.ui;
+                    fAdaptative = false;
                     break;
             }
         }
@@ -251,7 +251,7 @@ extern "C"
         strcpy ( desc->params[i].name, "duplex" );
         desc->params[i].character = 'D';
         desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = 1;
+        desc->params[i].value.i = true;
         strcpy ( desc->params[i].short_desc,
                  "Provide both capture and playback ports" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
@@ -285,10 +285,10 @@ extern "C"
         i++;
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 32768;
-        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames");
-        strcpy(desc->params[i].long_desc, "Resampling ringbuffer size in frames (default = 32768, 0 for automatic mode)");
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = false;
+        strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
+        strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (false = automatic adaptative)");
 
         return desc;
     }

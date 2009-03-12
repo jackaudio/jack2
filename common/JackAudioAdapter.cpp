@@ -36,19 +36,22 @@ namespace Jack
     int JackAudioAdapter::Process (jack_nframes_t frames, void* arg)
     {
         JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
-        if (!adapter->fAudioAdapter->IsRunning())
-            return 0;
-    
         float* inputBuffer[adapter->fAudioAdapter->GetInputs()];
         float* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
+        
+        // Always clear output 
         for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
             inputBuffer[i] = (float*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
+            memset(inputBuffer[i], 0, frames * sizeof(float));
         }
-        for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
-            outputBuffer[i] = (float*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
-        }
-        
-        adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
+       
+        if (adapter->fAudioAdapter->IsRunning()) {
+            for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
+                outputBuffer[i] = (float*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
+            }
+            adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
+        } 
+    
         return 0;
     }
 
@@ -81,7 +84,7 @@ namespace Jack
             param = (const jack_driver_param_t*) node->data;
             switch (param->character) {
                 case 'c':
-                    fAutoConnect = param->value.i;
+                    fAutoConnect = true;
                     break;
             }
         }

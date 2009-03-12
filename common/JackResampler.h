@@ -63,7 +63,7 @@ class JackResampler
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
         
-        unsigned int GetOffset()
+        unsigned int GetError()
         {
             return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
         }

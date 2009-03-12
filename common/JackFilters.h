@@ -263,20 +263,21 @@ namespace Jack
             static_resample_factor = resample_factor;
         }
         
+        /*
         double GetRatio(int fill_level)
         {
             double offset = fill_level;
 
             // Save offset.
             offset_array[(offset_differential_index++) % smooth_size] = offset;
-
+            
             // Build the mean of the windowed offset array basically fir lowpassing.
             double smooth_offset = 0.0;
             for (int i = 0; i < smooth_size; i++) {
                 smooth_offset += offset_array[(i + offset_differential_index - 1) % smooth_size] * window_array[i];
             }
             smooth_offset /= double(smooth_size);
-
+        
             // This is the integral of the smoothed_offset
             offset_integral += smooth_offset;
 
@@ -284,19 +285,34 @@ namespace Jack
             // It only used in the P component and the I component is used for the fine tuning anyways.
             if (fabs(smooth_offset) < pclamp)
                 smooth_offset = 0.0;
-
+         
             // Ok, now this is the PI controller. 
             // u(t) = K * (e(t) + 1/T \int e(t') dt')
             // Kp = 1/catch_factor and T = catch_factor2  Ki = Kp/T 
             double current_resample_factor 
                 = static_resample_factor - smooth_offset / catch_factor - offset_integral / catch_factor / catch_factor2;
-
+            
             // Now quantize this value around resample_mean, so that the noise which is in the integral component doesnt hurt.
             current_resample_factor = floor((current_resample_factor - resample_mean) * controlquant + 0.5) / controlquant + resample_mean;
 
             // Calculate resample_mean so we can init ourselves to saner values.
             resample_mean = 0.9999 * resample_mean + 0.0001 * current_resample_factor;
             return current_resample_factor;
+        }
+        */
+
+        
+        double GetRatio(int error)
+        {
+            double smooth_offset = error;
+
+            // This is the integral of the smoothed_offset
+            offset_integral += smooth_offset;
+
+            // Ok, now this is the PI controller. 
+            // u(t) = K * (e(t) + 1/T \int e(t') dt')
+            // Kp = 1/catch_factor and T = catch_factor2 Ki = Kp/T 
+            return static_resample_factor - smooth_offset/catch_factor - offset_integral/catch_factor/catch_factor2;
         }
         
         void OurOfBounds()
