@@ -185,10 +185,11 @@ namespace Jack
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
         
-        if (fAdaptative)  {
+        if (fAdaptative) {
             jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
         } else {
-            fRingbufferCurSize = DEFAULT_RB_SIZE;
+            if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+                fRingbufferCurSize = DEFAULT_RB_SIZE;
             jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);
         }
         
@@ -246,7 +247,10 @@ namespace Jack
         // Reset all ringbuffers in case of failure
         if (failure) {
             jack_error("JackAudioAdapterInterface::PushAndPull ringbuffer failure... reset");
-            GrowRingBufferSize();
+            if (fAdaptative) {
+                GrowRingBufferSize();
+                jack_info("Ringbuffer size = %d frames", fRingbufferCurSize);
+            }
             ResetRingBuffers();
             return -1;
         } else {
