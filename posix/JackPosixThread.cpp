@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPosixThread.h"
 #include "JackError.h"
 #include "JackTime.h"
+#include "JackGlobals.h"
 #include <string.h> // for memset
 #include <unistd.h> // for _POSIX_PRIORITY_SCHEDULING check
 
@@ -139,7 +140,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
         return -1;
     }
 
-    if ((res = pthread_create(thread, &attributes, start_routine, arg))) {
+    if ((res = JackGlobals::fJackThreadCreator(thread, &attributes, start_routine, arg))) {
         jack_error("Cannot create thread res = %d err = %s", res, strerror(errno));
         return -1;
     }

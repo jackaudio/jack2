@@ -26,4 +26,6 @@
 typedef unsigned long long UInt64;
 typedef pthread_key_t jack_tls_key;
 
+typedef int (*jack_thread_creator_t)(pthread_t*, const pthread_attr_t*, void* (*function)(void*), void* arg);
+
 #endif

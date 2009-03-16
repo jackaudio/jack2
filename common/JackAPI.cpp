@@ -222,6 +222,7 @@ extern "C"
     
     EXPORT int jack_client_stop_thread (jack_client_t* client, pthread_t thread);
     EXPORT int jack_client_kill_thread (jack_client_t* client, pthread_t thread);
+    EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc);
 
     EXPORT char * jack_get_internal_client_name (jack_client_t *client,
             jack_intclient_t intclient);
@@ -1790,6 +1791,11 @@ EXPORT int jack_client_stop_thread(jack_client_t* client, pthread_t thread)
 EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread)
 {
     return JackThread::KillImp(thread);
+}
+
+EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc)
+{
+    JackGlobals::fJackThreadCreator = jtc;
 }
 
 // intclient.h

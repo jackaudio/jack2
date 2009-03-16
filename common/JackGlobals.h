@@ -36,6 +36,7 @@ struct JackGlobals {
     static JackMutex* fOpenMutex;
     static bool fServerRunning;
     static JackClient* fClientTable[];
+    static jack_thread_creator_t fJackThreadCreator; 
     
 };
 

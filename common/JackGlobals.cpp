@@ -32,4 +32,6 @@ JackMutex* JackGlobals::fOpenMutex = new JackMutex();
 bool JackGlobals::fServerRunning = false;
 JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 
+jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create; 
+
 } // end of namespace

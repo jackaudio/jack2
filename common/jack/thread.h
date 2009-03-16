@@ -117,6 +117,29 @@ int jack_client_stop_thread(jack_client_t* client, pthread_t thread);
  */    
  int jack_client_kill_thread(jack_client_t* client, pthread_t thread);
 
+ typedef int (*jack_thread_creator_t)(pthread_t*,
+				     const pthread_attr_t*,
+				     void* (*function)(void*),
+				     void* arg);
+/**
+ * This function can be used in very very specialized cases
+ * where it is necessary that client threads created by JACK
+ * are created by something other than pthread_create(). After
+ * it is used, any threads that JACK needs for the client will
+ * will be created by calling the function passed to this
+ * function. 
+ *
+ * No normal application/client should consider calling this.
+ * The specific case for which it was created involves running
+ * win32/x86 plugins under Wine on Linux, where it is necessary
+ * that all threads that might call win32 functions are known
+ * to Wine.
+ * 
+ * @param creator a function that creates a new thread
+ * 
+ */
+void jack_set_thread_creator (jack_thread_creator_t creator);
+
 /* @} */
 
 #ifdef __cplusplus
