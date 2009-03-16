@@ -219,11 +219,12 @@ extern "C"
                                           thread_routine routine,
                                           void *arg);
     EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
-    
+
     EXPORT int jack_client_stop_thread (jack_client_t* client, pthread_t thread);
     EXPORT int jack_client_kill_thread (jack_client_t* client, pthread_t thread);
+#ifndef WIN32
     EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc);
-
+#endif
     EXPORT char * jack_get_internal_client_name (jack_client_t *client,
             jack_intclient_t intclient);
     EXPORT jack_intclient_t jack_internal_client_handle (jack_client_t *client,
@@ -1760,8 +1761,8 @@ EXPORT int jack_client_max_real_time_priority(jack_client_t* ext_client)
         JackEngineControl* control = GetEngineControl();
        return (control->fRealTime) ? control->fMaxClientPriority : -1;
     }
-} 
- 
+}
+
 EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 {
     JackEngineControl* control = GetEngineControl();
@@ -1793,10 +1794,12 @@ EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread)
     return JackThread::KillImp(thread);
 }
 
+#ifndef WIN32
 EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc)
 {
     JackGlobals::fJackThreadCreator = jtc;
 }
+#endif
 
 // intclient.h
 EXPORT int jack_internal_client_new (const char *client_name,
