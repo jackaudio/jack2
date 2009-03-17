@@ -334,7 +334,7 @@ namespace Jack
                     if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) < 0 )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
-                    jack_info ( "'%s' starts transport.", fParams.fName );
+                    jack_info ( "'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
                 case JackTransportNetStarting :
                     jack_info ( "'%s' is ready to roll..", fParams.fName );

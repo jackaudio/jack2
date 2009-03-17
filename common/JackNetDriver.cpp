@@ -414,7 +414,7 @@ namespace Jack
                 case JackTransportStarting :
                     fEngineControl->fTransport.RequestNewPos ( &fSendTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
-                    jack_info ( "Master starts transport." );
+                    jack_info ( "Master starts transport frame = %d", fSendTransportData.fPosition.frame);
                     break;
 
                 case JackTransportRolling :
