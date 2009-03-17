@@ -674,13 +674,11 @@ int JackClient::TransportReposition(jack_position_t* pos)
 
 jack_transport_state_t JackClient::TransportQuery(jack_position_t* pos)
 {
-    jack_log("TransportQuery");
     return GetEngineControl()->fTransport.Query(pos);
 }
 
 jack_nframes_t JackClient::GetCurrentTransportFrame()
 {
-    jack_log("GetCurrentTransportFrame");
     return GetEngineControl()->fTransport.GetCurrentFrame();
 }
 

@@ -34,6 +34,9 @@ namespace Jack
         //settings
         fClientName = const_cast<char*> ( fParams.fName );
         fJackClient = NULL;
+        fSendTransportData.fState = -1;
+        fReturnTransportData.fState = -1;
+        fLastTransportState = -1;
         uint port_index;
 
         //jack audio ports
