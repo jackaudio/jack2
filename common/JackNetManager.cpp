@@ -282,7 +282,7 @@ namespace Jack
         fSendTransportData.fNewState = ( ( fSendTransportData.fState != fLastTransportState ) &&
                                          ( fSendTransportData.fState != fReturnTransportData.fState ) );
         if ( fSendTransportData.fNewState )
-            jack_info ( "Sending '%s' to '%s'.", GetTransportState ( fSendTransportData.fState ), fParams.fName );
+            jack_info ( "Sending '%s' to '%s' frame = %ld", GetTransportState ( fSendTransportData.fState ), fParams.fName, fSendTransportData.fPosition.frame );
         fLastTransportState = fSendTransportData.fState;
    }
 
