@@ -331,7 +331,7 @@ namespace Jack
                     jack_info ( "'%s' stops transport.", fParams.fName );
                     break;
                 case JackTransportStarting :
-                    if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) < 0 )
+                    if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) == EINVAL )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
                     jack_info ( "'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
