@@ -45,14 +45,12 @@ namespace Jack
             memset(inputBuffer[i], 0, frames * sizeof(float));
         }
 
-        if (adapter->fAudioAdapter->IsRunning()) {
-            for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
-                outputBuffer[i] = (float*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
-            }
-            adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
+        for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
+            outputBuffer[i] = (float*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
         }
 
-        return 0;
+        adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
+      	return 0;
     }
 
     int JackAudioAdapter::BufferSize ( jack_nframes_t buffer_size, void* arg )

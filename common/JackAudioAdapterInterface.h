@@ -92,7 +92,7 @@ namespace Jack
         unsigned int fQuality;
         unsigned int fRingbufferCurSize;
         jack_time_t fPullAndPushTime;
-      
+  
         bool fRunning;
         bool fAdaptative;
         
@@ -120,11 +120,6 @@ namespace Jack
 
         virtual ~JackAudioAdapterInterface()
         {}
-
-        bool IsRunning()
-        {
-            return fRunning;
-        }
 
         virtual void Reset();
        
