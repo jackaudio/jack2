@@ -26,7 +26,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-#define DEFAULT_RB_SIZE 16384	
+#define DEFAULT_RB_SIZE 32768
+#define DEFAULT_ADAPTATIVE_SIZE 2048		
 
 inline float Range(float min, float max, float val)
 {
@@ -49,10 +50,9 @@ class JackResampler
     public:
     
         JackResampler();
-        JackResampler(unsigned int ringbuffer_size);
         virtual ~JackResampler();
         
-        virtual void Reset();
+        virtual void Reset(unsigned int new_size);
         
         virtual unsigned int ReadResample(float* buffer, unsigned int frames);
         virtual unsigned int WriteResample(float* buffer, unsigned int frames);
@@ -63,7 +63,7 @@ class JackResampler
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
         
-        unsigned int GetOffset()
+        unsigned int GetError()
         {
             return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
         }

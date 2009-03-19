@@ -440,7 +440,12 @@ class SERVER_EXPORT JackConnectionManager
         void DirectConnect(int ref1, int ref2);
         void DirectDisconnect(int ref1, int ref2);
 
-        int GetActivation(int refnum) const;
+        int GetActivation(int refnum) const
+        {
+            return fInputCounter[refnum].GetValue();
+        }
+
+
 
         // Graph
         void ResetGraph(JackClientTiming* timing);

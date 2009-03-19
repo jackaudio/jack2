@@ -144,7 +144,11 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
         */
         int SetTimebaseMaster(int refnum, bool conditionnal);
         
-        void GetTimebaseMaster(int& refnum, bool& conditionnal);
+        void GetTimebaseMaster(int& refnum, bool& conditionnal)
+        {
+            refnum = fTimeBaseMaster;
+            conditionnal = fConditionnal;
+        }
 
         /*
         	\brief 

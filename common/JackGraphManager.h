@@ -120,7 +120,11 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         int ResumeRefNum(JackClientControl* control, JackSynchro* table);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, long usecs);
 
-        JackClientTiming* GetClientTiming(int refnum);
+        JackClientTiming* GetClientTiming(int refnum)
+        {
+            return &fClientTiming[refnum];
+        }
+
 
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);

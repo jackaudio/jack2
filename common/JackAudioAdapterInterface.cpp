@@ -52,13 +52,12 @@ namespace Jack
         for (int i = 1; i < max; i++)
         {
             fprintf(file, "%d \t %d \t %d  \t %f \t %f \t %d \t %d \n",
-                    fTable[i].delta, fTable[i+1].time1 - fTable[i].time1,
-                    fTable[i+1].time2 - fTable[i].time2,
+                    fTable[i].delta, fTable[i].time1, fTable[i].time2,
                     fTable[i].r1, fTable[i].r2, fTable[i].pos1, fTable[i].pos2);
         }
         fclose(file);
 
-        /* No used for now
+        // No used for now
         // Adapter timing 1
         file = fopen("AdapterTiming1.plot", "w");
         fprintf(file, "set multiplot\n");
@@ -68,9 +67,9 @@ namespace Jack
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
-        sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer interrupt period\" with lines,");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Ringbuffer error\" with lines,");
         fprintf(file, buffer);
-        sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Ringbuffer error with timing correction\" with lines");
         fprintf(file, buffer);
         
         fprintf(file, "\n unset multiplot\n");  
@@ -89,8 +88,7 @@ namespace Jack
         fprintf(file, buffer);
         
         fclose(file);
-        */
-
+   
         // Adapter timing 2
         file = fopen("AdapterTiming2.plot", "w");
         fprintf(file, "set multiplot\n");
@@ -155,16 +153,32 @@ namespace Jack
     }
 
 #endif
+
+    void JackAudioAdapterInterface::GrowRingBufferSize()
+    {
+        fRingbufferCurSize *= 2;
+    }
+    
+    void JackAudioAdapterInterface::AdaptRingBufferSize()
+    {
+        if (fHostBufferSize > fAdaptedBufferSize)
+            fRingbufferCurSize = 4 * fHostBufferSize;
+        else 
+            fRingbufferCurSize = 4 * fAdaptedBufferSize;
+    }
         
     void JackAudioAdapterInterface::ResetRingBuffers()
     {
+        if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+            fRingbufferCurSize = DEFAULT_RB_SIZE;
+        
         for (int i = 0; i < fCaptureChannels; i++)
-            fCaptureRingBuffer[i]->Reset();
+            fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
         for (int i = 0; i < fPlaybackChannels; i++)
-            fPlaybackRingBuffer[i]->Reset();
+            fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
     }
-
-     void JackAudioAdapterInterface::Reset()
+    
+    void JackAudioAdapterInterface::Reset()
     {
         ResetRingBuffers();
         fRunning = false;
@@ -179,11 +193,25 @@ namespace Jack
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
-        for (int i = 0; i < fCaptureChannels; i++ )
-            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality, fRingbufferSize);
-        for (int i = 0; i < fPlaybackChannels; i++ )
-            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality, fRingbufferSize);
-
+        
+        if (fAdaptative) {
+            AdaptRingBufferSize();
+            jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
+        } else {
+            if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+                fRingbufferCurSize = DEFAULT_RB_SIZE;
+            jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);
+        }
+        
+        for (int i = 0; i < fCaptureChannels; i++ ) {
+            fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
+            fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+        for (int i = 0; i < fPlaybackChannels; i++ ) {
+            fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
+            fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+     
         if (fCaptureChannels > 0)
             jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
         if (fPlaybackChannels > 0)
@@ -206,14 +234,14 @@ namespace Jack
     {
         bool failure = false;
         fRunning = true;
+   
+        // Finer estimation of the position in the ringbuffer
+        int delta_frames = (fPullAndPushTime > 0) ? (int)((float(long(GetMicroSeconds() - fPullAndPushTime)) * float(fAdaptedSampleRate)) / 1000000.f) : 0;
+        double ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetError() - delta_frames);
         
-        /*
-        Finer estimation of the position in the ringbuffer ??
-        int delta_frames = (int)(float(long(GetMicroSeconds() - fPullAndPushTime)) * float(fAdaptedSampleRate)) / 1000000.f;
-        double ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetOffset() - delta_frames);
-        */
-         
-        double ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetOffset());
+    #ifdef JACK_MONITOR
+        fTable.Write(fCaptureRingBuffer[0]->GetError(), fCaptureRingBuffer[0]->GetError() - delta_frames, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
+    #endif
     
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
@@ -223,18 +251,17 @@ namespace Jack
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fPlaybackRingBuffer[i]->SetRatio(1 / ratio);
+            fPlaybackRingBuffer[i]->SetRatio(1/ratio);
             if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames)
                  failure = true;
         }
-
-    #ifdef JACK_MONITOR
-        fTable.Write(0, 0, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fPlaybackRingBuffer[0]->WriteSpace());
-    #endif
-
         // Reset all ringbuffers in case of failure
         if (failure) {
             jack_error("JackAudioAdapterInterface::PushAndPull ringbuffer failure... reset");
+            if (fAdaptative) {
+                GrowRingBufferSize();
+                jack_info("Ringbuffer size = %d frames", fRingbufferCurSize);
+            }
             ResetRingBuffers();
             return -1;
         } else {
@@ -244,28 +271,24 @@ namespace Jack
 
     int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames) 
     {
-        bool failure = false;
         fPullAndPushTime = GetMicroSeconds();
-  
+        if (!fRunning)
+            return 0;
+
+        int res = 0;
+    
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
             if (fCaptureRingBuffer[i]->Read(inputBuffer[i], frames) < frames)
-                failure = true;
+                res = -1;
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
             if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], frames) < frames)
-                failure = true;
+                res = -1;
         }
-
-        // Reset all ringbuffers in case of failure
-        if (failure) {
-            jack_error("JackCallbackAudioAdapter::PullAndPush ringbuffer failure... reset");
-            Reset();
-            return -1;
-        } else {
-            return 0;
-        }
+        
+        return res;
     }
-
+ 
 } // namespace

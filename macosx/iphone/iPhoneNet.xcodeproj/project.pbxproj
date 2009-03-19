@@ -52,6 +52,10 @@
 		4B1A945A0F49C03600D3626B /* JackPosixThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1A933B0F49AC4500D3626B /* JackPosixThread.cpp */; };
 		4B1A947F0F49C42300D3626B /* JackAudioQueueAdapter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1A947D0F49C42300D3626B /* JackAudioQueueAdapter.cpp */; };
 		4B1A95760F49CEAB00D3626B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1A95750F49CEAB00D3626B /* AudioToolbox.framework */; };
+		4B2791880F72570C000536B7 /* JackGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B2791870F72570C000536B7 /* JackGlobals.cpp */; };
+		4B2791890F72570C000536B7 /* JackGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B2791870F72570C000536B7 /* JackGlobals.cpp */; };
+		4B27918A0F72570C000536B7 /* JackGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B2791870F72570C000536B7 /* JackGlobals.cpp */; };
+		4B27918B0F72570C000536B7 /* JackGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B2791870F72570C000536B7 /* JackGlobals.cpp */; };
 		4BBDC8FA0F5420C000465F9C /* freeverb.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDC8F90F5420C000465F9C /* freeverb.mm */; };
 		4BF1360F0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF1360E0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp */; };
 		4BF136100F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF1360E0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp */; };
@@ -104,6 +108,7 @@
 		4B1A947D0F49C42300D3626B /* JackAudioQueueAdapter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioQueueAdapter.cpp; path = ../coreaudio/JackAudioQueueAdapter.cpp; sourceTree = SOURCE_ROOT; };
 		4B1A947E0F49C42300D3626B /* JackAudioQueueAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioQueueAdapter.h; path = ../coreaudio/JackAudioQueueAdapter.h; sourceTree = SOURCE_ROOT; };
 		4B1A95750F49CEAB00D3626B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS2.2.1.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		4B2791870F72570C000536B7 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4BBDC8F90F5420C000465F9C /* freeverb.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = freeverb.mm; sourceTree = SOURCE_ROOT; };
 		4BF1360E0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterInterface.cpp; path = ../../common/JackAudioAdapterInterface.cpp; sourceTree = SOURCE_ROOT; };
 		4BF136120F4B0B5E00218A3F /* JackAudioAdapterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapterInterface.h; path = ../../common/JackAudioAdapterInterface.h; sourceTree = SOURCE_ROOT; };
@@ -204,6 +209,7 @@
 				4B1A93110F49AB3400D3626B /* JackNetTool.cpp */,
 				4B1A930F0F49AB2F00D3626B /* JackNetInterface.cpp */,
 				4B1A930D0F49AB2A00D3626B /* JackNetAPI.cpp */,
+				4B2791870F72570C000536B7 /* JackGlobals.cpp */,
 				32CA4F630368D1EE00C91783 /* iPhoneNet_Prefix.pch */,
 				4B0772490F54021B000DC657 /* main_slave.mm */,
 				4B0772500F54022D000DC657 /* main_master.mm */,
@@ -383,6 +389,7 @@
 				4BF136550F4B0F9F00218A3F /* ringbuffer.c in Sources */,
 				4B07724A0F54021B000DC657 /* main_slave.mm in Sources */,
 				4B0773870F541EE2000DC657 /* iPhoneNetAppDelegate.m in Sources */,
+				4B27918A0F72570C000536B7 /* JackGlobals.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +410,7 @@
 				4B07722E0F54018C000DC657 /* ringbuffer.c in Sources */,
 				4B0772510F54022D000DC657 /* main_master.mm in Sources */,
 				4B0773860F541EE2000DC657 /* iPhoneNetAppDelegate.m in Sources */,
+				4B27918B0F72570C000536B7 /* JackGlobals.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,6 +428,7 @@
 				4BF136100F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp in Sources */,
 				4BF1364E0F4B0F7700218A3F /* JackResampler.cpp in Sources */,
 				4BF136560F4B0F9F00218A3F /* ringbuffer.c in Sources */,
+				4B2791890F72570C000536B7 /* JackGlobals.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,6 +449,7 @@
 				4BFF456D0F4D5D9700106083 /* ringbuffer.c in Sources */,
 				4B0773880F541EE2000DC657 /* iPhoneNetAppDelegate.m in Sources */,
 				4BBDC8FA0F5420C000465F9C /* freeverb.mm in Sources */,
+				4B2791880F72570C000536B7 /* JackGlobals.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

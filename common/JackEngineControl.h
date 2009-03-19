@@ -119,18 +119,48 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     {}
 
     // Cycle
-    void CycleIncTime(jack_time_t callback_usecs);
-    void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
-    void CycleEnd(JackClientInterface** table);
+    void CycleIncTime(jack_time_t callback_usecs)
+    {
+        // Timer
+        fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
+    }
+
+    void CycleBegin(JackClientInterface** table, JackGraphManager* manager, jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)
+    {
+        fTransport.CycleBegin(fSampleRate, cur_cycle_begin);
+        CalcCPULoad(table, manager, cur_cycle_begin, prev_cycle_end);
+#ifdef JACK_MONITOR
+        fProfiler.Profile(table, manager, fPeriodUsecs, cur_cycle_begin, prev_cycle_end);
+#endif
+    }
+
+    void CycleEnd(JackClientInterface** table)
+    {
+        fTransport.CycleEnd(table, fSampleRate, fBufferSize);
+    }
 
     // Timer
-    void InitFrameTime();
-    void ResetFrameTime(jack_time_t callback_usecs);
-    void ReadFrameTime(JackTimer* timer);
+    void InitFrameTime()
+    {
+        fFrameTimer.InitFrameTime();
+    }
+
+    void ResetFrameTime(jack_time_t callback_usecs)
+    {
+        fFrameTimer.ResetFrameTime(fSampleRate, callback_usecs, fPeriodUsecs);
+    }
+
+    void ReadFrameTime(JackTimer* timer)
+    {
+        fFrameTimer.ReadFrameTime(timer);
+    }
     
     // XRun
     void NotifyXRun(float delayed_usecs);
-    void ResetXRun();
+    void ResetXRun()
+    {
+        fMaxDelayedUsecs = 0.f;
+    }
 
     // Private
     void CalcCPULoad(JackClientInterface** table, JackGraphManager* manager, jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);

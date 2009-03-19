@@ -378,7 +378,8 @@ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nfra
                 break;
                 
             case 'g':
-                fRingbufferSize = param->value.ui;
+                fRingbufferCurSize = param->value.ui;
+                fAdaptative = false;
                 break;
         }
     }
@@ -1080,9 +1081,9 @@ extern "C"
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Resampling ringbuffer size in frames (default = 16384)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        desc->params[i].value.ui = 32768;
+        strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
+        strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (if not set => automatic adaptative)");
 
         return desc;
     }

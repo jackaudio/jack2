@@ -33,44 +33,6 @@ static inline jack_time_t JACK_MAX(jack_time_t a, jack_time_t b)
     return (a < b) ? b : a;
 }
 
-void JackEngineControl::CycleIncTime(jack_time_t callback_usecs)
-{
-    // Timer
-    fFrameTimer.IncFrameTime(fBufferSize, callback_usecs, fPeriodUsecs);
-}
-
-void JackEngineControl::CycleBegin(JackClientInterface** table, 
-                                    JackGraphManager* manager, 
-                                    jack_time_t cur_cycle_begin, 
-                                    jack_time_t prev_cycle_end)
-{
-    fTransport.CycleBegin(fSampleRate, cur_cycle_begin);
-    CalcCPULoad(table, manager, cur_cycle_begin, prev_cycle_end);
-#ifdef JACK_MONITOR
-    fProfiler.Profile(table, manager, fPeriodUsecs, cur_cycle_begin, prev_cycle_end);
-#endif
-}
-
-void JackEngineControl::CycleEnd(JackClientInterface** table)
-{
-    fTransport.CycleEnd(table, fSampleRate, fBufferSize);
-}
-
-void JackEngineControl::InitFrameTime()
-{
-    fFrameTimer.InitFrameTime();
-}
-
-void JackEngineControl::ResetFrameTime(jack_time_t cur_cycle_begin)
-{
-    fFrameTimer.ResetFrameTime(fSampleRate, cur_cycle_begin, fPeriodUsecs);
-}
-
-void JackEngineControl::ReadFrameTime(JackTimer* timer)
-{
-    fFrameTimer.ReadFrameTime(timer);
-}
-
 void JackEngineControl::CalcCPULoad(JackClientInterface** table, 
                                     JackGraphManager* manager, 
                                     jack_time_t cur_cycle_begin, 
@@ -126,9 +88,4 @@ void JackEngineControl::NotifyXRun(float delayed_usecs)
         fMaxDelayedUsecs = delayed_usecs;
 }
     
-void JackEngineControl::ResetXRun()
-{
-    fMaxDelayedUsecs = 0.f;
-}
-
 } // end of namespace

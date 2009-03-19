@@ -738,9 +738,9 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
         for (int i = 0; i < fCaptureChannels; i++ )
-            fCaptureRingBuffer[i] = new JackResampler(fRingbufferSize);
+            fCaptureRingBuffer[i] = new JackResampler();
         for (int i = 0; i < fPlaybackChannels; i++ )
-            fPlaybackRingBuffer[i] = new JackResampler(fRingbufferSize);
+            fPlaybackRingBuffer[i] = new JackResampler();
 
         if (fCaptureChannels > 0)
             jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());

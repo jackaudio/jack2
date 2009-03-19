@@ -193,6 +193,16 @@ int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
 void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
 
 /**
+ * Reset the internal "available" size, and read and write pointers, making an empty buffer.
+ *
+ * This is not thread safe.
+ *
+ * @param rb a pointer to the ringbuffer structure.
+ * @param sz the new size, that must be less than allocated size.
+ */
+void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
+
+/**
  * Write data into the ringbuffer.
  *
  * @param rb a pointer to the ringbuffer structure.

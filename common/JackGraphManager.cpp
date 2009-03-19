@@ -101,11 +101,6 @@ int JackGraphManager::SuspendRefNum(JackClientControl* control, JackSynchro* tab
     return manager->SuspendRefNum(control, table, fClientTiming, usec);
 }
 
-JackClientTiming* JackGraphManager::GetClientTiming(int ref)
-{
-    return &fClientTiming[ref];
-}
-
 // Server
 void JackGraphManager::DirectConnect(int ref1, int ref2)
 {

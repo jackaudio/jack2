@@ -46,6 +46,7 @@ bool JackWaitThreadedDriver::Execute()
         if (fDriver->IsRealTime()) {
             jack_log("JackWaitThreadedDriver::Init IsRealTime");
             // Will do "something" on OSX only...
+            GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
             fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
             if (fThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
                 jack_error("AcquireRealTime error");
@@ -61,7 +62,7 @@ bool JackWaitThreadedDriver::Execute()
         return false;
     } catch (JackNetException& e) {
         e.PrintMessage();
-        jack_log("Driver is restarted");
+        jack_info("Driver is restarted");
         fThread.DropRealTime();
         // Thread in kIniting status again...
         fThread.SetStatus(JackThread::kIniting);

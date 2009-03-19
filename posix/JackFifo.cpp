@@ -30,9 +30,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-void JackFifo::BuildName(const char* name, const char* server_name, char* res)
+void JackFifo::BuildName(const char* client_name, const char* server_name, char* res)
 {
-    sprintf(res, "%s/jack_fifo.%d_%s_%s", jack_client_dir, JackTools::GetUID(), server_name, name);
+    char ext_client_name[JACK_CLIENT_NAME_SIZE + 1];
+    JackTools::RewriteName(client_name, ext_client_name);
+    sprintf(res, "%s/jack_fifo.%d_%s_%s", jack_client_dir, JackTools::GetUID(), server_name, ext_client_name);
 }
 
 bool JackFifo::Signal()

@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackResampler.h"
 #include "JackFilters.h"
 #include "JackConstants.h"
+#include <stdio.h>
 
 namespace Jack
 {
@@ -89,12 +90,15 @@ namespace Jack
         JackResampler** fPlaybackRingBuffer;
         
         unsigned int fQuality;
-        unsigned int fRingbufferSize;
+        unsigned int fRingbufferCurSize;
         jack_time_t fPullAndPushTime;
-      
+  
         bool fRunning;
+        bool fAdaptative;
         
         void ResetRingBuffers();
+        void AdaptRingBufferSize();
+        void GrowRingBufferSize();
         
     public:
 
@@ -107,9 +111,11 @@ namespace Jack
             fAdaptedSampleRate ( sample_rate ),
             fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
-            fQuality(0), fRingbufferSize(DEFAULT_RB_SIZE),
+            fQuality(0),
+            fRingbufferCurSize(DEFAULT_ADAPTATIVE_SIZE),
             fPullAndPushTime(0),
-            fRunning(false)
+            fRunning(false),
+            fAdaptative(true)
         {}
         JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
                                     jack_nframes_t host_sample_rate,
@@ -123,18 +129,12 @@ namespace Jack
                 fAdaptedSampleRate ( adapted_sample_rate ),
                 fPIControler(host_sample_rate / host_sample_rate, 256),
                 fQuality(0),
-                fRingbufferSize(DEFAULT_RB_SIZE),
                 fPullAndPushTime(0),
                 fRunning ( false )
         {}
 
         virtual ~JackAudioAdapterInterface()
         {}
-
-        bool IsRunning()
-        {
-            return fRunning;
-        }
 
         virtual void Reset();
        
@@ -154,12 +154,16 @@ namespace Jack
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
             fHostBufferSize = buffer_size;
+            if (fAdaptative) 
+                AdaptRingBufferSize();
             return 0;
         }
 
         virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
         {
             fAdaptedBufferSize = buffer_size;
+            if (fAdaptative) 
+                AdaptRingBufferSize();
             return 0;
         }
 
@@ -217,7 +221,7 @@ namespace Jack
         
         int PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int frames);
         int PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames);
-
+  
     };
 
 }

@@ -73,7 +73,7 @@ class SERVER_EXPORT JackTimer
 \brief A class using the JackAtomicState to manage jack time.
 */
 
-class JackFrameTimer : public JackAtomicState<JackTimer>
+class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
 {
     
     private:

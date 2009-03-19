@@ -55,6 +55,7 @@ EXPORT void jack_ringbuffer_read_advance(jack_ringbuffer_t *rb, size_t cnt);
 EXPORT size_t jack_ringbuffer_read_space(const jack_ringbuffer_t *rb);
 EXPORT int jack_ringbuffer_mlock(jack_ringbuffer_t *rb);
 EXPORT void jack_ringbuffer_reset(jack_ringbuffer_t *rb);
+EXPORT void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
 EXPORT size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
                                  size_t cnt);
 void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
@@ -119,6 +120,19 @@ jack_ringbuffer_mlock (jack_ringbuffer_t * rb)
 EXPORT void
 jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 {
+  rb->read_ptr = 0;
+  rb->write_ptr = 0;
+}
+
+/* Reset the read and write pointers to zero. This is not thread
+   safe. */
+
+EXPORT void
+jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz)
+{
+  rb->size = sz;
+  rb->size_mask = rb->size;
+  rb->size_mask -= 1;
   rb->read_ptr = 0;
   rb->write_ptr = 0;
 }

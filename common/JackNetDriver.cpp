@@ -45,6 +45,9 @@ namespace Jack
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fTransportSync = transport_sync;
         fParams.fNetworkMode = network_mode;
+        fSendTransportData.fState = -1;
+        fReturnTransportData.fState = -1;
+        fLastTransportState = -1;
         fLastTimebaseMaster = -1;
         fMidiCapturePortList = NULL;
         fMidiPlaybackPortList = NULL;
@@ -411,7 +414,7 @@ namespace Jack
                 case JackTransportStarting :
                     fEngineControl->fTransport.RequestNewPos ( &fSendTransportData.fPosition );
                     fEngineControl->fTransport.SetCommand ( TransportCommandStart );
-                    jack_info ( "Master starts transport." );
+                    jack_info ( "Master starts transport frame = %d", fSendTransportData.fPosition.frame);
                     break;
 
                 case JackTransportRolling :

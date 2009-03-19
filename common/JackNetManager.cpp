@@ -34,6 +34,9 @@ namespace Jack
         //settings
         fClientName = const_cast<char*> ( fParams.fName );
         fJackClient = NULL;
+        fSendTransportData.fState = -1;
+        fReturnTransportData.fState = -1;
+        fLastTransportState = -1;
         uint port_index;
 
         //jack audio ports
@@ -279,7 +282,7 @@ namespace Jack
         fSendTransportData.fNewState = ( ( fSendTransportData.fState != fLastTransportState ) &&
                                          ( fSendTransportData.fState != fReturnTransportData.fState ) );
         if ( fSendTransportData.fNewState )
-            jack_info ( "Sending '%s' to '%s'.", GetTransportState ( fSendTransportData.fState ), fParams.fName );
+            jack_info ( "Sending '%s' to '%s' frame = %ld", GetTransportState ( fSendTransportData.fState ), fParams.fName, fSendTransportData.fPosition.frame );
         fLastTransportState = fSendTransportData.fState;
    }
 
@@ -328,10 +331,10 @@ namespace Jack
                     jack_info ( "'%s' stops transport.", fParams.fName );
                     break;
                 case JackTransportStarting :
-                    if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) < 0 )
+                    if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) == EINVAL )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
-                    jack_info ( "'%s' starts transport.", fParams.fName );
+                    jack_info ( "'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
                 case JackTransportNetStarting :
                     jack_info ( "'%s' is ready to roll..", fParams.fName );

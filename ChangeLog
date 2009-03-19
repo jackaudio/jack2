@@ -24,9 +24,26 @@ Torben Hohn
   Jackdmp changes log
 ---------------------------
 
+2009-03-19 Stephane Letz  <letz@grame.fr>
+
+	* Tim Blechmann optimization patch (inlining some heavy used methods).
+
+2009-03-12 Stephane Letz  <letz@grame.fr>
+
+        * Virtualize and allow overriding of thread creation function, to allow Wine support (from JACK1).
+
+2009-03-12 Stephane Letz  <letz@grame.fr>
+
+        * Try automatic adaptative mode in adapters.
+
+2009-03-11 Stephane Letz  <letz@grame.fr>
+
+        * Client incorrect re-naming fixed : now done at socket level also.
+
 2009-03-10 Stephane Letz  <letz@grame.fr>
 
 	* Add -g (ring-buffer) parameter to netadapter.
+	* Automatic adaptative ringbuffer size mode when -g = 0.
 
 2009-03-09 Stephane Letz  <letz@grame.fr>
 

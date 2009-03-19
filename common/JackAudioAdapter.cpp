@@ -36,20 +36,21 @@ namespace Jack
     int JackAudioAdapter::Process (jack_nframes_t frames, void* arg)
     {
         JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
-        if (!adapter->fAudioAdapter->IsRunning())
-            return 0;
-    
         float* inputBuffer[adapter->fAudioAdapter->GetInputs()];
         float* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
+
+        // Always clear output
         for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
             inputBuffer[i] = (float*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
+            memset(inputBuffer[i], 0, frames * sizeof(float));
         }
+
         for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
             outputBuffer[i] = (float*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
         }
-        
+
         adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);
-        return 0;
+      	return 0;
     }
 
     int JackAudioAdapter::BufferSize ( jack_nframes_t buffer_size, void* arg )
@@ -70,23 +71,23 @@ namespace Jack
 
 //JackAudioAdapter *********************************************************
 
-     JackAudioAdapter::JackAudioAdapter (jack_client_t* jack_client, JackAudioAdapterInterface* audio_io, const JSList* params, bool system) 
+     JackAudioAdapter::JackAudioAdapter (jack_client_t* jack_client, JackAudioAdapterInterface* audio_io, const JSList* params, bool system)
         :fJackClient(jack_client), fAudioAdapter(audio_io)
     {
         const JSList* node;
         const jack_driver_param_t* param;
         fAutoConnect = false;
-        
+
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t*) node->data;
             switch (param->character) {
                 case 'c':
-                    fAutoConnect = param->value.i;
+                    fAutoConnect = true;
                     break;
             }
         }
     }
-            
+
     JackAudioAdapter::~JackAudioAdapter()
     {
         // When called, Close has already been used for the client, thus ports are already unregistered.
@@ -105,11 +106,11 @@ namespace Jack
         delete[] fCapturePortList;
         delete[] fPlaybackPortList;
     }
-    
+
     void JackAudioAdapter::ConnectPorts()
     {
         const char **ports;
-         
+
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
         if (ports != NULL) {
             for (int i = 0; i < fAudioAdapter->GetInputs() && ports[i]; i++) {
@@ -117,7 +118,7 @@ namespace Jack
             }
             free(ports);
         }
-        
+
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports != NULL) {
             for (int i = 0; i < fAudioAdapter->GetOutputs() && ports[i]; i++) {
@@ -137,7 +138,7 @@ namespace Jack
         char name[32];
         jack_log("JackAudioAdapter::Open fCaptureChannels %d fPlaybackChannels %d", fAudioAdapter->GetInputs(), fAudioAdapter->GetOutputs());
         fAudioAdapter->Create();
-     
+
         //jack ports
         fCapturePortList = new jack_port_t*[fAudioAdapter->GetInputs()];
         fPlaybackPortList = new jack_port_t*[fAudioAdapter->GetOutputs()];
@@ -165,7 +166,7 @@ namespace Jack
             goto fail;
         if ( jack_activate ( fJackClient ) < 0 )
             goto fail;
-            
+
         if (fAutoConnect)
             ConnectPorts();
 

@@ -30,23 +30,17 @@ JackResampler::JackResampler()
     jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize) / 2);
 }
 
-JackResampler::JackResampler(unsigned int ringbuffer_size)
-    :fRatio(1),fRingBufferSize(ringbuffer_size)
-{
-    fRingBuffer = jack_ringbuffer_create(sizeof(float) * fRingBufferSize);
-    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize) / 2);
-}
-
 JackResampler::~JackResampler()
 {
     if (fRingBuffer)
         jack_ringbuffer_free(fRingBuffer);
 }
 
-void JackResampler::Reset()
+void JackResampler::Reset(unsigned int new_size)
 {
-    jack_ringbuffer_reset(fRingBuffer);
-    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize) / 2);
+    fRingBufferSize = new_size;
+    jack_ringbuffer_reset_size(fRingBuffer, sizeof(float) * fRingBufferSize);
+    jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize / 2));
 }
 
 unsigned int JackResampler::ReadSpace()

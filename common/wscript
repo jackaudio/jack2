@@ -190,6 +190,7 @@ def build(bld):
 		'JackAudioAdapterInterface.cpp', 
 		'JackLibSampleRateResampler.cpp',
 		'JackResampler.cpp', 
+                'JackGlobals.cpp',
 		'ringbuffer.c']
 
     if bld.env['IS_LINUX']:

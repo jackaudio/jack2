@@ -31,8 +31,8 @@ JackLibSampleRateResampler::JackLibSampleRateResampler()
         jack_error("JackLibSampleRateResampler::JackLibSampleRateResampler err = %s", src_strerror(error));
 }
 
-JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality, unsigned int ringbuffer_size)
-    :JackResampler(ringbuffer_size)
+JackLibSampleRateResampler::JackLibSampleRateResampler(unsigned int quality)
+    :JackResampler()
 {
      switch (quality) {
        case 0:
@@ -67,9 +67,9 @@ JackLibSampleRateResampler::~JackLibSampleRateResampler()
     src_delete(fResampler);
 }
 
-void JackLibSampleRateResampler::Reset()
+void JackLibSampleRateResampler::Reset(unsigned int new_size)
 {
-    JackResampler::Reset();
+    JackResampler::Reset(new_size);
     src_reset(fResampler);
 }
 
