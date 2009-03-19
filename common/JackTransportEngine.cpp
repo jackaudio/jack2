@@ -86,12 +86,6 @@ int JackTransportEngine::SetTimebaseMaster(int refnum, bool conditionnal)
     }
 }
 
-void JackTransportEngine::GetTimebaseMaster(int& refnum, bool& conditionnal)
-{
-    refnum = fTimeBaseMaster;
-    conditionnal = fConditionnal;
-}
-
 // RT
 bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
 {

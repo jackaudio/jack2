@@ -83,11 +83,6 @@ bool JackConnectionManager::IsLoopPathAux(int ref1, int ref2) const
 // External API
 //--------------
 
-int JackConnectionManager::GetActivation(int refnum) const
-{
-    return fInputCounter[refnum].GetValue();
-}
-
 /*!
 \brief Connect port_src to port_dst.
 */
