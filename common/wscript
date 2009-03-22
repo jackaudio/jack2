@@ -257,7 +257,7 @@ def build(bld):
          process.env.append_value("LINKFLAGS", "-framework CoreAudio -framework AudioUnit -framework AudioToolbox -framework CoreServices")
          process.uselib = 'SAMPLERATE'
 
-    if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX']:
+    if bld.env['BUILD_ADAPTER'] and bld.env['IS_LINUX'] and bld.env['BUILD_DRIVER_ALSA']:
          audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
          process.uselib = ['ALSA', 'SAMPLERATE']
