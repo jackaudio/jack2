@@ -55,6 +55,8 @@ In the top folder do :
 ./waf build 
 sudo ./waf install 
 
+(Note : you may have to use "pfexec" instead of "sudo" on systems where sudo is not there.)  
+
 Various compilation options can be seen using ./waf --help.
 
 Important compilation options :
@@ -63,6 +65,11 @@ Important compilation options :
 
 - the --dbus flag must be defined at configure time to compile the jackdbus executable. If the "automatic start server option" is used by clients, jackd server will be started using the dbus service.
 
+Starting the server :
+
+- for best performances, the server has to be started with privileges that allows to use "real-time" threads, for example using the "pfexec" command (or configurating the system with "priocntl" first), for instance : pfexec jackd -R -S -P59 -d oss
+
+- audio cards info can be retrieved using "ossinfo" tool (for instance ossinfo -v3). Some card needs to be configurated first using "ossxmix" then the correct buffer size has to be used, for instance : pfexec jackd -R -S -P59 -d oss -p 512
 
 ------------
 OSX version
