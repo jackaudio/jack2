@@ -24,6 +24,10 @@ Torben Hohn
   Jackdmp changes log
 ---------------------------
 
+2009-03-23 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.3 started.
+
 2009-03-19 Stephane Letz  <letz@grame.fr>
 
 	* Tim Blechmann optimization patch (inlining some heavy used methods).
