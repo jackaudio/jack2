@@ -64,7 +64,7 @@ def set_options(opt):
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
-    opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 mixed mode')
+    opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
@@ -167,7 +167,7 @@ def configure(conf):
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
-    display_feature('Build with 32/64 mixed mode', conf.env['BUILD_WITH_32_64'])
+    display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
     
     
     if conf.env['IS_LINUX']:
