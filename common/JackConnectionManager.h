@@ -356,7 +356,7 @@ struct JackClientTiming
     {}
     ~JackClientTiming()
     {}
-};
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Connection manager.
@@ -445,12 +445,11 @@ class SERVER_EXPORT JackConnectionManager
             return fInputCounter[refnum].GetValue();
         }
 
-
-
         // Graph
         void ResetGraph(JackClientTiming* timing);
         int ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec);
+        
 };
 
 } // end of namespace

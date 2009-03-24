@@ -111,7 +111,7 @@ static jack_shm_info_t registry_info = {/* SHM info for the registry */
 #else
 static jack_shm_info_t registry_info = { /* SHM info for the registry */
 	.index = JACK_SHM_NULL_INDEX,
-	.attached_at = MAP_FAILED
+	.ptr.attached_at = MAP_FAILED
 };
 #endif
 
@@ -367,7 +367,7 @@ jack_initialize_shm (const char *server_name)
 
 char* jack_shm_addr (jack_shm_info_t* si) 
 {
-	return (char*)si->attached_at;  
+	return (char*)si->ptr.attached_at;  
 }
 
 void
@@ -638,7 +638,7 @@ jack_access_registry (jack_shm_info_t *ri)
 		return rc;
 	}
 
-	if ((ri->attached_at = mmap (0, JACK_SHM_REGISTRY_SIZE,
+	if ((ri->ptr.attached_at = mmap (0, JACK_SHM_REGISTRY_SIZE,
 				     PROT_READ|PROT_WRITE,
 				     MAP_SHARED, shm_fd, 0)) == MAP_FAILED) {
 		jack_error ("Cannot mmap shm registry segment (%s)",
@@ -649,7 +649,7 @@ jack_access_registry (jack_shm_info_t *ri)
 
 	/* set up global pointers */
 	ri->index = JACK_SHM_REGISTRY_INDEX;
-	jack_shm_header = ri->attached_at;
+	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 	
 	close (shm_fd); // steph
@@ -694,7 +694,7 @@ jack_create_registry (jack_shm_info_t *ri)
 		return rc;
 	}
 
-	if ((ri->attached_at = mmap (0, JACK_SHM_REGISTRY_SIZE,
+	if ((ri->ptr.attached_at = mmap (0, JACK_SHM_REGISTRY_SIZE,
 				     PROT_READ|PROT_WRITE,
 				     MAP_SHARED, shm_fd, 0)) == MAP_FAILED) {
 		jack_error ("Cannot mmap shm registry segment (%s)",
@@ -706,7 +706,7 @@ jack_create_registry (jack_shm_info_t *ri)
 
 	/* set up global pointers */
 	ri->index = JACK_SHM_REGISTRY_INDEX;
-	jack_shm_header = ri->attached_at;
+	jack_shm_header = ri->ptr.attached_at;
 	jack_shm_registry = (jack_shm_registry_t *) (jack_shm_header + 1);
 
 	/* initialize registry contents */
@@ -726,8 +726,8 @@ void
 jack_release_shm (jack_shm_info_t* si)
 {
 	/* registry may or may not be locked */
-	if (si->attached_at != MAP_FAILED) {
-		munmap (si->attached_at, jack_shm_registry[si->index].size);
+	if (si->ptr.attached_at != MAP_FAILED) {
+		munmap (si->ptr.attached_at, jack_shm_registry[si->index].size);
 	}
 }
 
@@ -781,7 +781,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	strncpy (registry->id, name, sizeof (registry->id));
 	registry->allocator = getpid();
 	si->index = registry->index;
-	si->attached_at = MAP_FAILED;	/* not attached */
+	si->ptr.attached_at = MAP_FAILED;	/* not attached */
 	rc = 0;				/* success */
 
  unlock:
@@ -802,7 +802,7 @@ jack_attach_shm (jack_shm_info_t* si)
 		return -1;
 	}
 
-	if ((si->attached_at = mmap (0, registry->size, PROT_READ|PROT_WRITE,
+	if ((si->ptr.attached_at = mmap (0, registry->size, PROT_READ|PROT_WRITE,
 				     MAP_SHARED, shm_fd, 0)) == MAP_FAILED) {
 		jack_error ("Cannot mmap shm segment %s (%s)", 
 			    registry->id,
@@ -828,7 +828,7 @@ jack_attach_shm_read (jack_shm_info_t* si)
 		return -1;
 	}
 
-	if ((si->attached_at = mmap (0, registry->size, PROT_READ,
+	if ((si->ptr.attached_at = mmap (0, registry->size, PROT_READ,
 				     MAP_SHARED, shm_fd, 0)) == MAP_FAILED) {
 		jack_error ("Cannot mmap shm segment %s (%s)", 
 			    registry->id,

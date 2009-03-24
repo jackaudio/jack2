@@ -102,7 +102,7 @@ class JackShmMemAble
 
         char* GetShmAddress()
         {
-            return (char*)fInfo.attached_at;
+            return (char*)fInfo.ptr.attached_at;
         }
 
         void LockMemory()
@@ -173,7 +173,7 @@ class JackShmReadWritePtr
         JackShmReadWritePtr()
         {
             fInfo.index = -1;
-            fInfo.attached_at = NULL;
+            fInfo.ptr.attached_at = (char*)NULL;
         }
 
         JackShmReadWritePtr(int index, const char* server_name)
@@ -192,12 +192,12 @@ class JackShmReadWritePtr
 
         T* operator->() const
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
         operator T*() const
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
         JackShmReadWritePtr& operator=(int index)
@@ -218,7 +218,7 @@ class JackShmReadWritePtr
 
         T* GetShmAddress()
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 };
 
@@ -259,7 +259,7 @@ class JackShmReadWritePtr1
         JackShmReadWritePtr1()
         {
             fInfo.index = -1;
-            fInfo.attached_at = NULL;
+            fInfo.ptr.attached_at = NULL;
         }
 
         JackShmReadWritePtr1(int index, const char* server_name)
@@ -278,12 +278,12 @@ class JackShmReadWritePtr1
 
         T* operator->() const
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
         operator T*() const
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
         JackShmReadWritePtr1& operator=(int index)
@@ -304,7 +304,7 @@ class JackShmReadWritePtr1
 
         T* GetShmAddress()
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 };
 
@@ -339,7 +339,7 @@ class JackShmReadPtr
         JackShmReadPtr()
         {
             fInfo.index = -1;
-            fInfo.attached_at = NULL;
+            fInfo.ptr.attached_at = NULL;
         }
 
         JackShmReadPtr(int index, const char* server_name)
@@ -358,12 +358,12 @@ class JackShmReadPtr
 
         T* operator->() const
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
         operator T*() const
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
         JackShmReadPtr& operator=(int index)
@@ -384,7 +384,7 @@ class JackShmReadPtr
 
         T* GetShmAddress()
         {
-            return (T*)fInfo.attached_at;
+            return (T*)fInfo.ptr.attached_at;
         }
 
 };

@@ -79,7 +79,7 @@ struct JackClientControl : public JackShmMemAble
         fActive = false;
     }
 
-};
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

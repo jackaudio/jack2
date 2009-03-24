@@ -129,7 +129,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);
 
-};
+} POST_PACKED_STRUCTURE;
 
 
 } // end of namespace

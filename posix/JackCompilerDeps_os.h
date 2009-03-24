@@ -20,7 +20,25 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackCompilerDeps_POSIX__
 #define __JackCompilerDeps_POSIX__
 
+#include "JackConstants.h"
+
 #if __GNUC__
+    #ifndef POST_PACKED_STRUCTURE
+        /* POST_PACKED_STRUCTURE needs to be a macro which
+        expands into a compiler directive. The directive must
+        tell the compiler to arrange the preceding structure
+        declaration so that it is packed on byte-boundaries rather 
+        than use the natural alignment of the processor and/or
+        compiler.
+        */
+        #if (__GNUC__< 4)  /* On Solaris, does not seem to work with GCC 3.XX serie */
+            #define POST_PACKED_STRUCTURE
+        #elif defined(JACK_32_64)
+            #define POST_PACKED_STRUCTURE __attribute__((__packed__))
+        #else
+            #define POST_PACKED_STRUCTURE
+        #endif
+    #endif
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
     #define EXPORT __attribute__((visibility("default")))
     #ifdef SERVER_SIDE
@@ -36,6 +54,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #define MEM_ALIGN(x,y) x
     #define EXPORT
     #define SERVER_EXPORT
+    /* Add other things here for non-gcc platforms for POST_PACKED_STRUCTURE */
 #endif
 	
 #endif
