@@ -28,6 +28,8 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'oss', ['oss/JackOSSDriver.cpp', '../common/memops.c'])
 
+    create_jack_driver_obj(bld, 'boomer', ['oss/JackBoomerDriver.cpp', '../common/memops.c'])
+
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')

@@ -174,29 +174,29 @@ void JackTransportEngine::CycleEnd(JackClientInterface** table, jack_nframes_t f
         case JackTransportStopped:
             // Set a JackTransportStarting for the current cycle, if all clients are ready (no slow_sync) ==> JackTransportRolling next state
             if (cmd == TransportCommandStart) {
-                jack_log("transport stopped ==> starting");
+                jack_log("transport stopped ==> starting frame = %d", ReadCurrentState()->frame);
                 fTransportState = JackTransportStarting;
                 MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
             } else if (fPendingPos) {
-                jack_log("transport stopped ==> stopped (locating)");
+                jack_log("transport stopped ==> stopped (locating) frame = %d", ReadCurrentState()->frame);
                 MakeAllLocating(table);
             }
             break;
 
         case JackTransportStarting:
             if (cmd == TransportCommandStop) {
-                jack_log("transport starting ==> stopped");
+                jack_log("transport starting ==> stopped frame = %d", ReadCurrentState()->frame);
                 fTransportState = JackTransportStopped;
                 MakeAllStopping(table);
             } else if (fPendingPos) {
-                jack_log("transport starting ==> starting");
+                jack_log("transport starting ==> starting frame = %d"), ReadCurrentState()->frame;
                 fTransportState = JackTransportStarting;
                 MakeAllStartingLocating(table);
                 SyncTimeout(frame_rate, buffer_size);
             } else if (--fSyncTimeLeft == 0 || CheckAllRolling(table)) {  // Slow clients may still catch up
                 if (fNetworkSync) {
-                    jack_log("transport starting ==> netstarting");
+                    jack_log("transport starting ==> netstarting frame = %d");
                     fTransportState = JackTransportNetStarting;
                 } else {
                     jack_log("transport starting ==> rolling fSyncTimeLeft = %ld", fSyncTimeLeft);
