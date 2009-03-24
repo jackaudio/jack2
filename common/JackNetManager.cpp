@@ -334,9 +334,7 @@ namespace Jack
                     if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) == EINVAL )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
-                    jack_position_t pos;
-                    jack_transport_query ( fJackClient, &pos );
-                    jack_info ( "'%s' starts transport frame = %d  frame = %d", fParams.fName, fReturnTransportData.fPosition.frame, pos.frame);
+                    jack_info ( "'%s' starts transport frame = %d  frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
                 case JackTransportNetStarting :
                     jack_info ( "'%s' is ready to roll..", fParams.fName );
@@ -378,8 +376,6 @@ namespace Jack
         return static_cast<JackNetMaster*> ( arg )->Process();
     }
 
-static int cycle = 0;
-
     int JackNetMaster::Process()
     {
         if ( !fRunning )
@@ -387,8 +383,6 @@ static int cycle = 0;
 
         uint port_index;
         int res = 0;
-
-        //jack_info("cycle = %d", cycle++);
 
 #ifdef JACK_MONITOR
         jack_time_t begin_time = GetMicroSeconds();
