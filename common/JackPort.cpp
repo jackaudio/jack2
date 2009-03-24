@@ -109,12 +109,12 @@ int JackPort::RequestMonitor(bool onoff)
 {
     /**
     jackd.h 
-     * If @ref JackPortCanMonitor is set for this @a port, turn input
-     * monitoring on or off. Otherwise, do nothing.
+    * If @ref JackPortCanMonitor is set for this @a port, turn input
+    * monitoring on or off. Otherwise, do nothing.
      
-     if (!(fFlags & JackPortCanMonitor))
+    if (!(fFlags & JackPortCanMonitor))
     	return -1;
-     */
+    */
 
     if (onoff) {
         fMonitorRequests++;
@@ -129,12 +129,12 @@ int JackPort::EnsureMonitor(bool onoff)
 {
     /**
     jackd.h 
-        * If @ref JackPortCanMonitor is set for this @a port, turn input
-        * monitoring on or off. Otherwise, do nothing.
+    * If @ref JackPortCanMonitor is set for this @a port, turn input
+    * monitoring on or off. Otherwise, do nothing.
      
-     if (!(fFlags & JackPortCanMonitor))
+    if (!(fFlags & JackPortCanMonitor))
     	return -1;
-     */
+    */
 
     if (onoff) {
         if (fMonitorRequests == 0) {

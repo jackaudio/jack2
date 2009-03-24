@@ -38,7 +38,7 @@ extern "C"
     typedef char shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
-#elif WIN32   // steph TO CHECK
+#elif WIN32   // TO CHECK
 #define NAME_MAX            255
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX
@@ -133,15 +133,15 @@ extern "C"
     void jack_shm_copy_to_registry (jack_shm_info_t*,
                                                jack_shm_registry_index_t*);
     void jack_release_shm_info (jack_shm_registry_index_t);
-    char* jack_shm_addr (jack_shm_info_t* si);  // steph
+    char* jack_shm_addr (jack_shm_info_t* si);  
 
     // here begin the API 
     int jack_register_server (const char *server_name, int new_registry);
     void jack_unregister_server (const char *server_name);
 
     int jack_initialize_shm (const char *server_name);
-    int jack_initialize_shm_server (void);  // steph
-    int jack_initialize_shm_client (void);  // steph
+    int jack_initialize_shm_server (void); 
+    int jack_initialize_shm_client (void);  
     int jack_cleanup_shm (void);
 
     int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
@@ -149,7 +149,7 @@ extern "C"
     void jack_release_shm (jack_shm_info_t*);
     void jack_destroy_shm (jack_shm_info_t*);
     int jack_attach_shm (jack_shm_info_t*);
-    int jack_attach_shm_read (jack_shm_info_t*); // steph
+    int jack_attach_shm_read (jack_shm_info_t*); 
     int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
 
 #ifdef __cplusplus
