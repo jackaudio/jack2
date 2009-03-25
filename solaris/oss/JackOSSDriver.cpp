@@ -828,7 +828,7 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     strcpy(desc->params[i].name, "ignorehwbuf");
     desc->params[i].character = 'b';
     desc->params[i].type = JackDriverParamBool;
-    desc->params[i].value.i = TRUE;
+    desc->params[i].value.i = false;
     strcpy(desc->params[i].short_desc, "Ignore hardware period size");
     strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
    
