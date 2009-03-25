@@ -63,6 +63,7 @@ class JackBoomerDriver : public JackAudioDriver
         
         void* fInputBuffer;
         void* fOutputBuffer;
+        pollfd* fPollTable;
         
         bool fFirstCycle;
         
@@ -83,11 +84,13 @@ class JackBoomerDriver : public JackAudioDriver
                 fInFD(-1), fOutFD(-1), fBits(0), 
                 fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false), fIgnoreHW(true),
                 fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL), fFirstCycle(true)
+                fInputBuffer(NULL), fOutputBuffer(NULL), fPollTable(NULL), fFirstCycle(true)
         {}
 
         virtual ~JackBoomerDriver()
-        {}
+        {
+            //delete[] fPollTable;
+        }
 
         int Open(jack_nframes_t frames_per_cycle,
                  int user_nperiods, 

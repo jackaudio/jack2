@@ -285,6 +285,7 @@ int JackBoomerDriver::OpenInput()
         jack_info("JackBoomerDriver::OpenInput driver forced the sample rate %ld", fEngineControl->fSampleRate);
     }
 
+    /*
     fInputBufferSize = 0;
     if (ioctl(fInFD, SNDCTL_DSP_GETBLKSIZE, &fInputBufferSize) == -1) {
         jack_error("JackBoomerDriver::OpenInput failed to get fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -301,6 +302,10 @@ int JackBoomerDriver::OpenInput()
            goto error;
        }
     }
+    */
+
+    // Just set the read size to the value we want...
+    fInputBufferSize = fEngineControl->fBufferSize * fSampleSize * fCaptureChannels;
 
     fInputBuffer = (void*)calloc(fInputBufferSize, 1);
     assert(fInputBuffer);
@@ -368,6 +373,7 @@ int JackBoomerDriver::OpenOutput()
         jack_info("JackBoomerDriver::OpenInput driver forced the sample rate %ld", fEngineControl->fSampleRate);
     }
 
+    /*
     fOutputBufferSize = 0;
     if (ioctl(fOutFD, SNDCTL_DSP_GETBLKSIZE, &fOutputBufferSize) == -1) {
         jack_error("JackBoomerDriver::OpenOutput failed to get fragments : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -384,6 +390,10 @@ int JackBoomerDriver::OpenOutput()
            goto error;
        }
     }
+    */
+
+    // Just set the write size to the value we want...
+    fOutputBufferSize = fEngineControl->fBufferSize * fSampleSize * fPlaybackChannels;
     
     fOutputBuffer = (void*)calloc(fOutputBufferSize, 1);
     fFirstCycle = true;
@@ -518,6 +528,21 @@ int JackBoomerDriver::OpenAux()
     if ((fRWMode & kRead) && (fRWMode & kWrite) && (fInputBufferSize != fOutputBufferSize)) {
        jack_error("JackBoomerDriver::OpenAux input and output buffer size are not the same!!");
        return -1;
+    }
+    */
+
+    /*
+    fPollTable = new pollfd[2];
+
+    if (fRWMode & kRead && fInFD > 0) {
+        fPollTable[0].fd = fInFD;
+        fPollTable[0].events = POLLIN | POLLERR;
+        fPollTable[0].revents = 0;
+    }
+    if (fRWMode & kWrite && fOutFD > 0) {
+        fPollTable[1].fd = fOutFD;
+        fPollTable[1].events = POLLOUT | POLLERR;
+        fPollTable[1].revents = 0;
     }
     */
 
@@ -703,6 +728,14 @@ int JackBoomerDriver::SetBufferSize(jack_nframes_t buffer_size)
 
 int JackBoomerDriver::ProcessSync()
 {
+    /*
+    // Global poll
+    if ((poll(fPollTable, 2, 0) < 0) && (errno != EINTR)) {
+        jack_error("Driver failed err = %s request thread quits...", strerror(errno));
+        return -1;
+    }
+    */
+
     // Read input buffers for the current cycle
     if (Read() < 0) { 
         jack_error("ProcessSync: read error, skip cycle");
