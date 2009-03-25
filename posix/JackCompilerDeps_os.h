@@ -27,11 +27,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         /* POST_PACKED_STRUCTURE needs to be a macro which
         expands into a compiler directive. The directive must
         tell the compiler to arrange the preceding structure
-        declaration so that it is packed on byte-boundaries rather 
+        declaration so that it is packed on byte-boundaries rather
         than use the natural alignment of the processor and/or
         compiler.
         */
-        #if (__GNUC__< 4)  /* On Solaris, does not seem to work with GCC 3.XX serie */
+        #if (__GNUC__< 4)  /* Does not seem to work with GCC 3.XX serie */
             #define POST_PACKED_STRUCTURE
         #elif defined(JACK_32_64)
             #define POST_PACKED_STRUCTURE __attribute__((__packed__))
@@ -43,19 +43,19 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #define EXPORT __attribute__((visibility("default")))
     #ifdef SERVER_SIDE
         #if (__GNUC__< 4)
-            #define SERVER_EXPORT 
+            #define SERVER_EXPORT
         #else
             #define SERVER_EXPORT __attribute__((visibility("default")))
-        #endif	
+        #endif
     #else
         #define SERVER_EXPORT
     #endif
-#else 
+#else
     #define MEM_ALIGN(x,y) x
     #define EXPORT
     #define SERVER_EXPORT
     /* Add other things here for non-gcc platforms for POST_PACKED_STRUCTURE */
 #endif
-	
+
 #endif
 
