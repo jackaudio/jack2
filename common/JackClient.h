@@ -184,11 +184,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         bool Execute();
 };
 
-// Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
-extern JackGraphManager* GetGraphManager();
-extern JackEngineControl* GetEngineControl();
-extern JackSynchro* GetSynchroTable();
-
 } // end of namespace
 
 #endif

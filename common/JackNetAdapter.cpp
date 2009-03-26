@@ -226,11 +226,9 @@ namespace Jack
         SetAdaptedSampleRate ( fParams.fSampleRate );
         
         // Will do "something" on OSX only...
-        fThread.SetParams(JackServerGlobals::fInstance->GetEngineControl()->fPeriod, 
-                        JackServerGlobals::fInstance->GetEngineControl()->fComputation, 
-                        JackServerGlobals::fInstance->GetEngineControl()->fConstraint);
+        fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
         
-        if (fThread.AcquireRealTime ( JackServerGlobals::fInstance->GetEngineControl()->fClientPriority ) < 0) {
+        if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
             jack_error("AcquireRealTime error");
         } else {
             set_threaded_log_function();
