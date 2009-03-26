@@ -125,7 +125,6 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
             return &fClientTiming[refnum];
         }
 
-
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);
 

@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackBoomerDriver__
 
 #include "JackAudioDriver.h"
+#include "ringbuffer.h"
+#include "JackThread.h"
 
 namespace Jack
 {
@@ -37,10 +39,10 @@ typedef jack_default_audio_sample_t jack_sample_t;
 #define OSS_DRIVER_DEF_OUTS	2
 
 /*!
-\brief The OSS driver.
+\brief The Boomer driver.
 */
 
-class JackBoomerDriver : public JackAudioDriver
+class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
 {
 
     enum { kRead = 1, kWrite = 2, kReadWrite = 3 };
@@ -63,7 +65,8 @@ class JackBoomerDriver : public JackAudioDriver
         
         void* fInputBuffer;
         void* fOutputBuffer;
-        pollfd* fPollTable;
+        jack_ringbuffer_t** fRingBuffer;
+        JackThread fThread;
         
         bool fFirstCycle;
         
@@ -84,13 +87,11 @@ class JackBoomerDriver : public JackAudioDriver
                 fInFD(-1), fOutFD(-1), fBits(0), 
                 fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false), fIgnoreHW(true),
                 fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL), fPollTable(NULL), fFirstCycle(true)
-        {}
+                fInputBuffer(NULL), fOutputBuffer(NULL), fRingBuffer(NULL), fFirstCycle(true)
+        {}:fThread(this)
 
         virtual ~JackBoomerDriver()
-        {
-            //delete[] fPollTable;
-        }
+        {}
 
         int Open(jack_nframes_t frames_per_cycle,
                  int user_nperiods, 
@@ -120,6 +121,9 @@ class JackBoomerDriver : public JackAudioDriver
         }
 
         int SetBufferSize(jack_nframes_t buffer_size);
+        
+        bool Init();
+        bool Execute();
 
 };
 

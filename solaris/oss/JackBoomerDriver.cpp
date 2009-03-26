@@ -530,21 +530,14 @@ int JackBoomerDriver::OpenAux()
        return -1;
     }
     */
-
-    /*
-    fPollTable = new pollfd[2];
-
-    if (fRWMode & kRead && fInFD > 0) {
-        fPollTable[0].fd = fInFD;
-        fPollTable[0].events = POLLIN | POLLERR;
-        fPollTable[0].revents = 0;
+    
+    if (fPlaybackChannels > 0) {
+        fRingBuffer = new jack_ringbuffer_t*[fPlaybackChannels];
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            fRingBuffer[i] = jack_ringbuffer_create(fOutputBufferSize);
+            jack_ringbuffer_read_advance(fRingBuffer, fOutputBufferSize / 2);
+        }
     }
-    if (fRWMode & kWrite && fOutFD > 0) {
-        fPollTable[1].fd = fOutFD;
-        fPollTable[1].events = POLLOUT | POLLERR;
-        fPollTable[1].revents = 0;
-    }
-    */
 
     DisplayDeviceInfo();  
     return 0;
@@ -569,6 +562,15 @@ void JackBoomerDriver::CloseAux()
     if (fOutputBuffer)
         free(fOutputBuffer);
     fOutputBuffer = NULL;
+    
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (fRingBuffer[i])
+            jack_ringbuffer_free(fRingBuffer[i]);
+        fRingBuffer[i] = NULL;
+    }
+    
+    delete [] fRingBuffer;
+    fRingBuffer = NULL;
 }
 
 int JackBoomerDriver::Read()
@@ -675,7 +677,10 @@ int JackBoomerDriver::Write()
     memset(fOutputBuffer, 0, fOutputBufferSize);
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
-            CopyAndConvertOut(fOutputBuffer, GetOutputBuffer(i), fEngineControl->fBufferSize, i, fPlaybackChannels, fBits);
+            if (jack_ringbuffer_write(fRingBuffer[i], GetOutputBuffer(i), fOutputBufferSize) < fOutputBufferSize) {
+                 jack_log("JackBoomerDriver::Write ringbuffer full");
+            }
+            //CopyAndConvertOut(fOutputBuffer, GetOutputBuffer(i), fEngineControl->fBufferSize, i, fPlaybackChannels, fBits);
         }
     }
 
@@ -719,6 +724,75 @@ int JackBoomerDriver::Write()
     }
 }
 
+bool JackBoomerDriver::Init()
+{
+    if (IsRealTime()) {
+        jack_log("JackBoomerDriver::Init IsRealTime");
+        // Will do "something" on OSX only...
+        GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
+        fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
+        if (fThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
+            jack_error("AcquireRealTime error");
+        } else {
+            set_threaded_log_function(); 
+        }
+    }
+
+    return true;
+}
+
+bool JackBoomerDriver::Execute()
+{
+    memset(fOutputBuffer, 0, fOutputBufferSize);
+    
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
+            jack_ringbuffer_data_t ring_buffer_data[2];
+            for (int j = 0; j < 2; j++) {
+                jack_ringbuffer_read(fRingBuffer[i], GetOutputBuffer(i), fOutputBufferSize);
+                CopyAndConvertOut(fOutputBuffer, GetOutputBuffer(i), fEngineControl->fBufferSize, i, fPlaybackChannels, fBits);
+            }
+        }
+    }
+    
+#ifdef JACK_MONITOR
+    gCycleTable.fTable[gCycleCount].fBeforeWrite = GetMicroSeconds();
+#endif    
+
+    // Keep end cycle time
+    JackDriver::CycleTakeEndTime();
+    count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
+
+#ifdef JACK_MONITOR
+    if (count > 0 && count != (int)fOutputBufferSize)
+        jack_log("JackBoomerDriver::Write count = %ld", count / (fSampleSize * fPlaybackChannels));
+    gCycleTable.fTable[gCycleCount].fAfterWrite = GetMicroSeconds();
+    gCycleCount = (gCycleCount == CYCLE_POINTS - 1) ? gCycleCount: gCycleCount + 1;
+#endif
+
+    // XRun detection
+    if (ioctl(fOutFD, SNDCTL_DSP_GETERROR, &ei_out) == 0) {
+
+        if (ei_out.play_underruns > 0) {
+            jack_error("JackBoomerDriver::Write underruns");
+            jack_time_t cur_time = GetMicroSeconds();
+            NotifyXRun(cur_time, float(cur_time - fBeginDateUst));   // Better this value than nothing... 
+        }
+
+        if (ei_out.play_errorcount > 0 && ei_out.play_lasterror != 0) {
+            jack_error("%d OSS play event(s), last=%05d:%d",ei_out.play_errorcount, ei_out.play_lasterror, ei_out.play_errorparm);
+        }
+    }
+     
+    if (count < 0) {
+        jack_log("JackBoomerDriver::Write error = %s", strerror(errno));
+    } else if (count < (int)fOutputBufferSize) {
+        jack_error("JackBoomerDriver::Write error bytes written = %ld", count);
+    }
+    
+    return true;
+}
+
 int JackBoomerDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     CloseAux(); 
@@ -728,14 +802,6 @@ int JackBoomerDriver::SetBufferSize(jack_nframes_t buffer_size)
 
 int JackBoomerDriver::ProcessSync()
 {
-    /*
-    // Global poll
-    if ((poll(fPollTable, 2, 0) < 0) && (errno != EINTR)) {
-        jack_error("Driver failed err = %s request thread quits...", strerror(errno));
-        return -1;
-    }
-    */
-
     // Read input buffers for the current cycle
     if (Read() < 0) { 
         jack_error("ProcessSync: read error, skip cycle");
