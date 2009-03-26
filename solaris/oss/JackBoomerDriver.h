@@ -21,8 +21,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackBoomerDriver__
 
 #include "JackAudioDriver.h"
+#include "JackPlatformPlug.h"
 #include "ringbuffer.h"
-#include "JackThread.h"
+//#include "JackThread.h"
 
 namespace Jack
 {
@@ -67,9 +68,7 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
         void* fOutputBuffer;
         jack_ringbuffer_t** fRingBuffer;
         JackThread fThread;
-        
-        bool fFirstCycle;
-        
+         
         int OpenInput();
         int OpenOutput();
         int OpenAux();
@@ -78,7 +77,7 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
         void DisplayDeviceInfo();
 
         // Redefining since timing for CPU load is specific
-        int ProcessSync();
+        int ProcessAsync();
 
     public:
 
@@ -87,8 +86,9 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
                 fInFD(-1), fOutFD(-1), fBits(0), 
                 fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false), fIgnoreHW(true),
                 fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL), fRingBuffer(NULL), fFirstCycle(true)
-        {}:fThread(this)
+                fInputBuffer(NULL), fOutputBuffer(NULL),
+                fRingBuffer(NULL), fThread(this)
+       {}
 
         virtual ~JackBoomerDriver()
         {}
@@ -110,6 +110,9 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
                  bool ignorehwbuf);
 
         int Close();
+
+        int Start();
+        int Stop();
 
         int Read();
         int Write();
