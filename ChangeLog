@@ -26,6 +26,10 @@ Torben Hohn
 
 2009-03-26 Stephane Letz  <letz@grame.fr>
 
+	* Add a buffer size callback for netmaster that just remove the client (it will be recreated with the new parameters).
+
+2009-03-26 Stephane Letz  <letz@grame.fr>
+
 	* First working JackBoomerDriver two threads version.
 
 2009-03-24 Stephane Letz  <letz@grame.fr>

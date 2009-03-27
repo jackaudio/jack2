@@ -127,7 +127,11 @@ namespace Jack
             return false;
         }
 
-        jack_set_process_callback ( fJackClient, SetProcess, this );
+        if (jack_set_process_callback(fJackClient, SetProcess, this ) < 0)
+             goto fail;
+             
+        if (jack_set_buffer_size_callback(fJackClient, SetBufferSize, this) < 0)
+             goto fail;
 
         if ( AllocPorts() != 0 )
         {
@@ -368,6 +372,13 @@ namespace Jack
     bool JackNetMaster::IsSlaveReadyToRoll()
     {
         return ( fReturnTransportData.fState == JackTransportNetStarting );
+    }
+    
+    int JackNetMaster::SetBufferSize (jack_nframes_t nframes, void* arg)
+    {
+        jack_error("Cannot handle bufer size change, so proxy will be removed...");
+        static_cast<JackNetMaster*> ( arg )->Exit();
+        return 0;
     }
 
 //process-----------------------------------------------------------------------------
