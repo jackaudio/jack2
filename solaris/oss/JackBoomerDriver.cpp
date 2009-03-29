@@ -547,7 +547,12 @@ int JackBoomerDriver::Start()
 
 int JackBoomerDriver::Stop()
 {
-    return fThread.Kill();
+    // Stop output thread only when needed
+    if (fOutFD > 0) {
+        return fThread.Kill();
+    } else {
+        return 0;
+    }
 }
 
 int JackBoomerDriver::Read()
@@ -626,9 +631,6 @@ bool JackBoomerDriver::Init()
 {
     if (IsRealTime()) {
         jack_log("JackBoomerDriver::Init IsRealTime");
-        // Will do "something" on OSX only...
-        GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
-        fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
         if (fThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
             jack_error("AcquireRealTime error");
         } else {
