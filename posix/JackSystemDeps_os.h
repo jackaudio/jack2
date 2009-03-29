@@ -28,7 +28,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define DRIVER_HANDLE void*
 #define LoadDriverModule(name) dlopen((name), RTLD_NOW | RTLD_GLOBAL)
 #define UnloadDriverModule(handle) dlclose((handle))
-#define GetProc(handle, name) dlsym((handle), (name))
+#define GetDriverProc(handle, name) dlsym((handle), (name))
+
+#define JACK_HANDLE void*
+#define LoadJackModule(name) dlopen((name), RTLD_NOW | RTLD_LOCAL);
+#define UnloadJackModule(handle) dlclose((handle));
+#define GetJackProc(handle, name) dlsym((handle), (name));
 
 #define JACK_DEBUG (getenv("JACK_CLIENT_DEBUG") && strcmp(getenv("JACK_CLIENT_DEBUG"), "on") == 0)
 

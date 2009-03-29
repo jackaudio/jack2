@@ -24,7 +24,11 @@ Torben Hohn
   Jackdmp changes log
 ---------------------------
 
-2009-03-26 Stephane Letz  <letz@grame.fr>
+2009-03-29 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup JackInternalClient code.
+
+2009-03-27 Stephane Letz  <letz@grame.fr>
 
 	* Add a buffer size callback for netmaster that just remove the client (it will be recreated with the new parameters).
 

@@ -262,10 +262,10 @@ namespace Jack
     int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames) 
     {
         fPullAndPushTime = GetMicroSeconds();
-	if (!fRunning)
-	    return 0;
+        if (!fRunning)
+            return 0;
 
-	int res = 0;
+        int res = 0;
     
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
