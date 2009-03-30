@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))
 #define GetDriverProc(handle, name) GetProcAddress(((HMODULE)handle), (name))
 
-#define HANDLE HINSTANCE
+#define JACK_HANDLE HINSTANCE
 #define LoadJackModule(name) LoadLibrary((name));
 #define UnloadJackModule(handle) FreeLibrary((handle));
 #define GetJackProc(handle, name) GetProcAddress((handle), (name));
