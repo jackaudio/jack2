@@ -313,11 +313,13 @@ int main(int argc, char* argv[])
     }
 
     if (show_version) {
-    	printf("jackdmp version" VERSION 
-               "\n");
+        printf( "jackdmp version " VERSION 
+				" tmpdir " jack_server_dir 
+				" protocol %d"
+				"\n", JACK_PROTOCOL_VERSION);
     	return -1;
     }
- 
+  
     if (!seen_driver) {
         usage(stderr);
         goto fail_free;
