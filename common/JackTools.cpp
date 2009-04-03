@@ -212,6 +212,63 @@ namespace Jack {
         }
         new_name[i] = '\0';
     }
+    
+#ifdef WIN32
 
+void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
+{
+    snprintf(path_to_so, path_len, ADDON_DIR "/%s.dll", so_name);
 }
+
+void PrintLoadError(const char* so_name)
+{
+    // Retrieve the system error message for the last-error code
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError();
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and exit the process
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)so_name) + 40) * sizeof(TCHAR));
+    _snprintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("error loading %s err = %s"), so_name, lpMsgBuf);
+
+    jack_error((LPCTSTR)lpDisplayBuf);
+
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
+}
+
+#else
+
+void PrintLoadError(const char* so_name) 
+{
+    jack_log("error loading %s err = %s", so_name, dlerror());
+}
+
+void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
+{
+    const char* internal_dir;
+    if ((internal_dir = getenv("JACK_INTERNAL_DIR")) == 0) {
+        if ((internal_dir = getenv("JACK_DRIVER_DIR")) == 0) {
+            internal_dir = ADDON_DIR;
+        }
+    }
+    
+    snprintf(path_to_so, path_len, "%s/%s.so", internal_dir, so_name);
+}
+
+#endif
+
+}  // end of namespace
 

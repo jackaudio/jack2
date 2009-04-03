@@ -95,7 +95,7 @@ main (int argc, char *argv[])
 	int c;
         extern int optind, opterr;
         int show_usage = 0;
-        char *optstring = "d:f";
+        char *optstring = "d:f:h";
         struct option long_options[] = {
                 { "help", 1, 0, 'h' },
                 { "duration", 1, 0, 'd' },

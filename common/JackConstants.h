@@ -83,11 +83,7 @@
 
 #define ALL_CLIENTS -1 // for notification
 
-#if defined(__ppc64__) || defined(__x86_64__)
-#define JACK_PROTOCOL_VERSION 6
-#else
-#define JACK_PROTOCOL_VERSION 5
-#endif
+#define JACK_PROTOCOL_VERSION 7  
 
 #define SOCKET_TIME_OUT 5               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec

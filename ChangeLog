@@ -19,10 +19,32 @@ Romain Moret
 Florian Faber
 Michael Voigt
 Torben Hohn  
+Paul Davis
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2009-04-03 Stephane Letz  <letz@grame.fr>
+
+	* Simplify JackClient RT code, jack_thread_wait API marked deprecated."
+
+2009-03-29 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup JackInternalClient code.
+
+2009-03-27 Stephane Letz  <letz@grame.fr>
+
+	* Add a buffer size callback for netmaster that just remove the client (it will be recreated with the new parameters).
+
+2009-03-26 Stephane Letz  <letz@grame.fr>
+
+	* First working JackBoomerDriver two threads version.
+
+2009-03-24 Stephane Letz  <letz@grame.fr>
+
+	* New JackBoomerDriver class for Boomer driver on Solaris.
+	* Add mixed 32/64 bits mode (off by default).
 
 2009-03-23 Stephane Letz  <letz@grame.fr>
 

@@ -37,7 +37,7 @@ JackShmMem::JackShmMem()
 void JackShmMemAble::Init()
 {
     fInfo.index = gInfo.index;
-    fInfo.attached_at = gInfo.attached_at;
+    fInfo.ptr.attached_at = gInfo.ptr.attached_at;
     fInfo.size = gInfo.size;
 }
     
@@ -71,9 +71,9 @@ void* JackShmMem::operator new(size_t size)
     // so use an intermediate global data
     gInfo.index = info.index;
     gInfo.size = size;
-    gInfo.attached_at = info.attached_at;
+    gInfo.ptr.attached_at = info.ptr.attached_at;
 
-    jack_log("JackShmMem::new index = %ld attached = %x size = %ld ", info.index, info.attached_at, size);
+    jack_log("JackShmMem::new index = %ld attached = %x size = %ld ", info.index, info.ptr.attached_at, size);
     return obj;
 
 error:
@@ -86,7 +86,7 @@ void JackShmMem::operator delete(void* p, size_t size)
     jack_shm_info_t info;
     JackShmMem* obj = (JackShmMem*)p;
     info.index = obj->fInfo.index;
-    info.attached_at = obj->fInfo.attached_at;
+    info.ptr.attached_at = obj->fInfo.ptr.attached_at;
 
     jack_log("JackShmMem::delete size = %ld index = %ld", size, info.index);
 

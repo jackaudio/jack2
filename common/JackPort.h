@@ -55,9 +55,8 @@ class SERVER_EXPORT JackPort
 
         bool fInUse;
         jack_port_id_t fTied;   // Locally tied source port
-
-        MEM_ALIGN(float fBuffer[BUFFER_SIZE_MAX], 64);  // 16 bytes alignment for vector code, 64 bytes better for cache loads/stores
-
+        float fBuffer[BUFFER_SIZE_MAX + 4];
+     
         bool IsUsed() const
         {
             return fInUse;
@@ -99,14 +98,15 @@ class SERVER_EXPORT JackPort
             return (fMonitorRequests > 0);
         }
 
+        // Since we are in shared memory, the resulting pointer cannot be cached, so align it here...
         float* GetBuffer()
         {
-            return fBuffer;
+            return (float*)((long)fBuffer & ~15L) + 4;
         }
 
         int GetRefNum() const;
-};
-
+        
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

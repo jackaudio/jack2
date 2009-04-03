@@ -97,14 +97,18 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
    
         virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value);
 
-        inline bool WaitFirstSync();
+        inline void DummyCycle();
         inline void ExecuteThread();
         inline bool WaitSync();
         inline void SignalSync();
         inline int CallProcessCallback();
         inline void End();
         inline void Error();
-
+        inline jack_nframes_t CycleWaitAux();
+        inline void CycleSignalAux(int status);
+        inline void CallSyncCallbackAux();
+        inline void CallTimebaseCallbackAux();
+   
     public:
 
         JackClient();
@@ -172,10 +176,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
         virtual void InternalClientUnload(int ref, jack_status_t* status);
 
-        // Fons Adriaensen thread model
-        virtual jack_nframes_t Wait(int status);
-
-        virtual jack_nframes_t CycleWait();
+        jack_nframes_t CycleWait();
         void CycleSignal(int status);
         int SetProcessThread(JackThreadCallback fun, void *arg);
 
@@ -183,11 +184,6 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         bool Init();
         bool Execute();
 };
-
-// Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
-extern JackGraphManager* GetGraphManager();
-extern JackEngineControl* GetEngineControl();
-extern JackSynchro* GetSynchroTable();
 
 } // end of namespace
 

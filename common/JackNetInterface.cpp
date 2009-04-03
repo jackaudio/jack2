@@ -329,9 +329,6 @@ namespace Jack
             jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
             
         mcast_socket.Close();
-
-        // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-        ThreadExit();
     }
 
     int JackNetMasterInterface::Recv ( size_t size, int flags )
@@ -349,6 +346,9 @@ namespace Jack
                 jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
                 //ask to the manager to properly remove the master
                 Exit();
+                
+                // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+                ThreadExit();
             }
             else
                 jack_error ( "Error in master receive : %s", StrError ( NET_ERROR_CODE ) );
@@ -373,6 +373,9 @@ namespace Jack
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
                 Exit();
+                
+                // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+                ThreadExit();
             }
             else
                 jack_error ( "Error in master send : %s", StrError ( NET_ERROR_CODE ) );

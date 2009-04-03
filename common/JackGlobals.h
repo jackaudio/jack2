@@ -22,13 +22,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
-#include "JackClient.h"
 
 namespace Jack
 {
 
 // Globals used for client management on server or libray side.
-
 struct JackGlobals {
 
     static jack_tls_key fRealTime;
@@ -41,6 +39,11 @@ struct JackGlobals {
 #endif
 
 };
+
+// Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
+extern EXPORT JackGraphManager* GetGraphManager();
+extern EXPORT JackEngineControl* GetEngineControl();
+extern EXPORT JackSynchro* GetSynchroTable();
 
 } // end of namespace
 

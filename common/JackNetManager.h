@@ -39,6 +39,7 @@ namespace Jack
             friend class JackNetMasterManager;
         private:
             static int SetProcess ( jack_nframes_t nframes, void* arg );
+            static int SetBufferSize (jack_nframes_t nframes, void* arg);
             static void SetTimebaseCallback ( jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg );
 
             //jack client
@@ -63,8 +64,7 @@ namespace Jack
             bool Init(bool auto_connect);
             int AllocPorts();
             void FreePorts();
-            void Exit();
-
+     
             //transport
             void EncodeTransportData();
             void DecodeTransportData();

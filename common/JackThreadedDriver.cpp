@@ -22,7 +22,6 @@
 #include "JackThreadedDriver.h"
 #include "JackError.h"
 #include "JackGlobals.h"
-#include "JackClient.h"
 #include "JackEngineControl.h"
 
 namespace Jack

@@ -69,7 +69,7 @@ int JackEngine::Close()
 {
     jack_log("JackEngine::Close");
     fChannel.Close();
-    
+
     // Close remaining clients (RT is stopped)
     for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
         if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
@@ -85,10 +85,10 @@ int JackEngine::Close()
             fClientTable[i] = NULL;
         }
     }
-    
+
     return 0;
 }
-    
+
 //-----------------------------
 // Client ressource management
 //-----------------------------
@@ -147,7 +147,7 @@ void JackEngine::ProcessCurrent(jack_time_t cur_cycle_begin)
 bool JackEngine::Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)
 {
     bool res = true;
- 
+
     // Cycle  begin
     fEngineControl->CycleBegin(fClientTable, fGraphManager, cur_cycle_begin, prev_cycle_end);
 
@@ -213,7 +213,7 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value1, int v
         jack_log("JackEngine::NotifyClient: client not available anymore");
     } else if (client->GetClientControl()->fCallback[event]) {
         if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
-            jack_error("NotifyClient fails name = %s event = %ld = val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
+            jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
     } else {
         jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);
     }
@@ -226,7 +226,7 @@ void JackEngine::NotifyClients(int event, int sync, int value1, int value2)
         if (client) {
             if (client->GetClientControl()->fCallback[event]) {
                 if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
-                    jack_error("NotifyClient fails name = %s event = %ld = val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
+                    jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
             } else {
                 jack_log("JackEngine::NotifyClients: no callback for event = %ld", event);
             }
@@ -461,7 +461,7 @@ int JackEngine::GetClientPID(const char* name)
         if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
             return client->GetClientControl()->fPID;
     }
-    
+
     return 0;
 }
 
@@ -472,7 +472,7 @@ int JackEngine::GetClientRefNum(const char* name)
         if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
             return client->GetClientControl()->fRefNum;
     }
-    
+
     return -1;
 }
 
@@ -511,7 +511,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
         jack_error("Cannot notify add client");
         goto error;
     }
- 
+
     fGraphManager->InitRefNum(refnum);
     fEngineControl->ResetRollingUsecs();
     *shared_engine = fEngineControl->GetShmIndex();
@@ -576,7 +576,7 @@ int JackEngine::ClientExternalClose(int refnum)
 {
     AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
-    
+
     if (client)	{
         fEngineControl->fTransport.ResetTimebase(refnum);
         int res = ClientCloseAux(refnum, client, true);
@@ -613,7 +613,7 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortUnRegister(refnum, ports[i]);
     }
-    
+
     // Remove the client from the table
     ReleaseRefnum(refnum);
 
@@ -641,11 +641,11 @@ int JackEngine::ClientActivate(int refnum, bool state)
     AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     assert(fClientTable[refnum]);
-  
+
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
-    if (state) 
+    if (state)
         fGraphManager->Activate(refnum);
- 
+
     // Wait for graph state change to be effective
     if (!fSignal.LockedTimedWait(fEngineControl->fTimeOutUsecs * 10)) {
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
@@ -665,11 +665,11 @@ int JackEngine::ClientDeactivate(int refnum)
         return -1;
 
     jack_log("JackEngine::ClientDeactivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
-    
+
     // Disconnect all ports ==> notifications are sent
     jack_int_t ports[PORT_NUM_FOR_CLIENT];
     int i;
-    
+
     fGraphManager->GetInputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortDisconnect(refnum, ports[i], ALL_PORTS);
@@ -679,7 +679,7 @@ int JackEngine::ClientDeactivate(int refnum)
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortDisconnect(refnum, ports[i], ALL_PORTS);
     }
-    
+
     fGraphManager->Deactivate(refnum);
     fLastSwitchUsecs = 0; // Force switch to occur next cycle, even when called with "dead" clients
 
@@ -701,11 +701,11 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
     jack_log("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d", refnum, name, type, flags, buffer_size);
     AssertRefnum(refnum);
     assert(fClientTable[refnum]);
-    
+
     // Check if port name already exists
     if (fGraphManager->GetPort(name) != NO_PORT) {
         jack_error("port_name \"%s\" already exists", name);
-        return -1; 
+        return -1;
     }
 
     *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
@@ -722,7 +722,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
     AssertRefnum(refnum);
     assert(fClientTable[refnum]);
-    
+
     // Disconnect port ==> notification is sent
     PortDisconnect(refnum, port_index, ALL_PORTS);
 
@@ -775,7 +775,7 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
     }
 
     int res = fGraphManager->Connect(src, dst);
-    if (res == 0) 
+    if (res == 0)
         NotifyPortConnect(src, dst, true);
     return res;
 }

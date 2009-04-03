@@ -521,11 +521,5 @@ void JackDebugClient::InternalClientUnload(int ref, jack_status_t* status)
     fClient->InternalClientUnload(ref, status);
 }
 
-jack_nframes_t JackDebugClient::Wait(int status)
-{
-    CheckClient();
-    return fClient->Wait(status);
-}
-
 } // end of namespace
 

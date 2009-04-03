@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2005 Samuel TRACOL for GRAME
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,7 @@
 /** @file jack_test.c
  *
  * @brief This client test the jack API.
- * 
+ *
  */
 
 #include <stdio.h>
@@ -38,7 +38,7 @@
 #include <jack/transport.h>
 
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(M_PI)
 #define M_PI 3.151592653
 #endif
 
@@ -122,9 +122,9 @@ int client_register = 0;
 /**
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
- 
+
 							Callbacks & basics functions
- 
+
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 */
@@ -266,9 +266,9 @@ int Jack_Sync_Callback(jack_transport_state_t state, jack_position_t *pos, void 
 /**
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
- 
+
 							processing functions
- 
+
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
  * Proccess1 is for client1
@@ -370,7 +370,7 @@ int process2(jack_nframes_t nframes, void *arg)
             }
         }
     }
-	
+
     if (process2_activated == 2) { // envoie de signal1 pour test tie mode et le r�cup�re direct + latence de la boucle jack...
         out2 = (jack_default_audio_sample_t *) jack_port_get_buffer (output_port2, nframes);
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
@@ -389,7 +389,7 @@ int process2(jack_nframes_t nframes, void *arg)
             }
         }
     }
-	
+
     if (process2_activated == 3) { // envoie de -signal1 pour sommation en oppo de phase par jack
         in2 = (jack_default_audio_sample_t *) jack_port_get_buffer (input_port2, nframes);
 
@@ -416,14 +416,14 @@ static int _process (jack_nframes_t nframes)
 	out = (jack_default_audio_sample_t *)jack_port_get_buffer (output_port1, nframes);
 	memcpy (out, in,
 		sizeof (jack_default_audio_sample_t) * nframes);
-	return 0;      
+	return 0;
 }
 
-static void* jack_thread(void *arg) 
+static void* jack_thread(void *arg)
 {
 	jack_client_t* client = (jack_client_t*) arg;
 	jack_nframes_t last_thread_time = jack_frame_time(client);
-	
+
 	while (1) {
 		jack_nframes_t frames = jack_cycle_wait (client);
 		jack_nframes_t current_thread_time = jack_frame_time(client);
@@ -433,7 +433,7 @@ static void* jack_thread(void *arg)
 		last_thread_time = current_thread_time;
 		jack_cycle_signal (client, status);
 	}
-	
+
 	return 0;
 }
 
@@ -441,7 +441,7 @@ static void* jack_thread(void *arg)
 int process3(jack_nframes_t nframes, void *arg)
 {
 	static int process3_call = 0;
-	
+
 	if (process3_call++ > 10) {
 		Log("process3 callback : exiting...\n");
 		return -1;
@@ -457,15 +457,15 @@ int process4(jack_nframes_t nframes, void *arg)
 
 	static jack_nframes_t last_time = jack_frame_time(client);
 	static jack_nframes_t tolerance = (jack_nframes_t)(cur_buffer_size * 0.1f);
-	
+
 	jack_nframes_t cur_time = jack_frame_time(client);
 	jack_nframes_t delta_time = cur_time - last_time;
-	
+
 	Log("calling process4 callback : jack_frame_time = %ld delta_time = %ld\n", cur_time, delta_time);
 	if (delta_time > 0  && (unsigned int)abs(delta_time - cur_buffer_size) > tolerance) {
 		printf("!!! ERROR !!! jack_frame_time seems to return incorrect values cur_buffer_size = %d, delta_time = %d\n", cur_buffer_size, delta_time);
 	}
-	
+
 	last_time = cur_time;
 	return 0;
 }
@@ -525,7 +525,7 @@ int main (int argc, char *argv[])
     int is_mine = 0;	// to test jack_port_is_mine function...
     const char *options = "kRnqvt:";
     float ratio;		// for speed calculation in freewheel mode
-    jack_options_t jack_options = JackNullOption; 
+    jack_options_t jack_options = JackNullOption;
 	struct option long_options[] = {
                                        {"realtime", 0, 0, 'R'},
                                        {"non-realtime", 0, 0, 'n'},
@@ -602,8 +602,8 @@ int main (int argc, char *argv[])
     printf("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*\n");
 
     /**
-     * Register a client... 
-     * 
+     * Register a client...
+     *
      */
 	Log("Register a client using jack_client_open()...\n");
     client1 = jack_client_open(client_name1, jack_options, &status, server_name);
@@ -618,7 +618,7 @@ int main (int argc, char *argv[])
     if (status & JackServerStarted) {
         fprintf(stderr, "JACK server started\n");
     }
-	
+
     /**
      * try to register another one with the same name...
      *
@@ -631,7 +631,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! Jackd server has accepted multiples client with the same name !\n");
         jack_client_close(client2);
     }
-	
+
 	/**
      * try to register another one with the same name using jack_client_open ==> since JackUseExactName is not used, an new client should be opened...
      *
@@ -644,7 +644,7 @@ int main (int argc, char *argv[])
     } else {
         printf("!!! ERROR !!! Jackd server automatic renaming feature does not work!\n");
     }
-	
+
     /**
      * testing client name...
      * Verify that the name sended at registration and the one returned by jack server is the same...
@@ -683,31 +683,31 @@ int main (int argc, char *argv[])
     if (jack_set_buffer_size_callback(client1, Jack_Update_Buffer_Size, 0) != 0) {
         printf("Error when calling buffer_size_callback !\n");
     }
-	
+
     if (jack_set_graph_order_callback(client1, Jack_Graph_Order_Callback, 0) != 0) {
         printf("Error when calling Jack_Graph_Order_Callback() !\n");
     }
-	
+
     if (jack_set_xrun_callback(client1, Jack_XRun_Callback, 0 ) != 0) {
         printf("Error when calling jack_set_xrun_callback() !\n");
     }
-	
+
     if (jack_set_sample_rate_callback(client1, Jack_Sample_Rate_Callback, 0 ) != 0) {
         printf("Error when calling Jack_Sample_Rate_Callback() !\n");
     }
-	
+
     if (jack_set_port_registration_callback(client1, Jack_Port_Register, 0) != 0) {
         printf("Error when calling jack_set_port_registration_callback() !\n");
     }
-	
+
     if (jack_set_port_connect_callback(client1, Jack_Port_Connect, 0) != 0) {
         printf("Error when calling jack_set_port_connect_callback() !\n");
     }
-	
+
 	if (jack_set_client_registration_callback(client1, Jack_Client_Registration_Callback, 0) != 0) {
 		printf("Error when calling jack_set_client_registration_callback() !\n");
 	}
-	
+
     jack_set_error_function(Jack_Error_Callback);
 
     /**
@@ -747,7 +747,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! Can't register any port for the client !\n");
         exit(1);
     }
-	
+
    /**
      * Test port type of the just registered port.
      *
@@ -811,7 +811,7 @@ int main (int argc, char *argv[])
         printf ("Fatal error : cannot activate client1\n");
         exit(1);
     }
-	
+
     /**
      * Test if init callback initThread have been called.
      *
@@ -925,7 +925,7 @@ int main (int argc, char *argv[])
     /**
     * remove the output port previously created
     * no more ports should subsist here for our client.
-    * 
+    *
     */
     if (jack_port_unregister(client1, output_port1) != 0) {
         printf("!!! ERROR !!! while unregistering port %s.\n", jack_port_name(output_port1));
@@ -933,7 +933,7 @@ int main (int argc, char *argv[])
 
     /**
      * list all in ports
-     * 
+     *
      */
     inports = jack_get_ports(client1, NULL, NULL, 0);
 
@@ -1133,7 +1133,7 @@ int main (int argc, char *argv[])
     }
 
     free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
-	
+
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
@@ -1157,7 +1157,7 @@ int main (int argc, char *argv[])
         }
         exit(1);
     }
-	
+
 	// Check client registration callback
 	jack_sleep(1000);
 	if (client_register == 0)
@@ -1368,7 +1368,7 @@ int main (int argc, char *argv[])
     }
 
     /**
-     * Test TIE MODE 
+     * Test TIE MODE
      * (This mode seems to be problematic in standard jack version 0.100. It seems that nobody
      * is used to apply this mode because the tie mode doesn't work at all. A patch seems difficult to produce
      * in this version of jack. Tie mode work well in MP version.)
@@ -1468,7 +1468,7 @@ int main (int argc, char *argv[])
      * So, the result must be zero...
      * See process1 for details about steps of this test
      *
-     */ 
+     */
     // fprintf(file, "Sum test\n");
     Log("Checking summation capabilities of patching...\n");
     output_port1b = jack_port_register(client1, "out1b",
@@ -1565,7 +1565,7 @@ int main (int argc, char *argv[])
     outports = jack_get_ports(client1, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
     if (inports[0] != NULL) {
         output_ext_latency = jack_port_get_latency (jack_port_by_name(client1, inports[0]));  // from client to out driver (which has "inputs" ports..)
-		input_ext_latency = jack_port_get_latency (jack_port_by_name(client1, outports[0]));  // from in driver (which has "output" ports..) to client 
+		input_ext_latency = jack_port_get_latency (jack_port_by_name(client1, outports[0]));  // from in driver (which has "output" ports..) to client
         if (output_ext_latency != jack_port_get_total_latency(client1, jack_port_by_name(client1, inports[0]))) {
             t_error = 1;
             printf("!!! ERROR !!! get_latency & get_all_latency for a PHY device (unconnected) didn't return the same value !\n");
@@ -1641,7 +1641,7 @@ int main (int argc, char *argv[])
     jack_port_disconnect(client1, input_port2);
     jack_port_disconnect(client1, output_port1);
     jack_port_disconnect(client1, output_port2);
-	
+
 	jack_sleep(1000);
 
     free(inports);
@@ -1836,23 +1836,23 @@ int main (int argc, char *argv[])
         jack_sleep (1 * 1000);
         time_before_exit--;
     }
-	
+
 	if (jack_deactivate(client2) != 0) {
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client2 !\n");
     }
     if (jack_deactivate(client1) != 0) {
         printf("!!! ERROR !!! jack_deactivate does not return 0 for client1 !\n");
     }
-	
+
 	/**
      * Checking jack_frame_time.
     */
 	Log("Testing jack_frame_time...\n");
 	jack_set_process_callback(client1, process4, client1);
 	jack_activate(client1);
-	jack_sleep(2 * 1000); 
-	
-	
+	jack_sleep(2 * 1000);
+
+
 	/**
      * Checking alternate thread model
     */
@@ -1862,7 +1862,7 @@ int main (int argc, char *argv[])
 	jack_set_process_thread(client1, jack_thread, client1);
 	jack_activate(client1);
 	jack_sleep(2 * 1000);
-	
+
 	/**
      * Checking callback exiting : when the return code is != 0, the client is desactivated.
     */
@@ -1871,8 +1871,8 @@ int main (int argc, char *argv[])
 	jack_set_process_thread(client1, NULL, NULL); // remove thread callback
 	jack_set_process_callback(client1, process3, 0);
 	jack_activate(client1);
-	jack_sleep(3 * 1000); 
-	
+	jack_sleep(3 * 1000);
+
     /**
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
      *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*

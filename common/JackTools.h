@@ -201,6 +201,10 @@ namespace Jack
                 return 0;
             }
     };
+    
+    void BuildClientPath(char* path_to_so, int path_len, const char* so_name);
+    void PrintLoadError(const char* so_name);
+    
 }
 
 #endif

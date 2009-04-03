@@ -109,12 +109,12 @@ int JackPort::RequestMonitor(bool onoff)
 {
     /**
     jackd.h 
-     * If @ref JackPortCanMonitor is set for this @a port, turn input
-     * monitoring on or off. Otherwise, do nothing.
+    * If @ref JackPortCanMonitor is set for this @a port, turn input
+    * monitoring on or off. Otherwise, do nothing.
      
-     if (!(fFlags & JackPortCanMonitor))
+    if (!(fFlags & JackPortCanMonitor))
     	return -1;
-     */
+    */
 
     if (onoff) {
         fMonitorRequests++;
@@ -129,12 +129,12 @@ int JackPort::EnsureMonitor(bool onoff)
 {
     /**
     jackd.h 
-        * If @ref JackPortCanMonitor is set for this @a port, turn input
-        * monitoring on or off. Otherwise, do nothing.
+    * If @ref JackPortCanMonitor is set for this @a port, turn input
+    * monitoring on or off. Otherwise, do nothing.
      
-     if (!(fFlags & JackPortCanMonitor))
+    if (!(fFlags & JackPortCanMonitor))
     	return -1;
-     */
+    */
 
     if (onoff) {
         if (fMonitorRequests == 0) {
@@ -247,13 +247,13 @@ int JackPort::UnsetAlias(const char* alias)
 void JackPort::ClearBuffer(jack_nframes_t frames)
 {
     const JackPortType* type = GetPortType(fTypeId);
-    (type->init)(fBuffer, frames * sizeof(float), frames);
+    (type->init)(GetBuffer(), frames * sizeof(float), frames);
 }
 
 void JackPort::MixBuffers(void** src_buffers, int src_count, jack_nframes_t buffer_size)
 {
     const JackPortType* type = GetPortType(fTypeId);
-    (type->mixdown)(fBuffer, src_buffers, src_count, buffer_size);
+    (type->mixdown)(GetBuffer(), src_buffers, src_count, buffer_size);
 }
 
 } // end of namespace

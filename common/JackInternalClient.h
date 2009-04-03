@@ -60,25 +60,6 @@ class JackInternalClient : public JackClient
 \brief Loadable internal clients in the server.
 */
 
-#ifdef WIN32
-
-#include <windows.h>
-#define HANDLE HINSTANCE
-#define LoadJackModule(name) LoadLibrary((name));
-#define UnloadJackModule(handle) FreeLibrary((handle));
-#define GetJackProc(handle, name) GetProcAddress((handle), (name));
-
-#else
-
-#include <dlfcn.h>
-#define HANDLE void*
-#define LoadJackModule(name) dlopen((name), RTLD_NOW | RTLD_LOCAL);
-#define UnloadJackModule(handle) dlclose((handle));
-#define GetJackProc(handle, name) dlsym((handle), (name));
-#define PrintLoadError(so_name) jack_log("error loading %s err = %s", so_name, dlerror());
-
-#endif
-
 typedef int (*InitializeCallback)(jack_client_t*, const char*);
 typedef int (*InternalInitializeCallback)(jack_client_t*, const JSList* params);
 typedef void (*FinishCallback)(void *);
@@ -89,7 +70,7 @@ class JackLoadableInternalClient : public JackInternalClient
 
     protected:
 
-        HANDLE fHandle;
+        JACK_HANDLE fHandle;
         FinishCallback fFinish;
         JackDriverDescFunction fDescriptor;
 

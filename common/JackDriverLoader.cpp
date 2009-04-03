@@ -432,8 +432,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
         return NULL;
     }
 
-    so_get_descriptor = (JackDriverDescFunction)
-                        GetProc(dlhandle, symbol);
+    so_get_descriptor = (JackDriverDescFunction)GetDriverProc(dlhandle, symbol);
 
 #ifdef WIN32
     if ((so_get_descriptor == NULL) && (dlerr = GetLastError()) != 0) {
@@ -513,7 +512,7 @@ static bool check_symbol(const char* sofile, const char* symbol)
         jack_error ("could not open component .so '%s': %s", filename, dlerror());
 #endif
      } else {
-        res = (GetProc(dlhandle, symbol)) ? true : false;
+        res = (GetDriverProc(dlhandle, symbol)) ? true : false;
         UnloadDriverModule(dlhandle);
     }
 
@@ -791,7 +790,7 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
         return NULL;
     }
 
-    fInitialize = (driverInitialize)GetProc(fHandle, "driver_initialize");
+    fInitialize = (driverInitialize)GetDriverProc(fHandle, "driver_initialize");
 
 #ifdef WIN32
     if ((fInitialize == NULL) && (errstr = GetLastError ()) != 0) {

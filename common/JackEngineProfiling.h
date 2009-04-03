@@ -52,7 +52,8 @@ struct JackTimingMeasureClient
         fFinishedAt(0),
         fStatus((jack_client_state_t)0)
     {}
-};
+    
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Timing interval in the global table for a given client
@@ -70,7 +71,8 @@ struct JackTimingClientInterval
          fBeginInterval(-1),
          fEndInterval(-1)
     {}
-};
+    
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Timing stucture for a table of clients.
@@ -90,7 +92,8 @@ struct JackTimingMeasure
         fCurCycleBegin(0),
         fPrevCycleEnd(0)
     {}
-};
+    
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Client timing monitoring.
@@ -125,7 +128,7 @@ class SERVER_EXPORT JackEngineProfiling
                     
         JackTimingMeasure* GetCurMeasure();
 
-};
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

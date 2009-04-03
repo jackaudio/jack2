@@ -35,15 +35,15 @@ extern "C"
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX
 #endif
-    typedef char	shm_name_t[SHM_NAME_MAX];
+    typedef char shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
-#elif WIN32   // steph TO CHECK
+#elif WIN32   // TO CHECK
 #define NAME_MAX            255
 #ifndef SHM_NAME_MAX
 #define SHM_NAME_MAX NAME_MAX
 #endif
-    typedef char	shm_name_t[SHM_NAME_MAX];
+    typedef char shm_name_t[SHM_NAME_MAX];
     typedef shm_name_t jack_shm_id_t;
 
 #else
@@ -73,7 +73,6 @@ extern "C"
 #ifdef WIN32
         int	pid;	/* process ID */
 #else
-
         pid_t pid;	/* process ID */
 #endif
 
@@ -96,10 +95,8 @@ extern "C"
         jack_shm_registry_index_t index;     /* offset into the registry */
 
 #ifdef WIN32
-
         int	allocator; /* PID that created shm segment */
 #else
-
         pid_t allocator; /* PID that created shm segment */
 #endif
 
@@ -118,12 +115,16 @@ extern "C"
      * indicating where the shared memory has been
      * attached to the address space.
      */
+     
     typedef struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
-        size_t size;
-        void *attached_at; /* address where attached */
+        uint32_t size;
+        union {
+            void *attached_at;  /* address where attached */
+            char ptr_size[8];   
+        } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */ 
     }
-    jack_shm_info_t;
+    POST_PACKED_STRUCTURE jack_shm_info_t;
 
     /* utility functions used only within JACK */
       
@@ -132,15 +133,15 @@ extern "C"
     void jack_shm_copy_to_registry (jack_shm_info_t*,
                                                jack_shm_registry_index_t*);
     void jack_release_shm_info (jack_shm_registry_index_t);
-    char* jack_shm_addr (jack_shm_info_t* si);  // steph
+    char* jack_shm_addr (jack_shm_info_t* si);  
 
     // here begin the API 
     int jack_register_server (const char *server_name, int new_registry);
     void jack_unregister_server (const char *server_name);
 
     int jack_initialize_shm (const char *server_name);
-    int jack_initialize_shm_server (void);  // steph
-    int jack_initialize_shm_client (void);  // steph
+    int jack_initialize_shm_server (void); 
+    int jack_initialize_shm_client (void);  
     int jack_cleanup_shm (void);
 
     int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
@@ -148,7 +149,7 @@ extern "C"
     void jack_release_shm (jack_shm_info_t*);
     void jack_destroy_shm (jack_shm_info_t*);
     int jack_attach_shm (jack_shm_info_t*);
-    int jack_attach_shm_read (jack_shm_info_t*); // steph
+    int jack_attach_shm_read (jack_shm_info_t*); 
     int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
 
 #ifdef __cplusplus
