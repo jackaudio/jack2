@@ -127,9 +127,6 @@ class JackDebugClient : public JackClient
         int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
         void InternalClientUnload(int ref, jack_status_t* status);
 
-        // Fons Adriaensen thread model
-        jack_nframes_t Wait(int status);
-
         JackClientControl* GetClientControl() const;
         void CheckClient() const;
 

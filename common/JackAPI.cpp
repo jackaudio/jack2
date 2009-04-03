@@ -842,7 +842,8 @@ EXPORT jack_nframes_t jack_thread_wait(jack_client_t* ext_client, int status)
         jack_error("jack_thread_wait called with a NULL client");
         return 0;
     } else {
-        return client->Wait(status);
+        jack_error("jack_thread_wait: deprecated, use jack_cycle_wait/jack_cycle_signal");
+        return -1;
     }
 }
 

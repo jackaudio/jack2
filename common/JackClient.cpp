@@ -355,6 +355,7 @@ int JackClient::StartThread()
 /*!
 \brief RT thread.
 */
+
 bool JackClient::Execute()
 {
     if (!jack_tls_set(JackGlobals::fRealTime, this)) 
@@ -362,71 +363,57 @@ bool JackClient::Execute()
         
     if (GetEngineControl()->fRealTime) 
         set_threaded_log_function(); 
-     
+        
+    // Execute a dummy cycle to be sure thread has the correct properties
+    DummyCycle();
+      
     if (fThreadFun) {
-        // Execute a dummy cycle to be sure thread has the correct properties (ensure thread creation is finished)
-        WaitSync();
-        SignalSync();
         fThreadFun(fThreadFunArg);
     } else {
-        if (WaitFirstSync())
-            ExecuteThread();
+        ExecuteThread();
     }
     return false; 
 }
 
-inline bool JackClient::WaitFirstSync()
+void JackClient::DummyCycle()
 {
-    while (true) {
-        // Start first cycle
-        WaitSync();
-        if (IsActive()) {
-            CallSyncCallback();
-            // Finish first cycle
-            if (Wait(CallProcessCallback()) != GetEngineControl()->fBufferSize)
-                return false;
-            return true;
-        } else {
-            jack_log("Process called for an inactive client");
-        }
-        SignalSync();
-    }
-    return false; 
+    WaitSync();
+    SignalSync();
 }
 
 inline void JackClient::ExecuteThread()
 {
-    while (Wait(CallProcessCallback()) == GetEngineControl()->fBufferSize);
+    while (true) { 
+        CycleWaitAux();
+        CycleSignalAux(CallProcessCallback());  
+	}
 }
 
-jack_nframes_t JackClient::Wait(int status)
+inline jack_nframes_t JackClient::CycleWaitAux()
+{
+    if (!WaitSync()) 
+        Error();   // Terminates the thread
+    CallSyncCallbackAux();
+    return GetEngineControl()->fBufferSize;
+}
+
+inline void JackClient::CycleSignalAux(int status)
 {
     if (status == 0)
-        CallTimebaseCallback();
+        CallTimebaseCallbackAux();
     SignalSync();
-    if (status != 0)
-        End();      // Terminates the thread
-    if (!WaitSync())
-        Error();    // Terminates the thread
-    CallSyncCallback();
-    return GetEngineControl()->fBufferSize;
+    if (status != 0) 
+        End();     // Terminates the thread
 }
 
 jack_nframes_t JackClient::CycleWait()
 {
-    if (!WaitSync()) 
-        Error();   // Terminates the thread
-    CallSyncCallback();
-    return GetEngineControl()->fBufferSize;
+    return CycleWaitAux();
 }
 
 void JackClient::CycleSignal(int status)
 {
-    if (status == 0)
-        CallTimebaseCallback();
-    SignalSync();
-    if (status != 0) 
-        End();     // Terminates the thread
+    CycleSignalAux(status);
 }
 
 inline int JackClient::CallProcessCallback()
@@ -696,7 +683,13 @@ void JackClient::TransportStop()
 
 // Never called concurently with the server
 // TODO check concurrency with SetSyncCallback
+
 void JackClient::CallSyncCallback()
+{
+    CallSyncCallbackAux();
+}
+
+inline void JackClient::CallSyncCallbackAux()
 {
     if (GetClientControl()->fTransportSync) {
     
@@ -717,6 +710,11 @@ void JackClient::CallSyncCallback()
 }
 
 void JackClient::CallTimebaseCallback()
+{
+    CallTimebaseCallbackAux();
+}
+
+inline void JackClient::CallTimebaseCallbackAux()
 {
     JackTransportEngine& transport = GetEngineControl()->fTransport;
     int master;

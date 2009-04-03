@@ -19,10 +19,15 @@ Romain Moret
 Florian Faber
 Michael Voigt
 Torben Hohn  
+Paul Davis
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2009-04-03 Stephane Letz  <letz@grame.fr>
+
+	* Simplify JackClient RT code, jack_thread_wait API marked deprecated."
 
 2009-03-29 Stephane Letz  <letz@grame.fr>
 
