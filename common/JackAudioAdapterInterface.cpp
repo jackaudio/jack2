@@ -73,7 +73,8 @@ namespace Jack
         
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
-        fprintf(file, "set title \"Audio adapter timing\"\n");
+        fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
+            ,float(fHostSampleRate)/1000.f, fHostBufferSize, float(fAdaptedSampleRate)/1000.f, fAdaptedBufferSize);
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
@@ -104,7 +105,8 @@ namespace Jack
         
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
-        fprintf(file, "set title \"Audio adapter timing\"\n");
+        fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
+            ,float(fHostSampleRate)/1000.f, fHostBufferSize, float(fAdaptedSampleRate)/1000.f, fAdaptedBufferSize);
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"resampling ratio\"\n");
         fprintf(file, "plot ");
@@ -135,7 +137,8 @@ namespace Jack
         
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
-        fprintf(file, "set title \"Audio adapter timing\"\n");
+        fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
+            ,float(fHostSampleRate)/1000.f, fHostBufferSize, float(fAdaptedSampleRate)/1000.f, fAdaptedBufferSize);
         fprintf(file, "set xlabel \"audio cycles\"\n");
         fprintf(file, "set ylabel \"frames\"\n");
         fprintf(file, "plot ");
