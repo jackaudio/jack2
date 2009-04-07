@@ -22,11 +22,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
-#ifdef __APPLE__
-#include "macosx/coremidi/JackCoreMidiDriver.h"
-#else
-#include "JackMidiDriver.h"
-#endif
 #include "JackThreadedDriver.h"
 #include "JackGlobals.h"
 #include "JackLockedEngine.h"
@@ -297,10 +292,8 @@ JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* dr
         delete info;
         return NULL;
     } else {
-        //Stop();
         backend->Attach();
         fAudioDriver->AddSlave(backend);
-        //Start();
         return info;
     }
 }
@@ -308,11 +301,9 @@ JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* dr
 void JackServer::RemoveSlave(JackDriverInfo* info)
 {
     JackDriverClientInterface* backend = info->GetBackend();
-    //Stop();
     fAudioDriver->RemoveSlave(info->GetBackend());
     backend->Detach();
     backend->Close();
-    //Start();
 }
 
 //----------------------
