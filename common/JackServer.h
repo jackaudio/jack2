@@ -50,7 +50,6 @@ class SERVER_EXPORT JackServer
         JackDriverInfo fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
-        JackDriverClientInterface* fLoopbackDriver;
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
@@ -58,7 +57,6 @@ class SERVER_EXPORT JackServer
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
-        long fLoopback;
         
         int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status);
 
@@ -86,6 +84,10 @@ class SERVER_EXPORT JackServer
         // Transport management
         int ReleaseTimebase(int refnum);
         int SetTimebaseCallback(int refnum, int conditional);
+        
+        // Backend management
+        JackDriverInfo* AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params);
+        void RemoveSlave(JackDriverInfo* info);
 
         // Object access
         JackLockedEngine* GetEngine();

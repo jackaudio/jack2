@@ -30,6 +30,21 @@ def create_jack_audio_driver_obj(bld, target, sources, uselib = None):
         driver.uselib = uselib
     return driver
 
+def create_jack_midi_driver_obj(bld, target, sources, uselib = None):
+    driver = bld.new_task_gen('cxx', 'shlib')
+    driver.features.append('cc')
+    driver.env['shlib_PATTERN'] = 'jack_%s.so'
+    driver.defines = 'HAVE_CONFIG_H'
+    driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
+    driver.target = target
+    driver.source = sources
+    driver.install_path = '${ADDON_DIR}/'
+    driver.uselib_local = 'serverlib'
+    driver.env.append_value("LINKFLAGS", "-framework CoreMIDI -framework CoreServices -framework AudioUnit")
+    if uselib:
+        driver.uselib = uselib
+    return driver
+
 def build(bld):
     jackd = bld.new_task_gen('cxx', 'program')
     jackd.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
@@ -43,6 +58,8 @@ def build(bld):
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 
     create_jack_audio_driver_obj(bld, 'coreaudio', 'coreaudio/JackCoreAudioDriver.cpp')
+
+    create_jack_midi_driver_obj(bld, 'coremidi', 'coremidi/JackCoreMidiDriver.cpp')
     
     portaudio_src = [
         '../windows/JackPortAudioDriver.cpp',

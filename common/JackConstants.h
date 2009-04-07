@@ -47,10 +47,10 @@
 #define CLIENT_NUM 64
 #endif
 
-#define AUDIO_DRIVER_REFNUM   0                     // Audio driver is initialized first, it will get the refnum 0
-#define FREEWHEEL_DRIVER_REFNUM   1                 // Freewheel driver is initialized second, it will get the refnum 1
-#define LOOPBACK_DRIVER_REFNUM   2                  // Loopback driver is initialized third, it will get the refnum 2
-#define REAL_REFNUM LOOPBACK_DRIVER_REFNUM + 1      // Real clients start at LOOPBACK_DRIVER_REFNUM + 1
+#define AUDIO_DRIVER_REFNUM   0                 // Audio driver is initialized first, it will get the refnum 0
+#define FREEWHEEL_DRIVER_REFNUM   1             // Freewheel driver is initialized second, it will get the refnum 1
+#define MIDI_DRIVER_REFNUM   2                  // Loopback driver is initialized third, it will get the refnum 2
+#define REAL_REFNUM MIDI_DRIVER_REFNUM + 1      // Real clients start at MIDI_DRIVER_REFNUM + 1
 
 #define JACK_DEFAULT_SERVER_NAME "default"
 

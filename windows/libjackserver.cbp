@@ -141,6 +141,7 @@
 		<Unit filename="..\common\JackLoopbackDriver.cpp" />
 		<Unit filename="..\common\JackMessageBuffer.cpp" />
 		<Unit filename="..\common\JackMidiAPI.cpp" />
+		<Unit filename="..\common\JackMidiDriver.cpp" />
 		<Unit filename="..\common\JackMidiPort.cpp" />
 		<Unit filename="..\common\JackNetInterface.cpp" />
 		<Unit filename="..\common\JackNetTool.cpp" />

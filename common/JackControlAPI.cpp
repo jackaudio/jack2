@@ -42,6 +42,7 @@
 #include "JackControlAPI.h"
 #include "JackLockedEngine.h"
 #include "JackConstants.h"
+#include "JackDriverLoader.h"
 
 using namespace Jack;
 
@@ -95,6 +96,7 @@ struct jackctl_driver
     jack_driver_desc_t * desc_ptr;
     JSList * parameters;
     JSList * set_parameters;
+    JackDriverInfo* info;
 };
 
 struct jackctl_internal
@@ -1161,4 +1163,23 @@ EXPORT bool jackctl_server_unload_internal(
     }
 }
 
+EXPORT bool jackctl_server_load_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
+{
+    if (server_ptr->engine != NULL) {
+        driver_ptr->info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
+        return (driver_ptr->info != 0);
+    } else {
+        return false;
+    }
+}
+
+EXPORT bool jackctl_server_unload_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
+{
+    if (server_ptr->engine != NULL) {
+        server_ptr->engine->RemoveSlave(driver_ptr->info);
+        return true;
+    } else {
+        return false;
+    }
+}
 

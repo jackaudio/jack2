@@ -42,6 +42,7 @@ class JackDriverInfo
     
         driverInitialize fInitialize;
         DRIVER_HANDLE fHandle;
+        Jack::JackDriverClientInterface* fBackend;
         
     public:
     
@@ -54,6 +55,11 @@ class JackDriverInfo
         }
         
         Jack::JackDriverClientInterface* Open(jack_driver_desc_t* driver_desc, Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
+        
+        Jack::JackDriverClientInterface* GetBackend()
+        {
+            return fBackend;
+        }
     
 };
 

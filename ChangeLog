@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-04-08 Stephane Letz  <letz@grame.fr>
+
+	* Native MIDI backend (JackCoreMidiDriver, JackWinMMEDriver) in progress.
+
 2009-04-03 Stephane Letz  <letz@grame.fr>
 
 	* Simplify JackClient RT code, jack_thread_wait API marked deprecated."

@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 
 /*
-This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server 
+This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:
 - dynamically retrieve available server parameters and then prepare to parse them
 - get available drivers and their possible parameters, then prepare to parse them.
@@ -58,7 +58,7 @@ static void notify_server_start(const char* server_name)
 static void notify_server_stop(const char* server_name)
 {
     // Send notification to be used in the JackRouter plugin
-    CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);    
+    CFStringRef ref1 = CFStringCreateWithCString(NULL, server_name, kCFStringEncodingMacRoman);
     CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
             CFSTR("com.grame.jackserver.stop"),
             ref1,
@@ -95,14 +95,14 @@ static void usage(FILE* file)
             "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
             "               [ --name OR -n server-name ]\n"
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
-            "               [ --loopback OR -L loopback-port-number ]\n"
+            "               [ --midi OR -X midi-driver ]\n"
             "               [ --verbose OR -v ]\n"
             "               [ --replace-registry OR -r ]\n"
             "               [ --silent OR -s ]\n"
             "               [ --sync OR -S ]\n"
             "               [ --temporary OR -T ]\n"
             "               [ --version OR -V ]\n"
-            "         -d driver [ ... driver args ... ]\n"
+            "         -d audio-driver [ ... driver args ... ]\n"
             "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
             "       jackdmp -d driver --help\n"
             "             to display options for each driver\n\n");
@@ -154,10 +154,12 @@ int main(int argc, char* argv[])
     jackctl_server_t * server_ctl;
     const JSList * server_parameters;
     const char* server_name = "default";
-    jackctl_driver_t * driver_ctl;
-    const char *options = "-ad:P:uvrshVRL:STFl:t:mn:p:";
+    jackctl_driver_t * audio_driver_ctl;
+    jackctl_driver_t * midi_driver_ctl;
+    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:";
     struct option long_options[] = {
-                                       { "driver", 1, 0, 'd' },
+                                       { "audio-driver", 1, 0, 'd' },
+                                       { "midi-driver", 1, 0, 'X' },
                                        { "verbose", 0, 0, 'v' },
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
@@ -177,10 +179,14 @@ int main(int argc, char* argv[])
                                    };
     int i,opt = 0;
     int option_index = 0;
-    bool seen_driver = false;
-    char *driver_name = NULL;
-    char **driver_args = NULL;
-    int driver_nargs = 1;
+    bool seen_audio_driver = false;
+    bool seen_midi_driver = false;
+    char *audio_driver_name = NULL;
+    char **audio_driver_args = NULL;
+    int audio_driver_nargs = 1;
+    char *midi_driver_name = NULL;
+    char **midi_driver_args = NULL;
+    int midi_driver_nargs = 1;
     int port_max = 512;
     int do_mlock = 1;
     int do_unlock = 0;
@@ -190,34 +196,39 @@ int main(int argc, char* argv[])
     union jackctl_parameter_value value;
 
 	copyright(stdout);
-    
+
     server_ctl = jackctl_server_create();
     if (server_ctl == NULL) {
         fprintf(stderr, "Failed to create server object\n");
         return -1;
     }
-    
+
     server_parameters = jackctl_server_get_parameters(server_ctl);
 
     opterr = 0;
-    while (!seen_driver &&
+    while (!seen_audio_driver &&
             (opt = getopt_long(argc, argv, options,
                                long_options, &option_index)) != EOF) {
         switch (opt) {
 
             case 'd':
-                seen_driver = true;
-                driver_name = optarg;
+                seen_audio_driver = true;
+                audio_driver_name = optarg;
                 break;
-                
+
+            case 'X':
+                seen_midi_driver = true;
+                midi_driver_name = optarg;
+                break;
+
             case 'p':
                 port_max = (unsigned int)atol(optarg);
                 break;
-                
+
             case 'm':
                 do_mlock = 0;
                 break;
-                
+
             case 'u':
                 do_unlock = 1;
                 break;
@@ -306,6 +317,7 @@ int main(int argc, char* argv[])
             default:
                 fprintf(stderr, "unknown option character %c\n", optopt);
                 /*fallthru*/
+
             case 'h':
                 usage(stdout);
                 goto fail_free;
@@ -313,61 +325,77 @@ int main(int argc, char* argv[])
     }
 
     if (show_version) {
-    	printf("jackdmp version" VERSION 
-               "\n");
+        printf( "jackdmp version " VERSION
+				" tmpdir " jack_server_dir
+				" protocol %d"
+				"\n", JACK_PROTOCOL_VERSION);
     	return -1;
     }
- 
-    if (!seen_driver) {
+
+    if (!seen_audio_driver) {
         usage(stderr);
         goto fail_free;
     }
 
-    driver_ctl = jackctl_server_get_driver(server_ctl, driver_name);
-    if (driver_ctl == NULL) {
-        fprintf(stderr, "Unkown driver \"%s\"\n", driver_name);
+    // Audio driver
+    audio_driver_ctl = jackctl_server_get_driver(server_ctl, audio_driver_name);
+    if (audio_driver_ctl == NULL) {
+        fprintf(stderr, "Unkown driver \"%s\"\n", audio_driver_name);
         goto fail_free;
     }
 
     if (optind < argc) {
-        driver_nargs = 1 + argc - optind;
+        audio_driver_nargs = 1 + argc - optind;
     } else {
-        driver_nargs = 1;
+        audio_driver_nargs = 1;
     }
 
-    if (driver_nargs == 0) {
+    if (audio_driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                 " anything when run like this.\n");
         goto fail_free;
     }
 
-    driver_args = (char **) malloc(sizeof(char *) * driver_nargs);
-    driver_args[0] = driver_name;
+    audio_driver_args = (char **) malloc(sizeof(char *) * audio_driver_nargs);
+    audio_driver_args[0] = audio_driver_name;
 
-    for (i = 1; i < driver_nargs; i++) {
-        driver_args[i] = argv[optind++];
+    for (i = 1; i < audio_driver_nargs; i++) {
+        audio_driver_args[i] = argv[optind++];
     }
 
-    if (jackctl_parse_driver_params(driver_ctl, driver_nargs, driver_args)) {
+    if (jackctl_parse_driver_params(audio_driver_ctl, audio_driver_nargs, audio_driver_args)) {
         goto fail_free;
     }
-    
-    if (!jackctl_server_start(server_ctl, driver_ctl)) {
+
+    // Start server
+    if (!jackctl_server_start(server_ctl, audio_driver_ctl)) {
         fprintf(stderr, "Failed to start server\n");
         goto fail_free;
     }
-    
+
+    // MIDI driver
+    if (seen_midi_driver) {
+
+        midi_driver_ctl = jackctl_server_get_driver(server_ctl, midi_driver_name);
+        if (midi_driver_ctl == NULL) {
+            fprintf(stderr, "Unkown driver \"%s\"\n", midi_driver_name);
+            goto fail_free;
+        }
+
+        jackctl_server_load_slave(server_ctl, midi_driver_ctl);
+    }
+
     notify_server_start(server_name);
 
     // Waits for signal
     signals = jackctl_setup_signals(0);
     jackctl_wait_signals(signals);
-       
+
     if (!jackctl_server_stop(server_ctl))
         fprintf(stderr, "Cannot stop server...\n");
-        
+
 fail_free:
-        
+
     jackctl_server_destroy(server_ctl);
     notify_server_stop(server_name);
     return 1;

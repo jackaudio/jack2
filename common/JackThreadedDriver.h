@@ -45,6 +45,19 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual ~JackThreadedDriver();
 
         virtual int Open();
+        
+        virtual int Open (bool capturing,
+                     bool playing,
+                     int inchannels,
+                     int outchannels,
+                     bool monitor,
+                     const char* capture_driver_name,
+                     const char* playback_driver_name,
+                     jack_nframes_t capture_latency,
+                     jack_nframes_t playback_latency) 
+        {
+            return -1;
+        }
         virtual int Open(jack_nframes_t buffer_size,
                          jack_nframes_t samplerate,
                          bool capturing,
