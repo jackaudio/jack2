@@ -92,9 +92,7 @@ JackWinMMEDriver::JackWinMMEDriver(const char* name, const char* alias, JackLock
 JackWinMMEDriver::~JackWinMMEDriver()
 {}
 
-int JackWinMMEDriver::Open(jack_nframes_t buffer_size,
-         jack_nframes_t samplerate,
-         bool capturing,
+int JackWinMMEDriver::Open(bool capturing,
          bool playing,
          int inchannels,
          int outchannels,
@@ -111,7 +109,7 @@ int JackWinMMEDriver::Open(jack_nframes_t buffer_size,
 	fRealPlaybackChannels = midiOutGetNumDevs ();
 
     // Generic JackMidiDriver Open
-    if (JackMidiDriver::Open(buffer_size, samplerate, capturing, playing, inchannels + fRealCaptureChannels, outchannels + fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
+    if (JackMidiDriver::Open(capturing, playing, inchannels + fRealCaptureChannels, outchannels + fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
         return -1;
 
     fMidiDestination = new MidiSlot[fRealCaptureChannels];
@@ -414,22 +412,22 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor() 
+    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         jack_driver_desc_t * desc;
         unsigned int i;
 
         desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-        strcpy(desc->name, "dummy");                  // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Timer based backend");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        strcpy(desc->name, "winmme");                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+        strcpy(desc->desc, "WinMME API based MIDI backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-        desc->nparams = 6;
+        desc->nparams = 0;
         desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
 
         return desc;
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
         /*
         unsigned int capture_ports = 2;
