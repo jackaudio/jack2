@@ -373,6 +373,7 @@ int main(int argc, char* argv[])
         goto fail_free;
     }
 
+    /*
     // MIDI driver
     if (seen_midi_driver) {
 
@@ -384,6 +385,7 @@ int main(int argc, char* argv[])
 
         jackctl_server_load_slave(server_ctl, midi_driver_ctl);
     }
+    */
 
     notify_server_start(server_name);
 

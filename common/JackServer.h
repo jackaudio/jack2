@@ -50,6 +50,7 @@ class SERVER_EXPORT JackServer
         JackDriverInfo fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
+        JackDriverClientInterface* fGenericMidiDriver;
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;

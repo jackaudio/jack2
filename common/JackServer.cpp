@@ -30,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
+#include "JackMidiDriver.h"
 #include "JackInternalClient.h"
 #include "JackError.h"
 #include "JackMessageBuffer.h"
@@ -49,6 +50,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
+    fGenericMidiDriver = new JackMidiDriver("midi_system", "", fEngine, GetSynchroTable());  // TEMPORARY
     fAudioDriver = NULL;
     fFreewheel = false;
     JackServerGlobals::fInstance = this;   // Unique instance
@@ -60,6 +62,7 @@ JackServer::~JackServer()
 {
     delete fGraphManager;
     delete fAudioDriver;
+    delete fGenericMidiDriver; // TEMPORARY 
     delete fFreewheelDriver;
     delete fEngine;
     delete fEngineControl;
@@ -84,6 +87,8 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         jack_error("Cannot initialize driver");
         goto fail_close3;
     }
+    
+    fGenericMidiDriver->Open(1, 1, 0, 0, 0, "", "", 0, 0); // TEMPORARY
  
     if (fFreewheelDriver->Open() != 0) { // before engine open
         jack_error("Cannot open driver");
@@ -96,8 +101,10 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
     }
  
     fFreewheelDriver->SetMaster(false);
+    fGenericMidiDriver->SetMaster(false); // TEMPORARY
     fAudioDriver->SetMaster(true);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
+    fAudioDriver->AddSlave(fGenericMidiDriver); // TEMPORARY
     InitTime();
     return 0;
   
@@ -125,6 +132,7 @@ int JackServer::Close()
     fAudioDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
+    fGenericMidiDriver->Close(); // TEMPORARY
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
