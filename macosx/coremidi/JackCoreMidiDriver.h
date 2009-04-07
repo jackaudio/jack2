@@ -57,9 +57,7 @@ class JackCoreMidiDriver : public JackMidiDriver
         JackCoreMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         virtual ~JackCoreMidiDriver();
 
-        int Open(jack_nframes_t buffer_size,
-                 jack_nframes_t samplerate,
-                 bool capturing,
+        int Open( bool capturing,
                  bool playing,
                  int chan_in,
                  int chan_out,

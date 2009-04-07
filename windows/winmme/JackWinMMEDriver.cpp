@@ -414,7 +414,8 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor () {
+    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor() 
+    {
         jack_driver_desc_t * desc;
         unsigned int i;
 
@@ -428,11 +429,8 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) {
-
-
-        jack_nframes_t sample_rate = 48000;
-        jack_nframes_t period_size = 1024;
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    {
         /*
         unsigned int capture_ports = 2;
         unsigned int playback_ports = 2;
@@ -474,7 +472,7 @@ extern "C"
         */
 
         Jack::JackDriverClientInterface* driver = new Jack::JackWinMMEDriver("system_midi", "winmme", engine, table);
-        if (driver->Open(period_size, sample_rate, 1, 1, 0, 0, false, "in", "out", 0, 0) == 0) {
+        if (driver->Open(1, 1, 0, 0, false, "in", "out", 0, 0) == 0) {
             return driver;
         } else {
             delete driver;
@@ -500,8 +498,6 @@ jack_connect system:midi_capture_1 system_midi:playback_1
 jack_connect system_midi:capture_1 system:midi_playback_1
 jack_connect system_midi:capture_2 system:midi_playback_1
 
-
 jack_connect system_midi:capture_1  system_midi:playback_1
-
 
 */

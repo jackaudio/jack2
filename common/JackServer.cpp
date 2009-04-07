@@ -22,7 +22,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
-#include "JackLoopbackDriver.h"
+#ifdef __APPLE__
+#include "macosx/coremidi/JackCoreMidiDriver.h"
+#else
+#include "JackMidiDriver.h"
+#endif
 #include "JackThreadedDriver.h"
 #include "JackGlobals.h"
 #include "JackLockedEngine.h"
@@ -50,10 +54,8 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
-    fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
     fAudioDriver = NULL;
     fFreewheel = false;
-    fLoopback = loopback;
     JackServerGlobals::fInstance = this;   // Unique instance
     JackServerGlobals::fUserCount = 1;     // One user
     jack_verbose = verbose;
@@ -64,7 +66,6 @@ JackServer::~JackServer()
     delete fGraphManager;
     delete fAudioDriver;
     delete fFreewheelDriver;
-    delete fLoopbackDriver;
     delete fEngine;
     delete fEngineControl;
 }
@@ -94,35 +95,17 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close4;
     }
     
-    if (fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
-        jack_error("Cannot open driver");
-        goto fail_close5;
-    }
-
     if (fAudioDriver->Attach() != 0) {
         jack_error("Cannot attach audio driver");
-        goto fail_close6;
-    }
-   
-    if (fLoopback > 0 && fLoopbackDriver->Attach() != 0) {
-        jack_error("Cannot attach loopback driver");
-        goto fail_close7;
+        goto fail_close5;
     }
  
     fFreewheelDriver->SetMaster(false);
     fAudioDriver->SetMaster(true);
-    if (fLoopback > 0)
-        fAudioDriver->AddSlave(fLoopbackDriver);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
     InitTime();
     return 0;
-
-fail_close7:     
-    fAudioDriver->Detach();
   
-fail_close6:     
-    fLoopbackDriver->Close();
-
 fail_close5:
     fFreewheelDriver->Close();
 
@@ -145,11 +128,8 @@ int JackServer::Close()
     jack_log("JackServer::Close");
     fChannel.Close();
     fAudioDriver->Detach();
-    if (fLoopback > 0)
-        fLoopbackDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
-    fLoopbackDriver->Close();
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
@@ -303,6 +283,36 @@ void JackServer::ClientKill(int refnum)
     if (fEngine->ClientExternalClose(refnum) < 0) {
         jack_error("JackServer::ClientKill ref = %ld cannot be closed", refnum);
     }
+}
+
+//----------------------
+// Backend management
+//----------------------
+
+JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params)
+{
+    JackDriverInfo* info = new JackDriverInfo();
+    JackDriverClientInterface* backend = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
+    if (backend == NULL) {
+        delete info;
+        return NULL;
+    } else {
+        //Stop();
+        backend->Attach();
+        fAudioDriver->AddSlave(backend);
+        //Start();
+        return info;
+    }
+}
+
+void JackServer::RemoveSlave(JackDriverInfo* info)
+{
+    JackDriverClientInterface* backend = info->GetBackend();
+    //Stop();
+    fAudioDriver->RemoveSlave(info->GetBackend());
+    backend->Detach();
+    backend->Close();
+    //Start();
 }
 
 //----------------------

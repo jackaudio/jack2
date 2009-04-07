@@ -24,7 +24,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
-#include "JackLockedEngine.h"
 #include "JackException.h"
 #include <assert.h>
 
@@ -49,9 +48,7 @@ JackMidiDriver::~JackMidiDriver()
     }
 }
 
-int JackMidiDriver::Open(jack_nframes_t buffer_size,
-                        jack_nframes_t samplerate,
-                        bool capturing,
+int JackMidiDriver::Open(bool capturing,
                         bool playing,
                         int inchannels,
                         int outchannels,
@@ -68,7 +65,7 @@ int JackMidiDriver::Open(jack_nframes_t buffer_size,
         fRingBuffer[i] = jack_ringbuffer_create(sizeof(float) * BUFFER_SIZE_MAX);
     }
   
-    return JackDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+    return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
 int JackMidiDriver::Attach()

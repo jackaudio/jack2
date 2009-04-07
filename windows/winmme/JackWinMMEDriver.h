@@ -30,13 +30,13 @@ namespace Jack
 \brief The WinMME driver.
 */
 
-#define kBuffSize			512
+#define kBuffSize	512
 
 struct MidiSlot {
 
-	LPVOID	    fHandle;	// MMSystem handler
-	short		fIndex;	    // MMSystem dev index
-	LPMIDIHDR	fHeader;	// for long msg output
+	LPVOID	    fHandle;    // MMSystem handler
+	short		fIndex;     // MMSystem dev index
+	LPMIDIHDR	fHeader;    // for long msg output
 
 	MidiSlot():fHandle(0),fIndex(0)
 	{}
@@ -64,9 +64,7 @@ class JackWinMMEDriver : public JackMidiDriver
         JackWinMMEDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         virtual ~JackWinMMEDriver();
 
-        int Open(jack_nframes_t buffer_size,
-                 jack_nframes_t samplerate,
-                 bool capturing,
+        int Open(bool capturing,
                  bool playing,
                  int chan_in,
                  int chan_out,

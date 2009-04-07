@@ -800,7 +800,8 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
         jack_error("no initialize function in shared object %s\n", driver_desc->file);
         return NULL;
     }
-
-    return fInitialize(engine, synchro, params);
+    
+    fBackend = fInitialize(engine, synchro, params);
+    return fBackend;
 }
 

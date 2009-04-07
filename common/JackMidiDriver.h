@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackDriver.h"
 #include "JackMidiPort.h"
+#include "JackLockedEngine.h"
 #include "ringbuffer.h"
 
 namespace Jack
@@ -52,9 +53,7 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
         JackMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
         virtual ~JackMidiDriver();
 
-        virtual int Open(jack_nframes_t buffer_size,
-                        jack_nframes_t samplerate,
-                        bool capturing,
+        virtual int Open(bool capturing,
                         bool playing,
                         int inchannels,
                         int outchannels,

@@ -71,17 +71,21 @@ static int process(jack_nframes_t nframes, void *arg)
 /*		printf("1st byte of 1st event addr is %p\n", in_events[0].buffer);*/
 	}
 	jack_midi_event_get(&in_event, port_buf, 0);
-	for(i=0; i<nframes; i++)
+	for(i = 0; i < nframes; i++)
 	{
-		if((in_event.time == i) && (event_index < event_count))
+		if ((in_event.time == i) && (event_index < event_count))
 		{
-			if( ((*(in_event.buffer) & 0xf0)) == 0x90 )
-			{
-				/* note on */
-				note = *(in_event.buffer + 1);
-				note_on = 1.0;
+			if (((*(in_event.buffer) & 0xf0)) == 0x90)
+			{   
+                /* note on */
+                note = *(in_event.buffer + 1);
+                if (*(in_event.buffer + 2) == 0) {
+                    note_on = 0.0;
+                } else {
+                    note_on = (float)(*(in_event.buffer + 2)) / 127.f;
+                }
 			}
-			else if( ((*(in_event.buffer)) & 0xf0) == 0x80 )
+			else if (((*(in_event.buffer)) & 0xf0) == 0x80)
 			{
 				/* note off */
 				note = *(in_event.buffer + 1);

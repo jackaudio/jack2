@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "types.h"
 #include "JackConstants.h"
+#include "JackPlatformPlug.h"
 #include <stddef.h>
 
 /** Type for raw event data contained in @ref jack_midi_event_t. */
@@ -42,7 +43,7 @@ struct jack_midi_event_t
 namespace Jack
 {
 
-struct JackMidiEvent
+struct SERVER_EXPORT JackMidiEvent
 {
     // Most MIDI events are < 4 bytes in size, so we can save a lot, storing them inplace.
     enum { INLINE_SIZE_MAX = sizeof(jack_shmsize_t) };

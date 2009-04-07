@@ -120,12 +120,12 @@ void JackClient::SetupDriverSync(bool freewheel)
         jack_log("JackClient::SetupDriverSync driver sem in flush mode");
         fSynchroTable[AUDIO_DRIVER_REFNUM].SetFlush(true);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM].SetFlush(true);
-        fSynchroTable[LOOPBACK_DRIVER_REFNUM].SetFlush(true);
+        fSynchroTable[MIDI_DRIVER_REFNUM].SetFlush(true);
     } else {
         jack_log("JackClient::SetupDriverSync driver sem in normal mode");
         fSynchroTable[AUDIO_DRIVER_REFNUM].SetFlush(false);
         fSynchroTable[FREEWHEEL_DRIVER_REFNUM].SetFlush(false);
-        fSynchroTable[LOOPBACK_DRIVER_REFNUM].SetFlush(false);
+        fSynchroTable[MIDI_DRIVER_REFNUM].SetFlush(false);
     }
 }
 

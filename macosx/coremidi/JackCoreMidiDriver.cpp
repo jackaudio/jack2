@@ -19,7 +19,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackCoreMidiDriver.h"
 #include "JackGraphManager.h"
+#include "JackServer.h"
 #include "JackEngineControl.h"
+#include "JackDriverLoader.h"
+
 #include <mach/mach_time.h>
 #include <assert.h>
 #include <iostream>
@@ -90,18 +93,16 @@ JackCoreMidiDriver::JackCoreMidiDriver(const char* name, const char* alias, Jack
 JackCoreMidiDriver::~JackCoreMidiDriver()
 {}
 
-int JackCoreMidiDriver::Open(jack_nframes_t buffer_size,
-         jack_nframes_t samplerate,
-         bool capturing,
-         bool playing,
-         int inchannels,
-         int outchannels,
-         bool monitor,
-         const char* capture_driver_name,
-         const char* playback_driver_name,
-         jack_nframes_t capture_latency,
-         jack_nframes_t playback_latency)
-{
+int JackCoreMidiDriver::Open(bool capturing,
+                             bool playing,
+                             int inchannels,
+                             int outchannels,
+                             bool monitor,
+                             const char* capture_driver_name,
+                             const char* playback_driver_name,
+                             jack_nframes_t capture_latency,
+                             jack_nframes_t playback_latency)
+                    {
     OSStatus err;
 	CFStringRef coutputStr;
 	std::string str;
@@ -111,7 +112,7 @@ int JackCoreMidiDriver::Open(jack_nframes_t buffer_size,
     fRealPlaybackChannels = MIDIGetNumberOfDestinations();
     
     // Generic JackMidiDriver Open
-    if (JackMidiDriver::Open(buffer_size, samplerate, capturing, playing, inchannels + fRealCaptureChannels, outchannels + fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
+    if (JackMidiDriver::Open(capturing, playing, inchannels + fRealCaptureChannels, outchannels + fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
         return -1;
     
     coutputStr = CFStringCreateWithCString(0, "JackMidi", CFStringGetSystemEncoding());
@@ -352,4 +353,74 @@ int JackCoreMidiDriver::Write()
 
 } // end of namespace
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor() 
+    {
+        jack_driver_desc_t * desc;
+        unsigned int i;
+
+        desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
+        strcpy(desc->name, "coremidi");                                     // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+        strcpy(desc->desc, "Apple CoreMIDI API based MIDI backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+
+        desc->nparams = 2;
+        desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+        
+        i = 0;
+        strcpy(desc->params[i].name, "inchannels");
+        desc->params[i].character = 'i';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "CoreMIDI virtual bus");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        i++;
+        strcpy(desc->params[i].name, "outchannels");
+        desc->params[i].character = 'o';
+        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].value.ui = 0;
+        strcpy(desc->params[i].short_desc, "CoreMIDI virtual bus");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+        return desc;
+    }
+
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    {
+        const JSList * node;
+        const jack_driver_param_t * param;
+        int virtual_in = 0;
+        int virtual_out = 0;
+
+        for (node = params; node; node = jack_slist_next (node)) {
+            param = (const jack_driver_param_t *) node->data;
+
+            switch (param->character) {
+
+                case 'i':
+                    virtual_in = param->value.ui;
+                    break;
+
+                case 'o':
+                    virtual_out = param->value.ui;
+                    break;
+                }
+        }
+      
+        Jack::JackDriverClientInterface* driver = new Jack::JackCoreMidiDriver("system_midi", "coremidi", engine, table);
+        if (driver->Open(1, 1, virtual_in, virtual_out, false, "in", "out", 0, 0) == 0) {
+            return driver;
+        } else {
+            delete driver;
+            return NULL;
+        }
+    }
+
+#ifdef __cplusplus
+}
+#endif
 

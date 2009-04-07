@@ -171,7 +171,7 @@ def build(bld):
         serverlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
         serverlib.env.append_value("CPPFLAGS", "-mmacosx-version-min=10.4 -arch i386 -arch ppc")
         #serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module -arch i386 -arch ppc")
-        serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework vecLib -single_module")
+        serverlib.env.append_value("LINKFLAGS", "-framework CoreAudio -framework CoreFoundation -framework vecLib -single_module")
         serverlib.env.append_value("LINKFLAGS", "-compatibility_version 1 -current_version 1")
 
     if bld.env['IS_SUN']:
