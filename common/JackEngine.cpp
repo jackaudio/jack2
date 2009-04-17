@@ -236,6 +236,7 @@ void JackEngine::NotifyClients(int event, int sync, int value1, int value2)
 
 int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* name, int refnum)
 {
+    jack_log("JackEngine::NotifyAddClient: name = %s", name);
     // Notify existing clients of the new client and new client of existing clients.
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];

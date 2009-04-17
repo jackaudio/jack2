@@ -67,7 +67,7 @@ SERVER_EXPORT void* audio_acquire(int num)
                  NULL,
                  &error)) < 0) {
 
-        jack_error ("Failed to acquire device: %s\n", error.message ? error.message : strerror(-e));
+        jack_error("Failed to acquire device: %s", error.message ? error.message : strerror(-e));
         return NULL;
     }
 
@@ -89,5 +89,7 @@ SERVER_EXPORT void audio_release(void* dev)
    if (device) {
         jack_info("Release audio card");
         rd_release(device);
+   } else {
+        jack_info("No audio card to release...");
    }
 }

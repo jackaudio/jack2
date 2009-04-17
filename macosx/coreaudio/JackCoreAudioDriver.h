@@ -115,6 +115,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
 
         // Setup
+        OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice);
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,

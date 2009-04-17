@@ -119,7 +119,7 @@ JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient()
     fOverlap.hEvent = CreateEvent(NULL,     // default security attribute
                                   TRUE,     // manual-reset event
                                   TRUE,     // initial state = signaled
-                                  NULL);   // unnamed event object
+                                  NULL);    // unnamed event object
 }
 
 JackWinAsyncNamedPipeClient::JackWinAsyncNamedPipeClient(HANDLE pipe, bool pending)
