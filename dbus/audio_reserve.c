@@ -67,7 +67,7 @@ SERVER_EXPORT void* audio_acquire(int num)
                  NULL,
                  &error)) < 0) {
 
-        jack_error("Failed to acquire device: %s", error.message ? error.message : strerror(-e));
+        jack_error("Failed to acquire device name : %s error : %s", audio_name, (error.message ? error.message : strerror(-e)));
         return NULL;
     }
 
