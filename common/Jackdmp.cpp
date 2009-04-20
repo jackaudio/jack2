@@ -217,7 +217,6 @@ int main(int argc, char* argv[])
     }
 
     server_parameters = jackctl_server_get_parameters(server_ctl);
-
     opterr = 0;
     while (!seen_audio_driver &&
             (opt = getopt_long(argc, argv, options,

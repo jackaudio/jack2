@@ -28,7 +28,7 @@ Paul Davis
 2009-04-20 Stephane Letz  <letz@grame.fr>
 
 	* In ALSA audio card reservation code, tries to open the card even if reservation fails.
-	* Clock source setting on Linux (in progress).
+	* Clock source setting on Linux.
 
 2009-04-08 Stephane Letz  <letz@grame.fr>
 
