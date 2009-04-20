@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-04-20 Stephane Letz  <letz@grame.fr>
+
+	* In ALSA audio card reservation code, tries to open the card even if reservation fails.
+
 2009-04-08 Stephane Letz  <letz@grame.fr>
 
 	* Native MIDI backend (JackCoreMidiDriver, JackWinMMEDriver) in progress.

@@ -2193,19 +2193,16 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     } else if (strcmp(capture_driver_name, playback_driver_name) == 0) {    // Same device for input and output 
 	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
     	if (fReservedCaptureDevice == NULL) {
-        	jack_error("Error audio device %s not available...", capture_driver_name);
-        	return -1;
+        	jack_error("Error audio device %s cannot be acquired, trying to open it anyway...", capture_driver_name);
     	}
     } else {
     	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
     	if (fReservedCaptureDevice == NULL) {
-        	jack_error("Error capture audio device %s not available...", capture_driver_name);
-        	return -1;
-    	}
+        	jack_error("Error capture audio device %s cannot be acquired, trying to open it anyway...", capture_driver_name);
+     	}
     	fReservedPlaybackDevice = audio_acquire(card_to_num(playback_driver_name));
     	if (fReservedPlaybackDevice == NULL) {
-        	jack_error("Error playback audio device %s not available...", playback_driver_name);
-        	return -1;
+        	jack_error("Error playback audio device %s cannot be acquired, trying to open it anyway...", playback_driver_name);
     	}
     }
 #endif
