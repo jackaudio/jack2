@@ -23,6 +23,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #endif
 
 #include "JackTime.h"
+#include "JackTypes.h"
 #include <unistd.h>
 
 SERVER_EXPORT void JackSleep(long usec) 
