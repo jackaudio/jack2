@@ -1346,6 +1346,9 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 			/* if POLLIN was the only bit set, we're OK */
 
 			*status = 0;
+            if (driver->pfd[nfds-1].revents == POLLIN) {
+                jack_error("driver->pfd[nfds-1].revents == POLLIN");
+            }
 			return (driver->pfd[nfds-1].revents == POLLIN) ? 0 : -1;
 		}
 
@@ -2191,8 +2194,8 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     if (audio_reservation_init() < 0) {
 	jack_error("Audio device reservation service not available....");
     } else if (strcmp(capture_driver_name, playback_driver_name) == 0) {    // Same device for input and output 
-	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
-    	if (fReservedCaptureDevice == NULL) {
+        fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
+        if (fReservedCaptureDevice == NULL) {
         	jack_error("Error audio device %s cannot be acquired, trying to open it anyway...", capture_driver_name);
     	}
     } else {
