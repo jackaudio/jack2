@@ -50,7 +50,7 @@ class SERVER_EXPORT JackServer
         JackDriverInfo fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
-        JackDriverClientInterface* fGenericMidiDriver;
+        JackDriverClientInterface* fLoopbackDriver;
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
@@ -58,6 +58,7 @@ class SERVER_EXPORT JackServer
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
+        long fLoopback;
         
         int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status);
 

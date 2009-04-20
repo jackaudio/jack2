@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
+#include "JackLoopbackDriver.h"
 #include "JackThreadedDriver.h"
 #include "JackGlobals.h"
 #include "JackLockedEngine.h"
@@ -30,7 +31,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
-#include "JackMidiDriver.h"
 #include "JackInternalClient.h"
 #include "JackError.h"
 #include "JackMessageBuffer.h"
@@ -50,9 +50,10 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
-    fGenericMidiDriver = new JackMidiDriver("midi_system", "", fEngine, GetSynchroTable());  // TEMPORARY
+    fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
     fAudioDriver = NULL;
     fFreewheel = false;
+    fLoopback = loopback;
     JackServerGlobals::fInstance = this;   // Unique instance
     JackServerGlobals::fUserCount = 1;     // One user
     jack_verbose = verbose;
@@ -62,8 +63,8 @@ JackServer::~JackServer()
 {
     delete fGraphManager;
     delete fAudioDriver;
-    delete fGenericMidiDriver; // TEMPORARY 
     delete fFreewheelDriver;
+    delete fLoopbackDriver;
     delete fEngine;
     delete fEngineControl;
 }
@@ -87,27 +88,41 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         jack_error("Cannot initialize driver");
         goto fail_close3;
     }
-    
-    fGenericMidiDriver->Open(1, 1, 0, 0, 0, "", "", 0, 0); // TEMPORARY
  
     if (fFreewheelDriver->Open() != 0) { // before engine open
         jack_error("Cannot open driver");
         goto fail_close4;
     }
     
+    if (fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
+        jack_error("Cannot open driver");
+        goto fail_close5;
+    }
+
     if (fAudioDriver->Attach() != 0) {
         jack_error("Cannot attach audio driver");
-        goto fail_close5;
+        goto fail_close6;
+    }
+   
+    if (fLoopback > 0 && fLoopbackDriver->Attach() != 0) {
+        jack_error("Cannot attach loopback driver");
+        goto fail_close7;
     }
  
     fFreewheelDriver->SetMaster(false);
-    fGenericMidiDriver->SetMaster(false); // TEMPORARY
     fAudioDriver->SetMaster(true);
+    if (fLoopback > 0)
+        fAudioDriver->AddSlave(fLoopbackDriver);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
-    fAudioDriver->AddSlave(fGenericMidiDriver); // TEMPORARY
     InitTime();
     return 0;
+
+fail_close7:     
+    fAudioDriver->Detach();
   
+fail_close6:     
+    fLoopbackDriver->Close();
+
 fail_close5:
     fFreewheelDriver->Close();
 
@@ -130,9 +145,11 @@ int JackServer::Close()
     jack_log("JackServer::Close");
     fChannel.Close();
     fAudioDriver->Detach();
+    if (fLoopback > 0)
+        fLoopbackDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
-    fGenericMidiDriver->Close(); // TEMPORARY
+    fLoopbackDriver->Close();
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
