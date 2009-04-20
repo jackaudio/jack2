@@ -23,15 +23,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "types.h"
 #include "JackCompilerDeps.h"
+#include "JackTypes.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-	SERVER_EXPORT void InitTime();	
-	SERVER_EXPORT jack_time_t GetMicroSeconds();
-	SERVER_EXPORT void JackSleep(long usec);
+    SERVER_EXPORT void InitTime();	
+    SERVER_EXPORT jack_time_t GetMicroSeconds();
+    SERVER_EXPORT void JackSleep(long usec);
+    SERVER_EXPORT void SetClockSource(jack_timer_type_t source);
+    SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source);
 
 #ifdef __cplusplus
 }

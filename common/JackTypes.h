@@ -49,16 +49,4 @@ typedef enum {
     Finished,
 } jack_client_state_t;
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-SERVER_EXPORT void SetClockSource(jack_timer_type_t source);
-SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source);
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif
