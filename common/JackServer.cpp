@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, jack_timer_type_t clock, const char* server_name)
 {
     if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
@@ -47,7 +47,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     }
 
     fGraphManager = new JackGraphManager();
-    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
+    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
     fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
@@ -115,6 +115,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         fAudioDriver->AddSlave(fLoopbackDriver);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
     InitTime();
+    SetClockSource(fEngineControl->fClockSource);
     return 0;
 
 fail_close7:     

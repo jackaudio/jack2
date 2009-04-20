@@ -41,3 +41,11 @@ SERVER_EXPORT jack_time_t GetMicroSeconds(void)
 	QueryPerformanceCounter(&t1);
 	return (jack_time_t)(((double)t1.QuadPart) / ((double)_jack_freq.QuadPart));		
 }
+
+SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
+{}
+
+SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source)
+{
+    return "";
+}

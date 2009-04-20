@@ -35,3 +35,10 @@ SERVER_EXPORT jack_time_t GetMicroSeconds(void)
     return (jack_time_t)(gethrtime() / 1000);
 }
 
+SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
+{}
+
+SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source)
+{
+    return "";
+}

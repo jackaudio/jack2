@@ -99,3 +99,11 @@ SERVER_EXPORT void JackSleep(long usec)
 	}
 	
 #endif 
+
+SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
+{}
+
+SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source)
+{
+    return "";
+}

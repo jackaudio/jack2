@@ -568,7 +568,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     CFRelease(captureDeviceUID);
     CFRelease(playbackDeviceUID);
     
-    jack_log("New aggregate device %ld\n", *outAggregateDevice);
+    jack_log("New aggregate device %ld", *outAggregateDevice);
     return noErr;
 }
 
