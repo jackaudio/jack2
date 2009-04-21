@@ -2277,7 +2277,7 @@ int JackAlsaDriver::Read()
         /* we detected an xrun and restarted: notify
          * clients about the delay. 
          */
-        jack_log("ALSA XRun");
+        jack_log("ALSA XRun wait_status = %d", wait_status);
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
         return -1;
     }
