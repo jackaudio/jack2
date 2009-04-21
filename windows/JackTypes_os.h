@@ -21,11 +21,11 @@
 #define __JackTypes_WIN32__
 
 #include <windows.h>
+#include "types.h"
 
 typedef ULONGLONG UInt64;
 typedef unsigned short uint16_t;
 typedef DWORD jack_tls_key;
-typedef HANDLE pthread_t;
 
 #endif
 
