@@ -39,6 +39,20 @@
 
 #ifdef __linux__
 
+#ifdef __x86_64__
+
+typedef unsigned long cycles_t;
+extern cycles_t cacheflush_time;
+
+static inline unsigned long get_cycles(void)
+{
+    unsigned int hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    return (((unsigned long)hi)<<32) | ((unsigned long)lo);
+}
+
+#endif
+
 #ifdef __PPC__
 
 /* PowerPC */
