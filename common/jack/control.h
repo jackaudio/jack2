@@ -511,12 +511,21 @@ jack_log(
 /* @} */
 
 bool 
-jackctl_server_load_slave(jackctl_server_t * server,
+jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
 bool 
-jackctl_server_unload_slave(jackctl_server_t * server,
+jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
+                            
+bool 
+jackctl_server_load_master(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
+
+bool 
+jackctl_server_unload_master(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
+                            
 
 #if 0
 { /* Adjust editor indent */

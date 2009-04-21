@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-04-21 Stephane Letz  <letz@grame.fr>
+
+	* Add jackctl_server_load_master/jackctl_server_unload_master API.
+
 2009-04-20 Stephane Letz  <letz@grame.fr>
 
 	* In ALSA audio card reservation code, tries to open the card even if reservation fails.

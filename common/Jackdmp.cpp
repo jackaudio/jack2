@@ -416,7 +416,7 @@ int main(int argc, char* argv[])
             goto fail_free;
         }
 
-        jackctl_server_load_slave(server_ctl, midi_driver_ctl);
+        jackctl_server_add_slave(server_ctl, midi_driver_ctl);
     }
     */
 
