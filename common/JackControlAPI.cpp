@@ -1196,20 +1196,19 @@ EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_dri
 {
     if (server_ptr->engine != NULL) {
         server_ptr->engine->RemoveSlave(driver_ptr->info);
+        delete driver_ptr->info;
         return true;
     } else {
         return false;
     }
 }
 
-EXPORT bool jackctl_server_load_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
+EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
-    // TODO
-    return false;
+    if (server_ptr->engine != NULL) {
+        return (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, driver_ptr->set_parameters) == 0);
+    } else {
+        return false;
+    }
 }
 
-EXPORT bool jackctl_server_unload_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
-{
-    // TODO
-    return false;
-}

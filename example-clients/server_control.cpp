@@ -53,6 +53,24 @@ static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server
     return NULL;
 }
 
+static jackctl_parameter_t *
+jackctl_get_parameter(
+    const JSList * parameters_list,
+    const char * parameter_name)
+{
+    while (parameters_list)
+    {
+        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0)
+        {
+            return (jackctl_parameter_t *)parameters_list->data;
+        }
+
+        parameters_list = jack_slist_next(parameters_list);
+    }
+
+    return NULL;
+}
+
 static void print_value(union jackctl_parameter_value value, jackctl_param_type_t type)
 {
     switch (type) {
@@ -152,6 +170,16 @@ int main(int argc, char *argv[])
 	server = jackctl_server_create();
     parameters = jackctl_server_get_parameters(server);
     
+    /*
+    jackctl_parameter_t* param;
+    union jackctl_parameter_value value;
+    param = jackctl_get_parameter(parameters, "verbose");
+    if (param != NULL) {
+        value.b = true;
+        jackctl_parameter_set_value(param, &value);
+    }
+    */
+    
     printf("\n========================== \n");
     printf("List of server parameters \n");
     printf("========================== \n");
@@ -182,7 +210,24 @@ int main(int argc, char *argv[])
     
     jackctl_server_start(server, jackctl_server_get_driver(server, driver_name));
     jackctl_server_load_internal(server, jackctl_server_get_internal(server, client_name));
-     
+    
+    /*
+    // Switch master test
+    
+    jackctl_driver_t* master;
+    
+    usleep(5000000);
+    printf("jackctl_server_load_master\n");
+    master = jackctl_server_get_driver(server, "coreaudio");
+    jackctl_server_switch_master(server, master);
+    
+    usleep(5000000);
+    printf("jackctl_server_load_master\n");
+    master = jackctl_server_get_driver(server, "dummy");
+    jackctl_server_switch_master(server, master);
+    
+    */
+      
     signals = jackctl_setup_signals(0);
     jackctl_wait_signals(signals);
      

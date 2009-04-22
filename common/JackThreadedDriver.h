@@ -91,6 +91,7 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual bool GetMaster();
         virtual void AddSlave(JackDriverInterface* slave);
         virtual void RemoveSlave(JackDriverInterface* slave);
+        virtual std::list<JackDriverInterface*> GetSlaves();
         virtual int ProcessSlaves();
         
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);

@@ -93,6 +93,7 @@ class SERVER_EXPORT JackDriverInterface
         virtual bool GetMaster() = 0;
         virtual void AddSlave(JackDriverInterface* slave) = 0;
         virtual void RemoveSlave(JackDriverInterface* slave) = 0;
+        virtual std::list<JackDriverInterface*> GetSlaves() = 0;
         virtual int ProcessSlaves() = 0;
         
         virtual bool IsRealTime() const = 0;
@@ -148,8 +149,13 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         
         void SetMaster(bool onoff);
         bool GetMaster();
+        
         void AddSlave(JackDriverInterface* slave);
         void RemoveSlave(JackDriverInterface* slave);
+        std::list<JackDriverInterface*> GetSlaves()
+        {
+            return fSlaveList;
+        }
         int ProcessSlaves();
       
         virtual int Open();

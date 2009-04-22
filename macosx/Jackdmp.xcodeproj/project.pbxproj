@@ -577,6 +577,8 @@
 		4BF284190F31B4BC00B05BE3 /* JackArgParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF284170F31B4BC00B05BE3 /* JackArgParser.h */; };
 		4BF2841A0F31B4BC00B05BE3 /* JackArgParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF284160F31B4BC00B05BE3 /* JackArgParser.cpp */; };
 		4BF2841B0F31B4BC00B05BE3 /* JackArgParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF284170F31B4BC00B05BE3 /* JackArgParser.h */; };
+		4BF2F4210F9F4DA300B3FFAD /* JackDummyDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */; };
+		4BF2F4220F9F4DA700B3FFAD /* JackDummyDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3988908B3CF6C00B6F371 /* JackDummyDriver.cpp */; };
 		4BF339160F8B86DC0080FB5B /* JackCoreMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */; };
 		4BF339170F8B86DC0080FB5B /* JackCoreMidiDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF339150F8B86DC0080FB5B /* JackCoreMidiDriver.cpp */; };
 		4BF339180F8B86DC0080FB5B /* JackCoreMidiDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */; };
@@ -5475,6 +5477,7 @@
 				4BECB2FB0F4451C10091B70A /* JackProcessSync.cpp in Sources */,
 				4BF339190F8B86DC0080FB5B /* JackCoreMidiDriver.cpp in Sources */,
 				4BF339210F8B873E0080FB5B /* JackMidiDriver.cpp in Sources */,
+				4BF2F4220F9F4DA700B3FFAD /* JackDummyDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5855,6 +5858,7 @@
 				4BBAE4110F42FA6100B8BD3F /* JackEngineProfiling.cpp in Sources */,
 				4BECB2F50F4451C10091B70A /* JackProcessSync.cpp in Sources */,
 				4BF339230F8B873E0080FB5B /* JackMidiDriver.cpp in Sources */,
+				4BF2F4210F9F4DA300B3FFAD /* JackDummyDriver.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

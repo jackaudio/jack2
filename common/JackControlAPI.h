@@ -227,11 +227,7 @@ EXPORT bool jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
 EXPORT bool 
-jackctl_server_load_master(jackctl_server_t * server,
-                            jackctl_driver_t * driver);
-
-EXPORT bool 
-jackctl_server_unload_master(jackctl_server_t * server,
+jackctl_server_switch_master(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
 #if 0

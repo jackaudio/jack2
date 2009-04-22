@@ -132,6 +132,11 @@ int JackThreadedDriver::ProcessSlaves()
     return fDriver->ProcessSlaves();
 }
 
+std::list<JackDriverInterface*> JackThreadedDriver::GetSlaves()
+{
+    return fDriver->GetSlaves();
+}
+
 int JackThreadedDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
 {
     return fDriver->ClientNotify(refnum, name, notify, sync, value1, value2);
