@@ -105,6 +105,17 @@ jack_control_run_method(
             jack_controller_control_send_signal_server_stopped();
         }
     }
+    else if (strcmp (call->method_name, "SwitchMaster") == 0)
+    {
+        if (!jack_controller_switch_master(controller_ptr, call))
+        {
+            jack_error ("Failed to switch master");
+        }
+        else
+        {
+            jack_controller_control_send_signal_server_stopped();
+        }
+    }
     else if (strcmp (call->method_name, "GetLoad") == 0)
     {
         if (!controller_ptr->started)
@@ -252,6 +263,9 @@ JACK_DBUS_METHOD_ARGUMENTS_END
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(StopServer)
 JACK_DBUS_METHOD_ARGUMENTS_END
 
+JACK_DBUS_METHOD_ARGUMENTS_BEGIN(SwitchMaster)
+JACK_DBUS_METHOD_ARGUMENTS_END
+
 JACK_DBUS_METHOD_ARGUMENTS_BEGIN(GetLoad)
     JACK_DBUS_METHOD_ARGUMENT("load", "d", true)
 JACK_DBUS_METHOD_ARGUMENTS_END
@@ -295,6 +309,7 @@ JACK_DBUS_METHODS_BEGIN
     JACK_DBUS_METHOD_DESCRIBE(IsStarted, NULL)
     JACK_DBUS_METHOD_DESCRIBE(StartServer, NULL)
     JACK_DBUS_METHOD_DESCRIBE(StopServer, NULL)
+    JACK_DBUS_METHOD_DESCRIBE(SwitchMaster, NULL)
     JACK_DBUS_METHOD_DESCRIBE(GetLoad, NULL)
     JACK_DBUS_METHOD_DESCRIBE(GetXruns, NULL)
     JACK_DBUS_METHOD_DESCRIBE(GetSampleRate, NULL)

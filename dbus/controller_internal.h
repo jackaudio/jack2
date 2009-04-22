@@ -82,6 +82,11 @@ jack_controller_stop_server(
     void *dbus_call_context_ptr);
 
 bool
+jack_controller_switch_master(
+    struct jack_controller *controller_ptr,
+    void *dbus_call_context_ptr);
+
+bool
 jack_controller_select_driver(
     struct jack_controller *controller_ptr,
     const char * driver_name);

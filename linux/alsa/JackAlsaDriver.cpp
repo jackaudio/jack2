@@ -51,6 +51,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "audio_reserve.h"
 
+//#define DEBUG_WAKEUP 1
+
 namespace Jack
 {
 

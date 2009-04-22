@@ -109,6 +109,7 @@ def main():
         print "    status                     - check whether jack server is started, return value is 0 if runing and 1 otherwise"
         print "    start                      - start jack server if not currently started"
         print "    stop                       - stop jack server if currenly started"
+	print "    sm                         - switch master to currently selected driver"
         print "    dl                         - get list of available drivers"
         print "    dg                         - get currently selected driver"
         print "    ds <driver>                - select driver"
@@ -155,6 +156,9 @@ def main():
             elif arg == 'stop':
                 print "--- stop"
                 control_iface.StopServer()
+	    elif arg == 'sm':
+                print "--- switch master driver"
+                control_iface.SwitchMaster()
             elif arg == 'ism':
                 if control_iface.IsManuallyActivated():
                     print "Manually activated"
