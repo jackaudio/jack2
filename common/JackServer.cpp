@@ -346,7 +346,9 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* master = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
     
-    if (master == NULL) {
+    if (master == NULL || info == NULL) {
+        delete info;
+        delete master;
         return -1;
     } else {
     

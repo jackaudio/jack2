@@ -25,7 +25,7 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
-2009-04-21 Stephane Letz  <letz@grame.fr>
+2009-04-22 Stephane Letz  <letz@grame.fr>
 
 	* jackctl_server_load_master renamed to jackctl_server_switch_master, jackctl_server_unload_master is removed.
 
