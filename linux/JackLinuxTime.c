@@ -73,7 +73,7 @@ static int jack_hpet_init ()
 
 	hpet_ptr = (unsigned char *) mmap(NULL, HPET_MMAP_SIZE,
 					  PROT_READ, MAP_SHARED, hpet_fd, 0);
-	if (hpet_ptr == NULL) {
+	if (hpet_ptr == MAP_FAILED) {
 		jack_error ("This system has no mappable HPET device (%s)", strerror (errno));
 		close (hpet_fd);
 		return -1;
