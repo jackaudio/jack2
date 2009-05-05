@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackInternalClient.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
+#include "JackServerGlobals.h"
 #include "JackGlobals.h"
 #include "JackChannel.h"
 #include "JackError.h"
@@ -71,7 +72,7 @@ int JackEngine::Close()
     fChannel.Close();
 
     // Close remaining clients (RT is stopped)
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+    for (int i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
         if (JackLoadableInternalClient* loadable_client = dynamic_cast<JackLoadableInternalClient*>(fClientTable[i])) {
             jack_log("JackEngine::Close loadable client = %s", loadable_client->GetClientControl()->fName);
             loadable_client->Close();
@@ -110,7 +111,7 @@ void JackEngine::ReleaseRefnum(int ref)
 
     if (fEngineControl->fTemporary) {
         int i;
-        for (i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+        for (i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
             if (fClientTable[i])
                 break;
         }
@@ -180,7 +181,7 @@ correctly mixed in the time window: callbackUsecs <==> Read <==> Write.
 
 void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions de fin
 {
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+    for (int i = fEngineControl->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client && client->GetClientControl()->fActive) {
             JackClientTiming* timing = fGraphManager->GetClientTiming(i);

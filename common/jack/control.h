@@ -511,10 +511,10 @@ jack_log(
 /* @} */
 
 /** 
- * Call this function to add a slave in the backend slave list.
+ * Call this function to add a slave in the driver slave list.
  * 
  * @param server server object handle
- * @param driver driver to add in the backend slave list.
+ * @param driver driver to add in the driver slave list.
  * 
  * @return success status: true - success, false - fail
  */ 
@@ -523,10 +523,10 @@ jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
 /** 
- * Call this function to remove a slave from the backend slave list.
+ * Call this function to remove a slave from the driver slave list.
  * 
  * @param server server object handle
- * @param driver driver to remove from the backend slave list.
+ * @param driver driver to remove from the driver slave list.
  * 
  * @return success status: true - success, false - fail
  */ 
@@ -535,7 +535,7 @@ jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
 /** 
- * Call this function to switch master backend.
+ * Call this function to switch master driver.
  * 
  * @param server server object handle
  * @param driver driver to switch to

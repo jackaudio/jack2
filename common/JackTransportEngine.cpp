@@ -21,6 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTransportEngine.h"
 #include "JackClientInterface.h"
 #include "JackClientControl.h"
+#include "JackEngineControl.h"
+#include "JackGlobals.h"
 #include "JackError.h"
 #include "JackTime.h"
 #include <assert.h>
@@ -89,7 +91,7 @@ int JackTransportEngine::SetTimebaseMaster(int refnum, bool conditionnal)
 // RT
 bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
 {
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client && client->GetClientControl()->fTransportState != JackTransportRolling) {
             jack_log("CheckAllRolling ref = %ld is not rolling", i);
@@ -103,7 +105,7 @@ bool JackTransportEngine::CheckAllRolling(JackClientInterface** table)
 // RT
 void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
 {
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
             JackClientControl* control = client->GetClientControl();
@@ -119,7 +121,7 @@ void JackTransportEngine::MakeAllStartingLocating(JackClientInterface** table)
 // RT
 void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
 {
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
             JackClientControl* control = client->GetClientControl();
@@ -134,7 +136,7 @@ void JackTransportEngine::MakeAllStopping(JackClientInterface** table)
 // RT
 void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
 {
-    for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+    for (int i = GetEngineControl()->fDriverNum; i < CLIENT_NUM; i++) {
         JackClientInterface* client = table[i];
         if (client) {
             JackClientControl* control = client->GetClientControl();

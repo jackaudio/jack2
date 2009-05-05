@@ -64,6 +64,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     char fServerName[64];
     JackTransportEngine fTransport;
     jack_timer_type_t fClockSource;
+    int fDriverNum;
     bool fVerbose;
 
     // CPU Load
@@ -115,7 +116,8 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fMaxDelayedUsecs = 0.f;
         fXrunDelayedUsecs = 0.f;
         fClockSource = clock;
-    }
+        fDriverNum = 0;
+   }
     
     ~JackEngineControl()
     {}

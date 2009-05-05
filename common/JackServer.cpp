@@ -51,7 +51,6 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
-    fLoopbackDriver = new JackLoopbackDriver(fEngine, GetSynchroTable());
     fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
     fFreewheel = false;
@@ -67,7 +66,6 @@ JackServer::~JackServer()
     delete fAudioDriver;
     delete fDriverInfo;
     delete fFreewheelDriver;
-    delete fLoopbackDriver;
     delete fEngine;
     delete fEngineControl;
 }
@@ -96,36 +94,18 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         jack_error("Cannot open driver");
         goto fail_close4;
     }
-    
-    if (fLoopbackDriver->Open(fEngineControl->fBufferSize, fEngineControl->fSampleRate, 1, 1, fLoopback, fLoopback, false, "loopback", "loopback", 0, 0) != 0) {
-        jack_error("Cannot open driver");
-        goto fail_close5;
-    }
-
+ 
     if (fAudioDriver->Attach() != 0) {
         jack_error("Cannot attach audio driver");
-        goto fail_close6;
+        goto fail_close5;
     }
    
-    if (fLoopback > 0 && fLoopbackDriver->Attach() != 0) {
-        jack_error("Cannot attach loopback driver");
-        goto fail_close7;
-    }
- 
     fFreewheelDriver->SetMaster(false);
     fAudioDriver->SetMaster(true);
-    if (fLoopback > 0)
-        fAudioDriver->AddSlave(fLoopbackDriver);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
     InitTime();
     SetClockSource(fEngineControl->fClockSource);
     return 0;
-
-fail_close7:     
-    fAudioDriver->Detach();
-  
-fail_close6:     
-    fLoopbackDriver->Close();
 
 fail_close5:
     fFreewheelDriver->Close();
@@ -149,11 +129,8 @@ int JackServer::Close()
     jack_log("JackServer::Close");
     fChannel.Close();
     fAudioDriver->Detach();
-    if (fLoopback > 0)
-        fLoopbackDriver->Detach();
     fAudioDriver->Close();
     fFreewheelDriver->Close();
-    fLoopbackDriver->Close();
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
