@@ -28,6 +28,7 @@ Paul Davis
 2009-05-06 Stephane Letz  <letz@grame.fr>
 
 	* Fix transport callback (timebase master, sync) issue when used after jack_activate (RT thread was not running).
+	* D-Bus access for jackctl_server_add_slave/jackctl_server_remove_slave API.
 
 2009-05-05 Stephane Letz  <letz@grame.fr>
 

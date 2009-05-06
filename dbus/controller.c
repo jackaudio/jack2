@@ -392,6 +392,44 @@ fail:
 }
 
 bool
+jack_controller_add_slave(
+    struct jack_controller *controller_ptr,
+    const char * driver_name)
+{
+    jackctl_driver_t *driver;
+
+    driver = jack_controller_find_driver(controller_ptr->server, driver_name);
+      
+    if (driver == NULL)
+    {
+        return false;
+    }
+
+    jack_info("driver \"%s\" selected", driver_name);
+
+    return jackctl_server_add_slave(controller_ptr->server, driver);
+}
+
+bool
+jack_controller_remove_slave(
+    struct jack_controller *controller_ptr,
+    const char * driver_name)
+{
+    jackctl_driver_t *driver;
+
+    driver = jack_controller_find_driver(controller_ptr->server, driver_name);
+      
+    if (driver == NULL)
+    {
+        return false;
+    }
+
+    jack_info("driver \"%s\" selected", driver_name);
+
+    return jackctl_server_remove_slave(controller_ptr->server, driver);
+}
+
+bool
 jack_controller_load_internal(
     struct jack_controller *controller_ptr,
     const char * internal_name)
