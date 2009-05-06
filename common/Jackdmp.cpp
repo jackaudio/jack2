@@ -97,6 +97,9 @@ static void usage(FILE* file)
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
             "               [ --midi OR -X midi-driver ]\n"
             "               [ --verbose OR -v ]\n"
+#ifdef __linux__
+            "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
+#endif
             "               [ --replace-registry OR -r ]\n"
             "               [ --silent OR -s ]\n"
             "               [ --sync OR -S ]\n"
@@ -156,8 +159,17 @@ int main(int argc, char* argv[])
     const char* server_name = "default";
     jackctl_driver_t * audio_driver_ctl;
     jackctl_driver_t * midi_driver_ctl;
+    
+#ifdef __linux__
+    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:c:";
+#else
     const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:";
+#endif
+    
     struct option long_options[] = {
+#ifdef __linux__
+                                       { "clock-source", 1, 0, 'c' },
+#endif
                                        { "audio-driver", 1, 0, 'd' },
                                        { "midi-driver", 1, 0, 'X' },
                                        { "verbose", 0, 0, 'v' },
@@ -177,6 +189,7 @@ int main(int argc, char* argv[])
                                        { "sync", 0, 0, 'S' },
                                        { 0, 0, 0, 0 }
                                    };
+
     int i,opt = 0;
     int option_index = 0;
     bool seen_audio_driver = false;
@@ -204,12 +217,32 @@ int main(int argc, char* argv[])
     }
 
     server_parameters = jackctl_server_get_parameters(server_ctl);
-
     opterr = 0;
     while (!seen_audio_driver &&
             (opt = getopt_long(argc, argv, options,
                                long_options, &option_index)) != EOF) {
         switch (opt) {
+
+        #ifdef __linux__        
+            case 'c':
+                param = jackctl_get_parameter(server_parameters, "clock-source");
+                if (param != NULL) {
+                    if (tolower (optarg[0]) == 'h') {
+                        value.ui = JACK_TIMER_HPET;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (tolower (optarg[0]) == 'c') {
+                        value.ui = JACK_TIMER_CYCLE_COUNTER;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (tolower (optarg[0]) == 's') {
+                        value.ui = JACK_TIMER_SYSTEM_CLOCK;
+                        jackctl_parameter_set_value(param, &value);
+                    } else {
+                        usage(stdout);
+                        goto fail_free;
+                    }
+                }
+                break;
+        #endif
 
             case 'd':
                 seen_audio_driver = true;
@@ -382,7 +415,7 @@ int main(int argc, char* argv[])
             goto fail_free;
         }
 
-        jackctl_server_load_slave(server_ctl, midi_driver_ctl);
+        jackctl_server_add_slave(server_ctl, midi_driver_ctl);
     }
 
     notify_server_start(server_name);

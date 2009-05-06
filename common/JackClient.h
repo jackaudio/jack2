@@ -108,6 +108,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         inline void CycleSignalAux(int status);
         inline void CallSyncCallbackAux();
         inline void CallTimebaseCallbackAux();
+        inline int ActivateAux();
    
     public:
 

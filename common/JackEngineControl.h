@@ -63,6 +63,8 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     int fMaxClientPriority;
     char fServerName[64];
     JackTransportEngine fTransport;
+    jack_timer_type_t fClockSource;
+    int fDriverNum;
     bool fVerbose;
 
     // CPU Load
@@ -88,7 +90,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     JackEngineProfiling fProfiler;
 #endif   
 
-    JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, const char* server_name)
+    JackEngineControl(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
     {
         fBufferSize = 512;
         fSampleRate = 48000;
@@ -113,7 +115,9 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fConstraint = 0;
         fMaxDelayedUsecs = 0.f;
         fXrunDelayedUsecs = 0.f;
-    }
+        fClockSource = clock;
+        fDriverNum = 0;
+   }
     
     ~JackEngineControl()
     {}

@@ -22,6 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackServerGlobals.h"
 #include "JackTime.h"
 #include "JackFreewheelDriver.h"
+#include "JackLoopbackDriver.h"
+#include "JackDummyDriver.h"
 #include "JackThreadedDriver.h"
 #include "JackGlobals.h"
 #include "JackLockedEngine.h"
@@ -37,7 +39,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, jack_timer_type_t clock, const char* server_name)
 {
     if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
@@ -46,11 +48,13 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     }
 
     fGraphManager = new JackGraphManager();
-    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, server_name);
+    fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
+    fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
     fFreewheel = false;
+    fLoopback = loopback;
     JackServerGlobals::fInstance = this;   // Unique instance
     JackServerGlobals::fUserCount = 1;     // One user
     jack_verbose = verbose;
@@ -60,6 +64,7 @@ JackServer::~JackServer()
 {
     delete fGraphManager;
     delete fAudioDriver;
+    delete fDriverInfo;
     delete fFreewheelDriver;
     delete fEngine;
     delete fEngineControl;
@@ -80,7 +85,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close2;
     }
 
-    if ((fAudioDriver = fDriverInfo.Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
+    if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
         jack_error("Cannot initialize driver");
         goto fail_close3;
     }
@@ -89,18 +94,19 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         jack_error("Cannot open driver");
         goto fail_close4;
     }
-    
+ 
     if (fAudioDriver->Attach() != 0) {
         jack_error("Cannot attach audio driver");
         goto fail_close5;
     }
- 
+   
     fFreewheelDriver->SetMaster(false);
     fAudioDriver->SetMaster(true);
     fAudioDriver->AddSlave(fFreewheelDriver); // After ???
     InitTime();
+    SetClockSource(fEngineControl->fClockSource);
     return 0;
-  
+
 fail_close5:
     fFreewheelDriver->Close();
 
@@ -287,23 +293,64 @@ void JackServer::ClientKill(int refnum)
 JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
     JackDriverInfo* info = new JackDriverInfo();
-    JackDriverClientInterface* backend = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
-    if (backend == NULL) {
+    JackDriverClientInterface* slave = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
+    if (slave == NULL) {
         delete info;
         return NULL;
     } else {
-        backend->Attach();
-        fAudioDriver->AddSlave(backend);
+        slave->Attach();
+        fAudioDriver->AddSlave(slave);
         return info;
     }
 }
 
 void JackServer::RemoveSlave(JackDriverInfo* info)
 {
-    JackDriverClientInterface* backend = info->GetBackend();
-    fAudioDriver->RemoveSlave(info->GetBackend());
-    backend->Detach();
-    backend->Close();
+    JackDriverClientInterface* slave = info->GetBackend();
+    fAudioDriver->RemoveSlave(slave);
+    slave->Detach();
+    slave->Close();
+}
+
+int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_params)
+{
+    /// Remove current master
+    fAudioDriver->Stop();
+    fAudioDriver->Detach();
+    fAudioDriver->Close();
+    
+    // Open new master
+    JackDriverInfo* info = new JackDriverInfo();
+    JackDriverClientInterface* master = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
+    
+    if (master == NULL || info == NULL) {
+        delete info;
+        delete master;
+        return -1;
+    } else {
+    
+        // Get slaves list
+        std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
+        std::list<JackDriverInterface*>::const_iterator it;
+        
+        // Move slaves in new master
+        for (it = slave_list.begin(); it != slave_list.end(); it++) {
+            JackDriverInterface* slave = *it;
+            master->AddSlave(slave);
+        }
+    
+        // Delete old master
+        delete fAudioDriver;
+        delete fDriverInfo;
+         
+        // Activate master
+        fAudioDriver = master;
+        fDriverInfo = info;
+        fEngineControl->InitFrameTime();
+        fAudioDriver->Attach();
+        fAudioDriver->SetMaster(true);
+        return fAudioDriver->Start();        
+    }
 }
 
 //----------------------

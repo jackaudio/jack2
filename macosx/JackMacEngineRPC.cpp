@@ -42,7 +42,7 @@ rpc_type server_rpc_jack_client_check(mach_port_t private_port, client_name_t na
 
 rpc_type server_rpc_jack_client_open(mach_port_t server_port, client_name_t name, int pid, mach_port_t* private_port, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    jack_log("rpc_jack_client_opne name = %s", name);
+    jack_log("rpc_jack_client_open name = %s", name);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[server_port];
     assert(channel);
     channel->ClientOpen((char*)name, pid, private_port, shared_engine, shared_client, shared_graph, result);

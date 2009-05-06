@@ -25,6 +25,27 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-06 Stephane Letz  <letz@grame.fr>
+
+	* Fix transport callback (timebase master, sync) issue when used after jack_activate (RT thread was not running).
+
+2009-05-05 Stephane Letz  <letz@grame.fr>
+
+	* First working version of native MIDI backend (JackCoreMidiDriver, JackWinMMEDriver).
+
+2009-04-22 Stephane Letz  <letz@grame.fr>
+
+	* jackctl_server_load_master renamed to jackctl_server_switch_master, jackctl_server_unload_master is removed.
+
+2009-04-21 Stephane Letz  <letz@grame.fr>
+
+	* Add jackctl_server_load_master/jackctl_server_unload_master API.
+
+2009-04-20 Stephane Letz  <letz@grame.fr>
+
+	* In ALSA audio card reservation code, tries to open the card even if reservation fails.
+	* Clock source setting on Linux.
+
 2009-04-08 Stephane Letz  <letz@grame.fr>
 
 	* Native MIDI backend (JackCoreMidiDriver, JackWinMMEDriver) in progress.

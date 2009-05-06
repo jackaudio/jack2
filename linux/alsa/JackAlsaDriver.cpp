@@ -51,6 +51,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "audio_reserve.h"
 
+//#define DEBUG_WAKEUP 1
+
 namespace Jack
 {
 
@@ -1346,6 +1348,9 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 			/* if POLLIN was the only bit set, we're OK */
 
 			*status = 0;
+            if (driver->pfd[nfds-1].revents == POLLIN) {
+                jack_error("driver->pfd[nfds-1].revents == POLLIN");
+            }
 			return (driver->pfd[nfds-1].revents == POLLIN) ? 0 : -1;
 		}
 
@@ -2191,21 +2196,18 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
     if (audio_reservation_init() < 0) {
 	jack_error("Audio device reservation service not available....");
     } else if (strcmp(capture_driver_name, playback_driver_name) == 0) {    // Same device for input and output 
-	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
-    	if (fReservedCaptureDevice == NULL) {
-        	jack_error("Error audio device %s not available...", capture_driver_name);
-        	return -1;
+        fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
+        if (fReservedCaptureDevice == NULL) {
+        	jack_error("Error audio device %s cannot be acquired, trying to open it anyway...", capture_driver_name);
     	}
     } else {
     	fReservedCaptureDevice = audio_acquire(card_to_num(capture_driver_name));
     	if (fReservedCaptureDevice == NULL) {
-        	jack_error("Error capture audio device %s not available...", capture_driver_name);
-        	return -1;
-    	}
+        	jack_error("Error capture audio device %s cannot be acquired, trying to open it anyway...", capture_driver_name);
+     	}
     	fReservedPlaybackDevice = audio_acquire(card_to_num(playback_driver_name));
     	if (fReservedPlaybackDevice == NULL) {
-        	jack_error("Error playback audio device %s not available...", playback_driver_name);
-        	return -1;
+        	jack_error("Error playback audio device %s cannot be acquired, trying to open it anyway...", playback_driver_name);
     	}
     }
 #endif
@@ -2277,7 +2279,7 @@ int JackAlsaDriver::Read()
         /* we detected an xrun and restarted: notify
          * clients about the delay. 
          */
-        jack_log("ALSA XRun");
+        jack_log("ALSA XRun wait_status = %d", wait_status);
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
         return -1;
     }

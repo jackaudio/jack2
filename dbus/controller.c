@@ -263,6 +263,22 @@ jack_controller_stop_server(
     return TRUE;
 }
 
+bool
+jack_controller_switch_master(
+    struct jack_controller * controller_ptr,
+    void *dbus_call_context_ptr)
+{
+    if (!jackctl_server_switch_master(
+            controller_ptr->server,
+            controller_ptr->driver))
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to switch master");
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 void *
 jack_controller_create(
         DBusConnection *connection)

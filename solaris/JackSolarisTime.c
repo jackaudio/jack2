@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include "JackTime.h"
+#include "JackTypes.h"
 #include <unistd.h>
 #include <time.h>
 
@@ -35,3 +36,10 @@ SERVER_EXPORT jack_time_t GetMicroSeconds(void)
     return (jack_time_t)(gethrtime() / 1000);
 }
 
+SERVER_EXPORT void SetClockSource(jack_timer_type_t source)
+{}
+
+SERVER_EXPORT const char* ClockSourceName(jack_timer_type_t source)
+{
+    return "";
+}

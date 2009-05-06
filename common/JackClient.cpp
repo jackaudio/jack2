@@ -118,14 +118,13 @@ void JackClient::SetupDriverSync(bool freewheel)
 {
     if (!freewheel && !GetEngineControl()->fSyncMode) {
         jack_log("JackClient::SetupDriverSync driver sem in flush mode");
-        fSynchroTable[AUDIO_DRIVER_REFNUM].SetFlush(true);
-        fSynchroTable[FREEWHEEL_DRIVER_REFNUM].SetFlush(true);
-        fSynchroTable[MIDI_DRIVER_REFNUM].SetFlush(true);
+        for (int i = 0; i < GetEngineControl()->fDriverNum; i++) {
+            fSynchroTable[i].SetFlush(true);
+        }
     } else {
         jack_log("JackClient::SetupDriverSync driver sem in normal mode");
-        fSynchroTable[AUDIO_DRIVER_REFNUM].SetFlush(false);
-        fSynchroTable[FREEWHEEL_DRIVER_REFNUM].SetFlush(false);
-        fSynchroTable[MIDI_DRIVER_REFNUM].SetFlush(false);
+        for (int i = 0; i < GetEngineControl()->fDriverNum; i++)
+            fSynchroTable[i].SetFlush(false);
     }
 }
 
@@ -338,7 +337,7 @@ int JackClient::StartThread()
     // Will do "something" on OSX only...
     fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
 
-    if (fThread.Start() < 0) {
+    if (fThread.StartSync() < 0) {
         jack_error("Start thread error");
         return -1;
     }
@@ -593,6 +592,27 @@ void JackClient::ShutDown()
 // Transport management
 //----------------------
 
+inline int JackClient::ActivateAux()
+{
+    // If activated without RT thread...
+    if (IsActive() && fThread.GetStatus() != JackThread::kRunning) {
+    
+        jack_log("ActivateAux");
+    
+        // RT thread is started
+        if (StartThread() < 0)
+            return -1;
+        
+        int result = -1;
+        GetClientControl()->fCallback[kRealTimeCallback] = IsRealTime();
+        fChannel->ClientActivate(GetClientControl()->fRefNum, IsRealTime(), &result);
+        return result;
+        
+    } else {
+        return 0;
+    }
+}
+
 int JackClient::ReleaseTimebase()
 {
     int result = -1;
@@ -611,29 +631,30 @@ int JackClient::SetSyncCallback(JackSyncCallback sync_callback, void* arg)
     GetClientControl()->fTransportSync = (fSync != NULL);
     fSyncArg = arg;
     fSync = sync_callback;
-    return 0;
-}
-
-int JackClient::SetSyncTimeout(jack_time_t timeout)
-{
-    GetEngineControl()->fTransport.SetSyncTimeout(timeout);
-    return 0;
+    return ActivateAux();
 }
 
 int JackClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
     int result = -1;
     fChannel->SetTimebaseCallback(GetClientControl()->fRefNum, conditional, &result);
-    jack_log("SetTimebaseCallback result = %ld", result);
+    
     if (result == 0) {
         GetClientControl()->fTransportTimebase = true;
         fTimebase = timebase_callback;
         fTimebaseArg = arg;
+        return ActivateAux();
     } else {
         fTimebase = NULL;
         fTimebaseArg = NULL;
+        return -1;
     }
-    return result;
+}
+
+int JackClient::SetSyncTimeout(jack_time_t timeout)
+{
+    GetEngineControl()->fTransport.SetSyncTimeout(timeout);
+    return 0;
 }
 
 // Must be RT safe

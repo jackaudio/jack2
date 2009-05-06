@@ -220,12 +220,15 @@ EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server,
     jackctl_internal * internal);
     
-EXPORT bool jackctl_server_load_slave(jackctl_server_t * server,
+EXPORT bool jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
-EXPORT bool jackctl_server_unload_slave(jackctl_server_t * server,
+EXPORT bool jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
+EXPORT bool 
+jackctl_server_switch_master(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
 
 #if 0
 { /* Adjust editor indent */

@@ -81,6 +81,10 @@ struct jackctl_server
     /* uint32_t, ports of the loopback driver */
     union jackctl_parameter_value loopback_ports;
     union jackctl_parameter_value default_loopback_ports;
+    
+    /* uint32_t, clock source type */
+    union jackctl_parameter_value clock_source;
+    union jackctl_parameter_value default_clock_source;
 
     /* bool */
     union jackctl_parameter_value replace_registry;
@@ -733,6 +737,20 @@ EXPORT jackctl_server_t * jackctl_server_create()
     {
         goto fail_free_parameters;
     }
+    
+    value.ui = 0;
+    if (jackctl_add_parameter(
+            &server_ptr->parameters,
+            "clock-source",
+            "Clocksource type : c(ycle) | h(pet) | s(ystem)",
+            "",
+            JackParamUInt,
+            &server_ptr->clock_source,
+            &server_ptr->default_clock_source,
+            value) == NULL)
+    {
+        goto fail_free_parameters;
+    }
 
     value.b = false;
     if (jackctl_add_parameter(
@@ -864,6 +882,7 @@ jackctl_server_start(
         server_ptr->realtime_priority.i,
         server_ptr->loopback_ports.ui,
         server_ptr->verbose.b,
+        (jack_timer_type_t)server_ptr->clock_source.ui,
         server_ptr->name.str);
     if (server_ptr->engine == NULL)
     {
@@ -1163,7 +1182,7 @@ EXPORT bool jackctl_server_unload_internal(
     }
 }
 
-EXPORT bool jackctl_server_load_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
+EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr->engine != NULL) {
         driver_ptr->info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
@@ -1173,11 +1192,21 @@ EXPORT bool jackctl_server_load_slave(jackctl_server * server_ptr, jackctl_drive
     }
 }
 
-EXPORT bool jackctl_server_unload_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
+EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr->engine != NULL) {
         server_ptr->engine->RemoveSlave(driver_ptr->info);
+        delete driver_ptr->info;
         return true;
+    } else {
+        return false;
+    }
+}
+
+EXPORT bool jackctl_server_switch_master(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
+{
+    if (server_ptr->engine != NULL) {
+        return (server_ptr->engine->SwitchMaster(driver_ptr->desc_ptr, driver_ptr->set_parameters) == 0);
     } else {
         return false;
     }

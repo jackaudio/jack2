@@ -510,13 +510,42 @@ jack_log(
 
 /* @} */
 
+/** 
+ * Call this function to add a slave in the driver slave list.
+ * 
+ * @param server server object handle
+ * @param driver driver to add in the driver slave list.
+ * 
+ * @return success status: true - success, false - fail
+ */ 
 bool 
-jackctl_server_load_slave(jackctl_server_t * server,
+jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
+/** 
+ * Call this function to remove a slave from the driver slave list.
+ * 
+ * @param server server object handle
+ * @param driver driver to remove from the driver slave list.
+ * 
+ * @return success status: true - success, false - fail
+ */ 
 bool 
-jackctl_server_unload_slave(jackctl_server_t * server,
+jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
+
+/** 
+ * Call this function to switch master driver.
+ * 
+ * @param server server object handle
+ * @param driver driver to switch to
+ * 
+ * @return success status: true - success, false - fail
+ */                          
+bool 
+jackctl_server_switch_master(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
+                            
 
 #if 0
 { /* Adjust editor indent */

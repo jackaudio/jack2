@@ -47,7 +47,7 @@ class SERVER_EXPORT JackServer
 
     private:
 
-        JackDriverInfo fDriverInfo;
+        JackDriverInfo* fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
         JackLockedEngine* fEngine;
@@ -57,12 +57,13 @@ class SERVER_EXPORT JackServer
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
+        long fLoopback;
         
         int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status);
 
     public:
 
-        JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, const char* server_name);
+        JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, jack_timer_type_t clock, const char* server_name);
         ~JackServer();
 
         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);
@@ -88,7 +89,8 @@ class SERVER_EXPORT JackServer
         // Backend management
         JackDriverInfo* AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params);
         void RemoveSlave(JackDriverInfo* info);
-
+        int SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_params);
+ 
         // Object access
         JackLockedEngine* GetEngine();
         JackEngineControl* GetEngineControl();

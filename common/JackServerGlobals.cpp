@@ -40,10 +40,11 @@ int JackServerGlobals::Start(const char* server_name,
                              int rt,
                              int priority,
                              int loopback,
-                             int verbose)
+                             int verbose,
+                            jack_timer_type_t clock)
 {
     jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
-    new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, server_name);  // Will setup fInstance and fUserCount globals
+    new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, clock, server_name);  // Will setup fInstance and fUserCount globals
     int res = fInstance->Open(driver_desc, driver_params);
     return (res < 0) ? res : fInstance->Start();
 }
@@ -92,6 +93,7 @@ bool JackServerGlobals::Init()
     char buffer[255];
     int argc = 0;
     char* argv[32];
+    jack_timer_type_t clock_source = JACK_TIMER_SYSTEM_CLOCK;
     
     // First user starts the server
     if (fUserCount++ == 0) {
@@ -99,8 +101,9 @@ bool JackServerGlobals::Init()
         jack_log("JackServerGlobals Init");
 
         jack_driver_desc_t* driver_desc;
-        const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:";
+        const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:c:";
         static struct option long_options[] = {
+                                                  { "clock-source", 1, 0, 'c' },
                                                   { "driver", 1, 0, 'd' },
                                                   { "verbose", 0, 0, 'v' },
                                                   { "help", 0, 0, 'h' },
@@ -155,6 +158,18 @@ bool JackServerGlobals::Init()
                 (opt = getopt_long(argc, argv, options, long_options, &option_index)) != EOF) {
 
             switch (opt) {
+            
+                case 'c':
+                    if (tolower (optarg[0]) == 'h') {
+                        clock_source = JACK_TIMER_HPET;
+                    } else if (tolower (optarg[0]) == 'c') {
+                        clock_source = JACK_TIMER_CYCLE_COUNTER;
+                    } else if (tolower (optarg[0]) == 's') {
+                        clock_source = JACK_TIMER_SYSTEM_CLOCK;
+                    } else {
+                        jack_error("unknown option character %c", optopt);
+                    }                
+                    break;
 
                 case 'd':
                     seen_driver = 1;
@@ -281,7 +296,7 @@ bool JackServerGlobals::Init()
             free(argv[i]);
         }
 
-        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux);
+        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux, clock_source);
         if (res < 0) {
             jack_error("Cannot start server... exit");
             Delete();

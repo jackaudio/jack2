@@ -44,7 +44,7 @@ void JackEngineControl::CalcCPULoad(JackClientInterface** table,
     
     // In Asynchronous mode, last cycle end is the max of client end dates
     if (!fSyncMode) {
-        for (int i = REAL_REFNUM; i < CLIENT_NUM; i++) {
+        for (int i = fDriverNum; i < CLIENT_NUM; i++) {
             JackClientInterface* client = table[i];
             JackClientTiming* timing = manager->GetClientTiming(i);
             if (client && client->GetClientControl()->fActive && timing->fStatus == Finished) 

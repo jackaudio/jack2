@@ -47,7 +47,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     fBeginDateUst = 0;
     fDelayedUsecs = 0.f;
     fIsMaster = true;
-}
+ }
 
 JackDriver::JackDriver()
 {
@@ -74,6 +74,7 @@ int JackDriver::Open()
 
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
+    fEngineControl->fDriverNum++;
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
     return 0;
@@ -100,6 +101,7 @@ int JackDriver::Open (bool capturing,
 
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
+    fEngineControl->fDriverNum++;
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
 
@@ -113,7 +115,6 @@ int JackDriver::Open (bool capturing,
     if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
 
-    //fGraphManager->SetBufferSize(fEngineControl->fBufferSize);
     fGraphManager->DirectConnect(fClientControl.fRefNum, fClientControl.fRefNum); // Connect driver to itself for "sync" mode
     SetupDriverSync(fClientControl.fRefNum, false);
     return 0;
@@ -142,6 +143,7 @@ int JackDriver::Open(jack_nframes_t buffer_size,
 
     fClientControl.fRefNum = refnum;
     fClientControl.fActive = true;
+    fEngineControl->fDriverNum++;
     fEngineControl->fBufferSize = buffer_size;
     fEngineControl->fSampleRate = samplerate;
     fCaptureLatency = capture_latency;
@@ -168,6 +170,7 @@ int JackDriver::Close()
     jack_log("JackDriver::Close");
     fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
     fClientControl.fActive = false;
+    fEngineControl->fDriverNum--;
     return fEngine->ClientInternalClose(fClientControl.fRefNum, false);
 }
 

@@ -131,6 +131,7 @@ def build(bld):
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
+        'JackDummyDriver.cpp',
         ]
 
     if bld.env['IS_LINUX']:
