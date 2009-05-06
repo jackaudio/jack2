@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-06 Stephane Letz  <letz@grame.fr>
+
+	* Fix transport callback (timebase master, sync) issue when used after jack_activate (RT thread was not running).
+
 2009-05-05 Stephane Letz  <letz@grame.fr>
 
 	* First working version of native MIDI backend (JackCoreMidiDriver, JackWinMMEDriver).

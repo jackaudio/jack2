@@ -56,14 +56,6 @@ bool JackConnectionManager::IsLoopPathAux(int ref1, int ref2) const
 {
     jack_log("JackConnectionManager::IsLoopPathAux ref1 = %ld ref2 = %ld", ref1, ref2);
 
-    /*
-    if (ref1 == AUDIO_DRIVER_REFNUM // Driver is reached
-            || ref2 == AUDIO_DRIVER_REFNUM
-            || ref1 == FREEWHEEL_DRIVER_REFNUM
-            || ref2 == FREEWHEEL_DRIVER_REFNUM
-            || ref1 == MIDI_DRIVER_REFNUM
-            || ref2 == MIDI_DRIVER_REFNUM) {
-            */
     if (ref1 < GetEngineControl()->fDriverNum || ref2 < GetEngineControl()->fDriverNum) {
         return false;
     } else if (ref1 == ref2) {	// Same refnum
