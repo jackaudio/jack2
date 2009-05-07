@@ -57,13 +57,12 @@ class SERVER_EXPORT JackServer
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
-        long fLoopback;
         
         int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status);
 
     public:
 
-        JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, long loopback, bool verbose, jack_timer_type_t clock, const char* server_name);
+        JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name);
         ~JackServer();
 
         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);

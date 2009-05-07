@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-07 Stephane Letz  <letz@grame.fr>
+
+	* Cleanup "loopback" stuff in server.
+
 2009-05-06 Stephane Letz  <letz@grame.fr>
 
 	* Fix transport callback (timebase master, sync) issue when used after jack_activate (RT thread was not running).
