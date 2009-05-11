@@ -30,14 +30,13 @@ SERVER_EXPORT void JackSleep(long usec)
 SERVER_EXPORT void InitTime()
 {
 	QueryPerformanceFrequency(&_jack_freq);
-	_jack_freq.QuadPart = _jack_freq.QuadPart / 1000000; // by usec
 }
 
 SERVER_EXPORT jack_time_t GetMicroSeconds(void)
 {
 	LARGE_INTEGER t1;
 	QueryPerformanceCounter(&t1);
-	return (jack_time_t)(((double)t1.QuadPart) / ((double)_jack_freq.QuadPart));
+	return (jack_time_t)(((double)t1.QuadPart) / ((double)_jack_freq.QuadPart) * 1000000.0);
 }
 
 SERVER_EXPORT void SetClockSource(jack_timer_type_t source)

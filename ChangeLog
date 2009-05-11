@@ -28,6 +28,7 @@ Paul Davis
 2009-05-11 Stephane Letz  <letz@grame.fr>
 
 	* New jack_free function added in jack.h.
+	* Torben Hohn fix for InitTime and GetMicroSeconds in JackWinTime.c.
 
 2009-05-07 Stephane Letz  <letz@grame.fr>
 
