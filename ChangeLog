@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-11 Stephane Letz  <letz@grame.fr>
+
+	* New jack_free function added in jack.h.
+
 2009-05-07 Stephane Letz  <letz@grame.fr>
 
 	* Cleanup "loopback" stuff in server.
