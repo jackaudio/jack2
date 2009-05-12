@@ -31,6 +31,7 @@
 
 #include <jack/jslist.h>
 #include <jack/systemdeps.h>
+#include <stdbool.h>
 
 /** Parameter types, intentionally similar to jack_driver_param_type_t */
 typedef enum
