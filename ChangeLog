@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-13 Stephane Letz  <letz@grame.fr>
+
+	* Reworked Torben Hohn fix for server restart issue on Windows.
+
 2009-05-11 Stephane Letz  <letz@grame.fr>
 
 	* New jack_free function added in jack.h.
