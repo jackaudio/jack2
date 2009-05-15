@@ -315,6 +315,7 @@ int JackDriver::Write()
 
 int JackDriver::Start()
 {
+    fEngineControl->InitFrameTime();
     return 0;
 }
 

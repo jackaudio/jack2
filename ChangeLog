@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-15 Stephane Letz  <letz@grame.fr>
+
+	* Move InitFrameTime in JackDriver::Start method.
+
 2009-05-13 Stephane Letz  <letz@grame.fr>
 
 	* Reworked Torben Hohn fix for server restart issue on Windows.

@@ -168,7 +168,6 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
 int JackServer::Start()
 {
     jack_log("JackServer::Start");
-    fEngineControl->InitFrameTime();
     return fAudioDriver->Start();
 }
 
@@ -201,13 +200,11 @@ int JackServer::SetBufferSize(jack_nframes_t buffer_size)
     if (fAudioDriver->SetBufferSize(buffer_size) == 0) {
         fFreewheelDriver->SetBufferSize(buffer_size);
         fEngine->NotifyBufferSize(buffer_size);
-        fEngineControl->InitFrameTime();
         return fAudioDriver->Start();
     } else { // Failure: try to restore current value
         jack_error("Cannot SetBufferSize for audio driver, restore current value %ld", current_buffer_size);
         fAudioDriver->SetBufferSize(current_buffer_size);
         fFreewheelDriver->SetBufferSize(current_buffer_size);
-        fEngineControl->InitFrameTime();
         fAudioDriver->Start();
         // SetBufferSize actually failed, so return an error...
         return -1;
@@ -239,7 +236,6 @@ int JackServer::SetFreewheel(bool onoff)
             fGraphManager->Restore(&fConnectionState);   // Restore previous connection state
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
-            fEngineControl->InitFrameTime();
             return fAudioDriver->Start();
         }
     } else {
@@ -344,7 +340,6 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
         // Activate master
         fAudioDriver = master;
         fDriverInfo = info;
-        fEngineControl->InitFrameTime();
         fAudioDriver->Attach();
         fAudioDriver->SetMaster(true);
         return fAudioDriver->Start();        
