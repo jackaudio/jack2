@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-05-18 Stephane Letz  <letz@grame.fr>
+
+	* Correct wcsript files to create jackdbus only (and not create jackd anymore) when compiled in --dbus mode, add a --classic option. Both options are possible but issue a warning.
+
 2009-05-15 Stephane Letz  <letz@grame.fr>
 
 	* Move InitFrameTime in JackDriver::Start method.
