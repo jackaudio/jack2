@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 using namespace Jack;
 
-#ifndef WIN32
-
 #if defined(JACK_DBUS)
 
 #include <dbus/dbus.h>
@@ -75,10 +73,10 @@ static int start_server_dbus(const char* server_name)
     return 0;
 }
 
-#else
+#endif
 
 /* Exec the JACK server in this process.  Does not return. */
-static void start_server_aux(const char* server_name)
+static void start_server_classic_aux(const char* server_name)
 {
     FILE* fp = 0;
     char filename[255];
@@ -161,18 +159,8 @@ static void start_server_aux(const char* server_name)
     fprintf(stderr, "exec of JACK server (command = \"%s\") failed: %s\n", command, strerror(errno));
 }
 
-#endif
-
-static int start_server(const char* server_name, jack_options_t options)
+static int start_server_classic(const char* server_name)
 {
-    if ((options & JackNoStartServer) || getenv("JACK_NO_START_SERVER")) {
-        return 1;
-    }
-
-#if defined(JACK_DBUS)
-    return start_server_dbus(server_name);
-#else
-
     /* The double fork() forces the server to become a child of
      * init, which will always clean up zombie process state on
      * termination. This even works in cases where the server
@@ -186,7 +174,7 @@ static int start_server(const char* server_name, jack_options_t options)
         case 0:					/* child process */
             switch (fork()) {
                 case 0:			/* grandchild process */
-                    start_server_aux(server_name);
+                    start_server_classic_aux(server_name);
                     _exit(99);	/* exec failed */
                 case - 1:
                     _exit(98);
@@ -199,6 +187,18 @@ static int start_server(const char* server_name, jack_options_t options)
 
     /* only the original parent process goes here */
     return 0;			/* (probably) successful */
+}
+
+static int start_server(const char* server_name, jack_options_t options)
+{
+    if ((options & JackNoStartServer) || getenv("JACK_NO_START_SERVER")) {
+        return 1;
+    }
+
+#if defined(JACK_DBUS)
+    return start_server_dbus(server_name);
+#else
+    return start_server_classic(server_name);
 #endif
 }
 
@@ -234,5 +234,3 @@ int try_start_server(jack_varargs_t* va, jack_options_t options, jack_status_t* 
 
     return 0;
 }
-
-#endif
