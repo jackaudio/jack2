@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackSocketServerChannel__
 #define __JackSocketServerChannel__
 
-#include "JackChannel.h"
 #include "JackSocket.h"
 #include "JackPlatformPlug.h"
 #include <poll.h>

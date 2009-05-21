@@ -20,7 +20,6 @@ Copyright (C) 2004-2006 Grame
 #ifndef __JackWinNamedPipeNotifyChannel__
 #define __JackWinNamedPipeNotifyChannel__
 
-#include "JackChannel.h"
 #include "JackWinNamedPipe.h"
 
 namespace Jack
