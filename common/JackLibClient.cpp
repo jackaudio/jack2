@@ -183,7 +183,8 @@ JackClientControl* JackLibClient::GetClientControl() const
     return fClientControl;
 }
 
-int JackLibClient::PortConnect(const char* src, const char* dst)
+int
+JackLibClient::NoSelfConnectCheck(const char* src, const char* dst)
 {
     // this check is to prevent apps to self connect to other apps
     // TODO: make this work with multiple clients per app
@@ -195,7 +196,7 @@ int JackLibClient::PortConnect(const char* src, const char* dst)
 
         client_name_ptr = GetClientControl()->fName;
 
-        //jack_info("Client '%s' connecting '%s' to '%s'", client_name_ptr, src, dst);
+        //jack_info("Client '%s' (dis)connecting '%s' to '%s'", client_name_ptr, src, dst);
 
         sep_ptr = strchr(src, ':');
         if (sep_ptr == NULL)
@@ -230,7 +231,37 @@ int JackLibClient::PortConnect(const char* src, const char* dst)
         }
     }
 
-    return JackClient::PortConnect(src, dst);
+    return 1;
+}
+
+int JackLibClient::PortConnect(const char* src, const char* dst)
+{
+    int ret;
+
+    //jack_info("Client connecting '%s' to '%s'");
+
+    ret = NoSelfConnectCheck(src, dst);
+    if (ret > 0)
+    {
+        return JackClient::PortConnect(src, dst);
+    }
+
+    return ret;
+}
+
+int JackLibClient::PortDisconnect(const char* src, const char* dst)
+{
+    int ret;
+
+    //jack_info("Client disconnecting '%s' to '%s'");
+
+    ret = NoSelfConnectCheck(src, dst);
+    if (ret > 0)
+    {
+        return JackClient::PortDisconnect(src, dst);
+    }
+
+    return ret;
 }
 
 } // end of namespace
