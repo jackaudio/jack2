@@ -183,6 +183,56 @@ JackClientControl* JackLibClient::GetClientControl() const
     return fClientControl;
 }
 
+int JackLibClient::PortConnect(const char* src, const char* dst)
+{
+    // this check is to prevent apps to self connect to other apps
+    // TODO: make this work with multiple clients per app
+    {
+        const char * sep_ptr;
+        const char * client_name_ptr;
+        int src_self;
+        int dst_self;
+
+        client_name_ptr = GetClientControl()->fName;
+
+        //jack_info("Client '%s' connecting '%s' to '%s'", client_name_ptr, src, dst);
+
+        sep_ptr = strchr(src, ':');
+        if (sep_ptr == NULL)
+        {
+            jack_error("source port '%s' is invalid", src);
+            return -1;
+        }
+
+        src_self = strncmp(client_name_ptr, src, sep_ptr - src) == 0 ? 0 : 1;
+
+        sep_ptr = strchr(dst, ':');
+        if (sep_ptr == NULL)
+        {
+            jack_error("destination port '%s' is invalid", dst);
+            return -1;
+        }
+
+        dst_self = strncmp(client_name_ptr, dst, sep_ptr - dst) == 0 ? 0 : 1;
+
+        //jack_info("src_self is %s", src_self ? "true" : "false");
+        //jack_info("dst_self is %s", dst_self ? "true" : "false");
+
+        // 0 means client is connecting other client ports (i.e. control app patchbay functionality)
+        // 1 means client is connecting its own port to port of other client (i.e. self hooking into system app)
+        // 2 means client is connecting its own ports (i.e. for app internal functionality)
+        // TODO: Make this check an engine option and more tweakable (return error or success)
+        // MAYBE: make the engine option changable on the fly and expose it through client or control API
+        if (src_self + dst_self == 1)
+        {
+            jack_info("ignoring self hook to other client ports ('%s': '%s' -> '%s')", client_name_ptr, src, dst);
+            return 0;
+        }
+    }
+
+    return JackClient::PortConnect(src, dst);
+}
+
 } // end of namespace
 
 
