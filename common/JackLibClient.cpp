@@ -70,6 +70,9 @@ JackLibClient::~JackLibClient()
 int JackLibClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
 {
     int shared_engine, shared_client, shared_graph, result;
+    int pid;
+    char * pid_str;
+
     jack_log("JackLibClient::Open name = %s", name);
 
     strncpy(fServerName, server_name, sizeof(fServerName));
@@ -87,8 +90,20 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
         goto error;
     }
 
+    pid = 0;
+    pid_str = getenv("JACK_CLIENT_PID_OVERRIDE");
+    if (pid_str != NULL)
+    {
+        pid = atoi(pid_str);
+    }
+
+    if (pid == 0)
+    {
+        pid = JackTools::GetPID();
+    }
+
     // Require new client
-    fChannel->ClientOpen(name_res, JackTools::GetPID(), &shared_engine, &shared_client, &shared_graph, &result);
+    fChannel->ClientOpen(name_res, pid, &shared_engine, &shared_client, &shared_graph, &result);
     if (result < 0) {
         jack_error("Cannot open %s client", name_res);
         goto error;
