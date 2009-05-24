@@ -1604,7 +1604,7 @@ jack_controller_port_connect_callback(
     }
     else
     {
-        jack_info("Disonnecting '%s' from '%s'", port1_name, port2_name);
+        jack_info("Disconnecting '%s' from '%s'", port1_name, port2_name);
         connection_ptr = jack_controller_patchbay_find_connection(patchbay_ptr, port1_ptr, port2_ptr);
         if (connection_ptr == NULL)
         {
