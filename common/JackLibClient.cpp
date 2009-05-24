@@ -224,7 +224,7 @@ JackLibClient::NoSelfConnectCheck(const char* src, const char* dst)
         // 2 means client is connecting its own ports (i.e. for app internal functionality)
         // TODO: Make this check an engine option and more tweakable (return error or success)
         // MAYBE: make the engine option changable on the fly and expose it through client or control API
-        if (src_self + dst_self == 1)
+        if (src_self + dst_self != 0)
         {
             jack_info("ignoring self hook to other client ports ('%s': '%s' -> '%s')", client_name_ptr, src, dst);
             return 0;
@@ -238,7 +238,7 @@ int JackLibClient::PortConnect(const char* src, const char* dst)
 {
     int ret;
 
-    //jack_info("Client connecting '%s' to '%s'");
+    //jack_info("Client connecting '%s' to '%s'", src, dst);
 
     ret = NoSelfConnectCheck(src, dst);
     if (ret > 0)
@@ -253,7 +253,7 @@ int JackLibClient::PortDisconnect(const char* src, const char* dst)
 {
     int ret;
 
-    //jack_info("Client disconnecting '%s' to '%s'");
+    //jack_info("Client disconnecting '%s' to '%s'", src, dst);
 
     ret = NoSelfConnectCheck(src, dst);
     if (ret > 0)
@@ -262,6 +262,13 @@ int JackLibClient::PortDisconnect(const char* src, const char* dst)
     }
 
     return ret;
+}
+
+int JackLibClient::PortDisconnect(jack_port_id_t src)
+{
+    jack_info("Ignoring port disconnect request");
+
+    return 0;
 }
 
 } // end of namespace
