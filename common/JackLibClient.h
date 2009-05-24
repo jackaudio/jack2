@@ -51,6 +51,8 @@ class JackLibClient : public JackClient
         JackGraphManager* GetGraphManager() const;
         JackEngineControl* GetEngineControl() const;
         JackClientControl* GetClientControl() const;
+
+        virtual int PortConnect(const char* src, const char* dst);
 };
 
 
