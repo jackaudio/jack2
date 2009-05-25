@@ -841,6 +841,7 @@ int JackFreebobDriver::Close()
 
 int JackFreebobDriver::Start()
 {
+    JackAudioDriver::Start();
     return freebob_driver_start((freebob_driver_t *)fDriver);
 }
 

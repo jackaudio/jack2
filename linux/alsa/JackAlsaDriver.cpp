@@ -2255,6 +2255,7 @@ int JackAlsaDriver::Close()
 
 int JackAlsaDriver::Start()
 {
+    JackAudioDriver::Start();
     return alsa_driver_start((alsa_driver_t *)fDriver);
 }
 

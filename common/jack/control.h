@@ -31,6 +31,7 @@
 
 #include <jack/jslist.h>
 #include <jack/systemdeps.h>
+#include <stdbool.h>
 
 /** Parameter types, intentionally similar to jack_driver_param_type_t */
 typedef enum
@@ -125,19 +126,6 @@ jackctl_server_destroy(
 	jackctl_server_t * server);
 
 /** 
- * Call this function to get list of available drivers. List node data
- * pointers is a driver object handle (::jackctl_driver_t).
- * 
- * @param server server object handle to get drivers for
- *
- * @return Single linked list of driver object handles. Must not be
- * modified. Always same for same server object.
- */
-const JSList *
-jackctl_server_get_drivers_list(
-	jackctl_server_t * server);
-
-/** 
  * Call this function to start JACK server
  * 
  * @param server server object handle
@@ -162,6 +150,19 @@ jackctl_server_stop(
 	jackctl_server_t * server);
 
 /** 
+ * Call this function to get list of available drivers. List node data
+ * pointers is a driver object handle (::jackctl_driver_t).
+ * 
+ * @param server server object handle to get drivers for
+ *
+ * @return Single linked list of driver object handles. Must not be
+ * modified. Always same for same server object.
+ */
+const JSList *
+jackctl_server_get_drivers_list(
+	jackctl_server_t * server);
+
+/** 
  * Call this function to get list of server parameters. List node data
  * pointers is a parameter object handle (::jackctl_parameter_t).
  * 
@@ -173,6 +174,82 @@ jackctl_server_stop(
 const JSList *
 jackctl_server_get_parameters(
 	jackctl_server_t * server);
+
+/** 
+ * Call this function to get list of available internal clients. List node data
+ * pointers is a internal client object handle (::jackctl_internal_t).
+ * 
+ * @param server server object handle to get internal clients for
+ *
+ * @return Single linked list of internal client object handles. Must not be
+ * modified. Always same for same server object.
+ */
+const JSList *
+jackctl_server_get_internals_list(
+	jackctl_server_t * server);
+
+/** 
+ * Call this function to load one internal client.
+ * 
+ * @param server server object handle
+ * @param internal internal to use
+ * 
+ * @return success status: true - success, false - fail
+ */
+bool
+jackctl_server_load_internal(
+    jackctl_server_t * server,
+    jackctl_internal_t * internal);
+
+/** 
+ * Call this function to unload one internal client.
+ * 
+ * @param server server object handle
+ * @param internal internal to unload
+ * 
+ * @return success status: true - success, false - fail
+ */
+bool
+jackctl_server_unload_internal(
+    jackctl_server_t * server,
+    jackctl_internal_t * internal);
+
+/** 
+ * Call this function to add a slave in the driver slave list.
+ * 
+ * @param server server object handle
+ * @param driver driver to add in the driver slave list.
+ * 
+ * @return success status: true - success, false - fail
+ */ 
+bool 
+jackctl_server_add_slave(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
+
+/** 
+ * Call this function to remove a slave from the driver slave list.
+ * 
+ * @param server server object handle
+ * @param driver driver to remove from the driver slave list.
+ * 
+ * @return success status: true - success, false - fail
+ */ 
+bool 
+jackctl_server_remove_slave(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
+
+/** 
+ * Call this function to switch master driver.
+ * 
+ * @param server server object handle
+ * @param driver driver to switch to
+ * 
+ * @return success status: true - success, false - fail
+ */                          
+bool 
+jackctl_server_switch_master(jackctl_server_t * server,
+                            jackctl_driver_t * driver);
+                            
 
 /** 
  * Call this function to get name of driver.
@@ -198,6 +275,31 @@ jackctl_driver_get_name(
 const JSList *
 jackctl_driver_get_parameters(
 	jackctl_driver_t * driver);
+
+/** 
+ * Call this function to get name of internal client.
+ * 
+ * @param internal internal object handle to get name of
+ *
+ * @return internal name. Must not be modified. Always same for same
+ * internal object.
+ */
+const char *
+jackctl_internal_get_name(
+	jackctl_internal_t * internal);
+
+/** 
+ * Call this function to get list of internal parameters. List node data
+ * pointers is a parameter object handle (::jackctl_parameter_t).
+ * 
+ * @param internal internal object handle to get parameters for
+ *
+ * @return Single linked list of parameter object handles. Must not be
+ * modified. Always same for same internal object.
+ */
+const JSList *
+jackctl_internal_get_parameters(
+	jackctl_internal_t * internal);
 
 /** 
  * Call this function to get parameter name.
@@ -414,70 +516,6 @@ jackctl_parameter_constraint_is_fake_value(
 	jackctl_parameter_t * parameter);
 
 /** 
- * Call this function to get list of available internal clients. List node data
- * pointers is a internal client object handle (::jackctl_internal_t).
- * 
- * @param server server object handle to get internal clients for
- *
- * @return Single linked list of internal client object handles. Must not be
- * modified. Always same for same server object.
- */
-const JSList *
-jackctl_server_get_internals_list(
-	jackctl_server_t * server);
-
-/** 
- * Call this function to get name of internal client.
- * 
- * @param internal internal object handle to get name of
- *
- * @return internal name. Must not be modified. Always same for same
- * internal object.
- */
-const char *
-jackctl_internal_get_name(
-	jackctl_internal_t * internal);
-
-/** 
- * Call this function to get list of internal parameters. List node data
- * pointers is a parameter object handle (::jackctl_parameter_t).
- * 
- * @param internal internal object handle to get parameters for
- *
- * @return Single linked list of parameter object handles. Must not be
- * modified. Always same for same internal object.
- */
-const JSList *
-jackctl_internal_get_parameters(
-	jackctl_internal_t * internal);
-
-/** 
- * Call this function to load one internal client.
- * 
- * @param server server object handle
- * @param internal internal to use
- * 
- * @return success status: true - success, false - fail
- */
-bool
-jackctl_server_load_internal(
-    jackctl_server_t * server,
-    jackctl_internal_t * internal);
-
-/** 
- * Call this function to unload one internal client.
- * 
- * @param server server object handle
- * @param internal internal to unload
- * 
- * @return success status: true - success, false - fail
- */
-bool
-jackctl_server_unload_internal(
-    jackctl_server_t * server,
-    jackctl_internal_t * internal);
-
-/** 
  * Call this function to log an error message.
  * 
  * @param format string
@@ -509,43 +547,6 @@ jack_log(
 	...);
 
 /* @} */
-
-/** 
- * Call this function to add a slave in the driver slave list.
- * 
- * @param server server object handle
- * @param driver driver to add in the driver slave list.
- * 
- * @return success status: true - success, false - fail
- */ 
-bool 
-jackctl_server_add_slave(jackctl_server_t * server,
-                            jackctl_driver_t * driver);
-
-/** 
- * Call this function to remove a slave from the driver slave list.
- * 
- * @param server server object handle
- * @param driver driver to remove from the driver slave list.
- * 
- * @return success status: true - success, false - fail
- */ 
-bool 
-jackctl_server_remove_slave(jackctl_server_t * server,
-                            jackctl_driver_t * driver);
-
-/** 
- * Call this function to switch master driver.
- * 
- * @param server server object handle
- * @param driver driver to switch to
- * 
- * @return success status: true - success, false - fail
- */                          
-bool 
-jackctl_server_switch_master(jackctl_server_t * server,
-                            jackctl_driver_t * driver);
-                            
 
 #if 0
 { /* Adjust editor indent */

@@ -77,10 +77,6 @@ struct jackctl_server
     /* int32_t, msecs; if zero, use period size. */
     union jackctl_parameter_value client_timeout;
     union jackctl_parameter_value default_client_timeout;
-
-    /* uint32_t, ports of the loopback driver */
-    union jackctl_parameter_value loopback_ports;
-    union jackctl_parameter_value default_loopback_ports;
     
     /* uint32_t, clock source type */
     union jackctl_parameter_value clock_source;
@@ -643,7 +639,7 @@ EXPORT jackctl_server_t * jackctl_server_create()
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "name",
-            "server name to use",
+            "Server name to use.",
             "",
             JackParamString,
             &server_ptr->name,
@@ -657,7 +653,7 @@ EXPORT jackctl_server_t * jackctl_server_create()
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "realtime",
-            "Whether to use realtime mode",
+            "Whether to use realtime mode.",
             "Use realtime scheduling. This is needed for reliable low-latency performance. On most systems, it requires JACK to run with special scheduler and memory allocation privileges, which may be obtained in several ways. On Linux you should use PAM.",
             JackParamBool,
             &server_ptr->realtime,
@@ -714,7 +710,7 @@ EXPORT jackctl_server_t * jackctl_server_create()
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "client-timeout",
-            "Client timeout limit in milliseconds",
+            "Client timeout limit in milliseconds.",
             "",
             JackParamInt,
             &server_ptr->client_timeout,
@@ -727,22 +723,8 @@ EXPORT jackctl_server_t * jackctl_server_create()
     value.ui = 0;
     if (jackctl_add_parameter(
             &server_ptr->parameters,
-            "loopback-ports",
-            "Number of loopback ports",
-            "",
-            JackParamUInt,
-            &server_ptr->loopback_ports,
-            &server_ptr->default_loopback_ports,
-            value) == NULL)
-    {
-        goto fail_free_parameters;
-    }
-    
-    value.ui = 0;
-    if (jackctl_add_parameter(
-            &server_ptr->parameters,
             "clock-source",
-            "Clocksource type : c(ycle) | h(pet) | s(ystem)",
+            "Clocksource type : c(ycle) | h(pet) | s(ystem).",
             "",
             JackParamUInt,
             &server_ptr->clock_source,
@@ -756,7 +738,7 @@ EXPORT jackctl_server_t * jackctl_server_create()
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "replace-registry",
-            "Replace registry",
+            "Replace shared memory registry.",
             "",
             JackParamBool,
             &server_ptr->replace_registry,
@@ -770,7 +752,7 @@ EXPORT jackctl_server_t * jackctl_server_create()
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "sync",
-            "Use synchronous mode",
+            "Use server synchronous mode.",
             "",
             JackParamBool,
             &server_ptr->sync,
@@ -880,7 +862,6 @@ jackctl_server_start(
         server_ptr->client_timeout.i,
         server_ptr->realtime.b,
         server_ptr->realtime_priority.i,
-        server_ptr->loopback_ports.ui,
         server_ptr->verbose.b,
         (jack_timer_type_t)server_ptr->clock_source.ui,
         server_ptr->name.str);

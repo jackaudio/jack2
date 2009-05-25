@@ -46,14 +46,15 @@ def create_jack_midi_driver_obj(bld, target, sources, uselib = None):
     return driver
 
 def build(bld):
-    jackd = bld.new_task_gen('cxx', 'program')
-    jackd.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
-    jackd.defines = 'HAVE_CONFIG_H'
-    jackd.source = ['../common/Jackdmp.cpp']
-    jackd.uselib = 'PTHREAD DL'
-    jackd.uselib_local = 'serverlib'
-    jackd.env.append_value("LINKFLAGS", "-framework CoreFoundation")
-    jackd.target = 'jackd'
+    if bld.env['BUILD_JACKD'] == True:
+    	jackd = bld.new_task_gen('cxx', 'program')
+    	jackd.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
+    	jackd.defines = 'HAVE_CONFIG_H'
+    	jackd.source = ['../common/Jackdmp.cpp']
+    	jackd.uselib = 'PTHREAD DL'
+    	jackd.uselib_local = 'serverlib'
+    	jackd.env.append_value("LINKFLAGS", "-framework CoreFoundation")
+    	jackd.target = 'jackd'
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 

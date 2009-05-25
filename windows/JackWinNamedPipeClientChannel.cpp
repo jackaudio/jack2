@@ -311,7 +311,6 @@ bool JackWinNamedPipeClientChannel::Execute()
     JackResult res;
 
     if (event.Read(&fNotificationListenPipe) < 0) {
-        fNotificationListenPipe.Close();
         jack_error("JackWinNamedPipeClientChannel read fail");
         goto error;
     }
@@ -320,7 +319,6 @@ bool JackWinNamedPipeClientChannel::Execute()
 
     if (event.fSync) {
         if (res.Write(&fNotificationListenPipe) < 0) {
-            fNotificationListenPipe.Close();
             jack_error("JackWinNamedPipeClientChannel write fail");
             goto error;
         }
@@ -328,6 +326,9 @@ bool JackWinNamedPipeClientChannel::Execute()
     return true;
 
 error:
+    // Close the pipes, server wont be able to create them otherwise.
+    fNotificationListenPipe.Close();
+    fRequestPipe.Close();
     fClient->ShutDown();
     return false;
 }

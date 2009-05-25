@@ -423,7 +423,7 @@ jack_controller_patchbay_new_port(
     const char *port_short_name;
     size_t client_name_len;
 
-    //jack_info("name: %s", port_full_name);
+    //jack_info("new port: %s", port_full_name);
 
     port_short_name = strchr(port_full_name, ':');
     if (port_short_name == NULL)
@@ -489,6 +489,8 @@ jack_controller_patchbay_remove_port(
     struct jack_controller_patchbay *patchbay_ptr,
     struct jack_graph_port *port_ptr)
 {
+    //jack_info("remove port: %s", port_ptr->name);
+
     pthread_mutex_lock(&patchbay_ptr->lock);
     list_del(&port_ptr->siblings_client);
     list_del(&port_ptr->siblings_graph);
@@ -1604,7 +1606,7 @@ jack_controller_port_connect_callback(
     }
     else
     {
-        jack_info("Disonnecting '%s' from '%s'", port1_name, port2_name);
+        jack_info("Disconnecting '%s' from '%s'", port1_name, port2_name);
         connection_ptr = jack_controller_patchbay_find_connection(patchbay_ptr, port1_ptr, port2_ptr);
         if (connection_ptr == NULL)
         {

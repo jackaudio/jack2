@@ -85,6 +85,16 @@ bool
 jack_controller_switch_master(
     struct jack_controller *controller_ptr,
     void *dbus_call_context_ptr);
+    
+bool
+jack_controller_add_slave(
+    struct jack_controller *controller_ptr,
+    const char * driver_name);
+    
+bool
+jack_controller_remove_slave(
+    struct jack_controller *controller_ptr,
+    const char * driver_name);
 
 bool
 jack_controller_select_driver(

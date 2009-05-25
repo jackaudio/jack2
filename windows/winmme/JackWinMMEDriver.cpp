@@ -106,10 +106,10 @@ int JackWinMMEDriver::Open(bool capturing,
     jack_log("JackWinMMEDriver::Open");
 
     fRealCaptureChannels = midiInGetNumDevs();
-	fRealPlaybackChannels = midiOutGetNumDevs ();
+	fRealPlaybackChannels = midiOutGetNumDevs();
 
     // Generic JackMidiDriver Open
-    if (JackMidiDriver::Open(capturing, playing, inchannels + fRealCaptureChannels, outchannels + fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
+    if (JackMidiDriver::Open(capturing, playing, fRealCaptureChannels, fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
         return -1;
 
     fMidiDestination = new MidiSlot[fRealCaptureChannels];

@@ -137,9 +137,9 @@ bool JackWinSemaphore::Allocate(const char* name, const char* server_name, int v
         return false;
     } else if (GetLastError() == ERROR_ALREADY_EXISTS) {
         jack_error("Allocate: named semaphore already exist name = %s", fName);
-        CloseHandle(fSemaphore);
-        fSemaphore = NULL;
-        return false;
+        // Try to open it 
+        fSemaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, FALSE, fName);
+        return (fSemaphore != NULL);
     } else {
         return true;
     }

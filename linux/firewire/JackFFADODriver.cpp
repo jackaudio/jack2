@@ -48,9 +48,6 @@ namespace Jack
 
 #define jack_get_microseconds GetMicroSeconds
 
-#define SAMPLE_MAX_24BIT  8388608.0f
-#define SAMPLE_MAX_16BIT  32768.0f
-
 int
 JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nframes)
 {
@@ -250,10 +247,10 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
     wait_enter = jack_get_microseconds ();
     if (wait_enter > driver->wait_next) {
         /*
-        	* This processing cycle was delayed past the
-        	* next due interrupt!  Do not account this as
-        	* a wakeup delay:
-        	*/
+                * This processing cycle was delayed past the
+                * next due interrupt!  Do not account this as
+                * a wakeup delay:
+                */
         driver->wait_next = 0;
         driver->wait_late++;
     }
@@ -270,7 +267,7 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
     }
     driver->wait_last = wait_ret;
     driver->wait_next = wait_ret + driver->period_usecs;
-// 	driver->engine->transport_cycle_start (driver->engine, wait_ret);
+//         driver->engine->transport_cycle_start (driver->engine, wait_ret);
 
     if(response == ffado_wait_ok) {
        // all good
@@ -344,8 +341,8 @@ JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
     /*
     driver->period_size = nframes; 
     driver->period_usecs =
-    	(jack_time_t) floor ((((float) nframes) / driver->sample_rate)
-    			     * 1000000.0f);
+            (jack_time_t) floor ((((float) nframes) / driver->sample_rate)
+                                 * 1000000.0f);
     */
 
     /* tell the engine to change its buffer size */
@@ -376,16 +373,16 @@ JackFFADODriver::ffado_driver_new (const char *name,
     /* Setup the jack interfaces */
     jack_driver_nt_init ((jack_driver_nt_t *) driver);
 
-    /*	driver->nt_attach    = (JackDriverNTAttachFunction)   ffado_driver_attach;
-    	driver->nt_detach    = (JackDriverNTDetachFunction)   ffado_driver_detach;
-    	driver->nt_start     = (JackDriverNTStartFunction)    ffado_driver_start;
-    	driver->nt_stop      = (JackDriverNTStopFunction)     ffado_driver_stop;
-    	driver->nt_run_cycle = (JackDriverNTRunCycleFunction) ffado_driver_run_cycle;
-    	driver->null_cycle   = (JackDriverNullCycleFunction)  ffado_driver_null_cycle;
-    	driver->write        = (JackDriverReadFunction)       ffado_driver_write;
-    	driver->read         = (JackDriverReadFunction)       ffado_driver_read;
-    	driver->nt_bufsize   = (JackDriverNTBufSizeFunction)  ffado_driver_bufsize;
-    	*/
+    /*        driver->nt_attach    = (JackDriverNTAttachFunction)   ffado_driver_attach;
+            driver->nt_detach    = (JackDriverNTDetachFunction)   ffado_driver_detach;
+            driver->nt_start     = (JackDriverNTStartFunction)    ffado_driver_start;
+            driver->nt_stop      = (JackDriverNTStopFunction)     ffado_driver_stop;
+            driver->nt_run_cycle = (JackDriverNTRunCycleFunction) ffado_driver_run_cycle;
+            driver->null_cycle   = (JackDriverNullCycleFunction)  ffado_driver_null_cycle;
+            driver->write        = (JackDriverReadFunction)       ffado_driver_write;
+            driver->read         = (JackDriverReadFunction)       ffado_driver_read;
+            driver->nt_bufsize   = (JackDriverNTBufSizeFunction)  ffado_driver_bufsize;
+            */
 
     /* copy command line parameter contents to the driver structure */
     memcpy(&driver->settings, params, sizeof(ffado_jack_settings_t));
@@ -398,7 +395,7 @@ JackFFADODriver::ffado_driver_new (const char *name,
     driver->period_usecs =
         (jack_time_t) floor ((((float) driver->period_size) * 1000000.0f) / driver->sample_rate);
 
-// 	driver->client = client;
+//         driver->client = client;
     driver->engine = NULL;
 
     memset(&driver->device_options, 0, sizeof(driver->device_options));
@@ -709,6 +706,7 @@ int JackFFADODriver::Close()
 
 int JackFFADODriver::Start()
 {
+    JackAudioDriver::Start();
     return ffado_driver_start((ffado_driver_t *)fDriver);
 }
 
@@ -918,6 +916,8 @@ extern "C"
 
         ffado_jack_settings_t cmlparams;
 
+        char *device_name="hw:0";
+
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
         cmlparams.buffer_size_set = 0;
@@ -941,6 +941,9 @@ extern "C"
             param = (jack_driver_param_t *) node->data;
 
             switch (param->character) {
+                case 'd':
+                    device_name = strdup (param->value.str);
+                    break;
                 case 'p':
                     cmlparams.period_size = param->value.ui;
                     cmlparams.period_size_set = 1;
@@ -953,15 +956,11 @@ extern "C"
                     cmlparams.sample_rate = param->value.ui;
                     cmlparams.sample_rate_set = 1;
                     break;
-                case 'C':
-                    cmlparams.capture_ports = 1;
+                case 'i':
+                    cmlparams.capture_ports = param->value.ui;
                     break;
-                case 'P':
-                    cmlparams.playback_ports = 1;
-                    break;
-                case 'D':
-                    cmlparams.capture_ports = 1;
-                    cmlparams.playback_ports = 1;
+                case 'o':
+                    cmlparams.playback_ports = param->value.ui;
                     break;
                 case 'I':
                     cmlparams.capture_frame_latency = param->value.ui;
@@ -969,10 +968,11 @@ extern "C"
                 case 'O':
                     cmlparams.playback_frame_latency = param->value.ui;
                     break;
-                    // ignore these for now
-                case 'i':
+                case 'x':
+                    cmlparams.slave_mode = param->value.ui;
                     break;
-                case 'o':
+                case 'X':
+                    cmlparams.snoop_mode = param->value.ui;
                     break;
                 case 'v':
                     cmlparams.verbose_level = param->value.ui;
@@ -981,9 +981,12 @@ extern "C"
 
         /* duplex is the default */
         if (!cmlparams.playback_ports && !cmlparams.capture_ports) {
-            cmlparams.playback_ports = TRUE;
-            cmlparams.capture_ports = TRUE;
+            cmlparams.playback_ports = 1;
+            cmlparams.capture_ports = 1;
         }
+
+        // temporary
+        cmlparams.device_info = device_name;
 
         Jack::JackFFADODriver* ffado_driver = new Jack::JackFFADODriver("system", "firewire_pcm", engine, table);
         Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(ffado_driver);

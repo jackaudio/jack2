@@ -241,6 +241,7 @@ extern "C"
 
     EXPORT jack_status_t jack_internal_client_unload (jack_client_t *client,
             jack_intclient_t intclient);
+    EXPORT void jack_free(void* ptr);
 
 #ifdef __cplusplus
 }
@@ -1929,4 +1930,9 @@ const char *
 jack_get_version_string()
 {
     return VERSION;
+}
+
+EXPORT void jack_free(void* ptr)
+{
+    free(ptr);
 }

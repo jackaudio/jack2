@@ -39,12 +39,11 @@ int JackServerGlobals::Start(const char* server_name,
                              int time_out_ms,
                              int rt,
                              int priority,
-                             int loopback,
                              int verbose,
                             jack_timer_type_t clock)
 {
     jack_log("Jackdmp: sync = %ld timeout = %ld rt = %ld priority = %ld verbose = %ld ", sync, time_out_ms, rt, priority, verbose);
-    new JackServer(sync, temporary, time_out_ms, rt, priority, loopback, verbose, clock, server_name);  // Will setup fInstance and fUserCount globals
+    new JackServer(sync, temporary, time_out_ms, rt, priority, verbose, clock, server_name);  // Will setup fInstance and fUserCount globals
     int res = fInstance->Open(driver_desc, driver_params);
     return (res < 0) ? res : fInstance->Start();
 }
@@ -71,7 +70,6 @@ bool JackServerGlobals::Init()
     int verbose_aux = 0;
     int do_mlock = 1;
     unsigned int port_max = 128;
-    int loopback = 0;
     int do_unlock = 0;
     int temporary = 0;
 
@@ -112,7 +110,6 @@ bool JackServerGlobals::Init()
                                                   { "name", 0, 0, 'n' },
                                                   { "unlock", 0, 0, 'u' },
                                                   { "realtime", 0, 0, 'R' },
-                                                  { "loopback", 0, 0, 'L' },
                                                   { "realtime-priority", 1, 0, 'P' },
                                                   { "timeout", 1, 0, 't' },
                                                   { "temporary", 0, 0, 'T' },
@@ -204,10 +201,6 @@ bool JackServerGlobals::Init()
                     realtime = 1;
                     break;
 
-                case 'L':
-                    loopback = atoi(optarg);
-                    break;
-
                 case 'T':
                     temporary = 1;
                     break;
@@ -296,7 +289,7 @@ bool JackServerGlobals::Init()
             free(argv[i]);
         }
 
-        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, loopback, verbose_aux, clock_source);
+        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, verbose_aux, clock_source);
         if (res < 0) {
             jack_error("Cannot start server... exit");
             Delete();

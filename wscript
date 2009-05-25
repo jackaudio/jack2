@@ -61,6 +61,7 @@ def set_options(opt):
     opt.tool_options('compiler_cc')
 
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
+    opt.add_option('--classic', action='store_true', default=False, help='Enable standard JACK (jackd)')
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
@@ -122,6 +123,8 @@ def configure(conf):
     conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
+    conf.env['BUILD_JACKDBUS'] = Options.options.dbus
+    conf.env['BUILD_JACKD'] = Options.options.classic
 
     if Options.options.libdir:
         conf.env['LIBDIR'] = Options.options.libdir
@@ -168,13 +171,19 @@ def configure(conf):
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
-    
+    if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
+        display_feature('Build standard (jackd) and D-Bus JACK (jackdbus) : WARNING !! mixing both program may cause issues...', True)
+    elif conf.env['BUILD_JACKDBUS']:
+        display_feature('Build D-Bus JACK (jackdbus)', True)
+    else:
+        conf.env['BUILD_JACKD'] = True;  # jackd is always built be default
+        display_feature('Build standard JACK (jackd)', True)
     
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
         display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
-        display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'] == True)
+       
     if conf.env['BUILD_JACKDBUS'] == True:
         display_msg('D-Bus service install directory', conf.env['DBUS_SERVICES_DIR'], 'CYAN')
         #display_msg('Settings persistence', xxx)

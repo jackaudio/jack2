@@ -20,7 +20,6 @@ Copyright (C) 2004-2006 Grame
 #ifndef __JackWinNamedPipeServerChannel__
 #define __JackWinNamedPipeServerChannel__
 
-#include "JackChannel.h"
 #include "JackWinNamedPipe.h"
 #include "JackPlatformPlug.h"
 #include <list>

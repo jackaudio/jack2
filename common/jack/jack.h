@@ -1070,6 +1070,16 @@ void jack_set_info_function (void (*func)(const char *));
 
 /*@}*/
 
+/**
+ * The free function to be used on memory returned by jack_port_get_connections, 
+ * jack_port_get_all_connections and jack_get_ports functions.
+ * This is MANDATORY on Windows when otherwise all nasty runtime version related crashes can occur.
+ * Developers are strongly encouraged to use this function instead of the standard "free" function in new code.
+ *
+ */
+void jack_free(void* ptr);
+
+
 #ifdef __cplusplus
 }
 #endif

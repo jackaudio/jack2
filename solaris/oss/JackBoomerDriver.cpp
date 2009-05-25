@@ -533,6 +533,7 @@ void JackBoomerDriver::CloseAux()
 int JackBoomerDriver::Start()
 {
     jack_log("JackBoomerDriver::Start");
+    JackAudioDriver::Start();
 
     // Start output thread only when needed
     if (fOutFD > 0) {
