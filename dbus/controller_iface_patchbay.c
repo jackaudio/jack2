@@ -1352,14 +1352,14 @@ jack_controller_dbus_disconnect_ports_by_id(
     if (port1_ptr == NULL)
     {
         jack_dbus_error(call, JACK_DBUS_ERROR_INVALID_ARGS, "cannot find port %" PRIu64, port1_id);
-        return;
+        goto unlock;
     }
 
     port2_ptr = jack_controller_patchbay_find_port_by_id(patchbay_ptr, port2_id);
     if (port2_ptr == NULL)
     {
         jack_dbus_error(call, JACK_DBUS_ERROR_INVALID_ARGS, "cannot find port %" PRIu64, port2_id);
-        return;
+        goto unlock;
     }
 
     if (!jack_controller_patchbay_disconnect(
