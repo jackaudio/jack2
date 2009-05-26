@@ -741,7 +741,7 @@ int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
     jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
     jack_port_id_t port_src, port_dst;
 
-    return (fGraphManager->CheckPorts(src, dst, &port_src, &port_dst) < 0)
+    return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
            ? -1
            : PortConnect(refnum, port_src, port_dst);
 }
@@ -788,14 +788,9 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
     AssertRefnum(refnum);
     jack_port_id_t port_src, port_dst;
 
-    if (fGraphManager->CheckPorts(src, dst, &port_src, &port_dst) < 0) {
-        return -1;
-    } else if (fGraphManager->Disconnect(port_src, port_dst) == 0) {
-        NotifyPortConnect(port_src, port_dst, false);
-        return 0;
-    } else {
-        return -1;
-    }
+    return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
+           ? -1
+           : PortDisconnect(refnum, port_src, port_dst);
 }
 
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)

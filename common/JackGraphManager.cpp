@@ -627,7 +627,7 @@ int JackGraphManager::CheckPorts(jack_port_id_t port_src, jack_port_id_t port_ds
     return 0;
 }
 
-int JackGraphManager::CheckPorts(const char* src_name, const char* dst_name, jack_port_id_t* port_src, jack_port_id_t* port_dst)
+int JackGraphManager::GetTwoPorts(const char* src_name, const char* dst_name, jack_port_id_t* port_src, jack_port_id_t* port_dst)
 {
     jack_log("JackGraphManager::CheckConnect src_name = %s dst_name = %s", src_name, dst_name);
 
@@ -641,7 +641,7 @@ int JackGraphManager::CheckPorts(const char* src_name, const char* dst_name, jac
         return -1;
     }
 
-    return CheckPorts(*port_src, *port_dst);
+    return 0;
 }
 
 // Client : port array
