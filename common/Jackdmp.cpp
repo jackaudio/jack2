@@ -187,6 +187,7 @@ int main(int argc, char* argv[])
                                        { "version", 0, 0, 'V' },
                                        { "silent", 0, 0, 's' },
                                        { "sync", 0, 0, 'S' },
+                                       { "autoconnect", 1, 0, 'a' },
                                        { 0, 0, 0, 0 }
                                    };
 
@@ -244,6 +245,30 @@ int main(int argc, char* argv[])
                 break;
         #endif
 
+            case 'a':
+                param = jackctl_get_parameter(server_parameters, "self-connect-mode");
+                if (param != NULL) {
+                    if (optarg[0] == SELF_CONNECT_MODE_ALLOW_CHAR) {
+                        value.ui = JackSelfConnectAllow;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (optarg[0] == SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR) {
+                        value.ui = JackSelfConnectFailExternalOnly;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (optarg[0] == SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR) {
+                        value.ui = JackSelfConnectFailExternalOnly;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (optarg[0] == SELF_CONNECT_MODE_FAIL_ALL_CHAR) {
+                        value.ui = JackSelfConnectFailExternalOnly;
+                        jackctl_parameter_set_value(param, &value);
+                    } else if (optarg[0] == SELF_CONNECT_MODE_IGNORE_ALL_CHAR) {
+                        value.ui = JackSelfConnectFailExternalOnly;
+                        jackctl_parameter_set_value(param, &value);
+                    } else {
+                        usage(stdout);
+                        goto fail_free;
+                    }
+                }
+                break;
             case 'd':
                 seen_audio_driver = true;
                 audio_driver_name = optarg;
