@@ -161,9 +161,9 @@ int main(int argc, char* argv[])
     jackctl_driver_t * midi_driver_ctl;
     
 #ifdef __linux__
-    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:c:";
+    const char *options = "-d:X:P:uvrshVRL:STFl:t:mn:p:c:a:";
 #else
-    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:";
+    const char *options = "-d:X:P:uvrshVRL:STFl:t:mn:p:a:";
 #endif
     
     struct option long_options[] = {
@@ -248,20 +248,15 @@ int main(int argc, char* argv[])
             case 'a':
                 param = jackctl_get_parameter(server_parameters, "self-connect-mode");
                 if (param != NULL) {
-                    if (optarg[0] == SELF_CONNECT_MODE_ALLOW_CHAR) {
-                        value.ui = JackSelfConnectAllow;
-                        jackctl_parameter_set_value(param, &value);
-                    } else if (optarg[0] == SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR) {
-                        value.ui = JackSelfConnectFailExternalOnly;
-                        jackctl_parameter_set_value(param, &value);
-                    } else if (optarg[0] == SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR) {
-                        value.ui = JackSelfConnectFailExternalOnly;
-                        jackctl_parameter_set_value(param, &value);
-                    } else if (optarg[0] == SELF_CONNECT_MODE_FAIL_ALL_CHAR) {
-                        value.ui = JackSelfConnectFailExternalOnly;
-                        jackctl_parameter_set_value(param, &value);
-                    } else if (optarg[0] == SELF_CONNECT_MODE_IGNORE_ALL_CHAR) {
-                        value.ui = JackSelfConnectFailExternalOnly;
+		    bool value_valid = false;
+		    for (int k=0; k<jackctl_parameter_get_enum_constraints_count( param ); k++ ) {
+			value = jackctl_parameter_get_enum_constraint_value( param, k );
+			if( value.c == optarg[0] )
+			    value_valid = true;
+		    }
+
+		    if( value_valid ) {
+                        value.c = optarg[0];
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
@@ -269,6 +264,7 @@ int main(int argc, char* argv[])
                     }
                 }
                 break;
+
             case 'd':
                 seen_audio_driver = true;
                 audio_driver_name = optarg;
