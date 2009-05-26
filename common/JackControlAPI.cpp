@@ -46,6 +46,13 @@
 
 using namespace Jack;
 
+#define SELF_CONNECT_MODE_ALLOW_CHAR                  ' '
+#define SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR     'E'
+#define SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR   'e'
+#define SELF_CONNECT_MODE_FAIL_ALL_CHAR               'A'
+#define SELF_CONNECT_MODE_IGNORE_ALL_CHAR             'a'
+#define SELF_CONNECT_MODES_COUNT              5
+
 struct jackctl_server
 {
     JSList * drivers;
@@ -89,6 +96,12 @@ struct jackctl_server
     /* bool, synchronous or asynchronous engine mode */
     union jackctl_parameter_value sync;
     union jackctl_parameter_value default_sync;
+
+    /* char enum, self connect mode mode */
+    union jackctl_parameter_value self_connect_mode;
+    union jackctl_parameter_value default_self_connect_mode;
+    jack_driver_param_value_enum_t self_connect_mode_possible_values[SELF_CONNECT_MODES_COUNT];
+    jack_driver_param_constraint_desc_t self_connect_mode_constraint;
 };
 
 struct jackctl_driver
@@ -762,6 +775,40 @@ EXPORT jackctl_server_t * jackctl_server_create()
         goto fail_free_parameters;
     }
 
+    server_ptr->self_connect_mode_constraint.flags = JACK_CONSTRAINT_FLAG_STRICT | JACK_CONSTRAINT_FLAG_FAKE_VALUE;
+    server_ptr->self_connect_mode_constraint.constraint.enumeration.count = SELF_CONNECT_MODES_COUNT;
+    server_ptr->self_connect_mode_constraint.constraint.enumeration.possible_values_array = server_ptr->self_connect_mode_possible_values;
+
+    server_ptr->self_connect_mode_possible_values[0].value.c = SELF_CONNECT_MODE_ALLOW_CHAR;
+    strcpy(server_ptr->self_connect_mode_possible_values[0].short_desc, "Don't restrict self connect requests");
+
+    server_ptr->self_connect_mode_possible_values[1].value.c = SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR ;
+    strcpy(server_ptr->self_connect_mode_possible_values[1].short_desc, "Fail self connect requests to external ports only");
+
+    server_ptr->self_connect_mode_possible_values[2].value.c = SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR;
+    strcpy(server_ptr->self_connect_mode_possible_values[2].short_desc, "Ignore self connect requests to external ports only");
+
+    server_ptr->self_connect_mode_possible_values[3].value.c = SELF_CONNECT_MODE_FAIL_ALL_CHAR;
+    strcpy(server_ptr->self_connect_mode_possible_values[3].short_desc, "Fail all self connect requests");
+
+    server_ptr->self_connect_mode_possible_values[4].value.c = SELF_CONNECT_MODE_IGNORE_ALL_CHAR;
+    strcpy(server_ptr->self_connect_mode_possible_values[4].short_desc, "Ignore all self connect requests");
+
+    value.c = SELF_CONNECT_MODE_ALLOW_CHAR;
+    if (jackctl_add_parameter(
+            &server_ptr->parameters,
+            "self-connect-mode",
+            "Self connect mode.",
+            "Whether JACK clients are allowed to connect their own ports",
+            JackParamChar,
+            &server_ptr->self_connect_mode,
+            &server_ptr->default_self_connect_mode,
+            value,
+            &server_ptr->self_connect_mode_constraint) == NULL)
+    {
+        goto fail_free_parameters;
+    }
+
     if (!jackctl_drivers_load(server_ptr))
     {
         goto fail_free_parameters;
@@ -829,6 +876,7 @@ jackctl_server_start(
     jackctl_driver *driver_ptr)
 {
     int rc;
+    JackSelfConnectMode self_connect_mode;
 
     rc = jack_register_server(server_ptr->name.str, server_ptr->replace_registry.b);
     switch (rc)
@@ -854,6 +902,27 @@ jackctl_server_start(
     if (!server_ptr->realtime.b && server_ptr->client_timeout.i == 0)
         server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
 
+    switch (server_ptr->self_connect_mode.c)
+    {
+    case SELF_CONNECT_MODE_ALLOW_CHAR:
+        self_connect_mode = JackSelfConnectAllow;
+        break;
+    case SELF_CONNECT_MODE_FAIL_EXTERNAL_ONLY_CHAR:
+        self_connect_mode = JackSelfConnectFailExternalOnly;
+        break;
+    case SELF_CONNECT_MODE_IGNORE_EXTERNAL_ONLY_CHAR:
+        self_connect_mode = JackSelfConnectIgnoreExternalOnly;
+        break;
+    case SELF_CONNECT_MODE_FAIL_ALL_CHAR:
+        self_connect_mode = JackSelfConnectFailAll;
+        break;
+    case SELF_CONNECT_MODE_IGNORE_ALL_CHAR:
+        self_connect_mode = JackSelfConnectIgnoreAll;
+        break;
+    default:
+        self_connect_mode = JACK_DEFAULT_SELF_CONNECT_MODE;
+    }
+
     /* get the engine/driver started */
 
     server_ptr->engine = new JackServer(
@@ -864,7 +933,7 @@ jackctl_server_start(
         server_ptr->realtime_priority.i,
         server_ptr->verbose.b,
         (jack_timer_type_t)server_ptr->clock_source.ui,
-        JACK_DEFAULT_SELF_CONNECT_MODE,
+        self_connect_mode,
         server_ptr->name.str);
     if (server_ptr->engine == NULL)
     {
