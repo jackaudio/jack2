@@ -51,11 +51,6 @@ class JackLibClient : public JackClient
         JackGraphManager* GetGraphManager() const;
         JackEngineControl* GetEngineControl() const;
         JackClientControl* GetClientControl() const;
-
-        int NoSelfConnectCheck(const char* src, const char* dst);
-        virtual int PortConnect(const char* src, const char* dst);
-        virtual int PortDisconnect(const char* src, const char* dst);
-        virtual int PortDisconnect(jack_port_id_t src);
 };
 
 
