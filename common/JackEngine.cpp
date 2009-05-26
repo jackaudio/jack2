@@ -39,11 +39,13 @@ namespace Jack
 
 JackEngine::JackEngine(JackGraphManager* manager,
                        JackSynchro* table,
-                       JackEngineControl* control)
+                       JackEngineControl* control,
+                       JackSelfConnectMode self_connect_mode)
 {
     fGraphManager = manager;
     fSynchroTable = table;
     fEngineControl = control;
+    fSelfConnectMode = self_connect_mode;
     for (int i = 0; i < CLIENT_NUM; i++)
         fClientTable[i] = NULL;
 }
@@ -756,10 +758,47 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     // 2 means client is connecting its own ports (i.e. for app internal functionality)
     // TODO: Make this check an engine option and more tweakable (return error or success)
     // MAYBE: make the engine option changable on the fly and expose it through client or control API
-    if (src_self + dst_self != 0)
+
+    switch (fSelfConnectMode)
     {
-        jack_info("ignoring port self connect request");
-        return 0;
+    case JackSelfConnectFailExternalOnly:
+        if (src_self + dst_self == 1)
+        {
+            jack_info("rejecting port self connect request to external port");
+            return -1;
+        }
+
+        return 1;
+
+    case JackSelfConnectIgnoreExternalOnly:
+        if (src_self + dst_self == 1)
+        {
+            jack_info("ignoring port self connect request to external port");
+            return 0;
+        }
+
+        return 1;
+
+    case JackSelfConnectFailAll:
+        if (src_self + dst_self != 0)
+        {
+            jack_info("rejecting port self connect request");
+            return -1;
+        }
+
+        return 1;
+
+    case JackSelfConnectIgnoreAll:
+        if (src_self + dst_self != 0)
+        {
+            jack_info("ignoring port self connect request");
+            return 0;
+        }
+
+        return 1;
+
+    case JackSelfConnectAllow:  // fix warning
+        return 1;
     }
 
     return 1;

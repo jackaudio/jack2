@@ -53,7 +53,8 @@ struct SERVER_EXPORT JackServerGlobals
                      int rt,
                      int priority,
                      int verbose,
-                    jack_timer_type_t clock);
+                     jack_timer_type_t clock,
+                     JackSelfConnectMode self_connect_mode);
     static void Stop();
     static void Delete();
 };

@@ -864,6 +864,7 @@ jackctl_server_start(
         server_ptr->realtime_priority.i,
         server_ptr->verbose.b,
         (jack_timer_type_t)server_ptr->clock_source.ui,
+        JACK_DEFAULT_SELF_CONNECT_MODE,
         server_ptr->name.str);
     if (server_ptr->engine == NULL)
     {

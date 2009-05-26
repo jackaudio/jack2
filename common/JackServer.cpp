@@ -38,7 +38,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, JackSelfConnectMode self_connect_mode, const char* server_name)
 {
     if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
@@ -48,7 +48,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
 
     fGraphManager = new JackGraphManager();
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
-    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
+    fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl, self_connect_mode);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
     fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
