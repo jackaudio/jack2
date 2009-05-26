@@ -736,12 +736,41 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     }
 }
 
+// this check is to prevent apps to self connect to other apps
+// TODO: make this work with multiple clients per app
+int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
+{
+    JackPort* src_port = fGraphManager->GetPort(src);
+    JackPort* dst_port = fGraphManager->GetPort(dst);
+
+    jack_info("CheckPortsConnect(caller = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
+
+    int src_self = src_port->GetRefNum() == refnum ? 1 : 0;
+    int dst_self = dst_port->GetRefNum() == refnum ? 1 : 0;
+
+    jack_info("src_self is %s", src_self ? "true" : "false");
+    jack_info("dst_self is %s", dst_self ? "true" : "false");
+
+    // 0 means client is connecting other client ports (i.e. control app patchbay functionality)
+    // 1 means client is connecting its own port to port of other client (i.e. self hooking into system app)
+    // 2 means client is connecting its own ports (i.e. for app internal functionality)
+    // TODO: Make this check an engine option and more tweakable (return error or success)
+    // MAYBE: make the engine option changable on the fly and expose it through client or control API
+    if (src_self + dst_self != 0)
+    {
+        jack_info("ignoring port self connect request");
+        return 0;
+    }
+
+    return 1;
+}
+
 int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 {
     jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
     jack_port_id_t port_src, port_dst;
 
-    return (fGraphManager->CheckPorts(src, dst, &port_src, &port_dst) < 0)
+    return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
            ? -1
            : PortConnect(refnum, port_src, port_dst);
 }
@@ -776,7 +805,12 @@ int JackEngine::PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
         return -1;
     }
 
-    int res = fGraphManager->Connect(src, dst);
+    int res = CheckPortsConnect(refnum, src, dst);
+    if (res != 1) {
+        return res;
+    }
+
+    res = fGraphManager->Connect(src, dst);
     if (res == 0)
         NotifyPortConnect(src, dst, true);
     return res;
@@ -788,14 +822,9 @@ int JackEngine::PortDisconnect(int refnum, const char* src, const char* dst)
     AssertRefnum(refnum);
     jack_port_id_t port_src, port_dst;
 
-    if (fGraphManager->CheckPorts(src, dst, &port_src, &port_dst) < 0) {
-        return -1;
-    } else if (fGraphManager->Disconnect(port_src, port_dst) == 0) {
-        NotifyPortConnect(port_src, port_dst, false);
-        return 0;
-    } else {
-        return -1;
-    }
+    return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
+           ? -1
+           : PortDisconnect(refnum, port_src, port_dst);
 }
 
 int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst)
@@ -808,30 +837,38 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
         jack_int_t connections[CONNECTION_NUM_FOR_PORT];
         fGraphManager->GetConnections(src, connections);
 
-        // Notifications
         JackPort* port = fGraphManager->GetPort(src);
+        int ret = 0;
         if (port->GetFlags() & JackPortIsOutput) {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
-                jack_log("NotifyPortConnect src = %ld dst = %ld false", src, connections[i]);
-                NotifyPortConnect(src, connections[i], false);
+                if (PortDisconnect(refnum, src, connections[i]) != 0) {
+                    ret = -1;
+                }
             }
         } else {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
-                jack_log("NotifyPortConnect src = %ld dst = %ld false", connections[i], src);
-                NotifyPortConnect(connections[i], src, false);
+                if (PortDisconnect(refnum, connections[i], src) != 0) {
+                    ret = -1;
+                }
             }
         }
 
-        return fGraphManager->DisconnectAll(src);
-    } else if (fGraphManager->CheckPorts(src, dst) < 0) {
-        return -1;
-    } else if (fGraphManager->Disconnect(src, dst) == 0) {
-        // Notifications
-        NotifyPortConnect(src, dst, false);
-        return 0;
-    } else {
+        return ret;
+    }
+
+    if (fGraphManager->CheckPorts(src, dst) < 0) {
         return -1;
     }
+
+    int res = CheckPortsConnect(refnum, src, dst);
+    if (res != 1) {
+        return res;
+    }
+
+    res = fGraphManager->Disconnect(src, dst);
+    if (res == 0)
+        NotifyPortConnect(src, dst, false);
+    return res;
 }
 
 int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)

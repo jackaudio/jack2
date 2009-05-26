@@ -71,6 +71,8 @@ class SERVER_EXPORT JackEngine
         void NotifyPortRename(jack_port_id_t src);
         void NotifyActivate(int refnum);
 
+        int CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
+
     public:
 
         JackEngine(JackGraphManager* manager, JackSynchro* table, JackEngineControl* controler);
