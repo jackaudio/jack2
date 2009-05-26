@@ -803,21 +803,23 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
         jack_int_t connections[CONNECTION_NUM_FOR_PORT];
         fGraphManager->GetConnections(src, connections);
 
-        // Notifications
         JackPort* port = fGraphManager->GetPort(src);
+        int ret = 0;
         if (port->GetFlags() & JackPortIsOutput) {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
-                jack_log("NotifyPortConnect src = %ld dst = %ld false", src, connections[i]);
-                NotifyPortConnect(src, connections[i], false);
+                if (PortDisconnect(refnum, src, connections[i]) != 0) {
+                    ret = -1;
+                }
             }
         } else {
             for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && (connections[i] != EMPTY); i++) {
-                jack_log("NotifyPortConnect src = %ld dst = %ld false", connections[i], src);
-                NotifyPortConnect(connections[i], src, false);
+                if (PortDisconnect(refnum, connections[i], src) != 0) {
+                    ret = -1;
+                }
             }
         }
 
-        return fGraphManager->DisconnectAll(src);
+        return ret;
     } else if (fGraphManager->CheckPorts(src, dst) < 0) {
         return -1;
     } else if (fGraphManager->Disconnect(src, dst) == 0) {
