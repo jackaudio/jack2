@@ -61,8 +61,8 @@ def set_options(opt):
     opt.tool_options('compiler_cc')
 
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
-    opt.add_option('--classic', action='store_true', default=False, help='Enable standard JACK (jackd)')
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
+    opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
@@ -124,7 +124,12 @@ def configure(conf):
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
     conf.env['BUILD_JACKDBUS'] = Options.options.dbus
-    conf.env['BUILD_JACKD'] = Options.options.classic
+    conf.env['BUILD_CLASSIC'] = Options.options.classic
+
+    if conf.env['BUILD_JACKDBUS']:
+        conf.env['BUILD_JACKD'] = conf.env['BUILD_CLASSIC']
+    else:
+        conf.env['BUILD_JACKD'] = True
 
     if Options.options.libdir:
         conf.env['LIBDIR'] = Options.options.libdir
@@ -171,13 +176,12 @@ def configure(conf):
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
+
+    display_feature('Build standard JACK (jackd)', conf.env['BUILD_JACKD'])
+    display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
+
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
-        display_feature('Build standard (jackd) and D-Bus JACK (jackdbus) : WARNING !! mixing both program may cause issues...', True)
-    elif conf.env['BUILD_JACKDBUS']:
-        display_feature('Build D-Bus JACK (jackdbus)', True)
-    else:
-        conf.env['BUILD_JACKD'] = True;  # jackd is always built be default
-        display_feature('Build standard JACK (jackd)', True)
+        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues!' + Logs.colors.NORMAL
     
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
