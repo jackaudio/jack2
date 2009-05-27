@@ -745,13 +745,13 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     JackPort* src_port = fGraphManager->GetPort(src);
     JackPort* dst_port = fGraphManager->GetPort(dst);
 
-    jack_info("CheckPortsConnect(caller = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
+    jack_log("CheckPortsConnect(caller = %d, src = %d, dst = %d)", refnum, src_port->GetRefNum(), dst_port->GetRefNum());
 
     int src_self = src_port->GetRefNum() == refnum ? 1 : 0;
     int dst_self = dst_port->GetRefNum() == refnum ? 1 : 0;
 
-    jack_info("src_self is %s", src_self ? "true" : "false");
-    jack_info("dst_self is %s", dst_self ? "true" : "false");
+    jack_log("src_self is %s", src_self ? "true" : "false");
+    jack_log("dst_self is %s", dst_self ? "true" : "false");
 
     // 0 means client is connecting other client ports (i.e. control app patchbay functionality)
     // 1 means client is connecting its own port to port of other client (i.e. self hooking into system app)
@@ -764,7 +764,7 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     case JackSelfConnectFailExternalOnly:
         if (src_self + dst_self == 1)
         {
-            jack_info("rejecting port self connect request to external port");
+            jack_info("rejecting port self connect request to external port (%s -> %s)", src_port->GetName(), dst_port->GetName());
             return -1;
         }
 
@@ -773,7 +773,7 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     case JackSelfConnectIgnoreExternalOnly:
         if (src_self + dst_self == 1)
         {
-            jack_info("ignoring port self connect request to external port");
+            jack_info("ignoring port self connect request to external port (%s -> %s)", src_port->GetName(), dst_port->GetName());
             return 0;
         }
 
@@ -782,7 +782,7 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     case JackSelfConnectFailAll:
         if (src_self + dst_self != 0)
         {
-            jack_info("rejecting port self connect request");
+            jack_info("rejecting port self connect request (%s -> %s)", src_port->GetName(), dst_port->GetName());
             return -1;
         }
 
@@ -791,7 +791,7 @@ int JackEngine::CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t
     case JackSelfConnectIgnoreAll:
         if (src_self + dst_self != 0)
         {
-            jack_info("ignoring port self connect request");
+            jack_info("ignoring port self connect request (%s -> %s)", src_port->GetName(), dst_port->GetName());
             return 0;
         }
 
