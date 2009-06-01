@@ -739,6 +739,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 int JackEngine::PortConnect(int refnum, const char* src, const char* dst)
 {
     jack_log("JackEngine::PortConnect src = %s dst = %s", src, dst);
+    AssertRefnum(refnum);
     jack_port_id_t port_src, port_dst;
 
     return (fGraphManager->GetTwoPorts(src, dst, &port_src, &port_dst) < 0)
@@ -833,6 +834,7 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 
 int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 {
+    AssertRefnum(refnum);
     fGraphManager->GetPort(port)->SetName(name);
     NotifyPortRename(port);
     return 0;
