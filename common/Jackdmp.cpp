@@ -76,9 +76,6 @@ static void notify_server_stop(const char* server_name)
 
 #endif
 
-static void silent_jack_error_callback(const char *desc)
-{}
-
 static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"

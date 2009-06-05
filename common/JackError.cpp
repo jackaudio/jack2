@@ -118,17 +118,23 @@ SERVER_EXPORT void jack_log(const char *fmt,...)
 	}
 }
 
-static void default_jack_error_callback(const char *desc)
+SERVER_EXPORT void default_jack_error_callback(const char *desc)
 {
     fprintf(stderr, "%s\n", desc);
     fflush(stderr);
 }
 
-static void default_jack_info_callback (const char *desc)
+SERVER_EXPORT void default_jack_info_callback(const char *desc)
 {
     fprintf(stdout, "%s\n", desc);
     fflush(stdout);
 }
+
+SERVER_EXPORT void silent_jack_error_callback(const char *desc)
+{}
+
+SERVER_EXPORT void silent_jack_info_callback(const char *desc)
+{}
 
 SERVER_EXPORT void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
 SERVER_EXPORT void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;

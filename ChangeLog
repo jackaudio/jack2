@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-06-05 Stephane Letz  <letz@grame.fr>
+
+	* Correct jack_set_error_function, jack_set_info_function and jack_set_thread_creator functions.
+
 2009-05-18 Stephane Letz  <letz@grame.fr>
 
 	* Correct wcsript files to create jackdbus only (and not create jackd anymore) when compiled in --dbus mode, add a --classic option. Both options are possible but issue a warning.
