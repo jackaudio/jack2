@@ -27,6 +27,8 @@ Copyright (C) 2004-2006 Grame
 namespace Jack
 {
 
+class JackServer;
+
 class JackClientPipeThread : public JackRunnableInterface
 {
 
