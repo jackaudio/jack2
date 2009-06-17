@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-06-17 Stephane Letz  <letz@grame.fr>
+
+	* Move DBus based audio device reservation code in ALSA backend compilation.
+
 2009-06-16 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackFifo::TimedWait for EINTR handling.

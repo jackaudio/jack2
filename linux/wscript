@@ -36,18 +36,24 @@ def build(bld):
         jackd.target = 'jackd'
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
+    
+    alsa_driver_src = ['alsa/JackAlsaDriver.cpp',
+                       'alsa/alsa_rawmidi.c',
+                       'alsa/alsa_seqmidi.c',
+                       'alsa/alsa_midi_jackmp.cpp',
+                       '../common/memops.c',
+                       'alsa/generic_hw.c',
+                       'alsa/hdsp.c',
+                       'alsa/hammerfall.c',
+                       'alsa/ice1712.c'
+                       ]
+		       
+    if bld.env['BUILD_JACKDBUS']:
+	alsa_driver_src += ['../dbus/reserve.c', '../dbus/audio_reserve.c']
+		       
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
-        create_jack_driver_obj(bld, 'alsa', ['alsa/JackAlsaDriver.cpp',
-                                             'alsa/alsa_rawmidi.c',
-                                             'alsa/alsa_seqmidi.c',
-                                             'alsa/alsa_midi_jackmp.cpp',
-                                             '../common/memops.c',
-                                             'alsa/generic_hw.c',
-                                             'alsa/hdsp.c',
-                                             'alsa/hammerfall.c',
-                                             'alsa/ice1712.c'
-                                             ], "ALSA")
+        create_jack_driver_obj(bld, 'alsa', alsa_driver_src, "ALSA")
 
     if bld.env['BUILD_DRIVER_FREEBOB'] == True:
         create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")
