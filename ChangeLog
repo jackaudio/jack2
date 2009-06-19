@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-06-19 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackTransportEngine::MakeAllLocating, sync callback has to be called in this case also.
+
 2009-06-17 Stephane Letz  <letz@grame.fr>
 
 	* Move DBus based audio device reservation code in ALSA backend compilation.
