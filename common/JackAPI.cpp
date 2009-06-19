@@ -278,12 +278,12 @@ static inline void WaitGraphChange()
 
 EXPORT void jack_set_error_function (print_function func)
 {
-    jack_error_callback = func;
+    jack_error_callback = (func == NULL) ? &default_jack_error_callback : func;
 }
 
 EXPORT void jack_set_info_function (print_function func)
 {
-    jack_info_callback = func;
+    jack_info_callback = (func == NULL) ? &default_jack_info_callback : func;
 }
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
@@ -1799,7 +1799,7 @@ EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread)
 #ifndef WIN32
 EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc)
 {
-    JackGlobals::fJackThreadCreator = jtc;
+    JackGlobals::fJackThreadCreator = (jtc == NULL) ? pthread_create : jtc;
 }
 #endif
 

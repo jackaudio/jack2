@@ -25,6 +25,22 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-06-19 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackTransportEngine::MakeAllLocating, sync callback has to be called in this case also.
+
+2009-06-17 Stephane Letz  <letz@grame.fr>
+
+	* Move DBus based audio device reservation code in ALSA backend compilation.
+
+2009-06-16 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackFifo::TimedWait for EINTR handling.
+
+2009-06-05 Stephane Letz  <letz@grame.fr>
+
+	* Correct jack_set_error_function, jack_set_info_function and jack_set_thread_creator functions.
+
 2009-05-18 Stephane Letz  <letz@grame.fr>
 
 	* Correct wcsript files to create jackdbus only (and not create jackd anymore) when compiled in --dbus mode, add a --classic option. Both options are possible but issue a warning.

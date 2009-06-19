@@ -141,6 +141,7 @@ void JackTransportEngine::MakeAllLocating(JackClientInterface** table)
         if (client) {
             JackClientControl* control = client->GetClientControl();
             control->fTransportState = JackTransportStopped;
+            control->fTransportSync = true; 
             control->fTransportTimebase = true; 
             jack_log("MakeAllLocating ref = %ld", i);
         }

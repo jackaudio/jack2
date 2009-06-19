@@ -76,9 +76,6 @@ static void notify_server_stop(const char* server_name)
 
 #endif
 
-static void silent_jack_error_callback(const char *desc)
-{}
-
 static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"
@@ -208,7 +205,7 @@ int main(int argc, char* argv[])
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
 
-	copyright(stdout);
+    copyright(stdout);
 
     server_ctl = jackctl_server_create();
     if (server_ctl == NULL) {
@@ -359,10 +356,10 @@ int main(int argc, char* argv[])
 
     if (show_version) {
         printf( "jackdmp version " VERSION
-				" tmpdir " jack_server_dir
-				" protocol %d"
-				"\n", JACK_PROTOCOL_VERSION);
-    	return -1;
+                " tmpdir " jack_server_dir
+                " protocol %d"
+                "\n", JACK_PROTOCOL_VERSION);
+        return -1;
     }
 
     if (!seen_audio_driver) {

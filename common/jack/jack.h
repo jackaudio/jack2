@@ -1047,6 +1047,7 @@ extern void (*jack_error_callback)(const char *msg);
 
 /**
  * Set the @ref jack_error_callback for error message display.
+ * Set it to NULL to restore default_jack_error_callback function.
  *
  * The JACK library provides two built-in callbacks for this purpose:
  * default_jack_error_callback() and silent_jack_error_callback().
@@ -1065,6 +1066,10 @@ extern void (*jack_info_callback)(const char *msg);
 
 /**
  * Set the @ref jack_info_callback for info message display.
+ * Set it to NULL to restore default_jack_info_callback function.
+ *
+ * The JACK library provides two built-in callbacks for this purpose:
+ * default_jack_info_callback() and silent_jack_info_callback().
  */
 void jack_set_info_function (void (*func)(const char *));
 

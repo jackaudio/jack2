@@ -91,7 +91,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void GetConnections(jack_port_id_t port_index, jack_int_t* connections);  // TODO
         const char** GetPorts(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
 
-        int CheckPorts(const char* src, const char* dst, jack_port_id_t* src_index, jack_port_id_t* dst_index);
+        int GetTwoPorts(const char* src, const char* dst, jack_port_id_t* src_index, jack_port_id_t* dst_index);
         int CheckPorts(jack_port_id_t port_src, jack_port_id_t port_dst);
 
         void DisconnectAllInput(jack_port_id_t port_index);

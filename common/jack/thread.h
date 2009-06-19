@@ -137,6 +137,8 @@ int jack_client_stop_thread(jack_client_t* client, pthread_t thread);
  * that all threads that might call win32 functions are known
  * to Wine.
  *
+ * Set it to NULL to restore thread creation function.
+ *
  * @param creator a function that creates a new thread
  *
  */

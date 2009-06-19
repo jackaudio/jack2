@@ -101,12 +101,16 @@ bool JackFifo::TimedWait(long usec)
 // Does not work on OSX ??
 bool JackFifo::TimedWait(long usec)
 {
-    assert(fFifo >= 0);
-
-    if ((poll(&fPoll, 1, usec / 1000) < 0) && (errno != EINTR)) {
-        jack_error("JackFifo::TimedWait name = %s err = %s", fName, strerror(errno));
+    int res;
+    
+    if (fFifo < 0) {
+        jack_error("JackFifo::TimedWait name = %s already desallocated!!", fName);
         return false;
     }
+   
+    do {
+        res = poll(&fPoll, 1, usec / 1000);
+    } while (res < 0 && errno == EINTR);
 
     if (fPoll.revents & POLLIN) {
         return Wait();
