@@ -618,7 +618,7 @@ namespace Jack
                 switch ( GetPacketType ( &host_params ) )
                 {
                     case SLAVE_AVAILABLE:
-                        if ( ( net_master = MasterInit ( host_params ) ) )
+                        if ( ( net_master = InitMaster ( host_params ) ) )
                             SessionParamsDisplay ( &net_master->fParams );
                         else
                             jack_error ( "Can't init new net master..." );
@@ -636,9 +636,9 @@ namespace Jack
         while ( fRunning );
     }
 
-    JackNetMaster* JackNetMasterManager::MasterInit ( session_params_t& params )
+    JackNetMaster* JackNetMasterManager::InitMaster ( session_params_t& params )
     {
-        jack_log ( "JackNetMasterManager::MasterInit, Slave : %s", params.fName );
+        jack_log ( "JackNetMasterManager::InitMaster, Slave : %s", params.fName );
         
         //check MASTER <<==> SLAVE network protocol coherency
         if (params.fProtocolVersion != MASTER_PROTOCOL) {

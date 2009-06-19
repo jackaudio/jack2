@@ -28,6 +28,7 @@ Paul Davis
 2009-06-19 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackTransportEngine::MakeAllLocating, sync callback has to be called in this case also.
+	* NetJack2 code : better error checkout, method renaming.
 
 2009-06-17 Stephane Letz  <letz@grame.fr>
 
