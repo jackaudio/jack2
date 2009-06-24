@@ -297,7 +297,7 @@ int JackWinMMEDriver::Attach()
 
     for (i = 0; i < fCaptureChannels; i++) {
         MIDIINCAPS caps;
-		res = midiInGetDevCaps(fMidiSource[i].fIndex, &caps, sizeof(caps));
+		res = midiInGetDevCaps(fMidiDestination[i].fIndex, &caps, sizeof(caps));
 		if (res == MMSYSERR_NOERROR) {
             snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, caps.szPname, i + 1);
 		} else {
@@ -319,7 +319,7 @@ int JackWinMMEDriver::Attach()
 
     for (i = 0; i < fPlaybackChannels; i++) {
         MIDIOUTCAPS caps;
-		res = midiOutGetDevCaps(fMidiDestination[i].fIndex, &caps, sizeof(caps));
+		res = midiOutGetDevCaps(fMidiSource[i].fIndex, &caps, sizeof(caps));
         if (res == MMSYSERR_NOERROR) {
             snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, caps.szPname, i + 1);
 		} else {
@@ -392,7 +392,11 @@ int JackWinMMEDriver::Write()
             for (unsigned int j = 0; j < midi_buffer->event_count; j++) {
                 JackMidiEvent* ev = &midi_buffer->events[j];
                 if (ev->size <= 3) {
-                    MMRESULT res = midiOutShortMsg((HMIDIOUT)fMidiSource[chan].fHandle, *((DWORD*)ev->GetData(midi_buffer)));
+                    DWORD winev = 0;
+                    if (ev->size > 0) winev |= d[0];
+                    if (ev->size > 1) winev |= (d[1] << 8);
+                    if (ev->size > 2) winev |= (d[2] << 16);
+                    MMRESULT res = midiOutShortMsg((HMIDIOUT)fMidiSource[chan].fHandle, winev);
                     if (res != MMSYSERR_NOERROR)
                         jack_error ("midiOutShortMsg error res %d", res);
                 } else  {
