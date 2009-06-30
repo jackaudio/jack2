@@ -45,6 +45,12 @@ extern "C"
 
     SERVER_EXPORT extern void (*jack_error_callback)(const char *desc);
     SERVER_EXPORT extern void (*jack_info_callback)(const char *desc);
+    
+    SERVER_EXPORT extern void default_jack_error_callback(const char *desc);
+    SERVER_EXPORT extern void default_jack_info_callback(const char *desc);
+    
+    SERVER_EXPORT extern void silent_jack_error_callback(const char *desc);
+    SERVER_EXPORT extern void silent_jack_info_callback(const char *desc);
 
     typedef void (* jack_log_function_t)(int level, const char *message);
 
@@ -52,8 +58,8 @@ extern "C"
     void jack_log_function(int level, const char *message);
    
     SERVER_EXPORT void set_threaded_log_function();
-
-	extern int jack_verbose;
+    
+    extern int jack_verbose;
 
 #ifdef __cplusplus
 }

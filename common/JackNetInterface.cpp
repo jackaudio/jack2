@@ -204,8 +204,7 @@ namespace Jack
         int rx_bytes = 0;
 
         //socket
-        if ( fSocket.NewSocket() == SOCKET_ERROR )
-        {
+        if ( fSocket.NewSocket() == SOCKET_ERROR ) {
             jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
             return false;
         }
@@ -215,8 +214,7 @@ namespace Jack
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
             
         //connect
-        if ( fSocket.Connect() == SOCKET_ERROR )
-        {
+        if ( fSocket.Connect() == SOCKET_ERROR ) {
             jack_error ( "Can't connect : %s", StrError ( NET_ERROR_CODE ) );
             return false;
         }
@@ -245,22 +243,19 @@ namespace Jack
             SessionParamsNToH(&net_params, &host_params);
         }
         while ( ( GetPacketType ( &host_params ) != START_MASTER ) && ( ++attempt < SLAVE_SETUP_RETRY ) );
-        if ( attempt == SLAVE_SETUP_RETRY )
-        {
+        if ( attempt == SLAVE_SETUP_RETRY ) {
             jack_error ( "Slave doesn't respond, exiting." );
             return false;
         }
 
         //set the new timeout for the socket
-        if ( SetRxTimeout() == SOCKET_ERROR )
-        {
+        if ( SetRxTimeout() == SOCKET_ERROR ) {
             jack_error ( "Can't set rx timeout : %s", StrError ( NET_ERROR_CODE ) );
             return false;
         }
 
         //set the new rx buffer size
-        if ( SetNetBufferSize() == SOCKET_ERROR )
-        {
+        if ( SetNetBufferSize() == SOCKET_ERROR ) {
             jack_error ( "Can't set net buffer sizes : %s", StrError ( NET_ERROR_CODE ) );
             return false;
         }
@@ -619,7 +614,7 @@ namespace Jack
             //first, get a master, do it until a valid connection is running
             do
             {
-                status = GetNetMaster();
+                status = SendAvailableToMaster();
                 if ( status == NET_SOCKET_ERROR )
                     return false;
             }
@@ -651,7 +646,7 @@ namespace Jack
         do
         {
             //get a master
-            status = GetNetMaster();
+            status = SendAvailableToMaster();
             if (status == NET_SOCKET_ERROR)
                 return false;
         }
@@ -678,26 +673,27 @@ namespace Jack
         return true;
     }
 
-    net_status_t JackNetSlaveInterface::GetNetMaster()
+    net_status_t JackNetSlaveInterface::SendAvailableToMaster()
     {
-        jack_log ( "JackNetSlaveInterface::GetNetMaster()" );
+        jack_log ( "JackNetSlaveInterface::SendAvailableToMaster()" );
         //utility
         session_params_t host_params;
         int rx_bytes = 0;
 
         //socket
-        if ( fSocket.NewSocket() == SOCKET_ERROR )
-        {
+        if ( fSocket.NewSocket() == SOCKET_ERROR ) {
             jack_error ( "Fatal error : network unreachable - %s", StrError ( NET_ERROR_CODE ) );
             return NET_SOCKET_ERROR;
         }
 
         //bind the socket
-        if ( fSocket.Bind() == SOCKET_ERROR )
+        if ( fSocket.Bind() == SOCKET_ERROR ) {
             jack_error ( "Can't bind the socket : %s", StrError ( NET_ERROR_CODE ) );
+            return NET_SOCKET_ERROR;
+        }
 
         //timeout on receive
-        if ( fSocket.SetTimeOut ( SLAVE_INIT_TIMEOUT ) == SOCKET_ERROR )
+        if ( fSocket.SetTimeOut ( SLAVE_INIT_TIMEOUT ) == SOCKET_ERROR ) 
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //disable local loop
@@ -730,12 +726,13 @@ namespace Jack
         fParams = host_params;
 
         //set the new buffer sizes
-        if ( SetNetBufferSize() == SOCKET_ERROR )
+        if ( SetNetBufferSize() == SOCKET_ERROR ) {
             jack_error ( "Can't set net buffer sizes : %s", StrError ( NET_ERROR_CODE ) );
+             return NET_SOCKET_ERROR;
+        }
 
         //connect the socket
-        if ( fSocket.Connect() == SOCKET_ERROR )
-        {
+        if ( fSocket.Connect() == SOCKET_ERROR ) {
             jack_error ( "Error in connect : %s", StrError ( NET_ERROR_CODE ) );
             return NET_CONNECT_ERROR;
         }

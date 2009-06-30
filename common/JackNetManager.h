@@ -105,7 +105,7 @@ namespace Jack
             bool fAutoConnect;
 
             void Run();
-            JackNetMaster* MasterInit ( session_params_t& params );
+            JackNetMaster* InitMaster ( session_params_t& params );
             master_list_it_t FindMaster ( uint32_t client_id );
             int KillMaster ( session_params_t* params );
             void SetSlaveName ( session_params_t& params );

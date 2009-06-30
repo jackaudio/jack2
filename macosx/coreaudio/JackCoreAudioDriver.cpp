@@ -26,7 +26,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "JackGlobals.h"
 #include "JackCompilerDeps.h"
+
 #include <iostream>
+#include <CoreServices/CoreServices.h>
 
 namespace Jack
 {
@@ -255,19 +257,22 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
          
     switch (inPropertyID) {
 
-        case kAudioDeviceProcessorOverload:
+        case kAudioDeviceProcessorOverload: {
             jack_error("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload");
             jack_time_t cur_time = GetMicroSeconds();
             driver->NotifyXRun(cur_time, float(cur_time - driver->fBeginDateUst));   // Better this value than nothing... 
             break;
+		}
 
-        case kAudioDevicePropertyStreamConfiguration:
+        case kAudioDevicePropertyStreamConfiguration: {
             jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server may not work correctly anymore...");
             return kAudioHardwareUnsupportedOperationError;
+		}
             
-         case kAudioDevicePropertyNominalSampleRate: 
+		case kAudioDevicePropertyNominalSampleRate: {
             jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server may not work correctly anymore...");
             return kAudioHardwareUnsupportedOperationError;
+		}
           
         /*
         case kAudioDevicePropertyNominalSampleRate: {

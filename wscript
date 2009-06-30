@@ -68,8 +68,6 @@ def set_options(opt):
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
-    opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
-    opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
     opt.sub_options('dbus')
 
 def configure(conf):

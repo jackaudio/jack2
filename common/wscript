@@ -141,9 +141,6 @@ def build(bld):
             '../posix/JackSocketServerNotifyChannel.cpp',
             '../posix/JackNetUnixSocket.cpp',
             ]
-	    
-    if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']:
-	serverlib.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c']
 
     if bld.env['IS_SUN']:
         serverlib.source += [
