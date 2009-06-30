@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-06-30 Stephane Letz  <letz@grame.fr>
+
+	* Tim Bechmann patch : hammerfall, only release monitor thread, if it has been created.
+
 2009-06-19 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackTransportEngine::MakeAllLocating, sync callback has to be called in this case also.
