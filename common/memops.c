@@ -300,6 +300,8 @@ void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsign
 {
 	/* ALERT: signed sign-extension portability !!! */
 
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
+
 	while (nsamples--) {
 		int x;
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -319,7 +321,7 @@ void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsign
 		x <<= 8;
 		x |= (unsigned char)(src[0]);
 #endif
-		*dst = (x >> 8) / SAMPLE_24BIT_SCALING;
+		*dst = (x >> 8) * scaling;
 		dst++;
 		src += src_skip;
 	}
@@ -357,8 +359,9 @@ void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigne
 
 	/* ALERT: signed sign-extension portability !!! */
 
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
 	while (nsamples--) {
-		*dst = (*((int *) src) >> 8) / SAMPLE_24BIT_SCALING;
+		*dst = (*((int *) src) >> 8) * scaling;
 		dst++;
 		src += src_skip;
 	}
@@ -404,6 +407,7 @@ void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned 
 {
 	/* ALERT: signed sign-extension portability !!! */
 
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
 	while (nsamples--) {
 		int x;
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -427,15 +431,43 @@ void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned 
 			x |= 0xff << 24;
 		}
 #endif
-		*dst = x / SAMPLE_24BIT_SCALING;
+		*dst = x * scaling;
 		dst++;
 		src += src_skip;
 	}
-}	
+}
 
 void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
-	/* ALERT: signed sign-extension portability !!! */
+	const jack_default_audio_sample_t scaling = 1.f/SAMPLE_24BIT_SCALING;
+
+#if defined (__SSE2__) && !defined (__sun__)
+	const __m128 scaling_block = _mm_set_ps1(scaling);
+	while (nsamples > 4) {
+		int x0, x1, x2, x3;
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		memcpy((char*)&x0 + 1, src, 3);
+		memcpy((char*)&x1 + 1, src+src_skip, 3);
+		memcpy((char*)&x2 + 1, src+2*src_skip, 3);
+		memcpy((char*)&x3 + 1, src+3*src_skip, 3);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		memcpy(&x0, src, 3);
+		memcpy(&x1, src+src_skip, 3);
+		memcpy(&x2, src+2*src_skip, 3);
+		memcpy(&x3, src+3*src_skip, 3);
+#endif
+		src += 4 * src_skip;
+
+		const __m128i block_i = _mm_set_epi32(x3, x2, x1, x0);
+		const __m128i shifted = _mm_srai_epi32(block_i, 8);
+		const __m128 converted = _mm_cvtepi32_ps (shifted);
+		const __m128 scaled = _mm_mul_ps(converted, scaling_block);
+		_mm_storeu_ps(dst, scaled);
+		dst += 4;
+		nsamples -= 4;
+	}
+#endif
 
 	while (nsamples--) {
 		int x;
@@ -445,11 +477,11 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 		memcpy(&x, src, 3);
 #endif
 		x >>= 8;
-		*dst = x / SAMPLE_24BIT_SCALING;
+		*dst = x * scaling;
 		dst++;
 		src += src_skip;
 	}
-}	
+}
 
 
 void sample_move_d16_sSs (char *dst,  jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)	
@@ -636,6 +668,7 @@ void sample_move_dither_shaped_d16_sS (char *dst,  jack_default_audio_sample_t *
 void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) 	
 {
 	short z;
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_16BIT_SCALING;
 
 	/* ALERT: signed sign-extension portability !!! */
 	while (nsamples--) {
@@ -648,7 +681,7 @@ void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned 
 		z <<= 8;
 		z |= (unsigned char)(src[0]);
 #endif
-		*dst = z / SAMPLE_16BIT_SCALING;
+		*dst = z * scaling;
 		dst++;
 		src += src_skip;
 	}
@@ -657,8 +690,9 @@ void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned 
 void sample_move_dS_s16 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) 
 {
 	/* ALERT: signed sign-extension portability !!! */
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_16BIT_SCALING;
 	while (nsamples--) {
-		*dst = (*((short *) src)) / SAMPLE_16BIT_SCALING;
+		*dst = (*((short *) src)) * scaling;
 		dst++;
 		src += src_skip;
 	}
