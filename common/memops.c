@@ -467,6 +467,7 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 		dst += 4;
 		nsamples -= 4;
 	}
+#endif
 
 	while (nsamples--) {
 		int x;
