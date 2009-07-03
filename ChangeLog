@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-07-03 Stephane Letz  <letz@grame.fr>
+
+	* Another Tim Bechmann memops.c optimization patch.
+
 2009-07-01 Stephane Letz  <letz@grame.fr>
 
 	* Tim Bechmann memops.c optimization patch.
