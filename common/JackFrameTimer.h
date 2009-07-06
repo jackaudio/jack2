@@ -67,7 +67,7 @@ class SERVER_EXPORT JackTimer
             return fCurrentWakeup;
         }
 
-};
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief A class using the JackAtomicState to manage jack time.
