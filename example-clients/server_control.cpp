@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 		}
 	}
     
-	server = jackctl_server_create();
+	server = jackctl_server_create(NULL, NULL);
     parameters = jackctl_server_get_parameters(server);
     
     /*

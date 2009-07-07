@@ -59,6 +59,7 @@ def build(bld):
         #'xml_nop.c',
         'xml_write_raw.c',
         'sigsegv.c',
+	'reserve.c',
         ]
     if bld.env['IS_LINUX']:
         obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'

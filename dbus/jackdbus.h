@@ -312,5 +312,6 @@ jack_dbus_send_signal(
 #define JACK_CONTROLLER_OBJECT_PATH "/org/jackaudio/Controller"
 
 extern struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[];
+extern DBusConnection * g_connection;
 
 #endif /* #ifndef DBUS_H__3DB2458F_44B2_43EA_882A_9F888DF71A88__INCLUDED */
