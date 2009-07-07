@@ -145,7 +145,7 @@ JackAlsaDriver::alsa_driver_check_card_type (alsa_driver_t *driver)
     }
 
     driver->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
-    jack_info("Using ALSA driver %s running on %s", driver->alsa_driver, snd_ctl_card_info_get_longname(card_info));
+    jack_info("Using ALSA driver %s running on card %i - %s", driver->alsa_driver, snd_ctl_card_info_get_card(card_info), snd_ctl_card_info_get_longname(card_info));
 
     regfree(&expression);
     free(ctl_name);
