@@ -180,7 +180,7 @@ def build(bld):
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.uselib = uselib
     clientlib.install_path = '${LIBDIR}'
-    if bld.env['BUILD_JACKDBUS'] == True:
+    if bld.env['BUILD_JACKDBUS'] == True and bld.env['BUILD_JACKD'] == False:
         clientlib.uselib.append('DBUS-1')
     clientlib.includes = includes
     clientlib.name         = 'clientlib'

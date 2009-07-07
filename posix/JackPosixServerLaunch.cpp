@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 using namespace Jack;
 
-#if defined(JACK_DBUS)
+#if defined(USE_LIBDBUS_AUTOLAUNCH)
 
 #include <dbus/dbus.h>
 
@@ -73,7 +73,7 @@ static int start_server_dbus(const char* server_name)
     return 0;
 }
 
-#endif
+#else
 
 /* Exec the JACK server in this process.  Does not return. */
 static void start_server_classic_aux(const char* server_name)
@@ -189,13 +189,15 @@ static int start_server_classic(const char* server_name)
     return 0;			/* (probably) successful */
 }
 
+#endif
+
 static int start_server(const char* server_name, jack_options_t options)
 {
     if ((options & JackNoStartServer) || getenv("JACK_NO_START_SERVER")) {
         return 1;
     }
 
-#if defined(JACK_DBUS)
+#if defined(USE_LIBDBUS_AUTOLAUNCH)
     return start_server_dbus(server_name);
 #else
     return start_server_classic(server_name);
