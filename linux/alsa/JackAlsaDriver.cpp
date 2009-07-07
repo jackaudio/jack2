@@ -104,30 +104,47 @@ JackAlsaDriver::alsa_driver_check_capabilities (alsa_driver_t *driver)
     return 0;
 }
 
+static
+char *
+get_control_device_name (const char * device_name)
+{
+    char * ctl_name;
+    regex_t expression;
+
+    regcomp(&expression, "(plug)?hw:[0-9](,[0-9])?", REG_ICASE | REG_EXTENDED);
+
+    if (!regexec(&expression, device_name, 0, NULL, 0)) {
+        /* the user wants a hw or plughw device, the ctl name
+         * should be hw:x where x is the card number */
+
+        char tmp[5];
+        strncpy(tmp, strstr(device_name, "hw"), 4);
+        tmp[4] = '\0';
+        //jack_log("control device %s", tmp);
+        ctl_name = strdup(tmp);
+    } else {
+        ctl_name = strdup(device_name);
+    }
+
+    regfree(&expression);
+
+    if (ctl_name == NULL) {
+        jack_error("strdup(\"%s\") failed.", ctl_name);
+    }
+
+    return ctl_name;
+}
+
 int
 JackAlsaDriver::alsa_driver_check_card_type (alsa_driver_t *driver)
 {
     int err;
     snd_ctl_card_info_t *card_info;
     char * ctl_name;
-    regex_t expression;
 
     snd_ctl_card_info_alloca (&card_info);
 
-    regcomp(&expression, "(plug)?hw:[0-9](,[0-9])?", REG_ICASE | REG_EXTENDED);
-
-    if (!regexec(&expression, driver->alsa_name_playback, 0, NULL, 0)) {
-        /* the user wants a hw or plughw device, the ctl name
-         * should be hw:x where x is the card number */
-
-        char tmp[5];
-        strncpy(tmp, strstr(driver->alsa_name_playback, "hw"), 4);
-        tmp[4] = '\0';
-        jack_log("control device %s", tmp);
-        ctl_name = strdup(tmp);
-    } else {
-        ctl_name = strdup(driver->alsa_name_playback);
-    }
+    ctl_name = get_control_device_name(driver->alsa_name_playback);
 
     // XXX: I don't know the "right" way to do this. Which to use
     // driver->alsa_name_playback or driver->alsa_name_capture.
@@ -147,7 +164,6 @@ JackAlsaDriver::alsa_driver_check_card_type (alsa_driver_t *driver)
     driver->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
     jack_info("Using ALSA driver %s running on card %i - %s", driver->alsa_driver, snd_ctl_card_info_get_card(card_info), snd_ctl_card_info_get_longname(card_info));
 
-    regfree(&expression);
     free(ctl_name);
 
     return alsa_driver_check_capabilities (driver);
@@ -2146,16 +2162,41 @@ int JackAlsaDriver::Detach()
 #if defined(JACK_DBUS)
 static int card_to_num(const char* device) 
 {
-    const char* t;
-    int i;
+    int err;
+    char* ctl_name;
+    snd_ctl_card_info_t *card_info;
+    snd_ctl_t* ctl_handle;
+    int i = -1;
 
-    if ((t = strchr(device, ':')))
-       device = t + 1;
+    snd_ctl_card_info_alloca (&card_info);
 
-    if ((i = snd_card_get_index(device)) < 0) {
-       i = atoi(device);
+    ctl_name = get_control_device_name(device);
+    if (ctl_name == NULL) {
+        jack_error("get_control_device_name() failed.");
+        goto fail;
     }
 
+    if ((err = snd_ctl_open (&ctl_handle, ctl_name, 0)) < 0) {
+        jack_error ("control open \"%s\" (%s)", ctl_name,
+                    snd_strerror(err));
+        goto free;
+    }
+
+    if ((err = snd_ctl_card_info(ctl_handle, card_info)) < 0) {
+        jack_error ("control hardware info \"%s\" (%s)",
+                    device, snd_strerror (err));
+        goto close;
+    }
+
+    i = snd_ctl_card_info_get_card(card_info);
+
+close:
+    snd_ctl_close(ctl_handle);
+
+free:
+    free(ctl_name);
+
+fail:
     return i;
 }
 #endif
