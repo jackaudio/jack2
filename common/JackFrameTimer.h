@@ -44,8 +44,8 @@ class SERVER_EXPORT JackTimer
         jack_time_t	fCurrentCallback;
         jack_time_t	fNextWakeUp;
         float fSecondOrderIntegrator;
-        bool fInitialized;
         float fFilterCoefficient;	/* set once, never altered */
+        bool fInitialized;
 
     public: 
     

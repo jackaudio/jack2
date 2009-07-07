@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-07-07 Stephane Letz  <letz@grame.fr>
+
+	* Use __attribute__((__aligned__(32))) instead of __attribute__((__packed__)) for 64/32 mixed mode.
+
 2009-07-03 Stephane Letz  <letz@grame.fr>
 
 	* Another Tim Bechmann memops.c optimization patch.
