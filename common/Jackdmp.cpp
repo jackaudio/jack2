@@ -208,7 +208,7 @@ int main(int argc, char* argv[])
 
     copyright(stdout);
 
-    server_ctl = jackctl_server_create();
+    server_ctl = jackctl_server_create(NULL, NULL);
     if (server_ctl == NULL) {
         fprintf(stderr, "Failed to create server object\n");
         return -1;

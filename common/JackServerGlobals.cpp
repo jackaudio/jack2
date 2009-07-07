@@ -30,6 +30,8 @@ namespace Jack
 
 JackServer* JackServerGlobals::fInstance; 
 unsigned int JackServerGlobals::fUserCount;
+bool (* JackServerGlobals::on_device_acquire)(const char * device_name) = NULL;
+void (* JackServerGlobals::on_device_release)(const char * device_name) = NULL;
 
 int JackServerGlobals::Start(const char* server_name,
                              jack_driver_desc_t* driver_desc,

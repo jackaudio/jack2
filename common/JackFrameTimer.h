@@ -44,8 +44,8 @@ class SERVER_EXPORT JackTimer
         jack_time_t	fCurrentCallback;
         jack_time_t	fNextWakeUp;
         float fSecondOrderIntegrator;
-        bool fInitialized;
         float fFilterCoefficient;	/* set once, never altered */
+        bool fInitialized;
 
     public: 
     
@@ -67,7 +67,7 @@ class SERVER_EXPORT JackTimer
             return fCurrentWakeup;
         }
 
-};
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief A class using the JackAtomicState to manage jack time.

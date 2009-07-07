@@ -47,10 +47,6 @@ def build(bld):
                        'alsa/hammerfall.c',
                        'alsa/ice1712.c'
                        ]
-		       
-    if bld.env['BUILD_JACKDBUS']:
-	alsa_driver_src += ['../dbus/reserve.c', '../dbus/audio_reserve.c']
-		       
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
         create_jack_driver_obj(bld, 'alsa', alsa_driver_src, "ALSA")

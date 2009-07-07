@@ -88,7 +88,9 @@ jackctl_wait_signals(
     sigset_t signals);
 
 EXPORT jackctl_server_t *
-jackctl_server_create();
+jackctl_server_create(
+    bool (* on_device_acquire)(const char * device_name),
+    void (* on_device_release)(const char * device_name));
 
 EXPORT void
 jackctl_server_destroy(

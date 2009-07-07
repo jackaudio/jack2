@@ -29,6 +29,7 @@
 #include "controller.h"
 #include "controller_internal.h"
 #include "xml.h"
+#include "reserve.h"
 
 struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
 {
@@ -279,6 +280,58 @@ jack_controller_switch_master(
     return TRUE;
 }
 
+/* TODO: use contianer with unique entries (dict) */
+bool g_reserved_device_valid = false;
+static rd_device * g_reserved_device;
+
+static
+bool
+on_device_acquire(const char * device_name)
+{
+    int ret;
+    DBusError error;
+
+    if (g_reserved_device_valid) {
+        jack_error("Ignoring reservation for more than one device (acquire)");
+        return false;
+    }
+
+    ret = rd_acquire(
+        &g_reserved_device,
+        g_connection,
+        device_name,
+        "Jack audio server",
+        INT32_MAX,
+        NULL,
+        &error);
+    if (ret  < 0)
+    {
+        jack_error("Failed to acquire device name : %s error : %s", device_name, (error.message ? error.message : strerror(-ret)));
+        return false;
+    }
+
+    g_reserved_device_valid = true;
+
+    jack_info("Acquired audio card %s", device_name);
+
+    return true;
+}
+
+static
+void
+on_device_release(const char * device_name)
+{
+    if (!g_reserved_device_valid) {
+        jack_error("Ignoring reservation for more than one device(release)");
+    }
+
+    rd_release(g_reserved_device);
+
+    g_reserved_device_valid = false;
+
+    jack_info("Released audio card %s", device_name);
+}
+
 void *
 jack_controller_create(
         DBusConnection *connection)
@@ -303,7 +356,7 @@ jack_controller_create(
         goto fail;
     }
 
-    controller_ptr->server = jackctl_server_create();
+    controller_ptr->server = jackctl_server_create(on_device_acquire, on_device_release);
     if (controller_ptr->server == NULL)
     {
         jack_error("Failed to create server object");

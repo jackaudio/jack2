@@ -43,6 +43,7 @@
 #include "JackLockedEngine.h"
 #include "JackConstants.h"
 #include "JackDriverLoader.h"
+#include "JackServerGlobals.h"
 
 using namespace Jack;
 
@@ -631,7 +632,9 @@ get_realtime_priority_constraint()
     return constraint_ptr;
 }
 
-EXPORT jackctl_server_t * jackctl_server_create()
+EXPORT jackctl_server_t * jackctl_server_create(
+    bool (* on_device_acquire)(const char * device_name),
+    void (* on_device_release)(const char * device_name))
 {
     struct jackctl_server * server_ptr;
     union jackctl_parameter_value value;
@@ -808,6 +811,9 @@ EXPORT jackctl_server_t * jackctl_server_create()
     {
         goto fail_free_parameters;
     }
+
+    JackServerGlobals::on_device_acquire = on_device_acquire;
+    JackServerGlobals::on_device_release = on_device_release;
 
     if (!jackctl_drivers_load(server_ptr))
     {
