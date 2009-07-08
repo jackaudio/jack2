@@ -137,8 +137,6 @@ The binary elements are :
 
 - JackRouter.dll : an ASIO/JACK driver that allows ASIO compatible applications to become JACK clients and access the JACK server. ASIO "jackified" applications appear with their names. Ableton Live, Samplitude, Reason, Arturia applications have been successfully tested. To install it, use "regsvr32 JackRouter.dll" in a terminal (use regsvr32 /u JackRouter.dll to uninstall). [VISTA special note: regsvr32 has to be used with "administrator" priviledges to properly register JackRouter.dll (Start Menu -> All Programs -> Accessories -> Right Click on Command Prompt -> Run As Administrator)]. A JackRouter.ini file is used by the driver to read parameters : an [IO] section allows to setup the number of input/output jack ports for the application and a [AUTO_CONNECT] section allows to setup jack ports autoconnection mode to machine input/output.
 
-All dll are compiled in "release" mode. The "Debug" folder contains debug version of all dlls and libraries. MSVCRTD.dll and MSVCP60D.dll debug dll are also included.
-
 WARNING !! WARNING !!
 
 Depending of the used interface and driver settings, the PortAudio layer may add additionnal buffering between the real card interrupt and the jack server callback. This usually result in *unregular* calls of the jack server callback (for example if jack server used a 256 frames buffer and the card used a 512 frames, the jack server callback will be called twice every card interrupt). For proper functionning of jack server and clients in this case, the jack server has to be started in "synchronous" mode, using the "-S" parameter.
@@ -156,16 +154,6 @@ Automatic server launch
 Starting from the 0.64 version, automatic server launch from client is implemented : when the server is not yet running, and if the client uses the "jack_client_open" API, the server will be started automatically. The server configuration is saved in a ".jackdrc" file located in the user home folder. The Qjackctl tool allows to save its configuration in this . jackdrc (setting can be done in Qjackctl Setup/Misc). If no configuration file is found, a default setup will be used. 
 
 WARNING : automatic server launch is not implemented on Windows
-
-----------------
-Loopback driver
-----------------
-
-An experimental loopback driver allows to manually "pipeline" applications connected in sequence, and thus parallelize sequential sub-graph. Lets say we have A ==> B graph, by using the loopback driver, it can be rewritten as : A ==> loopback driver ==> B. At each cycle, the loopback driver copy buffers received on its input ports (at the previous cycle) to its output ports. The resulting graph become parallel and thus can take profit of multi-processors machines, at each cycle A and B can be activated in parallel. Note that the loopback driver add a one buffer delay in the connection, which may be relevant in more complex graphs when having global synchronicity between clients is a desirable property.  
-
-To activate loopback driver, use :
-
-- jackd (jackdmp) ... -L n ...  where n is the number of input/output ports.
 
 ------------------
 Validations tools

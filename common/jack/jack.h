@@ -108,6 +108,7 @@ jack_client_t * jack_client_open (const char *client_name,
 * \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
 *  NEW JACK CLIENTS
 *
+* @deprecated Please use jack_client_open().
 */
 jack_client_t * jack_client_new (const char *client_name);
 
@@ -212,8 +213,7 @@ int jack_is_realtime (jack_client_t *client);
  * \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
  *  NEW JACK CLIENTS.
  *
- * It should be replace by use of @ jack_cycle_wait and @ jack_cycle_signal functions.
- *
+ * @deprecated Please use jack_cycle_wait() and jack_cycle_signal() functions.
  */
 jack_nframes_t jack_thread_wait (jack_client_t*, int status);
 
@@ -835,7 +835,7 @@ int jack_port_set_alias (jack_port_t *port, const char *alias);
  */
 int jack_port_unset_alias (jack_port_t *port, const char *alias);
 
-/*
+/**
  * Get any aliases known for @port.
  *
  * @return the number of aliases discovered for the port
