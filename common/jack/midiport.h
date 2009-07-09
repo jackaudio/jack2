@@ -47,7 +47,7 @@ typedef struct _jack_midi_event
  * @{
  */
 
-/* Get number of events in a port buffer.
+/** Get number of events in a port buffer.
  *
  * @param port_buffer Port buffer from which to retrieve event.
  * @return number of events inside @a port_buffer

@@ -61,6 +61,7 @@ def set_options(opt):
     opt.tool_options('compiler_cc')
 
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
+    opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
@@ -206,7 +207,22 @@ def configure(conf):
             print Logs.colors.NORMAL,
     print
 
+    if Options.options.mixed == True:
+	env_variant2 = conf.env.copy()
+	conf.set_env_name('lib32', env_variant2)
+	env_variant2.set_variant('lib32')
+	conf.setenv('lib32')
+    	conf.env.append_unique('CXXFLAGS', '-m32')
+    	conf.env.append_unique('CCFLAGS', '-m32')
+    	conf.env.append_unique('LINKFLAGS', '-m32')
+        conf.write_config_header('config.h')
+    	if Options.options.libdir32:
+	    conf.env['LIBDIR'] = Options.options.libdir32
+    	else:
+	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32/'
+
 def build(bld):
+    print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 

@@ -25,6 +25,11 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-07-09 Stephane Letz  <letz@grame.fr>
+
+	* Use __attribute__((__packed__)) again, more fixes for 64/32 mixed mode.
+	* Torben Hohn changes for 64/32 mixed mode in wscripts.
+
 2009-07-07 Stephane Letz  <letz@grame.fr>
 
 	* Use __attribute__((__aligned__(32))) instead of __attribute__((__packed__)) for 64/32 mixed mode.

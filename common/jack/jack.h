@@ -236,7 +236,7 @@ void jack_cycle_signal (jack_client_t* client, int status);
 
 /**
  * Tell the Jack server to call @a thread_callback in the RT thread.
- * Typical use are in conjunction with @a jack_cycle_wait and @ jack_cycle_signal functions.
+ * Typical use are in conjunction with @a jack_cycle_wait and @a jack_cycle_signal functions.
  * The code in the supplied function must be suitable for real-time
  * execution.  That means that it cannot call functions that might
  * block for a long time. This includes malloc, free, printf,
