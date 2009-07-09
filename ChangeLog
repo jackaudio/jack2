@@ -29,6 +29,7 @@ Paul Davis
 
 	* Use __attribute__((__packed__)) again, more fixes for 64/32 mixed mode.
 	* Torben Hohn changes for 64/32 mixed mode in wscripts.
+	* Add compile time option for maximum ports per application.
 
 2009-07-07 Stephane Letz  <letz@grame.fr>
 

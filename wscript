@@ -69,6 +69,7 @@ def set_options(opt):
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
+    opt.add_option('--ports-per-application', default=512, type="int", dest="application_ports", help='Maximum number of ports per application')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -136,7 +137,8 @@ def configure(conf):
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib/'
 
     conf.define('CLIENT_NUM', Options.options.clients)
-    conf.define('PORT_NUM', Options.options. ports)
+    conf.define('PORT_NUM', Options.options.ports)
+    conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
     conf.define('ADDON_DIR', os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack')))
     conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
@@ -170,6 +172,7 @@ def configure(conf):
 
     print "Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM']
     print "Build with a maximum of %d ports" % conf.env['PORT_NUM']
+    print "Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT']
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
