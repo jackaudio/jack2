@@ -119,7 +119,6 @@ def build(bld):
         'JackExternalClient.cpp',
         'JackFreewheelDriver.cpp',
         'JackInternalClient.cpp',
-        'JackLoopbackDriver.cpp',
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
         'JackRestartThreadedDriver.cpp',
