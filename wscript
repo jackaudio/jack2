@@ -132,9 +132,9 @@ def configure(conf):
         conf.env['BUILD_JACKD'] = True
 
     if Options.options.libdir:
-        conf.env['LIBDIR'] = Options.options.libdir
+        conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir
     else:
-        conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib/'
+        conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM', Options.options.ports)
@@ -220,9 +220,9 @@ def configure(conf):
     	conf.env.append_unique('LINKFLAGS', '-m32')
         conf.write_config_header('config.h')
     	if Options.options.libdir32:
-	    conf.env['LIBDIR'] = Options.options.libdir32
+	    conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
     	else:
-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32/'
+	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
 
 def build(bld):
     print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
