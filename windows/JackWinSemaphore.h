@@ -44,7 +44,7 @@ class JackWinSemaphore : public detail::JackSynchro
 
     public:
 
-        JackWinSemaphore(): fSemaphore(NULL)
+        JackWinSemaphore():JackSynchro(), fSemaphore(NULL)
         {}
 
         bool Signal();

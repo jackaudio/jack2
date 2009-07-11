@@ -269,7 +269,7 @@ void JackAudioDriver::ProcessGraphSync()
         fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
         if (ProcessSlaves() < 0)
             jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
-        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0)
+        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0)
             jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
     } else { // Graph not finished: do not activate it
         jack_error("JackAudioDriver::ProcessSync: error");

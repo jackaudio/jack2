@@ -48,7 +48,7 @@ class SERVER_EXPORT JackFifo : public detail::JackSynchro
 
     public:
 
-        JackFifo(): fFifo( -1)
+        JackFifo():JackSynchro(), fFifo(-1)
         {}
 
         bool Signal();

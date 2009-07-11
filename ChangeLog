@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-07-11 Stephane Letz  <letz@grame.fr>
+
+	* Raise drivers time out used in synchronous mode.
+
 2009-07-09 Stephane Letz  <letz@grame.fr>
 
 	* Use __attribute__((__packed__)) again, more fixes for 64/32 mixed mode.
