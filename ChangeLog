@@ -28,6 +28,8 @@ Paul Davis
 2009-07-16 Stephane Letz  <letz@grame.fr>
 
 	* Rename JackDriver::Init method to JackDriver::Initialize (to avoid confusion with JackThread::Init method).
+	* Update Solaris boomer driver.
+	* Report some cleanup and documentation improvements done on JACK1 timing functions.
 
 2009-07-11 Stephane Letz  <letz@grame.fr>
 
