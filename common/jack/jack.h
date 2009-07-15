@@ -483,7 +483,7 @@ int jack_set_xrun_callback (jack_client_t *,
 /*@}*/
 
 /**
- * @defgroup ServerControl Controlling & querying JACK server operation
+ * @defgroup ServerClientControl Controlling & querying JACK server operation
  * @{
  */
                          
