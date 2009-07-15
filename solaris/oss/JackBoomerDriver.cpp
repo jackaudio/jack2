@@ -61,7 +61,8 @@ struct OSSCycleTable {
 };
 
 OSSCycleTable gCycleTable;
-int gCycleCount = 0;
+int gCycleReadCount = 0;
+int gCycleWriteCount = 0;
 
 #endif
 
@@ -395,12 +396,11 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
         return -1;
     } else {
 
-/*
-        if (fEngineControl->fSyncMode) {
-            jack_error("Cannot run in synchronous mode, remove the -S parameter for jackd");
+        if (!fEngineControl->fSyncMode) {
+            jack_error("Cannot run in asynchronous mode, use the -S parameter for jackd");
             return -1;
         }
-*/   
+
         fRWMode |= ((capturing) ? kRead : 0);
         fRWMode |= ((playing) ? kWrite : 0);
         fBits = bits;
@@ -429,7 +429,7 @@ int JackBoomerDriver::Close()
     
     if (file) {
         jack_info("Writing OSS driver timing data....");
-        for (int i = 1; i < gCycleCount; i++) {
+        for (int i = 1; i < std::min(gCycleReadCount, gCycleWriteCount); i++) {
             int d1 = gCycleTable.fTable[i].fAfterRead - gCycleTable.fTable[i].fBeforeRead;
             int d2 = gCycleTable.fTable[i].fAfterReadConvert - gCycleTable.fTable[i].fAfterRead;
             int d3 = gCycleTable.fTable[i].fAfterWrite - gCycleTable.fTable[i].fBeforeWrite;
@@ -492,7 +492,7 @@ int JackBoomerDriver::OpenAux()
     if (fPlaybackChannels > 0) {
         fRingBuffer = new jack_ringbuffer_t*[fPlaybackChannels];
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fRingBuffer[i] = jack_ringbuffer_create(fOutputBufferSize * 8);
+            fRingBuffer[i] = jack_ringbuffer_create(fOutputBufferSize * 2);
             jack_ringbuffer_read_advance(fRingBuffer[i], fOutputBufferSize);
         }
     }
@@ -567,7 +567,7 @@ int JackBoomerDriver::Read()
     }
  
 #ifdef JACK_MONITOR
-    gCycleTable.fTable[gCycleCount].fBeforeRead =  GetMicroSeconds();
+    gCycleTable.fTable[gCycleReadCount].fBeforeRead = GetMicroSeconds();
 #endif
 
     audio_errinfo ei_in;
@@ -576,7 +576,7 @@ int JackBoomerDriver::Read()
 #ifdef JACK_MONITOR
     if (count > 0 && count != (int)fInputBufferSize)
         jack_log("JackBoomerDriver::Read count = %ld", count / (fSampleSize * fCaptureChannels));
-    gCycleTable.fTable[gCycleCount].fAfterRead = GetMicroSeconds();
+    gCycleTable.fTable[gCycleReadCount].fAfterRead = GetMicroSeconds();
 #endif
     
     // XRun detection
@@ -610,7 +610,8 @@ int JackBoomerDriver::Read()
         }
 
     #ifdef JACK_MONITOR
-        gCycleTable.fTable[gCycleCount].fAfterReadConvert = GetMicroSeconds();
+        gCycleTable.fTable[gCycleReadCount].fAfterReadConvert = GetMicroSeconds();
+        gCycleReadCount = (gCycleReadCount == CYCLE_POINTS - 1) ? gCycleReadCount: gCycleReadCount + 1;
     #endif
         
         return 0;
@@ -668,6 +669,10 @@ bool JackBoomerDriver::Init()
 bool JackBoomerDriver::Execute()
 {
     memset(fOutputBuffer, 0, fOutputBufferSize);
+
+#ifdef JACK_MONITOR
+    gCycleTable.fTable[gCycleWriteCount].fBeforeWriteConvert = GetMicroSeconds();
+#endif
    
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
@@ -697,18 +702,16 @@ bool JackBoomerDriver::Execute()
     }
     
 #ifdef JACK_MONITOR
-    gCycleTable.fTable[gCycleCount].fBeforeWrite = GetMicroSeconds();
+    gCycleTable.fTable[gCycleWriteCount].fBeforeWrite = GetMicroSeconds();
 #endif    
 
-    // Keep end cycle time
-    JackDriver::CycleTakeEndTime();
     ssize_t count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
 
 #ifdef JACK_MONITOR
     if (count > 0 && count != (int)fOutputBufferSize)
         jack_log("JackBoomerDriver::Execute count = %ld", count / (fSampleSize * fPlaybackChannels));
-    gCycleTable.fTable[gCycleCount].fAfterWrite = GetMicroSeconds();
-    gCycleCount = (gCycleCount == CYCLE_POINTS - 1) ? gCycleCount: gCycleCount + 1;
+    gCycleTable.fTable[gCycleWriteCount].fAfterWrite = GetMicroSeconds();
+    gCycleWriteCount = (gCycleWriteCount == CYCLE_POINTS - 1) ? gCycleWriteCount: gCycleWriteCount + 1;
 #endif
 
     // XRun detection
@@ -742,30 +745,6 @@ int JackBoomerDriver::SetBufferSize(jack_nframes_t buffer_size)
     return OpenAux();
 }
 
-int JackBoomerDriver::ProcessAsync()
-{
-    // Read input buffers for the current cycle
-    if (Read() < 0) {   
-        jack_error("JackBoomerDriver::ProcessAsync: read error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
-    }
-
-    // Write output buffers from the previous cycle
-    if (Write() < 0) {
-        jack_error("JackBoomerDriver::ProcessAsync: write error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
-    }
-
-    if (fIsMaster) {
-        ProcessGraphAsync();
-    } else {
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
-    }
-    
-    // Keep end cycle time
-    JackDriver::CycleTakeEndTime();
-    return 0;
-}
 
 } // end of namespace
 

@@ -76,9 +76,6 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
         void SetSampleFormat();
         void DisplayDeviceInfo();
 
-        // Redefining since timing for CPU load is specific
-        int ProcessAsync();
-
     public:
 
         JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
