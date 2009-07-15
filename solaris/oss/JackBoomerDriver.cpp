@@ -395,11 +395,12 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
         return -1;
     } else {
 
+/*
         if (fEngineControl->fSyncMode) {
             jack_error("Cannot run in synchronous mode, remove the -S parameter for jackd");
             return -1;
         }
-     
+*/   
         fRWMode |= ((capturing) ? kRead : 0);
         fRWMode |= ((playing) ? kWrite : 0);
         fBits = bits;
@@ -491,7 +492,7 @@ int JackBoomerDriver::OpenAux()
     if (fPlaybackChannels > 0) {
         fRingBuffer = new jack_ringbuffer_t*[fPlaybackChannels];
         for (int i = 0; i < fPlaybackChannels; i++) {
-            fRingBuffer[i] = jack_ringbuffer_create(fOutputBufferSize * 2);
+            fRingBuffer[i] = jack_ringbuffer_create(fOutputBufferSize * 8);
             jack_ringbuffer_read_advance(fRingBuffer[i], fOutputBufferSize);
         }
     }
@@ -529,6 +530,7 @@ void JackBoomerDriver::CloseAux()
     delete [] fRingBuffer;
     fRingBuffer = NULL;
 }
+
 
 int JackBoomerDriver::Start()
 {
@@ -620,7 +622,7 @@ int JackBoomerDriver::Write()
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
             if (jack_ringbuffer_write(fRingBuffer[i], (char*)GetOutputBuffer(i), fOutputBufferSize) < fOutputBufferSize) {
-                 jack_log("JackBoomerDriver::Write ringbuffer full");
+                 jack_error("JackBoomerDriver::Write ringbuffer full");
             }
         }
     }
@@ -666,7 +668,7 @@ bool JackBoomerDriver::Init()
 bool JackBoomerDriver::Execute()
 {
     memset(fOutputBuffer, 0, fOutputBufferSize);
-    
+   
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
 
@@ -678,7 +680,7 @@ bool JackBoomerDriver::Execute()
 
             unsigned int needed_bytes = fOutputBufferSize;
             float* output = (float*)fOutputBuffer;
-  
+
             for (int j = 0; j < 2; j++) {
                 unsigned int consumed_bytes = std::min(needed_bytes, ring_buffer_data[j].len);    
                 CopyAndConvertOut(output, (float*)ring_buffer_data[j].buf, consumed_bytes / sizeof(float), i, fPlaybackChannels, fBits);
@@ -687,7 +689,7 @@ bool JackBoomerDriver::Execute()
             }
 
             if (needed_bytes > 0) {
-                jack_error("JackBoomerDriver::Execute missing frames = %ld", needed_bytes / sizeof(float));
+                jack_error("JackBoomerDriver::Execute missing bytes = %ld", needed_bytes);
             }
 
             jack_ringbuffer_read_advance(fRingBuffer[i], fOutputBufferSize - needed_bytes);
@@ -700,7 +702,7 @@ bool JackBoomerDriver::Execute()
 
     // Keep end cycle time
     JackDriver::CycleTakeEndTime();
-    ssize_t  count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
+    ssize_t count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
 
 #ifdef JACK_MONITOR
     if (count > 0 && count != (int)fOutputBufferSize)
@@ -987,7 +989,7 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     Jack::JackBoomerDriver* boomer_driver = new Jack::JackBoomerDriver("system", "boomer", engine, table);
     Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(boomer_driver);
     
-    // Special open for OSS driver...
+    // Special open for Boomer driver...
     if (boomer_driver->Open(frames_per_interrupt, nperiods, srate, capture, playback, chan_in, chan_out, 
         excl, monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency, bits, ignorehwbuf) == 0) {
         return threaded_driver;
