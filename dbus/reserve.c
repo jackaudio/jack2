@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include "reserve.h"
 
@@ -120,7 +121,7 @@ static DBusHandlerResult object_handler(
 
 	dbus_error_init(&error);
 
-	d = userdata;
+	d = (rd_device*)userdata;
 	assert(d->ref >= 1);
 
 	if (dbus_message_is_method_call(
@@ -296,7 +297,7 @@ static DBusHandlerResult filter_handler(
 
 	dbus_error_init(&error);
 
-	d = userdata;
+	d = (rd_device*)userdata;
 
 	if (dbus_message_is_signal(m, "org.freedesktop.DBus", "NameLost")) {
 		const char *name;
@@ -352,10 +353,7 @@ oom:
 	return DBUS_HANDLER_RESULT_NEED_MEMORY;
 }
 
-
-static const struct DBusObjectPathVTable vtable ={
-	.message_function = object_handler
-};
+static DBusObjectPathVTable vtable;
 
 int rd_acquire(
 	rd_device **_d,
@@ -371,6 +369,8 @@ int rd_acquire(
 	DBusError _error;
 	DBusMessage *m = NULL, *reply = NULL;
 	dbus_bool_t good;
+
+        vtable.message_function = object_handler;
 
 	if (!error)
 		error = &_error;
@@ -389,7 +389,7 @@ int rd_acquire(
 	if (!request_cb && priority != INT32_MAX)
 		return -EINVAL;
 
-	if (!(d = calloc(sizeof(rd_device), 1)))
+	if (!(d = (rd_device *)calloc(sizeof(rd_device), 1)))
 		return -ENOMEM;
 
 	d->ref = 1;
@@ -408,13 +408,13 @@ int rd_acquire(
 	d->connection = dbus_connection_ref(connection);
 	d->request_cb = request_cb;
 
-	if (!(d->service_name = malloc(sizeof(SERVICE_PREFIX) + strlen(device_name)))) {
+	if (!(d->service_name = (char*)malloc(sizeof(SERVICE_PREFIX) + strlen(device_name)))) {
 		r = -ENOMEM;
 		goto fail;
 	}
 	sprintf(d->service_name, SERVICE_PREFIX "%s", d->device_name);
 
-	if (!(d->object_path = malloc(sizeof(OBJECT_PREFIX) + strlen(device_name)))) {
+	if (!(d->object_path = (char*)malloc(sizeof(OBJECT_PREFIX) + strlen(device_name)))) {
 		r = -ENOMEM;
 		goto fail;
 	}

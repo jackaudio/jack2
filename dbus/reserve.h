@@ -28,6 +28,13 @@
 #include <dbus/dbus.h>
 #include <inttypes.h>
 
+# ifndef INT32_MIN
+# define INT32_MIN     (-2147483647-1)
+# endif
+# ifndef INT32_MAX
+# define INT32_MAX     (2147483647)
+# endif
+
 typedef struct rd_device rd_device;
 
 /* Prototype for a function that is called whenever someone else wants
@@ -39,6 +46,10 @@ typedef struct rd_device rd_device;
 typedef int (*rd_request_cb_t)(
 	rd_device *d,
 	int forced);                  /* Non-zero if an application forcibly took the lock away without asking. If this is the case then the return value of this call is ignored. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Try to lock the device. Returns 0 on success, a negative errno
  * style return value on error. The DBus error might be set as well if
@@ -65,5 +76,9 @@ void rd_set_userdata(rd_device *d, void *userdata);
 /* Query the userdata pointer from an rd_device. Returns NULL if no
  * userdata was set. */
 void* rd_get_userdata(rd_device *d);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif

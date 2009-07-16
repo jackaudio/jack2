@@ -32,6 +32,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 #include "JackDriverLoader.h"
 
+#if defined(JACK_DBUS) && defined(__linux__)
+#include <dbus/dbus.h> 
+#include "audio_reserve.h"
+#endif
+
 /*
 This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:
@@ -206,8 +211,11 @@ int main(int argc, char* argv[])
     union jackctl_parameter_value value;
 
     copyright(stdout);
-
+#if defined(JACK_DBUS) && defined(__linux__)
+    server_ctl = jackctl_server_create(audio_acquire, audio_release);
+#else
     server_ctl = jackctl_server_create(NULL, NULL);
+#endif
     if (server_ctl == NULL) {
         fprintf(stderr, "Failed to create server object\n");
         return -1;
