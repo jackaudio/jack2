@@ -97,6 +97,7 @@ static void usage(FILE* file)
             "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
             "               [ --name OR -n server-name ]\n"
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
+            "               [ --loopback OR -L loopback-port-number ]\n"
             "               [ --midi OR -X midi-driver ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
@@ -161,17 +162,19 @@ int main(int argc, char* argv[])
     const char* server_name = "default";
     jackctl_driver_t * audio_driver_ctl;
     jackctl_driver_t * midi_driver_ctl;
+    jackctl_driver_t * loopback_driver_ctl;
     
 #ifdef __linux__
-    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:c:";
+    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:c:L:";
 #else
-    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:";
+    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:L:";
 #endif
     
     struct option long_options[] = {
 #ifdef __linux__
                                        { "clock-source", 1, 0, 'c' },
 #endif
+                                       { "loopback-driver", 1, 0, 'L' },
                                        { "audio-driver", 1, 0, 'd' },
                                        { "midi-driver", 1, 0, 'X' },
                                        { "verbose", 0, 0, 'v' },
@@ -205,6 +208,7 @@ int main(int argc, char* argv[])
     int port_max = 512;
     int do_mlock = 1;
     int do_unlock = 0;
+    int loopback = 0;
     bool show_version = false;
     sigset_t signals;
     jackctl_parameter_t* param;
@@ -252,6 +256,10 @@ int main(int argc, char* argv[])
             case 'd':
                 seen_audio_driver = true;
                 audio_driver_name = optarg;
+                break;
+                
+            case 'L':
+                loopback = atoi(optarg);
                 break;
 
             case 'X':
@@ -320,14 +328,6 @@ int main(int argc, char* argv[])
                 param = jackctl_get_parameter(server_parameters, "realtime");
                 if (param != NULL) {
                     value.b = true;
-                    jackctl_parameter_set_value(param, &value);
-                }
-                break;
-
-            case 'L':
-                param = jackctl_get_parameter(server_parameters, "loopback-ports");
-                if (param != NULL) {
-                    value.ui = atoi(optarg);
                     jackctl_parameter_set_value(param, &value);
                 }
                 break;
@@ -421,6 +421,20 @@ int main(int argc, char* argv[])
         }
 
         jackctl_server_add_slave(server_ctl, midi_driver_ctl);
+    }
+    
+    // Loopback driver
+    if (loopback > 0) {
+        loopback_driver_ctl = jackctl_server_get_driver(server_ctl, "loopback");
+        if (loopback_driver_ctl != NULL) {
+            const JSList * loopback_parameters = jackctl_driver_get_parameters(loopback_driver_ctl);
+            param = jackctl_get_parameter(loopback_parameters, "channels");
+            if (param != NULL) {
+                value.ui = loopback;
+                jackctl_parameter_set_value(param, &value);
+            }
+            jackctl_server_add_slave(server_ctl, loopback_driver_ctl);
+        }
     }
 
     notify_server_start(server_name);

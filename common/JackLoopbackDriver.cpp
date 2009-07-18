@@ -62,7 +62,7 @@ extern "C"
 
         desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
         strcpy(desc->name, "loopback");              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Loppback backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        strcpy(desc->desc, "Loopback backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
         desc->nparams = 1;
         desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
@@ -72,7 +72,7 @@ extern "C"
         desc->params[i].character = 'c';
         desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Loopback ports");
+        strcpy(desc->params[i].short_desc, "Maximum number of loopback ports");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;
