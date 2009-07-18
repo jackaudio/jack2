@@ -27,13 +27,17 @@ Paul Davis
 
 2009-07-17 Stephane Letz  <letz@grame.fr>
 
-	* Big rewrite of Solaris boomer driver, seems to work in duplex mode at least.
+	* JackLoopbackDriver reborn as a dynamicalled loadable separated backend.
 
 2009-07-17 Stephane Letz  <letz@grame.fr>
 
-	* In combined --dbus and --classic compilation code, use PulseAudio acquire/release code.
+	* Big rewrite of Solaris boomer driver, seems to work in duplex mode at least.
 
 2009-07-16 Stephane Letz  <letz@grame.fr>
+
+	* In combined --dbus and --classic compilation code, use PulseAudio acquire/release code.
+
+2009-07-15 Stephane Letz  <letz@grame.fr>
 
 	* Rename JackDriver::Init method to JackDriver::Initialize (to avoid confusion with JackThread::Init method).
 	* Update Solaris boomer driver.
