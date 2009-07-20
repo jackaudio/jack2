@@ -79,6 +79,22 @@ int JackAudioDriver::Open(jack_nframes_t buffer_size,
     return JackDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
+int JackAudioDriver::Open(bool capturing,
+                          bool playing,
+                          int inchannels,
+                          int outchannels,
+                          bool monitor,
+                          const char* capture_driver_name,
+                          const char* playback_driver_name,
+                          jack_nframes_t capture_latency,
+                          jack_nframes_t playback_latency)
+{
+    fCaptureChannels = inchannels;
+    fPlaybackChannels = outchannels;
+    fWithMonitorPorts = monitor;
+    return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+}
+
 int JackAudioDriver::Attach()
 {
     JackPort* port;
