@@ -34,3 +34,4 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 
+    create_jack_driver_obj(bld, 'loopback', '../common/JackLoopbackDriver.cpp')

@@ -19,7 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackSystemDeps.h"
-#include "JackServerGlobals.h"
+#include "JackGlobals.h"
 #include "JackLoopbackDriver.h"
 #include "JackDriverLoader.h"
 #include "JackEngineControl.h"
@@ -94,14 +94,9 @@ extern "C"
                     break;
                 }
         }
-      
+             
         Jack::JackDriverClientInterface* driver = new Jack::JackLoopbackDriver(engine, table);
-        if (driver->Open(Jack::JackServerGlobals::fInstance->GetEngineControl()->fBufferSize, 
-                        Jack::JackServerGlobals::fInstance->GetEngineControl()->fSampleRate, 
-                        1, 1, 
-                        channels, channels, 
-                        false, 
-                        "loopback", "loopback", 0, 0) == 0) {
+        if (driver->Open(Jack::GetEngineControl()->fBufferSize, Jack::GetEngineControl()->fSampleRate, 1, 1, channels, channels, false, "loopback", "loopback", 0, 0) == 0) {
             return driver;
         } else {
             delete driver;
