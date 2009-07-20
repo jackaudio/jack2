@@ -11234,8 +11234,11 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = "-DJACK_32_64";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DMACH_RPC_MACH_SEMA",
+					"-DJACK_32_64",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackservermp,
