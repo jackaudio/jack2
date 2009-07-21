@@ -15,6 +15,7 @@ sudo cp jackdmp /usr/local/bin
 # Copy drivers
 sudo install -d  /usr/local/lib/jackmp 
 sudo cp  jack_coreaudio.so  /usr/local/lib/jackmp 
+sudo cp  jack_coremidi.so  /usr/local/lib/jackmp
 sudo cp  jack_dummy.so  /usr/local/lib/jackmp
 sudo cp  jack_loopback.so  /usr/local/lib/jackmp
 [ -f jack_net.so ] && sudo cp jack_net.so /usr/local/lib/jackmp
