@@ -27,8 +27,8 @@ Paul Davis
 
 2009-07-17 Stephane Letz  <letz@grame.fr>
 
-	* JackLoopbackDriver reborn as a dynamicalled loadable separated backend.
-	* -L paramater for loopback backend activated again in jackd.
+	* Loopback backend reborn as a dynamically loadable separated backend.
+	* -L parameter for loopback backend activated again in jackd.
 
 2009-07-17 Stephane Letz  <letz@grame.fr>
 
