@@ -32,10 +32,12 @@ def configure(conf):
     if conf.is_defined('HAVE_EXPAT'):
         conf.env['LIB_EXPAT'] = ['expat']
 
-    conf.env['BUILD_JACKDBUS'] = conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1')
+    conf.env['BUILD_JACKDBUS1'] = conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1')
+
 
 def build(bld):
-    if bld.env["BUILD_JACKDBUS"] != True:
+
+    if bld.env['BUILD_JACKDBUS1'] != True:
         return
 
     obj = bld.new_task_gen('cc', 'program')
@@ -59,6 +61,7 @@ def build(bld):
         #'xml_nop.c',
         'xml_write_raw.c',
         'sigsegv.c',
+	'reserve.c',
         ]
     if bld.env['IS_LINUX']:
         obj.uselib = 'PTHREAD DL RT DBUS-1 EXPAT'

@@ -119,7 +119,6 @@ def build(bld):
         'JackExternalClient.cpp',
         'JackFreewheelDriver.cpp',
         'JackInternalClient.cpp',
-        'JackLoopbackDriver.cpp',
         'JackServer.cpp',
         'JackThreadedDriver.cpp',
         'JackRestartThreadedDriver.cpp',
@@ -212,7 +211,7 @@ def build(bld):
     clientlib.defines = 'HAVE_CONFIG_H'
     clientlib.uselib = uselib
     clientlib.install_path = '${LIBDIR}'
-    if bld.env['BUILD_JACKDBUS'] == True:
+    if bld.env['BUILD_JACKDBUS'] == True and bld.env['BUILD_JACKD'] == False:
         clientlib.uselib.append('DBUS-1')
     clientlib.includes = includes
     clientlib.name         = 'clientlib'
@@ -258,6 +257,10 @@ def build(bld):
     if bld.env['IS_SUN']:
         clientlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
+    if bld.env['BUILD_WITH_32_64']:
+        print "create 32bit lib..."
+        clientlib32bit = clientlib.clone('lib32')
+  
     create_jack_process_obj(bld, 'netmanager', 'JackNetManager.cpp', serverlib)
 
     create_jack_process_obj(bld, 'profiler', 'JackProfiler.cpp', serverlib)

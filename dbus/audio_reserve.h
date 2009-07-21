@@ -20,6 +20,7 @@
 #define __audio_reserve__
 
 #include "JackCompilerDeps.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,8 +29,8 @@ extern "C" {
 SERVER_EXPORT int audio_reservation_init();
 SERVER_EXPORT int audio_reservation_finish();
 
-SERVER_EXPORT void* audio_acquire(int num);
-SERVER_EXPORT void audio_release(void* dev);
+SERVER_EXPORT bool audio_acquire(const char * device_name);
+SERVER_EXPORT void audio_release(const char * device_name);
 SERVER_EXPORT void audio_reserve_loop();
 
 #ifdef __cplusplus

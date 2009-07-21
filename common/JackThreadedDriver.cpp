@@ -209,7 +209,7 @@ bool JackThreadedDriver::Execute()
 
 bool JackThreadedDriver::Init()
 {
-    if (fDriver->Init())  {
+    if (fDriver->Initialize())  {
         if (fDriver->IsRealTime()) {
             jack_log("JackThreadedDriver::Init IsRealTime");
             // Will do "something" on OSX only...

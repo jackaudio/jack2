@@ -46,7 +46,7 @@ class SERVER_EXPORT JackPosixSemaphore : public detail::JackSynchro
 
     public:
 
-        JackPosixSemaphore(): fSemaphore(NULL)
+        JackPosixSemaphore():JackSynchro(), fSemaphore(NULL)
         {}
 
         bool Signal();

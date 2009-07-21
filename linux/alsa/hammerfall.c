@@ -206,8 +206,10 @@ hammerfall_release (jack_hardware_t *hw)
 		return;
 	}
 
-	pthread_cancel (h->monitor_thread);
-	pthread_join (h->monitor_thread, &status);
+    if (h->monitor_thread) {
+        pthread_cancel (h->monitor_thread);
+        pthread_join (h->monitor_thread, &status);
+    }
 
 	free (h);
 }

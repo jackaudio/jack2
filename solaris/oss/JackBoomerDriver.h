@@ -23,7 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAudioDriver.h"
 #include "JackPlatformPlug.h"
 #include "ringbuffer.h"
-//#include "JackThread.h"
+#include <semaphore.h>
 
 namespace Jack
 {
@@ -43,13 +43,47 @@ typedef jack_default_audio_sample_t jack_sample_t;
 \brief The Boomer driver.
 */
 
-class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
+class JackBoomerDriver : public JackAudioDriver
 {
 
     enum { kRead = 1, kWrite = 2, kReadWrite = 3 };
 
     private:
+
+        class JackBoomerDriverInput : public JackRunnableInterface {
+
+            private:
     
+                JackBoomerDriver* fDriver;
+
+            public:
+
+                JackBoomerDriverInput(JackBoomerDriver* driver): fDriver(driver)
+                {}
+                ~JackBoomerDriverInput()
+                {}
+
+                bool Init();
+                bool Execute();
+        };
+
+        class JackBoomerDriverOutput : public JackRunnableInterface {
+
+            private:
+    
+                JackBoomerDriver* fDriver;
+
+            public:
+
+                JackBoomerDriverOutput(JackBoomerDriver* driver): fDriver(driver)
+                {}
+                ~JackBoomerDriverOutput()
+                {}
+
+                bool Init();
+                bool Execute();
+        };
+
         int fInFD;
         int fOutFD;
         
@@ -66,8 +100,15 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
         
         void* fInputBuffer;
         void* fOutputBuffer;
-        jack_ringbuffer_t** fRingBuffer;
-        JackThread fThread;
+  
+        sem_t fReadSema;
+        sem_t fWriteSema;
+
+        JackThread fInputThread;
+        JackThread fOutputThread;
+     
+        JackBoomerDriverInput fInputHandler;
+        JackBoomerDriverOutput fOutputHandler;
          
         int OpenInput();
         int OpenOutput();
@@ -75,24 +116,14 @@ class JackBoomerDriver : public JackAudioDriver, public JackRunnableInterface
         void CloseAux();
         void SetSampleFormat();
         void DisplayDeviceInfo();
-
-        // Redefining since timing for CPU load is specific
-        int ProcessAsync();
+        void SynchronizeRead();
+        void SynchronizeWrite();
 
     public:
 
-        JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-                : JackAudioDriver(name, alias, engine, table),
-                fInFD(-1), fOutFD(-1), fBits(0), 
-                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false), fIgnoreHW(true),
-                fInputBufferSize(0), fOutputBufferSize(0),
-                fInputBuffer(NULL), fOutputBuffer(NULL),
-                fRingBuffer(NULL), fThread(this)
-       {}
-
-        virtual ~JackBoomerDriver()
-        {}
-
+        JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
+        virtual ~JackBoomerDriver();
+ 
         int Open(jack_nframes_t frames_per_cycle,
                  int user_nperiods, 
                  jack_nframes_t rate,

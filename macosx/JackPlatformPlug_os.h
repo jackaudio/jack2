@@ -35,7 +35,7 @@ namespace Jack
 
 /* __JackPlatformMutex__ */
 #include "JackPosixMutex.h"
-namespace Jack {typedef JackPosixMutex JackMutex; }
+namespace Jack { typedef JackPosixMutex JackMutex; }
 
 /* __JackPlatformThread__ */
 #include "JackMachThread.h"
@@ -47,8 +47,6 @@ namespace Jack { typedef JackMachSemaphore JackSynchro; }
 
 /* __JackPlatformProcessSync__ */
 #include "JackProcessSync.h"
-//#include "JackMachProcessSync.h"
-//namespace Jack { typedef JackMachProcessSync JackProcessSync; }
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
 
 /* __JackPlatformServerChannel__ */ 

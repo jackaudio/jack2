@@ -164,6 +164,32 @@
 	}
 
 
+#if defined (__SSE2__) && !defined (__sun__)
+
+/* generates same as _mm_set_ps(1.f, 1.f, 1f., 1f) but faster  */
+static inline __m128 gen_one(void)
+{
+    volatile __m128i x;
+    __m128i ones = _mm_cmpeq_epi32(x, x);
+    return (__m128)_mm_slli_epi32 (_mm_srli_epi32(ones, 25), 23);
+}
+
+static inline __m128 clip(__m128 s, __m128 min, __m128 max)
+{
+    return _mm_min_ps(max, _mm_max_ps(s, min));
+}
+
+static inline __m128i float_24_sse(__m128 s)
+{
+    const __m128 upper_bound = gen_one(); /* NORMALIZED_FLOAT_MAX */
+    const __m128 lower_bound = _mm_sub_ps(_mm_setzero_ps(), upper_bound);
+
+    __m128 clipped = clip(s, lower_bound, upper_bound);
+    __m128 scaled = _mm_mul_ps(clipped, _mm_set1_ps(SAMPLE_24BIT_SCALING));
+    return _mm_cvtps_epi32(scaled);
+}
+#endif
+
 /* Linear Congruential noise generator. From the music-dsp list
  * less random than rand(), but good enough and 10x faster 
  */
@@ -254,7 +280,7 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 	while (unrolled--) {
 		__m128 in = _mm_load_ps(src);
 		__m128 scaled = _mm_mul_ps(in, factor);
-		__m128 clipped = _mm_min_ps(int_max, _mm_max_ps(scaled, int_min));
+		__m128 clipped = clip(scaled, int_min, int_max);
 
 		__m128i y = _mm_cvttps_epi32(clipped);
 		__m128i shifted = _mm_slli_epi32(y, 8);
@@ -264,13 +290,11 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 		__m128i shuffled3 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(2, 1, 0, 3));
 
 		_mm_store_ss((float*)dst, (__m128)shifted);
-		dst += dst_skip;
-		_mm_store_ss((float*)dst, (__m128)shuffled1);
-		dst += dst_skip;
-		_mm_store_ss((float*)dst, (__m128)shuffled2);
-		dst += dst_skip;
-		_mm_store_ss((float*)dst, (__m128)shuffled3);
-		dst += dst_skip;
+
+		_mm_store_ss((float*)(dst+dst_skip), (__m128)shuffled1);
+		_mm_store_ss((float*)(dst+2*dst_skip), (__m128)shuffled2);
+		_mm_store_ss((float*)(dst+3*dst_skip), (__m128)shuffled3);
+		dst += 4*dst_skip;
 
 		src+= 4;
 	}
@@ -300,6 +324,8 @@ void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsign
 {
 	/* ALERT: signed sign-extension portability !!! */
 
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
+
 	while (nsamples--) {
 		int x;
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -319,7 +345,7 @@ void sample_move_dS_s32u24s (jack_default_audio_sample_t *dst, char *src, unsign
 		x <<= 8;
 		x |= (unsigned char)(src[0]);
 #endif
-		*dst = (x >> 8) / SAMPLE_24BIT_SCALING;
+		*dst = (x >> 8) * scaling;
 		dst++;
 		src += src_skip;
 	}
@@ -357,8 +383,9 @@ void sample_move_dS_s32u24 (jack_default_audio_sample_t *dst, char *src, unsigne
 
 	/* ALERT: signed sign-extension portability !!! */
 
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
 	while (nsamples--) {
-		*dst = (*((int *) src) >> 8) / SAMPLE_24BIT_SCALING;
+		*dst = (*((int *) src) >> 8) * scaling;
 		dst++;
 		src += src_skip;
 	}
@@ -386,8 +413,38 @@ void sample_move_d24_sSs (char *dst, jack_default_audio_sample_t *src, unsigned 
 
 void sample_move_d24_sS (char *dst, jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)
 {
-        int32_t z;
-	
+#if defined (__SSE2__) && !defined (__sun__)
+	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
+	while (nsamples >= 4) {
+		int i;
+		int32_t z[4];
+		__m128 samples = _mm_loadu_ps(src);
+		__m128i converted = float_24_sse(samples);
+
+		__m128i shuffled1 = _mm_shuffle_epi32(converted, _MM_SHUFFLE(0, 3, 2, 1));
+		__m128i shuffled2 = _mm_shuffle_epi32(converted, _MM_SHUFFLE(1, 0, 3, 2));
+		__m128i shuffled3 = _mm_shuffle_epi32(converted, _MM_SHUFFLE(2, 1, 0, 3));
+
+		_mm_store_ss((float*)z, (__m128)converted);
+		_mm_store_ss((float*)z+1, (__m128)shuffled1);
+		_mm_store_ss((float*)z+2, (__m128)shuffled2);
+		_mm_store_ss((float*)z+3, (__m128)shuffled3);
+
+		for (i = 0; i != 4; ++i) {
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+			memcpy (dst, z+i, 3);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+			memcpy (dst, (float*)((char *)&z + 1)+i, 3);
+#endif
+			dst += dst_skip;
+		}
+		nsamples -= 4;
+		src += 4;
+	}
+#endif
+
+    int32_t z;
+
 	while (nsamples--) {
 		float_24 (*src, z);
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -398,12 +455,13 @@ void sample_move_d24_sS (char *dst, jack_default_audio_sample_t *src, unsigned l
 		dst += dst_skip;
 		src++;
 	}
-}	
+}
 
 void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
 	/* ALERT: signed sign-extension portability !!! */
 
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_24BIT_SCALING;
 	while (nsamples--) {
 		int x;
 #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -427,15 +485,43 @@ void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned 
 			x |= 0xff << 24;
 		}
 #endif
-		*dst = x / SAMPLE_24BIT_SCALING;
+		*dst = x * scaling;
 		dst++;
 		src += src_skip;
 	}
-}	
+}
 
 void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip)
 {
-	/* ALERT: signed sign-extension portability !!! */
+	const jack_default_audio_sample_t scaling = 1.f/SAMPLE_24BIT_SCALING;
+
+#if defined (__SSE2__) && !defined (__sun__)
+	const __m128 scaling_block = _mm_set_ps1(scaling);
+	while (nsamples >= 4) {
+		int x0, x1, x2, x3;
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+		memcpy((char*)&x0 + 1, src, 3);
+		memcpy((char*)&x1 + 1, src+src_skip, 3);
+		memcpy((char*)&x2 + 1, src+2*src_skip, 3);
+		memcpy((char*)&x3 + 1, src+3*src_skip, 3);
+#elif __BYTE_ORDER == __BIG_ENDIAN
+		memcpy(&x0, src, 3);
+		memcpy(&x1, src+src_skip, 3);
+		memcpy(&x2, src+2*src_skip, 3);
+		memcpy(&x3, src+3*src_skip, 3);
+#endif
+		src += 4 * src_skip;
+
+		const __m128i block_i = _mm_set_epi32(x3, x2, x1, x0);
+		const __m128i shifted = _mm_srai_epi32(block_i, 8);
+		const __m128 converted = _mm_cvtepi32_ps (shifted);
+		const __m128 scaled = _mm_mul_ps(converted, scaling_block);
+		_mm_storeu_ps(dst, scaled);
+		dst += 4;
+		nsamples -= 4;
+	}
+#endif
 
 	while (nsamples--) {
 		int x;
@@ -445,11 +531,11 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 		memcpy(&x, src, 3);
 #endif
 		x >>= 8;
-		*dst = x / SAMPLE_24BIT_SCALING;
+		*dst = x * scaling;
 		dst++;
 		src += src_skip;
 	}
-}	
+}
 
 
 void sample_move_d16_sSs (char *dst,  jack_default_audio_sample_t *src, unsigned long nsamples, unsigned long dst_skip, dither_state_t *state)	
@@ -636,6 +722,7 @@ void sample_move_dither_shaped_d16_sS (char *dst,  jack_default_audio_sample_t *
 void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) 	
 {
 	short z;
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_16BIT_SCALING;
 
 	/* ALERT: signed sign-extension portability !!! */
 	while (nsamples--) {
@@ -648,7 +735,7 @@ void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned 
 		z <<= 8;
 		z |= (unsigned char)(src[0]);
 #endif
-		*dst = z / SAMPLE_16BIT_SCALING;
+		*dst = z * scaling;
 		dst++;
 		src += src_skip;
 	}
@@ -657,8 +744,9 @@ void sample_move_dS_s16s (jack_default_audio_sample_t *dst, char *src, unsigned 
 void sample_move_dS_s16 (jack_default_audio_sample_t *dst, char *src, unsigned long nsamples, unsigned long src_skip) 
 {
 	/* ALERT: signed sign-extension portability !!! */
+	const jack_default_audio_sample_t scaling = 1.0/SAMPLE_16BIT_SCALING;
 	while (nsamples--) {
-		*dst = (*((short *) src)) / SAMPLE_16BIT_SCALING;
+		*dst = (*((short *) src)) * scaling;
 		dst++;
 		src += src_skip;
 	}

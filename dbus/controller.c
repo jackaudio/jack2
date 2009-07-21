@@ -29,6 +29,7 @@
 #include "controller.h"
 #include "controller_internal.h"
 #include "xml.h"
+#include "reserve.h"
 
 struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
 {
@@ -279,6 +280,68 @@ jack_controller_switch_master(
     return TRUE;
 }
 
+#define DEVICE_MAX 2
+
+typedef struct reserved_audio_device {
+
+     char device_name[64];
+     rd_device * reserved_device;
+
+} reserved_audio_device;
+
+
+int g_device_count = 0;
+static reserved_audio_device g_reserved_device[DEVICE_MAX];
+
+static
+bool
+on_device_acquire(const char * device_name)
+{
+    int ret;
+    DBusError error;
+
+    ret = rd_acquire(
+        &g_reserved_device[g_device_count].reserved_device,
+        g_connection,
+        device_name,
+        "Jack audio server",
+        INT32_MAX,
+        NULL,
+        &error);
+    if (ret  < 0)
+    {
+        jack_error("Failed to acquire device name : %s error : %s", device_name, (error.message ? error.message : strerror(-ret)));
+        return false;
+    }
+
+    strcpy(g_reserved_device[g_device_count].device_name, device_name);
+    g_device_count++;
+    jack_info("Acquired audio card %s", device_name);
+    return true;
+}
+
+static
+void
+on_device_release(const char * device_name)
+{
+    int i;
+
+    // Look for corresponding reserved device
+    for (i = 0; i < DEVICE_MAX; i++) {
+ 	if (strcmp(g_reserved_device[i].device_name, device_name) == 0)  
+	    break;
+    }
+   
+    if (i < DEVICE_MAX) {
+	jack_info("Released audio card %s", device_name);
+        rd_release(g_reserved_device[i].reserved_device);
+    } else {
+	jack_error("Audio card %s not found!!", device_name);
+    }
+
+    g_device_count--;
+}
+
 void *
 jack_controller_create(
         DBusConnection *connection)
@@ -303,7 +366,7 @@ jack_controller_create(
         goto fail;
     }
 
-    controller_ptr->server = jackctl_server_create();
+    controller_ptr->server = jackctl_server_create(on_device_acquire, on_device_release);
     if (controller_ptr->server == NULL)
     {
         jack_error("Failed to create server object");

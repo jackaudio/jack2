@@ -151,7 +151,7 @@ namespace Jack
             bool InitConnection();
             bool InitRendering();
             
-            net_status_t GetNetMaster();
+            net_status_t SendAvailableToMaster();
             net_status_t SendStartToMaster();
             
             void SetParams();

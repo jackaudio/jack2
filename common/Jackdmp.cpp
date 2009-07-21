@@ -32,6 +32,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 #include "JackDriverLoader.h"
 
+#if defined(JACK_DBUS) && defined(__linux__)
+#include <dbus/dbus.h> 
+#include "audio_reserve.h"
+#endif
+
 /*
 This is a simple port of the old jackdmp.cpp file to use the new Jack 2.0 control API. Available options for the server
 are "hard-coded" in the source. A much better approach would be to use the control API to:
@@ -92,6 +97,7 @@ static void usage(FILE* file)
             "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
             "               [ --name OR -n server-name ]\n"
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
+            "               [ --loopback OR -L loopback-port-number ]\n"
             "               [ --midi OR -X midi-driver ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
@@ -156,17 +162,19 @@ int main(int argc, char* argv[])
     const char* server_name = "default";
     jackctl_driver_t * audio_driver_ctl;
     jackctl_driver_t * midi_driver_ctl;
+    jackctl_driver_t * loopback_driver_ctl;
     
 #ifdef __linux__
-    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:c:";
+    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:c:L:";
 #else
-    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:";
+    const char *options = "-ad:X:P:uvrshVRL:STFl:t:mn:p:L:";
 #endif
     
     struct option long_options[] = {
 #ifdef __linux__
                                        { "clock-source", 1, 0, 'c' },
 #endif
+                                       { "loopback-driver", 1, 0, 'L' },
                                        { "audio-driver", 1, 0, 'd' },
                                        { "midi-driver", 1, 0, 'X' },
                                        { "verbose", 0, 0, 'v' },
@@ -200,14 +208,18 @@ int main(int argc, char* argv[])
     int port_max = 512;
     int do_mlock = 1;
     int do_unlock = 0;
+    int loopback = 0;
     bool show_version = false;
     sigset_t signals;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
 
     copyright(stdout);
-
-    server_ctl = jackctl_server_create();
+#if defined(JACK_DBUS) && defined(__linux__)
+    server_ctl = jackctl_server_create(audio_acquire, audio_release);
+#else
+    server_ctl = jackctl_server_create(NULL, NULL);
+#endif
     if (server_ctl == NULL) {
         fprintf(stderr, "Failed to create server object\n");
         return -1;
@@ -244,6 +256,10 @@ int main(int argc, char* argv[])
             case 'd':
                 seen_audio_driver = true;
                 audio_driver_name = optarg;
+                break;
+                
+            case 'L':
+                loopback = atoi(optarg);
                 break;
 
             case 'X':
@@ -312,14 +328,6 @@ int main(int argc, char* argv[])
                 param = jackctl_get_parameter(server_parameters, "realtime");
                 if (param != NULL) {
                     value.b = true;
-                    jackctl_parameter_set_value(param, &value);
-                }
-                break;
-
-            case 'L':
-                param = jackctl_get_parameter(server_parameters, "loopback-ports");
-                if (param != NULL) {
-                    value.ui = atoi(optarg);
                     jackctl_parameter_set_value(param, &value);
                 }
                 break;
@@ -413,6 +421,20 @@ int main(int argc, char* argv[])
         }
 
         jackctl_server_add_slave(server_ctl, midi_driver_ctl);
+    }
+    
+    // Loopback driver
+    if (loopback > 0) {
+        loopback_driver_ctl = jackctl_server_get_driver(server_ctl, "loopback");
+        if (loopback_driver_ctl != NULL) {
+            const JSList * loopback_parameters = jackctl_driver_get_parameters(loopback_driver_ctl);
+            param = jackctl_get_parameter(loopback_parameters, "channels");
+            if (param != NULL) {
+                value.ui = loopback;
+                jackctl_parameter_set_value(param, &value);
+            }
+            jackctl_server_add_slave(server_ctl, loopback_driver_ctl);
+        }
     }
 
     notify_server_start(server_name);

@@ -116,7 +116,7 @@ class JackFixedArray
             return fCounter;
         }
 
-};
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Utility class.
@@ -151,7 +151,8 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
                 return true;
             }
         }
-};
+        
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Utility class.
@@ -226,7 +227,7 @@ class JackFixedMatrix
             return false;
         }
 
-};
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief Utility class.
@@ -339,7 +340,7 @@ class JackLoopFeedback
             return -1;
         }
 
-};
+} POST_PACKED_STRUCTURE;
 
 /*!
 \brief For client timing measurements.
@@ -356,6 +357,7 @@ struct JackClientTiming
     {}
     ~JackClientTiming()
     {}
+    
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -450,7 +452,7 @@ class SERVER_EXPORT JackConnectionManager
         int ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec);
         
-};
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

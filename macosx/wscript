@@ -58,6 +58,8 @@ def build(bld):
 
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
 
+    create_jack_driver_obj(bld, 'loopback', '../common/JackLoopbackDriver.cpp')
+
     create_jack_audio_driver_obj(bld, 'coreaudio', 'coreaudio/JackCoreAudioDriver.cpp')
 
     create_jack_midi_driver_obj(bld, 'coremidi', 'coremidi/JackCoreMidiDriver.cpp')

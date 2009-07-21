@@ -54,7 +54,8 @@ namespace Jack
                 mean += fTable[i];
             return mean / MAX_SIZE;
         }
-    };
+        
+    } POST_PACKED_STRUCTURE;
     
     class JackDelayLockedLoop
     {
@@ -136,7 +137,7 @@ namespace Jack
                 return fCurrentWakeup;
             }
   
-    };
+    } POST_PACKED_STRUCTURE;
     
     class JackAtomicDelayLockedLoop : public JackAtomicState<JackDelayLockedLoop>
     {
@@ -201,7 +202,7 @@ namespace Jack
                 
                 return res;
             }
-    };
+    } POST_PACKED_STRUCTURE;
     
     /*
     Torben Hohn PI controler from JACK1
@@ -301,7 +302,6 @@ namespace Jack
         }
         */
 
-        
         double GetRatio(int error)
         {
             double smooth_offset = error;

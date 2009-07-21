@@ -61,6 +61,7 @@ def set_options(opt):
     opt.tool_options('compiler_cc')
 
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
+    opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
@@ -68,6 +69,7 @@ def set_options(opt):
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports', default=1024, type="int", dest="ports", help='Maximum number of ports')
+    opt.add_option('--ports-per-application', default=512, type="int", dest="application_ports", help='Maximum number of ports per application')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -130,12 +132,13 @@ def configure(conf):
         conf.env['BUILD_JACKD'] = True
 
     if Options.options.libdir:
-        conf.env['LIBDIR'] = Options.options.libdir
+        conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir
     else:
-        conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib/'
+        conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
     conf.define('CLIENT_NUM', Options.options.clients)
-    conf.define('PORT_NUM', Options.options. ports)
+    conf.define('PORT_NUM', Options.options.ports)
+    conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
     conf.define('ADDON_DIR', os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack')))
     conf.define('JACK_LOCATION', os.path.normpath(os.path.join(conf.env['PREFIX'], 'bin')))
@@ -143,6 +146,8 @@ def configure(conf):
     conf.define('JACKMP', 1)
     if conf.env['BUILD_JACKDBUS'] == True:
         conf.define('JACK_DBUS', 1)
+        if conf.env['BUILD_JACKD'] == False:
+            conf.define('USE_LIBDBUS_AUTOLAUNCH', 1)
     if conf.env['BUILD_WITH_PROFILE'] == True:
         conf.define('JACK_MONITOR', 1)
     if conf.env['BUILD_WITH_32_64'] == True:
@@ -167,6 +172,7 @@ def configure(conf):
 
     print "Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM']
     print "Build with a maximum of %d ports" % conf.env['PORT_NUM']
+    print "Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT']
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
@@ -204,7 +210,22 @@ def configure(conf):
             print Logs.colors.NORMAL,
     print
 
+    if Options.options.mixed == True:
+	env_variant2 = conf.env.copy()
+	conf.set_env_name('lib32', env_variant2)
+	env_variant2.set_variant('lib32')
+	conf.setenv('lib32')
+    	conf.env.append_unique('CXXFLAGS', '-m32')
+    	conf.env.append_unique('CCFLAGS', '-m32')
+    	conf.env.append_unique('LINKFLAGS', '-m32')
+        conf.write_config_header('config.h')
+    	if Options.options.libdir32:
+	    conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
+    	else:
+	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+
 def build(bld):
+    print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
     if not os.access('svnversion.h', os.R_OK):
         create_svnversion_task(bld)
 

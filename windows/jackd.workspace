@@ -48,5 +48,6 @@
 		</Project>
 		<Project filename="jack_winmme.cbp" />
 		<Project filename="libjacknet.cbp" active="1" />
+		<Project filename="jack_loopback.cbp" active="1" />
 	</Workspace>
 </CodeBlocks_workspace_file>

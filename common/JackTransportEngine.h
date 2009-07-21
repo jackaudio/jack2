@@ -195,7 +195,6 @@ class SERVER_EXPORT JackTransportEngine : public JackAtomicArrayState<jack_posit
 
 } POST_PACKED_STRUCTURE;
 
-
 } // end of namespace
 
 #endif

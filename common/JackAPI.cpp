@@ -1465,14 +1465,8 @@ EXPORT jack_nframes_t jack_last_frame_time(const jack_client_t* ext_client)
 #ifdef __CLIENTDEBUG__
     JackLibGlobals::CheckContext();
 #endif
-    JackTimer timer;
     JackEngineControl* control = GetEngineControl();
-    if (control) {
-        control->ReadFrameTime(&timer);
-        return timer.CurFrame();
-    } else {
-        return 0;
-    }
+    return (control) ? control->fFrameTimer.ReadCurrentState()->CurFrame() : 0;
 }
 
 EXPORT float jack_cpu_load(jack_client_t* ext_client)

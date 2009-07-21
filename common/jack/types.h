@@ -454,6 +454,7 @@ typedef enum {
     JackBBTFrameOffset =      0x40,	/**< Frame offset of BBT information */
     JackAudioVideoRatio =     0x80, /**< audio frames per video frame */
     JackVideoFrameOffset =   0x100  /**< frame offset of first video frame */
+    
 } jack_position_bits_t;
 
 /** all valid position bits */
@@ -641,7 +642,6 @@ typedef struct {
     double ticks_per_beat;
     double beats_per_minute;
 
-}
-jack_transport_info_t;
+} jack_transport_info_t;
 
 #endif /* __jack_types_h__ */

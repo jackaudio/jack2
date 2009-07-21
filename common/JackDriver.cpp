@@ -339,7 +339,7 @@ int JackDriver::SetSampleRate(jack_nframes_t sample_rate)
     return 0;
 }
 
-bool JackDriver::Init()
+bool JackDriver::Initialize()
 {
     return true;
 }

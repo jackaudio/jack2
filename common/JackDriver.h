@@ -203,7 +203,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual JackClientControl* GetClientControl() const;
         
         virtual bool IsRealTime() const;
-        virtual bool Init();  // To be called by the wrapping thread Init method when the driver is a "blocking" one 
+        virtual bool Initialize();  // To be called by the wrapping thread Init method when the driver is a "blocking" one 
             
 };
     

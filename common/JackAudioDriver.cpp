@@ -79,6 +79,22 @@ int JackAudioDriver::Open(jack_nframes_t buffer_size,
     return JackDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
+int JackAudioDriver::Open(bool capturing,
+                          bool playing,
+                          int inchannels,
+                          int outchannels,
+                          bool monitor,
+                          const char* capture_driver_name,
+                          const char* playback_driver_name,
+                          jack_nframes_t capture_latency,
+                          jack_nframes_t playback_latency)
+{
+    fCaptureChannels = inchannels;
+    fPlaybackChannels = outchannels;
+    fWithMonitorPorts = monitor;
+    return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
+}
+
 int JackAudioDriver::Attach()
 {
     JackPort* port;
@@ -269,7 +285,7 @@ void JackAudioDriver::ProcessGraphSync()
         fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
         if (ProcessSlaves() < 0)
             jack_error("JackAudioDriver::ProcessSync ProcessSlaves error, engine may now behave abnormally!!");
-        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0)
+        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0)
             jack_error("JackAudioDriver::ProcessSync SuspendRefNum error, engine may now behave abnormally!!");
     } else { // Graph not finished: do not activate it
         jack_error("JackAudioDriver::ProcessSync: error");
