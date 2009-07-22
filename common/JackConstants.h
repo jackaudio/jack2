@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.3"
+#define VERSION "1.9.4"
 
 #define BUFFER_SIZE_MAX 8192
 
