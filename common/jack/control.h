@@ -31,7 +31,14 @@
 
 #include <jack/jslist.h>
 #include <jack/systemdeps.h>
-#include <stdbool.h>
+#if __STDC_VERSION__ >= 199901L
+#  include <stdbool.h>
+#else
+#  define TRUE 1
+#  define FALSE 0
+#  define bool int
+#  define __bool_true_false_are_defined
+#endif
 
 /** Parameter types, intentionally similar to jack_driver_param_type_t */
 typedef enum
