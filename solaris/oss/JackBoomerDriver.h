@@ -145,9 +145,6 @@ class JackBoomerDriver : public JackAudioDriver
         int Start();
         int Stop();
 
-        int Read();
-        int Write();
-
         // BufferSize can be changed
         bool IsFixedBufferSize()
         {

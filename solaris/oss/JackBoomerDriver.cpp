@@ -404,12 +404,6 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
                       int bits,
                       bool ignorehwbuf)
 {
-
-    if (playing && !capturing) {
-        jack_error("Playback only mode is not yet supported, use duplex instead");
-        return -1;
-    }
-
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, 
         capture_driver_uid, playback_driver_uid, capture_latency, playback_latency) != 0) {
@@ -572,26 +566,6 @@ int JackBoomerDriver::Stop()
     return 0;
 }
 
-int JackBoomerDriver::Read()
-{
-/*
-    // Keep begin cycle time
-    JackDriver::CycleTakeBeginTime();
-*/
-
-    return 0;
-}
-
-int JackBoomerDriver::Write()
-{
-/*
-    // Keep begin cycle time
-    JackDriver::CycleTakeEndTime();
-*/
-
-    return 0;
-}
-
 bool JackBoomerDriver::JackBoomerDriverInput::Init()
 {
     if (fDriver->IsRealTime()) {
@@ -608,12 +582,7 @@ bool JackBoomerDriver::JackBoomerDriverInput::Init()
 
 bool JackBoomerDriver::JackBoomerDriverInput::Execute()
 {
-    if (fDriver->fInFD < 0) {
-        // Keep begin cycle time
-        fDriver->CycleTakeBeginTime();
-        return true;
-    }
- 
+  
 #ifdef JACK_MONITOR
     gCycleTable.fTable[gCycleReadCount].fBeforeRead = GetMicroSeconds();
 #endif
@@ -661,7 +630,13 @@ bool JackBoomerDriver::JackBoomerDriverInput::Execute()
     #endif
     }
 
-    fDriver->SynchronizeRead();
+    // Duplex : sync with write thread
+    if (fDriver->fInFD > 0 && fDriver->fOutFD > 0) {
+        fDriver->SynchronizeRead();
+    } else {
+        // Otherwise direct process
+        fDriver->Process();
+    }
     return true;
 }
 
@@ -748,7 +723,14 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Execute()
         jack_error("JackBoomerDriverOutput::Execute error bytes written = %ld", count);
     }
     
-    fDriver->SynchronizeWrite();
+    // Duplex : sync with read thread
+    if (fDriver->fInFD > 0 && fDriver->fOutFD > 0) {
+        fDriver->SynchronizeWrite();
+    } else {
+        // Otherwise direct process
+        fDriver->CycleTakeBeginTime();
+        fDriver->Process();
+    }
     return true;
 }
 
