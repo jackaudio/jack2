@@ -233,7 +233,7 @@ void JackBoomerDriver::DisplayDeviceInfo()
 JackBoomerDriver::JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
                 fInFD(-1), fOutFD(-1), fBits(0), 
-                fSampleFormat(0), fNperiods(0), fRWMode(0)
+                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false),
                 fInputBufferSize(0), fOutputBufferSize(0),
                 fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputThread(&fInputHandler), fOutputThread(&fOutputHandler),
@@ -260,12 +260,19 @@ int JackBoomerDriver::OpenInput()
 
     if (fCaptureChannels == 0) fCaptureChannels = 2;
   
-    if ((fInFD = open(fCaptureDriverName, O_RDONLY)) < 0) {
+    if ((fInFD = open(fCaptureDriverName, O_RDONLY | ((fExcl) ? O_EXCL : 0))) < 0) {
         jack_error("JackBoomerDriver::OpenInput failed to open device : %s@%i, errno = %d", __FILE__, __LINE__, errno);
         return -1;
     }
 
     jack_log("JackBoomerDriver::OpenInput input fInFD = %d", fInFD);
+
+    if (fExcl) {
+        if (ioctl(fInFD, SNDCTL_DSP_COOKEDMODE, &flags) == -1) {
+            jack_error("JackBoomerDriver::OpenInput failed to set cooked mode : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+            goto error;
+        }
+    }
 
     gFragFormat = (2 << 16) + int2pow2(fEngineControl->fBufferSize * fSampleSize * fCaptureChannels);	
     if (ioctl(fInFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
@@ -322,12 +329,19 @@ int JackBoomerDriver::OpenOutput()
 
     if (fPlaybackChannels == 0) fPlaybackChannels = 2;
     
-    if ((fOutFD = open(fPlaybackDriverName, O_WRONLY)) < 0) {
+    if ((fOutFD = open(fPlaybackDriverName, O_WRONLY | ((fExcl) ? O_EXCL : 0))) < 0) {
        jack_error("JackBoomerDriver::OpenOutput failed to open device : %s@%i, errno = %d", __FILE__, __LINE__, errno);
        return -1;
     }
 
     jack_log("JackBoomerDriver::OpenOutput output fOutFD = %d", fOutFD);
+    
+    if (fExcl) {
+        if (ioctl(fOutFD, SNDCTL_DSP_COOKEDMODE, &flags) == -1) {
+            jack_error("JackBoomerDriver::OpenOutput failed to set cooked mode : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+            goto error;
+        }  
+    } 
 
     gFragFormat = (2 << 16) + int2pow2(fEngineControl->fBufferSize * fSampleSize * fPlaybackChannels);	
     if (ioctl(fOutFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
@@ -803,6 +817,14 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     desc->params[i].value.ui = OSS_DRIVER_DEF_OUTS;
     strcpy(desc->params[i].short_desc, "Playback channels");
     strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+    
+    i++;
+    strcpy(desc->params[i].name, "excl");
+    desc->params[i].character = 'e';
+    desc->params[i].type = JackDriverParamBool;
+    desc->params[i].value.i = false;
+    strcpy(desc->params[i].short_desc, "Exclusif (O_EXCL) access mode");
+    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
     i++;
     strcpy(desc->params[i].name, "capture");
@@ -859,6 +881,7 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     int chan_in = 0;
     int chan_out = 0;
     bool monitor = false;
+    bool excl = false;
     unsigned int nperiods = OSS_DRIVER_DEF_NPERIODS;
     const JSList *node;
     const jack_driver_param_t *param;
@@ -913,6 +936,10 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
             playback_pcm_name = strdup (param->value.str);
             capture_pcm_name = strdup (param->value.str);
             break;
+            
+        case 'e':
+            excl = true;
+            break;
 		
         case 'I':
             systemic_input_latency = param->value.ui;
@@ -933,7 +960,7 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     Jack::JackBoomerDriver* boomer_driver = new Jack::JackBoomerDriver("system", "boomer", engine, table);
     
     // Special open for Boomer driver...
-    if (boomer_driver->Open(frames_per_interrupt, nperiods, srate, capture, playback, chan_in, chan_out, 
+    if (boomer_driver->Open(frames_per_interrupt, nperiods, srate, capture, playback, chan_in, chan_out, excl, 
         monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency, bits) == 0) {
         return boomer_driver;
     } else {
