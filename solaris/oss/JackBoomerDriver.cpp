@@ -395,6 +395,7 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
                       bool playing,
                       int inchannels,
                       int outchannels,
+                      bool excl,
                       bool monitor,
                       const char* capture_driver_uid,
                       const char* playback_driver_uid,
@@ -416,6 +417,7 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
         fRWMode |= ((capturing) ? kRead : 0);
         fRWMode |= ((playing) ? kWrite : 0);
         fBits = bits;
+        fExcl = excl;
         fNperiods = user_nperiods;
    
     #ifdef JACK_MONITOR
