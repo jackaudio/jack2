@@ -42,7 +42,6 @@ Known problems, limitations
 
 - use of POSIX named semaphore is currently unstable and not recommended yet. 
 
-
 ----------------
 Solaris version
 ----------------
@@ -137,8 +136,6 @@ The binary elements are :
 
 - JackRouter.dll : an ASIO/JACK driver that allows ASIO compatible applications to become JACK clients and access the JACK server. ASIO "jackified" applications appear with their names. Ableton Live, Samplitude, Reason, Arturia applications have been successfully tested. To install it, use "regsvr32 JackRouter.dll" in a terminal (use regsvr32 /u JackRouter.dll to uninstall). [VISTA special note: regsvr32 has to be used with "administrator" priviledges to properly register JackRouter.dll (Start Menu -> All Programs -> Accessories -> Right Click on Command Prompt -> Run As Administrator)]. A JackRouter.ini file is used by the driver to read parameters : an [IO] section allows to setup the number of input/output jack ports for the application and a [AUTO_CONNECT] section allows to setup jack ports autoconnection mode to machine input/output.
 
-All dll are compiled in "release" mode. The "Debug" folder contains debug version of all dlls and libraries. MSVCRTD.dll and MSVCP60D.dll debug dll are also included.
-
 WARNING !! WARNING !!
 
 Depending of the used interface and driver settings, the PortAudio layer may add additionnal buffering between the real card interrupt and the jack server callback. This usually result in *unregular* calls of the jack server callback (for example if jack server used a 256 frames buffer and the card used a 512 frames, the jack server callback will be called twice every card interrupt). For proper functionning of jack server and clients in this case, the jack server has to be started in "synchronous" mode, using the "-S" parameter.
@@ -156,16 +153,6 @@ Automatic server launch
 Starting from the 0.64 version, automatic server launch from client is implemented : when the server is not yet running, and if the client uses the "jack_client_open" API, the server will be started automatically. The server configuration is saved in a ".jackdrc" file located in the user home folder. The Qjackctl tool allows to save its configuration in this . jackdrc (setting can be done in Qjackctl Setup/Misc). If no configuration file is found, a default setup will be used. 
 
 WARNING : automatic server launch is not implemented on Windows
-
-----------------
-Loopback driver
-----------------
-
-An experimental loopback driver allows to manually "pipeline" applications connected in sequence, and thus parallelize sequential sub-graph. Lets say we have A ==> B graph, by using the loopback driver, it can be rewritten as : A ==> loopback driver ==> B. At each cycle, the loopback driver copy buffers received on its input ports (at the previous cycle) to its output ports. The resulting graph become parallel and thus can take profit of multi-processors machines, at each cycle A and B can be activated in parallel. Note that the loopback driver add a one buffer delay in the connection, which may be relevant in more complex graphs when having global synchronicity between clients is a desirable property.  
-
-To activate loopback driver, use :
-
-- jackd (jackdmp) ... -L n ...  where n is the number of input/output ports.
 
 ------------------
 Validations tools
@@ -225,6 +212,7 @@ Note : To experiment with the -S option, jackdmp must be launched in a console.
 1.9.0 : Waf based build system : Nedko Arnaudov, Grame for preliminary OSX support. Control API, dbus based server control access : Nedko Arnaudov, Grame. NetJack2 components (in progress) : jack_net backend, netmanager, audioadapter, netadapter : Romain Moret, Grame. Code restructuring to help port on other architectures : Michael Voigt. Code cleanup/optimization : Tim Blechmann. Improve handling of server internal clients that can now be loaded/unloaded using the new server control API : Grame. A lot of bug fix and improvements.
 1.9.1 : Fix jackctl_server_unload_internal. Filter SIGPIPE to avoid having client get a SIGPIPE when trying to access a died server. Libjack shutdown handler does not "deactivate" (fActive = false) the client anymore, so that jack_deactivate correctly does the job later on. Better isolation of server and clients system resources to allow starting the server in several user account at the same time. Report ringbuffer.c fixes from jack1. Client and library global context cleanup in case of incorrect shutdown handling (that is applications not correctly closing client after server has shutdown). Use JACK_DRIVER_DIR variable in internal clients loader. For ALSA driver, synchronize with latest jack1 memops functions. Synchronize jack2 public headers with jack1 ones. Implement jack_client_real_time_priority and jack_client_max_real_time_priority API. Use up to BUFFER_SIZE_MAX frames in midi ports, fix for ticket #117. Cleanup server starting code for clients directly linked with libjackserver.so. JackMessageBuffer was using thread "Stop" scheme in destructor, now use the safer thread "Kill" way. Synchronize ALSA backend code with JACK1 one. Set default mode to 'slow' in JackNetDriver and JackNetAdapter. Simplify audio packet order verification. Fix JackNetInterface::SetNetBufferSize for socket buffer size computation and JackNetMasterInterface::DataRecv if synch packet is received, various cleanup. Better recovery of network overload situations, now "resynchronize" by skipping cycles.". Support for BIG_ENDIAN machines in NetJack2. Support for BIG_ENDIAN machines in NetJack2 for MIDI ports. Support for "-h" option in internal clients to print the parameters. In NetJack2, fix a bug when capture or playback only channels are used. Add a JACK_INTERNAL_DIR environment variable to be used for internal clients. Add a resample quality parameter in audioadapter. Now correctly return an error if JackServer::SetBufferSize could not change the buffer size (and was just restoring the current one). Use PRIu32 kind of macro in JackAlsaDriver again. Add a resample quality parameter in netadapter.
 1.9.2 : Solaris version. New "profiling" tools. Rework the mutex/signal classes. Support for BIG_ENDIAN machines in NetJack2. D-BUS based device reservation to better coexist with PulseAudio on Linux. Add auto_connect parameter in netmanager and netadapter. Use Torben Hohn PI controler code for adapters. Client incorrect re-naming fixed : now done at socket and fifo level. Virtualize and allow overriding of thread creation function, to allow Wine support (from JACK1).
+1.9.3 : New JackBoomerDriver class for Boomer driver on Solaris. Add mixed 32/64 bits mode (off by default). Native MIDI backend (JackCoreMidiDriver, JackWinMMEDriver). In ALSA audio card reservation code, tries to open the card even if reservation fails. Clock source setting on Linux. Add jackctl_server_switch_master API. Fix transport callback (timebase master, sync) issue when used after jack_activate (RT thread was not running). D-Bus access for jackctl_server_add_slave/jackctl_server_remove_slave API. Cleanup "loopback" stuff in server. Torben Hohn fix for InitTime and GetMicroSeconds in JackWinTime.c. New jack_free function added in jack.h. Reworked Torben Hohn fix for server restart issue on Windows. Correct jack_set_error_function, jack_set_info_function and jack_set_thread_creator functions. Correct JackFifo::TimedWait for EINTR handling. Move DBus based audio device reservation code in ALSA backend compilation. Correct JackTransportEngine::MakeAllLocating, sync callback has to be called in this case also. NetJack2 code : better error checkout, method renaming. Tim Bechmann patch : hammerfall, only release monitor thread, if it has been created. Tim Bechmann memops.c optimization patches. In combined --dbus and --classic compilation code, use PulseAudio acquire/release code. Big rewrite of Solaris boomer driver, seems to work in duplex mode at least. Loopback backend reborn as a dynamically loadable separated backend. 
 
 This is a work in progress but the implementation is now stable enough to be tested. jackdmp has been used successfully with the following applications : Ardour, Hydrogen, Jamin, Qjackctl, Jack-Rack, SooperLooper, AlsaPlayer...  
 

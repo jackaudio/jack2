@@ -1,5 +1,5 @@
 <*project
-      version = 4 civer = "Free v4.14.3" winver = "2.6/5.1.2600" > 
+      version = 4 civer = "Free v4.14.5" winver = "2.6/5.1.2600" > 
    <output> .</>
    <exename> Jack_v1.9.3_setup.exe</>
    <digitsign> </>
@@ -38,7 +38,7 @@
    <srcfolder> </>
    <ifexist> over</>
    <runafter> </>
-   <runconfirm> 0</>
+   <runconfirm> 1</>
    <uninclude> 1</>
    <unicon> Uninstall - 2</>
    <unshortcut> 1</>
@@ -54,6 +54,7 @@
    <bgback> </>
    <files listview >
       <_><src>..\Release\bin\libjack.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\vcredist_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
@@ -72,6 +73,8 @@
 <_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_dummy.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\jack_loopback.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\jack\jack_winmme.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_portaudio.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\netmanager.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\audioadapter.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
@@ -99,7 +102,8 @@
 
    </files>
    <runx listview >
-      
+      <_><type>app</><path>inst</><file>vcredist_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
+
    </runx>
    <registry listview >
       

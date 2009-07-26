@@ -65,7 +65,7 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
                 bool Execute()
                 {
                     // Blocks until decorated driver is started (that is when it's Init method returns).
-                    fDriver->Init();
+                    fDriver->Initialize();
                     fRunning = true;
                     return false;
                 }

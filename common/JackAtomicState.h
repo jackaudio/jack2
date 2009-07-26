@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackAtomicState__
 
 #include "JackAtomic.h"
+#include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
 
 namespace Jack
@@ -68,7 +69,7 @@ struct AtomicCounter
         return *this;
     }
 
-};
+} POST_PACKED_STRUCTURE;
 
 #define Counter(e) (e).info.fLongVal
 #define CurIndex(e) (e).info.scounter.fShortVal1
@@ -250,11 +251,10 @@ class JackAtomicState
         	} while (cur_index != next_index);
         }
         */
-};
-
+        
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
-
 
 #endif
 

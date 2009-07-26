@@ -558,7 +558,7 @@ int JackOSSDriver::Read()
     ssize_t count;
 
 #ifdef JACK_MONITOR
-    gCycleTable.fTable[gCycleCount].fBeforeRead =  GetMicroSeconds();
+    gCycleTable.fTable[gCycleCount].fBeforeRead = GetMicroSeconds();
 #endif
 
     audio_errinfo ei_in;

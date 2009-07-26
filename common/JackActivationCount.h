@@ -73,7 +73,7 @@ class JackActivationCount
             return fValue;
         }
 
-};
+}  POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

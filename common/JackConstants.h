@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.3"
+#define VERSION "1.9.4"
 
 #define BUFFER_SIZE_MAX 8192
 
@@ -38,10 +38,14 @@
 #endif
 
 #define DRIVER_PORT_NUM 256
-#define PORT_NUM_FOR_CLIENT 256
+
+#ifndef PORT_NUM_FOR_CLIENT
+#define PORT_NUM_FOR_CLIENT 512
+#endif
+
 #define FIRST_AVAILABLE_PORT 1
 
-#define CONNECTION_NUM_FOR_PORT 256
+#define CONNECTION_NUM_FOR_PORT PORT_NUM_FOR_CLIENT
 
 #ifndef CLIENT_NUM
 #define CLIENT_NUM 64
@@ -86,6 +90,7 @@
 #define SOCKET_TIME_OUT 5               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec
 #define FREEWHEEL_DRIVER_TIMEOUT 10     // in sec
+#define DRIVER_TIMEOUT_FACTOR    10     
 
 #define NO_PORT   0xFFFE
 

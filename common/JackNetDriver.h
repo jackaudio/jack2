@@ -50,7 +50,7 @@ namespace Jack
             JackGnuPlotMonitor<float>* fNetTimeMon;
 #endif
 
-            bool Init();
+            bool Initialize();
             void FreeAll();
             
             int AllocPorts();

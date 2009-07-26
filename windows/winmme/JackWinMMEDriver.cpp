@@ -392,6 +392,7 @@ int JackWinMMEDriver::Write()
             for (unsigned int j = 0; j < midi_buffer->event_count; j++) {
                 JackMidiEvent* ev = &midi_buffer->events[j];
                 if (ev->size <= 3) {
+                    jack_midi_data_t *d = ev->GetData(midi_buffer);
                     DWORD winev = 0;
                     if (ev->size > 0) winev |= d[0];
                     if (ev->size > 1) winev |= (d[1] << 8);

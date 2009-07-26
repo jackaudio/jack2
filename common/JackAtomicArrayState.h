@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackAtomicArrayState__
 
 #include "JackAtomic.h"
+#include "JackCompilerDeps.h"
 #include <string.h> // for memcpy
 
 namespace Jack
@@ -67,7 +68,7 @@ struct AtomicArrayCounter
         return *this;
     }
     
-};
+} POST_PACKED_STRUCTURE;
 
 #define Counter1(e) (e).info.fLongVal
 #define GetIndex1(e, state) ((e).info.scounter.fByteVal[state])
@@ -247,7 +248,7 @@ class JackAtomicArrayState
             WriteNextStateStopAux(state);
         }
 
-};
+} POST_PACKED_STRUCTURE;
 
 } // end of namespace
 

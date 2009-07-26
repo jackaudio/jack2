@@ -121,13 +121,13 @@ namespace Jack
         as a "dummy driver, until Init method returns.
     */
     
-    bool JackNetDriver::Init()
+    bool JackNetDriver::Initialize()
     {
-        jack_log ( "JackNetDriver::Init()" );
+        jack_log("JackNetDriver::Initialize()");
 
         //new loading, but existing socket, restart the driver
         if (fSocket.IsSocket()) {
-            jack_info( "Restarting driver..." );
+            jack_info("Restarting driver...");
             FreeAll();
         }
 
