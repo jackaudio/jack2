@@ -107,7 +107,7 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
         int AcquireRealTime(int priority);
         int DropRealTime();
         void SetParams(UInt64 period, UInt64 computation, UInt64 constraint);
-        static int GetParams(UInt64* period, UInt64* computation, UInt64* constraint);
+        static int GetParams(pthread_t thread, UInt64* period, UInt64* computation, UInt64* constraint);
         static int SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint);
 
         static int AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint);

@@ -218,7 +218,7 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
     AudioDeviceStop(driver->fDeviceID, MeasureCallback);
     
     jack_log("JackCoreAudioDriver::MeasureCallback called");
-    JackMachThread::GetParams(&driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
+    JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
     
     // Setup threadded based log function
     set_threaded_log_function();
