@@ -233,7 +233,7 @@ void JackBoomerDriver::DisplayDeviceInfo()
 JackBoomerDriver::JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
                 fInFD(-1), fOutFD(-1), fBits(0), 
-                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false),
+                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false),fTrigger(0),
                 fInputBufferSize(0), fOutputBufferSize(0),
                 fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputThread(&fInputHandler), fOutputThread(&fOutputHandler),
@@ -418,7 +418,7 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
         fRWMode |= ((playing) ? kWrite : 0);
         fBits = bits;
         fExcl = excl;
-        fNperiods = user_nperiods;
+        fNperiods = (user_nperiods == 0) ? 1 : user_nperiods ;
    
     #ifdef JACK_MONITOR
         // Force memory page in
@@ -506,12 +506,12 @@ int JackBoomerDriver::OpenAux()
 
 void JackBoomerDriver::CloseAux()
 {
-    if (fRWMode & kRead && fInFD > 0) {
+    if (fRWMode & kRead && fInFD >= 0) {
         close(fInFD);
         fInFD = -1;
     }
     
-    if (fRWMode & kWrite && fOutFD > 0) {
+    if (fRWMode & kWrite && fOutFD >= 0) {
         close(fOutFD);
         fOutFD = -1;
     }
@@ -530,8 +530,19 @@ int JackBoomerDriver::Start()
     jack_log("JackBoomerDriver::Start");
     JackAudioDriver::Start();
 
+    if (fInFD >= 0 && fOutFD >= 0) {
+
+        ioctl(fOutFD, SNDCTL_DSP_SETTRIGGER, &fTrigger);
+        fTrigger = (PCM_ENABLE_INPUT|PCM_ENABLE_OUTPUT);
+
+        if (ioctl(fInFD, SNDCTL_DSP_SETDUPLEX, 0) < 0) {
+            if (errno != EINVAL) /* Dont care */
+				jack_error("JackBoomerDriver::Start failed to enable full duplex errno = %d", errno);
+	    }
+    }
+
     // Start input thread only when needed
-    if (fInFD > 0) {
+    if (fInFD >= 0) {
         if (fInputThread.StartSync() < 0) {
             jack_error("Cannot start input thread");
             return -1;
@@ -539,7 +550,7 @@ int JackBoomerDriver::Start()
     }
 
     // Start output thread only when needed
-    if (fOutFD > 0) {
+    if (fOutFD >= 0) {
         if (fOutputThread.StartSync() < 0) {
             jack_error("Cannot start output thread");
             return -1;
@@ -552,12 +563,12 @@ int JackBoomerDriver::Start()
 int JackBoomerDriver::Stop()
 {
     // Stop input thread only when needed
-    if (fInFD > 0) {
+    if (fInFD >= 0) {
         fInputThread.Kill();
     }
 
     // Stop output thread only when needed
-    if (fOutFD > 0) {
+    if (fOutFD >= 0) {
         fOutputThread.Kill();
     }
 
@@ -629,7 +640,7 @@ bool JackBoomerDriver::JackBoomerDriverInput::Execute()
     }
 
     // Duplex : sync with write thread
-    if (fDriver->fInFD > 0 && fDriver->fOutFD > 0) {
+    if (fDriver->fInFD >= 0 && fDriver->fOutFD >= 0) {
         fDriver->SynchronizeRead();
     } else {
         // Otherwise direct process
@@ -653,22 +664,24 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Init()
     memset(fDriver->fOutputBuffer, 0, fDriver->fOutputBufferSize);
 
     // Prefill ouput buffer
-    if (fDriver->fOutFD > 0) {
-        for (int i = 0; i < fDriver->fNperiods; i++) {
-            ssize_t count = ::write(fDriver->fOutFD, fDriver->fOutputBuffer, fDriver->fOutputBufferSize);
-            if (count < (int)fDriver->fOutputBufferSize) {
-                jack_error("JackBoomerDriver::Write error bytes written = %ld", count);
-            }
+    for (int i = 0; i < fDriver->fNperiods; i++) {
+        ssize_t count = ::write(fDriver->fOutFD, fDriver->fOutputBuffer, fDriver->fOutputBufferSize);
+        if (count < (int)fDriver->fOutputBufferSize) {
+            jack_error("JackBoomerDriver::Write error bytes written = %ld", count);
         }
-        
-        int delay;
-        if (ioctl(fDriver->fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
-            jack_error("JackBoomerDriver::Write error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
-        }
-        
-        delay /= fDriver->fSampleSize * fDriver->fPlaybackChannels;
-        jack_info("JackBoomerDriver::Write output latency frames = %ld", delay);
     }
+
+    if (fDriver->fTrigger) {
+        ioctl(fDriver->fOutFD, SNDCTL_DSP_SETTRIGGER, &fDriver->fTrigger);
+    }
+        
+    int delay;
+    if (ioctl(fDriver->fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
+        jack_error("JackBoomerDriver::Write error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+    }
+        
+    delay /= fDriver->fSampleSize * fDriver->fPlaybackChannels;
+    jack_info("JackBoomerDriver::Write output latency frames = %ld", delay);
  
     return true;
 }
@@ -722,7 +735,7 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Execute()
     }
     
     // Duplex : sync with read thread
-    if (fDriver->fInFD > 0 && fDriver->fOutFD > 0) {
+    if (fDriver->fInFD >= 0 && fDriver->fOutFD >= 0) {
         fDriver->SynchronizeWrite();
     } else {
         // Otherwise direct process
