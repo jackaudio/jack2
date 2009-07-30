@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-07-30 Stephane Letz  <letz@grame.fr>
+
+	* Add a -G parameter in CoreAudio backend (the computation value in RT thread expressed at percent of period).
+
 2009-07-28 Stephane Letz  <letz@grame.fr>
 
 	* Fix CopyAndConvertIn for Solaris backends.
@@ -32,8 +36,8 @@ Paul Davis
 2009-07-22 Stephane Letz  <letz@grame.fr>
 
 	* Version 1.9.4 started.
-    * Solaris boomer backend now working in capture or playback only mode.
-    * Fix control.h for proper compilation on Solaris.
+	* Solaris boomer backend now working in capture or playback only mode.
+	* Fix control.h for proper compilation on Solaris.
 
 2009-07-17 Stephane Letz  <letz@grame.fr>
 

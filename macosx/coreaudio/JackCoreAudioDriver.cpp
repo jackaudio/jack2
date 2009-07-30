@@ -220,6 +220,11 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
     jack_log("JackCoreAudioDriver::MeasureCallback called");
     JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
     
+    if (driver->fComputationGrain > 0) {
+        jack_log("JackCoreAudioDriver::MeasureCallback : RT thread computation setup to %ld percent of period", int(driver->fComputationGrain * 100));
+        driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
+    }
+    
     // Setup threadded based log function
     set_threaded_log_function();
     return noErr;
@@ -441,7 +446,7 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int& channe
 }
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-        : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f)
+        : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f),fComputationGrain(-1.f)
 {}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
@@ -1103,7 +1108,8 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
                               const char* playback_driver_uid,
                               jack_nframes_t capture_latency,
                               jack_nframes_t playback_latency,
-                              int async_output_latency)
+                              int async_output_latency,
+                              int computation_grain)
 {
     int in_nChannels = 0;
     int out_nChannels = 0;
@@ -1120,7 +1126,8 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     strcpy(fPlaybackUID, playback_driver_uid);
     fCaptureLatency = capture_latency;
     fPlaybackLatency = playback_latency;
-    fIOUsage = float(async_output_latency)/ 100.f;
+    fIOUsage = float(async_output_latency) / 100.f;
+    fComputationGrain = float(computation_grain) / 100.f;
 
     if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name) < 0)
         return -1;
@@ -1364,7 +1371,7 @@ extern "C"
         strcpy(desc->name, "coreaudio");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Apple CoreAudio API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
         
-        desc->nparams = 14;
+        desc->nparams = 15;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1478,6 +1485,14 @@ extern "C"
         desc->params[i].value.i = 100;
         strcpy(desc->params[i].short_desc, "Extra output latency in aynchronous mode (percent)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "grain");
+        desc->params[i].character = 'G';
+        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].value.i = 100;
+        strcpy(desc->params[i].short_desc, "Computation grain in RT thread (percent)");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         return desc;
     }
@@ -1498,6 +1513,7 @@ extern "C"
         jack_nframes_t systemic_input_latency = 0;
         jack_nframes_t systemic_output_latency = 0;
         int async_output_latency = 100;
+        int computation_grain = -1;
     
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t *) node->data;
@@ -1567,6 +1583,10 @@ extern "C"
                 case 'L':
                     async_output_latency = param->value.ui;
                     break;
+                    
+                case 'G':
+                    computation_grain = param->value.ui;
+                    break;
             }
         }
 
@@ -1578,7 +1598,7 @@ extern "C"
 
         Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("system", "coreaudio", engine, table);
         if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_driver_uid, 
-            playback_driver_uid, systemic_input_latency, systemic_output_latency, async_output_latency) == 0) {
+            playback_driver_uid, systemic_input_latency, systemic_output_latency, async_output_latency, computation_grain) == 0) {
             return driver;
         } else {
             delete driver;
