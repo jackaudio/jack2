@@ -171,6 +171,7 @@ void JackBoomerDriver::DisplayDeviceInfo()
         } else {
             jack_info("output space info: fragments = %d, fragstotal = %d, fragsize = %d, bytes = %d", 
                 info.fragments, info.fragstotal, info.fragsize, info.bytes);
+            fFragmentSize = info.fragsize;
         }
     
         if (ioctl(fOutFD, SNDCTL_DSP_GETCAPS, &cap) == -1)  {
@@ -233,7 +234,8 @@ void JackBoomerDriver::DisplayDeviceInfo()
 JackBoomerDriver::JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
                 fInFD(-1), fOutFD(-1), fBits(0), 
-                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false),
+                fSampleFormat(0), fNperiods(0), fSampleSize(0), fFragmentSize(0),
+                fRWMode(0), fExcl(false), fSyncIO(false),
                 fInputBufferSize(0), fOutputBufferSize(0),
                 fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputThread(&fInputHandler), fOutputThread(&fOutputHandler),
@@ -401,7 +403,7 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
                       const char* playback_driver_uid,
                       jack_nframes_t capture_latency,
                       jack_nframes_t playback_latency,
-                      int bits)
+                      int bits, bool syncio)
 {
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(nframes, samplerate, capturing, playing, inchannels, outchannels, monitor, 
@@ -419,6 +421,7 @@ int JackBoomerDriver::Open(jack_nframes_t nframes,
         fBits = bits;
         fExcl = excl;
         fNperiods = (user_nperiods == 0) ? 1 : user_nperiods ;
+        fSyncIO = syncio;
    
     #ifdef JACK_MONITOR
         // Force memory page in
@@ -529,7 +532,60 @@ int JackBoomerDriver::Start()
 {
     jack_log("JackBoomerDriver::Start");
     JackAudioDriver::Start();
-    
+
+    // Input/output synchronisation 
+    if (fInFD >= 0 && fOutFD >= 0 && fSyncIO) {
+
+        jack_log ("JackBoomerDriverOutput::Start sync input/output"); 
+
+        // Create and fill synch group
+        int id;
+        oss_syncgroup group;
+        group.id = 0;
+  
+        group.mode = PCM_ENABLE_INPUT;
+        if (ioctl(fInFD, SNDCTL_DSP_SYNCGROUP, &group) == -1) 
+            jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCGROUP : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+   
+        group.mode = PCM_ENABLE_OUTPUT;
+        if (ioctl(fOutFD, SNDCTL_DSP_SYNCGROUP, &group) == -1) 
+            jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCGROUP : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+
+        // Prefill ouput buffer : 2 fragments of silence as described in http://manuals.opensound.com/developer/synctest.c.html#LOC6
+        char* silence_buf = (char*)malloc(fFragmentSize);
+        memset(silence_buf, 0, fFragmentSize);
+
+        jack_log ("JackBoomerDriverOutput::Start prefill size = %d", fFragmentSize); 
+
+        for (int i = 0; i < 2; i++) {
+            ssize_t count = ::write(fOutFD, silence_buf, fFragmentSize);
+            if (count < (int)fFragmentSize) {
+                jack_error("JackBoomerDriverOutput::Start error bytes written = %ld", count);
+            }
+        }
+
+        free(silence_buf);
+
+        // Start input/output in sync
+        id = group.id;
+
+        if (ioctl(fInFD, SNDCTL_DSP_SYNCSTART, &id) == -1) 
+            jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCSTART : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+
+    } else if (fOutFD >= 0) {
+        
+        // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html   
+        memset(fOutputBuffer, 0, fOutputBufferSize);
+
+        // Prefill ouput buffer
+        for (int i = 0; i < fNperiods; i++) {
+            ssize_t count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
+            if (count < (int)fOutputBufferSize) {
+                jack_error("JackBoomerDriverOutput::Init error bytes written = %ld", count);
+            }
+        }
+    } 
+   
     // Start input thread only when needed
     if (fInFD >= 0) {
         if (fInputThread.StartSync() < 0) {
@@ -653,18 +709,7 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Init()
             set_threaded_log_function(); 
         }
     }
-
-    // Maybe necessary to write an empty output buffer first time : see http://manuals.opensound.com/developer/fulldup.c.html   
-    memset(fDriver->fOutputBuffer, 0, fDriver->fOutputBufferSize);
-
-    // Prefill ouput buffer
-    for (int i = 0; i < fDriver->fNperiods; i++) {
-        ssize_t count = ::write(fDriver->fOutFD, fDriver->fOutputBuffer, fDriver->fOutputBufferSize);
-        if (count < (int)fDriver->fOutputBufferSize) {
-            jack_error("JackBoomerDriverOutput::Init error bytes written = %ld", count);
-        }
-    }
-        
+      
     int delay;
     if (ioctl(fDriver->fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
         jack_error("JackBoomerDriverOutput::Init error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
@@ -876,6 +921,14 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     strcpy(desc->params[i].short_desc, "Extra output latency");
     strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
+    i++;
+    strcpy(desc->params[i].name, "sync-io");
+    desc->params[i].character = 'S';
+    desc->params[i].type = JackDriverParamBool;
+    desc->params[i].value.i = false;
+    strcpy(desc->params[i].short_desc, "In duplex mode, synchronize input and ouput");
+    strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
     return desc;
 }
 
@@ -892,6 +945,7 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     int chan_out = 0;
     bool monitor = false;
     bool excl = false;
+    bool syncio = false;
     unsigned int nperiods = OSS_DRIVER_DEF_NPERIODS;
     const JSList *node;
     const jack_driver_param_t *param;
@@ -958,6 +1012,10 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
         case 'O':
             systemic_output_latency = param->value.ui;
             break;
+
+        case 'S':
+            syncio = true;
+            break;
         }
     }
 
@@ -971,7 +1029,7 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
     
     // Special open for Boomer driver...
     if (boomer_driver->Open(frames_per_interrupt, nperiods, srate, capture, playback, chan_in, chan_out, excl, 
-        monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency, bits) == 0) {
+        monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency, bits, syncio) == 0) {
         return boomer_driver;
     } else {
         delete boomer_driver; // Delete the driver
