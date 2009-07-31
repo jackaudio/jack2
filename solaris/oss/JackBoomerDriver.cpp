@@ -536,7 +536,7 @@ int JackBoomerDriver::Start()
     // Input/output synchronisation 
     if (fInFD >= 0 && fOutFD >= 0 && fSyncIO) {
 
-        jack_log ("JackBoomerDriverOutput::Start sync input/output"); 
+        jack_log("JackBoomerDriver::Start sync input/output"); 
 
         // Create and fill synch group
         int id;
@@ -555,12 +555,12 @@ int JackBoomerDriver::Start()
         char* silence_buf = (char*)malloc(fFragmentSize);
         memset(silence_buf, 0, fFragmentSize);
 
-        jack_log ("JackBoomerDriverOutput::Start prefill size = %d", fFragmentSize); 
+        jack_log ("JackBoomerDriver::Start prefill size = %d", fFragmentSize); 
 
         for (int i = 0; i < 2; i++) {
             ssize_t count = ::write(fOutFD, silence_buf, fFragmentSize);
             if (count < (int)fFragmentSize) {
-                jack_error("JackBoomerDriverOutput::Start error bytes written = %ld", count);
+                jack_error("JackBoomerDriver::Start error bytes written = %ld", count);
             }
         }
 
@@ -581,7 +581,7 @@ int JackBoomerDriver::Start()
         for (int i = 0; i < fNperiods; i++) {
             ssize_t count = ::write(fOutFD, fOutputBuffer, fOutputBufferSize);
             if (count < (int)fOutputBufferSize) {
-                jack_error("JackBoomerDriverOutput::Init error bytes written = %ld", count);
+                jack_error("JackBoomerDriver::Start error bytes written = %ld", count);
             }
         }
     } 
@@ -926,7 +926,7 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     desc->params[i].character = 'S';
     desc->params[i].type = JackDriverParamBool;
     desc->params[i].value.i = false;
-    strcpy(desc->params[i].short_desc, "In duplex mode, synchronize input and ouput");
+    strcpy(desc->params[i].short_desc, "In duplex mode, synchronize input and output");
     strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
     return desc;
