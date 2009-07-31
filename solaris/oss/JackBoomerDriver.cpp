@@ -68,51 +68,51 @@ int gCycleWriteCount = 0;
 
 inline int int2pow2(int x)	{ int r = 0; while ((1 << r) < x) r++; return r; }
 
-static inline void CopyAndConvertIn(jack_sample_t *dst, void *src, size_t nframes, int channel, int chcount, int bits)
+static inline void CopyAndConvertIn(jack_sample_t *dst, void *src, size_t nframes, int channel, int byte_skip, int bits)
 {
     switch (bits) {
 
 		case 16: {
 		    signed short *s16src = (signed short*)src;
             s16src += channel;
-            sample_move_dS_s16(dst, (char*)s16src, nframes, chcount<<1);
+            sample_move_dS_s16(dst, (char*)s16src, nframes, byte_skip);
 			break;
         }
 		case 24: {
 			signed int *s32src = (signed int*)src;
             s32src += channel;
-            sample_move_dS_s24(dst, (char*)s32src, nframes, chcount<<2);
+            sample_move_dS_s24(dst, (char*)s32src, nframes, byte_skip);
 			break;
         }
 		case 32: {
 			signed int *s32src = (signed int*)src;
             s32src += channel;
-            sample_move_dS_s32u24(dst, (char*)s32src, nframes, chcount<<2);
+            sample_move_dS_s32u24(dst, (char*)s32src, nframes, byte_skip);
 			break;
         }
 	}
 }
 
-static inline void CopyAndConvertOut(void *dst, jack_sample_t *src, size_t nframes, int channel, int chcount, int bits)
+static inline void CopyAndConvertOut(void *dst, jack_sample_t *src, size_t nframes, int channel, int byte_skip, int bits)
 {
 	switch (bits) {
 
 		case 16: {
 			signed short *s16dst = (signed short*)dst;
             s16dst += channel;
-            sample_move_d16_sS((char*)s16dst, src, nframes, chcount<<1, NULL); // No dithering for now...
+            sample_move_d16_sS((char*)s16dst, src, nframes, byte_skip, NULL); // No dithering for now...
 			break;
         }
 		case 24: {
 			signed int *s32dst = (signed int*)dst;
             s32dst += channel;
-            sample_move_d24_sS((char*)s32dst, src, nframes, chcount<<2, NULL); // No dithering for now...
+            sample_move_d24_sS((char*)s32dst, src, nframes, byte_skip, NULL); 
 			break;
         }    
 		case 32: {
             signed int *s32dst = (signed int*)dst;
             s32dst += channel;
-            sample_move_d32u24_sS((char*)s32dst, src, nframes, chcount<<2, NULL);
+            sample_move_d32u24_sS((char*)s32dst, src, nframes, byte_skip, NULL);
 			break;  
         }
 	}
@@ -124,16 +124,16 @@ void JackBoomerDriver::SetSampleFormat()
 
 	    case 24:	/* native-endian LSB aligned 24-bits in 32-bits integer */
             fSampleFormat = AFMT_S24_NE;
-            fSampleSize = sizeof(int);
+            fSampleSize = 4;
 			break;
 		case 32:	/* native-endian 32-bit integer */
             fSampleFormat = AFMT_S32_NE; 
-            fSampleSize = sizeof(int);
+            fSampleSize = 4;
 			break;
 		case 16:	/* native-endian 16-bit integer */
 		default:
             fSampleFormat = AFMT_S16_NE;
-            fSampleSize = sizeof(short);
+            fSampleSize = 2;
 			break;
     }
 }
@@ -233,7 +233,7 @@ void JackBoomerDriver::DisplayDeviceInfo()
 JackBoomerDriver::JackBoomerDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
                 : JackAudioDriver(name, alias, engine, table),
                 fInFD(-1), fOutFD(-1), fBits(0), 
-                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false),fTrigger(0),
+                fSampleFormat(0), fNperiods(0), fRWMode(0), fExcl(false),
                 fInputBufferSize(0), fOutputBufferSize(0),
                 fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputThread(&fInputHandler), fOutputThread(&fOutputHandler),
@@ -529,18 +529,7 @@ int JackBoomerDriver::Start()
 {
     jack_log("JackBoomerDriver::Start");
     JackAudioDriver::Start();
-
-    if (fInFD >= 0 && fOutFD >= 0) {
-
-        ioctl(fOutFD, SNDCTL_DSP_SETTRIGGER, &fTrigger);
-        fTrigger = (PCM_ENABLE_INPUT|PCM_ENABLE_OUTPUT);
-
-        if (ioctl(fInFD, SNDCTL_DSP_SETDUPLEX, 0) < 0) {
-            if (errno != EINVAL) /* Dont care */
-				jack_error("JackBoomerDriver::Start failed to enable full duplex errno = %d", errno);
-	    }
-    }
-
+    
     // Start input thread only when needed
     if (fInFD >= 0) {
         if (fInputThread.StartSync() < 0) {
@@ -585,7 +574,7 @@ bool JackBoomerDriver::JackBoomerDriverInput::Init()
             set_threaded_log_function(); 
         }
     }
-   
+    
     return true;
 }
 
@@ -629,7 +618,12 @@ bool JackBoomerDriver::JackBoomerDriverInput::Execute()
         fDriver->CycleTakeBeginTime();
         for (int i = 0; i < fDriver->fCaptureChannels; i++) {
             if (fDriver->fGraphManager->GetConnectionsNum(fDriver->fCapturePortList[i]) > 0) {
-                CopyAndConvertIn(fDriver->GetInputBuffer(i), fDriver->fInputBuffer, fDriver->fEngineControl->fBufferSize, i, fDriver->fCaptureChannels, fDriver->fBits);
+                CopyAndConvertIn(fDriver->GetInputBuffer(i), 
+                                fDriver->fInputBuffer, 
+                                fDriver->fEngineControl->fBufferSize, 
+                                i, 
+                                fDriver->fCaptureChannels * fDriver->fSampleSize, 
+                                fDriver->fBits);
             }
         }
 
@@ -667,21 +661,17 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Init()
     for (int i = 0; i < fDriver->fNperiods; i++) {
         ssize_t count = ::write(fDriver->fOutFD, fDriver->fOutputBuffer, fDriver->fOutputBufferSize);
         if (count < (int)fDriver->fOutputBufferSize) {
-            jack_error("JackBoomerDriver::Write error bytes written = %ld", count);
+            jack_error("JackBoomerDriverOutput::Init error bytes written = %ld", count);
         }
-    }
-
-    if (fDriver->fTrigger) {
-        ioctl(fDriver->fOutFD, SNDCTL_DSP_SETTRIGGER, &fDriver->fTrigger);
     }
         
     int delay;
     if (ioctl(fDriver->fOutFD, SNDCTL_DSP_GETODELAY, &delay) == -1) {
-        jack_error("JackBoomerDriver::Write error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
+        jack_error("JackBoomerDriverOutput::Init error get out delay : %s@%i, errno = %d", __FILE__, __LINE__, errno);
     }
         
     delay /= fDriver->fSampleSize * fDriver->fPlaybackChannels;
-    jack_info("JackBoomerDriver::Write output latency frames = %ld", delay);
+    jack_info("JackBoomerDriverOutput::Init output latency frames = %ld", delay);
  
     return true;
 }
@@ -696,7 +686,12 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Execute()
    
     for (int i = 0; i < fDriver->fPlaybackChannels; i++) {
         if (fDriver->fGraphManager->GetConnectionsNum(fDriver->fPlaybackPortList[i]) > 0) {
-              CopyAndConvertOut(fDriver->fOutputBuffer, fDriver->GetOutputBuffer(i), fDriver->fEngineControl->fBufferSize, i, fDriver->fPlaybackChannels, fDriver->fBits);
+              CopyAndConvertOut(fDriver->fOutputBuffer, 
+                                fDriver->GetOutputBuffer(i), 
+                                fDriver->fEngineControl->fBufferSize, 
+                                i, 
+                                fDriver->fPlaybackChannels * fDriver->fSampleSize, 
+                                fDriver->fBits);
         }
     }
     

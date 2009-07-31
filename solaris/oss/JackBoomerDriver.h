@@ -93,8 +93,7 @@ class JackBoomerDriver : public JackAudioDriver
         unsigned int fSampleSize;
         int fRWMode;
         bool fExcl;
-        int fTrigger;
-        
+       
         unsigned int fInputBufferSize;
         unsigned int fOutputBufferSize;
         

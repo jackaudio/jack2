@@ -27,7 +27,7 @@ Paul Davis
 
 2009-07-30 Stephane Letz  <letz@grame.fr>
 
-	* Add a -G parameter in CoreAudio backend (the computation value in RT thread expressed at percent of period).
+	* Add a -G parameter in CoreAudio backend (the computation value in RT thread expressed as percent of period).
 
 2009-07-28 Stephane Letz  <letz@grame.fr>
 

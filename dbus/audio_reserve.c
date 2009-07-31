@@ -106,10 +106,10 @@ SERVER_EXPORT void audio_release(const char * device_name)
     }
    
     if (i < DEVICE_MAX) {
-	jack_info("Released audio card %s", device_name);
+        jack_info("Released audio card %s", device_name);
         rd_release(gReservedDevice[i].reserved_device);
     } else {
-	jack_error("Audio card %s not found!!", device_name);
+        jack_error("Audio card %s not found!!", device_name);
     }
 
     // Close DBus connection last time
