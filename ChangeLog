@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-08-28 Stephane Letz  <letz@grame.fr>
+
+	* Correct monitor port naming in JackAudioDriver and JackCoreAudioDriver.
+
 2009-07-31 Stephane Letz  <letz@grame.fr>
 
 	* Use SNDCTL_DSP_SYNCGROUP/SNDCTL_DSP_SYNCSTART API to synchronize input and output in Solaris boomer backend.
