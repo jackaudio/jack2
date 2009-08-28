@@ -481,7 +481,7 @@ void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned 
 		x <<= 8;
 		x |= (unsigned char)(src[0]);
 		/* correct sign bit and the rest of the top byte */
-		if (src[0] & 0x80) {
+		if (src[2] & 0x80) {
 			x |= 0xff << 24;
 		}
 #endif

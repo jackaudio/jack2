@@ -28,6 +28,7 @@ Paul Davis
 2009-08-28 Stephane Letz  <letz@grame.fr>
 
 	* Correct monitor port naming in JackAudioDriver and JackCoreAudioDriver.
+	* Big endian bug fix in memops.c (http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=5;filename=11_be24bit.patch;att=1;bug=486308)
 
 2009-07-31 Stephane Letz  <letz@grame.fr>
 
