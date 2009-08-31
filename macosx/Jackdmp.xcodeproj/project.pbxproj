@@ -10846,7 +10846,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_showtime;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";

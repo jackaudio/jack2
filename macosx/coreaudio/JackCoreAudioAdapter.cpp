@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include <unistd.h>
 
+#include <CoreServices/CoreServices.h>
+
 namespace Jack
 {
 

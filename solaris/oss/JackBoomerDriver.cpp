@@ -551,7 +551,7 @@ int JackBoomerDriver::Start()
         if (ioctl(fOutFD, SNDCTL_DSP_SYNCGROUP, &group) == -1) 
             jack_error("JackBoomerDriver::Start failed to use SNDCTL_DSP_SYNCGROUP : %s@%i, errno = %d", __FILE__, __LINE__, errno);
 
-        // Prefill ouput buffer : 2 fragments of silence as described in http://manuals.opensound.com/developer/synctest.c.html#LOC6
+        // Prefill output buffer : 2 fragments of silence as described in http://manuals.opensound.com/developer/synctest.c.html#LOC6
         char* silence_buf = (char*)malloc(fFragmentSize);
         memset(silence_buf, 0, fFragmentSize);
 
