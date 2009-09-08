@@ -126,13 +126,13 @@ UInt32 JackMachThread::GetThreadPriority(pthread_t thread, int inWhichPriority)
     return 0;
 }
 
-int JackMachThread::GetParams(UInt64* period, UInt64* computation, UInt64* constraint)
+int JackMachThread::GetParams(pthread_t thread, UInt64* period, UInt64* computation, UInt64* constraint)
 {
     thread_time_constraint_policy_data_t theTCPolicy;
     mach_msg_type_number_t count = THREAD_TIME_CONSTRAINT_POLICY_COUNT;
     boolean_t get_default = false;
 
-    kern_return_t res = thread_policy_get(pthread_mach_thread_np(pthread_self()),
+    kern_return_t res = thread_policy_get(pthread_mach_thread_np(thread),
                                           THREAD_TIME_CONSTRAINT_POLICY,
                                           (thread_policy_t) & theTCPolicy,
                                           &count,
@@ -187,7 +187,7 @@ int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 c
     UInt64 int_period;
     UInt64 int_computation;
     UInt64 int_constraint;
-    GetParams(&int_period, &int_computation, &int_constraint);
+    GetParams(thread, &int_period, &int_computation, &int_constraint);
     return 0;
 }
 

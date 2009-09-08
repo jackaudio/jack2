@@ -42,7 +42,6 @@ Known problems, limitations
 
 - use of POSIX named semaphore is currently unstable and not recommended yet. 
 
-
 ----------------
 Solaris version
 ----------------

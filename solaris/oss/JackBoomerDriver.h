@@ -91,10 +91,11 @@ class JackBoomerDriver : public JackAudioDriver
         int fSampleFormat;
         int fNperiods;
         unsigned int fSampleSize;
+        unsigned int fFragmentSize;
         int fRWMode;
         bool fExcl;
-        bool fIgnoreHW;
-        
+        bool fSyncIO;
+       
         unsigned int fInputBufferSize;
         unsigned int fOutputBufferSize;
         
@@ -131,22 +132,18 @@ class JackBoomerDriver : public JackAudioDriver
                  bool playing,
                  int chan_in,
                  int chan_out,
-                 bool vmix,
+                 bool excl,
                  bool monitor,
                  const char* capture_driver_name,
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency,
-                 int bits,
-                 bool ignorehwbuf);
+                 int bits, bool syncio);
 
         int Close();
 
         int Start();
         int Stop();
-
-        int Read();
-        int Write();
 
         // BufferSize can be changed
         bool IsFixedBufferSize()

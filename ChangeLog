@@ -25,6 +25,30 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-08-28 Stephane Letz  <letz@grame.fr>
+
+	* Correct monitor port naming in JackAudioDriver and JackCoreAudioDriver.
+	* Big endian bug fix in memops.c (http://bugs.debian.org/cgi-bin/bugreport.cgi?msg=5;filename=11_be24bit.patch;att=1;bug=486308)
+
+2009-07-31 Stephane Letz  <letz@grame.fr>
+
+	* Use SNDCTL_DSP_SYNCGROUP/SNDCTL_DSP_SYNCSTART API to synchronize input and output in Solaris boomer backend.
+
+
+2009-07-29 Stephane Letz  <letz@grame.fr>
+
+	* Add a -G parameter in CoreAudio backend (the computation value in RT thread expressed as percent of period).
+
+2009-07-28 Stephane Letz  <letz@grame.fr>
+
+	* Fix CopyAndConvertIn for Solaris backends.
+
+2009-07-22 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.4 started.
+	* Solaris boomer backend now working in capture or playback only mode.
+	* Fix control.h for proper compilation on Solaris.
+
 2009-07-17 Stephane Letz  <letz@grame.fr>
 
 	* Loopback backend reborn as a dynamically loadable separated backend.

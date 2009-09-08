@@ -44,13 +44,13 @@ static inline void CopyAndConvertIn(jack_sample_t *dst, void *src, size_t nframe
 			break;
         }
 		case 24: {
-			signed short *s32src = (signed short*)src;
+			signed int *s32src = (signed int*)src;
             s32src += channel;
             sample_move_dS_s24(dst, (char*)s32src, nframes, chcount<<2);
 			break;
         }
 		case 32: {
-			signed short *s32src = (signed short*)src;
+			signed int *s32src = (signed int*)src;
             s32src += channel;
             sample_move_dS_s32u24(dst, (char*)s32src, nframes, chcount<<2);
 			break;
@@ -309,16 +309,12 @@ int JackOSSAdapter::OpenInput()
         return -1;
     }
 
-jack_log("JackOSSAdapter::OpenInput input fInFD = %d", fInFD);
-
     if (fExcl) {
         if (ioctl(fInFD, SNDCTL_DSP_COOKEDMODE, &flags) == -1) {
             jack_error("JackOSSAdapter::OpenInput failed to set cooked mode : %s@%i, errno = %d", __FILE__, __LINE__, errno);
             goto error;
         }
     }
-
-printf("fAdaptedBufferSize %d %d %d %d %s\n", fExcl, fAdaptedBufferSize, fSampleSize, fCaptureChannels, fCaptureDriverName);
 
     gFragFormat = (2 << 16) + int2pow2(fAdaptedBufferSize * fSampleSize * fCaptureChannels);	
     if (ioctl(fInFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {
@@ -405,9 +401,6 @@ int JackOSSAdapter::OpenOutput()
             goto error;
         }  
     } 
-
-printf("fAdaptedBufferSize %d %d %d %d %s\n", fExcl, fAdaptedBufferSize, fSampleSize, fPlaybackChannels, fPlaybackDriverName);
-
 
     gFragFormat = (2 << 16) + int2pow2(fAdaptedBufferSize * fSampleSize * fPlaybackChannels);	
     if (ioctl(fOutFD, SNDCTL_DSP_SETFRAGMENT, &gFragFormat) == -1) {

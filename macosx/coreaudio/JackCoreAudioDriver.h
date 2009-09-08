@@ -72,6 +72,7 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         bool fMonitor;
         float fIOUsage;
+        float fComputationGrain;
     
         /*    
     #ifdef MAC_OS_X_VERSION_10_5
@@ -164,7 +165,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency,
-                 int async_output_latency);
+                 int async_output_latency,
+                 int computation_grain);
         int Close();
 
         int Attach();
