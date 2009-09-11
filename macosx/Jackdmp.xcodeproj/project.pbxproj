@@ -86,7 +86,6 @@
 				4BFA99540AAAED90009E916C /* PBXTargetDependency */,
 				4B363E750DEB0838001F72D9 /* PBXTargetDependency */,
 				4B363E770DEB0838001F72D9 /* PBXTargetDependency */,
-				4B363EF20DEB0965001F72D9 /* PBXTargetDependency */,
 				4B363F250DEB0ABE001F72D9 /* PBXTargetDependency */,
 				4B363F530DEB0CFE001F72D9 /* PBXTargetDependency */,
 				4B363F780DEB0D85001F72D9 /* PBXTargetDependency */,
@@ -844,13 +843,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 4B363E440DEB0775001F72D9;
 			remoteInfo = "jack_bufsize Universal";
-		};
-		4B363EF10DEB0965001F72D9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4B363EDF0DEB091C001F72D9;
-			remoteInfo = "jack_rec Universal";
 		};
 		4B363F240DEB0ABE001F72D9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -6588,11 +6580,6 @@
 			target = 4B363E440DEB0775001F72D9 /* jack_bufsize Universal */;
 			targetProxy = 4B363E760DEB0838001F72D9 /* PBXContainerItemProxy */;
 		};
-		4B363EF20DEB0965001F72D9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4B363EDF0DEB091C001F72D9 /* jack_rec Universal */;
-			targetProxy = 4B363EF10DEB0965001F72D9 /* PBXContainerItemProxy */;
-		};
 		4B363F250DEB0ABE001F72D9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4B363F140DEB0A6A001F72D9 /* jack_monitor_client Universal */;
@@ -10775,7 +10762,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lsndfile",
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -10873,7 +10859,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lsndfile",
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -10971,7 +10956,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lsndfile",
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -15902,7 +15886,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lsndfile",
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -16004,7 +15987,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lsndfile",
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -16106,7 +16088,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lsndfile",
 					"-framework",
 					Jackmp,
 					"-framework",
