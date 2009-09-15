@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-09-15 Stephane Letz  <letz@grame.fr>
+
+	* Correct CPU timing in JackNetDriver, now take cycle begin time after Read.
+
 2009-08-28 Stephane Letz  <letz@grame.fr>
 
 	* Correct monitor port naming in JackAudioDriver and JackCoreAudioDriver.
@@ -33,7 +37,6 @@ Paul Davis
 2009-07-31 Stephane Letz  <letz@grame.fr>
 
 	* Use SNDCTL_DSP_SYNCGROUP/SNDCTL_DSP_SYNCSTART API to synchronize input and output in Solaris boomer backend.
-
 
 2009-07-29 Stephane Letz  <letz@grame.fr>
 
