@@ -53,7 +53,7 @@ namespace Jack
         fMidiPlaybackPortList = NULL;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
-	fRcvSyncUst = 0;
+        fRcvSyncUst = 0;
 #endif
     }
 
@@ -209,7 +209,7 @@ namespace Jack
         JackDriver::NotifySampleRate ( fParams.fSampleRate );
 
         //transport engine parametering
-        fEngineControl->fTransport.SetNetworkSync ( true );
+        fEngineControl->fTransport.SetNetworkSync ( fParams.fTransportSync );
         return true;
     }
 
@@ -419,6 +419,7 @@ namespace Jack
                     break;
 
                 case JackTransportRolling :
+                    fEngineControl->fTransport.SetCommand ( TransportCommandStart );
                     fEngineControl->fTransport.SetState ( JackTransportRolling );
                     jack_info ( "Master is rolling." );
                     break;
@@ -498,7 +499,7 @@ namespace Jack
         if ( DataRecv() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
-	//take the time at the beginning of the cycle
+        //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();
 
 #ifdef JACK_MONITOR

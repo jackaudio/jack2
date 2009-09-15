@@ -28,6 +28,7 @@ Paul Davis
 2009-09-15 Stephane Letz  <letz@grame.fr>
 
 	* Correct CPU timing in JackNetDriver, now take cycle begin time after Read.
+	* Fix issues in JackNetDriver::DecodeTransportData and JackNetDriver::Initialize.
 
 2009-08-28 Stephane Letz  <letz@grame.fr>
 
