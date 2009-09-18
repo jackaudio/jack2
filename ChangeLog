@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-09-18 Stephane Letz  <letz@grame.fr>
+
+	* Simplify transport in NetJack2: master only can control transport.
+
 2009-09-15 Stephane Letz  <letz@grame.fr>
 
 	* Correct CPU timing in JackNetDriver, now take cycle begin time after Read.

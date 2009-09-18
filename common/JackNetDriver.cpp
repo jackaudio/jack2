@@ -419,7 +419,7 @@ namespace Jack
                     break;
 
                 case JackTransportRolling :
-                    fEngineControl->fTransport.SetCommand ( TransportCommandStart );
+                    //fEngineControl->fTransport.SetCommand ( TransportCommandStart );
                     fEngineControl->fTransport.SetState ( JackTransportRolling );
                     jack_info ( "Master is rolling." );
                     break;
@@ -429,6 +429,7 @@ namespace Jack
 
     void JackNetDriver::EncodeTransportData()
     {
+        /* Desactiva
         //is there a timebase master change ?
         int refnum;
         bool conditional;
@@ -451,12 +452,14 @@ namespace Jack
         }
         else
             fReturnTransportData.fTimebaseMaster = NO_CHANGE;
-
+        */
+        
         //update transport state and position
         fReturnTransportData.fState = fEngineControl->fTransport.Query ( &fReturnTransportData.fPosition );
-
+    
         //is it a new state (that the master need to know...) ?
-        fReturnTransportData.fNewState = ( ( fReturnTransportData.fState != fLastTransportState ) &&
+        fReturnTransportData.fNewState = (( fReturnTransportData.fState == JackTransportNetStarting) &&
+                                           ( fReturnTransportData.fState != fLastTransportState ) && 
                                            ( fReturnTransportData.fState != fSendTransportData.fState ) );
         if ( fReturnTransportData.fNewState )
             jack_info ( "Sending '%s'.", GetTransportState ( fReturnTransportData.fState ) );
