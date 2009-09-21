@@ -417,6 +417,7 @@ namespace Jack
         dst_params->fPosition.usecs = htonl(src_params->fPosition.usecs);
         dst_params->fPosition.frame_rate = htonl(src_params->fPosition.frame_rate);
         dst_params->fPosition.frame = htonl(src_params->fPosition.frame);
+        dst_params->fPosition.valid = (jack_position_bits_t)htonl((uint32_t)src_params->fPosition.valid);
         dst_params->fPosition.bar = htonl(src_params->fPosition.bar);
         dst_params->fPosition.beat = htonl(src_params->fPosition.beat);
         dst_params->fPosition.tick = htonl(src_params->fPosition.tick);
@@ -442,6 +443,7 @@ namespace Jack
         dst_params->fPosition.usecs = ntohl(src_params->fPosition.usecs);
         dst_params->fPosition.frame_rate = ntohl(src_params->fPosition.frame_rate);
         dst_params->fPosition.frame = ntohl(src_params->fPosition.frame);
+        dst_params->fPosition.valid = (jack_position_bits_t)ntohl((uint32_t)src_params->fPosition.valid);
         dst_params->fPosition.bar = ntohl(src_params->fPosition.bar);
         dst_params->fPosition.beat = ntohl(src_params->fPosition.beat);
         dst_params->fPosition.tick = ntohl(src_params->fPosition.tick);
