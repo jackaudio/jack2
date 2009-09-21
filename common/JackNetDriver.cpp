@@ -429,7 +429,7 @@ namespace Jack
 
     void JackNetDriver::EncodeTransportData()
     {
-        /* Desactiva
+        /* Desactivated
         //is there a timebase master change ?
         int refnum;
         bool conditional;
