@@ -1128,6 +1128,13 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     fPlaybackLatency = playback_latency;
     fIOUsage = float(async_output_latency) / 100.f;
     fComputationGrain = float(computation_grain) / 100.f;
+    
+    CFRunLoopRef theRunLoop = NULL;
+    AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    OSStatus theError = AudioObjectSetPropertyData (kAudioObjectSystemObject, &theAddress, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
+    if (theError != noErr) {
+        jack_error("JackCoreAudioDriver::Open kAudioHardwarePropertyRunLoop error");
+    }
 
     if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name) < 0)
         return -1;

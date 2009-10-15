@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-15 Stephane Letz  <letz@grame.fr>
+
+	* Change CoreAudio notification thread setup for OSX Snow Leopard.
+
 2009-09-18 Stephane Letz  <letz@grame.fr>
 
 	* Simplify transport in NetJack2: master only can control transport.
