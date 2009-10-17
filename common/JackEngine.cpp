@@ -119,9 +119,7 @@ void JackEngine::ReleaseRefnum(int ref)
             // last client and temporay case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
-#ifndef WIN32
- 	    exit(0);
-#endif
+            JackServerGlobals::fKilled = true;
         }
     }
 }

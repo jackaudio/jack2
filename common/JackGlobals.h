@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-// Globals used for client management on server or libray side.
+// Globals used for client management on server or library side.
 struct JackGlobals {
 
     static jack_tls_key fRealTime;

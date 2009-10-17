@@ -395,6 +395,13 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             jack_error("Unknown request %ld", header.fType);
             break;
     }
+    
+    /* TODO
+    // Issued by JackEngine::ReleaseRefnum when temporary mode is used
+    if (JackServerGlobals::fKilled) {
+        kill(JackTools::GetPID(), SIGINT);
+    }
+    */
 
     return true;
 }

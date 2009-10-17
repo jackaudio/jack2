@@ -316,6 +316,13 @@ bool JackClientPipeThread::HandleRequest()
                 break;
         }
     }
+    
+    /* TODO
+    // Issued by JackEngine::ReleaseRefnum when temporary mode is used
+    if (JackServerGlobals::fKilled) {
+        kill(JackTools::GetPID(), SIGINT);
+    }
+    */
 
     // Unlock the global mutex
     ReleaseMutex(fMutex);

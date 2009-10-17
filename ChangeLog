@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-17 Stephane Letz  <letz@grame.fr>
+
+	* Correct server temporary mode : now set a global and quit after server/client message handling is finished.
+
 2009-10-15 Stephane Letz  <letz@grame.fr>
 
 	* Change CoreAudio notification thread setup for OSX Snow Leopard.

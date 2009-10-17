@@ -36,6 +36,7 @@ class JackClient;
 
 struct SERVER_EXPORT JackServerGlobals
 {
+    static bool fKilled;
     static JackServer* fInstance;
     static unsigned int fUserCount;
     static bool (* on_device_acquire)(const char * device_name);
