@@ -27,7 +27,8 @@ Paul Davis
 
 2009-10-20 Stephane Letz  <letz@grame.fr>
 
-	* Add a string parameter to server ==> client notification, add a new "InfoShutdown" callback.
+	* Add a string parameter to server ==> client notification, add a new JackInfoShutdownCallback type.
+	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration change…)
 
 2009-10-17 Stephane Letz  <letz@grame.fr>
 

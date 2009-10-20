@@ -250,6 +250,11 @@ void JackDriver::NotifySampleRate(jack_nframes_t sample_rate)
     fEngine->NotifySampleRate(sample_rate);
     fEngineControl->InitFrameTime();
 }
+    
+void JackDriver::NotifyFailure(int code, const char* reason)
+{
+    fEngine->NotifyFailure(code, reason);
+}
 
 void JackDriver::SetMaster(bool onoff)
 {

@@ -116,6 +116,7 @@ class SERVER_EXPORT JackEngine
 
         // Notifications
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
+        void NotifyFailure(int code, const char* reason);
         void NotifyXRun(int refnum);
         void NotifyGraphReorder();
         void NotifyBufferSize(jack_nframes_t buffer_size);

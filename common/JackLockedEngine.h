@@ -191,6 +191,12 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             fEngine.NotifyFreewheel(onoff);
         }
     
+        void NotifyFailure(int code, const char* reason)
+        {
+            JackLock lock(this);
+            fEngine.NotifyFailure(code, reason);
+        }
+    
         int GetClientPID(const char* name)
         {
             JackLock lock(this);

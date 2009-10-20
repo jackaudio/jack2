@@ -234,12 +234,12 @@ typedef void (*JackShutdownCallback)(void *arg);
  * to release client ressources. Warning: jack_client_close() cannot be
  * safely used inside the shutdown callback and has to be called outside of
  * the callback context.
- *
- * @param reason a string discribinh the shuntdown reason (backend failure, server crash... etc...)
+ 
+ * @param code a shuntdown code
+ * @param reason a string discribing the shuntdown reason (backend failure, server crash... etc...)
  * @param arg pointer to a client supplied structure
  */
-typedef void (*JackInfoShutdownCallback)(const char* reason, void *arg);
-
+typedef void (*JackInfoShutdownCallback)(int code, const char* reason, void *arg);
 
 /**
  * Used for the type argument of jack_port_register() for default
@@ -434,7 +434,12 @@ enum JackStatus {
     /**
      * Client's protocol version does not match
      */
-    JackVersionError = 0x400
+    JackVersionError = 0x400,
+    
+    /**
+     * Backend failure
+     */
+    JackBackendError = 0x800
 };
 
 /**

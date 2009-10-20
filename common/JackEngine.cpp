@@ -298,6 +298,11 @@ void JackEngine::NotifySampleRate(jack_nframes_t sample_rate)
     NotifyClients(kSampleRateCallback, true, "", sample_rate, 0);
 }
 
+void JackEngine::NotifyFailure(int code, const char* reason)
+{
+    NotifyClients(kShutDownCallback, false, reason, code, 0);
+}
+    
 void JackEngine::NotifyFreewheel(bool onoff)
 {
     fEngineControl->fRealTime = !onoff;

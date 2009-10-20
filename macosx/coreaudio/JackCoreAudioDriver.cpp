@@ -25,6 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackDriverLoader.h"
 #include "JackGlobals.h"
+#include "JackTools.h"
 #include "JackCompilerDeps.h"
 
 #include <iostream>
@@ -270,12 +271,16 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 		}
 
         case kAudioDevicePropertyStreamConfiguration: {
-            jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server may not work correctly anymore...");
+            jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server will quit...");
+            driver->NotifyFailure(JackBackendError, "CoreAudio device stream configuration has changed, backend stopped.");
+            kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
 		}
             
 		case kAudioDevicePropertyNominalSampleRate: {
-            jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server may not work correctly anymore...");
+            jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server will quit...");
+            driver->NotifyFailure(JackBackendError, "CoreAudio device sampling rate has changed, backend stopped.");
+            kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
 		}
           

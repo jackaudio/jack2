@@ -252,8 +252,10 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 
             case kShutDownCallback:
                 jack_log("JackClient::kShutDownCallback");
-                if (fInfoShutdown)
-                    fInfoShutdown(message, fInfoShutdownArg);
+                if (fInfoShutdown) {
+                    fInfoShutdown(value1, message, fInfoShutdownArg);
+                    fInfoShutdown = NULL;
+                }
                 break;
         }
     }
@@ -591,7 +593,7 @@ void JackClient::ShutDown()
     JackGlobals::fServerRunning = false;
     
     if (fInfoShutdown) {
-        fInfoShutdown("JACK server has been closed", fInfoShutdownArg);
+        fInfoShutdown(JackFailure, "JACK server has been closed", fInfoShutdownArg);
         fInfoShutdown = NULL;
     } else if (fShutdown) {
         fShutdown(fShutdownArg);
@@ -789,6 +791,7 @@ void JackClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *arg)
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
     } else {
+        GetClientControl()->fCallback[kShutDownCallback] = (callback != NULL);
         fInfoShutdownArg = arg;
         fInfoShutdown = callback;
     }
