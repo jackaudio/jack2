@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Sep  1 17:42:28 2008
- * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
+ * stub generated Tue Oct 20 12:13:26 2009
+ * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCEngine_subsystem__ 1
@@ -50,15 +50,15 @@
 #ifndef	__MachMsgErrorWithTimeout
 #define	__MachMsgErrorWithTimeout(_R_) { \
 	switch (_R_) { \
-	case MACH_SEND_INVALID_REPLY: \
-	case MACH_RCV_INVALID_NAME: \
-	case MACH_RCV_PORT_DIED: \
-	case MACH_RCV_PORT_CHANGED: \
-	case MACH_RCV_TIMED_OUT: \
-		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
-		break; \
-	default: \
+	case MACH_SEND_INVALID_DATA: \
+	case MACH_SEND_INVALID_DEST: \
+	case MACH_SEND_INVALID_HEADER: \
 		mig_put_reply_port(InP->Head.msgh_reply_port); \
+		break; \
+	case MACH_SEND_TIMED_OUT: \
+	case MACH_RCV_TIMED_OUT: \
+	default: \
+		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
 	} \
 }
 #endif	/* __MachMsgErrorWithTimeout */
@@ -66,14 +66,13 @@
 #ifndef	__MachMsgErrorWithoutTimeout
 #define	__MachMsgErrorWithoutTimeout(_R_) { \
 	switch (_R_) { \
-	case MACH_SEND_INVALID_REPLY: \
-	case MACH_RCV_INVALID_NAME: \
-	case MACH_RCV_PORT_DIED: \
-	case MACH_RCV_PORT_CHANGED: \
-		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
+	case MACH_SEND_INVALID_DATA: \
+	case MACH_SEND_INVALID_DEST: \
+	case MACH_SEND_INVALID_HEADER: \
+		mig_put_reply_port(InP->Head.msgh_reply_port); \
 		break; \
 	default: \
-		mig_put_reply_port(InP->Head.msgh_reply_port); \
+		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
 	} \
 }
 #endif	/* __MachMsgErrorWithoutTimeout */
@@ -399,8 +398,9 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_client_open_t(__Reply__r
 
 #if	__MigTypeCheck
 	if (Out0P->private_port.type != MACH_MSG_PORT_DESCRIPTOR ||
-	    Out0P->private_port.disposition != 17)
-		{ return MIG_TYPE_ERROR; }
+	    Out0P->private_port.disposition != 17) {
+		return MIG_TYPE_ERROR;
+	}
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined) || \

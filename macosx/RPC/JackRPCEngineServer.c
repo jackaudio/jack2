@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Sep  1 17:42:28 2008
- * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
+ * stub generated Tue Oct 20 12:13:26 2009
+ * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
 
@@ -910,6 +910,17 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_open_t(__attrib
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->client_name),  128);
+		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
+#endif	/* __MigTypeCheck */
+
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__client_name__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_open_t__pid__defined)
 	if (In0P->NDR.int_rep != NDR_record.int_rep) {
@@ -1241,6 +1252,17 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_check_t(__attri
 	if ((In0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
 	    (In0P->Head.msgh_size != (mach_msg_size_t)sizeof(__Request)))
 		return MIG_BAD_ARGUMENTS;
+#endif	/* __MigTypeCheck */
+
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->client_name),  128);
+		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_check_t__client_name__defined) || \
@@ -2281,6 +2303,20 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_register_t(__attr
 	if ((In0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
 	    (In0P->Head.msgh_size != (mach_msg_size_t)sizeof(__Request)))
 		return MIG_BAD_ARGUMENTS;
+#endif	/* __MigTypeCheck */
+
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->name),  128);
+		if (( memchr(In0P->name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->port_type),  128);
+		if (( memchr(In0P->port_type, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_port_register_t__refnum__defined) || \
@@ -3526,6 +3562,20 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_connect_name_t(__
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->src),  128);
+		if (( memchr(In0P->src, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->dst),  128);
+		if (( memchr(In0P->dst, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
+#endif	/* __MigTypeCheck */
+
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_port_connect_name_t__refnum__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_connect_name_t__src__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_connect_name_t__dst__defined)
@@ -3848,6 +3898,20 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_disconnect_name_t
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->src),  128);
+		if (( memchr(In0P->src, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->dst),  128);
+		if (( memchr(In0P->dst, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
+#endif	/* __MigTypeCheck */
+
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_port_disconnect_name_t__refnum__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_disconnect_name_t__src__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_port_disconnect_name_t__dst__defined)
@@ -4168,6 +4232,17 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_port_rename_t(__attrib
 	if ((In0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
 	    (In0P->Head.msgh_size != (mach_msg_size_t)sizeof(__Request)))
 		return MIG_BAD_ARGUMENTS;
+#endif	/* __MigTypeCheck */
+
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->name),  128);
+		if (( memchr(In0P->name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_port_rename_t__refnum__defined) || \
@@ -5451,6 +5526,17 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clienthandle_
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->client_name),  128);
+		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
+#endif	/* __MigTypeCheck */
+
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_internal_clienthandle_t__refnum__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_internal_clienthandle_t__client_name__defined)
 	if (In0P->NDR.int_rep != NDR_record.int_rep) {
@@ -5879,6 +5965,23 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_internal_clientload_t(
 	if ((In0P->Head.msgh_bits & MACH_MSGH_BITS_COMPLEX) ||
 	    (In0P->Head.msgh_size != (mach_msg_size_t)sizeof(__Request)))
 		return MIG_BAD_ARGUMENTS;
+#endif	/* __MigTypeCheck */
+
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->client_name),  128);
+		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->so_name),  1024);
+		if (( memchr(In0P->so_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->objet_data),  1024);
+		if (( memchr(In0P->objet_data, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_internal_clientload_t__refnum__defined) || \
@@ -6626,47 +6729,47 @@ const struct server_JackRPCEngine_subsystem {
 	(vm_address_t)0,
 	{
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_open, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_open_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_open, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_open_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_check, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_check_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_check, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_check_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_close, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_close_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_close, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_close_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_activate, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_activate_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_activate, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_activate_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_deactivate, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_deactivate_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_deactivate, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_deactivate_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_register, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_register_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_register, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_register_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_unregister, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_unregister_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_unregister, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_unregister_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_connect, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_connect_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_connect, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_connect_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_disconnect, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_disconnect_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_disconnect, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_disconnect_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_connect_name, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_connect_name_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_connect_name, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_connect_name_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_disconnect_name, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_disconnect_name_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_disconnect_name, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_disconnect_name_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_port_rename, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_rename_t)},
+          (mig_stub_routine_t) _Xrpc_jack_port_rename, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_port_rename_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_set_buffer_size, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_set_buffer_size_t)},
+          (mig_stub_routine_t) _Xrpc_jack_set_buffer_size, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_set_buffer_size_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_set_freewheel, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_set_freewheel_t)},
+          (mig_stub_routine_t) _Xrpc_jack_set_freewheel, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_set_freewheel_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_release_timebase, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_release_timebase_t)},
+          (mig_stub_routine_t) _Xrpc_jack_release_timebase, 3, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_release_timebase_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_set_timebase_callback, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_set_timebase_callback_t)},
+          (mig_stub_routine_t) _Xrpc_jack_set_timebase_callback, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_set_timebase_callback_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_get_internal_clientname, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_get_internal_clientname_t)},
+          (mig_stub_routine_t) _Xrpc_jack_get_internal_clientname, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_get_internal_clientname_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_internal_clienthandle, 6, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_internal_clienthandle_t)},
+          (mig_stub_routine_t) _Xrpc_jack_internal_clienthandle, 6, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_internal_clienthandle_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_internal_clientload, 9, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_internal_clientload_t)},
+          (mig_stub_routine_t) _Xrpc_jack_internal_clientload, 9, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_internal_clientload_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_internal_clientunload, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_internal_clientunload_t)},
+          (mig_stub_routine_t) _Xrpc_jack_internal_clientunload, 5, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_internal_clientunload_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_rt_notify, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_rt_notify_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_rt_notify, 4, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_rt_notify_t)},
 	}
 };
 

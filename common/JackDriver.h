@@ -199,7 +199,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
         
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
         virtual JackClientControl* GetClientControl() const;
         
         virtual bool IsRealTime() const;

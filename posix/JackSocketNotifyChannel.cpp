@@ -47,9 +47,9 @@ void JackSocketNotifyChannel::Close()
     fNotifySocket.Close();
 }
 
-void JackSocketNotifyChannel::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2, int* result)
+void JackSocketNotifyChannel::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2, int* result)
 {
-    JackClientNotification event(name, refnum, notify, sync, value1, value2);
+    JackClientNotification event(name, refnum, notify, sync, message, value1, value2);
     JackResult res;
 
     // Send notification

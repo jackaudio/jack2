@@ -282,7 +282,7 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * @param function The jack_shutdown function pointer.
  * @param arg The arguments for the jack_shutdown function.
  *
- * Register a function (and argument) to be called if and when the
+ * @deprecated Register a function (and argument) to be called if and when the
  * JACK server shuts down the client thread.  The function must
  * be written as if it were an asynchonrous POSIX signal
  * handler --- use only async-safe functions, and remember that it
@@ -298,6 +298,27 @@ int jack_set_thread_init_callback (jack_client_t *client,
 void jack_on_shutdown (jack_client_t *client,
                        JackShutdownCallback shutdown_callback, void *arg);
 
+/**
+ * @param client pointer to JACK client structure.
+ * @param function The jack_shutdown function pointer.
+ * @param arg The arguments for the jack_shutdown function.
+ *
+ * Register a function (and argument) to be called if and when the
+ * JACK server shuts down the client thread.  The function must
+ * be written as if it were an asynchonrous POSIX signal
+ * handler --- use only async-safe functions, and remember that it
+ * is executed from another thread.  A typical function might
+ * set a flag or write to a pipe so that the rest of the
+ * application knows that the JACK client thread has shut
+ * down.
+ *
+ * NOTE: clients do not need to call this.  It exists only
+ * to help more complex clients understand what is going
+ * on.  It should be called before jack_client_activate().
+ */
+void jack_on_info_shutdown (jack_client_t *client,
+                       JackInfoShutdownCallback shutdown_callback, void *arg);
+    
 /**
  * Tell the Jack server to call @a process_callback whenever there is
  * work be done, passing @a arg as the second argument.

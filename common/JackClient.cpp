@@ -49,6 +49,7 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fGraphOrder = NULL;
     fXrun = NULL;
     fShutdown = NULL;
+    fInfoShutdown = NULL;
     fInit = NULL;
     fBufferSize = NULL;
     fClientRegistration = NULL;
@@ -63,6 +64,7 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fGraphOrderArg = NULL;
     fXrunArg = NULL;
     fShutdownArg = NULL;
+    fInfoShutdownArg = NULL;
     fInitArg = NULL;
     fBufferSizeArg = NULL;
     fFreewheelArg = NULL;
@@ -132,12 +134,12 @@ void JackClient::SetupDriverSync(bool freewheel)
 \brief Notification received from the server.
 */
 
-int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackClient::ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     return 0;
 }
 
-int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     int res = 0;
 
@@ -145,11 +147,11 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
     switch (notify) {
 
         case kAddClient:
-            res = ClientNotifyImp(refnum, name, notify, sync, value1, value2);
+            res = ClientNotifyImp(refnum, name, notify, sync, message, value1, value2);
             break;
 
         case kRemoveClient:
-            res = ClientNotifyImp(refnum, name, notify, sync, value1, value2);
+            res = ClientNotifyImp(refnum, name, notify, sync, message, value1, value2);
             break;
 
         case kActivateClient:
@@ -246,6 +248,12 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 jack_log("JackClient::kXRunCallback");
                 if (fXrun)
                     res = fXrun(fXrunArg);
+                break;
+                
+            case kShutDownCallback:
+                jack_log("JackClient::kShutDownCallback");
+                if (fInfoShutdown)
+                    fInfoShutdown(message, fInfoShutdownArg);
                 break;
         }
     }
@@ -582,7 +590,10 @@ void JackClient::ShutDown()
     jack_log("ShutDown");
     JackGlobals::fServerRunning = false;
     
-    if (fShutdown) {
+    if (fInfoShutdown) {
+        fInfoShutdown("JACK server has been closed", fInfoShutdownArg);
+        fInfoShutdown = NULL;
+    } else if (fShutdown) {
         fShutdown(fShutdownArg);
         fShutdown = NULL;
     }
@@ -770,6 +781,16 @@ void JackClient::OnShutdown(JackShutdownCallback callback, void *arg)
     } else {
         fShutdownArg = arg;
         fShutdown = callback;
+    }
+}
+    
+void JackClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+    } else {
+        fInfoShutdownArg = arg;
+        fInfoShutdown = callback;
     }
 }
 

@@ -1079,13 +1079,15 @@ struct JackClientNotification
     int fValue1;
     int fValue2;
     int fSync;
+    char fMessage[JACK_MESSAGE_SIZE + 1];
 
     JackClientNotification(): fNotify(-1), fValue1(-1), fValue2(-1)
     {}
-    JackClientNotification(const char* name, int refnum, int notify, int sync, int value1, int value2)
+    JackClientNotification(const char* name, int refnum, int notify, int sync, const char* message, int value1, int value2)
             : fRefNum(refnum), fNotify(notify), fValue1(value1), fValue2(value2), fSync(sync)
     {
         snprintf(fName, sizeof(fName), "%s", name);
+        snprintf(fMessage, sizeof(fMessage), "%s", message);
     }
 
     int Read(JackChannelTransaction* trans)
@@ -1096,6 +1098,7 @@ struct JackClientNotification
         CheckRes(trans->Read(&fValue1, sizeof(int)));
         CheckRes(trans->Read(&fValue2, sizeof(int)));
         CheckRes(trans->Read(&fSync, sizeof(int)));
+        CheckRes(trans->Read(&fMessage, JACK_MESSAGE_SIZE + 1));
         return 0;
     }
 
@@ -1107,6 +1110,7 @@ struct JackClientNotification
         CheckRes(trans->Write(&fValue1, sizeof(int)));
         CheckRes(trans->Write(&fValue2, sizeof(int)));
         CheckRes(trans->Write(&fSync, sizeof(int)));
+        CheckRes(trans->Write(&fMessage, JACK_MESSAGE_SIZE + 1));
         return 0;
     }
 

@@ -26,12 +26,14 @@ waittime 5000;
 
 type client_name_t = c_string[128];
 type client_port_name_t = c_string[128];
+type message_t = c_string[512];
 
 routine rpc_jack_client_sync_notify(
 	client_port	: mach_port_t;
 	refnum		: int;
 	client_name	: client_name_t;
 	notify		: int;
+	message		: message_t;
 	value1		: int;
 	value2		: int;
     out result : int);
@@ -41,5 +43,6 @@ simpleroutine rpc_jack_client_async_notify(
 	refnum		: int;
 	client_name	: client_name_t;
 	notify		: int;
+	message		: message_t;
 	value1		: int;
 	value2		: int);

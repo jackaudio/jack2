@@ -190,7 +190,7 @@ void JackDriver::SetupDriverSync(int ref, bool freewheel)
     }
 }
 
-int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     switch (notify) {
 

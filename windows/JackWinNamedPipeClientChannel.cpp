@@ -315,7 +315,7 @@ bool JackWinNamedPipeClientChannel::Execute()
         goto error;
     }
 
-    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fValue1, event.fValue2);
+    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fMessage, event.fValue1, event.fValue2);
 
     if (event.fSync) {
         if (res.Write(&fNotificationListenPipe) < 0) {
