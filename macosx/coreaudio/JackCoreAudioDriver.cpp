@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-static void Print4CharCode(char* msg, long c)
+static void Print4CharCode(const char* msg, long c)
 {
     UInt32 __4CC_number = (c);
     char __4CC_string[5];
@@ -251,8 +251,7 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
     return noErr;
 }
 
-// A better implementation would try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
-
+// A better implementation would possibly try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
 OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         UInt32 inChannel,
         Boolean	isInput,
@@ -283,70 +282,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
 		}
-          
-        /*
-        case kAudioDevicePropertyNominalSampleRate: {
-
-            UInt32 outSize = sizeof(Float64);
-            Float64 sampleRate;
-            int in_nChannels = 0;
-            int out_nChannels = 0;
-            char capture_driver_name[256];
-            char playback_driver_name[256];
-            CFStringRef ref;
-     
-            // Stop and restart
-            driver->Stop();
-            driver->RemoveListeners();
-            driver->CloseAUHAL();
-
-            OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
-            if (err != noErr) {
-                jack_error("Cannot get current sample rate");
-                printError(err);
-            }
-            jack_log("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyNominalSampleRate %ld", long(sampleRate));
-
-            if (driver->SetupDevices(driver->fCaptureUID, driver->fPlaybackUID, capture_driver_name, playback_driver_name) < 0)
-                return -1;
-
-            if (driver->SetupChannels(driver->fCapturing, driver->fPlaying, driver->fInChannels, driver->fOutChannels, in_nChannels, out_nChannels, false) < 0)
-                return -1;
-
-            if (driver->SetupBufferSizeAndSampleRate(driver->fEngineControl->fBufferSize, sampleRate)  < 0)
-                return -1;
-
-            if (driver->OpenAUHAL(driver->fCapturing,
-                                  driver->fPlaying,
-                                  driver->fInChannels,
-                                  driver->fOutChannels,
-                                  in_nChannels,
-                                  out_nChannels,
-                                  driver->fEngineControl->fBufferSize,
-                                  sampleRate,
-                                  false) < 0)
-                goto error;
-
-            if (driver->AddListeners() < 0)
-                goto error;
-
-            driver->Start();
-
-            // Send notification to be used in JackPilot or JackRouter plugin
-            jack_error("Device restart...");
-            ref = CFStringCreateWithCString(NULL, driver->fEngineControl->fServerName, kCFStringEncodingMacRoman);
-            CFNotificationCenterPostNotificationWithOptions(CFNotificationCenterGetDistributedCenter(),
-                    CFSTR("com.grame.jackserver.restart"),
-                    ref,
-                    NULL,
-                    kCFNotificationDeliverImmediately | kCFNotificationPostToAllSessions);
-            CFRelease(ref);
-            return noErr;
-error:
-            driver->CloseAUHAL();
-            break;
-        }
-        */
+            
     }
     return noErr;
 }
