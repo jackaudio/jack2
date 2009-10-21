@@ -164,70 +164,30 @@ OSStatus JackCoreAudioAdapter::SRNotificationCallback(AudioDeviceID inDevice,
 }
 
 // A better implementation would try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
-
 OSStatus JackCoreAudioAdapter::DeviceNotificationCallback(AudioDeviceID inDevice,
         UInt32 inChannel,
         Boolean	isInput,
         AudioDevicePropertyID inPropertyID,
         void* inClientData)
 {
-    JackCoreAudioAdapter* driver = (JackCoreAudioAdapter*)inClientData;
-         
+        
     switch (inPropertyID) {
-
-        case kAudioDevicePropertyStreamConfiguration:
-        case kAudioDevicePropertyNominalSampleRate: {
-
-            UInt32 outSize = sizeof(Float64);
-            Float64 sampleRate;
-            int in_nChannels = 0;
-            int out_nChannels = 0;
-            char capture_driver_name[256];
-            char playback_driver_name[256];
-    
-            // Stop and restart
-            AudioOutputUnitStop(driver->fAUHAL);
-            driver->RemoveListeners();
-            driver->CloseAUHAL();
-
-            OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
-            if (err != noErr) {
-                jack_error("Cannot get current sample rate");
-                printError(err);
-            }
-            jack_log("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyNominalSampleRate %ld", long(sampleRate));
-
-            if (driver->SetupDevices(driver->fCaptureUID, driver->fPlaybackUID, capture_driver_name, playback_driver_name) < 0)
-                return -1;
-
-            if (driver->SetupChannels(driver->fCapturing, driver->fPlaying, driver->fCaptureChannels, driver->fPlaybackChannels, in_nChannels, out_nChannels, false) < 0)
-                return -1;
-
-            if (driver->SetupBufferSizeAndSampleRate(driver->fAdaptedBufferSize, sampleRate)  < 0)
-                return -1;
-                
-            driver->SetAdaptedSampleRate(sampleRate);
-
-            if (driver->OpenAUHAL(driver->fCapturing,
-                                  driver->fPlaying,
-                                  driver->fCaptureChannels,
-                                  driver->fPlaybackChannels,
-                                  in_nChannels,
-                                  out_nChannels,
-                                  driver->fAdaptedBufferSize,
-                                  sampleRate,
-                                  false) < 0)
-                goto error;
-
-            if (driver->AddListeners() < 0)
-                goto error;
-       
-            AudioOutputUnitStart(driver->fAUHAL);
-            return noErr;
-error:
-            driver->CloseAUHAL();
+        
+        case kAudioDeviceProcessorOverload: {
+            jack_error("JackCoreAudioAdapter::DeviceNotificationCallback kAudioDeviceProcessorOverload");
             break;
+		}
+
+        case kAudioDevicePropertyStreamConfiguration: {
+            jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration");
+            return kAudioHardwareUnsupportedOperationError;
         }
+            
+        case kAudioDevicePropertyNominalSampleRate: {
+            jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate");
+            return kAudioHardwareUnsupportedOperationError;
+        }
+            
     }
     return noErr;
 }
@@ -237,7 +197,13 @@ int JackCoreAudioAdapter::AddListeners()
     OSStatus err = noErr;
 
     // Add listeners
- 
+    err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDeviceProcessorOverload");
+        printError(err);
+        return -1;
+    }
+    
     err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback, this);
     if (err != noErr) {
         jack_error("Error calling AudioDeviceAddPropertyListener with kAudioHardwarePropertyDevices");
@@ -276,9 +242,9 @@ int JackCoreAudioAdapter::AddListeners()
     return 0;
 }
 
-
 void JackCoreAudioAdapter::RemoveListeners()
 {
+    AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioHardwarePropertyDevices, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceNotificationCallback);
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyDeviceIsRunning, DeviceNotificationCallback);
