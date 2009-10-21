@@ -641,14 +641,14 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     return 0;
 }
 
-int JackEngine::ClientActivate(int refnum, bool state)
+int JackEngine::ClientActivate(int refnum, bool is_real_time)
 {
     AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     assert(fClientTable[refnum]);
 
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
-    if (state)
+    if (is_real_time)
         fGraphManager->Activate(refnum);
 
     // Wait for graph state change to be effective

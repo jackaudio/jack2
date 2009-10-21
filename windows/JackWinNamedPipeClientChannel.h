@@ -64,7 +64,7 @@ class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface,
         {}
         void ClientClose(int refnum, int* result);
 
-        void ClientActivate(int refnum, int state, int* result);
+        void ClientActivate(int refnum, int is_real_time, int* result);
         void ClientDeactivate(int refnum, int* result);
 
         void PortRegister(int refnum, const char* name, const char* type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index, int* result);

@@ -297,25 +297,25 @@ struct JackActivateRequest : public JackRequest
 {
 
     int fRefNum;
-    int fState;
+    int fIsRealTime;
 
     JackActivateRequest()
     {}
-    JackActivateRequest(int refnum, int state)
-        : JackRequest(JackRequest::kActivateClient), fRefNum(refnum), fState(state)
+    JackActivateRequest(int refnum, int is_real_time)
+        : JackRequest(JackRequest::kActivateClient), fRefNum(refnum), fIsRealTime(is_real_time)
     {}
 
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        return trans->Read(&fState, sizeof(int));
+        return trans->Read(&fIsRealTime, sizeof(int));
     }
 
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        return trans->Write(&fState, sizeof(int));
+        return trans->Write(&fIsRealTime, sizeof(int));
     }
 
 } POST_PACKED_STRUCTURE;

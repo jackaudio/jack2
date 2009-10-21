@@ -83,10 +83,10 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             return fEngine.ClientInternalClose(refnum, wait);
         }
 
-        int ClientActivate(int refnum, bool state)
+        int ClientActivate(int refnum, bool is_real_time)
         {
             JackLock lock(this);
-            return fEngine.ClientActivate(refnum, state);
+            return fEngine.ClientActivate(refnum, is_real_time);
         }
         int ClientDeactivate(int refnum)
         {

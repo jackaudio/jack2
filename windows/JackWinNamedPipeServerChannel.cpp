@@ -138,7 +138,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackResult res;
                 jack_log("JackRequest::ActivateClient");
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fState);
+                    res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fIsRealTime);
                 res.Write(fPipe);
                 break;
             }

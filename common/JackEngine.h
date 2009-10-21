@@ -88,7 +88,7 @@ class SERVER_EXPORT JackEngine
         int ClientExternalClose(int refnum);
         int ClientInternalClose(int refnum, bool wait);
 
-        int ClientActivate(int refnum, bool state);
+        int ClientActivate(int refnum, bool is_real_time);
         int ClientDeactivate(int refnum);
     
         int GetClientPID(const char* name);
