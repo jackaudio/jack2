@@ -272,6 +272,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         case kAudioDevicePropertyStreamConfiguration: {
             jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server will quit...");
             driver->NotifyFailure(JackBackendError, "CoreAudio device stream configuration has changed, backend stopped.");
+            driver->CloseAUHAL();
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
 		}
@@ -279,6 +280,7 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
 		case kAudioDevicePropertyNominalSampleRate: {
             jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server will quit...");
             driver->NotifyFailure(JackBackendError, "CoreAudio device sampling rate has changed, backend stopped.");
+            driver->CloseAUHAL();
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
 		}
