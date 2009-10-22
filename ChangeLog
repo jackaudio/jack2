@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-22 Stephane Letz  <letz@grame.fr>
+
+	* Correct jackdmp.cpp (failures case were not correct..). Improve JackCoreAudioDriver code. Raise default port number to 2048.
+
 2009-10-20 Stephane Letz  <letz@grame.fr>
 
 	* Add a string parameter to server ==> client notification, add a new JackInfoShutdownCallback type.

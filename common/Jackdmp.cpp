@@ -247,7 +247,7 @@ int main(int argc, char* argv[])
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
-                        goto fail_free;
+                        goto fail_free1;
                     }
                 }
                 break;
@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
 
             case 'h':
                 usage(stdout);
-                goto fail_free;
+                goto fail_free1;
         }
     }
 
@@ -372,14 +372,14 @@ int main(int argc, char* argv[])
 
     if (!seen_audio_driver) {
         usage(stderr);
-        goto fail_free;
+        goto fail_free1;
     }
 
     // Audio driver
     audio_driver_ctl = jackctl_server_get_driver(server_ctl, audio_driver_name);
     if (audio_driver_ctl == NULL) {
         fprintf(stderr, "Unkown driver \"%s\"\n", audio_driver_name);
-        goto fail_free;
+        goto fail_free1;
     }
 
     if (optind < argc) {
@@ -391,7 +391,7 @@ int main(int argc, char* argv[])
     if (audio_driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                 " anything when run like this.\n");
-        goto fail_free;
+        goto fail_free1;
     }
 
     audio_driver_args = (char **) malloc(sizeof(char *) * audio_driver_nargs);
@@ -402,13 +402,13 @@ int main(int argc, char* argv[])
     }
 
     if (jackctl_parse_driver_params(audio_driver_ctl, audio_driver_nargs, audio_driver_args)) {
-        goto fail_free;
+        goto fail_free1;
     }
 
     // Start server
     if (!jackctl_server_start(server_ctl, audio_driver_ctl)) {
         fprintf(stderr, "Failed to start server\n");
-        goto fail_free;
+        goto fail_free1;
     }
 
     // MIDI driver
@@ -417,7 +417,7 @@ int main(int argc, char* argv[])
         midi_driver_ctl = jackctl_server_get_driver(server_ctl, midi_driver_name);
         if (midi_driver_ctl == NULL) {
             fprintf(stderr, "Unkown driver \"%s\"\n", midi_driver_name);
-            goto fail_free;
+            goto fail_free2;
         }
 
         jackctl_server_add_slave(server_ctl, midi_driver_ctl);
@@ -445,10 +445,18 @@ int main(int argc, char* argv[])
 
     if (!jackctl_server_stop(server_ctl))
         fprintf(stderr, "Cannot stop server...\n");
-
-fail_free:
-
+    
     jackctl_server_destroy(server_ctl);
     notify_server_stop(server_name);
-    return 1;
+    return 0;
+
+fail_free1  :
+    jackctl_server_destroy(server_ctl);
+    return -1;
+    
+fail_free2:
+    jackctl_server_stop(server_ctl);
+    jackctl_server_destroy(server_ctl);
+    notify_server_stop(server_name);
+    return -1;
 }

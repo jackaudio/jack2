@@ -261,25 +261,25 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
          
     switch (inPropertyID) {
-
+        
         case kAudioDeviceProcessorOverload: {
             jack_error("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload");
             jack_time_t cur_time = GetMicroSeconds();
             driver->NotifyXRun(cur_time, float(cur_time - driver->fBeginDateUst));   // Better this value than nothing... 
             break;
-		}
-
+        }
+        
         case kAudioDevicePropertyStreamConfiguration: {
             jack_error("Cannot handle kAudioDevicePropertyStreamConfiguration : server will quit...");
-            driver->NotifyFailure(JackBackendError, "CoreAudio device stream configuration has changed, backend stopped.");
+            driver->NotifyFailure(JackBackendError, "Another application has changed the device configuration.");
             driver->CloseAUHAL();
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
-		}
-            
-		case kAudioDevicePropertyNominalSampleRate: {
+        }
+        
+        case kAudioDevicePropertyNominalSampleRate: {
             jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server will quit...");
-            driver->NotifyFailure(JackBackendError, "CoreAudio device sampling rate has changed, backend stopped.");
+            driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");
             driver->CloseAUHAL();
             kill(JackTools::GetPID(), SIGINT);
             return kAudioHardwareUnsupportedOperationError;
@@ -1072,11 +1072,19 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     fIOUsage = float(async_output_latency) / 100.f;
     fComputationGrain = float(computation_grain) / 100.f;
     
-    CFRunLoopRef theRunLoop = NULL;
-    AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-    OSStatus theError = AudioObjectSetPropertyData (kAudioObjectSystemObject, &theAddress, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
-    if (theError != noErr) {
-        jack_error("JackCoreAudioDriver::Open kAudioHardwarePropertyRunLoop error");
+    SInt32 major;
+    SInt32 minor;
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    
+    // Starting with 10.6 systems...
+    if (major == 10 && minor >=6) {
+        CFRunLoopRef theRunLoop = NULL;
+        AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+        OSStatus theError = AudioObjectSetPropertyData (kAudioObjectSystemObject, &theAddress, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
+        if (theError != noErr) {
+            jack_error("JackCoreAudioDriver::Open kAudioHardwarePropertyRunLoop error");
+        }
     }
 
     if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name) < 0)

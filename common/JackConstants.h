@@ -35,7 +35,7 @@
 #define JACK_MESSAGE_SIZE 512
 
 #ifndef PORT_NUM
-#define PORT_NUM 1024
+#define PORT_NUM 2048
 #endif
 
 #define DRIVER_PORT_NUM 256
