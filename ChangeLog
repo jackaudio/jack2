@@ -27,6 +27,10 @@ Paul Davis
 
 2009-10-22 Stephane Letz  <letz@grame.fr>
 
+	* Correct JackProcessSync::LockedTimedWait.
+
+2009-10-22 Stephane Letz  <letz@grame.fr>
+
 	* Correct jackdmp.cpp (failures case were not correct..). Improve JackCoreAudioDriver code. Raise default port number to 2048.
 
 2009-10-20 Stephane Letz  <letz@grame.fr>

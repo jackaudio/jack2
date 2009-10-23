@@ -484,7 +484,7 @@ int JackEngine::GetClientRefNum(const char* name)
 // Used for external clients
 int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
-    jack_log("JackEngine::ClientOpen: name = %s ", name);
+    jack_log("JackEngine::ClientExternalOpen: name = %s ", name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -536,7 +536,7 @@ error:
 // Used for server driver clients
 int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)
 {
-    jack_log("JackEngine::ClientInternalNew: name = %s", name);
+    jack_log("JackEngine::ClientInternalOpen: name = %s", name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {

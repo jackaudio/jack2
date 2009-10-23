@@ -222,7 +222,7 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
     JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
     
     if (driver->fComputationGrain > 0) {
-        jack_log("JackCoreAudioDriver::MeasureCallback : RT thread computation setup to %ld percent of period", int(driver->fComputationGrain * 100));
+        jack_log("JackCoreAudioDriver::MeasureCallback : RT thread computation setup to %d percent of period", int(driver->fComputationGrain * 100));
         driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
     }
     
@@ -647,24 +647,24 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
     }
 
     if (inchannels > in_nChannels) {
-        jack_error("This device hasn't required input channels inchannels = %ld in_nChannels = %ld", inchannels, in_nChannels);
+        jack_error("This device hasn't required input channels inchannels = %d in_nChannels = %d", inchannels, in_nChannels);
         if (strict)
             return -1;
     }
 
     if (outchannels > out_nChannels) {
-        jack_error("This device hasn't required output channels outchannels = %ld out_nChannels = %ld", outchannels, out_nChannels);
+        jack_error("This device hasn't required output channels outchannels = %d out_nChannels = %d", outchannels, out_nChannels);
         if (strict)
             return -1;
     }
 
     if (inchannels == 0) {
-        jack_log("Setup max in channels = %ld", in_nChannels);
+        jack_log("Setup max in channels = %d", in_nChannels);
         inchannels = in_nChannels;
     }
 
     if (outchannels == 0) {
-        jack_log("Setup max out channels = %ld", out_nChannels);
+        jack_log("Setup max out channels = %d", out_nChannels);
         outchannels = out_nChannels;
     }
 
@@ -717,7 +717,7 @@ int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size
         int count = 0;
         while (!fState && count++ < 100) {
             usleep(100000);
-            jack_log("Wait count = %ld", count);
+            jack_log("Wait count = %d", count);
         }
 
         // Remove SR change notification
@@ -741,7 +741,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     UInt32 enableIO;
     AudioStreamBasicDescription srcFormat, dstFormat;
 
-    jack_log("OpenAUHAL capturing = %ld playing = %ld inchannels = %ld outchannels = %ld in_nChannels = %ld out_nChannels = %ld ", capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels);
+    jack_log("OpenAUHAL capturing = %d playing = %d inchannels = %d outchannels = %d in_nChannels = %d out_nChannels = %d", capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels);
 
     if (inchannels == 0 && outchannels == 0) {
         jack_error("No input and output channels...");
@@ -1099,7 +1099,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
 
     if (SetupBufferSizeAndSampleRate(buffer_size, samplerate)  < 0)
         return -1;
-
+ 
     if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, buffer_size, samplerate, true) < 0)
         goto error;
 
