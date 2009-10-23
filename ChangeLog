@@ -28,6 +28,7 @@ Paul Davis
 2009-10-22 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackProcessSync::LockedTimedWait.
+	* Correct JACK_MESSAGE_SIZE value, particularly in OSX RPC code.
 
 2009-10-22 Stephane Letz  <letz@grame.fr>
 

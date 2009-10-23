@@ -25,11 +25,11 @@ import "Jackdefs.h";
 
 ServerPrefix server_;
 
-type client_name_t = c_string[128];
+type client_name_t = c_string[64];
 type client_port_name_t = c_string[128];
 type client_port_type_t = c_string[128];
-type so_name_t = c_string[1024];
-type objet_data_t = c_string[1024];
+type so_name_t = c_string[256];
+type objet_data_t = c_string[256];
 
 routine rpc_jack_client_open(
 	server_port	: mach_port_t;

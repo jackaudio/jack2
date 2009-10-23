@@ -24,9 +24,8 @@ subsystem  JackRPCClient 1000;
 import "Jackdefs.h";
 waittime 5000;
 
-type client_name_t = c_string[128];
-type client_port_name_t = c_string[128];
-type message_t = c_string[512];
+type client_name_t = c_string[64];
+type message_t = c_string[256];
 
 routine rpc_jack_client_sync_notify(
 	client_port	: mach_port_t;

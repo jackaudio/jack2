@@ -53,7 +53,7 @@ class JackMachServerChannel : public JackRunnableInterface
 
         int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
         void Close();                                           // Close the Server/Client connection
-
+  
         JackLockedEngine* GetEngine();
         JackServer* GetServer();
 

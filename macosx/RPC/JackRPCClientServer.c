@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Tue Oct 20 12:13:25 2009
+ * stub generated Fri Oct 23 10:35:08 2009
  * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
@@ -226,11 +226,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__string(a, f, 128)
+	__NDR_convert__int_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined */
 
@@ -266,11 +266,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
-	__NDR_convert__int_rep__JackRPCClient__string(a, f, 512)
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 256)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
-	__NDR_convert__int_rep__string(a, f, 512)
+	__NDR_convert__int_rep__string(a, f, 256)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 
@@ -346,11 +346,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__string(a, f, 128)
+	__NDR_convert__char_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined */
 
@@ -386,11 +386,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
-	__NDR_convert__char_rep__JackRPCClient__string(a, f, 512)
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 256)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
-	__NDR_convert__char_rep__string(a, f, 512)
+	__NDR_convert__char_rep__string(a, f, 256)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 
@@ -466,11 +466,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__string(a, f, 128)
+	__NDR_convert__float_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined */
 
@@ -506,11 +506,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
-	__NDR_convert__float_rep__JackRPCClient__string(a, f, 512)
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 256)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
-	__NDR_convert__float_rep__string(a, f, 512)
+	__NDR_convert__float_rep__string(a, f, 256)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 
@@ -570,10 +570,10 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
 		size_t memchr_limit;
 
-		memchr_limit = min((msg_limit - In0P->client_name),  128);
+		memchr_limit = min((msg_limit - In0P->client_name),  64);
 		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
 			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
-		memchr_limit = min((msg_limit - In0P->message),  512);
+		memchr_limit = min((msg_limit - In0P->message),  256);
 		if (( memchr(In0P->message, '\0', memchr_limit) == NULL ))
 			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
 	}
@@ -784,11 +784,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__string(a, f, 128)
+	__NDR_convert__int_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined */
 
@@ -824,11 +824,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
-	__NDR_convert__int_rep__JackRPCClient__string(a, f, 512)
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 256)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
-	__NDR_convert__int_rep__string(a, f, 512)
+	__NDR_convert__int_rep__string(a, f, 256)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 
@@ -904,11 +904,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__string(a, f, 128)
+	__NDR_convert__char_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined */
 
@@ -944,11 +944,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
-	__NDR_convert__char_rep__JackRPCClient__string(a, f, 512)
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 256)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
-	__NDR_convert__char_rep__string(a, f, 512)
+	__NDR_convert__char_rep__string(a, f, 256)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 
@@ -1024,11 +1024,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__string(a, f, 128)
+	__NDR_convert__float_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined */
 
@@ -1064,11 +1064,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
-	__NDR_convert__float_rep__JackRPCClient__string(a, f, 512)
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 256)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
-	__NDR_convert__float_rep__string(a, f, 512)
+	__NDR_convert__float_rep__string(a, f, 256)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 
@@ -1128,10 +1128,10 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
 		size_t memchr_limit;
 
-		memchr_limit = min((msg_limit - In0P->client_name),  128);
+		memchr_limit = min((msg_limit - In0P->client_name),  64);
 		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
 			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
-		memchr_limit = min((msg_limit - In0P->message),  512);
+		memchr_limit = min((msg_limit - In0P->message),  256);
 		if (( memchr(In0P->message, '\0', memchr_limit) == NULL ))
 			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
 	}

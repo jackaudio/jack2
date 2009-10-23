@@ -1,6 +1,6 @@
 /*
  * IDENTIFICATION:
- * stub generated Tue Oct 20 12:13:25 2009
+ * stub generated Fri Oct 23 10:35:08 2009
  * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
@@ -342,11 +342,11 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 
 	InP->refnum = refnum;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->notify = notify;
 
-	(void) mig_strncpy(InP->message, message, 512);
+	(void) mig_strncpy(InP->message, message, 256);
 
 	InP->value1 = value1;
 
@@ -438,11 +438,11 @@ mig_external kern_return_t rpc_jack_client_async_notify
 
 	InP->refnum = refnum;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->notify = notify;
 
-	(void) mig_strncpy(InP->message, message, 512);
+	(void) mig_strncpy(InP->message, message, 256);
 
 	InP->value1 = value1;
 
