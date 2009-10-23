@@ -53,7 +53,14 @@ JackClientPipeThread::~JackClientPipeThread()
 int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
 {
     fServer = server;
-    return 0;
+    
+    // Start listening
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener\n");
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
@@ -70,16 +77,6 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
     fRefNum = -1;
 }
     
-int JackClientPipeThread::Start()
-{
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener");
-        return -1;
-    }  
-    
-    return 0;
-}    
-
 bool JackClientPipeThread::Execute()
 {
     jack_log("JackClientPipeThread::Execute");
