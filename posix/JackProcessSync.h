@@ -32,7 +32,7 @@ namespace Jack
 \brief  A synchronization primitive built using a condition variable.
 */
 
-class JackProcessSync : public JackPosixMutex
+class JackProcessSync : public JackBasePosixMutex
 {
 
     private:
@@ -41,12 +41,12 @@ class JackProcessSync : public JackPosixMutex
 
     public:
 
-        JackProcessSync():JackPosixMutex()
+        JackProcessSync():JackBasePosixMutex()
         {
             pthread_cond_init(&fCond, NULL);
         }
 
-        ~JackProcessSync()
+        virtual ~JackProcessSync()
         {
             pthread_cond_destroy(&fCond);
         }
