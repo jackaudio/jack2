@@ -48,9 +48,8 @@ JackSocketServerChannel::~JackSocketServerChannel()
 
 int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
-    jack_log("JackSocketServerChannel::Open ");
-    fServer = server;
-
+    jack_log("JackSocketServerChannel::Open");
+   
     // Prepare request socket
     if (fRequestListenSocket.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_log("JackSocketServerChannel::Open : cannot create result listen socket");
@@ -59,13 +58,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 
     // Prepare for poll
     BuildPoolTable();
-
-    // Start listening
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener");
-        goto error;
-    }
-
+    fServer = server;
     return 0;
 
 error:
@@ -87,6 +80,16 @@ void JackSocketServerChannel::Close()
         socket->Close();
         delete socket;
     }
+}
+    
+int JackSocketServerChannel::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
 }
 
 void JackSocketServerChannel::ClientCreate()

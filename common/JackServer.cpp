@@ -78,7 +78,7 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close1;
     }
   
-    if (fEngine->Open() != 0) {
+    if (fEngine->Open() < 0) {
         jack_error("Cannot open engine");
         goto fail_close2;
     }
@@ -88,12 +88,12 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close3;
     }
  
-    if (fFreewheelDriver->Open() != 0) { // before engine open
+    if (fFreewheelDriver->Open() < 0) { // before engine open
         jack_error("Cannot open driver");
         goto fail_close4;
     }
  
-    if (fAudioDriver->Attach() != 0) {
+    if (fAudioDriver->Attach() < 0) {
         jack_error("Cannot attach audio driver");
         goto fail_close5;
     }
@@ -168,7 +168,10 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
 int JackServer::Start()
 {
     jack_log("JackServer::Start");
-    return fAudioDriver->Start();
+    if (fAudioDriver->Start() < 0) {
+        return -1;
+    }
+    return fChannel.Start();
 }
 
 int JackServer::Stop()

@@ -31,15 +31,17 @@ using namespace std;
 namespace Jack
 {
 
-HANDLE JackClientPipeThread::fMutex = NULL;  // never released....
+HANDLE JackClientPipeThread::fMutex = NULL;  // Never released....
 
 // fRefNum = -1 correspond to already removed client
 
 JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
-    : fPipe(pipe), fServer(NULL), fThread(this), fRefNum(0)
+    :fPipe(pipe), fServer(NULL), fThread(this), fRefNum(0)
 {
-    if (fMutex == NULL)
+    // First one allocated the static fMutex
+    if (fMutex == NULL) {
         fMutex = CreateMutex(NULL, FALSE, NULL);
+    }
 }
 
 JackClientPipeThread::~JackClientPipeThread()
@@ -51,14 +53,7 @@ JackClientPipeThread::~JackClientPipeThread()
 int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
 {
     fServer = server;
-
-    // Start listening
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener\n");
-        return -1;
-    } else {
-        return 0;
-    }
+    return 0;
 }
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
@@ -74,6 +69,16 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
     fPipe->Close();
     fRefNum = -1;
 }
+    
+int JackClientPipeThread::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
+}    
 
 bool JackClientPipeThread::Execute()
 {

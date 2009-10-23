@@ -50,11 +50,6 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
         return -1;
     }
 
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener");
-        return -1;
-    }
-
     fServer = server;
     fPortTable[fServerPort.GetPort()] = this;
     return 0;
@@ -65,6 +60,16 @@ void JackMachServerChannel::Close()
     jack_log("JackMachServerChannel::Close");
     fThread.Kill();
     fServerPort.DestroyPort();
+}
+    
+int JackMachServerChannel::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
 }
 
 JackLockedEngine* JackMachServerChannel::GetEngine()

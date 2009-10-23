@@ -29,6 +29,7 @@ Paul Davis
 
 	* Correct JackProcessSync::LockedTimedWait.
 	* Correct JACK_MESSAGE_SIZE value, particularly in OSX RPC code.
+	* Now start server channel thread only when backend has been started (so in JackServer::Start). Should solve race conditions at start time.
 
 2009-10-22 Stephane Letz  <letz@grame.fr>
 
