@@ -34,10 +34,10 @@ struct JackGlobals {
     static JackMutex* fOpenMutex;
     static bool fServerRunning;
     static JackClient* fClientTable[];
+    static bool fVerbose;
 #ifndef WIN32
     static jack_thread_creator_t fJackThreadCreator;
 #endif
-
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.

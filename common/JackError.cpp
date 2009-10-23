@@ -25,8 +25,6 @@
 #include "JackGlobals.h"
 #include "JackMessageBuffer.h"
 
-int jack_verbose = 0;
-
 using namespace Jack;
 
 void change_thread_log_function(jack_log_function_t log_function)
@@ -110,7 +108,7 @@ SERVER_EXPORT void jack_info(const char *fmt, ...)
 
 SERVER_EXPORT void jack_log(const char *fmt,...)
 {
-	if (jack_verbose) {
+	if (JackGlobals::fVerbose) {
 		va_list ap;
 		va_start(ap, fmt);
         jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);

@@ -55,7 +55,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
     fFreewheel = false;
     JackServerGlobals::fInstance = this;   // Unique instance
     JackServerGlobals::fUserCount = 1;     // One user
-    jack_verbose = verbose;
+    JackGlobals::fVerbose = verbose;
 }
 
 JackServer::~JackServer()
