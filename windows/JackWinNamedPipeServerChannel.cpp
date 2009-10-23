@@ -52,15 +52,14 @@ JackClientPipeThread::~JackClientPipeThread()
 
 int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
 {
-    fServer = server;
-    
     // Start listening
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener\n");
         return -1;
-    } else {
-        return 0;
     }
+    
+    fServer = server;
+    return 0;
 }
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
@@ -380,29 +379,18 @@ JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
 int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* server)
 {
     jack_log("JackWinNamedPipeServerChannel::Open ");
-
-    fServer = server;
     snprintf(fServerName, sizeof(fServerName), server_name);
-
+    
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object
     if (fRequestListenPipe.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
-        return false;
+        return -1;
     }
-
-    // Start listening
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener\n");
-        goto error;
-    }
-
+    
+    fServer = server;
     return 0;
-
-error:
-    fRequestListenPipe.Close();
-    return -1;
 }
-
+    
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
@@ -417,6 +405,16 @@ void JackWinNamedPipeServerChannel::Close()
     fRequestListenPipe.Close();
 }
 
+int JackWinNamedPipeServerChannel::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
+}    
+    
 bool JackWinNamedPipeServerChannel::Init()
 {
     jack_log("JackWinNamedPipeServerChannel::Init ");
