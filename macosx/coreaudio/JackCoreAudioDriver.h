@@ -53,8 +53,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         AudioBufferList* fJackInputData;
         AudioBufferList* fDriverOutputData;
 
-        AudioDeviceID fDeviceID;
-        AudioObjectID fPluginID;
+        AudioDeviceID fDeviceID;    // Used "duplex" device
+        AudioObjectID fPluginID;    // Used for aggregate device
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;

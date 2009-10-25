@@ -431,6 +431,8 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     //---------------------------------------------------------------------------
     // Start to create a new aggregate by getting the base audio hardware plugin
     //---------------------------------------------------------------------------
+    
+    jack_info("Separated input and output devices, so create a private aggregate device to handle them...");
  
     osErr = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyPlugInForBundleID, &outSize, &outWritable);
     if (osErr != noErr) 
@@ -584,7 +586,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
             
         } else {
         
-            // Creates agregate device
+            // Creates aggregate device
             AudioDeviceID captureID, playbackID;
             if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr)
                 return -1;
@@ -594,7 +596,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
                 return -1;
         }
 
-        // Capture only
+    // Capture only
     } else if (strcmp(capture_driver_uid, "") != 0) {
         jack_log("JackCoreAudioDriver::Open capture only");
         if (GetDeviceIDFromUID(capture_driver_uid, &fDeviceID) != noErr) {
@@ -609,7 +611,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
             return -1;
         }
 
-        // Playback only
+    // Playback only
     } else if (strcmp(playback_driver_uid, "") != 0) {
         jack_log("JackCoreAudioDriver::Open playback only");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
@@ -624,7 +626,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
             return -1;
         }
 
-        // Use default driver in duplex mode
+    // Use default driver in duplex mode
     } else {
         jack_log("JackCoreAudioDriver::Open default driver");
         if (GetDefaultDevice(&fDeviceID) != noErr) {
@@ -1090,7 +1092,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     Gestalt(gestaltSystemVersionMajor, &major);
     Gestalt(gestaltSystemVersionMinor, &minor);
     
-    // Starting with 10.6 systems...
+    // Starting with 10.6 systems, the HAL notification thread is created internally
     if (major == 10 && minor >=6) {
         CFRunLoopRef theRunLoop = NULL;
         AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
