@@ -399,16 +399,12 @@ JackCoreAudioDriver::~JackCoreAudioDriver()
 OSStatus JackCoreAudioDriver::DestroyAggregateDevice() 
 {
     OSStatus osErr = noErr;
-     
     AudioObjectPropertyAddress pluginAOPA;
     pluginAOPA.mSelector = kAudioPlugInDestroyAggregateDevice;
     pluginAOPA.mScope = kAudioObjectPropertyScopeGlobal;
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     UInt32 outDataSize;
-    UInt32 value;
-    
-    jack_log("JackCoreAudioDriver::DestroyAggregateDevice");
-
+  
     osErr = AudioObjectGetPropertyDataSize(fPluginID, &pluginAOPA, 0, NULL, &outDataSize);
     if (osErr != noErr) {
         jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyDataSize error");
@@ -434,7 +430,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
 
     //---------------------------------------------------------------------------
     // Start to create a new aggregate by getting the base audio hardware plugin
-     //---------------------------------------------------------------------------
+    //---------------------------------------------------------------------------
  
     osErr = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyPlugInForBundleID, &outSize, &outWritable);
     if (osErr != noErr) 
@@ -570,17 +566,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
     // Duplex
     if (strcmp(capture_driver_uid, "") != 0 && strcmp(playback_driver_uid, "") != 0) {
         jack_log("JackCoreAudioDriver::Open duplex");
-        
-        /*
-        AudioDeviceID captureID, playbackID;
-        if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr)
-            return -1;
-        if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) 
-            return -1;
-        if (CreateAggregateDevice(captureID, playbackID, &fDeviceID) != noErr)
-            return -1;
-        */
-        
+          
         // Same device for capture and playback...
         if (strcmp(capture_driver_uid, playback_driver_uid) == 0)  {
             
