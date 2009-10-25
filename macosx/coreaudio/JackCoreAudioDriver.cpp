@@ -30,6 +30,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 #include <CoreServices/CoreServices.h>
+#include <CoreFoundation/CFNumber.h>
 
 namespace Jack
 {
@@ -389,11 +390,41 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int& channe
 }
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-        : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fState(false), fIOUsage(1.f),fComputationGrain(-1.f)
+        : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fPluginID(0), fState(false), fIOUsage(1.f),fComputationGrain(-1.f)
 {}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
 {}
+
+OSStatus JackCoreAudioDriver::DestroyAggregateDevice() 
+{
+    OSStatus osErr = noErr;
+     
+    AudioObjectPropertyAddress pluginAOPA;
+    pluginAOPA.mSelector = kAudioPlugInDestroyAggregateDevice;
+    pluginAOPA.mScope = kAudioObjectPropertyScopeGlobal;
+    pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
+    UInt32 outDataSize;
+    UInt32 value;
+    
+    jack_log("JackCoreAudioDriver::DestroyAggregateDevice");
+
+    osErr = AudioObjectGetPropertyDataSize(fPluginID, &pluginAOPA, 0, NULL, &outDataSize);
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyDataSize error");
+        printError(osErr);
+        return osErr;
+    }
+        
+    osErr = AudioObjectGetPropertyData(fPluginID, &pluginAOPA, 0, NULL, &outDataSize, &fDeviceID);
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyData error");
+        printError(osErr);
+        return osErr;
+    }
+    
+    return noErr;
+}
 
 OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice) 
 {
@@ -401,10 +432,10 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     UInt32 outSize;
     Boolean outWritable;
 
-    //-----------------------
+    //---------------------------------------------------------------------------
     // Start to create a new aggregate by getting the base audio hardware plugin
-    //-----------------------
-
+     //---------------------------------------------------------------------------
+ 
     osErr = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyPlugInForBundleID, &outSize, &outWritable);
     if (osErr != noErr) 
         return osErr;
@@ -412,32 +443,36 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     AudioValueTranslation pluginAVT;
 
     CFStringRef inBundleRef = CFSTR("com.apple.audio.CoreAudio");
-    AudioObjectID pluginID;
-
+   
     pluginAVT.mInputData = &inBundleRef;
     pluginAVT.mInputDataSize = sizeof(inBundleRef);
-    pluginAVT.mOutputData = &pluginID;
-    pluginAVT.mOutputDataSize = sizeof(pluginID);
+    pluginAVT.mOutputData = &fPluginID;
+    pluginAVT.mOutputDataSize = sizeof(fPluginID);
 
     osErr = AudioHardwareGetProperty(kAudioHardwarePropertyPlugInForBundleID, &outSize, &pluginAVT);
     if (osErr != noErr) 
         return osErr;
 
-    //-----------------------
+    //-------------------------------------------------
     // Create a CFDictionary for our aggregate device
-    //-----------------------
+    //-------------------------------------------------
 
     CFMutableDictionaryRef aggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
     CFStringRef AggregateDeviceNameRef = CFSTR("JackDuplex");
     CFStringRef AggregateDeviceUIDRef = CFSTR("com.grame.JackDuplex");
-
+    
     // add the name of the device to the dictionary
     CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceNameKey), AggregateDeviceNameRef);
 
     // add our choice of UID for the aggregate device to the dictionary
     CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceUIDKey), AggregateDeviceUIDRef);
-
+    
+    // add a "private aggregate key" to the dictionary
+    int value = 1;
+    CFNumberRef AggregateDeviceNumberRef = CFNumberCreate(NULL, kCFNumberIntType, &value);
+    CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
+  
     //-------------------------------------------------
     // Create a CFMutableArray for our sub-device list
     //-------------------------------------------------
@@ -465,11 +500,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     UInt32 outDataSize;
 
-    osErr = AudioObjectGetPropertyDataSize(pluginID, &pluginAOPA, 0, NULL, &outDataSize);
+    osErr = AudioObjectGetPropertyDataSize(fPluginID, &pluginAOPA, 0, NULL, &outDataSize);
     if (osErr != noErr) 
         return osErr;
 
-    osErr = AudioObjectGetPropertyData(pluginID, &pluginAOPA, sizeof(aggDeviceDict), &aggDeviceDict, &outDataSize, outAggregateDevice);
+    osErr = AudioObjectGetPropertyData(fPluginID, &pluginAOPA, sizeof(aggDeviceDict), &aggDeviceDict, &outDataSize, outAggregateDevice);
     if (osErr != noErr) 
         return osErr;
 
@@ -512,6 +547,8 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     //----------
     // Clean up
     //----------
+    
+    CFRelease(AggregateDeviceNumberRef);
 
     // release the CF objects we have created - we don't need them any more
     CFRelease(aggDeviceDict);
@@ -819,17 +856,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (strict)
             return -1;
     }
-    
-    err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
-    if (err1 != noErr) {
-        jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
-        printError(err1);
-        if (strict)
-            return -1;
-    } else {
-        jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
-    }
-
+  
     // Set buffer size
     if (capturing && inchannels > 0) {
         err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_MaximumFramesPerSlice, kAudioUnitScope_Global, 1, (UInt32*)&buffer_size, sizeof(UInt32));
@@ -1128,6 +1155,8 @@ int JackCoreAudioDriver::Close()
     RemoveListeners();
     DisposeBuffers();
     CloseAUHAL();
+    if (fPluginID > 0)
+        DestroyAggregateDevice();
     return 0;
 }
 

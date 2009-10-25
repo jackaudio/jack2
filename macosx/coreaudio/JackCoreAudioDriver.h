@@ -54,6 +54,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         AudioBufferList* fDriverOutputData;
 
         AudioDeviceID fDeviceID;
+        AudioObjectID fPluginID;
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;
@@ -101,7 +102,6 @@ class JackCoreAudioDriver : public JackAudioDriver
                 AudioDevicePropertyID inPropertyID,
                 void* inClientData);
 
-
         static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
                                                UInt32 inChannel,
                                                Boolean	isInput,
@@ -117,6 +117,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice);
+        OSStatus DestroyAggregateDevice();
+        
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
