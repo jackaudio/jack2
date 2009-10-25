@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
     notify_server_stop(server_name);
     return 0;
 
-fail_free1  :
+fail_free1:
     jackctl_server_destroy(server_ctl);
     return -1;
     
