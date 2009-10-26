@@ -396,7 +396,7 @@ OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)
 
     jack_log("GetDefaultDevice: input = %ld output = %ld", inDefault, outDefault);
 
-    // Get the device only if default input and ouput are the same
+    // Get the device only if default input and output are the same
     if (inDefault == outDefault) {
         *id = inDefault;
         return noErr;
@@ -963,7 +963,11 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDevice(AudioDeviceID captureDevice
     // Start to create a new aggregate by getting the base audio hardware plugin
     //---------------------------------------------------------------------------
     
-    jack_info("Separated input and output devices, so create a private aggregate device to handle them...");
+    char capture_name[256];
+    char playback_name[256];
+    GetDeviceNameFromID(captureDeviceID, capture_name);
+    GetDeviceNameFromID(playbackDeviceID, playback_name);
+    jack_info("Separated input = '%s' and output = '%s' devices, create a private aggregate device to handle them...", capture_name, playback_name);
  
     osErr = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyPlugInForBundleID, &outSize, &outWritable);
     if (osErr != noErr) 

@@ -321,7 +321,7 @@ OSStatus JackCoreAudioDriver::GetDefaultDevice(AudioDeviceID* id)
 
     jack_log("GetDefaultDevice: input = %ld output = %ld", inDefault, outDefault);
 
-    // Get the device only if default input and ouput are the same
+    // Get the device only if default input and output are the same
     if (inDefault == outDefault) {
         *id = inDefault;
         return noErr;
@@ -432,7 +432,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     // Start to create a new aggregate by getting the base audio hardware plugin
     //---------------------------------------------------------------------------
     
-    jack_info("Separated input and output devices, so create a private aggregate device to handle them...");
+    char capture_name[256];
+    char playback_name[256];
+    GetDeviceNameFromID(captureDeviceID, capture_name);
+    GetDeviceNameFromID(playbackDeviceID, playback_name);
+    jack_info("Separated input = '%s' and output = '%s' devices, create a private aggregate device to handle them...", capture_name, playback_name);
  
     osErr = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyPlugInForBundleID, &outSize, &outWritable);
     if (osErr != noErr) 
@@ -1450,7 +1454,7 @@ extern "C"
         strcpy(desc->params[i].name, "list-devices");
         desc->params[i].character = 'l';
         desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
+        desc->params[i].value.i = FALSE;
         strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
         
@@ -1459,7 +1463,7 @@ extern "C"
         desc->params[i].character = 'L';
         desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.i = 100;
-        strcpy(desc->params[i].short_desc, "Extra output latency in aynchronous mode (percent)");
+        strcpy(desc->params[i].short_desc, "Extra output latency in asynchronous mode (percent)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
         
         i++;
