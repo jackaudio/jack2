@@ -484,9 +484,21 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceUIDKey), AggregateDeviceUIDRef);
     
     // add a "private aggregate key" to the dictionary
+    
     int value = 1;
     CFNumberRef AggregateDeviceNumberRef = CFNumberCreate(NULL, kCFNumberIntType, &value);
-    CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
+    
+    SInt32 major;
+    SInt32 minor;
+    SInt32 bugfix;
+    Gestalt(gestaltSystemVersionMajor, &major);
+    Gestalt(gestaltSystemVersionMinor, &minor);
+    Gestalt(gestaltSystemVersionBugFix, &bugfix);
+    
+    // Starting with 10.5.4 systems, the AD can be internal... (better)
+    if (major == 10 && minor >= 5 && bugfix >= 4) {
+        CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
+    }
   
     //-------------------------------------------------
     // Create a CFMutableArray for our sub-device list
@@ -1132,7 +1144,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     Gestalt(gestaltSystemVersionMinor, &minor);
     
     // Starting with 10.6 systems, the HAL notification thread is created internally
-    if (major == 10 && minor >=6) {
+    if (major == 10 && minor >= 6) {
         CFRunLoopRef theRunLoop = NULL;
         AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
         OSStatus theError = AudioObjectSetPropertyData (kAudioObjectSystemObject, &theAddress, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
