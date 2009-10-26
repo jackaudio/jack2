@@ -28,6 +28,7 @@ Paul Davis
 2009-10-26 Stephane Letz  <letz@grame.fr>
 
 	* Implement "hog mode" (exclusive access of the audio device) in JackCoreAudioDriver.
+	* Fix jack_set_sample_rate_callback to have he same bevahior as in JACK1.
 
 2009-10-25 Stephane Letz  <letz@grame.fr>
 
