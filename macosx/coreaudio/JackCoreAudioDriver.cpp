@@ -1334,6 +1334,31 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     return 0;
 }
 
+
+bool JackCoreAudioDriver::TakeHog(AudioDeviceID deviceID, bool isInput)
+{
+    pid_t hog_pid;
+    OSStatus err;
+
+    UInt32 propSize = sizeof(hog_pid);
+    err = AudioDeviceGetProperty(deviceID, 0, isInput, kAudioDevicePropertyHogMode, &propSize, &hog_pid);
+    if (err) {
+        jack_error("Cannot read hog state...");
+        printError(err);
+    }
+
+    if (hog_pid != getpid()) {
+        hog_pid = getpid();
+        err = AudioDeviceSetProperty(deviceID, 0, 0, isInput, kAudioDevicePropertyHogMode, propSize, &hog_pid);
+        if (err != noErr) {
+            jack_error("Can't hog device = %d because it's being hogged by another program", deviceID);
+            return false;
+        }
+    }
+    
+    return true;
+}
+
 } // end of namespace
 
 

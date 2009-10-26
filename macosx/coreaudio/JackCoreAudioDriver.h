@@ -150,6 +150,8 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         int AddListeners();
         void RemoveListeners();
+        
+        bool TakeHog(AudioDeviceID deviceID, bool isInput);
 
     public:
 
