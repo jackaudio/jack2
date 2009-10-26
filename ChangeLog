@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-26 Stephane Letz  <letz@grame.fr>
+
+	* Implement "hog mode" (exclusive access of the audio device) in JackCoreAudioDriver.
+
 2009-10-25 Stephane Letz  <letz@grame.fr>
 
 	* Improve aggregate device management in JackCoreAudioDriver : now a "private" device only and cleanup properly.

@@ -60,6 +60,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         AudioTimeStamp* fCurrentTime;
 
         bool fState;
+        bool fHogged;
 
         // Initial state
         bool fCapturing;
@@ -151,7 +152,8 @@ class JackCoreAudioDriver : public JackAudioDriver
         int AddListeners();
         void RemoveListeners();
         
-        bool TakeHog(AudioDeviceID deviceID, bool isInput);
+        bool TakeHogAux(AudioDeviceID deviceID, bool isInput);
+        bool TakeHog();
 
     public:
 
@@ -170,7 +172,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency,
                  int async_output_latency,
-                 int computation_grain);
+                 int computation_grain,
+                 bool hogged);
         int Close();
 
         int Attach();

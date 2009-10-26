@@ -390,7 +390,14 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int& channe
 }
 
 JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-        : JackAudioDriver(name, alias, engine, table), fJackInputData(NULL), fDriverOutputData(NULL), fPluginID(0), fState(false), fIOUsage(1.f),fComputationGrain(-1.f)
+        : JackAudioDriver(name, alias, engine, table), 
+        fJackInputData(NULL), 
+        fDriverOutputData(NULL), 
+        fPluginID(0), 
+        fState(false), 
+        fHogged(false),
+        fIOUsage(1.f),
+        fComputationGrain(-1.f)
 {}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()
@@ -640,6 +647,14 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
         if (GetDeviceNameFromID(fDeviceID, capture_driver_name) != noErr || GetDeviceNameFromID(fDeviceID, playback_driver_name) != noErr) {
             jack_error("Cannot get device name from device ID");
             return -1;
+        }
+    }
+    
+    if (fHogged) {
+        if (TakeHog()) {
+            jack_info("Device = %ld has been hogged", fDeviceID);
+        } else {
+            jack_error("Cannot hog device = %ld", fDeviceID);
         }
     }
 
@@ -1071,7 +1086,8 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
                               jack_nframes_t capture_latency,
                               jack_nframes_t playback_latency,
                               int async_output_latency,
-                              int computation_grain)
+                              int computation_grain,
+                              bool hogged)
 {
     int in_nChannels = 0;
     int out_nChannels = 0;
@@ -1090,6 +1106,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     fPlaybackLatency = playback_latency;
     fIOUsage = float(async_output_latency) / 100.f;
     fComputationGrain = float(computation_grain) / 100.f;
+    fHogged = hogged;
     
     SInt32 major;
     SInt32 minor;
@@ -1334,8 +1351,7 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     return 0;
 }
 
-
-bool JackCoreAudioDriver::TakeHog(AudioDeviceID deviceID, bool isInput)
+bool JackCoreAudioDriver::TakeHogAux(AudioDeviceID deviceID, bool isInput)
 {
     pid_t hog_pid;
     OSStatus err;
@@ -1358,6 +1374,29 @@ bool JackCoreAudioDriver::TakeHog(AudioDeviceID deviceID, bool isInput)
     
     return true;
 }
+    
+bool JackCoreAudioDriver::TakeHog()
+{
+    OSStatus err = noErr;
+    AudioObjectID sub_device[32];
+    UInt32 outSize = sizeof(sub_device);
+    err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioAggregateDevicePropertyActiveSubDeviceList, &outSize, sub_device);
+    
+    if (err != noErr) {
+        jack_log("Device does not have subdevices");
+        return TakeHogAux(fDeviceID, true);
+    } else {
+        int num_devices = outSize / sizeof(AudioObjectID);
+        jack_log("Device does has %d subdevices", num_devices);
+        for (int i = 0; i < num_devices; i++) {
+            if (!TakeHogAux(sub_device[i], true)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+    
 
 } // end of namespace
 
@@ -1376,7 +1415,7 @@ extern "C"
         strcpy(desc->name, "coreaudio");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Apple CoreAudio API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
         
-        desc->nparams = 15;
+        desc->nparams = 16;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1484,6 +1523,14 @@ extern "C"
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
         
         i++;
+        strcpy(desc->params[i].name, "hog");
+        desc->params[i].character = 'H';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = FALSE;
+        strcpy(desc->params[i].short_desc, "Take exclusive access of the audio device");
+        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
         strcpy(desc->params[i].name, "async-latency");
         desc->params[i].character = 'L';
         desc->params[i].type = JackDriverParamUInt;
@@ -1519,6 +1566,7 @@ extern "C"
         jack_nframes_t systemic_output_latency = 0;
         int async_output_latency = 100;
         int computation_grain = -1;
+        bool hogged = false;
     
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t *) node->data;
@@ -1585,6 +1633,10 @@ extern "C"
                     Jack::DisplayDeviceNames();
                     break;
                     
+                case 'H':
+                    hogged = true;
+                    break;
+                    
                 case 'L':
                     async_output_latency = param->value.ui;
                     break;
@@ -1603,7 +1655,7 @@ extern "C"
 
         Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("system", "coreaudio", engine, table);
         if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_driver_uid, 
-            playback_driver_uid, systemic_input_latency, systemic_output_latency, async_output_latency, computation_grain) == 0) {
+            playback_driver_uid, systemic_input_latency, systemic_output_latency, async_output_latency, computation_grain, hogged) == 0) {
             return driver;
         } else {
             delete driver;
