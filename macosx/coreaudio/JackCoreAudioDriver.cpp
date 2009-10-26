@@ -446,8 +446,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     jack_info("Separated input = '%s' and output = '%s' devices, create a private aggregate device to handle them...", capture_name, playback_name);
  
     osErr = AudioHardwareGetPropertyInfo(kAudioHardwarePropertyPlugInForBundleID, &outSize, &outWritable);
-    if (osErr != noErr) 
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioHardwareGetPropertyInfo kAudioHardwarePropertyPlugInForBundleID error");
+        printError(osErr);
         return osErr;
+    }
 
     AudioValueTranslation pluginAVT;
 
@@ -459,8 +462,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     pluginAVT.mOutputDataSize = sizeof(fPluginID);
 
     osErr = AudioHardwareGetProperty(kAudioHardwarePropertyPlugInForBundleID, &outSize, &pluginAVT);
-    if (osErr != noErr) 
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioHardwareGetProperty kAudioHardwarePropertyPlugInForBundleID error");
+        printError(osErr);
         return osErr;
+    }
 
     //-------------------------------------------------
     // Create a CFDictionary for our aggregate device
@@ -510,12 +516,18 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     UInt32 outDataSize;
 
     osErr = AudioObjectGetPropertyDataSize(fPluginID, &pluginAOPA, 0, NULL, &outDataSize);
-    if (osErr != noErr) 
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectGetPropertyDataSize error");
+        printError(osErr);
         return osErr;
-
+    }
+    
     osErr = AudioObjectGetPropertyData(fPluginID, &pluginAOPA, sizeof(aggDeviceDict), &aggDeviceDict, &outDataSize, outAggregateDevice);
-    if (osErr != noErr) 
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectGetPropertyData error");
+        printError(osErr);
         return osErr;
+    }
 
     // pause for a bit to make sure that everything completed correctly
     // this is to work around a bug in the HAL where a new aggregate device seems to disappear briefly after it is created
@@ -530,9 +542,12 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     outDataSize = sizeof(CFMutableArrayRef);
     osErr = AudioObjectSetPropertyData(*outAggregateDevice, &pluginAOPA, 0, NULL, outDataSize, &subDevicesArray);
-    if (osErr != noErr)
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectSetPropertyData for sub-device list error");
+        printError(osErr);
         return osErr;
-
+    }
+    
     // pause again to give the changes time to take effect
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
 
@@ -547,9 +562,12 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     outDataSize = sizeof(CFStringRef);
     osErr = AudioObjectSetPropertyData(*outAggregateDevice, &pluginAOPA, 0, NULL, outDataSize, &captureDeviceUID);  // capture is master...
-    if (osErr != noErr) 
+    if (osErr != noErr) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectSetPropertyData for master device error");
+        printError(osErr);
         return osErr;
-
+    }
+    
     // pause again to give the changes time to take effect
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
 
