@@ -1004,7 +1004,19 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDevice(AudioDeviceID captureDevice
     // add a "private aggregate key" to the dictionary
     int value = 1;
     CFNumberRef AggregateDeviceNumberRef = CFNumberCreate(NULL, kCFNumberIntType, &value);
-    CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
+    
+    SInt32 system;
+    Gestalt(gestaltSystemVersion, &system);
+     
+    jack_log("JackCoreAudioDriver::CreateAggregateDevice : system version = %x limit = %x", system, 0x00001054);
+    
+    // Starting with 10.5.4 systems, the AD can be internal... (better)
+    if (system < 0x00001054) {
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : public aggregate device....");
+    } else {
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : private aggregate device....");
+        CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
+    }
   
     //-------------------------------------------------
     // Create a CFMutableArray for our sub-device list

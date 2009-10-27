@@ -25,10 +25,14 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-27 Stephane Letz  <letz@grame.fr>
+
+	* Dynamic system version detection in JackCoreAudioDriver to either create public or private aggregate device.
+
 2009-10-26 Stephane Letz  <letz@grame.fr>
 
 	* Implement "hog mode" (exclusive access of the audio device) in JackCoreAudioDriver.
-	* Fix jack_set_sample_rate_callback to have he same bevahior as in JACK1.
+	* Fix jack_set_sample_rate_callback to have he same behavior as in JACK1.
 
 2009-10-25 Stephane Letz  <letz@grame.fr>
 

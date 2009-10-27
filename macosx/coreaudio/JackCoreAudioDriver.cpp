@@ -484,19 +484,19 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceUIDKey), AggregateDeviceUIDRef);
     
     // add a "private aggregate key" to the dictionary
-    
     int value = 1;
     CFNumberRef AggregateDeviceNumberRef = CFNumberCreate(NULL, kCFNumberIntType, &value);
     
-    SInt32 major;
-    SInt32 minor;
-    SInt32 bugfix;
-    Gestalt(gestaltSystemVersionMajor, &major);
-    Gestalt(gestaltSystemVersionMinor, &minor);
-    Gestalt(gestaltSystemVersionBugFix, &bugfix);
+    SInt32 system;
+    Gestalt(gestaltSystemVersion, &system);
+     
+    jack_log("JackCoreAudioDriver::CreateAggregateDevice : system version = %x limit = %x", system, 0x00001054);
     
     // Starting with 10.5.4 systems, the AD can be internal... (better)
-    if (major == 10 && minor >= 5 && bugfix >= 4) {
+    if (system < 0x00001054) {
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : public aggregate device....");
+    } else {
+        jack_log("JackCoreAudioDriver::CreateAggregateDevice : private aggregate device....");
         CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
     }
   
@@ -587,6 +587,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     // Clean up
     //----------
     
+    // release the private AD key
     CFRelease(AggregateDeviceNumberRef);
 
     // release the CF objects we have created - we don't need them any more
