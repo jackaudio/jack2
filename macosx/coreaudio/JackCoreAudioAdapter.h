@@ -90,6 +90,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
+        bool IsAggregateDevice(AudioDeviceID device);
         
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,

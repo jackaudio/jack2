@@ -25,6 +25,11 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-28 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, force the SR value to the wanted one *before* creating aggregate device (otherwise creation will fail). 
+	* In JackCoreAudioDriver, better cleanup of AD when intermediate open failure.
+
 2009-10-27 Stephane Letz  <letz@grame.fr>
 
 	* Dynamic system version detection in JackCoreAudioDriver to either create public or private aggregate device.

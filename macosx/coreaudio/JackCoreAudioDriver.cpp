@@ -411,29 +411,49 @@ OSStatus JackCoreAudioDriver::DestroyAggregateDevice()
     pluginAOPA.mScope = kAudioObjectPropertyScopeGlobal;
     pluginAOPA.mElement = kAudioObjectPropertyElementMaster;
     UInt32 outDataSize;
-  
-    osErr = AudioObjectGetPropertyDataSize(fPluginID, &pluginAOPA, 0, NULL, &outDataSize);
-    if (osErr != noErr) {
-        jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyDataSize error");
-        printError(osErr);
-        return osErr;
-    }
+     
+    if (fPluginID > 0)   {
+      
+        osErr = AudioObjectGetPropertyDataSize(fPluginID, &pluginAOPA, 0, NULL, &outDataSize);
+        if (osErr != noErr) {
+            jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyDataSize error");
+            printError(osErr);
+            return osErr;
+        }
+            
+        osErr = AudioObjectGetPropertyData(fPluginID, &pluginAOPA, 0, NULL, &outDataSize, &fDeviceID);
+        if (osErr != noErr) {
+            jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyData error");
+            printError(osErr);
+            return osErr;
+        }
         
-    osErr = AudioObjectGetPropertyData(fPluginID, &pluginAOPA, 0, NULL, &outDataSize, &fDeviceID);
-    if (osErr != noErr) {
-        jack_error("JackCoreAudioDriver::DestroyAggregateDevice : AudioObjectGetPropertyData error");
-        printError(osErr);
-        return osErr;
     }
     
     return noErr;
 }
 
-OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice) 
+OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice) 
 {
     OSStatus osErr = noErr;
     UInt32 outSize;
     Boolean outWritable;
+    
+    // Check devices... (TO IMPROVE)
+    if (IsAggregateDevice(captureDeviceID) || IsAggregateDevice(playbackDeviceID)) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot agregate devices that are already aggregate devices...");
+        return -1;
+    }
+    
+    //---------------------------------------------------------------------------
+    // Setup SR of both devices otherwise creating AD may fail...
+    //---------------------------------------------------------------------------
+    if (SetupSampleRateAux(captureDeviceID, samplerate) < 0) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot set SR of input device");
+    }
+    if (SetupSampleRateAux(playbackDeviceID, samplerate) < 0) {
+        jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot set SR of output device");
+    }
 
     //---------------------------------------------------------------------------
     // Start to create a new aggregate by getting the base audio hardware plugin
@@ -531,14 +551,14 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     if (osErr != noErr) {
         jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectGetPropertyDataSize error");
         printError(osErr);
-        return osErr;
+        goto error;
     }
     
     osErr = AudioObjectGetPropertyData(fPluginID, &pluginAOPA, sizeof(aggDeviceDict), &aggDeviceDict, &outDataSize, outAggregateDevice);
     if (osErr != noErr) {
         jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectGetPropertyData error");
         printError(osErr);
-        return osErr;
+        goto error;
     }
 
     // pause for a bit to make sure that everything completed correctly
@@ -557,7 +577,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     if (osErr != noErr) {
         jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectSetPropertyData for sub-device list error");
         printError(osErr);
-        return osErr;
+        goto error;
     }
     
     // pause again to give the changes time to take effect
@@ -577,7 +597,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     if (osErr != noErr) {
         jack_error("JackCoreAudioDriver::CreateAggregateDevice : AudioObjectSetPropertyData for master device error");
         printError(osErr);
-        return osErr;
+        goto error;
     }
     
     // pause again to give the changes time to take effect
@@ -600,9 +620,13 @@ OSStatus JackCoreAudioDriver::CreateAggregateDevice(AudioDeviceID captureDeviceI
     
     jack_log("New aggregate device %ld", *outAggregateDevice);
     return noErr;
+    
+error:
+    DestroyAggregateDevice();
+    return -1;
 }
 
-int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char* playback_driver_uid, char* capture_driver_name, char* playback_driver_name)
+int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char* playback_driver_uid, char* capture_driver_name, char* playback_driver_name, jack_nframes_t samplerate)
 {
     capture_driver_name[0] = 0;
     playback_driver_name[0] = 0;
@@ -634,7 +658,7 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char
                 return -1;
             if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) 
                 return -1;
-            if (CreateAggregateDevice(captureID, playbackID, &fDeviceID) != noErr)
+            if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr)
                 return -1;
         }
 
@@ -746,24 +770,34 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
     return 0;
 }
 
-int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate)
+int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
 {
-    OSStatus err = noErr;
-    UInt32 outSize;
-    Float64 sampleRate;
-
     // Setting buffer size
-    outSize = sizeof(UInt32);
-    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
+    UInt32 outSize = sizeof(UInt32);
+    OSStatus err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
     if (err != noErr) {
         jack_error("Cannot set buffer size %ld", buffer_size);
         printError(err);
         return -1;
     }
 
+    return 0;
+}
+
+int JackCoreAudioDriver::SetupSampleRate(jack_nframes_t samplerate)
+{
+    return SetupSampleRateAux(fDeviceID, samplerate);
+}
+
+int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes_t samplerate)
+{
+    OSStatus err = noErr;
+    UInt32 outSize;
+    Float64 sampleRate;
+
     // Get sample rate
     outSize =  sizeof(Float64);
-    err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
+    err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
     if (err != noErr) {
         jack_error("Cannot get current sample rate");
         printError(err);
@@ -775,13 +809,13 @@ int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size
         sampleRate = (Float64)samplerate;
 
         // To get SR change notification
-        err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback, this);
+        err = AudioDeviceAddPropertyListener(inDevice, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback, this);
         if (err != noErr) {
             jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDevicePropertyNominalSampleRate");
             printError(err);
             return -1;
         }
-        err = AudioDeviceSetProperty(fDeviceID, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, outSize, &sampleRate);
+        err = AudioDeviceSetProperty(inDevice, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, outSize, &sampleRate);
         if (err != noErr) {
             jack_error("Cannot set sample rate = %ld", samplerate);
             printError(err);
@@ -796,11 +830,12 @@ int JackCoreAudioDriver::SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size
         }
 
         // Remove SR change notification
-        AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback);
+        AudioDeviceRemovePropertyListener(inDevice, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback);
     }
 
     return 0;
 }
+
 
 int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                                    bool playing,
@@ -1154,18 +1189,21 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
         }
     }
 
-    if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name) < 0)
-        return -1;
+    if (SetupDevices(capture_driver_uid, playback_driver_uid, capture_driver_name, playback_driver_name, samplerate) < 0)
+        goto error;
 
     // Generic JackAudioDriver Open
     if (JackAudioDriver::Open(buffer_size, samplerate, capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
-        return -1;
+        goto error;
 
     if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, true) < 0)
-        return -1;
+        goto error;
 
-    if (SetupBufferSizeAndSampleRate(buffer_size, samplerate)  < 0)
-        return -1;
+    if (SetupBufferSize(buffer_size)  < 0)
+        goto error;
+        
+    if (SetupSampleRate(samplerate) < 0)
+        goto error;
  
     if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, buffer_size, samplerate, true) < 0)
         goto error;
@@ -1176,7 +1214,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
 
     if (AddListeners() < 0)
         goto error;
-
+  
     // Core driver may have changed the in/out values
     fCaptureChannels = inchannels;
     fPlaybackChannels = outchannels;
@@ -1195,8 +1233,7 @@ int JackCoreAudioDriver::Close()
     RemoveListeners();
     DisposeBuffers();
     CloseAUHAL();
-    if (fPluginID > 0)
-        DestroyAggregateDevice();
+    DestroyAggregateDevice();
     return 0;
 }
 
@@ -1428,6 +1465,19 @@ bool JackCoreAudioDriver::TakeHog()
     }
 }
     
+bool JackCoreAudioDriver::IsAggregateDevice(AudioDeviceID device)
+{
+    UInt32 deviceType, outSize = sizeof(UInt32);
+    OSStatus err = AudioDeviceGetProperty(device, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyTransportType, &outSize, &deviceType);
+    
+    if (err != noErr) {
+        jack_log("JackCoreAudioDriver::IsAggregateDevice kAudioDevicePropertyTransportType error");
+        return false;
+    } else {
+        return (deviceType == kAudioDeviceTransportTypeAggregate);
+    }
+}
+
 
 } // end of namespace
 

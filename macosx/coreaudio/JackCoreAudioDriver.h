@@ -117,13 +117,15 @@ class JackCoreAudioDriver : public JackAudioDriver
         OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
 
         // Setup
-        OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice);
+        OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
+        bool IsAggregateDevice(AudioDeviceID device);
         
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
-                         char* playback_driver_name);
+                         char* playback_driver_name,
+                         jack_nframes_t samplerate);
 
         int SetupChannels(bool capturing,
                           bool playing,
@@ -136,7 +138,9 @@ class JackCoreAudioDriver : public JackAudioDriver
         int SetupBuffers(int inchannels);
         void DisposeBuffers();
 
-        int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
+        int SetupBufferSize(jack_nframes_t buffer_size);
+        int SetupSampleRate(jack_nframes_t samplerate);
+        int SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes_t samplerate);
 
         int OpenAUHAL(bool capturing,
                       bool playing,

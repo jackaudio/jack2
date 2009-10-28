@@ -958,6 +958,12 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDevice(AudioDeviceID captureDevice
     OSStatus osErr = noErr;
     UInt32 outSize;
     Boolean outWritable;
+    
+    // Check devices...
+    if (IsAggregateDevice(captureDeviceID) || IsAggregateDevice(playbackDeviceID)) {
+        jack_error("JackCoreAudioAdapter::CreateAggregateDevice : cannot agregate devices that are already aggregate devices...");
+        return -1;
+    }
 
     //---------------------------------------------------------------------------
     // Start to create a new aggregate by getting the base audio hardware plugin
@@ -1105,6 +1111,23 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDevice(AudioDeviceID captureDevice
     
     jack_log("New aggregate device %ld", *outAggregateDevice);
     return noErr;
+}
+    
+bool JackCoreAudioAdapter::IsAggregateDevice(AudioDeviceID device)
+{
+    OSStatus err = noErr;
+    AudioObjectID sub_device[32];
+    UInt32 outSize = sizeof(sub_device);
+    err = AudioDeviceGetProperty(device, 0, kAudioDeviceSectionGlobal, kAudioAggregateDevicePropertyActiveSubDeviceList, &outSize, sub_device);
+    
+    if (err != noErr) {
+        jack_log("Device does not have subdevices");
+        return false;
+    } else {
+        int num_devices = outSize / sizeof(AudioObjectID);
+        jack_log("Device does has %d subdevices", num_devices);
+        return true;
+    }
 }
 
 void JackCoreAudioAdapter::CloseAUHAL()
