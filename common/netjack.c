@@ -149,7 +149,7 @@ void netjack_wait( netjack_driver_state_t *netj )
     netj->running_free = 0;
 
     if( !we_have_the_expected_frame )
-        jack_log( "xrun... %d", netj->expected_framecnt );
+        jack_error( "netxrun... %d", netj->expected_framecnt );
 
     if( we_have_the_expected_frame ) {
 	netj->time_to_deadline = netj->next_deadline - jack_get_time() - netj->period_usecs;
