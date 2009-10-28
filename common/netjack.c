@@ -171,11 +171,11 @@ void netjack_wait( netjack_driver_state_t *netj )
 	    */
 
 	if( netj->deadline_goodness < (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100) ) {
-	    netj->next_deadline += netj->period_usecs/100;
+	    netj->next_deadline -= netj->period_usecs/100;
 	    //jack_log( "goodness: %d, Adjust deadline: --- %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 	}
 	if( netj->deadline_goodness > (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100) ) {
-	    netj->next_deadline -= netj->period_usecs/100;
+	    netj->next_deadline += netj->period_usecs/100;
 	    //jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 	}
     } else {
