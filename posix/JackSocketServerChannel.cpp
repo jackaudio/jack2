@@ -60,10 +60,6 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
     BuildPoolTable();
     fServer = server;
     return 0;
-
-error:
-    fRequestListenSocket.Close();
-    return -1;
 }
 
 void JackSocketServerChannel::Close()

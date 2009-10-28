@@ -53,13 +53,14 @@ class JackCoreAudioDriver : public JackAudioDriver
         AudioBufferList* fJackInputData;
         AudioBufferList* fDriverOutputData;
 
-        AudioDeviceID fDeviceID;
-        AudioObjectID fPluginID;
+        AudioDeviceID fDeviceID;    // Used "duplex" device
+        AudioObjectID fPluginID;    // Used for aggregate device
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;
 
         bool fState;
+        bool fHogged;
 
         // Initial state
         bool fCapturing;
@@ -150,6 +151,9 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         int AddListeners();
         void RemoveListeners();
+        
+        bool TakeHogAux(AudioDeviceID deviceID, bool isInput);
+        bool TakeHog();
 
     public:
 
@@ -168,7 +172,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency,
                  int async_output_latency,
-                 int computation_grain);
+                 int computation_grain,
+                 bool hogged);
         int Close();
 
         int Attach();
