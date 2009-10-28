@@ -874,6 +874,9 @@ int JackClient::SetSampleRateCallback(JackSampleRateCallback callback, void *arg
         GetClientControl()->fCallback[kSampleRateCallback] = (callback != NULL);
         fSampleRateArg = arg;
         fSampleRate = callback;
+        // Now invoke it 
+        if (callback) 
+            callback(GetEngineControl()->fSampleRate, arg);
         return 0;
     }
 }

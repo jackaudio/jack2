@@ -54,7 +54,9 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         bool fCapturing;
         bool fPlaying;
 
-        AudioDeviceID fDeviceID;
+        AudioDeviceID fDeviceID;    // Used "duplex" device
+        AudioObjectID fPluginID;    // Used for aggregate device
+
         bool fState;
 
         AudioUnitRenderActionFlags* fActionFags;
@@ -86,6 +88,9 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
 
         // Setup
+        OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice);
+        OSStatus DestroyAggregateDevice();
+        
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
