@@ -132,7 +132,9 @@ int get_sample_size (int bitdepth)
         return sizeof (int8_t);
     if (bitdepth == 16)
         return sizeof (int16_t);
-    if( bitdepth == 1000 )
+    //JN: why? is this for buffer sizes before or after encoding?
+    //JN: if the former, why not int16_t, if the latter, shouldn't it depend on -c N?    
+    if( bitdepth == CELT_MODE )
 	return sizeof( unsigned char );
     return sizeof (int32_t);
 }
@@ -1504,7 +1506,7 @@ render_payload_to_jack_ports (int bitdepth, void *packet_payload, jack_nframes_t
     else if (bitdepth == 16)
         render_payload_to_jack_ports_16bit (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
 #if HAVE_CELT
-    else if (bitdepth == 1000)
+    else if (bitdepth == CELT_MODE)
         render_payload_to_jack_ports_celt (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
 #endif
     else
@@ -1519,7 +1521,7 @@ render_jack_ports_to_payload (int bitdepth, JSList *playback_ports, JSList *play
     else if (bitdepth == 16)
         render_jack_ports_to_payload_16bit (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
 #if HAVE_CELT
-    else if (bitdepth == 1000)
+    else if (bitdepth == CELT_MODE)
         render_jack_ports_to_payload_celt (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
 #endif
     else

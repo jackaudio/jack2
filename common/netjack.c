@@ -364,7 +364,7 @@ void netjack_attach( netjack_driver_state_t *netj )
         netj->capture_ports =
             jack_slist_append (netj->capture_ports, port);
 
-	if( netj->bitdepth == 1000 ) {
+	if( netj->bitdepth == CELT_MODE ) {
 #if HAVE_CELT
 	    celt_int32_t lookahead;
 	    // XXX: memory leak
@@ -411,7 +411,7 @@ void netjack_attach( netjack_driver_state_t *netj )
 
         netj->playback_ports =
             jack_slist_append (netj->playback_ports, port);
-	if( netj->bitdepth == 1000 ) {
+	if( netj->bitdepth == CELT_MODE ) {
 #if HAVE_CELT
 	    // XXX: memory leak
 	    CELTMode *celt_mode = celt_mode_create( netj->sample_rate, 1, netj->period_size, NULL );
@@ -517,7 +517,7 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     netj->client = client;
 
 
-    if ((bitdepth != 0) && (bitdepth != 8) && (bitdepth != 16) && (bitdepth != 1000))
+    if ((bitdepth != 0) && (bitdepth != 8) && (bitdepth != 16) && (bitdepth != CELT_MODE))
     {
         jack_info ("Invalid bitdepth: %d (8, 16 or 0 for float) !!!", bitdepth);
         return NULL;
@@ -655,7 +655,7 @@ netjack_startup( netjack_driver_state_t *netj )
         (jack_time_t) floor ((((float) netj->period_size) / (float)netj->sample_rate)
                              * 1000000.0f);
 
-    if( netj->bitdepth == 1000 ) {
+    if( netj->bitdepth == CELT_MODE ) {
 	// celt mode.
 	// TODO: this is a hack. But i dont want to change the packet header.
 	netj->net_period_down = netj->resample_factor;

@@ -42,6 +42,8 @@
 //#include <netinet/in.h>
 // The Packet Header.
 
+#define CELT_MODE 1000   // Magic bitdepth value that indicates CELT compression
+
 typedef struct _jacknet_packet_header jacknet_packet_header;
 
 struct _jacknet_packet_header
