@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackAudioDriver.h"
 #include "netjack.h"
+#include "netjack_packet.h"
 
 namespace Jack
 {

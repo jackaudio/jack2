@@ -161,7 +161,7 @@ namespace Jack
 	    netj.capture_ports =
 		jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
 
-	    if( netj.bitdepth == 1000 ) {
+	    if( netj.bitdepth == CELT_MODE ) {
 #if HAVE_CELT
 		celt_int32_t lookahead;
 		// XXX: memory leak
@@ -208,7 +208,7 @@ namespace Jack
 	    netj.playback_ports =
 		jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
 
-	    if( netj.bitdepth == 1000 ) {
+	    if( netj.bitdepth == CELT_MODE ) {
 #if HAVE_CELT
 		// XXX: memory leak
 		CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
@@ -458,7 +458,7 @@ JackNetOneDriver::FreePorts ()
     }
     netj.playback_ports = NULL;
 
-    if( netj.bitdepth == 1000 ) {
+    if( netj.bitdepth == CELT_MODE ) {
 #if HAVE_CELT
 	node = netj.playback_srcs;
 	while( node != NULL ) {
@@ -778,7 +778,7 @@ void
 JackNetOneDriver::render_payload_to_jack_ports (int bitdepth, void *packet_payload, jack_nframes_t net_period_down, JSList *capture_ports, JSList *capture_srcs, jack_nframes_t nframes, int dont_htonl_floats)
 {
 #if HAVE_CELT
-    if (bitdepth == 1000)
+    if (bitdepth == CELT_MODE)
         render_payload_to_jack_ports_celt (packet_payload, net_period_down, capture_ports, capture_srcs, nframes);
     else
 #endif
@@ -789,7 +789,7 @@ void
 JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_ports, JSList *playback_srcs, jack_nframes_t nframes, void *packet_payload, jack_nframes_t net_period_up, int dont_htonl_floats)
 {
 #if HAVE_CELT
-    if (bitdepth == 1000)
+    if (bitdepth == CELT_MODE)
         render_jack_ports_to_payload_celt (playback_ports, playback_srcs, nframes, packet_payload, net_period_up);
     else
 #endif
@@ -1048,7 +1048,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 
 	    case 'c':
 #if HAVE_CELT
-		bitdepth = 1000;
+		bitdepth = CELT_MODE;
 		resample_factor = param->value.ui;
 #else
 		jack_error( "not built with celt support\n" );
