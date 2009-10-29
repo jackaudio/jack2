@@ -139,6 +139,17 @@ int get_sample_size (int bitdepth)
     return sizeof (int32_t);
 }
 
+int jack_port_is_audio(const char *porttype)
+{
+    return (strncmp (porttype, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0);
+}
+
+int jack_port_is_midi(const char *porttype)
+{
+    return (strncmp (porttype, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0);
+}
+
+
 // fragment management functions.
 
 packet_cache
@@ -985,7 +996,7 @@ render_payload_to_jack_ports_float ( void *packet_payload, jack_nframes_t net_pe
 
         const char *porttype = jack_port_type (port);
 
-        if (strncmp (porttype, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
 #if HAVE_SAMPLERATE
             // audio port, resample if necessary
@@ -1028,7 +1039,7 @@ render_payload_to_jack_ports_float ( void *packet_payload, jack_nframes_t net_pe
 		}
             }
         }
-        else if (strncmp (porttype, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // midi port, decode midi events
             // convert the data buffer to a standard format (uint32_t based)
@@ -1065,7 +1076,7 @@ render_jack_ports_to_payload_float (JSList *playback_ports, JSList *playback_src
 
         const char *porttype = jack_port_type (port);
 
-        if (strncmp (porttype, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
             // audio port, resample if necessary
 
@@ -1108,7 +1119,7 @@ render_jack_ports_to_payload_float (JSList *playback_ports, JSList *playback_src
 		}
             }
         }
-        else if (strncmp(porttype, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // encode midi events from port to packet
             // convert the data buffer to a standard format (uint32_t based)
@@ -1151,9 +1162,9 @@ render_payload_to_jack_ports_16bit (void *packet_payload, jack_nframes_t net_per
 #if HAVE_SAMPLERATE
         float *floatbuf = alloca (sizeof(float) * net_period_down);
 #endif
-        const char *portname = jack_port_type (port);
+        const char *porttype = jack_port_type (port);
 
-        if (strncmp(portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
             // audio port, resample if necessary
 
@@ -1184,7 +1195,7 @@ render_payload_to_jack_ports_16bit (void *packet_payload, jack_nframes_t net_per
                 for (i = 0; i < net_period_down; i++)
                     buf[i] = ((float) ntohs (packet_bufX[i])) / 32768.0 - 1.0;
         }
-        else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // midi port, decode midi events
             // convert the data buffer to a standard format (uint32_t based)
@@ -1217,9 +1228,9 @@ render_jack_ports_to_payload_16bit (JSList *playback_ports, JSList *playback_src
         int i;
         jack_port_t *port = (jack_port_t *) node->data;
         jack_default_audio_sample_t* buf = jack_port_get_buffer (port, nframes);
-        const char *portname = jack_port_type (port);
+        const char *porttype = jack_port_type (port);
 
-        if (strncmp (portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
             // audio port, resample if necessary
 
@@ -1253,7 +1264,7 @@ render_jack_ports_to_payload_16bit (JSList *playback_ports, JSList *playback_src
                 for (i = 0; i < net_period_up; i++)
                     packet_bufX[i] = htons(((uint16_t)((buf[i] + 1.0) * 32767.0)));
         }
-        else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // encode midi events from port to packet
             // convert the data buffer to a standard format (uint32_t based)
@@ -1297,9 +1308,9 @@ render_payload_to_jack_ports_8bit (void *packet_payload, jack_nframes_t net_peri
 #if HAVE_SAMPLERATE
         float *floatbuf = alloca (sizeof (float) * net_period_down);
 #endif
-        const char *portname = jack_port_type (port);
+        const char *porttype = jack_port_type (port);
 
-        if (strncmp (portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio(porttype))
         {
 #if HAVE_SAMPLERATE
             // audio port, resample if necessary
@@ -1327,7 +1338,7 @@ render_payload_to_jack_ports_8bit (void *packet_payload, jack_nframes_t net_peri
                 for (i = 0; i < net_period_down; i++)
                     buf[i] = ((float) packet_bufX[i]) / 127.0;
         }
-        else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // midi port, decode midi events
             // convert the data buffer to a standard format (uint32_t based)
@@ -1361,9 +1372,9 @@ render_jack_ports_to_payload_8bit (JSList *playback_ports, JSList *playback_srcs
         jack_port_t *port = (jack_port_t *) node->data;
 
         jack_default_audio_sample_t* buf = jack_port_get_buffer (port, nframes);
-        const char *portname = jack_port_type (port);
+        const char *porttype = jack_port_type (port);
 
-        if (strncmp (portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
 #if HAVE_SAMPLERATE
             // audio port, resample if necessary
@@ -1395,7 +1406,7 @@ render_jack_ports_to_payload_8bit (JSList *playback_ports, JSList *playback_srcs
                 for (i = 0; i < net_period_up; i++)
                     packet_bufX[i] = buf[i] * 127.0;
         }
-        else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // encode midi events from port to packet
             // convert the data buffer to a standard format (uint32_t based)
@@ -1425,9 +1436,9 @@ render_payload_to_jack_ports_celt (void *packet_payload, jack_nframes_t net_peri
         jack_port_t *port = (jack_port_t *) node->data;
         jack_default_audio_sample_t* buf = jack_port_get_buffer (port, nframes);
 
-        const char *portname = jack_port_type (port);
+        const char *porttype = jack_port_type (port);
 
-        if (strncmp(portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
             // audio port, decode celt data.
 
@@ -1439,7 +1450,7 @@ render_payload_to_jack_ports_celt (void *packet_payload, jack_nframes_t net_peri
 
 	    src_node = jack_slist_next (src_node);
         }
-        else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // midi port, decode midi events
             // convert the data buffer to a standard format (uint32_t based)
@@ -1467,9 +1478,9 @@ render_jack_ports_to_payload_celt (JSList *playback_ports, JSList *playback_srcs
     {
         jack_port_t *port = (jack_port_t *) node->data;
         jack_default_audio_sample_t* buf = jack_port_get_buffer (port, nframes);
-        const char *portname = jack_port_type (port);
+        const char *porttype = jack_port_type (port);
 
-        if (strncmp (portname, JACK_DEFAULT_AUDIO_TYPE, jack_port_type_size()) == 0)
+        if (jack_port_is_audio (porttype))
         {
             // audio port, encode celt data.
 
@@ -1482,7 +1493,7 @@ render_jack_ports_to_payload_celt (JSList *playback_ports, JSList *playback_srcs
 		printf( "something in celt changed. netjack needs to be changed to handle this.\n" );
 	    src_node = jack_slist_next( src_node );
         }
-        else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
+        else if (jack_port_is_midi (porttype))
         {
             // encode midi events from port to packet
             // convert the data buffer to a standard format (uint32_t based)
