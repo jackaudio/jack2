@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-29 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver::Start, wait for the audio driver to effectively start (use the MeasureCallback).
+
 2009-10-28 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudioDriver, force the SR value to the wanted one *before* creating aggregate device (otherwise creation will fail). 

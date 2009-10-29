@@ -227,6 +227,9 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
         driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
     }
     
+    // Signal waiting start function...
+    driver->fState = true;
+    
     // Setup threadded based log function
     set_threaded_log_function();
     return noErr;
@@ -824,7 +827,7 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
 
         // Waiting for SR change notification
         int count = 0;
-        while (!fState && count++ < 100) {
+        while (!fState && count++ < WAIT_COUNTER) {
             usleep(100000);
             jack_log("Wait count = %d", count);
         }
@@ -1376,8 +1379,22 @@ int JackCoreAudioDriver::Start()
         printError(err);
         return -1;
     }
-
-    return 0;
+    
+    // Waiting for Measure callback to be called ( = driver has started)
+    fState = false;
+    int count = 0;
+    while (!fState && count++ < WAIT_COUNTER) {
+        usleep(100000);
+        jack_log("JackCoreAudioDriver::Start wait count = %d", count);
+    }
+    
+    if (count < WAIT_COUNTER) {
+        jack_info("CoreAudio driver is running...");
+        return 0;
+    } else {
+        jack_error("CoreAudio driver cannot start...");
+        return -1;
+    }
 }
 
 int JackCoreAudioDriver::Stop()

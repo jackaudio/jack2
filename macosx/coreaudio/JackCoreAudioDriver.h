@@ -36,6 +36,8 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
+    
+#define WAIT_COUNTER 60
 
 /*!
 \brief The CoreAudio driver.
