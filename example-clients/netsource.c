@@ -666,10 +666,13 @@ main (int argc, char *argv[])
 	{
             if (statecopy_netxruns != state_netxruns) {
 		statecopy_netxruns = state_netxruns;
-		printf ("at frame %06d -> total netxruns %d  (%d%%) queue time= %d\n", state_currentframe,
-									     statecopy_netxruns,
-									     100*statecopy_netxruns/state_currentframe,
-									     state_recv_packet_queue_time);
+		printf ("%s: at frame %06d -> total netxruns %d  (%d%%) queue time= %d\n",
+				client_name, 
+				state_currentframe,
+				statecopy_netxruns,
+				100*statecopy_netxruns/state_currentframe,
+				state_recv_packet_queue_time);
+
 		fflush(stdout);
             }
         }
