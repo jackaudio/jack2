@@ -31,6 +31,7 @@ Paul Davis
 	* In JackCoreAudioDriver::OpenAUHAL, correct stream format setup and cleanup. 
 	* Correct crash bug in JackAudioAdapterInterface when not input is used in adapter (temporary fix...)
 	* Sync JackCoreAudioAdapter code on JackCoreAudioDriver one.
+	* JACK_SCHED_POLICY switched to SCHED_FIFO.
 
 2009-10-29 Stephane Letz  <letz@grame.fr>
 
