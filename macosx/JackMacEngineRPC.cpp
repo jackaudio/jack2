@@ -59,12 +59,12 @@ rpc_type server_rpc_jack_client_close(mach_port_t private_port, int refnum, int*
     return KERN_SUCCESS;
 }
 
-rpc_type server_rpc_jack_client_activate(mach_port_t private_port, int refnum, int state, int* result)
+rpc_type server_rpc_jack_client_activate(mach_port_t private_port, int refnum, int is_real_time, int* result)
 {
     jack_log("rpc_jack_client_activate");
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
-    *result = channel->GetEngine()->ClientActivate(refnum, state);
+    *result = channel->GetEngine()->ClientActivate(refnum, is_real_time);
     return KERN_SUCCESS;
 }
 
@@ -83,7 +83,7 @@ rpc_type server_rpc_jack_client_deactivate(mach_port_t private_port, int refnum,
 
 rpc_type server_rpc_jack_port_register(mach_port_t private_port, int refnum, client_port_name_t name, client_port_type_t type, unsigned int flags, unsigned int buffer_size, unsigned int* port_index, int* result)
 {
-    jack_log("rpc_jack_port_register ref = %ld name = %s", refnum, name);
+    jack_log("rpc_jack_port_register ref = %d name = %s", refnum, name);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
     *result = channel->GetEngine()->PortRegister(refnum, name, type, flags, buffer_size, port_index);
@@ -92,7 +92,7 @@ rpc_type server_rpc_jack_port_register(mach_port_t private_port, int refnum, cli
 
 rpc_type server_rpc_jack_port_unregister(mach_port_t private_port, int refnum, int port, int* result)
 {
-    jack_log("rpc_jack_port_unregister ref = %ld port = %ld ", refnum, port);
+    jack_log("rpc_jack_port_unregister ref = %d port = %d ", refnum, port);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[private_port];
     assert(channel);
     *result = channel->GetEngine()->PortUnRegister(refnum, port);
@@ -234,7 +234,7 @@ rpc_type server_rpc_jack_internal_clientunload(mach_port_t private_port, int ref
 
 rpc_type server_rpc_jack_client_rt_notify(mach_port_t server_port, int refnum, int notify, int value)
 {
-    jack_log("rpc_jack_client_rt_notify ref = %ld notify = %ld value = %ld", refnum, notify, value);
+    jack_log("rpc_jack_client_rt_notify ref = %d notify = %d value = %d", refnum, notify, value);
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[server_port];
     assert(channel);
     assert(channel->GetServer());

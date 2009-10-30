@@ -49,11 +49,11 @@ void JackMachNotifyChannel::Close()
     fClientPort.DisconnectPort();
 }
 
-void JackMachNotifyChannel::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2, int* result)
+void JackMachNotifyChannel::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2, int* result)
 {
     kern_return_t res = (sync)
-                        ? rpc_jack_client_sync_notify(fClientPort.GetPort(), refnum, (char*)name, notify, value1, value2, result)
-                        : rpc_jack_client_async_notify(fClientPort.GetPort(), refnum, (char*)name, notify, value1, value2);
+                        ? rpc_jack_client_sync_notify(fClientPort.GetPort(), refnum, (char*)name, notify, (char*)message, value1, value2, result)
+                        : rpc_jack_client_async_notify(fClientPort.GetPort(), refnum, (char*)name, notify, (char*)message, value1, value2);
     if (res == KERN_SUCCESS) {
         *result = 0;
     } else {

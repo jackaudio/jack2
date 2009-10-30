@@ -44,7 +44,7 @@ class JackMachNotifyChannel
         int Open(const char* name);		// Open the Server/Client connection
         void Close();					// Close the Server/Client connection
 
-        void ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2, int* result);
+        void ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2, int* result);
 };
 
 } // end of namespace

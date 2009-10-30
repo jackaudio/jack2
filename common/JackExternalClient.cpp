@@ -33,11 +33,11 @@ JackExternalClient::JackExternalClient(): fClientControl(NULL)
 JackExternalClient::~JackExternalClient()
 {}
 
-int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     int result = -1;
     jack_log("JackExternalClient::ClientNotify ref = %ld name = %s notify = %ld", refnum, name, notify);
-    fChannel.ClientNotify(refnum, name, notify, sync, value1, value2, &result);
+    fChannel.ClientNotify(refnum, name, notify, sync, message, value1, value2, &result);
     return result;
 }
 

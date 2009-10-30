@@ -167,11 +167,15 @@ int JackDriver::Open(jack_nframes_t buffer_size,
 
 int JackDriver::Close()
 {
-    jack_log("JackDriver::Close");
-    fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
-    fClientControl.fActive = false;
-    fEngineControl->fDriverNum--;
-    return fEngine->ClientInternalClose(fClientControl.fRefNum, false);
+    if (fClientControl.fRefNum > 0) { 
+        jack_log("JackDriver::Close");
+        fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
+        fClientControl.fActive = false;
+        fEngineControl->fDriverNum--;
+        return fEngine->ClientInternalClose(fClientControl.fRefNum, false);
+    } else {
+        return -1;
+    }
 }
 
 /*!
@@ -190,7 +194,7 @@ void JackDriver::SetupDriverSync(int ref, bool freewheel)
     }
 }
 
-int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     switch (notify) {
 
@@ -249,6 +253,11 @@ void JackDriver::NotifySampleRate(jack_nframes_t sample_rate)
 {
     fEngine->NotifySampleRate(sample_rate);
     fEngineControl->InitFrameTime();
+}
+    
+void JackDriver::NotifyFailure(int code, const char* reason)
+{
+    fEngine->NotifyFailure(code, reason);
 }
 
 void JackDriver::SetMaster(bool onoff)

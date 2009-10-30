@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
+bool JackGlobals::fVerbose = 0;
+    
 jack_tls_key JackGlobals::fRealTime;
 static bool gKeyRealtimeInitialized = jack_tls_allocate_key(&JackGlobals::fRealTime);
 

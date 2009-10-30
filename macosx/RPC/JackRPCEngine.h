@@ -21,7 +21,7 @@ typedef struct {
         char            *name;
         function_ptr_t  function;
 } function_table_entry;
-typedef function_table_entry 	*function_table_t;
+typedef function_table_entry   *function_table_t;
 #endif /* FUNCTION_PTR_T */
 #endif /* AUTOTEST */
 

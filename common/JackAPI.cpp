@@ -72,6 +72,8 @@ extern "C"
     EXPORT int jack_is_realtime (jack_client_t *client);
     EXPORT void jack_on_shutdown (jack_client_t *client,
                                   JackShutdownCallback shutdown_callback, void *arg);
+    EXPORT void jack_on_info_shutdown (jack_client_t *client,
+                                  JackInfoShutdownCallback shutdown_callback, void *arg);
     EXPORT int jack_set_process_callback (jack_client_t *client,
                                           JackProcessCallback process_callback,
                                           void *arg);
@@ -812,10 +814,24 @@ EXPORT void jack_on_shutdown(jack_client_t* ext_client, JackShutdownCallback cal
     JackLibGlobals::CheckContext();
 #endif
     JackClient* client = (JackClient*)ext_client;
+    jack_error("jack_on_shutdown: deprecated, use jack_on_info_shutdown");
     if (client == NULL) {
         jack_error("jack_on_shutdown called with a NULL client");
     } else {
         client->OnShutdown(callback, arg);
+    }
+}
+
+EXPORT void jack_on_info_shutdown(jack_client_t* ext_client, JackInfoShutdownCallback callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+    JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_on_info_shutdown called with a NULL client");
+    } else {
+        client->OnInfoShutdown(callback, arg);
     }
 }
 

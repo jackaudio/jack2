@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-// Globals used for client management on server or libray side.
+// Globals used for client management on server or library side.
 struct JackGlobals {
 
     static jack_tls_key fRealTime;
@@ -34,10 +34,10 @@ struct JackGlobals {
     static JackMutex* fOpenMutex;
     static bool fServerRunning;
     static JackClient* fClientTable[];
+    static bool fVerbose;
 #ifndef WIN32
     static jack_thread_creator_t fJackThreadCreator;
 #endif
-
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.

@@ -66,10 +66,13 @@ class JackMessageBuffer : public JackRunnableInterface
         bool fRunning;
 
         void Flush();
+    
+        void Start();
+        void Stop();
  	    
     public:
     
-        JackMessageBuffer();        
+        JackMessageBuffer();     
         ~JackMessageBuffer();
          
         // JackRunnableInterface interface

@@ -50,9 +50,9 @@ class JackClientPipeThread : public JackRunnableInterface
         JackClientPipeThread(JackWinNamedPipeClient* pipe);
         virtual ~JackClientPipeThread();
 
-        int Open(JackServer* server);	// Open the Server/Client connection
-        void Close();					// Close the Server/Client connection
-
+        int Open(JackServer* server);   // Open the Server/Client connection
+        void Close();                   // Close the Server/Client connection
+   
         bool HandleRequest();
 
         // JackRunnableInterface interface
@@ -88,8 +88,10 @@ class JackWinNamedPipeServerChannel : public JackRunnableInterface
         JackWinNamedPipeServerChannel();
         ~JackWinNamedPipeServerChannel();
 
-        int Open(const char* server_name, JackServer* server);	// Open the Server/Client connection
-        void Close();					// Close the Server/Client connection
+        int Open(const char* server_name, JackServer* server);  // Open the Server/Client connection
+        void Close();                                           // Close the Server/Client connection
+    
+        int Start();
 
         // JackRunnableInterface interface
         bool Init();

@@ -240,10 +240,18 @@ namespace Jack
    
         // Finer estimation of the position in the ringbuffer
         int delta_frames = (fPullAndPushTime > 0) ? (int)((float(long(GetMicroSeconds() - fPullAndPushTime)) * float(fAdaptedSampleRate)) / 1000000.f) : 0;
-        double ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetError() - delta_frames);
+        
+        double ratio = 1;
+        
+        // TODO : done like this just to avoid crash when input only or output only...
+        if (fCaptureChannels > 0)
+            ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetError() - delta_frames);
+        else if (fPlaybackChannels > 0)
+            ratio = fPIControler.GetRatio(fPlaybackRingBuffer[0]->GetError() - delta_frames);
         
     #ifdef JACK_MONITOR
-        fTable.Write(fCaptureRingBuffer[0]->GetError(), fCaptureRingBuffer[0]->GetError() - delta_frames, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
+        if (fCaptureRingBuffer[0] != NULL)
+            fTable.Write(fCaptureRingBuffer[0]->GetError(), fCaptureRingBuffer[0]->GetError() - delta_frames, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
     #endif
     
         // Push/pull from ringbuffer

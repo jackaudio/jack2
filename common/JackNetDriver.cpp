@@ -53,6 +53,7 @@ namespace Jack
         fMidiPlaybackPortList = NULL;
 #ifdef JACK_MONITOR
         fNetTimeMon = NULL;
+        fRcvSyncUst = 0;
 #endif
     }
 
@@ -208,7 +209,7 @@ namespace Jack
         JackDriver::NotifySampleRate ( fParams.fSampleRate );
 
         //transport engine parametering
-        fEngineControl->fTransport.SetNetworkSync ( true );
+        fEngineControl->fTransport.SetNetworkSync ( fParams.fTransportSync );
         return true;
     }
 
@@ -418,6 +419,7 @@ namespace Jack
                     break;
 
                 case JackTransportRolling :
+                    //fEngineControl->fTransport.SetCommand ( TransportCommandStart );
                     fEngineControl->fTransport.SetState ( JackTransportRolling );
                     jack_info ( "Master is rolling." );
                     break;
@@ -427,6 +429,7 @@ namespace Jack
 
     void JackNetDriver::EncodeTransportData()
     {
+        /* Desactivated
         //is there a timebase master change ?
         int refnum;
         bool conditional;
@@ -449,12 +452,14 @@ namespace Jack
         }
         else
             fReturnTransportData.fTimebaseMaster = NO_CHANGE;
-
+        */
+        
         //update transport state and position
         fReturnTransportData.fState = fEngineControl->fTransport.Query ( &fReturnTransportData.fPosition );
-
+    
         //is it a new state (that the master need to know...) ?
-        fReturnTransportData.fNewState = ( ( fReturnTransportData.fState != fLastTransportState ) &&
+        fReturnTransportData.fNewState = (( fReturnTransportData.fState == JackTransportNetStarting) &&
+                                           ( fReturnTransportData.fState != fLastTransportState ) && 
                                            ( fReturnTransportData.fState != fSendTransportData.fState ) );
         if ( fReturnTransportData.fNewState )
             jack_info ( "Sending '%s'.", GetTransportState ( fReturnTransportData.fState ) );
@@ -481,22 +486,27 @@ namespace Jack
         if ( SyncRecv() == SOCKET_ERROR )
             return 0;
 
-        //take the time at the beginning of the cycle
-        JackDriver::CycleTakeBeginTime();
+#ifdef JACK_MONITOR
+        // For timing  
+        fRcvSyncUst = GetMicroSeconds();
+#endif
 
         //decode sync
         //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
         DecodeSyncPacket();
  
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - fRcvSyncUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
         //audio, midi or sync if driver is late
         if ( DataRecv() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
+        //take the time at the beginning of the cycle
+        JackDriver::CycleTakeBeginTime();
+
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - fRcvSyncUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         return 0;
@@ -514,7 +524,7 @@ namespace Jack
             fNetAudioPlaybackBuffer->SetBuffer ( audio_port_index, GetOutputBuffer ( audio_port_index ) );
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - fRcvSyncUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         //sync
@@ -525,7 +535,7 @@ namespace Jack
             return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
+        fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - fRcvSyncUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         //send data
@@ -533,7 +543,7 @@ namespace Jack
             return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->AddLast ( ( ( float ) ( GetMicroSeconds() - JackDriver::fBeginDateUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
+        fNetTimeMon->AddLast ( ( ( float ) ( GetMicroSeconds() - fRcvSyncUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
 
         return 0;

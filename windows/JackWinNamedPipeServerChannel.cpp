@@ -31,15 +31,17 @@ using namespace std;
 namespace Jack
 {
 
-HANDLE JackClientPipeThread::fMutex = NULL;  // never released....
+HANDLE JackClientPipeThread::fMutex = NULL;  // Never released....
 
 // fRefNum = -1 correspond to already removed client
 
 JackClientPipeThread::JackClientPipeThread(JackWinNamedPipeClient* pipe)
-    : fPipe(pipe), fServer(NULL), fThread(this), fRefNum(0)
+    :fPipe(pipe), fServer(NULL), fThread(this), fRefNum(0)
 {
-    if (fMutex == NULL)
+    // First one allocated the static fMutex
+    if (fMutex == NULL) {
         fMutex = CreateMutex(NULL, FALSE, NULL);
+    }
 }
 
 JackClientPipeThread::~JackClientPipeThread()
@@ -50,15 +52,14 @@ JackClientPipeThread::~JackClientPipeThread()
 
 int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
 {
-    fServer = server;
-
     // Start listening
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener\n");
         return -1;
-    } else {
-        return 0;
     }
+    
+    fServer = server;
+    return 0;
 }
 
 void JackClientPipeThread::Close()					// Close the Server/Client connection
@@ -74,7 +75,7 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
     fPipe->Close();
     fRefNum = -1;
 }
-
+    
 bool JackClientPipeThread::Execute()
 {
     jack_log("JackClientPipeThread::Execute");
@@ -138,7 +139,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackResult res;
                 jack_log("JackRequest::ActivateClient");
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fState);
+                    res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fIsRealTime);
                 res.Write(fPipe);
                 break;
             }
@@ -316,6 +317,13 @@ bool JackClientPipeThread::HandleRequest()
                 break;
         }
     }
+    
+    /* TODO
+    // Issued by JackEngine::ReleaseRefnum when temporary mode is used
+    if (JackServerGlobals::fKilled) {
+        kill(JackTools::GetPID(), SIGINT);
+    }
+    */
 
     // Unlock the global mutex
     ReleaseMutex(fMutex);
@@ -371,29 +379,18 @@ JackWinNamedPipeServerChannel::~JackWinNamedPipeServerChannel()
 int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* server)
 {
     jack_log("JackWinNamedPipeServerChannel::Open ");
-
-    fServer = server;
     snprintf(fServerName, sizeof(fServerName), server_name);
-
+    
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object
     if (fRequestListenPipe.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
-        return false;
+        return -1;
     }
-
-    // Start listening
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener\n");
-        goto error;
-    }
-
+    
+    fServer = server;
     return 0;
-
-error:
-    fRequestListenPipe.Close();
-    return -1;
 }
-
+    
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
@@ -408,6 +405,16 @@ void JackWinNamedPipeServerChannel::Close()
     fRequestListenPipe.Close();
 }
 
+int JackWinNamedPipeServerChannel::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
+}    
+    
 bool JackWinNamedPipeServerChannel::Init()
 {
     jack_log("JackWinNamedPipeServerChannel::Init ");

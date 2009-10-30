@@ -32,9 +32,10 @@
 #define JACK_PORT_TYPE_SIZE 32
 
 #define JACK_CLIENT_NAME_SIZE 64
+#define JACK_MESSAGE_SIZE 256
 
 #ifndef PORT_NUM
-#define PORT_NUM 1024
+#define PORT_NUM 2048
 #endif
 
 #define DRIVER_PORT_NUM 256

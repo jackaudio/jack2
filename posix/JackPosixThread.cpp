@@ -25,8 +25,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <string.h> // for memset
 #include <unistd.h> // for _POSIX_PRIORITY_SCHEDULING check
 
-#define JACK_SCHED_POLICY SCHED_RR
-//#define JACK_SCHED_POLICY SCHED_FIFO
+//#define JACK_SCHED_POLICY SCHED_RR
+#define JACK_SCHED_POLICY SCHED_FIFO
 
 namespace Jack
 {

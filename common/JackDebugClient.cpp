@@ -139,10 +139,10 @@ JackEngineControl* JackDebugClient::GetEngineControl() const
 \brief Notification received from the server.
 */
 
-int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
     CheckClient();
-    return fClient->ClientNotify( refnum, name, notify, sync, value1, value2);
+    return fClient->ClientNotify( refnum, name, notify, sync, message, value1, value2);
 }
 
 int JackDebugClient::Activate()
@@ -416,6 +416,12 @@ void JackDebugClient::OnShutdown(JackShutdownCallback callback, void *arg)
     fClient->OnShutdown(callback, arg);
 }
 
+void JackDebugClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *arg)
+{
+    CheckClient();
+    fClient->OnInfoShutdown(callback, arg);
+}
+    
 int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
 {
     JackDebugClient* client = (JackDebugClient*)arg;

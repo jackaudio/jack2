@@ -220,6 +220,12 @@ void jack_shutdown(void *arg)
     exit(1);
 }
 
+void jack_info_shutdown(int code, const char* reason, void *arg)
+{
+    printf("JACK server failure : %s\n", reason);
+    exit(1);
+}
+
 void Jack_Port_Register(jack_port_id_t port, int mode, void *arg)
 {
     port_callback_reg++;
@@ -679,6 +685,7 @@ int main (int argc, char *argv[])
     }
 
     jack_on_shutdown(client1, jack_shutdown, 0);
+    jack_on_info_shutdown(client1, jack_info_shutdown, 0);
 
     if (jack_set_buffer_size_callback(client1, Jack_Update_Buffer_Size, 0) != 0) {
         printf("Error when calling buffer_size_callback !\n");

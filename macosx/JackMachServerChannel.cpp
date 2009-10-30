@@ -24,6 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackServer.h"
 #include "JackLockedEngine.h"
 #include "JackNotification.h"
+#include "JackServerGlobals.h"
 
 using namespace std;
 
@@ -49,11 +50,6 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
         return -1;
     }
 
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener");
-        return -1;
-    }
-
     fServer = server;
     fPortTable[fServerPort.GetPort()] = this;
     return 0;
@@ -64,6 +60,16 @@ void JackMachServerChannel::Close()
     jack_log("JackMachServerChannel::Close");
     fThread.Kill();
     fServerPort.DestroyPort();
+}
+    
+int JackMachServerChannel::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
 }
 
 JackLockedEngine* JackMachServerChannel::GetEngine()
@@ -137,6 +143,10 @@ boolean_t JackMachServerChannel::MessageHandler(mach_msg_header_t* Request, mach
         channel->ClientKill(Request->msgh_local_port);
     } else {
         JackRPCEngine_server(Request, Reply);
+        // Issued by JackEngine::ReleaseRefnum when temporary mode is used
+        if (JackServerGlobals::fKilled) {
+            kill(JackTools::GetPID(), SIGINT);
+        }
     }
     return true;
 }

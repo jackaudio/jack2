@@ -64,8 +64,9 @@ class SERVER_EXPORT JackEngine
         int AllocateRefnum();
         void ReleaseRefnum(int ref);
 
-        void NotifyClient(int refnum, int event, int sync, int value1, int value2);
-        void NotifyClients(int event, int sync, int value1, int value2);
+        void NotifyClient(int refnum, int event, int sync, const char*  message, int value1, int value2);
+        void NotifyClients(int event, int sync, const char*  message,  int value1, int value2);
+    
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
         void NotifyPortRename(jack_port_id_t src);
@@ -87,7 +88,7 @@ class SERVER_EXPORT JackEngine
         int ClientExternalClose(int refnum);
         int ClientInternalClose(int refnum, bool wait);
 
-        int ClientActivate(int refnum, bool state);
+        int ClientActivate(int refnum, bool is_real_time);
         int ClientDeactivate(int refnum);
     
         int GetClientPID(const char* name);
@@ -115,6 +116,7 @@ class SERVER_EXPORT JackEngine
 
         // Notifications
         void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
+        void NotifyFailure(int code, const char* reason);
         void NotifyXRun(int refnum);
         void NotifyGraphReorder();
         void NotifyBufferSize(jack_nframes_t buffer_size);

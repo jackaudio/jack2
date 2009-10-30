@@ -214,7 +214,7 @@ typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* new_name,
 typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
- * Prototype for the client supplied function that is called
+ * @deprecated Prototype for the client supplied function that is called
  * whenever jackd is shutdown. Note that after server shutdown, 
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()
@@ -225,6 +225,21 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
  * @param arg pointer to a client supplied structure
  */
 typedef void (*JackShutdownCallback)(void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown. Note that after server shutdown, 
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
+ 
+ * @param code a shuntdown code
+ * @param reason a string discribing the shuntdown reason (backend failure, server crash... etc...)
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackInfoShutdownCallback)(int code, const char* reason, void *arg);
 
 /**
  * Used for the type argument of jack_port_register() for default
@@ -419,7 +434,12 @@ enum JackStatus {
     /**
      * Client's protocol version does not match
      */
-    JackVersionError = 0x400
+    JackVersionError = 0x400,
+    
+    /**
+     * Backend failure
+     */
+    JackBackendError = 0x800
 };
 
 /**

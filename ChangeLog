@@ -25,6 +25,70 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-10-30 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, improve management of input/output channels: -1 is now used internally to indicate a wanted max value. 
+	* In JackCoreAudioDriver::OpenAUHAL, correct stream format setup and cleanup. 
+	* Correct crash bug in JackAudioAdapterInterface when not input is used in adapter (temporary fix...)
+	* Sync JackCoreAudioAdapter code on JackCoreAudioDriver one.
+	* JACK_SCHED_POLICY switched to SCHED_FIFO.
+
+2009-10-29 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver::Start, wait for the audio driver to effectively start (use the MeasureCallback).
+
+2009-10-28 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, force the SR value to the wanted one *before* creating aggregate device (otherwise creation will fail). 
+	* In JackCoreAudioDriver, better cleanup of AD when intermediate open failure.
+
+2009-10-27 Stephane Letz  <letz@grame.fr>
+
+	* Dynamic system version detection in JackCoreAudioDriver to either create public or private aggregate device.
+
+2009-10-26 Stephane Letz  <letz@grame.fr>
+
+	* Implement "hog mode" (exclusive access of the audio device) in JackCoreAudioDriver.
+	* Fix jack_set_sample_rate_callback to have he same behavior as in JACK1.
+
+2009-10-25 Stephane Letz  <letz@grame.fr>
+
+	* Improve aggregate device management in JackCoreAudioDriver : now a "private" device only and cleanup properly.
+	* Aggregate device code added to JackCoreAudioAdapter.
+
+2009-10-23 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackProcessSync::LockedTimedWait.
+	* Correct JACK_MESSAGE_SIZE value, particularly in OSX RPC code.
+	* Now start server channel thread only when backend has been started (so in JackServer::Start). Should solve race conditions at start time.
+	* jack_verbose moved to JackGlobals class.
+
+2009-10-22 Stephane Letz  <letz@grame.fr>
+
+	* Correct jackdmp.cpp (failures case were not correct..). Improve JackCoreAudioDriver code. Raise default port number to 2048.
+
+2009-10-20 Stephane Letz  <letz@grame.fr>
+
+	* Add a string parameter to server ==> client notification, add a new JackInfoShutdownCallback type.
+	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration change…)
+
+2009-10-17 Stephane Letz  <letz@grame.fr>
+
+	* Correct server temporary mode : now set a global and quit after server/client message handling is finished.
+
+2009-10-15 Stephane Letz  <letz@grame.fr>
+
+	* Change CoreAudio notification thread setup for OSX Snow Leopard.
+
+2009-09-18 Stephane Letz  <letz@grame.fr>
+
+	* Simplify transport in NetJack2: master only can control transport.
+
+2009-09-15 Stephane Letz  <letz@grame.fr>
+
+	* Correct CPU timing in JackNetDriver, now take cycle begin time after Read.
+	* Fix issues in JackNetDriver::DecodeTransportData and JackNetDriver::Initialize.
+
 2009-08-28 Stephane Letz  <letz@grame.fr>
 
 	* Correct monitor port naming in JackAudioDriver and JackCoreAudioDriver.
@@ -33,7 +97,6 @@ Paul Davis
 2009-07-31 Stephane Letz  <letz@grame.fr>
 
 	* Use SNDCTL_DSP_SYNCGROUP/SNDCTL_DSP_SYNCSTART API to synchronize input and output in Solaris boomer backend.
-
 
 2009-07-29 Stephane Letz  <letz@grame.fr>
 

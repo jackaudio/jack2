@@ -305,6 +305,7 @@ namespace Jack
                     else
                         jack_info ( "'%s' isn't the timebase master anymore.", fParams.fName );
                     break;
+                    
                 case TIMEBASEMASTER :
                     timebase = jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
                     if ( timebase < 0 )
@@ -312,6 +313,7 @@ namespace Jack
                     else
                         jack_info ( "'%s' is the new timebase master.", fParams.fName );
                     break;
+                    
                 case CONDITIONAL_TIMEBASEMASTER :
                     timebase = jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
                     if ( timebase != EBUSY )
@@ -334,15 +336,18 @@ namespace Jack
                     jack_transport_stop ( fJackClient );
                     jack_info ( "'%s' stops transport.", fParams.fName );
                     break;
+                    
                 case JackTransportStarting :
                     if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) == EINVAL )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
-                    jack_info ( "'%s' starts transport frame = %d  frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
+                    jack_info ( "'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
+                    
                 case JackTransportNetStarting :
                     jack_info ( "'%s' is ready to roll..", fParams.fName );
                     break;
+                    
                 case JackTransportRolling :
                     jack_info ( "'%s' is rolling.", fParams.fName );
                     break;

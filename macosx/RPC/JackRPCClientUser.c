@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Sep  1 17:42:27 2008
- * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
+ * stub generated Fri Oct 23 10:35:08 2009
+ * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCClient_subsystem__ 1
@@ -50,15 +50,15 @@
 #ifndef	__MachMsgErrorWithTimeout
 #define	__MachMsgErrorWithTimeout(_R_) { \
 	switch (_R_) { \
-	case MACH_SEND_INVALID_REPLY: \
-	case MACH_RCV_INVALID_NAME: \
-	case MACH_RCV_PORT_DIED: \
-	case MACH_RCV_PORT_CHANGED: \
-	case MACH_RCV_TIMED_OUT: \
-		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
-		break; \
-	default: \
+	case MACH_SEND_INVALID_DATA: \
+	case MACH_SEND_INVALID_DEST: \
+	case MACH_SEND_INVALID_HEADER: \
 		mig_put_reply_port(InP->Head.msgh_reply_port); \
+		break; \
+	case MACH_SEND_TIMED_OUT: \
+	case MACH_RCV_TIMED_OUT: \
+	default: \
+		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
 	} \
 }
 #endif	/* __MachMsgErrorWithTimeout */
@@ -66,14 +66,13 @@
 #ifndef	__MachMsgErrorWithoutTimeout
 #define	__MachMsgErrorWithoutTimeout(_R_) { \
 	switch (_R_) { \
-	case MACH_SEND_INVALID_REPLY: \
-	case MACH_RCV_INVALID_NAME: \
-	case MACH_RCV_PORT_DIED: \
-	case MACH_RCV_PORT_CHANGED: \
-		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
+	case MACH_SEND_INVALID_DATA: \
+	case MACH_SEND_INVALID_DEST: \
+	case MACH_SEND_INVALID_HEADER: \
+		mig_put_reply_port(InP->Head.msgh_reply_port); \
 		break; \
 	default: \
-		mig_put_reply_port(InP->Head.msgh_reply_port); \
+		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
 	} \
 }
 #endif	/* __MachMsgErrorWithoutTimeout */
@@ -265,6 +264,7 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
+	message_t message,
 	int value1,
 	int value2,
 	int *result
@@ -280,6 +280,7 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 	} Request;
@@ -341,9 +342,11 @@ mig_external kern_return_t rpc_jack_client_sync_notify
 
 	InP->refnum = refnum;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->notify = notify;
+
+	(void) mig_strncpy(InP->message, message, 256);
 
 	InP->value1 = value1;
 
@@ -387,6 +390,7 @@ mig_external kern_return_t rpc_jack_client_async_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
+	message_t message,
 	int value1,
 	int value2
 )
@@ -401,6 +405,7 @@ mig_external kern_return_t rpc_jack_client_async_notify
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 	} Request;
@@ -433,9 +438,11 @@ mig_external kern_return_t rpc_jack_client_async_notify
 
 	InP->refnum = refnum;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->notify = notify;
+
+	(void) mig_strncpy(InP->message, message, 256);
 
 	InP->value1 = value1;
 

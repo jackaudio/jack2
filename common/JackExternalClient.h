@@ -49,7 +49,7 @@ class JackExternalClient : public JackClientInterface
         int Open(const char* name, int pid, int refnum, int* shared_client);
         int Close();
 
-        int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
+        int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 
         JackClientControl* GetClientControl() const;
 };

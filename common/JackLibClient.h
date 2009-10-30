@@ -46,7 +46,7 @@ class JackLibClient : public JackClient
 
         int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
 
-        int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value2);
+        int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 
         JackGraphManager* GetGraphManager() const;
         JackEngineControl* GetEngineControl() const;
