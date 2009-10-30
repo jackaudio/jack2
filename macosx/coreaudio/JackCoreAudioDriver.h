@@ -151,8 +151,7 @@ class JackCoreAudioDriver : public JackAudioDriver
                       int in_nChannels,
                       int out_nChannels,
                       jack_nframes_t nframes,
-                      jack_nframes_t samplerate,
-                      bool strict);
+                      jack_nframes_t samplerate);
         void CloseAUHAL();
 
         int AddListeners();

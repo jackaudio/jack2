@@ -44,6 +44,20 @@ static void Print4CharCode(const char* msg, long c)
     jack_log("%s'%s'", (msg), __4CC_string);
 }
 
+static void PrintStreamDesc(AudioStreamBasicDescription *inDesc)
+{
+    jack_log("- - - - - - - - - - - - - - - - - - - -");
+    jack_log("  Sample Rate:%f", inDesc->mSampleRate);
+    jack_log("  Format ID:%.*s", (int) sizeof(inDesc->mFormatID), (char*)&inDesc->mFormatID);
+    jack_log("  Format Flags:%lX", inDesc->mFormatFlags);
+    jack_log("  Bytes per Packet:%ld", inDesc->mBytesPerPacket);
+    jack_log("  Frames per Packet:%ld", inDesc->mFramesPerPacket);
+    jack_log("  Bytes per Frame:%ld", inDesc->mBytesPerFrame);
+    jack_log("  Channels per Frame:%ld", inDesc->mChannelsPerFrame);
+    jack_log("  Bits per Channel:%ld", inDesc->mBitsPerChannel);
+    jack_log("- - - - - - - - - - - - - - - - - - - -\n");
+}
+
 static void printError(OSStatus err)
 {
     switch (err) {
@@ -629,7 +643,11 @@ error:
     return -1;
 }
 
-int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, const char* playback_driver_uid, char* capture_driver_name, char* playback_driver_name, jack_nframes_t samplerate)
+int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid, 
+                                      const char* playback_driver_uid, 
+                                      char* capture_driver_name, 
+                                      char* playback_driver_name, 
+                                      jack_nframes_t samplerate)
 {
     capture_driver_name[0] = 0;
     playback_driver_name[0] = 0;
@@ -760,12 +778,12 @@ int JackCoreAudioDriver::SetupChannels(bool capturing, bool playing, int& inchan
             return -1;
     }
 
-    if (inchannels == 0) {
+    if (inchannels == -1) {
         jack_log("Setup max in channels = %d", in_nChannels);
         inchannels = in_nChannels;
     }
 
-    if (outchannels == 0) {
+    if (outchannels == -1) {
         jack_log("Setup max out channels = %d", out_nChannels);
         outchannels = out_nChannels;
     }
@@ -839,7 +857,6 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
     return 0;
 }
 
-
 int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                                    bool playing,
                                    int inchannels,
@@ -847,12 +864,13 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
                                    int in_nChannels,
                                    int out_nChannels,
                                    jack_nframes_t buffer_size,
-                                   jack_nframes_t samplerate,
-                                   bool strict)
+                                   jack_nframes_t samplerate)
 {
     ComponentResult err1;
     UInt32 enableIO;
     AudioStreamBasicDescription srcFormat, dstFormat;
+    AudioDeviceID currAudioDeviceID;
+    UInt32 size;
 
     jack_log("OpenAUHAL capturing = %d playing = %d inchannels = %d outchannels = %d in_nChannels = %d out_nChannels = %d", capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels);
 
@@ -869,14 +887,14 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     if (err1 != noErr) {
         jack_error("Error calling OpenAComponent");
         printError(err1);
-        return -1;
+        goto error;
     }
 
     err1 = AudioUnitInitialize(fAUHAL);
     if (err1 != noErr) {
         jack_error("Cannot initialize AUHAL unit");
         printError(err1);
-        return -1;
+        goto error;
     }
 
     // Start I/O
@@ -892,8 +910,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO, kAudioUnitScope_Input");
         printError(err1);
-        if (strict)
-            return -1;
+        goto error;
     }
 
     if (playing && outchannels > 0) {
@@ -908,18 +925,15 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_EnableIO,kAudioUnitScope_Output");
         printError(err1);
-        if (strict)
-            return -1;
+        goto error;
     }
     
-    AudioDeviceID currAudioDeviceID;
-    UInt32 size = sizeof(AudioDeviceID);
+    size = sizeof(AudioDeviceID);
     err1 = AudioUnitGetProperty(fAUHAL, kAudioOutputUnitProperty_CurrentDevice, kAudioUnitScope_Global, 0, &currAudioDeviceID, &size);
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitGetProperty - kAudioOutputUnitProperty_CurrentDevice");
         printError(err1);
-        if (strict)
-            return -1;
+        goto error;
     } else {
         jack_log("AudioUnitGetPropertyCurrentDevice = %d", currAudioDeviceID);
     }
@@ -929,8 +943,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     if (err1 != noErr) {
         jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_CurrentDevice");
         printError(err1);
-        if (strict)
-            return -1;
+        goto error;
     }
   
     // Set buffer size
@@ -939,8 +952,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
-            if (strict)
-                return -1;
+            goto error;
         }
     }
 
@@ -949,8 +961,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_MaximumFramesPerSlice");
             printError(err1);
-            if (strict)
-                return -1;
+            goto error;
         }
     }
 
@@ -967,6 +978,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_ChannelMap 1");
             printError(err1);
+            goto error;
         }
     }
 
@@ -982,40 +994,71 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioOutputUnitProperty_ChannelMap 0");
             printError(err1);
+            goto error;
         }
     }
 
     // Setup stream converters
-    jack_log("Setup AUHAL input stream converter SR = %ld", samplerate);
-    srcFormat.mSampleRate = samplerate;
-    srcFormat.mFormatID = kAudioFormatLinearPCM;
-    srcFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
-    srcFormat.mBytesPerPacket = sizeof(float);
-    srcFormat.mFramesPerPacket = 1;
-    srcFormat.mBytesPerFrame = sizeof(float);
-    srcFormat.mChannelsPerFrame = outchannels;
-    srcFormat.mBitsPerChannel = 32;
-
-    err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &srcFormat, sizeof(AudioStreamBasicDescription));
-    if (err1 != noErr) {
-        jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
-        printError(err1);
+    if (capturing && inchannels > 0) {
+    
+        size = sizeof(AudioStreamBasicDescription);
+        err1 = AudioUnitGetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &srcFormat, &size);
+        if (err1 != noErr) {
+            jack_error("Error calling AudioUnitGetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
+            printError(err1);
+            goto error;
+        }
+        PrintStreamDesc(&srcFormat);
+              
+        jack_log("Setup AUHAL input stream converter SR = %ld", samplerate);
+        srcFormat.mSampleRate = samplerate;
+        srcFormat.mFormatID = kAudioFormatLinearPCM;
+        srcFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
+        srcFormat.mBytesPerPacket = sizeof(float);
+        srcFormat.mFramesPerPacket = 1;
+        srcFormat.mBytesPerFrame = sizeof(float);
+        srcFormat.mChannelsPerFrame = inchannels;
+        srcFormat.mBitsPerChannel = 32;
+        PrintStreamDesc(&srcFormat);
+      
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &srcFormat, sizeof(AudioStreamBasicDescription));
+        
+        if (err1 != noErr) {
+            jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
+            printError(err1);
+            goto error;
+        }
     }
 
-    jack_log("Setup AUHAL output stream converter SR = %ld", samplerate);
-    dstFormat.mSampleRate = samplerate;
-    dstFormat.mFormatID = kAudioFormatLinearPCM;
-    dstFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
-    dstFormat.mBytesPerPacket = sizeof(float);
-    dstFormat.mFramesPerPacket = 1;
-    dstFormat.mBytesPerFrame = sizeof(float);
-    dstFormat.mChannelsPerFrame = inchannels;
-    dstFormat.mBitsPerChannel = 32;
-
-    err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &dstFormat, sizeof(AudioStreamBasicDescription));
-    if (err1 != noErr) {
-        jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
-        printError(err1);
+    if (playing && outchannels > 0) {
+    
+        size = sizeof(AudioStreamBasicDescription);
+        err1 = AudioUnitGetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 1, &dstFormat, &size);
+        if (err1 != noErr) {
+            jack_error("Error calling AudioUnitGetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
+            printError(err1);
+            goto error;
+        }
+        PrintStreamDesc(&dstFormat);
+         
+        jack_log("Setup AUHAL output stream converter SR = %ld", samplerate);
+        dstFormat.mSampleRate = samplerate;
+        dstFormat.mFormatID = kAudioFormatLinearPCM;
+        dstFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
+        dstFormat.mBytesPerPacket = sizeof(float);
+        dstFormat.mFramesPerPacket = 1;
+        dstFormat.mBytesPerFrame = sizeof(float);
+        dstFormat.mChannelsPerFrame = outchannels;
+        dstFormat.mBitsPerChannel = 32;
+        PrintStreamDesc(&dstFormat);
+       
+        err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &dstFormat, sizeof(AudioStreamBasicDescription));
+        
+        if (err1 != noErr) {
+            jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
+            printError(err1);
+            goto error;
+        }
     }
 
     // Setup callbacks
@@ -1027,7 +1070,7 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (err1 != noErr) {
             jack_error("Error calling  AudioUnitSetProperty - kAudioUnitProperty_SetRenderCallback 1");
             printError(err1);
-            return -1;
+            goto error;
         }
     } else {
         AURenderCallbackStruct output;
@@ -1037,11 +1080,15 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         if (err1 != noErr) {
             jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_SetRenderCallback 0");
             printError(err1);
-            return -1;
+            goto error;
         }
     }
 
     return 0;
+    
+error:
+    CloseAUHAL();
+    return -1;
 }
 
 int JackCoreAudioDriver::SetupBuffers(int inchannels)
@@ -1202,13 +1249,13 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     if (SetupChannels(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, true) < 0)
         goto error;
 
-    if (SetupBufferSize(buffer_size)  < 0)
+    if (SetupBufferSize(buffer_size) < 0)
         goto error;
         
     if (SetupSampleRate(samplerate) < 0)
         goto error;
  
-    if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, buffer_size, samplerate, true) < 0)
+    if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, buffer_size, samplerate) < 0)
         goto error;
 
     if (capturing && inchannels > 0)
@@ -1520,25 +1567,25 @@ extern "C"
         strcpy(desc->params[i].name, "channels");
         desc->params[i].character = 'c';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
+        desc->params[i].value.ui = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        strcpy(desc->params[i].long_desc, "Maximum number of channels. If -1, max possible number of channels will be used");
 
         i++;
         strcpy(desc->params[i].name, "inchannels");
         desc->params[i].character = 'i';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
+        desc->params[i].value.ui = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of input channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        strcpy(desc->params[i].long_desc, "Maximum number of input channels. If -1, max possible number of input channels will be used");
 
         i++;
         strcpy(desc->params[i].name, "outchannels");
         desc->params[i].character = 'o';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
+        desc->params[i].value.ui = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of output channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        strcpy(desc->params[i].long_desc, "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
         i++;
         strcpy(desc->params[i].name, "capture");
@@ -1651,10 +1698,10 @@ extern "C"
     {
         jack_nframes_t srate = 44100;
         jack_nframes_t frames_per_interrupt = 128;
-        int capture = FALSE;
-        int playback = FALSE;
-        int chan_in = 0;
-        int chan_out = 0;
+        bool capture = false;
+        bool playback = false;
+        int chan_in = -1;   // Default: if not explicitely set, then max possible will be used...
+        int chan_out = -1;  // Default: ifà not explicitely set, then max possible will be used...
         bool monitor = false;
         const char* capture_driver_uid = "";
         const char* playback_driver_uid = "";
@@ -1677,31 +1724,31 @@ extern "C"
                     break;
 
                 case 'D':
-                    capture = TRUE;
-                    playback = TRUE;
+                    capture = true;
+                    playback = true;
                     break;
 
                 case 'c':
-                    chan_in = chan_out = (int) param->value.ui;
+                    chan_in = chan_out = (int)param->value.ui;
                     break;
 
                 case 'i':
-                    chan_in = (int) param->value.ui;
+                    chan_in = (int)param->value.ui;
                     break;
 
                 case 'o':
-                    chan_out = (int) param->value.ui;
+                    chan_out = (int)param->value.ui;
                     break;
 
                 case 'C':
-                    capture = TRUE;
+                    capture = true;
                     if (strcmp(param->value.str, "none") != 0) {
                         capture_driver_uid = strdup(param->value.str);
                     }
                     break;
 
                 case 'P':
-                    playback = TRUE;
+                    playback = true;
                     if (strcmp(param->value.str, "none") != 0) {
                         playback_driver_uid = strdup(param->value.str);
                     }
@@ -1716,7 +1763,7 @@ extern "C"
                     break;
 
                 case 'p':
-                    frames_per_interrupt = (unsigned int) param->value.ui;
+                    frames_per_interrupt = (unsigned int)param->value.ui;
                     break;
 
                 case 'I':
@@ -1747,8 +1794,8 @@ extern "C"
 
         /* duplex is the default */
         if (!capture && !playback) {
-            capture = TRUE;
-            playback = TRUE;
+            capture = true;
+            playback = true;
         }
 
         Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("system", "coreaudio", engine, table);
