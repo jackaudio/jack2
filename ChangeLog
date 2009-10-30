@@ -32,6 +32,7 @@ Paul Davis
 	* Correct crash bug in JackAudioAdapterInterface when not input is used in adapter (temporary fix...)
 	* Sync JackCoreAudioAdapter code on JackCoreAudioDriver one.
 	* JACK_SCHED_POLICY switched to SCHED_FIFO.
+	* Now can aggregate device that are themselves AD.
 
 2009-10-29 Stephane Letz  <letz@grame.fr>
 
