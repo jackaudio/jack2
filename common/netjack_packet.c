@@ -387,6 +387,10 @@ netjack_poll_deadline (int sockfd, jack_time_t deadline)
     if( now >= deadline )
 	return 0;
 
+    if( (deadline-now) >= 1000000 ) {
+	    jack_error( "deadline more than 1 second in the future, trimming it." );
+	    deadline = now+500000;
+    }
 #if HAVE_PPOLL
     timeout_spec.tv_nsec = (deadline - now) * 1000;
 #else
@@ -529,6 +533,7 @@ netjack_poll_deadline (int sockfd, jack_time_t deadline)
     //jack_error( "timeout = %d", timeout_usecs );
         timeout.tv_sec = 0;
         timeout.tv_usec = (timeout_usecs < 500) ? 500 : timeout_usecs;
+        timeout.tv_usec = (timeout_usecs > 1000000) ? 500000 : timeout_usecs;
 
         int poll_err = select (0, &fds, NULL, NULL, &timeout);
         if( poll_err != 0 )
