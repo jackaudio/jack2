@@ -266,50 +266,51 @@ process (jack_nframes_t nframes, void *arg)
     jacknet_packet_header *pkthdr = (jacknet_packet_header *) packet_buf;
 
     /*
-     * ok... SEND code first.
-     * needed some time to find out why latency=0
-     * did not work ;S
+     * for latency==0 we need to send out the packet before we wait on the reply.
+     * but this introduces a cycle of latency, when netsource is connected to itself.
+     * so we send out before read only in zero latency mode.
      *
      */
 
-    /* reset packet_bufX... */
-    packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
+    if( latency == 0 ) {
+	    /* reset packet_bufX... */
+	    packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
 
-    /* ---------- Send ---------- */
-    render_jack_ports_to_payload (bitdepth, playback_ports, playback_srcs, nframes,
-	    packet_bufX, net_period, dont_htonl_floats);
+	    /* ---------- Send ---------- */
+	    render_jack_ports_to_payload (bitdepth, playback_ports, playback_srcs, nframes,
+			    packet_bufX, net_period, dont_htonl_floats);
 
-    /* fill in packet hdr */
-    pkthdr->transport_state = jack_transport_query (client, &local_trans_pos);
-    pkthdr->transport_frame = local_trans_pos.frame;
-    pkthdr->framecnt = framecnt;
-    pkthdr->latency = latency;
-    pkthdr->reply_port = reply_port;
-    pkthdr->sample_rate = jack_get_sample_rate (client);
-    pkthdr->period_size = nframes;
+	    /* fill in packet hdr */
+	    pkthdr->transport_state = jack_transport_query (client, &local_trans_pos);
+	    pkthdr->transport_frame = local_trans_pos.frame;
+	    pkthdr->framecnt = framecnt;
+	    pkthdr->latency = latency;
+	    pkthdr->reply_port = reply_port;
+	    pkthdr->sample_rate = jack_get_sample_rate (client);
+	    pkthdr->period_size = nframes;
 
-    /* playback for us is capture on the other side */
-    pkthdr->capture_channels_audio = playback_channels_audio;
-    pkthdr->playback_channels_audio = capture_channels_audio;
-    pkthdr->capture_channels_midi = playback_channels_midi;
-    pkthdr->playback_channels_midi = capture_channels_midi;
-    pkthdr->mtu = mtu;
-    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
-    //printf("goodness=%d\n", deadline_goodness );
+	    /* playback for us is capture on the other side */
+	    pkthdr->capture_channels_audio = playback_channels_audio;
+	    pkthdr->playback_channels_audio = capture_channels_audio;
+	    pkthdr->capture_channels_midi = playback_channels_midi;
+	    pkthdr->playback_channels_midi = capture_channels_midi;
+	    pkthdr->mtu = mtu;
+	    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
+	    //printf("goodness=%d\n", deadline_goodness );
 
-    packet_header_hton (pkthdr);
-    if (cont_miss < 3*latency+5) {
-	int r;
-	for( r=0; r<redundancy; r++ )
-	    netjack_sendto (outsockfd, (char *) packet_buf, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
-
-    }
-    else if (cont_miss > 50+5*latency)
-    {
-	state_connected = 0;
-	packet_cache_reset_master_address( global_packcache );
-        //printf ("Frame %d  \tRealy too many packets missed (%d). Let's reset the counter\n", framecnt, cont_miss);
-        cont_miss = 0;
+	    packet_header_hton (pkthdr);
+	    if (cont_miss < 3*latency+5) {
+		    int r;
+		    for( r=0; r<redundancy; r++ )
+			    netjack_sendto (outsockfd, (char *) packet_buf, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
+	    }
+	    else if (cont_miss > 50+5*latency)
+	    {
+		    state_connected = 0;
+		    packet_cache_reset_master_address( global_packcache );
+		    //printf ("Frame %d  \tRealy too many packets missed (%d). Let's reset the counter\n", framecnt, cont_miss);
+		    cont_miss = 0;
+	    }
     }
 
     /*
@@ -407,6 +408,46 @@ process (jack_nframes_t nframes, void *arg)
             chn++;
         }
     }
+    if( latency != 0 ) {
+	    /* reset packet_bufX... */
+	    packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
+
+	    /* ---------- Send ---------- */
+	    render_jack_ports_to_payload (bitdepth, playback_ports, playback_srcs, nframes,
+			    packet_bufX, net_period, dont_htonl_floats);
+
+	    /* fill in packet hdr */
+	    pkthdr->transport_state = jack_transport_query (client, &local_trans_pos);
+	    pkthdr->transport_frame = local_trans_pos.frame;
+	    pkthdr->framecnt = framecnt;
+	    pkthdr->latency = latency;
+	    pkthdr->reply_port = reply_port;
+	    pkthdr->sample_rate = jack_get_sample_rate (client);
+	    pkthdr->period_size = nframes;
+
+	    /* playback for us is capture on the other side */
+	    pkthdr->capture_channels_audio = playback_channels_audio;
+	    pkthdr->playback_channels_audio = capture_channels_audio;
+	    pkthdr->capture_channels_midi = playback_channels_midi;
+	    pkthdr->playback_channels_midi = capture_channels_midi;
+	    pkthdr->mtu = mtu;
+	    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
+	    //printf("goodness=%d\n", deadline_goodness );
+
+	    packet_header_hton (pkthdr);
+	    if (cont_miss < 3*latency+5) {
+		    int r;
+		    for( r=0; r<redundancy; r++ )
+			    netjack_sendto (outsockfd, (char *) packet_buf, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
+	    }
+	    else if (cont_miss > 50+5*latency)
+	    {
+		    state_connected = 0;
+		    packet_cache_reset_master_address( global_packcache );
+		    //printf ("Frame %d  \tRealy too many packets missed (%d). Let's reset the counter\n", framecnt, cont_miss);
+		    cont_miss = 0;
+	    }
+    }
 
     framecnt++;
     return 0;
@@ -437,8 +478,8 @@ fflush( stdout );
         struct hostent *hostinfo = gethostbyname (hostname);
         if (hostinfo == NULL) {
             fprintf (stderr, "init_sockaddr_in: unknown host: %s.\n", hostname);
-            fflush( stderr );
-        }
+	    fflush( stderr );
+	}
 #ifdef WIN32
         name->sin_addr.s_addr = inet_addr( hostname );
 #else
