@@ -167,8 +167,6 @@ void netjack_wait( netjack_driver_state_t *netj )
 		}
 	}
 
-	jack_log( "deadline_offset: %d", (int) netj->deadline_offset );
-
 	netj->next_deadline = jack_get_time() + netj->deadline_offset;
     } else {
 	netj->time_to_deadline = 0;
