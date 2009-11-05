@@ -224,6 +224,15 @@ def configure(conf):
     	else:
 	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
 
+    if conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
+	conf.env['HAVE_CELT'] = True
+	conf.env['HAVE_CELT_API_0_7'] = True
+    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', required=True):
+	conf.env['HAVE_CELT'] = True
+	conf.env['HAVE_CELT_API_0_5'] = True
+    else:
+	conf.env['HAVE_CELT'] = False
+
 def build(bld):
     print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
     if not os.access('svnversion.h', os.R_OK):
