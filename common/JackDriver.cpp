@@ -167,11 +167,15 @@ int JackDriver::Open(jack_nframes_t buffer_size,
 
 int JackDriver::Close()
 {
-    jack_log("JackDriver::Close");
-    fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
-    fClientControl.fActive = false;
-    fEngineControl->fDriverNum--;
-    return fEngine->ClientInternalClose(fClientControl.fRefNum, false);
+    if (fClientControl.fRefNum > 0) { 
+        jack_log("JackDriver::Close");
+        fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
+        fClientControl.fActive = false;
+        fEngineControl->fDriverNum--;
+        return fEngine->ClientInternalClose(fClientControl.fRefNum, false);
+    } else {
+        return -1;
+    }
 }
 
 /*!

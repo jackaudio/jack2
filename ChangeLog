@@ -25,6 +25,28 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-05 Stephane Letz  <letz@grame.fr>
+
+	* No reason to make jack_on_shutdown deprecated, so revert the incorrect change.
+
+2009-10-30 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, improve management of input/output channels: -1 is now used internally to indicate a wanted max value. 
+	* In JackCoreAudioDriver::OpenAUHAL, correct stream format setup and cleanup. 
+	* Correct crash bug in JackAudioAdapterInterface when not input is used in adapter (temporary fix...)
+	* Sync JackCoreAudioAdapter code on JackCoreAudioDriver one.
+	* JACK_SCHED_POLICY switched to SCHED_FIFO.
+	* Now can aggregate device that are themselves AD.
+
+2009-10-29 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver::Start, wait for the audio driver to effectively start (use the MeasureCallback).
+
+2009-10-28 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, force the SR value to the wanted one *before* creating aggregate device (otherwise creation will fail). 
+	* In JackCoreAudioDriver, better cleanup of AD when intermediate open failure.
+
 2009-10-27 Stephane Letz  <letz@grame.fr>
 
 	* Dynamic system version detection in JackCoreAudioDriver to either create public or private aggregate device.

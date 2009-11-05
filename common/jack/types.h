@@ -214,7 +214,7 @@ typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* new_name,
 typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
- * @deprecated Prototype for the client supplied function that is called
+ * Prototype for the client supplied function that is called
  * whenever jackd is shutdown. Note that after server shutdown, 
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()

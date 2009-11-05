@@ -27,6 +27,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 
+#include <vector>
+
+using namespace std;
+
 namespace Jack
 {
 
@@ -36,6 +40,8 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
 
+#define WAIT_COUNTER 60
+    
 /*!
 \brief Audio adapter using CoreAudio API.
 */
@@ -88,13 +94,16 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
 
         // Setup
-        OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, AudioDeviceID* outAggregateDevice);
+        OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
+        OSStatus CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
+        bool IsAggregateDevice(AudioDeviceID device);
         
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
-                         char* playback_driver_name);
+                         char* playback_driver_name,
+                         jack_nframes_t samplerate);
 
         int SetupChannels(bool capturing,
                           bool playing,
@@ -111,10 +120,12 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
                     int in_nChannels,
                     int out_nChannels,
                     jack_nframes_t buffer_size,
-                    jack_nframes_t samplerate,
-                    bool strict);
+                    jack_nframes_t samplerate);
 
-        int SetupBufferSizeAndSampleRate(jack_nframes_t buffer_size, jack_nframes_t samplerate);
+        int SetupBufferSize(jack_nframes_t buffer_size);
+        int SetupSampleRate(jack_nframes_t samplerate);
+        int SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes_t samplerate);
+    
         int SetupBuffers(int inchannels);
         void DisposeBuffers();
         void CloseAUHAL();
