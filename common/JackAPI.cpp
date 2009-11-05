@@ -814,7 +814,6 @@ EXPORT void jack_on_shutdown(jack_client_t* ext_client, JackShutdownCallback cal
     JackLibGlobals::CheckContext();
 #endif
     JackClient* client = (JackClient*)ext_client;
-    jack_error("jack_on_shutdown: deprecated, use jack_on_info_shutdown");
     if (client == NULL) {
         jack_error("jack_on_shutdown called with a NULL client");
     } else {

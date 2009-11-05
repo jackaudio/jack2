@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-05 Stephane Letz  <letz@grame.fr>
+
+	* No reason to make jack_on_shutdown deprecated, so revert the incorrect change.
+
 2009-10-30 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudioDriver, improve management of input/output channels: -1 is now used internally to indicate a wanted max value. 
