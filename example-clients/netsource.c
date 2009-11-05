@@ -110,6 +110,8 @@ int framecnt = 0;
 
 int cont_miss = 0;
 
+int freewheeling = 0;
+
 /**
  * This Function allocates all the I/O Ports which are added the lists.
  */
@@ -226,6 +228,12 @@ sync_cb (jack_transport_state_t state, jack_position_t *pos, void *arg)
     return retval;
 }
 
+void
+freewheel_cb (int starting, void *arg)
+{
+	freewheeling = starting;
+}
+
     int deadline_goodness=0;
 /**
  * The process callback for this JACK application.
@@ -295,7 +303,10 @@ process (jack_nframes_t nframes, void *arg)
 	    pkthdr->capture_channels_midi = playback_channels_midi;
 	    pkthdr->playback_channels_midi = capture_channels_midi;
 	    pkthdr->mtu = mtu;
-	    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
+	    if( freewheeling!= 0 )
+		    pkthdr->sync_state = (jack_nframes_t)MASTER_FREEWHEELS;
+	    else
+		    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
 	    //printf("goodness=%d\n", deadline_goodness );
 
 	    packet_header_hton (pkthdr);
@@ -327,17 +338,19 @@ process (jack_nframes_t nframes, void *arg)
 	input_fd = outsockfd;
 
     // for latency == 0 we can poll.
-    if( latency == 0 ) {
+    if( (latency == 0) || (freewheeling!=0)  ) {
 	jack_time_t deadline = jack_get_time() + 1000000 * jack_get_buffer_size(client)/jack_get_sample_rate(client);
 	// Now loop until we get the right packet.
 	while(1) {
+	    jack_nframes_t got_frame;
 	    if ( ! netjack_poll_deadline( input_fd, deadline ) )
 		break;
 
 	    packet_cache_drain_socket(global_packcache, input_fd);
 
-	    if (packet_cache_get_next_available_framecnt( global_packcache, framecnt - latency, NULL ))
-		break;
+	    if (packet_cache_get_next_available_framecnt( global_packcache, framecnt - latency, &got_frame ))
+		if( got_frame == (framecnt - latency) )
+		    break;
 	}
     } else {
 	// normally:
@@ -431,7 +444,10 @@ process (jack_nframes_t nframes, void *arg)
 	    pkthdr->capture_channels_midi = playback_channels_midi;
 	    pkthdr->playback_channels_midi = capture_channels_midi;
 	    pkthdr->mtu = mtu;
-	    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
+	    if( freewheeling!= 0 )
+		    pkthdr->sync_state = (jack_nframes_t)MASTER_FREEWHEELS;
+	    else
+		    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
 	    //printf("goodness=%d\n", deadline_goodness );
 
 	    packet_header_hton (pkthdr);
@@ -657,6 +673,7 @@ main (int argc, char *argv[])
     /* Set up jack callbacks */
     jack_set_process_callback (client, process, 0);
     jack_set_sync_callback (client, sync_cb, 0);
+    jack_set_freewheel_callback (client, freewheel_cb, 0);
     jack_on_shutdown (client, jack_shutdown, 0);
 
     alloc_ports (capture_channels_audio, playback_channels_audio, capture_channels_midi, playback_channels_midi);

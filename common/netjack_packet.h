@@ -43,6 +43,7 @@
 // The Packet Header.
 
 #define CELT_MODE 1000   // Magic bitdepth value that indicates CELT compression
+#define MASTER_FREEWHEELS 0x80000000
 
 typedef struct _jacknet_packet_header jacknet_packet_header;
 

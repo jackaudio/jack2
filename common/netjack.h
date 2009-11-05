@@ -96,6 +96,7 @@ struct _netjack_driver_state {
     int		   expected_framecnt_valid;
     unsigned int   num_lost_packets;
     jack_time_t	   next_deadline;
+    jack_time_t	   deadline_offset;
     int		   next_deadline_valid;
     int		   packet_data_valid;
     int		   resync_threshold;
