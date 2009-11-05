@@ -11,8 +11,6 @@ def configure(conf):
     if conf.is_defined('HAVE_SAMPLERATE'):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
-    conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs')
-
     conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
