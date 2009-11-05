@@ -163,13 +163,17 @@ namespace Jack
 
 	    if( netj.bitdepth == CELT_MODE ) {
 #if HAVE_CELT
-		celt_int32_t lookahead;
-		// XXX: memory leak
-		CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
-		celt_mode_info( celt_mode, CELT_GET_LOOKAHEAD, &lookahead );
-		netj.codec_latency = 2*lookahead;
-
-		netj.capture_srcs = jack_slist_append(netj.capture_srcs, (void *)celt_decoder_create( celt_mode ) );
+#if HAVE_CELT_API_0_7
+	    celt_int32 lookahead;
+	    CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
+	    netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create( celt_mode, 1, NULL ) );
+#else
+	    celt_int32_t lookahead;
+	    CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
+	    netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create( celt_mode ) );
+#endif
+	    celt_mode_info( celt_mode, CELT_GET_LOOKAHEAD, &lookahead );
+	    netj.codec_latency = 2*lookahead;
 #endif
 	    } else {
 #if HAVE_SAMPLERATE
@@ -210,9 +214,13 @@ namespace Jack
 
 	    if( netj.bitdepth == CELT_MODE ) {
 #if HAVE_CELT
-		// XXX: memory leak
-		CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
-		netj.playback_srcs = jack_slist_append(netj.playback_srcs, (void *)celt_encoder_create( celt_mode ) );
+#if HAVE_CELT_API_0_7
+	    CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
+	    netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create( celt_mode, 1, NULL ) );
+#else
+	    CELTMode *celt_mode = celt_mode_create( netj.sample_rate, 1, netj.period_size, NULL );
+	    netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create( celt_mode ) );
+#endif
 #endif
 	    } else {
 #if HAVE_SAMPLERATE
