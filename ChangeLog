@@ -28,6 +28,7 @@ Paul Davis
 2009-11-05 Stephane Letz  <letz@grame.fr>
 
 	* No reason to make jack_on_shutdown deprecated, so revert the incorrect change.
+	* Thread AcquireRealTime and DropRealTime were (incorrectly) using fThread field. Use pthread_self()) (or GetCurrentThread() on Windows) to get the calling thread.
 
 2009-10-30 Stephane Letz  <letz@grame.fr>
 

@@ -205,7 +205,7 @@ int JackPosixThread::StopImp(pthread_t thread)
 
 int JackPosixThread::AcquireRealTime()
 {
-    return (fThread != (pthread_t)NULL) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+    return AcquireRealTimeImp(pthread_self(), fPriority);
 }
 
 int JackPosixThread::AcquireRealTime(int priority)
@@ -232,7 +232,7 @@ int JackPosixThread::AcquireRealTimeImp(pthread_t thread, int priority)
 
 int JackPosixThread::DropRealTime()
 {
-    return (fThread != (pthread_t)NULL) ? DropRealTimeImp(fThread) : -1;
+    return DropRealTimeImp(pthread_self());
 }
 
 int JackPosixThread::DropRealTimeImp(pthread_t thread)

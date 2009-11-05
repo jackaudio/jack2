@@ -145,9 +145,11 @@ int JackMachThread::Kill()
     // pthread_cancel still not yet implemented in Darwin (TO CHECK ON TIGER)
     jack_log("JackMachThread::Kill");
     
-    if (fThread) { // If thread has been started
+    if (fThread != (pthread_t)NULL)  { // If thread has been started
         mach_port_t machThread = pthread_mach_thread_np(fThread);
-        return (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
+        int res = (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
+        fThread = (pthread_t)NULL;
+        return res;
     } else {
         return -1;
     }
@@ -157,7 +159,7 @@ int JackMachThread::AcquireRealTime()
 {
     jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
              long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
-    return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
+    return AcquireRealTimeImp(pthread_self(), fPeriod, fComputation, fConstraint);
 }
 
 int JackMachThread::AcquireRealTime(int priority)
@@ -178,7 +180,7 @@ int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 c
 
 int JackMachThread::DropRealTime()
 {
-    return (fThread) ? DropRealTimeImp(fThread) : -1;
+    return DropRealTimeImp(pthread_self());
 }
 
 int JackMachThread::DropRealTimeImp(pthread_t thread)

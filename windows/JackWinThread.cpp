@@ -58,7 +58,7 @@ JackWinThread::JackWinThread(JackRunnableInterface* runnable)
         : JackThreadInterface(runnable, 0, false, 0)
 {
     fEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    fThread = NULL;
+    fThread = (HANDLE)NULL;
     assert(fEvent);
 }
 
@@ -126,12 +126,12 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
 
 int JackWinThread::Kill()
 {
-    if (fThread) { // If thread has been started
+    if (fThread != (HANDLE)NULL) { // If thread has been started
         TerminateThread(fThread, 0);
         WaitForSingleObject(fThread, INFINITE);
         CloseHandle(fThread);
         jack_log("JackWinThread::Kill");
-        fThread = NULL;
+        fThread = (HANDLE)NULL;
         fStatus = kIdle;
         return 0;
     } else {
@@ -141,12 +141,12 @@ int JackWinThread::Kill()
 
 int JackWinThread::Stop()
 {
-    if (fThread) { // If thread has been started
+    if (fThread != (HANDLE)NULL) { // If thread has been started
         jack_log("JackWinThread::Stop");
         fStatus = kIdle; // Request for the thread to stop
         WaitForSingleObject(fEvent, INFINITE);
         CloseHandle(fThread);
-        fThread = NULL;
+        fThread = (HANDLE)NULL;
         return 0;
     } else {
         return -1;
@@ -155,7 +155,7 @@ int JackWinThread::Stop()
 
 int JackWinThread::KillImp(pthread_t thread)
 {
-    if (thread) { // If thread has been started
+    if (thread != (HANDLE)NULL) { // If thread has been started
         TerminateThread(thread, 0);
         WaitForSingleObject(thread, INFINITE);
         CloseHandle(thread);
@@ -178,7 +178,7 @@ int JackWinThread::StopImp(pthread_t thread)
 
 int JackWinThread::AcquireRealTime()
 {
-    return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+    return AcquireRealTimeImp(GetCurrentThread(), fPriority);
 }
 
 int JackWinThread::AcquireRealTime(int priority)
@@ -200,7 +200,7 @@ int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
 }
 int JackWinThread::DropRealTime()
 {
-    return DropRealTimeImp(fThread);
+    return DropRealTimeImp(GetCurrentThread());
 }
 
 int JackWinThread::DropRealTimeImp(pthread_t thread)
