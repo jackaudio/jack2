@@ -108,7 +108,7 @@ struct _netjack_driver_state {
     unsigned int   resample_factor_up;
 };
 
-void netjack_wait( netjack_driver_state_t *netj );
+int netjack_wait( netjack_driver_state_t *netj );
 void netjack_send_silence( netjack_driver_state_t *netj, int syncstate );
 void netjack_read( netjack_driver_state_t *netj, jack_nframes_t nframes ) ;
 void netjack_write( netjack_driver_state_t *netj, jack_nframes_t nframes, int syncstate );

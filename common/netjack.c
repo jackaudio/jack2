@@ -83,7 +83,7 @@ net_driver_sync_cb(jack_transport_state_t state, jack_position_t *pos, void *dat
     return retval;
 }
 
-void netjack_wait( netjack_driver_state_t *netj )
+int netjack_wait( netjack_driver_state_t *netj )
 {
     int we_have_the_expected_frame = 0;
     jack_nframes_t next_frame_avail;
@@ -132,8 +132,8 @@ void netjack_wait( netjack_driver_state_t *netj )
     //      it works... so...
     netj->running_free = 0;
 
-    if( !we_have_the_expected_frame )
-        jack_error( "netxrun... %d", netj->expected_framecnt );
+    //if( !we_have_the_expected_frame )
+    //    jack_error( "netxrun... %d", netj->expected_framecnt );
 
     if( we_have_the_expected_frame ) {
 	netj->time_to_deadline = netj->next_deadline - jack_get_time() - netj->period_usecs;
@@ -279,6 +279,11 @@ void netjack_wait( netjack_driver_state_t *netj )
     else {
 	netj->num_lost_packets = 0;
     }
+
+    if( !netj->packet_data_valid && !netj->running_free )
+	    return 1;
+
+    return 0;
 }
 
 void netjack_send_silence( netjack_driver_state_t *netj, int syncstate )
