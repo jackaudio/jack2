@@ -211,7 +211,9 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 SetupDriverSync(false);
                 if (fFreewheel)
                     fFreewheel(0, fFreewheelArg);
-                fThread.AcquireRealTime();
+                if (GetEngineControl()->fRealTime) {
+                    fThread.AcquireRealTime();
+                }
                 break;
 
             case kPortRegistrationOnCallback:
