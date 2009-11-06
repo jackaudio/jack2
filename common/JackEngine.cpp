@@ -305,7 +305,15 @@ void JackEngine::NotifyFailure(int code, const char* reason)
     
 void JackEngine::NotifyFreewheel(bool onoff)
 {
-    fEngineControl->fRealTime = !onoff;
+    if (onoff) {
+        // Save RT state
+        fEngineControl->fFWRealTime = fEngineControl->fRealTime;
+        fEngineControl->fRealTime = false;
+    } else {
+        // Restore RT state
+        fEngineControl->fRealTime = fEngineControl->fFWRealTime;
+        fEngineControl->fFWRealTime = false;
+    }
     NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, "", 0, 0);
 }
 

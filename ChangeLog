@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-06 Stephane Letz  <letz@grame.fr>
+
+	* Correctly save and restore RT mode state in freewheel mode.
+
 2009-11-05 Stephane Letz  <letz@grame.fr>
 
 	* No reason to make jack_on_shutdown deprecated, so revert the incorrect change.
