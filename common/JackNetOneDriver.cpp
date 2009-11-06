@@ -288,8 +288,12 @@ namespace Jack
 //driver processes--------------------------------------------------------------------
     int JackNetOneDriver::Read()
     {
-	if( netjack_wait( &netj ) )
-	    NotifyXRun(fBeginDateUst, fDelayedUsecs);
+	int delay;
+	delay = netjack_wait( &netj );
+	if( delay ) {
+	    NotifyXRun(fBeginDateUst, (float) delay);
+	    jack_error( "netxruns... duration: %dms", delay/1000 );
+	}
 
 	if( (netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2 )
 	    throw JackNetException();

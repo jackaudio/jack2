@@ -50,6 +50,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include "netjack.h"
 
 //#include "config.h"
+
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
 #endif
@@ -270,8 +271,9 @@ int netjack_wait( netjack_driver_state_t *netj )
 		    netj->running_free = 0;
 		    jack_info( "resync after freerun... %d\n", netj->expected_framecnt );
 		} else {
-		    // give up. lets run freely.
-		    // XXX: hmm...
+		    if( netj->num_lost_packets == 101 ) {
+			jack_info( "master seems gone... entering freerun mode\n", netj->expected_framecnt );
+		    }
 
 		    netj->running_free = 1;
 
@@ -288,16 +290,20 @@ int netjack_wait( netjack_driver_state_t *netj )
 	}
     }
 
-    if( !netj->packet_data_valid )
+    int retval = 0;
+
+    if( !netj->packet_data_valid ) {
 	netj->num_lost_packets += 1;
-    else {
+	if( netj->num_lost_packets == 1 )
+	    retval = netj->period_usecs;
+    } else {
+	if( (netj->num_lost_packets>1) && !netj->running_free )
+	    retval = (netj->num_lost_packets-1) * netj->period_usecs;
+
 	netj->num_lost_packets = 0;
     }
 
-    if( !netj->packet_data_valid && !netj->running_free )
-	    return 1;
-
-    return 0;
+    return retval;
 }
 
 void netjack_send_silence( netjack_driver_state_t *netj, int syncstate )
