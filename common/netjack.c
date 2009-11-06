@@ -97,7 +97,21 @@ int netjack_wait( netjack_driver_state_t *netj )
 
     // Increment expected frame here.
 
-    netj->expected_framecnt += 1;
+    if( netj->expected_framecnt_valid ) {
+	netj->expected_framecnt += 1;
+    } else {
+	// starting up.... lets look into the packetcache, and fetch the highest packet.
+	packet_cache_drain_socket( global_packcache, netj->sockfd );
+	if( packet_cache_get_highest_available_framecnt( global_packcache, &next_frame_avail ) ) {
+	    netj->expected_framecnt = next_frame_avail;
+	    netj->expected_framecnt_valid = 1;
+	} else {
+	    // no packets there... start normally.
+	    netj->expected_framecnt = 0;
+	    netj->expected_framecnt_valid = 1;
+	}
+
+    }
 
     //jack_log( "expect %d", netj->expected_framecnt );
     // Now check if required packet is already in the cache.
