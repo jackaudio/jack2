@@ -50,6 +50,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include "netjack.h"
 
 //#include "config.h"
+
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
 #endif
@@ -83,7 +84,7 @@ net_driver_sync_cb(jack_transport_state_t state, jack_position_t *pos, void *dat
     return retval;
 }
 
-void netjack_wait( netjack_driver_state_t *netj )
+int netjack_wait( netjack_driver_state_t *netj )
 {
     int we_have_the_expected_frame = 0;
     jack_nframes_t next_frame_avail;
@@ -97,7 +98,21 @@ void netjack_wait( netjack_driver_state_t *netj )
 
     // Increment expected frame here.
 
-    netj->expected_framecnt += 1;
+    if( netj->expected_framecnt_valid ) {
+	netj->expected_framecnt += 1;
+    } else {
+	// starting up.... lets look into the packetcache, and fetch the highest packet.
+	packet_cache_drain_socket( global_packcache, netj->sockfd );
+	if( packet_cache_get_highest_available_framecnt( global_packcache, &next_frame_avail ) ) {
+	    netj->expected_framecnt = next_frame_avail;
+	    netj->expected_framecnt_valid = 1;
+	} else {
+	    // no packets there... start normally.
+	    netj->expected_framecnt = 0;
+	    netj->expected_framecnt_valid = 1;
+	}
+
+    }
 
     //jack_log( "expect %d", netj->expected_framecnt );
     // Now check if required packet is already in the cache.
@@ -132,8 +147,8 @@ void netjack_wait( netjack_driver_state_t *netj )
     //      it works... so...
     netj->running_free = 0;
 
-    if( !we_have_the_expected_frame )
-        jack_error( "netxrun... %d", netj->expected_framecnt );
+    //if( !we_have_the_expected_frame )
+    //    jack_error( "netxrun... %d", netj->expected_framecnt );
 
     if( we_have_the_expected_frame ) {
 	netj->time_to_deadline = netj->next_deadline - jack_get_time() - netj->period_usecs;
@@ -142,17 +157,6 @@ void netjack_wait( netjack_driver_state_t *netj )
 	packet_header_ntoh(pkthdr);
 	netj->deadline_goodness = (int)pkthdr->sync_state;
 	netj->packet_data_valid = 1;
-
-	// TODO: Queue state could be taken into account.
-	//       But needs more processing, cause, when we are running as
-	//       fast as we can, recv_time_offset can be zero, which is
-	//       good.
-	//       need to add (now-deadline) and check that.
-	/*
-	if( recv_time_offset < netj->period_usecs )
-	    //netj->next_deadline -= netj->period_usecs*netj->latency/100;
-	    netj->next_deadline += netj->period_usecs/1000;
-	    */
 
 	if( netj->deadline_goodness != MASTER_FREEWHEELS ) {
 		if( netj->deadline_goodness < (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100) ) {
@@ -163,6 +167,10 @@ void netjack_wait( netjack_driver_state_t *netj )
 			netj->deadline_offset += netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
+	}
+	if( netj->deadline_offset < (netj->period_usecs*70/100) ) {
+		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
+		netj->deadline_offset = (netj->period_usecs*90/100);
 	}
 
 	netj->next_deadline = jack_get_time() + netj->deadline_offset;
@@ -263,8 +271,9 @@ void netjack_wait( netjack_driver_state_t *netj )
 		    netj->running_free = 0;
 		    jack_info( "resync after freerun... %d\n", netj->expected_framecnt );
 		} else {
-		    // give up. lets run freely.
-		    // XXX: hmm...
+		    if( netj->num_lost_packets == 101 ) {
+			jack_info( "master seems gone... entering freerun mode\n", netj->expected_framecnt );
+		    }
 
 		    netj->running_free = 1;
 
@@ -281,11 +290,20 @@ void netjack_wait( netjack_driver_state_t *netj )
 	}
     }
 
-    if( !netj->packet_data_valid )
+    int retval = 0;
+
+    if( !netj->packet_data_valid ) {
 	netj->num_lost_packets += 1;
-    else {
+	if( netj->num_lost_packets == 1 )
+	    retval = netj->period_usecs;
+    } else {
+	if( (netj->num_lost_packets>1) && !netj->running_free )
+	    retval = (netj->num_lost_packets-1) * netj->period_usecs;
+
 	netj->num_lost_packets = 0;
     }
+
+    return retval;
 }
 
 void netjack_send_silence( netjack_driver_state_t *netj, int syncstate )

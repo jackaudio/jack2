@@ -28,8 +28,6 @@
 
 //#include "config.h"
 
-#define HAVE_CELT 1
-
 #define _XOPEN_SOURCE 600
 #define _BSD_SOURCE
 
@@ -51,7 +49,6 @@
 #include <stdarg.h>
 
 #include <jack/types.h>
-//#include <jack/engine.h>
 
 #include <sys/types.h>
 
@@ -713,6 +710,9 @@ packet_cache_get_next_available_framecnt( packet_cache *pcache, jack_nframes_t e
 	    //printf( "invalid\n" );
 	    continue;
 	}
+
+	if( cpack->framecnt < expected_framecnt )
+	    continue;
 
 	if( (cpack->framecnt - expected_framecnt) > best_offset ) {
 	    continue;
