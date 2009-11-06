@@ -143,17 +143,6 @@ void netjack_wait( netjack_driver_state_t *netj )
 	netj->deadline_goodness = (int)pkthdr->sync_state;
 	netj->packet_data_valid = 1;
 
-	// TODO: Queue state could be taken into account.
-	//       But needs more processing, cause, when we are running as
-	//       fast as we can, recv_time_offset can be zero, which is
-	//       good.
-	//       need to add (now-deadline) and check that.
-	/*
-	if( recv_time_offset < netj->period_usecs )
-	    //netj->next_deadline -= netj->period_usecs*netj->latency/100;
-	    netj->next_deadline += netj->period_usecs/1000;
-	    */
-
 	if( netj->deadline_goodness != MASTER_FREEWHEELS ) {
 		if( netj->deadline_goodness < (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100) ) {
 			netj->deadline_offset -= netj->period_usecs/100;
@@ -163,6 +152,10 @@ void netjack_wait( netjack_driver_state_t *netj )
 			netj->deadline_offset += netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
+	}
+	if( netj->deadline_offset < (netj->period_usecs*70/100) ) {
+		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
+		netj->deadline_offset = (netj->period_usecs*90/100);
 	}
 
 	netj->next_deadline = jack_get_time() + netj->deadline_offset;
