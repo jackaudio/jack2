@@ -291,7 +291,7 @@ namespace Jack
 	if( netjack_wait( &netj ) )
 	    NotifyXRun(fBeginDateUst, fDelayedUsecs);
 
-	if( (netj.num_lost_packets * netj.period_size / netj.sample_rate) > 10 )
+	if( (netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2 )
 	    throw JackNetException();
 
 	//netjack_read( &netj, netj.period_size );
@@ -374,12 +374,11 @@ namespace Jack
 		    break;
 		case JackTransportRolling:
 		    netj.sync_state = 1;
-		    //		    		if(local_trans_pos.frame != (pkthdr->transport_frame + (pkthdr->latency) * netj.period_size)) {
-		    //				    jack_transport_locate(netj.client, (pkthdr->transport_frame + (pkthdr->latency + 2) * netj.period_size));
-		    //				    jack_info("running locate to %d", pkthdr->transport_frame + (pkthdr->latency)*netj.period_size);
-		    //		    		}
+//		    if(local_trans_pos.frame != (pkthdr->transport_frame + (pkthdr->latency) * netj.period_size)) {
+//		        jack_transport_locate(netj.client, (pkthdr->transport_frame + (pkthdr->latency + 2) * netj.period_size));
+//			jack_info("running locate to %d", pkthdr->transport_frame + (pkthdr->latency)*netj.period_size);
+//		    		}
 		    if (local_trans_state != JackTransportRolling)
-			//jack_transport_start (netj.client);
 			fEngineControl->fTransport.SetState ( JackTransportRolling );
 
 		    break;
@@ -398,7 +397,6 @@ namespace Jack
     int JackNetOneDriver::Write()
     {
 	int syncstate = netj.sync_state | ((fEngineControl->fTransport.GetState() == JackTransportNetStarting) ? 1 : 0 );
-	//netjack_write( &netj, netj.period_size, 0 );
 	uint32_t *packet_buf, *packet_bufX;
 
 	int packet_size = get_sample_size(netj.bitdepth) * netj.playback_channels * netj.net_period_up + sizeof(jacknet_packet_header);
