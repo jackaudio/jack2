@@ -54,6 +54,8 @@ def configure(conf):
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
+    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.is_defined('HAVE_SAMPLERATE')
+
 def build(bld):
     if bld.env['IS_LINUX']:
         os_incdir = ['../linux', '../posix']
@@ -80,8 +82,7 @@ def build(bld):
             prog.uselib_local = 'clientlib'              
         prog.target = example_program
    
-    #if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']
-    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
+    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
         prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
@@ -96,7 +97,7 @@ def build(bld):
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
-    if bld.env['BUILD_EXAMPLE_CLIENT_REC'] == True:
+    if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
         prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
@@ -126,7 +127,7 @@ def build(bld):
     prog.uselib_local = 'clientlib'
     prog.target = 'jack_netsource'
 
-    if bld.env['IS_LINUX']:
+    if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
 	prog = bld.new_task_gen('cc', 'program')
 	prog.includes = os_incdir + ['../common/jack', '../common']
 	prog.source = ['alsa_in.c', '../common/memops.c']
