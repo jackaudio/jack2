@@ -101,12 +101,12 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
     int res;
 
     if ((res = pthread_attr_setdetachstate(&attributes, PTHREAD_CREATE_JOINABLE))) {
-        jack_error("Cannot request joinable thread creation for RT thread res = %d err = %s", res, strerror(errno));
+        jack_error("Cannot request joinable thread creation for thread res = %d", res);
         return -1;
     }
 
     if ((res = pthread_attr_setscope(&attributes, PTHREAD_SCOPE_SYSTEM))) {
-        jack_error("Cannot set scheduling scope for RT thread res = %d err = %s", res, strerror(errno));
+        jack_error("Cannot set scheduling scope for thread res = %d", res);
         return -1;
     }
 
@@ -115,33 +115,34 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
         jack_log("Create RT thread");
 
         if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
-            jack_error("Cannot request explicit scheduling for RT thread res = %d err = %s", res, strerror(errno));
+            jack_error("Cannot request explicit scheduling for RT thread res = %d", res);
             return -1;
     	}
     
         if ((res = pthread_attr_setschedpolicy(&attributes, JACK_SCHED_POLICY))) {
-            jack_error("Cannot set RR scheduling class for RT thread res = %d err = %s", res, strerror(errno));
+            jack_error("Cannot set RR scheduling class for RT thread res = %d", res);
             return -1;
         }
+        
+        memset(&rt_param, 0, sizeof(rt_param));
+        rt_param.sched_priority = priority;
+
+        if ((res = pthread_attr_setschedparam(&attributes, &rt_param))) {
+            jack_error("Cannot set scheduling priority for RT thread res = %d", res);
+            return -1;
+        }
+
     } else {
         jack_log("Create non RT thread");
     }
 
-    memset(&rt_param, 0, sizeof(rt_param));
-    rt_param.sched_priority = priority;
-
-    if ((res = pthread_attr_setschedparam(&attributes, &rt_param))) {
-        jack_error("Cannot set scheduling priority for RT thread res = %d err = %s", res, strerror(errno));
-        return -1;
-    }
-
     if ((res = pthread_attr_setstacksize(&attributes, THREAD_STACK))) {
-        jack_error("Cannot set thread stack size res = %d err = %s", res, strerror(errno));
+        jack_error("Cannot set thread stack size res = %d", res);
         return -1;
     }
 
     if ((res = JackGlobals::fJackThreadCreator(thread, &attributes, start_routine, arg))) {
-        jack_error("Cannot create thread res = %d err = %s", res, strerror(errno));
+        jack_error("Cannot create thread res = %d", res);
         return -1;
     }
 
@@ -318,7 +319,7 @@ bool jack_tls_allocate_key(jack_tls_key *key_ptr)
     ret = pthread_key_create(key_ptr, NULL);
     if (ret != 0)
     {
-        jack_error("pthread_key_create() failed with error %d errno %s", ret, strerror(errno));
+        jack_error("pthread_key_create() failed with error %d", ret);
         return false;
     }
     
@@ -332,7 +333,7 @@ bool jack_tls_free_key(jack_tls_key key)
     ret = pthread_key_delete(key);
     if (ret != 0)
     {
-        jack_error("pthread_key_delete() failed with error %d errno %s", ret, strerror(errno));
+        jack_error("pthread_key_delete() failed with error %d", ret);
         return false;
     }
     
@@ -346,7 +347,7 @@ bool jack_tls_set(jack_tls_key key, void *data_ptr)
     ret = pthread_setspecific(key, (const void *)data_ptr);
     if (ret != 0)
     {
-        jack_error("pthread_setspecific() failed with error %d errno %s", ret, strerror(errno));
+        jack_error("pthread_setspecific() failed with error %d", ret);
         return false;
     }
     

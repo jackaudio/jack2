@@ -28,6 +28,7 @@ Paul Davis
 2009-11-07 Stephane Letz  <letz@grame.fr>
 
 	* Fix AcquireRealTime and DropRealTime: now distinguish when called from another thread (AcquireRealTime/DropRealTime) and from the thread itself (AcquireSelfRealTime/DropSelfRealTime).
+	* Correct JackPosixThread::StartImp : thread priority setting now done in the RT case only.
 
 2009-11-06 Stephane Letz  <letz@grame.fr>
 
