@@ -178,6 +178,11 @@ int JackWinThread::StopImp(pthread_t thread)
 
 int JackWinThread::AcquireRealTime()
 {
+    return (fThread) ? AcquireRealTimeImp(fThread, fPriority) : -1;
+}
+
+int JackWinThread::AcquireSelfRealTime()
+{
     return AcquireRealTimeImp(GetCurrentThread(), fPriority);
 }
 
@@ -185,6 +190,12 @@ int JackWinThread::AcquireRealTime(int priority)
 {
     fPriority = priority;
     return AcquireRealTime();
+}
+
+int JackWinThread::AcquireSelfRealTime(int priority)
+{
+    fPriority = priority;
+    return AcquireSelfRealTime();
 }
 
 int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
@@ -198,7 +209,13 @@ int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
         return -1;
     }
 }
+
 int JackWinThread::DropRealTime()
+{
+    return DropRealTimeImp(fThread);
+}
+
+int JackWinThread::DropSelfRealTime()
 {
     return DropRealTimeImp(GetCurrentThread());
 }

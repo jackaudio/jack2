@@ -159,6 +159,13 @@ int JackMachThread::AcquireRealTime()
 {
     jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
              long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
+    return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1; 
+}
+
+int JackMachThread::AcquireSelfRealTime()
+{
+    jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
+             long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
     return AcquireRealTimeImp(pthread_self(), fPeriod, fComputation, fConstraint);
 }
 
@@ -166,6 +173,12 @@ int JackMachThread::AcquireRealTime(int priority)
 {
     fPriority = priority;
     return AcquireRealTime();
+}
+
+int JackMachThread::AcquireSelfRealTime(int priority)
+{
+    fPriority = priority;
+    return AcquireSelfRealTime();
 }
 
 int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
@@ -179,6 +192,11 @@ int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 c
 }
 
 int JackMachThread::DropRealTime()
+{
+    return (fThread) ? DropRealTimeImp(fThread) : -1;
+}
+
+int JackMachThread::DropSelfRealTime()
 {
     return DropRealTimeImp(pthread_self());
 }

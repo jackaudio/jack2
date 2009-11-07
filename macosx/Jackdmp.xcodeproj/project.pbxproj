@@ -706,35 +706,35 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B3224D710A3156800838A8E /* jack_netone Universal */;
+			remoteGlobalIDString = 4B3224D710A3156800838A8E;
 			remoteInfo = "jack_netone Universal";
 		};
 		4B32258A10A31A9000838A8E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B32255710A3187800838A8E /* jack_netsource Universal */;
+			remoteGlobalIDString = 4B32255710A3187800838A8E;
 			remoteInfo = "jack_netsource Universal";
 		};
 		4B32258C10A31A9D00838A8E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B3224D710A3156800838A8E /* jack_netone Universal */;
+			remoteGlobalIDString = 4B3224D710A3156800838A8E;
 			remoteInfo = "jack_netone Universal";
 		};
 		4B32258E10A31AB400838A8E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B32257110A3190C00838A8E /* jack_netsource 64 bits */;
+			remoteGlobalIDString = 4B32257110A3190C00838A8E;
 			remoteInfo = "jack_netsource 64 bits";
 		};
 		4B32259010A31ABA00838A8E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B32251D10A316B200838A8E /* jack_netone 64 bits */;
+			remoteGlobalIDString = 4B32251D10A316B200838A8E;
 			remoteInfo = "jack_netone 64 bits";
 		};
 		4B35C5540D4731D2000DE7AE /* PBXContainerItemProxy */ = {

@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-07 Stephane Letz  <letz@grame.fr>
+
+	* Fix AcquireRealTime and DropRealTime: now distinguish when called from another thread (AcquireRealTime/DropRealTime) and from the thread itself (AcquireSelfRealTime/DropSelfRealTime).
+
 2009-11-06 Stephane Letz  <letz@grame.fr>
 
 	* Correctly save and restore RT mode state in freewheel mode.
