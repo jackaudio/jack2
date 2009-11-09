@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 	jack_on_shutdown(client, jack_shutdown, 0);
 
 	if (just_print_bufsize) {
-		fprintf(stdout, "%d", jack_get_buffer_size( client ) );
+		fprintf(stdout, "%d\n", jack_get_buffer_size( client ) );
 		rc=0;
 	}
 	else

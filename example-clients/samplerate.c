@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
 	jack_on_shutdown(client, jack_shutdown, 0);
 
-	fprintf(stdout, "%d", jack_get_sample_rate( client ) );
+	fprintf(stdout, "%d\n", jack_get_sample_rate( client ) );
 
 	jack_client_close(client);
 
