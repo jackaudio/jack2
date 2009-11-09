@@ -33,6 +33,11 @@ using namespace std;
 
 namespace Jack {
 
+    void JackTools::ThrowJackNetException() 
+    {
+        throw JackNetException();
+    }
+
 #define DEFAULT_TMP_DIR "/tmp"
     char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
 

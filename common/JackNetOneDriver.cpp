@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
 #include "JackWaitThreadedDriver.h"
-#include "JackException.h"
+#include "JackTools.h"
 #include "driver_interface.h"
 
 #include "netjack.h"
@@ -112,7 +112,7 @@ namespace Jack
         }
         else
         {
-            jack_error( "open fail\n" );
+            jack_error( "open fail" );
             return -1;
         }
     }
@@ -296,7 +296,7 @@ namespace Jack
 	}
 
 	if( (netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2 )
-	    throw JackNetException();
+        JackTools::ThrowJackNetException();
 
 	//netjack_read( &netj, netj.period_size );
         JackDriver::CycleTakeBeginTime();
@@ -766,7 +766,7 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
 	    CELTEncoder *encoder = (CELTEncoder *)src_node->data;
 	    encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
 	    if( encoded_bytes != (int)net_period_up )
-		jack_error( "something in celt changed. netjack needs to be changed to handle this.\n" );
+		jack_error( "something in celt changed. netjack needs to be changed to handle this." );
 	    src_node = jack_slist_next( src_node );
         }
         else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
@@ -1036,36 +1036,36 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
                 break;
 
             case 'f':
-#if HAVE_SAMPLERATE
+        #if HAVE_SAMPLERATE
                 resample_factor = param->value.ui;
-#else
-		jack_error( "not built with libsamplerate support\n" );
-		exit(10);
-#endif
+        #else
+                jack_error( "not built with libsamplerate support" );
+                return NULL;
+        #endif
                 break;
 
             case 'u':
-#if HAVE_SAMPLERATE
+        #if HAVE_SAMPLERATE
                 resample_factor_up = param->value.ui;
-#else
-		jack_error( "not built with libsamplerate support\n" );
-		exit(10);
-#endif
+        #else
+                jack_error( "not built with libsamplerate support" );
+                return NULL;
+        #endif
                 break;
 
             case 'b':
                 bitdepth = param->value.ui;
                 break;
 
-	    case 'c':
-#if HAVE_CELT
-		bitdepth = CELT_MODE;
-		resample_factor = param->value.ui;
-#else
-		jack_error( "not built with celt support\n" );
-		exit(10);
-#endif
-		break;
+            case 'c':
+        #if HAVE_CELT
+                bitdepth = CELT_MODE;
+                resample_factor = param->value.ui;
+        #else
+                jack_error( "not built with celt support" );
+                return NULL;
+        #endif
+                break;
 
             case 't':
                 handle_transport_sync = param->value.ui;

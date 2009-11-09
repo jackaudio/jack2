@@ -36,6 +36,7 @@
 #include "driver_interface.h"
 #include "JackCompilerDeps.h"
 #include "JackError.h"
+#include "JackException.h"
 
 #include <string>
 #include <algorithm>
@@ -61,6 +62,8 @@ namespace Jack
         static void CleanupFiles ( const char* server_name );
         static int GetTmpdir();
         static void RewriteName ( const char* name, char* new_name );
+        
+        static void ThrowJackNetException();
     };
 
     /*!
@@ -204,7 +207,6 @@ namespace Jack
     
     void BuildClientPath(char* path_to_so, int path_len, const char* so_name);
     void PrintLoadError(const char* so_name);
-    
-}
+ }
 
 #endif

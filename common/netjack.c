@@ -269,10 +269,10 @@ int netjack_wait( netjack_driver_state_t *netj )
 		    netj->next_deadline_valid = 0;
 		    netj->packet_data_valid = 1;
 		    netj->running_free = 0;
-		    jack_info( "resync after freerun... %d\n", netj->expected_framecnt );
+		    jack_info( "resync after freerun... %d", netj->expected_framecnt );
 		} else {
 		    if( netj->num_lost_packets == 101 ) {
-			jack_info( "master seems gone... entering freerun mode\n", netj->expected_framecnt );
+			jack_info( "master seems gone... entering freerun mode", netj->expected_framecnt );
 		    }
 
 		    netj->running_free = 1;

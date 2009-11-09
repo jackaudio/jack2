@@ -163,7 +163,7 @@ packet_cache
     packet_cache *pcache = malloc (sizeof (packet_cache));
     if (pcache == NULL)
     {
-        jack_error ("could not allocate packet cache (1)\n");
+        jack_error ("could not allocate packet cache (1)");
         return NULL;
     }
 
@@ -175,7 +175,7 @@ packet_cache
 
     if (pcache->packets == NULL)
     {
-        jack_error ("could not allocate packet cache (2)\n");
+        jack_error ("could not allocate packet cache (2)");
         return NULL;
     }
 
@@ -190,7 +190,7 @@ packet_cache
         pcache->packets[i].packet_buf = malloc (pkt_size);
         if ((pcache->packets[i].fragment_array == NULL) || (pcache->packets[i].packet_buf == NULL))
         {
-            jack_error ("could not allocate packet cache (3)\n");
+            jack_error ("could not allocate packet cache (3)");
             return NULL;
         }
     }
@@ -326,7 +326,7 @@ cache_packet_add_fragment (cache_packet *pack, char *packet_buf, int rcv_len)
 
     if (framecnt != pack->framecnt)
     {
-        jack_error ("errror. framecnts dont match\n");
+        jack_error ("errror. framecnts dont match");
         return;
     }
 
@@ -510,7 +510,7 @@ netjack_poll (int sockfd, int timeout)
 int
 netjack_poll (int sockfd, int timeout)
 {
-    jack_error( "netjack_poll not implemented\n" );
+    jack_error( "netjack_poll not implemented" );
     return 0;
 }
 int
