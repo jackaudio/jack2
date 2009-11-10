@@ -227,21 +227,6 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
 typedef void (*JackShutdownCallback)(void *arg);
 
 /**
- * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown, 
- * the client pointer is *not* deallocated by libjack,
- * the application is responsible to properly use jack_client_close()
- * to release client ressources. Warning: jack_client_close() cannot be
- * safely used inside the shutdown callback and has to be called outside of
- * the callback context.
- 
- * @param code a shuntdown code
- * @param reason a string discribing the shuntdown reason (backend failure, server crash... etc...)
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackInfoShutdownCallback)(int code, const char* reason, void *arg);
-
-/**
  * Used for the type argument of jack_port_register() for default
  * audio ports and midi ports.
  */
@@ -437,9 +422,14 @@ enum JackStatus {
     JackVersionError = 0x400,
     
     /**
-     * Backend failure
+     * Client process failure
      */
-    JackBackendError = 0x800
+    JackClientProcessFailure = 0x800,
+    
+    /**
+     * Client zombified failure
+     */
+    JackClientZombie = 0x1000
 };
 
 /**
@@ -663,5 +653,20 @@ typedef struct {
     double beats_per_minute;
 
 } jack_transport_info_t;
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown. Note that after server shutdown, 
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
+ 
+ * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
+ * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason, void *arg);
 
 #endif /* __jack_types_h__ */

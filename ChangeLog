@@ -25,11 +25,13 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-10 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackInfoShutdownCallback prototype, two new JackClientProcessFailure and JackClientZombie JackStatus code.  
 
 2009-11-09 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackGraphManager::GetBuffer for the "client loop with one connection" case : buffer must be copied.
-
 
 2009-11-07 Stephane Letz  <letz@grame.fr>
 

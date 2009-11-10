@@ -268,7 +268,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
             case kShutDownCallback:
                 jack_log("JackClient::kShutDownCallback");
                 if (fInfoShutdown) {
-                    fInfoShutdown(value1, message, fInfoShutdownArg);
+                    fInfoShutdown((jack_status_t)value1, message, fInfoShutdownArg);
                     fInfoShutdown = NULL;
                 }
                 break;

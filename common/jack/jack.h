@@ -300,8 +300,8 @@ void jack_on_shutdown (jack_client_t *client,
 
 /**
  * @param client pointer to JACK client structure.
- * @param function The jack_shutdown function pointer.
- * @param arg The arguments for the jack_shutdown function.
+ * @param function The jack_info_shutdown function pointer.
+ * @param arg The arguments for the jack_info_shutdown function.
  *
  * Register a function (and argument) to be called if and when the
  * JACK server shuts down the client thread.  The function must
