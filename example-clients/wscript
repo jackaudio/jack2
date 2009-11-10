@@ -16,6 +16,7 @@ example_programs = {
     'jack_showtime' : 'showtime.c',
     'jack_alias' : 'alias.c',
     'jack_bufsize' : 'bufsize.c',
+    'jack_wait' : 'wait.c',
     'jack_samplerate' : 'samplerate.c',
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
