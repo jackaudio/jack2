@@ -27,6 +27,10 @@ Paul Davis
 
 2009-11-10 Stephane Letz  <letz@grame.fr>
 
+	* Correct JackCoreAudio driver when empty strings are given as -C, -P or -d parameter. 
+
+2009-11-10 Stephane Letz  <letz@grame.fr>
+
 	* Correct JackInfoShutdownCallback prototype, two new JackClientProcessFailure and JackClientZombie JackStatus code.  
 
 2009-11-09 Stephane Letz  <letz@grame.fr>
