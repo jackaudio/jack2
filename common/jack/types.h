@@ -422,9 +422,9 @@ enum JackStatus {
     JackVersionError = 0x400,
     
     /**
-     * Client process failure
+     * Backend error
      */
-    JackClientProcessFailure = 0x800,
+    JackBackendError = 0x800,
     
     /**
      * Client zombified failure
