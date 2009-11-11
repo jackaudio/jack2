@@ -294,6 +294,11 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * NOTE: clients do not need to call this.  It exists only
  * to help more complex clients understand what is going
  * on.  It should be called before jack_client_activate().
+ *
+ * NOTE: if a client calls this AND jack_on_info_shutdown(), then
+ * the event of a client thread shutdown, the callback
+ * passed to this function will not be called, and the one passed to
+ * jack_on_info_shutdown() will.
  */
 void jack_on_shutdown (jack_client_t *client,
                        JackShutdownCallback shutdown_callback, void *arg);
@@ -315,6 +320,11 @@ void jack_on_shutdown (jack_client_t *client,
  * NOTE: clients do not need to call this.  It exists only
  * to help more complex clients understand what is going
  * on.  It should be called before jack_client_activate().
+ *
+ * NOTE: if a client calls this AND jack_on_info_shutdown(), then
+ * the event of a client thread shutdown, the callback
+ * passed to this function will not be called, and the one passed to
+ * jack_on_info_shutdown() will.
  */
 void jack_on_info_shutdown (jack_client_t *client,
                        JackInfoShutdownCallback shutdown_callback, void *arg);
