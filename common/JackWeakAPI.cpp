@@ -90,6 +90,7 @@ DECL_FUNCTION(int, jack_internal_client_new, (const char *client_name,
 DECL_VOID_FUNCTION(jack_internal_client_close, (const char *client_name), (client_name));
 DECL_FUNCTION(int, jack_is_realtime, (jack_client_t *client), (client));
 DECL_VOID_FUNCTION(jack_on_shutdown, (jack_client_t *client, JackShutdownCallback shutdown_callback, void *arg), (client, function, arg));
+DECL_VOID_FUNCTION(jack_on_info_shutdown, (jack_client_t* ext_client, JackInfoShutdownCallback callback, void* arg, (client, function, arg))
 DECL_FUNCTION(int, jack_set_process_callback, (jack_client_t *client,
                                             JackProcessCallback process_callback,
                                             void *arg), (client, process_callback, arg));
