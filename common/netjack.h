@@ -106,6 +106,7 @@ struct _netjack_driver_state {
     unsigned int   use_autoconfig;
     unsigned int   resample_factor;
     unsigned int   resample_factor_up;
+    int		   jitter_val;
 };
 
 int netjack_wait( netjack_driver_state_t *netj );
@@ -133,7 +134,8 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
 		unsigned int latency,
 		unsigned int redundancy,
 		int dont_htonl_floats,
-		int always_deadline);
+		int always_deadline,
+		int jitter_val );
 
 void netjack_release( netjack_driver_state_t *netj );
 int netjack_startup( netjack_driver_state_t *netj );
