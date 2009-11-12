@@ -25,7 +25,11 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
-2009-11-10 Stephane Letz  <letz@grame.fr>
+2009-11-12 Stephane Letz  <letz@grame.fr>
+
+	* Better memory allocation error checking on client (library) side. 
+
+2009-11-11 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackCoreAudio driver when empty strings are given as -C, -P or -d parameter. 
 

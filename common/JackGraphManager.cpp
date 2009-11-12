@@ -702,6 +702,9 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 {
     const char** res = (const char**)malloc(sizeof(char*) * CONNECTION_NUM_FOR_PORT);
     UInt16 cur_index, next_index;
+    
+    if (!res)
+        return NULL;
 
     do {
         cur_index = GetCurrentIndex();
@@ -782,6 +785,9 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
 {
     const char** res = (const char**)malloc(sizeof(char*) * PORT_NUM);
     UInt16 cur_index, next_index;
+    
+    if (!res)
+        return NULL;
  
     do {
         cur_index = GetCurrentIndex();

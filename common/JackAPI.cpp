@@ -1943,5 +1943,7 @@ jack_get_version_string()
 
 EXPORT void jack_free(void* ptr)
 {
-    free(ptr);
+    if (ptr) {
+        free(ptr);
+    }
 }
