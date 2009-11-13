@@ -31,6 +31,7 @@ Paul Davis
 	* Memory allocation error checking for jack_client_new and jack_client_open (server and client side).
 	* Memory allocation error checking in server for RPC.
 	* Simplify server temporary mode : now use a JackTemporaryException.
+	* Lock/Unlock shared memory segments (to test...).
 
 2009-11-12 Stephane Letz  <letz@grame.fr>
 

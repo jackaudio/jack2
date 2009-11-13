@@ -32,6 +32,12 @@ size_t JackMem::gSize = 0;
 JackShmMem::JackShmMem()
 {
     JackShmMemAble::Init();
+    LockMemory();
+}
+    
+JackShmMem::~JackShmMem()
+{
+    UnlockMemory();
 }
 
 void JackShmMemAble::Init()
