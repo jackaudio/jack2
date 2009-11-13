@@ -387,22 +387,17 @@ OSStatus JackCoreAudioDriver::GetTotalChannels(AudioDeviceID device, int& channe
     OSStatus err = noErr;
     UInt32	outSize;
     Boolean	outWritable;
-    AudioBufferList* bufferList = 0;
-
+ 
     channelCount = 0;
     err = AudioDeviceGetPropertyInfo(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, &outWritable);
     if (err == noErr) {
-        bufferList = (AudioBufferList*)malloc(outSize);
+        AudioBufferList bufferList[outSize];
         err = AudioDeviceGetProperty(device, 0, isInput, kAudioDevicePropertyStreamConfiguration, &outSize, bufferList);
         if (err == noErr) {
             for (unsigned int i = 0; i < bufferList->mNumberBuffers; i++)
                 channelCount += bufferList->mBuffers[i].mNumberChannels;
         }
-
-        if (bufferList)
-            free(bufferList);
     }
-
     return err;
 }
 
