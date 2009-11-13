@@ -118,11 +118,6 @@ def build(bld):
     prog.includes = os_incdir + ['../common/jack', '../common']
     prog.source = ['netsource.c', '../common/netjack_packet.c']
     prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
-    if bld.env['HAVE_CELT']:
-	if bld.env['HAVE_CELT_API_0_5']:
-	    prog.defines = ['HAVE_CELT', 'HAVE_CELT_API_0_5']
-	elif bld.env['HAVE_CELT_API_0_7']:
-	    prog.defines = ['HAVE_CELT', 'HAVE_CELT_API_0_7']
     prog.uselib = 'CELT SAMPLERATE'
 
     prog.uselib_local = 'clientlib'
