@@ -105,14 +105,22 @@ EXPORT jack_client_t* jack_client_open_aux(const char* client_name, jack_options
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
-    assert(JackGlobals::fOpenMutex);
-    JackGlobals::fOpenMutex->Lock();
-    va_list ap;
-    va_start(ap, status);
-    jack_client_t* res = jack_client_open_aux(ext_client_name, options, status, ap);
-    va_end(ap);
-    JackGlobals::fOpenMutex->Unlock();
-    return res;
+    try {
+        assert(JackGlobals::fOpenMutex);
+        JackGlobals::fOpenMutex->Lock();
+        va_list ap;
+        va_start(ap, status);
+        jack_client_t* res = jack_client_open_aux(ext_client_name, options, status, ap);
+        va_end(ap);
+        JackGlobals::fOpenMutex->Unlock();
+        return res;
+    } catch(std::bad_alloc& e) {
+        jack_error("Memory allocation error...");
+        return NULL;
+    } catch (...) {
+        jack_error("Unknown error...");
+        return NULL;
+    }
 }
 
 EXPORT int jack_client_close(jack_client_t* ext_client)

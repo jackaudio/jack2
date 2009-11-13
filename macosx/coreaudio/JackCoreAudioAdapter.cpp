@@ -721,10 +721,6 @@ int JackCoreAudioAdapter::SetupBuffers(int inchannels)
 
     // Prepare buffers
     fInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
-    if (fInputData == 0) {
-        jack_error("Cannot allocate memory for input buffers");
-        return -1;
-    }
     fInputData->mNumberBuffers = inchannels;
     for (int i = 0; i < fCaptureChannels; i++) {
         fInputData->mBuffers[i].mNumberChannels = 1;

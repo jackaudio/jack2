@@ -58,7 +58,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     float fXrunDelayedUsecs;
     bool fTimeOut;
     bool fRealTime;
-    bool fFWRealTime;  // RT state saved and restored during Freewheel mode
+    bool fSavedRealTime;  // RT state saved and restored during Freewheel mode
     int fServerPriority;
     int fClientPriority;
     int fMaxClientPriority;
@@ -101,7 +101,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
         fTimeOut = (timeout > 0);
         fTimeOutUsecs = timeout * 1000;
         fRealTime = rt;
-        fFWRealTime = false;
+        fSavedRealTime = false;
         fServerPriority = priority;
         fClientPriority = (rt) ? priority - 5 : 0;
         fMaxClientPriority = (rt) ? priority - 1 : 0;

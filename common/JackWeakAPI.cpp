@@ -75,7 +75,7 @@ void *load_jack_function(const char *fn_name)
     static fn_name##_ptr_t fn = 0;                                      \
     if (fn == 0) { fn = (fn_name##_ptr_t)load_jack_function(#fn_name); } \
     if (fn) return (*fn)arguments;                                      \
-    else return (return_type)0;                                                      \
+    else return (return_type)-1;                                                      \
   }
 
 #define DECL_VOID_FUNCTION(fn_name, arguments_types, arguments)         \
