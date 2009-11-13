@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-13 Stephane Letz  <letz@grame.fr>
+
+	* Better memory allocation error checking in ringbuffer.c, weak import improvements.
+
 2009-11-12 Stephane Letz  <letz@grame.fr>
 
 	* Better memory allocation error checking on client (library) side. 

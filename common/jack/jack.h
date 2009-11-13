@@ -34,6 +34,25 @@ extern "C"
  * Note: More documentation can be found in jack/types.h.
  */
  
+/*************************************************************
+ * NOTE: JACK_WEAK_EXPORT ***MUST*** be used on every function
+ * added to the JACK API after the 0.116.2 release.
+ *************************************************************/
+
+#ifndef JACK_WEAK_EXPORT
+#ifdef __GNUC__
+/* JACK_WEAK_EXPORT needs to be a macro which
+   expands into a compiler directive. If non-null, the directive 
+   must tell the compiler to arrange for weak linkage of 
+   the symbol it used with. For this to work full may
+   require linker arguments in the client as well.
+*/
+#define JACK_WEAK_EXPORT __attribute__((weak))
+#else
+/* Add other things here for non-gcc platforms */
+#endif
+#endif
+
 /**
 * @defgroup ClientFunctions Creating & manipulating clients
 * @{
@@ -301,7 +320,7 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * jack_on_info_shutdown() will.
  */
 void jack_on_shutdown (jack_client_t *client,
-                       JackShutdownCallback shutdown_callback, void *arg);
+                       JackShutdownCallback shutdown_callback, void *arg) JACK_WEAK_EXPORT;
 
 /**
  * @param client pointer to JACK client structure.

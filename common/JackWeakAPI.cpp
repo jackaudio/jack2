@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
     Completed from Julien Pommier (PianoTeq : http://www.pianoteq.com/) code.
 */
 
-#include "jack.h"
+#include <jack/jack.h>
 #include <math.h>
 #include <dlfcn.h>
 #include <stdlib.h>
@@ -81,7 +81,7 @@ DECL_FUNCTION(const char *, jack_get_version_string, (), ());
 DECL_FUNCTION(jack_client_t *, jack_client_open, (const char *client_name, jack_options_t options, jack_status_t *status, ...), 
               (client_name, options, status));
 DECL_FUNCTION(int, jack_client_close, (jack_client_t *client), (client));
-DECL_FUNCTION(int, jack_client_new, (const char *client_name), (client_name));
+DECL_FUNCTION(jack_client_t *, jack_client_new, (const char *client_name), (client_name));
 DECL_FUNCTION(int, jack_client_name_size, (), ());
 DECL_FUNCTION(char*, jack_get_client_name, (jack_client_t *client), (client));
 DECL_FUNCTION(int, jack_internal_client_new, (const char *client_name,
@@ -89,8 +89,8 @@ DECL_FUNCTION(int, jack_internal_client_new, (const char *client_name,
                                             const char *load_init), (client_name, load_name, load_init));
 DECL_VOID_FUNCTION(jack_internal_client_close, (const char *client_name), (client_name));
 DECL_FUNCTION(int, jack_is_realtime, (jack_client_t *client), (client));
-DECL_VOID_FUNCTION(jack_on_shutdown, (jack_client_t *client, JackShutdownCallback shutdown_callback, void *arg), (client, function, arg));
-DECL_VOID_FUNCTION(jack_on_info_shutdown, (jack_client_t* ext_client, JackInfoShutdownCallback callback, void* arg, (client, function, arg))
+DECL_VOID_FUNCTION(jack_on_shutdown, (jack_client_t *client, JackShutdownCallback shutdown_callback, void *arg), (client, shutdown_callback, arg));
+DECL_VOID_FUNCTION(jack_on_info_shutdown, (jack_client_t* client, JackInfoShutdownCallback shutdown_callback, void* arg), (client, shutdown_callback, arg));
 DECL_FUNCTION(int, jack_set_process_callback, (jack_client_t *client,
                                             JackProcessCallback process_callback,
                                             void *arg), (client, process_callback, arg));
@@ -98,7 +98,7 @@ DECL_FUNCTION(jack_nframes_t, jack_thread_wait, (jack_client_t *client, int stat
                                       
 //
 DECL_FUNCTION(jack_nframes_t, jack_cycle_wait, (jack_client_t *client), (client));   
-DECL_VOID_FUNCTION(jack_cycle_signal, (jack_client_t *client, , int status), (client, status));                                          
+DECL_VOID_FUNCTION(jack_cycle_signal, (jack_client_t *client, int status), (client, status));                                          
 DECL_FUNCTION(int, jack_set_process_thread, (jack_client_t *client,
                                             JackThreadCallback fun,
                                             void *arg), (client, fun, arg));
@@ -153,11 +153,11 @@ DECL_FUNCTION(const char**, jack_port_get_connections, (const jack_port_t *port)
 DECL_FUNCTION(const char**, jack_port_get_all_connections, (const jack_port_t *port), (port));
 DECL_FUNCTION(int, jack_port_tie, (jack_port_t *src, jack_port_t *dst), (src, dst));
 DECL_FUNCTION(int, jack_port_untie, (jack_port_t *port), (port));
-DECL_FUNCTION(jack_nframes_t, jack_port_get_latency, (jack_port_t *port));
+DECL_FUNCTION(jack_nframes_t, jack_port_get_latency, (jack_client_t *), (jack_port_t *port));
 DECL_FUNCTION(jack_nframes_t, jack_port_get_total_latency ,(jack_client_t *), (jack_port_t *port));
 DECL_VOID_FUNCTION(jack_port_set_latency, (jack_port_t *), (jack_nframes_t));
 DECL_FUNCTION(int, jack_recompute_total_latency, (jack_client_t*), (jack_port_t* port));
-DECL_FUNCTION(int, jack_recompute_total_latencies, (jack_client_t*));
+DECL_FUNCTION(int, jack_recompute_total_latencies, (jack_client_t*),(client));
 
 DECL_FUNCTION(int, jack_port_set_name, (jack_port_t *port), (const char *port_name));
 DECL_FUNCTION(int, jack_port_set_alias, (jack_port_t *port), (const char *alias));
@@ -239,5 +239,5 @@ DECL_FUNCTION(int jack_midi_event_get(jack_midi_event_t* event, void* port_buffe
 DECL_VOID_FUNCTION(jack_midi_clear_buffer, (void* port_buffer));
 DECL_FUNCTION(size_t, jack_midi_max_event_size, (void* port_buffer));
 DECL_FUNCTION(jack_midi_data_t*, jack_midi_event_reserve, (void* port_buffer), (jack_nframes_t time), (size_t data_size));
-DECL_FUNCTIO(int jack_midi_event_write, (void* port_buffer), (jack_nframes_t time), (const jack_midi_data_t* data), (size_t data_size));
+DECL_FUNCTION(int jack_midi_event_write, (void* port_buffer), (jack_nframes_t time), (const jack_midi_data_t* data), (size_t data_size));
 DECL_FUNCTION(jack_nframes_t, jack_midi_get_lost_event_count, (void* port_buffer));
