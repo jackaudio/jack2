@@ -316,7 +316,7 @@ int process (jack_nframes_t nframes, void *arg) {
     snd_pcm_sframes_t delay = target_delay;
     int i;
 
-    snd_pcm_delay( alsa_handle, &delay );
+    delay = (num_periods*period_size)-snd_pcm_avail( alsa_handle ) ;
 
     delay -= jack_frames_since_cycle_start( client );
     delay += jack_get_buffer_size( client ) / 2;
