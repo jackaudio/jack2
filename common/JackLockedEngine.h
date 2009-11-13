@@ -22,6 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackEngine.h"
 #include "JackMutex.h"
+#include "JackTools.h"
+#include "JackException.h"
 
 namespace Jack
 {
@@ -32,6 +34,10 @@ namespace Jack
 #define CATCH_EXCEPTION_RETURN                      \
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
+        return -1;                                  \
+    } catch(JackTemporaryException& e) {                       \
+        jack_error("JackTemporaryException : now quits...");   \
+        kill(JackTools::GetPID(), SIGINT);          \
         return -1;                                  \
     } catch (...) {                                 \
         jack_error("Unknown error...");             \

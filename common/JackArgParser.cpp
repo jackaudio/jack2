@@ -128,6 +128,10 @@ namespace Jack {
             return -1;
         //else allocate and fill it
         argv = (char**)calloc (fArgv.size(), sizeof(char*));
+        if (argv == NULL) 
+        {
+            return -1;
+        }
         for ( unsigned int i = 0; i < fArgv.size(); i++ )
         {
             argv[i] = (char*)calloc(fArgv[i].length(), sizeof(char));
