@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <jack/jack.h>
+#include <jack/thread.h>
+#include <jack/midiport.h>
 #include <math.h>
 #include <dlfcn.h>
 #include <stdlib.h>
@@ -32,6 +34,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
    (similar to what relaytool is trying to do, but more portably..)
 */
 
+typedef void (*print_function)(const char *);
+typedef void *(*thread_routine)(void*);
+
 using std::cerr;
 
 int libjack_is_present = 0;     // public symbol, similar to what relaytool does.
@@ -40,7 +45,12 @@ static void *libjack_handle = 0;
 static void __attribute__((constructor)) tryload_libjack()
 {
     if (getenv("SKIP_LIBJACK") == 0) { // just in case libjack is causing troubles..
+    #ifdef __APPLE__
+        libjack_handle = dlopen("libjack.0.dylib", RTLD_LAZY);
+    #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
+    #endif
+        
     }
     libjack_is_present = (libjack_handle != 0);
 }
@@ -65,7 +75,7 @@ void *load_jack_function(const char *fn_name)
     static fn_name##_ptr_t fn = 0;                                      \
     if (fn == 0) { fn = (fn_name##_ptr_t)load_jack_function(#fn_name); } \
     if (fn) return (*fn)arguments;                                      \
-    else return 0;                                                      \
+    else return (return_type)0;                                                      \
   }
 
 #define DECL_VOID_FUNCTION(fn_name, arguments_types, arguments)         \
@@ -150,94 +160,102 @@ DECL_FUNCTION(int, jack_port_is_mine, (const jack_client_t *client, const jack_p
 DECL_FUNCTION(int, jack_port_connected, (const jack_port_t *port), (port));
 DECL_FUNCTION(int, jack_port_connected_to, (const jack_port_t *port, const char *port_name), (port, port_name));
 DECL_FUNCTION(const char**, jack_port_get_connections, (const jack_port_t *port), (port));
-DECL_FUNCTION(const char**, jack_port_get_all_connections, (const jack_port_t *port), (port));
+DECL_FUNCTION(const char**, jack_port_get_all_connections, (const jack_client_t *client,const jack_port_t *port), (client, port));
 DECL_FUNCTION(int, jack_port_tie, (jack_port_t *src, jack_port_t *dst), (src, dst));
 DECL_FUNCTION(int, jack_port_untie, (jack_port_t *port), (port));
-DECL_FUNCTION(jack_nframes_t, jack_port_get_latency, (jack_client_t *), (jack_port_t *port));
-DECL_FUNCTION(jack_nframes_t, jack_port_get_total_latency ,(jack_client_t *), (jack_port_t *port));
-DECL_VOID_FUNCTION(jack_port_set_latency, (jack_port_t *), (jack_nframes_t));
-DECL_FUNCTION(int, jack_recompute_total_latency, (jack_client_t*), (jack_port_t* port));
-DECL_FUNCTION(int, jack_recompute_total_latencies, (jack_client_t*),(client));
+DECL_FUNCTION(jack_nframes_t, jack_port_get_latency, (jack_port_t *port), (port));
+DECL_FUNCTION(jack_nframes_t, jack_port_get_total_latency ,(jack_client_t * client, jack_port_t *port), (client, port));
+DECL_VOID_FUNCTION(jack_port_set_latency, (jack_port_t * port, jack_nframes_t frames), (port, frames));
+DECL_FUNCTION(int, jack_recompute_total_latency, (jack_client_t* client, jack_port_t* port), (client, port));
+DECL_FUNCTION(int, jack_recompute_total_latencies, (jack_client_t* client),(client));
 
-DECL_FUNCTION(int, jack_port_set_name, (jack_port_t *port), (const char *port_name));
-DECL_FUNCTION(int, jack_port_set_alias, (jack_port_t *port), (const char *alias));
-DECL_FUNCTION(int, jack_port_unset_alias, (jack_port_t *port), (const char *alias));
-DECL_FUNCTION(int, jack_port_get_aliases, (const jack_port_t *port), (char* const aliases[2]));
-DECL_FUNCTION(int, jack_port_request_monitor, (jack_port_t *port), (int onoff));
-DECL_FUNCTION(int, jack_port_request_monitor_by_name, (jack_client_t *client), (const char *port_name), (int onoff));
-DECL_FUNCTION(int, jack_port_ensure_monitor, (jack_port_t *port), (int onoff));
-DECL_FUNCTION(int, jack_port_monitoring_input, (jack_port_t *port));
-DECL_FUNCTION(int, jack_connect, (jack_client_t *), (const char *source_port), (const char *destination_port));
-DECL_FUNCTION(int, jack_disconnect, (jack_client_t *), (const char *source_port), (const char *destination_port));
-DECL_FUNCTION(int, jack_port_disconnect, (jack_client_t *), (jack_port_t *));
-DECL_FUNCTION(int, jack_port_name_size,(void));
-DECL_FUNCTION(int, jack_port_type_size,(void));
+DECL_FUNCTION(int, jack_port_set_name, (jack_port_t *port, const char *port_name), (port, port_name));
+DECL_FUNCTION(int, jack_port_set_alias, (jack_port_t *port, const char *alias), (port, alias));
+DECL_FUNCTION(int, jack_port_unset_alias, (jack_port_t *port, const char *alias), (port, alias));
+DECL_FUNCTION(int, jack_port_get_aliases, (const jack_port_t *port, char* const aliases[2]), (port,aliases));
+DECL_FUNCTION(int, jack_port_request_monitor, (jack_port_t *port, int onoff), (port, onoff));
+DECL_FUNCTION(int, jack_port_request_monitor_by_name, (jack_client_t *client, const char *port_name, int onoff), (client, port_name, onoff));
+DECL_FUNCTION(int, jack_port_ensure_monitor, (jack_port_t *port, int onoff), (port, onoff));
+DECL_FUNCTION(int, jack_port_monitoring_input, (jack_port_t *port) ,(port));
+DECL_FUNCTION(int, jack_connect, (jack_client_t * client, const char *source_port, const char *destination_port), (client, source_port, destination_port));
+DECL_FUNCTION(int, jack_disconnect, (jack_client_t * client, const char *source_port, const char *destination_port), (client, source_port, destination_port));
+DECL_FUNCTION(int, jack_port_disconnect, (jack_client_t * client, jack_port_t * port), (client, port));
+DECL_FUNCTION(int, jack_port_name_size,(),());
+DECL_FUNCTION(int, jack_port_type_size,(),());
             
 DECL_FUNCTION(jack_nframes_t, jack_get_sample_rate, (jack_client_t *client), (client));
 DECL_FUNCTION(jack_nframes_t, jack_get_buffer_size, (jack_client_t *client), (client));
 DECL_FUNCTION(const char**, jack_get_ports, (jack_client_t *client, const char *port_name_pattern, const char *	type_name_pattern,
                                              unsigned long flags), (client, port_name_pattern, type_name_pattern, flags));
-DECL_FUNCTION(jack_port_t *, jack_port_by_name, (jack_client_t *), (const char *port_name));
-DECL_FUNCTION(jack_port_t *, jack_port_by_id, (jack_client_t *client), (jack_port_id_t port_id));
+DECL_FUNCTION(jack_port_t *, jack_port_by_name, (jack_client_t * client, const char *port_name), (client, port_name));
+DECL_FUNCTION(jack_port_t *, jack_port_by_id, (jack_client_t *client, jack_port_id_t port_id), (client, port_id));
 
-DECL_FUNCTION(int, jack_engine_takeover_timebase, (jack_client_t *));
-DECL_FUNCTION(jack_nframes_t, jack_frames_since_cycle_start, (const jack_client_t *));
-DECL_FUNCTION(jack_time_t, jack_get_time());
-DECL_FUNCTION(jack_nframes_t, jack_time_to_frames, (const jack_client_t *client), (jack_time_t time));
-DECL_FUNCTION(jack_time_t, jack_frames_to_time, (const jack_client_t *client), (jack_nframes_t frames));
-DECL_FUNCTION(jack_nframes_t, jack_frame_time, (const jack_client_t *));
-DECL_FUNCTION(jack_nframes_t, jack_last_frame_time, (const jack_client_t *client));
-DECL_FUNCTION(float, jack_cpu_load, (jack_client_t *client));
-DECL_FUNCTION(pthread_t, jack_client_thread_id, (jack_client_t *));
-DECL_VOID_FUNCTION(jack_set_error_function, (print_function));
-DECL_VOID_FUNCTION(jack_set_info_function, (print_function));
+DECL_FUNCTION(int, jack_engine_takeover_timebase, (jack_client_t * client), (client));
+DECL_FUNCTION(jack_nframes_t, jack_frames_since_cycle_start, (const jack_client_t * client), (client));
+DECL_FUNCTION(jack_time_t, jack_get_time, (), ());
+DECL_FUNCTION(jack_nframes_t, jack_time_to_frames, (const jack_client_t *client, jack_time_t time), (client, time));
+DECL_FUNCTION(jack_time_t, jack_frames_to_time, (const jack_client_t *client, jack_nframes_t frames), (client, frames));
+DECL_FUNCTION(jack_nframes_t, jack_frame_time, (const jack_client_t *client), (client));
+DECL_FUNCTION(jack_nframes_t, jack_last_frame_time, (const jack_client_t *client), (client));
+DECL_FUNCTION(float, jack_cpu_load, (jack_client_t *client), (client));
+DECL_FUNCTION(pthread_t, jack_client_thread_id, (jack_client_t *client), (client));
+DECL_VOID_FUNCTION(jack_set_error_function, (print_function fun), (fun));
+DECL_VOID_FUNCTION(jack_set_info_function, (print_function fun), (fun));
 
-DECL_FUNCTION(float, jack_get_max_delayed_usecs, (jack_client_t *client));
-DECL_FUNCTION(float, jack_get_xrun_delayed_usecs, (jack_client_t *client));
-DECL_VOID_FUNCTION(jack_reset_max_delayed_usecs, (jack_client_t *client));
+DECL_FUNCTION(float, jack_get_max_delayed_usecs, (jack_client_t *client), (client));
+DECL_FUNCTION(float, jack_get_xrun_delayed_usecs, (jack_client_t *client), (client));
+DECL_VOID_FUNCTION(jack_reset_max_delayed_usecs, (jack_client_t *client), (client));
 
-DECL_FUNCTION(int, jack_release_timebase, (jack_client_t *client));
-DECL_FUNCTION(int, jack_set_sync_callback, (jack_client_t *client, (JackSyncCallback sync_callback), (void *arg));
-DECL_FUNCTION(int, jack_set_sync_timeout, (jack_client_t *client), (jack_time_t timeout));
-DECL_FUNCTION(int, jack_set_timebase_callback, (jack_client_t *client), (int conditional), (JackTimebaseCallback timebase_callback), (void *arg));
-DECL_FUNCTION(int, jack_transport_locate, (jack_client_t *client), (jack_nframes_t frame));
-DECL_FUNCTION(jack_transport_state_t, jack_transport_query, (const jack_client_t *client), (jack_position_t *pos));
-DECL_FUNCTION(jack_nframes_t, jack_get_current_transport_frame, (const jack_client_t *client));
-DECL_FUNCTION(int, jack_transport_reposition, (jack_client_t *client), (jack_position_t *pos));
-DECL_VOID_FUNCTION(jack_transport_start, (jack_client_t *client));
-DECL_VOID_FUNCTION(jack_transport_stop, (jack_client_t *client));
-DECL_VOID_FUNCTION(jack_get_transport_info, (jack_client_t *client), (jack_transport_info_t *tinfo));
-DECL_VOID_FUNCTION(jack_set_transport_info, (jack_client_t *client), (jack_transport_info_t *tinfo));
+DECL_FUNCTION(int, jack_release_timebase, (jack_client_t *client), (client));
+DECL_FUNCTION(int, jack_set_sync_callback, (jack_client_t *client, JackSyncCallback sync_callback, void *arg), (client, sync_callback, arg));
+DECL_FUNCTION(int, jack_set_sync_timeout, (jack_client_t *client, jack_time_t timeout), (client, timeout));
+DECL_FUNCTION(int, jack_set_timebase_callback, (jack_client_t *client, 
+                                                int conditional,
+                                                JackTimebaseCallback timebase_callback,
+                                                void *arg), (client, conditional, timebase_callback, arg));
+DECL_FUNCTION(int, jack_transport_locate, (jack_client_t *client, jack_nframes_t frame), (client, frame));
+DECL_FUNCTION(jack_transport_state_t, jack_transport_query, (const jack_client_t *client, jack_position_t *pos), (client, pos));
+DECL_FUNCTION(jack_nframes_t, jack_get_current_transport_frame, (const jack_client_t *client), (client));
+DECL_FUNCTION(int, jack_transport_reposition, (jack_client_t *client, jack_position_t *pos), (client, pos));
+DECL_VOID_FUNCTION(jack_transport_start, (jack_client_t *client), (client));
+DECL_VOID_FUNCTION(jack_transport_stop, (jack_client_t *client), (client));
+DECL_VOID_FUNCTION(jack_get_transport_info, (jack_client_t *client, jack_transport_info_t *tinfo), (client,tinfo));
+DECL_VOID_FUNCTION(jack_set_transport_info, (jack_client_t *client, jack_transport_info_t *tinfo), (client,tinfo));
 
-DECL_FUNCTION(int, jack_client_real_time_priority, (jack_client_t*));
-DECL_FUNCTION(int, jack_client_max_real_time_priority, (jack_client_t*));
-DECL_FUNCTION(int, jack_acquire_real_time_scheduling, (pthread_t thread), (int priority));
-DECL_FUNCTION(int, jack_client_create_thread, (jack_client_t* client),
-                                      (pthread_t *thread),
-                                      (int priority),
-                                      (int realtime), 	// boolean
-                                      (thread_routine routine),
-                                      (void *arg));
-DECL_FUNCTION(int, jack_drop_real_time_scheduling, (pthread_t thread));
+DECL_FUNCTION(int, jack_client_real_time_priority, (jack_client_t* client), (client));
+DECL_FUNCTION(int, jack_client_max_real_time_priority, (jack_client_t* client), (client));
+DECL_FUNCTION(int, jack_acquire_real_time_scheduling, (pthread_t thread, int priority), (thread, priority));
+DECL_FUNCTION(int, jack_client_create_thread, (jack_client_t* client,
+                                      pthread_t *thread,
+                                      int priority,
+                                      int realtime, 	// boolean
+                                      thread_routine routine,
+                                      void *arg), (client, thread, priority, realtime, routine, arg));
+DECL_FUNCTION(int, jack_drop_real_time_scheduling, (pthread_t thread), (thread));
 
-DECL_FUNCTION(int, jack_client_stop_thread, (jack_client_t* client), (pthread_t thread));
-DECL_FUNCTION(int, jack_client_kill_thread, (jack_client_t* client), (pthread_t thread));
+DECL_FUNCTION(int, jack_client_stop_thread, (jack_client_t* client, pthread_t thread), (client, thread));
+DECL_FUNCTION(int, jack_client_kill_thread, (jack_client_t* client, pthread_t thread), (client, thread));
 #ifndef WIN32
-DECL_VOID_FUNCTION(jack_set_thread_creator, (jack_thread_creator_t jtc));
+DECL_VOID_FUNCTION(jack_set_thread_creator, (jack_thread_creator_t jtc), (jtc));
 #endif
-DECL_FUNCTION(char *, jack_get_internal_client_name, (jack_client_t *client, (jack_intclient_t intclient));
-DECL_FUNCTION(jack_intclient_t, jack_internal_client_handle, (jack_client_t *client), (const char *client_name), (jack_status_t *status));
-DECL_FUNCTION(jack_intclient_t, jack_internal_client_load, (jack_client_t *client), (const char *client_name), (jack_options_t options), (jack_status_t *status), ...));
-
-DECL_FUNCTION(jack_status_t, jack_internal_client_unload, (jack_client_t *client), jack_intclient_t intclient));
-DECL_VOID_FUNCTION(jack_free, (void* ptr));
+DECL_FUNCTION(char *, jack_get_internal_client_name, (jack_client_t *client, jack_intclient_t intclient), (client, intclient));
+DECL_FUNCTION(jack_intclient_t, jack_internal_client_handle, (jack_client_t *client, const char *client_name, jack_status_t *status), (client, client_name, status));
+/*
+DECL_FUNCTION(jack_intclient_t, jack_internal_client_load, (jack_client_t *client, 
+                                                            const char *client_name, 
+                                                            jack_options_t options, 
+                                                            jack_status_t *status
+                                                            , ...), (client, client_name, options, status, ...));
+*/
+DECL_FUNCTION(jack_status_t, jack_internal_client_unload, (jack_client_t *client, jack_intclient_t intclient), (client, intclient));
+DECL_VOID_FUNCTION(jack_free, (void* ptr), (ptr));
 
 // MIDI
 
-DECL_FUNCTION(jack_nframes_t, jack_midi_get_event_count, (void* port_buffer));
-DECL_FUNCTION(int jack_midi_event_get(jack_midi_event_t* event, void* port_buffer, jack_nframes_t event_index);
-DECL_VOID_FUNCTION(jack_midi_clear_buffer, (void* port_buffer));
-DECL_FUNCTION(size_t, jack_midi_max_event_size, (void* port_buffer));
-DECL_FUNCTION(jack_midi_data_t*, jack_midi_event_reserve, (void* port_buffer), (jack_nframes_t time), (size_t data_size));
-DECL_FUNCTION(int jack_midi_event_write, (void* port_buffer), (jack_nframes_t time), (const jack_midi_data_t* data), (size_t data_size));
-DECL_FUNCTION(jack_nframes_t, jack_midi_get_lost_event_count, (void* port_buffer));
+DECL_FUNCTION(jack_nframes_t, jack_midi_get_event_count, (void* port_buffer), (port_buffer));
+DECL_FUNCTION(int, jack_midi_event_get, (jack_midi_event_t* event, void* port_buffer, jack_nframes_t event_index), (event, port_buffer, event_index)) ;
+DECL_VOID_FUNCTION(jack_midi_clear_buffer, (void* port_buffer), (port_buffer));
+DECL_FUNCTION(size_t, jack_midi_max_event_size, (void* port_buffer), (port_buffer));
+DECL_FUNCTION(jack_midi_data_t*, jack_midi_event_reserve, (void* port_buffer, jack_nframes_t time, size_t data_size), (port_buffer, time, data_size));
+DECL_FUNCTION(int, jack_midi_event_write, (void* port_buffer, jack_nframes_t time, const jack_midi_data_t* data, size_t data_size), (port_buffer, time, data, data_size));
+DECL_FUNCTION(jack_nframes_t, jack_midi_get_lost_event_count, (void* port_buffer), (port_buffer));
