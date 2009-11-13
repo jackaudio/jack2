@@ -28,6 +28,7 @@ Paul Davis
 2009-11-13 Stephane Letz  <letz@grame.fr>
 
 	* Better memory allocation error checking in ringbuffer.c, weak import improvements.
+	* Memory allocation error checking for jack_client_new and jack_client_open.
 
 2009-11-12 Stephane Letz  <letz@grame.fr>
 

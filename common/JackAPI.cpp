@@ -290,15 +290,23 @@ EXPORT void jack_set_info_function (print_function func)
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
-    assert(JackGlobals::fOpenMutex);
-    JackGlobals::fOpenMutex->Lock();
-    jack_error("jack_client_new: deprecated");
-    int options = JackUseExactName;
-    if (getenv("JACK_START_SERVER") == NULL)
-        options |= JackNoStartServer;
-    jack_client_t* res = jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
-    JackGlobals::fOpenMutex->Unlock();
-    return res;
+    try {
+        assert(JackGlobals::fOpenMutex);
+        JackGlobals::fOpenMutex->Lock();
+        jack_error("jack_client_new: deprecated");
+        int options = JackUseExactName;
+        if (getenv("JACK_START_SERVER") == NULL)
+            options |= JackNoStartServer;
+        jack_client_t* res = jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
+        JackGlobals::fOpenMutex->Unlock();
+        return res;
+    } catch (std::bad_alloc& e) {
+        jack_error("Memory allocation error...");
+        return NULL;
+    } catch (...) {
+        jack_error("Unknown error...");
+        return NULL;
+    }
 }
 
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
