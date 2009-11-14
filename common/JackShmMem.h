@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2009 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -163,7 +163,7 @@ class JackShmReadWritePtr
                 if (jack_attach_shm(&fInfo)) {
                     throw - 2;
                 }
-                static_cast<T*>(fInfo.ptr.attached_at)->LockMemory();
+                GetShmAddress()->LockMemory();
             }
         }
 
@@ -184,7 +184,7 @@ class JackShmReadWritePtr
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %ld", fInfo.index);
-                static_cast<T*>(fInfo.ptr.attached_at)->UnlockMemory();
+                GetShmAddress()->UnlockMemory();
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
              }
@@ -250,7 +250,7 @@ class JackShmReadWritePtr1
                 vanish till we exit (and release it).
                 */
                 jack_destroy_shm(&fInfo);
-                static_cast<T*>(fInfo.ptr.attached_at)->LockMemory();
+                GetShmAddress()->LockMemory();
             }
         }
 
@@ -271,7 +271,7 @@ class JackShmReadWritePtr1
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld", fInfo.index);
-                static_cast<T*>(fInfo.ptr.attached_at)->UnlockMemory();
+                GetShmAddress()->UnlockMemory();
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }
@@ -331,7 +331,7 @@ class JackShmReadPtr
                 if (jack_attach_shm_read(&fInfo)) {
                     throw - 2;
                 }
-                static_cast<T*>(fInfo.ptr.attached_at)->LockMemory();
+                GetShmAddress()->LockMemory();
             }
         }
 
@@ -352,7 +352,7 @@ class JackShmReadPtr
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmPtrRead::~JackShmPtrRead %ld", fInfo.index);
-                static_cast<T*>(fInfo.ptr.attached_at)->UnlockMemory();
+                GetShmAddress()->UnlockMemory();
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }
