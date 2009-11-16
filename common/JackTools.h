@@ -55,6 +55,8 @@ namespace Jack
         static int GetPID();
         static int GetUID();
 
+        static void KillServer();
+
         static char* UserDir();
         static char* ServerDir ( const char* server_name, char* server_dir );
         static const char* DefaultServerName();
@@ -201,10 +203,10 @@ namespace Jack
                 return 0;
             }
     };
-    
+
     void BuildClientPath(char* path_to_so, int path_len, const char* so_name);
     void PrintLoadError(const char* so_name);
-    
+
 }
 
 #endif

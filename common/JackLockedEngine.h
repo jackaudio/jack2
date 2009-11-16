@@ -30,14 +30,14 @@ namespace Jack
 
 #define TRY_CALL    \
     try {           \
-    
+
 #define CATCH_EXCEPTION_RETURN                      \
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
         return -1;                                  \
     } catch(JackTemporaryException& e) {                       \
         jack_error("JackTemporaryException : now quits...");   \
-        kill(JackTools::GetPID(), SIGINT);          \
+        JackTools::KillServer();                     \
         return -1;                                  \
     } catch (...) {                                 \
         jack_error("Unknown error...");             \
@@ -54,7 +54,7 @@ namespace Jack
 /*!
 \brief Locked Engine, access to methods is serialized using a mutex.
 */
-    
+
 class SERVER_EXPORT JackLockedEngine : public JackLockAble
 {
     private:
@@ -205,7 +205,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             return fEngine.PortDisconnect(refnum, src, dst);
             CATCH_EXCEPTION_RETURN
         }
-        
+
         int PortRename(int refnum, jack_port_id_t port, const char* name)
         {
             TRY_CALL
@@ -263,7 +263,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             fEngine.NotifyFreewheel(onoff);
             CATCH_ENGINE_EXCEPTION
         }
-    
+
         void NotifyFailure(int code, const char* reason)
         {
             TRY_CALL
@@ -271,7 +271,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             fEngine.NotifyFailure(code, reason);
             CATCH_ENGINE_EXCEPTION
         }
-    
+
         int GetClientPID(const char* name)
         {
             TRY_CALL
@@ -279,7 +279,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             return fEngine.GetClientPID(name);
             CATCH_EXCEPTION_RETURN
         }
-        
+
         int GetClientRefNum(const char* name)
         {
             TRY_CALL
@@ -287,7 +287,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             return fEngine.GetClientRefNum(name);
             CATCH_EXCEPTION_RETURN
         }
-        
+
 };
 
 } // end of namespace
