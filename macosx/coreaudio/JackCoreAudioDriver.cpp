@@ -491,14 +491,48 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     //---------------------------------------------------------------------------
     // Setup SR of both devices otherwise creating AD may fail...
     //---------------------------------------------------------------------------
+    UInt32 keptclockdomain = 0;
+    UInt32 clockdomain = 0;
+    outSize = sizeof(UInt32);
+    bool clock_drift = false;
+    
     for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
         if (SetupSampleRateAux(captureDeviceID[i], samplerate) < 0) {
             jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot set SR of input device");
+        } else  {
+            // Check clock domain
+            osErr = AudioDeviceGetProperty(captureDeviceID[i], 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyClockDomain, &outSize, &clockdomain); 
+            if (osErr != 0) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice : kAudioDevicePropertyClockDomain error");
+                printError(osErr);
+            } else {
+                keptclockdomain = (keptclockdomain == 0) ? clockdomain : keptclockdomain; 
+                jack_log("JackCoreAudioDriver::CreateAggregateDevice : input clockdomain = %d", clockdomain);
+                if (clockdomain != 0 && clockdomain != keptclockdomain) {
+                    jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock!! clock drift compensation would be needed...");
+                    clock_drift = true;
+                }
+            }
         }
     }
+    
     for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
         if (SetupSampleRateAux(playbackDeviceID[i], samplerate) < 0) {
             jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot set SR of output device");
+        } else {
+            // Check clock domain
+            osErr = AudioDeviceGetProperty(playbackDeviceID[i], 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyClockDomain, &outSize, &clockdomain); 
+            if (osErr != 0) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice : kAudioDevicePropertyClockDomain error");
+                printError(osErr);
+            } else {
+                keptclockdomain = (keptclockdomain == 0) ? clockdomain : keptclockdomain; 
+                jack_log("JackCoreAudioDriver::CreateAggregateDevice : output clockdomain = %d", clockdomain);
+                if (clockdomain != 0 && clockdomain != keptclockdomain) {
+                    jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock!! clock drift compensation would be needed...");
+                    clock_drift = true;
+                }
+            }
         }
     }
 
@@ -571,7 +605,36 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
         jack_log("JackCoreAudioDriver::CreateAggregateDevice : private aggregate device....");
         CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
     }
-  
+    
+    CFMutableDictionaryRef aggDeviceDict1 = NULL;
+    // Prepare sub-devices for clock drift compensation
+    if (clock_drift) {
+        if (fClockDriftCompensate) {
+            aggDeviceDict1 = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+            for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
+                CFStringRef UI = GetDeviceName(captureDeviceID[i]);
+                if (UI) {
+                    jack_info("JackCoreAudioDriver::CreateAggregateDevice : IN kAudioSubDeviceDriftCompensationKey");
+                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceUIDKey), UI);
+                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
+                    CFRelease(UI);
+                }
+            }
+             for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
+                CFStringRef UI = GetDeviceName(playbackDeviceID[i]);
+                if (UI) {
+                    jack_info("JackCoreAudioDriver::CreateAggregateDevice : OUT kAudioSubDeviceDriftCompensationKey");
+                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceUIDKey), UI);
+                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
+                    CFRelease(UI);
+                }
+            }
+        } else {
+            jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock and -s is not used...");
+            return -1;
+        }
+    }
+    
     //-------------------------------------------------
     // Create a CFMutableArray for our sub-device list
     //-------------------------------------------------
@@ -644,7 +707,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     
     // pause again to give the changes time to take effect
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
-
+    
     //-----------------------
     // Set the master device
     //-----------------------
@@ -1262,7 +1325,8 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
                               jack_nframes_t playback_latency,
                               int async_output_latency,
                               int computation_grain,
-                              bool hogged)
+                              bool hogged,
+                              bool clock_drift)
 {
     int in_nChannels = 0;
     int out_nChannels = 0;
@@ -1282,6 +1346,7 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     fIOUsage = float(async_output_latency) / 100.f;
     fComputationGrain = float(computation_grain) / 100.f;
     fHogged = hogged;
+    fClockDriftCompensate = clock_drift;
     
     SInt32 major;
     SInt32 minor;
@@ -1619,7 +1684,7 @@ extern "C"
         strcpy(desc->name, "coreaudio");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Apple CoreAudio API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
         
-        desc->nparams = 16;
+        desc->nparams = 17;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1746,6 +1811,14 @@ extern "C"
         desc->params[i].value.i = 100;
         strcpy(desc->params[i].short_desc, "Computation grain in RT thread (percent)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        
+        i++;
+        strcpy(desc->params[i].name, "clock-drift");
+        desc->params[i].character = 's';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = FALSE;
+        strcpy(desc->params[i].short_desc, "Clock drift compensation");
+        strcpy(desc->params[i].long_desc, "Whether to compensate clock drift in dynamically created aggregate device");
 
         return desc;
     }
@@ -1768,6 +1841,7 @@ extern "C"
         int async_output_latency = 100;
         int computation_grain = -1;
         bool hogged = false;
+        bool clock_drift = false;
     
         for (node = params; node; node = jack_slist_next(node)) {
             param = (const jack_driver_param_t *) node->data;
@@ -1845,6 +1919,10 @@ extern "C"
                 case 'G':
                     computation_grain = param->value.ui;
                     break;
+                    
+                case 's':
+                    clock_drift = true;
+                    break;
             }
         }
 
@@ -1856,7 +1934,7 @@ extern "C"
 
         Jack::JackCoreAudioDriver* driver = new Jack::JackCoreAudioDriver("system", "coreaudio", engine, table);
         if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_driver_uid, 
-            playback_driver_uid, systemic_input_latency, systemic_output_latency, async_output_latency, computation_grain, hogged) == 0) {
+            playback_driver_uid, systemic_input_latency, systemic_output_latency, async_output_latency, computation_grain, hogged, clock_drift) == 0) {
             return driver;
         } else {
             delete driver;

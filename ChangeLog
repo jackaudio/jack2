@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-16 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudio driver, (possibly) clock drift compensation when needed in aggregated devices.
+
 2009-11-14 Stephane Letz  <letz@grame.fr>
 
 	* Sync with JACK1 : -r parameter now used for no-realtime, realtime (-R) is now default, usable backend given vie platform.
