@@ -606,29 +606,40 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
         CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
     }
     
-    CFMutableDictionaryRef aggDeviceDict1 = NULL;
     // Prepare sub-devices for clock drift compensation
+    CFMutableArrayRef subDevicesArrayClock = NULL;
     if (clock_drift) {
         if (fClockDriftCompensate) {
-            aggDeviceDict1 = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+           
+            subDevicesArrayClock = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+            
             for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
-                CFStringRef UI = GetDeviceName(captureDeviceID[i]);
-                if (UI) {
+                CFStringRef UID = GetDeviceName(captureDeviceID[i]);
+                if (UID) {
+                    CFMutableDictionaryRef subdeviceAggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
                     jack_info("JackCoreAudioDriver::CreateAggregateDevice : IN kAudioSubDeviceDriftCompensationKey");
-                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceUIDKey), UI);
-                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
-                    CFRelease(UI);
+                    CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceUIDKey), UID);
+                    CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
+                    //CFRelease(UID);
+                    CFArrayAppendValue(subDevicesArrayClock, subdeviceAggDeviceDict);
                 }
             }
-             for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
-                CFStringRef UI = GetDeviceName(playbackDeviceID[i]);
-                if (UI) {
+            
+            for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
+                CFStringRef UID = GetDeviceName(playbackDeviceID[i]);
+                if (UID) {
+                    CFMutableDictionaryRef subdeviceAggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
                     jack_info("JackCoreAudioDriver::CreateAggregateDevice : OUT kAudioSubDeviceDriftCompensationKey");
-                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceUIDKey), UI);
-                    CFDictionaryAddValue(aggDeviceDict1, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
-                    CFRelease(UI);
+                    CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceUIDKey), UID);
+                    CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
+                    //CFRelease(UID);
+                    CFArrayAppendValue(subDevicesArrayClock, subdeviceAggDeviceDict);
                 }
             }
+            
+            // add sub-device clock array for the aggregate device to the dictionary
+            CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceSubDeviceListKey), subDevicesArrayClock);
+            
         } else {
             jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock and -s is not used...");
             return -1;
@@ -738,6 +749,9 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     // release the CF objects we have created - we don't need them any more
     CFRelease(aggDeviceDict);
     CFRelease(subDevicesArray);
+    
+    if (subDevicesArrayClock)
+        CFRelease(subDevicesArrayClock);
 
     // release the device UID
     for (UInt32 i = 0; i < captureDeviceUID.size(); i++) {
