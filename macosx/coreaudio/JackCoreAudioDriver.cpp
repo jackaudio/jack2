@@ -488,13 +488,13 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     UInt32 outSize;
     Boolean outWritable;
     
+    // Prepare sub-devices for clock drift compensation
     // Workaround for bug in the HAL : until 10.6.2
     AudioObjectPropertyAddress theAddressOwned = { kAudioObjectPropertyOwnedObjects, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     AudioObjectPropertyAddress theAddressDrift = { kAudioSubDevicePropertyDriftCompensation, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
     UInt32 theQualifierDataSize = sizeof(AudioObjectID);
     AudioClassID inClass = kAudioSubDeviceClassID;
-	void* theQualifierData = &inClass;
-    UInt32 theDataSize = 0;
+    void* theQualifierData = &inClass;
     UInt32 subDevicesNum = 0;
      
     //---------------------------------------------------------------------------
@@ -753,19 +753,19 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
         if (fClockDriftCompensate) {
    
             // Get the property data size
-            osErr = AudioObjectGetPropertyDataSize(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &theDataSize);
+            osErr = AudioObjectGetPropertyDataSize(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &outSize);
             if (osErr != noErr) {
                 jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioObjectPropertyOwnedObjects error");
                 printError(osErr);
             }
             
             //	Calculate the number of object IDs
-            subDevicesNum = theDataSize / sizeof(AudioObjectID);
+            subDevicesNum = outSize / sizeof(AudioObjectID);
             jack_info("JackCoreAudioDriver::CreateAggregateDevice clock drift compensation, number of sub-devices = %d", subDevicesNum);
             AudioObjectID subDevices[subDevicesNum];
-            theDataSize = sizeof(subDevices);
+            outSize = sizeof(subDevices);
             
-            osErr = AudioObjectGetPropertyData(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &theDataSize, subDevices);
+            osErr = AudioObjectGetPropertyData(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &outSize, subDevices);
             if (osErr != noErr) {
                 jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioObjectPropertyOwnedObjects error");
                 printError(osErr);
@@ -783,7 +783,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
             
         } else {
             jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock and -s is not used...");
-            return -1;
+            goto error;
         }
     }
     
