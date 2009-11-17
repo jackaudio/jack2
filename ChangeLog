@@ -28,6 +28,7 @@ Paul Davis
 2009-11-17 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudio driver, clock drift compensation in aggregated devices working.
+	* In JackCoreAudio driver, clock drift compensation semantic changed a bit : when on, does not activate if not needed (same clock domain).
 
 2009-11-16 Stephane Letz  <letz@grame.fr>
 

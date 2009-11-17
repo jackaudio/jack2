@@ -503,7 +503,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     UInt32 keptclockdomain = 0;
     UInt32 clockdomain = 0;
     outSize = sizeof(UInt32);
-    bool clock_drift = false;
+    bool need_clock_drift_compensation = false;
     
     for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
         if (SetupSampleRateAux(captureDeviceID[i], samplerate) < 0) {
@@ -519,7 +519,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
                 jack_log("JackCoreAudioDriver::CreateAggregateDevice : input clockdomain = %d", clockdomain);
                 if (clockdomain != 0 && clockdomain != keptclockdomain) {
                     jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock!! clock drift compensation would be needed...");
-                    clock_drift = true;
+                    need_clock_drift_compensation = true;
                 }
             }
         }
@@ -539,10 +539,15 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
                 jack_log("JackCoreAudioDriver::CreateAggregateDevice : output clockdomain = %d", clockdomain);
                 if (clockdomain != 0 && clockdomain != keptclockdomain) {
                     jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock!! clock drift compensation would be needed...");
-                    clock_drift = true;
+                    need_clock_drift_compensation = true;
                 }
             }
         }
+    }
+    
+    // If no valid clock domain was found, then assume we have to compensate...
+    if (keptclockdomain == 0) {
+        need_clock_drift_compensation = true;
     }
 
     //---------------------------------------------------------------------------
@@ -618,9 +623,10 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     // Prepare sub-devices for clock drift compensation
     CFMutableArrayRef subDevicesArrayClock = NULL;
     
-    if (clock_drift) {
-        if (fClockDriftCompensate) {
-           
+    /*
+    if (fClockDriftCompensate) {
+        if (need_clock_drift_compensation) {
+            jack_info("Clock drift compensation activated...");
             subDevicesArrayClock = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
             
             for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
@@ -647,12 +653,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
             
             // add sub-device clock array for the aggregate device to the dictionary
             CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceSubDeviceListKey), subDevicesArrayClock);
-            
         } else {
-            jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock and -s is not used...");
-            return -1;
+            jack_info("Clock drift compensation was asked but is not needed (devices use the same clock domain)");
         }
     }
+    */
     
     //-------------------------------------------------
     // Create a CFMutableArray for our sub-device list
@@ -749,9 +754,11 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
   
     // Prepare sub-devices for clock drift compensation
     // Workaround for bug in the HAL : until 10.6.2
-    if (clock_drift) {
-        if (fClockDriftCompensate) {
-   
+    
+    if (fClockDriftCompensate) {
+        if (need_clock_drift_compensation) {
+            jack_info("Clock drift compensation activated...");
+       
             // Get the property data size
             osErr = AudioObjectGetPropertyDataSize(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &outSize);
             if (osErr != noErr) {
@@ -780,12 +787,10 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
                     printError(osErr);
                 }
             }
-            
         } else {
-            jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock and -s is not used...");
-            goto error;
+            jack_info("Clock drift compensation was asked but is not needed (devices use the same clock domain)");
         }
-    }
+    }    
     
     // pause again to give the changes time to take effect
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
