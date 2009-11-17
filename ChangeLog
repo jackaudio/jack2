@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-17 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudio driver, clock drift compensation in aggregated devices working.
+
 2009-11-16 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudio driver, (possibly) clock drift compensation when needed in aggregated devices.

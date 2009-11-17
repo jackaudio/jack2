@@ -487,7 +487,16 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     OSStatus osErr = noErr;
     UInt32 outSize;
     Boolean outWritable;
-      
+    
+    // Workaround for bug in the HAL : until 10.6.2
+    AudioObjectPropertyAddress theAddressOwned = { kAudioObjectPropertyOwnedObjects, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress theAddressDrift = { kAudioSubDevicePropertyDriftCompensation, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    UInt32 theQualifierDataSize = sizeof(AudioObjectID);
+    AudioClassID inClass = kAudioSubDeviceClassID;
+	void* theQualifierData = &inClass;
+    UInt32 theDataSize = 0;
+    UInt32 subDevicesNum = 0;
+     
     //---------------------------------------------------------------------------
     // Setup SR of both devices otherwise creating AD may fail...
     //---------------------------------------------------------------------------
@@ -608,6 +617,7 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     
     // Prepare sub-devices for clock drift compensation
     CFMutableArrayRef subDevicesArrayClock = NULL;
+    
     if (clock_drift) {
         if (fClockDriftCompensate) {
            
@@ -617,7 +627,6 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
                 CFStringRef UID = GetDeviceName(captureDeviceID[i]);
                 if (UID) {
                     CFMutableDictionaryRef subdeviceAggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-                    jack_info("JackCoreAudioDriver::CreateAggregateDevice : IN kAudioSubDeviceDriftCompensationKey");
                     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceUIDKey), UID);
                     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
                     //CFRelease(UID);
@@ -629,7 +638,6 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
                 CFStringRef UID = GetDeviceName(playbackDeviceID[i]);
                 if (UID) {
                     CFMutableDictionaryRef subdeviceAggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-                    jack_info("JackCoreAudioDriver::CreateAggregateDevice : OUT kAudioSubDeviceDriftCompensationKey");
                     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceUIDKey), UID);
                     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
                     //CFRelease(UID);
@@ -738,7 +746,50 @@ OSStatus JackCoreAudioDriver::CreateAggregateDeviceAux(vector<AudioDeviceID> cap
     
     // pause again to give the changes time to take effect
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
-
+  
+    // Prepare sub-devices for clock drift compensation
+    // Workaround for bug in the HAL : until 10.6.2
+    if (clock_drift) {
+        if (fClockDriftCompensate) {
+   
+            // Get the property data size
+            osErr = AudioObjectGetPropertyDataSize(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &theDataSize);
+            if (osErr != noErr) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioObjectPropertyOwnedObjects error");
+                printError(osErr);
+            }
+            
+            //	Calculate the number of object IDs
+            subDevicesNum = theDataSize / sizeof(AudioObjectID);
+            jack_info("JackCoreAudioDriver::CreateAggregateDevice clock drift compensation, number of sub-devices = %d", subDevicesNum);
+            AudioObjectID subDevices[subDevicesNum];
+            theDataSize = sizeof(subDevices);
+            
+            osErr = AudioObjectGetPropertyData(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &theDataSize, subDevices);
+            if (osErr != noErr) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioObjectPropertyOwnedObjects error");
+                printError(osErr);
+            }
+            
+            // Set kAudioSubDevicePropertyDriftCompensation property...
+            for (UInt32 index = 0; index < subDevicesNum; ++index) {
+                UInt32 theDriftCompensationValue = 1;
+                osErr = AudioObjectSetPropertyData(subDevices[index], &theAddressDrift, 0, NULL, sizeof(UInt32), &theDriftCompensationValue);
+                if (osErr != noErr) {
+                    jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioSubDevicePropertyDriftCompensation error");
+                    printError(osErr);
+                }
+            }
+            
+        } else {
+            jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock and -s is not used...");
+            return -1;
+        }
+    }
+    
+    // pause again to give the changes time to take effect
+    CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
+       
     //----------
     // Clean up
     //----------
@@ -1371,9 +1422,10 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     if (major == 10 && minor >= 6) {
         CFRunLoopRef theRunLoop = NULL;
         AudioObjectPropertyAddress theAddress = { kAudioHardwarePropertyRunLoop, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
-        OSStatus theError = AudioObjectSetPropertyData (kAudioObjectSystemObject, &theAddress, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
-        if (theError != noErr) {
+        OSStatus osErr = AudioObjectSetPropertyData (kAudioObjectSystemObject, &theAddress, 0, NULL, sizeof(CFRunLoopRef), &theRunLoop);
+        if (osErr != noErr) {
             jack_error("JackCoreAudioDriver::Open kAudioHardwarePropertyRunLoop error");
+            printError(osErr);
         }
     }
 
