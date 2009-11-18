@@ -1496,16 +1496,14 @@ extern "C"
         strcpy(desc->params[i].name, "capture");
         desc->params[i].character = 'C';
         desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default CoreAudio input device");
-        strcpy(desc->params[i].short_desc, "Provide capture ports. Optionally set CoreAudio device name");
+        strcpy(desc->params[i].short_desc, "Input CoreAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
         strcpy(desc->params[i].name, "playback");
         desc->params[i].character = 'P';
         desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default CoreAudio output device");
-        strcpy(desc->params[i].short_desc, "Provide playback ports. Optionally set CoreAudio device name");
+        strcpy(desc->params[i].short_desc, "Output CoreAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
@@ -1517,11 +1515,11 @@ extern "C"
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
-        strcpy(desc->params[i].name, "periodsize");
+        strcpy(desc->params[i].name, "period");
         desc->params[i].character = 'p';
         desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 512U;
-        strcpy(desc->params[i].short_desc, "Period size");
+        strcpy(desc->params[i].short_desc, "Frames per period");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
         i++;
@@ -1536,7 +1534,6 @@ extern "C"
         strcpy(desc->params[i].name, "device");
         desc->params[i].character = 'd';
         desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default CoreAudio device name");
         strcpy(desc->params[i].short_desc, "CoreAudio device name");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
