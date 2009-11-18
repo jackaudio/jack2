@@ -301,6 +301,7 @@ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nfra
     char playbackName[256];
     fCaptureUID[0] = 0;
     fPlaybackUID[0] = 0;
+    fClockDriftCompensate = false;
     
     // Default values
     fCaptureChannels = -1;
@@ -376,6 +377,10 @@ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nfra
             case 'g':
                 fRingbufferCurSize = param->value.ui;
                 fAdaptative = false;
+                break;
+                
+            case 's':
+                fClockDriftCompensate = true;
                 break;
         }
     }
@@ -1044,25 +1049,73 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDevice(AudioDeviceID captureDevice
     
     return CreateAggregateDeviceAux(captureDeviceIDArray, playbackDeviceIDArray, samplerate, outAggregateDevice);
 }
-
+    
 OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice) 
 {
     OSStatus osErr = noErr;
     UInt32 outSize;
     Boolean outWritable;
     
+    // Prepare sub-devices for clock drift compensation
+    // Workaround for bug in the HAL : until 10.6.2
+    AudioObjectPropertyAddress theAddressOwned = { kAudioObjectPropertyOwnedObjects, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    AudioObjectPropertyAddress theAddressDrift = { kAudioSubDevicePropertyDriftCompensation, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMaster };
+    UInt32 theQualifierDataSize = sizeof(AudioObjectID);
+    AudioClassID inClass = kAudioSubDeviceClassID;
+    void* theQualifierData = &inClass;
+    UInt32 subDevicesNum = 0;
+    
     //---------------------------------------------------------------------------
     // Setup SR of both devices otherwise creating AD may fail...
     //---------------------------------------------------------------------------
+    UInt32 keptclockdomain = 0;
+    UInt32 clockdomain = 0;
+    outSize = sizeof(UInt32);
+    bool need_clock_drift_compensation = false;
+    
     for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
         if (SetupSampleRateAux(captureDeviceID[i], samplerate) < 0) {
             jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot set SR of input device");
+        } else  {
+            // Check clock domain
+            osErr = AudioDeviceGetProperty(captureDeviceID[i], 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyClockDomain, &outSize, &clockdomain); 
+            if (osErr != 0) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice : kAudioDevicePropertyClockDomain error");
+                printError(osErr);
+            } else {
+                keptclockdomain = (keptclockdomain == 0) ? clockdomain : keptclockdomain; 
+                jack_log("JackCoreAudioDriver::CreateAggregateDevice : input clockdomain = %d", clockdomain);
+                if (clockdomain != 0 && clockdomain != keptclockdomain) {
+                    jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock!! clock drift compensation would be needed...");
+                    need_clock_drift_compensation = true;
+                }
+            }
         }
     }
+    
     for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
         if (SetupSampleRateAux(playbackDeviceID[i], samplerate) < 0) {
             jack_error("JackCoreAudioDriver::CreateAggregateDevice : cannot set SR of output device");
+        } else {
+            // Check clock domain
+            osErr = AudioDeviceGetProperty(playbackDeviceID[i], 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyClockDomain, &outSize, &clockdomain); 
+            if (osErr != 0) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice : kAudioDevicePropertyClockDomain error");
+                printError(osErr);
+            } else {
+                keptclockdomain = (keptclockdomain == 0) ? clockdomain : keptclockdomain; 
+                jack_log("JackCoreAudioDriver::CreateAggregateDevice : output clockdomain = %d", clockdomain);
+                if (clockdomain != 0 && clockdomain != keptclockdomain) {
+                    jack_error("JackCoreAudioDriver::CreateAggregateDevice : devices do not share the same clock!! clock drift compensation would be needed...");
+                    need_clock_drift_compensation = true;
+                }
+            }
         }
+    }
+    
+    // If no valid clock domain was found, then assume we have to compensate...
+    if (keptclockdomain == 0) {
+        need_clock_drift_compensation = true;
     }
     
     //---------------------------------------------------------------------------
@@ -1134,6 +1187,45 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
         jack_log("JackCoreAudioDriver::CreateAggregateDevice : private aggregate device....");
         CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceIsPrivateKey), AggregateDeviceNumberRef);
     }
+    
+    // Prepare sub-devices for clock drift compensation
+    CFMutableArrayRef subDevicesArrayClock = NULL;
+    
+    /*
+     if (fClockDriftCompensate) {
+     if (need_clock_drift_compensation) {
+     jack_info("Clock drift compensation activated...");
+     subDevicesArrayClock = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+     
+     for (UInt32 i = 0; i < captureDeviceID.size(); i++) {
+     CFStringRef UID = GetDeviceName(captureDeviceID[i]);
+     if (UID) {
+     CFMutableDictionaryRef subdeviceAggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceUIDKey), UID);
+     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
+     //CFRelease(UID);
+     CFArrayAppendValue(subDevicesArrayClock, subdeviceAggDeviceDict);
+     }
+     }
+     
+     for (UInt32 i = 0; i < playbackDeviceID.size(); i++) {
+     CFStringRef UID = GetDeviceName(playbackDeviceID[i]);
+     if (UID) {
+     CFMutableDictionaryRef subdeviceAggDeviceDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceUIDKey), UID);
+     CFDictionaryAddValue(subdeviceAggDeviceDict, CFSTR(kAudioSubDeviceDriftCompensationKey), AggregateDeviceNumberRef);
+     //CFRelease(UID);
+     CFArrayAppendValue(subDevicesArrayClock, subdeviceAggDeviceDict);
+     }
+     }
+     
+     // add sub-device clock array for the aggregate device to the dictionary
+     CFDictionaryAddValue(aggDeviceDict, CFSTR(kAudioAggregateDeviceSubDeviceListKey), subDevicesArrayClock);
+     } else {
+     jack_info("Clock drift compensation was asked but is not needed (devices use the same clock domain)");
+     }
+     }
+     */
     
     //-------------------------------------------------
     // Create a CFMutableArray for our sub-device list
@@ -1228,6 +1320,49 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
     // pause again to give the changes time to take effect
     CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
     
+    // Prepare sub-devices for clock drift compensation
+    // Workaround for bug in the HAL : until 10.6.2
+    
+    if (fClockDriftCompensate) {
+        if (need_clock_drift_compensation) {
+            jack_info("Clock drift compensation activated...");
+            
+            // Get the property data size
+            osErr = AudioObjectGetPropertyDataSize(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &outSize);
+            if (osErr != noErr) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioObjectPropertyOwnedObjects error");
+                printError(osErr);
+            }
+            
+            //	Calculate the number of object IDs
+            subDevicesNum = outSize / sizeof(AudioObjectID);
+            jack_info("JackCoreAudioDriver::CreateAggregateDevice clock drift compensation, number of sub-devices = %d", subDevicesNum);
+            AudioObjectID subDevices[subDevicesNum];
+            outSize = sizeof(subDevices);
+            
+            osErr = AudioObjectGetPropertyData(*outAggregateDevice, &theAddressOwned, theQualifierDataSize, theQualifierData, &outSize, subDevices);
+            if (osErr != noErr) {
+                jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioObjectPropertyOwnedObjects error");
+                printError(osErr);
+            }
+            
+            // Set kAudioSubDevicePropertyDriftCompensation property...
+            for (UInt32 index = 0; index < subDevicesNum; ++index) {
+                UInt32 theDriftCompensationValue = 1;
+                osErr = AudioObjectSetPropertyData(subDevices[index], &theAddressDrift, 0, NULL, sizeof(UInt32), &theDriftCompensationValue);
+                if (osErr != noErr) {
+                    jack_error("JackCoreAudioDriver::CreateAggregateDevice kAudioSubDevicePropertyDriftCompensation error");
+                    printError(osErr);
+                }
+            }
+        } else {
+            jack_info("Clock drift compensation was asked but is not needed (devices use the same clock domain)");
+        }
+    }    
+    
+    // pause again to give the changes time to take effect
+    CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, false);
+    
     //----------
     // Clean up
     //----------
@@ -1238,6 +1373,9 @@ OSStatus JackCoreAudioAdapter::CreateAggregateDeviceAux(vector<AudioDeviceID> ca
     // release the CF objects we have created - we don't need them any more
     CFRelease(aggDeviceDict);
     CFRelease(subDevicesArray);
+    
+    if (subDevicesArrayClock)
+        CFRelease(subDevicesArrayClock);
     
     // release the device UID
     for (UInt32 i = 0; i < captureDeviceUID.size(); i++) {
@@ -1327,7 +1465,7 @@ extern "C"
         strcpy(desc->name, "audioadapter");                            // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack audio <==> net backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
      
-        desc->nparams = 12;
+        desc->nparams = 13;
         desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
 
         i = 0;
@@ -1425,7 +1563,15 @@ extern "C"
         desc->params[i].value.ui = 32768;
         strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
         strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (if not set => automatic adaptative)");
-
+       
+        i++;
+        strcpy(desc->params[i].name, "clock-drift");
+        desc->params[i].character = 's';
+        desc->params[i].type = JackDriverParamBool;
+        desc->params[i].value.i = FALSE;
+        strcpy(desc->params[i].short_desc, "Clock drift compensation");
+        strcpy(desc->params[i].long_desc, "Whether to compensate clock drift in dynamically created aggregate device");
+   
         return desc;
     }
 

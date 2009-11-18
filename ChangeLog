@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-18 Stephane Letz  <letz@grame.fr>
+
+	* Sync JackCoreAudioAdapter code with JackCoreAudioDriver.
+
 2009-11-17 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudio driver, clock drift compensation in aggregated devices working.

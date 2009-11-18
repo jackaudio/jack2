@@ -67,6 +67,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;
+        bool fClockDriftCompensate;
 
         static	OSStatus Render(void *inRefCon,
                                 AudioUnitRenderActionFlags *ioActionFlags,
