@@ -151,19 +151,33 @@ int netjack_wait( netjack_driver_state_t *netj )
     //    jack_error( "netxrun... %d", netj->expected_framecnt );
 
     if( we_have_the_expected_frame ) {
-	netj->time_to_deadline = netj->next_deadline - jack_get_time() - netj->period_usecs;
+
+	jack_time_t now =  jack_get_time();
+	if( now < netj->next_deadline )
+		netj->time_to_deadline = netj->next_deadline - now;
+	else
+		netj->time_to_deadline = 0;
+
 	packet_cache_retreive_packet_pointer( global_packcache, netj->expected_framecnt, (char **) &(netj->rx_buf), netj->rx_bufsize , &packet_recv_time_stamp);
 	pkthdr = (jacknet_packet_header *) netj->rx_buf;
 	packet_header_ntoh(pkthdr);
 	netj->deadline_goodness = (int)pkthdr->sync_state;
 	netj->packet_data_valid = 1;
 
+	int want_deadline;
+	if( netj->jitter_val != 0 ) 
+		want_deadline = netj->jitter_val;
+	else if( netj->latency < 4 )
+		want_deadline = -netj->period_usecs/2;
+	else
+		want_deadline = (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100);
+
 	if( netj->deadline_goodness != MASTER_FREEWHEELS ) {
-		if( netj->deadline_goodness < (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100) ) {
+		if( netj->deadline_goodness < want_deadline ) {
 			netj->deadline_offset -= netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: --- %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
-		if( netj->deadline_goodness > (netj->period_usecs/4+10*(int)netj->period_usecs*netj->latency/100) ) {
+		if( netj->deadline_goodness > want_deadline ) {
 			netj->deadline_offset += netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
@@ -269,10 +283,10 @@ int netjack_wait( netjack_driver_state_t *netj )
 		    netj->next_deadline_valid = 0;
 		    netj->packet_data_valid = 1;
 		    netj->running_free = 0;
-		    jack_info( "resync after freerun... %d\n", netj->expected_framecnt );
+		    jack_info( "resync after freerun... %d", netj->expected_framecnt );
 		} else {
 		    if( netj->num_lost_packets == 101 ) {
-			jack_info( "master seems gone... entering freerun mode\n", netj->expected_framecnt );
+			jack_info( "master seems gone... entering freerun mode", netj->expected_framecnt );
 		    }
 
 		    netj->running_free = 1;
@@ -497,7 +511,8 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
 		unsigned int latency,
 		unsigned int redundancy,
 		int dont_htonl_floats,
-		int always_deadline)
+		int always_deadline,
+		int jitter_val )
 {
 
     // Fill in netj values.
@@ -665,6 +680,27 @@ netjack_startup( netjack_driver_state_t *netj )
     netj->capture_channels  = netj->capture_channels_audio + netj->capture_channels_midi;
     netj->playback_channels = netj->playback_channels_audio + netj->playback_channels_midi;
 
+    if( (netj->capture_channels * netj->period_size * netj->latency * 4) > 100000000 ) {
+	    jack_error( "autoconfig requests more than 100MB packet cache... bailing out" );
+	    exit(1);
+    }
+
+    if( netj->playback_channels > 1000 ) {
+	    jack_error( "autoconfig requests more than 1000 playback channels... bailing out" );
+	    exit(1);
+    }
+
+
+    if( netj->mtu < (2*sizeof( jacknet_packet_header )) ) {
+	    jack_error( "bullshit mtu requested by autoconfig" );
+	    exit(1);
+    }
+
+    if( netj->sample_rate == 0 ) {
+	    jack_error( "sample_rate 0 requested by autoconfig" );
+	    exit(1);
+    }
+
     // After possible Autoconfig: do all calculations...
     netj->period_usecs =
         (jack_time_t) floor ((((float) netj->period_size) / (float)netj->sample_rate)
@@ -678,6 +714,9 @@ netjack_startup( netjack_driver_state_t *netj )
     if( netj->bitdepth == CELT_MODE ) {
 	// celt mode.
 	// TODO: this is a hack. But i dont want to change the packet header.
+	netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
+	netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
+	
 	netj->net_period_down = netj->resample_factor;
 	netj->net_period_up = netj->resample_factor_up;
     } else {

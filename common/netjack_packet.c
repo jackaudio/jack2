@@ -28,9 +28,6 @@
 
 //#include "config.h"
 
-#define _XOPEN_SOURCE 600
-#define _BSD_SOURCE
-
 #ifdef __APPLE__
 #define _DARWIN_C_SOURCE
 #endif
@@ -44,7 +41,6 @@
 #include <memory.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <alloca.h>
 #include <errno.h>
 #include <stdarg.h>
 
@@ -163,7 +159,7 @@ packet_cache
     packet_cache *pcache = malloc (sizeof (packet_cache));
     if (pcache == NULL)
     {
-        jack_error ("could not allocate packet cache (1)\n");
+        jack_error ("could not allocate packet cache (1)");
         return NULL;
     }
 
@@ -175,7 +171,7 @@ packet_cache
 
     if (pcache->packets == NULL)
     {
-        jack_error ("could not allocate packet cache (2)\n");
+        jack_error ("could not allocate packet cache (2)");
         return NULL;
     }
 
@@ -190,7 +186,7 @@ packet_cache
         pcache->packets[i].packet_buf = malloc (pkt_size);
         if ((pcache->packets[i].fragment_array == NULL) || (pcache->packets[i].packet_buf == NULL))
         {
-            jack_error ("could not allocate packet cache (3)\n");
+            jack_error ("could not allocate packet cache (3)");
             return NULL;
         }
     }
@@ -326,7 +322,7 @@ cache_packet_add_fragment (cache_packet *pack, char *packet_buf, int rcv_len)
 
     if (framecnt != pack->framecnt)
     {
-        jack_error ("errror. framecnts dont match\n");
+        jack_error ("errror. framecnts dont match");
         return;
     }
 
@@ -369,13 +365,10 @@ int
 netjack_poll_deadline (int sockfd, jack_time_t deadline)
 {
     struct pollfd fds;
-    int i, poll_err = 0;
-    sigset_t sigmask;
-    struct sigaction action;
+    int poll_err = 0;
 #if HAVE_PPOLL
     struct timespec timeout_spec = { 0, 0 };
 #else
-    sigset_t rsigmask;
     int timeout;
 #endif
 
@@ -391,35 +384,17 @@ netjack_poll_deadline (int sockfd, jack_time_t deadline)
 #if HAVE_PPOLL
     timeout_spec.tv_nsec = (deadline - now) * 1000;
 #else
-    timeout = lrintf( (float)(deadline - now) / 1000.0 );
+    timeout = (deadline - now + 500) / 1000;
 #endif
 
-    sigemptyset(&sigmask);
-	sigaddset(&sigmask, SIGHUP);
-	sigaddset(&sigmask, SIGINT);
-	sigaddset(&sigmask, SIGQUIT);
-	sigaddset(&sigmask, SIGPIPE);
-	sigaddset(&sigmask, SIGTERM);
-	sigaddset(&sigmask, SIGUSR1);
-	sigaddset(&sigmask, SIGUSR2);
-
-	action.sa_handler = SIG_DFL;
-	action.sa_mask = sigmask;
-	action.sa_flags = SA_RESTART;
-
-    for (i = 1; i < NSIG; i++)
-        if (sigismember (&sigmask, i))
-            sigaction (i, &action, 0);
 
     fds.fd = sockfd;
     fds.events = POLLIN;
 
 #if HAVE_PPOLL
-    poll_err = ppoll (&fds, 1, &timeout_spec, &sigmask);
+    poll_err = ppoll (&fds, 1, &timeout_spec, NULL);
 #else
-    sigprocmask (SIG_UNBLOCK, &sigmask, &rsigmask);
     poll_err = poll (&fds, 1, timeout);
-    sigprocmask (SIG_SETMASK, &rsigmask, NULL);
 #endif
 
     if (poll_err == -1)
@@ -510,7 +485,7 @@ netjack_poll (int sockfd, int timeout)
 int
 netjack_poll (int sockfd, int timeout)
 {
-    jack_error( "netjack_poll not implemented\n" );
+    jack_error( "netjack_poll not implemented" );
     return 0;
 }
 int

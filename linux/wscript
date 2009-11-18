@@ -11,16 +11,14 @@ def configure(conf):
     conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs')
     conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
 
+    conf.define('HAVE_PPOLL', 1 )
+
+
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
-    if bld.env['HAVE_CELT']:
-	if bld.env['HAVE_CELT_API_0_5']:
-	    driver.defines +=  ['HAVE_CELT', 'HAVE_CELT_API_0_5']
-	elif bld.env['HAVE_CELT_API_0_7']:
-	    driver.defines +=  ['HAVE_CELT', 'HAVE_CELT_API_0_7']
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
     driver.target = target
     driver.source = sources

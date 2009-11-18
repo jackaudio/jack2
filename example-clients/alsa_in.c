@@ -86,9 +86,9 @@ typedef struct alsa_format {
 } alsa_format_t;
 
 alsa_format_t formats[] = {
-	{ SND_PCM_FORMAT_S24_3LE, 3, sample_move_d24_sS, sample_move_dS_s24, "24bit - real" },
 	{ SND_PCM_FORMAT_FLOAT_LE, 4, sample_move_dS_floatLE, sample_move_floatLE_sSs, "float" },
 	{ SND_PCM_FORMAT_S32, 4, sample_move_d32u24_sS, sample_move_dS_s32u24, "32bit" },
+	{ SND_PCM_FORMAT_S24_3LE, 3, sample_move_d24_sS, sample_move_dS_s24, "24bit - real" },
 	{ SND_PCM_FORMAT_S24, 4, sample_move_d24_sS, sample_move_dS_s24, "24bit" },
 	{ SND_PCM_FORMAT_S16, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit" }
 };
@@ -313,9 +313,9 @@ int process (jack_nframes_t nframes, void *arg) {
     int put_back_samples=0;
     int i;
 
-    snd_pcm_delay( alsa_handle, &delay );
+    delay = snd_pcm_avail( alsa_handle );
 
-    //delay -= jack_frames_since_cycle_start( client );
+    delay -= jack_frames_since_cycle_start( client );
     // Do it the hard way.
     // this is for compensating xruns etc...
 
@@ -696,10 +696,10 @@ int main (int argc, char *argv[]) {
     jack_buffer_size = jack_get_buffer_size( client );
     // Setup target delay and max_diff for the normal user, who does not play with them...
     if( !target_delay ) 
-	target_delay = (num_periods*period_size / 2) - jack_buffer_size/2;
+	target_delay = (num_periods*period_size / 2) + jack_buffer_size/2;
 
     if( !max_diff )
-	max_diff = target_delay;	
+	max_diff = num_periods*period_size - target_delay ;	
 
     if( max_diff > target_delay ) {
 	    fprintf( stderr, "target_delay (%d) cant be smaller than max_diff(%d)\n", target_delay, max_diff );

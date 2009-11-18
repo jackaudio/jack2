@@ -27,7 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
 #include "JackWaitThreadedDriver.h"
-#include "JackException.h"
+#include "JackTools.h"
 #include "driver_interface.h"
 
 #include "netjack.h"
@@ -50,8 +50,8 @@ namespace Jack
     JackNetOneDriver::JackNetOneDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                    int port, int mtu, int capture_ports, int playback_ports, int midi_input_ports, int midi_output_ports,
 				   int sample_rate, int period_size, int resample_factor,
-                                   char* net_name, uint transport_sync, int bitdepth, int use_autoconfig,
-				   int latency, int redundancy, int dont_htonl_floats, int always_deadline )
+                                   const char* net_name, uint transport_sync, int bitdepth, int use_autoconfig,
+				   int latency, int redundancy, int dont_htonl_floats, int always_deadline, int jitter_val )
             : JackAudioDriver ( name, alias, engine, table )
     {
         jack_log ( "JackNetOneDriver::JackNetOneDriver port %d", port );
@@ -79,7 +79,8 @@ namespace Jack
 		latency,
 		redundancy,
 		dont_htonl_floats,
-		always_deadline);
+		always_deadline,
+		jitter_val);
     }
 
     JackNetOneDriver::~JackNetOneDriver()
@@ -112,7 +113,7 @@ namespace Jack
         }
         else
         {
-            jack_error( "open fail\n" );
+            jack_error( "open fail" );
             return -1;
         }
     }
@@ -296,7 +297,7 @@ namespace Jack
 	}
 
 	if( (netj.num_lost_packets * netj.period_size / netj.sample_rate) > 2 )
-	    throw JackNetException();
+        JackTools::ThrowJackNetException();
 
 	//netjack_read( &netj, netj.period_size );
         JackDriver::CycleTakeBeginTime();
@@ -439,7 +440,7 @@ namespace Jack
 		netj.syncsource_address.sin_port = htons(netj.reply_port);
 
 	    for( r=0; r<netj.redundancy; r++ )
-		netjack_sendto(netj.outsockfd, (char *)packet_buf, packet_size,
+		netjack_sendto(netj.sockfd, (char *)packet_buf, packet_size,
 			flag, (struct sockaddr*)&(netj.syncsource_address), sizeof(struct sockaddr_in), netj.mtu);
 	}
 	return 0;
@@ -766,7 +767,7 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
 	    CELTEncoder *encoder = (CELTEncoder *)src_node->data;
 	    encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
 	    if( encoded_bytes != (int)net_period_up )
-		jack_error( "something in celt changed. netjack needs to be changed to handle this.\n" );
+		jack_error( "something in celt changed. netjack needs to be changed to handle this." );
 	    src_node = jack_slist_next( src_node );
         }
         else if (strncmp(portname, JACK_DEFAULT_MIDI_TYPE, jack_port_type_size()) == 0)
@@ -823,11 +824,11 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy ( desc->name, "netone" );                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
 	    strcpy ( desc->desc, "netjack one slave backend component" ); // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-	    desc->nparams = 17;
+	    desc->nparams = 18;
 	    params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
 	    int i = 0;
-	    strcpy (params[i].name, "inchannels");
+	    strcpy (params[i].name, "audio-ins");
 	    params[i].character  = 'i';
 	    params[i].type       = JackDriverParamUInt;
 	    params[i].value.ui   = 2U;
@@ -835,7 +836,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
-	    strcpy (params[i].name, "outchannels");
+	    strcpy (params[i].name, "audio-outs");
 	    params[i].character  = 'o';
 	    params[i].type       = JackDriverParamUInt;
 	    params[i].value.ui   = 2U;
@@ -843,7 +844,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
-	    strcpy (params[i].name, "midi inchannels");
+	    strcpy (params[i].name, "midi-ins");
 	    params[i].character  = 'I';
 	    params[i].type       = JackDriverParamUInt;
 	    params[i].value.ui   = 1U;
@@ -851,7 +852,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
-	    strcpy (params[i].name, "midi outchannels");
+	    strcpy (params[i].name, "midi-outs");
 	    params[i].character  = 'O';
 	    params[i].type       = JackDriverParamUInt;
 	    params[i].value.ui   = 1U;
@@ -872,6 +873,15 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    params[i].type       = JackDriverParamUInt;
 	    params[i].value.ui   = 1024U;
 	    strcpy (params[i].short_desc, "Frames per period");
+	    strcpy (params[i].long_desc, params[i].short_desc);
+
+	    i++;
+	    strcpy (params[i].name, "num-periods");
+	    params[i].character  = 'n';
+	    params[i].type       = JackDriverParamUInt;
+	    params[i].value.ui   = 5U;
+	    strcpy (params[i].short_desc,
+		    "Network latency setting in no. of periods");
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
@@ -907,7 +917,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    params[i].type       = JackDriverParamUInt;
 	    params[i].value.ui   = 0U;
 	    strcpy (params[i].short_desc,
-		    "sets celt encoding and number of bytes per channel");
+		    "sets celt encoding and number of kbits per channel");
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
@@ -938,15 +948,6 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
-	    strcpy (params[i].name, "latency");
-	    params[i].character  = 'L';
-	    params[i].type       = JackDriverParamUInt;
-	    params[i].value.ui   = 5U;
-	    strcpy (params[i].short_desc,
-		    "Latency setting");
-	    strcpy (params[i].long_desc, params[i].short_desc);
-
-	    i++;
 	    strcpy (params[i].name, "redundancy");
 	    params[i].character  = 'R';
 	    params[i].type       = JackDriverParamUInt;
@@ -956,8 +957,8 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
-	    strcpy (params[i].name, "no-htonl");
-	    params[i].character  = 'H';
+	    strcpy (params[i].name, "native-endian");
+	    params[i].character  = 'e';
 	    params[i].type       = JackDriverParamBool;
 	    params[i].value.ui   = 0U;
 	    strcpy (params[i].short_desc,
@@ -965,12 +966,21 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    i++;
-	    strcpy (params[i].name, "deadline");
+	    strcpy (params[i].name, "jitterval");
+	    params[i].character  = 'J';
+	    params[i].type       = JackDriverParamInt;
+	    params[i].value.i   = 0;
+	    strcpy (params[i].short_desc,
+		    "attempted jitterbuffer microseconds on master");
+	    strcpy (params[i].long_desc, params[i].short_desc);
+
+	    i++;
+	    strcpy (params[i].name, "always-deadline");
 	    params[i].character  = 'D';
 	    params[i].type       = JackDriverParamBool;
 	    params[i].value.ui   = 0U;
 	    strcpy (params[i].short_desc,
-		    "always use deadline (recommended for internet connect)");
+		    "always use deadline");
 	    strcpy (params[i].long_desc, params[i].short_desc);
 
 	    desc->params = params;
@@ -997,6 +1007,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
     unsigned int mtu = 1400;
     int dont_htonl_floats = 0;
     int always_deadline = 0;
+    int jitter_val = 0;
     const JSList * node;
     const jack_driver_param_t * param;
 
@@ -1036,36 +1047,36 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
                 break;
 
             case 'f':
-#if HAVE_SAMPLERATE
+        #if HAVE_SAMPLERATE
                 resample_factor = param->value.ui;
-#else
-		jack_error( "not built with libsamplerate support\n" );
-		exit(10);
-#endif
+        #else
+                jack_error( "not built with libsamplerate support" );
+                return NULL;
+        #endif
                 break;
 
             case 'u':
-#if HAVE_SAMPLERATE
+        #if HAVE_SAMPLERATE
                 resample_factor_up = param->value.ui;
-#else
-		jack_error( "not built with libsamplerate support\n" );
-		exit(10);
-#endif
+        #else
+                jack_error( "not built with libsamplerate support" );
+                return NULL;
+        #endif
                 break;
 
             case 'b':
                 bitdepth = param->value.ui;
                 break;
 
-	    case 'c':
-#if HAVE_CELT
-		bitdepth = CELT_MODE;
-		resample_factor = param->value.ui;
-#else
-		jack_error( "not built with celt support\n" );
-		exit(10);
-#endif
-		break;
+            case 'c':
+        #if HAVE_CELT
+                bitdepth = CELT_MODE;
+                resample_factor = param->value.ui;
+        #else
+                jack_error( "not built with celt support" );
+                return NULL;
+        #endif
+                break;
 
             case 't':
                 handle_transport_sync = param->value.ui;
@@ -1075,7 +1086,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
                 use_autoconfig = param->value.ui;
                 break;
 
-            case 'L':
+            case 'n':
                 latency = param->value.ui;
                 break;
 
@@ -1085,6 +1096,10 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
 
             case 'H':
                 dont_htonl_floats = param->value.ui;
+                break;
+
+            case 'J':
+                jitter_val = param->value.i;
                 break;
 
             case 'D':
@@ -1102,7 +1117,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
                                               capture_ports_midi, playback_ports_midi, capture_ports, playback_ports,
 					      sample_rate, period_size, resample_factor,
 					      "net_pcm", handle_transport_sync, bitdepth, use_autoconfig, latency, redundancy, 
-					      dont_htonl_floats, always_deadline ) );
+					      dont_htonl_floats, always_deadline, jitter_val ) );
 
                 if ( driver->Open ( period_size, sample_rate, 1, 1, capture_ports, playback_ports,
                                     0, "from_master_", "to_master_", 0, 0 ) == 0 )
