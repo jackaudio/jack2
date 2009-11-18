@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	parse_arguments(argc, argv);
 
 	/* become a JACK client */
-	if ((client = jack_client_new(package)) == 0) {
+	if ((client = jack_client_open(package, JackNullOption, NULL)) == 0) {
 		fprintf(stderr, "JACK server not running?\n");
 		exit(1);
 	}
