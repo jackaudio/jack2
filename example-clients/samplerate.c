@@ -62,8 +62,6 @@ void parse_arguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	int rc;
-
 	parse_arguments(argc, argv);
 
 	/* become a JACK client */
