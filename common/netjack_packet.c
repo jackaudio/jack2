@@ -26,7 +26,7 @@
  *
  */
 
-//#include "config.h"
+#include "config.h"
 
 #ifdef __APPLE__
 #define _DARWIN_C_SOURCE

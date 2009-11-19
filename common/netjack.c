@@ -49,7 +49,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #include "netjack.h"
 
-//#include "config.h"
+#include "config.h"
 
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
