@@ -611,6 +611,11 @@ get_realtime_priority_constraint()
     //jack_info("realtime priority range is (%d,%d)", min, max);
 
     constraint_ptr = (jack_driver_param_constraint_desc_t *)calloc(1, sizeof(jack_driver_param_value_enum_t));
+    if (constraint_ptr == NULL)
+    {
+        jack_error("Cannot allocate memory for jack_driver_param_constraint_desc_t structure.");
+        return NULL;
+    }
     constraint_ptr->flags = JACK_CONSTRAINT_FLAG_RANGE;
 
     constraint_ptr->constraint.range.min.i = min;

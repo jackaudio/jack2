@@ -36,6 +36,7 @@
 #include "driver_interface.h"
 #include "JackCompilerDeps.h"
 #include "JackError.h"
+#include "JackException.h"
 
 #include <string>
 #include <algorithm>
@@ -55,12 +56,16 @@ namespace Jack
         static int GetPID();
         static int GetUID();
 
+        static void KillServer();
+
         static char* UserDir();
         static char* ServerDir ( const char* server_name, char* server_dir );
         static const char* DefaultServerName();
         static void CleanupFiles ( const char* server_name );
         static int GetTmpdir();
         static void RewriteName ( const char* name, char* new_name );
+        
+        static void ThrowJackNetException();
     };
 
     /*!
@@ -201,10 +206,10 @@ namespace Jack
                 return 0;
             }
     };
-    
+
     void BuildClientPath(char* path_to_so, int path_len, const char* so_name);
     void PrintLoadError(const char* so_name);
-    
+
 }
 
 #endif

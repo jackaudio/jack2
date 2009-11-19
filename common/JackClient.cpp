@@ -170,90 +170,105 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
             case kAddClient:
                 jack_log("JackClient::kAddClient fName = %s name = %s", GetClientControl()->fName, name);
-                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
+                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0) {	// Don't call the callback for the registering client itself
                     fClientRegistration(name, 1, fClientRegistrationArg);
+                }
                 break;
 
             case kRemoveClient:
                 jack_log("JackClient::kRemoveClient fName = %s name = %s", GetClientControl()->fName, name);
-                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0)	// Don't call the callback for the registering client itself
+                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0) { // Don't call the callback for the registering client itself
                     fClientRegistration(name, 0, fClientRegistrationArg);
+                }
                 break;
 
             case kBufferSizeCallback:
                 jack_log("JackClient::kBufferSizeCallback buffer_size = %ld", value1);
-                if (fBufferSize)
+                if (fBufferSize) {
                     res = fBufferSize(value1, fBufferSizeArg);
+                }
                 break;
                 
             case kSampleRateCallback:
                 jack_log("JackClient::kSampleRateCallback sample_rate = %ld", value1);
-                if (fSampleRate)
+                if (fSampleRate) {
                     res = fSampleRate(value1, fSampleRateArg);
+                }
                 break;
 
             case kGraphOrderCallback:
                 jack_log("JackClient::kGraphOrderCallback");
-                if (fGraphOrder)
+                if (fGraphOrder) {
                     res = fGraphOrder(fGraphOrderArg);
+                }
                 break;
 
             case kStartFreewheelCallback:
                 jack_log("JackClient::kStartFreewheel");
                 SetupDriverSync(true);
-                fThread.DropRealTime();
-                if (fFreewheel)
+                fThread.DropRealTime();     // Always done (JACK server in RT mode or not...)
+                if (fFreewheel) {
                     fFreewheel(1, fFreewheelArg);
+                }
                 break;
 
             case kStopFreewheelCallback:
                 jack_log("JackClient::kStopFreewheel");
                 SetupDriverSync(false);
-                if (fFreewheel)
+                if (fFreewheel) {
                     fFreewheel(0, fFreewheelArg);
-                fThread.AcquireRealTime();
+                }
+                if (GetEngineControl()->fRealTime) {
+                    fThread.AcquireRealTime();
+                }
                 break;
 
             case kPortRegistrationOnCallback:
                 jack_log("JackClient::kPortRegistrationOn port_index = %ld", value1);
-                if (fPortRegistration)
+                if (fPortRegistration) {
                     fPortRegistration(value1, 1, fPortRegistrationArg);
+                }
                 break;
 
             case kPortRegistrationOffCallback:
                 jack_log("JackClient::kPortRegistrationOff port_index = %ld ", value1);
-                if (fPortRegistration)
+                if (fPortRegistration) {
                     fPortRegistration(value1, 0, fPortRegistrationArg);
+                }
                 break;
 
             case kPortConnectCallback:
                 jack_log("JackClient::kPortConnectCallback src = %ld dst = %ld", value1, value2);
-                if (fPortConnect)
+                if (fPortConnect) {
                     fPortConnect(value1, value2, 1, fPortConnectArg);
+                }
                 break;
 
             case kPortDisconnectCallback:
                 jack_log("JackClient::kPortDisconnectCallback src = %ld dst = %ld", value1, value2);
-                if (fPortConnect)
+                if (fPortConnect) {
                     fPortConnect(value1, value2, 0, fPortConnectArg);
+                }
                 break;
                 
              case kPortRenameCallback:
                 jack_log("JackClient::kPortRenameCallback port = %ld");
-                if (fPortRename)
+                if (fPortRename) {
                     fPortRename(value1, GetGraphManager()->GetPort(value1)->GetName(), fPortRenameArg);
+                }
                 break;
 
             case kXRunCallback:
                 jack_log("JackClient::kXRunCallback");
-                if (fXrun)
+                if (fXrun) {
                     res = fXrun(fXrunArg);
+                }
                 break;
                 
             case kShutDownCallback:
                 jack_log("JackClient::kShutDownCallback");
                 if (fInfoShutdown) {
-                    fInfoShutdown(value1, message, fInfoShutdownArg);
+                    fInfoShutdown((jack_status_t)value1, message, fInfoShutdownArg);
                     fInfoShutdown = NULL;
                 }
                 break;
@@ -454,7 +469,7 @@ inline void JackClient::End()
     jack_log("JackClient::Execute end name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
     int result;
-    fThread.DropRealTime();
+    fThread.DropSelfRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     fThread.Terminate();
@@ -465,7 +480,7 @@ inline void JackClient::Error()
     jack_error("JackClient::Execute error name = %s", GetClientControl()->fName);
     // Hum... not sure about this, the following "close" code is called in the RT thread...
     int result;
-    fThread.DropRealTime();
+    fThread.DropSelfRealTime();
     GetClientControl()->fActive = false;
     fChannel->ClientDeactivate(GetClientControl()->fRefNum, &result);
     ShutDown();
@@ -973,14 +988,7 @@ char* JackClient::GetInternalClientName(int ref)
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
     int result = -1;
     fChannel->GetInternalClientName(GetClientControl()->fRefNum, ref, name_res, &result);
-
-    if (result < 0) {
-        return NULL;
-    } else {
-        char* name = (char*)malloc(strlen(name_res));
-        strcpy(name, name_res);
-        return name;
-    }
+    return (result < 0) ? NULL : strdup(name_res);
 }
 
 int JackClient::InternalClientHandle(const char* client_name, jack_status_t* status)

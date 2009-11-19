@@ -27,6 +27,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
 
+#include <vector>
+
+using namespace std;
+
 namespace Jack
 {
 
@@ -63,6 +67,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         AudioUnitRenderActionFlags* fActionFags;
         AudioTimeStamp* fCurrentTime;
+        bool fClockDriftCompensate;
 
         static	OSStatus Render(void *inRefCon,
                                 AudioUnitRenderActionFlags *ioActionFlags,
@@ -91,6 +96,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
+        OSStatus CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
         bool IsAggregateDevice(AudioDeviceID device);
         

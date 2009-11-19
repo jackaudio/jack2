@@ -33,10 +33,24 @@ using namespace std;
 
 namespace Jack {
 
+    void JackTools::KillServer()
+    {
+#ifdef WIN32
+        exit(1);
+#else
+        kill(GetPID(), SIGINT);
+#endif
+    }
+
+    void JackTools::ThrowJackNetException() 
+    {
+        throw JackNetException();
+    }
+
 #define DEFAULT_TMP_DIR "/tmp"
     char* jack_tmpdir = (char*)DEFAULT_TMP_DIR;
 
-    int JackTools::GetPID() 
+    int JackTools::GetPID()
     {
 #ifdef WIN32
         return _getpid();
@@ -45,7 +59,7 @@ namespace Jack {
 #endif
     }
 
-    int JackTools::GetUID() 
+    int JackTools::GetUID()
     {
 #ifdef WIN32
         return  _getpid();
@@ -55,7 +69,7 @@ namespace Jack {
 #endif
     }
 
-    const char* JackTools::DefaultServerName() 
+    const char* JackTools::DefaultServerName()
     {
         const char* server_name;
         if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
@@ -66,25 +80,25 @@ namespace Jack {
     /* returns the name of the per-user subdirectory of jack_tmpdir */
 #ifdef WIN32
 
-    char* JackTools::UserDir() 
+    char* JackTools::UserDir()
     {
         return "";
     }
 
-    char* JackTools::ServerDir(const char* server_name, char* server_dir) 
+    char* JackTools::ServerDir(const char* server_name, char* server_dir)
     {
         return "";
     }
 
     void JackTools::CleanupFiles(const char* server_name) {}
 
-    int JackTools::GetTmpdir() 
+    int JackTools::GetTmpdir()
     {
         return 0;
     }
 
 #else
-    char* JackTools::UserDir() 
+    char* JackTools::UserDir()
     {
         static char user_dir[JACK_PATH_MAX + 1] = "";
 
@@ -101,7 +115,7 @@ namespace Jack {
     }
 
     /* returns the name of the per-server subdirectory of jack_user_dir() */
-    char* JackTools::ServerDir(const char* server_name, char* server_dir) 
+    char* JackTools::ServerDir(const char* server_name, char* server_dir)
     {
         /* format the path name into the suppled server_dir char array,
         * assuming that server_dir is at least as large as JACK_PATH_MAX + 1 */
@@ -110,7 +124,7 @@ namespace Jack {
         return server_dir;
     }
 
-    void JackTools::CleanupFiles(const char* server_name) 
+    void JackTools::CleanupFiles(const char* server_name)
     {
         DIR* dir;
         struct dirent *dirent;
@@ -169,7 +183,7 @@ namespace Jack {
         }
     }
 
-    int JackTools::GetTmpdir() 
+    int JackTools::GetTmpdir()
     {
         FILE* in;
         size_t len;
@@ -201,7 +215,7 @@ namespace Jack {
     }
 #endif
 
-    void JackTools::RewriteName(const char* name, char* new_name) 
+    void JackTools::RewriteName(const char* name, char* new_name)
     {
         size_t i;
         for (i = 0; i < strlen(name); i++) {
@@ -212,7 +226,7 @@ namespace Jack {
         }
         new_name[i] = '\0';
     }
-    
+
 #ifdef WIN32
 
 void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
@@ -251,7 +265,7 @@ void PrintLoadError(const char* so_name)
 
 #else
 
-void PrintLoadError(const char* so_name) 
+void PrintLoadError(const char* so_name)
 {
     jack_log("error loading %s err = %s", so_name, dlerror());
 }
@@ -264,7 +278,7 @@ void BuildClientPath(char* path_to_so, int path_len, const char* so_name)
             internal_dir = ADDON_DIR;
         }
     }
-    
+
     snprintf(path_to_so, path_len, "%s/%s.so", internal_dir, so_name);
 }
 

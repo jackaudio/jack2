@@ -26,6 +26,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackAudioDriver.h"
 #include "JackTime.h"
 
+#include <vector>
+
+using namespace std;
+
 namespace Jack
 {
 
@@ -77,6 +81,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         bool fMonitor;
         float fIOUsage;
         float fComputationGrain;
+        bool fClockDriftCompensate;
     
         /*    
     #ifdef MAC_OS_X_VERSION_10_5
@@ -117,9 +122,10 @@ class JackCoreAudioDriver : public JackAudioDriver
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
         OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
-
+   
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
+        OSStatus CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
         bool IsAggregateDevice(AudioDeviceID device);
         
@@ -178,7 +184,8 @@ class JackCoreAudioDriver : public JackAudioDriver
                  jack_nframes_t playback_latency,
                  int async_output_latency,
                  int computation_grain,
-                 bool hogged);
+                 bool hogged,
+                 bool clock_drift);
         int Close();
 
         int Attach();

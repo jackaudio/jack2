@@ -220,7 +220,7 @@ void jack_shutdown(void *arg)
     exit(1);
 }
 
-void jack_info_shutdown(int code, const char* reason, void *arg)
+void jack_info_shutdown(jack_status_t code, const char* reason, void *arg)
 {
     printf("JACK server failure : %s\n", reason);
     exit(1);

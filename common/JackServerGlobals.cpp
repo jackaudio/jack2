@@ -28,7 +28,6 @@ static char* server_name = NULL;
 namespace Jack
 {
 
-bool JackServerGlobals::fKilled = false;
 JackServer* JackServerGlobals::fInstance; 
 unsigned int JackServerGlobals::fUserCount;
 bool (* JackServerGlobals::on_device_acquire)(const char * device_name) = NULL;

@@ -25,6 +25,62 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-18 Stephane Letz  <letz@grame.fr>
+
+	* Sync JackCoreAudioAdapter code with JackCoreAudioDriver.
+
+2009-11-17 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudio driver, clock drift compensation in aggregated devices working.
+	* In JackCoreAudio driver, clock drift compensation semantic changed a bit : when on, does not activate if not needed (same clock domain).
+
+2009-11-16 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudio driver, (possibly) clock drift compensation when needed in aggregated devices.
+
+2009-11-14 Stephane Letz  <letz@grame.fr>
+
+	* Sync with JACK1 : -r parameter now used for no-realtime, realtime (-R) is now default, usable backend given vie platform.
+
+2009-11-13 Stephane Letz  <letz@grame.fr>
+
+	* Better memory allocation error checking in ringbuffer.c, weak import improvements.
+	* Memory allocation error checking for jack_client_new and jack_client_open (server and client side).
+	* Memory allocation error checking in server for RPC.
+	* Simplify server temporary mode : now use a JackTemporaryException.
+	* Lock/Unlock shared memory segments (to test...).
+
+2009-11-12 Stephane Letz  <letz@grame.fr>
+
+	* Better memory allocation error checking on client (library) side. 
+
+2009-11-11 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackCoreAudio driver when empty strings are given as -C, -P or -d parameter. 
+
+2009-11-10 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackInfoShutdownCallback prototype, two new JackClientProcessFailure and JackClientZombie JackStatus code.  
+
+2009-11-09 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackGraphManager::GetBuffer for the "client loop with one connection" case : buffer must be copied.
+
+2009-11-07 Stephane Letz  <letz@grame.fr>
+
+	* Fix AcquireRealTime and DropRealTime: now distinguish when called from another thread (AcquireRealTime/DropRealTime) and from the thread itself (AcquireSelfRealTime/DropSelfRealTime).
+	* Correct JackPosixThread::StartImp : thread priority setting now done in the RT case only.
+
+2009-11-06 Stephane Letz  <letz@grame.fr>
+
+	* Correctly save and restore RT mode state in freewheel mode.
+	* Correct freewheel code on client side.
+
+2009-11-05 Stephane Letz  <letz@grame.fr>
+
+	* No reason to make jack_on_shutdown deprecated, so revert the incorrect change.
+	* Thread AcquireRealTime and DropRealTime were (incorrectly) using fThread field. Use pthread_self()) (or GetCurrentThread() on Windows) to get the calling thread.
+
 2009-10-30 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudioDriver, improve management of input/output channels: -1 is now used internally to indicate a wanted max value. 
@@ -32,6 +88,7 @@ Paul Davis
 	* Correct crash bug in JackAudioAdapterInterface when not input is used in adapter (temporary fix...)
 	* Sync JackCoreAudioAdapter code on JackCoreAudioDriver one.
 	* JACK_SCHED_POLICY switched to SCHED_FIFO.
+	* Now can aggregate device that are themselves AD.
 
 2009-10-29 Stephane Letz  <letz@grame.fr>
 
@@ -398,12 +455,12 @@ Paul Davis
 
 2009-01-05 Stephane Letz  <letz@grame.fr>
 
-	* Synchronize jack2 public headers with jack1 ones. 
+	* Synchronize jack2 public headers with JACK1 ones. 
 	* Implement jack_client_real_time_priority and jack_client_max_real_time_priority API.
 
 2008-12-18 Stephane Letz  <letz@grame.fr>
 
-	* For ALSA driver, synchronize with latest jack1 memops functions. 
+	* For ALSA driver, synchronize with latest JACK1 memops functions. 
     	* Use memops functions in JackOSSDriver.
 	* Use memops functions in JackOSSAdapter.
 
@@ -437,13 +494,13 @@ Paul Davis
 2008-11-27 Stephane Letz  <letz@grame.fr>
 
 	* Add timing profiling code in JackOSSDriver.
-	* Report ringbuffer.c fixes from jack1.
+	* Report ringbuffer.c fixes from JACK1.
 
 2008-11-21 Stephane Letz  <letz@grame.fr>
 
-	* Report ringbuffer.c fixes from jack1.
+	* Report ringbuffer.c fixes from JACK1.
 	* Better isolation of server and clients system resources to allow starting the server in several user account at the same time.
-        * Correct ressource cleanup in case of driver open failure.
+	* Correct ressource cleanup in case of driver open failure.
 
 2008-11-19 Stephane Letz  <letz@grame.fr>
 

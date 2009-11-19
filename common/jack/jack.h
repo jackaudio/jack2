@@ -34,6 +34,25 @@ extern "C"
  * Note: More documentation can be found in jack/types.h.
  */
  
+/*************************************************************
+ * NOTE: JACK_WEAK_EXPORT ***MUST*** be used on every function
+ * added to the JACK API after the 0.116.2 release.
+ *************************************************************/
+
+#ifndef JACK_WEAK_EXPORT
+#ifdef __GNUC__
+/* JACK_WEAK_EXPORT needs to be a macro which
+   expands into a compiler directive. If non-null, the directive 
+   must tell the compiler to arrange for weak linkage of 
+   the symbol it used with. For this to work full may
+   require linker arguments in the client as well.
+*/
+#define JACK_WEAK_EXPORT __attribute__((weak))
+#else
+/* Add other things here for non-gcc platforms */
+#endif
+#endif
+
 /**
 * @defgroup ClientFunctions Creating & manipulating clients
 * @{
@@ -282,7 +301,7 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * @param function The jack_shutdown function pointer.
  * @param arg The arguments for the jack_shutdown function.
  *
- * @deprecated Register a function (and argument) to be called if and when the
+ * Register a function (and argument) to be called if and when the
  * JACK server shuts down the client thread.  The function must
  * be written as if it were an asynchonrous POSIX signal
  * handler --- use only async-safe functions, and remember that it
@@ -294,14 +313,19 @@ int jack_set_thread_init_callback (jack_client_t *client,
  * NOTE: clients do not need to call this.  It exists only
  * to help more complex clients understand what is going
  * on.  It should be called before jack_client_activate().
+ *
+ * NOTE: if a client calls this AND jack_on_info_shutdown(), then
+ * the event of a client thread shutdown, the callback
+ * passed to this function will not be called, and the one passed to
+ * jack_on_info_shutdown() will.
  */
 void jack_on_shutdown (jack_client_t *client,
-                       JackShutdownCallback shutdown_callback, void *arg);
+                       JackShutdownCallback shutdown_callback, void *arg) JACK_WEAK_EXPORT;
 
 /**
  * @param client pointer to JACK client structure.
- * @param function The jack_shutdown function pointer.
- * @param arg The arguments for the jack_shutdown function.
+ * @param function The jack_info_shutdown function pointer.
+ * @param arg The arguments for the jack_info_shutdown function.
  *
  * Register a function (and argument) to be called if and when the
  * JACK server shuts down the client thread.  The function must
@@ -315,6 +339,11 @@ void jack_on_shutdown (jack_client_t *client,
  * NOTE: clients do not need to call this.  It exists only
  * to help more complex clients understand what is going
  * on.  It should be called before jack_client_activate().
+ *
+ * NOTE: if a client calls this AND jack_on_info_shutdown(), then
+ * the event of a client thread shutdown, the callback
+ * passed to this function will not be called, and the one passed to
+ * jack_on_info_shutdown() will.
  */
 void jack_on_info_shutdown (jack_client_t *client,
                        JackInfoShutdownCallback shutdown_callback, void *arg);

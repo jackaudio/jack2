@@ -1,5 +1,5 @@
 /*
- *  bufsize.c -- change JACK buffer size.
+ *  smaplerate.c -- get current samplerate
  *
  *  Copyright (C) 2003 Jack O'Quin.
  *  
@@ -29,8 +29,6 @@
 
 char *package;				/* program name */
 jack_client_t *client;
-jack_nframes_t nframes;
-int just_print_bufsize=0;
 
 void jack_shutdown(void *arg)
 {
@@ -56,30 +54,18 @@ void parse_arguments(int argc, char *argv[])
 		package++;
 
 	if (argc==1) {
-		just_print_bufsize = 1;
 		return;
 	}
-	if (argc < 2) {
-		fprintf(stderr, "usage: %s <bufsize>\n", package);
-		exit(9);
-	}
-
-	nframes = strtoul(argv[1], NULL, 0);
-	if (errno == ERANGE) {
-		fprintf(stderr, "%s: invalid buffer size: %s\n",
-			package, argv[1]);
-		exit(2);
-	}
+	fprintf(stderr, "usage: %s [bufsize]\n", package);
+	exit(9);
 }
 
 int main(int argc, char *argv[])
 {
-	int rc;
-
 	parse_arguments(argc, argv);
 
 	/* become a JACK client */
-    if ((client = jack_client_open(package, JackNullOption, NULL)) == 0) {
+	if ((client = jack_client_open(package, JackNullOption, NULL)) == 0) {
 		fprintf(stderr, "JACK server not running?\n");
 		exit(1);
 	}
@@ -91,17 +77,9 @@ int main(int argc, char *argv[])
 
 	jack_on_shutdown(client, jack_shutdown, 0);
 
-	if (just_print_bufsize) {
-		fprintf(stdout, "%d\n", jack_get_buffer_size( client ) );
-		rc=0;
-	}
-	else
-	{
-		rc = jack_set_buffer_size(client, nframes);
-		if (rc)
-			fprintf(stderr, "jack_set_buffer_size(): %s\n", strerror(rc));
-	}
+	fprintf(stdout, "%d\n", jack_get_sample_rate( client ) );
+
 	jack_client_close(client);
 
-	return rc;
+	return 0;
 }

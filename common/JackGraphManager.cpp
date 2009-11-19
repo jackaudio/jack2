@@ -135,8 +135,8 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     JackConnectionManager* manager = ReadCurrentState();
     JackPort* port = GetPort(port_index);
 
+    // This happens when a port has just been unregistered and is still used by the RT code
     if (!port->IsUsed()) {
-        // This happens when a port has just been unregistered and is still used by the RT code.
         jack_log("JackGraphManager::GetBuffer : port = %ld is released state", port_index);
         return GetBuffer(0); // port_index 0 is not used
     }
@@ -149,14 +149,29 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     // Input port
     jack_int_t len = manager->Connections(port_index);
 
-    if (len == 0) {  // No connections: return a zero-filled buffer
+    // No connections : return a zero-filled buffer
+    if (len == 0) { 
         port->ClearBuffer(buffer_size);
         return port->GetBuffer();
-    } else if (len == 1) {	 // One connection: use zero-copy mode - just pass the buffer of the connected (output) port.
-        assert(manager->GetPort(port_index, 0) != port_index); // Check recursion
-        return GetBuffer(manager->GetPort(port_index, 0), buffer_size);
-    } else {  // Multiple connections
-
+        
+    // One connection
+    } else if (len == 1) {	 
+        jack_port_id_t src_index = manager->GetPort(port_index, 0);
+        
+        // Ports in same client : copy the buffer
+        if (GetPort(src_index)->GetRefNum() == port->GetRefNum()) {
+            void* buffers[1];
+            buffers[0] = GetBuffer(src_index, buffer_size);
+            port->MixBuffers(buffers, 1, buffer_size);
+            return port->GetBuffer();
+        // Otherwise, use zero-copy mode, just pass the buffer of the connected (output) port.
+        } else {
+            return GetBuffer(src_index, buffer_size);
+        }
+        
+    // Multiple connections : mix all buffers
+    } else {  
+    
         const jack_int_t* connections = manager->GetConnections(port_index);
         void* buffers[CONNECTION_NUM_FOR_PORT];
         jack_port_id_t src_index;
@@ -167,7 +182,6 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
             buffers[i] = GetBuffer(src_index, buffer_size);
         }
 
-        JackPort* port = GetPort(port_index);
         port->MixBuffers(buffers, i, buffer_size);
         return port->GetBuffer();
     }
@@ -688,6 +702,9 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 {
     const char** res = (const char**)malloc(sizeof(char*) * CONNECTION_NUM_FOR_PORT);
     UInt16 cur_index, next_index;
+    
+    if (!res)
+        return NULL;
 
     do {
         cur_index = GetCurrentIndex();
@@ -768,6 +785,9 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
 {
     const char** res = (const char**)malloc(sizeof(char*) * PORT_NUM);
     UInt16 cur_index, next_index;
+    
+    if (!res)
+        return NULL;
  
     do {
         cur_index = GetCurrentIndex();

@@ -58,7 +58,25 @@ class SERVER_EXPORT JackException : public std::runtime_error {
 };
 
 /*!
-\brief Exception possibly thrown by Net Slaves.
+ \brief Exception thrown by JackEngine in temporary mode.
+ */
+
+class SERVER_EXPORT JackTemporaryException : public JackException {
+    
+    public:
+        
+        JackTemporaryException(const std::string& msg) : JackException(msg)
+        {}
+        JackTemporaryException(char* msg) : JackException(msg)
+        {}
+        JackTemporaryException(const char* msg) : JackException(msg)
+        {}
+        JackTemporaryException() : JackException("")
+        {}
+};
+    
+/*!
+\brief Exception possibly thrown by Net slaves.
 */
 
 class SERVER_EXPORT JackNetException : public JackException {

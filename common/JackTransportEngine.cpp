@@ -38,7 +38,8 @@ JackTransportEngine::JackTransportEngine(): JackAtomicArrayState<jack_position_t
 {
     fTransportState = JackTransportStopped;
     fTransportCmd = fPreviousCmd = TransportCommandStop;
-    fSyncTimeout = 2000000;	/* 2 second default */
+    fSyncTimeout = 10000000;	/* 10 seconds default... 
+				   in case of big netjack1 roundtrip */
     fSyncTimeLeft = 0;
     fTimeBaseMaster = -1;
     fWriteCounter = 0;

@@ -46,7 +46,7 @@ void JackMessageBuffer::Stop()
     if (fOverruns > 0) {
         jack_error("WARNING: %d message buffer overruns!", fOverruns); 
     } else {
-        jack_info("no message buffer overruns"); 
+        jack_log("no message buffer overruns"); 
     }
     fGuard.Lock();
     fRunning = false;

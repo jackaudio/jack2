@@ -160,9 +160,11 @@ int JackMachThread::Kill()
     // pthread_cancel still not yet implemented in Darwin (TO CHECK ON TIGER)
     jack_log("JackMachThread::Kill");
     
-    if (fThread) { // If thread has been started
+    if (fThread != (pthread_t)NULL)  { // If thread has been started
         mach_port_t machThread = pthread_mach_thread_np(fThread);
-        return (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
+        int res = (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
+        fThread = (pthread_t)NULL;
+        return res;
     } else {
         return -1;
     }
@@ -172,7 +174,14 @@ int JackMachThread::AcquireRealTime()
 {
     jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
              long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
-    return (fThread) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
+    return (fThread != (pthread_t)NULL) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1; 
+}
+
+int JackMachThread::AcquireSelfRealTime()
+{
+    jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
+             long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
+    return AcquireRealTimeImp(pthread_self(), fPeriod, fComputation, fConstraint);
 }
 
 int JackMachThread::AcquireRealTime(int priority)
@@ -181,19 +190,26 @@ int JackMachThread::AcquireRealTime(int priority)
     return AcquireRealTime();
 }
 
+int JackMachThread::AcquireSelfRealTime(int priority)
+{
+    fPriority = priority;
+    return AcquireSelfRealTime();
+}
+
 int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
 {
     SetThreadToPriority(thread, 96, true, period, computation, constraint);
-    UInt64 int_period;
-    UInt64 int_computation;
-    UInt64 int_constraint;
-    GetParams(thread, &int_period, &int_computation, &int_constraint);
     return 0;
 }
 
 int JackMachThread::DropRealTime()
 {
-    return (fThread) ? DropRealTimeImp(fThread) : -1;
+    return (fThread != (pthread_t)NULL) ? DropRealTimeImp(fThread) : -1;
+}
+
+int JackMachThread::DropSelfRealTime()
+{
+    return DropRealTimeImp(pthread_self());
 }
 
 int JackMachThread::DropRealTimeImp(pthread_t thread)

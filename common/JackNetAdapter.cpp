@@ -228,8 +228,8 @@ namespace Jack
         // Will do "something" on OSX only...
         fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
         
-        if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
-            jack_error("AcquireRealTime error");
+        if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
+            jack_error("AcquireSelfRealTime error");
         } else {
             set_threaded_log_function();
         }
@@ -251,7 +251,7 @@ namespace Jack
             e.PrintMessage();
             jack_info("NetAdapter is restarted.");
             Reset();
-            fThread.DropRealTime();
+            fThread.DropSelfRealTime();
             fThread.SetStatus(JackThread::kIniting);
             if (Init()) {
                 fThread.SetStatus(JackThread::kRunning);

@@ -58,9 +58,14 @@ class SERVER_EXPORT JackPosixThread : public detail::JackThreadInterface
         int Stop();
         void Terminate();
 
-        int AcquireRealTime();
-        int AcquireRealTime(int priority);
-        int DropRealTime();
+        int AcquireRealTime();                  // Used when called from another thread
+        int AcquireSelfRealTime();              // Used when called from thread itself
+        
+        int AcquireRealTime(int priority);      // Used when called from another thread
+        int AcquireSelfRealTime(int priority);  // Used when called from thread itself
+        
+        int DropRealTime();                     // Used when called from another thread
+        int DropSelfRealTime();                 // Used when called from thread itself
 
         pthread_t GetThreadID();
 

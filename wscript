@@ -114,6 +114,19 @@ def configure(conf):
         conf.sub_config('dbus')
     conf.sub_config('example-clients')
 
+    if conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
+        conf.define('HAVE_CELT', 1)
+        conf.define('HAVE_CELT_API_0_7', 1)
+        conf.define('HAVE_CELT_API_0_5', 0)
+    elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', required=True):
+        conf.define('HAVE_CELT', 1)
+        conf.define('HAVE_CELT_API_0_5', 1)
+        conf.define('HAVE_CELT_API_0_7', 0)
+    else:
+        conf.define('HAVE_CELT', 0)
+        conf.define('HAVE_CELT_API_0_5', 0)
+        conf.define('HAVE_CELT_API_0_7', 0)
+
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
     conf.env['LIB_RT'] = ['rt']
@@ -218,11 +231,11 @@ def configure(conf):
     	conf.env.append_unique('CXXFLAGS', '-m32')
     	conf.env.append_unique('CCFLAGS', '-m32')
     	conf.env.append_unique('LINKFLAGS', '-m32')
-        conf.write_config_header('config.h')
     	if Options.options.libdir32:
 	    conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
     	else:
 	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+	conf.write_config_header('config.h')
 
 def build(bld):
     print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )

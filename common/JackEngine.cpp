@@ -119,7 +119,7 @@ void JackEngine::ReleaseRefnum(int ref)
             // last client and temporay case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
-            JackServerGlobals::fKilled = true;
+            throw JackTemporaryException();
         }
     }
 }
@@ -305,7 +305,15 @@ void JackEngine::NotifyFailure(int code, const char* reason)
     
 void JackEngine::NotifyFreewheel(bool onoff)
 {
-    fEngineControl->fRealTime = !onoff;
+    if (onoff) {
+        // Save RT state
+        fEngineControl->fSavedRealTime = fEngineControl->fRealTime;
+        fEngineControl->fRealTime = false;
+    } else {
+        // Restore RT state
+        fEngineControl->fRealTime = fEngineControl->fSavedRealTime;
+        fEngineControl->fSavedRealTime = false;
+    }
     NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, "", 0, 0);
 }
 
