@@ -69,6 +69,6 @@ def build(bld):
     create_jack_driver_obj(bld, 'loopback', '../common/JackLoopbackDriver.cpp')
 
     create_jack_driver_obj(bld, 'netone', [ '../common/JackNetOneDriver.cpp',
-		                            '../common/netjack.c',
-					    '../common/netjack_packet.c' ], "SAMPLERATE CELT" )
+                                            '../common/netjack.c',
+                                            '../common/netjack_packet.c' ], "SAMPLERATE CELT" )
 
