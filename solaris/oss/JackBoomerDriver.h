@@ -30,7 +30,7 @@ namespace Jack
 
 typedef jack_default_audio_sample_t jack_sample_t;
 
-#define OSS_DRIVER_N_PARAMS	12
+#define OSS_DRIVER_N_PARAMS	13
 #define OSS_DRIVER_DEF_DEV	"/dev/dsp"
 #define OSS_DRIVER_DEF_FS	48000
 #define OSS_DRIVER_DEF_BLKSIZE	1024
@@ -91,9 +91,11 @@ class JackBoomerDriver : public JackAudioDriver
         int fSampleFormat;
         int fNperiods;
         unsigned int fSampleSize;
+        unsigned int fFragmentSize;
         int fRWMode;
         bool fExcl;
-        
+        bool fSyncIO;
+       
         unsigned int fInputBufferSize;
         unsigned int fOutputBufferSize;
         
@@ -136,7 +138,7 @@ class JackBoomerDriver : public JackAudioDriver
                  const char* playback_driver_name,
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency,
-                 int bits);
+                 int bits, bool syncio);
 
         int Close();
 

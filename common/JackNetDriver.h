@@ -40,15 +40,16 @@ namespace Jack
             //jack data
             jack_port_id_t* fMidiCapturePortList;
             jack_port_id_t* fMidiPlaybackPortList;
-
+	   
             //transport
             int fLastTransportState;
             int fLastTimebaseMaster;
   
             //monitoring
-#ifdef JACK_MONITOR
+	#ifdef JACK_MONITOR
             JackGnuPlotMonitor<float>* fNetTimeMon;
-#endif
+            jack_time_t fRcvSyncUst;
+	#endif
 
             bool Initialize();
             void FreeAll();

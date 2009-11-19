@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2009 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,6 +32,12 @@ size_t JackMem::gSize = 0;
 JackShmMem::JackShmMem()
 {
     JackShmMemAble::Init();
+    LockMemory();
+}
+    
+JackShmMem::~JackShmMem()
+{
+    UnlockMemory();
 }
 
 void JackShmMemAble::Init()
@@ -96,8 +102,9 @@ void JackShmMem::operator delete(void* p, size_t size)
 
 void JackShmMem::operator delete(void* obj)
 {	
-    if (obj)	
+    if (obj) {
         JackShmMem::operator delete(obj, 0);
+    }
 }
 
 void LockMemoryImp(void* ptr, size_t size)

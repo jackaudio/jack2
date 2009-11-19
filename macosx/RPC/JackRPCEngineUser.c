@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Sep  1 17:42:28 2008
- * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
+ * stub generated Fri Oct 23 10:35:08 2009
+ * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
 #define	__MIG_check__Reply__JackRPCEngine_subsystem__ 1
@@ -50,15 +50,15 @@
 #ifndef	__MachMsgErrorWithTimeout
 #define	__MachMsgErrorWithTimeout(_R_) { \
 	switch (_R_) { \
-	case MACH_SEND_INVALID_REPLY: \
-	case MACH_RCV_INVALID_NAME: \
-	case MACH_RCV_PORT_DIED: \
-	case MACH_RCV_PORT_CHANGED: \
-	case MACH_RCV_TIMED_OUT: \
-		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
-		break; \
-	default: \
+	case MACH_SEND_INVALID_DATA: \
+	case MACH_SEND_INVALID_DEST: \
+	case MACH_SEND_INVALID_HEADER: \
 		mig_put_reply_port(InP->Head.msgh_reply_port); \
+		break; \
+	case MACH_SEND_TIMED_OUT: \
+	case MACH_RCV_TIMED_OUT: \
+	default: \
+		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
 	} \
 }
 #endif	/* __MachMsgErrorWithTimeout */
@@ -66,14 +66,13 @@
 #ifndef	__MachMsgErrorWithoutTimeout
 #define	__MachMsgErrorWithoutTimeout(_R_) { \
 	switch (_R_) { \
-	case MACH_SEND_INVALID_REPLY: \
-	case MACH_RCV_INVALID_NAME: \
-	case MACH_RCV_PORT_DIED: \
-	case MACH_RCV_PORT_CHANGED: \
-		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
+	case MACH_SEND_INVALID_DATA: \
+	case MACH_SEND_INVALID_DEST: \
+	case MACH_SEND_INVALID_HEADER: \
+		mig_put_reply_port(InP->Head.msgh_reply_port); \
 		break; \
 	default: \
-		mig_put_reply_port(InP->Head.msgh_reply_port); \
+		mig_dealloc_reply_port(InP->Head.msgh_reply_port); \
 	} \
 }
 #endif	/* __MachMsgErrorWithoutTimeout */
@@ -399,8 +398,9 @@ mig_internal kern_return_t __MIG_check__Reply__rpc_jack_client_open_t(__Reply__r
 
 #if	__MigTypeCheck
 	if (Out0P->private_port.type != MACH_MSG_PORT_DESCRIPTOR ||
-	    Out0P->private_port.disposition != 17)
-		{ return MIG_TYPE_ERROR; }
+	    Out0P->private_port.disposition != 17) {
+		return MIG_TYPE_ERROR;
+	}
 #endif	/* __MigTypeCheck */
 
 #if	defined(__NDR_convert__int_rep__Reply__rpc_jack_client_open_t__shared_engine__defined) || \
@@ -561,7 +561,7 @@ mig_external kern_return_t rpc_jack_client_open
 
 	InP->NDR = NDR_record;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->pid = pid;
 
@@ -628,11 +628,11 @@ mig_external kern_return_t rpc_jack_client_open
 #elif	defined(__NDR_convert__int_rep__JackRPCEngine__string__defined)
 #define	__NDR_convert__int_rep__Reply__rpc_jack_client_check_t__client_name_res__defined
 #define	__NDR_convert__int_rep__Reply__rpc_jack_client_check_t__client_name_res(a, f) \
-	__NDR_convert__int_rep__JackRPCEngine__string(a, f, 128)
+	__NDR_convert__int_rep__JackRPCEngine__string(a, f, 64)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Reply__rpc_jack_client_check_t__client_name_res__defined
 #define	__NDR_convert__int_rep__Reply__rpc_jack_client_check_t__client_name_res(a, f) \
-	__NDR_convert__int_rep__string(a, f, 128)
+	__NDR_convert__int_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Reply__rpc_jack_client_check_t__client_name_res__defined */
 
@@ -692,11 +692,11 @@ mig_external kern_return_t rpc_jack_client_open
 #elif	defined(__NDR_convert__char_rep__JackRPCEngine__string__defined)
 #define	__NDR_convert__char_rep__Reply__rpc_jack_client_check_t__client_name_res__defined
 #define	__NDR_convert__char_rep__Reply__rpc_jack_client_check_t__client_name_res(a, f) \
-	__NDR_convert__char_rep__JackRPCEngine__string(a, f, 128)
+	__NDR_convert__char_rep__JackRPCEngine__string(a, f, 64)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Reply__rpc_jack_client_check_t__client_name_res__defined
 #define	__NDR_convert__char_rep__Reply__rpc_jack_client_check_t__client_name_res(a, f) \
-	__NDR_convert__char_rep__string(a, f, 128)
+	__NDR_convert__char_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Reply__rpc_jack_client_check_t__client_name_res__defined */
 
@@ -756,11 +756,11 @@ mig_external kern_return_t rpc_jack_client_open
 #elif	defined(__NDR_convert__float_rep__JackRPCEngine__string__defined)
 #define	__NDR_convert__float_rep__Reply__rpc_jack_client_check_t__client_name_res__defined
 #define	__NDR_convert__float_rep__Reply__rpc_jack_client_check_t__client_name_res(a, f) \
-	__NDR_convert__float_rep__JackRPCEngine__string(a, f, 128)
+	__NDR_convert__float_rep__JackRPCEngine__string(a, f, 64)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Reply__rpc_jack_client_check_t__client_name_res__defined
 #define	__NDR_convert__float_rep__Reply__rpc_jack_client_check_t__client_name_res(a, f) \
-	__NDR_convert__float_rep__string(a, f, 128)
+	__NDR_convert__float_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Reply__rpc_jack_client_check_t__client_name_res__defined */
 
@@ -983,7 +983,7 @@ mig_external kern_return_t rpc_jack_client_check
 
 	InP->NDR = NDR_record;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->protocol = protocol;
 
@@ -1011,7 +1011,7 @@ mig_external kern_return_t rpc_jack_client_check
 		{ return check_result; }
 #endif	/* defined(__MIG_check__Reply__rpc_jack_client_check_t__defined) */
 
-	(void) mig_strncpy(client_name_res, Out0P->client_name_res, 128);
+	(void) mig_strncpy(client_name_res, Out0P->client_name_res, 64);
 
 	*status = Out0P->status;
 
@@ -4739,11 +4739,11 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 #elif	defined(__NDR_convert__int_rep__JackRPCEngine__string__defined)
 #define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
 #define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
-	__NDR_convert__int_rep__JackRPCEngine__string(a, f, 128)
+	__NDR_convert__int_rep__JackRPCEngine__string(a, f, 64)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
 #define	__NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
-	__NDR_convert__int_rep__string(a, f, 128)
+	__NDR_convert__int_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
 
@@ -4782,11 +4782,11 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 #elif	defined(__NDR_convert__char_rep__JackRPCEngine__string__defined)
 #define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
 #define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
-	__NDR_convert__char_rep__JackRPCEngine__string(a, f, 128)
+	__NDR_convert__char_rep__JackRPCEngine__string(a, f, 64)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
 #define	__NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
-	__NDR_convert__char_rep__string(a, f, 128)
+	__NDR_convert__char_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
 
@@ -4825,11 +4825,11 @@ mig_external kern_return_t rpc_jack_set_timebase_callback
 #elif	defined(__NDR_convert__float_rep__JackRPCEngine__string__defined)
 #define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
 #define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
-	__NDR_convert__float_rep__JackRPCEngine__string(a, f, 128)
+	__NDR_convert__float_rep__JackRPCEngine__string(a, f, 64)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined
 #define	__NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res(a, f) \
-	__NDR_convert__float_rep__string(a, f, 128)
+	__NDR_convert__float_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Reply__rpc_jack_get_internal_clientname_t__client_name_res__defined */
 
@@ -5040,7 +5040,7 @@ mig_external kern_return_t rpc_jack_get_internal_clientname
 		{ return check_result; }
 #endif	/* defined(__MIG_check__Reply__rpc_jack_get_internal_clientname_t__defined) */
 
-	(void) mig_strncpy(client_name_res, Out0P->client_name_res, 128);
+	(void) mig_strncpy(client_name_res, Out0P->client_name_res, 64);
 
 	*result = Out0P->result;
 
@@ -5431,7 +5431,7 @@ mig_external kern_return_t rpc_jack_internal_clienthandle
 
 	InP->refnum = refnum;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
 	InP->Head.msgh_bits =
 		MACH_MSGH_BITS(19, MACH_MSG_TYPE_MAKE_SEND_ONCE);
@@ -5854,11 +5854,11 @@ mig_external kern_return_t rpc_jack_internal_clientload
 
 	InP->refnum = refnum;
 
-	(void) mig_strncpy(InP->client_name, client_name, 128);
+	(void) mig_strncpy(InP->client_name, client_name, 64);
 
-	(void) mig_strncpy(InP->so_name, so_name, 1024);
+	(void) mig_strncpy(InP->so_name, so_name, 256);
 
-	(void) mig_strncpy(InP->objet_data, objet_data, 1024);
+	(void) mig_strncpy(InP->objet_data, objet_data, 256);
 
 	InP->options = options;
 

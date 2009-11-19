@@ -104,6 +104,7 @@ bool JackProcessSync::TimedWait(long usec)
     gettimeofday(&T1, 0);
     jack_log("JackProcessSync::TimedWait finished delta = %5.1lf",
              (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
+    
     return (res == 0);
 }
 
@@ -112,11 +113,11 @@ bool JackProcessSync::LockedTimedWait(long usec)
     struct timeval T0, T1;
     timespec time;
     struct timeval now;
-    int res;
+    int res1, res2;
 
-    res = pthread_mutex_lock(&fMutex);
-    if (res != 0)
-        jack_error("JackProcessSync::LockedTimedWait error err = %s", usec, strerror(res));
+    res1 = pthread_mutex_lock(&fMutex);
+    if (res1 != 0)
+        jack_error("JackProcessSync::LockedTimedWait error err = %s", usec, strerror(res1));
         
     jack_log("JackProcessSync::TimedWait time out = %ld", usec);
     gettimeofday(&T0, 0);
@@ -125,19 +126,19 @@ bool JackProcessSync::LockedTimedWait(long usec)
     unsigned int next_date_usec = now.tv_usec + usec;
     time.tv_sec = now.tv_sec + (next_date_usec / 1000000);
     time.tv_nsec = (next_date_usec % 1000000) * 1000;
-    res = pthread_cond_timedwait(&fCond, &fMutex, &time);
-    if (res != 0)
-        jack_error("JackProcessSync::LockedTimedWait error usec = %ld err = %s", usec, strerror(res));
+    res2 = pthread_cond_timedwait(&fCond, &fMutex, &time);
+    if (res2 != 0)
+        jack_error("JackProcessSync::LockedTimedWait error usec = %ld err = %s", usec, strerror(res2));
 
     gettimeofday(&T1, 0);
-    
-    res = pthread_mutex_unlock(&fMutex);
-    if (res != 0)
-        jack_error("JackProcessSync::LockedTimedWait error err = %s", usec, strerror(res));
+    res1 = pthread_mutex_unlock(&fMutex);
+    if (res1 != 0)
+        jack_error("JackProcessSync::LockedTimedWait error err = %s", usec, strerror(res1));
         
     jack_log("JackProcessSync::TimedWait finished delta = %5.1lf",
              (1e6 * T1.tv_sec - 1e6 * T0.tv_sec + T1.tv_usec - T0.tv_usec));
-    return (res == 0);
+    
+    return (res2 == 0);
 }
 
 

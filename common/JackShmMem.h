@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001 Paul Davis
-Copyright (C) 2004-2008 Grame
+Copyright (C) 2004-2009 Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -129,9 +129,8 @@ class SERVER_EXPORT JackShmMem : public JackShmMemAble
      protected:
     
         JackShmMem();
-        ~JackShmMem()
-        {}
- 
+        ~JackShmMem();
+  
     public:
     
         void* operator new(size_t size);
@@ -162,9 +161,9 @@ class JackShmReadWritePtr
                     throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
-                    //jack_error("cannot attach shared memory segment", strerror(errno));
                     throw - 2;
                 }
+                GetShmAddress()->LockMemory();
             }
         }
 
@@ -185,9 +184,10 @@ class JackShmReadWritePtr
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %ld", fInfo.index);
+                GetShmAddress()->UnlockMemory();
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
-            }
+             }
         }
 
         T* operator->() const
@@ -242,15 +242,15 @@ class JackShmReadWritePtr1
                     throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm(&fInfo)) {
-                    //jack_error("cannot attach shared memory segment", strerror(errno));
                     throw - 2;
                 }
                 /*
-                            nobody else needs to access this shared memory any more, so
-                            destroy it. because we have our own attachment to it, it won't
-                            vanish till we exit (and release it).
-                            */
+                nobody else needs to access this shared memory any more, so
+                destroy it. because we have our own attachment to it, it won't
+                vanish till we exit (and release it).
+                */
                 jack_destroy_shm(&fInfo);
+                GetShmAddress()->LockMemory();
             }
         }
 
@@ -271,6 +271,7 @@ class JackShmReadWritePtr1
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld", fInfo.index);
+                GetShmAddress()->UnlockMemory();
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }
@@ -328,9 +329,9 @@ class JackShmReadPtr
                     throw - 1;
                 fInfo.index = index;
                 if (jack_attach_shm_read(&fInfo)) {
-                    //jack_error("cannot attach shared memory segment", strerror(errno));
                     throw - 2;
                 }
+                GetShmAddress()->LockMemory();
             }
         }
 
@@ -351,6 +352,7 @@ class JackShmReadPtr
         {
             if (fInfo.index >= 0) {
                 jack_log("JackShmPtrRead::~JackShmPtrRead %ld", fInfo.index);
+                GetShmAddress()->UnlockMemory();
                 jack_release_shm(&fInfo);
                 fInfo.index = -1;
             }

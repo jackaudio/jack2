@@ -94,7 +94,9 @@ static void copyright(FILE* file)
 static void usage(FILE* file)
 {
     fprintf(file, "\n"
-            "usage: jackdmp [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
+            "usage: jackdmp [ --no-realtime OR -r ]\n"
+            "               [ --realtime OR -R [ --realtime-priority OR -P priority ] ]\n"
+            "      (the two previous arguments are mutually exclusive. The default is --realtime)\n"
             "               [ --name OR -n server-name ]\n"
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
             "               [ --loopback OR -L loopback-port-number ]\n"
@@ -103,15 +105,26 @@ static void usage(FILE* file)
 #ifdef __linux__
             "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
 #endif
-            "               [ --replace-registry OR -r ]\n"
+            "               [ --replace-registry ]\n"
             "               [ --silent OR -s ]\n"
             "               [ --sync OR -S ]\n"
             "               [ --temporary OR -T ]\n"
             "               [ --version OR -V ]\n"
-            "         -d audio-driver [ ... driver args ... ]\n"
-            "             where driver can be `alsa', `coreaudio', 'portaudio' or `dummy'\n"
-            "       jackdmp -d driver --help\n"
-            "             to display options for each driver\n\n");
+            "         -d backend [ ... backend args ... ]\n"
+#ifdef __APPLE__
+            "               Available backends may include: coreaudio, dummy or net.\n\n"
+#endif 
+#ifdef WIN32
+            "               Available backends may include: portaudio, dummy or net.\n\n"
+#endif 
+#ifdef __linux__
+            "               Available backends may include: alsa, dummy, freebob, firewire, net, oss or sun.\n\n"
+#endif
+#if defined(__sun__) || defined(sun)
+            "               Available backends may include: boomer, oss, dummy or net.\n\n"
+#endif
+            "       jackdmp -d backend --help\n"
+            "             to display options for each backend\n\n");
 }
 
 // To put in the control.h interface??
@@ -163,12 +176,14 @@ int main(int argc, char* argv[])
     jackctl_driver_t * audio_driver_ctl;
     jackctl_driver_t * midi_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl;
+    int replace_registry = 0;
     
+    const char *options = "-d:X:P:uvshVrRL:STFl:t:mn:p:"
+        "a:"
 #ifdef __linux__
-    const char *options = "-d:X:P:uvrshVRSTFl:t:mn:p:c:a:L:";
-#else
-    const char *options = "-d:X:P:uvrshVRSTFl:t:mn:p:a:L:";
+        "c:"
 #endif
+        ;
     
     struct option long_options[] = {
 #ifdef __linux__
@@ -184,7 +199,8 @@ int main(int argc, char* argv[])
                                        { "name", 0, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
-                                       { "replace-registry", 0, 0, 'r' },
+                                       { "no-realtime", 0, 0, 'r' }, 
+                                       { "replace-registry", 0, &replace_registry, 0 },
                                        { "loopback", 0, 0, 'L' },
                                        { "realtime-priority", 1, 0, 'P' },
                                        { "timeout", 1, 0, 't' },
@@ -225,8 +241,16 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Failed to create server object\n");
         return -1;
     }
-
+  
     server_parameters = jackctl_server_get_parameters(server_ctl);
+    
+    // Default setting
+    param = jackctl_get_parameter(server_parameters, "realtime");
+    if (param != NULL) {
+        value.b = true;
+        jackctl_parameter_set_value(param, &value);
+    }
+    
     opterr = 0;
     while (!seen_audio_driver &&
             (opt = getopt_long(argc, argv, options,
@@ -248,7 +272,7 @@ int main(int argc, char* argv[])
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
-                        goto fail_free;
+                        goto fail_free1;
                     }
                 }
                 break;
@@ -269,7 +293,7 @@ int main(int argc, char* argv[])
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
-                        goto fail_free;
+                        goto fail_free1;
                     }
                 }
                 break;
@@ -336,11 +360,11 @@ int main(int argc, char* argv[])
                     jackctl_parameter_set_value(param, &value);
                 }
                 break;
-
+          
             case 'r':
-                param = jackctl_get_parameter(server_parameters, "replace-registry");
+                param = jackctl_get_parameter(server_parameters, "realtime");
                 if (param != NULL) {
-                    value.b = true;
+                    value.b = false;
                     jackctl_parameter_set_value(param, &value);
                 }
                 break;
@@ -379,10 +403,17 @@ int main(int argc, char* argv[])
 
             case 'h':
                 usage(stdout);
-                goto fail_free;
+                goto fail_free1;
         }
     }
-
+    
+    // Long option with no letter so treated separately
+    param = jackctl_get_parameter(server_parameters, "replace-registry");
+    if (param != NULL) {
+        value.b = replace_registry;
+        jackctl_parameter_set_value(param, &value);
+    }
+ 
     if (show_version) {
         printf( "jackdmp version " VERSION
                 " tmpdir " jack_server_dir
@@ -393,14 +424,14 @@ int main(int argc, char* argv[])
 
     if (!seen_audio_driver) {
         usage(stderr);
-        goto fail_free;
+        goto fail_free1;
     }
 
     // Audio driver
     audio_driver_ctl = jackctl_server_get_driver(server_ctl, audio_driver_name);
     if (audio_driver_ctl == NULL) {
         fprintf(stderr, "Unkown driver \"%s\"\n", audio_driver_name);
-        goto fail_free;
+        goto fail_free1;
     }
 
     if (optind < argc) {
@@ -412,7 +443,7 @@ int main(int argc, char* argv[])
     if (audio_driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                 " anything when run like this.\n");
-        goto fail_free;
+        goto fail_free1;
     }
 
     audio_driver_args = (char **) malloc(sizeof(char *) * audio_driver_nargs);
@@ -423,13 +454,13 @@ int main(int argc, char* argv[])
     }
 
     if (jackctl_parse_driver_params(audio_driver_ctl, audio_driver_nargs, audio_driver_args)) {
-        goto fail_free;
+        goto fail_free1;
     }
 
     // Start server
     if (!jackctl_server_start(server_ctl, audio_driver_ctl)) {
         fprintf(stderr, "Failed to start server\n");
-        goto fail_free;
+        goto fail_free1;
     }
 
     // MIDI driver
@@ -438,7 +469,7 @@ int main(int argc, char* argv[])
         midi_driver_ctl = jackctl_server_get_driver(server_ctl, midi_driver_name);
         if (midi_driver_ctl == NULL) {
             fprintf(stderr, "Unkown driver \"%s\"\n", midi_driver_name);
-            goto fail_free;
+            goto fail_free2;
         }
 
         jackctl_server_add_slave(server_ctl, midi_driver_ctl);
@@ -466,10 +497,18 @@ int main(int argc, char* argv[])
 
     if (!jackctl_server_stop(server_ctl))
         fprintf(stderr, "Cannot stop server...\n");
-
-fail_free:
-
+    
     jackctl_server_destroy(server_ctl);
     notify_server_stop(server_name);
-    return 1;
+    return 0;
+
+fail_free1:
+    jackctl_server_destroy(server_ctl);
+    return -1;
+    
+fail_free2:
+    jackctl_server_stop(server_ctl);
+    jackctl_server_destroy(server_ctl);
+    notify_server_stop(server_name);
+    return -1;
 }

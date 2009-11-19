@@ -18,7 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 typedef char client_name_t[64];
-typedef char client_port_name_t[256];
+typedef char client_port_name_t[128];
 typedef char client_port_type_t[128];
 typedef char so_name_t[256];
 typedef char objet_data_t[256];
+typedef char message_t[256];

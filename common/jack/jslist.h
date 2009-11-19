@@ -48,8 +48,10 @@ jack_slist_alloc (void)
     JSList *new_list;
 
     new_list = (JSList*)malloc(sizeof(JSList));
-    new_list->data = NULL;
-    new_list->next = NULL;
+    if (new_list) {
+        new_list->data = NULL;
+        new_list->next = NULL;
+    }
 
     return new_list;
 }
@@ -61,8 +63,10 @@ jack_slist_prepend (JSList* list, void* data)
     JSList *new_list;
 
     new_list = (JSList*)malloc(sizeof(JSList));
-    new_list->data = data;
-    new_list->next = list;
+    if (new_list) {
+        new_list->data = data;
+        new_list->next = list;
+    }
 
     return new_list;
 }

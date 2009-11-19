@@ -22,7 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackServer.h"
 #include "JackLockedEngine.h"
 #include "JackGlobals.h"
+#include "JackServerGlobals.h"
 #include "JackClient.h"
+#include "JackTools.h"
 #include "JackNotification.h"
 #include <assert.h>
 #include <signal.h>
@@ -46,9 +48,8 @@ JackSocketServerChannel::~JackSocketServerChannel()
 
 int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
-    jack_log("JackSocketServerChannel::Open ");
-    fServer = server;
-
+    jack_log("JackSocketServerChannel::Open");
+   
     // Prepare request socket
     if (fRequestListenSocket.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_log("JackSocketServerChannel::Open : cannot create result listen socket");
@@ -57,18 +58,8 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 
     // Prepare for poll
     BuildPoolTable();
-
-    // Start listening
-    if (fThread.Start() != 0) {
-        jack_error("Cannot start Jack server listener");
-        goto error;
-    }
-
+    fServer = server;
     return 0;
-
-error:
-    fRequestListenSocket.Close();
-    return -1;
 }
 
 void JackSocketServerChannel::Close()
@@ -85,6 +76,16 @@ void JackSocketServerChannel::Close()
         socket->Close();
         delete socket;
     }
+}
+    
+int JackSocketServerChannel::Start()
+{
+    if (fThread.Start() != 0) {
+        jack_error("Cannot start Jack server listener");
+        return -1;
+    }  
+    
+    return 0;
 }
 
 void JackSocketServerChannel::ClientCreate()
@@ -201,7 +202,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackResult res;
             jack_log("JackRequest::ActivateClient");
             if (req.Read(socket) == 0)
-                res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fState);
+                res.fResult = fServer->GetEngine()->ClientActivate(req.fRefNum, req.fIsRealTime);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ActivateClient write error ref = %d", req.fRefNum);
             break;
@@ -395,7 +396,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             jack_error("Unknown request %ld", header.fType);
             break;
     }
-
+     
     return true;
 }
 

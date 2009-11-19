@@ -50,7 +50,7 @@ void JackWinNamedPipeServerNotifyChannel::Notify(int refnum, int notify, int val
 {
     JackClientNotificationRequest req(refnum, notify, value);
     if (req.Write(&fRequestPipe) < 0) {
-        jack_error("Could not write request ref = %ld notify = %ld", refnum, notify);
+        jack_error("Could not write request ref = %d notify = %d", refnum, notify);
     }
 }
 

@@ -54,6 +54,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackGraphOrderCallback fGraphOrder;
         JackXRunCallback fXrun;
         JackShutdownCallback fShutdown;
+        JackInfoShutdownCallback fInfoShutdown;
         JackThreadInitCallback fInit;
         JackBufferSizeCallback fBufferSize;
         JackSampleRateCallback fSampleRate;
@@ -70,6 +71,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fGraphOrderArg;
         void* fXrunArg;
         void* fShutdownArg;
+        void* fInfoShutdownArg;
         void* fInitArg;
         void* fBufferSizeArg;
         void* fSampleRateArg;
@@ -95,7 +97,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void CallSyncCallback();
         void CallTimebaseCallback();
    
-        virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, int value1, int value);
+        virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value);
 
         inline void DummyCycle();
         inline void ExecuteThread();
@@ -123,7 +125,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual JackEngineControl* GetEngineControl() const = 0;
 
         // Notifications
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 
         virtual int Activate();
         virtual int Deactivate();
@@ -159,6 +161,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 
         // Callbacks
         virtual void OnShutdown(JackShutdownCallback callback, void *arg);
+        virtual void OnInfoShutdown(JackInfoShutdownCallback callback, void *arg);
         virtual int SetProcessCallback(JackProcessCallback callback, void* arg);
         virtual int SetXRunCallback(JackXRunCallback callback, void* arg);
         virtual int SetInitCallback(JackThreadInitCallback callback, void* arg);

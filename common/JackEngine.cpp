@@ -121,9 +121,7 @@ void JackEngine::ReleaseRefnum(int ref)
             // last client and temporay case: quit the server
             jack_log("JackEngine::ReleaseRefnum server quit");
             fEngineControl->fTemporary = false;
-#ifndef WIN32
- 	    exit(0);
-#endif
+            throw JackTemporaryException();
         }
     }
 }
@@ -207,7 +205,7 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
 // Notifications
 //---------------
 
-void JackEngine::NotifyClient(int refnum, int event, int sync, int value1, int value2)
+void JackEngine::NotifyClient(int refnum, int event, int sync, const char* message, int value1, int value2)
 {
     JackClientInterface* client = fClientTable[refnum];
 
@@ -215,20 +213,20 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, int value1, int v
     if (!client) {
         jack_log("JackEngine::NotifyClient: client not available anymore");
     } else if (client->GetClientControl()->fCallback[event]) {
-        if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
+        if (client->ClientNotify(refnum, client->GetClientControl()->fName, event, sync, message, value1, value2) < 0)
             jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
     } else {
         jack_log("JackEngine::NotifyClient: no callback for event = %ld", event);
     }
 }
 
-void JackEngine::NotifyClients(int event, int sync, int value1, int value2)
+void JackEngine::NotifyClients(int event, int sync, const char*  message, int value1, int value2)
 {
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
             if (client->GetClientControl()->fCallback[event]) {
-                if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, value1, value2) < 0)
+                if (client->ClientNotify(i, client->GetClientControl()->fName, event, sync, message, value1, value2) < 0)
                     jack_error("NotifyClient fails name = %s event = %ld val1 = %ld val2 = %ld", client->GetClientControl()->fName, event, value1, value2);
             } else {
                 jack_log("JackEngine::NotifyClients: no callback for event = %ld", event);
@@ -244,11 +242,11 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
         if (old_client) {
-            if (old_client->ClientNotify(refnum, name, kAddClient, true, 0, 0) < 0) {
+            if (old_client->ClientNotify(refnum, name, kAddClient, true, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
                 return -1;
             }
-            if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, 0, 0) < 0) {
+            if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient new_client fails name = %s", name);
                 return -1;
             }
@@ -264,7 +262,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            client->ClientNotify(refnum, name, kRemoveClient, true, 0, 0);
+            client->ClientNotify(refnum, name, kRemoveClient, true, "",0, 0);
         }
     }
 }
@@ -281,51 +279,64 @@ void JackEngine::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
 void JackEngine::NotifyXRun(int refnum)
 {
     if (refnum == ALL_CLIENTS) {
-        NotifyClients(kXRunCallback, false, 0, 0);
+        NotifyClients(kXRunCallback, false, "", 0, 0);
     } else {
-        NotifyClient(refnum, kXRunCallback, false, 0, 0);
+        NotifyClient(refnum, kXRunCallback, false, "", 0, 0);
     }
 }
 
 void JackEngine::NotifyGraphReorder()
 {
-    NotifyClients(kGraphOrderCallback, false, 0, 0);
+    NotifyClients(kGraphOrderCallback, false, "", 0, 0);
 }
 
 void JackEngine::NotifyBufferSize(jack_nframes_t buffer_size)
 {
-    NotifyClients(kBufferSizeCallback, true, buffer_size, 0);
+    NotifyClients(kBufferSizeCallback, true, "", buffer_size, 0);
 }
 
 void JackEngine::NotifySampleRate(jack_nframes_t sample_rate)
 {
-    NotifyClients(kSampleRateCallback, true, sample_rate, 0);
+    NotifyClients(kSampleRateCallback, true, "", sample_rate, 0);
 }
 
+void JackEngine::NotifyFailure(int code, const char* reason)
+{
+    NotifyClients(kShutDownCallback, false, reason, code, 0);
+}
+    
 void JackEngine::NotifyFreewheel(bool onoff)
 {
-    fEngineControl->fRealTime = !onoff;
-    NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, 0, 0);
+    if (onoff) {
+        // Save RT state
+        fEngineControl->fSavedRealTime = fEngineControl->fRealTime;
+        fEngineControl->fRealTime = false;
+    } else {
+        // Restore RT state
+        fEngineControl->fRealTime = fEngineControl->fSavedRealTime;
+        fEngineControl->fSavedRealTime = false;
+    }
+    NotifyClients((onoff ? kStartFreewheelCallback : kStopFreewheelCallback), true, "", 0, 0);
 }
 
 void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
 {
-    NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, port_index, 0);
+    NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, "", port_index, 0);
 }
 
 void JackEngine::NotifyPortRename(jack_port_id_t port)
 {
-    NotifyClients(kPortRenameCallback, false, port, 0);
+    NotifyClients(kPortRenameCallback, false, "", port, 0);
 }
 
 void JackEngine::NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff)
 {
-    NotifyClients((onoff ? kPortConnectCallback : kPortDisconnectCallback), false, src, dst);
+    NotifyClients((onoff ? kPortConnectCallback : kPortDisconnectCallback), false, "", src, dst);
 }
 
 void JackEngine::NotifyActivate(int refnum)
 {
-    NotifyClient(refnum, kActivateClient, true, 0, 0);
+    NotifyClient(refnum, kActivateClient, true, "", 0, 0);
 }
 
 //----------------------------
@@ -483,7 +494,7 @@ int JackEngine::GetClientRefNum(const char* name)
 // Used for external clients
 int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
-    jack_log("JackEngine::ClientOpen: name = %s ", name);
+    jack_log("JackEngine::ClientExternalOpen: name = %s ", name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -535,7 +546,7 @@ error:
 // Used for server driver clients
 int JackEngine::ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)
 {
-    jack_log("JackEngine::ClientInternalNew: name = %s", name);
+    jack_log("JackEngine::ClientInternalOpen: name = %s", name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -640,14 +651,14 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     return 0;
 }
 
-int JackEngine::ClientActivate(int refnum, bool state)
+int JackEngine::ClientActivate(int refnum, bool is_real_time)
 {
     AssertRefnum(refnum);
     JackClientInterface* client = fClientTable[refnum];
     assert(fClientTable[refnum]);
 
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
-    if (state)
+    if (is_real_time)
         fGraphManager->Activate(refnum);
 
     // Wait for graph state change to be effective

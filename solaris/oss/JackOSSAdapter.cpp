@@ -44,13 +44,13 @@ static inline void CopyAndConvertIn(jack_sample_t *dst, void *src, size_t nframe
 			break;
         }
 		case 24: {
-			signed short *s32src = (signed short*)src;
+			signed int *s32src = (signed int*)src;
             s32src += channel;
             sample_move_dS_s24(dst, (char*)s32src, nframes, chcount<<2);
 			break;
         }
 		case 32: {
-			signed short *s32src = (signed short*)src;
+			signed int *s32src = (signed int*)src;
             s32src += channel;
             sample_move_dS_s32u24(dst, (char*)s32src, nframes, chcount<<2);
 			break;

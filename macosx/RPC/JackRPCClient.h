@@ -21,7 +21,7 @@ typedef struct {
         char            *name;
         function_ptr_t  function;
 } function_table_entry;
-typedef function_table_entry 	*function_table_t;
+typedef function_table_entry   *function_table_t;
 #endif /* FUNCTION_PTR_T */
 #endif /* AUTOTEST */
 
@@ -55,6 +55,7 @@ kern_return_t rpc_jack_client_sync_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
+	message_t message,
 	int value1,
 	int value2,
 	int *result
@@ -72,6 +73,7 @@ kern_return_t rpc_jack_client_async_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
+	message_t message,
 	int value1,
 	int value2
 );
@@ -103,6 +105,7 @@ __END_DECLS
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 	} __Request__rpc_jack_client_sync_notify_t;
@@ -119,6 +122,7 @@ __END_DECLS
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 	} __Request__rpc_jack_client_async_notify_t;

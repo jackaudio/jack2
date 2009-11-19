@@ -62,7 +62,7 @@ SERVER_EXPORT void jack_print_driver_options (jack_driver_desc_t* desc, FILE* fi
         fprintf (file, "\t-%c, --%s \t%s (default: %s)\n",
                  desc->params[i].character,
                  desc->params[i].name,
-                 desc->params[i].short_desc,
+                 desc->params[i].long_desc,
                  arg_default);
     }
 }

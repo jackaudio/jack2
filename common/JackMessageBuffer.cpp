@@ -29,18 +29,24 @@ namespace Jack
 JackMessageBuffer* JackMessageBuffer::fInstance = NULL;
 
 JackMessageBuffer::JackMessageBuffer()
-    :fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0)
+    :fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0),fRunning(false)
+{}
+
+JackMessageBuffer::~JackMessageBuffer()
+{}
+    
+void JackMessageBuffer::Start()
 {
     fRunning = true;
     fThread.StartSync();
 }
 
-JackMessageBuffer::~JackMessageBuffer()
+void JackMessageBuffer::Stop()
 {
     if (fOverruns > 0) {
         jack_error("WARNING: %d message buffer overruns!", fOverruns); 
     } else {
-        jack_info("no message buffer overruns"); 
+        jack_log("no message buffer overruns"); 
     }
     fGuard.Lock();
     fRunning = false;
@@ -49,7 +55,7 @@ JackMessageBuffer::~JackMessageBuffer()
     fThread.Stop();
     Flush();
 }
-
+    
 void JackMessageBuffer::Flush()
 {
     while (fOutBuffer != fInBuffer) {
@@ -86,12 +92,14 @@ void JackMessageBuffer::Create()
 {
     if (fInstance == NULL) {
         fInstance = new JackMessageBuffer();
+        fInstance->Start();
     }
 }
 
 void JackMessageBuffer::Destroy() 
 {
     if (fInstance != NULL) {
+        fInstance->Stop();
         delete fInstance;
         fInstance = NULL;
     }
@@ -100,8 +108,7 @@ void JackMessageBuffer::Destroy()
 void JackMessageBufferAdd(int level, const char *message) 
 {
     if (Jack::JackMessageBuffer::fInstance == NULL) {
-        /* Unable to print message with realtime safety.
-         * Complain and print it anyway. */
+        /* Unable to print message with realtime safety. Complain and print it anyway. */
         jack_log_function(LOG_LEVEL_ERROR, "messagebuffer not initialized, skip message");
     } else {
         Jack::JackMessageBuffer::fInstance->AddMessage(level, message);

@@ -1,7 +1,7 @@
 /*
  * IDENTIFICATION:
- * stub generated Mon Sep  1 17:42:27 2008
- * with a MiG generated Tue Feb 19 02:01:43 PST 2008 by root@b75.local
+ * stub generated Fri Oct 23 10:35:08 2009
+ * with a MiG generated Mon May 18 09:59:33 PDT 2009 by root@sulitlana.apple.com
  * OPTIONS: 
  */
 
@@ -113,6 +113,7 @@
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 	} __Request__rpc_jack_client_sync_notify_t;
@@ -129,6 +130,7 @@
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 	} __Request__rpc_jack_client_async_notify_t;
@@ -224,11 +226,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__string(a, f, 128)
+	__NDR_convert__int_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined */
 
@@ -251,6 +253,26 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__notify__defined */
+
+#ifndef __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#if	defined(__NDR_convert__int_rep__JackRPCClient__message_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__int_rep__JackRPCClient__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__message_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__int_rep__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 256)
+#elif	defined(__NDR_convert__int_rep__string__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__int_rep__string(a, f, 256)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 
 #ifndef __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__value1__defined
 #if	defined(__NDR_convert__int_rep__JackRPCClient__int__defined)
@@ -324,11 +346,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__string(a, f, 128)
+	__NDR_convert__char_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined */
 
@@ -351,6 +373,26 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__notify__defined */
+
+#ifndef __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#if	defined(__NDR_convert__char_rep__JackRPCClient__message_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__char_rep__JackRPCClient__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__message_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__char_rep__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 256)
+#elif	defined(__NDR_convert__char_rep__string__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__char_rep__string(a, f, 256)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 
 #ifndef __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__value1__defined
 #if	defined(__NDR_convert__char_rep__JackRPCClient__int__defined)
@@ -424,11 +466,11 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 #elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__string(a, f, 128)
+	__NDR_convert__float_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined */
 
@@ -451,6 +493,26 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__notify__defined */
+
+#ifndef __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#if	defined(__NDR_convert__float_rep__JackRPCClient__message_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__float_rep__JackRPCClient__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__message_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__float_rep__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 256)
+#elif	defined(__NDR_convert__float_rep__string__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(a, f) \
+	__NDR_convert__float_rep__string(a, f, 256)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 
 #ifndef __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value1__defined
 #if	defined(__NDR_convert__float_rep__JackRPCClient__int__defined)
@@ -503,9 +565,24 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->client_name),  64);
+		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->message),  256);
+		if (( memchr(In0P->message, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
+#endif	/* __MigTypeCheck */
+
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__refnum__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__notify__defined) || \
+	defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__value1__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__value2__defined)
 	if (In0P->NDR.int_rep != NDR_record.int_rep) {
@@ -518,6 +595,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__notify__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__notify(&In0P->notify, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__notify__defined */
+#if defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined)
+		__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message(&In0P->message, In0P->NDR.int_rep);
+#endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__value1__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__value1(&In0P->value1, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_sync_notify_t__value1__defined */
@@ -530,6 +610,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 #if	defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__refnum__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__notify__defined) || \
+	defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__value1__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__value2__defined)
 	if (In0P->NDR.char_rep != NDR_record.char_rep) {
@@ -542,6 +623,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__notify__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__notify(&In0P->notify, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__notify__defined */
+#if defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined)
+		__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message(&In0P->message, In0P->NDR.char_rep);
+#endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__value1__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__value1(&In0P->value1, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_sync_notify_t__value1__defined */
@@ -554,6 +638,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 #if	defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__refnum__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__client_name__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__notify__defined) || \
+	defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value1__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value2__defined)
 	if (In0P->NDR.float_rep != NDR_record.float_rep) {
@@ -566,6 +651,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_sync_notify_t(_
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__notify__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__notify(&In0P->notify, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__notify__defined */
+#if defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined)
+		__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message(&In0P->message, In0P->NDR.float_rep);
+#endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__message__defined */
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value1__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value1(&In0P->value1, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_sync_notify_t__value1__defined */
@@ -594,6 +682,7 @@ kern_return_t rpc_jack_client_sync_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
+	message_t message,
 	int value1,
 	int value2,
 	int *result
@@ -613,6 +702,7 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 		mach_msg_trailer_t trailer;
@@ -646,7 +736,7 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 		{ MIG_RETURN_ERROR(OutP, check_result); }
 #endif	/* defined(__MIG_check__Request__rpc_jack_client_sync_notify_t__defined) */
 
-	OutP->RetCode = rpc_jack_client_sync_notify(In0P->Head.msgh_request_port, In0P->refnum, In0P->client_name, In0P->notify, In0P->value1, In0P->value2, &OutP->result);
+	OutP->RetCode = rpc_jack_client_sync_notify(In0P->Head.msgh_request_port, In0P->refnum, In0P->client_name, In0P->notify, In0P->message, In0P->value1, In0P->value2, &OutP->result);
 	if (OutP->RetCode != KERN_SUCCESS) {
 		MIG_RETURN_ERROR(OutP, OutP->RetCode);
 	}
@@ -694,11 +784,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__int_rep__string__defined)
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__int_rep__string(a, f, 128)
+	__NDR_convert__int_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined */
 
@@ -721,6 +811,26 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 	__NDR_convert__int_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__notify__defined */
+
+#ifndef __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#if	defined(__NDR_convert__int_rep__JackRPCClient__message_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__int_rep__JackRPCClient__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__message_t__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__int_rep__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__int_rep__JackRPCClient__string__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__int_rep__JackRPCClient__string(a, f, 256)
+#elif	defined(__NDR_convert__int_rep__string__defined)
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__int_rep__string(a, f, 256)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 
 #ifndef __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__value1__defined
 #if	defined(__NDR_convert__int_rep__JackRPCClient__int__defined)
@@ -794,11 +904,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__char_rep__string__defined)
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__char_rep__string(a, f, 128)
+	__NDR_convert__char_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined */
 
@@ -821,6 +931,26 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 	__NDR_convert__char_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__notify__defined */
+
+#ifndef __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#if	defined(__NDR_convert__char_rep__JackRPCClient__message_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__char_rep__JackRPCClient__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__message_t__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__char_rep__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__char_rep__JackRPCClient__string__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__char_rep__JackRPCClient__string(a, f, 256)
+#elif	defined(__NDR_convert__char_rep__string__defined)
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__char_rep__string(a, f, 256)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 
 #ifndef __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__value1__defined
 #if	defined(__NDR_convert__char_rep__JackRPCClient__int__defined)
@@ -894,11 +1024,11 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 #elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__JackRPCClient__string(a, f, 128)
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 64)
 #elif	defined(__NDR_convert__float_rep__string__defined)
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined
 #define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name(a, f) \
-	__NDR_convert__float_rep__string(a, f, 128)
+	__NDR_convert__float_rep__string(a, f, 64)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined */
 
@@ -921,6 +1051,26 @@ mig_internal novalue _Xrpc_jack_client_sync_notify
 	__NDR_convert__float_rep__int32_t((int32_t *)(a), f)
 #endif /* defined(__NDR_convert__*__defined) */
 #endif /* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__notify__defined */
+
+#ifndef __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#if	defined(__NDR_convert__float_rep__JackRPCClient__message_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__float_rep__JackRPCClient__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__message_t__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__float_rep__message_t((message_t *)(a), f)
+#elif	defined(__NDR_convert__float_rep__JackRPCClient__string__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__float_rep__JackRPCClient__string(a, f, 256)
+#elif	defined(__NDR_convert__float_rep__string__defined)
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined
+#define	__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(a, f) \
+	__NDR_convert__float_rep__string(a, f, 256)
+#endif /* defined(__NDR_convert__*__defined) */
+#endif /* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 
 #ifndef __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value1__defined
 #if	defined(__NDR_convert__float_rep__JackRPCClient__int__defined)
@@ -973,9 +1123,24 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 		return MIG_BAD_ARGUMENTS;
 #endif	/* __MigTypeCheck */
 
+#if __MigTypeCheck
+	{
+		char * msg_limit = ((char *) In0P) + In0P->Head.msgh_size;
+		size_t memchr_limit;
+
+		memchr_limit = min((msg_limit - In0P->client_name),  64);
+		if (( memchr(In0P->client_name, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+		memchr_limit = min((msg_limit - In0P->message),  256);
+		if (( memchr(In0P->message, '\0', memchr_limit) == NULL ))
+			return MIG_BAD_ARGUMENTS; // string length exceeds buffer length!
+	}
+#endif	/* __MigTypeCheck */
+
 #if	defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__refnum__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__client_name__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__notify__defined) || \
+	defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__value1__defined) || \
 	defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__value2__defined)
 	if (In0P->NDR.int_rep != NDR_record.int_rep) {
@@ -988,6 +1153,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__notify__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__notify(&In0P->notify, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__notify__defined */
+#if defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined)
+		__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message(&In0P->message, In0P->NDR.int_rep);
+#endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 #if defined(__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__value1__defined)
 		__NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__value1(&In0P->value1, In0P->NDR.int_rep);
 #endif	/* __NDR_convert__int_rep__Request__rpc_jack_client_async_notify_t__value1__defined */
@@ -1000,6 +1168,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 #if	defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__refnum__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__client_name__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__notify__defined) || \
+	defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__value1__defined) || \
 	defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__value2__defined)
 	if (In0P->NDR.char_rep != NDR_record.char_rep) {
@@ -1012,6 +1181,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__notify__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__notify(&In0P->notify, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__notify__defined */
+#if defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined)
+		__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message(&In0P->message, In0P->NDR.char_rep);
+#endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 #if defined(__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__value1__defined)
 		__NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__value1(&In0P->value1, In0P->NDR.char_rep);
 #endif	/* __NDR_convert__char_rep__Request__rpc_jack_client_async_notify_t__value1__defined */
@@ -1024,6 +1196,7 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 #if	defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__refnum__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__client_name__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__notify__defined) || \
+	defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value1__defined) || \
 	defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value2__defined)
 	if (In0P->NDR.float_rep != NDR_record.float_rep) {
@@ -1036,6 +1209,9 @@ mig_internal kern_return_t __MIG_check__Request__rpc_jack_client_async_notify_t(
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__notify__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__notify(&In0P->notify, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__notify__defined */
+#if defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined)
+		__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message(&In0P->message, In0P->NDR.float_rep);
+#endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__message__defined */
 #if defined(__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value1__defined)
 		__NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value1(&In0P->value1, In0P->NDR.float_rep);
 #endif	/* __NDR_convert__float_rep__Request__rpc_jack_client_async_notify_t__value1__defined */
@@ -1064,6 +1240,7 @@ kern_return_t rpc_jack_client_async_notify
 	int refnum,
 	client_name_t client_name,
 	int notify,
+	message_t message,
 	int value1,
 	int value2
 );
@@ -1082,6 +1259,7 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 		int refnum;
 		client_name_t client_name;
 		int notify;
+		message_t message;
 		int value1;
 		int value2;
 		mach_msg_trailer_t trailer;
@@ -1115,7 +1293,7 @@ mig_internal novalue _Xrpc_jack_client_async_notify
 		{ MIG_RETURN_ERROR(OutP, check_result); }
 #endif	/* defined(__MIG_check__Request__rpc_jack_client_async_notify_t__defined) */
 
-	OutP->RetCode = rpc_jack_client_async_notify(In0P->Head.msgh_request_port, In0P->refnum, In0P->client_name, In0P->notify, In0P->value1, In0P->value2);
+	OutP->RetCode = rpc_jack_client_async_notify(In0P->Head.msgh_request_port, In0P->refnum, In0P->client_name, In0P->notify, In0P->message, In0P->value1, In0P->value2);
 	__AfterRcvSimple(1001, "rpc_jack_client_async_notify")
 }
 
@@ -1145,9 +1323,9 @@ const struct JackRPCClient_subsystem {
 	(vm_address_t)0,
 	{
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_sync_notify, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_sync_notify_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_sync_notify, 8, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_sync_notify_t)},
           { (mig_impl_routine_t) 0,
-            (mig_stub_routine_t) _Xrpc_jack_client_async_notify, 6, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_async_notify_t)},
+          (mig_stub_routine_t) _Xrpc_jack_client_async_notify, 7, 0, (routine_arg_descriptor_t)0, (mach_msg_size_t)sizeof(__Reply__rpc_jack_client_async_notify_t)},
 	}
 };
 

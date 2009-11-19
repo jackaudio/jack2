@@ -168,9 +168,9 @@ void JackSocketClientChannel::ClientClose(int refnum, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
-void JackSocketClientChannel::ClientActivate(int refnum, int state, int* result)
+void JackSocketClientChannel::ClientActivate(int refnum, int is_real_time, int* result)
 {
-    JackActivateRequest req(refnum, state);
+    JackActivateRequest req(refnum, is_real_time);
     JackResult res;
     ServerSyncCall(&req, &res, result);
 }
@@ -320,7 +320,7 @@ bool JackSocketClientChannel::Execute()
         goto error;
     }
 
-    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fValue1, event.fValue2);
+    res.fResult = fClient->ClientNotify(event.fRefNum, event.fName, event.fNotify, event.fSync, event.fMessage, event.fValue1, event.fValue2);
 
     if (event.fSync) {
         if (res.Write(fNotificationSocket) < 0) {

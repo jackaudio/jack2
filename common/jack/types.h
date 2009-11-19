@@ -419,7 +419,17 @@ enum JackStatus {
     /**
      * Client's protocol version does not match
      */
-    JackVersionError = 0x400
+    JackVersionError = 0x400,
+    
+    /**
+     * Backend error
+     */
+    JackBackendError = 0x800,
+    
+    /**
+     * Client zombified failure
+     */
+    JackClientZombie = 0x1000
 };
 
 /**
@@ -643,5 +653,20 @@ typedef struct {
     double beats_per_minute;
 
 } jack_transport_info_t;
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown. Note that after server shutdown, 
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
+ 
+ * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
+ * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason, void *arg);
 
 #endif /* __jack_types_h__ */

@@ -11,11 +11,14 @@ def configure(conf):
     conf. check_cfg(package='libffado', atleast_version='1.999.17', args='--cflags --libs')
     conf.env['BUILD_DRIVER_FFADO'] = conf.is_defined('HAVE_LIBFFADO')
 
+    conf.define('HAVE_PPOLL', 1 )
+
+
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
-    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
+    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
     driver.target = target
     driver.source = sources
@@ -64,3 +67,8 @@ def build(bld):
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 
     create_jack_driver_obj(bld, 'loopback', '../common/JackLoopbackDriver.cpp')
+
+    create_jack_driver_obj(bld, 'netone', [ '../common/JackNetOneDriver.cpp',
+                                            '../common/netjack.c',
+                                            '../common/netjack_packet.c' ], "SAMPLERATE CELT" )
+

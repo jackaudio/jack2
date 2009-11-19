@@ -94,7 +94,7 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
         virtual std::list<JackDriverInterface*> GetSlaves();
         virtual int ProcessSlaves();
         
-        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2);
+        virtual int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
         virtual JackClientControl* GetClientControl() const;
         virtual bool IsRealTime() const;
    

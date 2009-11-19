@@ -46,7 +46,7 @@ struct SERVER_EXPORT JackServerGlobals
 
     static bool Init();
     static void Destroy();
-    static int Start (const char* server_name,
+    static int Start(const char* server_name,
                      jack_driver_desc_t* driver_desc,
                      JSList* driver_params,
                      int sync,

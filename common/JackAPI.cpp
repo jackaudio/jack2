@@ -72,6 +72,8 @@ extern "C"
     EXPORT int jack_is_realtime (jack_client_t *client);
     EXPORT void jack_on_shutdown (jack_client_t *client,
                                   JackShutdownCallback shutdown_callback, void *arg);
+    EXPORT void jack_on_info_shutdown (jack_client_t *client,
+                                  JackInfoShutdownCallback shutdown_callback, void *arg);
     EXPORT int jack_set_process_callback (jack_client_t *client,
                                           JackProcessCallback process_callback,
                                           void *arg);
@@ -288,15 +290,23 @@ EXPORT void jack_set_info_function (print_function func)
 
 EXPORT jack_client_t* jack_client_new(const char* client_name)
 {
-    assert(JackGlobals::fOpenMutex);
-    JackGlobals::fOpenMutex->Lock();
-    jack_error("jack_client_new: deprecated");
-    int options = JackUseExactName;
-    if (getenv("JACK_START_SERVER") == NULL)
-        options |= JackNoStartServer;
-    jack_client_t* res = jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
-    JackGlobals::fOpenMutex->Unlock();
-    return res;
+    try {
+        assert(JackGlobals::fOpenMutex);
+        JackGlobals::fOpenMutex->Lock();
+        jack_error("jack_client_new: deprecated");
+        int options = JackUseExactName;
+        if (getenv("JACK_START_SERVER") == NULL)
+            options |= JackNoStartServer;
+        jack_client_t* res = jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
+        JackGlobals::fOpenMutex->Unlock();
+        return res;
+    } catch (std::bad_alloc& e) {
+        jack_error("Memory allocation error...");
+        return NULL;
+    } catch (...) {
+        jack_error("Unknown error...");
+        return NULL;
+    }
 }
 
 EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
@@ -816,6 +826,19 @@ EXPORT void jack_on_shutdown(jack_client_t* ext_client, JackShutdownCallback cal
         jack_error("jack_on_shutdown called with a NULL client");
     } else {
         client->OnShutdown(callback, arg);
+    }
+}
+
+EXPORT void jack_on_info_shutdown(jack_client_t* ext_client, JackInfoShutdownCallback callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+    JackLibGlobals::CheckContext();
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_on_info_shutdown called with a NULL client");
+    } else {
+        client->OnInfoShutdown(callback, arg);
     }
 }
 
@@ -1928,5 +1951,7 @@ jack_get_version_string()
 
 EXPORT void jack_free(void* ptr)
 {
-    free(ptr);
+    if (ptr) {
+        free(ptr);
+    }
 }

@@ -23,6 +23,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <windows.h>
 
+// See GetProcessWorkingSetSize and SetProcessWorkingSetSize
+
 #define CHECK_MLOCK(ptr, size) (VirtualLock((ptr), (size)) != 0)
 #define CHECK_MUNLOCK(ptr, size) (VirtualUnlock((ptr), (size)) != 0)
 #define CHECK_MLOCKALL()(false)

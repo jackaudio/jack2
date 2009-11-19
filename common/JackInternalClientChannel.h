@@ -63,9 +63,9 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fEngine->ClientInternalClose(refnum, true);
         }
 
-        void ClientActivate(int refnum, int state, int* result)
+        void ClientActivate(int refnum, int is_real_time, int* result)
         {
-            *result = fEngine->ClientActivate(refnum, state);
+            *result = fEngine->ClientActivate(refnum, is_real_time);
         }
         void ClientDeactivate(int refnum, int* result)
         {

@@ -16,6 +16,8 @@ example_programs = {
     'jack_showtime' : 'showtime.c',
     'jack_alias' : 'alias.c',
     'jack_bufsize' : 'bufsize.c',
+    'jack_wait' : 'wait.c',
+    'jack_samplerate' : 'samplerate.c',
     'jack_evmon' : 'evmon.c',
     'jack_monitor_client' : 'monitor_client.c',
     'jack_thru' : 'thru_client.c',
@@ -30,8 +32,15 @@ example_libs = {
 def configure(conf):
     e = conf.check_cc(header_name='sndfile.h', define_name="HAVE_SNDFILE")
  
+    conf.check_cc(header_name='samplerate.h', define_name="HAVE_SAMPLERATE")
+   
+    if conf.is_defined('HAVE_SAMPLERATE'):
+        conf.env['LIB_SAMPLERATE'] = ['samplerate']
+
     if conf.is_defined('HAVE_SNDFILE'):
         conf.env['LIB_SNDFILE'] = ['sndfile']
+
+    conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs')
 
     e = conf.check_cc(header_name='ncurses.h', define_name="HAVE_NCURSES")
 
@@ -46,6 +55,8 @@ def configure(conf):
     conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.is_defined('HAVE_READLINE') and conf.is_defined('HAVE_NCURSES')
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
+
+    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.is_defined('HAVE_SAMPLERATE')
 
 def build(bld):
     if bld.env['IS_LINUX']:
@@ -73,8 +84,7 @@ def build(bld):
             prog.uselib_local = 'clientlib'              
         prog.target = example_program
    
-    #if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']
-    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] == True:
+    if bld.env['BUILD_EXAMPLE_CLIENT_TRANSPORT']:
         prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'transport.c'
@@ -89,7 +99,7 @@ def build(bld):
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_transport'
 
-    if bld.env['BUILD_EXAMPLE_CLIENT_REC'] == True:
+    if bld.env['BUILD_EXAMPLE_CLIENT_REC']:
         prog = bld.new_task_gen('cc', 'program')
         prog.includes = os_incdir + ['../common/jack', '../common']
         prog.source = 'capture_client.c'
@@ -104,6 +114,38 @@ def build(bld):
             prog.uselib = 'RT SNDFILE'
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_rec'
+
+    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
+        prog = bld.new_task_gen('cc', 'program')
+        prog.includes = os_incdir + ['../common/jack', '../common']
+        prog.source = ['netsource.c', '../common/netjack_packet.c']
+        prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+        # Seems uneeded here...
+        #if bld.env['HAVE_CELT']:
+	    #if bld.env['HAVE_CELT_API_0_5']:
+	    #    prog.defines = ['HAVE_CELT', 'HAVE_CELT_API_0_5']
+	    #elif bld.env['HAVE_CELT_API_0_7']:
+	    #    prog.defines = ['HAVE_CELT', 'HAVE_CELT_API_0_7']
+        prog.uselib = 'CELT SAMPLERATE'
+        prog.uselib_local = 'clientlib'
+        prog.target = 'jack_netsource'
+
+    if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
+	    prog = bld.new_task_gen('cc', 'program')
+	    prog.includes = os_incdir + ['../common/jack', '../common']
+	    prog.source = ['alsa_in.c', '../common/memops.c']
+	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+	    prog.uselib = 'ALSA SAMPLERATE'
+	    prog.uselib_local = 'clientlib'
+	    prog.target = 'alsa_in'
+
+	    prog = bld.new_task_gen('cc', 'program')
+	    prog.includes = os_incdir + ['../common/jack', '../common']
+	    prog.source = ['alsa_out.c', '../common/memops.c']
+	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+	    prog.uselib = 'ALSA SAMPLERATE'
+	    prog.uselib_local = 'clientlib'
+	    prog.target = 'alsa_out'
 
     for example_lib, example_lib_source in example_libs.items():
         lib = bld.new_task_gen('cc', 'shlib')

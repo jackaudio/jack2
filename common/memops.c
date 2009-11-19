@@ -37,6 +37,9 @@
 
 #if defined (__SSE2__) && !defined (__sun__)
 #include <emmintrin.h>
+#ifdef __SSE4_1__
+#include <smmintrin.h>
+#endif
 #endif
 
 /* Notes about these *_SCALING values.
@@ -285,6 +288,12 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 		__m128i y = _mm_cvttps_epi32(clipped);
 		__m128i shifted = _mm_slli_epi32(y, 8);
 
+#ifdef __SSE4_1__
+		*(int32_t*)dst              = _mm_extract_epi32(shifted, 0);
+		*(int32_t*)(dst+dst_skip)   = _mm_extract_epi32(shifted, 1);
+		*(int32_t*)(dst+2*dst_skip) = _mm_extract_epi32(shifted, 2);
+		*(int32_t*)(dst+3*dst_skip) = _mm_extract_epi32(shifted, 3);
+#else
 		__m128i shuffled1 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(0, 3, 2, 1));
 		__m128i shuffled2 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(1, 0, 3, 2));
 		__m128i shuffled3 = _mm_shuffle_epi32(shifted, _MM_SHUFFLE(2, 1, 0, 3));
@@ -294,6 +303,7 @@ void sample_move_d32u24_sS (char *dst, jack_default_audio_sample_t *src, unsigne
 		_mm_store_ss((float*)(dst+dst_skip), (__m128)shuffled1);
 		_mm_store_ss((float*)(dst+2*dst_skip), (__m128)shuffled2);
 		_mm_store_ss((float*)(dst+3*dst_skip), (__m128)shuffled3);
+#endif
 		dst += 4*dst_skip;
 
 		src+= 4;
@@ -421,6 +431,12 @@ void sample_move_d24_sS (char *dst, jack_default_audio_sample_t *src, unsigned l
 		__m128 samples = _mm_loadu_ps(src);
 		__m128i converted = float_24_sse(samples);
 
+#ifdef __SSE4_1__
+		z[0] = _mm_extract_epi32(converted, 0);
+		z[1] = _mm_extract_epi32(converted, 1);
+		z[2] = _mm_extract_epi32(converted, 2);
+		z[3] = _mm_extract_epi32(converted, 3);
+#else
 		__m128i shuffled1 = _mm_shuffle_epi32(converted, _MM_SHUFFLE(0, 3, 2, 1));
 		__m128i shuffled2 = _mm_shuffle_epi32(converted, _MM_SHUFFLE(1, 0, 3, 2));
 		__m128i shuffled3 = _mm_shuffle_epi32(converted, _MM_SHUFFLE(2, 1, 0, 3));
@@ -431,13 +447,11 @@ void sample_move_d24_sS (char *dst, jack_default_audio_sample_t *src, unsigned l
 		_mm_store_ss((float*)z+3, (__m128)shuffled3);
 
 		for (i = 0; i != 4; ++i) {
-#if __BYTE_ORDER == __LITTLE_ENDIAN
 			memcpy (dst, z+i, 3);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-			memcpy (dst, (float*)((char *)&z + 1)+i, 3);
-#endif
 			dst += dst_skip;
 		}
+#endif
+
 		nsamples -= 4;
 		src += 4;
 	}
@@ -481,7 +495,7 @@ void sample_move_dS_s24s (jack_default_audio_sample_t *dst, char *src, unsigned 
 		x <<= 8;
 		x |= (unsigned char)(src[0]);
 		/* correct sign bit and the rest of the top byte */
-		if (src[0] & 0x80) {
+		if (src[2] & 0x80) {
 			x |= 0xff << 24;
 		}
 #endif
@@ -500,17 +514,10 @@ void sample_move_dS_s24 (jack_default_audio_sample_t *dst, char *src, unsigned l
 	while (nsamples >= 4) {
 		int x0, x1, x2, x3;
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
 		memcpy((char*)&x0 + 1, src, 3);
 		memcpy((char*)&x1 + 1, src+src_skip, 3);
 		memcpy((char*)&x2 + 1, src+2*src_skip, 3);
 		memcpy((char*)&x3 + 1, src+3*src_skip, 3);
-#elif __BYTE_ORDER == __BIG_ENDIAN
-		memcpy(&x0, src, 3);
-		memcpy(&x1, src+src_skip, 3);
-		memcpy(&x2, src+2*src_skip, 3);
-		memcpy(&x3, src+3*src_skip, 3);
-#endif
 		src += 4 * src_skip;
 
 		const __m128i block_i = _mm_set_epi32(x3, x2, x1, x0);

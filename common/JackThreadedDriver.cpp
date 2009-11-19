@@ -137,9 +137,9 @@ std::list<JackDriverInterface*> JackThreadedDriver::GetSlaves()
     return fDriver->GetSlaves();
 }
 
-int JackThreadedDriver::ClientNotify(int refnum, const char* name, int notify, int sync, int value1, int value2)
+int JackThreadedDriver::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
-    return fDriver->ClientNotify(refnum, name, notify, sync, value1, value2);
+    return fDriver->ClientNotify(refnum, name, notify, sync, message, value1, value2);
 }
 
 JackClientControl* JackThreadedDriver::GetClientControl() const
@@ -215,8 +215,8 @@ bool JackThreadedDriver::Init()
             // Will do "something" on OSX only...
             GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
             fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-            if (fThread.AcquireRealTime(GetEngineControl()->fServerPriority) < 0) {
-                jack_error("AcquireRealTime error");
+            if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
+                jack_error("AcquireSelfRealTime error");
             } else {
                 set_threaded_log_function(); 
             }

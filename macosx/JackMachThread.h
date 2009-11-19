@@ -103,11 +103,17 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
 
         int Kill();
 
-        int AcquireRealTime();
-        int AcquireRealTime(int priority);
-        int DropRealTime();
+        int AcquireRealTime();                  // Used when called from another thread
+        int AcquireSelfRealTime();              // Used when called from thread itself
+        
+        int AcquireRealTime(int priority);      // Used when called from another thread
+        int AcquireSelfRealTime(int priority);  // Used when called from thread itself
+        
+        int DropRealTime();                     // Used when called from another thread
+        int DropSelfRealTime();                 // Used when called from thread itself
+        
         void SetParams(UInt64 period, UInt64 computation, UInt64 constraint);
-        static int GetParams(UInt64* period, UInt64* computation, UInt64* constraint);
+        static int GetParams(pthread_t thread, UInt64* period, UInt64* computation, UInt64* constraint);
         static int SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint);
 
         static int AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint);
