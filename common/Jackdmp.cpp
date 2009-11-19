@@ -178,11 +178,11 @@ int main(int argc, char* argv[])
     jackctl_driver_t * loopback_driver_ctl;
     int replace_registry = 0;
     
+    const char *options = "-ad:X:P:uvshVrRL:STFl:t:mn:p:L:"
 #ifdef __linux__
-    const char *options = "-ad:X:P:uvshVrRL:STFl:t:mn:p:c:L:";
-#else
-    const char *options = "-ad:X:P:uvshVrRL:STFl:t:mn:p:L:";
+        "c:"
 #endif
+        ;
     
     struct option long_options[] = {
 #ifdef __linux__
