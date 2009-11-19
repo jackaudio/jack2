@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
     jackctl_driver_t * loopback_driver_ctl;
     int replace_registry = 0;
     
-    const char *options = "-ad:X:P:uvshVrRL:STFl:t:mn:p:"
+    const char *options = "-d:X:P:uvshVrRL:STFl:t:mn:p:"
 #ifdef __linux__
         "c:"
 #endif
