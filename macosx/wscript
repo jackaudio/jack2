@@ -6,12 +6,11 @@ def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
     driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
-    # Seems uneeded here...
-    #if bld.env['HAVE_CELT']:
-	#if bld.env['HAVE_CELT_API_0_5']:
-	#    driver.defines +=  ['HAVE_CELT', 'HAVE_CELT_API_0_5']
-	#elif bld.env['HAVE_CELT_API_0_7']:
-	#    driver.defines +=  ['HAVE_CELT', 'HAVE_CELT_API_0_7']
+    if bld.env['HAVE_CELT']:
+	if bld.env['HAVE_CELT_API_0_5']:
+	    driver.defines +=  ['HAVE_CELT', 'HAVE_CELT_API_0_5']
+	elif bld.env['HAVE_CELT_API_0_7']:
+	    driver.defines +=  ['HAVE_CELT', 'HAVE_CELT_API_0_7']
     driver.includes = ['.', '../macosx', '../posix', '../common', '../common/jack']
     driver.target = target
     driver.source = sources

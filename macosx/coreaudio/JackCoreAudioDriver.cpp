@@ -409,8 +409,7 @@ JackCoreAudioDriver::JackCoreAudioDriver(const char* name, const char* alias, Ja
         fState(false), 
         fHogged(false),
         fIOUsage(1.f),
-        fComputationGrain(-1.f),
-        fClockDriftCompensate(false)
+        fComputationGrain(-1.f)
 {}
 
 JackCoreAudioDriver::~JackCoreAudioDriver()

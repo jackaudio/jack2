@@ -26,10 +26,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
+#include <ucontext.h>
 #include <dlfcn.h>
 #include <execinfo.h>
 #include <errno.h>
 #ifndef NO_CPP_DEMANGLE
+//#include <cxxabi.h>
 char * __cxa_demangle(const char * __mangled_name, char * __output_buffer, size_t * __length, int * __status);
 #endif
 
@@ -53,8 +55,6 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr)
 {}
 
 #else
-
-#include <ucontext.h>
 
 static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     static const char *si_codes[3] = {"", "SEGV_MAPERR", "SEGV_ACCERR"};
