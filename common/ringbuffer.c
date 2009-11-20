@@ -401,3 +401,4 @@ jack_ringbuffer_get_write_vector (const jack_ringbuffer_t * rb,
 		vec[1].len = 0;
 	}
 }
+

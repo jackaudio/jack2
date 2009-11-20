@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackDebugClient.h"
 #include "JackEngineControl.h"
+#include "JackException.h"
 #include "JackError.h"
 #include "JackTime.h"
 #include <iostream>
@@ -55,9 +56,9 @@ JackDebugClient::~JackDebugClient()
     *fStream << setw(5) << "- Total number of instantiated port : " << fTotalPortNumber << endl;
     *fStream << setw(5) << "- Number of port remaining open when exiting client : " << fOpenPortNumber << endl;
     if (fOpenPortNumber != 0)
-        *fStream << "!!! WARNING !!! Some ports have not been unregistrated ! Incorrect exiting !" << endl;
+        *fStream << "!!! WARNING !!! Some ports have not been unregistered ! Incorrect exiting !" << endl;
     if (fIsDeactivated != fIsActivated)
-        *fStream << "!!! ERROR !!! Client seem do not perform symetric activation-deactivation ! (not the same number of activate and deactivate)" << endl;
+        *fStream << "!!! ERROR !!! Client seem to not perform symetric activation-deactivation ! (not the same number of activate and deactivate)" << endl;
     if (fIsClosed == 0)
         *fStream << "!!! ERROR !!! Client have not been closed with jack_client_close() !" << endl;
 
@@ -68,9 +69,9 @@ JackDebugClient::~JackDebugClient()
         *fStream << setw(5) << "- Name : " << fPortList[i].name << endl;
         *fStream << setw(5) << "- idport : " << fPortList[i].idport << endl;
         *fStream << setw(5) << "- IsConnected : " << fPortList[i].IsConnected << endl;
-        *fStream << setw(5) << "- IsUnregistrated : " << fPortList[i].IsUnregistrated << endl;
-        if (fPortList[i].IsUnregistrated == 0)
-            *fStream << "!!! WARNING !!! Port have not been unregistrated ! Incorrect exiting !" << endl;
+        *fStream << setw(5) << "- IsUnregistered : " << fPortList[i].IsUnregistered << endl;
+        if (fPortList[i].IsUnregistered == 0)
+            *fStream << "!!! WARNING !!! Port have not been unregistered ! Incorrect exiting !" << endl;
     }
     *fStream << "delete object JackDebugClient : end of tracing" << endl;
     delete fStream;
@@ -106,33 +107,39 @@ int JackDebugClient::Open(const char* server_name, const char* name, jack_option
 
 int JackDebugClient::Close()
 {
-    fIsClosed++;
     *fStream << "Client '" << fClientName << "' was closed" << endl;
-    return fClient->Close();
+    int res = fClient->Close();
+    fIsClosed++;
+    return res;
 }
 
-void JackDebugClient::CheckClient() const
+void JackDebugClient::CheckClient(const char* function_name) const
 {
+    *fStream << "CheckClient : " << function_name << ", calling thread : " << pthread_self() << endl;
+    
     if (fIsClosed > 0)  {
-        *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed !" << endl;
+        *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed " << "from " << function_name << endl; 
         *fStream << "This is likely to cause crash !'" << endl;
+    #ifdef __APPLE__
+        Debugger();
+    #endif 
     }
 }
 
 pthread_t JackDebugClient::GetThreadID()
 {
-    CheckClient();
+    CheckClient("GetThreadID");
     return fClient->GetThreadID();
 }
 
 JackGraphManager* JackDebugClient::GetGraphManager() const
 {
-    CheckClient();
+    CheckClient("GetGraphManager");
     return fClient->GetGraphManager();
 }
 JackEngineControl* JackDebugClient::GetEngineControl() const
 {
-    CheckClient();
+    CheckClient("GetEngineControl");
     return fClient->GetEngineControl();
 }
 /*!
@@ -141,13 +148,13 @@ JackEngineControl* JackDebugClient::GetEngineControl() const
 
 int JackDebugClient::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
-    CheckClient();
+    CheckClient("ClientNotify");
     return fClient->ClientNotify( refnum, name, notify, sync, message, value1, value2);
 }
 
 int JackDebugClient::Activate()
 {
-    CheckClient();
+    CheckClient("Activate");
     int res = fClient->Activate();
     fIsActivated++;
     if (fIsDeactivated)
@@ -160,7 +167,7 @@ int JackDebugClient::Activate()
 
 int JackDebugClient::Deactivate()
 {
-    CheckClient();
+    CheckClient("Deactivate");
     int res = fClient->Deactivate();
     fIsDeactivated++;
     if (fIsActivated == 0)
@@ -177,7 +184,7 @@ int JackDebugClient::Deactivate()
 
 int JackDebugClient::PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size)
 {
-    CheckClient();
+    CheckClient("PortRegister");
     int res = fClient->PortRegister(port_name, port_type, flags, buffer_size);
     if (res <= 0) {
         *fStream << "Client '" << fClientName << "' try port register ('" << port_name << "') and server return error  " << res << " ." << endl;
@@ -186,7 +193,7 @@ int JackDebugClient::PortRegister(const char* port_name, const char* port_type, 
             fPortList[fTotalPortNumber].idport = res;
             strcpy(fPortList[fTotalPortNumber].name, port_name);
             fPortList[fTotalPortNumber].IsConnected = 0;
-            fPortList[fTotalPortNumber].IsUnregistrated = 0;
+            fPortList[fTotalPortNumber].IsUnregistered = 0;
         } else {
             *fStream << "!!! WARNING !!! History is full : no more port history will be recorded." << endl;
         }
@@ -199,42 +206,42 @@ int JackDebugClient::PortRegister(const char* port_name, const char* port_type, 
 
 int JackDebugClient::PortUnRegister(jack_port_id_t port_index)
 {
-    CheckClient();
+    CheckClient("PortUnRegister");
     int res = fClient->PortUnRegister(port_index);
     fOpenPortNumber--;
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
         if (fPortList[i].idport == port_index) {		// We found the last record
-            if (fPortList[i].IsUnregistrated != 0)
+            if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! : '" << fClientName << "' id deregistering port '" << fPortList[i].name << "' that have already been unregistered !" << endl;
-            fPortList[i].IsUnregistrated++;
+            fPortList[i].IsUnregistered++;
             break;
         }
     }
     if (i == 0) // Port is not found
         *fStream << "JackClientDebug : PortUnregister : port " << port_index << " was not previously registered !" << endl;
     if (res != 0)
-        *fStream << "Client '" << fClientName << "' try to do PortUnregister and server return " << res << " )." << endl;
+        *fStream << "Client '" << fClientName << "' try to do PortUnregister and server return " << res << endl;
     *fStream << "Client '" << fClientName << "' unregister port '" << port_index << "'." << endl;
     return res;
 }
 
 int JackDebugClient::PortConnect(const char* src, const char* dst)
 {
-    CheckClient();
+    CheckClient("PortConnect");
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! Trying to connect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
     int i;
     int res = fClient->PortConnect( src, dst);
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
         if (strcmp(fPortList[i].name, src) == 0) {	// We found the last record in sources
-            if (fPortList[i].IsUnregistrated != 0)
+            if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! Connecting port " << src << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected++;
             *fStream << "Connecting port " << src << " to " << dst << ". ";
             break;
         } else if (strcmp(fPortList[i].name, dst) == 0 ) { // We found the record in dest
-            if (fPortList[i].IsUnregistrated != 0)
+            if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! Connecting port  " << dst << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected++;
             *fStream << "Connecting port " << src << " to " << dst << ". ";
@@ -251,20 +258,20 @@ int JackDebugClient::PortConnect(const char* src, const char* dst)
 
 int JackDebugClient::PortDisconnect(const char* src, const char* dst)
 {
-    CheckClient();
+    CheckClient("PortDisconnect");
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! Trying to disconnect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
     int res = fClient->PortDisconnect( src, dst);
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) { // We search the record into the history
         if (strcmp(fPortList[i].name, src) == 0) { // We found the record in sources
-            if (fPortList[i].IsUnregistrated != 0)
+            if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! : Disconnecting port " << src << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected--;
             *fStream << "disconnecting port " << src << ". ";
             break;
         } else if (strcmp(fPortList[i].name, dst) == 0 ) { // We found the record in dest
-            if (fPortList[i].IsUnregistrated != 0)
+            if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! : Disonnecting port  " << dst << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected--;
             *fStream << "disconnecting port " << dst << ". ";
@@ -281,14 +288,14 @@ int JackDebugClient::PortDisconnect(const char* src, const char* dst)
 
 int JackDebugClient::PortDisconnect(jack_port_id_t src)
 {
-    CheckClient();
+    CheckClient("PortDisconnect");
     if (!fIsActivated)
         *fStream << "!!! ERROR !!! : Trying to disconnect port  " << src << " while that client has not been activated !" << endl;
     int res = fClient->PortDisconnect(src);
     int i;
     for (i = (fTotalPortNumber - 1); i >= 0; i--) {		// We search the record into the history
         if (fPortList[i].idport == src) {				// We found the record in sources
-            if (fPortList[i].IsUnregistrated != 0)
+            if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! : Disconnecting port  " << src << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected--;
             *fStream << "Disconnecting port " << src << ". " << endl;
@@ -305,7 +312,7 @@ int JackDebugClient::PortDisconnect(jack_port_id_t src)
 
 int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 {
-    CheckClient();
+    CheckClient("PortIsMine");
     return fClient->PortIsMine(port_index);
 }
 
@@ -315,13 +322,13 @@ int JackDebugClient::PortIsMine(jack_port_id_t port_index)
 
 int JackDebugClient::SetBufferSize(jack_nframes_t buffer_size)
 {
-    CheckClient();
+    CheckClient("SetBufferSize");
     return fClient->SetBufferSize(buffer_size);
 }
 
 int JackDebugClient::SetFreeWheel(int onoff)
 {
-    CheckClient();
+    CheckClient("SetFreeWheel");
     if (onoff && fFreewheel)
          *fStream << "!!! ERROR !!! : Freewheel setup seems incorrect : set = ON while FW is already ON " << endl;
     if (!onoff && !fFreewheel)
@@ -348,61 +355,61 @@ void JackDebugClient::ShutDown()
 
 int JackDebugClient::ReleaseTimebase()
 {
-    CheckClient();
+    CheckClient("ReleaseTimebase");
     return fClient->ReleaseTimebase();
 }
 
 int JackDebugClient::SetSyncCallback(JackSyncCallback sync_callback, void* arg)
 {
-    CheckClient();
+    CheckClient("SetSyncCallback");
     return fClient->SetSyncCallback(sync_callback, arg);
 }
 
 int JackDebugClient::SetSyncTimeout(jack_time_t timeout)
 {
-    CheckClient();
+    CheckClient("SetSyncTimeout");
     return fClient->SetSyncTimeout(timeout);
 }
 
 int JackDebugClient::SetTimebaseCallback(int conditional, JackTimebaseCallback timebase_callback, void* arg)
 {
-    CheckClient();
+    CheckClient("SetTimebaseCallback");
     return fClient->SetTimebaseCallback( conditional, timebase_callback, arg);
 }
 
 void JackDebugClient::TransportLocate(jack_nframes_t frame)
 {
-    CheckClient();
+    CheckClient("TransportLocate");
     fClient->TransportLocate(frame);
 }
 
 jack_transport_state_t JackDebugClient::TransportQuery(jack_position_t* pos)
 {
-    CheckClient();
+    CheckClient("TransportQuery");
     return fClient->TransportQuery(pos);
 }
 
 jack_nframes_t JackDebugClient::GetCurrentTransportFrame()
 {
-    CheckClient();
+    CheckClient("GetCurrentTransportFrame");
     return fClient->GetCurrentTransportFrame();
 }
 
 int JackDebugClient::TransportReposition(jack_position_t* pos)
 {
-    CheckClient();
+    CheckClient("TransportReposition");
     return fClient->TransportReposition(pos);
 }
 
 void JackDebugClient::TransportStart()
 {
-    CheckClient();
+    CheckClient("TransportStart");
     fClient->TransportStart();
 }
 
 void JackDebugClient::TransportStop()
 {
-    CheckClient();
+    CheckClient("TransportStop");
     fClient->TransportStop();
 }
 
@@ -412,13 +419,13 @@ void JackDebugClient::TransportStop()
 
 void JackDebugClient::OnShutdown(JackShutdownCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("OnShutdown");
     fClient->OnShutdown(callback, arg);
 }
 
 void JackDebugClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("OnInfoShutdown");
     fClient->OnInfoShutdown(callback, arg);
 }
     
@@ -427,16 +434,18 @@ int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
     JackDebugClient* client = (JackDebugClient*)arg;
     jack_time_t t1 = GetMicroSeconds();
     int res = client->fProcessTimeCallback(nframes, client->fProcessTimeCallbackArg);
+    if (res == 0) {
     jack_time_t t2 = GetMicroSeconds();
-    long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
-    if (delta > 0 && !client->fFreewheel)
-        *client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
+        long delta = long((t2 - t1) - client->GetEngineControl()->fPeriodUsecs);
+        if (delta > 0 && !client->fFreewheel)
+            *client->fStream << "!!! ERROR !!! : Process overload of " << delta << " us" << endl;
+    }
     return res;
 }
 
 int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetProcessCallback");
     fProcessTimeCallback = callback;
     fProcessTimeCallbackArg = arg;
     return fClient->SetProcessCallback(TimeCallback, this);
@@ -444,86 +453,86 @@ int JackDebugClient::SetProcessCallback(JackProcessCallback callback, void *arg)
 
 int JackDebugClient::SetXRunCallback(JackXRunCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetXRunCallback");
     return fClient->SetXRunCallback(callback, arg);
 }
 
 int JackDebugClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetInitCallback");
     return fClient->SetInitCallback(callback, arg);
 }
 
 int JackDebugClient::SetGraphOrderCallback(JackGraphOrderCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetGraphOrderCallback");
     return fClient->SetGraphOrderCallback(callback, arg);
 }
 
 int JackDebugClient::SetBufferSizeCallback(JackBufferSizeCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetBufferSizeCallback");
     return fClient->SetBufferSizeCallback(callback, arg);
 }
 
 int JackDebugClient::SetClientRegistrationCallback(JackClientRegistrationCallback callback, void* arg)
 {
-    CheckClient();
+    CheckClient("SetClientRegistrationCallback");
     return fClient->SetClientRegistrationCallback(callback, arg);
 }
 
 int JackDebugClient::SetFreewheelCallback(JackFreewheelCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetFreewheelCallback");
     return fClient->SetFreewheelCallback(callback, arg);
 }
 
 int JackDebugClient::SetPortRegistrationCallback(JackPortRegistrationCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetPortRegistrationCallback");
     return fClient->SetPortRegistrationCallback(callback, arg);
 }
 
 int JackDebugClient::SetPortConnectCallback(JackPortConnectCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetPortConnectCallback");
     return fClient->SetPortConnectCallback(callback, arg);
 }
 
 int JackDebugClient::SetPortRenameCallback(JackPortRenameCallback callback, void *arg)
 {
-    CheckClient();
+    CheckClient("SetPortRenameCallback");
     return fClient->SetPortRenameCallback(callback, arg);
 }
 
 JackClientControl* JackDebugClient::GetClientControl() const
 {
-    CheckClient();
+    CheckClient("GetClientControl");
     return fClient->GetClientControl();
 }
 
 // Internal clients
 char* JackDebugClient::GetInternalClientName(int ref)
 {
-    CheckClient();
+    CheckClient("GetInternalClientName");
     return fClient->GetInternalClientName(ref);
 }
 
 int JackDebugClient::InternalClientHandle(const char* client_name, jack_status_t* status)
 {
-    CheckClient();
+    CheckClient("InternalClientHandle");
     return fClient->InternalClientHandle(client_name, status);
 }
 
 int JackDebugClient::InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va)
 {
-    CheckClient();
+    CheckClient("InternalClientLoad");
     return fClient->InternalClientLoad(client_name, options, status, va);
 }
 
 void JackDebugClient::InternalClientUnload(int ref, jack_status_t* status)
 {
-    CheckClient();
+    CheckClient("InternalClientUnload");
     fClient->InternalClientUnload(ref, status);
 }
 

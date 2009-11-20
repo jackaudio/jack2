@@ -23,6 +23,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <time.h>
+
 namespace Jack
 {
 
@@ -37,6 +42,11 @@ struct JackGlobals {
     static bool fVerbose;
 #ifndef WIN32
     static jack_thread_creator_t fJackThreadCreator;
+#endif
+    
+#ifdef __CLIENTDEBUG__
+    static std::ofstream* fStream;
+    static void CheckContext(const char* name);
 #endif
 };
 
