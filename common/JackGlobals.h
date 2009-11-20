@@ -23,10 +23,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
 
+#ifdef __CLIENTDEBUG__ 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <time.h>
+#endif 
 
 namespace Jack
 {

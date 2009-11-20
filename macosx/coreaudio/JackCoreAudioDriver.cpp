@@ -1623,7 +1623,7 @@ int JackCoreAudioDriver::Start()
         return -1;
     }
     
-    // Waiting for Measure callback to be called ( = driver has started)
+    // Waiting for Measure callback to be called (= driver has started)
     fState = false;
     int count = 0;
     while (!fState && count++ < WAIT_COUNTER) {
