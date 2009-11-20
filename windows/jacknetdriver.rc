@@ -11,8 +11,8 @@
 //
 LANGUAGE LANG_FRENCH, SUBLANG_DEFAULT
 1 VERSIONINFO
-    FILEVERSION     1,9,4,0
-    PRODUCTVERSION  1,9,4,0
+    FILEVERSION     1,9,5,0
+    PRODUCTVERSION  1,9,5,0
     FILEOS          VOS_UNKNOWN
     FILETYPE        VFT_DLL
 BEGIN
@@ -23,14 +23,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
             VALUE "FileDescription", "Jackmp Net Driver for Windows\0"
-            VALUE "FileVersion", "1, 9, 4, 0\0"
+            VALUE "FileVersion", "1, 9, 5, 0\0"
             VALUE "InternalName", "jack_netdriver\0"
             VALUE "LegalCopyright", "Copyright Grame © 2006-2009\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "jack_netdriver.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "jack_netdriver\0"
-            VALUE "ProductVersion", "1, 9, 4, 0\0"
+            VALUE "ProductVersion", "1, 9, 5, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END

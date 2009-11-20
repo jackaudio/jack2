@@ -25,6 +25,10 @@ Paul Davis
   Jackdmp changes log
 ---------------------------
 
+2009-11-20 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.5 started.
+
 2009-11-18 Stephane Letz  <letz@grame.fr>
 
 	* Sync JackCoreAudioAdapter code with JackCoreAudioDriver.
