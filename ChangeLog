@@ -20,10 +20,15 @@ Florian Faber
 Michael Voigt
 Torben Hohn  
 Paul Davis
+Peter L Jones
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2009-11-23 Stephane Letz  <letz@grame.fr>
+
+	* Peter L Jones patch for NetJack1 compilation on Windows.
 
 2009-11-20 Stephane Letz  <letz@grame.fr>
 

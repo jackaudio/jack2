@@ -11,6 +11,9 @@
 		<Project filename="jack_netdriver.cbp">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
+		<Project filename="jack_netonedriver.cbp">
+			<Depends filename="libjackserver.cbp" />
+		</Project>
 		<Project filename="jack_dummy.cbp">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
@@ -33,6 +36,10 @@
 		<Project filename="jack_lsp.cbp">
 			<Depends filename="libjack.cbp" />
 		</Project>
+		<Project filename="jack_netsource.cbp" active="1">
+			<Depends filename="libjack.cbp" />
+			<Depends filename="jack_netonedriver.cbp" />
+		</Project>
 		<Project filename="jack_metro.cbp">
 			<Depends filename="libjack.cbp" />
 		</Project>
@@ -47,6 +54,6 @@
 			<Depends filename="libjack.cbp" />
 		</Project>
 		<Project filename="jack_winmme.cbp" />
-		<Project filename="jack_loopback.cbp" active="1" />
+		<Project filename="jack_loopback.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

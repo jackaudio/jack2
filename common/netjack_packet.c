@@ -50,6 +50,7 @@
 
 #ifdef WIN32
 #include <winsock2.h>
+#define socklen_t int
 #include <malloc.h>
 #else
 #include <sys/socket.h>

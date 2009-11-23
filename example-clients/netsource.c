@@ -36,6 +36,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #ifdef WIN32
 #include <winsock2.h>
+#define socklen_t int
 #include <malloc.h>
 #else
 #include <netinet/in.h>
