@@ -28,15 +28,9 @@ namespace Jack
 {
 
 JackPort::JackPort()
-        : fTypeId(0),
-        fFlags(JackPortIsInput), 
-        fRefNum( -1), 
-        fLatency(0), 
-        fTotalLatency(0), 
-        fMonitorRequests(0), 
-        fInUse(false), 
-        fTied(NO_PORT)
-{}
+{
+    Release();
+}
 
 bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type, JackPortFlags flags)
 {
@@ -68,6 +62,7 @@ void JackPort::Release()
     fInUse = false;
     fLatency = 0;
     fTotalLatency = 0;
+    fMonitorRequests = 0;
     fTied = NO_PORT;
     fAlias1[0] = '\0';
     fAlias2[0] = '\0';

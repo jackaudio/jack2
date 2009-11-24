@@ -353,10 +353,20 @@ struct JackClientTiming
     jack_time_t fFinishedAt;
     jack_client_state_t fStatus;
 
-    JackClientTiming(): fSignaledAt(0), fAwakeAt(0), fFinishedAt(0), fStatus(NotTriggered)
-    {}
+    JackClientTiming()
+    {
+        Init();
+    }
     ~JackClientTiming()
     {}
+    
+    void Init()
+    {
+        fSignaledAt = 0;
+        fAwakeAt = 0;
+        fFinishedAt = 0;
+        fStatus = NotTriggered;
+    }
     
 } POST_PACKED_STRUCTURE;
 
@@ -379,7 +389,7 @@ class SERVER_EXPORT JackConnectionManager
 
     private:
 
-        JackFixedArray<CONNECTION_NUM_FOR_PORT> fConnection[PORT_NUM];  /*! Connection matrix: list of connected ports for a given port: needed to compute Mix buffer */
+        JackFixedArray<CONNECTION_NUM_FOR_PORT> fConnection[PORT_NUM_MAX];  /*! Connection matrix: list of connected ports for a given port: needed to compute Mix buffer */
         JackFixedArray1<PORT_NUM_FOR_CLIENT> fInputPort[CLIENT_NUM];	/*! Table of input port per refnum : to find a refnum for a given port */
         JackFixedArray<PORT_NUM_FOR_CLIENT> fOutputPort[CLIENT_NUM];	/*! Table of output port per refnum : to find a refnum for a given port */
         JackFixedMatrix<CLIENT_NUM> fConnectionRef;						/*! Table of port connections by (refnum , refnum) */

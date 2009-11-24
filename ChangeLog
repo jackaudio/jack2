@@ -26,6 +26,10 @@ Peter L Jones
   Jackdmp changes log
 ---------------------------
 
+2009-11-24 Stephane Letz  <letz@grame.fr>
+
+	* Dynamic choice of maximum port number.
+
 2009-11-23 Stephane Letz  <letz@grame.fr>
 
 	* Peter L Jones patch for NetJack1 compilation on Windows.

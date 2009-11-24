@@ -100,6 +100,7 @@ static void usage(FILE* file)
             "               [ --name OR -n server-name ]\n"
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
             "               [ --loopback OR -L loopback-port-number ]\n"
+            "               [ --port-max OR -p maximum-number-of-ports]\n"
             "               [ --midi OR -X midi-driver ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
@@ -220,7 +221,6 @@ int main(int argc, char* argv[])
     char *midi_driver_name = NULL;
     char **midi_driver_args = NULL;
     int midi_driver_nargs = 1;
-    int port_max = 512;
     int do_mlock = 1;
     int do_unlock = 0;
     int loopback = 0;
@@ -291,7 +291,11 @@ int main(int argc, char* argv[])
                 break;
 
             case 'p':
-                port_max = (unsigned int)atol(optarg);
+                param = jackctl_get_parameter(server_parameters, "port-max");
+                if (param != NULL) {
+                    value.ui = atoi(optarg);
+                    jackctl_parameter_set_value(param, &value);
+                }
                 break;
 
             case 'm':
