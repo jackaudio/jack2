@@ -250,10 +250,10 @@ OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
 }
 
 OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
-        UInt32 inChannel,
-        Boolean	isInput,
-        AudioDevicePropertyID inPropertyID,
-        void* inClientData)
+                                                    UInt32 inChannel,
+                                                    Boolean	isInput,
+                                                    AudioDevicePropertyID inPropertyID,
+                                                    void* inClientData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
 
@@ -271,10 +271,10 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
 
 // A better implementation would possibly try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
 OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
-        UInt32 inChannel,
-        Boolean	isInput,
-        AudioDevicePropertyID inPropertyID,
-        void* inClientData)
+                                                        UInt32 inChannel,
+                                                        Boolean	isInput,
+                                                        AudioDevicePropertyID inPropertyID,
+                                                        void* inClientData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
          
@@ -296,12 +296,19 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         }
         
         case kAudioDevicePropertyNominalSampleRate: {
-            jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server will quit...");
-            driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");    // Message length limited to JACK_MESSAGE_SIZE
-            driver->CloseAUHAL();
-            kill(JackTools::GetPID(), SIGINT);
-            return kAudioHardwareUnsupportedOperationError;
-		}
+            Float64 new_sample_rate;
+            UInt32 outsize = sizeof(Float64);
+            OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outsize, &new_sample_rate);
+            if (err != noErr || new_sample_rate != driver->fEngineControl->fSampleRate) {
+                jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server will quit...");
+                driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");    // Message length limited to JACK_MESSAGE_SIZE
+                driver->CloseAUHAL();
+                kill(JackTools::GetPID(), SIGINT);
+                return kAudioHardwareUnsupportedOperationError;
+            } else {
+                return noErr;
+            }
+        }
             
     }
     return noErr;

@@ -26,6 +26,10 @@ Peter L Jones
   Jackdmp changes log
 ---------------------------
 
+2009-11-29 Stephane Letz  <letz@grame.fr>
+
+	* More robust sample rate change handling code in JackCoreAudioDriver.
+
 2009-11-24 Stephane Letz  <letz@grame.fr>
 
 	* Dynamic choice of maximum port number.
