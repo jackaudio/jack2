@@ -55,6 +55,13 @@ def build(bld):
                        'alsa/ice1712.c'
                        ]
 
+    ffado_driver_src = ['firewire/JackFFADODriver.cpp',
+                        'firewire/JackFFADOMidiInput.cpp',
+                        'firewire/JackFFADOMidiOutput.cpp',
+                        '../common/JackPhysicalMidiInput.cpp',
+                        '../common/JackPhysicalMidiOutput.cpp'
+                       ]
+
     if bld.env['BUILD_DRIVER_ALSA'] == True:
         create_jack_driver_obj(bld, 'alsa', alsa_driver_src, "ALSA")
 
@@ -62,7 +69,7 @@ def build(bld):
         create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")
 
     if bld.env['BUILD_DRIVER_FFADO'] == True:
-        create_jack_driver_obj(bld, 'firewire', 'firewire/JackFFADODriver.cpp', "LIBFFADO")
+        create_jack_driver_obj(bld, 'firewire', ffado_driver_src, "LIBFFADO")
 
     create_jack_driver_obj(bld, 'net', '../common/JackNetDriver.cpp')
 

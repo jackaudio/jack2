@@ -131,6 +131,8 @@ def build(bld):
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
         'JackDummyDriver.cpp',
+        'JackPhysicalMidiInput.cpp',
+        'JackPhysicalMidiOutput.cpp',
         ]
 
     if bld.env['IS_LINUX']:

@@ -21,10 +21,15 @@ Michael Voigt
 Torben Hohn  
 Paul Davis
 Peter L Jones
+Devin Anderson
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2009-11-30 Stephane Letz  <letz@grame.fr>
+
+	* Devin Anderson patch for Jack FFADO driver issues with lost MIDI bytes between periods (and more). 
 
 2009-11-29 Stephane Letz  <letz@grame.fr>
 
