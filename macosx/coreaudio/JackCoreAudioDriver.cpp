@@ -296,11 +296,11 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         }
         
         case kAudioDevicePropertyNominalSampleRate: {
-            Float64 new_sample_rate;
+            Float64 new_sample_rate = 0;
             UInt32 outsize = sizeof(Float64);
             OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outsize, &new_sample_rate);
             if (err != noErr || new_sample_rate != driver->fEngineControl->fSampleRate) {
-                jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate : server will quit...");
+                jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate, new SR = %f : server will quit...", new_sample_rate);
                 driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");    // Message length limited to JACK_MESSAGE_SIZE
                 driver->CloseAUHAL();
                 kill(JackTools::GetPID(), SIGINT);
