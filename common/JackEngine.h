@@ -69,7 +69,7 @@ class SERVER_EXPORT JackEngine
     
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
-        void NotifyPortRename(jack_port_id_t src);
+        void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
 
     public:

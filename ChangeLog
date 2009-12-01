@@ -27,6 +27,10 @@ Devin Anderson
   Jackdmp changes log
 ---------------------------
 
+2009-12-01 Stephane Letz  <letz@grame.fr>
+
+	* Fix port_rename callback : now both old name and new name are given as parameters.
+
 2009-11-30 Stephane Letz  <letz@grame.fr>
 
 	* Devin Anderson patch for Jack FFADO driver issues with lost MIDI bytes between periods (and more). 

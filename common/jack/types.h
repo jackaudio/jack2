@@ -202,7 +202,7 @@ typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int 
  *
  * @return zero on success, non-zero on error
  */
-typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* new_name, void *arg);
+typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* old_name, const char* new_name, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
