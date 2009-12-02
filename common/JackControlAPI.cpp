@@ -882,9 +882,14 @@ jackctl_server_start(
 
     if (!server_ptr->realtime.b && server_ptr->client_timeout.i == 0)
         server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
+    
+    /* check port max value before allocating server */
+    if (server_ptr->port_max.ui > PORT_NUM_MAX) {
+        jack_error("JACK server started with too much ports %d (when port max can be %d)", server_ptr->port_max.ui, PORT_NUM_MAX);
+        goto fail;
+    }
 
     /* get the engine/driver started */
-
     server_ptr->engine = new JackServer(
         server_ptr->sync.b,
         server_ptr->temporary.b,

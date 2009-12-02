@@ -6,7 +6,6 @@ Dmitry Baikov
 Steven Chamberlain
 Thom Johansen
 Thibault LeMeur
-Pieter Palmers
 Tom Szilagyi
 Andrzej Szombierski 
 Kjetil S.Matheussen
@@ -31,6 +30,7 @@ Devin Anderson
 
 	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver. 
 	* Ensure that client-side message buffer thread calls thread_init callback if/when it is set by the client (backport of JACK1 rev 3838).
+	* Check dynamic port-max value.
 
 2009-12-01 Stephane Letz  <letz@grame.fr>
 
