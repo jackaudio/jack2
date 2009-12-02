@@ -29,7 +29,7 @@ namespace Jack
 JackMessageBuffer* JackMessageBuffer::fInstance = NULL;
 
 JackMessageBuffer::JackMessageBuffer()
-    :fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0),fRunning(false)
+    :fInit(NULL),fInitArg(NULL),fThread(this),fInBuffer(0),fOutBuffer(0),fOverruns(0),fRunning(false)
 {}
 
 JackMessageBuffer::~JackMessageBuffer()
@@ -82,6 +82,15 @@ bool JackMessageBuffer::Execute()
     while (fRunning) {
         fGuard.Lock();
         fGuard.Wait();
+        /* the client asked for all threads to run a thread
+        initialization callback, which includes us.
+        */
+        if (fInit) {
+            fInit(fInitArg);
+            fInit = NULL;
+            /* and we're done */
+            fGuard.Signal();
+        }
         Flush();
         fGuard.Unlock();
     }
@@ -114,6 +123,21 @@ void JackMessageBufferAdd(int level, const char *message)
         Jack::JackMessageBuffer::fInstance->AddMessage(level, message);
     }
 }
+
+void JackMessageBuffer::SetInitCallback(JackThreadInitCallback callback, void *arg)
+{
+    fGuard.Lock();
+    /* set up the callback */
+    fInitArg = arg;
+    fInit = callback;
+    /* wake msg buffer thread */
+    fGuard.Signal();
+    /* wait for it to be done */
+    fGuard.Wait();
+    /* and we're done */
+    fGuard.Unlock();
+}
+    
 
 };
 

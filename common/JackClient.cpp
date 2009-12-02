@@ -848,6 +848,8 @@ int JackClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
     } else {
         fInitArg = arg;
         fInit = callback;
+        /* make sure that the message buffer thread is initialized too */
+        JackMessageBuffer::fInstance->SetInitCallback(callback, arg);
         return 0;
     }
 }

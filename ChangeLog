@@ -30,6 +30,7 @@ Devin Anderson
 2009-12-02 Stephane Letz  <letz@grame.fr>
 
 	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver. 
+	* Ensure that client-side message buffer thread calls thread_init callback if/when it is set by the client (backport of JACK1 rev 3838).
 
 2009-12-01 Stephane Letz  <letz@grame.fr>
 
