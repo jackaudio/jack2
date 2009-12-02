@@ -227,6 +227,7 @@ namespace Jack
         do
         {
             session_params_t net_params;
+            memset(&net_params, 0, sizeof ( session_params_t ));
             SetPacketType ( &fParams, SLAVE_SETUP );
             SessionParamsHToN(&fParams, &net_params);
             
@@ -316,6 +317,7 @@ namespace Jack
         JackNetSocket mcast_socket ( fMulticastIP, fSocket.GetPort() );
         
         session_params_t net_params;
+        memset(&net_params, 0, sizeof ( session_params_t ));
         SessionParamsHToN(&fParams, &net_params);
 
         if ( mcast_socket.NewSocket() == SOCKET_ERROR )
@@ -706,6 +708,7 @@ namespace Jack
         {
             //send 'available'
             session_params_t net_params;
+            memset(&net_params, 0, sizeof ( session_params_t ));
             SessionParamsHToN(&fParams, &net_params);
             if ( fSocket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
                 jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
@@ -746,6 +749,7 @@ namespace Jack
 
         //tell the master to start
         session_params_t net_params;
+        memset(&net_params, 0, sizeof ( session_params_t ));
         SetPacketType ( &fParams, START_MASTER );
         SessionParamsHToN(&fParams, &net_params);
         if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )

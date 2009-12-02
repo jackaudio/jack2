@@ -262,6 +262,16 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
         case kAudioDevicePropertyNominalSampleRate: {
             jack_log("JackCoreAudioDriver::SRNotificationCallback kAudioDevicePropertyNominalSampleRate");
             driver->fState = true;
+            // Check new sample rate
+            Float64 sampleRate;
+            UInt32 outSize =  sizeof(Float64);
+            OSStatus err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
+            if (err != noErr) {
+                jack_error("Cannot get current sample rate");
+                printError(err);
+            } else {
+                jack_log("SRNotificationCallback : checked sample rate = %f", sampleRate);
+            }
             break;
         }
     }
@@ -279,6 +289,15 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
          
     switch (inPropertyID) {
+            
+        case kAudioDevicePropertyDeviceIsRunning: {
+            UInt32 isrunning = 0;
+            UInt32 outsize = sizeof(UInt32);
+            if (AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyDeviceIsRunning, &outsize, &isrunning) == noErr) {
+                jack_log("JackCoreAudioDriver::DeviceNotificationCallback kAudioDevicePropertyDeviceIsRunning = %d", isrunning);
+            }
+            break;
+        }
         
         case kAudioDeviceProcessorOverload: {
             jack_error("JackCoreAudioDriver::DeviceNotificationCallback kAudioDeviceProcessorOverload");
@@ -296,17 +315,50 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
         }
         
         case kAudioDevicePropertyNominalSampleRate: {
-            Float64 new_sample_rate = 0;
+            Float64 sampleRate = 0;
             UInt32 outsize = sizeof(Float64);
-            OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outsize, &new_sample_rate);
-            if (err != noErr || new_sample_rate != driver->fEngineControl->fSampleRate) {
-                jack_error("Cannot handle kAudioDevicePropertyNominalSampleRate, new SR = %f : server will quit...", new_sample_rate);
-                driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");    // Message length limited to JACK_MESSAGE_SIZE
-                driver->CloseAUHAL();
-                kill(JackTools::GetPID(), SIGINT);
+            OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outsize, &sampleRate);
+            if (err != noErr)
                 return kAudioHardwareUnsupportedOperationError;
-            } else {
-                return noErr;
+            
+            char device_name[256];
+            const char* digidesign_name = "Digidesign";
+            driver->GetDeviceNameFromID(driver->fDeviceID, device_name);
+        
+            if (sampleRate != driver->fEngineControl->fSampleRate) {
+               
+               // Digidesign hardware, so "special" code : change the SR again here
+               if (strncmp(device_name, digidesign_name, sizeof(digidesign_name)) == 0) {
+                   
+                    jack_log("Digidesign HW = %s", device_name);
+                
+                    // Set sample rate again...
+                    sampleRate = driver->fEngineControl->fSampleRate;
+                    err = AudioDeviceSetProperty(driver->fDeviceID, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, outsize, &sampleRate);
+                    if (err != noErr) {
+                        jack_error("Cannot set sample rate = %f", sampleRate);
+                        printError(err);
+                    } else {
+                        jack_log("Set sample rate = %f", sampleRate);
+                    }
+                    
+                    // Check new sample rate again...
+                    outsize = sizeof(Float64);
+                    err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outsize, &sampleRate);
+                    if (err != noErr) {
+                        jack_error("Cannot get current sample rate");
+                        printError(err);
+                    } else {
+                        jack_log("Checked sample rate = %f", sampleRate);
+                    }
+                    return noErr;
+                    
+                } else {
+                    driver->NotifyFailure(JackBackendError, "Another application has changed the sample rate.");    // Message length limited to JACK_MESSAGE_SIZE
+                    driver->CloseAUHAL();
+                    kill(JackTools::GetPID(), SIGINT);
+                    return kAudioHardwareUnsupportedOperationError;
+                }
             }
         }
             
@@ -933,8 +985,6 @@ int JackCoreAudioDriver::SetupDevices(const char* capture_driver_uid,
     if (fHogged) {
         if (TakeHog()) {
             jack_info("Device = %ld has been hogged", fDeviceID);
-        } else {
-            jack_error("Cannot hog device = %ld", fDeviceID);
         }
     }
 
@@ -1027,6 +1077,8 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
         jack_error("Cannot get current sample rate");
         printError(err);
         return -1;
+    } else {
+        jack_log("Current sample rate = %f", sampleRate);
     }
 
     // If needed, set new sample rate
@@ -1052,6 +1104,16 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
         while (!fState && count++ < WAIT_COUNTER) {
             usleep(100000);
             jack_log("Wait count = %d", count);
+        }
+        
+        // Check new sample rate
+        outSize =  sizeof(Float64);
+        err = AudioDeviceGetProperty(inDevice, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outSize, &sampleRate);
+        if (err != noErr) {
+            jack_error("Cannot get current sample rate");
+            printError(err);
+        } else {
+            jack_log("Checked sample rate = %f", sampleRate);
         }
 
         // Remove SR change notification
@@ -1702,7 +1764,7 @@ bool JackCoreAudioDriver::TakeHogAux(AudioDeviceID deviceID, bool isInput)
         hog_pid = getpid();
         err = AudioDeviceSetProperty(deviceID, 0, 0, isInput, kAudioDevicePropertyHogMode, propSize, &hog_pid);
         if (err != noErr) {
-            jack_error("Can't hog device = %d because it's being hogged by another program", deviceID);
+            jack_error("Can't hog device = %d because it's being hogged by another program or cannot be hogged", deviceID);
             return false;
         }
     }

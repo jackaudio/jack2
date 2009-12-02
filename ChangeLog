@@ -27,6 +27,10 @@ Devin Anderson
   Jackdmp changes log
 ---------------------------
 
+2009-12-02 Stephane Letz  <letz@grame.fr>
+
+	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver. 
+
 2009-12-01 Stephane Letz  <letz@grame.fr>
 
 	* Fix port_rename callback : now both old name and new name are given as parameters.
