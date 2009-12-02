@@ -257,8 +257,7 @@ JackPhysicalMidiOutput::Process(jack_nframes_t frames)
         // Since we have no time left, we need to put all remaining midi
         // events in their appropriate buffers, and send them next period.
 
-        for (current_midi_event++; current_midi_event < midi_events;
-             current_midi_event++) {
+        for (; current_midi_event < midi_events; current_midi_event++) {
             midi_event = &(port_buffer->events[current_midi_event]);
             midi_event_buffer = midi_event->GetData(port_buffer);
             midi_event_size = midi_event->size;
