@@ -26,6 +26,10 @@ Devin Anderson
   Jackdmp changes log
 ---------------------------
 
+2009-12-03 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackCoreMidiDriver::ReadProcAux when ring buffer is full (thanks Devin Anderson).  
+
 2009-12-02 Stephane Letz  <letz@grame.fr>
 
 	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver. 
