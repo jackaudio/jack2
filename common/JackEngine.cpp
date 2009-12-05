@@ -664,6 +664,19 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {
+        jack_int_t ports[PORT_NUM_FOR_CLIENT];
+        int i;
+
+        fGraphManager->GetInputPorts(refnum, ports);
+        for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+            NotifyPortRegistation(ports[i], true);
+        }
+
+        fGraphManager->GetOutputPorts(refnum, ports);
+        for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+            NotifyPortRegistation(ports[i], true);
+        }
+
         NotifyActivate(refnum);
         return 0;
     }
@@ -686,11 +699,13 @@ int JackEngine::ClientDeactivate(int refnum)
     fGraphManager->GetInputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortDisconnect(refnum, ports[i], ALL_PORTS);
+        NotifyPortRegistation(ports[i], false);
     }
 
     fGraphManager->GetOutputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortDisconnect(refnum, ports[i], ALL_PORTS);
+        NotifyPortRegistation(ports[i], false);
     }
 
     fGraphManager->Deactivate(refnum);
@@ -723,7 +738,6 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 
     *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
     if (*port_index != NO_PORT) {
-        NotifyPortRegistation(*port_index, true);
         return 0;
     } else {
         return -1;
@@ -740,7 +754,6 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     PortDisconnect(refnum, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
-        NotifyPortRegistation(port_index, false);
         return 0;
     } else {
         return -1;
