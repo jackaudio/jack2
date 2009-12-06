@@ -432,7 +432,7 @@ inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type
 		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++midi->midi_out_cnt);
 
 	port->jack = jack_port_register(midi->client, name, JACK_DEFAULT_MIDI_TYPE,
-		type | JackPortIsPhysical|JackPortIsTerminal, 0);
+		type | JackPortIsPhysical | JackPortIsTerminal | JackPortIsActive, 0);
 		
 	if (port->jack) 
 		jack_port_set_alias(port->jack, alias);

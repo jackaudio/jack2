@@ -376,6 +376,18 @@ int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
     return res;
 }
 
+void JackGraphManager::ActivatePort(jack_port_id_t port_index)
+{
+    JackPort* port = GetPort(port_index);
+    port->fFlags = (JackPortFlags)(port->fFlags | JackPortIsActive);
+}
+
+void JackGraphManager::DeactivatePort(jack_port_id_t port_index)
+{
+    JackPort* port = GetPort(port_index);
+    port->fFlags = (JackPortFlags)(port->fFlags | ~JackPortIsActive);
+}
+
 void JackGraphManager::GetInputPorts(int refnum, jack_int_t* res)
 {
     JackConnectionManager* manager = WriteNextStateStart();

@@ -669,11 +669,13 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
 
         fGraphManager->GetInputPorts(refnum, ports);
         for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+            fGraphManager->ActivatePort(ports[i]);
             NotifyPortRegistation(ports[i], true);
         }
 
         fGraphManager->GetOutputPorts(refnum, ports);
         for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+            fGraphManager->ActivatePort(ports[i]);
             NotifyPortRegistation(ports[i], true);
         }
 
@@ -699,12 +701,14 @@ int JackEngine::ClientDeactivate(int refnum)
     fGraphManager->GetInputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortDisconnect(refnum, ports[i], ALL_PORTS);
+        fGraphManager->DeactivatePort(ports[i]);
         NotifyPortRegistation(ports[i], false);
     }
 
     fGraphManager->GetOutputPorts(refnum, ports);
     for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
         PortDisconnect(refnum, ports[i], ALL_PORTS);
+        fGraphManager->DeactivatePort(ports[i]);
         NotifyPortRegistation(ports[i], false);
     }
 

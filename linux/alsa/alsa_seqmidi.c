@@ -488,7 +488,7 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	/* mark anything that looks like a hardware port as physical&terminal */
 
 	if (snd_seq_port_info_get_type (info) & (SND_SEQ_PORT_TYPE_HARDWARE|SND_SEQ_PORT_TYPE_PORT|SND_SEQ_PORT_TYPE_SPECIFIC)) {
-		jack_caps |= (JackPortIsPhysical|JackPortIsTerminal);
+		jack_caps |= (JackPortIsPhysical | JackPortIsTerminal | JackPortIsActive);
 	}
 
 	if (jack_caps & JackPortIsOutput)

@@ -289,7 +289,6 @@ int JackWinMMEDriver::Attach()
     jack_port_id_t port_index;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    unsigned long port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
     MMRESULT res;
     int i;
 
@@ -305,7 +304,7 @@ int JackWinMMEDriver::Attach()
 		}
         snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
@@ -314,8 +313,6 @@ int JackWinMMEDriver::Attach()
         fCapturePortList[i] = port_index;
         jack_log("JackMidiDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
     }
-
-    port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
 
     for (i = 0; i < fPlaybackChannels; i++) {
         MIDIOUTCAPS caps;
@@ -327,7 +324,7 @@ int JackWinMMEDriver::Attach()
 		}
         snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }

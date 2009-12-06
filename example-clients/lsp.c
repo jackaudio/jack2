@@ -208,6 +208,12 @@ main (int argc, char *argv[])
 				if (flags & JackPortIsTerminal) {
 					fputs ("terminal,", stdout);
 				}
+                
+                if (flags & JackPortIsActive) {
+                    fputs ("active,", stdout);
+                } else {
+                    fputs ("non-active,", stdout);
+                }
 				putc ('\n', stdout);
 			}
 		}
