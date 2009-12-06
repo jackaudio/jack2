@@ -677,15 +677,17 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
             fGraphManager->ActivatePort(output_ports[i]);
         }
         
+        // Notify client
+        NotifyActivate(refnum);
+        
         // Then issue port registration notification
-        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY) ; i++) {
+        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
             NotifyPortRegistation(input_ports[i], true);
         }
-        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY) ; i++) {
+        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
             NotifyPortRegistation(output_ports[i], true);
         }
 
-        NotifyActivate(refnum);
         return 0;
     }
 }
@@ -744,6 +746,7 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
     jack_log("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d", refnum, name, type, flags, buffer_size);
     AssertRefnum(refnum);
     assert(fClientTable[refnum]);
+    JackClientInterface* client = fClientTable[refnum];
 
     // Check if port name already exists
     if (fGraphManager->GetPort(name) != NO_PORT) {
@@ -753,6 +756,8 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 
     *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
     if (*port_index != NO_PORT) {
+        if (client->GetClientControl()->fActive)
+            NotifyPortRegistation(*port_index, true);
         return 0;
     } else {
         return -1;
@@ -764,11 +769,14 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
     AssertRefnum(refnum);
     assert(fClientTable[refnum]);
+    JackClientInterface* client = fClientTable[refnum];
 
     // Disconnect port ==> notification is sent
     PortDisconnect(refnum, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
+        if (client->GetClientControl()->fActive)
+            NotifyPortRegistation(port_index, false);
         return 0;
     } else {
         return -1;

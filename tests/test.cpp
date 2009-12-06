@@ -821,6 +821,8 @@ int main (int argc, char *argv[])
         printf("error : port_set_name function can't be tested...\n");
     }
 
+    port_callback_reg = 0;	// number of port registration received by the callback
+    
     /**
      * Activate the client
      *
@@ -839,6 +841,20 @@ int main (int argc, char *argv[])
 
     if (port_rename_clbk == 0)
         printf("!!! ERROR !!! Jack_Port_Rename_Callback was not called !!.\n");
+        
+        
+    /**
+     * Test if portregistration callback have been called.
+     *
+     */
+     
+    jack_sleep(1 * 1000); 
+
+    if (1 == port_callback_reg) {
+        Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", 1, port_callback_reg);
+    } else {
+        printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", 1, port_callback_reg);
+    }
  
     /**
      * Test if init callback initThread have been called.
@@ -1094,11 +1110,14 @@ int main (int argc, char *argv[])
     }
 
     jack_sleep(1 * 1000); // To hope all port registration and reorder callback have been received...
+    
+    // Check port registration callback
     if (j == port_callback_reg) {
         Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", j, port_callback_reg);
     } else {
-        printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, k);
+        printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);
     }
+    
     if (reorder == (2 * j)) {
         Log("%i graph reorder callback have been received... ok\n", reorder);
     } else {
@@ -1146,6 +1165,7 @@ int main (int argc, char *argv[])
      * Deregister all ports previously created.
      *
      */
+    port_callback_reg = 0; // to check registration callback
     Log("Deregistering all ports of the client...\n");
     inports = jack_get_ports(client1, NULL, NULL, 0);
     a = 0;
@@ -1158,6 +1178,13 @@ int main (int argc, char *argv[])
             }
         }
         a++;
+    }
+    
+    // Check port registration callback again
+    if (j == port_callback_reg) { 
+        Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", j, port_callback_reg);
+    } else {
+        printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);
     }
 
     free(inports); // free array of ports (as mentionned in the doc of jack_get_ports)
