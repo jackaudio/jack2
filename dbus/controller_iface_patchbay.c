@@ -1618,6 +1618,45 @@ jack_controller_port_connect_callback(
     }
 }
 
+int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_name, const char * new_name, void * context)
+{
+    struct jack_graph_port * port_ptr;
+    const char * port_new_short_name;
+    char * name_buffer;
+
+    jack_info("port renamed: '%s' -> '%s'", old_name, new_name);
+
+    port_new_short_name = strchr(new_name, ':');
+    if (port_new_short_name == NULL)
+    {
+        jack_error("renamed port new name '%s' does not contain ':' separator char", new_name);
+        return -1;
+    }
+
+    port_new_short_name++;      /* skip ':' separator char */
+
+    port_ptr = jack_controller_patchbay_find_port_by_full_name(patchbay_ptr, old_name);
+    if (port_ptr == NULL)
+    {
+        jack_error("renamed port '%s' not found", old_name);
+        return -1;
+    }
+
+    name_buffer = strdup(port_new_short_name);
+    if (name_buffer == NULL)
+    {
+        jack_error("strdup() call for port name '%s' failed.", port_new_short_name);
+        return 1;
+    }
+
+    free(port_ptr->name);
+    port_ptr->name = name_buffer;
+
+    /* TODO: send signal */
+
+    return 0;
+}
+
 #undef controller_ptr
 
 void
@@ -1711,6 +1750,13 @@ jack_controller_patchbay_init(
     if (ret != 0)
     {
         jack_error("jack_set_port_connect_callback() failed with error %d", ret);
+        goto fail_uninit_mutex;
+    }
+
+    ret = jack_set_port_rename_callback(controller_ptr->client, jack_controller_port_rename_callback, controller_ptr);
+    if (ret != 0)
+    {
+        jack_error("jack_set_port_rename_callback() failed with error %d", ret);
         goto fail_uninit_mutex;
     }
 
