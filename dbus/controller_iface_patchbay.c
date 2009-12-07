@@ -281,6 +281,35 @@ jack_controller_patchbay_send_signal_ports_disconnected(
         DBUS_TYPE_INVALID);
 }
 
+void
+jack_controller_patchbay_send_signal_port_renamed(
+    dbus_uint64_t new_graph_version,
+    dbus_uint64_t client_id,
+    const char * client_name,
+    dbus_uint64_t port_id,
+    const char * port_old_name,
+    const char * port_new_name)
+{
+
+    jack_dbus_send_signal(
+        JACK_CONTROLLER_OBJECT_PATH,
+        JACK_DBUS_IFACE_NAME,
+        "PortRenamed",
+        DBUS_TYPE_UINT64,
+        &new_graph_version,
+        DBUS_TYPE_UINT64,
+        &client_id,
+        DBUS_TYPE_STRING,
+        &client_name,
+        DBUS_TYPE_UINT64,
+        &port_id,
+        DBUS_TYPE_STRING,
+        &port_old_name,
+        DBUS_TYPE_STRING,
+        &port_new_name,
+        DBUS_TYPE_INVALID);
+}
+
 static
 struct jack_graph_client *
 jack_controller_patchbay_find_client(
@@ -1622,6 +1651,7 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
 {
     struct jack_graph_port * port_ptr;
     const char * port_new_short_name;
+    const char * port_old_short_name;
     char * name_buffer;
 
     jack_info("port renamed: '%s' -> '%s'", old_name, new_name);
@@ -1634,6 +1664,15 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
     }
 
     port_new_short_name++;      /* skip ':' separator char */
+
+    port_old_short_name = strchr(old_name, ':');
+    if (port_old_short_name == NULL)
+    {
+        jack_error("renamed port old name '%s' does not contain ':' separator char", old_name);
+        return -1;
+    }
+
+    port_old_short_name++;      /* skip ':' separator char */
 
     port_ptr = jack_controller_patchbay_find_port_by_full_name(patchbay_ptr, old_name);
     if (port_ptr == NULL)
@@ -1652,7 +1691,17 @@ int jack_controller_port_rename_callback(jack_port_id_t port, const char * old_n
     free(port_ptr->name);
     port_ptr->name = name_buffer;
 
-    /* TODO: send signal */
+    pthread_mutex_lock(&patchbay_ptr->lock);
+    patchbay_ptr->graph.version++;
+    jack_controller_patchbay_send_signal_port_renamed(
+        patchbay_ptr->graph.version,
+        port_ptr->client->id,
+        port_ptr->client->name,
+        port_ptr->id,
+        port_old_short_name,
+        port_ptr->name);
+    jack_controller_patchbay_send_signal_graph_changed(patchbay_ptr->graph.version);
+    pthread_mutex_unlock(&patchbay_ptr->lock);
 
     return 0;
 }
@@ -1884,6 +1933,15 @@ JACK_DBUS_SIGNAL_ARGUMENTS_BEGIN(PortsDisconnected)
     JACK_DBUS_SIGNAL_ARGUMENT("connection_id", DBUS_TYPE_UINT64_AS_STRING)
 JACK_DBUS_SIGNAL_ARGUMENTS_END
 
+JACK_DBUS_SIGNAL_ARGUMENTS_BEGIN(PortRenamed)
+    JACK_DBUS_SIGNAL_ARGUMENT("new_graph_version", DBUS_TYPE_UINT64_AS_STRING)
+    JACK_DBUS_SIGNAL_ARGUMENT("port_id", DBUS_TYPE_UINT64_AS_STRING)
+    JACK_DBUS_SIGNAL_ARGUMENT("client_id", DBUS_TYPE_UINT64_AS_STRING)
+    JACK_DBUS_SIGNAL_ARGUMENT("client_name", DBUS_TYPE_STRING_AS_STRING)
+    JACK_DBUS_SIGNAL_ARGUMENT("port_old_name", DBUS_TYPE_STRING_AS_STRING)
+    JACK_DBUS_SIGNAL_ARGUMENT("port_new_name", DBUS_TYPE_STRING_AS_STRING)
+JACK_DBUS_SIGNAL_ARGUMENTS_END
+
 JACK_DBUS_SIGNALS_BEGIN
     JACK_DBUS_SIGNAL_DESCRIBE(GraphChanged)
     JACK_DBUS_SIGNAL_DESCRIBE(ClientAppeared)
@@ -1892,6 +1950,7 @@ JACK_DBUS_SIGNALS_BEGIN
     JACK_DBUS_SIGNAL_DESCRIBE(PortDisappeared)
     JACK_DBUS_SIGNAL_DESCRIBE(PortsConnected)
     JACK_DBUS_SIGNAL_DESCRIBE(PortsDisconnected)
+    JACK_DBUS_SIGNAL_DESCRIBE(PortRenamed)
 JACK_DBUS_SIGNALS_END
 
 JACK_DBUS_IFACE_BEGIN(g_jack_controller_iface_patchbay, JACK_DBUS_IFACE_NAME)
