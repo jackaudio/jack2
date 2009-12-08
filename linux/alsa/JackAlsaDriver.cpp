@@ -263,102 +263,106 @@ JackAlsaDriver::alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitorin
 void
 JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 {
-	if (SND_PCM_FORMAT_FLOAT_LE == driver->playback_sample_format) {
-		if (driver->playback_interleaved) {
-			driver->channel_copy = memcpy_interleave_d32_s32;
-		} else {
-			driver->channel_copy = memcpy_fake;
-		}
-		driver->read_via_copy = sample_move_floatLE_sSs;
-		driver->write_via_copy = sample_move_dS_floatLE;
-	} else {
-
-		switch (driver->playback_sample_bytes) {
-		case 2:
-			if (driver->playback_interleaved) {
-				driver->channel_copy = memcpy_interleave_d16_s16;
-			} else {
-				driver->channel_copy = memcpy_fake;
-			}
-			
-			switch (driver->dither) {
-			case Rectangular:
-				jack_info("Rectangular dithering at 16 bits");
-				driver->write_via_copy = driver->quirk_bswap?
-                                        sample_move_dither_rect_d16_sSs:
-                                        sample_move_dither_rect_d16_sS;
-				break;
-				
-			case Triangular:
-				jack_info("Triangular dithering at 16 bits");
-				driver->write_via_copy = driver->quirk_bswap?
-                                        sample_move_dither_tri_d16_sSs:
-                                        sample_move_dither_tri_d16_sS;
-				break;
-				
-			case Shaped:
-				jack_info("Noise-shaped dithering at 16 bits");
-				driver->write_via_copy = driver->quirk_bswap?
-                                        sample_move_dither_shaped_d16_sSs:
-                                        sample_move_dither_shaped_d16_sS;
-				break;
-				
-			default:
-				driver->write_via_copy = driver->quirk_bswap?
-                                        sample_move_d16_sSs : 
-        				sample_move_d16_sS;
-				break;
-			}
-			break;
-			
-		case 3: /* NO DITHER */
-			if (driver->playback_interleaved) {
-				driver->channel_copy = memcpy_interleave_d24_s24;
-			} else {
-				driver->channel_copy = memcpy_fake;
-			}
-			
-			driver->write_via_copy = driver->quirk_bswap?
-				sample_move_d24_sSs: 
-				sample_move_d24_sS;
-
-			break;
-									
-	 	case 4: /* NO DITHER */
+	if (driver->playback_handle) {
+		if (SND_PCM_FORMAT_FLOAT_LE == driver->playback_sample_format) {
 			if (driver->playback_interleaved) {
 				driver->channel_copy = memcpy_interleave_d32_s32;
 			} else {
 				driver->channel_copy = memcpy_fake;
 			}
+			driver->read_via_copy = sample_move_floatLE_sSs;
+			driver->write_via_copy = sample_move_dS_floatLE;
+		} else {
 
-			driver->write_via_copy = driver->quirk_bswap?
-				sample_move_d32u24_sSs: 
-				sample_move_d32u24_sS;
-		    break;
+			switch (driver->playback_sample_bytes) {
+			case 2:
+				if (driver->playback_interleaved) {
+					driver->channel_copy = memcpy_interleave_d16_s16;
+				} else {
+					driver->channel_copy = memcpy_fake;
+				}
+			
+				switch (driver->dither) {
+				case Rectangular:
+					jack_info("Rectangular dithering at 16 bits");
+					driver->write_via_copy = driver->quirk_bswap?
+        	                                sample_move_dither_rect_d16_sSs:
+        	                                sample_move_dither_rect_d16_sS;
+					break;
+				
+				case Triangular:
+					jack_info("Triangular dithering at 16 bits");
+					driver->write_via_copy = driver->quirk_bswap?
+        	                                sample_move_dither_tri_d16_sSs:
+        	                                sample_move_dither_tri_d16_sS;
+					break;
+				
+				case Shaped:
+					jack_info("Noise-shaped dithering at 16 bits");
+					driver->write_via_copy = driver->quirk_bswap?
+        	                                sample_move_dither_shaped_d16_sSs:
+        	                                sample_move_dither_shaped_d16_sS;
+					break;
+				
+				default:
+					driver->write_via_copy = driver->quirk_bswap?
+        	                                sample_move_d16_sSs : 
+        					sample_move_d16_sS;
+					break;
+				}
+				break;
+			
+			case 3: /* NO DITHER */
+				if (driver->playback_interleaved) {
+					driver->channel_copy = memcpy_interleave_d24_s24;
+				} else {
+					driver->channel_copy = memcpy_fake;
+				}
+			
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_d24_sSs: 
+					sample_move_d24_sS;
 
-		default:
-			jack_error ("impossible sample width (%d) discovered!",
-				    driver->playback_sample_bytes);
-			exit (1);
+				break;
+									
+		 	case 4: /* NO DITHER */
+				if (driver->playback_interleaved) {
+					driver->channel_copy = memcpy_interleave_d32_s32;
+				} else {
+					driver->channel_copy = memcpy_fake;
+				}
+
+				driver->write_via_copy = driver->quirk_bswap?
+					sample_move_d32u24_sSs: 
+					sample_move_d32u24_sS;
+			    break;
+
+			default:
+				jack_error ("impossible sample width (%d) discovered!",
+					    driver->playback_sample_bytes);
+				exit (1);
+			}
 		}
 	}
 	
-	switch (driver->capture_sample_bytes) {
-	case 2:
-		driver->read_via_copy = driver->quirk_bswap?
-			sample_move_dS_s16s: 
-		        sample_move_dS_s16;
-		break;
-	case 3:
-		driver->read_via_copy = driver->quirk_bswap?
-			sample_move_dS_s24s: 
-		        sample_move_dS_s24;
-		break;
-	case 4:
-		driver->read_via_copy = driver->quirk_bswap?
-		 	sample_move_dS_s32u24s: 
-		        sample_move_dS_s32u24;
-		break;
+	if (driver->capture_handle) {
+		switch (driver->capture_sample_bytes) {
+		case 2:
+			driver->read_via_copy = driver->quirk_bswap?
+				sample_move_dS_s16s: 
+			        sample_move_dS_s16;
+			break;
+		case 3:
+			driver->read_via_copy = driver->quirk_bswap?
+				sample_move_dS_s24s: 
+			        sample_move_dS_s24;
+			break;
+		case 4:
+			driver->read_via_copy = driver->quirk_bswap?
+			 	sample_move_dS_s32u24s: 
+			        sample_move_dS_s32u24;
+			break;
+		}
 	}
 }
 
