@@ -106,6 +106,10 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-O3 -Wall')
     conf.env.append_unique('CCFLAGS', '-O3 -Wall')
 
+    #conf.env.append_unique('CXXFLAGS', '-g')
+    #conf.env.append_unique('CCFLAGS', '-g')
+    #conf.env.append_unique('LINKFLAGS', '-g')
+
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
