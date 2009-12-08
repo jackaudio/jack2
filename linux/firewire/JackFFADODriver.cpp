@@ -207,16 +207,21 @@ JackFFADODriver::ffado_driver_wait (ffado_driver_t *driver, int extra_fd, int *s
     } else if (response == ffado_wait_error) {
         // an error happened (unhandled xrun)
         // this should be fatal
+        jack_error("JackFFADODriver::ffado_driver_wait - unhandled xrun");
         *status = -1;
         return 0;
     } else if (response == ffado_wait_shutdown) {
         // ffado requested shutdown (e.g. device unplugged)
         // this should be fatal
+        jack_error("JackFFADODriver::ffado_driver_wait - shutdown requested "
+                   "(device unplugged?)");
         *status = -1;
         return 0;
     } else {
         // unknown response code. should be fatal
         // this should be fatal
+        jack_error("JackFFADODriver::ffado_driver_wait - unexpected error "
+                   "code '%d' returned from 'ffado_streaming_wait'", response);
         *status = -1;
         return 0;
     }

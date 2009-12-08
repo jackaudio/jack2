@@ -21,10 +21,15 @@ Torben Hohn
 Paul Davis
 Peter L Jones
 Devin Anderson
+Josh Green
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2009-12-08 Stephane Letz  <letz@grame.fr>
+
+	* Josh Green ALSA driver capture only patch.  
 
 2009-12-03 Stephane Letz  <letz@grame.fr>
 

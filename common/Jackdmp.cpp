@@ -119,7 +119,7 @@ static void usage(FILE* file)
             "               Available backends may include: portaudio, dummy or net.\n\n"
 #endif 
 #ifdef __linux__
-            "               Available backends may include: alsa, dummy, freebob, firewire, net, oss or sun.\n\n"
+            "               Available backends may include: alsa, dummy, freebob, firewire or net\n\n"
 #endif
 #if defined(__sun__) || defined(sun)
             "               Available backends may include: boomer, oss, dummy or net.\n\n"
