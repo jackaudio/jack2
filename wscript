@@ -69,6 +69,7 @@ def set_options(opt):
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
+    opt.add_option('--debug', action='store_true', default=False, dest='debug', help="Build debuggable binaries")
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -106,10 +107,6 @@ def configure(conf):
     conf.env.append_unique('CXXFLAGS', '-O3 -Wall')
     conf.env.append_unique('CCFLAGS', '-O3 -Wall')
 
-    #conf.env.append_unique('CXXFLAGS', '-g')
-    #conf.env.append_unique('CCFLAGS', '-g')
-    #conf.env.append_unique('LINKFLAGS', '-g')
-
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
@@ -141,6 +138,7 @@ def configure(conf):
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
     conf.env['BUILD_JACKDBUS'] = Options.options.dbus
     conf.env['BUILD_CLASSIC'] = Options.options.classic
+    conf.env['BUILD_DEBUG'] = Options.options.debug
 
     if conf.env['BUILD_JACKDBUS']:
         conf.env['BUILD_JACKD'] = conf.env['BUILD_CLASSIC']
@@ -151,6 +149,11 @@ def configure(conf):
         conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
+
+    if conf.env['BUILD_DEBUG']:
+        conf.env.append_unique('CXXFLAGS', '-g')
+        conf.env.append_unique('CCFLAGS', '-g')
+        conf.env.append_unique('LINKFLAGS', '-g')
 
     conf.define('CLIENT_NUM', Options.options.clients)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
@@ -191,6 +194,7 @@ def configure(conf):
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
+    display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
