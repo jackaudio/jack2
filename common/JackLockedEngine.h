@@ -31,6 +31,16 @@ namespace Jack
 #define TRY_CALL    \
     try {           \
 
+/*
+See : http://groups.google.com/group/comp.programming.threads/browse_thread/thread/652bcf186fbbf697/f63757846514e5e5
+
+catch (...) {
+    // Assuming thread cancellation, must rethrow
+    throw;
+    
+}
+*/
+
 #define CATCH_EXCEPTION_RETURN                      \
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
@@ -40,15 +50,16 @@ namespace Jack
         JackTools::KillServer();                     \
         return -1;                                  \
     } catch (...) {                                 \
-        jack_error("Unknown error...");             \
-        return -1;                                  \
+        jack_error("Unknown error...");             \   
+        throw;                                      \
     }                                               \
 
 #define CATCH_ENGINE_EXCEPTION                      \
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
     } catch (...) {                                 \
-        jack_error("Unknown error...");             \
+        jack_error("Unknown error...");             \   
+        throw;                                      \
     }                                               \
 
 /*!

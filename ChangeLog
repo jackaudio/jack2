@@ -27,6 +27,10 @@ Josh Green
   Jackdmp changes log
 ---------------------------
 
+2009-12-09 Stephane Letz  <letz@grame.fr>
+
+	* When threads are cancelled, the exception has to be rethrown. 
+
 2009-12-08 Stephane Letz  <letz@grame.fr>
 
 	* Josh Green ALSA driver capture only patch.  
