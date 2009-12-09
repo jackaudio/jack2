@@ -50,7 +50,7 @@ catch (...) {
         JackTools::KillServer();                     \
         return -1;                                  \
     } catch (...) {                                 \
-        jack_error("Unknown error...");             \   
+        jack_error("Unknown error...");             \
         throw;                                      \
     }                                               \
 
@@ -58,7 +58,7 @@ catch (...) {
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
     } catch (...) {                                 \
-        jack_error("Unknown error...");             \   
+        jack_error("Unknown error...");             \
         throw;                                      \
     }                                               \
 
