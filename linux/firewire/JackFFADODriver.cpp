@@ -528,7 +528,7 @@ int JackFFADODriver::Attach()
             printMessage ("Registering midi playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
-                              PlaybackDriverFlags
+                              PlaybackDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
