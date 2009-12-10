@@ -45,6 +45,7 @@ class JackWinNamedPipeServerNotifyChannel
         void Close();
 
         void Notify(int refnum, int notify, int value);
+        void NotifyQuit();
 };
 
 } // end of namespace
