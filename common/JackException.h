@@ -76,6 +76,24 @@ class SERVER_EXPORT JackTemporaryException : public JackException {
 };
     
 /*!
+ \brief 
+ */
+
+class SERVER_EXPORT JackQuitException : public JackException {
+    
+    public:
+        
+        JackQuitException(const std::string& msg) : JackException(msg)
+        {}
+        JackQuitException(char* msg) : JackException(msg)
+        {}
+        JackQuitException(const char* msg) : JackException(msg)
+        {}
+        JackQuitException() : JackException("")
+        {}
+};
+    
+/*!
 \brief Exception possibly thrown by Net slaves.
 */
 

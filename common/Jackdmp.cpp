@@ -412,7 +412,7 @@ int main(int argc, char* argv[])
     // Audio driver
     audio_driver_ctl = jackctl_server_get_driver(server_ctl, audio_driver_name);
     if (audio_driver_ctl == NULL) {
-        fprintf(stderr, "Unkown driver \"%s\"\n", audio_driver_name);
+        fprintf(stderr, "Unknown driver \"%s\"\n", audio_driver_name);
         goto fail_free1;
     }
 
@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
 
         midi_driver_ctl = jackctl_server_get_driver(server_ctl, midi_driver_name);
         if (midi_driver_ctl == NULL) {
-            fprintf(stderr, "Unkown driver \"%s\"\n", midi_driver_name);
+            fprintf(stderr, "Unknown driver \"%s\"\n", midi_driver_name);
             goto fail_free2;
         }
 

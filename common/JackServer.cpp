@@ -125,6 +125,7 @@ fail_close1:
 int JackServer::Close()
 {
     jack_log("JackServer::Close");
+    fEngine->NotifyQuit();
     fChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
