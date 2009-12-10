@@ -89,6 +89,11 @@ int JackEngine::Close()
 
     return 0;
 }
+    
+void JackEngine::NotifyQuit()
+{
+    fChannel.NotifyQuit();
+}
 
 //-----------------------------
 // Client ressource management

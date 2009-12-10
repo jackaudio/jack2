@@ -24,6 +24,8 @@ Copyright (C) 2004-2006 Grame
 #include "JackLockedEngine.h"
 #include "JackGlobals.h"
 #include "JackClient.h"
+#include "JackNotification.h"
+#include "JackException.h"
 #include <assert.h>
 
 using namespace std;
@@ -57,7 +59,7 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
         jack_error("Cannot start Jack server listener\n");
         return -1;
     }
-    
+
     fServer = server;
     return 0;
 }
@@ -71,15 +73,20 @@ void JackClientPipeThread::Close()					// Close the Server/Client connection
     	all ressources will be desallocated at the end.
     */
 
-    fThread.Kill();
+    fThread.Stop();
     fPipe->Close();
     fRefNum = -1;
 }
-    
+
 bool JackClientPipeThread::Execute()
 {
-    jack_log("JackClientPipeThread::Execute");
-    return(HandleRequest());
+    try{
+        jack_log("JackClientPipeThread::Execute");
+        return (HandleRequest());
+    } catch (JackQuitException& e) {
+        jack_log("JackMachServerChannel::Execute JackQuitException");
+        return false;
+    }
 }
 
 bool JackClientPipeThread::HandleRequest()
@@ -307,8 +314,14 @@ bool JackClientPipeThread::HandleRequest()
             case JackRequest::kNotification: {
                 jack_log("JackRequest::Notification");
                 JackClientNotificationRequest req;
-                if (req.Read(fPipe) == 0)
-                    fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
+                if (req.Read(fPipe) == 0) {
+                    if (req.fNotify == kQUIT) {
+                        jack_log("JackRequest::Notification kQUIT");
+                        throw JackQuitException();
+                    } else {
+                        fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
+                    }
+                }
                 break;
             }
 
@@ -317,7 +330,7 @@ bool JackClientPipeThread::HandleRequest()
                 break;
         }
     }
- 
+
     // Unlock the global mutex
     ReleaseMutex(fMutex);
     return ret;
@@ -373,17 +386,17 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
 {
     jack_log("JackWinNamedPipeServerChannel::Open ");
     snprintf(fServerName, sizeof(fServerName), server_name);
-    
+
     // Needed for internal connection from JackWinNamedPipeServerNotifyChannel object
     if (fRequestListenPipe.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_error("JackWinNamedPipeServerChannel::Open : cannot create result listen pipe");
         return -1;
     }
-    
+
     fServer = server;
     return 0;
 }
-    
+
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
@@ -403,11 +416,11 @@ int JackWinNamedPipeServerChannel::Start()
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
-    }  
-    
+    }
+
     return 0;
-}    
-    
+}
+
 bool JackWinNamedPipeServerChannel::Init()
 {
     jack_log("JackWinNamedPipeServerChannel::Init ");

@@ -44,6 +44,7 @@ enum NotificationType {
     kPortRenameCallback = 13,
     kRealTimeCallback = 14,
     kShutDownCallback = 15,
+    kQUIT = 16,
     kMaxNotification
 };
 

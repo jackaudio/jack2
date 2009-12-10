@@ -54,7 +54,7 @@ catch (...) {
         throw;                                      \
     }                                               \
 
-#define CATCH_ENGINE_EXCEPTION                      \
+#define CATCH_EXCEPTION                      \
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
     } catch (...) {                                 \
@@ -94,7 +94,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             return fEngine.Close();
             CATCH_EXCEPTION_RETURN
         }
-
+    
         // Client management
         int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status)
         {
@@ -244,35 +244,35 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             TRY_CALL
             JackLock lock(this);
             fEngine.NotifyXRun(refnum);
-            CATCH_ENGINE_EXCEPTION
+            CATCH_EXCEPTION
         }
         void NotifyGraphReorder()
         {
             TRY_CALL
             JackLock lock(this);
             fEngine.NotifyGraphReorder();
-            CATCH_ENGINE_EXCEPTION
+            CATCH_EXCEPTION
         }
         void NotifyBufferSize(jack_nframes_t buffer_size)
         {
             TRY_CALL
             JackLock lock(this);
             fEngine.NotifyBufferSize(buffer_size);
-            CATCH_ENGINE_EXCEPTION
+            CATCH_EXCEPTION
         }
         void NotifySampleRate(jack_nframes_t sample_rate)
         {
             TRY_CALL
             JackLock lock(this);
             fEngine.NotifySampleRate(sample_rate);
-            CATCH_ENGINE_EXCEPTION
+            CATCH_EXCEPTION
         }
         void NotifyFreewheel(bool onoff)
         {
             TRY_CALL
             JackLock lock(this);
             fEngine.NotifyFreewheel(onoff);
-            CATCH_ENGINE_EXCEPTION
+            CATCH_EXCEPTION
         }
 
         void NotifyFailure(int code, const char* reason)
@@ -280,7 +280,7 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             TRY_CALL
             JackLock lock(this);
             fEngine.NotifyFailure(code, reason);
-            CATCH_ENGINE_EXCEPTION
+            CATCH_EXCEPTION
         }
 
         int GetClientPID(const char* name)
@@ -298,7 +298,15 @@ class SERVER_EXPORT JackLockedEngine : public JackLockAble
             return fEngine.GetClientRefNum(name);
             CATCH_EXCEPTION_RETURN
         }
-
+    
+        void NotifyQuit()
+        {
+            TRY_CALL
+            JackLock lock(this);
+            return fEngine.NotifyQuit();
+            CATCH_EXCEPTION
+        }
+ 
 };
 
 } // end of namespace

@@ -27,6 +27,11 @@ Josh Green
   Jackdmp changes log
 ---------------------------
 
+
+2009-12-10 Stephane Letz  <letz@grame.fr>
+
+	* Use a QUIT notification to properly quit the server channel, the server channel thread can then be 'stopped' instead of 'canceled'.
+
 2009-12-09 Stephane Letz  <letz@grame.fr>
 
 	* When threads are cancelled, the exception has to be rethrown. 
