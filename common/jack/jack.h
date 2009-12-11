@@ -430,8 +430,8 @@ int jack_set_sample_rate_callback (jack_client_t *client,
                                    void *arg);
 
 /**
- * Tell the JACK server to call @a registration_callback whenever a
- * port is registered or unregistered, passing @a arg as a parameter.
+ * Tell the JACK server to call @a client_registration_callback whenever a
+ * client is registered or unregistered, passing @a arg as a parameter.
  *
  * All "notification events" are received in a seperated non RT thread,
  * the code in the supplied function does not need to be
