@@ -167,7 +167,8 @@ class SERVER_EXPORT JackLockedEngine
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return (fEngine.CheckClient(refnum)) ? fEngine.InternalClientUnload(refnum, status) : -1;
+            // Client is tested in fEngine.InternalClientUnload
+            return fEngine.InternalClientUnload(refnum, status);
             CATCH_EXCEPTION_RETURN
         }
 

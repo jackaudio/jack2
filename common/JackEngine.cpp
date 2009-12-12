@@ -346,12 +346,8 @@ void JackEngine::NotifyActivate(int refnum)
 int JackEngine::GetInternalClientName(int refnum, char* name_res)
 {
     JackClientInterface* client = fClientTable[refnum];
-    if (client) {
-        strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
-        return 0;
-    } else {
-        return -1;
-    }
+    strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
+    return 0;
 }
 
 int JackEngine::InternalClientHandle(const char* client_name, int* status, int* int_ref)
@@ -588,23 +584,18 @@ error:
 int JackEngine::ClientExternalClose(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
-
-    if (client)	{
-        fEngineControl->fTransport.ResetTimebase(refnum);
-        int res = ClientCloseAux(refnum, client, true);
-        client->Close();
-        delete client;
-        return res;
-    } else {
-        return -1;
-    }
+    fEngineControl->fTransport.ResetTimebase(refnum);
+    int res = ClientCloseAux(refnum, client, true);
+    client->Close();
+    delete client;
+    return res;
 }
 
 // Used for server internal clients or drivers when the RT thread is stopped
 int JackEngine::ClientInternalClose(int refnum, bool wait)
 {
     JackClientInterface* client = fClientTable[refnum];
-    return (client)	? ClientCloseAux(refnum, client, wait) : -1;
+    return ClientCloseAux(refnum, client, wait);
 }
 
 int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wait)
@@ -650,8 +641,8 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
 int JackEngine::ClientActivate(int refnum, bool is_real_time)
 {
     JackClientInterface* client = fClientTable[refnum];
- 
     jack_log("JackEngine::ClientActivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
+    
     if (is_real_time)
         fGraphManager->Activate(refnum);
 
@@ -669,9 +660,6 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
 int JackEngine::ClientDeactivate(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
-    if (client == NULL)
-        return -1;
-
     jack_log("JackEngine::ClientDeactivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 
     // Disconnect all ports ==> notifications are sent
@@ -725,7 +713,6 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 
 int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
-    JackLock lock(this);
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
  
     // Disconnect port ==> notification is sent
