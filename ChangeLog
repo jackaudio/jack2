@@ -22,11 +22,15 @@ Paul Davis
 Peter L Jones
 Devin Anderson
 Josh Green
+Mario Lang
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
 
+2009-12-13 Stephane Letz  <letz@grame.fr>
+
+	* Mario Lang alsa_io time calculation overflow patch.
 
 2009-12-10 Stephane Letz  <letz@grame.fr>
 
