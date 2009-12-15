@@ -582,7 +582,13 @@ netjack_startup( netjack_driver_state_t *netj )
     struct sockaddr_in address;
     // Now open the socket, and wait for the first packet to arrive...
     netj->sockfd = socket (AF_INET, SOCK_DGRAM, 0);
+
 #ifdef WIN32
+    u_long parm = 1;
+    DWORD bufsize = 262144;
+    //ioctlsocket( netj->sockfd, FIONBIO, &parm );
+    setsockopt( netj->sockfd, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof(bufsize) );
+    setsockopt( netj->sockfd, SOL_SOCKET, SO_SNDBUF, (char *)&bufsize, sizeof(bufsize) );
     if (netj->sockfd == INVALID_SOCKET)
 #else
     if (netj->sockfd == -1)
