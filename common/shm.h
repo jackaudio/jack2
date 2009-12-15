@@ -132,7 +132,7 @@ extern "C"
                 jack_shm_registry_index_t);
     void jack_shm_copy_to_registry (jack_shm_info_t*,
                                                jack_shm_registry_index_t*);
-    void jack_release_shm_info (jack_shm_registry_index_t);
+    int jack_release_shm_info (jack_shm_registry_index_t);
     char* jack_shm_addr (jack_shm_info_t* si);  
 
     // here begin the API 

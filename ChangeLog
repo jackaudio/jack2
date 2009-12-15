@@ -28,6 +28,10 @@ Mario Lang
   Jackdmp changes log
 ---------------------------
 
+2009-12-15 Stephane Letz  <letz@grame.fr>
+
+	* Shared memory manager was calling abort in case of fatal error, now return an error in caller.
+
 2009-12-13 Stephane Letz  <letz@grame.fr>
 
 	* Mario Lang alsa_io time calculation overflow patch.
