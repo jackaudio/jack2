@@ -52,6 +52,7 @@
 #include <winsock2.h>
 #define socklen_t int
 #include <malloc.h>
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>

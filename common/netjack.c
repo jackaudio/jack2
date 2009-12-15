@@ -42,6 +42,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #ifdef WIN32
 #include <winsock.h>
 #include <malloc.h>
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
