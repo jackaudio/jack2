@@ -145,11 +145,11 @@ static int semid = -1;
 
 #ifdef WIN32
 
-static void
-semaphore_init () {}
+static int
+semaphore_init () {return 0;}
 
-static  void
-semaphore_add (int value) {}
+static  int
+semaphore_add (int value) {return 0;}
 
 #else
 /* all semaphore errors are fatal -- issue message, but do not return */
@@ -194,7 +194,7 @@ semaphore_init ()
             return -1;
 		}
 	}
-    
+
     return 0;
 }
 
@@ -206,12 +206,12 @@ semaphore_add (int value)
 	sbuf.sem_num = 0;
 	sbuf.sem_op = value;
 	sbuf.sem_flg = SEM_UNDO;
-    
+
 	if (semop(semid, &sbuf, 1) == -1) {
 		semaphore_error ("semop");
         return -1;
 	}
-    
+
     return 0;
 }
 
@@ -228,7 +228,7 @@ jack_shm_lock_registry (void)
 	return semaphore_add (-1);
 }
 
-static void 
+static void
 jack_shm_unlock_registry (void)
 {
 	semaphore_add (1);
@@ -370,7 +370,7 @@ jack_initialize_shm (const char *server_name)
         jack_error ("jack_shm_lock_registry fails...");
         return -1;
     }
-                    
+
 	if ((rc = jack_access_registry (&registry_info)) == 0) {
 		if ((rc = jack_shm_validate_registry ()) != 0) {
 			jack_error ("Incompatible shm registry, "
@@ -441,7 +441,7 @@ jack_release_shm_info (jack_shm_registry_index_t index)
 		jack_release_shm_entry (index);
 		jack_shm_unlock_registry ();
 	}
-    
+
     return 0;
 }
 
@@ -518,7 +518,7 @@ jack_register_server (const char *server_name, int new_registry)
 }
 
 /* release server_name registration */
-void
+int
 jack_unregister_server (const char *server_name /* unused */)
 {
 	int i;
@@ -535,6 +535,7 @@ jack_unregister_server (const char *server_name /* unused */)
 	}
 
 	jack_shm_unlock_registry ();
+	return 0;
 }
 
 /* called for server startup and termination */

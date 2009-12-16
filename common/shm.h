@@ -115,33 +115,33 @@ extern "C"
      * indicating where the shared memory has been
      * attached to the address space.
      */
-     
+
     typedef struct _jack_shm_info {
         jack_shm_registry_index_t index;       /* offset into the registry */
         uint32_t size;
         union {
             void *attached_at;  /* address where attached */
-            char ptr_size[8];   
-        } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */ 
+            char ptr_size[8];
+        } ptr;  /* a "pointer" that has the same 8 bytes size when compling in 32 or 64 bits */
     }
     POST_PACKED_STRUCTURE jack_shm_info_t;
 
     /* utility functions used only within JACK */
-      
+
     void jack_shm_copy_from_registry (jack_shm_info_t*,
                 jack_shm_registry_index_t);
     void jack_shm_copy_to_registry (jack_shm_info_t*,
                                                jack_shm_registry_index_t*);
     int jack_release_shm_info (jack_shm_registry_index_t);
-    char* jack_shm_addr (jack_shm_info_t* si);  
+    char* jack_shm_addr (jack_shm_info_t* si);
 
-    // here begin the API 
+    // here begin the API
     int jack_register_server (const char *server_name, int new_registry);
-    void jack_unregister_server (const char *server_name);
+    int jack_unregister_server (const char *server_name);
 
     int jack_initialize_shm (const char *server_name);
-    int jack_initialize_shm_server (void); 
-    int jack_initialize_shm_client (void);  
+    int jack_initialize_shm_server (void);
+    int jack_initialize_shm_client (void);
     int jack_cleanup_shm (void);
 
     int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
@@ -149,7 +149,7 @@ extern "C"
     void jack_release_shm (jack_shm_info_t*);
     void jack_destroy_shm (jack_shm_info_t*);
     int jack_attach_shm (jack_shm_info_t*);
-    int jack_attach_shm_read (jack_shm_info_t*); 
+    int jack_attach_shm_read (jack_shm_info_t*);
     int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
 
 #ifdef __cplusplus
