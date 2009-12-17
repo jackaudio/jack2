@@ -49,6 +49,7 @@ extern "C"
 */
 #define JACK_WEAK_EXPORT __attribute__((weak))
 #else
+#define JACK_WEAK_EXPORT
 /* Add other things here for non-gcc platforms */
 #endif
 #endif

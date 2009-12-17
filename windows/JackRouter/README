@@ -1,0 +1,3 @@
+This folder contains the sources for ASIO/JACK bridge ASIO driver called "JackRouter". The included project is a Microsoft VC++ 6 one. 
+It requires some files (combase.cpp, dllentry.cpp, register.cpp) that are part on the ASIO driver SDK. The produced "JackRouter.dll" file
+has to be registered in the system using the "regsvr32" tool.
