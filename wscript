@@ -203,8 +203,9 @@ def configure(conf):
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
-        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues!' + Logs.colors.NORMAL
-    
+        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL
+        print Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL
+
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
