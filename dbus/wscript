@@ -10,11 +10,15 @@ def set_options(opt):
     opt.add_option('--enable-pkg-config-dbus-service-dir', action='store_true', default=False, help='force D-Bus service install dir to be one returned by pkg-config')
 
 def configure(conf):
-    if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs'):
+    conf.env['BUILD_JACKDBUS'] = False
+
+    if not conf.check_cfg(package='dbus-1', atleast_version='1.0.0', args='--cflags --libs') or not conf.is_defined('HAVE_DBUS_1'):
+        print Logs.colors.RED + 'WARNING !! jackdbus will not be built because libdbus-dev is missing' + Logs.colors.NORMAL
         return
 
     dbus_dir = conf.check_cfg(package='dbus-1', args='--variable=session_bus_services_dir')
     if not dbus_dir:
+        print Logs.colors.RED + 'WARNING !! jackdbus will not be built because service dir is unknown' + Logs.colors.NORMAL
         return
 
     dbus_dir = dbus_dir.strip()
@@ -31,15 +35,13 @@ def configure(conf):
 
     if conf.is_defined('HAVE_EXPAT'):
         conf.env['LIB_EXPAT'] = ['expat']
-
-    conf.env['BUILD_JACKDBUS1'] = conf.is_defined('HAVE_EXPAT') and conf.is_defined('HAVE_DBUS_1')
-
-
-def build(bld):
-
-    if bld.env['BUILD_JACKDBUS1'] != True:
+    else:
+        print Logs.colors.RED + 'WARNING !! jackdbus will not be built because of expat is missing' + Logs.colors.NORMAL
         return
 
+    conf.env['BUILD_JACKDBUS'] = True
+
+def build(bld):
     obj = bld.new_task_gen('cc', 'program')
     if bld.env['IS_LINUX']:
         sysdeps_dbus_include = ['../linux', '../posix']
