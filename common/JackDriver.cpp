@@ -167,7 +167,7 @@ int JackDriver::Open(jack_nframes_t buffer_size,
 
 int JackDriver::Close()
 {
-    if (fClientControl.fRefNum > 0) { 
+    if (fClientControl.fRefNum >= 0) { 
         jack_log("JackDriver::Close");
         fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
         fClientControl.fActive = false;
