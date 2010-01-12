@@ -92,7 +92,7 @@ int netjack_wait( netjack_driver_state_t *netj )
     jacknet_packet_header *pkthdr;
 
     if( !netj->next_deadline_valid ) {
-	    netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	    netj->next_deadline = jack_get_time() + netj->period_usecs;
 	    netj->next_deadline_valid = 1;
     }
 
@@ -174,23 +174,23 @@ int netjack_wait( netjack_driver_state_t *netj )
 
 	if( netj->deadline_goodness != MASTER_FREEWHEELS ) {
 		if( netj->deadline_goodness < want_deadline ) {
-			netj->deadline_offset -= netj->period_usecs/100;
+			netj->next_deadline -= netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: --- %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
 		if( netj->deadline_goodness > want_deadline ) {
-			netj->deadline_offset += netj->period_usecs/100;
+			netj->next_deadline += netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
 	}
-	if( netj->deadline_offset < (netj->period_usecs*70/100) ) {
-		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
-		netj->deadline_offset = (netj->period_usecs*90/100);
-	}
+//	if( netj->next_deadline < (netj->period_usecs*70/100) ) {
+//		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
+//		netj->deadline_offset = (netj->period_usecs*90/100);
+//	}
 
-	netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	netj->next_deadline += netj->period_usecs;
     } else {
 	netj->time_to_deadline = 0;
-	netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	netj->next_deadline += netj->period_usecs;
 	// bah... the packet is not there.
 	// either
 	// - it got lost.
