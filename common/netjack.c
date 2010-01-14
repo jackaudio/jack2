@@ -50,7 +50,9 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #include "netjack.h"
 
+#ifndef WIN32
 #include "config.h"
+#endif
 
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
@@ -166,7 +168,7 @@ int netjack_wait( netjack_driver_state_t *netj )
 	netj->packet_data_valid = 1;
 
 	int want_deadline;
-	if( netj->jitter_val != 0 ) 
+	if( netj->jitter_val != 0 )
 		want_deadline = netj->jitter_val;
 	else if( netj->latency < 4 )
 		want_deadline = -netj->period_usecs/2;
@@ -712,7 +714,7 @@ netjack_startup( netjack_driver_state_t *netj )
     netj->period_usecs =
         (jack_time_t) floor ((((float) netj->period_size) / (float)netj->sample_rate)
                              * 1000000.0f);
-    
+
     if( netj->latency == 0 )
 	netj->deadline_offset = 50*netj->period_usecs;
     else
@@ -723,7 +725,7 @@ netjack_startup( netjack_driver_state_t *netj )
 	// TODO: this is a hack. But i dont want to change the packet header.
 	netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
 	netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
-	
+
 	netj->net_period_down = netj->resample_factor;
 	netj->net_period_up = netj->resample_factor_up;
     } else {
