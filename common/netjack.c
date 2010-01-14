@@ -50,7 +50,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #include "netjack.h"
 
-#ifndef WIN32
+#ifdef __linux__
 #include "config.h"
 #endif
 

@@ -34,7 +34,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include <signal.h>
 
-#ifndef WIN32
+#ifdef __linux__
 #include "config.h"
 #endif
 

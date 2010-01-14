@@ -26,7 +26,7 @@
  *
  */
 
-#ifndef WIN32
+#ifdef __linux__
 #include "config.h"
 #endif
 
