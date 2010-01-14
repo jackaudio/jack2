@@ -26,7 +26,7 @@
  *
  */
 
-//#include "config.h"
+#include "config.h"
 
 #ifdef __APPLE__
 #define _DARWIN_C_SOURCE
@@ -52,6 +52,7 @@
 #include <winsock2.h>
 #define socklen_t int
 #include <malloc.h>
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>

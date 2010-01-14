@@ -42,6 +42,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #ifdef WIN32
 #include <winsock.h>
 #include <malloc.h>
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -49,7 +50,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #include "netjack.h"
 
-//#include "config.h"
+#include "config.h"
 
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
@@ -92,7 +93,7 @@ int netjack_wait( netjack_driver_state_t *netj )
     jacknet_packet_header *pkthdr;
 
     if( !netj->next_deadline_valid ) {
-	    netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	    netj->next_deadline = jack_get_time() + netj->period_usecs;
 	    netj->next_deadline_valid = 1;
     }
 
@@ -174,23 +175,23 @@ int netjack_wait( netjack_driver_state_t *netj )
 
 	if( netj->deadline_goodness != MASTER_FREEWHEELS ) {
 		if( netj->deadline_goodness < want_deadline ) {
-			netj->deadline_offset -= netj->period_usecs/100;
+			netj->next_deadline -= netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: --- %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
 		if( netj->deadline_goodness > want_deadline ) {
-			netj->deadline_offset += netj->period_usecs/100;
+			netj->next_deadline += netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
 	}
-	if( netj->deadline_offset < (netj->period_usecs*70/100) ) {
-		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
-		netj->deadline_offset = (netj->period_usecs*90/100);
-	}
+//	if( netj->next_deadline < (netj->period_usecs*70/100) ) {
+//		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
+//		netj->deadline_offset = (netj->period_usecs*90/100);
+//	}
 
-	netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	netj->next_deadline += netj->period_usecs;
     } else {
 	netj->time_to_deadline = 0;
-	netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	netj->next_deadline += netj->period_usecs;
 	// bah... the packet is not there.
 	// either
 	// - it got lost.
@@ -581,7 +582,13 @@ netjack_startup( netjack_driver_state_t *netj )
     struct sockaddr_in address;
     // Now open the socket, and wait for the first packet to arrive...
     netj->sockfd = socket (AF_INET, SOCK_DGRAM, 0);
+
 #ifdef WIN32
+    u_long parm = 1;
+    DWORD bufsize = 262144;
+    //ioctlsocket( netj->sockfd, FIONBIO, &parm );
+    setsockopt( netj->sockfd, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof(bufsize) );
+    setsockopt( netj->sockfd, SOL_SOCKET, SO_SNDBUF, (char *)&bufsize, sizeof(bufsize) );
     if (netj->sockfd == INVALID_SOCKET)
 #else
     if (netj->sockfd == -1)

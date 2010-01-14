@@ -34,6 +34,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include <signal.h>
 
+#include "config.h"
+
 #ifdef WIN32
 #include <winsock2.h>
 #define socklen_t int
