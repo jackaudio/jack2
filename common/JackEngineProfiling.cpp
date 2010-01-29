@@ -104,14 +104,15 @@ JackEngineProfiling::~JackEngineProfiling()
         fStream1 <<  "set ylabel \"usec\"\n";
         fStream1 <<  "plot \"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines \n";
         
-        fStream1 <<  "set output 'Timing1.pdf\n";
-        fStream1 <<  "set terminal pdf\n";
+        fStream1 <<  "set output 'Timing1.svg\n";
+        fStream1 <<  "set terminal svg\n";
         
         fStream1 <<  "set grid\n";
         fStream1 <<  "set title \"Audio driver timing\"\n";
         fStream1 <<  "set xlabel \"audio cycles\"\n";
         fStream1 <<  "set ylabel \"usec\"\n";
         fStream1 <<  "plot \"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines \n";
+	fStream1 <<  "unset output\n";
     }
     
     // Driver end date
@@ -127,14 +128,15 @@ JackEngineProfiling::~JackEngineProfiling()
         fStream2 <<  "set ylabel \"usec\"\n";
         fStream2 <<  "plot  \"JackEngineProfiling.log\" using 2 title \"Driver end date\" with lines \n";
     
-        fStream2 <<  "set output 'Timing2.pdf\n";
-        fStream2 <<  "set terminal pdf\n";
+        fStream2 <<  "set output 'Timing2.svg\n";
+        fStream2 <<  "set terminal svg\n";
     
         fStream2 <<  "set grid\n";
         fStream2 <<  "set title \"Driver end date\"\n";
         fStream2 <<  "set xlabel \"audio cycles\"\n";
         fStream2 <<  "set ylabel \"usec\"\n";
         fStream2 <<  "plot  \"JackEngineProfiling.log\" using 2 title \"Driver end date\" with lines \n";
+	fStream2 <<  "unset output\n";
     }
         
     // Clients end date
@@ -170,8 +172,8 @@ JackEngineProfiling::~JackEngineProfiling()
             }
         
             fStream3 << "\n unset multiplot\n";  
-            fStream3 << "set output 'Timing3.pdf\n";
-            fStream3 << "set terminal pdf\n";
+            fStream3 << "set output 'Timing3.svg\n";
+            fStream3 << "set terminal svg\n";
         
             fStream3 << "set multiplot\n";
             fStream3 << "set grid\n";
@@ -196,6 +198,8 @@ JackEngineProfiling::~JackEngineProfiling()
                     fStream3 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7) - 1  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
+	    fStream3 << "\nunset multiplot\n";
+	    fStream3 << "unset output\n";
         }
     }
 
@@ -222,8 +226,8 @@ JackEngineProfiling::~JackEngineProfiling()
             }
             
             fStream4 << "\n unset multiplot\n";  
-            fStream4 << "set output 'Timing4.pdf\n";
-            fStream4 << "set terminal pdf\n";
+            fStream4 << "set output 'Timing4.svg\n";
+            fStream4 << "set terminal svg\n";
             
             fStream4 << "set multiplot\n";
             fStream4 << "set grid\n";
@@ -238,6 +242,8 @@ JackEngineProfiling::~JackEngineProfiling()
                      fStream4 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7)  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
+	    fStream4 << "\nunset multiplot\n";
+	    fStream4 << "unset output\n";
         }
     }
     
@@ -264,8 +270,8 @@ JackEngineProfiling::~JackEngineProfiling()
             }
             
             fStream5 << "\n unset multiplot\n";  
-            fStream5 << "set output 'Timing5.pdf\n";
-            fStream5 << "set terminal pdf\n";
+            fStream5 << "set output 'Timing5.svg\n";
+            fStream5 << "set terminal svg\n";
             
             fStream5 << "set multiplot\n";
             fStream5 << "set grid\n";
@@ -280,6 +286,8 @@ JackEngineProfiling::~JackEngineProfiling()
                     fStream5 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7) + 1  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
+	    fStream5 << "\nunset multiplot\n";
+	    fStream5 << "unset output\n";
         }
     }
 }

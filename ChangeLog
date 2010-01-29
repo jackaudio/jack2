@@ -3,6 +3,7 @@
 ---------------------------
 
 Dmitry Baikov
+Gabriel M. Beddingfield
 Steven Chamberlain
 Thom Johansen
 Thibault LeMeur
@@ -27,6 +28,10 @@ Mario Lang
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2010-01-29 Gabriel M. Beddingfield <gabriel@teuton.org>
+
+	* Change JackEngineProfiling and JackAudioAdapterInterface gnuplot scripts to output SVG instead of PDF.
 
 2009-12-15 Stephane Letz  <letz@grame.fr>
 
