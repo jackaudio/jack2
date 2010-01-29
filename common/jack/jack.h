@@ -46,31 +46,7 @@ extern "C"
      * <jack/weakjack.h> before jack.h.
      *************************************************************/
     
-#ifndef JACK_WEAK_EXPORT
-#ifdef __GNUC__
-    /* JACK_WEAK_EXPORT needs to be a macro which
-     expands into a compiler directive. If non-null, the directive 
-     must tell the compiler to arrange for weak linkage of 
-     the symbol it used with. For this to work full may
-     require linker arguments in the client as well.
-     */
-#define JACK_WEAK_EXPORT __attribute__((weak))
-#else
-    /* Add other things here for non-gcc platforms */
-#endif
-#endif
-    
-#ifndef JACK_OPTIONAL_WEAK_EXPORT
-#define JACK_OPTIONAL_WEAK_EXPORT
-#endif
-    
-#ifndef JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT
-#ifdef __GNUC__
-#define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT __attribute__((__deprecated__))
-#else
-    /* Add other things here for non-gcc platforms */
-#endif /* __GNUC__ */
-#endif
+#include <jack/weakmacros.h>
     
 /**
  * Call this function to get version of the JACK, in form of several numbers
