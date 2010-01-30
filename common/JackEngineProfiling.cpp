@@ -293,28 +293,39 @@ JackEngineProfiling::~JackEngineProfiling()
     
     std::ofstream fStream6("Timings.html", std::ios_base::ate);
     if (!fStream6.is_open()) {
-        jack_error("JackEngineProfiling::Save cannot open Timing6.html file");
+        jack_error("JackEngineProfiling::Save cannot open Timings.html file");
     } else {
-        fStream6 << "<body>\n";
-        fStream6 << "<center><H2>JACK engine profiling </H2> </center>\n";
-        fStream6 << "<P>\n";
-        fStream6 << "<center><img src=\"Timing1.svg\" /> </center>\n";
-        fStream6 << "<center><img src=\"Timing2.svg\" /> </center>\n";
-        fStream6 << "<center><img src=\"Timing3.svg\" /> </center>\n";
-        fStream6 << "<center><img src=\"Timing4.svg\" /> </center>\n";
-        fStream6 << "<center><img src=\"Timing5.svg\" /> </center>\n";
-        fStream6 << "</body>\n";
+        fStream6 << "<?xml version='1.0' encoding='utf-8'?>\n";
+        fStream6 << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n";
+        fStream6 << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
+        fStream6 << "<html xmlns='http://www.w3.org/1999/xhtml' lang='en'>\n";
+        fStream6 << "  <head>\n";
+        fStream6 << "    <title>JACK engine profiling</title>\n";
+        fStream6 << "    <!-- assuming that images are 600px wide -->\n";
+        fStream6 << "    <style media='all' type='text/css'>\n";
+        fStream6 << "    .center { margin-left:auto ; margin-right: auto; width: 650px; height: 550px }\n";
+        fStream6 << "    </style>\n";
+        fStream6 << "  </head>\n";
+        fStream6 << "  <body>\n";
+        fStream6 << "    <h2 style='text-align:center'>JACK engine profiling</h2>\n";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing1.svg'>Timing1</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing2.svg'>Timing2</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing3.svg'>Timing3</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing4.svg'>Timing4</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing5.svg'>Timing5</object></div>";
+        fStream6 << "  </body>\n";
+        fStream6 << "</html>\n";
     }  
     
     std::ofstream fStream7("generate_timings", std::ios_base::ate);
     if (!fStream7.is_open()) {
         jack_error("JackEngineProfiling::Save cannot open generate_timings file");
     } else {
-        fStream7 << "gnuplot Timing1.plot\n";
-        fStream7 << "gnuplot Timing2.plot\n";
-        fStream7 << "gnuplot Timing3.plot\n";
-        fStream7 << "gnuplot Timing4.plot\n";
-        fStream7 << "gnuplot Timing5.plot\n";
+        fStream7 << "gnuplot -persist Timing1.plot \n";
+        fStream7 << "gnuplot -persist Timing2.plot\n";
+        fStream7 << "gnuplot -persist Timing3.plot\n";
+        fStream7 << "gnuplot -persist Timing4.plot\n";
+        fStream7 << "gnuplot -persist Timing5.plot\n";
     }       
 }
 
