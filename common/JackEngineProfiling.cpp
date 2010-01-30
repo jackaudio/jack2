@@ -95,7 +95,7 @@ JackEngineProfiling::~JackEngineProfiling()
      std::ofstream fStream1("Timing1.plot", std::ios_base::ate);
  
     if (!fStream1.is_open()) {
-        jack_error("JackEngineProfiling::Save cannot open Timing1.log file");
+        jack_error("JackEngineProfiling::Save cannot open Timing1.plot file");
     } else {
         
         fStream1 << "set grid\n";
@@ -119,7 +119,7 @@ JackEngineProfiling::~JackEngineProfiling()
     std::ofstream fStream2("Timing2.plot", std::ios_base::ate);
   
     if (!fStream2.is_open()) {
-        jack_error("JackEngineProfiling::Save cannot open Timing2.log file");
+        jack_error("JackEngineProfiling::Save cannot open Timing2.plot file");
     } else {
    
         fStream2 << "set grid\n";
@@ -144,7 +144,7 @@ JackEngineProfiling::~JackEngineProfiling()
         std::ofstream fStream3("Timing3.plot", std::ios_base::ate);
         
         if (!fStream3.is_open()) {
-            jack_error("JackEngineProfiling::Save cannot open Timing3.log file");
+            jack_error("JackEngineProfiling::Save cannot open Timing3.plot file");
         } else {
         
             fStream3 << "set multiplot\n";
@@ -208,7 +208,7 @@ JackEngineProfiling::~JackEngineProfiling()
         std::ofstream fStream4("Timing4.plot", std::ios_base::ate);
         
         if (!fStream4.is_open()) {
-            jack_error("JackEngineProfiling::Save cannot open Timing4.log file");
+            jack_error("JackEngineProfiling::Save cannot open Timing4.plot file");
         } else {
         
             fStream4 << "set multiplot\n";
@@ -252,7 +252,7 @@ JackEngineProfiling::~JackEngineProfiling()
         std::ofstream fStream5("Timing5.plot", std::ios_base::ate);
 
         if (!fStream5.is_open()) {
-            jack_error("JackEngineProfiling::Save cannot open Timing5.log file");
+            jack_error("JackEngineProfiling::Save cannot open Timing5.plot file");
         } else {
         
             fStream5 << "set multiplot\n";
@@ -290,6 +290,32 @@ JackEngineProfiling::~JackEngineProfiling()
 	    fStream5 << "unset output\n";
         }
     }
+    
+    std::ofstream fStream6("Timings.html", std::ios_base::ate);
+    if (!fStream6.is_open()) {
+        jack_error("JackEngineProfiling::Save cannot open Timing6.html file");
+    } else {
+        fStream6 << "<body>\n";
+        fStream6 << "<center><H2>JACK engine profiling </H2> </center>\n";
+        fStream6 << "<P>\n";
+        fStream6 << "<center><img src=\"Timing1.svg\" /> </center>\n";
+        fStream6 << "<center><img src=\"Timing2.svg\" /> </center>\n";
+        fStream6 << "<center><img src=\"Timing3.svg\" /> </center>\n";
+        fStream6 << "<center><img src=\"Timing4.svg\" /> </center>\n";
+        fStream6 << "<center><img src=\"Timing5.svg\" /> </center>\n";
+        fStream6 << "</body>\n";
+    }  
+    
+    std::ofstream fStream7("generate_timings", std::ios_base::ate);
+    if (!fStream7.is_open()) {
+        jack_error("JackEngineProfiling::Save cannot open generate_timings file");
+    } else {
+        fStream7 << "gnuplot Timing1.plot\n";
+        fStream7 << "gnuplot Timing2.plot\n";
+        fStream7 << "gnuplot Timing3.plot\n";
+        fStream7 << "gnuplot Timing4.plot\n";
+        fStream7 << "gnuplot Timing5.plot\n";
+    }       
 }
 
 bool JackEngineProfiling::CheckClient(const char* name, int cur_point)
