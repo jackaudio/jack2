@@ -42,6 +42,7 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #ifdef WIN32
 #include <winsock.h>
 #include <malloc.h>
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -49,7 +50,9 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 
 #include "netjack.h"
 
-//#include "config.h"
+#ifdef __linux__
+#include "config.h"
+#endif
 
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
@@ -92,7 +95,7 @@ int netjack_wait( netjack_driver_state_t *netj )
     jacknet_packet_header *pkthdr;
 
     if( !netj->next_deadline_valid ) {
-	    netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	    netj->next_deadline = jack_get_time() + netj->period_usecs;
 	    netj->next_deadline_valid = 1;
     }
 
@@ -165,7 +168,7 @@ int netjack_wait( netjack_driver_state_t *netj )
 	netj->packet_data_valid = 1;
 
 	int want_deadline;
-	if( netj->jitter_val != 0 ) 
+	if( netj->jitter_val != 0 )
 		want_deadline = netj->jitter_val;
 	else if( netj->latency < 4 )
 		want_deadline = -netj->period_usecs/2;
@@ -174,23 +177,23 @@ int netjack_wait( netjack_driver_state_t *netj )
 
 	if( netj->deadline_goodness != MASTER_FREEWHEELS ) {
 		if( netj->deadline_goodness < want_deadline ) {
-			netj->deadline_offset -= netj->period_usecs/100;
+			netj->next_deadline -= netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: --- %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
 		if( netj->deadline_goodness > want_deadline ) {
-			netj->deadline_offset += netj->period_usecs/100;
+			netj->next_deadline += netj->period_usecs/100;
 			//jack_log( "goodness: %d, Adjust deadline: +++ %d\n", netj->deadline_goodness, (int) netj->period_usecs*netj->latency/100 );
 		}
 	}
-	if( netj->deadline_offset < (netj->period_usecs*70/100) ) {
-		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
-		netj->deadline_offset = (netj->period_usecs*90/100);
-	}
+//	if( netj->next_deadline < (netj->period_usecs*70/100) ) {
+//		jack_error( "master is forcing deadline_offset to below 70%% of period_usecs... increase latency setting on master" );
+//		netj->deadline_offset = (netj->period_usecs*90/100);
+//	}
 
-	netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	netj->next_deadline += netj->period_usecs;
     } else {
 	netj->time_to_deadline = 0;
-	netj->next_deadline = jack_get_time() + netj->deadline_offset;
+	netj->next_deadline += netj->period_usecs;
 	// bah... the packet is not there.
 	// either
 	// - it got lost.
@@ -581,7 +584,13 @@ netjack_startup( netjack_driver_state_t *netj )
     struct sockaddr_in address;
     // Now open the socket, and wait for the first packet to arrive...
     netj->sockfd = socket (AF_INET, SOCK_DGRAM, 0);
+
 #ifdef WIN32
+    u_long parm = 1;
+    DWORD bufsize = 262144;
+    //ioctlsocket( netj->sockfd, FIONBIO, &parm );
+    setsockopt( netj->sockfd, SOL_SOCKET, SO_RCVBUF, (char *)&bufsize, sizeof(bufsize) );
+    setsockopt( netj->sockfd, SOL_SOCKET, SO_SNDBUF, (char *)&bufsize, sizeof(bufsize) );
     if (netj->sockfd == INVALID_SOCKET)
 #else
     if (netj->sockfd == -1)
@@ -705,7 +714,7 @@ netjack_startup( netjack_driver_state_t *netj )
     netj->period_usecs =
         (jack_time_t) floor ((((float) netj->period_size) / (float)netj->sample_rate)
                              * 1000000.0f);
-    
+
     if( netj->latency == 0 )
 	netj->deadline_offset = 50*netj->period_usecs;
     else
@@ -716,7 +725,7 @@ netjack_startup( netjack_driver_state_t *netj )
 	// TODO: this is a hack. But i dont want to change the packet header.
 	netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
 	netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
-	
+
 	netj->net_period_down = netj->resample_factor;
 	netj->net_period_up = netj->resample_factor_up;
     } else {

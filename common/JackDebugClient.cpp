@@ -121,7 +121,7 @@ void JackDebugClient::CheckClient(const char* function_name) const
         *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed " << "from " << function_name << endl; 
         *fStream << "This is likely to cause crash !'" << endl;
     #ifdef __APPLE__
-        Debugger();
+       // Debugger();
     #endif 
     }
 }

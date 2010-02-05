@@ -95,7 +95,7 @@ JackEngineProfiling::~JackEngineProfiling()
      std::ofstream fStream1("Timing1.plot", std::ios_base::ate);
  
     if (!fStream1.is_open()) {
-        jack_error("JackEngineProfiling::Save cannot open Timing1.log file");
+        jack_error("JackEngineProfiling::Save cannot open Timing1.plot file");
     } else {
         
         fStream1 << "set grid\n";
@@ -104,21 +104,22 @@ JackEngineProfiling::~JackEngineProfiling()
         fStream1 <<  "set ylabel \"usec\"\n";
         fStream1 <<  "plot \"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines \n";
         
-        fStream1 <<  "set output 'Timing1.pdf\n";
-        fStream1 <<  "set terminal pdf\n";
+        fStream1 <<  "set output 'Timing1.svg\n";
+        fStream1 <<  "set terminal svg\n";
         
         fStream1 <<  "set grid\n";
         fStream1 <<  "set title \"Audio driver timing\"\n";
         fStream1 <<  "set xlabel \"audio cycles\"\n";
         fStream1 <<  "set ylabel \"usec\"\n";
         fStream1 <<  "plot \"JackEngineProfiling.log\" using 1 title \"Audio period\" with lines \n";
+	fStream1 <<  "unset output\n";
     }
     
     // Driver end date
     std::ofstream fStream2("Timing2.plot", std::ios_base::ate);
   
     if (!fStream2.is_open()) {
-        jack_error("JackEngineProfiling::Save cannot open Timing2.log file");
+        jack_error("JackEngineProfiling::Save cannot open Timing2.plot file");
     } else {
    
         fStream2 << "set grid\n";
@@ -127,14 +128,15 @@ JackEngineProfiling::~JackEngineProfiling()
         fStream2 <<  "set ylabel \"usec\"\n";
         fStream2 <<  "plot  \"JackEngineProfiling.log\" using 2 title \"Driver end date\" with lines \n";
     
-        fStream2 <<  "set output 'Timing2.pdf\n";
-        fStream2 <<  "set terminal pdf\n";
+        fStream2 <<  "set output 'Timing2.svg\n";
+        fStream2 <<  "set terminal svg\n";
     
         fStream2 <<  "set grid\n";
         fStream2 <<  "set title \"Driver end date\"\n";
         fStream2 <<  "set xlabel \"audio cycles\"\n";
         fStream2 <<  "set ylabel \"usec\"\n";
         fStream2 <<  "plot  \"JackEngineProfiling.log\" using 2 title \"Driver end date\" with lines \n";
+	fStream2 <<  "unset output\n";
     }
         
     // Clients end date
@@ -142,7 +144,7 @@ JackEngineProfiling::~JackEngineProfiling()
         std::ofstream fStream3("Timing3.plot", std::ios_base::ate);
         
         if (!fStream3.is_open()) {
-            jack_error("JackEngineProfiling::Save cannot open Timing3.log file");
+            jack_error("JackEngineProfiling::Save cannot open Timing3.plot file");
         } else {
         
             fStream3 << "set multiplot\n";
@@ -170,8 +172,8 @@ JackEngineProfiling::~JackEngineProfiling()
             }
         
             fStream3 << "\n unset multiplot\n";  
-            fStream3 << "set output 'Timing3.pdf\n";
-            fStream3 << "set terminal pdf\n";
+            fStream3 << "set output 'Timing3.svg\n";
+            fStream3 << "set terminal svg\n";
         
             fStream3 << "set multiplot\n";
             fStream3 << "set grid\n";
@@ -196,6 +198,8 @@ JackEngineProfiling::~JackEngineProfiling()
                     fStream3 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7) - 1  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
+	    fStream3 << "\nunset multiplot\n";
+	    fStream3 << "unset output\n";
         }
     }
 
@@ -204,7 +208,7 @@ JackEngineProfiling::~JackEngineProfiling()
         std::ofstream fStream4("Timing4.plot", std::ios_base::ate);
         
         if (!fStream4.is_open()) {
-            jack_error("JackEngineProfiling::Save cannot open Timing4.log file");
+            jack_error("JackEngineProfiling::Save cannot open Timing4.plot file");
         } else {
         
             fStream4 << "set multiplot\n";
@@ -222,8 +226,8 @@ JackEngineProfiling::~JackEngineProfiling()
             }
             
             fStream4 << "\n unset multiplot\n";  
-            fStream4 << "set output 'Timing4.pdf\n";
-            fStream4 << "set terminal pdf\n";
+            fStream4 << "set output 'Timing4.svg\n";
+            fStream4 << "set terminal svg\n";
             
             fStream4 << "set multiplot\n";
             fStream4 << "set grid\n";
@@ -238,6 +242,8 @@ JackEngineProfiling::~JackEngineProfiling()
                      fStream4 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7)  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
+	    fStream4 << "\nunset multiplot\n";
+	    fStream4 << "unset output\n";
         }
     }
     
@@ -246,7 +252,7 @@ JackEngineProfiling::~JackEngineProfiling()
         std::ofstream fStream5("Timing5.plot", std::ios_base::ate);
 
         if (!fStream5.is_open()) {
-            jack_error("JackEngineProfiling::Save cannot open Timing5.log file");
+            jack_error("JackEngineProfiling::Save cannot open Timing5.plot file");
         } else {
         
             fStream5 << "set multiplot\n";
@@ -264,8 +270,8 @@ JackEngineProfiling::~JackEngineProfiling()
             }
             
             fStream5 << "\n unset multiplot\n";  
-            fStream5 << "set output 'Timing5.pdf\n";
-            fStream5 << "set terminal pdf\n";
+            fStream5 << "set output 'Timing5.svg\n";
+            fStream5 << "set terminal svg\n";
             
             fStream5 << "set multiplot\n";
             fStream5 << "set grid\n";
@@ -280,8 +286,47 @@ JackEngineProfiling::~JackEngineProfiling()
                     fStream5 << "\"JackEngineProfiling.log\" using " << ((i + 1) * 7) + 1  << " title \"" << fIntervalTable[i].fName << "\" with lines,";
                 }
             }
+	    fStream5 << "\nunset multiplot\n";
+	    fStream5 << "unset output\n";
         }
     }
+    
+    std::ofstream fStream6("Timings.html", std::ios_base::ate);
+    if (!fStream6.is_open()) {
+        jack_error("JackEngineProfiling::Save cannot open Timings.html file");
+    } else {
+        fStream6 << "<?xml version='1.0' encoding='utf-8'?>\n";
+        fStream6 << "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n";
+        fStream6 << "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n";
+        fStream6 << "<html xmlns='http://www.w3.org/1999/xhtml' lang='en'>\n";
+        fStream6 << "  <head>\n";
+        fStream6 << "    <title>JACK engine profiling</title>\n";
+        fStream6 << "    <!-- assuming that images are 600px wide -->\n";
+        fStream6 << "    <style media='all' type='text/css'>\n";
+        fStream6 << "    .center { margin-left:auto ; margin-right: auto; width: 650px; height: 550px }\n";
+        fStream6 << "    </style>\n";
+        fStream6 << "  </head>\n";
+        fStream6 << "  <body>\n";
+        fStream6 << "    <h2 style='text-align:center'>JACK engine profiling</h2>\n";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing1.svg'>Timing1</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing2.svg'>Timing2</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing3.svg'>Timing3</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing4.svg'>Timing4</object></div>";
+        fStream6 << "    <div class='center'><object class='center' type='image/svg+xml' data='Timing5.svg'>Timing5</object></div>";
+        fStream6 << "  </body>\n";
+        fStream6 << "</html>\n";
+    }  
+    
+    std::ofstream fStream7("generate_timings", std::ios_base::ate);
+    if (!fStream7.is_open()) {
+        jack_error("JackEngineProfiling::Save cannot open generate_timings file");
+    } else {
+        fStream7 << "gnuplot -persist Timing1.plot \n";
+        fStream7 << "gnuplot -persist Timing2.plot\n";
+        fStream7 << "gnuplot -persist Timing3.plot\n";
+        fStream7 << "gnuplot -persist Timing4.plot\n";
+        fStream7 << "gnuplot -persist Timing5.plot\n";
+    }       
 }
 
 bool JackEngineProfiling::CheckClient(const char* name, int cur_point)

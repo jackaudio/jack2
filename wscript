@@ -112,6 +112,8 @@ def configure(conf):
         conf.sub_config('linux')
     if Options.options.dbus:
         conf.sub_config('dbus')
+        if conf.env['BUILD_JACKDBUS'] != True:
+            conf.fatal('jackdbus was explicitly requested but cannot be built')
     conf.sub_config('example-clients')
 
     if conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
@@ -136,7 +138,6 @@ def configure(conf):
     conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
-    conf.env['BUILD_JACKDBUS'] = Options.options.dbus
     conf.env['BUILD_CLASSIC'] = Options.options.classic
     conf.env['BUILD_DEBUG'] = Options.options.debug
 
@@ -203,8 +204,9 @@ def configure(conf):
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
-        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues!' + Logs.colors.NORMAL
-    
+        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL
+        print Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL
+
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
