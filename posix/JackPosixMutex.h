@@ -103,11 +103,12 @@ class JackPosixMutex
             pthread_mutex_destroy(&fMutex);
         }
 
-        void Lock()
+        bool Lock()
         {
             int res = pthread_mutex_lock(&fMutex);
             if (res != 0)
                 jack_error("JackPosixMutex::Lock res = %d", res);
+            return (res == 0);
         }
 
         bool Trylock()
@@ -115,11 +116,12 @@ class JackPosixMutex
             return (pthread_mutex_trylock(&fMutex) == 0);
         }
 
-        void Unlock()
+        bool Unlock()
         {
             int res = pthread_mutex_unlock(&fMutex);
             if (res != 0)
                 jack_error("JackPosixMutex::Unlock res = %d", res);
+            return (res == 0);
         }
 
 };

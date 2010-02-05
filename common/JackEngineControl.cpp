@@ -81,8 +81,9 @@ void JackEngineControl::ResetRollingUsecs()
     fRollingInterval = int(floor((JACK_ENGINE_ROLLING_INTERVAL * 1000.f) / fPeriodUsecs));
 }
     
-void JackEngineControl::NotifyXRun(float delayed_usecs)
+void JackEngineControl::NotifyXRun(jack_time_t callback_usecs, float delayed_usecs)
 {
+    ResetFrameTime(callback_usecs);
     fXrunDelayedUsecs = delayed_usecs;
     if (delayed_usecs > fMaxDelayedUsecs)
         fMaxDelayedUsecs = delayed_usecs;
