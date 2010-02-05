@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackPlatformPlug_APPLE__
 #define __JackPlatformPlug_APPLE__
 
+#include <TargetConditionals.h>
+
 namespace Jack
 {       
 	class JackPosixMutex;
@@ -42,13 +44,16 @@ namespace Jack { typedef JackPosixMutex JackMutex; }
 namespace Jack { typedef JackMachThread JackThread; }
 
 /* __JackPlatformSynchro__  client activation */
+#ifndef TARGET_OS_IPHONE
 #include "JackMachSemaphore.h"
 namespace Jack { typedef JackMachSemaphore JackSynchro; }
+#endif
 
 /* __JackPlatformProcessSync__ */
 #include "JackProcessSync.h"
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
 
+#ifndef TARGET_OS_IPHONE
 /* __JackPlatformServerChannel__ */ 
 #include "JackMachServerChannel.h"
 namespace Jack { typedef JackMachServerChannel JackServerChannel; }
@@ -64,6 +69,7 @@ namespace Jack { typedef JackMachServerNotifyChannel JackServerNotifyChannel; }
 /* __JackPlatformNotifyChannel__ */
 #include "JackMachNotifyChannel.h"
 namespace Jack { typedef JackMachNotifyChannel JackNotifyChannel; }
+#endif
 
 /* __JackPlatformNetSocket__ */
 #include "JackNetUnixSocket.h"

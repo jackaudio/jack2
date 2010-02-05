@@ -878,21 +878,46 @@ SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** in
 
 
 // Empty code for now..
-//#ifdef TARGET_OS_IPHONE
+#ifdef TARGET_OS_IPHONE
+
+static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
+{
+    char buffer[300];
+    size_t len;
+    
+    if (prefix != NULL) {
+        len = strlen(prefix);
+        memcpy(buffer, prefix, len);
+    } else {
+        len = 0;
+    }
+    
+    vsnprintf(buffer + len, sizeof(buffer) - len, fmt, ap);
+    printf(buffer);
+    printf("\n");
+}
 
 SERVER_EXPORT void jack_error(const char *fmt, ...)
 {
-    // TODO
-}
+    va_list ap;
+    va_start(ap, fmt);
+    jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
+    va_end(ap);}
 
 SERVER_EXPORT void jack_info(const char *fmt, ...)
 {
-   // TODO
+    va_list ap;
+    va_start(ap, fmt);
+    jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
+    va_end(ap);
 }
 
 SERVER_EXPORT void jack_log(const char *fmt, ...)
 {
-    // TODO
+    va_list ap;
+    va_start(ap, fmt);
+    jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
+    va_end(ap);
 }
 
-//#endif
+#endif

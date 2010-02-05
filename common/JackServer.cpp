@@ -38,15 +38,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name)
+JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name)
 {
     if (rt) {
         jack_info("JACK server starting in realtime mode with priority %ld", priority);
     } else {
         jack_info("JACK server starting in non-realtime mode");
     }
-
-    fGraphManager = new JackGraphManager();
+    
+    fGraphManager = JackGraphManager::Allocate(port_max);
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
     fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
@@ -60,7 +60,7 @@ JackServer::JackServer(bool sync, bool temporary, long timeout, bool rt, long pr
 
 JackServer::~JackServer()
 {
-    delete fGraphManager;
+    JackGraphManager::Destroy(fGraphManager);
     delete fAudioDriver;
     delete fDriverInfo;
     delete fFreewheelDriver;
@@ -125,6 +125,7 @@ fail_close1:
 int JackServer::Close()
 {
     jack_log("JackServer::Close");
+    fEngine->NotifyQuit();
     fChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();

@@ -38,7 +38,7 @@ typedef struct
     jack_port_id_t idport;
     char name[JACK_PORT_NAME_SIZE]; //portname
     int IsConnected;
-    int IsUnregistrated;
+    int IsUnregistered;
 }
 PortFollower;
 
@@ -129,7 +129,7 @@ class JackDebugClient : public JackClient
         void InternalClientUnload(int ref, jack_status_t* status);
 
         JackClientControl* GetClientControl() const;
-        void CheckClient() const;
+        void CheckClient(const char* function_name) const;
 
         static int TimeCallback(jack_nframes_t nframes, void *arg);
 };

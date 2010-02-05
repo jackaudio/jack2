@@ -62,7 +62,7 @@ class SERVER_EXPORT JackServer
 
     public:
 
-        JackServer(bool sync, bool temporary, long timeout, bool rt, long priority, bool verbose, jack_timer_type_t clock, const char* server_name);
+        JackServer(bool sync, bool temporary, int timeout, bool rt, int priority, int port_max, bool verbose, jack_timer_type_t clock, const char* server_name);
         ~JackServer();
 
         int Open(jack_driver_desc_t* driver_desc, JSList* driver_params);

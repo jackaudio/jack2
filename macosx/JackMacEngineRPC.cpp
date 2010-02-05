@@ -18,9 +18,11 @@ This program is free software; you can redistribute it and/or modify
 */
 
 #include "JackServer.h"
+#include "JackNotification.h"
 #include "JackLockedEngine.h"
 #include "JackRPCEngine.h"
 #include "JackMachServerChannel.h"
+#include "JackException.h"
 #include <assert.h>
 
 using namespace Jack;
@@ -238,6 +240,11 @@ rpc_type server_rpc_jack_client_rt_notify(mach_port_t server_port, int refnum, i
     JackMachServerChannel* channel = JackMachServerChannel::fPortTable[server_port];
     assert(channel);
     assert(channel->GetServer());
-    channel->GetServer()->Notify(refnum, notify, value);
-    return KERN_SUCCESS;
+    
+    if (notify == kQUIT) {
+        throw JackQuitException();
+    } else {
+        channel->GetServer()->Notify(refnum, notify, value);
+        return KERN_SUCCESS;
+    }
 }

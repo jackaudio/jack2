@@ -136,8 +136,14 @@ main (int argc, char *argv[])
     for (i = 0; i < result.audio_output; i++) {
         audio_output_buffer[i] = calloc(buffer_size, sizeof(float));
     }
-
-    // Run until interrupted 
+    
+    /*
+    Run until interrupted.
+     
+    WARNING !! : this code is given for demonstration purpose. For proper timing bevahiour
+    it has to be called in a real-time context (which is *not* the case here...)
+    */
+    
   	while (1) {
         
         // Copy input to output

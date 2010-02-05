@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackRPCClientServer.c"
 #include "JackError.h"
 #include "JackLibClient.h"
-#include "JackLibGlobals.h"
 #include "JackMachThread.h"
 #include "JackConstants.h"
 

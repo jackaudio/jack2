@@ -61,8 +61,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackMachThread__
 #define __JackMachThread__
 
+#include <TargetConditionals.h>
+
+#ifdef TARGET_OS_IPHONE
+typedef unsigned char Boolean;
+#endif
+
+
 #include "JackPosixThread.h"
+#ifndef TARGET_OS_IPHONE
 #import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
+#endif
 
 #include <mach/thread_policy.h>
 #include <mach/thread_act.h>

@@ -23,9 +23,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPlatformPlug.h"
 #include "JackConstants.h"
 
+#ifdef __CLIENTDEBUG__ 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <time.h>
+#endif 
+
 namespace Jack
 {
-
+    
 // Globals used for client management on server or library side.
 struct JackGlobals {
 
@@ -37,6 +44,11 @@ struct JackGlobals {
     static bool fVerbose;
 #ifndef WIN32
     static jack_thread_creator_t fJackThreadCreator;
+#endif
+    
+#ifdef __CLIENTDEBUG__
+    static std::ofstream* fStream;
+    static void CheckContext(const char* name);
 #endif
 };
 

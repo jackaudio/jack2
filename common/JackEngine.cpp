@@ -89,6 +89,11 @@ int JackEngine::Close()
 
     return 0;
 }
+    
+void JackEngine::NotifyQuit()
+{
+    fChannel.NotifyQuit();
+}
 
 //-----------------------------
 // Client ressource management
@@ -322,9 +327,9 @@ void JackEngine::NotifyPortRegistation(jack_port_id_t port_index, bool onoff)
     NotifyClients((onoff ? kPortRegistrationOnCallback : kPortRegistrationOffCallback), false, "", port_index, 0);
 }
 
-void JackEngine::NotifyPortRename(jack_port_id_t port)
+void JackEngine::NotifyPortRename(jack_port_id_t port, const char* old_name)
 {
-    NotifyClients(kPortRenameCallback, false, "", port, 0);
+    NotifyClients(kPortRenameCallback, false, old_name, port, 0);
 }
 
 void JackEngine::NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff)
@@ -846,8 +851,10 @@ int JackEngine::PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t ds
 int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
 {
     AssertRefnum(refnum);
+    char old_name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    strcpy(old_name, fGraphManager->GetPort(port)->GetName());
     fGraphManager->GetPort(port)->SetName(name);
-    NotifyPortRename(port);
+    NotifyPortRename(port, old_name);
     return 0;
 }
 

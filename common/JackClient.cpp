@@ -254,7 +254,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
              case kPortRenameCallback:
                 jack_log("JackClient::kPortRenameCallback port = %ld");
                 if (fPortRename) {
-                    fPortRename(value1, GetGraphManager()->GetPort(value1)->GetName(), fPortRenameArg);
+                    fPortRename(value1, message, GetGraphManager()->GetPort(value1)->GetName(), fPortRenameArg);
                 }
                 break;
 
@@ -848,6 +848,8 @@ int JackClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
     } else {
         fInitArg = arg;
         fInit = callback;
+        /* make sure that the message buffer thread is initialized too */
+        JackMessageBuffer::fInstance->SetInitCallback(callback, arg);
         return 0;
     }
 }

@@ -20,8 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackAudioQueueAdapter__
 #define __JackAudioQueueAdapter__
 
-#include <AudioToolbox/AudioConverter.h>
-#include <AudioToolbox/AudioQueue.h>
+//#include <AudioToolbox/AudioConverter.h>
+//#include <AudioToolbox/AudioQueue.h>
+
+#include <AudioToolbox/AudioToolbox.h>
 
 #include <jack/net.h>
 
@@ -32,7 +34,8 @@ namespace Jack
 \brief Audio adapter using AudioQueue API.
 */
 
-static const int kNumberBuffers = 3;
+#define kNumberBuffers 3
+#define kBufferDurationSeconds .5
 
 class JackAudioQueueAdapter 
 {
@@ -44,7 +47,7 @@ class JackAudioQueueAdapter
         
         AudioQueueRef fPlaybackQueue;
         AudioQueueBufferRef	fPlaybackQueueBuffers[kNumberBuffers];
-        AudioStreamPacketDescription fPlaybackPacketDescs;
+        //AudioStreamPacketDescription fPlaybackPacketDescs;
         
         
         jack_nframes_t fBufferSize;
@@ -55,17 +58,24 @@ class JackAudioQueueAdapter
         
         jack_adapter_t* fAdapter;
     
-        static void CaptureCallback(void * inUserData,
+        static void CaptureCallback(void* inUserData,
 									AudioQueueRef inAQ,
 									AudioQueueBufferRef inBuffer,
-									const AudioTimeStamp * inStartTime,
+									const AudioTimeStamp* inStartTime,
 									UInt32 inNumPackets,
-									const AudioStreamPacketDescription *inPacketDesc);
+									const AudioStreamPacketDescription* inPacketDesc);
 
 
-       static void PlaybackCallback(void * inUserData,
-								AudioQueueRef inAQ,
-								AudioQueueBufferRef inCompleteAQBuffer);
+       static void PlaybackCallback(void* inUserData,
+                                    AudioQueueRef inAQ,
+                                    AudioQueueBufferRef inCompleteAQBuffer);
+                                
+       static void InterruptionListener(void* inClientData, UInt32 inInterruptionState);
+       
+       static void PropListener(void* inClientData,
+                                AudioSessionPropertyID inID,
+                                UInt32 inDataSize,
+                                const void* inData);
 
     public:
 
@@ -74,6 +84,10 @@ class JackAudioQueueAdapter
     
         virtual int Open();
         virtual int Close();
+    
+        virtual int Start();
+        virtual int Stop();
+    
 
         virtual int SetSampleRate(jack_nframes_t sample_rate);
         virtual int SetBufferSize(jack_nframes_t buffer_size);

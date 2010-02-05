@@ -3,10 +3,10 @@
 ---------------------------
 
 Dmitry Baikov
+Gabriel M. Beddingfield
 Steven Chamberlain
 Thom Johansen
 Thibault LeMeur
-Pieter Palmers
 Tom Szilagyi
 Andrzej Szombierski 
 Kjetil S.Matheussen
@@ -20,10 +20,73 @@ Florian Faber
 Michael Voigt
 Torben Hohn  
 Paul Davis
+Peter L Jones
+Devin Anderson
+Josh Green
+Mario Lang
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2010-01-29 Gabriel M. Beddingfield <gabriel@teuton.org>
+
+	* Change JackEngineProfiling and JackAudioAdapterInterface gnuplot scripts to output SVG instead of PDF.
+
+2009-12-15 Stephane Letz  <letz@grame.fr>
+
+	* Shared memory manager was calling abort in case of fatal error, now return an error in caller.
+
+2009-12-13 Stephane Letz  <letz@grame.fr>
+
+	* Mario Lang alsa_io time calculation overflow patch.
+
+2009-12-10 Stephane Letz  <letz@grame.fr>
+
+	* Use a QUIT notification to properly quit the server channel, the server channel thread can then be 'stopped' instead of 'canceled'.
+
+2009-12-09 Stephane Letz  <letz@grame.fr>
+
+	* When threads are cancelled, the exception has to be rethrown. 
+
+2009-12-08 Stephane Letz  <letz@grame.fr>
+
+	* Josh Green ALSA driver capture only patch.  
+
+2009-12-03 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackCoreMidiDriver::ReadProcAux when ring buffer is full (thanks Devin Anderson).  
+
+2009-12-02 Stephane Letz  <letz@grame.fr>
+
+	* Special code in JackCoreAudio driver to handle completely buggy Digidesign CoreAudio user-land driver. 
+	* Ensure that client-side message buffer thread calls thread_init callback if/when it is set by the client (backport of JACK1 rev 3838).
+	* Check dynamic port-max value.
+
+2009-12-01 Stephane Letz  <letz@grame.fr>
+
+	* Fix port_rename callback : now both old name and new name are given as parameters.
+
+2009-11-30 Stephane Letz  <letz@grame.fr>
+
+	* Devin Anderson patch for Jack FFADO driver issues with lost MIDI bytes between periods (and more). 
+
+2009-11-29 Stephane Letz  <letz@grame.fr>
+
+	* More robust sample rate change handling code in JackCoreAudioDriver.
+
+2009-11-24 Stephane Letz  <letz@grame.fr>
+
+	* Dynamic choice of maximum port number.
+
+2009-11-23 Stephane Letz  <letz@grame.fr>
+
+	* Peter L Jones patch for NetJack1 compilation on Windows.
+
+2009-11-20 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.5 started.
+	* Client debugging code improved.
 
 2009-11-18 Stephane Letz  <letz@grame.fr>
 

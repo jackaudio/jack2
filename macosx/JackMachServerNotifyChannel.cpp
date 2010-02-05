@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackMachServerNotifyChannel.h"
 #include "JackRPCEngineUser.c"
+#include "JackNotification.h"
 #include "JackTools.h"
 #include "JackConstants.h"
 #include "JackError.h"
@@ -42,9 +43,7 @@ int JackMachServerNotifyChannel::Open(const char* server_name)
 }
 
 void JackMachServerNotifyChannel::Close()
-{
-    //fClientPort.DisconnectPort(); pas nécessaire car le JackMachServerChannel a déja disparu?
-}
+{}
 
 void JackMachServerNotifyChannel::Notify(int refnum, int notify, int value)
 {
@@ -52,6 +51,18 @@ void JackMachServerNotifyChannel::Notify(int refnum, int notify, int value)
     if (res != KERN_SUCCESS) {
         jack_error("Could not write request ref = %d notify = %d err = %s", refnum, notify, mach_error_string(res));
     }
+}
+    
+void JackMachServerNotifyChannel::NotifyQuit()
+{
+ #ifdef MAC_OS_X_VERSION_10_5
+    // Nothing : since exception does not work in this case on pre Snow Loopard systems, see JackMachServerChannel::Close()
+ #else
+    kern_return_t res = rpc_jack_client_rt_notify(fClientPort.GetPort(), -1, kQUIT, 0, 0);
+    if (res != KERN_SUCCESS) {
+        jack_error("Could not write request ref = %d notify = %d err = %s", -1, kQUIT, mach_error_string(res));
+    }
+#endif
 }
 
 } // end of namespace

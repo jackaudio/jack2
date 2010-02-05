@@ -38,6 +38,8 @@
 #include <list>
 #include <map>
 
+#include "JackAudioQueueAdapter.h"
+
 using namespace std;
 
 // On Intel set FZ (Flush to Zero) and DAZ (Denormals Are Zero)
@@ -690,19 +692,36 @@ static int net_process(jack_nframes_t buffer_size,
 // 									MAIN
 //-------------------------------------------------------------------------
 
+
+#define TEST_MASTER "194.5.49.5"
+  
 int main(int argc, char *argv[]) {
     
     UI* interface = new CMDUI(argc, argv);
     jack_net_slave_t* net;
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
+    //Jack::JackAudioQueueAdapter audio(2, 2, 1024, 44100, NULL);
+    
     gNumInChans = DSP.getNumInputs();
 	gNumOutChans = DSP.getNumOutputs();
  
     jack_slave_t request = { gNumInChans, gNumOutChans, 0, 0, DEFAULT_MTU, -1, JackSlowMode };
     jack_master_t result;
-
-    if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result)) == 0) {
+    
+    printf("Network\n");
+    
+    //if (audio.Open() < 0) {
+    //    fprintf(stderr, "Cannot open audio\n");
+    //    return 1;
+    //}
+    
+     //audio.Start();
+    
+    // Hang around forever...
+	 //while(1) CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.25, false);
+   
+    if ((net = jack_net_slave_open(TEST_MASTER, DEFAULT_PORT, "iPhone", &request, &result)) == 0) {
 	    fprintf(stderr, "jack remote server not running ?\n");
 	    return 1;
 	}
@@ -726,5 +745,10 @@ int main(int argc, char *argv[]) {
     // Wait for application end
     jack_net_slave_deactivate(net);
     jack_net_slave_close(net);
+    
+    //if (audio.Close() < 0) {
+    //    fprintf(stderr, "Cannot close audio\n");
+    //}
+    
     return retVal;
 }

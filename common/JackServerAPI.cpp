@@ -105,6 +105,9 @@ EXPORT jack_client_t* jack_client_open_aux(const char* client_name, jack_options
 
 EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_client_open");
+#endif
     try {
         assert(JackGlobals::fOpenMutex);
         JackGlobals::fOpenMutex->Lock();
@@ -125,6 +128,9 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
 
 EXPORT int jack_client_close(jack_client_t* ext_client)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_client_close");
+#endif    
     assert(JackGlobals::fOpenMutex);
     JackGlobals::fOpenMutex->Lock();
     int res = -1;

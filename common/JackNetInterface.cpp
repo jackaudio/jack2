@@ -227,6 +227,7 @@ namespace Jack
         do
         {
             session_params_t net_params;
+            memset(&net_params, 0, sizeof ( session_params_t ));
             SetPacketType ( &fParams, SLAVE_SETUP );
             SessionParamsHToN(&fParams, &net_params);
             
@@ -316,6 +317,7 @@ namespace Jack
         JackNetSocket mcast_socket ( fMulticastIP, fSocket.GetPort() );
         
         session_params_t net_params;
+        memset(&net_params, 0, sizeof ( session_params_t ));
         SessionParamsHToN(&fParams, &net_params);
 
         if ( mcast_socket.NewSocket() == SOCKET_ERROR )
@@ -679,6 +681,8 @@ namespace Jack
         //utility
         session_params_t host_params;
         int rx_bytes = 0;
+        
+        jack_log ( "sizeof (session_params_t) %d", sizeof (session_params_t) );
 
         //socket
         if ( fSocket.NewSocket() == SOCKET_ERROR ) {
@@ -706,6 +710,7 @@ namespace Jack
         {
             //send 'available'
             session_params_t net_params;
+            memset(&net_params, 0, sizeof ( session_params_t ));
             SessionParamsHToN(&fParams, &net_params);
             if ( fSocket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
                 jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
@@ -713,15 +718,28 @@ namespace Jack
             //filter incoming packets : don't exit while no error is detected
             memset(&net_params, 0, sizeof ( session_params_t ));
             rx_bytes = fSocket.CatchHost ( &net_params, sizeof ( session_params_t ), 0 );
+            
+            SessionParamsDisplay(&net_params);
+            jack_error ( "rx_bytes %d %d", rx_bytes, errno );
+            
+            
             SessionParamsNToH(&net_params, &host_params);
             if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
                 return NET_RECV_ERROR;
             }
+            for (int i = 0; i < 7; i++) {
+                jack_info ( " fPacketType %d", host_params.fPacketType[i]);
+            }
+            jack_info ( " received... host_params param %s %s %d %d",  net_params.fPacketType, fParams.fPacketType, net_params.fPacketID, GetPacketType ( &host_params ));
+        
+            SessionParamsDisplay(&host_params);
         }
         while ( strcmp ( host_params.fPacketType, fParams.fPacketType )  && ( GetPacketType ( &host_params ) != SLAVE_SETUP ) );
 
+        jack_info ( "SLAVE_SETUP received..." );
+        
         //everything is OK, copy parameters
         fParams = host_params;
 
@@ -746,6 +764,7 @@ namespace Jack
 
         //tell the master to start
         session_params_t net_params;
+        memset(&net_params, 0, sizeof ( session_params_t ));
         SetPacketType ( &fParams, START_MASTER );
         SessionParamsHToN(&fParams, &net_params);
         if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )

@@ -17,10 +17,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackAudioAdapter.h"
 #ifdef __APPLE__
 #include <TargetConditionals.h>
 #endif
+
+#include "JackAudioAdapter.h"
 #ifndef TARGET_OS_IPHONE
 #include "JackLibSampleRateResampler.h"
 #endif
@@ -73,8 +74,8 @@ namespace Jack
         fprintf(file, buffer);
         
         fprintf(file, "\n unset multiplot\n");  
-        fprintf(file, "set output 'AdapterTiming1.pdf\n");
-        fprintf(file, "set terminal pdf\n");
+        fprintf(file, "set output 'AdapterTiming1.svg\n");
+        fprintf(file, "set terminal svg\n");
         
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
@@ -85,8 +86,10 @@ namespace Jack
         fprintf(file, "plot ");
         sprintf(buffer, "\"JackAudioAdapter.log\" using 2 title \"Consumer interrupt period\" with lines,");
         fprintf(file, buffer);
-        sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Producer interrupt period\" with lines\n");
         fprintf(file, buffer);
+        fprintf(file, "unset multiplot\n");
+        fprintf(file, "unset output\n");
         
         fclose(file);
    
@@ -105,8 +108,8 @@ namespace Jack
         fprintf(file, buffer);
         
         fprintf(file, "\n unset multiplot\n");  
-        fprintf(file, "set output 'AdapterTiming2.pdf\n");
-        fprintf(file, "set terminal pdf\n");
+        fprintf(file, "set output 'AdapterTiming2.svg\n");
+        fprintf(file, "set terminal svg\n");
         
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
@@ -117,8 +120,10 @@ namespace Jack
         fprintf(file, "plot ");
         sprintf(buffer, "\"JackAudioAdapter.log\" using 4 title \"Ratio 1\" with lines,");
         fprintf(file, buffer);
-        sprintf(buffer, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines\n");
         fprintf(file, buffer);
+        fprintf(file, "unset multiplot\n");
+        fprintf(file, "unset output\n");
         
         fclose(file);
 
@@ -137,8 +142,8 @@ namespace Jack
         fprintf(file, buffer);
         
         fprintf(file, "\n unset multiplot\n");  
-        fprintf(file, "set output 'AdapterTiming3.pdf\n");
-        fprintf(file, "set terminal pdf\n");
+        fprintf(file, "set output 'AdapterTiming3.svg\n");
+        fprintf(file, "set terminal svg\n");
         
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
@@ -149,8 +154,10 @@ namespace Jack
         fprintf(file, "plot ");
         sprintf(buffer, "\"JackAudioAdapter.log\" using 6 title \"Frames position in consumer ringbuffer\" with lines,");
         fprintf(file, buffer);
-        sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines");
+        sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines\n");
         fprintf(file, buffer);
+        fprintf(file, "unset multiplot\n");
+        fprintf(file, "unset output\n");
         
         fclose(file);
     }

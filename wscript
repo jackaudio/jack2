@@ -68,8 +68,8 @@ def set_options(opt):
     opt.add_option('--profile', action='store_true', default=False, help='Build with engine profiling')
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
-    opt.add_option('--ports', default=2048, type="int", dest="ports", help='Maximum number of ports')
-    opt.add_option('--ports-per-application', default=512, type="int", dest="application_ports", help='Maximum number of ports per application')
+    opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
+    opt.add_option('--debug', action='store_true', default=False, dest='debug', help="Build debuggable binaries")
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -112,6 +112,8 @@ def configure(conf):
         conf.sub_config('linux')
     if Options.options.dbus:
         conf.sub_config('dbus')
+        if conf.env['BUILD_JACKDBUS'] != True:
+            conf.fatal('jackdbus was explicitly requested but cannot be built')
     conf.sub_config('example-clients')
 
     if conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
@@ -136,8 +138,8 @@ def configure(conf):
     conf.env['BUILD_DOXYGEN_DOCS'] = Options.options.doxygen
     conf.env['BUILD_WITH_PROFILE'] = Options.options.profile
     conf.env['BUILD_WITH_32_64'] = Options.options.mixed
-    conf.env['BUILD_JACKDBUS'] = Options.options.dbus
     conf.env['BUILD_CLASSIC'] = Options.options.classic
+    conf.env['BUILD_DEBUG'] = Options.options.debug
 
     if conf.env['BUILD_JACKDBUS']:
         conf.env['BUILD_JACKD'] = conf.env['BUILD_CLASSIC']
@@ -149,8 +151,12 @@ def configure(conf):
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
+    if conf.env['BUILD_DEBUG']:
+        conf.env.append_unique('CXXFLAGS', '-g')
+        conf.env.append_unique('CCFLAGS', '-g')
+        conf.env.append_unique('LINKFLAGS', '-g')
+
     conf.define('CLIENT_NUM', Options.options.clients)
-    conf.define('PORT_NUM', Options.options.ports)
     conf.define('PORT_NUM_FOR_CLIENT', Options.options.application_ports)
 
     conf.define('ADDON_DIR', os.path.normpath(os.path.join(conf.env['LIBDIR'], 'jack')))
@@ -184,12 +190,12 @@ def configure(conf):
     print version_msg
 
     print "Build with a maximum of %d JACK clients" % conf.env['CLIENT_NUM']
-    print "Build with a maximum of %d ports" % conf.env['PORT_NUM']
     print "Build with a maximum of %d ports per application" % conf.env['PORT_NUM_FOR_CLIENT']
  
     display_msg("Install prefix", conf.env['PREFIX'], 'CYAN')
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
+    display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
@@ -198,8 +204,9 @@ def configure(conf):
     display_feature('Build D-Bus JACK (jackdbus)', conf.env['BUILD_JACKDBUS'])
 
     if conf.env['BUILD_JACKDBUS'] and conf.env['BUILD_JACKD']:
-        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues!' + Logs.colors.NORMAL
-    
+        print Logs.colors.RED + 'WARNING !! mixing both jackd and jackdbus may cause issues:' + Logs.colors.NORMAL
+        print Logs.colors.RED + 'WARNING !! jackdbus does not use .jackdrc nor qjackctl settings' + Logs.colors.NORMAL
+
     if conf.env['IS_LINUX']:
         display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
         display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)

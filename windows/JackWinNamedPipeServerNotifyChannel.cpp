@@ -21,6 +21,7 @@ This program is free software; you can redistribute it and/or modify
 #include "JackError.h"
 #include "JackRequest.h"
 #include "JackConstants.h"
+#include "JackNotification.h"
 
 namespace Jack
 {
@@ -51,6 +52,14 @@ void JackWinNamedPipeServerNotifyChannel::Notify(int refnum, int notify, int val
     JackClientNotificationRequest req(refnum, notify, value);
     if (req.Write(&fRequestPipe) < 0) {
         jack_error("Could not write request ref = %d notify = %d", refnum, notify);
+    }
+}
+
+void JackWinNamedPipeServerNotifyChannel::NotifyQuit()
+{
+    JackClientNotificationRequest req(-1, kQUIT, 0);
+    if (req.Write(&fRequestPipe) < 0) {
+        jack_error("Could not write request ref = %d notify = %d", -1, kQUIT);
     }
 }
 

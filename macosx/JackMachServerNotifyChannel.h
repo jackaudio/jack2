@@ -46,7 +46,8 @@ class JackMachServerNotifyChannel
         void Close();                       // Close the Server/Client connection
 
         void Notify(int refnum, int notify, int value);
-};
+        void NotifyQuit();
+};  
 
 } // end of namespace
 

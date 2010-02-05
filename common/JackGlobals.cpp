@@ -37,5 +37,28 @@ JackClient* JackGlobals::fClientTable[CLIENT_NUM] = {};
 #ifndef WIN32
 jack_thread_creator_t JackGlobals::fJackThreadCreator = pthread_create;
 #endif
+    
+#ifdef __CLIENTDEBUG__
+std::ofstream* JackGlobals::fStream = NULL;
+
+void JackGlobals::CheckContext(const char* name)
+{
+    if (JackGlobals::fStream == NULL) {
+        char provstr[256];
+        char buffer[256];
+        time_t curtime;
+        struct tm *loctime;
+        /* Get the current time. */
+        curtime = time (NULL);
+        /* Convert it to local time representation. */
+        loctime = localtime (&curtime);
+        strftime (buffer, 256, "%I-%M", loctime);
+        sprintf(provstr, "JackAPICall-%s.log", buffer);
+        JackGlobals::fStream = new std::ofstream(provstr, std::ios_base::ate);
+        JackGlobals::fStream->is_open();
+    }
+    (*fStream) << "JACK API call : " << name << ", calling thread : " << pthread_self() << std::endl;
+}
+#endif    
 
 } // end of namespace

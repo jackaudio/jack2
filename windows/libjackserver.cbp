@@ -156,6 +156,8 @@
 		<Unit filename="..\common\JackTools.cpp" />
 		<Unit filename="..\common\JackTransportEngine.cpp" />
 		<Unit filename="..\common\JackWaitThreadedDriver.cpp" />
+		<Unit filename="..\common\JackPhysicalMidiInput.cpp" />
+		<Unit filename="..\common\JackPhysicalMidiOutput.cpp" />
 		<Unit filename="..\common\ringbuffer.c">
 			<Option compilerVar="CC" />
 		</Unit>

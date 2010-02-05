@@ -33,7 +33,7 @@ JackConnectionManager::JackConnectionManager()
     int i;
     jack_log("JackConnectionManager::InitConnections size = %ld ", sizeof(JackConnectionManager));
 
-    for (i = 0; i < PORT_NUM; i++) {
+    for (i = 0; i < PORT_NUM_MAX; i++) {
         fConnection[i].Init();
     }
 

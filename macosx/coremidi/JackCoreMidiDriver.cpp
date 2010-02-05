@@ -52,19 +52,17 @@ void JackCoreMidiDriver::ReadProcAux(const MIDIPacketList *pktlist, jack_ringbuf
         
         // TODO : use timestamp
         
+        // Check available size first..
+        size = jack_ringbuffer_write_space(ringbuffer);
+        if (size < (sizeof(UInt16) + packet->length)) {
+           jack_error("ReadProc : ring buffer is full, skip events...");
+           return;
+        }
         // Write length of each packet first
-        size = jack_ringbuffer_write(ringbuffer, (char*)&packet->length, sizeof(UInt16));
-        if (size != sizeof(UInt16)) {
-            jack_error("ReadProc : ring buffer is full, skip events...");
-            return;
-        }  
+        jack_ringbuffer_write(ringbuffer, (char*)&packet->length, sizeof(UInt16));
         // Write event actual data
-        size = jack_ringbuffer_write(ringbuffer, (char*)packet->data, packet->length);
-        if (size != packet->length) {
-            jack_error("ReadProc : ring buffer is full, skip events...");
-            return;
-        }  
-        
+        jack_ringbuffer_write(ringbuffer, (char*)packet->data, packet->length);
+            
         packet = MIDIPacketNext(packet);
     }
 }

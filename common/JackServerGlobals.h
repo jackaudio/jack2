@@ -54,6 +54,7 @@ struct SERVER_EXPORT JackServerGlobals
                      int time_out_ms,
                      int rt,
                      int priority,
+                     int port_max,
                      int verbose,
                     jack_timer_type_t clock);
     static void Stop();

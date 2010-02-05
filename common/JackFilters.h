@@ -20,13 +20,21 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackFilters__
 #define __JackFilters__
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 #include "jack.h"
+#ifndef TARGET_OS_IPHONE
 #include "JackAtomicState.h"
+#endif
 #include <math.h>
 #include <stdlib.h>
 
 namespace Jack
 {
+    
+#ifndef TARGET_OS_IPHONE
 
     #define MAX_SIZE 64
     
@@ -204,6 +212,7 @@ namespace Jack
             }
     } POST_PACKED_STRUCTURE;
     
+#endif
     /*
     Torben Hohn PI controler from JACK1
     */

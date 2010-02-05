@@ -85,6 +85,7 @@ int reorder = 0;	// graph reorder callback
 int RT = 0;			// is real time or not...
 int FW = 0;			// freewheel mode
 int init_clbk = 0;	// init callback
+int port_rename_clbk = 0;	// portrename callback
 int i, j, k = 0;
 int port_callback_reg = 0;
 jack_nframes_t cur_buffer_size, old_buffer_size, cur_pos;
@@ -178,6 +179,13 @@ void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 		client_register++;
 	else
 		client_register--;
+}
+
+int Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
+{
+     Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n");
+     port_rename_clbk = 1;
+     return 0;
 }
 
 int Jack_Update_Buffer_Size(jack_nframes_t nframes, void *arg)
@@ -679,6 +687,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! while calling jack_set_thread_init_callback()...\n");
     if (jack_set_freewheel_callback(client1, Jack_Freewheel_Callback, 0) != 0 )
         printf("\n!!! ERROR !!! while calling jack_set_freewheel_callback()...\n");
+  
 
     if (jack_set_process_callback(client1, process1, 0) != 0) {
         printf("Error when calling jack_set_process_callback() !\n");
@@ -694,6 +703,9 @@ int main (int argc, char *argv[])
     if (jack_set_graph_order_callback(client1, Jack_Graph_Order_Callback, 0) != 0) {
         printf("Error when calling Jack_Graph_Order_Callback() !\n");
     }
+    
+    if (jack_set_port_rename_callback(client1, Jack_Port_Rename_Callback, 0) != 0 )
+        printf("\n!!! ERROR !!! while calling jack_set_rename_callback()...\n");
 
     if (jack_set_xrun_callback(client1, Jack_XRun_Callback, 0 ) != 0) {
         printf("Error when calling jack_set_xrun_callback() !\n");
@@ -818,13 +830,23 @@ int main (int argc, char *argv[])
         printf ("Fatal error : cannot activate client1\n");
         exit(1);
     }
+    
+    /**
+     * Test if portrename callback have been called.
+     *
+     */
+    jack_port_set_name (output_port1, "renamed-port#");
+    jack_sleep(1 * 1000); 
 
+    if (port_rename_clbk == 0)
+        printf("!!! ERROR !!! Jack_Port_Rename_Callback was not called !!.\n");
+ 
     /**
      * Test if init callback initThread have been called.
      *
      */
     if (init_clbk == 0)
-        printf("!!! ERROR !!! JackThreadInitCallback was not called !!.\n");
+        printf("!!! ERROR !!! Jack_Thread_Init_Callback was not called !!.\n");
 
     jack_sleep(10 * 1000); // test see the clock in the graph at the begining...
 
