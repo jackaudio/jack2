@@ -202,7 +202,7 @@ typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int 
  *
  * @return zero on success, non-zero on error
  */
-typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* new_name, void *arg);
+typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* old_name, const char* new_name, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
@@ -295,7 +295,15 @@ enum JackPortFlags {
      * systems are examples of clients that would set this flag for
      * their ports.
      */
-    JackPortIsTerminal = 0x10
+    JackPortIsTerminal = 0x10,
+    
+    /**
+     * JackPortIsActive means the port has been registered and the 
+     * client is "active", that is jack_activate has been called
+     * 
+     * JackPortIsActive is on between jack_activate and jack_deactivate.
+     */
+    JackPortIsActive = 0x20
 };
 
 /**

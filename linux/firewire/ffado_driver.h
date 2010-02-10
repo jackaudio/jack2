@@ -7,6 +7,7 @@
  *   http://www.jackaudio.org
  *
  *   Copyright (C) 2005-2007 Pieter Palmers
+ *   Copyright (C) 2009 Devin Anderson
  *
  *   adapted for JackMP by Pieter Palmers
  *
@@ -51,9 +52,7 @@
 #include <types.h>
 
 #include <assert.h>
-#include <jack/midiport.h>
-#include "../alsa/midi_pack.h"
-#include "../alsa/midi_unpack.h"
+//#include <jack/midiport.h>
 
 // debug print control flags
 #define DEBUG_LEVEL_BUFFERS           	(1<<0)
@@ -143,21 +142,16 @@ struct _ffado_jack_settings
 typedef struct _ffado_capture_channel
 {
     ffado_streaming_stream_type stream_type;
-    midi_unpack_t midi_unpack;
     uint32_t *midi_buffer;
+    void *midi_input;
 }
 ffado_capture_channel_t;
 
-#define MIDI_OVERFLOW_BUFFER_SIZE 4
 typedef struct _ffado_playback_channel
 {
     ffado_streaming_stream_type stream_type;
-    midi_pack_t midi_pack;
     uint32_t *midi_buffer;
-    // to hold the midi bytes that couldn't be transferred
-    // during the previous period
-    char overflow_buffer[MIDI_OVERFLOW_BUFFER_SIZE];
-    unsigned int nb_overflow_bytes;
+    void *midi_output;
 }
 ffado_playback_channel_t;
 

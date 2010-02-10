@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 #include "JackGraphManager.h"
 #include "JackSynchro.h"
+#include "JackMutex.h"
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
 
@@ -37,8 +38,10 @@ class JackExternalClient;
 \brief Engine description.
 */
 
-class SERVER_EXPORT JackEngine 
+class SERVER_EXPORT JackEngine : public JackLockAble
 {
+    friend class JackLockedEngine;
+    
     private:
 
         JackGraphManager* fGraphManager;
@@ -70,8 +73,13 @@ class SERVER_EXPORT JackEngine
     
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
-        void NotifyPortRename(jack_port_id_t src);
+        void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
+        
+        bool CheckClient(int refnum)
+        {
+            return (refnum >= 0 && refnum < CLIENT_NUM && fClientTable[refnum] != NULL);
+        }
 
         int CheckPortsConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
 
@@ -82,7 +90,7 @@ class SERVER_EXPORT JackEngine
 
         int Open();
         int Close();
-
+  
         // Client management
         int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
         int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
@@ -125,6 +133,7 @@ class SERVER_EXPORT JackEngine
         void NotifyBufferSize(jack_nframes_t buffer_size);
         void NotifySampleRate(jack_nframes_t sample_rate);
         void NotifyFreewheel(bool onoff);
+        void NotifyQuit();
 };
 
 

@@ -57,6 +57,8 @@ class JackMessageBuffer : public JackRunnableInterface
 
     private:
     
+        JackThreadInitCallback fInit;
+        void* fInitArg;
         JackMessage fBuffers[MB_BUFFERS];
         JackThread fThread;
         JackProcessSync fGuard;
@@ -82,6 +84,7 @@ class JackMessageBuffer : public JackRunnableInterface
 	    void static Destroy();
 
         void AddMessage(int level, const char *message);
+        void SetInitCallback(JackThreadInitCallback callback, void *arg);
 
 	    static JackMessageBuffer* fInstance;
 };

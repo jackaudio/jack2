@@ -283,8 +283,11 @@ jack_control_run_method(
     return true;
 
 not_started:
-    jack_dbus_error (call, JACK_DBUS_ERROR_SERVER_NOT_RUNNING,
-                     "Can't execute method '%s' with stopped JACK server", call->method_name);
+    jack_dbus_only_error(
+        call,
+        JACK_DBUS_ERROR_SERVER_NOT_RUNNING,
+        "Can't execute method '%s' with stopped JACK server",
+        call->method_name);
 
 exit:
     return true;

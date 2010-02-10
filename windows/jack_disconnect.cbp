@@ -37,7 +37,7 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Release\bin" />
+					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling">

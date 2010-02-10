@@ -29,13 +29,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-static void AssertPort(jack_port_id_t port_index)
-{
-    if (port_index >= PORT_NUM) {
-        jack_log("JackGraphManager::AssertPort port_index = %ld", port_index);
-        assert(port_index < PORT_NUM);
-    }
-}
 
 static void AssertBufferSize(jack_nframes_t buffer_size)
 {
@@ -44,7 +37,40 @@ static void AssertBufferSize(jack_nframes_t buffer_size)
         assert(buffer_size <= BUFFER_SIZE_MAX);
     }
 }
+  
+void JackGraphManager::AssertPort(jack_port_id_t port_index)
+{
+    if (port_index >= fPortMax) {
+        jack_log("JackGraphManager::AssertPort port_index = %ld", port_index);
+        assert(port_index < fPortMax);
+    }
+}
+    
+JackGraphManager* JackGraphManager::Allocate(int port_max)
+{
+    // Using "Placement" new
+    void* shared_ptr = JackShmMem::operator new(sizeof(JackGraphManager) + port_max * sizeof(JackPort));
+    return new(shared_ptr) JackGraphManager(port_max);
+}
 
+void JackGraphManager::Destroy(JackGraphManager* manager)
+{
+    // "Placement" new was used
+    manager->~JackGraphManager();
+    JackShmMem::operator delete(manager);
+}
+    
+JackGraphManager::JackGraphManager(int port_max) 
+{
+    assert(port_max <= PORT_NUM_MAX);
+    
+    for (int i = 0; i < port_max; i++) {
+        fPortArray[i].Release();
+    }
+            
+    fPortMax = port_max;
+}
+        
 JackPort* JackGraphManager::GetPort(jack_port_id_t port_index)
 {
     AssertPort(port_index);
@@ -262,7 +288,7 @@ int JackGraphManager::ComputeTotalLatency(jack_port_id_t port_index)
 int JackGraphManager::ComputeTotalLatencies()
 {
     jack_port_id_t port_index;
-    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
+    for (port_index = FIRST_AVAILABLE_PORT; port_index < fPortMax; port_index++) {
         JackPort* port = GetPort(port_index);
         if (port->IsUsed())
             ComputeTotalLatency(port_index);
@@ -276,7 +302,7 @@ void JackGraphManager::SetBufferSize(jack_nframes_t buffer_size)
     jack_log("JackGraphManager::SetBufferSize size = %ld", buffer_size);
 
     jack_port_id_t port_index;
-    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
+    for (port_index = FIRST_AVAILABLE_PORT; port_index < fPortMax; port_index++) {
         JackPort* port = GetPort(port_index);
         if (port->IsUsed())
             port->ClearBuffer(buffer_size);
@@ -289,7 +315,7 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
     jack_port_id_t port_index;
 
     // Available ports start at FIRST_AVAILABLE_PORT (= 1), otherwise a port_index of 0 is "seen" as a NULL port by the external API...
-    for (port_index = FIRST_AVAILABLE_PORT; port_index < PORT_NUM; port_index++) {
+    for (port_index = FIRST_AVAILABLE_PORT; port_index < fPortMax; port_index++) {
         JackPort* port = GetPort(port_index);
         if (!port->IsUsed()) {
             jack_log("JackGraphManager::AllocatePortAux port_index = %ld name = %s type = %s", port_index, port_name, port_type);
@@ -299,7 +325,7 @@ jack_port_id_t JackGraphManager::AllocatePortAux(int refnum, const char* port_na
         }
     }
 
-    return (port_index < PORT_NUM) ? port_index : NO_PORT;
+    return (port_index < fPortMax) ? port_index : NO_PORT;
 }
 
 // Server
@@ -348,6 +374,18 @@ int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
     port->Release();
     WriteNextStateStop();
     return res;
+}
+
+void JackGraphManager::ActivatePort(jack_port_id_t port_index)
+{
+    JackPort* port = GetPort(port_index);
+    port->fFlags = (JackPortFlags)(port->fFlags | JackPortIsActive);
+}
+
+void JackGraphManager::DeactivatePort(jack_port_id_t port_index)
+{
+    JackPort* port = GetPort(port_index);
+    port->fFlags = (JackPortFlags)(port->fFlags | ~JackPortIsActive);
 }
 
 void JackGraphManager::GetInputPorts(int refnum, jack_int_t* res)
@@ -424,7 +462,7 @@ void JackGraphManager::DisconnectAllInput(jack_port_id_t port_index)
     jack_log("JackGraphManager::DisconnectAllInput port_index = %ld", port_index);
     JackConnectionManager* manager = WriteNextStateStart();
 
-    for (int i = 0; i < PORT_NUM; i++) {
+    for (unsigned int i = 0; i < fPortMax; i++) {
         if (manager->IsConnected(i, port_index)) {
             jack_log("JackGraphManager::Disconnect i = %ld  port_index = %ld", i, port_index);
             Disconnect(i, port_index);
@@ -661,7 +699,7 @@ int JackGraphManager::GetTwoPorts(const char* src_name, const char* dst_name, ja
 // Client : port array
 jack_port_id_t JackGraphManager::GetPort(const char* name)
 {
-    for (int i = 0; i < PORT_NUM; i++) {
+    for (unsigned int i = 0; i < fPortMax; i++) {
         JackPort* port = GetPort(i);
         if (port->IsUsed() && port->NameEquals(name))
             return i;
@@ -734,9 +772,9 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
     }
 
     // Cleanup port array
-    memset(matching_ports, 0, sizeof(char*) * PORT_NUM);
+    memset(matching_ports, 0, sizeof(char*) * fPortMax);
 
-    for (int i = 0; i < PORT_NUM; i++) {
+    for (unsigned int i = 0; i < fPortMax; i++) {
         bool matching = true;
         JackPort* port = GetPort(i);
 
@@ -783,7 +821,7 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
 */
 const char** JackGraphManager::GetPorts(const char* port_name_pattern, const char* type_name_pattern, unsigned long flags)
 {
-    const char** res = (const char**)malloc(sizeof(char*) * PORT_NUM);
+    const char** res = (const char**)malloc(sizeof(char*) * fPortMax);
     UInt16 cur_index, next_index;
     
     if (!res)

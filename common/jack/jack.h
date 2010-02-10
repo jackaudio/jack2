@@ -34,30 +34,20 @@ extern "C"
  * Note: More documentation can be found in jack/types.h.
  */
  
-/*************************************************************
- * NOTE: JACK_WEAK_EXPORT ***MUST*** be used on every function
- * added to the JACK API after the 0.116.2 release.
- *************************************************************/
-
-#ifndef JACK_WEAK_EXPORT
-#ifdef __GNUC__
-/* JACK_WEAK_EXPORT needs to be a macro which
-   expands into a compiler directive. If non-null, the directive 
-   must tell the compiler to arrange for weak linkage of 
-   the symbol it used with. For this to work full may
-   require linker arguments in the client as well.
-*/
-#define JACK_WEAK_EXPORT __attribute__((weak))
-#else
-/* Add other things here for non-gcc platforms */
-#endif
-#endif
-
-/**
-* @defgroup ClientFunctions Creating & manipulating clients
-* @{
-*/
-
+    /*************************************************************
+     * NOTE: JACK_WEAK_EXPORT ***MUST*** be used on every function
+     * added to the JACK API after the 0.116.2 release.
+     * 
+     * Functions that predate this release are marked with 
+     * JACK_WEAK_OPTIONAL_EXPORT which can be defined at compile
+     * time in a variety of ways. The default definition is empty,
+     * so that these symbols get normal linkage. If you wish to
+     * use all JACK symbols with weak linkage, include 
+     * <jack/weakjack.h> before jack.h.
+     *************************************************************/
+    
+#include <jack/weakmacros.h>
+    
 /**
  * Call this function to get version of the JACK, in form of several numbers
  *
@@ -75,7 +65,7 @@ jack_get_version(
     int *major_ptr,
     int *minor_ptr,
     int *micro_ptr,
-    int *proto_ptr);
+    int *proto_ptr) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Call this function to get version of the JACK, in form of a string
@@ -84,7 +74,7 @@ jack_get_version(
  *
  */
 const char *
-jack_get_version_string();
+jack_get_version_string() JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Open an external client session with a JACK server.  This interface
@@ -121,7 +111,7 @@ jack_get_version_string();
  */
 jack_client_t * jack_client_open (const char *client_name,
                                   jack_options_t options,
-                                  jack_status_t *status, ...);
+                                  jack_status_t *status, ...) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
 * \bold THIS FUNCTION IS DEPRECATED AND SHOULD NOT BE USED IN
@@ -129,20 +119,20 @@ jack_client_t * jack_client_open (const char *client_name,
 *
 * @deprecated Please use jack_client_open().
 */
-jack_client_t * jack_client_new (const char *client_name);
+jack_client_t * jack_client_new (const char *client_name) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * Disconnects an external client from a JACK server.
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_client_close (jack_client_t *client);
+int jack_client_close (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the maximum number of characters in a JACK client name
  * including the final NULL character.  This value is a constant.
  */
-int jack_client_name_size (void);
+int jack_client_name_size (void) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return pointer to actual client name.  This is useful when @ref
@@ -150,7 +140,7 @@ int jack_client_name_size (void);
  * JackNameNotUnique status was returned.  In that case, the actual
  * name will differ from the @a client_name requested.
  */
-char * jack_get_client_name (jack_client_t *client);
+char * jack_get_client_name (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Load an internal client into the Jack server.
@@ -175,14 +165,14 @@ char * jack_get_client_name (jack_client_t *client);
  */
 int jack_internal_client_new (const char *client_name,
                               const char *load_name,
-                              const char *load_init);
+                              const char *load_init) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * Remove an internal client from a JACK server.
  *
  * @deprecated Please use jack_internal_client_load().
  */
-void jack_internal_client_close (const char *client_name);
+void jack_internal_client_close (const char *client_name) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * Tell the Jack server that the program is ready to start processing
@@ -190,7 +180,7 @@ void jack_internal_client_close (const char *client_name);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_activate (jack_client_t *client);
+int jack_activate (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the Jack server to remove this @a client from the process
@@ -199,18 +189,18 @@ int jack_activate (jack_client_t *client);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_deactivate (jack_client_t *client);
+int jack_deactivate (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return pid of client. If not available, 0 will be returned.
  */
-int jack_get_client_pid (const char *name);
+int jack_get_client_pid (const char *name) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the pthread ID of the thread running the JACK client side
  * code.
  */
-pthread_t jack_client_thread_id (jack_client_t *);
+pthread_t jack_client_thread_id (jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -221,7 +211,7 @@ pthread_t jack_client_thread_id (jack_client_t *);
  *
  * @return 1 if JACK is running realtime, 0 otherwise
  */
-int jack_is_realtime (jack_client_t *client);
+int jack_is_realtime (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @defgroup NonCallbackAPI The non-callback API
@@ -234,7 +224,7 @@ int jack_is_realtime (jack_client_t *client);
  *
  * @deprecated Please use jack_cycle_wait() and jack_cycle_signal() functions.
  */
-jack_nframes_t jack_thread_wait (jack_client_t*, int status);
+jack_nframes_t jack_thread_wait (jack_client_t*, int status) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Wait until this JACK client should process data.
@@ -243,7 +233,7 @@ jack_nframes_t jack_thread_wait (jack_client_t*, int status);
  *
  * @return the number of frames of data to process
  */
-jack_nframes_t jack_cycle_wait (jack_client_t* client);
+    jack_nframes_t jack_cycle_wait (jack_client_t* client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Signal next clients in the graph.
@@ -251,7 +241,7 @@ jack_nframes_t jack_cycle_wait (jack_client_t* client);
  * @param client - pointer to a JACK client structure
  * @param status - if non-zero, calling thread should exit
  */
-void jack_cycle_signal (jack_client_t* client, int status);
+void jack_cycle_signal (jack_client_t* client, int status) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the Jack server to call @a thread_callback in the RT thread.
@@ -269,7 +259,7 @@ void jack_cycle_signal (jack_client_t* client, int status);
  *
  * @return 0 on success, otherwise a non-zero error code.
 */
-int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_callback, void *arg);
+int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -294,7 +284,7 @@ int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_cal
  */
 int jack_set_thread_init_callback (jack_client_t *client,
                                    JackThreadInitCallback thread_init_callback,
-                                   void *arg);
+                                   void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @param client pointer to JACK client structure.
@@ -346,7 +336,7 @@ void jack_on_shutdown (jack_client_t *client,
  * jack_on_info_shutdown() will.
  */
 void jack_on_info_shutdown (jack_client_t *client,
-                       JackInfoShutdownCallback shutdown_callback, void *arg);
+                            JackInfoShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
     
 /**
  * Tell the Jack server to call @a process_callback whenever there is
@@ -367,7 +357,7 @@ void jack_on_info_shutdown (jack_client_t *client,
  */
 int jack_set_process_callback (jack_client_t *client,
                                JackProcessCallback process_callback,
-                               void *arg);
+                               void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the Jack server to call @a freewheel_callback
@@ -387,7 +377,7 @@ int jack_set_process_callback (jack_client_t *client,
  */
 int jack_set_freewheel_callback (jack_client_t *client,
                                  JackFreewheelCallback freewheel_callback,
-                                 void *arg);
+                                 void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell JACK to call @a bufsize_callback whenever the size of the the
@@ -410,7 +400,7 @@ int jack_set_freewheel_callback (jack_client_t *client,
  */
 int jack_set_buffer_size_callback (jack_client_t *client,
                                    JackBufferSizeCallback bufsize_callback,
-                                   void *arg);
+                                   void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the Jack server to call @a srate_callback whenever the system
@@ -427,11 +417,11 @@ int jack_set_buffer_size_callback (jack_client_t *client,
  */
 int jack_set_sample_rate_callback (jack_client_t *client,
                                    JackSampleRateCallback srate_callback,
-                                   void *arg);
+                                   void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
- * Tell the JACK server to call @a registration_callback whenever a
- * port is registered or unregistered, passing @a arg as a parameter.
+ * Tell the JACK server to call @a client_registration_callback whenever a
+ * client is registered or unregistered, passing @a arg as a parameter.
  *
  * All "notification events" are received in a seperated non RT thread,
  * the code in the supplied function does not need to be
@@ -444,7 +434,7 @@ int jack_set_sample_rate_callback (jack_client_t *client,
  */
 int jack_set_client_registration_callback (jack_client_t *,
                        JackClientRegistrationCallback
-                       registration_callback, void *arg);
+                                           registration_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the JACK server to call @a registration_callback whenever a
@@ -460,8 +450,8 @@ int jack_set_client_registration_callback (jack_client_t *,
  * @return 0 on success, otherwise a non-zero error code
  */
  int jack_set_port_registration_callback (jack_client_t *,
-        JackPortRegistrationCallback
-        registration_callback, void *arg);
+                                          JackPortRegistrationCallback
+                                          registration_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
         
  /**
  * Tell the JACK server to call @a connect_callback whenever a
@@ -477,8 +467,8 @@ int jack_set_client_registration_callback (jack_client_t *,
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_port_connect_callback (jack_client_t *,
-                JackPortConnectCallback
-                connect_callback, void *arg);
+                                    JackPortConnectCallback
+                                    connect_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
  /**
  * Tell the JACK server to call @a rename_callback whenever a
@@ -494,8 +484,8 @@ int jack_set_port_connect_callback (jack_client_t *,
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_port_rename_callback (jack_client_t *,
-                JackPortRenameCallback
-                rename_callback, void *arg);
+                                   JackPortRenameCallback
+                                   rename_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the JACK server to call @a graph_callback whenever the
@@ -512,7 +502,7 @@ int jack_set_port_rename_callback (jack_client_t *,
  */
 int jack_set_graph_order_callback (jack_client_t *,
                                    JackGraphOrderCallback graph_callback,
-                                   void *);
+                                   void *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Tell the JACK server to call @a xrun_callback whenever there is a
@@ -528,7 +518,7 @@ int jack_set_graph_order_callback (jack_client_t *,
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_xrun_callback (jack_client_t *,
-                            JackXRunCallback xrun_callback, void *arg);
+                            JackXRunCallback xrun_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
                             
 /*@}*/
 
@@ -561,7 +551,7 @@ int jack_set_xrun_callback (jack_client_t *,
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
-int jack_set_freewheel(jack_client_t* client, int onoff);
+int jack_set_freewheel(jack_client_t* client, int onoff) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Change the buffer size passed to the @a process_callback.
@@ -578,13 +568,13 @@ int jack_set_freewheel(jack_client_t* client, int onoff);
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_set_buffer_size (jack_client_t *client, jack_nframes_t nframes);
+int jack_set_buffer_size (jack_client_t *client, jack_nframes_t nframes) JACK_OPTIONAL_WEAK_EXPORT;
                        
 /**
  * @return the sample rate of the jack system, as set by the user when
  * jackd was started.
  */
-jack_nframes_t jack_get_sample_rate (jack_client_t *);
+jack_nframes_t jack_get_sample_rate (jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the current maximum size that will ever be passed to the @a
@@ -595,7 +585,7 @@ jack_nframes_t jack_get_sample_rate (jack_client_t *);
  *
  * @see jack_set_buffer_size_callback()
  */
-jack_nframes_t jack_get_buffer_size (jack_client_t *);
+jack_nframes_t jack_get_buffer_size (jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Old-style interface to become the timebase for the entire JACK
@@ -607,7 +597,7 @@ jack_nframes_t jack_get_buffer_size (jack_client_t *);
  *
  * @return ENOSYS, function not implemented.
  */
-int jack_engine_takeover_timebase (jack_client_t *);
+int jack_engine_takeover_timebase (jack_client_t *) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  * @return the current CPU load estimated by JACK.  This is a running
@@ -615,7 +605,7 @@ int jack_engine_takeover_timebase (jack_client_t *);
  * all clients as a percentage of the real time available per cycle
  * determined by the buffer size and sample rate.
  */
-float jack_cpu_load (jack_client_t *client);
+float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -654,7 +644,7 @@ jack_port_t * jack_port_register (jack_client_t *client,
                                   const char *port_name,
                                   const char *port_type,
                                   unsigned long flags,
-                                  unsigned long buffer_size);
+                                  unsigned long buffer_size) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Remove the port from the client, disconnecting any existing
@@ -662,7 +652,7 @@ jack_port_t * jack_port_register (jack_client_t *client,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_port_unregister (jack_client_t *, jack_port_t *);
+int jack_port_unregister (jack_client_t *, jack_port_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * This returns a pointer to the memory area associated with the
@@ -683,7 +673,7 @@ int jack_port_unregister (jack_client_t *, jack_port_t *);
  * Caching output ports is DEPRECATED in Jack 2.0, due to some new optimization (like "pipelining").
  * Port buffers have to be retrieved in each callback for proper functionning. 
  */
-void * jack_port_get_buffer (jack_port_t *, jack_nframes_t);
+void * jack_port_get_buffer (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the full name of the jack_port_t (including the @a
@@ -691,7 +681,7 @@ void * jack_port_get_buffer (jack_port_t *, jack_nframes_t);
  *
  * @see jack_port_name_size().
  */
-const char * jack_port_name (const jack_port_t *port);
+const char * jack_port_name (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the short name of the jack_port_t (not including the @a
@@ -699,35 +689,35 @@ const char * jack_port_name (const jack_port_t *port);
  *
  * @see jack_port_name_size().
  */
-const char * jack_port_short_name (const jack_port_t *port);
+const char * jack_port_short_name (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the @ref JackPortFlags of the jack_port_t.
  */
-int jack_port_flags (const jack_port_t *port);
+int jack_port_flags (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the @a port type, at most jack_port_type_size() characters
  * including a final NULL.
  */
-const char * jack_port_type (const jack_port_t *port);
+const char * jack_port_type (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
  /**
  * @return the @a port type id.
  */
-jack_port_type_id_t jack_port_type_id (const jack_port_t *port);
+jack_port_type_id_t jack_port_type_id (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return TRUE if the jack_port_t belongs to the jack_client_t.
  */
-int jack_port_is_mine (const jack_client_t *, const jack_port_t *port);
+int jack_port_is_mine (const jack_client_t *, const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return number of connections to or from @a port.
  *
  * @pre The calling client must own @a port.
  */
-int jack_port_connected (const jack_port_t *port);
+int jack_port_connected (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return TRUE if the locally-owned @a port is @b directly connected
@@ -736,7 +726,7 @@ int jack_port_connected (const jack_port_t *port);
  * @see jack_port_name_size()
  */
 int jack_port_connected_to (const jack_port_t *port,
-                            const char *port_name);
+                            const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return a null-terminated array of full port names to which the @a
@@ -749,7 +739,7 @@ int jack_port_connected_to (const jack_port_t *port,
  *
  * @see jack_port_name_size(), jack_port_get_all_connections()
  */
-const char ** jack_port_get_connections (const jack_port_t *port);
+const char ** jack_port_get_connections (const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return a null-terminated array of full port names to which the @a
@@ -771,7 +761,7 @@ const char ** jack_port_get_connections (const jack_port_t *port);
  * @see jack_port_name_size()
  */
 const char ** jack_port_get_all_connections (const jack_client_t *client,
-        const jack_port_t *port);
+                                             const jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  *
@@ -780,7 +770,7 @@ const char ** jack_port_get_all_connections (const jack_client_t *client,
  * turned out to serve essentially no purpose in real-life
  * JACK clients.
  */
-int jack_port_tie (jack_port_t *src, jack_port_t *dst);
+int jack_port_tie (jack_port_t *src, jack_port_t *dst) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /**
  *
@@ -789,7 +779,7 @@ int jack_port_tie (jack_port_t *src, jack_port_t *dst);
  * turned out to serve essentially no purpose in real-life
  * JACK clients.
  */
-int jack_port_untie (jack_port_t *port);
+int jack_port_untie (jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
  /**
  * @return the time (in frames) between data being available or
@@ -801,7 +791,7 @@ int jack_port_untie (jack_port_t *port);
  * connector and the corresponding frames being readable from the
  * port.
  */
-jack_nframes_t jack_port_get_latency (jack_port_t *port);
+jack_nframes_t jack_port_get_latency (jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * The maximum of the sum of the latencies in every
@@ -809,7 +799,7 @@ jack_nframes_t jack_port_get_latency (jack_port_t *port);
  * ports with the @ref JackPortIsTerminal flag set.
  */
 jack_nframes_t jack_port_get_total_latency (jack_client_t *,
-        jack_port_t *port);
+                                            jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * The port latency is zero by default. Clients that control
@@ -821,7 +811,7 @@ jack_nframes_t jack_port_get_total_latency (jack_client_t *,
  * to an external digital converter, the latency setting should
  * include both buffering by the audio interface *and* the converter. 
  */
-void jack_port_set_latency (jack_port_t *, jack_nframes_t);
+void jack_port_set_latency (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
 * Request a complete recomputation of a port's total latency. This
@@ -834,7 +824,7 @@ void jack_port_set_latency (jack_port_t *, jack_nframes_t);
 * @return zero for successful execution of the request. non-zero
 *         otherwise.
 */
-int jack_recompute_total_latency (jack_client_t*, jack_port_t* port);
+int jack_recompute_total_latency (jack_client_t*, jack_port_t* port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
 * Request a complete recomputation of all port latencies. This
@@ -849,7 +839,7 @@ int jack_recompute_total_latency (jack_client_t*, jack_port_t* port);
 * @return zero for successful execution of the request. non-zero
 *         otherwise.
 */
-int jack_recompute_total_latencies (jack_client_t*);
+    int jack_recompute_total_latencies (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Modify a port's short name.  May be called at any time.  If the
@@ -858,7 +848,7 @@ int jack_recompute_total_latencies (jack_client_t*);
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
-int jack_port_set_name (jack_port_t *port, const char *port_name);
+int jack_port_set_name (jack_port_t *port, const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Set @a alias as an alias for @a port.  May be called at any time.
@@ -873,7 +863,7 @@ int jack_port_set_name (jack_port_t *port, const char *port_name);
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
-int jack_port_set_alias (jack_port_t *port, const char *alias);
+int jack_port_set_alias (jack_port_t *port, const char *alias) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Remove @a alias as an alias for @a port.  May be called at any time.
@@ -883,20 +873,20 @@ int jack_port_set_alias (jack_port_t *port, const char *alias);
  *
  * @return 0 on success, otherwise a non-zero error code.
  */
-int jack_port_unset_alias (jack_port_t *port, const char *alias);
+int jack_port_unset_alias (jack_port_t *port, const char *alias) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Get any aliases known for @port.
  *
  * @return the number of aliases discovered for the port
  */
-int jack_port_get_aliases (const jack_port_t *port, char* const aliases[2]);
+int jack_port_get_aliases (const jack_port_t *port, char* const aliases[2]) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * If @ref JackPortCanMonitor is set for this @a port, turn input
  * monitoring on or off.  Otherwise, do nothing.
  */
-int jack_port_request_monitor (jack_port_t *port, int onoff);
+int jack_port_request_monitor (jack_port_t *port, int onoff) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * If @ref JackPortCanMonitor is set for this @a port_name, turn input
@@ -907,7 +897,7 @@ int jack_port_request_monitor (jack_port_t *port, int onoff);
  * @see jack_port_name_size()
  */
 int jack_port_request_monitor_by_name (jack_client_t *client,
-                                       const char *port_name, int onoff);
+                                       const char *port_name, int onoff) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * If @ref JackPortCanMonitor is set for a port, this function turns
@@ -916,12 +906,12 @@ int jack_port_request_monitor_by_name (jack_client_t *client,
  *
  * @return 0 on success, otherwise a non-zero error code
  */
-int jack_port_ensure_monitor (jack_port_t *port, int onoff);
+int jack_port_ensure_monitor (jack_port_t *port, int onoff) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return TRUE if input monitoring has been requested for @a port.
  */
-int jack_port_monitoring_input (jack_port_t *port);
+int jack_port_monitoring_input (jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Establish a connection between two ports.
@@ -942,7 +932,7 @@ int jack_port_monitoring_input (jack_port_t *port);
  */
 int jack_connect (jack_client_t *,
                   const char *source_port,
-                  const char *destination_port);
+                  const char *destination_port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Remove a connection between two ports.
@@ -959,7 +949,7 @@ int jack_connect (jack_client_t *,
  */
 int jack_disconnect (jack_client_t *,
                      const char *source_port,
-                     const char *destination_port);
+                     const char *destination_port) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Perform the same function as jack_disconnect() using port handles
@@ -970,7 +960,7 @@ int jack_disconnect (jack_client_t *,
  * while generic connection clients (e.g. patchbays) would use
  * jack_disconnect().
  */
-int jack_port_disconnect (jack_client_t *, jack_port_t *);
+int jack_port_disconnect (jack_client_t *, jack_port_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the maximum number of characters in a full JACK port name
@@ -980,13 +970,13 @@ int jack_port_disconnect (jack_client_t *, jack_port_t *);
  * with a colon (:) followed by its short name and a NULL
  * character.
  */
-int jack_port_name_size(void);
+int jack_port_name_size(void) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the maximum number of characters in a JACK port type name
  * including the final NULL character.  This value is a constant.
  */
-int jack_port_type_size(void);
+int jack_port_type_size(void) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -1014,20 +1004,20 @@ int jack_port_type_size(void);
 const char ** jack_get_ports (jack_client_t *,
                               const char *port_name_pattern,
                               const char *type_name_pattern,
-                              unsigned long flags);
+                              unsigned long flags) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return address of the jack_port_t named @a port_name.
  *
  * @see jack_port_name_size()
  */
-jack_port_t * jack_port_by_name (jack_client_t *, const char *port_name);
+jack_port_t * jack_port_by_name (jack_client_t *, const char *port_name) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return address of the jack_port_t of a @a port_id.
  */
 jack_port_t * jack_port_by_id (jack_client_t *client,
-                               jack_port_id_t port_id);
+                               jack_port_id_t port_id) JACK_OPTIONAL_WEAK_EXPORT;
                                
 /*@}*/ 
 
@@ -1044,7 +1034,7 @@ jack_port_t * jack_port_by_id (jack_client_t *client,
  * @return the estimated time in frames that has passed since the JACK
  * server began the current process cycle.
  */
-jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *);
+jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the estimated current time in frames.
@@ -1052,7 +1042,7 @@ jack_nframes_t jack_frames_since_cycle_start (const jack_client_t *);
  * callback).  The return value can be compared with the value of
  * jack_last_frame_time to relate time in other threads to JACK time.
  */
-jack_nframes_t jack_frame_time (const jack_client_t *);
+jack_nframes_t jack_frame_time (const jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the precise time at the start of the current process cycle.
@@ -1068,17 +1058,17 @@ jack_nframes_t jack_frame_time (const jack_client_t *);
  * If an xrun occurs, clients must check this value again, as time
  * may have advanced in a non-linear way (e.g. cycles may have been skipped).
  */
-jack_nframes_t jack_last_frame_time (const jack_client_t *client);
+jack_nframes_t jack_last_frame_time (const jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the estimated time in microseconds of the specified frame time
  */
-jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t);
+jack_time_t jack_frames_to_time(const jack_client_t *client, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return the estimated time in frames for the specified system time.
  */
-jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t);
+jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * @return return JACK's current system time in microseconds,
@@ -1086,7 +1076,7 @@ jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t);
  * 
  * The value returned is guaranteed to be monotonic, but not linear.
  */
-jack_time_t jack_get_time();
+jack_time_t jack_get_time() JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -1103,7 +1093,7 @@ jack_time_t jack_get_time();
  *
  * @param msg error message text (no newline at end).
  */
-extern void (*jack_error_callback)(const char *msg);
+extern void (*jack_error_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Set the @ref jack_error_callback for error message display.
@@ -1112,7 +1102,7 @@ extern void (*jack_error_callback)(const char *msg);
  * The JACK library provides two built-in callbacks for this purpose:
  * default_jack_error_callback() and silent_jack_error_callback().
  */
-void jack_set_error_function (void (*func)(const char *));
+void jack_set_error_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Display JACK info message.
@@ -1122,7 +1112,7 @@ void jack_set_error_function (void (*func)(const char *));
  *
  * @param msg info message text (no newline at end).
  */
-extern void (*jack_info_callback)(const char *msg);
+extern void (*jack_info_callback)(const char *msg) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Set the @ref jack_info_callback for info message display.
@@ -1131,7 +1121,7 @@ extern void (*jack_info_callback)(const char *msg);
  * The JACK library provides two built-in callbacks for this purpose:
  * default_jack_info_callback() and silent_jack_info_callback().
  */
-void jack_set_info_function (void (*func)(const char *));
+void jack_set_info_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -1142,7 +1132,7 @@ void jack_set_info_function (void (*func)(const char *));
  * Developers are strongly encouraged to use this function instead of the standard "free" function in new code.
  *
  */
-void jack_free(void* ptr);
+void jack_free(void* ptr) JACK_OPTIONAL_WEAK_EXPORT;
 
 
 #ifdef __cplusplus

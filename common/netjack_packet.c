@@ -26,7 +26,9 @@
  *
  */
 
-//#include "config.h"
+#ifdef __linux__
+#include "config.h"
+#endif
 
 #ifdef __APPLE__
 #define _DARWIN_C_SOURCE
@@ -50,7 +52,9 @@
 
 #ifdef WIN32
 #include <winsock2.h>
+#define socklen_t int
 #include <malloc.h>
+#define socklen_t int
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -126,7 +130,7 @@ int get_sample_size (int bitdepth)
     if (bitdepth == 16)
         return sizeof (int16_t);
     //JN: why? is this for buffer sizes before or after encoding?
-    //JN: if the former, why not int16_t, if the latter, shouldn't it depend on -c N?    
+    //JN: if the former, why not int16_t, if the latter, shouldn't it depend on -c N?
     if( bitdepth == CELT_MODE )
 	return sizeof( unsigned char );
     return sizeof (int32_t);

@@ -257,6 +257,13 @@ jack_dbus_error(
     const char *format,
     ...);
 
+void
+jack_dbus_only_error(
+    void *dbus_call_context_ptr,
+    const char *error_name,
+    const char *format,
+    ...);
+
 bool
 jack_dbus_get_method_args(
     struct jack_dbus_method_call *call,

@@ -17,8 +17,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-//#define HAVE_CELT 1
-
 #ifdef WIN32
 #include <malloc.h>
 #endif
@@ -140,19 +138,15 @@ namespace Jack
 	jack_port_id_t port_id;
 	char buf[64];
 	unsigned int chn;
-	int port_flags;
-
 
 	//if (netj.handle_transport_sync)
 	//    jack_set_sync_callback(netj.client, (JackSyncCallback) net_driver_sync_cb, NULL);
-
-	port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
 
 	for (chn = 0; chn < netj.capture_channels_audio; chn++) {
 	    snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
 
             if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
-                             static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
+                             CaptureDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT )
             {
                 jack_error ( "driver: cannot register port for %s", buf );
                 return -1;
@@ -186,7 +180,7 @@ namespace Jack
 	    snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
 
             if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
-                             static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
+                             CaptureDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT )
             {
                 jack_error ( "driver: cannot register port for %s", buf );
                 return -1;
@@ -197,13 +191,11 @@ namespace Jack
 		jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
 	}
 
-	port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-
 	for (chn = 0; chn < netj.playback_channels_audio; chn++) {
 	    snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
 
             if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
-                             static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
+                             PlaybackDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT )
             {
                 jack_error ( "driver: cannot register port for %s", buf );
                 return -1;
@@ -233,7 +225,7 @@ namespace Jack
 	    snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
 
             if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
-                             static_cast<JackPortFlags> ( port_flags ), fEngineControl->fBufferSize ) ) == NO_PORT )
+                             PlaybackDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT )
             {
                 jack_error ( "driver: cannot register port for %s", buf );
                 return -1;

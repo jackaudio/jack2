@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackClient.h"
 #include "JackTools.h"
 #include "JackNotification.h"
+#include "JackException.h"
+
 #include <assert.h>
 #include <signal.h>
 
@@ -64,7 +66,7 @@ int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 
 void JackSocketServerChannel::Close()
 {
-    fThread.Kill();
+    fThread.Stop();
     fRequestListenSocket.Close();
 
     // Close remaining client sockets
@@ -387,8 +389,14 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         case JackRequest::kNotification: {
             jack_log("JackRequest::Notification");
             JackClientNotificationRequest req;
-            if (req.Read(socket) == 0)
-                fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
+            if (req.Read(socket) == 0) {
+                if (req.fNotify == kQUIT) {
+                    jack_log("JackRequest::Notification kQUIT");
+                    throw JackQuitException();
+                } else {
+                    fServer->Notify(req.fRefNum, req.fNotify, req.fValue);
+                }
+            }
             break;
         }
 
@@ -436,35 +444,42 @@ bool JackSocketServerChannel::Init()
 
 bool JackSocketServerChannel::Execute()
 {
-    // Global poll
-    if ((poll(fPollTable, fSocketTable.size() + 1, 10000) < 0) && (errno != EINTR)) {
-        jack_error("Engine poll failed err = %s request thread quits...", strerror(errno));
-        return false;
-    } else {
+    try {
+    
+        // Global poll
+        if ((poll(fPollTable, fSocketTable.size() + 1, 10000) < 0) && (errno != EINTR)) {
+            jack_error("Engine poll failed err = %s request thread quits...", strerror(errno));
+            return false;
+        } else {
 
-        // Poll all clients
-        for (unsigned int i = 1; i < fSocketTable.size() + 1; i++) {
-            int fd = fPollTable[i].fd;
-            jack_log("fPollTable i = %ld fd = %ld", i, fd);
-            if (fPollTable[i].revents & ~POLLIN) {
-                jack_log("Poll client error err = %s", strerror(errno));
-                ClientKill(fd);
-            } else if (fPollTable[i].revents & POLLIN) {
-                if (!HandleRequest(fd)) 
-                    jack_log("Could not handle external client request");
+            // Poll all clients
+            for (unsigned int i = 1; i < fSocketTable.size() + 1; i++) {
+                int fd = fPollTable[i].fd;
+                jack_log("fPollTable i = %ld fd = %ld", i, fd);
+                if (fPollTable[i].revents & ~POLLIN) {
+                    jack_log("Poll client error err = %s", strerror(errno));
+                    ClientKill(fd);
+                } else if (fPollTable[i].revents & POLLIN) {
+                    if (!HandleRequest(fd)) 
+                        jack_log("Could not handle external client request");
+                }
             }
+
+            // Check the server request socket */
+            if (fPollTable[0].revents & POLLERR) 
+                jack_error("Error on server request socket err = %s", strerror(errno));
+       
+            if (fPollTable[0].revents & POLLIN) 
+                ClientCreate();
         }
 
-        // Check the server request socket */
-        if (fPollTable[0].revents & POLLERR) 
-            jack_error("Error on server request socket err = %s", strerror(errno));
-   
-        if (fPollTable[0].revents & POLLIN) 
-            ClientCreate();
+        BuildPoolTable();
+        return true;
+        
+    } catch (JackQuitException& e) {
+        jack_log("JackMachServerChannel::Execute JackQuitException");
+        return false;
     }
-
-    BuildPoolTable();
-    return true;
 }
 
 } // end of namespace

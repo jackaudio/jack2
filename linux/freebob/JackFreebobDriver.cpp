@@ -667,8 +667,7 @@ int JackFreebobDriver::Attach()
 {
     JackPort* port;
     int port_index;
-    unsigned long port_flags;
-
+  
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];
 
@@ -717,8 +716,6 @@ int JackFreebobDriver::Attach()
     /* ports */
 
     // capture
-    port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-
     driver->capture_nchannels = freebob_streaming_get_nb_capture_streams(driver->dev);
     driver->capture_nchannels_audio = 0;
 
@@ -734,7 +731,7 @@ int JackFreebobDriver::Attach()
 
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
-                              (JackPortFlags)port_flags,
+                              CaptureDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
@@ -748,8 +745,6 @@ int JackFreebobDriver::Attach()
     }
 
     // playback
-    port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-
     driver->playback_nchannels = freebob_streaming_get_nb_playback_streams(driver->dev);
     driver->playback_nchannels_audio = 0;
 
@@ -764,7 +759,7 @@ int JackFreebobDriver::Attach()
             printMessage ("Registering playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
-                              (JackPortFlags)port_flags,
+                              PlaybackDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;

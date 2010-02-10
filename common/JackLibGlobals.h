@@ -31,6 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include <assert.h>
 #include <signal.h>
+ 
 
 namespace Jack
 {
@@ -120,13 +121,6 @@ struct JackLibGlobals
             jack_log("JackLibGlobals Destroy %x", fGlobals);
             delete fGlobals;
             fGlobals = NULL;
-        }
-    }
-
-    static void CheckContext()
-    {
-        if (!(fClientCount > 0 && fGlobals)) {
-            jack_error("Error !!! : client accessing an already desallocated library context");
         }
     }
 

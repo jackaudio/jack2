@@ -58,7 +58,12 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 void JackMachServerChannel::Close()
 {
     jack_log("JackMachServerChannel::Close");
+ #ifdef MAC_OS_X_VERSION_10_5
+    // Exception does not work in this case on pre Snow Loopard systems, see JackMachServerNotifyChannel::NotifyQuit()
     fThread.Kill();
+ #else
+    fThread.Stop();
+ #endif
     fServerPort.DestroyPort();
 }
     
@@ -149,12 +154,19 @@ boolean_t JackMachServerChannel::MessageHandler(mach_msg_header_t* Request, mach
 
 bool JackMachServerChannel::Execute()
 {
-    kern_return_t res;
-    if ((res = mach_msg_server(MessageHandler, 1024, fServerPort.GetPortSet(), 0)) != KERN_SUCCESS) {
-        jack_log("JackMachServerChannel::Execute: err = %s", mach_error_string(res));
+    try {
+        
+        kern_return_t res;
+        if ((res = mach_msg_server(MessageHandler, 1024, fServerPort.GetPortSet(), 0)) != KERN_SUCCESS) {
+            jack_log("JackMachServerChannel::Execute: err = %s", mach_error_string(res));
+            return false;
+        }
+        return true;
+        
+    } catch (JackQuitException& e) {
+        jack_log("JackMachServerChannel::Execute JackQuitException");
+        return false;
     }
-    //return (res == KERN_SUCCESS);  mach_msg_server can fail if the client reply port is not valid anymore (crashed client)
-    return true;
 }
 
 } // end of namespace

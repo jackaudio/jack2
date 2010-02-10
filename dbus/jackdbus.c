@@ -765,6 +765,34 @@ jack_dbus_error(
     va_end(ap);
 }
 
+void
+jack_dbus_only_error(
+    void *dbus_call_context_ptr,
+    const char *error_name,
+    const char *format,
+    ...)
+{
+    va_list ap;
+    char buffer[300];
+
+    va_start(ap, format);
+
+    vsnprintf(buffer, sizeof(buffer), format, ap);
+
+    if (((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply != NULL)
+    {
+        dbus_message_unref(((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply);
+        ((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply = NULL;
+    }
+
+    ((struct jack_dbus_method_call *)dbus_call_context_ptr)->reply = dbus_message_new_error(
+        ((struct jack_dbus_method_call *)dbus_call_context_ptr)->message,
+        error_name,
+        buffer);
+
+    va_end(ap);
+}
+
 int
 main (int argc, char **argv)
 {

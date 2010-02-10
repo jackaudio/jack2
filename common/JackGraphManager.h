@@ -42,9 +42,11 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
     private:
 
-		JackPort fPortArray[PORT_NUM];
+        unsigned int fPortMax;
         JackClientTiming fClientTiming[CLIENT_NUM];
+        JackPort fPortArray[0];    // The actual size depends of port_max, it will be dynamically computed and allocated using "placement" new
 
+        void AssertPort(jack_port_id_t port_index);
         jack_port_id_t AllocatePortAux(int refnum, const char* port_name, const char* port_type, JackPortFlags flags);
         void GetConnectionsAux(JackConnectionManager* manager, const char** res, jack_port_id_t port_index);
         void GetPortsAux(const char** matching_ports, const char* port_name_pattern, const char* type_name_pattern, unsigned long flags);
@@ -54,8 +56,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
     public:
 
-        JackGraphManager()
-        {}
+        JackGraphManager(int port_max);
         ~JackGraphManager()
         {}
 
@@ -64,6 +65,8 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         // Ports management
         jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size);
         int ReleasePort(int refnum, jack_port_id_t port_index);
+        void ActivatePort(jack_port_id_t port_index);
+        void DeactivatePort(jack_port_id_t port_index);
         void GetInputPorts(int refnum, jack_int_t* res);
         void GetOutputPorts(int refnum, jack_int_t* res);
         void RemoveAllPorts(int refnum);
@@ -74,7 +77,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         int ComputeTotalLatency(jack_port_id_t port_index);
         int ComputeTotalLatencies();
         int RequestMonitor(jack_port_id_t port_index, bool onoff);
-
+   
         // Connections management
         int Connect(jack_port_id_t src_index, jack_port_id_t dst_index);
         int Disconnect(jack_port_id_t src_index, jack_port_id_t dst_index);
@@ -127,6 +130,9 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);
+    
+        static JackGraphManager* Allocate(int port_max);
+        static void Destroy(JackGraphManager* manager);
 
 } POST_PACKED_STRUCTURE;
 

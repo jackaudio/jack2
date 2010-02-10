@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include "JackRequest.h"
 #include "JackConstants.h"
+#include "JackNotification.h"
 
 namespace Jack
 {
@@ -54,6 +55,15 @@ void JackSocketServerNotifyChannel::Notify(int refnum, int notify, int value)
         jack_error("Could not write request ref = %d notify = %d", refnum, notify);
     }
 }
+
+void JackSocketServerNotifyChannel::NotifyQuit()
+{
+    JackClientNotificationRequest req(-1, kQUIT, 0);
+    if (req.Write(&fRequestSocket) < 0) {
+        jack_error("Could not write request ref = %d notify = %d", -1, kQUIT);
+    }
+}
+    
 
 } // end of namespace
 
