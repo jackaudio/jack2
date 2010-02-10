@@ -106,9 +106,9 @@ def main():
         print "Usage: %s [command] [command] ..." % os.path.basename(sys.argv[0])
         print "Commands:"
         print "    exit                       - exit jack dbus service (stops jack server if currently running)"
-        print "    status                     - check whether jack server is started, return value is 0 if runing and 1 otherwise"
+        print "    status                     - check whether jack server is started, return value is 0 if running and 1 otherwise"
         print "    start                      - start jack server if not currently started"
-        print "    stop                       - stop jack server if currenly started"
+        print "    stop                       - stop jack server if currently started"
 	print "    sm                         - switch master to currently selected driver"
         print "    dl                         - get list of available drivers"
         print "    dg                         - get currently selected driver"

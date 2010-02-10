@@ -70,7 +70,7 @@ jack_ringbuffer_create (size_t sz)
 	int power_of_two;
 	jack_ringbuffer_t *rb;
 	
-	if ((rb = malloc (sizeof (jack_ringbuffer_t))) == NULL) {
+	if ((rb = (jack_ringbuffer_t *) malloc (sizeof (jack_ringbuffer_t))) == NULL) {
 		return NULL;
 	}
 	
@@ -81,7 +81,7 @@ jack_ringbuffer_create (size_t sz)
 	rb->size_mask -= 1;
 	rb->write_ptr = 0;
 	rb->read_ptr = 0;
-	if ((rb->buf = malloc (rb->size)) == NULL) {
+	if ((rb->buf = (char *) malloc (rb->size)) == NULL) {
 		free (rb);
 		return NULL;
 	}

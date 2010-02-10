@@ -49,10 +49,11 @@ def configure(conf):
 
     e = conf.check_cc(lib='readline', define_name="HAVE_READLINE")
 
-    if conf.is_defined('HAVE_READLINE'):
-        conf.env['LIB_READLINE'] = ['readline']
+    # define_name="HAVE_READLINE" has no effect, LIB_READLINE is defined if readline is available
+    #if conf.is_defined('HAVE_READLINE'):
+    #    conf.env['LIB_READLINE'] = ['readline']
 
-    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = conf.is_defined('HAVE_READLINE') and conf.is_defined('HAVE_NCURSES')
+    conf.env['BUILD_EXAMPLE_CLIENT_TRANSPORT'] = bool(conf.env['LIB_READLINE']) and bool(conf.env['LIB_NCURSES'])
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 

@@ -145,23 +145,22 @@ static int semid = -1;
 
 #ifdef WIN32
 
-static void
-semaphore_init () {}
+static int
+semaphore_init () {return 0;}
 
-static  void
-semaphore_add (int value) {}
+static  int
+semaphore_add (int value) {return 0;}
 
 #else
 /* all semaphore errors are fatal -- issue message, but do not return */
 static void
 semaphore_error (char *msg)
 {
-	jack_error ("Fatal JACK semaphore error: %s (%s)",
+	jack_error ("JACK semaphore error: %s (%s)",
 		    msg, strerror (errno));
-	abort ();
 }
 
-static void
+static int
 semaphore_init ()
 {
 	key_t semkey = JACK_SEMAPHORE_KEY;
@@ -180,21 +179,26 @@ semaphore_init ()
 			sbuf.sem_op = 1;
 			sbuf.sem_flg = 0;
 			if (semop(semid, &sbuf, 1) == -1) {
-				semaphore_error ("semop");
+                semaphore_error ("semop");
+                return -1;
 			}
 
 		} else if (errno == EEXIST) {
 			if ((semid = semget(semkey, 0, 0)) == -1) {
-				semaphore_error ("semget");
+                semaphore_error ("semget");
+                return -1;
 			}
 
 		} else {
-			semaphore_error ("semget creation");
+            semaphore_error ("semget creation");
+            return -1;
 		}
 	}
+
+    return 0;
 }
 
-static inline void
+static inline int
 semaphore_add (int value)
 {
 	struct sembuf sbuf;
@@ -202,20 +206,26 @@ semaphore_add (int value)
 	sbuf.sem_num = 0;
 	sbuf.sem_op = value;
 	sbuf.sem_flg = SEM_UNDO;
+
 	if (semop(semid, &sbuf, 1) == -1) {
 		semaphore_error ("semop");
+        return -1;
 	}
+
+    return 0;
 }
 
 #endif
 
-static void
+static int
 jack_shm_lock_registry (void)
 {
-	if (semid == -1)
-		semaphore_init ();
+	if (semid == -1) {
+        if (semaphore_init () < 0)
+            return -1;
+    }
 
-	semaphore_add (-1);
+	return semaphore_add (-1);
 }
 
 static void
@@ -297,7 +307,10 @@ jack_server_initialize_shm (int new_registry)
 	if (jack_shm_header)
 		return 0;		/* already initialized */
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	rc = jack_access_registry (&registry_info);
 
@@ -353,7 +366,11 @@ jack_initialize_shm (const char *server_name)
 
 	jack_set_server_prefix (server_name);
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
+
 	if ((rc = jack_access_registry (&registry_info)) == 0) {
 		if ((rc = jack_shm_validate_registry ()) != 0) {
 			jack_error ("Incompatible shm registry, "
@@ -412,15 +429,20 @@ jack_release_shm_entry (jack_shm_registry_index_t index)
 		sizeof (jack_shm_registry[index].id));
 }
 
-void
+int
 jack_release_shm_info (jack_shm_registry_index_t index)
 {
 	/* must NOT have the registry locked */
 	if (jack_shm_registry[index].allocator == GetPID()) {
-		jack_shm_lock_registry ();
+		if (jack_shm_lock_registry () < 0) {
+            jack_error ("jack_shm_lock_registry fails...");
+            return -1;
+        }
 		jack_release_shm_entry (index);
 		jack_shm_unlock_registry ();
 	}
+
+    return 0;
 }
 
 /* Claim server_name for this process.
@@ -440,7 +462,10 @@ jack_register_server (const char *server_name, int new_registry)
 	if (jack_server_initialize_shm (new_registry))
 		return ENOMEM;
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	/* See if server_name already registered.  Since server names
 	 * are per-user, we register the unique server prefix string.
@@ -493,11 +518,14 @@ jack_register_server (const char *server_name, int new_registry)
 }
 
 /* release server_name registration */
-void
+int
 jack_unregister_server (const char *server_name /* unused */)
 {
 	int i;
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	for (i = 0; i < MAX_SERVERS; i++) {
 		if (jack_shm_header->server[i].pid == GetPID()) {
@@ -507,6 +535,7 @@ jack_unregister_server (const char *server_name /* unused */)
 	}
 
 	jack_shm_unlock_registry ();
+	return 0;
 }
 
 /* called for server startup and termination */
@@ -517,7 +546,10 @@ jack_cleanup_shm ()
 	int destroy;
 	jack_shm_info_t copy;
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	for (i = 0; i < MAX_SHM_ID; i++) {
 		jack_shm_registry_t* r;
@@ -741,7 +773,10 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	int rc = -1;
 	char name[SHM_NAME_MAX+1];
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	if ((registry = jack_get_free_shm_info ()) == NULL) {
 		jack_error ("shm registry full");
@@ -780,7 +815,7 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	close (shm_fd);
 	registry->size = size;
 	strncpy (registry->id, name, sizeof (registry->id));
-	registry->allocator = getpid();
+	registry->allocator = GetPID();
 	si->index = registry->index;
 	si->ptr.attached_at = MAP_FAILED;	/* not attached */
 	rc = 0;				/* success */
@@ -936,7 +971,10 @@ jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 	int rc = -1;
 	char name[SHM_NAME_MAX+1];
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	if ((registry = jack_get_free_shm_info ()) == NULL) {
 		jack_error ("shm registry full");
@@ -1133,7 +1171,10 @@ jack_shmalloc (const char* name_not_used, jack_shmsize_t size,
 	int rc = -1;
 	jack_shm_registry_t* registry;
 
-	jack_shm_lock_registry ();
+	if (jack_shm_lock_registry () < 0) {
+        jack_error ("jack_shm_lock_registry fails...");
+        return -1;
+    }
 
 	if ((registry = jack_get_free_shm_info ())) {
 

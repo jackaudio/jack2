@@ -103,6 +103,9 @@ int JackLibClient::Open(const char* server_name, const char* name, jack_options_
     } catch (int n) {
         jack_error("Map shared memory segments exception %d", n);
         goto error;
+    } catch (...) {
+        jack_error("Unknown error...");
+        goto error;
     }
 
     SetupDriverSync(false);

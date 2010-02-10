@@ -34,6 +34,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 #include <signal.h>
 
+#ifdef __linux__
+#include "config.h"
+#endif
+
 #ifdef WIN32
 #include <winsock2.h>
 #define socklen_t int
@@ -754,7 +758,7 @@ main (int argc, char *argv[])
             if (statecopy_netxruns != state_netxruns) {
 		statecopy_netxruns = state_netxruns;
 		printf ("%s: at frame %06d -> total netxruns %d  (%d%%) queue time= %d\n",
-				client_name, 
+				client_name,
 				state_currentframe,
 				statecopy_netxruns,
 				100*statecopy_netxruns/state_currentframe,

@@ -1268,9 +1268,9 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     if (capturing && inchannels > 0) {
     
         size = sizeof(AudioStreamBasicDescription);
-        err1 = AudioUnitGetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 0, &srcFormat, &size);
+        err1 = AudioUnitGetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &srcFormat, &size);
         if (err1 != noErr) {
-            jack_error("Error calling AudioUnitGetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
+            jack_error("Error calling AudioUnitGetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
             printError(err1);
             goto error;
         }
@@ -1288,9 +1288,8 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         PrintStreamDesc(&srcFormat);
       
         err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Output, 1, &srcFormat, sizeof(AudioStreamBasicDescription));
-        
         if (err1 != noErr) {
-            jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
+            jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
             printError(err1);
             goto error;
         }
@@ -1299,9 +1298,9 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
     if (playing && outchannels > 0) {
     
         size = sizeof(AudioStreamBasicDescription);
-        err1 = AudioUnitGetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 1, &dstFormat, &size);
+        err1 = AudioUnitGetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &dstFormat, &size);
         if (err1 != noErr) {
-            jack_error("Error calling AudioUnitGetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
+            jack_error("Error calling AudioUnitGetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
             printError(err1);
             goto error;
         }
@@ -1319,9 +1318,8 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         PrintStreamDesc(&dstFormat);
        
         err1 = AudioUnitSetProperty(fAUHAL, kAudioUnitProperty_StreamFormat, kAudioUnitScope_Input, 0, &dstFormat, sizeof(AudioStreamBasicDescription));
-        
         if (err1 != noErr) {
-            jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Output");
+            jack_error("Error calling AudioUnitSetProperty - kAudioUnitProperty_StreamFormat kAudioUnitScope_Input");
             printError(err1);
             goto error;
         }

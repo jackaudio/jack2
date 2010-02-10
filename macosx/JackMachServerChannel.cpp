@@ -58,7 +58,12 @@ int JackMachServerChannel::Open(const char* server_name, JackServer* server)
 void JackMachServerChannel::Close()
 {
     jack_log("JackMachServerChannel::Close");
+ #ifdef MAC_OS_X_VERSION_10_5
+    // Exception does not work in this case on pre Snow Loopard systems, see JackMachServerNotifyChannel::NotifyQuit()
+    fThread.Kill();
+ #else
     fThread.Stop();
+ #endif
     fServerPort.DestroyPort();
 }
     
