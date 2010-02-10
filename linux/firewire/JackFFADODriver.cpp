@@ -447,6 +447,9 @@ int JackFFADODriver::Attach()
 
             port = fGraphManager->GetPort(port_index);
             port->SetLatency(driver->period_size + driver->capture_frame_latency);
+            // capture port aliases (jackd1 style port names)
+            snprintf(buf, sizeof(buf) - 1, "%s:capture_%i", fClientControl.fName, (int) chn + 1);
+            port->SetAlias(buf);
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
@@ -520,6 +523,9 @@ int JackFFADODriver::Attach()
             port = fGraphManager->GetPort(port_index);
             // Add one buffer more latency if "async" mode is used...
             port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency);
+            // playback port aliases (jackd1 style port names)
+            snprintf(buf, sizeof(buf) - 1, "%s:playback_%i", fClientControl.fName, (int) chn + 1);
+            port->SetAlias(buf);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
