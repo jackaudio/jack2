@@ -65,6 +65,8 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         // Ports management
         jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size);
         int ReleasePort(int refnum, jack_port_id_t port_index);
+        void ActivatePort(jack_port_id_t port_index);
+        void DeactivatePort(jack_port_id_t port_index);
         void GetInputPorts(int refnum, jack_int_t* res);
         void GetOutputPorts(int refnum, jack_int_t* res);
         void RemoveAllPorts(int refnum);
@@ -75,7 +77,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         int ComputeTotalLatency(jack_port_id_t port_index);
         int ComputeTotalLatencies();
         int RequestMonitor(jack_port_id_t port_index, bool onoff);
-
+   
         // Connections management
         int Connect(jack_port_id_t src_index, jack_port_id_t dst_index);
         int Disconnect(jack_port_id_t src_index, jack_port_id_t dst_index);

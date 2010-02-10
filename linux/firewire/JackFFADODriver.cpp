@@ -359,8 +359,6 @@ int JackFFADODriver::Attach()
 {
     JackPort* port;
     int port_index;
-    unsigned long port_flags;
-
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];
 
@@ -418,8 +416,6 @@ int JackFFADODriver::Attach()
     /* ports */
 
     // capture
-    port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
-
     driver->capture_nchannels = ffado_streaming_get_nb_capture_streams(driver->dev);
     driver->capture_channels = (ffado_capture_channel_t *)calloc(driver->capture_nchannels, sizeof(ffado_capture_channel_t));
     if (driver->capture_channels == NULL) {
@@ -437,7 +433,7 @@ int JackFFADODriver::Attach()
             printMessage ("Registering audio capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
-                              (JackPortFlags)port_flags,
+                              CaptureDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
@@ -460,7 +456,7 @@ int JackFFADODriver::Attach()
             printMessage ("Registering midi capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
-                              (JackPortFlags)port_flags,
+                              CaptureDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
@@ -489,8 +485,6 @@ int JackFFADODriver::Attach()
     }
 
     // playback
-    port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
-
     driver->playback_nchannels = ffado_streaming_get_nb_playback_streams(driver->dev);
     driver->playback_channels = (ffado_playback_channel_t *)calloc(driver->playback_nchannels, sizeof(ffado_playback_channel_t));
     if (driver->playback_channels == NULL) {
@@ -509,7 +503,7 @@ int JackFFADODriver::Attach()
             printMessage ("Registering audio playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
-                              (JackPortFlags)port_flags,
+                              PlaybackDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
@@ -534,7 +528,7 @@ int JackFFADODriver::Attach()
             printMessage ("Registering midi playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
-                              (JackPortFlags)port_flags,
+                              PlaybackDriverFlags,
                               fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;

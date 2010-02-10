@@ -651,7 +651,30 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
         jack_error("JackEngine::ClientActivate wait error ref = %ld name = %s", refnum, client->GetClientControl()->fName);
         return -1;
     } else {
+        jack_int_t input_ports[PORT_NUM_FOR_CLIENT];
+        jack_int_t output_ports[PORT_NUM_FOR_CLIENT];
+        fGraphManager->GetInputPorts(refnum, input_ports);
+        fGraphManager->GetOutputPorts(refnum, output_ports);
+        
+        // First add port state to JackPortIsActive
+        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
+            fGraphManager->ActivatePort(input_ports[i]);
+        }
+        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
+            fGraphManager->ActivatePort(output_ports[i]);
+        }
+        
+        // Notify client
         NotifyActivate(refnum);
+        
+        // Then issue port registration notification
+        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
+            NotifyPortRegistation(input_ports[i], true);
+        }
+        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
+            NotifyPortRegistation(output_ports[i], true);
+        }
+
         return 0;
     }
 }
@@ -662,18 +685,27 @@ int JackEngine::ClientDeactivate(int refnum)
     JackClientInterface* client = fClientTable[refnum];
     jack_log("JackEngine::ClientDeactivate ref = %ld name = %s", refnum, client->GetClientControl()->fName);
 
-    // Disconnect all ports ==> notifications are sent
-    jack_int_t ports[PORT_NUM_FOR_CLIENT];
-    int i;
+    jack_int_t input_ports[PORT_NUM_FOR_CLIENT];
+    jack_int_t output_ports[PORT_NUM_FOR_CLIENT];
+    fGraphManager->GetInputPorts(refnum, input_ports);
+    fGraphManager->GetOutputPorts(refnum, output_ports);
 
-    fGraphManager->GetInputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
-        PortDisconnect(refnum, ports[i], ALL_PORTS);
+    // First disconnect all ports and remove their JackPortIsActive state
+    for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
+        PortDisconnect(refnum, input_ports[i], ALL_PORTS);
+        fGraphManager->DeactivatePort(input_ports[i]);
     }
-
-    fGraphManager->GetOutputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
-        PortDisconnect(refnum, ports[i], ALL_PORTS);
+    for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
+        PortDisconnect(refnum, output_ports[i], ALL_PORTS);
+        fGraphManager->DeactivatePort(output_ports[i]);
+    }
+    
+    // Then issue port registration notification
+    for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
+        NotifyPortRegistation(input_ports[i], false);
+    }
+    for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
+        NotifyPortRegistation(output_ports[i], false);
     }
 
     fGraphManager->Deactivate(refnum);
@@ -695,7 +727,8 @@ int JackEngine::ClientDeactivate(int refnum)
 int JackEngine::PortRegister(int refnum, const char* name, const char *type, unsigned int flags, unsigned int buffer_size, jack_port_id_t* port_index)
 {
     jack_log("JackEngine::PortRegister ref = %ld name = %s type = %s flags = %d buffer_size = %d", refnum, name, type, flags, buffer_size);
- 
+    JackClientInterface* client = fClientTable[refnum];
+
     // Check if port name already exists
     if (fGraphManager->GetPort(name) != NO_PORT) {
         jack_error("port_name \"%s\" already exists", name);
@@ -704,7 +737,8 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 
     *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
     if (*port_index != NO_PORT) {
-        NotifyPortRegistation(*port_index, true);
+        if (client->GetClientControl()->fActive)
+            NotifyPortRegistation(*port_index, true);
         return 0;
     } else {
         return -1;
@@ -714,12 +748,14 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
 int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
 {
     jack_log("JackEngine::PortUnRegister ref = %ld port_index = %ld", refnum, port_index);
- 
+    JackClientInterface* client = fClientTable[refnum];
+
     // Disconnect port ==> notification is sent
     PortDisconnect(refnum, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
-        NotifyPortRegistation(port_index, false);
+        if (client->GetClientControl()->fActive)
+            NotifyPortRegistation(port_index, false);
         return 0;
     } else {
         return -1;
