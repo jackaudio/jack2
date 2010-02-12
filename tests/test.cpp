@@ -183,7 +183,7 @@ void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 
 int Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
 {
-     Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n");
+     Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n", old_name, new_name);
      port_rename_clbk = 1;
      return 0;
 }
