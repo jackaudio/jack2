@@ -580,6 +580,18 @@
 		4B80D7EB0BA0D17400F035BB /* JackMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B80D7E50BA0D17400F035BB /* JackMidiPort.h */; };
 		4B80D7EC0BA0D17400F035BB /* JackMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E60BA0D17400F035BB /* JackMidiPort.cpp */; };
 		4B80D7ED0BA0D17400F035BB /* JackMidiAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E70BA0D17400F035BB /* JackMidiAPI.cpp */; };
+		4B88D03B11298BEE007A87C1 /* weakjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03911298BEE007A87C1 /* weakjack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D03C11298BEE007A87C1 /* weakmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03A11298BEE007A87C1 /* weakmacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D03D11298BEE007A87C1 /* weakjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03911298BEE007A87C1 /* weakjack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D03E11298BEE007A87C1 /* weakmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03A11298BEE007A87C1 /* weakmacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D03F11298BEE007A87C1 /* weakjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03911298BEE007A87C1 /* weakjack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04011298BEE007A87C1 /* weakmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03A11298BEE007A87C1 /* weakmacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04111298BEE007A87C1 /* weakjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03911298BEE007A87C1 /* weakjack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04211298BEE007A87C1 /* weakmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03A11298BEE007A87C1 /* weakmacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04311298BEE007A87C1 /* weakjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03911298BEE007A87C1 /* weakjack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04411298BEE007A87C1 /* weakmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03A11298BEE007A87C1 /* weakmacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04511298BEE007A87C1 /* weakjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03911298BEE007A87C1 /* weakjack.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4B88D04611298BEE007A87C1 /* weakmacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B88D03A11298BEE007A87C1 /* weakmacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B93F1990E87992100E4ECCD /* JackPosixThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6A20E703B2E0066E42F /* JackPosixThread.cpp */; };
 		4B93F19A0E87992200E4ECCD /* JackPosixThread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6A30E703B2E0066E42F /* JackPosixThread.h */; };
 		4B93F19C0E87998200E4ECCD /* JackPosixServerLaunch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF5FBBA0E878B9C003D2374 /* JackPosixServerLaunch.cpp */; };
@@ -1567,6 +1579,8 @@
 		4B869B3D08C8D21C001CF041 /* driver_interface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = driver_interface.h; path = ../common/driver_interface.h; sourceTree = SOURCE_ROOT; };
 		4B869B4208C8D22F001CF041 /* JackDriverLoader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackDriverLoader.h; path = ../common/JackDriverLoader.h; sourceTree = SOURCE_ROOT; };
 		4B869D7F08C9CB00001CF041 /* JackDriverLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackDriverLoader.cpp; path = ../common/JackDriverLoader.cpp; sourceTree = SOURCE_ROOT; };
+		4B88D03911298BEE007A87C1 /* weakjack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = weakjack.h; path = ../common/jack/weakjack.h; sourceTree = SOURCE_ROOT; };
+		4B88D03A11298BEE007A87C1 /* weakmacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = weakmacros.h; path = ../common/jack/weakmacros.h; sourceTree = SOURCE_ROOT; };
 		4B89B759076B731100D170DE /* JackRPCClientUser.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = JackRPCClientUser.c; path = RPC/JackRPCClientUser.c; sourceTree = SOURCE_ROOT; };
 		4B89B769076B74D200D170DE /* JackRPCEngineUser.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = JackRPCEngineUser.c; path = RPC/JackRPCEngineUser.c; sourceTree = SOURCE_ROOT; };
 		4B940B9B06DDDE5B00D77F60 /* AudioHardware.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AudioHardware.h; path = /System/Library/Frameworks/CoreAudio.framework/Versions/A/Headers/AudioHardware.h; sourceTree = "<absolute>"; };
@@ -2711,6 +2725,8 @@
 				4B6C737D0CC60A6D001AFFD4 /* thread.h */,
 				4B6C737E0CC60A6D001AFFD4 /* transport.h */,
 				4B6C737F0CC60A6D001AFFD4 /* types.h */,
+				4B88D03911298BEE007A87C1 /* weakjack.h */,
+				4B88D03A11298BEE007A87C1 /* weakmacros.h */,
 			);
 			name = jack;
 			path = ../common/jack;
@@ -3159,6 +3175,8 @@
 				4B4F9C910DC20C0400706CB0 /* JackMessageBuffer.h in Headers */,
 				4B93F19E0E87998400E4ECCD /* JackPosixThread.h in Headers */,
 				4BECB2FA0F4451C10091B70A /* JackProcessSync.h in Headers */,
+				4B88D03F11298BEE007A87C1 /* weakjack.h in Headers */,
+				4B88D04011298BEE007A87C1 /* weakmacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3227,6 +3245,8 @@
 				4BDCDC0A1001FDA800B15929 /* JackArgParser.h in Headers */,
 				4BCBCE6210C4FE3F00450FFE /* JackPhysicalMidiInput.h in Headers */,
 				4BCBCE6410C4FE3F00450FFE /* JackPhysicalMidiOutput.h in Headers */,
+				4B88D04311298BEE007A87C1 /* weakjack.h in Headers */,
+				4B88D04411298BEE007A87C1 /* weakmacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3507,6 +3527,8 @@
 				4B47ACA910B5890100469C67 /* JackMessageBuffer.h in Headers */,
 				4B47ACAA10B5890100469C67 /* JackPosixThread.h in Headers */,
 				4B47ACAB10B5890100469C67 /* JackProcessSync.h in Headers */,
+				4B88D04111298BEE007A87C1 /* weakjack.h in Headers */,
+				4B88D04211298BEE007A87C1 /* weakmacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3592,6 +3614,8 @@
 				4BC3B6A50E703B2E0066E42F /* JackPosixThread.h in Headers */,
 				4BECB2F80F4451C10091B70A /* JackProcessSync.h in Headers */,
 				4B94334A10A5E666002A187F /* systemdeps.h in Headers */,
+				4B88D03B11298BEE007A87C1 /* weakjack.h in Headers */,
+				4B88D03C11298BEE007A87C1 /* weakmacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3664,6 +3688,8 @@
 				4B94334B10A5E666002A187F /* systemdeps.h in Headers */,
 				4BCBCE5E10C4FE3F00450FFE /* JackPhysicalMidiInput.h in Headers */,
 				4BCBCE6010C4FE3F00450FFE /* JackPhysicalMidiOutput.h in Headers */,
+				4B88D03D11298BEE007A87C1 /* weakjack.h in Headers */,
+				4B88D03E11298BEE007A87C1 /* weakmacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3841,6 +3867,8 @@
 				4BA3396F10B2E36800190E3B /* JackArgParser.h in Headers */,
 				4BCBCE6610C4FE3F00450FFE /* JackPhysicalMidiInput.h in Headers */,
 				4BCBCE6810C4FE3F00450FFE /* JackPhysicalMidiOutput.h in Headers */,
+				4B88D04511298BEE007A87C1 /* weakjack.h in Headers */,
+				4B88D04611298BEE007A87C1 /* weakmacros.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
