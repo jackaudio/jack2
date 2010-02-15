@@ -1,9 +1,9 @@
 <*project
       version = 4 civer = "Free v4.14.5" winver = "2.6/5.1.2600" > 
    <output> .</>
-   <exename> Jack_v1.9.5_setup.exe</>
+   <exename> Jack_v1.9.6_setup.exe</>
    <digitsign> </>
-   <appname> Jack v1.9.5</>
+   <appname> Jack v1.9.6</>
    <password> </>
    <addlang> </>
    <icon> Default - 2</>

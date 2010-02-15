@@ -29,6 +29,10 @@ Mario Lang
   Jackdmp changes log
 ---------------------------
 
+2010-02-15 Gabriel M. Beddingfield <gabriel@teuton.org>
+
+	* Version 1.9.6 started.
+
 2010-01-29 Gabriel M. Beddingfield <gabriel@teuton.org>
 
 	* Change JackEngineProfiling and JackAudioAdapterInterface gnuplot scripts to output SVG instead of PDF.
