@@ -92,6 +92,8 @@
 <_><src>..\..\common\jack\transport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
+<_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
+<_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>.\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
