@@ -877,7 +877,6 @@ SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** in
 }
 
 
-// Empty code for now..
 #ifdef TARGET_OS_IPHONE
 
 static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
@@ -919,5 +918,18 @@ SERVER_EXPORT void jack_log(const char *fmt, ...)
     jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
     va_end(ap);
 }
+
+#else
+
+// Empty code for now..
+
+SERVER_EXPORT void jack_error(const char *fmt, ...)
+{}
+
+SERVER_EXPORT void jack_info(const char *fmt, ...)
+{}
+
+SERVER_EXPORT void jack_log(const char *fmt, ...)
+{}
 
 #endif
