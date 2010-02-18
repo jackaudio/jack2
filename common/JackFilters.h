@@ -25,7 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "jack.h"
-#ifndef TARGET_OS_IPHONE
+#ifndef MY_TARGET_OS_IPHONE
 #include "JackAtomicState.h"
 #endif
 #include <math.h>

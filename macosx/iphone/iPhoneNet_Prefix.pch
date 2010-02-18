@@ -6,3 +6,5 @@
     #import <Foundation/Foundation.h>
     #import <UIKit/UIKit.h>
 #endif
+
+#define MY_TARGET_OS_IPHONE 1

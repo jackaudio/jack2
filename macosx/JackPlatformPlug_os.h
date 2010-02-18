@@ -33,6 +33,13 @@ namespace Jack
 	class JackMachServerNotifyChannel;
 	class JackMachNotifyChannel;
 	class JackNetUnixSocket;
+    
+#ifdef MY_TARGET_OS_IPHONE
+    class JackClient;
+    class JackGraphManager;
+    class JackEngineControl;
+    class JackSynchro;    
+#endif 
 }
 
 /* __JackPlatformMutex__ */
@@ -44,7 +51,7 @@ namespace Jack { typedef JackPosixMutex JackMutex; }
 namespace Jack { typedef JackMachThread JackThread; }
 
 /* __JackPlatformSynchro__  client activation */
-#ifndef TARGET_OS_IPHONE
+#ifndef MY_TARGET_OS_IPHONE
 #include "JackMachSemaphore.h"
 namespace Jack { typedef JackMachSemaphore JackSynchro; }
 #endif
@@ -53,7 +60,7 @@ namespace Jack { typedef JackMachSemaphore JackSynchro; }
 #include "JackProcessSync.h"
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
 
-#ifndef TARGET_OS_IPHONE
+#ifndef MY_TARGET_OS_IPHONE
 /* __JackPlatformServerChannel__ */ 
 #include "JackMachServerChannel.h"
 namespace Jack { typedef JackMachServerChannel JackServerChannel; }

@@ -31,7 +31,7 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
         // REAL-TIME / TIME-CONSTRAINT THREAD
         thread_time_constraint_policy_data_t	theTCPolicy;
 
-#ifdef TARGET_OS_IPHONE
+#ifdef MY_TARGET_OS_IPHONE
         theTCPolicy.period =  0;
         theTCPolicy.computation = 0;
         theTCPolicy.constraint =  0;
@@ -138,7 +138,7 @@ int JackMachThread::GetParams(pthread_t thread, UInt64* period, UInt64* computat
                                           &count,
                                           &get_default);
     if (res == KERN_SUCCESS) {
-    #ifdef TARGET_OS_IPHONE
+    #ifdef MY_TARGET_OS_IPHONE
         *period = 0;
         *computation = 0;
         *constraint = 0;

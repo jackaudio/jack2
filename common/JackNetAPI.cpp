@@ -877,7 +877,7 @@ SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** in
 }
 
 
-#ifdef TARGET_OS_IPHONE
+#ifdef MY_TARGET_OS_IPHONE
 
 static void jack_format_and_log(int level, const char *prefix, const char *fmt, va_list ap)
 {
