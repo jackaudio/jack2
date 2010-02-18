@@ -28,8 +28,8 @@ LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,2,0,0
- PRODUCTVERSION 0,2,0,0
+ FILEVERSION 0,2,1,0
+ PRODUCTVERSION 0,2,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -47,14 +47,14 @@ BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
             VALUE "FileDescription", "JackRouter ASIO driver\0"
-            VALUE "FileVersion", "0, 2, 0, 0\0"
+            VALUE "FileVersion", "0, 2, 1, 0\0"
             VALUE "InternalName", "JackRouter\0"
-            VALUE "LegalCopyright", "Copyright Grame © 2006-2009\0"
+            VALUE "LegalCopyright", "Copyright Grame © 2006-2010\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "JackRouter.dll\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "JackRouter\0"
-            VALUE "ProductVersion", "0, 2, 0, 0\0"
+            VALUE "ProductVersion", "0, 2, 1, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END

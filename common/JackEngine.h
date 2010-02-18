@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackConstants.h"
 #include "JackGraphManager.h"
 #include "JackSynchro.h"
+#include "JackMutex.h"
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
 
@@ -37,8 +38,10 @@ class JackExternalClient;
 \brief Engine description.
 */
 
-class SERVER_EXPORT JackEngine 
+class SERVER_EXPORT JackEngine : public JackLockAble
 {
+    friend class JackLockedEngine;
+    
     private:
 
         JackGraphManager* fGraphManager;
@@ -71,6 +74,11 @@ class SERVER_EXPORT JackEngine
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
         void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
+        
+        bool CheckClient(int refnum)
+        {
+            return (refnum >= 0 && refnum < CLIENT_NUM && fClientTable[refnum] != NULL);
+        }
 
     public:
 

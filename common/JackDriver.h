@@ -109,6 +109,10 @@ class SERVER_EXPORT JackDriverClientInterface : public JackDriverInterface, publ
 /*!
  \brief The base class for drivers.
  */
+ 
+#define CaptureDriverFlags  static_cast<JackPortFlags>(JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal | JackPortIsActive)
+#define PlaybackDriverFlags static_cast<JackPortFlags>(JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal | JackPortIsActive)
+#define MonitorDriverFlags static_cast<JackPortFlags>(JackPortIsOutput | JackPortIsActive)
 
 class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 {

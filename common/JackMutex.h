@@ -36,11 +36,9 @@ namespace Jack
 class JackLockAble
 {
 
-    private:
-
-        JackMutex fMutex;
-
     protected:
+    
+        JackMutex fMutex;
 
         JackLockAble()
         {}

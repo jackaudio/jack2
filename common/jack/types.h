@@ -295,7 +295,15 @@ enum JackPortFlags {
      * systems are examples of clients that would set this flag for
      * their ports.
      */
-    JackPortIsTerminal = 0x10
+    JackPortIsTerminal = 0x10,
+    
+    /**
+     * JackPortIsActive means the port has been registered and the 
+     * client is "active", that is jack_activate has been called
+     * 
+     * JackPortIsActive is on between jack_activate and jack_deactivate.
+     */
+    JackPortIsActive = 0x20
 };
 
 /**

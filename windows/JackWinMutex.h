@@ -43,15 +43,15 @@ class JackWinMutex
             // In recursive mode by default
             fMutex = (HANDLE)CreateMutex(0, FALSE, 0);
         }
-        
+
         virtual ~JackWinMutex()
         {
             CloseHandle(fMutex);
         }
 
-        void Lock()
+        bool Lock()
         {
-			WaitForSingleObject(fMutex, INFINITE);
+            return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, INFINITE));
         }
 
         bool Trylock()
@@ -59,9 +59,9 @@ class JackWinMutex
             return (WAIT_OBJECT_0 == WaitForSingleObject(fMutex, 0));
         }
 
-        void Unlock()
+        bool Unlock()
         {
-            ReleaseMutex(fMutex);
+            return(ReleaseMutex(fMutex) != 0);
         }
 
 };

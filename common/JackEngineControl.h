@@ -162,7 +162,7 @@ struct SERVER_EXPORT JackEngineControl : public JackShmMem
     }
     
     // XRun
-    void NotifyXRun(float delayed_usecs);
+    void NotifyXRun(jack_time_t callback_usecs, float delayed_usecs);
     void ResetXRun()
     {
         fMaxDelayedUsecs = 0.f;
