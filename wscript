@@ -69,7 +69,10 @@ def set_options(opt):
     opt.add_option('--mixed', action='store_true', default=False, help='Build with 32/64 bits mixed mode')
     opt.add_option('--clients', default=64, type="int", dest="clients", help='Maximum number of JACK clients')
     opt.add_option('--ports-per-application', default=768, type="int", dest="application_ports", help='Maximum number of ports per application')
-    opt.add_option('--debug', action='store_true', default=False, dest='debug', help="Build debuggable binaries")
+    opt.add_option('--debug', action='store_true', default=False, dest='debug', help='Build debuggable binaries')
+    opt.add_option('--firewire', action='store_true', default=False, help='Enable FireWire driver (FFADO)')
+    opt.add_option('--freebob', action='store_true', default=False, help='Enable FreeBob driver')
+    opt.add_option('--alsa', action='store_true', default=False, help='Enable ALSA driver')
     opt.sub_options('dbus')
 
 def configure(conf):
@@ -110,6 +113,15 @@ def configure(conf):
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
         conf.sub_config('linux')
+        if Options.options.alsa and not conf.env['BUILD_DRIVER_ALSA']:
+            conf.fatal('ALSA driver was explicitly requested but cannot be built')
+        if Options.options.freebob and not conf.env['BUILD_DRIVER_FREEBOB']:
+            conf.fatal('FreeBob driver was explicitly requested but cannot be built')
+        if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
+            conf.fatal('FFADO driver was explicitly requested but cannot be built')
+        conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
+        conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
+        conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
     if Options.options.dbus:
         conf.sub_config('dbus')
         if conf.env['BUILD_JACKDBUS'] != True:
