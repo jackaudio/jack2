@@ -9,15 +9,11 @@
 #import <UIKit/UIKit.h>
 #include <jack/net.h>
 
-#include "JackAudioQueueAdapter.h"
-
 #define NUM_INPUT 2
 #define NUM_OUTPUT 2
 
 jack_net_slave_t* net;
 jack_adapter_t* adapter;
-
-Jack::JackAudioQueueAdapter* audio;
 
 static int net_process(jack_nframes_t buffer_size,
                             int audio_input, 
