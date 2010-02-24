@@ -20,7 +20,7 @@ jack_adapter_t* adapter;
 float** audio_input_buffer;
 float** audio_output_buffer;
 
-int buffer_size = 2048;
+int buffer_size = 4096;
 int sample_rate = 44100;
 
 jack_master_t request = { buffer_size, sample_rate, "master" };
@@ -30,18 +30,18 @@ void MasterAudioCallback(int frames, float** inputs, float** outputs, void* arg)
 {
     int i; 
     
+    // Copy from iPod input to network
     for (i = 0; i < result.audio_input; i++) {
         memcpy(audio_output_buffer[i], inputs[i], buffer_size * sizeof(float));
     }
-   
     if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
         printf("jack_net_master_send error..\n");
     }
     
+    // Copy from network to iPod output
     if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
         printf("jack_net_master_recv error..\n");
     }
-    
     for (i = 0; i < result.audio_output; i++) {
         memcpy(outputs[i], audio_input_buffer[i], buffer_size * sizeof(float));
     }
@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     int i;
+    int wait_usec = (unsigned long)((((float)buffer_size) / ((float)sample_rate)) * 1000000.0f);
     
     TiPhoneCoreAudioRenderer audio_device(NUM_INPUT, NUM_OUTPUT);
  
@@ -80,12 +81,9 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     
-     // Run until interrupted 
+    // Run until interrupted 
   	while (1) {}
     
-    audio_device.Stop();
-    audio_device.Close();
-
     /*
     // Quite brutal way, the application actually does not start completely, the netjack audio processing loop is used instead...
     // Run until interrupted 
@@ -98,16 +96,19 @@ int main(int argc, char *argv[]) {
         
         if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
             printf("jack_net_master_send error..\n");
-            break;
         }
         
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
             printf("jack_net_master_recv error..\n");
-            break;
         }
         usleep(wait_usec);
 	};
     */
+    
+    audio_device.Stop();
+    audio_device.Close();
+    
+    int retVal = UIApplicationMain(argc, argv, nil, nil);
     
     // Wait for application end
     jack_net_master_close(net);
@@ -118,13 +119,10 @@ int main(int argc, char *argv[]) {
     free(audio_input_buffer);
     
     for (i = 0; i < result.audio_output; i++) {
-          free(audio_output_buffer[i]);
+        free(audio_output_buffer[i]);
     }
     free(audio_output_buffer);
    
-    //int retVal = UIApplicationMain(argc, argv, nil, nil);
     [pool release];
-    
-    //return retVal;
-    return 0;
+    return retVal;
 }

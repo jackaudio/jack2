@@ -384,7 +384,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
              return DataSend();
              
-         } catch (JackNetException& e) {
+        } catch (JackNetException& e) {
             jack_error("Connection lost.");
             return -1;
         } 
