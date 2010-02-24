@@ -181,6 +181,8 @@ namespace Jack
     {
         if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
             fRingbufferCurSize = DEFAULT_RB_SIZE;
+            
+        jack_log("JackAudioAdapterInterface::ResetRingBuffers new_size = %ld", fRingbufferCurSize);
         
         for (int i = 0; i < fCaptureChannels; i++)
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);

@@ -746,10 +746,24 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
-        for (int i = 0; i < fCaptureChannels; i++ )
+        
+         if (fAdaptative) {
+            AdaptRingBufferSize();
+            jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
+        } else {
+            if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+                fRingbufferCurSize = DEFAULT_RB_SIZE;
+            jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);
+        }
+
+        for (int i = 0; i < fCaptureChannels; i++ ) {
             fCaptureRingBuffer[i] = new JackResampler();
-        for (int i = 0; i < fPlaybackChannels; i++ )
+            fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+        for (int i = 0; i < fPlaybackChannels; i++ ) {
             fPlaybackRingBuffer[i] = new JackResampler();
+            fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
 
         if (fCaptureChannels > 0)
             jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
@@ -925,7 +939,7 @@ SERVER_EXPORT void jack_log(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
+    //jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
     va_end(ap);
 }
 

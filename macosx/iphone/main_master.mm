@@ -26,7 +26,7 @@ int sample_rate = 44100;
 jack_master_t request = { buffer_size, sample_rate, "master" };
 jack_slave_t result;
 
-void MasterAudioCallback(int frames, float** inputs, float** outputs, void* arg)
+static void MasterAudioCallback(int frames, float** inputs, float** outputs, void* arg)
 {
     int i; 
     

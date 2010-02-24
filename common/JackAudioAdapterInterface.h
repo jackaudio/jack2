@@ -129,8 +129,10 @@ namespace Jack
                 fAdaptedSampleRate ( adapted_sample_rate ),
                 fPIControler(host_sample_rate / host_sample_rate, 256),
                 fQuality(0),
+                fRingbufferCurSize(DEFAULT_ADAPTATIVE_SIZE),
                 fPullAndPushTime(0),
-                fRunning ( false )
+                fRunning(false),
+                fAdaptative(true)
         {}
 
         virtual ~JackAudioAdapterInterface()
