@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     int i;
-    int buffer_size = 512;
+    int buffer_size = 2048;
     int sample_rate = 44100;
     jack_master_t request = { buffer_size, sample_rate, "master" };
     jack_slave_t result;
@@ -72,17 +72,19 @@ int main(int argc, char *argv[]) {
 
     // Run until interrupted 
   	while (1) {
-        
+    
         // Copy input to output
         for (i = 0; i < result.audio_input; i++) {
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
         
         if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
+            printf("jack_net_master_send error..\n");
             break;
         }
         
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
+            printf("jack_net_master_recv error..\n");
             break;
         }
         usleep(wait_usec);

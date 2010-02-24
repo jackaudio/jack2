@@ -60,6 +60,9 @@ class JackResampler
         virtual unsigned int Read(float* buffer, unsigned int frames);
         virtual unsigned int Write(float* buffer, unsigned int frames);
         
+        virtual unsigned int Read(void* buffer, unsigned int bytes);
+        virtual unsigned int Write(void* buffer, unsigned int bytes);
+        
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
         

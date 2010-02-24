@@ -136,7 +136,7 @@ class JackCoreAudioAdapter : public JackAudioAdapterInterface
 
     public:
 
-        JackCoreAudioAdapter( jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+        JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackCoreAudioAdapter()
         {}
 

@@ -194,7 +194,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             SessionParamsNToH(&net_params, &fParams);
             
             if ((rx_bytes == SOCKET_ERROR) && (fSocket.GetError() != NET_NO_DATA)) {
-                 fprintf(stderr, "Error in receive : %s\n", StrError(NET_ERROR_CODE));
+                fprintf(stderr, "Error in receive : %s\n", StrError(NET_ERROR_CODE));
                 if (++attempt == 10) {
                     fprintf(stderr, "Can't receive on the socket, exiting net manager.\n" );
                     goto error;
@@ -339,43 +339,55 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
      {
-         assert((unsigned int)audio_input == fParams.fSendAudioChannels);
-         int port_index;
-         
-         for (port_index = 0; port_index < audio_input; port_index++) {
-             fNetAudioPlaybackBuffer->SetBuffer(port_index, audio_input_buffer[port_index]);
-         }
-         
-         for (port_index = 0; port_index < midi_input; port_index++) {
-             fNetMidiPlaybackBuffer->SetBuffer(port_index, ((JackMidiBuffer**)midi_input_buffer)[port_index]);
-         }
-        
-         if (SyncRecv() == SOCKET_ERROR)
-             return 0;
+        try {
+            assert((unsigned int)audio_input == fParams.fSendAudioChannels);
+            int port_index;
+             
+            for (port_index = 0; port_index < audio_input; port_index++) {
+                fNetAudioPlaybackBuffer->SetBuffer(port_index, audio_input_buffer[port_index]);
+            }
+             
+            for (port_index = 0; port_index < midi_input; port_index++) {
+                fNetMidiPlaybackBuffer->SetBuffer(port_index, ((JackMidiBuffer**)midi_input_buffer)[port_index]);
+            }
+            
+            if (SyncRecv() == SOCKET_ERROR)
+                return 0;
 
-         DecodeSyncPacket();
-         return DataRecv();
+            DecodeSyncPacket();
+            return DataRecv();
+            
+        } catch (JackNetException& e) {
+            jack_error("Connection lost.");
+            return -1;
+        } 
      }
 
      int Write(int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
      {
-         assert((unsigned int)audio_output == fParams.fReturnAudioChannels);
-         int port_index;
-       
-         for (port_index = 0;  port_index < audio_output; port_index++) {
-             fNetAudioCaptureBuffer->SetBuffer(port_index, audio_output_buffer[port_index]);
-         }
+        try {
+             assert((unsigned int)audio_output == fParams.fReturnAudioChannels);
+             int port_index;
+           
+             for (port_index = 0;  port_index < audio_output; port_index++) {
+                 fNetAudioCaptureBuffer->SetBuffer(port_index, audio_output_buffer[port_index]);
+             }
+             
+             for (port_index = 0;  port_index < midi_output; port_index++) {
+                 fNetMidiCaptureBuffer->SetBuffer(port_index, ((JackMidiBuffer**)midi_output_buffer)[port_index]);
+             }
+          
+             EncodeSyncPacket();
          
-         for (port_index = 0;  port_index < midi_output; port_index++) {
-             fNetMidiCaptureBuffer->SetBuffer(port_index, ((JackMidiBuffer**)midi_output_buffer)[port_index]);
-         }
-      
-         EncodeSyncPacket();
-     
-         if (SyncSend() == SOCKET_ERROR)
-             return SOCKET_ERROR;
+             if (SyncSend() == SOCKET_ERROR)
+                 return SOCKET_ERROR;
 
-         return DataSend();
+             return DataSend();
+             
+         } catch (JackNetException& e) {
+            jack_error("Connection lost.");
+            return -1;
+        } 
      }
      
     // Transport
@@ -898,7 +910,8 @@ SERVER_EXPORT void jack_error(const char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
-    va_end(ap);}
+    va_end(ap);
+}
 
 SERVER_EXPORT void jack_info(const char *fmt, ...)
 {

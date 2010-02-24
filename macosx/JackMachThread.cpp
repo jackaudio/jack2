@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackMachThread.h"
 #include "JackError.h"
 
+#include "/Developer/Extras/CoreAudio/PublicUtility/CAHostTimeBase.h"
+
 namespace Jack
 {
 
@@ -32,17 +34,16 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
         thread_time_constraint_policy_data_t	theTCPolicy;
 
 #ifdef MY_TARGET_OS_IPHONE
-        theTCPolicy.period =  0;
-        theTCPolicy.computation = 0;
-        theTCPolicy.constraint =  0;
+        theTCPolicy.period = CAHostTimeBase::ConvertFromNanos(period);
+        theTCPolicy.computation = CAHostTimeBase::ConvertFromNanos(computation);
+        theTCPolicy.constraint = CAHostTimeBase::ConvertFromNanos(constraint);
 #else
         theTCPolicy.period = AudioConvertNanosToHostTime(period);
         theTCPolicy.computation = AudioConvertNanosToHostTime(computation);
         theTCPolicy.constraint = AudioConvertNanosToHostTime(constraint);
-
 #endif
         theTCPolicy.preemptible = true;
-        kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) & theTCPolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
+        kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_TIME_CONSTRAINT_POLICY, (thread_policy_t) &theTCPolicy, THREAD_TIME_CONSTRAINT_POLICY_COUNT);
         jack_log("JackMachThread::thread_policy_set res = %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     } else {
@@ -65,7 +66,7 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
         relativePriority = inPriority - GetThreadSetPriority(pthread_self());
 
         thePrecedencePolicy.importance = relativePriority;
-        kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_PRECEDENCE_POLICY, (thread_policy_t) & thePrecedencePolicy, THREAD_PRECEDENCE_POLICY_COUNT);
+        kern_return_t res = thread_policy_set(pthread_mach_thread_np(thread), THREAD_PRECEDENCE_POLICY, (thread_policy_t) &thePrecedencePolicy, THREAD_PRECEDENCE_POLICY_COUNT);
         jack_log("JackMachThread::thread_policy_set res = %ld", res);
         return (res == KERN_SUCCESS) ? 0 : -1;
     }
@@ -139,9 +140,9 @@ int JackMachThread::GetParams(pthread_t thread, UInt64* period, UInt64* computat
                                           &get_default);
     if (res == KERN_SUCCESS) {
     #ifdef MY_TARGET_OS_IPHONE
-        *period = 0;
-        *computation = 0;
-        *constraint = 0;
+        *period = CAHostTimeBase::ConvertToNanos(theTCPolicy.period);
+        *computation = CAHostTimeBase::ConvertToNanos(theTCPolicy.computation);
+        *constraint = CAHostTimeBase::ConvertToNanos(theTCPolicy.constraint);
     #else
         *period = AudioConvertHostTimeToNanos(theTCPolicy.period);
         *computation = AudioConvertHostTimeToNanos(theTCPolicy.computation);
@@ -179,7 +180,7 @@ int JackMachThread::AcquireRealTime()
 
 int JackMachThread::AcquireSelfRealTime()
 {
-    jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
+    jack_log("JackMachThread::AcquireSelfRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
              long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
     return AcquireRealTimeImp(pthread_self(), fPeriod, fComputation, fConstraint);
 }

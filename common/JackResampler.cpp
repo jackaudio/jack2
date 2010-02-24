@@ -81,6 +81,34 @@ unsigned int JackResampler::Write(float* buffer, unsigned int frames)
     }
 }
 
+unsigned int JackResampler::Read(void* buffer, unsigned int bytes)
+{
+    size_t len = jack_ringbuffer_read_space(fRingBuffer);
+    jack_log("JackResampler::Read input available = %ld", len);
+        
+    if (len < bytes) {
+        jack_error("JackResampler::Read : producer too slow, missing bytes = %d", bytes);
+        return 0;
+    } else {
+        jack_ringbuffer_read(fRingBuffer, (char*)buffer, bytes);
+        return bytes;
+    }
+}
+
+unsigned int JackResampler::Write(void* buffer, unsigned int bytes)
+{
+    size_t len = jack_ringbuffer_write_space(fRingBuffer);
+    jack_log("JackResampler::Write output available = %ld", len);
+        
+    if (len < bytes) {
+        jack_error("JackResampler::Write : consumer too slow, skip bytes = %d", bytes);
+        return 0;
+    } else {
+        jack_ringbuffer_write(fRingBuffer, (char*)buffer, bytes);
+        return bytes;
+    }
+}
+
 unsigned int JackResampler::ReadResample(float* buffer, unsigned int frames)
 {
     return Read(buffer, frames);
