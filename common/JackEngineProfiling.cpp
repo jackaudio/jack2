@@ -67,7 +67,7 @@ JackEngineProfiling::~JackEngineProfiling()
                 int ref = fIntervalTable[j].fRefNum;
             
                 // Is valid client cycle 
-                 if (fProfileTable[i].fClientTable[ref].fStatus != NotTriggered) {
+                if (fProfileTable[i].fClientTable[ref].fStatus != NotTriggered) {
              
                     long d5 = long(fProfileTable[i].fClientTable[ref].fSignaledAt - fProfileTable[i - 1].fCurCycleBegin);
                     long d6 = long(fProfileTable[i].fClientTable[ref].fAwakeAt - fProfileTable[i - 1].fCurCycleBegin);

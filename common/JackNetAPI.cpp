@@ -23,7 +23,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include "JackTime.h"
 #include "JackException.h"
-
 #include "JackAudioAdapterInterface.h"
 
 #ifdef __cplusplus
@@ -242,7 +241,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     
     int MasterInit()
     {
-        // Check MASTER <<==> SLAVE network protocol coherency
+        // Check MASTER <==> SLAVE network protocol coherency
         if (fParams.fProtocolVersion != MASTER_PROTOCOL) {
             fprintf(stderr, "Error : slave is running with a different protocol %s\n", fParams.fName);
             return -1;
@@ -355,7 +354,6 @@ struct JackNetExtMaster : public JackNetMasterInterface {
              return 0;
 
          DecodeSyncPacket();
-         
          return DataRecv();
      }
 
@@ -615,7 +613,6 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return 0;
 
         DecodeSyncPacket();
-   
         return DataRecv();
     }
 
