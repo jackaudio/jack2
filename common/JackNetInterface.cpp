@@ -24,6 +24,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
+#define PACKET_AVAILABLE_SIZE (fParams.fMtu - sizeof(packet_header_t))
+
 /*  
  TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames, 
  probably also use BUFFER_SIZE_MAX in everything related to MIDI events 
@@ -61,6 +63,7 @@ namespace Jack
 
     JackNetInterface::JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip ) : fSocket ( socket )
     {
+        jack_log("JackNetInterface ( session_params_t& params...)");
         fParams = params;
         strcpy(fMulticastIP, multicast_ip);
         fTxBuffer = NULL;
@@ -93,7 +96,7 @@ namespace Jack
         if (fParams.fSendAudioChannels == 0 && fParams.fReturnAudioChannels == 0) {
             fParams.fFramesPerPacket = fParams.fPeriodSize;
         } else {
-            jack_nframes_t period = ( int ) powf ( 2.f, ( int ) ( log (float ( fParams.fMtu - sizeof ( packet_header_t ) )
+            jack_nframes_t period = ( int ) powf ( 2.f, ( int ) ( log (float (PACKET_AVAILABLE_SIZE)
                                                / ( max ( fParams.fReturnAudioChannels, fParams.fSendAudioChannels ) * sizeof ( sample_t ) ) ) / log ( 2. ) ) );
             fParams.fFramesPerPacket = ( period > fParams.fPeriodSize ) ? fParams.fPeriodSize : period;
         }
@@ -109,7 +112,7 @@ namespace Jack
         audio_size = fParams.fMtu * ( fParams.fPeriodSize / fParams.fFramesPerPacket );
         //midi
         midi_size = fParams.fMtu * ( max ( fParams.fSendMidiChannels, fParams.fReturnMidiChannels ) *
-                                     fParams.fPeriodSize * sizeof ( sample_t ) / ( fParams.fMtu - sizeof ( packet_header_t ) ) );
+                                     fParams.fPeriodSize * sizeof(sample_t) / PACKET_AVAILABLE_SIZE);
         //bufsize = sync + audio + midi
         bufsize = MAX_LATENCY * (fParams.fMtu + ( int ) audio_size + ( int ) midi_size);
 
@@ -128,13 +131,14 @@ namespace Jack
     {
         //even if there is no midi data, jack need an empty buffer to know there is no event to read
         //99% of the cases : all data in one packet
-        if ( fTxHeader.fMidiDataSize <= ( fParams.fMtu - sizeof ( packet_header_t ) ) )
+        
+        if (fTxHeader.fMidiDataSize <= PACKET_AVAILABLE_SIZE) {
             return 1;
-        //else, get the number of needed packets (simply slice the biiig buffer)
-        int npckt = fTxHeader.fMidiDataSize / ( fParams.fMtu - sizeof ( packet_header_t ) );
-        if ( fTxHeader.fMidiDataSize % ( fParams.fMtu - sizeof ( packet_header_t ) ) )
-            return ++npckt;
-        return npckt;
+        } else { //get the number of needed packets (simply slice the biiig buffer)
+            return (fTxHeader.fMidiDataSize % PACKET_AVAILABLE_SIZE) 
+                    ? (fTxHeader.fMidiDataSize / PACKET_AVAILABLE_SIZE + 1) 
+                    : fTxHeader.fMidiDataSize / PACKET_AVAILABLE_SIZE;
+        }
     }
 
     bool JackNetInterface::IsNextPacket()
@@ -162,7 +166,7 @@ namespace Jack
         fNSubProcess = fParams.fPeriodSize / fParams.fFramesPerPacket;
 
         //payload size
-        fPayloadSize = fParams.fMtu - sizeof ( packet_header_t );
+        fPayloadSize = PACKET_AVAILABLE_SIZE;
 
         //TX header init
         strcpy ( fTxHeader.fPacketType, "header" );
@@ -460,10 +464,11 @@ namespace Jack
                 //  - if the network is two fast, just wait the next cycle, this mode allows a shorter cycle duration for the master
                 //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
                 //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
-                if (fCycleOffset < 2)
-                     return 0;
-                else
+                if (fCycleOffset < 2) {
+                    return 0;
+                } else {
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                }
                     
                 if (fCycleOffset > 2) {
                     jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
@@ -475,13 +480,15 @@ namespace Jack
                 //  - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwidth
                 //  - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
                 //  - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
-                if (fCycleOffset < 1)
+                if (fCycleOffset < 1) {
                     return 0;
-                else
+                } else {
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                }
                     
-                if (fCycleOffset != 1) 
+                if (fCycleOffset != 1)  {
                     jack_info("'%s' can't run in normal network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
+                }
                 break;
 
             case 'f' :
@@ -491,8 +498,9 @@ namespace Jack
                 //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
                 rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 
-                if (fCycleOffset != 0)
+                if (fCycleOffset != 0) {
                     jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
+                }
                 break;
         }
 
@@ -539,9 +547,6 @@ namespace Jack
 
                     case 'a':   //audio
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                        // SL: 25/01/09
-                        // if ( !IsNextPacket() )
-                        //    jack_error ( "Packet(s) missing from '%s'...", fParams.fName );
                         if (recvd_audio_pckt++ != rx_head->fSubCycle) {
                             jack_error("Packet(s) missing from '%s'...", fParams.fSlaveNetName);
                         }
@@ -553,10 +558,6 @@ namespace Jack
                         break;
 
                     case 's':   //sync
-                        /* SL: 25/01/09
-                        if ( rx_head->fCycle == fTxHeader.fCycle )
-                            return 0;
-                        */
                         jack_info("NetMaster : overloaded, skipping receive from '%s'", fParams.fName);
                         return 0;
                 }
@@ -805,16 +806,15 @@ namespace Jack
         {
             net_error_t error = fSocket.GetError();
             //no data isn't really an error in realtime processing, so just return 0
-            if ( error == NET_NO_DATA )
+            if ( error == NET_NO_DATA ) {
                 jack_error ( "No data, is the master still running ?" );
             //if a network error occurs, this exception will restart the driver
-            else if ( error == NET_CONN_ERROR )
-            {
+            } else if ( error == NET_CONN_ERROR ) {
                 jack_error ( "Connection lost." );
                 throw JackNetException();
-            }
-            else
+            } else {
                 jack_error ( "Fatal error in slave receive : %s", StrError ( NET_ERROR_CODE ) );
+            }
         }
         
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
@@ -833,13 +833,12 @@ namespace Jack
         {
             net_error_t error = fSocket.GetError();
             //if a network error occurs, this exception will restart the driver
-            if ( error == NET_CONN_ERROR )
-            {
+            if ( error == NET_CONN_ERROR ) {
                 jack_error ( "Connection lost." );
                 throw JackNetException();
-            }
-            else
+            } else {
                 jack_error ( "Fatal error in slave send : %s", StrError ( NET_ERROR_CODE ) );
+            }
         }
         return tx_bytes;
     }
@@ -848,6 +847,7 @@ namespace Jack
     {
         int rx_bytes = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
+        
         //receive sync (launch the cycle)
         do
         {
@@ -885,17 +885,16 @@ namespace Jack
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
+                        // Last midi packet is received, so finish rendering...
                         if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
                             fNetMidiCaptureBuffer->RenderToJackPorts();
                         break;
 
                     case 'a':   //audio
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                        //SL: 25/01/09
-                        // if ( !IsNextPacket() )
-                        //    jack_error ( "Packet(s) missing..." );
                         if (recvd_audio_pckt++ != rx_head->fSubCycle) {
-                            jack_error("Packet(s) missing from '%s'...", fParams.fMasterNetName);
+                            //jack_error("Packet(s) missing from '%s'...", fParams.fMasterNetName);
+                            jack_error("Packet(s) missing from '%s'... %d %d %d", fParams.fMasterNetName, rx_head->fCycle, recvd_audio_pckt, rx_head->fSubCycle);
                         }
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;

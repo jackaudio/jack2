@@ -71,6 +71,12 @@
 		4B4146AA10BD3C4300C12F0C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		4B4146AB10BD3C4300C12F0C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
 		4B4146AC10BD3C4300C12F0C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1A95750F49CEAB00D3626B /* AudioToolbox.framework */; };
+		4B9CB1371136CA99007DE01A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B9CB1361136CA99007DE01A /* icon.png */; };
+		4B9CB1381136CA99007DE01A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B9CB1361136CA99007DE01A /* icon.png */; };
+		4B9CB1391136CA99007DE01A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B9CB1361136CA99007DE01A /* icon.png */; };
+		4B9CB13A1136CA99007DE01A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B9CB1361136CA99007DE01A /* icon.png */; };
+		4B9CB13B1136CA99007DE01A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B9CB1361136CA99007DE01A /* icon.png */; };
+		4B9CB13C1136CA99007DE01A /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B9CB1361136CA99007DE01A /* icon.png */; };
 		4BBDC8FA0F5420C000465F9C /* freeverb.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BBDC8F90F5420C000465F9C /* freeverb.mm */; };
 		4BC9C1F71135AB2800D22670 /* main_master.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4B0772500F54022D000DC657 /* main_master.mm */; };
 		4BCB37B6112D647C008C7BC1 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
@@ -160,12 +166,13 @@
 		4B1A95750F49CEAB00D3626B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS2.2.1.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		4B2791870F72570C000536B7 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4B4146B010BD3C4300C12F0C /* iPhoneFaustNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneFaustNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B9CB1361136CA99007DE01A /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = SOURCE_ROOT; };
 		4BBDC8F90F5420C000465F9C /* freeverb.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = freeverb.mm; sourceTree = SOURCE_ROOT; };
 		4BC9C1D31135AA1800D22670 /* iPhoneNetMasterAppl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iPhoneNetMasterAppl-Info.plist"; sourceTree = "<group>"; };
 		4BCB37CE112D647C008C7BC1 /* iPhoneFaust.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneFaust.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCB37D5112D64B4008C7BC1 /* HardwareClock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HardwareClock.cpp; sourceTree = SOURCE_ROOT; };
 		4BCB37D8112D64D8008C7BC1 /* iphone-faust.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "iphone-faust.mm"; sourceTree = SOURCE_ROOT; };
-		4BCF75F210BC2FD90082C526 /* iPhoneFaustNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneFaustNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneThruNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF75F610BC30140082C526 /* audio_thru.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_thru.mm; sourceTree = SOURCE_ROOT; };
 		4BF1360E0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterInterface.cpp; path = ../../common/JackAudioAdapterInterface.cpp; sourceTree = SOURCE_ROOT; };
 		4BF136120F4B0B5E00218A3F /* JackAudioAdapterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapterInterface.h; path = ../../common/JackAudioAdapterInterface.h; sourceTree = SOURCE_ROOT; };
@@ -263,7 +270,7 @@
 				4BFF45120F4D59DB00106083 /* libjacknet.a */,
 				4BFF45770F4D5D9700106083 /* iPhoneFaustNet.app */,
 				4B0772380F54018C000DC657 /* iPhoneNetMaster.app */,
-				4BCF75F210BC2FD90082C526 /* iPhoneFaustNet.app */,
+				4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */,
 				4B4146B010BD3C4300C12F0C /* iPhoneFaustNet.app */,
 				4BCB37CE112D647C008C7BC1 /* iPhoneFaust.app */,
 			);
@@ -318,6 +325,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				4B9CB1361136CA99007DE01A /* icon.png */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				4BC9C1D31135AA1800D22670 /* iPhoneNetMasterAppl-Info.plist */,
@@ -389,9 +397,9 @@
 			productReference = 4B0772380F54018C000DC657 /* iPhoneNetMaster.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4B1A940F0F49BDE000D3626B /* jacknet */ = {
+		4B1A940F0F49BDE000D3626B /* libjacknet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4B1A94130F49BDFF00D3626B /* Build configuration list for PBXNativeTarget "jacknet" */;
+			buildConfigurationList = 4B1A94130F49BDFF00D3626B /* Build configuration list for PBXNativeTarget "libjacknet" */;
 			buildPhases = (
 				4B1A940C0F49BDE000D3626B /* Headers */,
 				4B1A940D0F49BDE000D3626B /* Sources */,
@@ -401,7 +409,7 @@
 			);
 			dependencies = (
 			);
-			name = jacknet;
+			name = libjacknet;
 			productName = jacknet;
 			productReference = 4BFF45120F4D59DB00106083 /* libjacknet.a */;
 			productType = "com.apple.product-type.library.static";
@@ -454,7 +462,7 @@
 			);
 			name = iPhoneThruNet;
 			productName = iPhoneNet;
-			productReference = 4BCF75F210BC2FD90082C526 /* iPhoneFaustNet.app */;
+			productReference = 4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4BFF455E0F4D5D9700106083 /* iPhoneFaustNet */ = {
@@ -492,7 +500,7 @@
 				4BCF75D810BC2FD90082C526 /* iPhoneThruNet */,
 				4B41469610BD3C4300C12F0C /* iPhoneFaustNet Distribution */,
 				4BCB37B4112D647C008C7BC1 /* iPhoneFaust */,
-				4B1A940F0F49BDE000D3626B /* jacknet */,
+				4B1A940F0F49BDE000D3626B /* libjacknet */,
 			);
 		};
 /* End PBXProject section */
@@ -503,6 +511,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
+				4B9CB1381136CA99007DE01A /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,6 +520,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B0772210F54018C000DC657 /* MainWindow.xib in Resources */,
+				4B9CB1371136CA99007DE01A /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,6 +529,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B41469810BD3C4300C12F0C /* MainWindow.xib in Resources */,
+				4B9CB13B1136CA99007DE01A /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,6 +538,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BCB37B6112D647C008C7BC1 /* MainWindow.xib in Resources */,
+				4B9CB13C1136CA99007DE01A /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -535,6 +547,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BCF75DA10BC2FD90082C526 /* MainWindow.xib in Resources */,
+				4B9CB13A1136CA99007DE01A /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,6 +556,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BFF45600F4D5D9700106083 /* MainWindow.xib in Resources */,
+				4B9CB1391136CA99007DE01A /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -737,7 +751,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Debug-iphonesimulator\"",
 				);
-				PRODUCT_NAME = iPhoneNetSlave;
+				PRODUCT_NAME = NetJackSlave;
 			};
 			name = Release;
 		};
@@ -808,6 +822,7 @@
 				MACH_O_TYPE = staticlib;
 				PREBINDING = NO;
 				PRODUCT_NAME = jacknet;
+				SDKROOT = iphoneos3.1.3;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 			};
 			name = Debug;
@@ -828,6 +843,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = jacknet;
+				SDKROOT = iphoneos3.1.3;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1083,7 +1099,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4B1A94130F49BDFF00D3626B /* Build configuration list for PBXNativeTarget "jacknet" */ = {
+		4B1A94130F49BDFF00D3626B /* Build configuration list for PBXNativeTarget "libjacknet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B1A94110F49BDE100D3626B /* Debug */,
