@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
         audio_output_buffer[i] = (float*)(calloc(buffer_size, sizeof(float)));
     }
     
-    if (audio_device.OpenDefault(buffer_size, sample_rate) < 0) {
+    if (audio_device.Open(buffer_size, sample_rate) < 0) {
         return -1;
     }
     

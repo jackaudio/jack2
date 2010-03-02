@@ -11,8 +11,8 @@
 
 #include "TiPhoneCoreAudioRenderer.h"
 
-#define NUM_INPUT 2
-#define NUM_OUTPUT 2
+#define NUM_INPUT 1
+#define NUM_OUTPUT 1
 
 jack_net_slave_t* net;
 jack_adapter_t* adapter;
@@ -33,23 +33,36 @@ static int net_process(jack_nframes_t buffer_size,
                         void* data)
 {
 
-    jack_adapter_pull_and_push(adapter, audio_output_buffer, audio_input_buffer, buffer_size);
+    //jack_adapter_pull_and_push(adapter, audio_output_buffer, audio_input_buffer, buffer_size);
+    
+    // Process input, produce output
+    if (audio_input == audio_output) {
+        // Copy input to output
+        for (int i = 0; i < audio_input; i++) {
+            memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
+        }
+    }
     return 0;
 }
 
 static void SlaveAudioCallback(int frames, float** inputs, float** outputs, void* arg)
 {
-    jack_adapter_push_and_pull(adapter, inputs, outputs, frames);
+    //jack_adapter_push_and_pull(adapter, inputs, outputs, frames);
 }
+
+//http://www.securityfocus.com/infocus/1884
+
+#define WIFI_MTU 1500
+
 
 int main(int argc, char *argv[]) {
     
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     
-    jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, DEFAULT_MTU, -1, JackSlowMode };
+    jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
     jack_master_t result;
 
-    if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    if ((net = jack_net_slave_open("169.254.136.64", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
         return -1;
     }
     
@@ -69,7 +82,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     
-    if (audio_device.OpenDefault(result.buffer_size, result.sample_rate) < 0) {
+    if (audio_device.Open(result.buffer_size, result.sample_rate) < 0) {
         return -1;
     }
     

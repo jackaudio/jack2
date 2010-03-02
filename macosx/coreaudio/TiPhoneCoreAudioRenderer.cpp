@@ -118,14 +118,14 @@ void TiPhoneCoreAudioRenderer::InterruptionListener(void *inClientData, UInt32 i
     }
 }
 
-int TiPhoneCoreAudioRenderer::OpenDefault(int bufferSize, int samplerate)
+int TiPhoneCoreAudioRenderer::Open(int bufferSize, int samplerate)
 {
     OSStatus err1;
     UInt32 outSize;
     UInt32 enableIO;
 	AudioStreamBasicDescription srcFormat, dstFormat;
     
-    printf("OpenDefault fDevNumInChans = %ld fDevNumOutChans = %ld bufferSize = %ld samplerate = %ld\n", fDevNumInChans, fDevNumOutChans, bufferSize, samplerate);
+    printf("Open fDevNumInChans = %ld fDevNumOutChans = %ld bufferSize = %ld samplerate = %ld\n", fDevNumInChans, fDevNumOutChans, bufferSize, samplerate);
 	  
     // Initialize and configure the audio session
     err1 = AudioSessionInitialize(NULL, NULL, InterruptionListener, this);

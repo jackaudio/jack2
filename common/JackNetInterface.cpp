@@ -115,6 +115,7 @@ namespace Jack
                                      fParams.fPeriodSize * sizeof(sample_t) / PACKET_AVAILABLE_SIZE);
         //bufsize = sync + audio + midi
         bufsize = MAX_LATENCY * (fParams.fMtu + ( int ) audio_size + ( int ) midi_size);
+        jack_info("SetNetBufferSize bufsize = %d", bufsize);
 
         //tx buffer
         if ( fSocket.SetOption ( SOL_SOCKET, SO_SNDBUF, &bufsize, sizeof ( bufsize ) ) == SOCKET_ERROR )
@@ -298,8 +299,12 @@ namespace Jack
         assert ( fNetMidiPlaybackBuffer );
 
         //audio net buffers
-        fNetAudioCaptureBuffer = new NetAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
-        fNetAudioPlaybackBuffer = new NetAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+        fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+        fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+        
+        //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+        //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );     
+     
         assert ( fNetAudioCaptureBuffer );
         assert ( fNetAudioPlaybackBuffer );
 
@@ -387,7 +392,7 @@ namespace Jack
     bool JackNetMasterInterface::IsSynched()
     {
         if (fParams.fNetworkMode == 's') {
-            return (fCycleOffset < 3);
+            return (fCycleOffset < (CYCLE_OFFSET_SLOW + 1));
         } else {
             return true;
         }
@@ -464,13 +469,13 @@ namespace Jack
                 //  - if the network is two fast, just wait the next cycle, this mode allows a shorter cycle duration for the master
                 //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
                 //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
-                if (fCycleOffset < 2) {
+                if (fCycleOffset < CYCLE_OFFSET_SLOW) {
                     return 0;
                 } else {
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 }
-                    
-                if (fCycleOffset > 2) {
+                
+                if (fCycleOffset > CYCLE_OFFSET_SLOW) {
                     jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 }
                 break;
@@ -514,6 +519,8 @@ namespace Jack
         uint jumpcnt = 0;
         uint recvd_midi_pckt = 0;
         uint recvd_audio_pckt = 0;
+        int last_cycle = 0;
+         
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
         
         while ( !fRxHeader.fIsLastPckt )
@@ -553,16 +560,22 @@ namespace Jack
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fSubCycle );
+                        fNetAudioPlaybackBuffer->RenderToJackPorts ( rx_head->fCycle,  rx_head->fSubCycle);
                         jumpcnt = 0;
+                        last_cycle = rx_head->fCycle;
                         break;
 
                     case 's':   //sync
                         jack_info("NetMaster : overloaded, skipping receive from '%s'", fParams.fName);
+                        // Finish rendering (copy to JACK ports)
+                        fNetAudioPlaybackBuffer->FinishRenderToJackPorts(last_cycle); 
                         return 0;
                 }
             }
         }
+        
+        // Finish rendering (copy to JACK ports)
+        fNetAudioPlaybackBuffer->FinishRenderToJackPorts(last_cycle); 
         return rx_bytes;
     }
     
@@ -790,8 +803,11 @@ namespace Jack
         fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fTxData );
 
         //audio net buffers
-        fNetAudioCaptureBuffer = new NetAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-        fNetAudioPlaybackBuffer = new NetAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+        fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+        fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+        
+        //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+        //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
 
         //audio netbuffer length
         fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
@@ -867,6 +883,8 @@ namespace Jack
         uint recvd_midi_pckt = 0;
         uint recvd_audio_pckt = 0;
         int rx_bytes = 0;
+        int last_cycle = 0;
+     
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
         while ( !fRxHeader.fIsLastPckt )
@@ -893,21 +911,26 @@ namespace Jack
                     case 'a':   //audio
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                         if (recvd_audio_pckt++ != rx_head->fSubCycle) {
-                            //jack_error("Packet(s) missing from '%s'...", fParams.fMasterNetName);
-                            jack_error("Packet(s) missing from '%s'... %d %d %d", fParams.fMasterNetName, rx_head->fCycle, recvd_audio_pckt, rx_head->fSubCycle);
+                            jack_error("Packet(s) missing from '%s'...", fParams.fMasterNetName);
                         }
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fSubCycle );
+                        fNetAudioCaptureBuffer->RenderToJackPorts ( rx_head->fCycle, rx_head->fSubCycle);
+                        last_cycle = rx_head->fCycle;
                         break;
 
                     case 's':   //sync
                         jack_info ( "NetSlave : overloaded, skipping receive." );
+                        // Finish rendering (copy to JACK ports)
+                        fNetAudioCaptureBuffer->FinishRenderToJackPorts(last_cycle); 
                         return 0;
                 }
             }
         }
+        
+        // Finish rendering (copy to JACK ports)
+        fNetAudioCaptureBuffer->FinishRenderToJackPorts(last_cycle); 
         fRxHeader.fCycle = rx_head->fCycle;
         return 0;
     }

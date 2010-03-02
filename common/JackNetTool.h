@@ -248,6 +248,25 @@ namespace Jack
 
 // audio data *********************************************************************************
 
+    class SERVER_EXPORT NetAudioBuffer 
+    {
+    
+        public:
+            NetAudioBuffer ()
+            {}
+            ~NetAudioBuffer()
+            {}
+            
+            virtual size_t GetSize() = 0;
+            //jack<->buffer
+            virtual void RenderFromJackPorts (int subcycle ) = 0;
+            virtual void RenderToJackPorts ( int cycle, int subcycle) = 0;
+            virtual void FinishRenderToJackPorts (int cycle) = 0;
+
+            virtual void SetBuffer ( int index, sample_t* buffer ) = 0;
+            virtual sample_t* GetBuffer ( int index ) = 0;
+   };
+
     /**
     \Brief Audio buffer and operations class
 
@@ -257,24 +276,191 @@ namespace Jack
     So there is no need of an intermediate buffer as in NetMidiBuffer.
 
     */
+    
+    struct JackPortList {
+    
+        jack_nframes_t fPeriodSize;
+        jack_nframes_t fSubPeriodSize;
+        size_t fSubPeriodBytesSize;
+        sample_t** fPortBuffer;
+        int fNPorts;
+        
+        JackPortList(session_params_t* params, uint32_t nports)
+        {
+            fNPorts = nports;
+            fPeriodSize = params->fPeriodSize;
+            fSubPeriodSize = params->fFramesPerPacket;
+            fSubPeriodBytesSize = fSubPeriodSize * sizeof ( sample_t );
+            fPortBuffer = new sample_t* [fNPorts];
+            for ( int port_index = 0; port_index < fNPorts; port_index++ )
+                fPortBuffer[port_index] = NULL;
+        }
+        
+        JackPortList()
+        {
+            fNPorts = 0;
+            fPeriodSize = 0;
+            fSubPeriodSize = 0;
+            fSubPeriodBytesSize = 0;
+            fPortBuffer = 0;
+        }
+     
+        ~JackPortList()
+        {
+            delete [] fPortBuffer;
+        }
+        
+        void SetBuffer( int index, sample_t* buffer )
+        {
+            fPortBuffer[index] = buffer;
+        }
+        
+        sample_t* GetBuffer ( int index ) 
+        {
+            return fPortBuffer[index];
+        }
+        
+        void Copy(sample_t** buffers)
+        {
+            for ( int port_index = 0; port_index < fNPorts; port_index++ )
+                memcpy(buffers[port_index], fPortBuffer[port_index], fPeriodSize * sizeof(float));
+        }
+        
+        size_t GetSize()
+        {
+             return fNPorts * fSubPeriodBytesSize;
+        }
+         
+    #ifdef __BIG_ENDIAN__
 
-    class SERVER_EXPORT NetAudioBuffer
+        static inline float SwapFloat(float f)
+        {
+              union
+              {
+                float f;
+                unsigned char b[4];
+              } dat1, dat2;
+
+              dat1.f = f;
+              dat2.b[0] = dat1.b[3];
+              dat2.b[1] = dat1.b[2];
+              dat2.b[2] = dat1.b[1];
+              dat2.b[3] = dat1.b[0];
+              return dat2.f;
+        }
+
+        void RenderFromJackPorts (char* net_buffer, int subcycle )
+        {
+            for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+                float* src = (float*)(fPortBuffer[port_index] + subcycle * fSubPeriodSize);
+                float* dst = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
+                for (unsigned int sample = 0; sample < fSubPeriodBytesSize / sizeof(float); sample++) {
+                    dst[sample] = SwapFloat(src[sample]);
+                }
+            }
+        }
+
+        void RenderToJackPorts (char* net_buffer, int subcycle)
+        {
+            for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+                float* src = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
+                float* dst = (float*)(fPortBuffer[port_index] + subcycle * fSubPeriodSize);
+                for (unsigned int sample = 0; sample < fSubPeriodBytesSize / sizeof(float); sample++) {
+                    dst[sample] = SwapFloat(src[sample]);
+                }
+            }    
+        }
+        
+    #else
+
+        void RenderFromJackPorts (char* net_buffer, int subcycle )
+        {
+            for ( int port_index = 0; port_index < fNPorts; port_index++ )
+                memcpy ( net_buffer + port_index * fSubPeriodBytesSize, fPortBuffer[port_index] + subcycle * fSubPeriodSize, fSubPeriodBytesSize );
+        }
+
+        void RenderToJackPorts (char* net_buffer, int subcycle)
+        {
+            for ( int port_index = 0; port_index < fNPorts; port_index++ )
+                memcpy ( fPortBuffer[port_index] + subcycle * fSubPeriodSize, net_buffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize );
+        }
+
+    #endif
+    
+    };
+    
+    struct JackPortListAllocate : public JackPortList {
+     
+        JackPortListAllocate()
+        {
+            fNPorts = 0;
+            fPeriodSize = 0;
+            fSubPeriodSize = 0;
+            fSubPeriodBytesSize = 0;
+            fPortBuffer = 0;
+        }
+        
+        ~JackPortListAllocate()
+        {
+            for ( int port_index = 0; port_index < fNPorts; port_index++ )
+                delete [] fPortBuffer[port_index];
+            delete [] fPortBuffer;
+        }
+        
+        void Init(session_params_t* params, uint32_t nports)
+        {
+            fNPorts = nports;
+            fPeriodSize = params->fPeriodSize;
+            fSubPeriodSize = params->fFramesPerPacket;
+            fSubPeriodBytesSize = fSubPeriodSize * sizeof ( sample_t );
+            fPortBuffer = new sample_t* [fNPorts];
+            for ( int port_index = 0; port_index < fNPorts; port_index++ )
+                fPortBuffer[port_index] = new sample_t[fPeriodSize];
+        }
+        
+    };
+
+    class SERVER_EXPORT NetSingleAudioBuffer : public NetAudioBuffer
     {
         private:
-            int fNPorts;
-            jack_nframes_t fPeriodSize;
-            jack_nframes_t fSubPeriodSize;
-            size_t fSubPeriodBytesSize;
+            JackPortList fPortBuffer;
             char* fNetBuffer;
-            sample_t** fPortBuffer;
+            
         public:
-            NetAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
-            ~NetAudioBuffer();
+            NetSingleAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
+            ~NetSingleAudioBuffer();
 
             size_t GetSize();
             //jack<->buffer
-            void RenderFromJackPorts ( int subcycle );
-            void RenderToJackPorts ( int subcycle );
+            void RenderFromJackPorts (int subcycle );
+            void RenderToJackPorts (int cycle, int subcycle);
+
+            void SetBuffer ( int index, sample_t* buffer );
+            sample_t* GetBuffer ( int index );
+            
+            void FinishRenderToJackPorts (int cycle) {}
+    };
+    
+    #define AUDIO_BUFFER_SIZE 8
+    
+    class SERVER_EXPORT NetBufferedAudioBuffer : public NetAudioBuffer
+    {
+    
+        private:
+            char* fNetBuffer;
+            JackPortListAllocate fPortBuffer[AUDIO_BUFFER_SIZE];
+            sample_t** fJackPortBuffer;
+            int fMaxCycle;
+            
+        public:
+            NetBufferedAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
+            ~NetBufferedAudioBuffer();
+
+            size_t GetSize();
+            //jack<->buffer
+            void RenderFromJackPorts (int subcycle );
+            void RenderToJackPorts ( int cycle, int subcycle);
+            void FinishRenderToJackPorts (int cycle);
 
             void SetBuffer ( int index, sample_t* buffer );
             sample_t* GetBuffer ( int index );

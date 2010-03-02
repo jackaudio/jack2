@@ -78,7 +78,7 @@ class TiPhoneCoreAudioRenderer
             }
         }
 
-        int OpenDefault(int bufferSize, int sampleRate);
+        int Open(int bufferSize, int sampleRate);
         int Close();
 
         int Start();
