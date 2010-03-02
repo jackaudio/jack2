@@ -29,7 +29,11 @@ Mario Lang
   Jackdmp changes log
 ---------------------------
 
-2010-02-15 Gabriel M. Beddingfield <gabriel@teuton.org>
+2010-03-02 Stephane Letz  <letz@grame.fr>
+
+	* Improve JackCoreAudioDriver and JackCoreAudioAdapter : when no devices are described, takes default input and output and aggregate them.
+
+2010-02-15 Stephane Letz  <letz@grame.fr>
 
 	* Version 1.9.6 started.
 
