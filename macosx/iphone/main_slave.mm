@@ -62,9 +62,11 @@ int main(int argc, char *argv[]) {
     jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
     jack_master_t result;
 
-    if ((net = jack_net_slave_open("169.254.136.64", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    //if ((net = jack_net_slave_open("169.254.121.189", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
         return -1;
     }
+    
     
     if ((adapter = jack_create_adapter(NUM_INPUT, 
                                     NUM_OUTPUT, 

@@ -25,6 +25,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 using namespace std;
 
 #define PACKET_AVAILABLE_SIZE (fParams.fMtu - sizeof(packet_header_t))
+#define HEADER_SIZE (sizeof(packet_header_t))
 
 /*  
  TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames, 
@@ -309,8 +310,8 @@ namespace Jack
         assert ( fNetAudioPlaybackBuffer );
 
         //audio netbuffer length
-        fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
-        fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
+        fAudioTxLen = HEADER_SIZE + fNetAudioCaptureBuffer->GetSize();
+        fAudioRxLen = HEADER_SIZE + fNetAudioPlaybackBuffer->GetSize();
     }
 
     void JackNetMasterInterface::Exit()
@@ -340,24 +341,23 @@ namespace Jack
     int JackNetMasterInterface::Recv ( size_t size, int flags )
     {
         int rx_bytes;
-        if ( ( ( rx_bytes = fSocket.Recv ( fRxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
-        {
+        
+        if ((( rx_bytes = fSocket.Recv(fRxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
             net_error_t error = fSocket.GetError();
             //no data isn't really a network error, so just return 0 avalaible read bytes
-            if ( error == NET_NO_DATA )
+            if (error == NET_NO_DATA) {
                 return 0;
-            else if ( error == NET_CONN_ERROR )
-            {
+            } else if (error == NET_CONN_ERROR) {
                 //fatal connection issue, exit
-                jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
+                jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError(NET_ERROR_CODE));
                 //ask to the manager to properly remove the master
                 Exit();
                 
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
+            } else {
+                jack_error ( "Error in master receive : %s", StrError(NET_ERROR_CODE));
             }
-            else
-                jack_error ( "Error in master receive : %s", StrError ( NET_ERROR_CODE ) );
         }
         
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
@@ -371,20 +371,18 @@ namespace Jack
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fTxBuffer);
         PacketHeaderHToN(header, header);
         
-        if ( ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
-        {
+        if (((tx_bytes = fSocket.Send(fTxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
             net_error_t error = fSocket.GetError();
-            if ( error == NET_CONN_ERROR )
-            {
+            if (error == NET_CONN_ERROR) {
                 //fatal connection issue, exit
-                jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
+                jack_error ("'%s' : %s, exiting.", fParams.fName, StrError (NET_ERROR_CODE));
                 Exit();
                 
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
+            } else {
+                jack_error("Error in master send : %s", StrError(NET_ERROR_CODE));
             }
-            else
-                jack_error ( "Error in master send : %s", StrError ( NET_ERROR_CODE ) );
         }
         return tx_bytes;
     }
@@ -404,9 +402,9 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = ( fParams.fSendMidiChannels == 0 && fParams.fSendAudioChannels == 0) ?  1 : 0;
-        fTxHeader.fPacketSize = fParams.fMtu;
-        memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-        return Send ( fTxHeader.fPacketSize, 0 );
+        fTxHeader.fPacketSize = HEADER_SIZE;
+        memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+        return Send(fTxHeader.fPacketSize, 0);
     }
 
     int JackNetMasterInterface::DataSend()
@@ -422,10 +420,10 @@ namespace Jack
             for ( subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
             {
                 fTxHeader.fSubCycle = subproc;
-                fTxHeader.fIsLastPckt = ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && (fParams.fSendAudioChannels == 0)) ? 1 : 0;
-                fTxHeader.fPacketSize = sizeof ( packet_header_t ) + fNetMidiCaptureBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                if ( Send ( fTxHeader.fPacketSize, 0 ) == SOCKET_ERROR )
+                fTxHeader.fIsLastPckt = (( subproc == (fTxHeader.fNMidiPckt - 1)) && (fParams.fSendAudioChannels == 0)) ? 1 : 0;
+                fTxHeader.fPacketSize = HEADER_SIZE + fNetMidiCaptureBuffer->RenderToNetwork(subproc, fTxHeader.fMidiDataSize);
+                memcpy ( fTxBuffer, &fTxHeader, HEADER_SIZE);
+                if (Send (fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
                     return SOCKET_ERROR;
             }
         }
@@ -436,14 +434,14 @@ namespace Jack
             fTxHeader.fDataType = 'a';
             fTxHeader.fMidiDataSize = 0;
             fTxHeader.fNMidiPckt = 0;
-            for ( subproc = 0; subproc < fNSubProcess; subproc++ )
+            for (subproc = 0; subproc < fNSubProcess; subproc++)
             {
                 fTxHeader.fSubCycle = subproc;
-                fTxHeader.fIsLastPckt = ( subproc == ( fNSubProcess - 1 ) ) ? 1 : 0;
+                fTxHeader.fIsLastPckt = (subproc == (fNSubProcess - 1)) ? 1 : 0;
                 fTxHeader.fPacketSize = fAudioTxLen;
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                fNetAudioCaptureBuffer->RenderFromJackPorts ( subproc );
-                if ( Send ( fTxHeader.fPacketSize, 0 ) == SOCKET_ERROR )
+                memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+                fNetAudioCaptureBuffer->RenderFromJackPorts(subproc);
+                if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
                     return SOCKET_ERROR;
             }
         }
@@ -454,7 +452,7 @@ namespace Jack
     int JackNetMasterInterface::SyncRecv()
     {
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
-        int rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+        int rx_bytes = Recv(HEADER_SIZE, MSG_PEEK);
         
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
@@ -485,13 +483,13 @@ namespace Jack
                 //  - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwidth
                 //  - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
                 //  - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
-                if (fCycleOffset < 1) {
+                if (fCycleOffset < CYCLE_OFFSET_NORMAL) {
                     return 0;
                 } else {
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 }
                     
-                if (fCycleOffset != 1)  {
+                if (fCycleOffset > CYCLE_OFFSET_NORMAL)  {
                     jack_info("'%s' can't run in normal network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 }
                 break;
@@ -503,7 +501,7 @@ namespace Jack
                 //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
                 rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 
-                if (fCycleOffset != 0) {
+                if (fCycleOffset > CYCLE_OFFSET_FAST) {
                     jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 }
                 break;
@@ -526,7 +524,7 @@ namespace Jack
         while ( !fRxHeader.fIsLastPckt )
         {
             //how much data is queued on the rx buffer ?
-            rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+            rx_bytes = Recv(HEADER_SIZE, MSG_PEEK);
               
             if ( rx_bytes == SOCKET_ERROR )
                 return rx_bytes;
@@ -546,7 +544,7 @@ namespace Jack
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetMidiPlaybackBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
+                        fNetMidiPlaybackBuffer->RenderFromNetwork(rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
                         if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
                             fNetMidiPlaybackBuffer->RenderToJackPorts();
                         jumpcnt = 0;
@@ -732,29 +730,17 @@ namespace Jack
             //filter incoming packets : don't exit while no error is detected
             memset(&net_params, 0, sizeof ( session_params_t ));
             rx_bytes = fSocket.CatchHost ( &net_params, sizeof ( session_params_t ), 0 );
-            
-            SessionParamsDisplay(&net_params);
-            jack_error ( "rx_bytes %d %d", rx_bytes, errno );
-            
-            
             SessionParamsNToH(&net_params, &host_params);
             if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Can't receive : %s", StrError ( NET_ERROR_CODE ) );
                 return NET_RECV_ERROR;
             }
-            for (int i = 0; i < 7; i++) {
-                jack_info ( " fPacketType %d", host_params.fPacketType[i]);
-            }
-            jack_info ( " received... host_params param %s %s %d %d",  net_params.fPacketType, fParams.fPacketType, net_params.fPacketID, GetPacketType ( &host_params ));
-        
-            SessionParamsDisplay(&host_params);
         }
         while ( strcmp ( host_params.fPacketType, fParams.fPacketType )  && ( GetPacketType ( &host_params ) != SLAVE_SETUP ) );
-
-        jack_info ( "SLAVE_SETUP received..." );
-        
+   
         //everything is OK, copy parameters
+        SessionParamsDisplay(&host_params);
         fParams = host_params;
 
         //set the new buffer sizes
@@ -810,8 +796,8 @@ namespace Jack
         //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
 
         //audio netbuffer length
-        fAudioTxLen = sizeof ( packet_header_t ) + fNetAudioPlaybackBuffer->GetSize();
-        fAudioRxLen = sizeof ( packet_header_t ) + fNetAudioCaptureBuffer->GetSize();
+        fAudioTxLen = HEADER_SIZE + fNetAudioPlaybackBuffer->GetSize();
+        fAudioRxLen = HEADER_SIZE + fNetAudioCaptureBuffer->GetSize();
     }
 
     int JackNetSlaveInterface::Recv ( size_t size, int flags )
@@ -867,7 +853,7 @@ namespace Jack
         //receive sync (launch the cycle)
         do
         {
-            rx_bytes = Recv ( fParams.fMtu, 0 );
+            rx_bytes = Recv(HEADER_SIZE, 0);
             //connection issue, send will detect it, so don't skip the cycle (return 0)
             if ( rx_bytes == SOCKET_ERROR )
                 return rx_bytes;
@@ -889,7 +875,7 @@ namespace Jack
 
         while ( !fRxHeader.fIsLastPckt )
         {
-            rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
+            rx_bytes = Recv(HEADER_SIZE, MSG_PEEK);
             //error here, problem with recv, just skip the cycle (return -1)
 
             if ( rx_bytes == SOCKET_ERROR )
@@ -902,7 +888,7 @@ namespace Jack
                         rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetMidiCaptureBuffer->RenderFromNetwork ( rx_head->fSubCycle, rx_bytes - sizeof ( packet_header_t ) );
+                        fNetMidiCaptureBuffer->RenderFromNetwork(rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
                         // Last midi packet is received, so finish rendering...
                         if ( ++recvd_midi_pckt == rx_head->fNMidiPckt )
                             fNetMidiCaptureBuffer->RenderToJackPorts();
@@ -938,16 +924,18 @@ namespace Jack
     int JackNetSlaveInterface::SyncSend()
     {
         //tx header
-        if ( fParams.fSlaveSyncMode )
+        if ( fParams.fSlaveSyncMode ) {
             fTxHeader.fCycle = fRxHeader.fCycle;
-        else
+        } else {
             fTxHeader.fCycle++;
+        }
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = ( fParams.fReturnMidiChannels == 0 && fParams.fReturnAudioChannels == 0) ?  1 : 0;
-        fTxHeader.fPacketSize = fParams.fMtu;
-        memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-        return Send ( fTxHeader.fPacketSize, 0 );
+        fTxHeader.fPacketSize = HEADER_SIZE;
+        
+        memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+        return Send (fTxHeader.fPacketSize, 0);
     }
 
     int JackNetSlaveInterface::DataSend()
@@ -963,10 +951,10 @@ namespace Jack
             for ( subproc = 0; subproc < fTxHeader.fNMidiPckt; subproc++ )
             {
                 fTxHeader.fSubCycle = subproc;
-                fTxHeader.fIsLastPckt = ( ( subproc == ( fTxHeader.fNMidiPckt - 1 ) ) && !fParams.fReturnAudioChannels ) ? 1 : 0;
-                fTxHeader.fPacketSize = sizeof ( packet_header_t ) + fNetMidiPlaybackBuffer->RenderToNetwork ( subproc, fTxHeader.fMidiDataSize );
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                if ( Send ( fTxHeader.fPacketSize, 0 ) == SOCKET_ERROR )
+                fTxHeader.fIsLastPckt = ((subproc == (fTxHeader.fNMidiPckt - 1)) && !fParams.fReturnAudioChannels) ? 1 : 0;
+                fTxHeader.fPacketSize = HEADER_SIZE+ fNetMidiPlaybackBuffer->RenderToNetwork(subproc, fTxHeader.fMidiDataSize);
+                memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+                if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
                     return SOCKET_ERROR;
             }
         }
@@ -980,11 +968,11 @@ namespace Jack
             for ( subproc = 0; subproc < fNSubProcess; subproc++ )
             {
                 fTxHeader.fSubCycle = subproc;
-                fTxHeader.fIsLastPckt = ( subproc == ( fNSubProcess - 1 ) ) ? 1 : 0;
+                fTxHeader.fIsLastPckt = (subproc == (fNSubProcess - 1)) ? 1 : 0;
                 fTxHeader.fPacketSize = fAudioTxLen;
-                memcpy ( fTxBuffer, &fTxHeader, sizeof ( packet_header_t ) );
-                fNetAudioPlaybackBuffer->RenderFromJackPorts ( subproc );
-                if ( Send ( fTxHeader.fPacketSize, 0 ) == SOCKET_ERROR )
+                memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+                fNetAudioPlaybackBuffer->RenderFromJackPorts (subproc);
+                if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
                     return SOCKET_ERROR;
             }
         }
