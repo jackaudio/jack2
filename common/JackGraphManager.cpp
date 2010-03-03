@@ -385,7 +385,7 @@ void JackGraphManager::ActivatePort(jack_port_id_t port_index)
 void JackGraphManager::DeactivatePort(jack_port_id_t port_index)
 {
     JackPort* port = GetPort(port_index);
-    port->fFlags = (JackPortFlags)(port->fFlags | ~JackPortIsActive);
+    port->fFlags = (JackPortFlags)(port->fFlags & ~JackPortIsActive);
 }
 
 void JackGraphManager::GetInputPorts(int refnum, jack_int_t* res)
