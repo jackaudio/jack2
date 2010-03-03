@@ -233,11 +233,14 @@ namespace Jack
 
             void Reset();
             size_t GetSize();
+            
             //utility
             void DisplayEvents();
+            
             //jack<->buffer
             int RenderFromJackPorts();
             int RenderToJackPorts();
+            
             //network<->buffer
             int RenderFromNetwork ( int subcycle, size_t copy_size );
             int RenderToNetwork ( int subcycle, size_t total_size );
@@ -258,10 +261,15 @@ namespace Jack
             {}
             
             virtual size_t GetSize() = 0;
+            
             //jack<->buffer
             virtual void RenderFromJackPorts (int subcycle ) = 0;
             virtual void RenderToJackPorts ( int cycle, int subcycle) = 0;
             virtual void FinishRenderToJackPorts (int cycle) = 0;
+            
+            //network<->buffer
+            //int RenderFromNetwork ( int subcycle, size_t copy_size ) = 0;
+            //int RenderToNetwork ( int subcycle, size_t total_size ) = 0;
 
             virtual void SetBuffer ( int index, sample_t* buffer ) = 0;
             virtual sample_t* GetBuffer ( int index ) = 0;

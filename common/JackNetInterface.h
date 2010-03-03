@@ -57,11 +57,6 @@ namespace Jack
             NetAudioBuffer* fNetAudioCaptureBuffer;
             NetAudioBuffer* fNetAudioPlaybackBuffer;
 
-            //sizes
-            int fAudioRxLen;
-            int fAudioTxLen;
-            int fPayloadSize;
-
             //utility methods
             void SetFramesPerPacket();
             int SetNetBufferSize();
