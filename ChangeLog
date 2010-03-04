@@ -32,6 +32,7 @@ Mario Lang
 2010-03-04 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackMachServerChannel::Execute : keep running even in error cases.
+	* Raise JACK_PROTOCOL_VERSION number.
 
 2010-03-03 Stephane Letz  <letz@grame.fr>
 

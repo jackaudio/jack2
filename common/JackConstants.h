@@ -88,7 +88,7 @@
 
 #define ALL_CLIENTS -1 // for notification
 
-#define JACK_PROTOCOL_VERSION 7  
+#define JACK_PROTOCOL_VERSION 8
 
 #define SOCKET_TIME_OUT 5               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec
