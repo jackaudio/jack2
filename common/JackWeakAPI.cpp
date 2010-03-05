@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <jack/thread.h>
 #include <jack/midiport.h>
 #include <math.h>
-#include <dlfcn.h>
 #include <stdlib.h>
 #include <cassert>
 #include <iostream>
@@ -40,13 +39,22 @@ typedef void *(*thread_routine)(void*);
 using std::cerr;
 
 int libjack_is_present = 0;     // public symbol, similar to what relaytool does.
+
+#ifdef WIN32
+#include <windows.h>
+HMODULE libjack_handle = 0;
+#else
+#include <dlfcn.h>
 static void *libjack_handle = 0;
+#endif
 
 static void __attribute__((constructor)) tryload_libjack()
 {
     if (getenv("SKIP_LIBJACK") == 0) { // just in case libjack is causing troubles..
     #ifdef __APPLE__
         libjack_handle = dlopen("libjack.0.dylib", RTLD_LAZY);
+    #elif defined(WIN32)
+        libjack_handle = LoadLibrary("libjack.dll");
     #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
     #endif
@@ -62,7 +70,11 @@ void *load_jack_function(const char *fn_name)
         std::cerr << "libjack not found, so do not try to load " << fn_name << " ffs !\n";
         return 0;
     }
+#ifdef WIN32
+    fn = (void*)GetProcAddress(libjack_handle, fn_name);
+#else
     fn = dlsym(libjack_handle, fn_name);
+#endif
     if (!fn) { 
         std::cerr << "could not dlsym(" << libjack_handle << "), " << dlerror() << "\n"; 
     }
