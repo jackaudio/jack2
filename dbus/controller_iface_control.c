@@ -87,34 +87,31 @@ jack_control_run_method(
     {
         if (!jack_controller_start_server(controller_ptr, call))
         {
-            jack_error ("Failed to start server");
+            jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "Failed to start server");
+            return true;
         }
-        else
-        {
-            jack_controller_control_send_signal_server_started();
-        }
+
+        jack_controller_control_send_signal_server_started();
     }
     else if (strcmp (call->method_name, "StopServer") == 0)
     {
         if (!jack_controller_stop_server(controller_ptr, call))
         {
-            jack_error ("Failed to stop server");
+            jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "Failed to stop server");
+            return true;
         }
-        else
-        {
-            jack_controller_control_send_signal_server_stopped();
-        }
+
+        jack_controller_control_send_signal_server_stopped();
     }
     else if (strcmp (call->method_name, "SwitchMaster") == 0)
     {
         if (!jack_controller_switch_master(controller_ptr, call))
         {
-            jack_error ("Failed to switch master");
+            jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "Failed to switch master");
+            return true;
         }
-        else
-        {
-            jack_controller_control_send_signal_server_stopped();
-        }
+
+        jack_controller_control_send_signal_server_stopped();
     }
     else if (strcmp (call->method_name, "GetLoad") == 0)
     {
