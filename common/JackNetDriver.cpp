@@ -142,11 +142,12 @@ namespace Jack
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
         //init network
-        if ( !JackNetSlaveInterface::Init() )
+        if (!JackNetSlaveInterface::Init())
             return false;
 
         //set global parameters
-        SetParams();
+        if (!SetParams())
+            return false;
          
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];

@@ -35,8 +35,7 @@ namespace Jack
             session_params_t fParams;
             JackNetSocket fSocket;
             char fMulticastIP[32];
-            uint fNSubProcess;
-
+       
             //headers
             packet_header_t fTxHeader;
             packet_header_t fRxHeader;
@@ -58,13 +57,10 @@ namespace Jack
             NetAudioBuffer* fNetAudioPlaybackBuffer;
 
             //utility methods
-            void SetFramesPerPacket();
             int SetNetBufferSize();
-            int GetNMidiPckt();
-            bool IsNextPacket();
-
+     
             //virtual methods : depends on the sub class master/slave
-            virtual void SetParams();
+            virtual bool SetParams();
             virtual bool Init() = 0;
 
             //transport
@@ -103,7 +99,7 @@ namespace Jack
 
             bool Init();
             int SetRxTimeout();
-            void SetParams();
+            bool SetParams();
             
             void Exit();
             
@@ -149,7 +145,7 @@ namespace Jack
             net_status_t SendAvailableToMaster();
             net_status_t SendStartToMaster();
             
-            void SetParams();
+            bool SetParams();
             
             int SyncRecv();
             int SyncSend();

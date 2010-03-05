@@ -262,7 +262,9 @@ struct JackNetExtMaster : public JackNetMasterInterface {
             return -1;
 
         // Set global parameters
-        SetParams();
+        if (!SetParams())
+            return -1;
+            
         AllocPorts();
         return 0;
     }
@@ -465,12 +467,12 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     int Open(jack_master_t* result)
     {
         // Init network connection
-        if (!JackNetSlaveInterface::InitConnection()){
+        if (!JackNetSlaveInterface::InitConnection()) 
             return -1;
-        }
              
         // Then set global parameters
-        SetParams();
+        if (!SetParams())
+            return -1;
         
          // Set result
          if (result != NULL) {
@@ -494,7 +496,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             return -1;
                
         // Then set global parameters
-        SetParams();
+        if (!SetParams())
+            return -1;
      
         // We need to notify possibly new buffer size and sample rate (see Execute)
         if (fBufferSizeCallback) 
@@ -513,6 +516,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         FreePorts();
         return 0;
     }
+
 
     void AllocPorts()
     {
@@ -939,7 +943,7 @@ SERVER_EXPORT void jack_log(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    //jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
+    jack_format_and_log(LOG_LEVEL_INFO, "Jack: ", fmt, ap);
     va_end(ap);
 }
 

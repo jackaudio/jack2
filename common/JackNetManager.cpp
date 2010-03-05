@@ -113,11 +113,12 @@ namespace Jack
     bool JackNetMaster::Init(bool auto_connect)
     {
         //network init
-        if ( !JackNetMasterInterface::Init() )
+        if (!JackNetMasterInterface::Init())
             return false;
 
         //set global parameters
-        SetParams();
+        if (!SetParams())
+            return false;
 
         //jack client and process
         jack_status_t status;
@@ -415,7 +416,7 @@ namespace Jack
         for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
             fNetMidiPlaybackBuffer->SetBuffer ( port_index, static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index],
                                                 fParams.fPeriodSize ) ) );
-        for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
+        for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ ) 
             fNetAudioPlaybackBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
                                                  fParams.fPeriodSize ) ) );
 
@@ -601,7 +602,7 @@ namespace Jack
         if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
-        jack_info ( "Waiting for a slave..." );
+        jack_log ( "sizeof (session_params_t) %d", sizeof (session_params_t) );
 
         //main loop, wait for data, deal with it and wait again
         do

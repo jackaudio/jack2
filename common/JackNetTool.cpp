@@ -35,6 +35,9 @@ namespace Jack
         for ( int port_index = 0; port_index < fNPorts; port_index++ )
             fPortBuffer[port_index] = NULL;
         fNetBuffer = net_buffer;
+        
+        fCycleSize = params->fMtu * (max(params->fSendMidiChannels, params->fReturnMidiChannels) *
+                                     params->fPeriodSize * sizeof(sample_t) / (params->fMtu - sizeof(packet_header_t)));
     }
 
     NetMidiBuffer::~NetMidiBuffer()
@@ -46,6 +49,23 @@ namespace Jack
     size_t NetMidiBuffer::GetSize()
     {
         return fMaxBufsize;
+    }
+    
+    size_t NetMidiBuffer::GetCycleSize()
+    {
+        return fCycleSize;
+    }
+    
+    int NetMidiBuffer::GetNumPackets()
+    {
+        /*
+        return (data_size % PACKET_AVAILABLE_SIZE) 
+                ? (data_size / PACKET_AVAILABLE_SIZE + 1) 
+                : data_size / PACKET_AVAILABLE_SIZE;
+        */ 
+        
+        //TODO
+        return 0;
     }
 
     void NetMidiBuffer::SetBuffer ( int index, JackMidiBuffer* buffer )
@@ -124,9 +144,7 @@ namespace Jack
         return copy_size;
     }
 
-
 // net audio buffer *********************************************************************************
-
 
     NetSingleAudioBuffer::NetSingleAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
         : fPortBuffer(params, nports), fNetBuffer(net_buffer)
@@ -139,6 +157,11 @@ namespace Jack
     {
         return fPortBuffer.GetSize();
     }
+    
+    size_t NetSingleAudioBuffer::GetCycleSize()
+    {
+        return fPortBuffer.GetCycleSize();
+    }
 
     void NetSingleAudioBuffer::SetBuffer ( int index, sample_t* buffer )
     {
@@ -150,18 +173,30 @@ namespace Jack
         return fPortBuffer.GetBuffer(index);
     }
 
-    void NetSingleAudioBuffer::RenderFromJackPorts (int subcycle)
+    int NetSingleAudioBuffer::RenderFromJackPorts ()
     {
-        fPortBuffer.RenderFromJackPorts(fNetBuffer, subcycle);
+        return fPortBuffer.RenderFromJackPorts();
     }
 
-    void NetSingleAudioBuffer::RenderToJackPorts (int cycle, int subcycle)
+    int NetSingleAudioBuffer::RenderToJackPorts ()
     {
-        fPortBuffer.RenderToJackPorts(fNetBuffer, subcycle);
+        return fPortBuffer.RenderToJackPorts();
+    }
+    
+     //network<->buffer
+    int NetSingleAudioBuffer::RenderFromNetwork ( int cycle,  int subcycle, size_t copy_size )
+    {
+        return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, subcycle, copy_size);
+    }
+    
+    int NetSingleAudioBuffer::RenderToNetwork (int subcycle, size_t total_size )
+    {
+        return fPortBuffer.RenderToNetwork(fNetBuffer, subcycle, total_size);
     }
 
 // Buffered
 
+/*
     NetBufferedAudioBuffer::NetBufferedAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
     {
         fMaxCycle = 0;
@@ -172,7 +207,7 @@ namespace Jack
         }
         
         fJackPortBuffer = new sample_t* [nports];
-        for ( int port_index = 0; port_index < nports; port_index++ )
+        for ( uint32_t port_index = 0; port_index < nports; port_index++ )
             fJackPortBuffer[port_index] = NULL;
     }
 
@@ -184,6 +219,11 @@ namespace Jack
     size_t NetBufferedAudioBuffer::GetSize()
     {
         return fPortBuffer[0].GetSize();
+    }
+    
+    size_t NetBufferedAudioBuffer::GetCycleSize()
+    {
+        return fPortBuffer[0].GetCycleSize();
     }
 
     void NetBufferedAudioBuffer::SetBuffer ( int index, sample_t* buffer )
@@ -214,6 +254,7 @@ namespace Jack
         fMaxCycle = std::max(fMaxCycle, cycle);
         fPortBuffer[(cycle + 1) % AUDIO_BUFFER_SIZE].Copy(fJackPortBuffer);  // Copy internal buffer in JACK ports
     }
+    */
 
 // SessionParams ************************************************************************************
 
@@ -230,7 +271,6 @@ namespace Jack
         dst_params->fReturnMidiChannels = htonl ( src_params->fReturnMidiChannels );
         dst_params->fSampleRate = htonl ( src_params->fSampleRate );
         dst_params->fPeriodSize = htonl ( src_params->fPeriodSize );
-        dst_params->fFramesPerPacket = htonl ( src_params->fFramesPerPacket );
         dst_params->fBitdepth = htonl ( src_params->fBitdepth );
         dst_params->fSlaveSyncMode = htonl ( src_params->fSlaveSyncMode );
     }
@@ -248,7 +288,6 @@ namespace Jack
         dst_params->fReturnMidiChannels = ntohl ( src_params->fReturnMidiChannels );
         dst_params->fSampleRate = ntohl ( src_params->fSampleRate );
         dst_params->fPeriodSize = ntohl ( src_params->fPeriodSize );
-        dst_params->fFramesPerPacket = ntohl ( src_params->fFramesPerPacket );
         dst_params->fBitdepth = ntohl ( src_params->fBitdepth );
         dst_params->fSlaveSyncMode = ntohl ( src_params->fSlaveSyncMode );
     }
@@ -282,8 +321,6 @@ namespace Jack
         jack_info ( "Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels );
         jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
         jack_info ( "Period size : %u frames per period", params->fPeriodSize );
-        jack_info ( "Frames per packet : %u", params->fFramesPerPacket );
-        jack_info ( "Packet per period : %u", (params->fFramesPerPacket != 0) ? params->fPeriodSize / params->fFramesPerPacket : 0);
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
         jack_info ( "Network mode : %s", mode );
@@ -338,9 +375,8 @@ namespace Jack
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fID = htonl ( src_header->fID );
-        dst_header->fMidiDataSize = htonl ( src_header->fMidiDataSize );
         dst_header->fBitdepth = htonl ( src_header->fBitdepth );
-        dst_header->fNMidiPckt = htonl ( src_header->fNMidiPckt );
+        dst_header->fNumPacket = htonl ( src_header->fNumPacket );
         dst_header->fPacketSize = htonl ( src_header->fPacketSize );
         dst_header->fCycle = htonl ( src_header->fCycle );
         dst_header->fSubCycle = htonl ( src_header->fSubCycle );
@@ -351,9 +387,8 @@ namespace Jack
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fID = ntohl ( src_header->fID );
-        dst_header->fMidiDataSize = ntohl ( src_header->fMidiDataSize );
         dst_header->fBitdepth = ntohl ( src_header->fBitdepth );
-        dst_header->fNMidiPckt = ntohl ( src_header->fNMidiPckt );
+        dst_header->fNumPacket = ntohl ( src_header->fNumPacket );
         dst_header->fPacketSize = ntohl ( src_header->fPacketSize );
         dst_header->fCycle = ntohl ( src_header->fCycle );
         dst_header->fSubCycle = ntohl ( src_header->fSubCycle );
@@ -370,8 +405,7 @@ namespace Jack
         jack_info ( "ID : %u", header->fID );
         jack_info ( "Cycle : %u", header->fCycle );
         jack_info ( "SubCycle : %u", header->fSubCycle );
-        jack_info ( "Midi packets : %u", header->fNMidiPckt );
-        jack_info ( "Midi data size : %u", header->fMidiDataSize );
+        jack_info ( "Midi packets : %u", header->fNumPacket );
         jack_info ( "Last packet : '%s'", ( header->fIsLastPckt ) ? "yes" : "no" );
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "**********************************************" );

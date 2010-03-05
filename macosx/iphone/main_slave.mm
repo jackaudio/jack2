@@ -33,7 +33,7 @@ static int net_process(jack_nframes_t buffer_size,
                         void* data)
 {
 
-    //jack_adapter_pull_and_push(adapter, audio_output_buffer, audio_input_buffer, buffer_size);
+    jack_adapter_pull_and_push(adapter, audio_output_buffer, audio_input_buffer, buffer_size);
     
     // Process input, produce output
     if (audio_input == audio_output) {
@@ -47,7 +47,7 @@ static int net_process(jack_nframes_t buffer_size,
 
 static void SlaveAudioCallback(int frames, float** inputs, float** outputs, void* arg)
 {
-    //jack_adapter_push_and_pull(adapter, inputs, outputs, frames);
+    jack_adapter_push_and_pull(adapter, inputs, outputs, frames);
 }
 
 //http://www.securityfocus.com/infocus/1884
@@ -62,8 +62,8 @@ int main(int argc, char *argv[]) {
     jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
     jack_master_t result;
 
-    //if ((net = jack_net_slave_open("169.254.121.189", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
-    if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    if ((net = jack_net_slave_open("169.254.46.132", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    //if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
         return -1;
     }
     
@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
                                     result.sample_rate)) == 0) {
         return -1;
     }
+    
     
     TiPhoneCoreAudioRenderer audio_device(NUM_INPUT, NUM_OUTPUT);
 
