@@ -881,7 +881,7 @@ extern "C"
 
             switch (param->character) {
                 case 'd':
-                    device_name = strdup (param->value.str);
+                    device_name = param->value.str;
                     break;
                 case 'p':
                     cmlparams.period_size = param->value.ui;
