@@ -863,5 +863,12 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
+void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, int *result )
+{
+    // yay... :(
+    *result = 0;
+}
+
+
 } // end of namespace
 

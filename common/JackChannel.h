@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackChannel__
 
 #include "types.h"
+#include "session.h"
 
 namespace Jack
 {
@@ -126,6 +127,8 @@ class JackClientChannelInterface
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
         
+	virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, int *result)
+	{}
 };
 
 }

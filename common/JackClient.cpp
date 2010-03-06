@@ -981,6 +981,19 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
     }
 }
 
+int JackClient::SetSessionCallback(JackSessionCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+	GetClientControl()->fCallback[kSessionCallback] = (callback != NULL);
+        fSessionArg = arg;
+        fSession = callback;
+        return 0;
+    }
+}
+
 //------------------
 // Internal clients
 //------------------
@@ -1036,6 +1049,15 @@ void JackClient::InternalClientUnload(int ref, jack_status_t* status)
 {
     int result = -1;
     fChannel->InternalClientUnload(GetClientControl()->fRefNum, ref, (int*)status, &result);
+}
+
+//------------------
+// Session API
+//------------------
+
+jack_session_command_t *JackClient::SessionNotify( const char* target, jack_session_event_type_t type, const char* path )
+{
+    return NULL;
 }
 
 

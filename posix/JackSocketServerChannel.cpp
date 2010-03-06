@@ -400,6 +400,18 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             break;
         }
 
+        case JackRequest::kSessionNotify: {
+            jack_log("JackRequest::SessionNotify");
+            JackSessionNotifyRequest req;
+            JackSessionNotifyResult res;
+            if (req.Read(socket) == 0) {
+		fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, &res.fStatus);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::SessionNotify write error ref = %d", req.fRefNum);
+            break;
+        }
+
         default:
             jack_error("Unknown request %ld", header.fType);
             break;

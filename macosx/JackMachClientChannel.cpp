@@ -251,6 +251,20 @@ void JackMachClientChannel::SetFreewheel(int onoff, int* result)
     }
 }
 
+void JackMachClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
+{
+// dunno, how to generate this rpc stuff.
+#if 0
+    kern_return_t res = rpc_jack_session_notify(fPrivatePort, target, type, path, result);
+    if (res != KERN_SUCCESS) {
+        *result = -1;
+        jack_error("JackMachClientChannel::SetFreewheel err = %s", mach_error_string(res));
+    }
+#else
+    *result = NULL;
+#endif
+}
+
 void JackMachClientChannel::ReleaseTimebase(int refnum, int* result)
 {
     kern_return_t res = rpc_jack_release_timebase(fPrivatePort, refnum, result);

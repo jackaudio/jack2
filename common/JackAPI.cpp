@@ -1859,3 +1859,36 @@ EXPORT void jack_free(void* ptr)
         free(ptr);
     }
 }
+
+// session.h
+EXPORT int jack_set_session_callback(jack_client_t* ext_client, JackSessionCallback session_callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_set_session_callback");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_set_session_callback ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_set_session_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->SetSessionCallback(session_callback, arg);
+    }
+}
+
+EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char *path) 
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_session_notify");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_session_notify ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_session_notify called with a NULL client");
+        return NULL;
+    } else {
+        return client->SessionNotify(target, ev_type, path);
+    }
+}
+
+

@@ -131,6 +131,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifySampleRate(jack_nframes_t sample_rate);
         void NotifyFreewheel(bool onoff);
         void NotifyQuit();
+
+	void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, int *result );
 };
 
 

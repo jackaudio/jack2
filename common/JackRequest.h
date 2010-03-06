@@ -65,7 +65,11 @@ struct JackRequest
         kInternalClientLoad = 29,
         kInternalClientUnload = 30,
         kPortRename = 31,
-        kNotification = 32
+        kNotification = 32,
+	kSessionNotify = 33,
+	kSessionReply  = 34,
+	kGetClientByUUID = 35,
+	kReserveClientName = 36
     };
 
     RequestType fType;
@@ -1062,6 +1066,110 @@ struct JackClientNotificationRequest : public JackRequest
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         CheckRes(trans->Write(&fNotify, sizeof(int)));
         CheckRes(trans->Write(&fValue, sizeof(int)));
+        return 0;
+    }
+
+} POST_PACKED_STRUCTURE;
+
+struct JackSessionNotifyResult : public JackResult
+{
+
+    int fStatus;
+
+    JackSessionNotifyResult(): JackResult()
+    {}
+    JackSessionNotifyResult(int32_t result, int status)
+            : JackResult(result), fStatus(status)
+    {}
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(JackResult::Read(trans));
+        CheckRes(trans->Read(&fStatus, sizeof(int)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackResult::Write(trans));
+        CheckRes(trans->Write(&fStatus, sizeof(int)));
+        return 0;
+    }
+    
+} POST_PACKED_STRUCTURE;
+
+/*!
+\brief SessionNotify request.
+*/
+
+struct JackSessionNotifyRequest : public JackRequest
+{
+    char fPath[JACK_MESSAGE_SIZE + 1];
+    char fDst[JACK_CLIENT_NAME_SIZE + 1];
+    jack_session_event_type_t  fEventType;
+    int  fRefNum;
+
+    JackSessionNotifyRequest()
+    {}
+    JackSessionNotifyRequest(int refnum, const char *path, jack_session_event_type_t type, const char *dst)
+            : JackRequest(JackRequest::kSessionNotify), fEventType(type), fRefNum(refnum)
+    {
+        snprintf(fPath, sizeof(fPath), "%s", path);
+	if (dst)
+	    snprintf(fDst, sizeof(fDst), "%s", dst);
+	else
+	    fDst[0] = '\0';
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(trans->Read(&fRefNum, sizeof(fRefNum)));
+        CheckRes(trans->Read(&fPath, sizeof(fPath)));
+        CheckRes(trans->Read(&fDst, sizeof(fDst)));
+        CheckRes(trans->Read(&fEventType, sizeof(fEventType)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fRefNum, sizeof(fRefNum)));
+        CheckRes(trans->Write(&fPath, sizeof(fPath)));
+        CheckRes(trans->Write(&fDst, sizeof(fDst)));
+        CheckRes(trans->Write(&fEventType, sizeof(fEventType)));
+        return 0;
+    }
+
+} POST_PACKED_STRUCTURE;
+
+struct JackSessionReplyRequest : public JackRequest
+{
+    char fCommand[JACK_MESSAGE_SIZE + 1];
+    int  fFlags;
+
+    JackSessionReplyRequest()
+    {}
+    JackSessionReplyRequest(const char *command, int flags)
+            : JackRequest(JackRequest::kSessionNotify), fFlags(flags)
+    {
+	if (command)
+	    snprintf(fCommand, sizeof(fCommand), "%s", command);
+	else
+	    fCommand[0] = '\0';
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(trans->Read(&fCommand, sizeof(fCommand)));
+        CheckRes(trans->Read(&fFlags, sizeof(fFlags)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fCommand, sizeof(fCommand)));
+        CheckRes(trans->Write(&fFlags, sizeof(fFlags)));
         return 0;
     }
 

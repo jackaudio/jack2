@@ -306,6 +306,14 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.NotifyQuit();
             CATCH_EXCEPTION
         }
+
+	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, int *result)
+	{
+            TRY_CALL
+            JackLock lock(&fEngine);
+            return fEngine.SessionNotify( refnum, target, type, path, result );
+            CATCH_EXCEPTION
+	}
  
 };
 

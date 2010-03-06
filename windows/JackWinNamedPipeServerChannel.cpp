@@ -326,6 +326,17 @@ bool JackClientPipeThread::HandleRequest()
                 break;
             }
 
+	    case JackRequest::kSessionNotify: {
+		  jack_log("JackRequest::SessionNotify");
+		  JackSessionNotifyRequest req;
+		  JackSessionNotifyResult res;
+		  if (req.Read(fPipe) == 0) {
+		      fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath);
+		  }
+		  res.Write(fPipe);
+		  break;
+	      }
+
             default:
                 jack_log("Unknown request %ld", header.fType);
                 break;
