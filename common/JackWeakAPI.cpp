@@ -131,7 +131,7 @@ DECL_FUNCTION(int, jack_internal_client_new, (const char *client_name,
 DECL_VOID_FUNCTION(jack_internal_client_close, (const char *client_name), (client_name));
 DECL_FUNCTION(int, jack_is_realtime, (jack_client_t *client), (client));
 DECL_VOID_FUNCTION(jack_on_shutdown, (jack_client_t *client, JackShutdownCallback shutdown_callback, void *arg), (client, shutdown_callback, arg));
-//DECL_VOID_FUNCTION(jack_on_info_shutdown, (jack_client_t* client, JackInfoShutdownCallback shutdown_callback, void* arg), (client, shutdown_callback, arg));
+DECL_VOID_FUNCTION(jack_on_info_shutdown, (jack_client_t* client, JackInfoShutdownCallback shutdown_callback, void* arg), (client, shutdown_callback, arg));
 DECL_FUNCTION(int, jack_set_process_callback, (jack_client_t *client,
                                             JackProcessCallback process_callback,
                                             void *arg), (client, process_callback, arg));

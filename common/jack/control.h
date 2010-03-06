@@ -48,8 +48,8 @@ typedef enum
 /** @brief Max value that jackctl_param_type_t type can have */
 #define JACK_PARAM_MAX (JackParamBool + 1)
 
-/** @brief Max length of string parameter value, excluding terminating nul char */
-#define JACK_PARAM_STRING_MAX  63
+/** @brief Max length of string parameter value, excluding terminating null char */
+#define JACK_PARAM_STRING_MAX  127
 
 /** @brief Type for parameter value */
 /* intentionally similar to jack_driver_param_value_t */
