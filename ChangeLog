@@ -29,6 +29,10 @@ Mario Lang
   Jackdmp changes log
 ---------------------------
 
+2010-03-06 Stephane Letz  <letz@grame.fr>
+
+	* Raise JACK_DRIVER_PARAM_STRING_MAX and JACK_PARAM_STRING_MAX to 127 otherwise some audio drivers cannot be loaded on OSX.
+
 2010-03-04 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackMachServerChannel::Execute : keep running even in error cases.

@@ -49,7 +49,7 @@ typedef enum
 #define JACK_PARAM_MAX (JackParamBool + 1)
 
 /** @brief Max length of string parameter value, excluding terminating null char */
-#define JACK_PARAM_STRING_MAX  63
+#define JACK_PARAM_STRING_MAX  127
 
 /** @brief Type for parameter value */
 /* intentionally similar to jack_driver_param_value_t */
