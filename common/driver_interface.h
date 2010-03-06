@@ -33,7 +33,7 @@ extern "C"
 
 #define JACK_DRIVER_NAME_MAX          15
 #define JACK_DRIVER_PARAM_NAME_MAX    15
-#define JACK_DRIVER_PARAM_STRING_MAX  127
+#define JACK_DRIVER_PARAM_STRING_MAX  63
 #define JACK_DRIVER_PARAM_DESC        255
 #define JACK_PATH_MAX                 511
 
