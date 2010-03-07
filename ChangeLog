@@ -24,12 +24,15 @@ Peter L Jones
 Devin Anderson
 Josh Green
 Mario Lang
+Arnold Krille
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
 
 2010-03-06 Stephane Letz  <letz@grame.fr>
+
+	* Arnold Krille firewire patch.
 
 	* Raise JACK_DRIVER_PARAM_STRING_MAX and JACK_PARAM_STRING_MAX to 127 otherwise some audio drivers cannot be loaded on OSX.
 

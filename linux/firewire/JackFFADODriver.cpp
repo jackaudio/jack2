@@ -753,12 +753,20 @@ extern "C"
         strcpy (desc->name, "firewire");                               // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Linux FFADO API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 11;
+        desc->nparams = 12;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
         desc->params = params;
 
         i = 0;
+        strcpy (params[i].name, "device");
+        params[i].character  = 'd';
+        params[i].type       = JackDriverParamString;
+        strcpy (params[i].value.str,  "hw:0");
+        strcpy (params[i].short_desc, "The FireWire device to use.");
+        strcpy (params[i].long_desc,  "The FireWire device to use. Please consult the FFADO documentation for more info.");
+
+        i++;
         strcpy (params[i].name, "period");
         params[i].character  = 'p';
         params[i].type       = JackDriverParamUInt;
@@ -881,7 +889,7 @@ extern "C"
 
             switch (param->character) {
                 case 'd':
-                    device_name = param->value.str;
+                    device_name = const_cast<char*>(param->value.str);
                     break;
                 case 'p':
                     cmlparams.period_size = param->value.ui;
