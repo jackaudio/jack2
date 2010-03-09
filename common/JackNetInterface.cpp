@@ -243,9 +243,19 @@ namespace Jack
         assert ( fNetMidiCaptureBuffer );
         assert ( fNetMidiPlaybackBuffer );
 
+        try {
         //audio net buffers
-        fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
-        fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+    #ifdef CELT
+            fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+            fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+    #else
+            fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+            fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+    #endif    
+        } catch (exception&) {
+            jack_error("NetAudioBuffer allocation error...");
+            return false;
+        }
         
         //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
         //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );     
@@ -500,7 +510,7 @@ namespace Jack
                 switch ( rx_head->fDataType )
                 {
                     case 'm':   //midi
-                        rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                        rx_bytes = Recv(rx_head->fPacketSize, 0);
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetMidiPlaybackBuffer->RenderFromNetwork(rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
@@ -510,13 +520,13 @@ namespace Jack
                         break;
 
                     case 'a':   //audio
-                        rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                        rx_bytes = Recv(rx_head->fPacketSize, 0);
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                         fNetAudioPlaybackBuffer->RenderFromNetwork (rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
-                         // Last audio packet is received, so finish rendering...
-                         if (fRxHeader.fIsLastPckt)
+                        fNetAudioPlaybackBuffer->RenderFromNetwork (rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
+                        // Last audio packet is received, so finish rendering...
+                        if (fRxHeader.fIsLastPckt)
                             fNetAudioPlaybackBuffer->RenderToJackPorts();
                         break;
 
@@ -647,9 +657,7 @@ namespace Jack
         //utility
         session_params_t host_params;
         int rx_bytes = 0;
-        
-        jack_log ( "sizeof (session_params_t) %d", sizeof (session_params_t) );
-
+     
         //socket
         if ( fSocket.NewSocket() == SOCKET_ERROR ) {
             jack_error ( "Fatal error : network unreachable - %s", StrError ( NET_ERROR_CODE ) );
@@ -738,12 +746,24 @@ namespace Jack
         assert ( fNetMidiPlaybackBuffer );
 
         //audio net buffers
-        fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-        fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-        
-        //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-        //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-        
+        //fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+        //fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+    
+        try {
+    #ifdef CELT
+            fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+            fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+    #else
+            fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+            fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+            //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+            //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+    #endif     
+        } catch (exception&) {
+            jack_error("NetAudioBuffer allocation error...");
+            return false;
+        }
+    
         assert ( fNetAudioCaptureBuffer );
         assert ( fNetAudioPlaybackBuffer );
         
@@ -830,7 +850,6 @@ namespace Jack
     int JackNetSlaveInterface::DataRecv()
     {
         int rx_bytes = 0;
-        //int last_cycle = 0;
         uint recvd_midi_pckt = 0;
         uint recvd_audio_pckt = 0;
       
@@ -850,24 +869,24 @@ namespace Jack
                 switch ( rx_head->fDataType )
                 {
                     case 'm':   //midi
-                        rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                        rx_bytes = Recv(rx_head->fPacketSize, 0);
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetMidiCaptureBuffer->RenderFromNetwork(rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
                         // Last midi packet is received, so finish rendering...
-                        if ( ++recvd_midi_pckt == rx_head->fNumPacket )
+                        if (++recvd_midi_pckt == rx_head->fNumPacket)
                             fNetMidiCaptureBuffer->RenderToJackPorts();
                         break;
 
                     case 'a':   //audio
-                        rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                        rx_bytes = Recv(rx_head->fPacketSize, 0);
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fNetAudioCaptureBuffer->RenderFromNetwork (rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
-                        if (fRxHeader.fIsLastPckt) {
+                        // Last audio packet is received, so finish rendering...
+                        if (fRxHeader.fIsLastPckt) 
                             fNetAudioCaptureBuffer->RenderToJackPorts();
-                        }
                         break;
 
                     case 's':   //sync

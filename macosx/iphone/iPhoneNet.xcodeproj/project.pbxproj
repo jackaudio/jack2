@@ -780,6 +780,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = iPhoneNet_Prefix.pch;
 				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
 					../../macosx/coreaudio,
 					../../macosx,
 					../../posix,
@@ -791,7 +792,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Debug-iphonesimulator\"",
 				);
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = libcelt.a;
 				PRODUCT_NAME = iPhoneNetSlave;
 				SDKROOT = iphoneos3.1.3;
 			};
@@ -802,9 +803,13 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = iPhoneNet_Prefix.pch;
+				GCC_THUMB_SUPPORT = NO;
 				HEADER_SEARCH_PATHS = (
+					.,
+					/usr/local/include,
 					../../macosx/coreaudio,
 					../../common/jack,
 					../../common,
@@ -816,7 +821,9 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/build/Debug-iphonesimulator\"",
 				);
+				OTHER_LDFLAGS = libcelt.a;
 				PRODUCT_NAME = NetJackSlave;
+				SDKROOT = iphoneos3.1.3;
 			};
 			name = Release;
 		};

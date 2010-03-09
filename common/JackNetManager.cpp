@@ -201,7 +201,6 @@ namespace Jack
             }
         }
         
-        
         //midi
         for ( i = 0; i < fParams.fSendMidiChannels; i++ )
         {
@@ -601,8 +600,6 @@ namespace Jack
         //set a timeout on the multicast receive (the thread can now be cancelled)
         if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
-
-        jack_log ( "sizeof (session_params_t) %d", sizeof (session_params_t) );
 
         //main loop, wait for data, deal with it and wait again
         do

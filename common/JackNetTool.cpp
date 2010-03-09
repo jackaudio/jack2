@@ -19,6 +19,72 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetTool.h"
 
+#ifdef __APPLE__
+
+#include <mach/mach_time.h>
+
+class HardwareClock
+{
+public:
+	HardwareClock();
+
+	void Reset();
+	void Update();
+
+	float GetDeltaTime() const;
+	double GetTime() const;		
+	
+private:
+	double m_clockToSeconds;
+
+	uint64_t m_startAbsTime;
+	uint64_t m_lastAbsTime;
+
+	double m_time;
+	float m_deltaTime;
+};
+
+HardwareClock::HardwareClock()
+{
+	mach_timebase_info_data_t info;
+	mach_timebase_info(&info);
+	m_clockToSeconds = (double)info.numer/info.denom/1000000000.0;
+
+	Reset();
+}
+
+void HardwareClock::Reset()
+{
+	m_startAbsTime = mach_absolute_time();
+	m_lastAbsTime = m_startAbsTime;
+	
+	m_time = m_startAbsTime*m_clockToSeconds;
+	m_deltaTime = 1.0f/60.0f;
+}
+
+void HardwareClock::Update()
+{
+	const uint64_t currentTime = mach_absolute_time();
+	const uint64_t dt = currentTime - m_lastAbsTime;
+
+	m_time = currentTime*m_clockToSeconds;
+	m_deltaTime = (double)dt*m_clockToSeconds;
+
+	m_lastAbsTime = currentTime;
+}
+
+float HardwareClock::GetDeltaTime() const
+{
+	return m_deltaTime;
+}
+
+double HardwareClock::GetTime() const
+{
+	return m_time;
+}
+
+#endif
+
 using namespace std;
 
 namespace Jack
@@ -46,11 +112,6 @@ namespace Jack
         delete[] fPortBuffer;
     }
 
-    size_t NetMidiBuffer::GetSize()
-    {
-        return fMaxBufsize;
-    }
-    
     size_t NetMidiBuffer::GetCycleSize()
     {
         return fCycleSize;
@@ -153,11 +214,6 @@ namespace Jack
     NetSingleAudioBuffer::~NetSingleAudioBuffer()
     {}
 
-    size_t NetSingleAudioBuffer::GetSize()
-    {
-        return fPortBuffer.GetSize();
-    }
-    
     size_t NetSingleAudioBuffer::GetCycleSize()
     {
         return fPortBuffer.GetCycleSize();
@@ -193,6 +249,212 @@ namespace Jack
     {
         return fPortBuffer.RenderToNetwork(fNetBuffer, subcycle, total_size);
     }
+    
+    // Celt audio buffer *********************************************************************************
+    
+#ifdef CELT
+
+    #define KPS 32
+    #define KPS_DIV 8
+
+    NetCeltAudioBuffer::NetCeltAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+        : fNetBuffer(net_buffer)
+    {
+        int res1, res2;
+        jack_nframes_t period;
+        
+        fNPorts = nports;
+        fPeriodSize = params->fPeriodSize;
+        
+        fCeltMode = new CELTMode *[fNPorts];
+        fCeltEncoder = new CELTEncoder *[fNPorts];
+        fCeltDecoder = new CELTDecoder *[fNPorts];
+        
+        memset(fCeltMode, 0, fNPorts * sizeof(CELTMode*));
+        memset(fCeltEncoder, 0, fNPorts * sizeof(CELTEncoder*));
+        memset(fCeltDecoder, 0, fNPorts * sizeof(CELTDecoder*));
+        
+        int error = CELT_OK;
+        
+        for (int i = 0; i < fNPorts; i++)  {
+            fCeltMode[i] = celt_mode_create(params->fSampleRate, params->fPeriodSize, &error);
+            if (error != CELT_OK)
+                goto error;
+            
+            fCeltEncoder[i] = celt_encoder_create(fCeltMode[i], 1, &error);
+            if (error != CELT_OK)
+                goto error;
+            celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(0));
+                
+            fCeltDecoder[i] = celt_decoder_create(fCeltMode[i], 1, &error);
+            if (error != CELT_OK)
+                goto error;
+            celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(0));
+        }
+        
+        fPortBuffer = new sample_t* [fNPorts];
+        for (int port_index = 0; port_index < fNPorts; port_index++)
+            fPortBuffer[port_index] = NULL;
+         
+        /*
+        celt_int32 lookahead;
+        celt_mode_info( celt_mode, CELT_GET_LOOKAHEAD, &lookahead );
+        */
+        
+        //fCompressedSizeByte = (KPS * params->fPeriodSize * 1024 / params->fSampleRate / 8)&(~1);
+        fCompressedSizeByte = (params->fPeriodSize * sizeof(sample_t)) / KPS_DIV;   // TODO
+        
+        fCompressedBuffer = new unsigned char* [fNPorts];
+        for (int port_index = 0; port_index < fNPorts; port_index++)
+            fCompressedBuffer[port_index] = new unsigned char[fCompressedSizeByte];
+     
+        jack_log("fCompressedSizeByte %d", fCompressedSizeByte);
+        
+        res1 = (fNPorts * fCompressedSizeByte) % (params->fMtu - sizeof(packet_header_t));
+        res2 = (fNPorts * fCompressedSizeByte) / (params->fMtu - sizeof(packet_header_t));
+        
+        jack_log("res1 = %d res2 = %d", res1, res2);
+         
+        fNumPackets = (res1) ? (res2 + 1) : res2;
+            
+        fSubPeriodBytesSize = fCompressedSizeByte / fNumPackets;
+        fLastSubPeriodBytesSize = fSubPeriodBytesSize + (fCompressedSizeByte - (fSubPeriodBytesSize * fNumPackets));
+        
+        jack_log("fNumPackets = %d fSubPeriodBytesSize = %d, fLastSubPeriodBytesSize = %d", fNumPackets, fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+        
+        fCycleDuration = float(fSubPeriodBytesSize / sizeof(sample_t)) / float(params->fSampleRate);
+        fCycleSize = params->fMtu * fNumPackets;
+        
+        fLastSubCycle = -1;
+        return;
+        
+    error:
+    
+        FreeCelt();
+        throw std::bad_alloc();
+    }
+
+    NetCeltAudioBuffer::~NetCeltAudioBuffer()
+    {
+        FreeCelt();
+        
+        for (int port_index = 0; port_index < fNPorts; port_index++)
+            delete [] fCompressedBuffer[port_index];
+            
+        delete [] fCompressedBuffer;
+        delete [] fPortBuffer;
+    }
+    
+    void NetCeltAudioBuffer::FreeCelt()
+    {
+        for (int i = 0; i < fNPorts; i++)  {
+            if (fCeltEncoder[i])
+                celt_encoder_destroy(fCeltEncoder[i]);
+            if (fCeltDecoder[i])
+                celt_decoder_destroy(fCeltDecoder[i]);
+            if (fCeltMode[i])
+                celt_mode_destroy(fCeltMode[i]);
+        }
+         
+        delete [] fCeltMode;
+        delete [] fCeltEncoder;
+        delete [] fCeltDecoder;
+    }
+
+    size_t NetCeltAudioBuffer::GetCycleSize()
+    {
+        return fCycleSize;
+    }
+    
+    float NetCeltAudioBuffer::GetCycleDuration()
+    {
+        return fCycleDuration;
+    }
+    
+    int NetCeltAudioBuffer::GetNumPackets()
+    {
+        return fNumPackets;
+    }
+
+    void NetCeltAudioBuffer::SetBuffer(int index, sample_t* buffer)
+    {
+        fPortBuffer[index] = buffer;
+    }
+
+    sample_t* NetCeltAudioBuffer::GetBuffer(int index)
+    {
+        return fPortBuffer[index];
+    }
+
+    int NetCeltAudioBuffer::RenderFromJackPorts()
+    {
+        float floatbuf[fPeriodSize];
+        
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
+            memcpy(floatbuf, fPortBuffer[port_index], fPeriodSize * sizeof(float));
+            int res = celt_encode_float(fCeltEncoder[port_index], floatbuf, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
+            if (res != fCompressedSizeByte) {
+                jack_error("celt_encode_float error fCompressedSizeByte = %d  res = %d", fCompressedSizeByte, res);
+            }
+        }
+        
+        return fNPorts * fCompressedSizeByte;  // in bytes
+    }
+
+    int NetCeltAudioBuffer::RenderToJackPorts()
+    {
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
+            int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
+            if (res != CELT_OK) {
+                jack_error("celt_decode_float error res = %d", fCompressedSizeByte, res);
+            }
+        }
+        
+        fLastSubCycle = -1;
+        //return fPeriodSize * sizeof(sample_t);  // in bytes; TODO
+        return 0;
+    }
+    
+    HardwareClock clock;
+     //network<->buffer
+    int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int subcycle, size_t copy_size)
+    {
+        //clock.Update();
+        
+        if (subcycle == fNumPackets - 1) {
+            for (int port_index = 0; port_index < fNPorts; port_index++)
+                memcpy(fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+        } else {
+            for (int port_index = 0; port_index < fNPorts; port_index++)
+                memcpy(fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+        }
+        
+        if (subcycle != fLastSubCycle + 1) 
+            jack_error("Packet(s) missing from... %d %d", fLastSubCycle, subcycle);
+        
+        fLastSubCycle = subcycle;
+        
+        //clock.Update();
+		//const float dt = clock.GetDeltaTime();
+		//printf("Delta: %f s\n", dt);
+        
+        return copy_size;
+    }
+    
+    int NetCeltAudioBuffer::RenderToNetwork(int subcycle, size_t total_size)
+    {
+        if (subcycle == fNumPackets - 1) {
+            for (int port_index = 0; port_index < fNPorts; port_index++)
+                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+        } else {
+            for (int port_index = 0; port_index < fNPorts; port_index++)
+                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fSubPeriodBytesSize);
+        }
+            
+        return fNPorts * fSubPeriodBytesSize; 
+    }
+
+#endif
 
 // Buffered
 
@@ -216,11 +478,6 @@ namespace Jack
         delete [] fJackPortBuffer;
     }
 
-    size_t NetBufferedAudioBuffer::GetSize()
-    {
-        return fPortBuffer[0].GetSize();
-    }
-    
     size_t NetBufferedAudioBuffer::GetCycleSize()
     {
         return fPortBuffer[0].GetCycleSize();

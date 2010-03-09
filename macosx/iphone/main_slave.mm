@@ -11,8 +11,8 @@
 
 #include "TiPhoneCoreAudioRenderer.h"
 
-#define NUM_INPUT 1
-#define NUM_OUTPUT 1
+#define NUM_INPUT 2
+#define NUM_OUTPUT 2
 
 jack_net_slave_t* net;
 jack_adapter_t* adapter;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
     jack_master_t result;
 
-    if ((net = jack_net_slave_open("169.254.46.132", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    if ((net = jack_net_slave_open("169.254.126.231", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
     //if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
         return -1;
     }
@@ -85,6 +85,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     
+    
     if (audio_device.Open(result.buffer_size, result.sample_rate) < 0) {
         return -1;
     }
@@ -94,6 +95,7 @@ int main(int argc, char *argv[]) {
     if (audio_device.Start() < 0) {
         return -1;
     }
+    
     
     int retVal = UIApplicationMain(argc, argv, nil, nil);
     [pool release];
