@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
     audio_device.Stop();
     audio_device.Close();
     
+    
     // Wait for application end
     jack_net_slave_deactivate(net);
     jack_net_slave_close(net);

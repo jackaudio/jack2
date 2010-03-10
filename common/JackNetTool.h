@@ -608,6 +608,56 @@ namespace Jack
     };
 
 #endif
+
+    class SERVER_EXPORT NetIntAudioBuffer : public NetAudioBuffer
+    {
+        private:
+        
+            int fCompressedSizeByte;
+            jack_nframes_t fPeriodSize;
+            
+            int fNumPackets;
+            float fCycleDuration; // in sec
+            size_t fCycleSize; // needed size in bytes for an entire cycle
+            
+            size_t fSubPeriodSize;
+            size_t fSubPeriodBytesSize;
+            size_t fLastSubPeriodSize;;
+            size_t fLastSubPeriodBytesSize;
+           
+            sample_t** fPortBuffer;
+            char* fNetBuffer;
+            short ** fIntBuffer;
+            
+            int fNPorts;
+            
+            int fLastSubCycle;
+             
+        public:
+        
+            NetIntAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
+            ~NetIntAudioBuffer();
+   
+            // needed size in bytes for an entire cycle
+            size_t GetCycleSize();
+            
+             // cycle duration in sec
+            float GetCycleDuration();
+            
+            int GetNumPackets();
+            
+            void SetBuffer(int index, sample_t* buffer);
+            sample_t* GetBuffer(int index);
+       
+            //jack<->buffer
+            int RenderFromJackPorts();
+            int RenderToJackPorts();
+
+            //network<->buffer
+            int RenderFromNetwork(int cycle, int subcycle, size_t copy_size);
+            int RenderToNetwork(int subcycle, size_t total_size);
+    };
+
     
     #define AUDIO_BUFFER_SIZE 8
     

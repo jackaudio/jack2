@@ -236,6 +236,9 @@ namespace Jack
     #ifdef CELT
             fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
             fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+            
+            //fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+            //fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
     #else
             fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
             fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
@@ -745,6 +748,9 @@ namespace Jack
     #ifdef CELT
             fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
             fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+            
+            // fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+           // fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
     #else
             fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
             fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
