@@ -49,7 +49,7 @@ typedef struct {
     int midi_input;     // from master or to slave
     int midi_output;    // to master or from slave
     int mtu;
-    int time_out;       // in millisecond, -1 means in infinite
+    int time_out;       // in second, -1 means in infinite
     char mode;
 
 } jack_slave_t;

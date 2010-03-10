@@ -609,10 +609,11 @@ namespace Jack
     
     // Separate the connection protocol into two separated step
     
-    bool JackNetSlaveInterface::InitConnection()
+    bool JackNetSlaveInterface::InitConnection(int time_out)
     {
-        jack_log ( "JackNetSlaveInterface::InitConnection()" );
-
+        jack_log("JackNetSlaveInterface::InitConnection()");
+        int try_count = (time_out > 0) ? ((1000000 * time_out) / SLAVE_INIT_TIMEOUT) : LONG_MAX;
+   
         //set the parameters to send
         strcpy (fParams.fPacketType, "params");
         fParams.fProtocolVersion = SLAVE_PROTOCOL;
@@ -622,13 +623,13 @@ namespace Jack
         do
         {
             //get a master
-            status = SendAvailableToMaster();
+            status = SendAvailableToMaster(try_count);
             if (status == NET_SOCKET_ERROR)
                 return false;
         }
-        while (status != NET_CONNECTED);
+        while (status != NET_CONNECTED && --try_count > 0);
   
-        return true;
+        return (try_count != 0);
     }
     
     bool JackNetSlaveInterface::InitRendering()
@@ -649,7 +650,7 @@ namespace Jack
         return true;
     }
 
-    net_status_t JackNetSlaveInterface::SendAvailableToMaster()
+    net_status_t JackNetSlaveInterface::SendAvailableToMaster(int count)
     {
         jack_log ( "JackNetSlaveInterface::SendAvailableToMaster()" );
         //utility
@@ -697,7 +698,12 @@ namespace Jack
                 return NET_RECV_ERROR;
             }
         }
-        while ( strcmp ( host_params.fPacketType, fParams.fPacketType )  && ( GetPacketType ( &host_params ) != SLAVE_SETUP ) );
+        while (strcmp(host_params.fPacketType, fParams.fPacketType)  && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--count > 0));
+        
+        // Time out failure..
+        if (count == 0) {
+            return NET_CONNECT_ERROR;
+        }
    
         //everything is OK, copy parameters
         SessionParamsDisplay(&host_params);

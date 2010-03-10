@@ -46,7 +46,7 @@ extern "C"
         int audio_input;
         int audio_output;
         int midi_input;
-        int midi_ouput; 
+        int midi_output; 
         int mtu;
         int time_out;   // in millisecond, -1 means in infinite
         char mode;
@@ -230,8 +230,8 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         result->audio_input = fParams.fSendAudioChannels;
         result->audio_output = fParams.fReturnAudioChannels;
         result->midi_input = fParams.fSendMidiChannels;
-        result->midi_ouput = fParams.fReturnMidiChannels;
-        result->midi_ouput = fParams.fMtu;
+        result->midi_output = fParams.fReturnMidiChannels;
+        result->mtu = fParams.fMtu;
         result->mode = fParams.fNetworkMode;
         return 0;
         
@@ -425,6 +425,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     JackMidiBuffer** fMidiCaptureBuffer;
     JackMidiBuffer** fMidiPlaybackBuffer;
     
+    int fConnectTimeOut;
+    
     JackNetExtSlave(const char* ip, 
                 int port, 
                 const char* name, 
@@ -448,9 +450,10 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fParams.fSendAudioChannels = request->audio_input;
         fParams.fReturnAudioChannels = request->audio_output;
         fParams.fSendMidiChannels = request->midi_input;
-        fParams.fReturnMidiChannels = request->midi_ouput;
+        fParams.fReturnMidiChannels = request->midi_output;
         fParams.fNetworkMode = request->mode;
         fParams.fSlaveSyncMode = 1;
+        fConnectTimeOut = request->time_out;
        
         // Create name with hostname and client name
         GetHostName(host_name, JACK_CLIENT_NAME_SIZE);
@@ -468,7 +471,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     int Open(jack_master_t* result)
     {
         // Init network connection
-        if (!JackNetSlaveInterface::InitConnection()) 
+        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) 
             return -1;
              
         // Then set global parameters

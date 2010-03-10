@@ -145,10 +145,10 @@ namespace Jack
             static uint fSlaveCounter;
        
             bool Init();
-            bool InitConnection();
+            bool InitConnection(int time_out);
             bool InitRendering();
             
-            net_status_t SendAvailableToMaster();
+            net_status_t SendAvailableToMaster(int count = LONG_MAX);
             net_status_t SendStartToMaster();
             
             bool SetParams();
@@ -207,7 +207,7 @@ namespace Jack
 #define SLAVE_SETUP_RETRY 5
 
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
-#define SLAVE_INIT_TIMEOUT 2000000      // in usec
+#define SLAVE_INIT_TIMEOUT 1000000      // in usec
 
 #define CYCLE_OFFSET_FAST   0
 #define CYCLE_OFFSET_NORMAL 1
