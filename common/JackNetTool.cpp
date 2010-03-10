@@ -284,12 +284,12 @@ namespace Jack
             fCeltEncoder[i] = celt_encoder_create(fCeltMode[i], 1, &error);
             if (error != CELT_OK)
                 goto error;
-            celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(0));
+            celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(1));
                 
             fCeltDecoder[i] = celt_decoder_create(fCeltMode[i], 1, &error);
             if (error != CELT_OK)
                 goto error;
-            celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(0));
+            celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
         }
         
         fPortBuffer = new sample_t* [fNPorts];
@@ -318,7 +318,8 @@ namespace Jack
         fNumPackets = (res1) ? (res2 + 1) : res2;
             
         fSubPeriodBytesSize = fCompressedSizeByte / fNumPackets;
-        fLastSubPeriodBytesSize = fSubPeriodBytesSize + (fCompressedSizeByte - (fSubPeriodBytesSize * fNumPackets));
+        //fLastSubPeriodBytesSize = fSubPeriodBytesSize + (fCompressedSizeByte - (fSubPeriodBytesSize * fNumPackets));
+        fLastSubPeriodBytesSize = fSubPeriodBytesSize + fCompressedSizeByte % fNumPackets;
         
         jack_log("fNumPackets = %d fSubPeriodBytesSize = %d, fLastSubPeriodBytesSize = %d", fNumPackets, fSubPeriodBytesSize, fLastSubPeriodBytesSize);
         

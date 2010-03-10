@@ -751,7 +751,7 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
         
-         if (fAdaptative) {
+        if (fAdaptative) {
             AdaptRingBufferSize();
             jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
         } else {

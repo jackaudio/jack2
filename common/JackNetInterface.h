@@ -31,7 +31,12 @@ namespace Jack
 
     class SERVER_EXPORT JackNetInterface
     {
+        private:
+        
+            void Initialize();
+            
         protected:
+        
             session_params_t fParams;
             JackNetSocket fSocket;
             char fMulticastIP[32];
@@ -96,6 +101,7 @@ namespace Jack
         protected:
             bool fRunning;
             int fCycleOffset;
+            int fLastfCycleOffset;
 
             bool Init();
             int SetRxTimeout();
@@ -119,7 +125,7 @@ namespace Jack
             bool IsSynched();
 
         public:
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0)
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fLastfCycleOffset(0)
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
                     : JackNetInterface ( params, socket, multicast_ip )
@@ -205,7 +211,7 @@ namespace Jack
 
 #define CYCLE_OFFSET_FAST   0
 #define CYCLE_OFFSET_NORMAL 1
-#define CYCLE_OFFSET_SLOW   3
+#define CYCLE_OFFSET_SLOW   30
 #define MAX_LATENCY CYCLE_OFFSET_SLOW * 4
 
 #endif

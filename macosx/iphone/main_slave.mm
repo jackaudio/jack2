@@ -18,8 +18,7 @@ jack_net_slave_t* net;
 jack_adapter_t* adapter;
 
 int buffer_size;
-int sample_rate ;
-
+int sample_rate;
 
 static int net_process(jack_nframes_t buffer_size,
                         int audio_input, 
@@ -54,7 +53,6 @@ static void SlaveAudioCallback(int frames, float** inputs, float** outputs, void
 
 #define WIFI_MTU 1500
 
-
 int main(int argc, char *argv[]) {
     
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
@@ -62,11 +60,10 @@ int main(int argc, char *argv[]) {
     jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
     jack_master_t result;
 
-    if ((net = jack_net_slave_open("169.254.126.231", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
-    //if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    //if ((net = jack_net_slave_open("169.254.112.119", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+    if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPod", &request, &result))  == 0) {
         return -1;
     }
-    
     
     if ((adapter = jack_create_adapter(NUM_INPUT, 
                                     NUM_OUTPUT, 
@@ -77,14 +74,12 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     
-    
     TiPhoneCoreAudioRenderer audio_device(NUM_INPUT, NUM_OUTPUT);
 
     jack_set_net_slave_process_callback(net, net_process, NULL);
     if (jack_net_slave_activate(net) != 0) {
         return -1;
     }
-    
     
     if (audio_device.Open(result.buffer_size, result.sample_rate) < 0) {
         return -1;
@@ -95,7 +90,6 @@ int main(int argc, char *argv[]) {
     if (audio_device.Start() < 0) {
         return -1;
     }
-    
     
     int retVal = UIApplicationMain(argc, argv, nil, nil);
     [pool release];
