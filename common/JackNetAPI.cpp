@@ -748,8 +748,11 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
     void Create()
     {
         //ringbuffers
-        fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
-        fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
+        
+        if (fCaptureChannels > 0)
+            fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
+        if (fPlaybackChannels > 0)
+            fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
         
         if (fAdaptative) {
             AdaptRingBufferSize();

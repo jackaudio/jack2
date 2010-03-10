@@ -511,7 +511,7 @@ namespace Jack
         
     };
 
-    class SERVER_EXPORT NetSingleAudioBuffer : public NetAudioBuffer
+    class SERVER_EXPORT NetFloatAudioBuffer : public NetAudioBuffer
     {
         private:
         
@@ -520,8 +520,8 @@ namespace Jack
             
         public:
         
-            NetSingleAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
-            ~NetSingleAudioBuffer();
+            NetFloatAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer );
+            ~NetFloatAudioBuffer();
     
             // needed size in bytes for an entire cycle
             size_t GetCycleSize();

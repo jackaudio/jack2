@@ -11,7 +11,7 @@
 
 #include "TiPhoneCoreAudioRenderer.h"
 
-#define NUM_INPUT 2
+#define NUM_INPUT 0
 #define NUM_OUTPUT 2
 
 jack_net_slave_t* net;
@@ -19,6 +19,7 @@ jack_adapter_t* adapter;
 
 int buffer_size;
 int sample_rate;
+
 
 static int net_process(jack_nframes_t buffer_size,
                         int audio_input, 
@@ -32,6 +33,7 @@ static int net_process(jack_nframes_t buffer_size,
                         void* data)
 {
 
+    //printf("audio_input %d  audio_output %d \n", audio_input, audio_output);
     jack_adapter_pull_and_push(adapter, audio_output_buffer, audio_input_buffer, buffer_size);
     
     // Process input, produce output
@@ -57,7 +59,7 @@ int main(int argc, char *argv[]) {
     
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     
-    jack_slave_t request = { NUM_INPUT, NUM_OUTPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
+    jack_slave_t request = { NUM_OUTPUT, NUM_INPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
     jack_master_t result;
 
     //if ((net = jack_net_slave_open("169.254.112.119", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
@@ -73,9 +75,10 @@ int main(int argc, char *argv[]) {
                                     result.sample_rate)) == 0) {
         return -1;
     }
-    
+     
     TiPhoneCoreAudioRenderer audio_device(NUM_INPUT, NUM_OUTPUT);
-
+  
+  
     jack_set_net_slave_process_callback(net, net_process, NULL);
     if (jack_net_slave_activate(net) != 0) {
         return -1;

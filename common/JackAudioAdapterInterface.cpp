@@ -257,21 +257,27 @@ namespace Jack
             ratio = fPIControler.GetRatio(fPlaybackRingBuffer[0]->GetError() - delta_frames);
         
     #ifdef JACK_MONITOR
-        if (fCaptureRingBuffer[0] != NULL)
+        if (fCaptureRingBuffer && fCaptureRingBuffer[0] != NULL)
             fTable.Write(fCaptureRingBuffer[0]->GetError(), fCaptureRingBuffer[0]->GetError() - delta_frames, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
     #endif
     
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
             fCaptureRingBuffer[i]->SetRatio(ratio);
-            if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], frames) < frames)
-                failure = true;
+            if (inputBuffer[i]) {
+                if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], frames) < frames) {
+                    failure = true;
+                }
+            }
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
             fPlaybackRingBuffer[i]->SetRatio(1/ratio);
-            if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames)
-                 failure = true;
+            if (outputBuffer[i]) {
+                if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames) {
+                     failure = true;
+                }
+            }
         }
         // Reset all ringbuffers in case of failure
         if (failure) {
@@ -297,13 +303,19 @@ namespace Jack
     
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
-            if (fCaptureRingBuffer[i]->Read(inputBuffer[i], frames) < frames)
-                res = -1;
+            if (inputBuffer[i]) {
+                if (fCaptureRingBuffer[i]->Read(inputBuffer[i], frames) < frames) {
+                    res = -1;
+                }
+            }
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], frames) < frames)
-                res = -1;
+            if (outputBuffer[i]) {
+                if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], frames) < frames) {
+                    res = -1;
+                }
+            }
         }
         
         return res;

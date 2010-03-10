@@ -207,45 +207,45 @@ namespace Jack
 
 // net audio buffer *********************************************************************************
 
-    NetSingleAudioBuffer::NetSingleAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+    NetFloatAudioBuffer::NetFloatAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
         : fPortBuffer(params, nports), fNetBuffer(net_buffer)
     {}
 
-    NetSingleAudioBuffer::~NetSingleAudioBuffer()
+    NetFloatAudioBuffer::~NetFloatAudioBuffer()
     {}
 
-    size_t NetSingleAudioBuffer::GetCycleSize()
+    size_t NetFloatAudioBuffer::GetCycleSize()
     {
         return fPortBuffer.GetCycleSize();
     }
 
-    void NetSingleAudioBuffer::SetBuffer ( int index, sample_t* buffer )
+    void NetFloatAudioBuffer::SetBuffer ( int index, sample_t* buffer )
     {
         fPortBuffer.SetBuffer(index, buffer);
     }
 
-    sample_t* NetSingleAudioBuffer::GetBuffer ( int index )
+    sample_t* NetFloatAudioBuffer::GetBuffer ( int index )
     {
         return fPortBuffer.GetBuffer(index);
     }
 
-    int NetSingleAudioBuffer::RenderFromJackPorts ()
+    int NetFloatAudioBuffer::RenderFromJackPorts ()
     {
         return fPortBuffer.RenderFromJackPorts();
     }
 
-    int NetSingleAudioBuffer::RenderToJackPorts ()
+    int NetFloatAudioBuffer::RenderToJackPorts ()
     {
         return fPortBuffer.RenderToJackPorts();
     }
     
      //network<->buffer
-    int NetSingleAudioBuffer::RenderFromNetwork ( int cycle,  int subcycle, size_t copy_size )
+    int NetFloatAudioBuffer::RenderFromNetwork ( int cycle,  int subcycle, size_t copy_size )
     {
         return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, subcycle, copy_size);
     }
     
-    int NetSingleAudioBuffer::RenderToNetwork (int subcycle, size_t total_size )
+    int NetFloatAudioBuffer::RenderToNetwork (int subcycle, size_t total_size )
     {
         return fPortBuffer.RenderToNetwork(fNetBuffer, subcycle, total_size);
     }
@@ -456,7 +456,6 @@ namespace Jack
     }
 
 #endif
-
 
     NetIntAudioBuffer::NetIntAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
         : fNetBuffer(net_buffer)

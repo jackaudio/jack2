@@ -44,10 +44,10 @@ extern "C"
     
 typedef struct {
     
-    int audio_input;   
-    int audio_output;
-    int midi_input;
-    int midi_ouput; 
+    int audio_input;    // from master or to slave
+    int audio_output;   // to master or from slave
+    int midi_input;     // from master or to slave
+    int midi_output;    // to master or from slave
     int mtu;
     int time_out;       // in millisecond, -1 means in infinite
     char mode;

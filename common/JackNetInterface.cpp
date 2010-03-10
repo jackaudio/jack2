@@ -234,26 +234,27 @@ namespace Jack
         try {
         //audio net buffers
     #ifdef CELT
-            fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
-            fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+            if (fParams.fSendAudioChannels)
+                fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+                
+            if (fParams.fReturnAudioChannels)
+                fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
             
             //fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
             //fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
     #else
-            fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
-            fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+            fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+            fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
     #endif    
+    
+            //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+            //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );     
+     
         } catch (exception&) {
             jack_error("NetAudioBuffer allocation error...");
             return false;
         }
-        
-        //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
-        //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );     
-     
-        assert(fNetAudioCaptureBuffer);
-        assert(fNetAudioPlaybackBuffer);
-        
+       
         //set the new timeout for the socket
         if (SetRxTimeout() == SOCKET_ERROR) {
             jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
@@ -741,19 +742,23 @@ namespace Jack
         assert ( fNetMidiPlaybackBuffer );
 
         //audio net buffers
-        //fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-        //fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+        //fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+        //fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
     
         try {
     #ifdef CELT
-            fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-            fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+            if (fParams.fSendAudioChannels)
+                fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+                
+            if (fParams.fReturnAudioChannels)
+                fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
             
             // fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
            // fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
     #else
-            fNetAudioCaptureBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-            fNetAudioPlaybackBuffer = new NetSingleAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+            fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+            fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+            
             //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
             //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
     #endif     
@@ -762,10 +767,7 @@ namespace Jack
             return false;
         }
     
-        assert ( fNetAudioCaptureBuffer );
-        assert ( fNetAudioPlaybackBuffer );
-        
-         //set the new buffer sizes
+        //set the new buffer sizes
         if ( SetNetBufferSize() == SOCKET_ERROR ) {
             jack_error ( "Can't set net buffer sizes : %s", StrError ( NET_ERROR_CODE ) );
             goto error;
