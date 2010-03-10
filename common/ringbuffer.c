@@ -126,6 +126,7 @@ jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 {
 	rb->read_ptr = 0;
 	rb->write_ptr = 0;
+    memset(rb->buf, 0, rb->size);
 }
 
 /* Reset the read and write pointers to zero. This is not thread

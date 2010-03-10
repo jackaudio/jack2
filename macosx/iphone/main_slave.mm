@@ -14,12 +14,11 @@
 #define NUM_INPUT 0
 #define NUM_OUTPUT 2
 
-jack_net_slave_t* net;
-jack_adapter_t* adapter;
+jack_net_slave_t* net = NULL;
+jack_adapter_t* adapter = NULL;
 
 int buffer_size;
 int sample_rate;
-
 
 static int net_process(jack_nframes_t buffer_size,
                         int audio_input, 
@@ -45,6 +44,13 @@ static int net_process(jack_nframes_t buffer_size,
     }
     return 0;
 }
+
+static void net_shutdown(void *arg)
+{
+    if (adapter)
+        jack_flush_adapter(adapter);
+}
+
 
 static void SlaveAudioCallback(int frames, float** inputs, float** outputs, void* arg)
 {
@@ -80,6 +86,8 @@ int main(int argc, char *argv[]) {
   
   
     jack_set_net_slave_process_callback(net, net_process, NULL);
+    jack_set_net_slave_shutdown_callback(net, net_shutdown, NULL);
+    
     if (jack_net_slave_activate(net) != 0) {
         return -1;
     }

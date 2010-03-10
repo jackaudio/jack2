@@ -111,6 +111,7 @@ extern "C"
                                                     jack_nframes_t adapted_buffer_size,
                                                     jack_nframes_t adapted_sample_rate);
     SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter);
+    SERVER_EXPORT void jack_flush_adapter(jack_adapter_t* adapter);
 
     SERVER_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
     SERVER_EXPORT int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
@@ -485,7 +486,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         return 0;
     }
     
-     int Restart()
+    int Restart()
     {
         // If shutdown cb is set, then call it
         if (fShutdownCallback)
@@ -782,6 +783,16 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
     {
         Destroy();
     }
+    
+    int Flush()
+    {
+        for (int i = 0; i < fCaptureChannels; i++ ) {
+            fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+        for (int i = 0; i < fPlaybackChannels; i++ ) {
+            fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
+        }
+    }
      
 };
 
@@ -892,6 +903,12 @@ SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)
 {
     delete((JackNetAdapter*)adapter);
     return 0;
+}
+
+SERVER_EXPORT void jack_flush_adapter(jack_adapter_t* adapter)
+{
+    JackNetAdapter* slave = (JackNetAdapter*)adapter;
+    slave->Flush();
 }
 
 SERVER_EXPORT int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames)

@@ -436,13 +436,15 @@ namespace Jack
                 //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
                 //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
                 
+                /*
                 if (fCycleOffset < CYCLE_OFFSET_SLOW) {
                     return 0;
                 } else {
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 }
+                */
                 
-                //rx_bytes = Recv ( rx_head->fPacketSize, 0 );
+                rx_bytes = Recv ( rx_head->fPacketSize, 0 );
                 
                 if (fCycleOffset != fLastfCycleOffset)
                     jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);

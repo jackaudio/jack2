@@ -268,6 +268,9 @@ jack_adapter_t* jack_create_adapter(int input, int output,
  */  
 int jack_destroy_adapter(jack_adapter_t* adapter);
 
+
+void jack_flush_adapter(jack_adapter_t* adapter);
+
 /**
  * Push input to and pull output from ringbuffer
  *

@@ -39,6 +39,7 @@ JackResampler::~JackResampler()
 void JackResampler::Reset(unsigned int new_size)
 {
     fRingBufferSize = new_size;
+    jack_ringbuffer_reset(fRingBuffer);
     jack_ringbuffer_reset_size(fRingBuffer, sizeof(float) * fRingBufferSize);
     jack_ringbuffer_read_advance(fRingBuffer, (sizeof(float) * fRingBufferSize / 2));
 }

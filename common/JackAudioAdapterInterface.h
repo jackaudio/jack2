@@ -102,7 +102,7 @@ namespace Jack
         
     public:
 
-         JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ):
+         JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE):
             fCaptureChannels ( 0 ),
             fPlaybackChannels ( 0 ),
             fHostBufferSize ( buffer_size ),
@@ -112,7 +112,7 @@ namespace Jack
             fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
             fQuality(0),
-            fRingbufferCurSize(DEFAULT_ADAPTATIVE_SIZE),
+            fRingbufferCurSize(ring_buffer_size),
             fPullAndPushTime(0),
             fRunning(false),
             fAdaptative(true)
@@ -120,7 +120,8 @@ namespace Jack
         JackAudioAdapterInterface ( jack_nframes_t host_buffer_size, 
                                     jack_nframes_t host_sample_rate,
                                     jack_nframes_t adapted_buffer_size,
-                                    jack_nframes_t adapted_sample_rate ) :
+                                    jack_nframes_t adapted_sample_rate,
+                                    jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE ) :
                 fCaptureChannels ( 0 ),
                 fPlaybackChannels ( 0 ),
                 fHostBufferSize ( host_buffer_size ),
@@ -129,7 +130,7 @@ namespace Jack
                 fAdaptedSampleRate ( adapted_sample_rate ),
                 fPIControler(host_sample_rate / host_sample_rate, 256),
                 fQuality(0),
-                fRingbufferCurSize(DEFAULT_ADAPTATIVE_SIZE),
+                fRingbufferCurSize(ring_buffer_size),
                 fPullAndPushTime(0),
                 fRunning(false),
                 fAdaptative(true)
