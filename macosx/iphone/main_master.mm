@@ -20,7 +20,7 @@ jack_adapter_t* adapter;
 float** audio_input_buffer;
 float** audio_output_buffer;
 
-int buffer_size = 4096;
+int buffer_size = 1024;
 int sample_rate = 44100;
 
 jack_master_t request = { buffer_size, sample_rate, "master" };
@@ -30,18 +30,22 @@ static void MasterAudioCallback(int frames, float** inputs, float** outputs, voi
 {
     int i; 
     
-    // Copy from iPod input to network
+    // Copy from iPod input to network buffers
     for (i = 0; i < result.audio_input; i++) {
         memcpy(audio_output_buffer[i], inputs[i], buffer_size * sizeof(float));
     }
+    
+    // Send network buffers
     if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
         printf("jack_net_master_send error..\n");
     }
     
-    // Copy from network to iPod output
+    // Recv network buffers
     if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
         printf("jack_net_master_recv error..\n");
     }
+    
+    // Copy from network buffers to iPod output
     for (i = 0; i < result.audio_output; i++) {
         memcpy(outputs[i], audio_input_buffer[i], buffer_size * sizeof(float));
     }
@@ -57,6 +61,7 @@ int main(int argc, char *argv[]) {
     TiPhoneCoreAudioRenderer audio_device(NUM_INPUT, NUM_OUTPUT);
  
     if ((net = jack_net_master_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
+        printf("jack_net_master_open error..\n");
         return -1;
     }
     
@@ -82,7 +87,7 @@ int main(int argc, char *argv[]) {
     }
     
     // Run until interrupted 
-  	while (1) {}
+  	//while (1) {}
     
     /*
     // Quite brutal way, the application actually does not start completely, the netjack audio processing loop is used instead...
@@ -105,10 +110,11 @@ int main(int argc, char *argv[]) {
 	};
     */
     
+    int retVal = UIApplicationMain(argc, argv, nil, nil);
+    
     audio_device.Stop();
     audio_device.Close();
-    
-    int retVal = UIApplicationMain(argc, argv, nil, nil);
+   
     
     // Wait for application end
     jack_net_master_close(net);

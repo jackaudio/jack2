@@ -278,7 +278,7 @@ namespace Jack
             virtual int RenderToJackPorts () = 0;
             
             //network<->buffer
-            virtual int RenderFromNetwork ( int cycle,  int subcycle, size_t copy_size ) = 0;
+            virtual int RenderFromNetwork ( int cycle, int subcycle, size_t copy_size ) = 0;
             virtual int RenderToNetwork (int subcycle, size_t total_size ) = 0;
 
             virtual void SetBuffer ( int index, sample_t* buffer ) = 0;

@@ -49,7 +49,6 @@ HardwareClock::HardwareClock()
 	mach_timebase_info_data_t info;
 	mach_timebase_info(&info);
 	m_clockToSeconds = (double)info.numer/info.denom/1000000000.0;
-
 	Reset();
 }
 
@@ -57,7 +56,6 @@ void HardwareClock::Reset()
 {
 	m_startAbsTime = mach_absolute_time();
 	m_lastAbsTime = m_startAbsTime;
-	
 	m_time = m_startAbsTime*m_clockToSeconds;
 	m_deltaTime = 1.0f/60.0f;
 }
@@ -69,7 +67,6 @@ void HardwareClock::Update()
 
 	m_time = currentTime*m_clockToSeconds;
 	m_deltaTime = (double)dt*m_clockToSeconds;
-
 	m_lastAbsTime = currentTime;
 }
 
@@ -200,8 +197,8 @@ namespace Jack
     int NetMidiBuffer::RenderToNetwork ( int subcycle, size_t total_size )
     {
         int size = total_size - subcycle * fMaxPcktSize;
-        int copy_size = ( size <= fMaxPcktSize ) ? size : fMaxPcktSize;
-        memcpy ( fNetBuffer, fBuffer + subcycle * fMaxPcktSize, copy_size );
+        int copy_size = (size <= fMaxPcktSize) ? size : fMaxPcktSize;
+        memcpy(fNetBuffer, fBuffer + subcycle * fMaxPcktSize, copy_size);
         return copy_size;
     }
 
@@ -414,12 +411,9 @@ namespace Jack
         return 0;
     }
     
-    HardwareClock clock;
-     //network<->buffer
+      //network<->buffer
     int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int subcycle, size_t copy_size)
     {
-        //clock.Update();
-        
         if (subcycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
                 memcpy(fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
@@ -432,11 +426,6 @@ namespace Jack
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, subcycle);
         
         fLastSubCycle = subcycle;
-        
-        //clock.Update();
-		//const float dt = clock.GetDeltaTime();
-		//printf("Delta: %f s\n", dt);
-        
         return copy_size;
     }
     

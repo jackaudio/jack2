@@ -117,18 +117,18 @@ namespace Jack
 
     JackNetAdapter::~JackNetAdapter()
     {
-        jack_log ( "JackNetAdapter::~JackNetAdapter" );
+        jack_log ("JackNetAdapter::~JackNetAdapter");
 
         int port_index;
-        if ( fSoftCaptureBuffer )
+        if (fSoftCaptureBuffer)
         {
-            for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+            for (port_index = 0; port_index < fCaptureChannels; port_index++)
                 delete[] fSoftCaptureBuffer[port_index];
             delete[] fSoftCaptureBuffer;
         }
-        if ( fSoftPlaybackBuffer )
+        if (fSoftPlaybackBuffer)
         {
-            for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+            for ( port_index = 0; port_index < fPlaybackChannels; port_index++)
                 delete[] fSoftPlaybackBuffer[port_index];
             delete[] fSoftPlaybackBuffer;
         }
@@ -194,6 +194,8 @@ namespace Jack
     }
 
 //thread------------------------------------------------------------------------------
+    // TODO : if failure, thread exist... need to restart ?
+    
     bool JackNetAdapter::Init()
     {
         jack_log ( "JackNetAdapter::Init" );
@@ -201,11 +203,16 @@ namespace Jack
         int port_index;
 
         //init network connection
-        if ( !JackNetSlaveInterface::Init() )
+        if (!JackNetSlaveInterface::Init()) {
+            jack_error("JackNetSlaveInterface::Init() error..." );
             return false;
+        }
 
         //then set global parameters
-        SetParams();
+        if (!SetParams()) {
+            jack_error("SetParams error..." );
+            return false;
+        }
 
         //set buffers
         fSoftCaptureBuffer = new sample_t*[fCaptureChannels];

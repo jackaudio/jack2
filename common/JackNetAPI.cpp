@@ -214,6 +214,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                             fprintf(stderr, "Can't init new net master...\n");
                             goto error;
                         }
+                        jack_info ( "Waiting for a slave..." );
                         break;
                         
                     case KILL_MASTER:
@@ -787,7 +788,7 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
         Destroy();
     }
     
-    int Flush()
+    void Flush()
     {
         for (int i = 0; i < fCaptureChannels; i++ ) {
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
@@ -881,14 +882,14 @@ SERVER_EXPORT int jack_net_master_close(jack_net_master_t* net)
 }
 SERVER_EXPORT int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
 {
-    JackNetExtMaster* slave = (JackNetExtMaster*)net;
-    return slave->Read(audio_input, audio_input_buffer, midi_input, midi_input_buffer);
+    JackNetExtMaster* master = (JackNetExtMaster*)net;
+    return master->Read(audio_input, audio_input_buffer, midi_input, midi_input_buffer);
 }
 
 SERVER_EXPORT int jack_net_master_send(jack_net_master_t* net, int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
 {
-    JackNetExtMaster* slave = (JackNetExtMaster*)net;
-    return slave->Write(audio_output, audio_output_buffer, midi_output, midi_output_buffer);
+    JackNetExtMaster* master = (JackNetExtMaster*)net;
+    return master->Write(audio_output, audio_output_buffer, midi_output, midi_output_buffer);
 }
 
 // Adapter API

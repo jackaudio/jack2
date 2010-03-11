@@ -67,9 +67,21 @@ namespace Jack
         memset(&fReturnTransportData, 0, sizeof(net_transport_data_t));
     }
     
+    void JackNetInterface::FreeNetworkBuffers()
+    {
+        delete fNetMidiCaptureBuffer;
+        delete fNetMidiPlaybackBuffer;
+        delete fNetAudioCaptureBuffer;
+        delete fNetAudioPlaybackBuffer;
+        fNetMidiCaptureBuffer = NULL;
+        fNetMidiPlaybackBuffer = NULL;
+        fNetAudioCaptureBuffer = NULL;
+        fNetAudioPlaybackBuffer = NULL;
+    }
+    
     JackNetInterface::~JackNetInterface()
     {
-        jack_log ( "JackNetInterface::~JackNetInterface" );
+        jack_log ("JackNetInterface::~JackNetInterface");
 
         fSocket.Close();
         delete[] fTxBuffer;
@@ -270,11 +282,7 @@ namespace Jack
         return true;
             
     error:
-    
-        delete fNetMidiCaptureBuffer;
-        delete fNetMidiPlaybackBuffer;
-        delete fNetAudioCaptureBuffer;
-        delete fNetAudioPlaybackBuffer;
+        FreeNetworkBuffers();
         return false;
     }
 
@@ -650,7 +658,7 @@ namespace Jack
         return true;
     }
 
-    net_status_t JackNetSlaveInterface::SendAvailableToMaster(int count)
+    net_status_t JackNetSlaveInterface::SendAvailableToMaster(long try_count)
     {
         jack_log ( "JackNetSlaveInterface::SendAvailableToMaster()" );
         //utility
@@ -698,10 +706,11 @@ namespace Jack
                 return NET_RECV_ERROR;
             }
         }
-        while (strcmp(host_params.fPacketType, fParams.fPacketType)  && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--count > 0));
+        while (strcmp(host_params.fPacketType, fParams.fPacketType)  && (GetPacketType(&host_params) != SLAVE_SETUP)  && (--try_count > 0));
         
         // Time out failure..
-        if (count == 0) {
+        if (try_count == 0) {
+            jack_error("Time out error in connect");
             return NET_CONNECT_ERROR;
         }
    
@@ -710,8 +719,8 @@ namespace Jack
         fParams = host_params;
 
         //connect the socket
-        if ( fSocket.Connect() == SOCKET_ERROR ) {
-            jack_error ( "Error in connect : %s", StrError ( NET_ERROR_CODE ) );
+        if (fSocket.Connect() == SOCKET_ERROR) {
+            jack_error("Error in connect : %s", StrError(NET_ERROR_CODE));
             return NET_CONNECT_ERROR;
         }
         return NET_CONNECTED;
@@ -719,17 +728,17 @@ namespace Jack
 
     net_status_t JackNetSlaveInterface::SendStartToMaster()
     {
-        jack_log ( "JackNetSlaveInterface::SendStartToMaster" );
+        jack_log("JackNetSlaveInterface::SendStartToMaster");
 
         //tell the master to start
         session_params_t net_params;
         memset(&net_params, 0, sizeof ( session_params_t ));
         SetPacketType ( &fParams, START_MASTER );
         SessionParamsHToN(&fParams, &net_params);
-        if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
+        if (fSocket.Send(&net_params, sizeof(session_params_t), 0) == SOCKET_ERROR)
         {
-            jack_error ( "Error in send : %s", StrError ( NET_ERROR_CODE ) );
-            return ( fSocket.GetError() == NET_CONN_ERROR ) ? NET_ERROR : NET_SEND_ERROR;
+            jack_error("Error in send : %s", StrError(NET_ERROR_CODE));
+            return (fSocket.GetError() == NET_CONN_ERROR) ? NET_ERROR : NET_SEND_ERROR;
         }
         return NET_ROLLING;
     }
@@ -784,10 +793,7 @@ namespace Jack
         return true;
         
     error:
-        delete fNetMidiCaptureBuffer;
-        delete fNetMidiPlaybackBuffer;
-        delete fNetAudioCaptureBuffer;
-        delete fNetAudioPlaybackBuffer;
+        FreeNetworkBuffers();        
         return false;
     }
 

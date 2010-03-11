@@ -63,6 +63,7 @@ namespace Jack
 
             //utility methods
             int SetNetBufferSize();
+            void FreeNetworkBuffers();
      
             //virtual methods : depends on the sub class master/slave
             virtual bool SetParams();
@@ -148,7 +149,7 @@ namespace Jack
             bool InitConnection(int time_out);
             bool InitRendering();
             
-            net_status_t SendAvailableToMaster(int count = LONG_MAX);
+            net_status_t SendAvailableToMaster(long count = LONG_MAX);  // long here (and not int...)
             net_status_t SendStartToMaster();
             
             bool SetParams();

@@ -113,12 +113,16 @@ namespace Jack
     bool JackNetMaster::Init(bool auto_connect)
     {
         //network init
-        if (!JackNetMasterInterface::Init())
+        if (!JackNetMasterInterface::Init()){
+            jack_error("JackNetMasterInterface::Init() error..." );
             return false;
+        }
 
         //set global parameters
-        if (!SetParams())
+        if (!SetParams()) {
+            jack_error("SetParams error..." );
             return false;
+        }
 
         //jack client and process
         jack_status_t status;

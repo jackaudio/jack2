@@ -212,13 +212,13 @@ namespace Jack
 
         int GetInputs()
         {
-            jack_log ( "JackAudioAdapterInterface::GetInputs %d", fCaptureChannels );
+            //jack_log("JackAudioAdapterInterface::GetInputs %d", fCaptureChannels);
             return fCaptureChannels;
         }
 
         int GetOutputs()
         {
-            jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
+            //jack_log ("JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels);
             return fPlaybackChannels;
         }
         
