@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
     
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     
-    jack_slave_t request = { NUM_OUTPUT, NUM_INPUT, 0, 0, WIFI_MTU, -1, JackSlowMode };
+    jack_slave_t request = { NUM_OUTPUT, NUM_INPUT, 0, 0, WIFI_MTU, -1, JackCeltEncoder, 128, JackSlowMode };
     jack_master_t result;
 
     //if ((net = jack_net_slave_open("169.254.112.119", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {

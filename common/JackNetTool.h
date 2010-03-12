@@ -47,6 +47,13 @@ namespace Jack
     typedef struct sockaddr socket_address_t;
     typedef struct in_addr address_t;
     typedef jack_default_audio_sample_t sample_t;
+    
+    enum JackNetEncoder {
+
+        JackFloatEncoder = 0,
+        JackIntEncoder = 1,
+        JackCeltEncoder = 2,
+    };
 
 //session params ******************************************************************************
 
@@ -87,7 +94,8 @@ namespace Jack
         uint32_t fReturnMidiChannels;       //number of slave->master midi channels
         uint32_t fSampleRate;               //session sample rate
         uint32_t fPeriodSize;               //period size
-        uint32_t fBitdepth;                 //samples bitdepth (unused)
+        uint32_t fSampleEncoder;            //samples encoder
+        uint32_t fKBps;                     // KB per second for CELT encoder
         uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
         char fNetworkMode;                  //fast, normal or slow mode
     };
@@ -157,7 +165,6 @@ namespace Jack
         char fDataType;             //a for audio, m for midi and s for sync
         char fDataStream;           //s for send, r for return
         uint32_t fID;               //unique ID of the slave
-        uint32_t fBitdepth;         //bitdepth of the data samples
         uint32_t fNumPacket;        //number of data packets of the cycle
         uint32_t fPacketSize;       //packet size in bytes
         uint32_t fCycle;            //process cycle counter
@@ -584,7 +591,7 @@ namespace Jack
             
         public:
         
-            NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer);
+            NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps);
             ~NetCeltAudioBuffer();
    
             // needed size in bytes for an entire cycle

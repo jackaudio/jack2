@@ -658,7 +658,6 @@ namespace Jack
         params.fID = ++fGlobalID;
         params.fSampleRate = jack_get_sample_rate ( fManagerClient );
         params.fPeriodSize = jack_get_buffer_size ( fManagerClient );
-        params.fBitdepth = 0;
         SetSlaveName ( params );
 
         //create a new master and add it to the list

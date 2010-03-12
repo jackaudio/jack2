@@ -254,7 +254,7 @@ namespace Jack
     #define KPS 32
     #define KPS_DIV 8
 
-    NetCeltAudioBuffer::NetCeltAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+    NetCeltAudioBuffer::NetCeltAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer, int kbps )
         : fNetBuffer(net_buffer)
     {
         int res1, res2;
@@ -297,8 +297,8 @@ namespace Jack
         celt_mode_info( celt_mode, CELT_GET_LOOKAHEAD, &lookahead );
         */
         
-        //fCompressedSizeByte = (KPS * params->fPeriodSize * 1024 / params->fSampleRate / 8)&(~1);
-        fCompressedSizeByte = (params->fPeriodSize * sizeof(sample_t)) / KPS_DIV;   // TODO
+        fCompressedSizeByte = (kbps * params->fPeriodSize * 1024) / (params->fSampleRate * 8);
+        //fCompressedSizeByte = (params->fPeriodSize * sizeof(sample_t)) / KPS_DIV;   // TODO
         
         fCompressedBuffer = new unsigned char* [fNPorts];
         for (int port_index = 0; port_index < fNPorts; port_index++)
@@ -649,7 +649,7 @@ namespace Jack
         dst_params->fReturnMidiChannels = htonl ( src_params->fReturnMidiChannels );
         dst_params->fSampleRate = htonl ( src_params->fSampleRate );
         dst_params->fPeriodSize = htonl ( src_params->fPeriodSize );
-        dst_params->fBitdepth = htonl ( src_params->fBitdepth );
+        dst_params->fSampleEncoder = htonl ( src_params->fSampleEncoder );
         dst_params->fSlaveSyncMode = htonl ( src_params->fSlaveSyncMode );
     }
 
@@ -666,14 +666,26 @@ namespace Jack
         dst_params->fReturnMidiChannels = ntohl ( src_params->fReturnMidiChannels );
         dst_params->fSampleRate = ntohl ( src_params->fSampleRate );
         dst_params->fPeriodSize = ntohl ( src_params->fPeriodSize );
-        dst_params->fBitdepth = ntohl ( src_params->fBitdepth );
+        dst_params->fSampleEncoder = ntohl ( src_params->fSampleEncoder );
         dst_params->fSlaveSyncMode = ntohl ( src_params->fSlaveSyncMode );
     }
 
     SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params )
     {
-        char bitdepth[16];
-        ( params->fBitdepth ) ? sprintf ( bitdepth, "%u", params->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
+        char encoder[16];
+        switch ( params->fSampleEncoder )
+        {
+            case JackFloatEncoder:
+                strcpy ( encoder, "float" );
+                break;
+            case JackIntEncoder:
+                strcpy ( encoder, "integer" );
+                break;
+            case JackCeltEncoder:
+                strcpy ( encoder, "CELT" );
+                break;
+        }
+       
         char mode[8];
         switch ( params->fNetworkMode )
         {
@@ -699,7 +711,7 @@ namespace Jack
         jack_info ( "Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels );
         jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
         jack_info ( "Period size : %u frames per period", params->fPeriodSize );
-        jack_info ( "Bitdepth : %s", bitdepth );
+        jack_info ( "SampleEncoder : %u", params->fSampleEncoder );
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
         jack_info ( "Network mode : %s", mode );
         jack_info ( "****************************************************" );
@@ -753,7 +765,6 @@ namespace Jack
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fID = htonl ( src_header->fID );
-        dst_header->fBitdepth = htonl ( src_header->fBitdepth );
         dst_header->fNumPacket = htonl ( src_header->fNumPacket );
         dst_header->fPacketSize = htonl ( src_header->fPacketSize );
         dst_header->fCycle = htonl ( src_header->fCycle );
@@ -765,7 +776,6 @@ namespace Jack
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
         dst_header->fID = ntohl ( src_header->fID );
-        dst_header->fBitdepth = ntohl ( src_header->fBitdepth );
         dst_header->fNumPacket = ntohl ( src_header->fNumPacket );
         dst_header->fPacketSize = ntohl ( src_header->fPacketSize );
         dst_header->fCycle = ntohl ( src_header->fCycle );
@@ -776,7 +786,6 @@ namespace Jack
     SERVER_EXPORT void PacketHeaderDisplay ( packet_header_t* header )
     {
         char bitdepth[16];
-        ( header->fBitdepth ) ? sprintf ( bitdepth, "%u", header->fBitdepth ) : sprintf ( bitdepth, "%s", "float" );
         jack_info ( "********************Header********************" );
         jack_info ( "Data type : %c", header->fDataType );
         jack_info ( "Data stream : %c", header->fDataStream );

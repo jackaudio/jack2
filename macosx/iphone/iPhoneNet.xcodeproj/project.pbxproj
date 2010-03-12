@@ -182,7 +182,7 @@
 		4BCB37CE112D647C008C7BC1 /* iPhoneFaust.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneFaust.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCB37D5112D64B4008C7BC1 /* HardwareClock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HardwareClock.cpp; sourceTree = SOURCE_ROOT; };
 		4BCB37D8112D64D8008C7BC1 /* iphone-faust.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "iphone-faust.mm"; sourceTree = SOURCE_ROOT; };
-		4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneThruNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BCF75F210BC2FD90082C526 /* iPhoneFaustNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneFaustNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF75F610BC30140082C526 /* audio_thru.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_thru.mm; sourceTree = SOURCE_ROOT; };
 		4BDFCD57113DB6B700D77992 /* NetJackSlave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetJackSlave.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BF1360E0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterInterface.cpp; path = ../../common/JackAudioAdapterInterface.cpp; sourceTree = SOURCE_ROOT; };
@@ -292,7 +292,7 @@
 				4BFF45120F4D59DB00106083 /* libjacknet.a */,
 				4BFF45770F4D5D9700106083 /* iPhoneFaustNet.app */,
 				4B0772380F54018C000DC657 /* NetJackMaster.app */,
-				4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */,
+				4BCF75F210BC2FD90082C526 /* iPhoneFaustNet.app */,
 				4B4146B010BD3C4300C12F0C /* iPhoneFaustNet.app */,
 				4BCB37CE112D647C008C7BC1 /* iPhoneFaust.app */,
 				4BDFCD57113DB6B700D77992 /* NetJackSlave.app */,
@@ -485,7 +485,7 @@
 			);
 			name = iPhoneThruNet;
 			productName = iPhoneNet;
-			productReference = 4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */;
+			productReference = 4BCF75F210BC2FD90082C526 /* iPhoneFaustNet.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4BDFCD3B113DB6B700D77992 /* iPhoneNetSlaveLib */ = {

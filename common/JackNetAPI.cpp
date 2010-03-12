@@ -40,8 +40,15 @@ extern "C"
         JackNormalMode = 'n',
         JackSlowMode = 's',
     };
+    
+    enum JackNetEncoder {
 
-     typedef struct {
+        JackFloatEncoder = 0,
+        JackIntEncoder = 1,
+        JackCeltEncoder = 2,
+    };
+
+    typedef struct {
     
         int audio_input;
         int audio_output;
@@ -49,6 +56,8 @@ extern "C"
         int midi_output; 
         int mtu;
         int time_out;   // in millisecond, -1 means in infinite
+        int encoder;
+        int kbps;       // KB per second for CELT encoder
         char mode;
 
     } jack_slave_t;
@@ -256,7 +265,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         // Settings
         fSocket.GetName(fParams.fMasterNetName);
         fParams.fID = 1;
-        fParams.fBitdepth = 0;
+        fParams.fSampleEncoder = JackFloatEncoder;
         fParams.fPeriodSize = fRequest.buffer_size;
         fParams.fSampleRate = fRequest.sample_rate;
      
@@ -463,7 +472,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fParams.fSendMidiChannels = request->midi_input;
         fParams.fReturnMidiChannels = request->midi_output;
         fParams.fNetworkMode = request->mode;
-        fParams.fSlaveSyncMode = 1;
+        fParams.fSampleEncoder = request->encoder;
+        fParams.fKBps = request->kbps;
         fConnectTimeOut = request->time_out;
        
         // Create name with hostname and client name

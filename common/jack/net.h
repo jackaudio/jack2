@@ -35,11 +35,18 @@ extern "C"
 
 #define SOCKET_ERROR -1
 
- enum JackNetMode {
+enum JackNetMode {
 
     JackFastMode = 'f',
     JackNormalMode = 'n',
     JackSlowMode = 's',
+};
+
+enum JackNetEncoder {
+
+    JackFloatEncoder = 0,
+    JackIntEncoder = 1,
+    JackCeltEncoder = 2,
 };
     
 typedef struct {
@@ -50,6 +57,8 @@ typedef struct {
     int midi_output;    // to master or from slave
     int mtu;
     int time_out;       // in second, -1 means in infinite
+    int encoder;
+    int kbps;           // KB per second for CELT encoder
     char mode;
 
 } jack_slave_t;

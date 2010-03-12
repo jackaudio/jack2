@@ -20,8 +20,8 @@ jack_adapter_t* adapter;
 float** audio_input_buffer = NULL;
 float** audio_output_buffer = NULL;
 
-int buffer_size = 512;
-int sample_rate = 32000;
+int buffer_size = 1024;
+int sample_rate = 22050;
 //int sample_rate = 32000;
 
 jack_master_t request = { buffer_size, sample_rate, "master" };
@@ -40,12 +40,12 @@ static void MasterAudioCallback(int frames, float** inputs, float** outputs, voi
 {
     int i; 
     
-    /*
+    
     // Copy from iPod input to network buffers
     for (i = 0; i < result.audio_input; i++) {
         memcpy(audio_input_buffer[i], inputs[i], buffer_size * sizeof(float));
     }
-    */
+    
     
     /*
     // Copy from network out buffers to network in buffers (audio thru)
@@ -55,7 +55,7 @@ static void MasterAudioCallback(int frames, float** inputs, float** outputs, voi
     */
     
     // Mix iPod input and network in buffers to network out buffers
-    MixAudio(audio_input_buffer, inputs, audio_output_buffer, result.audio_input, buffer_size);
+    //MixAudio(audio_input_buffer, inputs, audio_output_buffer, result.audio_input, buffer_size);
     
     // Send network buffers
     if (jack_net_master_send(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
