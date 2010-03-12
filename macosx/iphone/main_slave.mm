@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 
     //if ((net = jack_net_slave_open("169.254.112.119", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
     if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPod", &request, &result))  == 0) {
-        printf("jack_net_slave_open error..\n");
+        printf("jack_net_master_open error..\n");
         return -1;
     }
     

@@ -184,9 +184,7 @@
 		4BCB37D8112D64D8008C7BC1 /* iphone-faust.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "iphone-faust.mm"; sourceTree = SOURCE_ROOT; };
 		4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneThruNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF75F610BC30140082C526 /* audio_thru.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_thru.mm; sourceTree = SOURCE_ROOT; };
-		4BDFCCD7113DB30500D77992 /* Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info copy.plist"; sourceTree = "<group>"; };
 		4BDFCD57113DB6B700D77992 /* NetJackSlave.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetJackSlave.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BDFCD59113DB6B700D77992 /* Info copy 2.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info copy 2.plist"; sourceTree = "<group>"; };
 		4BF1360E0F4B0B4C00218A3F /* JackAudioAdapterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackAudioAdapterInterface.cpp; path = ../../common/JackAudioAdapterInterface.cpp; sourceTree = SOURCE_ROOT; };
 		4BF136120F4B0B5E00218A3F /* JackAudioAdapterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackAudioAdapterInterface.h; path = ../../common/JackAudioAdapterInterface.h; sourceTree = SOURCE_ROOT; };
 		4BF1364B0F4B0F7700218A3F /* JackResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackResampler.cpp; path = ../../common/JackResampler.cpp; sourceTree = SOURCE_ROOT; };
@@ -354,8 +352,6 @@
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				4BC9C1D31135AA1800D22670 /* iPhoneNetMasterAppl-Info.plist */,
-				4BDFCCD7113DB30500D77992 /* Info copy.plist */,
-				4BDFCD59113DB6B700D77992 /* Info copy 2.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";

@@ -80,14 +80,14 @@ OSStatus TiPhoneCoreAudioRenderer::Render(void *inRefCon,
                                          AudioBufferList *ioData)
 {
     TiPhoneCoreAudioRendererPtr renderer = (TiPhoneCoreAudioRendererPtr)inRefCon;
-    AudioUnitRender(renderer->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, ioData);
+    AudioUnitRender(renderer->fAUHAL, ioActionFlags, inTimeStamp, 1, inNumberFrames, renderer->fCAInputData);
     
     float coef = float(LONG_MAX);
     float inv_coef = 1.f/float(LONG_MAX);
     
     for (int chan = 0; chan < renderer->fDevNumInChans; chan++) {
         for (int frame = 0; frame < inNumberFrames; frame++) {
-            renderer->fInChannel[chan][frame] = float(((long*)ioData->mBuffers[chan].mData)[frame]) * inv_coef;
+            renderer->fInChannel[chan][frame] = float(((int*)renderer->fCAInputData->mBuffers[chan].mData)[frame]) * inv_coef;
         }
     }
     
@@ -95,7 +95,7 @@ OSStatus TiPhoneCoreAudioRenderer::Render(void *inRefCon,
     
     for (int chan = 0; chan < renderer->fDevNumOutChans; chan++) {
         for (int frame = 0; frame < inNumberFrames; frame++) {
-           ((long*)ioData->mBuffers[chan].mData)[frame] = long(renderer->fOutChannel[chan][frame] * coef); 
+           ((int*)ioData->mBuffers[chan].mData)[frame] = int(renderer->fOutChannel[chan][frame] * coef); 
         }
     }
     
@@ -326,7 +326,7 @@ int TiPhoneCoreAudioRenderer::Open(int bufferSize, int samplerate)
             printError(err1);
         }
     }
-
+    
     if (fDevNumInChans > 0 && fDevNumOutChans == 0) {
         AURenderCallbackStruct output;
         output.inputProc = Render;
@@ -348,6 +348,25 @@ int TiPhoneCoreAudioRenderer::Open(int bufferSize, int samplerate)
             goto error;
         }
     }
+    
+    // Prepare buffers
+    fCAInputData = (AudioBufferList*)malloc(sizeof(UInt32) + fDevNumInChans * sizeof(AudioBuffer));
+    fCAInputData->mNumberBuffers = fDevNumInChans;
+    for (int i = 0; i < fDevNumInChans; i++) {
+        fCAInputData->mBuffers[i].mNumberChannels = 1;
+        fCAInputData->mBuffers[i].mDataByteSize = bufferSize * sizeof(int);
+        fCAInputData->mBuffers[i].mData = malloc(bufferSize * sizeof(int));
+    }
+    
+    /*
+    // Add listeners
+    err1 = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDeviceProcessorOverload, DeviceNotificationCallback, this);
+    if (err != noErr) {
+        jack_error("Error calling AudioDeviceAddPropertyListener with kAudioDeviceProcessorOverload");
+        printError(err);
+        return -1;
+    }
+    */
 
     return NO_ERR;
 

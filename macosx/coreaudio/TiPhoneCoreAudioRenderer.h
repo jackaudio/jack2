@@ -41,6 +41,8 @@ class TiPhoneCoreAudioRenderer
         
         int	fDevNumInChans;
         int	fDevNumOutChans;
+        
+        AudioBufferList* fCAInputData;
      
         float* fInChannel[MAX_CHANNELS];
         float* fOutChannel[MAX_CHANNELS];
@@ -57,7 +59,7 @@ class TiPhoneCoreAudioRenderer
     public:
 
         TiPhoneCoreAudioRenderer(int input, int output)
-            :fDevNumInChans(input), fDevNumOutChans(output), fAudioCallback(NULL), fCallbackArg(NULL)
+            :fAudioCallback(NULL), fCallbackArg(NULL), fDevNumInChans(input), fDevNumOutChans(output), fCAInputData(NULL)
         {
             memset(fInChannel, 0, sizeof(float*) * MAX_CHANNELS);
             memset(fOutChannel, 0, sizeof(float*) * MAX_CHANNELS);
@@ -70,6 +72,7 @@ class TiPhoneCoreAudioRenderer
                 fOutChannel[i] = new float[8192];
             }
         }
+        
         virtual ~TiPhoneCoreAudioRenderer()
         {
             for (int i = 0; i < fDevNumInChans; i++) {
@@ -78,6 +81,13 @@ class TiPhoneCoreAudioRenderer
     
             for (int i = 0; i < fDevNumOutChans; i++) {
                 delete[] fOutChannel[i]; 
+            }
+            
+            if (fCAInputData) {
+                for (int i = 0; i < fDevNumInChans; i++) {
+                    free(fCAInputData->mBuffers[i].mData);
+                }
+                free(fCAInputData);
             }
         }
 
