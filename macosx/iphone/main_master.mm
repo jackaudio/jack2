@@ -40,12 +40,10 @@ static void MasterAudioCallback(int frames, float** inputs, float** outputs, voi
 {
     int i; 
     
-    
     // Copy from iPod input to network buffers
     for (i = 0; i < result.audio_input; i++) {
         memcpy(audio_input_buffer[i], inputs[i], buffer_size * sizeof(float));
     }
-    
     
     /*
     // Copy from network out buffers to network in buffers (audio thru)
@@ -76,9 +74,7 @@ static void MasterAudioCallback(int frames, float** inputs, float** outputs, voi
 int main(int argc, char *argv[]) {
     
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
     int i;
-    int wait_usec = (unsigned long)((((float)buffer_size) / ((float)sample_rate)) * 1000000.0f);
     
     if ((net = jack_net_master_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
         printf("jack_net_master_open error..\n");
@@ -112,12 +108,12 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     
-    // Run until interrupted 
-  	//while (1) {}
-    
     /*
     // Quite brutal way, the application actually does not start completely, the netjack audio processing loop is used instead...
     // Run until interrupted 
+    
+    int wait_usec = (unsigned long)((((float)buffer_size) / ((float)sample_rate)) * 1000000.0f);
+    
   	while (1) {
     
         // Copy input to output
@@ -141,7 +137,6 @@ int main(int argc, char *argv[]) {
     audio_device.Stop();
     audio_device.Close();
    
-    
     // Wait for application end
     jack_net_master_close(net);
     

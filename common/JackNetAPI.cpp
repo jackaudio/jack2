@@ -448,9 +448,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     int fConnectTimeOut;
     
     JackNetExtSlave(const char* ip, 
-                int port, 
-                const char* name, 
-                jack_slave_t* request)
+                    int port, 
+                    const char* name, 
+                    jack_slave_t* request)
         :fThread(this),
         fProcessCallback(NULL),fProcessArg(NULL), 
         fShutdownCallback(NULL), fShutdownArg(NULL),
@@ -541,7 +541,6 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         FreePorts();
         return 0;
     }
-
 
     void AllocPorts()
     {

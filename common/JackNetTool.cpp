@@ -476,7 +476,6 @@ namespace Jack
         fSubPeriodBytesSize = fCompressedSizeByte / fNumPackets;
         fSubPeriodSize = fSubPeriodBytesSize / sizeof(short);
        
-        //fLastSubPeriodBytesSize = fSubPeriodBytesSize + (fCompressedSizeByte - (fSubPeriodBytesSize * fNumPackets));
         fLastSubPeriodBytesSize = fSubPeriodBytesSize + fCompressedSizeByte % fNumPackets;
         fLastSubPeriodSize = fLastSubPeriodBytesSize / sizeof(short);
         

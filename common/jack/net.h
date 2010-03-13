@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2009 Grame
+  Copyright (C) 2009-2010 Grame
   
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
@@ -44,9 +44,9 @@ enum JackNetMode {
 
 enum JackNetEncoder {
 
-    JackFloatEncoder = 0,
-    JackIntEncoder = 1,
-    JackCeltEncoder = 2,
+    JackFloatEncoder = 0,   // Samples are transmitted as float
+    JackIntEncoder = 1,     // Samples are transmitted as 16 bits integer
+    JackCeltEncoder = 2,    // Samples are transmitted using CELT codec (http://www.celt-codec.org/)
 };
     
 typedef struct {
@@ -55,11 +55,11 @@ typedef struct {
     int audio_output;   // to master or from slave
     int midi_input;     // from master or to slave
     int midi_output;    // to master or from slave
-    int mtu;
+    int mtu;            // Network  Maximum Transmission Unit
     int time_out;       // in second, -1 means in infinite
-    int encoder;
+    int encoder;        // Encoder type (one of JackNetEncoder)
     int kbps;           // KB per second for CELT encoder
-    char mode;
+    char mode;          
 
 } jack_slave_t;
 
@@ -99,14 +99,14 @@ int jack_net_slave_close(jack_net_slave_t* net);
 /**
  * Prototype for Process callback.
  * @param nframes buffer size
- * @param audio_input number of audio inputs
- * @param audio_input_buffer an array of audio input buffers
+ * @param audio_input number of audio inputs 
+ * @param audio_input_buffer an array of audio input buffers (from master)
  * @param midi_input number of MIDI inputs
- * @param midi_input_buffer an array of MIDI input buffers
+ * @param midi_input_buffer an array of MIDI input buffers (from master)
  * @param audio_output number of audio outputs
- * @param audio_output_buffer an array of audio output buffers
+ * @param audio_output_buffer an array of audio output buffers (to master)
  * @param midi_output number of MIDI outputs
- * @param midi_output_buffer an array of MIDI output buffers
+ * @param midi_output_buffer an array of MIDI output buffers (to master)
  * @param arg pointer to a client supplied structure supplied by jack_set_net_process_callback().
  *
  * @return zero on success, non-zero on error
@@ -242,7 +242,7 @@ int jack_net_master_recv(jack_net_master_t* net, int audio_input, float** audio_
 /**
  * Send sync and data to the network
  * @param net the network connection
- * @param audio_output number of audio ouputs
+ * @param audio_output number of audio outputs
  * @param audio_output_buffer an array of audio output buffers
  * @param midi_output number of MIDI ouputs
  * @param midi_output_buffer an array of MIDI output buffers
@@ -261,6 +261,12 @@ typedef struct _jack_adapter jack_adapter_t;
 
 /**
  * Create an adapter.
+ * @param input number of audio inputs
+ * @param output of audio outputs
+ * @param host_buffer_size the host buffer size in frames
+ * @param host_sample_rate the host buffer sample rate
+ * @param adapted_buffer_size the adapted buffer size in frames
+ * @param adapted_sample_rate the adapted buffer sample rate
  *
  * @return 0 on success, otherwise a non-zero error code
  */  
@@ -272,28 +278,41 @@ jack_adapter_t* jack_create_adapter(int input, int output,
 
 /**
  * Destroy an adapter.
+ * @param adapter the adapter to be destroyed
  *
  * @return 0 on success, otherwise a non-zero error code
  */  
 int jack_destroy_adapter(jack_adapter_t* adapter);
 
-
+/**
+ * Flush internal state of an adapter.
+ * @param adapter the adapter to be flushed
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */ 
 void jack_flush_adapter(jack_adapter_t* adapter);
 
 /**
- * Push input to and pull output from ringbuffer
+ * Push input to and pull output from adapter ringbuffer
+ * @param adapter the adapter
+ * @param input an array of audio input buffers
+ * @param output an array of audio ouput buffers
+ * @param frames number of frames
  *
  * @return 0 on success, otherwise a non-zero error code
  */  
 int jack_adapter_push_and_pull(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
 
 /**
- * Pull input to and push output from ringbuffer
- *
+ * Pull input to and push output from adapter ringbuffer
+ * @param adapter the adapter
+ * @param input an array of audio input buffers
+ * @param output an array of audio ouput buffers
+ * @param frames number of frames
+ * 
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_adapter_pull_and_push(jack_adapter_t* adapter, float** input, float** output, unsigned int frames);
-
 
 #ifdef __cplusplus
 }

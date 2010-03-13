@@ -31,13 +31,11 @@ static int net_process(jack_nframes_t buffer_size,
                         void** midi_output_buffer, 
                         void* data)
 {
-
-    //printf("audio_input %d  audio_output %d \n", audio_input, audio_output);
     jack_adapter_pull_and_push(adapter, audio_output_buffer, audio_input_buffer, buffer_size);
     
     // Process input, produce output
     if (audio_input == audio_output) {
-        // Copy input to output
+        // Copy net input to net output
         for (int i = 0; i < audio_input; i++) {
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
@@ -50,7 +48,6 @@ static void net_shutdown(void *arg)
     if (adapter)
         jack_flush_adapter(adapter);
 }
-
 
 static void SlaveAudioCallback(int frames, float** inputs, float** outputs, void* arg)
 {
@@ -70,7 +67,7 @@ int main(int argc, char *argv[]) {
 
     //if ((net = jack_net_slave_open("169.254.112.119", DEFAULT_PORT, "iPhone", &request, &result))  == 0) {
     if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "iPod", &request, &result))  == 0) {
-        printf("jack_net_master_open error..\n");
+        printf("jack_net_slave_open error..\n");
         return -1;
     }
     
@@ -84,7 +81,6 @@ int main(int argc, char *argv[]) {
     }
      
     TiPhoneCoreAudioRenderer audio_device(NUM_INPUT, NUM_OUTPUT);
-  
   
     jack_set_net_slave_process_callback(net, net_process, NULL);
     jack_set_net_slave_shutdown_callback(net, net_shutdown, NULL);
@@ -108,7 +104,6 @@ int main(int argc, char *argv[]) {
     
     audio_device.Stop();
     audio_device.Close();
-    
     
     // Wait for application end
     jack_net_slave_deactivate(net);
