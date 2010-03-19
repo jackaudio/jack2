@@ -38,6 +38,8 @@ int jack_buffer_size;
 int quit = 0;
 double resample_mean = 1.0;
 double static_resample_factor = 1.0;
+double resample_lower_limit = 0.25;
+double resample_upper_limit = 4.0;
 
 double *offset_array;
 double *window_array;
@@ -388,8 +390,8 @@ int process (jack_nframes_t nframes, void *arg) {
     output_offset = (float) offset;
 
     // Clamp a bit.
-    if( current_resample_factor < 0.25 ) current_resample_factor = 0.25;
-    if( current_resample_factor > 4 ) current_resample_factor = 4;
+    if( current_resample_factor < resample_lower_limit ) current_resample_factor = resample_lower_limit;
+    if( current_resample_factor > resample_upper_limit ) current_resample_factor = resample_upper_limit;
 
     // Now Calculate how many samples we need.
     rlen = ceil( ((double)nframes) / current_resample_factor )+2;
@@ -675,6 +677,8 @@ int main (int argc, char *argv[]) {
     printf( "selected sample format: %s\n", formats[format].name );
 
     static_resample_factor = (double) jack_sample_rate / (double) sample_rate;
+    resample_lower_limit = static_resample_factor * 0.25;
+    resample_upper_limit = static_resample_factor * 4.0;
     resample_mean = static_resample_factor;
 
     offset_array = malloc( sizeof(double) * smooth_size );

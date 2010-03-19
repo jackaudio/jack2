@@ -33,6 +33,7 @@ Arnold Krille
 2010-03-19 Stephane Letz  <letz@grame.fr>
 
 	* Fix some file header to have library side code use LGPL.
+	* Apply srcfactor.diff patch for ticket #162.
 
 2010-03-06 Stephane Letz  <letz@grame.fr>
 
