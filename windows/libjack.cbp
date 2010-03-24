@@ -31,6 +31,7 @@
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -72,6 +73,7 @@
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -114,6 +116,7 @@
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
