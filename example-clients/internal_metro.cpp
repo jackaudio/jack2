@@ -46,7 +46,6 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
 {
     sample_t scale;
     int i, attack_length, decay_length;
-    double *amp;
     int attack_percent = 1, decay_percent = 10;
     const char *bpm_string = "bpm";
 
@@ -59,7 +58,7 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
     }
     if ((client = jack_client_open (client_name, JackNullOption, NULL)) == 0) {
         fprintf (stderr, "jack server not running?\n");
-        return ;
+        return;
     }
 
     jack_set_process_callback (client, process_audio, this);
@@ -81,11 +80,11 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
         	 ", wave length = %" PRIu32 "\n", tone_length,
         	 wave_length);
         */ 
-        return ;
+        return;
     }
     if (attack_length + decay_length > (int)tone_length) {
         fprintf (stderr, "invalid attack/decay\n");
-        return ;
+        return;
     }
 
     /* Build the wave table */
@@ -110,7 +109,6 @@ InternalMetro::InternalMetro(int freq, double max_amp, int dur_arg, int bpm, cha
 
     if (jack_activate (client)) {
         fprintf(stderr, "cannot activate client");
-        return;
     }
 }
 
@@ -120,4 +118,6 @@ InternalMetro::~InternalMetro()
     jack_port_unregister(client, input_port);
     jack_port_unregister(client, output_port);
     jack_client_close(client);
+    free(amp);
+    free(wave);
 }

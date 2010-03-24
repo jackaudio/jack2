@@ -24,10 +24,34 @@ Peter L Jones
 Devin Anderson
 Josh Green
 Mario Lang
+Arnold Krille
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2010-03-24 Stephane Letz  <letz@grame.fr>
+
+	* On Windows, now use TRE library for regexp (BSD license instead of GPL license).
+
+2010-03-19 Stephane Letz  <letz@grame.fr>
+
+	* Fix some file header to have library side code use LGPL.
+	* Apply srcfactor.diff patch for ticket #162.
+
+2010-03-06 Stephane Letz  <letz@grame.fr>
+
+	* Arnold Krille firewire patch.
+	* Raise JACK_DRIVER_PARAM_STRING_MAX and JACK_PARAM_STRING_MAX to 127 otherwise some audio drivers cannot be loaded on OSX.
+
+2010-03-04 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackMachServerChannel::Execute : keep running even in error cases.
+	* Raise JACK_PROTOCOL_VERSION number.
+
+2010-03-03 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackGraphManager::DeactivatePort.
 
 2010-03-02 Stephane Letz  <letz@grame.fr>
 

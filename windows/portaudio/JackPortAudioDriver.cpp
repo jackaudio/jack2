@@ -404,8 +404,8 @@ extern "C"
             {
 
             case 'd':
-                capture_pcm_name = strdup(param->value.str);
-                playback_pcm_name = strdup(param->value.str);
+                capture_pcm_name = param->value.str;
+                playback_pcm_name = param->value.str;
                 break;
 
             case 'D':
@@ -428,14 +428,14 @@ extern "C"
             case 'C':
                 capture = true;
                 if (strcmp(param->value.str, "none") != 0) {
-                    capture_pcm_name = strdup(param->value.str);
+                    capture_pcm_name = param->value.str;
                 }
                 break;
 
             case 'P':
                 playback = TRUE;
                 if (strcmp(param->value.str, "none") != 0) {
-                    playback_pcm_name = strdup(param->value.str);
+                    playback_pcm_name = param->value.str;
                 }
                 break;
 

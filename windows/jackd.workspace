@@ -20,7 +20,7 @@
 		<Project filename="jack_netmanager.cbp">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
-		<Project filename="jack_audioadapter.cbp">
+		<Project filename="jack_audioadapter.cbp" active="1">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
 		<Project filename="jack_netadapter.cbp">
@@ -36,7 +36,7 @@
 		<Project filename="jack_lsp.cbp">
 			<Depends filename="libjack.cbp" />
 		</Project>
-		<Project filename="jack_netsource.cbp" active="1">
+		<Project filename="jack_netsource.cbp">
 			<Depends filename="libjack.cbp" />
 			<Depends filename="jack_netonedriver.cbp" />
 		</Project>

@@ -2002,8 +2002,8 @@ extern "C"
             switch (param->character) {
 
                 case 'd':
-                    capture_driver_uid = strdup(param->value.str);
-                    playback_driver_uid = strdup(param->value.str);
+                    capture_driver_uid = param->value.str;
+                    playback_driver_uid = param->value.str;
                     break;
 
                 case 'D':
@@ -2026,14 +2026,14 @@ extern "C"
                 case 'C':
                     capture = true;
                     if (strcmp(param->value.str, "none") != 0) {
-                        capture_driver_uid = strdup(param->value.str);
+                        capture_driver_uid = param->value.str;
                     }
                     break;
 
                 case 'P':
                     playback = true;
                     if (strcmp(param->value.str, "none") != 0) {
-                        playback_driver_uid = strdup(param->value.str);
+                        playback_driver_uid = param->value.str;
                     }
                     break;
 

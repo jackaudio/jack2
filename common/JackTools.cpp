@@ -194,7 +194,7 @@ namespace Jack {
         }
 
         if (fgets(buf, sizeof(buf), in) == NULL) {
-            fclose(in);
+            pclose(in);
             return -1;
         }
 
@@ -202,7 +202,7 @@ namespace Jack {
 
         if (buf[len - 1] != '\n') {
             /* didn't get a whole line */
-            fclose(in);
+            pclose(in);
             return -1;
         }
 
@@ -210,7 +210,7 @@ namespace Jack {
         memcpy(jack_tmpdir, buf, len - 1);
         jack_tmpdir[len - 1] = '\0';
 
-        fclose(in);
+        pclose(in);
         return 0;
     }
 #endif
