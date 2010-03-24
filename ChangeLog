@@ -30,6 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-03-24 Stephane Letz  <letz@grame.fr>
+
+	* On Windows, now use TRE library for regexp (BSD license instead of GPL license).
+
 2010-03-19 Stephane Letz  <letz@grame.fr>
 
 	* Fix some file header to have library side code use LGPL.

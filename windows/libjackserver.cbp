@@ -26,10 +26,12 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -55,10 +57,12 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin" />
@@ -85,10 +89,12 @@
 					<Add option="-DSERVER_SIDE" />
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin" />
@@ -145,6 +151,8 @@
 		<Unit filename="..\common\JackMidiPort.cpp" />
 		<Unit filename="..\common\JackNetInterface.cpp" />
 		<Unit filename="..\common\JackNetTool.cpp" />
+		<Unit filename="..\common\JackPhysicalMidiInput.cpp" />
+		<Unit filename="..\common\JackPhysicalMidiOutput.cpp" />
 		<Unit filename="..\common\JackPort.cpp" />
 		<Unit filename="..\common\JackPortType.cpp" />
 		<Unit filename="..\common\JackRestartThreadedDriver.cpp" />
@@ -156,8 +164,6 @@
 		<Unit filename="..\common\JackTools.cpp" />
 		<Unit filename="..\common\JackTransportEngine.cpp" />
 		<Unit filename="..\common\JackWaitThreadedDriver.cpp" />
-		<Unit filename="..\common\JackPhysicalMidiInput.cpp" />
-		<Unit filename="..\common\JackPhysicalMidiOutput.cpp" />
 		<Unit filename="..\common\ringbuffer.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -185,9 +191,52 @@
 		<Unit filename="libjackserver.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="regex.c">
+		<Unit filename="tre-0.8.0\lib\regcomp.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="tre-0.8.0\lib\regerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\regex.h" />
+		<Unit filename="tre-0.8.0\lib\regexec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-ast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-ast.h" />
+		<Unit filename="tre-0.8.0\lib\tre-compile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-compile.h" />
+		<Unit filename="tre-0.8.0\lib\tre-internal.h" />
+		<Unit filename="tre-0.8.0\lib\tre-match-approx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-match-backtrack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-match-parallel.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-match-utils.h" />
+		<Unit filename="tre-0.8.0\lib\tre-mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-mem.h" />
+		<Unit filename="tre-0.8.0\lib\tre-parse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-parse.h" />
+		<Unit filename="tre-0.8.0\lib\tre-stack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-stack.h" />
+		<Unit filename="tre-0.8.0\lib\tre.h" />
+		<Unit filename="tre-0.8.0\lib\xmalloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\xmalloc.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
