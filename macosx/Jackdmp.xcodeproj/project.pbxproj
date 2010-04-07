@@ -7950,16 +7950,17 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT_API_0_7",
+					"-DHAVE_CELT",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
-					CoreAudio,
-					"-framework",
 					CoreServices,
-					"-framework",
-					AudioUnit,
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
@@ -8000,8 +8001,13 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT_API_0_7",
+					"-DHAVE_CELT",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -8037,7 +8043,11 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT_API_0_7",
+					"-DHAVE_CELT",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackdmp,
@@ -8087,17 +8097,19 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = "-DJACK_32_64";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DJACK_32_64",
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
-					CoreAudio,
-					"-framework",
 					CoreServices,
-					"-framework",
-					AudioUnit,
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
@@ -8137,10 +8149,13 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
 					"-DMACH_RPC_MACH_SEMA",
 					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackservermp,
 					"-framework",
@@ -8216,8 +8231,17 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = ../common;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+					"$(OTHER_CFLAGS)",
+				);
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -8249,8 +8273,17 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+					"$(OTHER_CFLAGS)",
+				);
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -8280,6 +8313,11 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
 				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+					"$(OTHER_CFLAGS)",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackmp,
@@ -8311,8 +8349,13 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = ../common;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -8342,8 +8385,13 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				HEADER_SEARCH_PATHS = ../common;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Jackmp,
 					"-framework",
@@ -8372,7 +8420,15 @@
 				);
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = ../common;
-				OTHER_CFLAGS = "";
+				OTHER_CFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+				);
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DHAVE_CELT_API_0_7",
+					"$(OTHER_CFLAGS)",
+				);
 				OTHER_LDFLAGS = (
 					"-framework",
 					Jackmp,
