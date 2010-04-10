@@ -503,11 +503,12 @@ init_sockaddr_in (struct sockaddr_in *name , const char *hostname , uint16_t por
         if (hostinfo == NULL) {
             fprintf (stderr, "init_sockaddr_in: unknown host: %s.\n", hostname);
 	    fflush( stderr );
+        return;
 	}
 #ifdef WIN32
-        name->sin_addr.s_addr = inet_addr( hostname );
+    name->sin_addr.s_addr = inet_addr( hostname );
 #else
-        name->sin_addr = *(struct in_addr *) hostinfo->h_addr ;
+    name->sin_addr = *(struct in_addr *) hostinfo->h_addr ;
 #endif
     }
     else
@@ -622,15 +623,15 @@ main (int argc, char *argv[])
             case 'b':
                 bitdepth = atoi (optarg);
                 break;
-	    case 'c':
-#if HAVE_CELT
-	        bitdepth = 1000;
+            case 'c':
+        #if HAVE_CELT
+                bitdepth = 1000;
                 factor = atoi (optarg);
-#else
+        #else
                 printf( "not built with celt supprt\n" );
                 exit(10);
-#endif
-	        break;
+        #endif
+                break;
             case 'm':
                 mtu = atoi (optarg);
                 break;
@@ -677,18 +678,17 @@ main (int argc, char *argv[])
     }
 
     init_sockaddr_in ((struct sockaddr_in *) &destaddr, peer_ip, peer_port);
-    if(bind_port) {
+    if (bind_port) {
         init_sockaddr_in ((struct sockaddr_in *) &bindaddr, NULL, bind_port);
         if( bind (outsockfd, &bindaddr, sizeof (bindaddr)) ) {
-		fprintf (stderr, "bind failure\n" );
-	}
+            fprintf (stderr, "bind failure\n" );
+        }
     }
-    if(reply_port)
-    {
+    if (reply_port) {
         init_sockaddr_in ((struct sockaddr_in *) &bindaddr, NULL, reply_port);
         if( bind (insockfd, &bindaddr, sizeof (bindaddr)) ) {
-		fprintf (stderr, "bind failure\n" );
-	}
+            fprintf (stderr, "bind failure\n" );
+        }
     }
 
     /* try to become a client of the JACK server */
