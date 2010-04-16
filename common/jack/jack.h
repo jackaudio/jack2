@@ -732,7 +732,7 @@ int jack_port_connected_to (const jack_port_t *port,
  * @return a null-terminated array of full port names to which the @a
  * port is connected.  If none, returns NULL.
  *
- * The caller is responsible for calling free(3) on any non-NULL
+ * The caller is responsible for calling jack_free(3) on any non-NULL
  * returned value.
  *
  * @param port locally owned jack_port_t pointer.
@@ -745,7 +745,7 @@ const char ** jack_port_get_connections (const jack_port_t *port) JACK_OPTIONAL_
  * @return a null-terminated array of full port names to which the @a
  * port is connected.  If none, returns NULL.
  *
- * The caller is responsible for calling free(3) on any non-NULL
+ * The caller is responsible for calling jack_free(3) on any non-NULL
  * returned value.
  *
  * This differs from jack_port_get_connections() in two important
@@ -996,7 +996,7 @@ int jack_port_type_size(void) JACK_OPTIONAL_WEAK_EXPORT;
  * If zero, no selection based on flags will be carried out.
  *
  * @return a NULL-terminated array of ports that match the specified
- * arguments.  The caller is responsible for calling free(3) any
+ * arguments.  The caller is responsible for calling jack_free(3) any
  * non-NULL returned value.
  *
  * @see jack_port_name_size(), jack_port_type_size()

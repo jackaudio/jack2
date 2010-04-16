@@ -29,8 +29,15 @@
 jack_port_t *input_port;
 jack_port_t *output_port;
 int connecting, disconnecting;
+int done = 0;
 #define TRUE 1
 #define FALSE 0
+
+
+void port_connect_callback(jack_port_id_t a, jack_port_id_t b, int connect, void* arg)
+{
+    done = 1;
+}
 
 int
 main (int argc, char *argv[])
@@ -69,6 +76,8 @@ main (int argc, char *argv[])
 		fprintf (stderr, "jack server not running?\n");
 		return 1;
 	}
+    
+    jack_set_port_connect_callback(client, port_connect_callback, NULL);
 
 	/* display the current sample rate. once the client is activated 
 	   (see below), you should rely on your own sample rate
@@ -109,6 +118,10 @@ main (int argc, char *argv[])
             goto error;
         }
 	}
+    
+    // Wait for connection/disconnection to be effective
+    while(!done) {usleep(100);}
+    
     jack_deactivate (client);
 	jack_client_close (client);
 	return 0;
