@@ -270,6 +270,11 @@ pthread_t JackPosixThread::GetThreadID()
     return fThread;
 }
 
+bool JackPosixThread::IsThread()
+{
+    return pthread_self() == fThread;
+}
+
 void JackPosixThread::Terminate()
 {
     jack_log("JackPosixThread::Terminate");

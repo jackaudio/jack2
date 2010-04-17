@@ -868,22 +868,27 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
     if (fSessionPendingReplies != 0) {
 	JackSessionNotifyResult res(-1);
 	res.Write(socket);
+	jack_log("JackEngine::SessionNotify ... busy");
 	return;
     }
 
     fSessionResult = new JackSessionNotifyResult();
 
     for (int i = 0; i < CLIENT_NUM; i++) {
+	jack_log("JackEngine::SessionNotify ... checking client %d", i);
         JackClientInterface* client = fClientTable[i];
         if (client && client->GetClientControl()->fCallback[kSessionCallback]) {
 
+	    jack_log("JackEngine::SessionNotify ... got target: %s", client->GetClientControl()->fName);
 	    // check if this is a notification to a specific client.
 	    if (target!=NULL && strlen(target)!=0) {
 		if (strcmp(target, client->GetClientControl()->fName)) {
+		    jack_log("JackEngine::SessionNotify ... not this one");
 		    continue;
 		}
 	    }
 
+	    jack_log("JackEngine::SessionNotify ... sending");
 	    int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path, (int) type, 0);
 	    if (result == 2) {
 		fSessionPendingReplies += 1;
@@ -895,15 +900,35 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 									    client->GetClientControl()->fSessionCommand, 
 									    client->GetClientControl()->fSessionFlags ));
 	    }
-
-
-
 	}
     }
-    // yay... :(
-    //*result = 0;
+
+    if (fSessionPendingReplies == 0) {
+	fSessionResult->Write(socket);
+	delete fSessionResult;
+	fSessionResult = NULL;
+    } else {
+	fSessionTransaction = socket;
+    }
 }
 
+void JackEngine::SessionReply(int refnum)
+{
+    JackClientInterface* client = fClientTable[refnum];
+    char uuid_buf[32];
+    snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
+    fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf, 
+                                                                client->GetClientControl()->fName,
+								client->GetClientControl()->fSessionCommand, 
+								client->GetClientControl()->fSessionFlags ));
+    fSessionPendingReplies -= 1;
+
+    if (fSessionPendingReplies == 0) {
+	fSessionResult->Write(fSessionTransaction);
+	delete fSessionResult;
+	fSessionResult = NULL;
+    }
+}
 
 } // end of namespace
 

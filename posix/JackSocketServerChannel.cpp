@@ -410,6 +410,17 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             break;
         }
 
+        case JackRequest::kSessionReply: {
+            jack_log("JackRequest::SessionReply");
+            JackSessionReplyRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+		fServer->GetEngine()->SessionReply(req.fRefNum);
+		res.fResult = 0;
+            }
+            break;
+        }
+
         default:
             jack_error("Unknown request %ld", header.fType);
             break;

@@ -311,7 +311,15 @@ class SERVER_EXPORT JackLockedEngine
 	{
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.SessionNotify( refnum, target, type, path, socket );
+            fEngine.SessionNotify(refnum, target, type, path, socket);
+            CATCH_EXCEPTION
+	}
+ 
+	void SessionReply(int refnum)
+	{
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.SessionReply(refnum);
             CATCH_EXCEPTION
 	}
  

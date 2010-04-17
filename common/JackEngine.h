@@ -138,6 +138,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyQuit();
 
 	void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
+	void SessionReply( int refnum );
 };
 
 

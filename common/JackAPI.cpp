@@ -1891,6 +1891,21 @@ EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, co
     }
 }
 
+EXPORT int jack_session_reply(jack_client_t *ext_client, jack_session_event_t *event)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_session_reply");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_session_reply ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_session_reply called with a NULL client");
+        return -1;
+    } else {
+        return client->SessionReply(event);
+    }
+}
+
 EXPORT void jack_session_event_free(jack_session_event_t* ev)
 {
     free((void *)ev->session_dir);

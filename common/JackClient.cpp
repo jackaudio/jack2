@@ -1073,13 +1073,30 @@ void JackClient::InternalClientUnload(int ref, jack_status_t* status)
 
 jack_session_command_t *JackClient::SessionNotify( const char* target, jack_session_event_type_t type, const char* path )
 {
-    printf( "yo man\n" );
-    sleep(1);
     jack_session_command_t *res;
     fChannel->SessionNotify( GetClientControl()->fRefNum, target, type, path, &res );
     return res;
 }
 
+int JackClient::SessionReply( jack_session_event_t *ev )
+{
+    if (ev->command_line) {
+	strncpy( GetClientControl()->fSessionCommand, ev->command_line, sizeof(GetClientControl()->fSessionCommand) );
+    } else {
+	GetClientControl()->fSessionCommand[0] = '\0';
+    }
+
+    GetClientControl()->fSessionFlags = ev->flags;
+
+    if (fThread.IsThread()) {
+	fImmediateSessionReply = true;
+	return 0;
+    }
+
+    int res;
+    fChannel->SessionReply( GetClientControl()->fRefNum, &res);
+    return res;
+}
 
 } // end of namespace
 

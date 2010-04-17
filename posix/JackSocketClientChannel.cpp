@@ -248,7 +248,7 @@ void JackSocketClientChannel::SetFreewheel(int onoff, int* result)
 
 void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t ** result)
 {
-    JackSessionNotifyRequest req(refnum, target, type, path);
+    JackSessionNotifyRequest req(refnum, path, type, target);
     JackSessionNotifyResult  res;
     int intresult;
     ServerSyncCall(&req, &res, &intresult);
@@ -269,6 +269,13 @@ void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack
 
 
     *result = session_command;
+}
+
+void JackSocketClientChannel::SessionReply(int refnum, int* result)
+{
+    JackSessionReplyRequest req(refnum);
+    JackResult  res;
+    ServerSyncCall(&req, &res, result);
 }
 
 void JackSocketClientChannel::ReleaseTimebase(int refnum, int* result)

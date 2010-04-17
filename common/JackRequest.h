@@ -1186,32 +1186,26 @@ struct JackSessionNotifyRequest : public JackRequest
 
 struct JackSessionReplyRequest : public JackRequest
 {
-    char fCommand[JACK_MESSAGE_SIZE + 1];
-    int  fFlags;
+    int fRefNum;
 
     JackSessionReplyRequest()
     {}
-    JackSessionReplyRequest(const char *command, int flags)
-            : JackRequest(JackRequest::kSessionNotify), fFlags(flags)
-    {
-	if (command)
-	    snprintf(fCommand, sizeof(fCommand), "%s", command);
-	else
-	    fCommand[0] = '\0';
-    }
+
+    JackSessionReplyRequest(int refnum)
+            : JackRequest(JackRequest::kSessionReply), fRefNum(refnum)
+    {}
 
     int Read(JackChannelTransaction* trans)
     {
-        CheckRes(trans->Read(&fCommand, sizeof(fCommand)));
-        CheckRes(trans->Read(&fFlags, sizeof(fFlags)));
+        CheckRes(JackRequest::Read(trans));
+        CheckRes(trans->Read(&fRefNum, sizeof(fRefNum)));
         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackRequest::Write(trans));
-        CheckRes(trans->Write(&fCommand, sizeof(fCommand)));
-        CheckRes(trans->Write(&fFlags, sizeof(fFlags)));
+        CheckRes(trans->Write(&fRefNum, sizeof(fRefNum)));
         return 0;
     }
 
