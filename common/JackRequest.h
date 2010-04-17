@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "types.h"
 #include <string.h>
 #include <stdio.h>
+#include <list>
 
 namespace Jack
 {
@@ -1071,28 +1072,69 @@ struct JackClientNotificationRequest : public JackRequest
 
 } POST_PACKED_STRUCTURE;
 
+struct JackSessionCommand
+{
+    char fUUID[32];
+    char fClientName[JACK_CLIENT_NAME_SIZE+1];
+    char fCommand[MAX_PATH+1];
+    jack_session_flags_t fFlags;
+
+    JackSessionCommand()
+    {}
+
+    JackSessionCommand( const char *uuid, const char *clientname, const char *command, jack_session_flags_t flags )
+    {
+	strncpy( fUUID, uuid, sizeof(fUUID));
+	strncpy( fClientName, clientname, sizeof(fClientName));
+	strncpy( fCommand, command, sizeof(fCommand));
+	fFlags = flags;
+    }
+};
+
+
 struct JackSessionNotifyResult : public JackResult
 {
 
-    int fStatus;
+    std::list<JackSessionCommand> fCommandList;
 
     JackSessionNotifyResult(): JackResult()
     {}
-    JackSessionNotifyResult(int32_t result, int status)
-            : JackResult(result), fStatus(status)
+    JackSessionNotifyResult(int32_t result)
+            : JackResult(result)
     {}
 
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(JackResult::Read(trans));
-        CheckRes(trans->Read(&fStatus, sizeof(int)));
+	while(1) {
+	    JackSessionCommand buffer;
+
+	    CheckRes(trans->Read(buffer.fUUID, sizeof(buffer.fUUID)));
+	    if (buffer.fUUID[0] == '\0')
+		break;
+
+	    CheckRes(trans->Read(buffer.fClientName, sizeof(buffer.fClientName)));
+	    CheckRes(trans->Read(buffer.fCommand, sizeof(buffer.fCommand)));
+	    CheckRes(trans->Read(&(buffer.fFlags), sizeof(buffer.fFlags)));
+
+	    fCommandList.push_back(buffer);
+	}
         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
     {
+	char terminator[32];
+	terminator[0] = '\0';
+
         CheckRes(JackResult::Write(trans));
-        CheckRes(trans->Write(&fStatus, sizeof(int)));
+	for (std::list<JackSessionCommand>::iterator i=fCommandList.begin(); i!=fCommandList.end(); i++) {
+	    CheckRes(trans->Write(i->fUUID, sizeof(i->fUUID)));
+	    CheckRes(trans->Write(i->fClientName, sizeof(i->fClientName)));
+	    CheckRes(trans->Write(i->fCommand, sizeof(i->fCommand)));
+	    CheckRes(trans->Write(&(i->fFlags), sizeof(i->fFlags)));
+	}
+        CheckRes(trans->Write(terminator, sizeof(terminator)));
         return 0;
     }
     

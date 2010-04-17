@@ -345,11 +345,16 @@ enum JackOptions {
      * Pass optional <em>(char *) load_init</em> string to the
      * jack_initialize() entry point of an internal client.
      */
-    JackLoadInit = 0x10
+    JackLoadInit = 0x10,
+
+     /**
+      * pass a SessionID Token this allows the sessionmanager to identify the client again.
+      */
+    JackSessionID = 0x20
 };
 
 /** Valid options for opening an external client. */
-#define JackOpenOptions (JackServerName|JackNoStartServer|JackUseExactName)
+#define JackOpenOptions (JackSessionID|JackServerName|JackNoStartServer|JackUseExactName)
 
 /** Valid options for loading an internal client. */
 #define JackLoadOptions (JackLoadInit|JackLoadName|JackUseExactName)

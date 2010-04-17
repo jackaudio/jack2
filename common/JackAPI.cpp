@@ -1891,4 +1891,12 @@ EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, co
     }
 }
 
+EXPORT void jack_session_event_free(jack_session_event_t* ev)
+{
+    free((void *)ev->session_dir);
+    free((void *)ev->client_uuid);
+    if (ev->command_line)
+	free(ev->command_line);
+    free(ev);
+}
 

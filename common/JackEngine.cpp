@@ -863,10 +863,45 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
-void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, int *result )
+void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket )
 {
+    if (fSessionPendingReplies != 0) {
+	JackSessionNotifyResult res(-1);
+	res.Write(socket);
+	return;
+    }
+
+    fSessionResult = new JackSessionNotifyResult();
+
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client && client->GetClientControl()->fCallback[kSessionCallback]) {
+
+	    // check if this is a notification to a specific client.
+	    if (target!=NULL && strlen(target)!=0) {
+		if (strcmp(target, client->GetClientControl()->fName)) {
+		    continue;
+		}
+	    }
+
+	    int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path, (int) type, 0);
+	    if (result == 2) {
+		fSessionPendingReplies += 1;
+	    } else if (result == 1) {
+		char uuid_buf[32];
+		snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
+		fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf, 
+			                                                    client->GetClientControl()->fName,
+									    client->GetClientControl()->fSessionCommand, 
+									    client->GetClientControl()->fSessionFlags ));
+	    }
+
+
+
+	}
+    }
     // yay... :(
-    *result = 0;
+    //*result = 0;
 }
 
 

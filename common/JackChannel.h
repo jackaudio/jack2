@@ -127,7 +127,7 @@ class JackClientChannelInterface
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
         
-	virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, int *result)
+	virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
 	{}
 };
 

@@ -405,10 +405,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackSessionNotifyRequest req;
             JackSessionNotifyResult res;
             if (req.Read(socket) == 0) {
-		fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, &res.fStatus);
+		fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
             }
-            if (res.Write(socket) < 0)
-                jack_error("JackRequest::SessionNotify write error ref = %d", req.fRefNum);
             break;
         }
 

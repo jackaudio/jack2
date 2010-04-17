@@ -272,6 +272,22 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     fInfoShutdown = NULL;
                 }
                 break;
+
+            case kSessionCallback:
+                jack_log("JackClient::kSessionCallback");
+                if (fSession) {
+		    jack_session_event_t *event = (jack_session_event_t *) malloc( sizeof(jack_session_event_t) );
+		    char uuid_buf[32];
+		    event->type = (jack_session_event_type_t) value1;
+		    event->session_dir = strdup( message );
+		    event->command_line = NULL;
+		    event->flags = (jack_session_flags_t) 0;
+		    snprintf( uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID );
+		    event->client_uuid = strdup( uuid_buf );
+
+                    fSession(event, fSessionArg);
+                }
+                break;
         }
     }
 
@@ -1057,7 +1073,11 @@ void JackClient::InternalClientUnload(int ref, jack_status_t* status)
 
 jack_session_command_t *JackClient::SessionNotify( const char* target, jack_session_event_type_t type, const char* path )
 {
-    return NULL;
+    printf( "yo man\n" );
+    sleep(1);
+    jack_session_command_t *res;
+    fChannel->SessionNotify( GetClientControl()->fRefNum, target, type, path, &res );
+    return res;
 }
 
 

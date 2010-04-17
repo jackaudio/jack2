@@ -246,14 +246,29 @@ void JackSocketClientChannel::SetFreewheel(int onoff, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
-void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, int* result)
+void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t ** result)
 {
     JackSessionNotifyRequest req(refnum, target, type, path);
-    JackResult res;
+    JackSessionNotifyResult  res;
     int intresult;
     ServerSyncCall(&req, &res, &intresult);
 
-    *result = 0;
+    jack_session_command_t *session_command = (jack_session_command_t *)malloc( sizeof(jack_session_command_t) * (res.fCommandList.size()+1) );
+    int i=0;
+   
+    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
+	session_command[i].uuid = strdup( ci->fUUID );
+	session_command[i].client_name = strdup( ci->fClientName );
+	session_command[i].command = strdup( ci->fCommand );
+	session_command[i].flags = ci->fFlags;
+
+	i+=1;
+    }	
+	
+    session_command[i].uuid = NULL;
+
+
+    *result = session_command;
 }
 
 void JackSocketClientChannel::ReleaseTimebase(int refnum, int* result)

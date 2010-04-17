@@ -307,11 +307,11 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, int *result)
+	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
 	{
             TRY_CALL
             JackLock lock(&fEngine);
-            return fEngine.SessionNotify( refnum, target, type, path, result );
+            fEngine.SessionNotify( refnum, target, type, path, socket );
             CATCH_EXCEPTION
 	}
  

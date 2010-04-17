@@ -26,6 +26,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSynchro.h"
 #include "JackNotification.h"
 
+#include "jack/session.h"
+
 namespace Jack
 {
 
@@ -43,6 +45,10 @@ struct JackClientControl : public JackShmMemAble
     int fRefNum;
     int fPID;
     bool fActive;
+
+    int fSessionID;
+    char fSessionCommand[256 + 1];
+    jack_session_flags_t fSessionFlags;
 
     JackClientControl(const char* name, int pid, int refnum)
     {
@@ -77,6 +83,8 @@ struct JackClientControl : public JackShmMemAble
         fTransportSync = false;
         fTransportTimebase = false;
         fActive = false;
+
+	fSessionID = 0;
     }
 
 } POST_PACKED_STRUCTURE;

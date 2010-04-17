@@ -95,7 +95,7 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
         bool Init();
         bool Execute();
 
-	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, int* result);
+	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result);
 };
 
 } // end of namespace
