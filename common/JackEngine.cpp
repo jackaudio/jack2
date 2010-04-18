@@ -890,6 +890,8 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 
 	    jack_log("JackEngine::SessionNotify ... sending");
 	    int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path, (int) type, 0);
+	    jack_log("JackEngine::SessionNotify ... got reply: %d", result);
+
 	    if (result == 2) {
 		fSessionPendingReplies += 1;
 	    } else if (result == 1) {

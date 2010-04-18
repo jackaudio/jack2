@@ -132,6 +132,9 @@ class JackClientChannelInterface
 
 	virtual void SessionReply(int refnum, int *result)
 	{}
+
+	virtual bool IsChannelThread()
+	{ return false; }
 };
 
 }

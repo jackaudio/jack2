@@ -285,7 +285,14 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 		    snprintf( uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID );
 		    event->client_uuid = strdup( uuid_buf );
 
+		    fImmediateSessionReply = false;
+
                     fSession(event, fSessionArg);
+
+		    if (fImmediateSessionReply)
+			res = 1;
+		    else
+			res = 2;
                 }
                 break;
         }
@@ -1088,10 +1095,14 @@ int JackClient::SessionReply( jack_session_event_t *ev )
 
     GetClientControl()->fSessionFlags = ev->flags;
 
-    if (fThread.IsThread()) {
+    jack_log( "JackClient::SessionReply... we are here" );
+    if (fChannel->IsChannelThread()) {
+	jack_log( "JackClient::SessionReply... in callback reply" );
 	fImmediateSessionReply = true;
 	return 0;
     }
+
+    jack_log( "JackClient::SessionReply... out of cb" );
 
     int res;
     fChannel->SessionReply( GetClientControl()->fRefNum, &res);
