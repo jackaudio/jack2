@@ -20,6 +20,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackPlatformPlug_linux__
 #define __JackPlatformPlug_linux__
 
+#define jack_server_dir "/dev/shm"
+#define jack_client_dir "/dev/shm"
+#define JACK_DEFAULT_DRIVER "alsa"
+
 namespace Jack
 {
     struct JackRequest;

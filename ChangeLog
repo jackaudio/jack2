@@ -30,6 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-04-016 Stephane Letz  <letz@grame.fr>
+
+	* Make jack_connect/jack_disconnect wait for effective port connection/disconnection.
+
 2010-04-07 Stephane Letz  <letz@grame.fr>
 
 	* Remove call to exit in library code.
