@@ -52,11 +52,11 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         JackProcessSync fSignal;
         jack_time_t fLastSwitchUsecs;
 
-	int fSessionPendingReplies;
-	JackChannelTransaction *fSessionTransaction;
-	JackSessionNotifyResult *fSessionResult;
-	std::map<int,std::string> fReservationMap;
-	int fMaxUUID;
+        int fSessionPendingReplies;
+        JackChannelTransaction *fSessionTransaction;
+        JackSessionNotifyResult *fSessionResult;
+        std::map<int,std::string> fReservationMap;
+        int fMaxUUID;
 
 
         int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
@@ -139,13 +139,13 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyFreewheel(bool onoff);
         void NotifyQuit();
 
-	void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
-	void SessionReply( int refnum );
-	int GetNewUUID();
-	void EnsureUUID(int uuid);
-	void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
-	void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
-	void ReserveClientName(const char *name, const char *uuid, int *result);
+        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
+        void SessionReply( int refnum );
+        int GetNewUUID();
+        void EnsureUUID(int uuid);
+        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
+        void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
+        void ReserveClientName(const char *name, const char *uuid, int *result);
 };
 
 

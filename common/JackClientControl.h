@@ -84,7 +84,7 @@ struct JackClientControl : public JackShmMemAble
         fTransportTimebase = false;
         fActive = false;
 
-	fSessionID = uuid;
+        fSessionID = uuid;
     }
 
 } POST_PACKED_STRUCTURE;

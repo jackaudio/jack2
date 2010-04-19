@@ -93,7 +93,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
 
-	bool fImmediateSessionReply;
+        bool fImmediateSessionReply;
   
         int StartThread();
         void SetupDriverSync(bool freewheel);
@@ -190,9 +190,9 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void CycleSignal(int status);
         int SetProcessThread(JackThreadCallback fun, void *arg);
 
-	// Session api
-	virtual jack_session_command_t *SessionNotify(const char *target, jack_session_event_type_t type, const char *path);
-	virtual int SessionReply(jack_session_event_t *ev);
+        // Session api
+        virtual jack_session_command_t *SessionNotify(const char *target, jack_session_event_type_t type, const char *path);
+        virtual int SessionReply(jack_session_event_t *ev);
 char* GetUUIDForClientName(const char* client_name);
 char* GetClientNameForUUID(const char* uuid);
 int ReserveClientName(const char *name, const char* uuid);

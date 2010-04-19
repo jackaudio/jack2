@@ -39,7 +39,7 @@ class JackExternalClient : public JackClientInterface
     private:
 
         JackNotifyChannel fChannel;   /*! Server/client communication channel */
-        JackClientControl*	fClientControl;     /*! Client control in shared memory     */
+        JackClientControl*      fClientControl;     /*! Client control in shared memory     */
 
     public:
 

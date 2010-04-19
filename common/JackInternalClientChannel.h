@@ -112,10 +112,10 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fServer->SetFreewheel(onoff);
         }
 
-	void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t **result )
-	{
-	    *result = NULL;
-	}
+        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t **result )
+        {
+            *result = NULL;
+        }
 
         void ReleaseTimebase(int refnum, int* result)
         {
@@ -139,7 +139,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
 
         void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result, int uuid)
         {
-            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status, uuid);	
+            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status, uuid);    
         }
 
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result)

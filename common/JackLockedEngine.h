@@ -307,43 +307,43 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
-	{
+        void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
+        {
             TRY_CALL
             JackLock lock(&fEngine);
             fEngine.SessionNotify(refnum, target, type, path, socket);
             CATCH_EXCEPTION
-	}
+        }
  
-	void SessionReply(int refnum)
-	{
+        void SessionReply(int refnum)
+        {
             TRY_CALL
             JackLock lock(&fEngine);
             fEngine.SessionReply(refnum);
             CATCH_EXCEPTION
-	}
+        }
  
-	void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result)
-	{
+        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result)
+        {
             TRY_CALL
             JackLock lock(&fEngine);
-	    fEngine.GetUUIDForClientName(client_name, uuid_res, result);
+            fEngine.GetUUIDForClientName(client_name, uuid_res, result);
             CATCH_EXCEPTION
-	}
-	void GetClientNameForUUID(const char *uuid, char *name_res, int *result)
-	{
+        }
+        void GetClientNameForUUID(const char *uuid, char *name_res, int *result)
+        {
             TRY_CALL
             JackLock lock(&fEngine);
-	    fEngine.GetClientNameForUUID(uuid, name_res, result);
+            fEngine.GetClientNameForUUID(uuid, name_res, result);
             CATCH_EXCEPTION
-	}
-	void ReserveClientName(const char *name, const char *uuid, int *result)
-	{
+        }
+        void ReserveClientName(const char *name, const char *uuid, int *result)
+        {
             TRY_CALL
             JackLock lock(&fEngine);
-	    fEngine.ReserveClientName(name, uuid, result);
+            fEngine.ReserveClientName(name, uuid, result);
             CATCH_EXCEPTION
-	}
+        }
 };
 
 } // end of namespace

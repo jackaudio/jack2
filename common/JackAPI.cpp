@@ -108,8 +108,8 @@ extern "C"
             JackPortConnectCallback
             connect_callback, void *arg);
     EXPORT int jack_set_port_rename_callback (jack_client_t *,
-				    JackPortRenameCallback
-				    rename_callback, void *arg);
+                                    JackPortRenameCallback
+                                    rename_callback, void *arg);
     EXPORT int jack_set_graph_order_callback (jack_client_t *,
             JackGraphOrderCallback graph_callback,
             void *);
@@ -217,7 +217,7 @@ extern "C"
     EXPORT int jack_client_create_thread (jack_client_t* client,
                                           pthread_t *thread,
                                           int priority,
-                                          int realtime, 	// boolean
+                                          int realtime,         // boolean
                                           thread_routine routine,
                                           void *arg);
     EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
@@ -1686,7 +1686,7 @@ EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 EXPORT int jack_client_create_thread(jack_client_t* client,
                                      pthread_t *thread,
                                      int priority,
-                                     int realtime,  	/* boolean */
+                                     int realtime,      /* boolean */
                                      thread_routine routine,
                                      void *arg)
 {
@@ -1766,8 +1766,8 @@ EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, c
         return 0;
     } else {
         jack_status_t my_status;
-        if (status == NULL)		/* no status from caller? */
-            status = &my_status;	/* use local status word */
+        if (status == NULL)             /* no status from caller? */
+            status = &my_status;        /* use local status word */
         *status = (jack_status_t)0;
         return client->InternalClientHandle(client_name, status);
     }
@@ -1786,8 +1786,8 @@ EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client,
         jack_varargs_t va;
         jack_status_t my_status;
 
-        if (status == NULL)			/* no status from caller? */
-            status = &my_status;	/* use local status word */
+        if (status == NULL)                     /* no status from caller? */
+            status = &my_status;        /* use local status word */
         *status = (jack_status_t)0;
 
         /* validate parameters */
@@ -1911,7 +1911,7 @@ EXPORT void jack_session_event_free(jack_session_event_t* ev)
     free((void *)ev->session_dir);
     free((void *)ev->client_uuid);
     if (ev->command_line)
-	free(ev->command_line);
+        free(ev->command_line);
     free(ev);
 }
 
@@ -1964,16 +1964,16 @@ EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
 {
     int i=0;
     while(1) {
-	if (cmds[i].client_name)
-	    free ((char *)cmds[i].client_name);
-	if (cmds[i].command)
-	    free ((char *)cmds[i].command);
-	if (cmds[i].uuid)
-	    free ((char *)cmds[i].uuid);
-	else
-	    break;
+        if (cmds[i].client_name)
+            free ((char *)cmds[i].client_name);
+        if (cmds[i].command)
+            free ((char *)cmds[i].command);
+        if (cmds[i].uuid)
+            free ((char *)cmds[i].uuid);
+        else
+            break;
 
-	i += 1;
+        i += 1;
     }
 
     free(cmds);

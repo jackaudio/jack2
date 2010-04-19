@@ -39,10 +39,10 @@ class JackSocketServerChannel : public JackRunnableInterface
 
     private:
 
-        JackServerSocket fRequestListenSocket;	// Socket to create request socket for the client
+        JackServerSocket fRequestListenSocket;  // Socket to create request socket for the client
         JackThread fThread;                     // Thread to execute the event loop
-        JackServer*	fServer;
-        pollfd*	fPollTable;
+        JackServer*     fServer;
+        pollfd* fPollTable;
         bool fRebuild;
         std::map<int, std::pair<int, JackClientSocket*> > fSocketTable;
 

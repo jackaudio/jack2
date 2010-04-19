@@ -53,7 +53,7 @@ JackClientPipeThread::~JackClientPipeThread()
     delete fPipe;
 }
 
-int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
+int JackClientPipeThread::Open(JackServer* server)      // Open the Server/Client connection
 {
     // Start listening
     if (fThread.Start() != 0) {
@@ -65,13 +65,13 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
     return 0;
 }
 
-void JackClientPipeThread::Close()					// Close the Server/Client connection
+void JackClientPipeThread::Close()                                      // Close the Server/Client connection
 {
     jack_log("JackClientPipeThread::Close %x %ld", this, fRefNum);
     /*
-    	TODO : solve WIN32 thread Kill issue
-    	This would hang.. since Close will be followed by a delete,
-    	all ressources will be desallocated at the end.
+        TODO : solve WIN32 thread Kill issue
+        This would hang.. since Close will be followed by a delete,
+        all ressources will be desallocated at the end.
     */
 
     fThread.Kill();
@@ -326,16 +326,16 @@ bool JackClientPipeThread::HandleRequest()
                 break;
             }
 
-	    case JackRequest::kSessionNotify: {
-		  jack_log("JackRequest::SessionNotify");
-		  JackSessionNotifyRequest req;
-		  JackSessionNotifyResult res;
-		  if (req.Read(fPipe) == 0) {
-		      fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath);
-		  }
-		  res.Write(fPipe);
-		  break;
-	      }
+            case JackRequest::kSessionNotify: {
+                  jack_log("JackRequest::SessionNotify");
+                  JackSessionNotifyRequest req;
+                  JackSessionNotifyResult res;
+                  if (req.Read(fPipe) == 0) {
+                      fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath);
+                  }
+                  res.Write(fPipe);
+                  break;
+              }
 
             default:
                 jack_log("Unknown request %ld", header.fType);
@@ -369,7 +369,7 @@ void JackClientPipeThread::ClientKill()
 {
     jack_log("JackClientPipeThread::ClientKill ref = %d", fRefNum);
 
-    if (fRefNum == -1) {		// Correspond to an already removed client.
+    if (fRefNum == -1) {                // Correspond to an already removed client.
         jack_log("Kill a closed client");
     } else if (fRefNum == 0) {  // Correspond to a still not opened client.
         jack_log("Kill a not opened client");
@@ -412,10 +412,10 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
-    	This would hang the server... since we are quitting it, its not really problematic,
-    	all ressources will be desallocated at the end.
+        This would hang the server... since we are quitting it, its not really problematic,
+        all ressources will be desallocated at the end.
 
-    	fRequestListenPipe.Close();
+        fRequestListenPipe.Close();
         fThread.Stop();
     */
 

@@ -405,7 +405,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackSessionNotifyRequest req;
             JackSessionNotifyResult res;
             if (req.Read(socket) == 0) {
-		fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
+                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
             }
             break;
         }
@@ -415,8 +415,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackSessionReplyRequest req;
             JackResult res;
             if (req.Read(socket) == 0) {
-		fServer->GetEngine()->SessionReply(req.fRefNum);
-		res.fResult = 0;
+                fServer->GetEngine()->SessionReply(req.fRefNum);
+                res.fResult = 0;
             }
             break;
         }
@@ -426,7 +426,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackGetClientNameRequest req;
             JackClientNameResult res;
             if (req.Read(socket) == 0) {
-		fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
+                fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::GetClientNameForUUID write error");
@@ -438,8 +438,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackGetUUIDRequest req;
             JackUUIDResult res;
             if (req.Read(socket) == 0) {
-		fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
-		res.fResult = 0;
+                fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
+                res.fResult = 0;
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::GetUUIDForClientName write error");
@@ -451,8 +451,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackReserveNameRequest req;
             JackResult res;
             if (req.Read(socket) == 0) {
-		fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
-		res.fResult = 0;
+                fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
+                res.fResult = 0;
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ReserveClientName write error");

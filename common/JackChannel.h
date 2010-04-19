@@ -127,23 +127,23 @@ class JackClientChannelInterface
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
         
-	virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
-	{}
+        virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
+        {}
 
-	virtual void SessionReply(int refnum, int *result)
-	{}
+        virtual void SessionReply(int refnum, int *result)
+        {}
 
-	virtual void GetUUIDForClientName( int refnum, const char *client_name, char *uuid_res, int *result )
-	{}
+        virtual void GetUUIDForClientName( int refnum, const char *client_name, char *uuid_res, int *result )
+        {}
 
-	virtual void GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result )
-	{}
+        virtual void GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result )
+        {}
 
-	virtual void ReserveClientName( int refnum, const char *client_name, const char *uuid, int *result )
-	{}
+        virtual void ReserveClientName( int refnum, const char *client_name, const char *uuid, int *result )
+        {}
 
-	virtual bool IsChannelThread()
-	{ return false; }
+        virtual bool IsChannelThread()
+        { return false; }
 };
 
 }

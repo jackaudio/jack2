@@ -53,8 +53,8 @@ class JackDebugClient : public JackClient
         JackClient* fClient;
         std::ofstream* fStream;
         PortFollower fPortList[MAX_PORT_HISTORY]; // Arbitrary value... To be tuned...
-        int fTotalPortNumber;	// The total number of port opened and maybe closed. Historical view.
-        int fOpenPortNumber;	// The current number of opened port.
+        int fTotalPortNumber;   // The total number of port opened and maybe closed. Historical view.
+        int fOpenPortNumber;    // The current number of opened port.
         int fIsActivated;
         int fIsDeactivated;
         int fIsClosed;

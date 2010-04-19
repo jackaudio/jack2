@@ -52,8 +52,8 @@ class JackInternalClient : public JackClient
         JackEngineControl* GetEngineControl() const;
         JackClientControl* GetClientControl() const;
 
-        static JackGraphManager* fGraphManager;		/*! Shared memory Port manager */
-        static JackEngineControl* fEngineControl;	/*! Shared engine cotrol */
+        static JackGraphManager* fGraphManager;         /*! Shared memory Port manager */
+        static JackEngineControl* fEngineControl;       /*! Shared engine cotrol */
 };
 
 /*!

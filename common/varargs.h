@@ -32,15 +32,15 @@ extern "C"
 
     /* variable argument structure */
     typedef struct {
-        char *server_name;		/* server name */
-        char *load_name;		/* load module name */
-        char *load_init;		/* initialization string */
-        int   session_id;		/* requested session_id */
+        char *server_name;              /* server name */
+        char *load_name;                /* load module name */
+        char *load_init;                /* initialization string */
+        int   session_id;               /* requested session_id */
     }
     jack_varargs_t;
 
     static const char* jack_default_server_name (void) 
-	{
+        {
         const char *server_name;
         if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
             server_name = "default";
@@ -48,14 +48,14 @@ extern "C"
     }
 
     static inline void jack_varargs_init (jack_varargs_t *va) 
-	{
+        {
         memset (va, 0, sizeof(jack_varargs_t));
         va->server_name = (char*)jack_default_server_name();
-	va->session_id = -1;
+        va->session_id = -1;
     }
 
     static inline void jack_varargs_parse (jack_options_t options, va_list ap, jack_varargs_t *va) 
-	{
+        {
         // initialize default settings
         jack_varargs_init (va);
 

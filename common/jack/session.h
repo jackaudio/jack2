@@ -133,8 +133,8 @@ typedef void (*JackSessionCallback)(jack_session_event_t *event, void *arg);
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_session_callback(jack_client_t *client,
-			    JackSessionCallback session_callback,
-			    void *arg) JACK_WEAK_EXPORT;
+                            JackSessionCallback session_callback,
+                            void *arg) JACK_WEAK_EXPORT;
 
 /**
  * reply to a session_event
@@ -162,18 +162,18 @@ void jack_session_event_free (jack_session_event_t *event);
 
 /**
  * @defgroup JackSessionManagerAPI  this API is intended for a sessionmanager.
- *				    this API could be server specific. if we dont reach consensus here,
- *				    we can just drop it.
- *				    i know its a bit clumsy.
- *				    but this api isnt required to be as stable as the client api.
+ *                                  this API could be server specific. if we dont reach consensus here,
+ *                                  we can just drop it.
+ *                                  i know its a bit clumsy.
+ *                                  but this api isnt required to be as stable as the client api.
  * @{
  */
 
 typedef struct  {
-	const char *uuid;
-	const char *client_name;
-	const char *command;
-	jack_session_flags_t flags;
+        const char *uuid;
+        const char *client_name;
+        const char *command;
+        jack_session_flags_t flags;
 } jack_session_command_t;
 
 /**
@@ -185,9 +185,9 @@ typedef struct  {
  */
 
 jack_session_command_t *jack_session_notify (jack_client_t* client,
-					     const char *target,
-					     jack_session_event_type_t type,
-					     const char *path ) JACK_WEAK_EXPORT;
+                                             const char *target,
+                                             jack_session_event_type_t type,
+                                             const char *path ) JACK_WEAK_EXPORT;
 
 /**
  * free the memory allocated by a session command.
