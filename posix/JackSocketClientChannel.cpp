@@ -266,6 +266,9 @@ void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack
     }	
 	
     session_command[i].uuid = NULL;
+    session_command[i].client_name = NULL;
+    session_command[i].command = NULL;
+    session_command[i].flags = (jack_session_flags_t)0;
 
 
     *result = session_command;
