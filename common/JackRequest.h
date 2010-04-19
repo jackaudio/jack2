@@ -159,7 +159,7 @@ struct JackClientCheckRequest : public JackRequest
         return trans->Write(&fOptions, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief CheckClient result.
@@ -195,7 +195,7 @@ struct JackClientCheckResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief NewClient request.
@@ -233,7 +233,7 @@ struct JackClientOpenRequest : public JackRequest
         return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief NewClient result.
@@ -271,7 +271,7 @@ struct JackClientOpenResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief CloseClient request.
@@ -298,7 +298,7 @@ struct JackClientCloseRequest : public JackRequest
         return trans->Write(&fRefNum, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Activate request.
@@ -329,7 +329,7 @@ struct JackActivateRequest : public JackRequest
         return trans->Write(&fIsRealTime, sizeof(int));
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief Deactivate request.
@@ -356,7 +356,7 @@ struct JackDeactivateRequest : public JackRequest
         return trans->Write(&fRefNum, sizeof(int));
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortRegister request.
@@ -401,7 +401,7 @@ struct JackPortRegisterRequest : public JackRequest
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortRegister result.
@@ -427,7 +427,7 @@ struct JackPortRegisterResult : public JackResult
         return trans->Write(&fPortIndex, sizeof(jack_port_id_t));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortUnregister request.
@@ -460,7 +460,7 @@ struct JackPortUnRegisterRequest : public JackRequest
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortConnectName request.
@@ -500,7 +500,7 @@ struct JackPortConnectNameRequest : public JackRequest
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortDisconnectName request.
@@ -539,7 +539,7 @@ struct JackPortDisconnectNameRequest : public JackRequest
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortConnect request.
@@ -575,7 +575,7 @@ struct JackPortConnectRequest : public JackRequest
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortDisconnect request.
@@ -612,7 +612,7 @@ struct JackPortDisconnectRequest : public JackRequest
 
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief PortRename request.
@@ -651,7 +651,7 @@ struct JackPortRenameRequest : public JackRequest
 
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief SetBufferSize request.
@@ -679,7 +679,7 @@ struct JackSetBufferSizeRequest : public JackRequest
         return trans->Write(&fBufferSize, sizeof(jack_nframes_t));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief SetFreeWheel request.
@@ -707,7 +707,7 @@ struct JackSetFreeWheelRequest : public JackRequest
         return trans->Write(&fOnOff, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief ReleaseTimebase request.
@@ -735,7 +735,7 @@ struct JackReleaseTimebaseRequest : public JackRequest
         return trans->Write(&fRefNum, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief SetTimebaseCallback request.
@@ -766,7 +766,7 @@ struct JackSetTimebaseCallbackRequest : public JackRequest
         return trans->Write(&fConditionnal, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief GetInternalClientName request.
@@ -797,7 +797,7 @@ struct JackGetInternalClientNameRequest : public JackRequest
         return trans->Write(&fIntRefNum, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief GetInternalClient result.
@@ -830,7 +830,7 @@ struct JackGetInternalClientNameResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief InternalClientHandle request.
@@ -863,7 +863,7 @@ struct JackInternalClientHandleRequest : public JackRequest
         return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief InternalClientHandle result.
@@ -897,7 +897,7 @@ struct JackInternalClientHandleResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief InternalClientLoad request.
@@ -949,7 +949,7 @@ struct JackInternalClientLoadRequest : public JackRequest
         return trans->Write(&fOptions, sizeof(int));
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief InternalClientLoad result.
@@ -983,7 +983,7 @@ struct JackInternalClientLoadResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief InternalClientUnload request.
@@ -1013,7 +1013,7 @@ struct JackInternalClientUnloadRequest : public JackRequest
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         return trans->Write(&fIntRefNum, sizeof(int));
     }
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief InternalClientLoad result.
@@ -1044,7 +1044,7 @@ struct JackInternalClientUnloadResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief ClientNotification request.
@@ -1080,7 +1080,7 @@ struct JackClientNotificationRequest : public JackRequest
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackSessionCommand
 {
@@ -1100,7 +1100,6 @@ struct JackSessionCommand
         fFlags = flags;
     }
 };
-
 
 struct JackSessionNotifyResult : public JackResult
 {
@@ -1148,7 +1147,7 @@ struct JackSessionNotifyResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 /*!
 \brief SessionNotify request.
@@ -1192,7 +1191,7 @@ struct JackSessionNotifyRequest : public JackRequest
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackSessionReplyRequest : public JackRequest
 {
@@ -1219,7 +1218,7 @@ struct JackSessionReplyRequest : public JackRequest
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackClientNameResult : public JackResult
 {
@@ -1248,7 +1247,7 @@ struct JackClientNameResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackUUIDResult : public JackResult
 {
@@ -1277,7 +1276,7 @@ struct JackUUIDResult : public JackResult
         return 0;
     }
     
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackGetUUIDRequest : public JackRequest
 {
@@ -1306,7 +1305,7 @@ struct JackGetUUIDRequest : public JackRequest
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackGetClientNameRequest : public JackRequest
 {
@@ -1335,7 +1334,7 @@ struct JackGetClientNameRequest : public JackRequest
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 struct JackReserveNameRequest : public JackRequest
 {
@@ -1370,7 +1369,8 @@ struct JackReserveNameRequest : public JackRequest
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
+
 /*!
 \brief ClientNotification.
 */
@@ -1418,7 +1418,7 @@ struct JackClientNotification
         return 0;
     }
 
-} POST_PACKED_STRUCTURE;
+};
 
 } // end of namespace
 
