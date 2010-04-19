@@ -151,9 +151,9 @@ void JackSocketClientChannel::ClientCheck(const char* name, char* name_res, int 
     strcpy(name_res, res.fName);
 }
 
-void JackSocketClientChannel::ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackClientOpenRequest req(name, pid);
+    JackClientOpenRequest req(name, pid, uuid);
     JackClientOpenResult res;
     ServerSyncCall(&req, &res, result);
     *shared_engine = res.fSharedEngine;
@@ -278,6 +278,29 @@ void JackSocketClientChannel::SessionReply(int refnum, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
+void JackSocketClientChannel::GetUUIDForClientName( int refnum, const char *client_name, char *uuid_res, int *result )
+{
+    JackGetUUIDRequest req(client_name);
+    JackUUIDResult  res;
+    ServerSyncCall(&req, &res, result);
+    strncpy( uuid_res, res.fUUID, 32 );
+}
+
+void JackSocketClientChannel::GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result )
+{
+    JackGetClientNameRequest req(uuid);
+    JackClientNameResult  res;
+    ServerSyncCall(&req, &res, result);
+    strncpy( name_res, res.fName, JACK_CLIENT_NAME_SIZE );
+}
+
+void JackSocketClientChannel::ReserveClientName( int refnum, const char *client_name, const char *uuid, int *result )
+{
+    JackReserveNameRequest req(refnum, client_name, uuid);
+    JackResult  res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackSocketClientChannel::ReleaseTimebase(int refnum, int* result)
 {
     JackReleaseTimebaseRequest req(refnum);
@@ -309,9 +332,9 @@ void JackSocketClientChannel::InternalClientHandle(int refnum, const char* clien
     *status = res.fStatus;
 }
 
-void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result, int uuid)
 {
-    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options);
+    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options, uuid);
     JackInternalClientLoadResult res;
     ServerSyncCall(&req, &res, result);
     *int_ref = res.fIntRefNum;

@@ -61,8 +61,8 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
         int ServerCheck(const char* server_name);
 
         void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
-        void ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
-        void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
+        void ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientOpen(const char* name, int* ref, int uuid, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {}
         void ClientClose(int refnum, int* result);
 
@@ -88,15 +88,20 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
 
         void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result);
         void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result);
-        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result);
+        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result, int uuid);
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
+
+	// Session Stuff
+	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result);
+	void SessionReply(int refnum, int* result);
+	void GetUUIDForClientName( int refnum, const char *client_name, char *uuid_res, int *result );
+	void GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result );
+	void ReserveClientName( int refnum, const char *client_name, const char *uuid, int *result );
 
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
 
-	void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result);
-	void SessionReply(int refnum, int* result);
 
 	bool IsChannelThread() { return fThread.IsThread(); }
 };

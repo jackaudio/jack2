@@ -102,11 +102,11 @@ void JackSocketServerChannel::ClientCreate()
     }
 }
 
-void JackSocketServerChannel::ClientAdd(int fd, char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketServerChannel::ClientAdd(int fd, char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     jack_log("JackSocketServerChannel::ClientAdd");
     int refnum = -1;
-    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, &refnum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, uuid, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
         fSocketTable[fd].first = refnum;
         fRebuild = true;
@@ -181,7 +181,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientOpenRequest req;
             JackClientOpenResult res;
             if (req.Read(socket) == 0)
-                ClientAdd(fd, req.fName, req.fPID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+                ClientAdd(fd, req.fName, req.fPID, req.fUUID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientOpen write error name = %s", req.fName);
             break;
@@ -369,7 +369,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackInternalClientLoadRequest req;
             JackInternalClientLoadResult res;
             if (req.Read(socket) == 0)
-                res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus);
+                res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus, req.fUUID);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::InternalClientLoad write error name = %s", req.fName);
             break;
@@ -418,6 +418,44 @@ bool JackSocketServerChannel::HandleRequest(int fd)
 		fServer->GetEngine()->SessionReply(req.fRefNum);
 		res.fResult = 0;
             }
+            break;
+        }
+
+        case JackRequest::kGetClientByUUID: {
+            jack_log("JackRequest::GetClientNameForUUID");
+            JackGetClientNameRequest req;
+            JackClientNameResult res;
+            if (req.Read(socket) == 0) {
+		fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::GetClientNameForUUID write error");
+            break;
+        }
+
+        case JackRequest::kGetUUIDByClient: {
+            jack_log("JackRequest::GetUUIDForClientName");
+            JackGetUUIDRequest req;
+            JackUUIDResult res;
+            if (req.Read(socket) == 0) {
+		fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
+		res.fResult = 0;
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::GetUUIDForClientName write error");
+            break;
+        }
+
+        case JackRequest::kReserveClientName: {
+            jack_log("JackRequest::ReserveClientName");
+            JackReserveNameRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+		fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
+		res.fResult = 0;
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ReserveClientName write error");
             break;
         }
 

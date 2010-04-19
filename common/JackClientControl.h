@@ -50,22 +50,22 @@ struct JackClientControl : public JackShmMemAble
     char fSessionCommand[256 + 1];
     jack_session_flags_t fSessionFlags;
 
-    JackClientControl(const char* name, int pid, int refnum)
+    JackClientControl(const char* name, int pid, int refnum, int uuid)
     {
-        Init(name, pid, refnum);
+        Init(name, pid, refnum, uuid);
     }
 
     JackClientControl(const char* name)
     {
-        Init(name, 0, -1);
+        Init(name, 0, -1, -1);
     }
 
     JackClientControl()
     {
-        Init("", 0, -1);
+        Init("", 0, -1, -1);
     }
 
-    void Init(const char* name, int pid, int refnum)
+    void Init(const char* name, int pid, int refnum, int uuid)
     {
         strcpy(fName, name);
         for (int i = 0; i < kMaxNotification; i++)
@@ -84,7 +84,7 @@ struct JackClientControl : public JackShmMemAble
         fTransportTimebase = false;
         fActive = false;
 
-	fSessionID = 0;
+	fSessionID = uuid;
     }
 
 } POST_PACKED_STRUCTURE;

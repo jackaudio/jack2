@@ -205,19 +205,23 @@ struct JackClientOpenRequest : public JackRequest
 {
 
     int fPID;
+    int fUUID;
     char fName[JACK_CLIENT_NAME_SIZE + 1];
+ 
 
     JackClientOpenRequest()
     {}
-    JackClientOpenRequest(const char* name, int pid): JackRequest(JackRequest::kClientOpen)
+    JackClientOpenRequest(const char* name, int pid, int uuid): JackRequest(JackRequest::kClientOpen)
     {
         snprintf(fName, sizeof(fName), "%s", name);
         fPID = pid;
+	fUUID = uuid;
     }
 
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fPID, sizeof(int)));
+        CheckRes(trans->Read(&fUUID, sizeof(int)));
         return trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1);
     }
 
@@ -225,6 +229,7 @@ struct JackClientOpenRequest : public JackRequest
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fPID, sizeof(int)));
+        CheckRes(trans->Write(&fUUID, sizeof(int)));
         return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
     }
     
@@ -910,14 +915,16 @@ struct JackInternalClientLoadRequest : public JackRequest
     char fDllName[MAX_PATH + 1];
     char fLoadInitName[JACK_LOAD_INIT_LIMIT + 1];
     int fOptions;
+    int fUUID;
 
     JackInternalClientLoadRequest()
     {}
-    JackInternalClientLoadRequest(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options)
-            : JackRequest(JackRequest::kInternalClientLoad), fRefNum(refnum), fOptions(options)
+    JackInternalClientLoadRequest(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int uuid )
+            : JackRequest(JackRequest::kInternalClientLoad), fRefNum(refnum), fOptions(options), fUUID(uuid)
     {
         snprintf(fName, sizeof(fName), "%s", client_name);
         snprintf(fDllName, sizeof(fDllName), "%s", so_name);
+        snprintf(fLoadInitName, sizeof(fLoadInitName), "%s", objet_data);
         snprintf(fLoadInitName, sizeof(fLoadInitName), "%s", objet_data);
     }
 
@@ -927,6 +934,7 @@ struct JackInternalClientLoadRequest : public JackRequest
         CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
         CheckRes(trans->Read(&fDllName, MAX_PATH + 1));
         CheckRes(trans->Read(&fLoadInitName, JACK_LOAD_INIT_LIMIT + 1));
+        CheckRes(trans->Read(&fUUID, sizeof(int)));
         return trans->Read(&fOptions, sizeof(int));
     }
 
@@ -937,6 +945,7 @@ struct JackInternalClientLoadRequest : public JackRequest
         CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
         CheckRes(trans->Write(&fDllName, MAX_PATH + 1));
         CheckRes(trans->Write(&fLoadInitName, JACK_LOAD_INIT_LIMIT + 1));
+        CheckRes(trans->Write(&fUUID, sizeof(int)));
         return trans->Write(&fOptions, sizeof(int));
     }
     

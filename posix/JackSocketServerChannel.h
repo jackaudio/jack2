@@ -50,7 +50,7 @@ class JackSocketServerChannel : public JackRunnableInterface
         void BuildPoolTable();
 
         void ClientCreate();
-        void ClientAdd(int fd, char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
+        void ClientAdd(int fd, char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientRemove(int fd, int refnum);
         void ClientKill(int fd);
 

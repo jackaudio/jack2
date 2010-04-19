@@ -97,7 +97,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
   
         // Client management
         int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
-        int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
+        int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
 
         int ClientExternalClose(int refnum);

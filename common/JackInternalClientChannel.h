@@ -137,9 +137,9 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fEngine->InternalClientHandle(client_name, status, int_ref);
         }
 
-        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result, int uuid)
         {
-            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status);	
+            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status, uuid);	
         }
 
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result)

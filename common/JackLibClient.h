@@ -44,7 +44,7 @@ class JackLibClient : public JackClient
         JackLibClient(JackSynchro* table);
         virtual ~JackLibClient();
 
-        int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status, int uuid);
 
         int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 

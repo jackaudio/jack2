@@ -460,7 +460,30 @@ bool JackEngine::ClientCheckName(const char* name)
             return true;
     }
 
+    for (std::map<int,std::string>::iterator i=fReservationMap.begin(); i!=fReservationMap.end(); i++) {
+	if (i->second == name)
+	    return true;
+    }
+
     return false;
+}
+
+int JackEngine::GetNewUUID()
+{
+    return fMaxUUID++;
+}
+
+void JackEngine::EnsureUUID(int uuid)
+{
+    if (uuid > fMaxUUID)
+	fMaxUUID = uuid+1;
+
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client && (client->GetClientControl()->fSessionID==uuid)) {
+	    client->GetClientControl()->fSessionID = GetNewUUID();
+	}
+    }
 }
 
 int JackEngine::GetClientPID(const char* name)
@@ -486,9 +509,26 @@ int JackEngine::GetClientRefNum(const char* name)
 }
 
 // Used for external clients
-int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
-    jack_log("JackEngine::ClientExternalOpen: name = %s ", name);
+    char real_name[JACK_CLIENT_NAME_SIZE+1];
+
+    if (uuid < 0) {
+	uuid = GetNewUUID();
+	strncpy( real_name, name, JACK_CLIENT_NAME_SIZE );
+    } else {
+	std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
+	if (res != fReservationMap.end()) {
+	    strncpy( real_name, res->second.c_str(), JACK_CLIENT_NAME_SIZE );
+	    fReservationMap.erase(uuid);
+	} else {
+	    strncpy( real_name, name, JACK_CLIENT_NAME_SIZE );
+	}
+
+	EnsureUUID(uuid);
+    }
+
+    jack_log("JackEngine::ClientExternalOpen: name = %s ", real_name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -498,12 +538,17 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
 
     JackExternalClient* client = new JackExternalClient();
 
-    if (!fSynchroTable[refnum].Allocate(name, fEngineControl->fServerName, 0)) {
+    if (!fSynchroTable[refnum].Allocate(real_name, fEngineControl->fServerName, 0)) {
         jack_error("Cannot allocate synchro");
         goto error;
     }
 
-    if (client->Open(name, pid, refnum, shared_client) < 0) {
+    if (uuid < 0)
+	uuid = GetNewUUID();
+    else
+	EnsureUUID(uuid);
+
+    if (client->Open(real_name, pid, refnum, uuid, shared_client) < 0) {
         jack_error("Cannot open client");
         goto error;
     }
@@ -516,7 +561,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int* ref, int* sha
 
     fClientTable[refnum] = client;
 
-    if (NotifyAddClient(client, name, refnum) < 0) {
+    if (NotifyAddClient(client, real_name, refnum) < 0) {
         jack_error("Cannot notify add client");
         goto error;
     }
