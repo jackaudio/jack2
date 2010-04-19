@@ -1915,3 +1915,66 @@ EXPORT void jack_session_event_free(jack_session_event_t* ev)
     free(ev);
 }
 
+EXPORT char *jack_get_uuid_for_client_name( jack_client_t *ext_client, const char *client_name )
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_get_uuid_for_client_name");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_get_uuid_for_client_name ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_get_uuid_for_client_name called with a NULL client");
+        return NULL;
+    } else {
+        return client->GetUUIDForClientName(client_name);
+    }
+}
+
+EXPORT char *jack_get_client_name_by_uuid( jack_client_t *ext_client, const char *client_uuid )
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_get_client_name_by_uuid");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_get_uuid_for_client_name ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_get_client_name_by_uuid called with a NULL client");
+        return NULL;
+    } else {
+        return client->GetClientNameForUUID(client_uuid);
+    }
+}
+
+EXPORT int jack_reserve_client_name( jack_client_t *ext_client, const char *name, const char *uuid )
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_reserve_client_name");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_reserve_client_name ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_reserve_client_name called with a NULL client");
+        return -1;
+    } else {
+        return client->ReserveClientName(name, uuid);
+    }
+}
+
+EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
+{
+    int i=0;
+    while(1) {
+	if (cmds[i].client_name)
+	    free ((char *)cmds[i].client_name);
+	if (cmds[i].command)
+	    free ((char *)cmds[i].command);
+	if (cmds[i].uuid)
+	    free ((char *)cmds[i].uuid);
+	else
+	    break;
+
+	i += 1;
+    }
+
+    free(cmds);
+}

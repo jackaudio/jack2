@@ -193,6 +193,9 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
 	// Session api
 	virtual jack_session_command_t *SessionNotify(const char *target, jack_session_event_type_t type, const char *path);
 	virtual int SessionReply(jack_session_event_t *ev);
+char* GetUUIDForClientName(const char* client_name);
+char* GetClientNameForUUID(const char* uuid);
+int ReserveClientName(const char *name, const char* uuid);
 
         // JackRunnableInterface interface
         bool Init();

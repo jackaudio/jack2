@@ -1109,5 +1109,36 @@ int JackClient::SessionReply( jack_session_event_t *ev )
     return res;
 }
 
+char* JackClient::GetUUIDForClientName(const char* client_name)
+{
+    char uuid_res[JACK_CLIENT_NAME_SIZE + 1];
+    int result = -1;
+    fChannel->GetUUIDForClientName( GetClientControl()->fRefNum, client_name, uuid_res, &result);
+
+    if(result)
+	return NULL;
+
+    return strdup(uuid_res);
+}
+
+char* JackClient::GetClientNameForUUID(const char* uuid)
+{
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    int result = -1;
+    fChannel->GetClientNameForUUID(GetClientControl()->fRefNum, uuid, name_res, &result);
+
+    if(result)
+	return NULL;
+
+    return strdup(name_res);
+}
+
+int JackClient::ReserveClientName(const char *name, const char* uuid)
+{
+    int result = -1;
+    fChannel->ReserveClientName( GetClientControl()->fRefNum, name, uuid, &result);
+    return result;
+}
+
 } // end of namespace
 

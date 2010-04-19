@@ -323,6 +323,27 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
 	}
  
+	void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result)
+	{
+            TRY_CALL
+            JackLock lock(&fEngine);
+	    fEngine.GetUUIDForClientName(client_name, uuid_res, result);
+            CATCH_EXCEPTION
+	}
+	void GetClientNameForUUID(const char *uuid, char *name_res, int *result)
+	{
+            TRY_CALL
+            JackLock lock(&fEngine);
+	    fEngine.GetClientNameForUUID(uuid, name_res, result);
+            CATCH_EXCEPTION
+	}
+	void ReserveClientName(const char *name, const char *uuid, int *result)
+	{
+            TRY_CALL
+            JackLock lock(&fEngine);
+	    fEngine.ReserveClientName(name, uuid, result);
+            CATCH_EXCEPTION
+	}
 };
 
 } // end of namespace

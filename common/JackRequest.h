@@ -70,7 +70,8 @@ struct JackRequest
 	kSessionNotify = 33,
 	kSessionReply  = 34,
 	kGetClientByUUID = 35,
-	kReserveClientName = 36
+	kReserveClientName = 36,
+	kGetUUIDByClient = 37
     };
 
     RequestType fType;
@@ -1211,6 +1212,156 @@ struct JackSessionReplyRequest : public JackRequest
 
 } POST_PACKED_STRUCTURE;
 
+struct JackClientNameResult : public JackResult
+{
+
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+
+    JackClientNameResult(): JackResult()
+    {}
+    JackClientNameResult(int32_t result, const char* name)
+            : JackResult(result)
+    {
+        snprintf(fName, sizeof(fName), "%s", name);
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(JackResult::Read(trans));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackResult::Write(trans));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
+        return 0;
+    }
+    
+} POST_PACKED_STRUCTURE;
+
+struct JackUUIDResult : public JackResult
+{
+
+    char fUUID[32 + 1];
+
+    JackUUIDResult(): JackResult()
+    {}
+    JackUUIDResult(int32_t result, const char* uuid)
+            : JackResult(result)
+    {
+        snprintf(fUUID, sizeof(fUUID), "%s", uuid);
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(JackResult::Read(trans));
+        CheckRes(trans->Read(&fUUID, sizeof(fUUID)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackResult::Write(trans));
+        CheckRes(trans->Write(&fUUID, sizeof(fUUID)));
+        return 0;
+    }
+    
+} POST_PACKED_STRUCTURE;
+
+struct JackGetUUIDRequest : public JackRequest
+{
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+
+    JackGetUUIDRequest()
+    {}
+
+    JackGetUUIDRequest(const char* client_name)
+            : JackRequest(JackRequest::kGetUUIDByClient)
+    {
+	strncpy(fName, client_name, sizeof(fName));
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        //CheckRes(JackRequest::Read(trans));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
+        return 0;
+    }
+
+} POST_PACKED_STRUCTURE;
+
+struct JackGetClientNameRequest : public JackRequest
+{
+    char fUUID[32 + 1];
+
+    JackGetClientNameRequest()
+    {}
+
+    JackGetClientNameRequest(const char* uuid)
+            : JackRequest(JackRequest::kGetClientByUUID)
+    {
+	strncpy(fUUID, uuid, sizeof(fUUID));
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        //CheckRes(JackRequest::Read(trans));
+        CheckRes(trans->Read(&fUUID, sizeof(fUUID)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fUUID, sizeof(fUUID)));
+        return 0;
+    }
+
+} POST_PACKED_STRUCTURE;
+
+struct JackReserveNameRequest : public JackRequest
+{
+    int  fRefNum;
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+    char fUUID[32 + 1];
+
+    JackReserveNameRequest()
+    {}
+
+    JackReserveNameRequest(int refnum, const char *name, const char* uuid)
+            : JackRequest(JackRequest::kReserveClientName), fRefNum(refnum)
+    {
+	strncpy(fName, name, sizeof(fName));
+	strncpy(fUUID, uuid, sizeof(fUUID));
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(trans->Read(&fUUID, sizeof(fUUID)));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
+        CheckRes(trans->Read(&fRefNum, sizeof(fRefNum)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fUUID, sizeof(fUUID)));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
+        CheckRes(trans->Write(&fRefNum, sizeof(fRefNum)));
+        return 0;
+    }
+
+} POST_PACKED_STRUCTURE;
 /*!
 \brief ClientNotification.
 */
