@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2002 Jeremy Hall
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -50,7 +50,7 @@ main (int argc, char *argv[])
 	} else {
 		my_name ++;
 	}
-    
+
     printf("name %s\n", my_name);
 
 	if (strstr(my_name, "jack_disconnect")) {
@@ -76,10 +76,10 @@ main (int argc, char *argv[])
 		fprintf (stderr, "jack server not running?\n");
 		return 1;
 	}
-    
+
     jack_set_port_connect_callback(client, port_connect_callback, NULL);
 
-	/* display the current sample rate. once the client is activated 
+	/* display the current sample rate. once the client is activated
 	   (see below), you should rely on your own sample rate
 	   callback (see above) for this value.
 	*/
@@ -94,7 +94,7 @@ main (int argc, char *argv[])
 		fprintf (stderr, "ERROR %s not a valid port\n", argv[2]);
 		goto error;
 	}
-	
+
 	/* tell the JACK server that we are ready to roll */
 
 	if (jack_activate (client)) {
@@ -118,16 +118,22 @@ main (int argc, char *argv[])
             goto error;
         }
 	}
-    
+
     // Wait for connection/disconnection to be effective
-    while(!done) {usleep(100);}
-    
+    while(!done) {
+    #ifdef WIN32
+        Sleep(10);
+    #else
+        usleep(10000);
+    #endif
+    }
+
     jack_deactivate (client);
 	jack_client_close (client);
 	return 0;
-    
+
 error:
-    if (client) 
+    if (client)
 		jack_client_close (client);
     return 1;
 }
