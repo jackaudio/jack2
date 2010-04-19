@@ -21,6 +21,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fstream>
 #include <assert.h>
 
+// for linux mkdir
+#include <sys/stat.h>
+#include <sys/types.h>
+
+
 #include "JackSystemDeps.h"
 #include "JackLockedEngine.h"
 #include "JackExternalClient.h"
@@ -926,22 +931,31 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
     fSessionResult = new JackSessionNotifyResult();
 
     for (int i = 0; i < CLIENT_NUM; i++) {
-	jack_log("JackEngine::SessionNotify ... checking client %d", i);
         JackClientInterface* client = fClientTable[i];
         if (client && client->GetClientControl()->fCallback[kSessionCallback]) {
 
-	    jack_log("JackEngine::SessionNotify ... got target: %s", client->GetClientControl()->fName);
 	    // check if this is a notification to a specific client.
 	    if (target!=NULL && strlen(target)!=0) {
 		if (strcmp(target, client->GetClientControl()->fName)) {
-		    jack_log("JackEngine::SessionNotify ... not this one");
 		    continue;
 		}
 	    }
 
-	    jack_log("JackEngine::SessionNotify ... sending");
-	    int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path, (int) type, 0);
-	    jack_log("JackEngine::SessionNotify ... got reply: %d", result);
+	    // TODO: this is linux specific right now. need proper platform abstract way.
+#define DIR_SEPARATOR '/'
+
+	    char path_buf[JACK_PORT_NAME_SIZE];
+	    snprintf( path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR );
+	    int mkdir_res = mkdir( path_buf, 0777 );
+
+	    if (mkdir_res != 0 && mkdir_res != EEXIST)
+	    {
+		jack_error( "JackEngine::SessionNotify: can not create session directory '%s'", path_buf );
+	    }
+	    // end of platform specific code.
+
+
+	    int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int) type, 0);
 
 	    if (result == 2) {
 		fSessionPendingReplies += 1;
@@ -1001,7 +1015,6 @@ void JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res, i
 
 void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *result)
 {
-    jack_log( "want uuid %s", uuid );
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
 
@@ -1011,11 +1024,9 @@ void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *res
 	char uuid_buf[33];
 	snprintf(uuid_buf, 32, "%d", client->GetClientControl()->fSessionID);
 
-	jack_log( "check uuid %s", uuid_buf );
 	if (strcmp(uuid,uuid_buf) == 0) {
 	    strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);
 	    *result = 0;
-	    jack_log( "found name\n" );
 	    return;
 	}
     }
