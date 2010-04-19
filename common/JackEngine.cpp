@@ -548,11 +548,6 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         goto error;
     }
 
-    if (uuid < 0)
-        uuid = GetNewUUID();
-    else
-        EnsureUUID(uuid);
-
     if (client->Open(real_name, pid, refnum, uuid, shared_client) < 0) {
         jack_error("Cannot open client");
         goto error;
