@@ -1908,11 +1908,15 @@ EXPORT int jack_session_reply(jack_client_t *ext_client, jack_session_event_t *e
 
 EXPORT void jack_session_event_free(jack_session_event_t* ev)
 {
-    free((void *)ev->session_dir);
-    free((void *)ev->client_uuid);
-    if (ev->command_line)
-        free(ev->command_line);
-    free(ev);
+    if (ev) {
+        if (ev->session_dir)
+            free((void *)ev->session_dir);
+        if (ev->client_uuid)
+            free((void *)ev->client_uuid);
+        if (ev->command_line)
+            free(ev->command_line);
+        free(ev);
+    }
 }
 
 EXPORT char *jack_get_uuid_for_client_name( jack_client_t *ext_client, const char *client_name )
@@ -1962,6 +1966,9 @@ EXPORT int jack_reserve_client_name( jack_client_t *ext_client, const char *name
 
 EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
 {
+    if(!cmds)
+        return;
+
     int i=0;
     while(1) {
         if (cmds[i].client_name)
