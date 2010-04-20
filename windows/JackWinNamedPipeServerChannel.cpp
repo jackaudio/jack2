@@ -327,15 +327,61 @@ bool JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kSessionNotify: {
-                  jack_log("JackRequest::SessionNotify");
-                  JackSessionNotifyRequest req;
-                  JackSessionNotifyResult res;
-                  if (req.Read(fPipe) == 0) {
-                      fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath);
-                  }
-                  res.Write(fPipe);
-                  break;
-              }
+                jack_log("JackRequest::SessionNotify");
+                JackSessionNotifyRequest req;
+                JackSessionNotifyResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath);
+                }
+                res.Write(fPipe);
+                break;
+            }
+                
+            case JackRequest::kSessionReply: {
+                jack_log("JackRequest::SessionReply");
+                JackSessionReplyRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->SessionReply(req.fRefNum);
+                    res.fResult = 0;
+                }
+                break;
+            }
+                
+            case JackRequest::kGetClientByUUID: {
+                jack_log("JackRequest::GetClientNameForUUID");
+                JackGetClientNameRequest req;
+                JackClientNameResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
+                }
+                res.Write(fPipe);
+                break;
+            }
+                
+            case JackRequest::kGetUUIDByClient: {
+                jack_log("JackRequest::GetUUIDForClientName");
+                JackGetUUIDRequest req;
+                JackUUIDResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
+                    res.fResult = 0;
+                }
+                res.Write(fPipe);
+                break;
+            }
+                
+            case JackRequest::kReserveClientName: {
+                jack_log("JackRequest::ReserveClientName");
+                JackReserveNameRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
+                    res.fResult = 0;
+                }
+                res.Write(fPipe);
+                break;
+            }
 
             default:
                 jack_log("Unknown request %ld", header.fType);
