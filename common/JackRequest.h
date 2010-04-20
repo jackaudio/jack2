@@ -146,7 +146,7 @@ struct JackClientCheckRequest : public JackRequest
 
     int Read(JackChannelTransaction* trans)
     {
-        CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
         CheckRes(trans->Read(&fProtocol, sizeof(int)));
         return trans->Read(&fOptions, sizeof(int));
     }
@@ -154,7 +154,7 @@ struct JackClientCheckRequest : public JackRequest
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackRequest::Write(trans));
-        CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fName,  sizeof(fName)));
         CheckRes(trans->Write(&fProtocol, sizeof(int)));
         return trans->Write(&fOptions, sizeof(int));
     }
@@ -182,7 +182,7 @@ struct JackClientCheckResult : public JackResult
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(JackResult::Read(trans));
-        CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
         CheckRes(trans->Read(&fStatus, sizeof(int)));
         return 0;
     }
@@ -190,7 +190,7 @@ struct JackClientCheckResult : public JackResult
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackResult::Write(trans));
-        CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
         CheckRes(trans->Write(&fStatus, sizeof(int)));
         return 0;
     }
@@ -208,7 +208,6 @@ struct JackClientOpenRequest : public JackRequest
     int fUUID;
     char fName[JACK_CLIENT_NAME_SIZE + 1];
  
-
     JackClientOpenRequest()
     {}
     JackClientOpenRequest(const char* name, int pid, int uuid): JackRequest(JackRequest::kClientOpen)
@@ -222,7 +221,7 @@ struct JackClientOpenRequest : public JackRequest
     {
         CheckRes(trans->Read(&fPID, sizeof(int)));
         CheckRes(trans->Read(&fUUID, sizeof(int)));
-        return trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1);
+        return trans->Read(&fName,  sizeof(fName));
     }
 
     int Write(JackChannelTransaction* trans)
@@ -230,7 +229,7 @@ struct JackClientOpenRequest : public JackRequest
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fPID, sizeof(int)));
         CheckRes(trans->Write(&fUUID, sizeof(int)));
-        return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
+        return trans->Write(&fName,  sizeof(fName));
     }
     
 };
@@ -383,8 +382,8 @@ struct JackPortRegisterRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
-        CheckRes(trans->Read(&fPortType, JACK_PORT_TYPE_SIZE + 1));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
+        CheckRes(trans->Read(&fPortType, sizeof(fPortType)));
         CheckRes(trans->Read(&fFlags, sizeof(unsigned int)));
         CheckRes(trans->Read(&fBufferSize, sizeof(unsigned int)));
         return 0;
@@ -394,8 +393,8 @@ struct JackPortRegisterRequest : public JackRequest
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
-        CheckRes(trans->Write(&fPortType, JACK_PORT_TYPE_SIZE + 1));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
+        CheckRes(trans->Write(&fPortType, sizeof(fPortType)));
         CheckRes(trans->Write(&fFlags, sizeof(unsigned int)));
         CheckRes(trans->Write(&fBufferSize, sizeof(unsigned int)));
         return 0;
@@ -485,8 +484,8 @@ struct JackPortConnectNameRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        CheckRes(trans->Read(&fSrc, JACK_PORT_NAME_SIZE + 1));
-        CheckRes(trans->Read(&fDst, JACK_PORT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fSrc, sizeof(fSrc)));
+        CheckRes(trans->Read(&fDst, sizeof(fDst)));
         return 0;
 
     }
@@ -495,8 +494,8 @@ struct JackPortConnectNameRequest : public JackRequest
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        CheckRes(trans->Write(&fSrc, JACK_PORT_NAME_SIZE + 1));
-        CheckRes(trans->Write(&fDst, JACK_PORT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fSrc, sizeof(fSrc)));
+        CheckRes(trans->Write(&fDst, sizeof(fDst)));
         return 0;
     }
     
@@ -525,8 +524,8 @@ struct JackPortDisconnectNameRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        CheckRes(trans->Read(&fSrc, JACK_PORT_NAME_SIZE + 1));
-        CheckRes(trans->Read(&fDst, JACK_PORT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fSrc, sizeof(fSrc)));
+        CheckRes(trans->Read(&fDst, sizeof(fDst)));
         return 0;
     }
 
@@ -534,8 +533,8 @@ struct JackPortDisconnectNameRequest : public JackRequest
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        CheckRes(trans->Write(&fSrc, JACK_PORT_NAME_SIZE + 1));
-        CheckRes(trans->Write(&fDst, JACK_PORT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fSrc, sizeof(fSrc)));
+        CheckRes(trans->Write(&fDst, sizeof(fDst)));
         return 0;
     }
     
@@ -609,7 +608,6 @@ struct JackPortDisconnectRequest : public JackRequest
         CheckRes(trans->Write(&fSrc, sizeof(jack_port_id_t)));
         CheckRes(trans->Write(&fDst, sizeof(jack_port_id_t)));
         return 0;
-
     }
     
 };
@@ -637,7 +635,7 @@ struct JackPortRenameRequest : public JackRequest
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
         CheckRes(trans->Read(&fPort, sizeof(jack_port_id_t)));
-        CheckRes(trans->Read(&fName, JACK_PORT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
         return 0;
     }
 
@@ -646,7 +644,7 @@ struct JackPortRenameRequest : public JackRequest
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         CheckRes(trans->Write(&fPort, sizeof(jack_port_id_t)));
-        CheckRes(trans->Write(&fName, JACK_PORT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
         return 0;
 
     }
@@ -819,14 +817,14 @@ struct JackGetInternalClientNameResult : public JackResult
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(JackResult::Read(trans));
-        CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fName,  sizeof(fName)));
         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackResult::Write(trans));
-        CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fName,  sizeof(fName)));
         return 0;
     }
     
@@ -853,14 +851,14 @@ struct JackInternalClientHandleRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        return trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1);
+        return trans->Read(&fName,  sizeof(fName));
     }
 
     int Write(JackChannelTransaction* trans)
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        return trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1);
+        return trans->Write(&fName,  sizeof(fName));
     }
     
 };
@@ -931,9 +929,9 @@ struct JackInternalClientLoadRequest : public JackRequest
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
-        CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
-        CheckRes(trans->Read(&fDllName, MAX_PATH + 1));
-        CheckRes(trans->Read(&fLoadInitName, JACK_LOAD_INIT_LIMIT + 1));
+        CheckRes(trans->Read(&fName,  sizeof(fName)));
+        CheckRes(trans->Read(&fDllName, sizeof(fDllName)));
+        CheckRes(trans->Read(&fLoadInitName, sizeof(fLoadInitName)));
         CheckRes(trans->Read(&fUUID, sizeof(int)));
         return trans->Read(&fOptions, sizeof(int));
     }
@@ -942,9 +940,9 @@ struct JackInternalClientLoadRequest : public JackRequest
     {
         CheckRes(JackRequest::Write(trans));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
-        CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
-        CheckRes(trans->Write(&fDllName, MAX_PATH + 1));
-        CheckRes(trans->Write(&fLoadInitName, JACK_LOAD_INIT_LIMIT + 1));
+        CheckRes(trans->Write(&fName,  sizeof(fName)));
+        CheckRes(trans->Write(&fDllName, sizeof(fDllName)));
+        CheckRes(trans->Write(&fLoadInitName, sizeof(fLoadInitName)));
         CheckRes(trans->Write(&fUUID, sizeof(int)));
         return trans->Write(&fOptions, sizeof(int));
     }
@@ -1222,7 +1220,6 @@ struct JackSessionReplyRequest : public JackRequest
 
 struct JackClientNameResult : public JackResult
 {
-
     char fName[JACK_CLIENT_NAME_SIZE + 1];
 
     JackClientNameResult(): JackResult()
@@ -1396,25 +1393,25 @@ struct JackClientNotification
 
     int Read(JackChannelTransaction* trans)
     {
-        CheckRes(trans->Read(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Read(&fName, sizeof(fName)));
         CheckRes(trans->Read(&fRefNum, sizeof(int)));
         CheckRes(trans->Read(&fNotify, sizeof(int)));
         CheckRes(trans->Read(&fValue1, sizeof(int)));
         CheckRes(trans->Read(&fValue2, sizeof(int)));
         CheckRes(trans->Read(&fSync, sizeof(int)));
-        CheckRes(trans->Read(&fMessage, JACK_MESSAGE_SIZE + 1));
+        CheckRes(trans->Read(&fMessage, sizeof(fName)));
         return 0;
     }
 
     int Write(JackChannelTransaction* trans)
     {
-        CheckRes(trans->Write(&fName, JACK_CLIENT_NAME_SIZE + 1));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         CheckRes(trans->Write(&fNotify, sizeof(int)));
         CheckRes(trans->Write(&fValue1, sizeof(int)));
         CheckRes(trans->Write(&fValue2, sizeof(int)));
         CheckRes(trans->Write(&fSync, sizeof(int)));
-        CheckRes(trans->Write(&fMessage, JACK_MESSAGE_SIZE + 1));
+        CheckRes(trans->Write(&fMessage, sizeof(fName)));
         return 0;
     }
 
