@@ -1084,9 +1084,9 @@ struct JackClientNotificationRequest : public JackRequest
 
 struct JackSessionCommand
 {
-    char fUUID[32];
+    char fUUID[JACK_UUID_SIZE];
     char fClientName[JACK_CLIENT_NAME_SIZE+1];
-    char fCommand[MAX_PATH+1];
+    char fCommand[JACK_SESSION_COMMAND_SIZE];
     jack_session_flags_t fFlags;
 
     JackSessionCommand()
@@ -1252,7 +1252,7 @@ struct JackClientNameResult : public JackResult
 struct JackUUIDResult : public JackResult
 {
 
-    char fUUID[32 + 1];
+    char fUUID[JACK_UUID_SIZE];
 
     JackUUIDResult(): JackResult()
     {}
@@ -1309,7 +1309,7 @@ struct JackGetUUIDRequest : public JackRequest
 
 struct JackGetClientNameRequest : public JackRequest
 {
-    char fUUID[32 + 1];
+    char fUUID[JACK_UUID_SIZE];
 
     JackGetClientNameRequest()
     {}
@@ -1340,7 +1340,7 @@ struct JackReserveNameRequest : public JackRequest
 {
     int  fRefNum;
     char fName[JACK_CLIENT_NAME_SIZE + 1];
-    char fUUID[32 + 1];
+    char fUUID[JACK_UUID_SIZE];
 
     JackReserveNameRequest()
     {}

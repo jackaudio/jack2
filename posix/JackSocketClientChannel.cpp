@@ -286,7 +286,7 @@ void JackSocketClientChannel::GetUUIDForClientName( int refnum, const char *clie
     JackGetUUIDRequest req(client_name);
     JackUUIDResult  res;
     ServerSyncCall(&req, &res, result);
-    strncpy( uuid_res, res.fUUID, 32 );
+    strncpy( uuid_res, res.fUUID, JACK_UUID_SIZE );
 }
 
 void JackSocketClientChannel::GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result )

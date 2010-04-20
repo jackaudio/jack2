@@ -955,7 +955,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             if (result == 2) {
                 fSessionPendingReplies += 1;
             } else if (result == 1) {
-                char uuid_buf[32];
+                char uuid_buf[JACK_UUID_SIZE];
                 snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
                 fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf, 
                                                                             client->GetClientControl()->fName,
@@ -977,7 +977,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
 void JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
-    char uuid_buf[32];
+    char uuid_buf[JACK_UUID_SIZE];
     snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
     fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf, 
                                                                 client->GetClientControl()->fName,
@@ -998,7 +998,7 @@ void JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res, i
         JackClientInterface* client = fClientTable[i];
 
         if (client && (strcmp(client_name, client->GetClientControl()->fName)==0)) {
-            snprintf(uuid_res, 32, "%d", client->GetClientControl()->fSessionID);
+            snprintf(uuid_res, JACK_UUID_SIZE, "%d", client->GetClientControl()->fSessionID);
             *result = 0;
             return;
         }
@@ -1016,8 +1016,8 @@ void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *res
         if (!client)
             continue;
 
-        char uuid_buf[33];
-        snprintf(uuid_buf, 32, "%d", client->GetClientControl()->fSessionID);
+        char uuid_buf[JACK_UUID_SIZE];
+        snprintf(uuid_buf, JACK_UUID_SIZE, "%d", client->GetClientControl()->fSessionID);
 
         if (strcmp(uuid,uuid_buf) == 0) {
             strncpy(name_res, client->GetClientControl()->fName, JACK_CLIENT_NAME_SIZE);

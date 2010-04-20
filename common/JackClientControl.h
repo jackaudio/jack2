@@ -47,7 +47,7 @@ struct JackClientControl : public JackShmMemAble
     bool fActive;
 
     int fSessionID;
-    char fSessionCommand[256 + 1];
+    char fSessionCommand[JACK_SESSION_COMMAND_SIZE];
     jack_session_flags_t fSessionFlags;
 
     JackClientControl(const char* name, int pid, int refnum, int uuid)
