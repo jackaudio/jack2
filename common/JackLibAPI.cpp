@@ -68,7 +68,7 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
 
     jack_log("jack_client_new %s", client_name);
    
-    if (status == NULL)                 /* no status from caller? */
+    if (status == NULL)         /* no status from caller? */
         status = &my_status;    /* use local status word */
     *status = (jack_status_t)0;
 

@@ -260,7 +260,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
         goto error;
     }
 
-    if (listen(fSocket, 1) < 0) {
+    if (listen(fSocket, 100) < 0) {
         jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
         goto error;
     }
