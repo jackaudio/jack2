@@ -22,7 +22,10 @@
 
 #ifdef WIN32
 #include <windows.h>
+#define DIR_SEPARATOR '\\'
 #else
+#define DIR_SEPARATOR '/'
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <dirent.h>
@@ -58,6 +61,7 @@ namespace Jack
 
         static void KillServer();
 
+        static int MkDir(const char* path);
         static char* UserDir();
         static char* ServerDir ( const char* server_name, char* server_dir );
         static const char* DefaultServerName();

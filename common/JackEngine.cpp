@@ -21,11 +21,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <fstream>
 #include <assert.h>
 
-// for linux mkdir
-#include <sys/stat.h>
-#include <sys/types.h>
-
-
 #include "JackSystemDeps.h"
 #include "JackLockedEngine.h"
 #include "JackExternalClient.h"
@@ -936,20 +931,13 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
                 }
             }
 
-            // TODO: this is linux specific right now. need proper platform abstract way.
-#define DIR_SEPARATOR '/'
-
             char path_buf[JACK_PORT_NAME_SIZE];
             snprintf( path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR );
-            int mkdir_res = mkdir( path_buf, 0777 );
-
-            if (mkdir_res != 0 && mkdir_res != EEXIST)
-            {
+            
+            int res = JackTools::MkDir(path_buf);
+            if (res) 
                 jack_error( "JackEngine::SessionNotify: can not create session directory '%s'", path_buf );
-            }
-            // end of platform specific code.
-
-
+        
             int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int) type, 0);
 
             if (result == 2) {
@@ -1032,16 +1020,14 @@ void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *res
 
 void JackEngine::ReserveClientName(const char *name, const char *uuid, int *result)
 {
-    
-    if (ClientCheckName(name))
-    {
+    if (ClientCheckName(name)) {
             *result = -1;
             return;
     }
 
     EnsureUUID(atoi(uuid));
-    
     fReservationMap[atoi(uuid)] = name;
 }
+
 } // end of namespace
 

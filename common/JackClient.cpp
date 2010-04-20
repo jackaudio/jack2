@@ -284,15 +284,9 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     event->flags = (jack_session_flags_t) 0;
                     snprintf( uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID );
                     event->client_uuid = strdup( uuid_buf );
-
                     fImmediateSessionReply = false;
-
                     fSession(event, fSessionArg);
-
-                    if (fImmediateSessionReply)
-                        res = 1;
-                    else
-                        res = 2;
+                    res = (fImmediateSessionReply) ? 1 : 2;
                 }
                 break;
         }
