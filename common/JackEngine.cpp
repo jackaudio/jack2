@@ -694,11 +694,11 @@ int JackEngine::ClientDeactivate(int refnum)
 
     // First disconnect all ports and remove their JackPortIsActive state
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
-        PortDisconnect(refnum, input_ports[i], ALL_PORTS);
+        PortDisconnect(-1, input_ports[i], ALL_PORTS);
         fGraphManager->DeactivatePort(input_ports[i]);
     }
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
-        PortDisconnect(refnum, output_ports[i], ALL_PORTS);
+        PortDisconnect(-1, output_ports[i], ALL_PORTS);
         fGraphManager->DeactivatePort(output_ports[i]);
     }
     
