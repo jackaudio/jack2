@@ -67,6 +67,15 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
     return ret;
 }
 
+#else
+
+#warning using builtin gcc (version > 4.1) atomic
+
+static inline char CAS(volatile uint32_t value, uint32_t newvalue, volatile int32_t* addr)
+{
+    return __sync_bool_compare_and_swap (addr, value, newvalue);
+}
+
 #endif
 
 #endif
