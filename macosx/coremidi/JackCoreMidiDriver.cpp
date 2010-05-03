@@ -40,11 +40,13 @@ static MIDITimeStamp MIDIGetCurrentHostTime()
 void JackCoreMidiDriver::ReadProcAux(const MIDIPacketList *pktlist, jack_ringbuffer_t* ringbuffer)
 {
     // Write the number of packets
-    size_t size = jack_ringbuffer_write(ringbuffer, (char*)&pktlist->numPackets, sizeof(UInt32));
-    if (size != sizeof(UInt32)) {
+    size_t size = jack_ringbuffer_write_space(ringbuffer);
+    if (size < sizeof(UInt32)) {
         jack_error("ReadProc : ring buffer is full, skip events...");
         return;
-    }    
+    }
+    
+    jack_ringbuffer_write(ringbuffer, (char*)&pktlist->numPackets, sizeof(UInt32));
     
     for (unsigned int i = 0; i < pktlist->numPackets; ++i) {
     
