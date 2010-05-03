@@ -317,11 +317,7 @@ EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_get_buffer");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_buffer called with an incorrect port %ld", myport);
@@ -337,11 +333,7 @@ EXPORT const char* jack_port_name(const jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_name");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_name called with an incorrect port %ld", myport);
@@ -357,11 +349,7 @@ EXPORT const char* jack_port_short_name(const jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_short_name");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_short_name called with an incorrect port %ld", myport);
@@ -377,11 +365,7 @@ EXPORT int jack_port_flags(const jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_flags");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_flags called with an incorrect port %ld", myport);
@@ -397,11 +381,7 @@ EXPORT const char* jack_port_type(const jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_type");
 #endif
- #if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
    if (!CheckPort(myport)) {
         jack_error("jack_port_flags called an incorrect port %ld", myport);
@@ -417,11 +397,7 @@ EXPORT jack_port_type_id_t jack_port_type_id(const jack_port_t *port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_type_id");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_type_id called an incorrect port %ld", myport);
@@ -437,11 +413,7 @@ EXPORT int jack_port_connected(const jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_connected");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_connected called with an incorrect port %ld", myport);
@@ -458,11 +430,7 @@ EXPORT int jack_port_connected_to(const jack_port_t* port, const char* port_name
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_connected_to");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t src = (jack_port_id_t)port_aux;
     if (!CheckPort(src)) {
         jack_error("jack_port_connected_to called with an incorrect port %ld", src);
@@ -488,21 +456,13 @@ EXPORT int jack_port_tie(jack_port_t* src, jack_port_t* dst)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_tie");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t src_aux = (uint64_t)src;
-#else
-    uint32_t src_aux = (uint32_t)src;
-#endif
+    uintptr_t src_aux = (uintptr_t)src;
     jack_port_id_t mysrc = (jack_port_id_t)src_aux;
     if (!CheckPort(mysrc)) {
         jack_error("jack_port_tie called with a NULL src port");
         return -1;
     }
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t dst_aux = (uint64_t)dst;
-#else
-    uint32_t dst_aux = (uint32_t)dst;
-#endif
+    uintptr_t dst_aux = (uintptr_t)dst;
     jack_port_id_t mydst = (jack_port_id_t)dst_aux;
     if (!CheckPort(mydst)) {
         jack_error("jack_port_tie called with a NULL dst port");
@@ -522,11 +482,7 @@ EXPORT int jack_port_untie(jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_untie");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_untie called with an incorrect port %ld", myport);
@@ -542,11 +498,7 @@ EXPORT jack_nframes_t jack_port_get_latency(jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_get_latency");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_latency called with an incorrect port %ld", myport);
@@ -563,11 +515,7 @@ EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_set_latency");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_latency called with an incorrect port %ld", myport);
@@ -585,11 +533,7 @@ EXPORT int jack_recompute_total_latency(jack_client_t* ext_client, jack_port_t* 
 #endif
 
     JackClient* client = (JackClient*)ext_client;
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (client == NULL) {
         jack_error("jack_recompute_total_latencies called with a NULL client");
@@ -630,11 +574,7 @@ EXPORT int jack_port_set_name(jack_port_t* port, const char* name)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_set_name");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_name called with an incorrect port %ld", myport);
@@ -660,11 +600,7 @@ EXPORT int jack_port_set_alias(jack_port_t* port, const char* name)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_set_alias");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_set_alias called with an incorrect port %ld", myport);
@@ -683,11 +619,7 @@ EXPORT int jack_port_unset_alias(jack_port_t* port, const char* name)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_unset_alias");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_unset_alias called with an incorrect port %ld", myport);
@@ -706,11 +638,7 @@ EXPORT int jack_port_get_aliases(const jack_port_t* port, char* const aliases[2]
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_get_aliases");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_aliases called with an incorrect port %ld", myport);
@@ -726,11 +654,7 @@ EXPORT int jack_port_request_monitor(jack_port_t* port, int onoff)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_request_monitor");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_request_monitor called with an incorrect port %ld", myport);
@@ -769,11 +693,7 @@ EXPORT int jack_port_ensure_monitor(jack_port_t* port, int onoff)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_ensure_monitor");
 #endif
- #if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_ensure_monitor called with an incorrect port %ld", myport);
@@ -789,11 +709,7 @@ EXPORT int jack_port_monitoring_input(jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_monitoring_input");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_monitoring_input called with an incorrect port %ld", myport);
@@ -1128,11 +1044,7 @@ EXPORT jack_port_t* jack_port_register(jack_client_t* ext_client, const char* po
         jack_error("jack_port_register called with a NULL port name or a NULL port_type");
         return NULL;
     } else {
-#if defined(__x86_64__) || defined(__ppc64__)
-        return (jack_port_t *)((uint64_t)client->PortRegister(port_name, port_type, flags, buffer_size));
-#else
-        return (jack_port_t *)client->PortRegister(port_name, port_type, flags, buffer_size);
-#endif
+        return (jack_port_t *)((uintptr_t)client->PortRegister(port_name, port_type, flags, buffer_size));
     }
 }
 
@@ -1146,11 +1058,7 @@ EXPORT int jack_port_unregister(jack_client_t* ext_client, jack_port_t* port)
         jack_error("jack_port_unregister called with a NULL client");
         return -1;
     }
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_unregister called with an incorrect port %ld", myport);
@@ -1169,11 +1077,7 @@ EXPORT int jack_port_is_mine(const jack_client_t* ext_client, const jack_port_t*
         jack_error("jack_port_is_mine called with a NULL client");
         return -1;
     }
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_is_mine called with an incorrect port %ld", myport);
@@ -1187,11 +1091,7 @@ EXPORT const char** jack_port_get_connections(const jack_port_t* port)
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_port_get_connections");
 #endif
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_connections called with an incorrect port %ld", myport);
@@ -1215,11 +1115,7 @@ EXPORT const char** jack_port_get_all_connections(const jack_client_t* ext_clien
         return NULL;
     }
 
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_all_connections called with an incorrect port %ld", myport);
@@ -1242,11 +1138,7 @@ EXPORT jack_nframes_t jack_port_get_total_latency(jack_client_t* ext_client, jac
         return 0;
     }
 
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)port;
-#else
-    uint32_t port_aux = (uint32_t)port;
-#endif
+    uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_get_total_latency called with an incorrect port %ld", myport);
@@ -1307,11 +1199,7 @@ EXPORT int jack_port_disconnect(jack_client_t* ext_client, jack_port_t* src)
         jack_error("jack_port_disconnect called with a NULL client");
         return -1;
     }
-#if defined(__x86_64__) || defined(__ppc64__)
-    uint64_t port_aux = (uint64_t)src;
-#else
-    uint32_t port_aux = (uint32_t)src;
-#endif
+    uintptr_t port_aux = (uintptr_t)src;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
         jack_error("jack_port_disconnect called with an incorrect port %ld", myport);
@@ -1383,11 +1271,7 @@ EXPORT jack_port_t* jack_port_by_name(jack_client_t* ext_client, const char* por
         if (!manager)
             return NULL;
         int res = manager->GetPort(portname); // returns a port index at least > 1
-#if defined(__x86_64__) || defined(__ppc64__)
-        return (res == NO_PORT) ? NULL : (jack_port_t*)((uint64_t)res);
-#else
-        return (res == NO_PORT) ? NULL : (jack_port_t*)res;
-#endif
+        return (res == NO_PORT) ? NULL : (jack_port_t*)((uintptr_t)res);
     }
 }
 
@@ -1397,11 +1281,7 @@ EXPORT jack_port_t* jack_port_by_id(jack_client_t* ext_client, jack_port_id_t id
     JackGlobals::CheckContext("jack_port_by_id");
 #endif
     /* jack_port_t* type is actually the port index */
-#if defined(__x86_64__) || defined(__ppc64__)
-    return (jack_port_t*)((uint64_t)id);
-#else
-    return (jack_port_t*)id;
-#endif
+    return (jack_port_t*)((uintptr_t)id);
 }
 
 EXPORT int jack_engine_takeover_timebase(jack_client_t* ext_client)
