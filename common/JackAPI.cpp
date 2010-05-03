@@ -56,9 +56,9 @@ extern "C"
     const char *
     jack_get_version_string();
 
-    EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
+    jack_client_t * jack_client_new_aux (const char *client_name,
             jack_options_t options,
-            jack_status_t *status, va_list ap);
+            jack_status_t *status);
     EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
@@ -300,7 +300,7 @@ EXPORT jack_client_t* jack_client_new(const char* client_name)
         int options = JackUseExactName;
         if (getenv("JACK_START_SERVER") == NULL)
             options |= JackNoStartServer;
-        jack_client_t* res = jack_client_open_aux(client_name, (jack_options_t)options, NULL, NULL);
+        jack_client_t* res = jack_client_new_aux(client_name, (jack_options_t)options, NULL);
         JackGlobals::fOpenMutex->Unlock();
         return res;
     } catch (std::bad_alloc& e) {

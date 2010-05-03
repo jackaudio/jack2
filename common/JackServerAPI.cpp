@@ -33,7 +33,10 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_client_t * jack_client_open_aux (const char *client_name,
+    jack_client_t * jack_client_new_aux (const char *client_name,
+            jack_options_t options,
+            jack_status_t *status);
+    jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
     EXPORT jack_client_t * jack_client_open (const char *client_name,
@@ -48,7 +51,58 @@ extern "C"
 
 using namespace Jack;
 
-EXPORT jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t options, jack_status_t* status, va_list ap)
+jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
+{
+    jack_varargs_t va;		/* variable arguments */
+    jack_status_t my_status;
+    JackClient* client;
+
+    if (client_name == NULL) {
+        jack_error("jack_client_new called with a NULL client_name");
+        return NULL;
+    }
+
+    jack_log("jack_client_new %s", client_name);
+ 
+    if (status == NULL)			/* no status from caller? */
+        status = &my_status;	/* use local status word */
+    *status = (jack_status_t)0;
+
+    /* validate parameters */
+    if ((options & ~JackOpenOptions)) {
+        int my_status1 = *status | (JackFailure | JackInvalidOption);
+        *status = (jack_status_t)my_status1;
+        return NULL;
+    }
+
+    /* parse variable arguments */
+    jack_varargs_init(&va);
+ 
+    if (!JackServerGlobals::Init()) { // jack server initialisation
+        int my_status1 = (JackFailure | JackServerError);
+        *status = (jack_status_t)my_status1;
+        return NULL;
+    }
+ 
+    if (JACK_DEBUG) {
+        client = new JackDebugClient(new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable())); // Debug mode
+    } else {
+        client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
+    }
+
+    int res = client->Open(va.server_name, client_name, options, status);
+    if (res < 0) {
+        delete client;
+        JackServerGlobals::Destroy(); // jack server destruction
+        int my_status1 = (JackFailure | JackServerError);
+        *status = (jack_status_t)my_status1;
+        return NULL;
+    } else {
+        return (jack_client_t*)client;
+    }
+}
+
+jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t options, jack_status_t* status, va_list ap)
 {
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
