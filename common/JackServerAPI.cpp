@@ -127,12 +127,8 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     }
 
     /* parse variable arguments */
-    if (ap) {
-        jack_varargs_parse(options, ap, &va);
-    } else {
-        jack_varargs_init(&va);
-    }
-
+    jack_varargs_parse(options, ap, &va);
+ 
     if (!JackServerGlobals::Init()) { // jack server initialisation
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
