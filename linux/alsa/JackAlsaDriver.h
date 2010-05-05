@@ -53,7 +53,7 @@ class JackAlsaDriver : public JackAudioDriver
         int alsa_driver_generic_hardware(alsa_driver_t *driver);
         int alsa_driver_hw_specific(alsa_driver_t *driver, int hw_monitoring,
                                      int hw_metering);
-        void alsa_driver_setup_io_function_pointers (alsa_driver_t *driver);
+        int alsa_driver_setup_io_function_pointers (alsa_driver_t *driver);
         int alsa_driver_configure_stream(alsa_driver_t *driver, char *device_name,
                                           const char *stream_name,
                                           snd_pcm_t *handle,

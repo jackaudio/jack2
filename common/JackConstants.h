@@ -59,30 +59,6 @@
 
 #define JACK_DEFAULT_SERVER_NAME "default"
 
-#ifdef WIN32
-#define jack_server_dir "server"
-#define jack_client_dir "client"
-#define ADDON_DIR "jack"
-#endif
-
-#ifdef __APPLE__
-#define jack_server_dir "/tmp"
-#define jack_client_dir "/tmp"
-#define JACK_DEFAULT_DRIVER "coreaudio"
-#endif
-
-#ifdef __linux__
-#define jack_server_dir "/dev/shm"
-#define jack_client_dir "/dev/shm"
-#define JACK_DEFAULT_DRIVER "alsa"
-#endif
-
-#if defined(__sun__) || defined(sun)
-#define jack_server_dir "/tmp"
-#define jack_client_dir "/tmp"
-#define JACK_DEFAULT_DRIVER "oss"
-#endif
-
 #define jack_server_entry "jackdmp_entry"
 #define jack_client_entry "jack_client"
 

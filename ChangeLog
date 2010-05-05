@@ -30,6 +30,18 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-04-016 Stephane Letz  <letz@grame.fr>
+
+	* Make jack_connect/jack_disconnect wait for effective port connection/disconnection.
+
+2010-04-07 Stephane Letz  <letz@grame.fr>
+
+	* Remove call to exit in library code.
+
+2010-03-26 Stephane Letz  <letz@grame.fr>
+
+	* ffado-portname-sync.patch from ticket #163 applied.
+
 2010-03-24 Stephane Letz  <letz@grame.fr>
 
 	* On Windows, now use TRE library for regexp (BSD license instead of GPL license).

@@ -21,6 +21,10 @@
 #ifndef __JackPlatformPlug_WIN32__
 #define __JackPlatformPlug_WIN32__
 
+#define jack_server_dir "server"
+#define jack_client_dir "client"
+#define ADDON_DIR "jack"
+
 namespace Jack
 {
     struct JackRequest;

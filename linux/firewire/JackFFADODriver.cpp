@@ -429,7 +429,7 @@ int JackFFADODriver::Attach()
 
         driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering audio capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
@@ -455,7 +455,7 @@ int JackFFADODriver::Attach()
             fCaptureChannels++;
 
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering midi capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
@@ -502,7 +502,7 @@ int JackFFADODriver::Attach()
         driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
 
         if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
             printMessage ("Registering audio playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
@@ -530,7 +530,7 @@ int JackFFADODriver::Attach()
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
         } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
             printMessage ("Registering midi playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,

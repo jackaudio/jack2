@@ -22,6 +22,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <TargetConditionals.h>
 
+#define jack_server_dir "/tmp"
+#define jack_client_dir "/tmp"
+#define JACK_DEFAULT_DRIVER "coreaudio"
+
 namespace Jack
 {       
 	class JackPosixMutex;
