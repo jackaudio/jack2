@@ -989,6 +989,7 @@ JackNetOneDriver::render_jack_ports_to_payload (int bitdepth, JSList *playback_p
             unsigned int latency = 5;
             unsigned int redundancy = 1;
             unsigned int mtu = 1400;
+            unsigned int resample_factor_up = 1;
             int dont_htonl_floats = 0;
             int always_deadline = 0;
             int jitter_val = 0;

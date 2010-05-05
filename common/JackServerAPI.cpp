@@ -141,7 +141,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
         client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
     }
 
-    int res = client->Open(va.server_name, client_name, options, status);
+    int res = client->Open(va.server_name, client_name, options, status, va.session_id);
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
