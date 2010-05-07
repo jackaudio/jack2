@@ -30,9 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
-2010-05-016 Stephane Letz  <letz@grame.fr>
+2010-05-07 Stephane Letz  <letz@grame.fr>
 
 	* Add tests to validate intclient.h API.
+	* On Linux, inter-process synchronization primitive switched to POSIX semaphore.
 
 2010-04-16 Stephane Letz  <letz@grame.fr>
 
@@ -238,7 +239,7 @@ Arnold Krille
 2009-10-20 Stephane Letz  <letz@grame.fr>
 
 	* Add a string parameter to server ==> client notification, add a new JackInfoShutdownCallback type.
-	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration changeÉ)
+	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration changeï¿½)
 
 2009-10-17 Stephane Letz  <letz@grame.fr>
 
