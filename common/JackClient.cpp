@@ -1058,7 +1058,8 @@ int JackClient::InternalClientLoad(const char* client_name, jack_options_t optio
     }
 
     int int_ref, result = -1;
-    fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, &result);
+    // UUID TO CHECK
+    fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, -1, &result);
     return int_ref;
 }
 

@@ -121,7 +121,7 @@ class JackClientChannelInterface
         virtual void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
         {}
 
-        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
         {}
 
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)

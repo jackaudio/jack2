@@ -335,7 +335,7 @@ void JackSocketClientChannel::InternalClientHandle(int refnum, const char* clien
     *status = res.fStatus;
 }
 
-void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result, int uuid)
+void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
 {
     JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options, uuid);
     JackInternalClientLoadResult res;

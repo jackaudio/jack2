@@ -136,25 +136,25 @@ int JackServer::Close()
     return 0;
 }
 
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status, int uuid)
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient1(JackServerGlobals::fInstance, GetSynchroTable(), objet_data);
     assert(client);
-    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, status, uuid);
+    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
  }
 
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status, int uuid)
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient2(JackServerGlobals::fInstance, GetSynchroTable(), parameters);
     assert(client);
-    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, status, uuid);
+    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
 }
 
-int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status, int uuid)
+int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int uuid, int* status)
 {
     // Clear status
     *status = 0;
-    if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name, (jack_options_t)options, (jack_status_t*)status, uuid) < 0)) {
+    if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
         delete client;
         int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;

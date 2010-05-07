@@ -125,7 +125,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientOpenRequest req;
                 JackClientOpenResult res;
                 if (req.Read(fPipe) == 0)
-                    ClientAdd(req.fName, req.fPID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+                    ClientAdd(req.fName, req.fPID, req.fUUID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(fPipe);
                 break;
             }
@@ -297,7 +297,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackInternalClientLoadRequest req;
                 JackInternalClientLoadResult res;
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus);
+                    res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
                 res.Write(fPipe);
                 break;
             }

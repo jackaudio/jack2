@@ -1179,7 +1179,7 @@ EXPORT bool jackctl_server_load_internal(
 {
     int status;
     if (server_ptr->engine != NULL) {
-        server_ptr->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, &status, -1);
+        server_ptr->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, -1, &status);
         return (internal->refnum > 0);
     } else {
         return false;

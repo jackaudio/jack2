@@ -23,7 +23,6 @@
 
 #include <jack/systemdeps.h>
 
-
 typedef int32_t jack_shmsize_t;
 
 /**

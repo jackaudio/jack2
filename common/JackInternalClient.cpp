@@ -63,7 +63,7 @@ JackInternalClient::~JackInternalClient()
     delete fChannel;
 }
 
-int JackInternalClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status, int uuid)
+int JackInternalClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int result;
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
@@ -198,11 +198,11 @@ JackLoadableInternalClient::~JackLoadableInternalClient()
         UnloadJackModule(fHandle);
 }
 
-int JackLoadableInternalClient1::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status, int uuid)
+int JackLoadableInternalClient1::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
     
-    if (JackInternalClient::Open(server_name, name, options, status, uuid) == 0) {
+    if (JackInternalClient::Open(server_name, name, uuid, options, status) == 0) {
         if (fInitialize((jack_client_t*)this, fObjectData) == 0) {
             res = 0;
         } else {
@@ -214,11 +214,11 @@ int JackLoadableInternalClient1::Open(const char* server_name, const char* name,
     return res;
 }
 
-int JackLoadableInternalClient2::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status, int uuid)
+int JackLoadableInternalClient2::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
     
-    if (JackInternalClient::Open(server_name, name, options, status, uuid) == 0) {
+    if (JackInternalClient::Open(server_name, name, uuid, options, status) == 0) {
         if (fInitialize((jack_client_t*)this, fParameters) == 0) {
             res = 0;
         } else {
