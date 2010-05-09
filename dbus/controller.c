@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008 Nedko Arnaudov
+    Copyright (C) 2007,2008,2010 Nedko Arnaudov
     Copyright (C) 2007-2008 Juuso Alasuutari
 
     This program is free software; you can redistribute it and/or modify
@@ -171,7 +171,6 @@ jack_controller_start_server(
     if (controller_ptr->client == NULL)
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "failed to create dbusapi jack client");
-
         goto fail_stop_server;
     }
 
@@ -179,13 +178,12 @@ jack_controller_start_server(
     if (ret != 0)
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "failed to set xrun callback. error is %d", ret);
-
         goto fail_close_client;
     }
 
     if (!jack_controller_patchbay_init(controller_ptr))
     {
-        jack_error("Failed to initialize patchbay district");
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to initialize patchbay district");
         goto fail_close_client;
     }
 
@@ -193,7 +191,6 @@ jack_controller_start_server(
     if (ret != 0)
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "failed to activate dbusapi jack client. error is %d", ret);
-
         goto fail_patchbay_uninit;
     }
 
@@ -241,7 +238,7 @@ jack_controller_stop_server(
     ret = jack_deactivate(controller_ptr->client);
     if (ret != 0)
     {
-        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "failed to deactivate dbusapi jack client. error is %d", ret);
+        jack_error("failed to deactivate dbusapi jack client. error is %d", ret);
     }
 
     jack_controller_patchbay_uninit(controller_ptr);
@@ -256,6 +253,7 @@ jack_controller_stop_server(
 
     if (!jackctl_server_stop(controller_ptr->server))
     {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to stop server");
         return FALSE;
     }
 
