@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <dbus/dbus.h>
+#include <assert.h>
 
 #include "controller.h"
 #include "controller_internal.h"
@@ -142,11 +143,7 @@ jack_controller_start_server(
 
     jack_info("Starting jack server...");
 
-    if (controller_ptr->started)
-    {
-        jack_info("Already started.");
-        return TRUE;
-    }
+    assert(!controller_ptr->started); /* should be ensured by caller */
 
     if (controller_ptr->driver == NULL)
     {
@@ -229,11 +226,7 @@ jack_controller_stop_server(
 
     jack_info("Stopping jack server...");
 
-    if (!controller_ptr->started)
-    {
-        jack_info("Already stopped.");
-        return TRUE;
-    }
+    assert(controller_ptr->started); /* should be ensured by caller */
 
     ret = jack_deactivate(controller_ptr->client);
     if (ret != 0)

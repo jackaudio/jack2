@@ -85,25 +85,39 @@ jack_control_run_method(
     }
     else if (strcmp (call->method_name, "StartServer") == 0)
     {
-        if (!jack_controller_start_server(controller_ptr, call))
+        if (controller_ptr->started)
         {
-            /* the reply is set by the failed function */
-            assert(call->reply != NULL);
-            return true;
+            jack_info("Ignoring JACK server start request because server is already started.");
         }
+        else
+        {
+            if (!jack_controller_start_server(controller_ptr, call))
+            {
+                /* the reply is set by the failed function */
+                assert(call->reply != NULL);
+                return true;
+            }
 
-        jack_controller_control_send_signal_server_started();
+            jack_controller_control_send_signal_server_started();
+        }
     }
     else if (strcmp (call->method_name, "StopServer") == 0)
     {
-        if (!jack_controller_stop_server(controller_ptr, call))
+        if (!controller_ptr->started)
         {
-            /* the reply is set by the failed function */
-            assert(call->reply != NULL);
-            return true;
+            jack_info("Ignoring JACK server stop request because server is already stopped.");
         }
+        else
+        {
+            if (!jack_controller_stop_server(controller_ptr, call))
+            {
+                /* the reply is set by the failed function */
+                assert(call->reply != NULL);
+                return true;
+            }
 
-        jack_controller_control_send_signal_server_stopped();
+            jack_controller_control_send_signal_server_stopped();
+        }
     }
     else if (strcmp (call->method_name, "SwitchMaster") == 0)
     {
