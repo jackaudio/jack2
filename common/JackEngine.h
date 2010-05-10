@@ -81,6 +81,9 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
         void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
+    
+        int GetNewUUID();
+        void EnsureUUID(int uuid);
         
         bool CheckClient(int refnum)
         {
@@ -141,8 +144,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
         void SessionReply( int refnum );
-        int GetNewUUID();
-        void EnsureUUID(int uuid);
+    
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
         void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
         void ReserveClientName(const char *name, const char *uuid, int *result);

@@ -1021,8 +1021,8 @@ void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *res
 void JackEngine::ReserveClientName(const char *name, const char *uuid, int *result)
 {
     if (ClientCheckName(name)) {
-            *result = -1;
-            return;
+        *result = -1;
+        return;
     }
 
     EnsureUUID(atoi(uuid));
