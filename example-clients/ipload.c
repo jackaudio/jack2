@@ -158,7 +158,7 @@ main (int argc, char *argv[])
 					       &status, load_name, load_init);
 	if (status & JackFailure) {
 		fprintf (stderr, "could not load %s, intclient = %d status = 0x%2.0x\n",
-			 load_name, intclient, status);
+			 load_name, (int)intclient, status);
 		return 2;
 	}
 	if (status & JackNameNotUnique) {
