@@ -304,19 +304,19 @@ namespace Jack
         for (int port_index = 0; port_index < fNPorts; port_index++)
             fCompressedBuffer[port_index] = new unsigned char[fCompressedSizeByte];
      
-        jack_log("fCompressedSizeByte %d", fCompressedSizeByte);
+        jack_log("NetCeltAudioBuffer fCompressedSizeByte %d", fCompressedSizeByte);
         
         res1 = (fNPorts * fCompressedSizeByte) % (params->fMtu - sizeof(packet_header_t));
         res2 = (fNPorts * fCompressedSizeByte) / (params->fMtu - sizeof(packet_header_t));
         
-        jack_log("res1 = %d res2 = %d", res1, res2);
+        jack_log("NetCeltAudioBuffer res1 = %d res2 = %d", res1, res2);
          
         fNumPackets = (res1) ? (res2 + 1) : res2;
             
         fSubPeriodBytesSize = fCompressedSizeByte / fNumPackets;
         fLastSubPeriodBytesSize = fSubPeriodBytesSize + fCompressedSizeByte % fNumPackets;
         
-        jack_log("fNumPackets = %d fSubPeriodBytesSize = %d, fLastSubPeriodBytesSize = %d", fNumPackets, fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+        jack_log("NetCeltAudioBuffer fNumPackets = %d fSubPeriodBytesSize = %d, fLastSubPeriodBytesSize = %d", fNumPackets, fSubPeriodBytesSize, fLastSubPeriodBytesSize);
         
         fCycleDuration = float(fSubPeriodBytesSize / sizeof(sample_t)) / float(params->fSampleRate);
         fCycleSize = params->fMtu * fNumPackets;
@@ -710,7 +710,17 @@ namespace Jack
         jack_info ( "Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels );
         jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
         jack_info ( "Period size : %u frames per period", params->fPeriodSize );
-        jack_info ( "SampleEncoder : %u", params->fSampleEncoder );
+        switch (params->fSampleEncoder) {
+            case (JackFloatEncoder):
+                jack_info ( "SampleEncoder : %s", "Float" );
+                break;
+            case (JackIntEncoder):
+                jack_info ( "SampleEncoder : %s", "16 bits integer");
+                break;
+            case (JackCeltEncoder):
+                jack_info ( "SampleEncoder : %s", "CELT");
+                break;
+        };
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
         jack_info ( "Network mode : %s", mode );
         jack_info ( "****************************************************" );

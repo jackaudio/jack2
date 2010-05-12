@@ -228,7 +228,7 @@ namespace Jack
 
     bool JackNetMasterInterface::SetParams()
     {
-        jack_log ( "JackNetMasterInterface::SetParams" );
+        jack_log("JackNetMasterInterface::SetParams");
 
         JackNetInterface::SetParams();
 
@@ -236,11 +236,12 @@ namespace Jack
         fRxHeader.fDataStream = 'r';
 
         //midi net buffers
-        fNetMidiCaptureBuffer = new NetMidiBuffer ( &fParams, fParams.fSendMidiChannels, fTxData );
-        fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fRxData );
-        assert ( fNetMidiCaptureBuffer );
-        assert ( fNetMidiPlaybackBuffer );
-
+        if (fParams.fSendMidiChannels)
+            fNetMidiCaptureBuffer = new NetMidiBuffer(&fParams, fParams.fSendMidiChannels, fTxData);
+            
+        if (fParams.fReturnMidiChannels)
+            fNetMidiPlaybackBuffer = new NetMidiBuffer(&fParams, fParams.fReturnMidiChannels, fRxData);
+     
         try {
         
             //audio net buffers
@@ -253,7 +254,7 @@ namespace Jack
                         break;
                         
                     case JackIntEncoder:
-                         fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+                        fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
                         break;
                         
                     case JackCeltEncoder:
@@ -269,7 +270,7 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
                     
                     case JackFloatEncoder:
-                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
                         break;
                         
                     case JackIntEncoder:
@@ -774,39 +775,15 @@ namespace Jack
         fTxHeader.fDataStream = 'r';
         fRxHeader.fDataStream = 's';
 
-        //midi net buffers
-        fNetMidiCaptureBuffer = new NetMidiBuffer ( &fParams, fParams.fSendMidiChannels, fRxData );
-        fNetMidiPlaybackBuffer = new NetMidiBuffer ( &fParams, fParams.fReturnMidiChannels, fTxData );
-        assert ( fNetMidiCaptureBuffer );
-        assert ( fNetMidiPlaybackBuffer );
+       //midi net buffers
+        if (fParams.fSendMidiChannels)
+            fNetMidiCaptureBuffer = new NetMidiBuffer(&fParams, fParams.fSendMidiChannels, fTxData);
+            
+        if (fParams.fReturnMidiChannels)
+            fNetMidiPlaybackBuffer = new NetMidiBuffer(&fParams, fParams.fReturnMidiChannels, fRxData);
 
-        //audio net buffers
-        //fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-        //fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-    
         try {
-    #ifdef CELT
-            if (fParams.fSendAudioChannels) {
-               // fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-                fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-            }
-                
-            if (fParams.fReturnAudioChannels) {
-                //fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-                fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-            }
-            
-            // fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-           // fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-    #else
-            fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-            fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-            
-            //fNetAudioCaptureBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
-            //fNetAudioPlaybackBuffer = new NetBufferedAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
-    #endif     
-    
-            
+              
             //audio net buffers
             if (fParams.fSendAudioChannels) {
             
@@ -817,7 +794,7 @@ namespace Jack
                         break;
                         
                     case JackIntEncoder:
-                         fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+                        fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
                         break;
                         
                     case JackCeltEncoder:
@@ -833,7 +810,7 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
                     
                     case JackFloatEncoder:
-                         fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
                         break;
                         
                     case JackIntEncoder:
