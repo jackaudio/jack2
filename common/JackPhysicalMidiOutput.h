@@ -92,7 +92,7 @@ namespace Jack {
 
         JackPhysicalMidiOutput(size_t non_rt_buffer_size=1024,
                                size_t rt_buffer_size=64);
-        ~JackPhysicalMidiOutput();
+        virtual ~JackPhysicalMidiOutput();
 
         /**
          * Called to process MIDI data during a period.
