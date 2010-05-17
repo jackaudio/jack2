@@ -1,0 +1,47 @@
+.TH JACK_LSP "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_lsp \- JACK toolkit client to list informtion on ports
+.SH SYNOPSIS
+\fBjack_lsp\fR [ \fI-s\fR | \fI--server\fR servername ] [ \fI-AclLptvh\fR ]
+.SH DESCRIPTION
+\fBjack_lsp\fR lists all known ports associated with a JACK
+server. It can also optionally list various kinds of information about each port.
+.SH OPTIONS
+.TP
+\fB-s\fR, \fB--server\fR \fIservername\fR
+.br
+Connect to the jack server named \fIservername\fR
+.TP
+\fB-A\fR, \fB--aliases\fR
+.br
+List aliases for each port
+.TP
+\fB-c\fR, \fB--connections\fR
+.br
+List connections to/from each port
+.TP
+\fB-l\fR, \fB--latency\fR
+.br
+Display per-port latency in frames at each port
+.TP
+\fB-L\fR, \fI--latency\fR
+.br
+Display total latency in frames at each port
+.TP
+\fB-p\fR, \fB--properties\fR
+.br
+Display port properties. Output may include input|output, can-monitor, physical, terminal
+.TP
+\fB-t\fR, \fB--type\fR
+.br
+Display port type
+.TP
+\fB-h\fR, \fB--help\fR
+.br
+Display help/usage message
+.TP
+\fB-v\fR, \fB--version\fR
+.br
+Output version information and exit
+
+

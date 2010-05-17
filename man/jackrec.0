@@ -1,0 +1,23 @@
+.TH JACKREC "1" "!DATE!" "!VERSION!"
+.SH NAME
+jackrec \- JACK toolkit client for recording audio
+.SH SYNOPSIS
+.B jackrec
+\-f filename \-d seconds [ \-b bitdepth ] port1 [ port2 ... ]
+.SH DESCRIPTION
+.B jackrec is a basic, but useful, audio recorder that will record
+audio from 1 or more JACK ports to a file on disk. The file format is
+always RIFF/WAV, with samples stored as signed integers. The sample
+bit depth can be selected using the \fI-b\fR option. The file will
+have as many channels as there are ports specified on the command line
+- each channel will contain the data recorded from one port. The user
+should generally specify the duration (in seconds) using the \fI-d\fR
+option. If not specified, jackrec will record until terminated by a
+signal (eg. from Ctrl-c).
+.PP
+This application is not intended to be a heavy duty audio recorder,
+and originated as an example client to show how to handle threading
+and disk I/O in a JACK client. However, it is a useful, simple
+recorder and is included in the JACK toolkit as a result.
+
+

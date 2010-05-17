@@ -1,0 +1,41 @@
+.TH JACK_WAIT "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_wait \- JACK toolkit client to check and wait for existence/exit of jackd.  
+.SH SYNOPSIS
+\fBjack_wait\fR [ \fI-s\fR | \fI--server\fR servername ] [ \fI-t\fR | \fI--timeout\fR timeout_seconds [ \fI-cqwhv\fR ]
+.SH DESCRIPTION
+\fBjack_wait\fR When invoked with \fI-c\fR it only checks for the existence of a jack server. When invoked with \fI-w\fR the
+program will wait for a jackd to be available.
+The \fI-q\fR makes it wait for the jackd to exit.
+
+.SH OPTIONS
+.TP
+\fB-w\fR, \fB--wait\fR
+.br
+Wait for jackd to be available.
+.TP
+\fB-q\fR, \fB--quit\fR
+.br
+Wait for jackd quit.
+.TP
+\fB-c\fR, \fB--check\fR
+.br
+Only check for existence of jackd, and exit.
+.TP
+\fB-s\fR, \fB--server\fR \fIservername\fR
+.br
+Connect to the jack server named \fIservername\fR
+.TP
+\fB-t\fR, \fB--timeout\fR \fItimeout_seconds\fR
+.br
+Only wait \fItimeout_seconds\fR.
+.TP
+\fB-h\fR, \fB--help\fR
+.br
+Display help/usage message
+.TP
+\fB-v\fR, \fB--version\fR
+.br
+Output version information and exit
+
+
