@@ -30,6 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-05-27 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, move code called in MeasureCallback to be called once in IO thread.
+
 2010-05-07 Stephane Letz  <letz@grame.fr>
 
 	* Add tests to validate intclient.h API.

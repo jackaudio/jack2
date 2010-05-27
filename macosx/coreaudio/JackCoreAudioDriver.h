@@ -96,14 +96,6 @@ class JackCoreAudioDriver : public JackAudioDriver
                                UInt32 inNumberFrames,
                                AudioBufferList *ioData);
 
-        static OSStatus MeasureCallback(AudioDeviceID inDevice,
-                                        const AudioTimeStamp* inNow,
-                                        const AudioBufferList* inInputData,
-                                        const AudioTimeStamp* inInputTime,
-                                        AudioBufferList* outOutputData,
-                                        const AudioTimeStamp* inOutputTime,
-                                        void* inClientData);
-
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
                 UInt32 inChannel,
                 Boolean	isInput,
