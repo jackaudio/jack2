@@ -55,7 +55,7 @@ extern "C"
 
     void jack_log_function(int level, const char *message);
    
-    SERVER_EXPORT bool set_threaded_log_function();
+    SERVER_EXPORT int set_threaded_log_function();
 
 #ifdef __cplusplus
 }

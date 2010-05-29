@@ -33,7 +33,7 @@ static bool change_thread_log_function(jack_log_function_t log_function)
             && jack_tls_set(JackGlobals::fKeyLogFunction, (void*)log_function));
 }
 
-SERVER_EXPORT bool set_threaded_log_function()
+SERVER_EXPORT int set_threaded_log_function()
 {
     return change_thread_log_function(JackMessageBufferAdd);
 }
