@@ -30,6 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-05-30 Stephane Letz  <letz@grame.fr>
+
+	* David Garcia Garzon netone patch.
+
 2010-05-27 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudioDriver, move code called in MeasureCallback to be called once in IO thread.

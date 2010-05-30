@@ -564,6 +564,7 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     netj->resample_factor = resample_factor;
     netj->resample_factor_up = resample_factor_up;
 
+    netj->jitter_val = jitter_val;
 
     return netj;
 }
