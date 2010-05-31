@@ -248,6 +248,8 @@ def configure(conf):
             print Logs.colors.NORMAL,
     print
 
+    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
+
     if Options.options.mixed == True:
 	env_variant2 = conf.env.copy()
 	conf.set_env_name('lib32', env_variant2)
