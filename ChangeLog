@@ -30,6 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-06-13 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackPosixSemaphore::TimedWait : same behavior as JackPosixSemaphore::Wait regarding EINTR.
+
 2010-05-31 Stephane Letz  <letz@grame.fr>
 
 	* Fix from Fernando Lopez-Lezcano for compilation on fc13.
