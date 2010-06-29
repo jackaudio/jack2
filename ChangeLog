@@ -30,6 +30,10 @@ Arnold Krille
   Jackdmp changes log
 ---------------------------
 
+2010-06-29 Stephane Letz  <letz@grame.fr>
+
+	* Arnold Krille irewire snooping patch.
+
 2010-06-16 Stephane Letz  <letz@grame.fr>
 
 	* David Garcia Garzon unused_pkt_buf_field_jack2 netone patch.

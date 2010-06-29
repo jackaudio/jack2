@@ -338,6 +338,7 @@ JackFFADODriver::ffado_driver_new (const char *name,
     driver->device_options.verbose = params->verbose_level;
     driver->capture_frame_latency = params->capture_frame_latency;
     driver->playback_frame_latency = params->playback_frame_latency;
+    driver->device_options.snoop_mode = params->snoop_mode;
 
     debugPrint(DEBUG_LEVEL_STARTUP, " Driver compiled on %s %s", __DATE__, __TIME__);
     debugPrint(DEBUG_LEVEL_STARTUP, " Created driver %s", name);
@@ -753,7 +754,7 @@ extern "C"
         strcpy (desc->name, "firewire");                               // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Linux FFADO API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 12;
+        desc->nparams = 13;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
         desc->params = params;
@@ -854,6 +855,14 @@ extern "C"
         strcpy (params[i].short_desc, "libffado verbose level");
         strcpy (params[i].long_desc, params[i].short_desc);
 
+        i++;
+        strcpy (params[i].name, "snoop");
+        params[i].character  = 'X';
+        params[i].type       = JackDriverParamBool;
+        params[i].value.i    = 0;
+        strcpy (params[i].short_desc, "Snoop firewire traffic");
+        strcpy (params[i].long_desc, params[i].short_desc);
+
         return desc;
     }
 
@@ -863,7 +872,7 @@ extern "C"
 
         ffado_jack_settings_t cmlparams;
 
-        char *device_name="hw:0";
+        char *device_name=(char*)"hw:0";
 
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
@@ -919,7 +928,7 @@ extern "C"
                     cmlparams.slave_mode = param->value.ui;
                     break;
                 case 'X':
-                    cmlparams.snoop_mode = param->value.ui;
+                    cmlparams.snoop_mode = param->value.i;
                     break;
                 case 'v':
                     cmlparams.verbose_level = param->value.ui;
