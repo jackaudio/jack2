@@ -25,14 +25,19 @@ Devin Anderson
 Josh Green
 Mario Lang
 Arnold Krille
+Jan Engelhardt
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
 
+2010-07-07 Stephane Letz  <letz@grame.fr>
+
+	* Jan Engelhardt patch for get_cycles on SPARC.
+
 2010-06-29 Stephane Letz  <letz@grame.fr>
 
-	* Arnold Krille irewire snooping patch.
+	* Arnold Krille firewire snooping patch.
 
 2010-06-16 Stephane Letz  <letz@grame.fr>
 

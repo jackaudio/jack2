@@ -53,6 +53,16 @@ static inline unsigned long get_cycles(void)
 
 #endif
 
+#ifdef __sparc_v9__
+/* rd is V9 only */
+static inline unsigned long long get_cycles(void)
+{
+	unsigned long long res;
+	__asm__ __volatile__("rd %%tick, %0" : "=r"(res));
+	return res;
+}
+#endif
+
 #ifdef __PPC__
 
 /* PowerPC */
