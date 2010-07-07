@@ -140,4 +140,6 @@ static inline cycles_t get_cycles(void)
 
 #endif
 
+#endif
+
 #endif /* __jack_cycles_h__ */
