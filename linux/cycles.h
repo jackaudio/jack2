@@ -113,8 +113,7 @@ static inline cycles_t get_cycles (void)
 
 #endif
 
-/* everything else but x86, amd64 or ppc */
-#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
+#if defined(__FreeBSD_kernel__)
 
 #warning No suitable get_cycles() implementation. Returning 0 instead
 
@@ -126,6 +125,18 @@ static inline cycles_t get_cycles(void)
 }
 
 #endif
+
+/* everything else but x86, amd64 or ppc */
+#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__)
+
+#warning No suitable get_cycles() implementation. Returning 0 instead
+
+typedef unsigned long long cycles_t;
+
+static inline cycles_t get_cycles(void)
+{
+    return 0;
+}
 
 #endif
 

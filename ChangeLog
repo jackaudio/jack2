@@ -26,6 +26,7 @@ Josh Green
 Mario Lang
 Arnold Krille
 Jan Engelhardt
+Adrian Knoth
 
 ---------------------------
   Jackdmp changes log
@@ -34,6 +35,7 @@ Jan Engelhardt
 2010-07-07 Stephane Letz  <letz@grame.fr>
 
 	* Jan Engelhardt patch for get_cycles on SPARC.
+	* Adrian Knoth hurd.patch, kfreebsd-fix.patch and alpha_ia64-sigsegv.patch from ticket 177.
 
 2010-06-29 Stephane Letz  <letz@grame.fr>
 

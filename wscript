@@ -79,7 +79,7 @@ def set_options(opt):
 def configure(conf):
     platform = Utils.detect_platform()
     conf.env['IS_MACOSX'] = platform == 'darwin'
-    conf.env['IS_LINUX'] = platform == 'linux'
+    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'posix'
     conf.env['IS_SUN'] = platform == 'sunos'
 
     if conf.env['IS_LINUX']:
