@@ -44,12 +44,15 @@ JackEngine::JackEngine(JackGraphManager* manager,
     fEngineControl = control;
     for (int i = 0; i < CLIENT_NUM; i++)
         fClientTable[i] = NULL;
+    fLastSwitchUsecs = 0;
+    fMaxUUID = 0;
+    fSessionPendingReplies = 0;
+    fSessionTransaction = NULL;
+    fSessionResult = NULL;
 }
 
 JackEngine::~JackEngine()
-{
-    jack_log("JackEngine::~JackEngine");
-}
+{}
 
 int JackEngine::Open()
 {
@@ -903,7 +906,7 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
-void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket )
+void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
 {
     if (fSessionPendingReplies != 0) {
         JackSessionNotifyResult res(-1);

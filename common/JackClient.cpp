@@ -1110,7 +1110,7 @@ char* JackClient::GetUUIDForClientName(const char* client_name)
     int result = -1;
     fChannel->GetUUIDForClientName( GetClientControl()->fRefNum, client_name, uuid_res, &result);
 
-    if(result)
+    if (result)
         return NULL;
 
     return strdup(uuid_res);
@@ -1122,7 +1122,7 @@ char* JackClient::GetClientNameForUUID(const char* uuid)
     int result = -1;
     fChannel->GetClientNameForUUID(GetClientControl()->fRefNum, uuid, name_res, &result);
 
-    if(result)
+    if (result)
         return NULL;
 
     return strdup(name_res);

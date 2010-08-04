@@ -1966,7 +1966,7 @@ EXPORT int jack_reserve_client_name( jack_client_t *ext_client, const char *name
 
 EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
 {
-    if(!cmds)
+    if (!cmds)
         return;
 
     int i=0;

@@ -58,7 +58,6 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         std::map<int,std::string> fReservationMap;
         int fMaxUUID;
 
-
         int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
         void CheckXRun(jack_time_t callback_usecs);
 
