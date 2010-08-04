@@ -129,7 +129,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
 #ifdef __APPLE__
-    int on = 1 ;
+    int on = 1;
     if (setsockopt(fSocket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
         jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fSocket, strerror(errno));
     }
