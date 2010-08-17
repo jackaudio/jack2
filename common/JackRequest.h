@@ -1204,7 +1204,6 @@ struct JackSessionReplyRequest : public JackRequest
 
     int Read(JackChannelTransaction* trans)
     {
-        CheckRes(JackRequest::Read(trans));
         CheckRes(trans->Read(&fRefNum, sizeof(fRefNum)));
         return 0;
     }
@@ -1290,7 +1289,6 @@ struct JackGetUUIDRequest : public JackRequest
 
     int Read(JackChannelTransaction* trans)
     {
-        //CheckRes(JackRequest::Read(trans));
         CheckRes(trans->Read(&fName, sizeof(fName)));
         return 0;
     }
@@ -1319,7 +1317,6 @@ struct JackGetClientNameRequest : public JackRequest
 
     int Read(JackChannelTransaction* trans)
     {
-        //CheckRes(JackRequest::Read(trans));
         CheckRes(trans->Read(&fUUID, sizeof(fUUID)));
         return 0;
     }
