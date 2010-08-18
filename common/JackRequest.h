@@ -1134,7 +1134,7 @@ struct JackSessionNotifyResult : public JackResult
 
     int Write(JackChannelTransaction* trans)
     {
-        char terminator[32];
+        char terminator[JACK_UUID_SIZE];
         terminator[0] = '\0';
 
         CheckRes(JackResult::Write(trans));
