@@ -424,6 +424,8 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 fServer->GetEngine()->SessionReply(req.fRefNum);
                 res.fResult = 0;
             }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::SessionReply write error");
             break;
         }
 
@@ -458,7 +460,6 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackResult res;
             if (req.Read(socket) == 0) {
                 fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
-                res.fResult = 0;
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ReserveClientName write error");
