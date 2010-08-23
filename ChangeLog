@@ -32,6 +32,10 @@ Adrian Knoth
   Jackdmp changes log
 ---------------------------
 
+2010-08-23 Stephane Letz  <letz@grame.fr>
+
+	* Adrian Knoth fix for linux cycle.h (ticket 188).
+
 2010-07-07 Stephane Letz  <letz@grame.fr>
 
 	* Jan Engelhardt patch for get_cycles on SPARC.
