@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008 Nedko Arnaudov
+    Copyright (C) 2007,2008,2010 Nedko Arnaudov
     Copyright (C) 2007-2008 Juuso Alasuutari
 
     This program is free software; you can redistribute it and/or modify
@@ -85,29 +85,46 @@ jack_control_run_method(
     }
     else if (strcmp (call->method_name, "StartServer") == 0)
     {
-        if (!jack_controller_start_server(controller_ptr, call))
+        if (controller_ptr->started)
         {
-            jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "Failed to start server");
-            return true;
+            jack_info("Ignoring JACK server start request because server is already started.");
         }
+        else
+        {
+            if (!jack_controller_start_server(controller_ptr, call))
+            {
+                /* the reply is set by the failed function */
+                assert(call->reply != NULL);
+                return true;
+            }
 
-        jack_controller_control_send_signal_server_started();
+            jack_controller_control_send_signal_server_started();
+        }
     }
     else if (strcmp (call->method_name, "StopServer") == 0)
     {
-        if (!jack_controller_stop_server(controller_ptr, call))
+        if (!controller_ptr->started)
         {
-            jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "Failed to stop server");
-            return true;
+            jack_info("Ignoring JACK server stop request because server is already stopped.");
         }
+        else
+        {
+            if (!jack_controller_stop_server(controller_ptr, call))
+            {
+                /* the reply is set by the failed function */
+                assert(call->reply != NULL);
+                return true;
+            }
 
-        jack_controller_control_send_signal_server_stopped();
+            jack_controller_control_send_signal_server_stopped();
+        }
     }
     else if (strcmp (call->method_name, "SwitchMaster") == 0)
     {
         if (!jack_controller_switch_master(controller_ptr, call))
         {
-            jack_dbus_error(call, JACK_DBUS_ERROR_GENERIC, "Failed to switch master");
+            /* the reply is set by the failed function */
+            assert(call->reply != NULL);
             return true;
         }
 

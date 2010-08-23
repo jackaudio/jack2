@@ -25,12 +25,52 @@ Devin Anderson
 Josh Green
 Mario Lang
 Arnold Krille
+Jan Engelhardt
+Adrian Knoth
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
 
-2010-04-016 Stephane Letz  <letz@grame.fr>
+2010-08-23 Stephane Letz  <letz@grame.fr>
+
+	* Adrian Knoth fix for linux cycle.h (ticket 188).
+
+2010-07-07 Stephane Letz  <letz@grame.fr>
+
+	* Jan Engelhardt patch for get_cycles on SPARC.
+	* Adrian Knoth hurd.patch, kfreebsd-fix.patch and alpha_ia64-sigsegv.patch from ticket 177.
+
+2010-06-29 Stephane Letz  <letz@grame.fr>
+
+	* Arnold Krille firewire snooping patch.
+
+2010-06-16 Stephane Letz  <letz@grame.fr>
+
+	* David Garcia Garzon unused_pkt_buf_field_jack2 netone patch.
+
+2010-06-13 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackPosixSemaphore::TimedWait : same behavior as JackPosixSemaphore::Wait regarding EINTR.
+
+2010-05-31 Stephane Letz  <letz@grame.fr>
+
+	* Fix from Fernando Lopez-Lezcano for compilation on fc13.
+
+2010-05-30 Stephane Letz  <letz@grame.fr>
+
+	* David Garcia Garzon netone patch.
+
+2010-05-27 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, move code called in MeasureCallback to be called once in IO thread.
+
+2010-05-07 Stephane Letz  <letz@grame.fr>
+
+	* Add tests to validate intclient.h API.
+	* On Linux, inter-process synchronization primitive switched to POSIX semaphore.
+
+2010-04-16 Stephane Letz  <letz@grame.fr>
 
 	* Make jack_connect/jack_disconnect wait for effective port connection/disconnection.
 
@@ -234,7 +274,7 @@ Arnold Krille
 2009-10-20 Stephane Letz  <letz@grame.fr>
 
 	* Add a string parameter to server ==> client notification, add a new JackInfoShutdownCallback type.
-	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration change…)
+	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration changed)
 
 2009-10-17 Stephane Letz  <letz@grame.fr>
 

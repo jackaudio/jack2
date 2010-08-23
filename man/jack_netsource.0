@@ -1,0 +1,109 @@
+.TH JACK_NETSOURCE "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_netsource \- Netjack Master client for one slave
+.SH SYNOPSIS
+\fBjack_netsource\fR [ \fI-H\fR hostname ] [ \fIoptions\fR ]
+
+.SH DESCRIPTION
+\fBjack_netsource\fR The Master side of a netjack connection. Represents the slave jackd -dnet in the master jack graph.
+Most connection parameters are configured via the netsource, and the slave will set itself up according to the commandline
+option given to jack_netsource.
+.br
+Netjack allows low latency audio connections over general IP networks. When using celt for compression, it is even possible
+to establish transatlantic links, with latencies not much over the actual ping time. 
+.br
+But the main usecase is of course a LAN, where it can achieve one jack period of latency.
+
+.SH OPTIONS
+.TP
+\fB-h\fR this help text
+.TP
+\fB-H\fR \fIslave host\fR
+.br
+Host name of the slave JACK
+.TP
+\fB-o\fR \fInum channels\fR
+.br
+Number of audio playback channels
+.TP
+\fB-i\fR \fInum channels\fR
+.br
+Number of audio capture channels
+.TP
+\fB-O\fR \fInum channels\fR
+.br
+Number of midi playback channels
+.TP
+\fB-I\fR \fInum channels\fR
+.br
+Number of midi capture channels
+.TP
+\fB-n\fR \fIperiods\fR
+.br
+Network latency in JACK periods
+.TP
+\fB-p\fR \fIport\fR
+.br
+UDP port that the slave is listening on
+.TP
+\fB-r\fR \fIreply port\fR
+.br
+UDP port that we are listening on
+.TP
+\fB-B\fR \fIbind port\fR
+.br
+reply port, for use in NAT environments
+.TP
+\fB-b\fR \fIbitdepth\fR
+.br
+Set transport to use 16bit or 8bit
+.TP
+\fB-c\fR \fIbytes\fR
+.br
+Use CELT encoding with <bytes> per period and channel
+.TP
+\fB-m\fR \fImtu\fR
+.br
+Assume this mtu for the link
+.TP
+\fB-R\fR \fIN\fR
+.br
+Redundancy: send out packets N times.
+.TP
+\fB-e\fR
+.br
+skip host-to-network endianness conversion
+.TP
+\fB-N\fR \fIjack name\fR
+.br
+Reports a different client name to jack
+.TP
+.TP
+\fB-s\fR, \fB--server\fR \fIservername\fR
+.br
+Connect to the jack server named \fIservername\fR
+.TP
+\fB-h\fR, \fB--help\fR
+.br
+Display help/usage message
+.TP
+\fB-v\fR, \fB--version\fR
+.br
+Output version information and exit
+
+
+.SH EXAMPLES
+
+.PP
+run a 4 audio channel bidirectional link with one period of latency and no midi channels. Audio data is flowing uncompressed over the wire:
+.br
+On \fIhostA\fR:
+.IP
+\fBjackd \-d alsa \fR
+.br
+\fBjack_netsource \-H hostB -n1 -i4 -o4 -I0 -O0 \fR
+.PP
+On \fIhostB\fR:
+.IP
+\fBjackd \-d net \fR
+

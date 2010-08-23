@@ -60,7 +60,7 @@ SERVER_EXPORT int audio_reservation_finish()
     if (gConnection) {
         dbus_connection_unref(gConnection);
         gConnection = NULL;
-	jack_info("audio_reservation_finish");
+        jack_info("audio_reservation_finish");
     }
     return 0;
 }

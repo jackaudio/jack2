@@ -1,0 +1,20 @@
+.TH JACK_CONNECT "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_simple_client \- The JACK Audio Connection Kit example client
+.SH SYNOPSYS
+.B jack_simple_client
+client-name
+.PP
+The client-name must be a yet unused client name.
+.SH DESCRIPTION
+.B jack_simple_client
+is an example client for the JACK Audio Connection Kit. It creates two
+ports (client-name:input and client-name:output) that pass the data
+unmodified.
+.SH EXAMPLE
+jack_simple_client in_process_test
+.SH AUTHOR
+Jeremy Hall
+.PP
+This manpage was written by Robert Jordens <jordens@debian.org> for Debian.
+

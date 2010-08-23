@@ -49,8 +49,13 @@ namespace Jack {typedef JackPosixMutex JackMutex; }
 namespace Jack { typedef JackPosixThread JackThread; }
 
 /* __JackPlatformSynchro__  client activation */
+/*
 #include "JackFifo.h"
 namespace Jack { typedef JackFifo JackSynchro; }
+*/
+
+#include "JackPosixSemaphore.h"
+namespace Jack { typedef JackPosixSemaphore JackSynchro; }
 
 /* __JackPlatformChannelTransaction__ */
 #include "JackSocket.h"

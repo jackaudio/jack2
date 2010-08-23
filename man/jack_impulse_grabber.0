@@ -1,0 +1,11 @@
+.TH JACK_IMPULSE_GRABBER "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_impulse_grabber \- JACK toolkit client to grab an impulse (response)
+.SH SYNOPSIS
+\fBjack_impulse_grabber\fR \fB-d\fR \fIduration\fR [\fI-f\fR (C|gnuplot)]
+.SH DESCRIPTION
+\fBjack_impulse_grabber\fR is a JACK example client for collecting
+impulses recordings from JACK ports.
+
+
+

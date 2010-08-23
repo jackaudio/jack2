@@ -564,6 +564,7 @@ netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
     netj->resample_factor = resample_factor;
     netj->resample_factor_up = resample_factor_up;
 
+    netj->jitter_val = jitter_val;
 
     return netj;
 }
@@ -734,7 +735,6 @@ netjack_startup( netjack_driver_state_t *netj )
     }
 
     netj->rx_bufsize = sizeof (jacknet_packet_header) + netj->net_period_down * netj->capture_channels * get_sample_size (netj->bitdepth);
-    netj->pkt_buf = malloc (netj->rx_bufsize);
     global_packcache = packet_cache_new (netj->latency + 50, netj->rx_bufsize, netj->mtu);
 
     netj->expected_framecnt_valid = 0;

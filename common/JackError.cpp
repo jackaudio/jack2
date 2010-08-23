@@ -27,17 +27,15 @@
 
 using namespace Jack;
 
-void change_thread_log_function(jack_log_function_t log_function)
+static bool change_thread_log_function(jack_log_function_t log_function)
 {
-    if (!jack_tls_set(JackGlobals::fKeyLogFunction, (void*)log_function))
-    {
-        jack_error("failed to set thread log function");
-    }
+    return (jack_tls_get(JackGlobals::fKeyLogFunction) == NULL 
+            && jack_tls_set(JackGlobals::fKeyLogFunction, (void*)log_function));
 }
 
-SERVER_EXPORT void set_threaded_log_function()
+SERVER_EXPORT int set_threaded_log_function()
 {
-    change_thread_log_function(JackMessageBufferAdd);
+    return change_thread_log_function(JackMessageBufferAdd);
 }
 
 void jack_log_function(int level, const char *message)

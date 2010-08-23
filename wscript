@@ -62,6 +62,7 @@ def set_options(opt):
 
     opt.add_option('--libdir', type='string', help="Library directory [Default: <prefix>/lib]")
     opt.add_option('--libdir32', type='string', help="32bit Library directory [Default: <prefix>/lib32]")
+    opt.add_option('--mandir', type='string', help="Manpage directory [Default: <prefix>/share/man/man1]")
     opt.add_option('--dbus', action='store_true', default=False, help='Enable D-Bus JACK (jackdbus)')
     opt.add_option('--classic', action='store_true', default=False, help='Force enable standard JACK (jackd) even if D-Bus JACK (jackdbus) is enabled too')
     opt.add_option('--doxygen', action='store_true', default=False, help='Enable build of doxygen documentation')
@@ -78,7 +79,7 @@ def set_options(opt):
 def configure(conf):
     platform = Utils.detect_platform()
     conf.env['IS_MACOSX'] = platform == 'darwin'
-    conf.env['IS_LINUX'] = platform == 'linux'
+    conf.env['IS_LINUX'] = platform == 'linux' or platform == 'posix'
     conf.env['IS_SUN'] = platform == 'sunos'
 
     if conf.env['IS_LINUX']:
@@ -163,6 +164,11 @@ def configure(conf):
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
+    if Options.options.libdir:
+        conf.env['MANDIR'] = conf.env['PREFIX'] + Options.options.mandir
+    else:
+        conf.env['MANDIR'] = conf.env['PREFIX'] + '/share/man/man1'
+
     if conf.env['BUILD_DEBUG']:
         conf.env.append_unique('CXXFLAGS', '-g')
         conf.env.append_unique('CCFLAGS', '-g')
@@ -242,6 +248,8 @@ def configure(conf):
             print Logs.colors.NORMAL,
     print
 
+    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
+
     if Options.options.mixed == True:
 	env_variant2 = conf.env.copy()
 	conf.set_env_name('lib32', env_variant2)
@@ -267,6 +275,7 @@ def build(bld):
         bld.add_subdirs('linux')
         bld.add_subdirs('example-clients')
         bld.add_subdirs('tests')
+        bld.add_subdirs('man')
         if bld.env['BUILD_JACKDBUS'] == True:
            bld.add_subdirs('dbus')
   

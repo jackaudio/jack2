@@ -53,7 +53,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #endif /* WIN32 */
 
-#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun)
+#if defined(__APPLE__) || defined(__linux__) || defined(__sun__) || defined(sun) || defined(__unix__)
     #include <inttypes.h>
     #include <pthread.h>
     #include <sys/types.h>

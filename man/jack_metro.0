@@ -1,0 +1,40 @@
+.TH JACK_METRO "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_metro \- JACK toolkit metronome
+.SH SYNOPSIS
+\fBjack_metro\fR [ \fI-n\fR name ] [ \fI-f\fR hz ] [ \fI-D\fR msecs ] [\fI-a\fR % ] [ \fI-d\fR % ] \fI-b\fR bpm 
+.SH DESCRIPTION
+\fBjack_metro\fR is a simple metronome for JACK. It generates a
+synthetic "tick" sound for every beat. Note that is does \fBnot\fR
+connect its output port by default - to hear the sound it makes you must
+connect them using some other tool.
+.SH OPTIONS
+.TP
+\fB-n\fR, \fB--name\fR
+.br
+Specify a name for this instance of the metronome.
+.TP
+\fB-f\fR, \fB--frequency\fR Hz
+.br
+Define the frequency of the "tick" in Hz.
+.TP
+\fB-D\fR, \fB--duration\fR msecs
+.br
+Define the duration of the "tick" in milliseconds.
+.TP
+\fB-a\fR, \fB--attack\fR %-age
+.br
+Define the duration of the attack phase of the "tick" as a percentage
+of the duration.
+.TP
+\fB-d\fR, \fB--decay\fR %-age
+.br
+Define the duration of the decay phase of the "tick" as a percentage
+of the duration.
+.TP
+\fB--b\fR, \fB--bpm\fR bpm
+.br
+Define the number of beats per minute.
+.SH AUTHOR
+Anthony Van Groningen
+

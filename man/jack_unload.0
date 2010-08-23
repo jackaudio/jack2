@@ -1,0 +1,19 @@
+.TH JACK_UNLOAD "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_unload \- The JACK Audio Connection Kit example client
+.SH SYNOPSIS
+.B jack_unload 
+client-name
+.PP
+The client-name must be the name of a loaded client that can be unloaded.
+.SH DESCRIPTION
+.B jack_unload
+is the counterpart to 
+.B jack_load
+and unloads the specified client.
+.SH EXAMPLE
+.B jack_unload in_process_test
+.SH AUTHOR
+Jeremy Hall
+.PP
+This manpage was written by Robert Jordens <jordens@debian.org> for Debian.
