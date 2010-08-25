@@ -32,6 +32,10 @@ Adrian Knoth
   Jackdmp changes log
 ---------------------------
 
+2010-08-25 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, fix an issue when no value is given for input.
+
 2010-08-23 Stephane Letz  <letz@grame.fr>
 
 	* Adrian Knoth fix for linux cycle.h (ticket 188).

@@ -1366,7 +1366,7 @@ int JackCoreAudioDriver::SetupBuffers(int inchannels)
     // Prepare buffers
     fJackInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
     fJackInputData->mNumberBuffers = inchannels;
-    for (int i = 0; i < fCaptureChannels; i++) {
+    for (int i = 0; i < inchannels; i++) {
         fJackInputData->mBuffers[i].mNumberChannels = 1;
         fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(float);
     }
@@ -1478,11 +1478,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     char playback_driver_name[256];
 
     // Keep initial state
-    fCapturing = capturing;
-    fPlaying = playing;
-    fInChannels = inchannels;
-    fOutChannels = outchannels;
-    fMonitor = monitor;
     strcpy(fCaptureUID, capture_driver_uid);
     strcpy(fPlaybackUID, playback_driver_uid);
     fCaptureLatency = capture_latency;
@@ -1946,7 +1941,7 @@ extern "C"
         bool capture = false;
         bool playback = false;
         int chan_in = -1;   // Default: if not explicitely set, then max possible will be used...
-        int chan_out = -1;  // Default: ifà not explicitely set, then max possible will be used...
+        int chan_out = -1;  // Default: if not explicitely set, then max possible will be used...
         bool monitor = false;
         const char* capture_driver_uid = "";
         const char* playback_driver_uid = "";
