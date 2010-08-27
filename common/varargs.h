@@ -68,8 +68,11 @@ extern "C"
             va->load_name = va_arg(ap, char *);
         if ((options & JackLoadInit))
             va->load_init = va_arg(ap, char *);
-        if ((options & JackSessionID))
-            va->session_id = atoi( va_arg(ap, char *) );
+        if ((options & JackSessionID)) {
+            char *sid = va_arg(ap, char *);
+            if (sid)
+                va->session_id = atoi( sid );
+        }
     }
 
 #ifdef __cplusplus
