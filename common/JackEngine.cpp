@@ -389,7 +389,7 @@ int JackEngine::InternalClientUnload(int refnum, int* status)
 // Client management
 //-------------------
 
-int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status)
+int JackEngine::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status)
 {
     // Clear status
     *status = 0;
@@ -403,7 +403,11 @@ int JackEngine::ClientCheck(const char* name, char* name_res, int protocol, int 
         return -1;
     }
 
-    if (ClientCheckName(name)) {
+    std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
+
+    if (res != fReservationMap.end()) {
+	strncpy( name_res, res->second.c_str(), JACK_CLIENT_NAME_SIZE );
+    } else if (ClientCheckName(name)) {
 
         *status |= JackNameNotUnique;
 
@@ -531,7 +535,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         EnsureUUID(uuid);
     }
 
-    jack_log("JackEngine::ClientExternalOpen: name = %s ", real_name);
+    jack_log("JackEngine::ClientExternalOpen: uuid=%d, name = %s ", uuid, real_name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -1023,13 +1027,17 @@ void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *res
 
 void JackEngine::ReserveClientName(const char *name, const char *uuid, int *result)
 {
+    jack_log( "JackEngine::ReserveClientName ( name = %s, uuid = %s )", name, uuid );
+
     if (ClientCheckName(name)) {
         *result = -1;
+        jack_log( "name already taken" );
         return;
     }
 
     EnsureUUID(atoi(uuid));
     fReservationMap[atoi(uuid)] = name;
+    *result = 0;
 }
 
 } // end of namespace

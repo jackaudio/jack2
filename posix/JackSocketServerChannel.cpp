@@ -176,7 +176,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientCheckRequest req;
             JackClientCheckResult res;
             if (req.Read(socket) == 0)
-                res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
+                res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientCheck write error name = %s", req.fName);
             break;
