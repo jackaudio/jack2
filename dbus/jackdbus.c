@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008 Nedko Arnaudov
+    Copyright (C) 2007,2008,2010 Nedko Arnaudov
     Copyright (C) 2007-2008 Juuso Alasuutari
     Copyright (C) 2008 Marc-Olivier Barre
 
@@ -44,6 +44,8 @@
 #include "sigsegv.h"
 #include "svnversion.h"
 
+static char * g_log_filename;
+static ino_t g_log_file_ino;
 FILE *g_logfile;
 char *g_jackdbus_config_dir;
 size_t g_jackdbus_config_dir_len; /* without terminating '\0' char */
@@ -550,6 +552,49 @@ fail:
     jack_error ("Ran out of memory trying to construct method return");
 }
 
+static bool jack_dbus_log_open(void)
+{
+    struct stat st;
+    int ret;
+    int retry;
+
+    if (g_logfile != NULL)
+    {
+        ret = stat(g_log_filename, &st);
+        if (ret != 0 || g_log_file_ino != st.st_ino)
+        {
+            fclose(g_logfile);
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    for (retry = 0; retry < 10; retry++)
+    {
+        g_logfile = fopen(g_log_filename, "a");
+        if (g_logfile == NULL)
+        {
+            fprintf(stderr, "Cannot open jackdbus log file \"%s\": %d (%s)\n", g_log_filename, errno, strerror(errno));
+            return false;
+        }
+
+        ret = stat(g_log_filename, &st);
+        if (ret == 0)
+        {
+            g_log_file_ino = st.st_ino;
+            return true;
+        }
+
+        fclose(g_logfile);
+        g_logfile = NULL;
+    }
+
+    fprintf(stderr, "Cannot stat just opened jackdbus log file \"%s\": %d (%s). %d retries\n", g_log_filename, errno, strerror(errno), retry);
+    return false;
+}
+
 void 
 jack_dbus_info_callback(const char *msg)
 {
@@ -560,8 +605,11 @@ jack_dbus_info_callback(const char *msg)
     ctime_r(&timestamp, timestamp_str);
     timestamp_str[24] = 0;
 
-    fprintf(g_logfile, "%s: %s\n", timestamp_str, msg);
-    fflush(g_logfile);
+    if (jack_dbus_log_open())
+    {
+        fprintf(g_logfile, "%s: %s\n", timestamp_str, msg);
+        fflush(g_logfile);
+    }
 }
 
 #define ANSI_BOLD_ON    "\033[1m"
@@ -579,8 +627,11 @@ jack_dbus_error_callback(const char *msg)
     ctime_r(&timestamp, timestamp_str);
     timestamp_str[24] = 0;
 
-    fprintf(g_logfile, "%s: " ANSI_BOLD_ON ANSI_COLOR_RED "ERROR: %s" ANSI_RESET "\n", timestamp_str, msg);
-    fflush(g_logfile);
+    if (jack_dbus_log_open())
+    {
+        fprintf(g_logfile, "%s: " ANSI_BOLD_ON ANSI_COLOR_RED "ERROR: %s" ANSI_RESET "\n", timestamp_str, msg);
+        fflush(g_logfile);
+    }
 }
 
 bool
@@ -695,42 +746,39 @@ paths_uninit()
     free(g_jackdbus_log_dir);
 }
 
-int
-log_init()
+static bool log_init(void)
 {
-    char *log_filename;
     size_t log_len;
 
     log_len = strlen(JACKDBUS_LOG);
 
-    log_filename = malloc(g_jackdbus_log_dir_len + log_len + 1);
-    if (log_filename == NULL)
+    g_log_filename = malloc(g_jackdbus_log_dir_len + log_len + 1);
+    if (g_log_filename == NULL)
     {
         fprintf(stderr, "Out of memory\n");
-        return FALSE;
+        return false;
     }
 
-    memcpy(log_filename, g_jackdbus_log_dir, g_jackdbus_log_dir_len);
-    memcpy(log_filename + g_jackdbus_log_dir_len, JACKDBUS_LOG, log_len);
-    log_filename[g_jackdbus_log_dir_len + log_len] = 0;
+    memcpy(g_log_filename, g_jackdbus_log_dir, g_jackdbus_log_dir_len);
+    memcpy(g_log_filename + g_jackdbus_log_dir_len, JACKDBUS_LOG, log_len);
+    g_log_filename[g_jackdbus_log_dir_len + log_len] = 0;
 
-    g_logfile = fopen(log_filename, "a");
-    if (g_logfile == NULL)
+    if (!jack_dbus_log_open())
     {
-        fprintf(stderr, "Cannot open jackdbus log file \"%s\": %d (%s)\n", log_filename, errno, strerror(errno));
-        free(log_filename);
-        return FALSE;
+        return false;
     }
 
-    free(log_filename);
-
-    return TRUE;
+    return true;
 }
 
-void
-log_uninit()
+static void log_uninit(void)
 {
-    fclose(g_logfile);
+    if (g_logfile != NULL)
+    {
+        fclose(g_logfile);
+    }
+
+    free(g_log_filename);
 }
 
 void
