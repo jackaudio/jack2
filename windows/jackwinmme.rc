@@ -22,7 +22,7 @@ BEGIN
         BEGIN
             VALUE "Comments", "\0"
             VALUE "CompanyName", "Grame\0"
-            VALUE "FileDescription", "Jackmp WinMMEo Driver for Windows\0"
+            VALUE "FileDescription", "Jackmp WinMME Driver for Windows\0"
             VALUE "FileVersion", "1, 9, 6, 0\0"
             VALUE "InternalName", "jack_portaudio\0"
             VALUE "LegalCopyright", "Copyright Grame © 2006-2010\0"

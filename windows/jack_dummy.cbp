@@ -80,6 +80,9 @@
 			<Add library="odbccp32" />
 			<Add library="libjackserver" />
 		</Linker>
+		<Unit filename="jackdummydriver.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
 		<Unit filename="..\common\JackDummyDriver.cpp" />
 		<Extensions>
 			<AutoVersioning>
