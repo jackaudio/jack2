@@ -33,6 +33,10 @@ David Garcia Garzon
   Jackdmp changes log
 ---------------------------
 
+2010-08-30 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.7 started.
+
 2010-08-25 Stephane Letz  <letz@grame.fr>
 
 	* In JackCoreAudioDriver, fix an issue when no value is given for input.
