@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <jack/jack.h>
+#include <jack/intclient.h>
 #include <jack/transport.h>
 
 
@@ -183,7 +184,7 @@ void Jack_Client_Registration_Callback(const char* name, int val, void *arg)
 
 int Jack_Port_Rename_Callback(jack_port_id_t port, const char* old_name, const char* new_name, void *arg)
 {
-     Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n");
+     Log("Rename callback has been successfully called with old_name '%s' and new_name '%s'. (msg from callback)\n", old_name, new_name);
      port_rename_clbk = 1;
      return 0;
 }
@@ -632,7 +633,57 @@ int main (int argc, char *argv[])
     if (status & JackServerStarted) {
         fprintf(stderr, "JACK server started\n");
     }
-
+    
+    /**
+     * Internal client tests...
+     *
+     */
+    jack_intclient_t intclient;
+    
+    Log("trying to load the \"inprocess\" server internal client \n");
+    
+    intclient = jack_internal_client_load (client1, "inprocess",
+                                           (jack_options_t)(JackLoadName|JackLoadInit),
+                                           &status, "inprocess", "");
+    
+    if (intclient == 0 || status & JackFailure) {
+        printf("!!! ERROR !!! cannot load internal client \"inprocess\" intclient %d status 0x%2.0x !\n", intclient, status);
+	} else {
+        
+        Log("\"inprocess\" server internal client loaded\n");
+        
+        char* internal_name = jack_get_internal_client_name(client1, intclient);
+        if (strcmp(internal_name, "inprocess") == 0) {
+            Log("jack_get_internal_client_name returns %s\n", internal_name);
+        } else {
+            printf("!!! ERROR !!! jack_get_internal_client_name returns incorrect name %s\n", internal_name);
+        }
+        
+        jack_intclient_t intclient1 = jack_internal_client_handle(client1, "inprocess", &status);
+        if (intclient1 == intclient) {
+            Log("jack_internal_client_handle returns correct handle\n");
+        } else {
+            printf("!!! ERROR !!! jack_internal_client_handle returns incorrect handle %d\n", intclient1);
+        }
+        
+        // Unload internal client
+        status = jack_internal_client_unload (client1, intclient);
+        if (status  == 0) {
+            Log("jack_internal_client_unload done first time returns correct value\n");
+        } else {
+            printf("!!! ERROR !!! jack_internal_client_unload returns incorrect value 0x%2.0x\n", status);
+        }
+        
+        // Unload internal client second time
+        status = jack_internal_client_unload (client1, intclient);
+        if (status & JackFailure &&  status & JackNoSuchClient) {
+            Log("jack_internal_client_unload done second time returns correct value\n");
+        } else {
+            printf("!!! ERROR !!! jack_internal_client_unload returns incorrect value 0x%2.0x\n", status);
+        }
+    }
+    
+    
     /**
      * try to register another one with the same name...
      *

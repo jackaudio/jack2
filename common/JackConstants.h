@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#define VERSION "1.9.5"
+#define VERSION "1.9.6"
 
 #define BUFFER_SIZE_MAX 8192
 
@@ -59,36 +59,12 @@
 
 #define JACK_DEFAULT_SERVER_NAME "default"
 
-#ifdef WIN32
-#define jack_server_dir "server"
-#define jack_client_dir "client"
-#define ADDON_DIR "jack"
-#endif
-
-#ifdef __APPLE__
-#define jack_server_dir "/tmp"
-#define jack_client_dir "/tmp"
-#define JACK_DEFAULT_DRIVER "coreaudio"
-#endif
-
-#ifdef __linux__
-#define jack_server_dir "/dev/shm"
-#define jack_client_dir "/dev/shm"
-#define JACK_DEFAULT_DRIVER "alsa"
-#endif
-
-#if defined(__sun__) || defined(sun)
-#define jack_server_dir "/tmp"
-#define jack_client_dir "/tmp"
-#define JACK_DEFAULT_DRIVER "oss"
-#endif
-
 #define jack_server_entry "jackdmp_entry"
 #define jack_client_entry "jack_client"
 
 #define ALL_CLIENTS -1 // for notification
 
-#define JACK_PROTOCOL_VERSION 7  
+#define JACK_PROTOCOL_VERSION 8
 
 #define SOCKET_TIME_OUT 5               // in sec
 #define DRIVER_OPEN_TIMEOUT 5           // in sec

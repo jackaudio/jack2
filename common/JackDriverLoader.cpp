@@ -152,7 +152,7 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
 
             fprintf (stderr, "Options for driver '%s':\n", desc->name);
             jack_print_driver_options (desc, stderr);
-            exit (1);
+            return 1;
         }
 
         for (param_index = 0; param_index < desc->nparams; param_index++) {

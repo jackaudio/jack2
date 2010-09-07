@@ -25,10 +25,13 @@
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -64,10 +67,13 @@
 					<Add option="-DREGEX_MALLOC" />
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -104,10 +110,13 @@
 					<Add option="-DSTDC_HEADERS" />
 					<Add option="-D__SMP__" />
 					<Add option="-DJACK_MONITOR" />
+					<Add option="-DHAVE_CONFIG_H" />
 					<Add directory="." />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
 					<Add library="kernel32" />
@@ -180,9 +189,52 @@
 		<Unit filename="libjack.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="regex.c">
+		<Unit filename="tre-0.8.0\lib\regcomp.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="tre-0.8.0\lib\regerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\regex.h" />
+		<Unit filename="tre-0.8.0\lib\regexec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-ast.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-ast.h" />
+		<Unit filename="tre-0.8.0\lib\tre-compile.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-compile.h" />
+		<Unit filename="tre-0.8.0\lib\tre-internal.h" />
+		<Unit filename="tre-0.8.0\lib\tre-match-approx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-match-backtrack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-match-parallel.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-match-utils.h" />
+		<Unit filename="tre-0.8.0\lib\tre-mem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-mem.h" />
+		<Unit filename="tre-0.8.0\lib\tre-parse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-parse.h" />
+		<Unit filename="tre-0.8.0\lib\tre-stack.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\tre-stack.h" />
+		<Unit filename="tre-0.8.0\lib\tre.h" />
+		<Unit filename="tre-0.8.0\lib\xmalloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tre-0.8.0\lib\xmalloc.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

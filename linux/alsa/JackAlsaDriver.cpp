@@ -260,7 +260,7 @@ JackAlsaDriver::alsa_driver_hw_specific (alsa_driver_t *driver, int hw_monitorin
     return 0;
 }
 
-void
+int
 JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 {
 	if (driver->playback_handle) {
@@ -340,7 +340,7 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 			default:
 				jack_error ("impossible sample width (%d) discovered!",
 					    driver->playback_sample_bytes);
-				exit (1);
+				return -1;
 			}
 		}
 	}
@@ -364,6 +364,8 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 			break;
 		}
 	}
+    
+    return 0;
 }
 
 int
@@ -779,7 +781,7 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
             default:
                 jack_error ("programming error: unhandled format "
                             "type for playback");
-                exit (1);
+                return -1;
         }
     }
 
@@ -797,7 +799,7 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
             default:
                 jack_error ("programming error: unhandled format "
                             "type for capture");
-                exit (1);
+                return -1;
         }
     }
 
@@ -836,7 +838,8 @@ JackAlsaDriver::alsa_driver_set_parameters (alsa_driver_t *driver,
         driver->user_nchannels = driver->playback_nchannels;
     }
 
-    alsa_driver_setup_io_function_pointers (driver);
+    if (alsa_driver_setup_io_function_pointers (driver) != 0)
+        return -1;
 
     /* Allocate and initialize structures that rely on the
        channels counts.

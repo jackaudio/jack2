@@ -118,10 +118,12 @@ bool JackPosixSemaphore::TimedWait(long usec)
     time.tv_sec += tv_usec / 1000000;
     time.tv_nsec = (tv_usec % 1000000) * 1000;
 
-    if ((res = sem_timedwait(fSemaphore, &time)) != 0) {
+    while ((res = sem_timedwait(fSemaphore, &time)) < 0) {
         jack_error("JackPosixSemaphore::TimedWait err = %s", strerror(errno));
         jack_log("now %ld %ld ", now.tv_sec, now.tv_usec);
         jack_log("next %ld %ld ", time.tv_sec, time.tv_nsec/1000);
+        if (errno != EINTR)
+            break;
     }
     return (res == 0);
 }
@@ -184,9 +186,8 @@ bool JackPosixSemaphore::ConnectOutput(const char* name, const char* server_name
 
 bool JackPosixSemaphore::Disconnect()
 {
-    jack_log("JackPosixSemaphore::Disconnect %s", fName);
-
     if (fSemaphore) {
+	jack_log("JackPosixSemaphore::Disconnect %s", fName);
         if (sem_close(fSemaphore) != 0) {
             jack_error("Disconnect: can't disconnect named semaphore name = %s err = %s", fName, strerror(errno));
             return false;

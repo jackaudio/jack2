@@ -60,7 +60,6 @@ ExternalMetro::ExternalMetro(int freq, double max_amp, int dur_arg, int bpm, con
 {
     sample_t scale;
     int i, attack_length, decay_length;
-    double *amp;
     int attack_percent = 1, decay_percent = 10;
     const char *bpm_string = "bpm";
     jack_options_t options = JackNullOption;
@@ -131,6 +130,8 @@ ExternalMetro::~ExternalMetro()
     jack_port_unregister(client, input_port);
     jack_port_unregister(client, output_port);
     jack_client_close(client);
+    free(amp);
+    free(wave);
 }
 
 int main (int argc, char *argv[])

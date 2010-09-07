@@ -338,6 +338,7 @@ JackFFADODriver::ffado_driver_new (const char *name,
     driver->device_options.verbose = params->verbose_level;
     driver->capture_frame_latency = params->capture_frame_latency;
     driver->playback_frame_latency = params->playback_frame_latency;
+    driver->device_options.snoop_mode = params->snoop_mode;
 
     debugPrint(DEBUG_LEVEL_STARTUP, " Driver compiled on %s %s", __DATE__, __TIME__);
     debugPrint(DEBUG_LEVEL_STARTUP, " Created driver %s", name);
@@ -429,7 +430,7 @@ int JackFFADODriver::Attach()
 
         driver->capture_channels[chn].stream_type = ffado_streaming_get_capture_stream_type(driver->dev, chn);
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering audio capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
@@ -455,7 +456,7 @@ int JackFFADODriver::Attach()
             fCaptureChannels++;
 
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering midi capture port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
@@ -502,7 +503,7 @@ int JackFFADODriver::Attach()
         driver->playback_channels[chn].stream_type = ffado_streaming_get_playback_stream_type(driver->dev, chn);
 
         if (driver->playback_channels[chn].stream_type == ffado_stream_type_audio) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
             printMessage ("Registering audio playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
@@ -530,7 +531,7 @@ int JackFFADODriver::Attach()
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
         } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
-            snprintf(buf, sizeof(buf) - 1, "%s:%s", fClientControl.fName, portname);
+            snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
             printMessage ("Registering midi playback port %s", buf);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
@@ -753,12 +754,20 @@ extern "C"
         strcpy (desc->name, "firewire");                               // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Linux FFADO API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
        
-        desc->nparams = 11;
+        desc->nparams = 13;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
         desc->params = params;
 
         i = 0;
+        strcpy (params[i].name, "device");
+        params[i].character  = 'd';
+        params[i].type       = JackDriverParamString;
+        strcpy (params[i].value.str,  "hw:0");
+        strcpy (params[i].short_desc, "The FireWire device to use.");
+        strcpy (params[i].long_desc,  "The FireWire device to use. Please consult the FFADO documentation for more info.");
+
+        i++;
         strcpy (params[i].name, "period");
         params[i].character  = 'p';
         params[i].type       = JackDriverParamUInt;
@@ -846,6 +855,14 @@ extern "C"
         strcpy (params[i].short_desc, "libffado verbose level");
         strcpy (params[i].long_desc, params[i].short_desc);
 
+        i++;
+        strcpy (params[i].name, "snoop");
+        params[i].character  = 'X';
+        params[i].type       = JackDriverParamBool;
+        params[i].value.i    = 0;
+        strcpy (params[i].short_desc, "Snoop firewire traffic");
+        strcpy (params[i].long_desc, params[i].short_desc);
+
         return desc;
     }
 
@@ -855,7 +872,7 @@ extern "C"
 
         ffado_jack_settings_t cmlparams;
 
-        char *device_name="hw:0";
+        char *device_name=(char*)"hw:0";
 
         cmlparams.period_size_set = 0;
         cmlparams.sample_rate_set = 0;
@@ -881,7 +898,7 @@ extern "C"
 
             switch (param->character) {
                 case 'd':
-                    device_name = strdup (param->value.str);
+                    device_name = const_cast<char*>(param->value.str);
                     break;
                 case 'p':
                     cmlparams.period_size = param->value.ui;
@@ -911,7 +928,7 @@ extern "C"
                     cmlparams.slave_mode = param->value.ui;
                     break;
                 case 'X':
-                    cmlparams.snoop_mode = param->value.ui;
+                    cmlparams.snoop_mode = param->value.i;
                     break;
                 case 'v':
                     cmlparams.verbose_level = param->value.ui;

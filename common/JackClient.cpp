@@ -252,7 +252,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                 break;
                 
              case kPortRenameCallback:
-                jack_log("JackClient::kPortRenameCallback port = %ld");
+                jack_log("JackClient::kPortRenameCallback port = %ld", value1);
                 if (fPortRename) {
                     fPortRename(value1, message, GetGraphManager()->GetPort(value1)->GetName(), fPortRenameArg);
                 }
@@ -1012,7 +1012,7 @@ int JackClient::InternalClientLoad(const char* client_name, jack_options_t optio
     if (va->load_name && (strlen(va->load_name) >= JACK_PATH_MAX)) {
         jack_error("\"%s\" is too long for a shared object name.\n"
                    "Please use %lu characters or less.",
-                   va->load_name, PATH_MAX);
+                   va->load_name, JACK_PATH_MAX);
         int my_status1 = *status | (JackFailure | JackInvalidOption);
         *status = (jack_status_t)my_status1;
         return 0;
@@ -1027,7 +1027,8 @@ int JackClient::InternalClientLoad(const char* client_name, jack_options_t optio
         return 0;
     }
 
-    int int_ref, result = -1;
+    int int_ref = 0;
+    int result = -1;
     fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, &result);
     return int_ref;
 }

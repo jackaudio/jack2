@@ -51,7 +51,17 @@ static inline unsigned long get_cycles(void)
     return (((unsigned long)hi)<<32) | ((unsigned long)lo);
 }
 
-#endif
+#endif /* __x86_64__ */
+
+#ifdef __sparc_v9__
+/* rd is V9 only */
+static inline unsigned long long get_cycles(void)
+{
+	unsigned long long res;
+	__asm__ __volatile__("rd %%tick, %0" : "=r"(res));
+	return res;
+}
+#endif /* __sparc_v9__ */
 
 #ifdef __PPC__
 
@@ -82,7 +92,7 @@ static inline cycles_t get_cycles(void)
     return ret;
 }
 
-#endif
+#endif /* __PPC__ */
 
 #ifdef __i386__
 
@@ -101,8 +111,37 @@ static inline cycles_t get_cycles (void)
     return ret;
 }
 
-#endif
+#endif /* __i386__ */
 
-#endif
+/* everything else but x86, amd64, sparcv9 or ppc */
+#if !defined (__PPC__) && !defined (__x86_64__) && !defined (__i386__) && !defined (__sparc_v9__)
+
+#warning No suitable get_cycles() implementation. Returning 0 instead
+
+typedef unsigned long long cycles_t;
+
+static inline cycles_t get_cycles(void)
+{
+    return 0;
+}
+
+#endif /* everything else but x86, amd64, sparcv9 or ppc */
+
+#endif /* __linux__ */
+
+
+#if defined(__FreeBSD_kernel__)
+
+#warning No suitable get_cycles() implementation. Returning 0 instead
+
+typedef unsigned long long cycles_t;
+
+static inline cycles_t get_cycles(void)
+{
+    return 0;
+}
+
+#endif /* __FreeBSD_kernel__ */
+
 
 #endif /* __jack_cycles_h__ */

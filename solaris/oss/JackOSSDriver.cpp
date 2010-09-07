@@ -904,20 +904,20 @@ EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine
         case 'C':
             capture = true;
             if (strcmp(param->value.str, "none") != 0) {
-                capture_pcm_name = strdup(param->value.str);
+                capture_pcm_name = param->value.str;
             }
             break;
 
         case 'P':
             playback = true;
             if (strcmp(param->value.str, "none") != 0) {
-                playback_pcm_name = strdup(param->value.str);
+                playback_pcm_name = param->value.str;
             }
             break;
 
         case 'd':
-            playback_pcm_name = strdup (param->value.str);
-            capture_pcm_name = strdup (param->value.str);
+            playback_pcm_name = param->value.str;
+            capture_pcm_name = param->value.str;
             break;
     
         case 'b':

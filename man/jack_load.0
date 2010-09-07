@@ -1,0 +1,28 @@
+.TH JACK_LOAD "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_load \- JACK toolkit client for loading in-process clients
+.SH SYNOPSIS
+\fBjack_load\fR [ \fI-i\fR initstring ] [ \fI-s\fR servername ] [\fI-w\fR ] client-name so-name [ initstring ]
+.SH DESCRIPTION
+\fBjack_load\fR is a JACK toolkit client. It loads the specified plugin and creates an in-process client.
+.SH ARGUMENTS
+.PP
+The client-name must be a currently unused client name.
+.PP
+The so-name is the name of file that client code is stored in (typically, \fIclientname.so\fR)
+.SH OPTIONS
+.TP
+\fB-i\fR, \fB--init\fR init-string
+.br
+initialization string passed to the in-process client. Note that this can also be specified as the last argument on the command line.
+.TP
+\fB-s\fR, \fB--server\fR servername
+.br
+Name of JACK server to connect to
+.TP
+\fB-w\fR, \fB--wait\fR
+Wait for a signal (eg. from Ctrl-c) and then unload the client.
+.SH AUTHOR
+Jeremy Hall
+
+

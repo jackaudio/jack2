@@ -1,0 +1,18 @@
+.TH JACK_CONNECT "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_monitor_client \- The JACK Audio Connection Kit example client
+.SH SYNOPSIS
+.B jack_monitor_client
+client-name
+.PP
+The client-name must be the name of a existing client that monitoring is 
+to be enabled for.
+.SH DESCRIPTION
+.B jack_monitor_client
+is an example client for the JACK Audio Connection Kit. It enables
+monitoring for the specified client.
+.SH AUTHOR
+Jeremy Hall
+.PP
+This manpage was written by Robert Jordens <jordens@debian.org> for Debian.
+

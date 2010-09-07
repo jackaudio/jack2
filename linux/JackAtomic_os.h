@@ -42,9 +42,9 @@ static inline int CAS(register UInt32 value, register UInt32 newvalue, register 
         "1:                     \n"
         "   li      %0, 0       \n"
         "2:                     \n"
-    : "=r" (result)
-                : "r" (addr), "r" (value), "r" (newvalue), "r" (tmp)
-            );
+        : "=r" (result)
+        : "r" (addr), "r" (value), "r" (newvalue), "r" (tmp)
+        );
     return result;
 }
 
@@ -61,13 +61,23 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
         "# CAS \n\t"
         LOCK "cmpxchg %2, (%1) \n\t"
         "sete %0               \n\t"
-    : "=a" (ret)
-                : "c" (addr), "d" (newvalue), "a" (value)
-            );
+        : "=a" (ret)
+        : "c" (addr), "d" (newvalue), "a" (value)
+        );
     return ret;
 }
 
 #endif
+
+#if !defined(__i386__) && !defined(__x86_64__)  && !defined(__PPC__)
+#warning using builtin gcc (version > 4.1) atomic
+
+static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
+{
+    return __sync_bool_compare_and_swap (&addr, value, newvalue);
+}
+#endif
+
 
 #endif
 

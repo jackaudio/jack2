@@ -545,10 +545,23 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
         
             // Creates aggregate device
             AudioDeviceID captureID, playbackID;
-            if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr)
-                return -1;
-            if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) 
-                return -1;
+            
+            if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr) {
+                jack_log("Will take default input");
+                if (GetDefaultInputDevice(&captureID) != noErr) {
+                    jack_error("Cannot open default input device");
+                    return -1;
+                }
+            }
+            
+            if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) {
+                jack_log("Will take default output");
+                if (GetDefaultOutputDevice(&playbackID) != noErr) {
+                    jack_error("Cannot open default output device");
+                    return -1;
+                }
+            }
+            
             if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr)
                 return -1;
         }
@@ -558,7 +571,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
         jack_log("JackCoreAudioAdapter::Open capture only");
         if (GetDeviceIDFromUID(capture_driver_uid, &fDeviceID) != noErr) {
             if (GetDefaultInputDevice(&fDeviceID) != noErr) {
-                jack_error("Cannot open default device");
+                jack_error("Cannot open default input device");
                 return -1;
             }
         }
@@ -572,7 +585,7 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
         jack_log("JackCoreAudioAdapter::Open playback only");
         if (GetDeviceIDFromUID(playback_driver_uid, &fDeviceID) != noErr) {
             if (GetDefaultOutputDevice(&fDeviceID) != noErr) {
-                jack_error("Cannot open default device");
+                jack_error("Cannot open default output device");
                 return -1;
             }
         }
@@ -583,14 +596,31 @@ int JackCoreAudioAdapter::SetupDevices(const char* capture_driver_uid,
 
     // Use default driver in duplex mode
     } else {
-        jack_log("JackCoreAudioAdapter::Open default driver");
+        jack_log("JackCoreAudioDriver::Open default driver");
         if (GetDefaultDevice(&fDeviceID) != noErr) {
-            jack_error("Cannot open default device");
-            return -1;
-        }
-        if (GetDeviceNameFromID(fDeviceID, capture_driver_name) != noErr || GetDeviceNameFromID(fDeviceID, playback_driver_name) != noErr) {
-            jack_error("Cannot get device name from device ID");
-            return -1;
+            jack_error("Cannot open default device in duplex mode, so aggregate default input and default output");
+            
+            // Creates aggregate device
+            AudioDeviceID captureID, playbackID;
+            
+            if (GetDeviceIDFromUID(capture_driver_uid, &captureID) != noErr) {
+                jack_log("Will take default input");
+                if (GetDefaultInputDevice(&captureID) != noErr) {
+                    jack_error("Cannot open default input device");
+                    return -1;
+                }
+            }
+            
+            if (GetDeviceIDFromUID(playback_driver_uid, &playbackID) != noErr) {
+                jack_log("Will take default output");
+                if (GetDefaultOutputDevice(&playbackID) != noErr) {
+                    jack_error("Cannot open default output device");
+                    return -1;
+                }
+            }
+            
+            if (CreateAggregateDevice(captureID, playbackID, samplerate, &fDeviceID) != noErr)
+                return -1;
         }
     }
 

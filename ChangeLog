@@ -24,10 +24,99 @@ Peter L Jones
 Devin Anderson
 Josh Green
 Mario Lang
+Arnold Krille
+Jan Engelhardt
+Adrian Knoth
+David Garcia Garzon
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2010-08-25 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, fix an issue when no value is given for input.
+
+2010-08-23 Stephane Letz  <letz@grame.fr>
+
+	* Adrian Knoth fix for linux cycle.h (ticket 188).
+
+2010-07-07 Stephane Letz  <letz@grame.fr>
+
+	* Jan Engelhardt patch for get_cycles on SPARC.
+	* Adrian Knoth hurd.patch, kfreebsd-fix.patch and alpha_ia64-sigsegv.patch from ticket 177.
+
+2010-06-29 Stephane Letz  <letz@grame.fr>
+
+	* Arnold Krille firewire snooping patch.
+
+2010-06-16 Stephane Letz  <letz@grame.fr>
+
+	* David Garcia Garzon unused_pkt_buf_field_jack2 netone patch.
+
+2010-06-13 Stephane Letz  <letz@grame.fr>
+
+	* Fix JackPosixSemaphore::TimedWait : same behavior as JackPosixSemaphore::Wait regarding EINTR.
+
+2010-05-31 Stephane Letz  <letz@grame.fr>
+
+	* Fix from Fernando Lopez-Lezcano for compilation on fc13.
+
+2010-05-30 Stephane Letz  <letz@grame.fr>
+
+	* David Garcia Garzon netone patch.
+
+2010-05-27 Stephane Letz  <letz@grame.fr>
+
+	* In JackCoreAudioDriver, move code called in MeasureCallback to be called once in IO thread.
+
+2010-05-07 Stephane Letz  <letz@grame.fr>
+
+	* Add tests to validate intclient.h API.
+	* On Linux, inter-process synchronization primitive switched to POSIX semaphore.
+
+2010-04-16 Stephane Letz  <letz@grame.fr>
+
+	* Make jack_connect/jack_disconnect wait for effective port connection/disconnection.
+
+2010-04-07 Stephane Letz  <letz@grame.fr>
+
+	* Remove call to exit in library code.
+
+2010-03-26 Stephane Letz  <letz@grame.fr>
+
+	* ffado-portname-sync.patch from ticket #163 applied.
+
+2010-03-24 Stephane Letz  <letz@grame.fr>
+
+	* On Windows, now use TRE library for regexp (BSD license instead of GPL license).
+
+2010-03-19 Stephane Letz  <letz@grame.fr>
+
+	* Fix some file header to have library side code use LGPL.
+	* Apply srcfactor.diff patch for ticket #162.
+
+2010-03-06 Stephane Letz  <letz@grame.fr>
+
+	* Arnold Krille firewire patch.
+	* Raise JACK_DRIVER_PARAM_STRING_MAX and JACK_PARAM_STRING_MAX to 127 otherwise some audio drivers cannot be loaded on OSX.
+
+2010-03-04 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackMachServerChannel::Execute : keep running even in error cases.
+	* Raise JACK_PROTOCOL_VERSION number.
+
+2010-03-03 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackGraphManager::DeactivatePort.
+
+2010-03-02 Stephane Letz  <letz@grame.fr>
+
+	* Improve JackCoreAudioDriver and JackCoreAudioAdapter : when no devices are described, takes default input and output and aggregate them.
+
+2010-02-15 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.6 started.
 
 2010-01-29 Gabriel M. Beddingfield <gabriel@teuton.org>
 
@@ -190,7 +279,7 @@ Mario Lang
 2009-10-20 Stephane Letz  <letz@grame.fr>
 
 	* Add a string parameter to server ==> client notification, add a new JackInfoShutdownCallback type.
-	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration change…)
+	* CoreAudio backend now issue a JackInfoShutdownCallback when an unrecoverable error is detected (sampling rate change, stream configuration changed)
 
 2009-10-17 Stephane Letz  <letz@grame.fr>
 

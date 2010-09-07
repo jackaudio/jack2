@@ -85,7 +85,6 @@ struct _netjack_driver_state {
     unsigned int handle_transport_sync;
 
     unsigned int *rx_buf;
-    unsigned int *pkt_buf;
     unsigned int rx_bufsize;
     //unsigned int tx_bufsize;
     unsigned int mtu;

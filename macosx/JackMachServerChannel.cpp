@@ -159,7 +159,7 @@ bool JackMachServerChannel::Execute()
         kern_return_t res;
         if ((res = mach_msg_server(MessageHandler, 1024, fServerPort.GetPortSet(), 0)) != KERN_SUCCESS) {
             jack_log("JackMachServerChannel::Execute: err = %s", mach_error_string(res));
-            return false;
+            // A recoverable error, so keep running...
         }
         return true;
         

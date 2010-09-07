@@ -98,8 +98,18 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
     jack_error("info.si_errno = %d", info->si_errno);
     jack_error("info.si_code  = %d (%s)", info->si_code, si_codes[info->si_code]);
     jack_error("info.si_addr  = %p", info->si_addr);
+#if !defined(__alpha__) && !defined(__ia64__) && !defined(__FreeBSD_kernel__) && !defined(__arm__) && !defined(__hppa__) && !defined(__sh__)
     for(i = 0; i < NGREG; i++)
-        jack_error("reg[%02d]       = 0x" REGFORMAT, i, ucontext->uc_mcontext.gregs[i]);
+        jack_error("reg[%02d]       = 0x" REGFORMAT, i, 
+#if defined(__powerpc__)
+                ucontext->uc_mcontext.uc_regs[i]
+#elif defined(__sparc__) && defined(__arch64__)
+                ucontext->uc_mcontext.mc_gregs[i]
+#else
+                ucontext->uc_mcontext.gregs[i]
+#endif
+                );
+#endif /* alpha, ia64, kFreeBSD, arm, hppa */
 
 #if defined(SIGSEGV_STACK_X86) || defined(SIGSEGV_STACK_IA64)
 # if defined(SIGSEGV_STACK_IA64)

@@ -53,6 +53,7 @@ extern "C"
         int bpm;
         jack_nframes_t tone_length, wave_length;
         sample_t *wave;
+        double *amp;
         long offset ;
 
         InternalMetro(int freq, double max_amp, int dur_arg, int bpm, char* client_name);

@@ -257,7 +257,7 @@ main (int argc, char *argv[])
 
 	if (jack_activate (client)) {
 		fprintf (stderr, "cannot activate client\n");
-		return 1;
+		goto error;
 	}
     
     /* install a signal handler to properly quits jack client */
@@ -282,5 +282,9 @@ main (int argc, char *argv[])
 	};
 	
     jack_client_close(client);
+    
+error:
+    free(amp);
+    free(wave);
     exit (0);
 }

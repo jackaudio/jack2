@@ -1,0 +1,13 @@
+.TH JACK_SHOWTIME "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_showtime \- The JACK Audio Connection Kit example client
+.SH SYNOPSIS
+.B jack_showtime
+.SH DESCRIPTION
+.B jack_showtime
+prints the current timebase information to stdout
+.SH AUTHOR
+Paul Davis
+.PP
+This manpage was written by Stefan Schwandter <swan@debian.org>
+

@@ -99,6 +99,13 @@ namespace Jack
             Reset();
         }
         fSockfd = socket ( AF_INET, SOCK_DGRAM, 0 );
+        
+        /* Enable address reuse */
+        int res, on = 1;
+        if ((res = setsockopt( fSockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) < 0) {
+            StrError(NET_ERROR_CODE);
+        }
+            
         return fSockfd;
     }
 

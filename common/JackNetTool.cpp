@@ -283,7 +283,7 @@ namespace Jack
         jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
         jack_info ( "Period size : %u frames per period", params->fPeriodSize );
         jack_info ( "Frames per packet : %u", params->fFramesPerPacket );
-        jack_info ( "Packet per period : %u", params->fPeriodSize / params->fFramesPerPacket );
+        jack_info ( "Packet per period : %u", (params->fFramesPerPacket != 0) ? params->fPeriodSize / params->fFramesPerPacket : 0);
         jack_info ( "Bitdepth : %s", bitdepth );
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
         jack_info ( "Network mode : %s", mode );

@@ -1,9 +1,9 @@
 <*project
       version = 4 civer = "Free v4.14.5" winver = "2.6/5.1.2600" > 
    <output> .</>
-   <exename> Jack_v1.9.5_setup.exe</>
+   <exename> Jack_v1.9.6_setup.exe</>
    <digitsign> </>
-   <appname> Jack v1.9.5</>
+   <appname> Jack v1.9.6</>
    <password> </>
    <addlang> </>
    <icon> Default - 2</>
@@ -92,6 +92,8 @@
 <_><src>..\..\common\jack\transport.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\types.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
+<_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
+<_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>.\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
