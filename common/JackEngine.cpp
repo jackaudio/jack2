@@ -753,7 +753,7 @@ int JackEngine::PortUnRegister(int refnum, jack_port_id_t port_index)
     JackClientInterface* client = fClientTable[refnum];
 
     // Disconnect port ==> notification is sent
-    PortDisconnect(refnum, port_index, ALL_PORTS);
+    PortDisconnect(-1, port_index, ALL_PORTS);
 
     if (fGraphManager->ReleasePort(refnum, port_index) == 0) {
         if (client->GetClientControl()->fActive)
