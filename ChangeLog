@@ -33,6 +33,10 @@ David Garcia Garzon
   Jackdmp changes log
 ---------------------------
 
+2010-09-08 Stephane Letz  <letz@grame.fr>
+
+	* Sync JackAlsaDriver::alsa_driver_check_card_type with JACK1 backend.
+
 2010-08-30 Stephane Letz  <letz@grame.fr>
 
 	* Version 1.9.7 started.

@@ -682,7 +682,7 @@ int JackFFADODriver::Read()
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackFFADODriver::Read nframes = %ld", nframes);
+        jack_log("JackFFADODriver::Read warning nframes = %ld", nframes);
         
     // Has to be done before read
     JackDriver::CycleIncTime();

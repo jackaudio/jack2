@@ -872,7 +872,7 @@ int JackFreebobDriver::Read()
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
+        jack_log("JackFreebobDriver::Read warning nframes = %ld", nframes);
 
     // Has to be done before read
     JackDriver::CycleIncTime();
