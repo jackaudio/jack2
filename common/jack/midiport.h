@@ -105,6 +105,10 @@ jack_midi_max_event_size(void* port_buffer) JACK_OPTIONAL_WEAK_EXPORT;
  * messages interspersed with other messages (realtime messages are fine
  * when they occur on their own, like other messages).
  *
+ * Events must be written in order, sorted by their sample offsets. 
+ * JACK will not sort the events for you, and will refuse to store  
+ * out-of-order events. 
+ * 
  * @param port_buffer Buffer to write event to.
  * @param time Sample offset of event.
  * @param data_size Length of event's raw data in bytes.
@@ -122,6 +126,16 @@ jack_midi_event_reserve(void *port_buffer,
  * This function is simply a wrapper for @ref jack_midi_event_reserve
  * which writes the event data into the space reserved in the buffer.
  * The same restrictions on the MIDI data apply.
+ *
+ * Clients must not write more than 
+ * @a data_size bytes into this buffer.  Clients must write normalised 
+ * MIDI data to the port - no running status and no (1-byte) realtime 
+ * messages interspersed with other messages (realtime messages are fine 
+ * when they occur on their own, like other messages). 
+ * 
+ * Events must be written in order, sorted by their sample offsets. 
+ * JACK will not sort the events for you, and will refuse to store  
+ * out-of-order events.
  * 
  * @param port_buffer Buffer to write event to.
  * @param time Sample offset of event.
