@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
                                        { "no-mlock", 0, 0, 'm' },
-                                       { "name", 0, 0, 'n' },
+                                       { "name", 1, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
                                        { "no-realtime", 0, 0, 'r' }, 
