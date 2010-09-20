@@ -194,6 +194,22 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
     driver->fActionFags = ioActionFlags;
     driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
     driver->fDriverOutputData = ioData;
+    
+    // Setup threadded based log function once...
+    if (set_threaded_log_function()) {
+        
+        jack_log("set_threaded_log_function");
+        JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
+        
+        if (driver->fComputationGrain > 0) {
+            jack_log("JackCoreAudioDriver::Render : RT thread computation setup to %d percent of period", int(driver->fComputationGrain * 100));
+            driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
+        }
+        
+        // Signal waiting start function...
+        driver->fState = true;
+    }
+    
     driver->CycleTakeBeginTime();
     return driver->Process();
 }
@@ -221,33 +237,6 @@ int JackCoreAudioDriver::Write()
     return 0;
 }
 
-// Will run only once
-OSStatus JackCoreAudioDriver::MeasureCallback(AudioDeviceID inDevice,
-        const AudioTimeStamp* inNow,
-        const AudioBufferList* inInputData,
-        const AudioTimeStamp* inInputTime,
-        AudioBufferList* outOutputData,
-        const AudioTimeStamp* inOutputTime,
-        void* inClientData)
-{
-    JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
-    AudioDeviceStop(driver->fDeviceID, MeasureCallback);
-    
-    jack_log("JackCoreAudioDriver::MeasureCallback called");
-    JackMachThread::GetParams(pthread_self(), &driver->fEngineControl->fPeriod, &driver->fEngineControl->fComputation, &driver->fEngineControl->fConstraint);
-    
-    if (driver->fComputationGrain > 0) {
-        jack_log("JackCoreAudioDriver::MeasureCallback : RT thread computation setup to %d percent of period", int(driver->fComputationGrain * 100));
-        driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
-    }
-    
-    // Signal waiting start function...
-    driver->fState = true;
-    
-    // Setup threadded based log function
-    set_threaded_log_function();
-    return noErr;
-}
 
 OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
                                                     UInt32 inChannel,
@@ -1377,7 +1366,7 @@ int JackCoreAudioDriver::SetupBuffers(int inchannels)
     // Prepare buffers
     fJackInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
     fJackInputData->mNumberBuffers = inchannels;
-    for (int i = 0; i < fCaptureChannels; i++) {
+    for (int i = 0; i < inchannels; i++) {
         fJackInputData->mBuffers[i].mNumberChannels = 1;
         fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(float);
     }
@@ -1489,11 +1478,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     char playback_driver_name[256];
 
     // Keep initial state
-    fCapturing = capturing;
-    fPlaying = playing;
-    fInChannels = inchannels;
-    fOutChannels = outchannels;
-    fMonitor = monitor;
     strcpy(fCaptureUID, capture_driver_uid);
     strcpy(fPlaybackUID, playback_driver_uid);
     fCaptureLatency = capture_latency;
@@ -1682,27 +1666,10 @@ int JackCoreAudioDriver::Start()
 {
     jack_log("JackCoreAudioDriver::Start");
     JackAudioDriver::Start();
-/*
-#ifdef MAC_OS_X_VERSION_10_5
-    OSStatus err = AudioDeviceCreateIOProcID(fDeviceID, MeasureCallback, this, &fMesureCallbackID);
-#else
-    OSStatus err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
-#endif
-*/
-    OSStatus err = AudioDeviceAddIOProc(fDeviceID, MeasureCallback, this);
-    
+
+    OSStatus err = AudioOutputUnitStart(fAUHAL);
     if (err != noErr)
         return -1;
-
-    err = AudioOutputUnitStart(fAUHAL);
-    if (err != noErr)
-        return -1;
-
-    if ((err = AudioDeviceStart(fDeviceID, MeasureCallback)) != noErr) {
-        jack_error("Cannot start MeasureCallback");
-        printError(err);
-        return -1;
-    }
     
     // Waiting for Measure callback to be called (= driver has started)
     fState = false;
@@ -1724,15 +1691,6 @@ int JackCoreAudioDriver::Start()
 int JackCoreAudioDriver::Stop()
 {
     jack_log("JackCoreAudioDriver::Stop");
-    AudioDeviceStop(fDeviceID, MeasureCallback);
-/*
-#ifdef MAC_OS_X_VERSION_10_5
-    AudioDeviceDestroyIOProcID(fDeviceID, fMesureCallbackID);
-#else
-    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
-#endif
-*/
-    AudioDeviceRemoveIOProc(fDeviceID, MeasureCallback);
     return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
 }
 
@@ -1983,7 +1941,7 @@ extern "C"
         bool capture = false;
         bool playback = false;
         int chan_in = -1;   // Default: if not explicitely set, then max possible will be used...
-        int chan_out = -1;  // Default: ifà not explicitely set, then max possible will be used...
+        int chan_out = -1;  // Default: if not explicitely set, then max possible will be used...
         bool monitor = false;
         const char* capture_driver_uid = "";
         const char* playback_driver_uid = "";

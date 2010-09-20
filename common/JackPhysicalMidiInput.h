@@ -120,7 +120,7 @@ namespace Jack {
     public:
 
         JackPhysicalMidiInput(size_t buffer_size=1024);
-        ~JackPhysicalMidiInput();
+        virtual ~JackPhysicalMidiInput();
 
         /**
          * Called to process MIDI data during a period.

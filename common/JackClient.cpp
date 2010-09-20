@@ -1042,7 +1042,7 @@ int JackClient::InternalClientLoad(const char* client_name, jack_options_t optio
     if (va->load_name && (strlen(va->load_name) >= JACK_PATH_MAX)) {
         jack_error("\"%s\" is too long for a shared object name.\n"
                    "Please use %lu characters or less.",
-                   va->load_name, PATH_MAX);
+                   va->load_name, JACK_PATH_MAX);
         int my_status1 = *status | (JackFailure | JackInvalidOption);
         *status = (jack_status_t)my_status1;
         return 0;
@@ -1058,7 +1058,6 @@ int JackClient::InternalClientLoad(const char* client_name, jack_options_t optio
     }
 
     int int_ref, result = -1;
-    // UUID TO CHECK
     fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, -1, &result);
     return int_ref;
 }

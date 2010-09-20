@@ -406,7 +406,7 @@ int JackEngine::ClientCheck(const char* name, int uuid, char* name_res, int prot
     std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
 
     if (res != fReservationMap.end()) {
-	strncpy( name_res, res->second.c_str(), JACK_CLIENT_NAME_SIZE );
+        strncpy( name_res, res->second.c_str(), JACK_CLIENT_NAME_SIZE );
     } else if (ClientCheckName(name)) {
 
         *status |= JackNameNotUnique;

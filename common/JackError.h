@@ -53,10 +53,9 @@ extern "C"
 
     typedef void (* jack_log_function_t)(int level, const char *message);
 
-    void change_thread_log_function(jack_log_function_t log_function);
     void jack_log_function(int level, const char *message);
    
-    SERVER_EXPORT void set_threaded_log_function();
+    SERVER_EXPORT int set_threaded_log_function();
 
 #ifdef __cplusplus
 }

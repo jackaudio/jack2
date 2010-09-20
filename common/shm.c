@@ -512,7 +512,7 @@ jack_register_server (const char *server_name, int new_registry)
 
  unlock:
 	jack_shm_unlock_registry ();
-	return 0;
+	return res;
 }
 
 /* release server_name registration */

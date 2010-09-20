@@ -1,0 +1,13 @@
+.TH JACK_TRANSPORT "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_transport \- JACK toolkit client for transport control
+.SH SYNOPSIS
+.B jack_transport
+.SH DESCRIPTION
+.B jack_transport
+is a toolkit client for the JACK Audio Connection Kit. It provides command-line
+control over the JACK transport system. Type help at jack_transport's
+command prompt to see the available commands.
+.SH AUTHOR
+Jeremy Hall
+

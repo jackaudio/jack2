@@ -120,7 +120,7 @@ get_control_device_name (const char * device_name)
         char tmp[5];
         strncpy(tmp, strstr(device_name, "hw"), 4);
         tmp[4] = '\0';
-        //jack_log("control device %s", tmp);
+        jack_info("control device %s",tmp);
         ctl_name = strdup(tmp);
     } else {
         ctl_name = strdup(device_name);
@@ -151,21 +151,16 @@ JackAlsaDriver::alsa_driver_check_card_type (alsa_driver_t *driver)
     if ((err = snd_ctl_open (&driver->ctl_handle, ctl_name, 0)) < 0) {
         jack_error ("control open \"%s\" (%s)", ctl_name,
                     snd_strerror(err));
-        return -1;
-    }
-
-    if ((err = snd_ctl_card_info(driver->ctl_handle, card_info)) < 0) {
+    } else if ((err = snd_ctl_card_info(driver->ctl_handle, card_info)) < 0) {
         jack_error ("control hardware info \"%s\" (%s)",
                     driver->alsa_name_playback, snd_strerror (err));
         snd_ctl_close (driver->ctl_handle);
-        return -1;
     }
 
     driver->alsa_driver = strdup(snd_ctl_card_info_get_driver (card_info));
     jack_info("Using ALSA driver %s running on card %i - %s", driver->alsa_driver, snd_ctl_card_info_get_card(card_info), snd_ctl_card_info_get_longname(card_info));
 
     free(ctl_name);
-
     return alsa_driver_check_capabilities (driver);
 }
 
@@ -1371,7 +1366,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 			/* if POLLIN was the only bit set, we're OK */
 
 			*status = 0;
-            if (driver->pfd[nfds-1].revents == POLLIN) {
+            if (driver->pfd[nfds-1].revents != POLLIN) {
                 jack_error("driver->pfd[nfds-1].revents == POLLIN");
             }
 			return (driver->pfd[nfds-1].revents == POLLIN) ? 0 : -1;
@@ -1585,7 +1580,6 @@ JackAlsaDriver::alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
          
             jack_error ("ALSA: could not complete read of %"
             		PRIu32 " frames: error = %d\n", contiguous, err);
-            jack_error ("ALSA: could not complete read of %d frames: error = %d", contiguous, err);
             return -1;
         }
 
@@ -1725,7 +1719,6 @@ JackAlsaDriver::alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes
                                         offset, contiguous)) < 0) {
             jack_error ("ALSA: could not complete playback of %"
             		PRIu32 " frames: error = %d", contiguous, err);
-            jack_error ("ALSA: could not complete playback of %d frames: error = %d", contiguous, err);
             if (err != EPIPE && err != ESTRPIPE)
                 return -1;
         }
@@ -1750,11 +1743,6 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
     }
     jack_slist_free (driver->clock_sync_listeners);
     
-    if (driver->ctl_handle) {
-		snd_ctl_close (driver->ctl_handle);
-		driver->ctl_handle = 0;
-	} 
-
     if (driver->ctl_handle) {
         snd_ctl_close (driver->ctl_handle);
         driver->ctl_handle = 0;
@@ -2343,7 +2331,7 @@ int JackAlsaDriver::Read()
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackAlsaDriver::Read error nframes = %ld", nframes);
+        jack_log("JackAlsaDriver::Read warning nframes = %ld", nframes);
         
     // Has to be done before read
     JackDriver::CycleIncTime();
@@ -2631,351 +2619,351 @@ get_dither_constraint()
     return constraint_ptr;
 }
 
-    static int
-    dither_opt (char c, DitherAlgorithm* dither) 
-    {
-        switch (c) {
-            case '-':
-            case 'n':
-                *dither = None;
+static int
+dither_opt (char c, DitherAlgorithm* dither) 
+{
+    switch (c) {
+        case '-':
+        case 'n':
+            *dither = None;
+            break;
+
+        case 'r':
+            *dither = Rectangular;
+            break;
+
+        case 's':
+            *dither = Shaped;
+            break;
+
+        case 't':
+            *dither = Triangular;
+            break;
+
+        default:
+            fprintf (stderr, "ALSA driver: illegal dithering mode %c\n", c);
+            return -1;
+    }
+    return 0;
+}
+
+SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor () 
+{
+    jack_driver_desc_t * desc;
+    jack_driver_param_desc_t * params;
+    unsigned int i;
+
+    desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
+    
+    strcpy(desc->name, "alsa");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
+    strcpy(desc->desc, "Linux ALSA API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+    
+    desc->nparams = 18;
+    params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+
+    i = 0;
+    strcpy (params[i].name, "capture");
+    params[i].character = 'C';
+    params[i].type = JackDriverParamString;
+    strcpy (params[i].value.str, "none");
+    strcpy (params[i].short_desc,
+            "Provide capture ports.  Optionally set device");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "playback");
+    params[i].character = 'P';
+    params[i].type = JackDriverParamString;
+    strcpy (params[i].value.str, "none");
+    strcpy (params[i].short_desc,
+            "Provide playback ports.  Optionally set device");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "device");
+    params[i].character = 'd';
+    params[i].type = JackDriverParamString;
+    strcpy (params[i].value.str, "hw:0");
+    strcpy (params[i].short_desc, "ALSA device name");
+    strcpy (params[i].long_desc, params[i].short_desc);
+    params[i].constraint = enum_alsa_devices();
+
+    i++;
+    strcpy (params[i].name, "rate");
+    params[i].character = 'r';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.ui = 48000U;
+    strcpy (params[i].short_desc, "Sample rate");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "period");
+    params[i].character = 'p';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.ui = 1024U;
+    strcpy (params[i].short_desc, "Frames per period");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "nperiods");
+    params[i].character = 'n';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.ui = 2U;
+    strcpy (params[i].short_desc, "Number of periods of playback latency");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "hwmon");
+    params[i].character = 'H';
+    params[i].type = JackDriverParamBool;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc, "Hardware monitoring, if available");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "hwmeter");
+    params[i].character = 'M';
+    params[i].type = JackDriverParamBool;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc, "Hardware metering, if available");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "duplex");
+    params[i].character = 'D';
+    params[i].type = JackDriverParamBool;
+    params[i].value.i = 1;
+    strcpy (params[i].short_desc,
+            "Provide both capture and playback ports");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "softmode");
+    params[i].character = 's';
+    params[i].type = JackDriverParamBool;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc, "Soft-mode, no xrun handling");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "monitor");
+    params[i].character = 'm';
+    params[i].type = JackDriverParamBool;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc, "Provide monitor ports for the output");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "dither");
+    params[i].character = 'z';
+    params[i].type = JackDriverParamChar;
+    params[i].value.c = 'n';
+    strcpy (params[i].short_desc, "Dithering mode");
+    strcpy (params[i].long_desc,
+            "Dithering mode:\n"
+            "  n - none\n"
+            "  r - rectangular\n"
+            "  s - shaped\n"
+            "  t - triangular");
+    params[i].constraint = get_dither_constraint();
+
+    i++;
+    strcpy (params[i].name, "inchannels");
+    params[i].character = 'i';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc,
+            "Number of capture channels (defaults to hardware max)");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "outchannels");
+    params[i].character = 'o';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc,
+            "Number of playback channels (defaults to hardware max)");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "shorts");
+    params[i].character = 'S';
+    params[i].type = JackDriverParamBool;
+    params[i].value.i = FALSE;
+    strcpy (params[i].short_desc, "Try 16-bit samples before 32-bit");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "input-latency");
+    params[i].character = 'I';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc, "Extra input latency (frames)");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "output-latency");
+    params[i].character = 'O';
+    params[i].type = JackDriverParamUInt;
+    params[i].value.i = 0;
+    strcpy (params[i].short_desc, "Extra output latency (frames)");
+    strcpy (params[i].long_desc, params[i].short_desc);
+
+    i++;
+    strcpy (params[i].name, "midi-driver");
+    params[i].character = 'X';
+    params[i].type = JackDriverParamString;
+    strcpy (params[i].value.str, "none");
+    strcpy (params[i].short_desc, "ALSA MIDI driver name (seq|raw)");
+    strcpy (params[i].long_desc,
+            "ALSA MIDI driver:\n"
+            " none - no MIDI driver\n"
+            " seq - ALSA Sequencer driver\n"
+            " raw - ALSA RawMIDI driver\n");
+    params[i].constraint = get_midi_driver_constraint();
+
+    desc->params = params;
+    return desc;
+}
+
+SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+{
+    jack_nframes_t srate = 48000;
+    jack_nframes_t frames_per_interrupt = 1024;
+    unsigned long user_nperiods = 2;
+    const char *playback_pcm_name = "hw:0";
+    const char *capture_pcm_name = "hw:0";
+    int hw_monitoring = FALSE;
+    int hw_metering = FALSE;
+    int capture = FALSE;
+    int playback = FALSE;
+    int soft_mode = FALSE;
+    int monitor = FALSE;
+    DitherAlgorithm dither = None;
+    int user_capture_nchnls = 0;
+    int user_playback_nchnls = 0;
+    int shorts_first = FALSE;
+    jack_nframes_t systemic_input_latency = 0;
+    jack_nframes_t systemic_output_latency = 0;
+    const JSList * node;
+    const jack_driver_param_t * param;
+    const char *midi_driver = "none";
+
+    for (node = params; node; node = jack_slist_next (node)) {
+        param = (const jack_driver_param_t *) node->data;
+
+        switch (param->character) {
+
+            case 'C':
+                capture = TRUE;
+                if (strcmp (param->value.str, "none") != 0) {
+                    capture_pcm_name = strdup (param->value.str);
+                    jack_log("capture device %s", capture_pcm_name);
+                }
+                break;
+
+            case 'P':
+                playback = TRUE;
+                if (strcmp (param->value.str, "none") != 0) {
+                    playback_pcm_name = strdup (param->value.str);
+                    jack_log("playback device %s", playback_pcm_name);
+                }
+                break;
+
+            case 'D':
+                playback = TRUE;
+                capture = TRUE;
+                break;
+
+            case 'd':
+                playback_pcm_name = strdup (param->value.str);
+                capture_pcm_name = strdup (param->value.str);
+                jack_log("playback device %s", playback_pcm_name);
+                jack_log("capture device %s", capture_pcm_name);
+                break;
+
+            case 'H':
+                hw_monitoring = param->value.i;
+                break;
+
+            case 'm':
+                monitor = param->value.i;
+                break;
+
+            case 'M':
+                hw_metering = param->value.i;
                 break;
 
             case 'r':
-                *dither = Rectangular;
+                srate = param->value.ui;
+                jack_log("apparent rate = %d", srate);
+                break;
+
+            case 'p':
+                frames_per_interrupt = param->value.ui;
+                jack_log("frames per period = %d", frames_per_interrupt);
+                break;
+
+            case 'n':
+                user_nperiods = param->value.ui;
+                if (user_nperiods < 2)	/* enforce minimum value */
+                    user_nperiods = 2;
                 break;
 
             case 's':
-                *dither = Shaped;
+                soft_mode = param->value.i;
                 break;
 
-            case 't':
-                *dither = Triangular;
+            case 'z':
+                if (dither_opt (param->value.c, &dither)) {
+                    return NULL;
+                }
                 break;
 
-            default:
-                fprintf (stderr, "ALSA driver: illegal dithering mode %c\n", c);
-                return -1;
-        }
-        return 0;
-    }
+            case 'i':
+                user_capture_nchnls = param->value.ui;
+                break;
 
-    SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor () 
-    {
-        jack_driver_desc_t * desc;
-        jack_driver_param_desc_t * params;
-        unsigned int i;
+            case 'o':
+                user_playback_nchnls = param->value.ui;
+                break;
 
-        desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-        
-        strcpy(desc->name, "alsa");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Linux ALSA API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-        
-        desc->nparams = 18;
-        params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+            case 'S':
+                shorts_first = param->value.i;
+                break;
 
-        i = 0;
-        strcpy (params[i].name, "capture");
-        params[i].character = 'C';
-        params[i].type = JackDriverParamString;
-        strcpy (params[i].value.str, "none");
-        strcpy (params[i].short_desc,
-                "Provide capture ports.  Optionally set device");
-        strcpy (params[i].long_desc, params[i].short_desc);
+            case 'I':
+                systemic_input_latency = param->value.ui;
+                break;
 
-        i++;
-        strcpy (params[i].name, "playback");
-        params[i].character = 'P';
-        params[i].type = JackDriverParamString;
-        strcpy (params[i].value.str, "none");
-        strcpy (params[i].short_desc,
-                "Provide playback ports.  Optionally set device");
-        strcpy (params[i].long_desc, params[i].short_desc);
+            case 'O':
+                systemic_output_latency = param->value.ui;
+                break;
 
-        i++;
-        strcpy (params[i].name, "device");
-        params[i].character = 'd';
-        params[i].type = JackDriverParamString;
-        strcpy (params[i].value.str, "hw:0");
-        strcpy (params[i].short_desc, "ALSA device name");
-        strcpy (params[i].long_desc, params[i].short_desc);
-        params[i].constraint = enum_alsa_devices();
-
-        i++;
-        strcpy (params[i].name, "rate");
-        params[i].character = 'r';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.ui = 48000U;
-        strcpy (params[i].short_desc, "Sample rate");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "period");
-        params[i].character = 'p';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.ui = 1024U;
-        strcpy (params[i].short_desc, "Frames per period");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "nperiods");
-        params[i].character = 'n';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.ui = 2U;
-        strcpy (params[i].short_desc, "Number of periods of playback latency");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "hwmon");
-        params[i].character = 'H';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Hardware monitoring, if available");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "hwmeter");
-        params[i].character = 'M';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Hardware metering, if available");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "duplex");
-        params[i].character = 'D';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = 1;
-        strcpy (params[i].short_desc,
-                "Provide both capture and playback ports");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "softmode");
-        params[i].character = 's';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Soft-mode, no xrun handling");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "monitor");
-        params[i].character = 'm';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Provide monitor ports for the output");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "dither");
-        params[i].character = 'z';
-        params[i].type = JackDriverParamChar;
-        params[i].value.c = 'n';
-        strcpy (params[i].short_desc, "Dithering mode");
-        strcpy (params[i].long_desc,
-                "Dithering mode:\n"
-                "  n - none\n"
-                "  r - rectangular\n"
-                "  s - shaped\n"
-                "  t - triangular");
-        params[i].constraint = get_dither_constraint();
-
-        i++;
-        strcpy (params[i].name, "inchannels");
-        params[i].character = 'i';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc,
-                "Number of capture channels (defaults to hardware max)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "outchannels");
-        params[i].character = 'o';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc,
-                "Number of playback channels (defaults to hardware max)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "shorts");
-        params[i].character = 'S';
-        params[i].type = JackDriverParamBool;
-        params[i].value.i = FALSE;
-        strcpy (params[i].short_desc, "Try 16-bit samples before 32-bit");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "input-latency");
-        params[i].character = 'I';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Extra input latency (frames)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "output-latency");
-        params[i].character = 'O';
-        params[i].type = JackDriverParamUInt;
-        params[i].value.i = 0;
-        strcpy (params[i].short_desc, "Extra output latency (frames)");
-        strcpy (params[i].long_desc, params[i].short_desc);
-
-        i++;
-        strcpy (params[i].name, "midi-driver");
-        params[i].character = 'X';
-        params[i].type = JackDriverParamString;
-        strcpy (params[i].value.str, "none");
-        strcpy (params[i].short_desc, "ALSA MIDI driver name (seq|raw)");
-        strcpy (params[i].long_desc,
-                "ALSA MIDI driver:\n"
-                " none - no MIDI driver\n"
-                " seq - ALSA Sequencer driver\n"
-                " raw - ALSA RawMIDI driver\n");
-        params[i].constraint = get_midi_driver_constraint();
-
-        desc->params = params;
-        return desc;
-    }
-
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
-    {
-        jack_nframes_t srate = 48000;
-        jack_nframes_t frames_per_interrupt = 1024;
-        unsigned long user_nperiods = 2;
-        const char *playback_pcm_name = "hw:0";
-        const char *capture_pcm_name = "hw:0";
-        int hw_monitoring = FALSE;
-        int hw_metering = FALSE;
-        int capture = FALSE;
-        int playback = FALSE;
-        int soft_mode = FALSE;
-        int monitor = FALSE;
-        DitherAlgorithm dither = None;
-        int user_capture_nchnls = 0;
-        int user_playback_nchnls = 0;
-        int shorts_first = FALSE;
-        jack_nframes_t systemic_input_latency = 0;
-        jack_nframes_t systemic_output_latency = 0;
-        const JSList * node;
-        const jack_driver_param_t * param;
-        const char *midi_driver = "none";
-
-        for (node = params; node; node = jack_slist_next (node)) {
-            param = (const jack_driver_param_t *) node->data;
-
-            switch (param->character) {
-
-                case 'C':
-                    capture = TRUE;
-                    if (strcmp (param->value.str, "none") != 0) {
-                        capture_pcm_name = strdup (param->value.str);
-                        jack_log("capture device %s", capture_pcm_name);
-                    }
-                    break;
-
-                case 'P':
-                    playback = TRUE;
-                    if (strcmp (param->value.str, "none") != 0) {
-                        playback_pcm_name = strdup (param->value.str);
-                        jack_log("playback device %s", playback_pcm_name);
-                    }
-                    break;
-
-                case 'D':
-                    playback = TRUE;
-                    capture = TRUE;
-                    break;
-
-                case 'd':
-                    playback_pcm_name = strdup (param->value.str);
-                    capture_pcm_name = strdup (param->value.str);
-                    jack_log("playback device %s", playback_pcm_name);
-                    jack_log("capture device %s", capture_pcm_name);
-                    break;
-
-                case 'H':
-                    hw_monitoring = param->value.i;
-                    break;
-
-                case 'm':
-                    monitor = param->value.i;
-                    break;
-
-                case 'M':
-                    hw_metering = param->value.i;
-                    break;
-
-                case 'r':
-                    srate = param->value.ui;
-                    jack_log("apparent rate = %d", srate);
-                    break;
-
-                case 'p':
-                    frames_per_interrupt = param->value.ui;
-                    jack_log("frames per period = %d", frames_per_interrupt);
-                    break;
-
-                case 'n':
-                    user_nperiods = param->value.ui;
-                    if (user_nperiods < 2)	/* enforce minimum value */
-                        user_nperiods = 2;
-                    break;
-
-                case 's':
-                    soft_mode = param->value.i;
-                    break;
-
-                case 'z':
-                    if (dither_opt (param->value.c, &dither)) {
-                        return NULL;
-                    }
-                    break;
-
-                case 'i':
-                    user_capture_nchnls = param->value.ui;
-                    break;
-
-                case 'o':
-                    user_playback_nchnls = param->value.ui;
-                    break;
-
-                case 'S':
-                    shorts_first = param->value.i;
-                    break;
-
-                case 'I':
-                    systemic_input_latency = param->value.ui;
-                    break;
-
-                case 'O':
-                    systemic_output_latency = param->value.ui;
-                    break;
-
-                case 'X':
-                    midi_driver = strdup(param->value.str);
-                    break;
-            }
-        }
-
-        /* duplex is the default */
-        if (!capture && !playback) {
-            capture = TRUE;
-            playback = TRUE;
-        }
-
-        Jack::JackAlsaDriver* alsa_driver = new Jack::JackAlsaDriver("system", "alsa_pcm", engine, table);
-        Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(alsa_driver);
-        // Special open for ALSA driver...
-        if (alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor,
-                              user_capture_nchnls, user_playback_nchnls, shorts_first, capture_pcm_name, playback_pcm_name,
-                              systemic_input_latency, systemic_output_latency, midi_driver) == 0) {
-            return threaded_driver;
-        } else {
-            delete threaded_driver; // Delete the decorated driver
-            return NULL;
+            case 'X':
+                midi_driver = strdup(param->value.str);
+                break;
         }
     }
+
+    /* duplex is the default */
+    if (!capture && !playback) {
+        capture = TRUE;
+        playback = TRUE;
+    }
+
+    Jack::JackAlsaDriver* alsa_driver = new Jack::JackAlsaDriver("system", "alsa_pcm", engine, table);
+    Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(alsa_driver);
+    // Special open for ALSA driver...
+    if (alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor,
+                          user_capture_nchnls, user_playback_nchnls, shorts_first, capture_pcm_name, playback_pcm_name,
+                          systemic_input_latency, systemic_output_latency, midi_driver) == 0) {
+        return threaded_driver;
+    } else {
+        delete threaded_driver; // Delete the decorated driver
+        return NULL;
+    }
+}
 
 #ifdef __cplusplus
 }

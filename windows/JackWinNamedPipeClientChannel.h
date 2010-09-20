@@ -51,7 +51,7 @@ class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface,
         JackWinNamedPipeClientChannel();
         virtual ~JackWinNamedPipeClientChannel();
 
-        int Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status);
         void Close();
 
         int Start();
@@ -59,7 +59,7 @@ class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface,
 
         int ServerCheck(const char* server_name);
 
-        void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result);
+        void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result);
         void ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result);
         void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {}

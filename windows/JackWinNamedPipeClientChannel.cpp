@@ -48,7 +48,7 @@ int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
     }
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackWinNamedPipeClientChannel::Open name = %s", name);
@@ -67,7 +67,7 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     }
 
     // Check name in server
-    ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
         jack_error("Client name = %s conflits with another running client", name);
         goto error;
@@ -142,9 +142,9 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
     }
 }
 
-void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+void JackWinNamedPipeClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
 {
-    JackClientCheckRequest req(name, protocol, options);
+    JackClientCheckRequest req(name, protocol, options, uuid);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
     *status = res.fStatus;

@@ -68,17 +68,9 @@ class JackCoreAudioDriver : public JackAudioDriver
         bool fState;
         bool fHogged;
 
-        // Initial state
-        bool fCapturing;
-        bool fPlaying;
-
-        int fInChannels;
-        int fOutChannels;
-
         char fCaptureUID[256];
         char fPlaybackUID[256];
 
-        bool fMonitor;
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;
@@ -95,14 +87,6 @@ class JackCoreAudioDriver : public JackAudioDriver
                                UInt32 inBusNumber,
                                UInt32 inNumberFrames,
                                AudioBufferList *ioData);
-
-        static OSStatus MeasureCallback(AudioDeviceID inDevice,
-                                        const AudioTimeStamp* inNow,
-                                        const AudioBufferList* inInputData,
-                                        const AudioTimeStamp* inInputTime,
-                                        AudioBufferList* outOutputData,
-                                        const AudioTimeStamp* inOutputTime,
-                                        void* inClientData);
 
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
                 UInt32 inChannel,
