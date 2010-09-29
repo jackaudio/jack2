@@ -96,18 +96,18 @@ class SERVER_EXPORT JackLockedEngine
         }
     
         // Client management
-        int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status)
+        int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return fEngine.ClientCheck(name, name_res, protocol, options, status);
+            return fEngine.ClientCheck(name, uuid, name_res, protocol, options, status);
             CATCH_EXCEPTION_RETURN
         }
-        int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
+        int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return fEngine.ClientExternalOpen(name, pid, ref, shared_engine, shared_client, shared_graph_manager);
+            return fEngine.ClientExternalOpen(name, pid, uuid, ref, shared_engine, shared_client, shared_graph_manager);
             CATCH_EXCEPTION_RETURN
         }
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait)
@@ -306,7 +306,44 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.NotifyQuit();
             CATCH_EXCEPTION
         }
+
+        void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.SessionNotify(refnum, target, type, path, socket);
+            CATCH_EXCEPTION
+        }
  
+        void SessionReply(int refnum)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.SessionReply(refnum);
+            CATCH_EXCEPTION
+        }
+ 
+        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.GetUUIDForClientName(client_name, uuid_res, result);
+            CATCH_EXCEPTION
+        }
+        void GetClientNameForUUID(const char *uuid, char *name_res, int *result)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.GetClientNameForUUID(uuid, name_res, result);
+            CATCH_EXCEPTION
+        }
+        void ReserveClientName(const char *name, const char *uuid, int *result)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.ReserveClientName(name, uuid, result);
+            CATCH_EXCEPTION
+        }
 };
 
 } // end of namespace

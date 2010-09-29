@@ -37,14 +37,14 @@ class JackLibClient : public JackClient
 
     private:
 
-        JackShmReadWritePtr1<JackClientControl>	fClientControl;	/*! Shared client control */
+        JackShmReadWritePtr1<JackClientControl> fClientControl; /*! Shared client control */
 
     public:
 
         JackLibClient(JackSynchro* table);
         virtual ~JackLibClient();
 
-        int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status);
+        int Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status);
 
         int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
 

@@ -52,6 +52,12 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         JackProcessSync fSignal;
         jack_time_t fLastSwitchUsecs;
 
+        int fSessionPendingReplies;
+        JackChannelTransaction *fSessionTransaction;
+        JackSessionNotifyResult *fSessionResult;
+        std::map<int,std::string> fReservationMap;
+        int fMaxUUID;
+
         int ClientCloseAux(int refnum, JackClientInterface* client, bool wait);
         void CheckXRun(jack_time_t callback_usecs);
 
@@ -74,6 +80,9 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
         void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
+    
+        int GetNewUUID();
+        void EnsureUUID(int uuid);
         
         bool CheckClient(int refnum)
         {
@@ -89,8 +98,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         int Close();
   
         // Client management
-        int ClientCheck(const char* name, char* name_res, int protocol, int options, int* status);
-        int ClientExternalOpen(const char* name, int pid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
+        int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status);
+        int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
         int ClientInternalOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, bool wait);
 
         int ClientExternalClose(int refnum);
@@ -131,6 +140,13 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifySampleRate(jack_nframes_t sample_rate);
         void NotifyFreewheel(bool onoff);
         void NotifyQuit();
+
+        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
+        void SessionReply( int refnum );
+    
+        void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
+        void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
+        void ReserveClientName(const char *name, const char *uuid, int *result);
 };
 
 

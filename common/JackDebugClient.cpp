@@ -36,8 +36,8 @@ namespace Jack
 
 JackDebugClient::JackDebugClient(JackClient * client)
 {
-    fTotalPortNumber = 1;	// The total number of port opened and maybe closed. Historical view.
-    fOpenPortNumber = 0;	// The current number of opened port.
+    fTotalPortNumber = 1;       // The total number of port opened and maybe closed. Historical view.
+    fOpenPortNumber = 0;        // The current number of opened port.
     fIsActivated = 0;
     fIsDeactivated = 0;
     fIsClosed = 0;
@@ -78,9 +78,9 @@ JackDebugClient::~JackDebugClient()
     delete fClient;
 }
 
-int JackDebugClient::Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status)
+int JackDebugClient::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
-    int res = fClient->Open(server_name, name, options, status);
+    int res = fClient->Open(server_name, name, uuid, options, status);
     char provstr[256];
     char buffer[256];
     time_t curtime;
@@ -210,8 +210,8 @@ int JackDebugClient::PortUnRegister(jack_port_id_t port_index)
     int res = fClient->PortUnRegister(port_index);
     fOpenPortNumber--;
     int i;
-    for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
-        if (fPortList[i].idport == port_index) {		// We found the last record
+    for (i = (fTotalPortNumber - 1); i >= 0; i--) {     // We search the record into the history
+        if (fPortList[i].idport == port_index) {                // We found the last record
             if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! : '" << fClientName << "' id deregistering port '" << fPortList[i].name << "' that have already been unregistered !" << endl;
             fPortList[i].IsUnregistered++;
@@ -233,8 +233,8 @@ int JackDebugClient::PortConnect(const char* src, const char* dst)
         *fStream << "!!! ERROR !!! Trying to connect a port ( " << src << " to " << dst << ") while the client has not been activated !" << endl;
     int i;
     int res = fClient->PortConnect( src, dst);
-    for (i = (fTotalPortNumber - 1); i >= 0; i--) {	// We search the record into the history
-        if (strcmp(fPortList[i].name, src) == 0) {	// We found the last record in sources
+    for (i = (fTotalPortNumber - 1); i >= 0; i--) {     // We search the record into the history
+        if (strcmp(fPortList[i].name, src) == 0) {      // We found the last record in sources
             if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! Connecting port " << src << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected++;
@@ -293,8 +293,8 @@ int JackDebugClient::PortDisconnect(jack_port_id_t src)
         *fStream << "!!! ERROR !!! : Trying to disconnect port  " << src << " while that client has not been activated !" << endl;
     int res = fClient->PortDisconnect(src);
     int i;
-    for (i = (fTotalPortNumber - 1); i >= 0; i--) {		// We search the record into the history
-        if (fPortList[i].idport == src) {				// We found the record in sources
+    for (i = (fTotalPortNumber - 1); i >= 0; i--) {             // We search the record into the history
+        if (fPortList[i].idport == src) {                               // We found the record in sources
             if (fPortList[i].IsUnregistered != 0)
                 *fStream << "!!! ERROR !!! : Disconnecting port  " << src << " previoulsy unregistered !" << endl;
             fPortList[i].IsConnected--;

@@ -129,7 +129,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
 #ifdef __APPLE__
-    int on = 1 ;
+    int on = 1;
     if (setsockopt(fSocket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
         jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fSocket, strerror(errno));
     }
@@ -260,7 +260,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
         goto error;
     }
 
-    if (listen(fSocket, 1) < 0) {
+    if (listen(fSocket, 100) < 0) {
         jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
         goto error;
     }

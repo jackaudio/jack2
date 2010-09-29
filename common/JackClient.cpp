@@ -112,9 +112,9 @@ pthread_t JackClient::GetThreadID()
 }
 
 /*!
-	In "async" mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
-	The synchronization primitives for drivers are setup in "flush" mode that to not keep unneeded activations.
-	Drivers synchro are setup in "flush" mode if server is "async" and NOT freewheel.
+        In "async" mode, the server does not synchronize itself on the output drivers, thus it would never "consume" the activations.
+        The synchronization primitives for drivers are setup in "flush" mode that to not keep unneeded activations.
+        Drivers synchro are setup in "flush" mode if server is "async" and NOT freewheel.
 */
 void JackClient::SetupDriverSync(bool freewheel)
 {
@@ -170,7 +170,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
             case kAddClient:
                 jack_log("JackClient::kAddClient fName = %s name = %s", GetClientControl()->fName, name);
-                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0) {	// Don't call the callback for the registering client itself
+                if (fClientRegistration && strcmp(GetClientControl()->fName, name) != 0) {      // Don't call the callback for the registering client itself
                     fClientRegistration(name, 1, fClientRegistrationArg);
                 }
                 break;
@@ -272,6 +272,23 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     fInfoShutdown = NULL;
                 }
                 break;
+
+            case kSessionCallback:
+                jack_log("JackClient::kSessionCallback");
+                if (fSession) {
+                    jack_session_event_t *event = (jack_session_event_t *) malloc( sizeof(jack_session_event_t) );
+                    char uuid_buf[JACK_UUID_SIZE];
+                    event->type = (jack_session_event_type_t) value1;
+                    event->session_dir = strdup( message );
+                    event->command_line = NULL;
+                    event->flags = (jack_session_flags_t) 0;
+                    snprintf( uuid_buf, sizeof(uuid_buf), "%d", GetClientControl()->fSessionID );
+                    event->client_uuid = strdup( uuid_buf );
+                    fImmediateSessionReply = false;
+                    fSession(event, fSessionArg);
+                    res = (fImmediateSessionReply) ? 1 : 2;
+                }
+                break;
         }
     }
 
@@ -280,7 +297,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
 /*!
 \brief We need to start thread before activating in the server, otherwise the FW driver
-	   connected to the client may not be activated.
+           connected to the client may not be activated.
 */
 int JackClient::Activate()
 {
@@ -410,7 +427,7 @@ inline void JackClient::ExecuteThread()
     while (true) { 
         CycleWaitAux();
         CycleSignalAux(CallProcessCallback());  
-	}
+        }
 }
 
 inline jack_nframes_t JackClient::CycleWaitAux()
@@ -981,6 +998,19 @@ int JackClient::SetProcessThread(JackThreadCallback fun, void *arg)
     }
 }
 
+int JackClient::SetSessionCallback(JackSessionCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+        GetClientControl()->fCallback[kSessionCallback] = (callback != NULL);
+        fSessionArg = arg;
+        fSession = callback;
+        return 0;
+    }
+}
+
 //------------------
 // Internal clients
 //------------------
@@ -1027,9 +1057,8 @@ int JackClient::InternalClientLoad(const char* client_name, jack_options_t optio
         return 0;
     }
 
-    int int_ref = 0;
-    int result = -1;
-    fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, &result);
+    int int_ref, result = -1;
+    fChannel->InternalClientLoad(GetClientControl()->fRefNum, client_name, va->load_name, va->load_init, options, (int*)status, &int_ref, -1, &result);
     return int_ref;
 }
 
@@ -1039,6 +1068,71 @@ void JackClient::InternalClientUnload(int ref, jack_status_t* status)
     fChannel->InternalClientUnload(GetClientControl()->fRefNum, ref, (int*)status, &result);
 }
 
+//------------------
+// Session API
+//------------------
+
+jack_session_command_t *JackClient::SessionNotify( const char* target, jack_session_event_type_t type, const char* path )
+{
+    jack_session_command_t *res;
+    fChannel->SessionNotify( GetClientControl()->fRefNum, target, type, path, &res );
+    return res;
+}
+
+int JackClient::SessionReply( jack_session_event_t *ev )
+{
+    if (ev->command_line) {
+        strncpy( GetClientControl()->fSessionCommand, ev->command_line, sizeof(GetClientControl()->fSessionCommand) );
+    } else {
+        GetClientControl()->fSessionCommand[0] = '\0';
+    }
+
+    GetClientControl()->fSessionFlags = ev->flags;
+
+    jack_log( "JackClient::SessionReply... we are here" );
+    if (fChannel->IsChannelThread()) {
+        jack_log( "JackClient::SessionReply... in callback reply" );
+        fImmediateSessionReply = true;
+        return 0;
+    }
+
+    jack_log( "JackClient::SessionReply... out of cb" );
+
+    int res;
+    fChannel->SessionReply( GetClientControl()->fRefNum, &res);
+    return res;
+}
+
+char* JackClient::GetUUIDForClientName(const char* client_name)
+{
+    char uuid_res[JACK_UUID_SIZE];
+    int result = -1;
+    fChannel->GetUUIDForClientName( GetClientControl()->fRefNum, client_name, uuid_res, &result);
+
+    if (result)
+        return NULL;
+
+    return strdup(uuid_res);
+}
+
+char* JackClient::GetClientNameForUUID(const char* uuid)
+{
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    int result = -1;
+    fChannel->GetClientNameForUUID(GetClientControl()->fRefNum, uuid, name_res, &result);
+
+    if (result)
+        return NULL;
+
+    return strdup(name_res);
+}
+
+int JackClient::ReserveClientName(const char *name, const char* uuid)
+{
+    int result = -1;
+    fChannel->ReserveClientName( GetClientControl()->fRefNum, name, uuid, &result);
+    return result;
+}
 
 } // end of namespace
 

@@ -50,9 +50,9 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             return 0;
         }
 
-        void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+        void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
         {
-            *result = fEngine->ClientCheck(name, name_res, protocol, options, status);
+            *result = fEngine->ClientCheck(name, uuid, name_res, protocol, options, status);
         }
         void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {
@@ -112,6 +112,11 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fServer->SetFreewheel(onoff);
         }
 
+        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t **result )
+        {
+            *result = NULL;
+        }
+
         void ReleaseTimebase(int refnum, int* result)
         {
             *result = fServer->ReleaseTimebase(refnum);
@@ -132,9 +137,9 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fEngine->InternalClientHandle(client_name, status, int_ref);
         }
 
-        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+        void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
         {
-            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, status);	
+            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, uuid, status);    
         }
 
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result)

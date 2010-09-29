@@ -117,7 +117,7 @@ int JackPosixThread::StartImp(pthread_t* thread, int priority, int realtime, voi
         if ((res = pthread_attr_setinheritsched(&attributes, PTHREAD_EXPLICIT_SCHED))) {
             jack_error("Cannot request explicit scheduling for RT thread res = %d", res);
             return -1;
-    	}
+        }
     
         if ((res = pthread_attr_setschedpolicy(&attributes, JACK_SCHED_POLICY))) {
             jack_error("Cannot set RR scheduling class for RT thread res = %d", res);
@@ -268,6 +268,11 @@ int JackPosixThread::DropRealTimeImp(pthread_t thread)
 pthread_t JackPosixThread::GetThreadID()
 {
     return fThread;
+}
+
+bool JackPosixThread::IsThread()
+{
+    return pthread_self() == fThread;
 }
 
 void JackPosixThread::Terminate()

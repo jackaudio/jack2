@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackChannel__
 
 #include "types.h"
+#include "session.h"
 
 namespace Jack
 {
@@ -49,7 +50,7 @@ class JackClientChannelInterface
         {}
 
         // Open the Server/Client connection
-        virtual int Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+        virtual int Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
         {
             return 0;
         }
@@ -73,9 +74,9 @@ class JackClientChannelInterface
             return -1;
         }
 
-        virtual void ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+        virtual void ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
         {}
-        virtual void ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+        virtual void ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
         {}
         virtual void ClientOpen(const char* name, int* ref, JackEngineControl** shared_engine, JackGraphManager** shared_manager, JackClientInterface* client, int* result)
         {}
@@ -120,12 +121,31 @@ class JackClientChannelInterface
         virtual void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
         {}
 
-        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+        virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
         {}
 
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
         
+        virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
+        {}
+
+        virtual void SessionReply(int refnum, int *result)
+        {}
+
+        virtual void GetUUIDForClientName(int refnum, const char *client_name, char *uuid_res, int *result)
+        {}
+
+        virtual void GetClientNameForUUID(int refnum, const char *uuid, char *name_res, int *result)
+        {}
+
+        virtual void ReserveClientName(int refnum, const char *client_name, const char *uuid, int *result)
+        {}
+
+        virtual bool IsChannelThread()
+        { 
+            return false; 
+        }
 };
 
 }

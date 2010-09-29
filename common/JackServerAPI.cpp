@@ -53,7 +53,7 @@ using namespace Jack;
 
 jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t options, jack_status_t* status)
 {
-    jack_varargs_t va;		/* variable arguments */
+    jack_varargs_t va;          /* variable arguments */
     jack_status_t my_status;
     JackClient* client;
 
@@ -64,8 +64,8 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
 
     jack_log("jack_client_new %s", client_name);
  
-    if (status == NULL)			/* no status from caller? */
-        status = &my_status;	/* use local status word */
+    if (status == NULL)         /* no status from caller? */
+        status = &my_status;    /* use local status word */
     *status = (jack_status_t)0;
 
     /* validate parameters */
@@ -90,7 +90,7 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
         client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
     }
 
-    int res = client->Open(va.server_name, client_name, options, status);
+    int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
@@ -141,7 +141,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
         client = new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable());
     }
 
-    int res = client->Open(va.server_name, client_name, options, status);
+    int res = client->Open(va.server_name, client_name, va.session_id, options, status);
     if (res < 0) {
         delete client;
         JackServerGlobals::Destroy(); // jack server destruction
@@ -191,7 +191,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     } else {
         res = client->Close();
         delete client;
-        JackServerGlobals::Destroy();	// jack server destruction
+        JackServerGlobals::Destroy();   // jack server destruction
         jack_log("jack_client_close res = %d", res);
     }
     JackGlobals::fOpenMutex->Unlock();

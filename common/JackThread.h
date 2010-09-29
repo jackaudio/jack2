@@ -106,6 +106,7 @@ class SERVER_EXPORT JackThreadInterface
         int DropSelfRealTime();                 // Used when called from thread itself
 
         pthread_t GetThreadID();
+        bool IsThread();
 
         static int AcquireRealTimeImp(pthread_t thread, int priority);
         static int AcquireRealTimeImp(pthread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint);

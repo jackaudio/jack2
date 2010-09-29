@@ -22,6 +22,8 @@ example_programs = {
     'jack_monitor_client' : 'monitor_client.c',
     'jack_thru' : 'thru_client.c',
     'jack_cpu_load' : 'cpu_load.c',
+    'jack_simple_session_client' : 'simple_session_client.c',
+    'jack_session_notify' : 'session_notify.c',
     'jack_server_control' : 'server_control.cpp',
     }
 
