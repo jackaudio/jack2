@@ -266,7 +266,7 @@ process (jack_nframes_t nframes, void *arg)
 
     jack_position_t local_trans_pos;
 
-    uint32_t *packet_buf, *packet_bufX;
+    uint32_t *packet_buf_tx, *packet_bufX;
     uint32_t *rx_packet_ptr;
     jack_time_t packet_recv_timestamp;
 
@@ -280,9 +280,9 @@ process (jack_nframes_t nframes, void *arg)
 
 
     /* Allocate a buffer where both In and Out Buffer will fit */
-    packet_buf = alloca ((rx_bufsize > tx_bufsize) ? rx_bufsize : tx_bufsize);
+    packet_buf_tx = alloca (tx_bufsize);
 
-    jacknet_packet_header *pkthdr = (jacknet_packet_header *) packet_buf;
+    jacknet_packet_header *pkthdr_tx = (jacknet_packet_header *) packet_buf_tx;
 
     /*
      * for latency==0 we need to send out the packet before we wait on the reply.
@@ -293,38 +293,38 @@ process (jack_nframes_t nframes, void *arg)
 
     if( latency == 0 ) {
 	    /* reset packet_bufX... */
-	    packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
+	    packet_bufX = packet_buf_tx + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
 
 	    /* ---------- Send ---------- */
 	    render_jack_ports_to_payload (bitdepth, playback_ports, playback_srcs, nframes,
 			    packet_bufX, net_period, dont_htonl_floats);
 
 	    /* fill in packet hdr */
-	    pkthdr->transport_state = jack_transport_query (client, &local_trans_pos);
-	    pkthdr->transport_frame = local_trans_pos.frame;
-	    pkthdr->framecnt = framecnt;
-	    pkthdr->latency = latency;
-	    pkthdr->reply_port = reply_port;
-	    pkthdr->sample_rate = jack_get_sample_rate (client);
-	    pkthdr->period_size = nframes;
+	    pkthdr_tx->transport_state = jack_transport_query (client, &local_trans_pos);
+	    pkthdr_tx->transport_frame = local_trans_pos.frame;
+	    pkthdr_tx->framecnt = framecnt;
+	    pkthdr_tx->latency = latency;
+	    pkthdr_tx->reply_port = reply_port;
+	    pkthdr_tx->sample_rate = jack_get_sample_rate (client);
+	    pkthdr_tx->period_size = nframes;
 
 	    /* playback for us is capture on the other side */
-	    pkthdr->capture_channels_audio = playback_channels_audio;
-	    pkthdr->playback_channels_audio = capture_channels_audio;
-	    pkthdr->capture_channels_midi = playback_channels_midi;
-	    pkthdr->playback_channels_midi = capture_channels_midi;
-	    pkthdr->mtu = mtu;
+	    pkthdr_tx->capture_channels_audio = playback_channels_audio;
+	    pkthdr_tx->playback_channels_audio = capture_channels_audio;
+	    pkthdr_tx->capture_channels_midi = playback_channels_midi;
+	    pkthdr_tx->playback_channels_midi = capture_channels_midi;
+	    pkthdr_tx->mtu = mtu;
 	    if( freewheeling!= 0 )
-		    pkthdr->sync_state = (jack_nframes_t)MASTER_FREEWHEELS;
+		    pkthdr_tx->sync_state = (jack_nframes_t)MASTER_FREEWHEELS;
 	    else
-		    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
+		    pkthdr_tx->sync_state = (jack_nframes_t)deadline_goodness;
 	    //printf("goodness=%d\n", deadline_goodness );
 
-	    packet_header_hton (pkthdr);
+	    packet_header_hton (pkthdr_tx);
 	    if (cont_miss < 3*latency+5) {
 		    int r;
 		    for( r=0; r<redundancy; r++ )
-			    netjack_sendto (outsockfd, (char *) packet_buf, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
+			    netjack_sendto (outsockfd, (char *) packet_buf_tx, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
 	    }
 	    else if (cont_miss > 50+5*latency)
 	    {
@@ -340,8 +340,6 @@ process (jack_nframes_t nframes, void *arg)
      *
      */
 
-    /* reset packet_bufX... */
-    packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
 
     if( reply_port )
 	input_fd = insockfd;
@@ -374,14 +372,14 @@ process (jack_nframes_t nframes, void *arg)
      * to the JACK ports so it can be played. */
     if (size == rx_bufsize)
     {
-	packet_buf = rx_packet_ptr;
-	pkthdr = (jacknet_packet_header *) packet_buf;
-	packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
+	uint32_t *packet_buf_rx = rx_packet_ptr;
+	jacknet_packet_header *pkthdr_rx = (jacknet_packet_header *) packet_buf_rx;
+	packet_bufX = packet_buf_rx + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
 	// calculate how much time there would have been, if this packet was sent at the deadline.
 
 	int recv_time_offset = (int) (jack_get_time() - packet_recv_timestamp);
-	packet_header_ntoh (pkthdr);
-	deadline_goodness = recv_time_offset - (int)pkthdr->latency;
+	packet_header_ntoh (pkthdr_rx);
+	deadline_goodness = recv_time_offset - (int)pkthdr_rx->latency;
 	//printf( "deadline goodness = %d ---> off: %d\n", deadline_goodness, recv_time_offset );
 
         if (cont_miss)
@@ -395,7 +393,7 @@ process (jack_nframes_t nframes, void *arg)
 	state_currentframe = framecnt;
 	state_recv_packet_queue_time = recv_time_offset;
 	state_connected = 1;
-        sync_state = pkthdr->sync_state;
+        sync_state = pkthdr_rx->sync_state;
 	packet_cache_release_packet( global_packcache, framecnt - latency );
     }
     /* Second alternative : we've received something that's not
@@ -434,38 +432,38 @@ process (jack_nframes_t nframes, void *arg)
     }
     if( latency != 0 ) {
 	    /* reset packet_bufX... */
-	    packet_bufX = packet_buf + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
+	    packet_bufX = packet_buf_tx + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
 
 	    /* ---------- Send ---------- */
 	    render_jack_ports_to_payload (bitdepth, playback_ports, playback_srcs, nframes,
 			    packet_bufX, net_period, dont_htonl_floats);
 
 	    /* fill in packet hdr */
-	    pkthdr->transport_state = jack_transport_query (client, &local_trans_pos);
-	    pkthdr->transport_frame = local_trans_pos.frame;
-	    pkthdr->framecnt = framecnt;
-	    pkthdr->latency = latency;
-	    pkthdr->reply_port = reply_port;
-	    pkthdr->sample_rate = jack_get_sample_rate (client);
-	    pkthdr->period_size = nframes;
+	    pkthdr_tx->transport_state = jack_transport_query (client, &local_trans_pos);
+	    pkthdr_tx->transport_frame = local_trans_pos.frame;
+	    pkthdr_tx->framecnt = framecnt;
+	    pkthdr_tx->latency = latency;
+	    pkthdr_tx->reply_port = reply_port;
+	    pkthdr_tx->sample_rate = jack_get_sample_rate (client);
+	    pkthdr_tx->period_size = nframes;
 
 	    /* playback for us is capture on the other side */
-	    pkthdr->capture_channels_audio = playback_channels_audio;
-	    pkthdr->playback_channels_audio = capture_channels_audio;
-	    pkthdr->capture_channels_midi = playback_channels_midi;
-	    pkthdr->playback_channels_midi = capture_channels_midi;
-	    pkthdr->mtu = mtu;
+	    pkthdr_tx->capture_channels_audio = playback_channels_audio;
+	    pkthdr_tx->playback_channels_audio = capture_channels_audio;
+	    pkthdr_tx->capture_channels_midi = playback_channels_midi;
+	    pkthdr_tx->playback_channels_midi = capture_channels_midi;
+	    pkthdr_tx->mtu = mtu;
 	    if( freewheeling!= 0 )
-		    pkthdr->sync_state = (jack_nframes_t)MASTER_FREEWHEELS;
+		    pkthdr_tx->sync_state = (jack_nframes_t)MASTER_FREEWHEELS;
 	    else
-		    pkthdr->sync_state = (jack_nframes_t)deadline_goodness;
+		    pkthdr_tx->sync_state = (jack_nframes_t)deadline_goodness;
 	    //printf("goodness=%d\n", deadline_goodness );
 
-	    packet_header_hton (pkthdr);
+	    packet_header_hton (pkthdr_tx);
 	    if (cont_miss < 3*latency+5) {
 		    int r;
 		    for( r=0; r<redundancy; r++ )
-			    netjack_sendto (outsockfd, (char *) packet_buf, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
+			    netjack_sendto (outsockfd, (char *) packet_buf_tx, tx_bufsize, 0, &destaddr, sizeof (destaddr), mtu);
 	    }
 	    else if (cont_miss > 50+5*latency)
 	    {
