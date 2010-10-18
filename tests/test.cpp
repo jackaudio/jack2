@@ -169,7 +169,7 @@ void Jack_Thread_Init_Callback(void *arg)
 
 void Jack_Freewheel_Callback(int starting, void *arg)
 {
-    Log("Freewhell callback has been successfully called with value %i. (msg from callback)\n", starting);
+    Log("Freewheel callback has been successfully called with value %i. (msg from callback)\n", starting);
     FW = starting;
 }
 
@@ -633,39 +633,39 @@ int main (int argc, char *argv[])
     if (status & JackServerStarted) {
         fprintf(stderr, "JACK server started\n");
     }
-    
+
     /**
      * Internal client tests...
      *
      */
     jack_intclient_t intclient;
-    
+
     Log("trying to load the \"inprocess\" server internal client \n");
-    
+
     intclient = jack_internal_client_load (client1, "inprocess",
                                            (jack_options_t)(JackLoadName|JackLoadInit),
                                            &status, "inprocess", "");
-    
+
     if (intclient == 0 || status & JackFailure) {
         printf("!!! ERROR !!! cannot load internal client \"inprocess\" intclient %d status 0x%2.0x !\n", intclient, status);
 	} else {
-        
+
         Log("\"inprocess\" server internal client loaded\n");
-        
+
         char* internal_name = jack_get_internal_client_name(client1, intclient);
         if (strcmp(internal_name, "inprocess") == 0) {
             Log("jack_get_internal_client_name returns %s\n", internal_name);
         } else {
             printf("!!! ERROR !!! jack_get_internal_client_name returns incorrect name %s\n", internal_name);
         }
-        
+
         jack_intclient_t intclient1 = jack_internal_client_handle(client1, "inprocess", &status);
         if (intclient1 == intclient) {
             Log("jack_internal_client_handle returns correct handle\n");
         } else {
             printf("!!! ERROR !!! jack_internal_client_handle returns incorrect handle %d\n", intclient1);
         }
-        
+
         // Unload internal client
         status = jack_internal_client_unload (client1, intclient);
         if (status  == 0) {
@@ -673,7 +673,7 @@ int main (int argc, char *argv[])
         } else {
             printf("!!! ERROR !!! jack_internal_client_unload returns incorrect value 0x%2.0x\n", status);
         }
-        
+
         // Unload internal client second time
         status = jack_internal_client_unload (client1, intclient);
         if (status & JackFailure &&  status & JackNoSuchClient) {
@@ -682,8 +682,8 @@ int main (int argc, char *argv[])
             printf("!!! ERROR !!! jack_internal_client_unload returns incorrect value 0x%2.0x\n", status);
         }
     }
-    
-    
+
+
     /**
      * try to register another one with the same name...
      *
@@ -738,7 +738,7 @@ int main (int argc, char *argv[])
         printf("!!! ERROR !!! while calling jack_set_thread_init_callback()...\n");
     if (jack_set_freewheel_callback(client1, Jack_Freewheel_Callback, 0) != 0 )
         printf("\n!!! ERROR !!! while calling jack_set_freewheel_callback()...\n");
-  
+
 
     if (jack_set_process_callback(client1, process1, 0) != 0) {
         printf("Error when calling jack_set_process_callback() !\n");
@@ -754,7 +754,7 @@ int main (int argc, char *argv[])
     if (jack_set_graph_order_callback(client1, Jack_Graph_Order_Callback, 0) != 0) {
         printf("Error when calling Jack_Graph_Order_Callback() !\n");
     }
-    
+
     if (jack_set_port_rename_callback(client1, Jack_Port_Rename_Callback, 0) != 0 )
         printf("\n!!! ERROR !!! while calling jack_set_rename_callback()...\n");
 
@@ -874,7 +874,7 @@ int main (int argc, char *argv[])
     }
 
     port_callback_reg = 0;	// number of port registration received by the callback
-    
+
     /**
      * Activate the client
      *
@@ -883,31 +883,31 @@ int main (int argc, char *argv[])
         printf ("Fatal error : cannot activate client1\n");
         exit(1);
     }
-    
+
     /**
      * Test if portrename callback have been called.
      *
      */
     jack_port_set_name (output_port1, "renamed-port#");
-    jack_sleep(1 * 1000); 
+    jack_sleep(1 * 1000);
 
     if (port_rename_clbk == 0)
         printf("!!! ERROR !!! Jack_Port_Rename_Callback was not called !!.\n");
-        
-        
+
+
     /**
      * Test if portregistration callback have been called.
      *
      */
-     
-    jack_sleep(1 * 1000); 
+
+    jack_sleep(1 * 1000);
 
     if (1 == port_callback_reg) {
         Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", 1, port_callback_reg);
     } else {
         printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", 1, port_callback_reg);
     }
- 
+
     /**
      * Test if init callback initThread have been called.
      *
@@ -1162,14 +1162,14 @@ int main (int argc, char *argv[])
     }
 
     jack_sleep(1 * 1000); // To hope all port registration and reorder callback have been received...
-    
+
     // Check port registration callback
     if (j == port_callback_reg) {
         Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", j, port_callback_reg);
     } else {
         printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);
     }
-    
+
     if (reorder == (2 * j)) {
         Log("%i graph reorder callback have been received... ok\n", reorder);
     } else {
@@ -1231,9 +1231,9 @@ int main (int argc, char *argv[])
         }
         a++;
     }
-    
+
     // Check port registration callback again
-    if (j == port_callback_reg) { 
+    if (j == port_callback_reg) {
         Log("%i ports have been successfully created, and %i callback reg ports have been received... ok\n", j, port_callback_reg);
     } else {
         printf("!!! ERROR !!! %i ports have been created, and %i callback reg ports have been received !\n", j, port_callback_reg);

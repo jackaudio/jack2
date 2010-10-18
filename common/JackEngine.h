@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackMutex.h"
 #include "JackTransportEngine.h"
 #include "JackPlatformPlug.h"
+#include <map>
 
 namespace Jack
 {
@@ -41,7 +42,7 @@ class JackExternalClient;
 class SERVER_EXPORT JackEngine : public JackLockAble
 {
     friend class JackLockedEngine;
-    
+
     private:
 
         JackGraphManager* fGraphManager;
@@ -75,15 +76,15 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         void NotifyClient(int refnum, int event, int sync, const char*  message, int value1, int value2);
         void NotifyClients(int event, int sync, const char*  message,  int value1, int value2);
-    
+
         void NotifyPortRegistation(jack_port_id_t port_index, bool onoff);
         void NotifyPortConnect(jack_port_id_t src, jack_port_id_t dst, bool onoff);
         void NotifyPortRename(jack_port_id_t src, const char* old_name);
         void NotifyActivate(int refnum);
-    
+
         int GetNewUUID();
         void EnsureUUID(int uuid);
-        
+
         bool CheckClient(int refnum)
         {
             return (refnum >= 0 && refnum < CLIENT_NUM && fClientTable[refnum] != NULL);
@@ -96,7 +97,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int Open();
         int Close();
-  
+
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status);
         int ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager);
@@ -107,10 +108,10 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int ClientActivate(int refnum, bool is_real_time);
         int ClientDeactivate(int refnum);
-    
+
         int GetClientPID(const char* name);
         int GetClientRefNum(const char* name);
-    
+
         // Internal client management
         int GetInternalClientName(int int_ref, char* name_res);
         int InternalClientHandle(const char* client_name, int* status, int* int_ref);
@@ -125,7 +126,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
         int PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst);
-        
+
         int PortRename(int refnum, jack_port_id_t port, const char* name);
 
         // Graph
@@ -143,7 +144,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
         void SessionReply( int refnum );
-    
+
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
         void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
         void ReserveClientName(const char *name, const char *uuid, int *result);

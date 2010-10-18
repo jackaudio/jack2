@@ -331,12 +331,12 @@ bool JackClientPipeThread::HandleRequest()
                 JackSessionNotifyRequest req;
                 JackSessionNotifyResult res;
                 if (req.Read(fPipe) == 0) {
-                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath);
+                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe);
                 }
                 res.Write(fPipe);
                 break;
             }
-                
+
             case JackRequest::kSessionReply: {
                 jack_log("JackRequest::SessionReply");
                 JackSessionReplyRequest req;
@@ -347,7 +347,7 @@ bool JackClientPipeThread::HandleRequest()
                 }
                 break;
             }
-                
+
             case JackRequest::kGetClientByUUID: {
                 jack_log("JackRequest::GetClientNameForUUID");
                 JackGetClientNameRequest req;
@@ -358,7 +358,7 @@ bool JackClientPipeThread::HandleRequest()
                 res.Write(fPipe);
                 break;
             }
-                
+
             case JackRequest::kGetUUIDByClient: {
                 jack_log("JackRequest::GetUUIDForClientName");
                 JackGetUUIDRequest req;
@@ -370,7 +370,7 @@ bool JackClientPipeThread::HandleRequest()
                 res.Write(fPipe);
                 break;
             }
-                
+
             case JackRequest::kReserveClientName: {
                 jack_log("JackRequest::ReserveClientName");
                 JackReserveNameRequest req;
@@ -394,11 +394,11 @@ bool JackClientPipeThread::HandleRequest()
     return ret;
 }
 
-void JackClientPipeThread::ClientAdd(char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackClientPipeThread::ClientAdd(char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     jack_log("JackClientPipeThread::ClientAdd %s", name);
     fRefNum = -1;
-    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, &fRefNum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, uuid, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
 void JackClientPipeThread::ClientRemove()
