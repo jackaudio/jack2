@@ -625,13 +625,16 @@ float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  * name.  Exceeding that will cause the port registration to fail and
  * return NULL.
  *
+ * The @a port_name must be unique among all ports owned by this client.  
+ * If the name is not unique, the registration will fail.  
+ * 
  * All ports have a type, which may be any non-NULL and non-zero
  * length string, passed as an argument.  Some port types are built
  * into the JACK API, currently only JACK_DEFAULT_AUDIO_TYPE.
  *
  * @param client pointer to JACK client structure.
  * @param port_name non-empty short name for the new port (not
- * including the leading @a "client_name:").
+ * including the leading @a "client_name:"). Must be unique. 
  * @param port_type port type name.  If longer than
  * jack_port_type_size(), only that many characters are significant.
  * @param flags @ref JackPortFlags bit mask.

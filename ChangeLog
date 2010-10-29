@@ -36,6 +36,7 @@ David Garcia Garzon
 2010-10-29 Stephane Letz  <letz@grame.fr>
 
 	* Correct lsp.c code.
+	* Add note about unique port-name requirement.
 
 2010-09-08 Stephane Letz  <letz@grame.fr>
 
