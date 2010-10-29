@@ -146,7 +146,7 @@ main (int argc, char *argv[])
     if (!ports) 
         goto error;
 
-	for (i = 0; ports[i]; ++i) {
+	for (i = 0; ports && ports[i]; ++i) {
 		// skip over any that don't match ALL of the strings presented at command line
 		skip_port = 0;
 		for(k = optind; k < argc; k++){
@@ -227,6 +227,8 @@ main (int argc, char *argv[])
 	}
     
 error:
+    if (ports)
+        jack_free (ports);
 	jack_client_close (client);
 	exit (0);
 }
