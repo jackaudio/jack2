@@ -72,22 +72,22 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
     // TODO: move that in reworked JackServerGlobals::Init()
     JackMessageBuffer::Create();
+    
+     if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
+        jack_error("Cannot initialize driver");
+        goto fail_close1;
+    }
   
     if (fChannel.Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
-        goto fail_close1;
+        goto fail_close2;
     }
   
     if (fEngine->Open() < 0) {
         jack_error("Cannot open engine");
-        goto fail_close2;
-    }
-
-    if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
-        jack_error("Cannot initialize driver");
         goto fail_close3;
     }
- 
+
     if (fFreewheelDriver->Open() < 0) { // before engine open
         jack_error("Cannot open driver");
         goto fail_close4;
@@ -109,13 +109,13 @@ fail_close5:
     fFreewheelDriver->Close();
 
 fail_close4:
-    fAudioDriver->Close();
+    fEngine->Close();
 
 fail_close3:
-    fEngine->Close();
+    fChannel.Close();
  
 fail_close2:     
-    fChannel.Close();
+    fAudioDriver->Close();
 
 fail_close1:     
     JackMessageBuffer::Destroy();
