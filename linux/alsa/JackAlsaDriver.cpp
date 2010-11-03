@@ -2316,6 +2316,8 @@ int JackAlsaDriver::Read()
     jack_nframes_t nframes;
     fDelayedUsecs = 0.f;
 
+retry:
+
     nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
  
     if (wait_status < 0)
@@ -2327,7 +2329,7 @@ int JackAlsaDriver::Read()
          */
         jack_log("ALSA XRun wait_status = %d", wait_status);
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
-        return -1;
+        goto retry; /* recoverable error*/
     }
 
     if (nframes != fEngineControl->fBufferSize)

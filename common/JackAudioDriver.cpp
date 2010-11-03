@@ -215,14 +215,14 @@ int JackAudioDriver::ProcessAsync()
 {
     // Read input buffers for the current cycle
     if (Read() < 0) {   
-        jack_error("JackAudioDriver::ProcessAsync: read error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+        jack_error("JackAudioDriver::ProcessAsync: read error, stopping...");
+        return -1;   
     }
 
     // Write output buffers from the previous cycle
     if (Write() < 0) {
-        jack_error("JackAudioDriver::ProcessAsync: write error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+        jack_error("JackAudioDriver::ProcessAsync: write error, stopping...");
+        return -1;   
     }
 
     if (fIsMaster) {
@@ -244,9 +244,9 @@ output buffers computed at the *current cycle* are used.
 int JackAudioDriver::ProcessSync()
 {
     // Read input buffers for the current cycle
-    if (Read() < 0) { 
-        jack_error("JackAudioDriver::ProcessSync: read error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+    if (Read() < 0) {   
+        jack_error("JackAudioDriver::ProcessSync: read error, stopping...");
+        return -1;   
     }
 
     if (fIsMaster) {
@@ -255,10 +255,10 @@ int JackAudioDriver::ProcessSync()
         fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     }
     
-    // Write output buffers for the current cycle
-    if (Write() < 0) { 
-        jack_error("JackAudioDriver::ProcessSync: write error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+    // Write output buffers from the previous cycle
+    if (Write() < 0) {
+        jack_error("JackAudioDriver::ProcessSync: write error, stopping...");
+        return -1;   
     }
     
     // Keep end cycle time

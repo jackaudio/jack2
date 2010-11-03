@@ -33,6 +33,10 @@ David Garcia Garzon
   Jackdmp changes log
 ---------------------------
 
+2010-11-03 Stephane Letz  <letz@grame.fr>
+
+	* Improve backend error handling: fatal error returned by Read/Write now cause a Process failure (so a thread exit for blocking backends). Recoverable ones (XRuns..) are now treated internally in ALSA, FreeBob and FFADO backends.
+
 2010-10-30 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackServer::Open to avoid a race when control API is used on OSX. 

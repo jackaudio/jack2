@@ -664,6 +664,8 @@ int JackFFADODriver::Read()
     int wait_status = 0;
     fDelayedUsecs = 0.f;
 
+retry:
+
     jack_nframes_t nframes = ffado_driver_wait(driver, -1, &wait_status,
                              &fDelayedUsecs);
 
@@ -678,7 +680,7 @@ int JackFFADODriver::Read()
          */
         jack_log("FFADO XRun");
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
-        return -1;
+        goto retry; /* recoverable error*/
     }
 
     if (nframes != fEngineControl->fBufferSize)
