@@ -216,8 +216,8 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
 
 int JackCoreAudioDriver::Read()
 {
-    AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
-    return 0;
+    OSStatus err = AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
+    return (err == noErr) ? 0 : -1;
 }
 
 int JackCoreAudioDriver::Write()
