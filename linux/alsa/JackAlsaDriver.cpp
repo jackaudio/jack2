@@ -1166,7 +1166,6 @@ JackAlsaDriver::alsa_driver_restart (alsa_driver_t *driver)
 
     if (res && driver->midi)
 	(driver->midi->stop)(driver->midi);
-
     return res;
 }
 
@@ -1175,8 +1174,6 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
 {
     snd_pcm_status_t *status;
     int res;
-
-    jack_error("alsa_driver_xrun_recovery");
 
     snd_pcm_status_alloca(&status);
 
@@ -1200,7 +1197,7 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
         snd_pcm_status_get_trigger_tstamp(status, &tstamp);
         timersub(&now, &tstamp, &diff);
         *delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
-        jack_error("\n\n**** alsa_pcm: xrun of at least %.3f msecs\n\n", *delayed_usecs / 1000.0);
+        jack_error("**** alsa_pcm: xrun of at least %.3f msecs", *delayed_usecs / 1000.0);
     }
 
     if (alsa_driver_restart (driver)) {
