@@ -436,17 +436,17 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
 
 #ifdef WIN32
     if ((so_get_descriptor == NULL) && (dlerr = GetLastError()) != 0) {
-        jack_log("jack_get_descriptor : dll is not a driver, err = %ld", dlerr);
+        jack_error("jack_get_descriptor : dll is not a driver, err = %ld", dlerr);
 #else
     if ((so_get_descriptor == NULL) && (dlerr = dlerror ()) != NULL) {
-        jack_log("jack_get_descriptor err = %s", dlerr);
+        jack_error("jack_get_descriptor err = %s", dlerr);
 #endif
 
         UnloadDriverModule(dlhandle);
         free(filename);
         return NULL;
     }
-
+  
     if ((descriptor = so_get_descriptor ()) == NULL) {
         jack_error("driver from '%s' returned NULL descriptor", filename);
         UnloadDriverModule(dlhandle);
@@ -467,7 +467,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
     /* check it doesn't exist already */
     for (node = drivers; node; node = jack_slist_next (node)) {
         other_descriptor = (jack_driver_desc_t *) node->data;
-
+    
         if (strcmp(descriptor->name, other_descriptor->name) == 0) {
             jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first",
                        other_descriptor->file, filename, other_descriptor->name);
@@ -563,6 +563,8 @@ jack_drivers_load (JSList * drivers) {
         desc = jack_get_descriptor (drivers, filedata.cFileName, "driver_get_descriptor");
         if (desc) {
             driver_list = jack_slist_append (driver_list, desc);
+        } else {
+            jack_error ("jack_get_descriptor returns null for \'%s\'", filedata.cFileName);
         }
 
     } while (FindNextFile(file, &filedata));
@@ -601,7 +603,7 @@ jack_drivers_load (JSList * drivers) {
     }
 
     while ((dir_entry = readdir(dir_stream))) {
-
+    
         /* check the filename is of the right format */
         if (strncmp ("jack_", dir_entry->d_name, 5) != 0) {
             continue;
@@ -617,8 +619,11 @@ jack_drivers_load (JSList * drivers) {
         }
 
         desc = jack_get_descriptor (drivers, dir_entry->d_name, "driver_get_descriptor");
+         
         if (desc) {
             driver_list = jack_slist_append (driver_list, desc);
+        } else {
+            jack_error ("jack_get_descriptor returns null for \'%s\'", dir_entry->d_name);
         }
     }
 
@@ -687,6 +692,8 @@ jack_internals_load (JSList * internals) {
         desc = jack_get_descriptor (internals, filedata.cFileName, "jack_get_descriptor");
         if (desc) {
             driver_list = jack_slist_append (driver_list, desc);
+        } else {
+            jack_error ("jack_get_descriptor returns null for \'%s\'", filedata.cFileName);
         }
 
     } while (FindNextFile(file, &filedata));
@@ -743,6 +750,8 @@ jack_internals_load (JSList * internals) {
         desc = jack_get_descriptor (internals, dir_entry->d_name, "jack_get_descriptor");
         if (desc) {
             driver_list = jack_slist_append (driver_list, desc);
+        } else {
+            jack_error ("jack_get_descriptor returns null for \'%s\'", dir_entry->d_name);
         }
     }
 

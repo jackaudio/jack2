@@ -33,6 +33,11 @@ David Garcia Garzon
   Jackdmp changes log
 ---------------------------
 
+2010-11-05 Stephane Letz  <letz@grame.fr>
+
+	* In jackdmp.cpp, jackctl_setup_signals moved before jackctl_server_start. 
+	* Correct symbols export in backends.
+
 2010-11-03 Stephane Letz  <letz@grame.fr>
 
 	* Improve backend error handling: fatal error returned by Read/Write now cause a Process failure (so a thread exit for blocking backends). Recoverable ones (XRuns..) are now treated internally in ALSA, FreeBob and FFADO backends.
