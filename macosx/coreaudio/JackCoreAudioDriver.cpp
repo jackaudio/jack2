@@ -216,8 +216,8 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
 
 int JackCoreAudioDriver::Read()
 {
-    AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
-    return 0;
+    OSStatus err = AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
+    return (err == noErr) ? 0 : -1;
 }
 
 int JackCoreAudioDriver::Write()
@@ -1366,7 +1366,7 @@ int JackCoreAudioDriver::SetupBuffers(int inchannels)
     // Prepare buffers
     fJackInputData = (AudioBufferList*)malloc(sizeof(UInt32) + inchannels * sizeof(AudioBuffer));
     fJackInputData->mNumberBuffers = inchannels;
-    for (int i = 0; i < fCaptureChannels; i++) {
+    for (int i = 0; i < inchannels; i++) {
         fJackInputData->mBuffers[i].mNumberChannels = 1;
         fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(float);
     }
@@ -1478,11 +1478,6 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
     char playback_driver_name[256];
 
     // Keep initial state
-    fCapturing = capturing;
-    fPlaying = playing;
-    fInChannels = inchannels;
-    fOutChannels = outchannels;
-    fMonitor = monitor;
     strcpy(fCaptureUID, capture_driver_uid);
     strcpy(fPlaybackUID, playback_driver_uid);
     fCaptureLatency = capture_latency;

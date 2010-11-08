@@ -41,7 +41,7 @@ int JackExternalClient::ClientNotify(int refnum, const char* name, int notify, i
     return result;
 }
 
-int JackExternalClient::Open(const char* name, int pid, int refnum, int* shared_client)
+int JackExternalClient::Open(const char* name, int pid, int refnum, int uuid, int* shared_client)
 {
     try {
 
@@ -53,7 +53,7 @@ int JackExternalClient::Open(const char* name, int pid, int refnum, int* shared_
         // Use "placement new" to allocate object in shared memory
         JackShmMemAble* shared_mem = static_cast<JackShmMemAble*>(JackShmMem::operator new(sizeof(JackClientControl)));
         shared_mem->Init();
-        fClientControl = new(shared_mem) JackClientControl(name, pid, refnum);
+        fClientControl = new(shared_mem) JackClientControl(name, pid, refnum, uuid);
       
         if (!fClientControl) {
             jack_error("Cannot allocate client shared memory segment");

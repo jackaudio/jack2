@@ -51,7 +51,7 @@ int JackSocketClientChannel::ServerCheck(const char* server_name)
     }
 }
 
-int JackSocketClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackSocketClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackSocketClientChannel::Open name = %s", name);
@@ -62,7 +62,7 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, cha
     }
 
     // Check name in server
-    ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
         int status1 = *status;
         if (status1 & JackVersionError)
@@ -142,18 +142,18 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
     }
 }
 
-void JackSocketClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+void JackSocketClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
 {
-    JackClientCheckRequest req(name, protocol, options);
+    JackClientCheckRequest req(name, protocol, options, uuid);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
     *status = res.fStatus;
     strcpy(name_res, res.fName);
 }
 
-void JackSocketClientChannel::ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackClientOpenRequest req(name, pid);
+    JackClientOpenRequest req(name, pid, uuid);
     JackClientOpenResult res;
     ServerSyncCall(&req, &res, result);
     *shared_engine = res.fSharedEngine;
@@ -246,6 +246,64 @@ void JackSocketClientChannel::SetFreewheel(int onoff, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
+void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t ** result)
+{
+    JackSessionNotifyRequest req(refnum, path, type, target);
+    JackSessionNotifyResult  res;
+    int intresult;
+    ServerSyncCall(&req, &res, &intresult);
+
+    jack_session_command_t *session_command = (jack_session_command_t *)malloc( sizeof(jack_session_command_t) * (res.fCommandList.size()+1) );
+    int i=0;
+   
+    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
+	session_command[i].uuid = strdup( ci->fUUID );
+	session_command[i].client_name = strdup( ci->fClientName );
+	session_command[i].command = strdup( ci->fCommand );
+	session_command[i].flags = ci->fFlags;
+
+	i+=1;
+    }	
+	
+    session_command[i].uuid = NULL;
+    session_command[i].client_name = NULL;
+    session_command[i].command = NULL;
+    session_command[i].flags = (jack_session_flags_t)0;
+
+
+    *result = session_command;
+}
+
+void JackSocketClientChannel::SessionReply(int refnum, int* result)
+{
+    JackSessionReplyRequest req(refnum);
+    JackResult  res;
+    ServerSyncCall(&req, &res, result);
+}
+
+void JackSocketClientChannel::GetUUIDForClientName( int refnum, const char *client_name, char *uuid_res, int *result )
+{
+    JackGetUUIDRequest req(client_name);
+    JackUUIDResult  res;
+    ServerSyncCall(&req, &res, result);
+    strncpy( uuid_res, res.fUUID, JACK_UUID_SIZE );
+}
+
+void JackSocketClientChannel::GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result )
+{
+    JackGetClientNameRequest req(uuid);
+    JackClientNameResult  res;
+    ServerSyncCall(&req, &res, result);
+    strncpy( name_res, res.fName, JACK_CLIENT_NAME_SIZE );
+}
+
+void JackSocketClientChannel::ReserveClientName( int refnum, const char *client_name, const char *uuid, int *result )
+{
+    JackReserveNameRequest req(refnum, client_name, uuid);
+    JackResult  res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackSocketClientChannel::ReleaseTimebase(int refnum, int* result)
 {
     JackReleaseTimebaseRequest req(refnum);
@@ -277,9 +335,9 @@ void JackSocketClientChannel::InternalClientHandle(int refnum, const char* clien
     *status = res.fStatus;
 }
 
-void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+void JackSocketClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
 {
-    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options);
+    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options, uuid);
     JackInternalClientLoadResult res;
     ServerSyncCall(&req, &res, result);
     *int_ref = res.fIntRefNum;

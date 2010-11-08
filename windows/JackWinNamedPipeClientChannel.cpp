@@ -48,7 +48,7 @@ int JackWinNamedPipeClientChannel::ServerCheck(const char* server_name)
     }
 }
 
-int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
+int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* name, int uuid, char* name_res, JackClient* obj, jack_options_t options, jack_status_t* status)
 {
     int result = 0;
     jack_log("JackWinNamedPipeClientChannel::Open name = %s", name);
@@ -67,7 +67,7 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     }
 
     // Check name in server
-    ClientCheck(name, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
     if (result < 0) {
         jack_error("Client name = %s conflits with another running client", name);
         goto error;
@@ -142,18 +142,18 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
     }
 }
 
-void JackWinNamedPipeClientChannel::ClientCheck(const char* name, char* name_res, int protocol, int options, int* status, int* result)
+void JackWinNamedPipeClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
 {
-    JackClientCheckRequest req(name, protocol, options);
+    JackClientCheckRequest req(name, protocol, options, uuid);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
     *status = res.fStatus;
     strcpy(name_res, res.fName);
 }
 
-void JackWinNamedPipeClientChannel::ClientOpen(const char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackWinNamedPipeClientChannel::ClientOpen(const char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
-    JackClientOpenRequest req(name, pid);
+    JackClientOpenRequest req(name, pid, uuid);
     JackClientOpenResult res;
     ServerSyncCall(&req, &res, result);
     *shared_engine = res.fSharedEngine;
@@ -246,6 +246,16 @@ void JackWinNamedPipeClientChannel::SetFreewheel(int onoff, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
+void JackWinNamedPipeClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result)
+{
+    JackSessionNotifyRequest req(refnum, target, type, path);
+    JackResult res;
+    int intresult;
+    ServerSyncCall(&req, &res, &intresult);
+
+    *result = NULL;
+}
+
 void JackWinNamedPipeClientChannel::ReleaseTimebase(int refnum, int* result)
 {
     JackReleaseTimebaseRequest req(refnum);
@@ -277,9 +287,9 @@ void JackWinNamedPipeClientChannel::InternalClientHandle(int refnum, const char*
     *status = res.fStatus;
 }
 
-void JackWinNamedPipeClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int* result)
+void JackWinNamedPipeClientChannel::InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
 {
-    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options);
+    JackInternalClientLoadRequest req(refnum, client_name, so_name, objet_data, options, uuid);
     JackInternalClientLoadResult res;
     ServerSyncCall(&req, &res, result);
     *int_ref = res.fIntRefNum;

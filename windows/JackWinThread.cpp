@@ -235,6 +235,11 @@ pthread_t JackWinThread::GetThreadID()
     return fThread;
 }
 
+bool JackWinThread::IsThread()
+{
+    return GetCurrentThread() == fThread;
+}
+
 void JackWinThread::Terminate()
 {
     jack_log("JackWinThread::Terminate");

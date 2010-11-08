@@ -28,14 +28,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 namespace Jack
 {       
+    struct JackRequest;
+    struct JackResult;
+    
 	class JackPosixMutex;
 	class JackMachThread;
 	class JackMachSemaphore;
-
-	class JackMachServerChannel;
-	class JackMachClientChannel;
-	class JackMachServerNotifyChannel;
-	class JackMachNotifyChannel;
+    
+    class JackSocketServerChannel;
+    class JackSocketClientChannel;
+    class JackSocketServerNotifyChannel;
+    class JackSocketNotifyChannel;
+    
 	class JackNetUnixSocket;
     
 #ifdef MY_TARGET_OS_IPHONE
@@ -60,26 +64,29 @@ namespace Jack { typedef JackMachThread JackThread; }
 namespace Jack { typedef JackMachSemaphore JackSynchro; }
 #endif
 
+#include "JackSocket.h"
+namespace Jack { typedef JackClientSocket JackChannelTransaction; }
+
 /* __JackPlatformProcessSync__ */
 #include "JackProcessSync.h"
 /* Only on windows a special JackProcessSync is used. It is directly defined by including JackProcessSync.h here */
 
 #ifndef MY_TARGET_OS_IPHONE
 /* __JackPlatformServerChannel__ */ 
-#include "JackMachServerChannel.h"
-namespace Jack { typedef JackMachServerChannel JackServerChannel; }
+#include "JackSocketServerChannel.h"
+namespace Jack { typedef JackSocketServerChannel JackServerChannel; }
 
 /* __JackPlatformClientChannel__ */
-#include "JackMachClientChannel.h"
-namespace Jack { typedef JackMachClientChannel JackClientChannel; }
+#include "JackSocketClientChannel.h"
+namespace Jack { typedef JackSocketClientChannel JackClientChannel; }
 
 /* __JackPlatformServerNotifyChannel__ */
-#include "JackMachServerNotifyChannel.h"
-namespace Jack { typedef JackMachServerNotifyChannel JackServerNotifyChannel; }
+#include "JackSocketServerNotifyChannel.h"
+namespace Jack { typedef JackSocketServerNotifyChannel JackServerNotifyChannel; }
 
 /* __JackPlatformNotifyChannel__ */
-#include "JackMachNotifyChannel.h"
-namespace Jack { typedef JackMachNotifyChannel JackNotifyChannel; }
+#include "JackSocketNotifyChannel.h"
+namespace Jack { typedef JackSocketNotifyChannel JackNotifyChannel; }
 #endif
 
 /* __JackPlatformNetSocket__ */

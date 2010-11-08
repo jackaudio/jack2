@@ -108,8 +108,8 @@ extern "C"
             JackPortConnectCallback
             connect_callback, void *arg);
     EXPORT int jack_set_port_rename_callback (jack_client_t *,
-				    JackPortRenameCallback
-				    rename_callback, void *arg);
+                                    JackPortRenameCallback
+                                    rename_callback, void *arg);
     EXPORT int jack_set_graph_order_callback (jack_client_t *,
             JackGraphOrderCallback graph_callback,
             void *);
@@ -217,7 +217,7 @@ extern "C"
     EXPORT int jack_client_create_thread (jack_client_t* client,
                                           pthread_t *thread,
                                           int priority,
-                                          int realtime, 	// boolean
+                                          int realtime,         // boolean
                                           thread_routine routine,
                                           void *arg);
     EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
@@ -1686,7 +1686,7 @@ EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
 EXPORT int jack_client_create_thread(jack_client_t* client,
                                      pthread_t *thread,
                                      int priority,
-                                     int realtime,  	/* boolean */
+                                     int realtime,      /* boolean */
                                      thread_routine routine,
                                      void *arg)
 {
@@ -1766,8 +1766,8 @@ EXPORT jack_intclient_t jack_internal_client_handle(jack_client_t* ext_client, c
         return 0;
     } else {
         jack_status_t my_status;
-        if (status == NULL)		/* no status from caller? */
-            status = &my_status;	/* use local status word */
+        if (status == NULL)             /* no status from caller? */
+            status = &my_status;        /* use local status word */
         *status = (jack_status_t)0;
         return client->InternalClientHandle(client_name, status);
     }
@@ -1786,8 +1786,8 @@ EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client,
         jack_varargs_t va;
         jack_status_t my_status;
 
-        if (status == NULL)			/* no status from caller? */
-            status = &my_status;	/* use local status word */
+        if (status == NULL)                     /* no status from caller? */
+            status = &my_status;        /* use local status word */
         *status = (jack_status_t)0;
 
         /* validate parameters */
@@ -1858,4 +1858,130 @@ EXPORT void jack_free(void* ptr)
     if (ptr) {
         free(ptr);
     }
+}
+
+// session.h
+EXPORT int jack_set_session_callback(jack_client_t* ext_client, JackSessionCallback session_callback, void* arg)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_set_session_callback");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_set_session_callback ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_set_session_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->SetSessionCallback(session_callback, arg);
+    }
+}
+
+EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char *path) 
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_session_notify");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_session_notify ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_session_notify called with a NULL client");
+        return NULL;
+    } else {
+        return client->SessionNotify(target, ev_type, path);
+    }
+}
+
+EXPORT int jack_session_reply(jack_client_t *ext_client, jack_session_event_t *event)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_session_reply");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_session_reply ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_session_reply called with a NULL client");
+        return -1;
+    } else {
+        return client->SessionReply(event);
+    }
+}
+
+EXPORT void jack_session_event_free(jack_session_event_t* ev)
+{
+    if (ev) {
+        if (ev->session_dir)
+            free((void *)ev->session_dir);
+        if (ev->client_uuid)
+            free((void *)ev->client_uuid);
+        if (ev->command_line)
+            free(ev->command_line);
+        free(ev);
+    }
+}
+
+EXPORT char *jack_get_uuid_for_client_name( jack_client_t *ext_client, const char *client_name )
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_get_uuid_for_client_name");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_get_uuid_for_client_name ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_get_uuid_for_client_name called with a NULL client");
+        return NULL;
+    } else {
+        return client->GetUUIDForClientName(client_name);
+    }
+}
+
+EXPORT char *jack_get_client_name_by_uuid( jack_client_t *ext_client, const char *client_uuid )
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_get_client_name_by_uuid");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_get_uuid_for_client_name ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_get_client_name_by_uuid called with a NULL client");
+        return NULL;
+    } else {
+        return client->GetClientNameForUUID(client_uuid);
+    }
+}
+
+EXPORT int jack_reserve_client_name( jack_client_t *ext_client, const char *name, const char *uuid )
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_reserve_client_name");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_reserve_client_name ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_reserve_client_name called with a NULL client");
+        return -1;
+    } else {
+        return client->ReserveClientName(name, uuid);
+    }
+}
+
+EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
+{
+    if (!cmds)
+        return;
+
+    int i=0;
+    while(1) {
+        if (cmds[i].client_name)
+            free ((char *)cmds[i].client_name);
+        if (cmds[i].command)
+            free ((char *)cmds[i].command);
+        if (cmds[i].uuid)
+            free ((char *)cmds[i].uuid);
+        else
+            break;
+
+        i += 1;
+    }
+
+    free(cmds);
 }

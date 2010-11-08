@@ -97,7 +97,7 @@ def build(bld):
             '../posix/JackPosixThread.cpp',
             '../macosx/JackMachThread.cpp',
             '../macosx/JackMachSemaphore.cpp',
-            '../macosx/JackMachPort.cpp',
+            '../posix/JackSocket.cpp',
             '../macosx/JackMachTime.c',
             ]
         includes = ['../macosx', '../macosx/RPC', '../posix'] + includes
@@ -152,11 +152,9 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         serverlib.source += [
-            '../macosx/JackMachServerChannel.cpp',
-            '../macosx/JackMachNotifyChannel.cpp',
-            '../macosx/JackMachServerNotifyChannel.cpp',
-            '../macosx/JackMacEngineRPC.cpp',
-            '../macosx/RPC/JackRPCClientUser.c',
+            '../posix/JackSocketServerChannel.cpp',
+            '../posix/JackSocketNotifyChannel.cpp',
+            '../posix/JackSocketServerNotifyChannel.cpp',
             '../posix/JackNetUnixSocket.cpp',
             ]
 
@@ -237,9 +235,7 @@ def build(bld):
 
     if bld.env['IS_MACOSX']:
         clientlib.source += [
-            '../macosx/JackMachClientChannel.cpp',
-            '../macosx/RPC/JackRPCEngineUser.c',
-            '../macosx/JackMacLibClientRPC.cpp',
+            '../posix/JackSocketClientChannel.cpp',
             '../posix/JackPosixServerLaunch.cpp',
             ]
 

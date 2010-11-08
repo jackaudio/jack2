@@ -634,6 +634,7 @@ bool JackBoomerDriver::JackBoomerDriverInput::Init()
     return true;
 }
 
+// TODO : better error handling
 bool JackBoomerDriver::JackBoomerDriverInput::Execute()
 {
   
@@ -721,6 +722,7 @@ bool JackBoomerDriver::JackBoomerDriverOutput::Init()
     return true;
 }
 
+// TODO : better error handling
 bool JackBoomerDriver::JackBoomerDriverOutput::Execute()
 {
     memset(fDriver->fOutputBuffer, 0, fDriver->fOutputBufferSize);

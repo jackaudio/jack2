@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
                                        { "no-mlock", 0, 0, 'm' },
-                                       { "name", 0, 0, 'n' },
+                                       { "name", 1, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
                                        { "no-realtime", 0, 0, 'r' }, 
@@ -439,7 +439,9 @@ int main(int argc, char* argv[])
         goto fail_free1;
     }
 
-    // Start server
+    // Setup signals then start server
+    signals = jackctl_setup_signals(0);
+   
     if (!jackctl_server_start(server_ctl, audio_driver_ctl)) {
         fprintf(stderr, "Failed to start server\n");
         goto fail_free1;
@@ -474,7 +476,6 @@ int main(int argc, char* argv[])
     notify_server_start(server_name);
 
     // Waits for signal
-    signals = jackctl_setup_signals(0);
     jackctl_wait_signals(signals);
 
     if (!jackctl_server_stop(server_ctl))

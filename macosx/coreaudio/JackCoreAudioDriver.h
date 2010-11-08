@@ -68,17 +68,9 @@ class JackCoreAudioDriver : public JackAudioDriver
         bool fState;
         bool fHogged;
 
-        // Initial state
-        bool fCapturing;
-        bool fPlaying;
-
-        int fInChannels;
-        int fOutChannels;
-
         char fCaptureUID[256];
         char fPlaybackUID[256];
 
-        bool fMonitor;
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;

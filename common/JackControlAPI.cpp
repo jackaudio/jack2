@@ -450,21 +450,21 @@ sigset_t
 jackctl_setup_signals(
     unsigned int flags)
 {
-	if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+        if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
         jack_error("CreateEvent fails err = %ld", GetLastError());
         return 0;
     }
 
-	(void) signal(SIGINT, do_nothing_handler);
+        (void) signal(SIGINT, do_nothing_handler);
     (void) signal(SIGABRT, do_nothing_handler);
     (void) signal(SIGTERM, do_nothing_handler);
 
-	return (sigset_t)waitEvent;
+        return (sigset_t)waitEvent;
 }
 
 void jackctl_wait_signals(sigset_t signals)
 {
-	if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
+        if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
         jack_error("WaitForSingleObject fails err = %ld", GetLastError());
     }
 }
@@ -1179,7 +1179,7 @@ EXPORT bool jackctl_server_load_internal(
 {
     int status;
     if (server_ptr->engine != NULL) {
-        server_ptr->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, &status);
+        server_ptr->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, -1, &status);
         return (internal->refnum > 0);
     } else {
         return false;

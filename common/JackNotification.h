@@ -45,6 +45,7 @@ enum NotificationType {
     kRealTimeCallback = 14,
     kShutDownCallback = 15,
     kQUIT = 16,
+    kSessionCallback = 17,
     kMaxNotification
 };
 

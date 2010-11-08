@@ -152,10 +152,7 @@ class JackBoomerDriver : public JackAudioDriver
         }
 
         int SetBufferSize(jack_nframes_t buffer_size);
-        
-        bool Init();
-        bool Execute();
-
+  
 };
 
 } // end of namespace

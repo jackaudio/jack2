@@ -72,22 +72,22 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
 {
     // TODO: move that in reworked JackServerGlobals::Init()
     JackMessageBuffer::Create();
+    
+     if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
+        jack_error("Cannot initialize driver");
+        goto fail_close1;
+    }
   
     if (fChannel.Open(fEngineControl->fServerName, this) < 0) {
         jack_error("Server channel open error");
-        goto fail_close1;
+        goto fail_close2;
     }
   
     if (fEngine->Open() < 0) {
         jack_error("Cannot open engine");
-        goto fail_close2;
-    }
-
-    if ((fAudioDriver = fDriverInfo->Open(driver_desc, fEngine, GetSynchroTable(), driver_params)) == NULL) {
-        jack_error("Cannot initialize driver");
         goto fail_close3;
     }
- 
+
     if (fFreewheelDriver->Open() < 0) { // before engine open
         jack_error("Cannot open driver");
         goto fail_close4;
@@ -109,13 +109,13 @@ fail_close5:
     fFreewheelDriver->Close();
 
 fail_close4:
-    fAudioDriver->Close();
+    fEngine->Close();
 
 fail_close3:
-    fEngine->Close();
+    fChannel.Close();
  
 fail_close2:     
-    fChannel.Close();
+    fAudioDriver->Close();
 
 fail_close1:     
     JackMessageBuffer::Destroy();
@@ -136,25 +136,25 @@ int JackServer::Close()
     return 0;
 }
 
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int* status)
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient1(JackServerGlobals::fInstance, GetSynchroTable(), objet_data);
     assert(client);
-    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, status);
+    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
  }
 
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int* status)
+int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient2(JackServerGlobals::fInstance, GetSynchroTable(), parameters);
     assert(client);
-    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, status);
+    return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
 }
 
-int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int* status)
+int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int uuid, int* status)
 {
     // Clear status
     *status = 0;
-    if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name, (jack_options_t)options, (jack_status_t*)status) < 0)) {
+    if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
         delete client;
         int my_status1 = *status | JackFailure;
         *status = (jack_status_t)my_status1;

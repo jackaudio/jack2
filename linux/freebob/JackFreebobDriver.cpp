@@ -854,6 +854,8 @@ int JackFreebobDriver::Read()
     int wait_status = 0;
     fDelayedUsecs = 0.f;
 
+retry:
+
     jack_nframes_t nframes = freebob_driver_wait (driver, -1, &wait_status,
                              &fDelayedUsecs);
 
@@ -868,11 +870,11 @@ int JackFreebobDriver::Read()
          */
         jack_log("FreeBoB XRun");
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
-        return -1;
+        goto retry; /* recoverable error*/
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
+        jack_log("JackFreebobDriver::Read warning nframes = %ld", nframes);
 
     // Has to be done before read
     JackDriver::CycleIncTime();

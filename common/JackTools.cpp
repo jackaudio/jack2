@@ -20,6 +20,7 @@
 #include "JackConstants.h"
 #include "JackDriverLoader.h"
 #include "JackTools.h"
+#include "JackError.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -45,6 +46,15 @@ namespace Jack {
     void JackTools::ThrowJackNetException() 
     {
         throw JackNetException();
+    }
+    
+     int JackTools::MkDir(const char* path)
+     {
+#ifdef WIN32
+        return CreateDirectory(path, NULL) == 0;
+#else
+        return mkdir(path, 0777) != 0;
+#endif
     }
 
 #define DEFAULT_TMP_DIR "/tmp"
