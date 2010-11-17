@@ -36,6 +36,7 @@ David Garcia Garzon
 2010-11-17 Stephane Letz  <letz@grame.fr>
 
 	* ALSA backend : suspend/resume handling (jack1 r4075).
+	* Correct dummy driver.
 
 2010-11-05 Stephane Letz  <letz@grame.fr>
 
