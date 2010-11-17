@@ -33,10 +33,14 @@ David Garcia Garzon
   Jackdmp changes log
 ---------------------------
 
+2010-11-17 Stephane Letz  <letz@grame.fr>
+
+	* ALSA backend : suspend/resume handling (jack1 r4075).
+
 2010-11-05 Stephane Letz  <letz@grame.fr>
 
 	* In jackdmp.cpp, jackctl_setup_signals moved before jackctl_server_start. 
-	* Correct symbols export in backends.
+	* Correct symbols export in backends on OSX.
 
 2010-11-03 Stephane Letz  <letz@grame.fr>
 

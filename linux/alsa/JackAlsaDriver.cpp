@@ -1188,6 +1188,19 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
             jack_error("status error: %s", snd_strerror(res));
         }
     }
+    
+    if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED) { 
+        jack_error("**** alsa_pcm: pcm in suspended state, resuming it" ); 
+        if (driver->capture_handle) { 
+            if ((res = snd_pcm_prepare(driver->capture_handle)) < 0) { 
+                    jack_error("error preparing after suspend: %s", snd_strerror(res)); 
+            } 
+        } else { 
+            if ((res = snd_pcm_prepare(driver->playback_handle)) < 0) { 
+                    jack_error("error preparing after suspend: %s", snd_strerror(res)); 
+            } 
+        } 
+    } 
 
     if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
             && driver->process_count > XRUN_REPORT_DELAY) {
