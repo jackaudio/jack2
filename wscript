@@ -164,7 +164,7 @@ def configure(conf):
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
-    if Options.options.libdir:
+    if Options.options.mandir:
         conf.env['MANDIR'] = conf.env['PREFIX'] + Options.options.mandir
     else:
         conf.env['MANDIR'] = conf.env['PREFIX'] + '/share/man/man1'
