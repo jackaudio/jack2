@@ -251,18 +251,18 @@ def configure(conf):
     conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
 
     if Options.options.mixed == True:
-	env_variant2 = conf.env.copy()
-	conf.set_env_name('lib32', env_variant2)
-	env_variant2.set_variant('lib32')
-	conf.setenv('lib32')
-    	conf.env.append_unique('CXXFLAGS', '-m32')
-    	conf.env.append_unique('CCFLAGS', '-m32')
-    	conf.env.append_unique('LINKFLAGS', '-m32')
-    	if Options.options.libdir32:
-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
-    	else:
-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
-	conf.write_config_header('config.h')
+        env_variant2 = conf.env.copy()
+        conf.set_env_name('lib32', env_variant2)
+        env_variant2.set_variant('lib32')
+        conf.setenv('lib32')
+        conf.env.append_unique('CXXFLAGS', '-m32')
+        conf.env.append_unique('CCFLAGS', '-m32')
+        conf.env.append_unique('LINKFLAGS', '-m32')
+        if Options.options.libdir32:
+            conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
+        else:
+            conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+        conf.write_config_header('config.h')
 
 def build(bld):
     print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )
