@@ -108,8 +108,8 @@ def configure(conf):
     #   conf.check_tool('compiler_cxx')
     #   conf.check_tool('compiler_cc')
  
-    conf.env.append_unique('CXXFLAGS', '-O3 -Wall')
-    conf.env.append_unique('CCFLAGS', '-O3 -Wall')
+    conf.env.append_unique('CXXFLAGS', '-Wall')
+    conf.env.append_unique('CCFLAGS', '-Wall')
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
