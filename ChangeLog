@@ -33,6 +33,10 @@ David Garcia Garzon
   Jackdmp changes log
 ---------------------------
 
+2011-01-11 Stephane Letz  <letz@grame.fr>
+
+	* Adrian Knoth jack_lsp patch.
+
 2010-11-17 Stephane Letz  <letz@grame.fr>
 
 	* ALSA backend : suspend/resume handling (jack1 r4075).
