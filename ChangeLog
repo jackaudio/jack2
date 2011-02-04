@@ -28,10 +28,15 @@ Arnold Krille
 Jan Engelhardt
 Adrian Knoth
 David Garcia Garzon
+Valerio Pilo
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2011-02-03 Stephane Letz  <letz@grame.fr>
+
+	* Valerio Pilo CAS for ARMv7 patch.
 
 2011-01-11 Stephane Letz  <letz@grame.fr>
 
