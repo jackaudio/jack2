@@ -71,54 +71,13 @@ static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* ad
 
 
 
-#if defined(__thumb__)
-/*
- * This Compare And Swap code is based off the version found
- * in MutekH, http://www.mutekh.org/trac/mutekh
- *
- * Copyright Alexandre Becoulet <alexandre.becoulet@lip6.fr> (c) 2006
- */
+
+#if !defined(__i386__) && !defined(__x86_64__)  && !defined(__PPC__)
+
 
 static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
 {
-  UInt32 tmp, loaded;
-  UInt32 thumb_tmp;
-
-  asm volatile(
-    ".align 2                                  \n\t"
-    "mov  %[adr], pc                           \n\t"
-    "add  %[adr], %[adr], #4                   \n\t"
-    "bx   %[adr]                               \n\t"
-    "nop                                       \n\t"
-    ".arm                                      \n\t"
-    "1:                                        \n\t"
-    "ldrex   %[loaded], [%[atomic]]            \n\t"
-    "cmp     %[loaded], %[value]               \n\t"
-    "bne     2f                                \n\t"
-    "strex   %[tmp], %[newvalue], [%[atomic]]  \n\t"
-    "tst     %[tmp], #1                        \n\t"
-    "bne     1b                                \n\t"
-    "2:                                        \n\t"
-    "add  %[adr], pc, #1                       \n\t"
-    "bx   %[adr]                               \n\t"
-    : [tmp] "=&r" (tmp), [loaded] "=&r" (loaded), "=m" (*(volatile UInt32*)addr)
-    , [adr] "=&l" (thumb_tmp)
-    : [value] "r" (value), [newvalue] "r" (newvalue), [atomic] "r" (addr)
-    );
-
-  return loaded == value;
-}
-
-#endif
-
-
-
-#if !defined(__i386__) && !defined(__x86_64__)  && !defined(__PPC__) && !defined(__thumb__)
-#warning using builtin gcc (version > 4.1) atomic
-
-static inline char CAS(volatile UInt32 value, UInt32 newvalue, volatile void* addr)
-{
-    return __sync_bool_compare_and_swap (&addr, value, newvalue);
+    return __sync_bool_compare_and_swap ((UInt32*)addr, value, newvalue);
 }
 #endif
 

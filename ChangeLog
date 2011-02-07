@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-02-07 Stephane Letz  <letz@grame.fr>
+
+	* Valerio Pilo second CAS for ARMv7 patch.
+
 2011-02-03 Stephane Letz  <letz@grame.fr>
 
 	* Valerio Pilo CAS for ARMv7 patch.
