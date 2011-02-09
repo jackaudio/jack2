@@ -72,7 +72,7 @@ main (int argc, char *argv[])
 	char* aliases[2];
 	char *server_name = NULL;
 	jack_port_t *port;
-	
+
 	struct option long_options[] = {
 	    { "server", 1, 0, 's' },
 		{ "aliases", 0, 0, 'A' },
@@ -152,7 +152,7 @@ main (int argc, char *argv[])
 	}
 
 	ports = jack_get_ports (client, NULL, NULL, 0);
-    if (!ports) 
+    if (!ports)
         goto error;
 
 	for (i = 0; ports && ports[i]; ++i) {
@@ -177,14 +177,14 @@ main (int argc, char *argv[])
 				printf ("   %s\n", aliases[i]);
 			}
 		}
-				
+
 		if (show_con) {
 			if ((connections = jack_port_get_all_connections (client, jack_port_by_name(client, ports[i]))) != 0) {
 				for (j = 0; connections[j]; j++) {
 					printf ("   %s\n", connections[j]);
 				}
 				free (connections);
-			} 
+			}
 		}
 		if (show_port_latency) {
 			if (port) {
@@ -217,12 +217,7 @@ main (int argc, char *argv[])
 				if (flags & JackPortIsTerminal) {
 					fputs ("terminal,", stdout);
 				}
-                
-                if (flags & JackPortIsActive) {
-                    fputs ("active,", stdout);
-                } else {
-                    fputs ("non-active,", stdout);
-                }
+
 				putc ('\n', stdout);
 			}
 		}
@@ -234,7 +229,7 @@ main (int argc, char *argv[])
 			}
 		}
 	}
-    
+
 error:
     if (ports)
         jack_free (ports);

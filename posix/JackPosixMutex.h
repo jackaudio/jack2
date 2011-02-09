@@ -33,47 +33,47 @@ namespace Jack
 \brief Mutex abstraction.
 */
 
-    
+
 class JackBasePosixMutex
 {
-    
+
     protected:
-        
+
         pthread_mutex_t fMutex;
-        
+
     public:
-        
+
         JackBasePosixMutex()
         {
-            pthread_mutex_init(&fMutex, NULL);        
+            pthread_mutex_init(&fMutex, NULL);
         }
-        
+
         virtual ~JackBasePosixMutex()
         {
             pthread_mutex_destroy(&fMutex);
         }
-        
+
         void Lock()
         {
             int res = pthread_mutex_lock(&fMutex);
             if (res != 0)
-                jack_error("JackBasePosixMutex::Lock res = %d", res);
+                jack_log("JackBasePosixMutex::Lock res = %d", res);
         }
-        
+
         bool Trylock()
         {
             return (pthread_mutex_trylock(&fMutex) == 0);
         }
-        
+
         void Unlock()
         {
             int res = pthread_mutex_unlock(&fMutex);
             if (res != 0)
-                jack_error("JackBasePosixMutex::Unlock res = %d", res);
+                jack_log("JackBasePosixMutex::Unlock res = %d", res);
         }
-    
+
 };
-    
+
 class JackPosixMutex
 {
 
@@ -97,7 +97,7 @@ class JackPosixMutex
             res = pthread_mutexattr_destroy(&mutex_attr);
             assert(res == 0);
         }
-        
+
         virtual ~JackPosixMutex()
         {
             pthread_mutex_destroy(&fMutex);
@@ -107,7 +107,7 @@ class JackPosixMutex
         {
             int res = pthread_mutex_lock(&fMutex);
             if (res != 0)
-                jack_error("JackPosixMutex::Lock res = %d", res);
+                jack_log("JackPosixMutex::Lock res = %d", res);
             return (res == 0);
         }
 
@@ -120,7 +120,7 @@ class JackPosixMutex
         {
             int res = pthread_mutex_unlock(&fMutex);
             if (res != 0)
-                jack_error("JackPosixMutex::Unlock res = %d", res);
+                jack_log("JackPosixMutex::Unlock res = %d", res);
             return (res == 0);
         }
 

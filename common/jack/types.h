@@ -214,7 +214,7 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown, 
+ * whenever jackd is shutdown. Note that after server shutdown,
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()
  * to release client ressources. Warning: jack_client_close() cannot be
@@ -295,14 +295,7 @@ enum JackPortFlags {
      * their ports.
      */
     JackPortIsTerminal = 0x10,
-    
-    /**
-     * JackPortIsActive means the port has been registered and the 
-     * client is "active", that is jack_activate has been called
-     * 
-     * JackPortIsActive is on between jack_activate and jack_deactivate.
-     */
-    JackPortIsActive = 0x20
+
 };
 
 /**
@@ -432,12 +425,12 @@ enum JackStatus {
      * Client's protocol version does not match
      */
     JackVersionError = 0x400,
-    
+
     /**
      * Backend error
      */
     JackBackendError = 0x800,
-    
+
     /**
      * Client zombified failure
      */
@@ -476,7 +469,7 @@ typedef enum {
     JackBBTFrameOffset =      0x40,     /**< Frame offset of BBT information */
     JackAudioVideoRatio =     0x80, /**< audio frames per video frame */
     JackVideoFrameOffset =   0x100  /**< frame offset of first video frame */
-    
+
 } jack_position_bits_t;
 
 /** all valid position bits */
@@ -668,13 +661,13 @@ typedef struct {
 
 /**
  * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown, 
+ * whenever jackd is shutdown. Note that after server shutdown,
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()
  * to release client ressources. Warning: jack_client_close() cannot be
  * safely used inside the shutdown callback and has to be called outside of
  * the callback context.
- 
+
  * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
  * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
  * @param arg pointer to a client supplied structure

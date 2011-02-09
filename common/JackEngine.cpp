@@ -708,14 +708,6 @@ int JackEngine::ClientActivate(int refnum, bool is_real_time)
         fGraphManager->GetInputPorts(refnum, input_ports);
         fGraphManager->GetOutputPorts(refnum, output_ports);
 
-        // First add port state to JackPortIsActive
-        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
-            fGraphManager->ActivatePort(input_ports[i]);
-        }
-        for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
-            fGraphManager->ActivatePort(output_ports[i]);
-        }
-
         // Notify client
         NotifyActivate(refnum);
 
@@ -745,11 +737,9 @@ int JackEngine::ClientDeactivate(int refnum)
     // First disconnect all ports and remove their JackPortIsActive state
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
         PortDisconnect(refnum, input_ports[i], ALL_PORTS);
-        fGraphManager->DeactivatePort(input_ports[i]);
     }
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (output_ports[i] != EMPTY); i++) {
         PortDisconnect(refnum, output_ports[i], ALL_PORTS);
-        fGraphManager->DeactivatePort(output_ports[i]);
     }
 
     // Then issue port registration notification

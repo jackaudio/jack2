@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -37,7 +37,7 @@ static void AssertBufferSize(jack_nframes_t buffer_size)
         assert(buffer_size <= BUFFER_SIZE_MAX);
     }
 }
-  
+
 void JackGraphManager::AssertPort(jack_port_id_t port_index)
 {
     if (port_index >= fPortMax) {
@@ -45,7 +45,7 @@ void JackGraphManager::AssertPort(jack_port_id_t port_index)
         assert(port_index < fPortMax);
     }
 }
-    
+
 JackGraphManager* JackGraphManager::Allocate(int port_max)
 {
     // Using "Placement" new
@@ -59,18 +59,18 @@ void JackGraphManager::Destroy(JackGraphManager* manager)
     manager->~JackGraphManager();
     JackShmMem::operator delete(manager);
 }
-    
-JackGraphManager::JackGraphManager(int port_max) 
+
+JackGraphManager::JackGraphManager(int port_max)
 {
     assert(port_max <= PORT_NUM_MAX);
-    
+
     for (int i = 0; i < port_max; i++) {
         fPortArray[i].Release();
     }
-            
+
     fPortMax = port_max;
 }
-        
+
 JackPort* JackGraphManager::GetPort(jack_port_id_t port_index)
 {
     AssertPort(port_index);
@@ -176,14 +176,14 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     jack_int_t len = manager->Connections(port_index);
 
     // No connections : return a zero-filled buffer
-    if (len == 0) { 
+    if (len == 0) {
         port->ClearBuffer(buffer_size);
         return port->GetBuffer();
-        
+
     // One connection
-    } else if (len == 1) {	 
+    } else if (len == 1) {
         jack_port_id_t src_index = manager->GetPort(port_index, 0);
-        
+
         // Ports in same client : copy the buffer
         if (GetPort(src_index)->GetRefNum() == port->GetRefNum()) {
             void* buffers[1];
@@ -194,10 +194,10 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
         } else {
             return GetBuffer(src_index, buffer_size);
         }
-        
+
     // Multiple connections : mix all buffers
-    } else {  
-    
+    } else {
+
         const jack_int_t* connections = manager->GetConnections(port_index);
         void* buffers[CONNECTION_NUM_FOR_PORT];
         jack_port_id_t src_index;
@@ -220,10 +220,10 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
     JackPort* port = GetPort(port_index);
 
     /**
-    jackd.h 
+    jackd.h
         * If @ref JackPortCanMonitor is set for this @a port, turn input
         * monitoring on or off. Otherwise, do nothing.
-     
+
      if (!(fFlags & JackPortCanMonitor))
     	return -1;
     */
@@ -376,18 +376,6 @@ int JackGraphManager::ReleasePort(int refnum, jack_port_id_t port_index)
     return res;
 }
 
-void JackGraphManager::ActivatePort(jack_port_id_t port_index)
-{
-    JackPort* port = GetPort(port_index);
-    port->fFlags = (JackPortFlags)(port->fFlags | JackPortIsActive);
-}
-
-void JackGraphManager::DeactivatePort(jack_port_id_t port_index)
-{
-    JackPort* port = GetPort(port_index);
-    port->fFlags = (JackPortFlags)(port->fFlags & ~JackPortIsActive);
-}
-
 void JackGraphManager::GetInputPorts(int refnum, jack_int_t* res)
 {
     JackConnectionManager* manager = WriteNextStateStart();
@@ -430,7 +418,7 @@ void JackGraphManager::RemoveAllPorts(int refnum)
             jack_error("JackGraphManager::RemoveAllPorts failure ref = %ld port_index = %ld", refnum, port_index);
             assert(true);
             break;
-        } 
+        }
     }
 
     WriteNextStateStop();
@@ -717,7 +705,7 @@ void JackGraphManager::GetConnectionsAux(JackConnectionManager* manager, const c
     const jack_int_t* connections = manager->GetConnections(port_index);
     jack_int_t index;
     int i;
-    
+
     // Cleanup connection array
     memset(res, 0, sizeof(char*) * CONNECTION_NUM_FOR_PORT);
 
@@ -740,7 +728,7 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
 {
     const char** res = (const char**)malloc(sizeof(char*) * CONNECTION_NUM_FOR_PORT);
     UInt16 cur_index, next_index;
-    
+
     if (!res)
         return NULL;
 
@@ -763,7 +751,7 @@ void JackGraphManager::GetPortsAux(const char** matching_ports, const char* port
 {
     int match_cnt = 0;
     regex_t port_regex, type_regex;
-  
+
     if (port_name_pattern && port_name_pattern[0]) {
         regcomp(&port_regex, port_name_pattern, REG_EXTENDED | REG_NOSUB);
     }
@@ -823,15 +811,15 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
 {
     const char** res = (const char**)malloc(sizeof(char*) * fPortMax);
     UInt16 cur_index, next_index;
-    
+
     if (!res)
         return NULL;
- 
+
     do {
         cur_index = GetCurrentIndex();
         GetPortsAux(res, port_name_pattern, type_name_pattern, flags);
         next_index = GetCurrentIndex();
-    } while (cur_index != next_index);  // Until a coherent state has been read 
+    } while (cur_index != next_index);  // Until a coherent state has been read
 
     if (res[0]) {    // at least one port
         return res;
