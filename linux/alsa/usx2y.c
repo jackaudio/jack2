@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 Paul Davis 
+    Copyright (C) 2001 Paul Davis
     Copyright (C) 2005 Karsten Wiese, Rui Nuno Capela
 
     This program is free software; you can redistribute it and/or modify
@@ -33,14 +33,14 @@
 int dbg_offset;
 char dbg_buffer[8096];
 #endif
-static 
+static
 int usx2y_set_input_monitor_mask (jack_hardware_t *hw, unsigned long mask)
 {
 	return -1;
 }
 
 static
-int usx2y_change_sample_clock (jack_hardware_t *hw, SampleClockMode mode) 
+int usx2y_change_sample_clock (jack_hardware_t *hw, SampleClockMode mode)
 {
 	return -1;
 }
@@ -52,7 +52,7 @@ usx2y_release (jack_hardware_t *hw)
 
 	if (h == 0)
 		return;
-        
+
 	if (h->hwdep_handle)
 		snd_hwdep_close(h->hwdep_handle);
 
@@ -622,7 +622,7 @@ usx2y_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 					offset, nframes_)) < 0) {
 		jack_error ("ALSA/USX2Y: could not complete playback of %"
 			    PRIu32 " frames: error = %d", nframes_, err);
-		if (err != EPIPE && err != ESTRPIPE)
+		if (err != -EPIPE && err != -ESTRPIPE)
 			return -1;
 	}
 

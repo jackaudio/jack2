@@ -38,9 +38,10 @@ struct SERVER_EXPORT JackServerGlobals
 {
     static JackServer* fInstance;
     static unsigned int fUserCount;
+    static int fRTNotificationSocket;  // For debugging purpose
     static bool (* on_device_acquire)(const char * device_name);
     static void (* on_device_release)(const char * device_name);
- 
+
     JackServerGlobals();
     ~JackServerGlobals();
 

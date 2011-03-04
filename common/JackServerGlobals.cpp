@@ -28,8 +28,10 @@ static char* server_name = NULL;
 namespace Jack
 {
 
-JackServer* JackServerGlobals::fInstance; 
+JackServer* JackServerGlobals::fInstance;
 unsigned int JackServerGlobals::fUserCount;
+int JackServerGlobals::fRTNotificationSocket;
+
 bool (* JackServerGlobals::on_device_acquire)(const char * device_name) = NULL;
 void (* JackServerGlobals::on_device_release)(const char * device_name) = NULL;
 
@@ -95,7 +97,7 @@ bool JackServerGlobals::Init()
     int argc = 0;
     char* argv[32];
     jack_timer_type_t clock_source = JACK_TIMER_SYSTEM_CLOCK;
-    
+
     // First user starts the server
     if (fUserCount++ == 0) {
 
@@ -158,7 +160,7 @@ bool JackServerGlobals::Init()
                 (opt = getopt_long(argc, argv, options, long_options, &option_index)) != EOF) {
 
             switch (opt) {
-            
+
                 case 'c':
                     if (tolower (optarg[0]) == 'h') {
                         clock_source = JACK_TIMER_HPET;
@@ -168,7 +170,7 @@ bool JackServerGlobals::Init()
                         clock_source = JACK_TIMER_SYSTEM_CLOCK;
                     } else {
                         jack_error("unknown option character %c", optopt);
-                    }                
+                    }
                     break;
 
                 case 'd':

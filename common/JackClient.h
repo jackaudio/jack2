@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -94,14 +94,14 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         std::list<jack_port_id_t> fPortList;
 
         bool fImmediateSessionReply;
-  
+
         int StartThread();
         void SetupDriverSync(bool freewheel);
         bool IsActive();
 
         void CallSyncCallback();
         void CallTimebaseCallback();
-   
+
         virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value);
 
         inline void DummyCycle();
@@ -116,7 +116,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         inline void CallSyncCallbackAux();
         inline void CallTimebaseCallbackAux();
         inline int ActivateAux();
-   
+
     public:
 
         JackClient();
@@ -193,9 +193,9 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // Session api
         virtual jack_session_command_t *SessionNotify(const char *target, jack_session_event_type_t type, const char *path);
         virtual int SessionReply(jack_session_event_t *ev);
-char* GetUUIDForClientName(const char* client_name);
-char* GetClientNameForUUID(const char* uuid);
-int ReserveClientName(const char *name, const char* uuid);
+        char* GetUUIDForClientName(const char* client_name);
+        char* GetClientNameForUUID(const char* uuid);
+        int ReserveClientName(const char *name, const char* uuid);
 
         // JackRunnableInterface interface
         bool Init();

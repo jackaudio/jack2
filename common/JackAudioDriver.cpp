@@ -188,13 +188,13 @@ int JackAudioDriver::ProcessNull()
 {
     // Keep begin cycle time
     JackDriver::CycleTakeBeginTime();
-    
+
     if (fEngineControl->fSyncMode) {
         ProcessGraphSync();
     } else {
         ProcessGraphAsync();
     }
-            
+
     // Keep end cycle time
     JackDriver::CycleTakeEndTime();
     WaitUntilNextCycle();
@@ -214,23 +214,24 @@ synchronize to the end of client graph execution.
 int JackAudioDriver::ProcessAsync()
 {
     // Read input buffers for the current cycle
-    if (Read() < 0) {   
+    if (Read() < 0) {
         jack_error("JackAudioDriver::ProcessAsync: read error, stopping...");
-        return -1;   
+        return -1;
     }
 
     // Write output buffers from the previous cycle
     if (Write() < 0) {
         jack_error("JackAudioDriver::ProcessAsync: write error, stopping...");
-        return -1;   
+        return -1;
     }
 
+    // Process graph
     if (fIsMaster) {
         ProcessGraphAsync();
     } else {
         fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     }
-    
+
     // Keep end cycle time
     JackDriver::CycleTakeEndTime();
     return 0;
@@ -238,29 +239,38 @@ int JackAudioDriver::ProcessAsync()
 
 /*
 The driver SYNC mode: the server does synchronize to the end of client graph execution,
-output buffers computed at the *current cycle* are used.
+if graph process succeed, output buffers computed at the *current cycle* are used.
 */
 
 int JackAudioDriver::ProcessSync()
 {
     // Read input buffers for the current cycle
-    if (Read() < 0) {   
+    if (Read() < 0) {
         jack_error("JackAudioDriver::ProcessSync: read error, stopping...");
-        return -1;   
+        return -1;
     }
 
+    // Process graph
     if (fIsMaster) {
-        ProcessGraphSync();
+        if (ProcessGraphSync() < 0) {
+            jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
+            goto end;
+        }
     } else {
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
+        if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+            jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
+            goto end;
+        }
     }
-    
+
     // Write output buffers from the current cycle
     if (Write() < 0) {
         jack_error("JackAudioDriver::ProcessSync: write error, stopping...");
-        return -1;   
+        return -1;
     }
-    
+
+end:
+
     // Keep end cycle time
     JackDriver::CycleTakeEndTime();
     return 0;
@@ -269,25 +279,34 @@ int JackAudioDriver::ProcessSync()
 void JackAudioDriver::ProcessGraphAsync()
 {
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
-    if (!fEngine->Process(fBeginDateUst, fEndDateUst)) 
+    if (!fEngine->Process(fBeginDateUst, fEndDateUst))
         jack_error("JackAudioDriver::ProcessGraphAsync: Process error");
     fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     if (ProcessSlaves() < 0)
         jack_error("JackAudioDriver::ProcessGraphAsync: ProcessSlaves error");
 }
 
-void JackAudioDriver::ProcessGraphSync()
+int JackAudioDriver::ProcessGraphSync()
 {
+    int res = 0;
+
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
-    if (fEngine->Process(fBeginDateUst, fEndDateUst)) { 
+    if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
         fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
-        if (ProcessSlaves() < 0)
+        if (ProcessSlaves() < 0) {
             jack_error("JackAudioDriver::ProcessGraphSync: ProcessSlaves error, engine may now behave abnormally!!");
-        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0)
+            res = -1;
+        }
+        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
             jack_error("JackAudioDriver::ProcessGraphSync: SuspendRefNum error, engine may now behave abnormally!!");
+            res = -1;
+        }
     } else { // Graph not finished: do not activate it
         jack_error("JackAudioDriver::ProcessGraphSync: Process error");
+        res = -1;
     }
+
+    return res;
 }
 
 void JackAudioDriver::WaitUntilNextCycle()

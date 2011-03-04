@@ -36,12 +36,12 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
     protected:
 
         void ProcessGraphAsync();
-        void ProcessGraphSync();
+        int ProcessGraphSync();
         void WaitUntilNextCycle();
 
         virtual int ProcessAsync();
         virtual int ProcessSync();
-  
+
         int fCaptureChannels;
         int fPlaybackChannels;
 
@@ -73,7 +73,7 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
                         const char* playback_driver_name,
                         jack_nframes_t capture_latency,
                         jack_nframes_t playback_latency);
-                        
+
         virtual int Open(bool capturing,
                         bool playing,
                         int inchannels,
@@ -83,13 +83,13 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
                         const char* playback_driver_name,
                         jack_nframes_t capture_latency,
                         jack_nframes_t playback_latency);
-                  
+
         virtual int Process();
         virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();
-        
+
         virtual int Write();
 
         virtual int SetBufferSize(jack_nframes_t buffer_size);
