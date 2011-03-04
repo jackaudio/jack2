@@ -245,7 +245,7 @@ int JackGraphManager::RequestMonitor(jack_port_id_t port_index, bool onoff) // C
 // Client
 jack_nframes_t JackGraphManager::ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count)
 {
-    const jack_int_t* connections = manager->GetConnections(port_index);
+    const jack_int_t* connections = ReadCurrentState()->GetConnections(port_index);
     jack_nframes_t max_latency = 0;
     jack_port_id_t dst_index;
 
@@ -294,6 +294,46 @@ int JackGraphManager::ComputeTotalLatencies()
             ComputeTotalLatency(port_index);
     }
     return 0;
+}
+
+void JackGraphManager::RecalculateLatencyAux(jack_port_id_t port_index, jack_latency_callback_mode_t mode)
+{
+    const jack_int_t* connections = ReadCurrentState()->GetConnections(port_index);
+    JackPort* port = GetPort(port_index);
+    jack_latency_range_t latency = { UINT32_MAX, 0 };
+    jack_port_id_t dst_index;
+
+    for (int i = 0; (i < CONNECTION_NUM_FOR_PORT) && ((dst_index = connections[i]) != EMPTY); i++) {
+        AssertPort(dst_index);
+        JackPort* dst_port = GetPort(dst_index);
+        jack_latency_range_t other_latency;
+
+        dst_port->GetLatencyRange(mode, &other_latency);
+
+        if (other_latency.max > latency.max)
+			latency.max = other_latency.max;
+		if (other_latency.min < latency.min)
+			latency.min = other_latency.min;
+    }
+
+    if (latency.min == UINT32_MAX)
+		latency.min = 0;
+
+	port->SetLatencyRange(mode, &latency);
+}
+
+void JackGraphManager::RecalculateLatency(jack_port_id_t port_index, jack_latency_callback_mode_t mode)
+{
+    UInt16 cur_index;
+    UInt16 next_index;
+
+    do {
+        cur_index = GetCurrentIndex();
+        RecalculateLatencyAux(port_index, mode);
+        next_index = GetCurrentIndex();
+    } while (cur_index != next_index); // Until a coherent state has been read
+
+    jack_log("JackGraphManager::RecalculateLatency port_index = %ld", port_index);
 }
 
 // Server

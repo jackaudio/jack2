@@ -51,6 +51,8 @@ class SERVER_EXPORT JackPort
 
         jack_nframes_t fLatency;
         jack_nframes_t fTotalLatency;
+        jack_latency_range_t  fPlaybackLatency;
+        jack_latency_range_t  fCaptureLatency;
         uint8_t fMonitorRequests;
 
         bool fInUse;
@@ -88,8 +90,12 @@ class SERVER_EXPORT JackPort
         int UnTie();
 
         jack_nframes_t GetLatency() const;
-        jack_nframes_t GetTotalLatency() const;
         void SetLatency(jack_nframes_t latency);
+
+        void SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_range_t* range);
+        void GetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_range_t* range) const;
+
+        jack_nframes_t GetTotalLatency() const;
 
         int RequestMonitor(bool onoff);
         int EnsureMonitor(bool onoff);

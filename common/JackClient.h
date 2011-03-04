@@ -67,6 +67,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackSyncCallback fSync;
         JackThreadCallback fThreadFun;
         JackSessionCallback fSession;
+        JackLatencyCallback fLatency;
 
         void* fProcessArg;
         void* fGraphOrderArg;
@@ -85,6 +86,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fSyncArg;
         void* fThreadFunArg;
         void* fSessionArg;
+        void* fLatencyArg;
         char fServerName[64];
 
         JackThread fThread;    /*! Thread to execute the Process function */
@@ -115,6 +117,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         inline void CallSyncCallbackAux();
         inline void CallTimebaseCallbackAux();
         inline int ActivateAux();
+
+        int HandleLatencyCallback(int status);
 
     public:
 
@@ -178,6 +182,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
         virtual int SetPortRenameCallback(JackPortRenameCallback callback, void *arg);
         virtual int SetSessionCallback(JackSessionCallback callback, void *arg);
+        virtual int SetLatencyCallback(JackLatencyCallback callback, void *arg);
 
         // Internal clients
         virtual char* GetInternalClientName(int ref);

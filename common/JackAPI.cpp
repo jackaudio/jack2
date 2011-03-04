@@ -115,6 +115,9 @@ extern "C"
             void *);
     EXPORT int jack_set_xrun_callback (jack_client_t *,
                                        JackXRunCallback xrun_callback, void *arg);
+    EXPORT int jack_set_latency_callback (jack_client_t *client,
+			       JackLatencyCallback callback, void *arg);
+
     EXPORT int jack_activate (jack_client_t *client);
     EXPORT int jack_deactivate (jack_client_t *client);
     EXPORT jack_port_t * jack_port_register (jack_client_t *client,
@@ -138,12 +141,19 @@ extern "C"
             const jack_port_t *port);
     EXPORT int jack_port_tie (jack_port_t *src, jack_port_t *dst);
     EXPORT int jack_port_untie (jack_port_t *port);
+
+    // Old latency API
     EXPORT jack_nframes_t jack_port_get_latency (jack_port_t *port);
     EXPORT jack_nframes_t jack_port_get_total_latency (jack_client_t *,
             jack_port_t *port);
     EXPORT void jack_port_set_latency (jack_port_t *, jack_nframes_t);
     EXPORT int jack_recompute_total_latency (jack_client_t*, jack_port_t* port);
+
+    // New latency API
+    EXPORT void jack_port_get_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range);
+    EXPORT void jack_port_set_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range);
     EXPORT int jack_recompute_total_latencies (jack_client_t*);
+
     EXPORT int jack_port_set_name (jack_port_t *port, const char *port_name);
     EXPORT int jack_port_set_alias (jack_port_t *port, const char *alias);
     EXPORT int jack_port_unset_alias (jack_port_t *port, const char *alias);
@@ -523,6 +533,40 @@ EXPORT void jack_port_set_latency(jack_port_t* port, jack_nframes_t frames)
         JackGraphManager* manager = GetGraphManager();
         if (manager)
             manager->GetPort(myport)->SetLatency(frames);
+    }
+}
+
+EXPORT void jack_port_get_latency_range(jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_port_get_latency_range");
+#endif
+    uintptr_t port_aux = (uintptr_t)port;
+    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_get_latency_range called with an incorrect port %ld", myport);
+    } else {
+        WaitGraphChange();
+        JackGraphManager* manager = GetGraphManager();
+        if (manager)
+            manager->GetPort(myport)->GetLatencyRange(mode, range);
+    }
+}
+
+EXPORT void jack_port_set_latency_range(jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_port_set_latency_range");
+#endif
+    uintptr_t port_aux = (uintptr_t)port;
+    jack_port_id_t myport = (jack_port_id_t)port_aux;
+    if (!CheckPort(myport)) {
+        jack_error("jack_port_set_latency_range called with an incorrect port %ld", myport);
+    } else {
+        WaitGraphChange();
+        JackGraphManager* manager = GetGraphManager();
+        if (manager)
+            manager->GetPort(myport)->SetLatencyRange(mode, range);
     }
 }
 
@@ -985,6 +1029,20 @@ EXPORT int jack_set_xrun_callback(jack_client_t* ext_client, JackXRunCallback xr
         return -1;
     } else {
         return client->SetXRunCallback(xrun_callback, arg);
+    }
+}
+
+EXPORT int jack_set_latency_callback(jack_client_t *ext_client, JackLatencyCallback latency_callback, void *arg)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_set_latency_callback");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    if (client == NULL) {
+        jack_error("jack_set_latency_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->SetLatencyCallback(latency_callback, arg);
     }
 }
 

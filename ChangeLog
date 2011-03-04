@@ -39,6 +39,7 @@ Valerio Pilo
 	* Revert r4119 (RT notification in the server). JackAudioDriver::ProcessSync now skip backend write in case of graph process failure.
 	* Fix incorrect error codes in alsa/usx2y.c and alsa/JackAlsaDriver.cpp.
 	* Synchronize public headers with JACK1. Update OSX project.
+	* New latency API implementation (in progress).
 
 2011-02-09 Stephane Letz  <letz@grame.fr>
 

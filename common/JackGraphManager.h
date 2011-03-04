@@ -53,6 +53,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         float* GetBuffer(jack_port_id_t port_index);
         void* GetBufferAux(JackConnectionManager* manager, jack_port_id_t port_index, jack_nframes_t frames);
         jack_nframes_t ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count);
+        void RecalculateLatencyAux(jack_port_id_t port_index, jack_latency_callback_mode_t mode);
 
     public:
 
@@ -72,8 +73,11 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
         JackPort* GetPort(jack_port_id_t index);
         jack_port_id_t GetPort(const char* name);
+
         int ComputeTotalLatency(jack_port_id_t port_index);
         int ComputeTotalLatencies();
+        void RecalculateLatency(jack_port_id_t port_index, jack_latency_callback_mode_t mode);
+
         int RequestMonitor(jack_port_id_t port_index, bool onoff);
 
         // Connections management

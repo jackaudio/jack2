@@ -60,6 +60,9 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fTimebase = NULL;
     fSync = NULL;
     fThreadFun = NULL;
+    fSession = NULL;
+    fLatency = NULL;
+
     fProcessArg = NULL;
     fGraphOrderArg = NULL;
     fXrunArg = NULL;
@@ -75,6 +78,8 @@ JackClient::JackClient(JackSynchro* table):fThread(this)
     fSyncArg = NULL;
     fTimebaseArg = NULL;
     fThreadFunArg = NULL;
+    fSessionArg = NULL;
+    fLatencyArg = NULL;
 }
 
 JackClient::~JackClient()
@@ -289,10 +294,111 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     res = (fImmediateSessionReply) ? 1 : 2;
                 }
                 break;
+
+            case kLatencyCallback:
+                res = HandleLatencyCallback(value1);
+                break;
         }
     }
 
     return res;
+}
+
+int JackClient::HandleLatencyCallback(int status)
+{
+    jack_latency_callback_mode_t mode = (status == 0) ? JackCaptureLatency : JackPlaybackLatency;
+	jack_latency_range_t latency = { UINT32_MAX, 0 };
+
+	/* first setup all latency values of the ports.
+	 * this is based on the connections of the ports.
+	 */
+    list<jack_port_id_t>::iterator it;
+
+	for (it = fPortList.begin(); it != fPortList.end(); it++) {
+	   JackPort* port = GetGraphManager()->GetPort(*it);
+
+		if ((port->GetFlags() & JackPortIsOutput) && (mode == JackPlaybackLatency)) {
+            GetGraphManager()->RecalculateLatency(*it, mode);
+		}
+		if ((port->GetFlags() & JackPortIsInput) && (mode == JackCaptureLatency)) {
+            GetGraphManager()->RecalculateLatency(*it, mode);
+		}
+	}
+
+	if (!fLatency) {
+		/*
+		 * default action is to assume all ports depend on each other.
+		 * then always take the maximum latency.
+		 */
+
+		if (mode == JackPlaybackLatency) {
+			/* iterate over all OutputPorts, to find maximum playback latency
+			 */
+			for (it = fPortList.begin(); it != fPortList.end(); it++) {
+                JackPort* port = GetGraphManager()->GetPort(*it);
+
+				if (port->GetFlags() & JackPortIsOutput) {
+					jack_latency_range_t other_latency;
+
+					port->GetLatencyRange(mode, &other_latency);
+					if (other_latency.max > latency.max)
+						latency.max = other_latency.max;
+					if (other_latency.min < latency.min)
+						latency.min = other_latency.min;
+				}
+			}
+
+			if (latency.min == UINT32_MAX)
+				latency.min = 0;
+
+			/* now set the found latency on all input ports
+			 */
+			for (it = fPortList.begin(); it != fPortList.end(); it++) {
+                JackPort* port = GetGraphManager()->GetPort(*it);
+
+				if (port->GetFlags() & JackPortIsInput) {
+					port->SetLatencyRange(mode, &latency);
+				}
+			}
+		}
+		if (mode == JackCaptureLatency) {
+			/* iterate over all InputPorts, to find maximum playback latency
+			 */
+			for (it = fPortList.begin(); it != fPortList.end(); it++) {
+                JackPort* port = GetGraphManager()->GetPort(*it);
+
+				if (port->GetFlags() & JackPortIsInput) {
+					jack_latency_range_t other_latency;
+
+					port->GetLatencyRange(mode, &other_latency);
+					if (other_latency.max > latency.max)
+						latency.max = other_latency.max;
+					if (other_latency.min < latency.min)
+						latency.min = other_latency.min;
+				}
+			}
+
+			if (latency.min == UINT32_MAX)
+				latency.min = 0;
+
+			/* now set the found latency on all output ports
+			 */
+			for (it = fPortList.begin(); it != fPortList.end(); it++) {
+                JackPort* port = GetGraphManager()->GetPort(*it);
+
+				if (port->GetFlags() & JackPortIsOutput) {
+					port->SetLatencyRange(mode, &latency);
+				}
+			}
+		}
+		return 0;
+	}
+
+	/* we have a latency callback setup by the client,
+	 * lets use it...
+	 */
+	fLatency(mode, fLatencyArg);
+	return 0;
 }
 
 /*!
@@ -1007,6 +1113,19 @@ int JackClient::SetSessionCallback(JackSessionCallback callback, void *arg)
         GetClientControl()->fCallback[kSessionCallback] = (callback != NULL);
         fSessionArg = arg;
         fSession = callback;
+        return 0;
+    }
+}
+
+int JackClient::SetLatencyCallback(JackLatencyCallback callback, void *arg)
+{
+    if (IsActive()) {
+        jack_error("You cannot set callbacks on an active client");
+        return -1;
+    } else {
+        GetClientControl()->fCallback[kLatencyCallback] = (callback != NULL);
+        fLatencyArg = arg;
+        fLatency = callback;
         return 0;
     }
 }

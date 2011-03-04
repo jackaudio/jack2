@@ -335,4 +335,37 @@ jack_default_audio_sample_t* JackAudioDriver::GetMonitorBuffer(int port_index)
     return (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[port_index], fEngineControl->fBufferSize);
 }
 
+int JackAudioDriver::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
+{
+    switch (notify) {
+
+        case kLatencyCallback:
+            HandleLatencyCallback(value1);
+            break;
+
+        default:
+            JackDriver::ClientNotify(refnum, name, notify, sync, message, value1, value2);
+            break;
+    }
+
+    return 0;
+}
+
+void JackAudioDriver::HandleLatencyCallback(int status)
+{
+    jack_latency_callback_mode_t mode = (status == 0) ? JackCaptureLatency : JackPlaybackLatency;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        if (mode == JackPlaybackLatency) {
+           fGraphManager->RecalculateLatency(fCapturePortList[i], mode);
+		}
+	}
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (mode == JackCaptureLatency) {
+            fGraphManager->RecalculateLatency(fPlaybackPortList[i], mode);
+		}
+	}
+}
+
 } // end of namespace
