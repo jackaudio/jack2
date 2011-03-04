@@ -21,7 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackTime__
 #define __JackTime__
 
-#include "types.h"
 #include "JackCompilerDeps.h"
 #include "JackTypes.h"
 

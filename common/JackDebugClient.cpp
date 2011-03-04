@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -116,17 +116,17 @@ int JackDebugClient::Close()
 void JackDebugClient::CheckClient(const char* function_name) const
 {
     *fStream << "CheckClient : " << function_name << ", calling thread : " << pthread_self() << endl;
-    
+
     if (fIsClosed > 0)  {
-        *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed " << "from " << function_name << endl; 
+        *fStream << "!!! ERROR !!! : Accessing a client '" << fClientName << "' already closed " << "from " << function_name << endl;
         *fStream << "This is likely to cause crash !'" << endl;
     #ifdef __APPLE__
        // Debugger();
-    #endif 
+    #endif
     }
 }
 
-pthread_t JackDebugClient::GetThreadID()
+jack_native_thread_t JackDebugClient::GetThreadID()
 {
     CheckClient("GetThreadID");
     return fClient->GetThreadID();
@@ -428,7 +428,7 @@ void JackDebugClient::OnInfoShutdown(JackInfoShutdownCallback callback, void *ar
     CheckClient("OnInfoShutdown");
     fClient->OnInfoShutdown(callback, arg);
 }
-    
+
 int JackDebugClient::TimeCallback(jack_nframes_t nframes, void *arg)
 {
     JackDebugClient* client = (JackDebugClient*)arg;

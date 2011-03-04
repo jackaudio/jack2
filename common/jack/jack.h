@@ -523,6 +523,64 @@ int jack_set_xrun_callback (jack_client_t *,
 /*@}*/
 
 /**
+ * Tell the Jack server to call @a latency_callback whenever it
+ * is necessary to recompute the latencies for some or all
+ * Jack ports.
+ *
+ * @a latency_callback will be called twice each time it is
+ * needed, once being passed JackCaptureLatency and once
+ * JackPlaybackLatency. See @ref LatencyFunctions for
+ * the definition of each type of latency and related functions.
+ *
+ * <b>IMPORTANT: Most JACK clients do NOT need to register a latency
+ * callback.</b>
+ *
+ * Clients that meet any of the following conditions do NOT
+ * need to register a latency callback:
+ *
+ *    - have only input ports
+ *    - have only output ports
+ *    - their output is totally unrelated to their input
+ *    - their output is not delayed relative to their input
+ *        (i.e. data that arrives in a given process()
+ *         callback is processed and output again in the
+ *         same callback)
+ *
+ * Clients NOT registering a latency callback MUST also
+ * satisfy this condition:
+ *
+ *    - have no multiple distinct internal signal pathways
+ *
+ * This means that if your client has more than 1 input and
+ * output port, and considers them always "correlated"
+ * (e.g. as a stereo pair), then there is only 1 (e.g. stereo)
+ * signal pathway through the client. This would be true,
+ * for example, of a stereo FX rack client that has a
+ * left/right input pair and a left/right output pair.
+ *
+ * However, this is somewhat a matter of perspective. The
+ * same FX rack client could be connected so that its
+ * two input ports were connected to entirely separate
+ * sources. Under these conditions, the fact that the client
+ * does not register a latency callback MAY result
+ * in port latency values being incorrect.
+ *
+ * Clients that do not meet any of those conditions SHOULD
+ * register a latency callback.
+ *
+ * See the documentation for  @ref jack_port_set_latency_range()
+ * on how the callback should operate. Remember that the @a mode
+ * argument given to the latency callback will need to be
+ * passed into @ref jack_port_set_latency_range()
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */
+int jack_set_latency_callback (jack_client_t *,
+			       JackLatencyCallback latency_callback,
+			       void *) JACK_WEAK_EXPORT;
+/*@}*/
+
+/**
  * @defgroup ServerClientControl Controlling & querying JACK server operation
  * @{
  */
@@ -784,66 +842,6 @@ int jack_port_tie (jack_port_t *src, jack_port_t *dst) JACK_OPTIONAL_WEAK_DEPREC
  */
 int jack_port_untie (jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
- /**
- * @return the time (in frames) between data being available or
- * delivered at/to a port, and the time at which it arrived at or is
- * delivered to the "other side" of the port.  E.g. for a physical
- * audio output port, this is the time between writing to the port and
- * when the signal will leave the connector.  For a physical audio
- * input port, this is the time between the sound arriving at the
- * connector and the corresponding frames being readable from the
- * port.
- */
-jack_nframes_t jack_port_get_latency (jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
- * The maximum of the sum of the latencies in every
- * connection path that can be drawn between the port and other
- * ports with the @ref JackPortIsTerminal flag set.
- */
-jack_nframes_t jack_port_get_total_latency (jack_client_t *,
-                                            jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
- * The port latency is zero by default. Clients that control
- * physical hardware with non-zero latency should call this
- * to set the latency to its correct value. Note that the value
- * should include any systemic latency present "outside" the
- * physical hardware controlled by the client. For example,
- * for a client controlling a digital audio interface connected
- * to an external digital converter, the latency setting should
- * include both buffering by the audio interface *and* the converter.
- */
-void jack_port_set_latency (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
-* Request a complete recomputation of a port's total latency. This
-* can be called by a client that has just changed the internal
-* latency of its port using @function jack_port_set_latency
-* and wants to ensure that all signal pathways in the graph
-* are updated with respect to the values that will be returned
-* by @function jack_port_get_total_latency.
-*
-* @return zero for successful execution of the request. non-zero
-*         otherwise.
-*/
-int jack_recompute_total_latency (jack_client_t*, jack_port_t* port) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
-* Request a complete recomputation of all port latencies. This
-* can be called by a client that has just changed the internal
-* latency of its port using @function jack_port_set_latency
-* and wants to ensure that all signal pathways in the graph
-* are updated with respect to the values that will be returned
-* by @function jack_port_get_total_latency. It allows a client
-* to change multiple port latencies without triggering a
-* recompute for each change.
-*
-* @return zero for successful execution of the request. non-zero
-*         otherwise.
-*/
-    int jack_recompute_total_latencies (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
-
 /**
  * Modify a port's short name.  May be called at any time.  If the
  * resulting full name (including the @a "client_name:" prefix) is
@@ -980,6 +978,224 @@ int jack_port_name_size(void) JACK_OPTIONAL_WEAK_EXPORT;
  * including the final NULL character.  This value is a constant.
  */
 int jack_port_type_size(void) JACK_OPTIONAL_WEAK_EXPORT;
+
+/**
+ * @return the buffersize of a port of type @arg port_type.
+ *
+ * this function may only be called in a buffer_size callback.
+ */
+size_t jack_port_type_get_buffer_size (jack_client_t *client, const char *port_type) JACK_WEAK_EXPORT;
+
+/*@}*/
+
+/**
+ * @defgroup LatencyFunctions Managing and determining latency
+ *
+ * The purpose of JACK's latency API is to allow clients to
+ * easily answer two questions:
+ *
+ * - How long has it been since the data read from a port arrived
+ *   at the edge of the JACK graph (either via a physical port
+ *   or being synthesized from scratch)?
+ *
+ * - How long will it be before the data written to a port arrives
+ *   at the edge of a JACK graph?
+
+ * To help answering these two questions, all JACK ports have two
+ * latency values associated with them, both measured in frames:
+ *
+ * <b>capture latency</b>: how long since the data read from
+ *                  the buffer of a port arrived at at
+ *                  a port marked with JackPortIsTerminal.
+ *                  The data will have come from the "outside
+ *                  world" if the terminal port is also
+ *                  marked with JackPortIsPhysical, or
+ *                  will have been synthesized by the client
+ *                  that owns the terminal port.
+ *
+ * <b>playback latency</b>: how long until the data
+ *                   written to the buffer of port will reach a port
+ *                   marked with JackPortIsTerminal.
+ *
+ * Both latencies might potentially have more than one value
+ * because there may be multiple pathways to/from a given port
+ * and a terminal port. Latency is therefore generally
+ * expressed a min/max pair.
+ *
+ * In most common setups, the minimum and maximum latency
+ * are the same, but this design accomodates more complex
+ * routing, and allows applications (and thus users) to
+ * detect cases where routing is creating an anomalous
+ * situation that may either need fixing or more
+ * sophisticated handling by clients that care about
+ * latency.
+ *
+ * See also @ref jack_set_latency_callback for details on how
+ * clients that add latency to the signal path should interact
+ * with JACK to ensure that the correct latency figures are
+ * used.
+ * @{
+ */
+
+/**
+ * The port latency is zero by default. Clients that control
+ * physical hardware with non-zero latency should call this
+ * to set the latency to its correct value. Note that the value
+ * should include any systemic latency present "outside" the
+ * physical hardware controlled by the client. For example,
+ * for a client controlling a digital audio interface connected
+ * to an external digital converter, the latency setting should
+ * include both buffering by the audio interface *and* the converter.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by a latency callback that calls @ref
+ * jack_port_set_latency_range().
+ */
+void jack_port_set_latency (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * return the latency range defined by @a mode for
+ * @a port, in frames.
+ *
+ * See @ref LatencyFunctions for the definition of each latency value.
+ *
+ * This is normally used in the LatencyCallback.
+ * and therefor safe to execute from callbacks.
+ */
+void jack_port_get_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range) JACK_WEAK_EXPORT;
+
+/**
+ * set the minimum and maximum latencies defined by
+ * @a mode for @a port, in frames.
+ *
+ * See @ref LatencyFunctions for the definition of each latency value.
+ *
+ * This function should ONLY be used inside a latency
+ * callback. The client should determine the current
+ * value of the latency using @ref jack_port_get_latency_range()
+ * (called using the same mode as @a mode)
+ * and then add some number of frames to that reflects
+ * latency added by the client.
+ *
+ * How much latency a client adds will vary
+ * dramatically. For most clients, the answer is zero
+ * and there is no reason for them to register a latency
+ * callback and thus they should never call this
+ * function.
+ *
+ * More complex clients that take an input signal,
+ * transform it in some way and output the result but
+ * not during the same process() callback will
+ * generally know a single constant value to add
+ * to the value returned by @ref jack_port_get_latency_range().
+ *
+ * Such clients would register a latency callback (see
+ * @ref jack_set_latency_callback) and must know what input
+ * ports feed which output ports as part of their
+ * internal state. Their latency callback will update
+ * the ports' latency values appropriately.
+ *
+ * A pseudo-code example will help. The @a mode argument to the latency
+ * callback will determine whether playback or capture
+ * latency is being set. The callback will use
+ * @ref jack_port_set_latency_range() as follows:
+ *
+ * \code
+ * jack_latency_range_t range;
+ * if (mode == JackPlaybackLatency) {
+ *  foreach input_port in (all self-registered port) {
+ *   jack_port_get_latency_range (port_feeding_input_port, JackPlaybackLatency, &range);
+ *   range.min += min_delay_added_as_signal_flows_from port_feeding to input_port;
+ *   range.max += max_delay_added_as_signal_flows_from port_feeding to input_port;
+ *   jack_port_set_latency_range (input_port, JackPlaybackLatency, &range);
+ *  }
+ * } else if (mode == JackCaptureLatency) {
+ *  foreach output_port in (all self-registered port) {
+ *   jack_port_get_latency_range (port_fed_by_output_port, JackCaptureLatency, &range);
+ *   range.min += min_delay_added_as_signal_flows_from_output_port_to_fed_by_port;
+ *   range.max += max_delay_added_as_signal_flows_from_output_port_to_fed_by_port;
+ *   jack_port_set_latency_range (output_port, JackCaptureLatency, &range);
+ *  }
+ * }
+ * \endcode
+ *
+ * In this relatively simple pseudo-code example, it is assumed that
+ * each input port or output is connected to only 1 output or input
+ * port respectively.
+ *
+ * If a port is connected to more than 1 other port, then the
+ * range.min and range.max values passed to @ref
+ * jack_port_set_latency_range() should reflect the minimum and
+ * maximum values across all connected ports.
+ *
+ * See the description of @ref jack_set_latency_callback for more
+ * information.
+ */
+void jack_port_set_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range) JACK_WEAK_EXPORT;
+
+/**
+ * Request a complete recomputation of all port latencies. This
+ * can be called by a client that has just changed the internal
+ * latency of its port using  jack_port_set_latency
+ * and wants to ensure that all signal pathways in the graph
+ * are updated with respect to the values that will be returned
+ * by  jack_port_get_total_latency. It allows a client
+ * to change multiple port latencies without triggering a
+ * recompute for each change.
+ *
+ * @return zero for successful execution of the request. non-zero
+ *         otherwise.
+ */
+int jack_recompute_total_latencies (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
+
+/**
+ * @return the time (in frames) between data being available or
+ * delivered at/to a port, and the time at which it arrived at or is
+ * delivered to the "other side" of the port.  E.g. for a physical
+ * audio output port, this is the time between writing to the port and
+ * when the signal will leave the connector.  For a physical audio
+ * input port, this is the time between the sound arriving at the
+ * connector and the corresponding frames being readable from the
+ * port.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by jack_port_get_latency_range() in any existing
+ * use cases.
+ */
+jack_nframes_t jack_port_get_latency (jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * The maximum of the sum of the latencies in every
+ * connection path that can be drawn between the port and other
+ * ports with the @ref JackPortIsTerminal flag set.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by jack_port_get_latency_range() in any existing
+ * use cases.
+ */
+jack_nframes_t jack_port_get_total_latency (jack_client_t *,
+					    jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * Request a complete recomputation of a port's total latency. This
+ * can be called by a client that has just changed the internal
+ * latency of its port using  jack_port_set_latency
+ * and wants to ensure that all signal pathways in the graph
+ * are updated with respect to the values that will be returned
+ * by  jack_port_get_total_latency.
+ *
+ * @return zero for successful execution of the request. non-zero
+ *         otherwise.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by jack_recompute_total_latencies() in any existing
+ * use cases.
+ */
+int jack_recompute_total_latency (jack_client_t*, jack_port_t* port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
 
 /*@}*/
 
