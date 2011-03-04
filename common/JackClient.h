@@ -139,7 +139,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetFreeWheel(int onoff);
         virtual void ShutDown();
-        virtual pthread_t GetThreadID();
+        virtual jack_native_thread_t GetThreadID();
 
         // Port management
         virtual int PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size);

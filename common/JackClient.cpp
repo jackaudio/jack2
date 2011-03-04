@@ -106,7 +106,7 @@ bool JackClient::IsActive()
     return (GetClientControl()) ? GetClientControl()->fActive : false;
 }
 
-pthread_t JackClient::GetThreadID()
+jack_native_thread_t JackClient::GetThreadID()
 {
     return fThread.GetThreadID();
 }

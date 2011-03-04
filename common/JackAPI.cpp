@@ -179,7 +179,7 @@ extern "C"
     EXPORT jack_nframes_t jack_frame_time (const jack_client_t *);
     EXPORT jack_nframes_t jack_last_frame_time (const jack_client_t *client);
     EXPORT float jack_cpu_load (jack_client_t *client);
-    EXPORT pthread_t jack_client_thread_id (jack_client_t *);
+    EXPORT jack_native_thread_t jack_client_thread_id (jack_client_t *);
     EXPORT void jack_set_error_function (print_function);
     EXPORT void jack_set_info_function (print_function);
 
@@ -213,17 +213,17 @@ extern "C"
 
     EXPORT int jack_client_real_time_priority (jack_client_t*);
     EXPORT int jack_client_max_real_time_priority (jack_client_t*);
-    EXPORT int jack_acquire_real_time_scheduling (pthread_t thread, int priority);
+    EXPORT int jack_acquire_real_time_scheduling (jack_native_thread_t thread, int priority);
     EXPORT int jack_client_create_thread (jack_client_t* client,
-                                          pthread_t *thread,
+                                          jack_native_thread_t *thread,
                                           int priority,
                                           int realtime,         // boolean
                                           thread_routine routine,
                                           void *arg);
-    EXPORT int jack_drop_real_time_scheduling (pthread_t thread);
+    EXPORT int jack_drop_real_time_scheduling (jack_native_thread_t thread);
 
-    EXPORT int jack_client_stop_thread (jack_client_t* client, pthread_t thread);
-    EXPORT int jack_client_kill_thread (jack_client_t* client, pthread_t thread);
+    EXPORT int jack_client_stop_thread (jack_client_t* client, jack_native_thread_t thread);
+    EXPORT int jack_client_kill_thread (jack_client_t* client, jack_native_thread_t thread);
 #ifndef WIN32
     EXPORT void jack_set_thread_creator (jack_thread_creator_t jtc);
 #endif
@@ -1396,7 +1396,7 @@ EXPORT float jack_cpu_load(jack_client_t* ext_client)
     }
 }
 
-EXPORT pthread_t jack_client_thread_id(jack_client_t* ext_client)
+EXPORT jack_native_thread_t jack_client_thread_id(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_thread_id");
@@ -1404,7 +1404,7 @@ EXPORT pthread_t jack_client_thread_id(jack_client_t* ext_client)
     JackClient* client = (JackClient*)ext_client;
     if (client == NULL) {
         jack_error("jack_client_thread_id called with a NULL client");
-        return (pthread_t)NULL;
+        return (jack_native_thread_t)NULL;
     } else {
         return client->GetThreadID();
     }
@@ -1595,7 +1595,7 @@ EXPORT void jack_set_transport_info(jack_client_t* ext_client, jack_transport_in
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_set_transport_info");
-#endif    
+#endif
     jack_error("jack_set_transport_info: deprecated");
     if (tinfo)
         memset(tinfo, 0, sizeof(jack_transport_info_t));
@@ -1677,14 +1677,14 @@ EXPORT int jack_client_max_real_time_priority(jack_client_t* ext_client)
     }
 }
 
-EXPORT int jack_acquire_real_time_scheduling(pthread_t thread, int priority)
+EXPORT int jack_acquire_real_time_scheduling(jack_native_thread_t thread, int priority)
 {
     JackEngineControl* control = GetEngineControl();
     return (control ? JackThread::AcquireRealTimeImp(thread, priority, GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint) : -1);
 }
 
 EXPORT int jack_client_create_thread(jack_client_t* client,
-                                     pthread_t *thread,
+                                     jack_native_thread_t *thread,
                                      int priority,
                                      int realtime,      /* boolean */
                                      thread_routine routine,
@@ -1692,28 +1692,28 @@ EXPORT int jack_client_create_thread(jack_client_t* client,
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_create_thread");
-#endif    
+#endif
     return JackThread::StartImp(thread, priority, realtime, routine, arg);
 }
 
-EXPORT int jack_drop_real_time_scheduling(pthread_t thread)
+EXPORT int jack_drop_real_time_scheduling(jack_native_thread_t thread)
 {
     return JackThread::DropRealTimeImp(thread);
 }
 
-EXPORT int jack_client_stop_thread(jack_client_t* client, pthread_t thread)
+EXPORT int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_stop_thread");
-#endif        
+#endif
     return JackThread::StopImp(thread);
 }
 
-EXPORT int jack_client_kill_thread(jack_client_t* client, pthread_t thread)
+EXPORT int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_kill_thread");
-#endif            
+#endif
     return JackThread::KillImp(thread);
 }
 
@@ -1876,7 +1876,7 @@ EXPORT int jack_set_session_callback(jack_client_t* ext_client, JackSessionCallb
     }
 }
 
-EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char *path) 
+EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char *path)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_session_notify");

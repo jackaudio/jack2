@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -84,7 +84,7 @@ class JackDebugClient : public JackClient
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreeWheel(int onoff);
         void ShutDown();
-        pthread_t GetThreadID();
+        jack_native_thread_t GetThreadID();
 
         // Port management
         int PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size);
