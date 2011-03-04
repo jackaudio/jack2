@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -20,7 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackChannel__
 #define __JackChannel__
 
-#include "types.h"
 #include "session.h"
 
 namespace Jack
@@ -126,7 +125,7 @@ class JackClientChannelInterface
 
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
-        
+
         virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
         {}
 
@@ -143,8 +142,8 @@ class JackClientChannelInterface
         {}
 
         virtual bool IsChannelThread()
-        { 
-            return false; 
+        {
+            return false;
         }
 };
 

@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -36,9 +36,9 @@ class SERVER_EXPORT JackTimer
 {
 
     friend class JackFrameTimer;
-    
-    private: 
-    
+
+    private:
+
         jack_nframes_t fFrames;
         jack_time_t	fCurrentWakeup;
         jack_time_t	fCurrentCallback;
@@ -47,21 +47,21 @@ class SERVER_EXPORT JackTimer
         float fFilterCoefficient;	/* set once, never altered */
         bool fInitialized;
 
-    public: 
-    
+    public:
+
         JackTimer();
         ~JackTimer()
         {}
-        
+
         jack_nframes_t Time2Frames(jack_time_t time, jack_nframes_t buffer_size);
         jack_time_t Frames2Time(jack_nframes_t frames, jack_nframes_t buffer_size);
         jack_nframes_t FramesSinceCycleStart(jack_time_t cur_time, jack_nframes_t frames_rate);
-        
+
         jack_nframes_t CurFrame()
         {
             return fFrames;
         }
-        
+
         jack_time_t CurTime()
         {
             return fCurrentWakeup;
@@ -75,7 +75,7 @@ class SERVER_EXPORT JackTimer
 
 class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
 {
-    
+
     private:
 
         bool fFirstWakeUp;
@@ -93,7 +93,7 @@ class SERVER_EXPORT JackFrameTimer : public JackAtomicState<JackTimer>
         void ResetFrameTime(jack_nframes_t frames_rate, jack_time_t callback_usecs, jack_time_t period_usecs);
         void IncFrameTime(jack_nframes_t buffer_size, jack_time_t callback_usecs, jack_time_t period_usecs);
         void ReadFrameTime(JackTimer* timer);
-        
+
 } POST_PACKED_STRUCTURE;
 
 
