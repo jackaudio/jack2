@@ -7768,6 +7768,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common/jack,
@@ -7817,6 +7818,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common/jack,
@@ -12814,6 +12816,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common/jack,
@@ -12863,6 +12866,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common,
@@ -16397,6 +16401,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common/jack,
@@ -16445,6 +16450,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common/jack,
@@ -16544,6 +16550,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common/jack,
@@ -16592,6 +16599,7 @@
 				GCC_MODEL_TUNING = G4;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				HEADER_SEARCH_PATHS = (
+					/opt/local/include,
 					.,
 					../posix,
 					../common,

@@ -75,230 +75,6 @@ typedef uint32_t jack_port_id_t;
 typedef uint32_t jack_port_type_id_t;
 
 /**
- * Prototype for the client supplied function that is called
- * by the engine anytime there is work to be done.
- *
- * @pre nframes == jack_get_buffer_size()
- * @pre nframes == pow(2,x)
- *
- * @param nframes number of frames to process
- * @param arg pointer to a client supplied structure
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackProcessCallback)(jack_nframes_t nframes, void *arg);
-
-/**
- * Prototype for the client thread routine called
- * by the engine when the client is inserted in the graph.
- *
- * @param arg pointer to a client supplied structure
- *
- */
-typedef void *(*JackThreadCallback)(void* arg);
-
-/**
- * Prototype for the client supplied function that is called
- * once after the creation of the thread in which other
- * callbacks will be made. Special thread characteristics
- * can be set from this callback, for example. This is a
- * highly specialized callback and most clients will not
- * and should not use it.
- *
- * @param arg pointer to a client supplied structure
- *
- * @return void
- */
-typedef void (*JackThreadInitCallback)(void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever the processing graph is reordered.
- *
- * @param arg pointer to a client supplied structure
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackGraphOrderCallback)(void *arg);
-
-/**
- * Prototype for the client-supplied function that is called whenever
- * an xrun has occured.
- *
- * @see jack_get_xrun_delayed_usecs()
- *
- * @param arg pointer to a client supplied structure
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackXRunCallback)(void *arg);
-
-/**
- * Prototype for the @a bufsize_callback that is invoked whenever the
- * JACK engine buffer size changes.  Although this function is called
- * in the JACK process thread, the normal process cycle is suspended
- * during its operation, causing a gap in the audio flow.  So, the @a
- * bufsize_callback can allocate storage, touch memory not previously
- * referenced, and perform other operations that are not realtime
- * safe.
- *
- * @param nframes buffer size
- * @param arg pointer supplied by jack_set_buffer_size_callback().
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackBufferSizeCallback)(jack_nframes_t nframes, void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * when the engine sample rate changes.
- *
- * @param nframes new engine sample rate
- * @param arg pointer to a client supplied structure
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackSampleRateCallback)(jack_nframes_t nframes, void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever a port is registered or unregistered.
- *
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int, void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever a client is registered or unregistered.
- *
- * @param name a null-terminated string containing the client name
- * @param register non-zero if the client is being registered,
- *                     zero if the client is being unregistered
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackClientRegistrationCallback)(const char* name, int val, void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever a port is connected or disconnected.
- *
- * @param a one of two ports connected or disconnected
- * @param b one of two ports connected or disconnected
- * @param connect non-zero if ports were connected
- *                    zero if ports were disconnected
- * @param arg pointer to a client supplied data
- */
-typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever the port name has been changed.
- *
- * @param port the port that has been renamed
- * @param new_name the new name
- * @param arg pointer to a client supplied structure
- *
- * @return zero on success, non-zero on error
- */
-typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* old_name, const char* new_name, void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever jackd starts or stops freewheeling.
- *
- * @param starting non-zero if we start starting to freewheel, zero otherwise
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackFreewheelCallback)(int starting, void *arg);
-
-/**
- * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown,
- * the client pointer is *not* deallocated by libjack,
- * the application is responsible to properly use jack_client_close()
- * to release client ressources. Warning: jack_client_close() cannot be
- * safely used inside the shutdown callback and has to be called outside of
- * the callback context.
- *
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackShutdownCallback)(void *arg);
-
-/**
- * Used for the type argument of jack_port_register() for default
- * audio ports and midi ports.
- */
-#define JACK_DEFAULT_AUDIO_TYPE "32 bit float mono audio"
-#define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
-
-/**
- * For convenience, use this typedef if you want to be able to change
- * between float and double. You may want to typedef sample_t to
- * jack_default_audio_sample_t in your application.
- */
-typedef float jack_default_audio_sample_t;
-
-/**
- *  A port has a set of flags that are formed by AND-ing together the
- *  desired values from the list below. The flags "JackPortIsInput" and
- *  "JackPortIsOutput" are mutually exclusive and it is an error to use
- *  them both.
- */
-enum JackPortFlags {
-
-    /**
-     * if JackPortIsInput is set, then the port can receive
-     * data.
-     */
-    JackPortIsInput = 0x1,
-
-    /**
-     * if JackPortIsOutput is set, then data can be read from
-     * the port.
-     */
-    JackPortIsOutput = 0x2,
-
-    /**
-     * if JackPortIsPhysical is set, then the port corresponds
-     * to some kind of physical I/O connector.
-     */
-    JackPortIsPhysical = 0x4,
-
-    /**
-     * if JackPortCanMonitor is set, then a call to
-     * jack_port_request_monitor() makes sense.
-     *
-     * Precisely what this means is dependent on the client. A typical
-     * result of it being called with TRUE as the second argument is
-     * that data that would be available from an output port (with
-     * JackPortIsPhysical set) is sent to a physical output connector
-     * as well, so that it can be heard/seen/whatever.
-     *
-     * Clients that do not control physical interfaces
-     * should never create ports with this bit set.
-     */
-    JackPortCanMonitor = 0x8,
-
-    /**
-     * JackPortIsTerminal means:
-     *
-     *  for an input port: the data received by the port
-     *                    will not be passed on or made
-     *                     available at any other port
-     *
-     * for an output port: the data available at the port
-     *                    does not originate from any other port
-     *
-     * Audio synthesizers, I/O hardware interface clients, HDR
-     * systems are examples of clients that would set this flag for
-     * their ports.
-     */
-    JackPortIsTerminal = 0x10,
-
-};
-
-/**
  *  @ref jack_options_t bits
  */
 enum JackOptions {
@@ -442,6 +218,302 @@ enum JackStatus {
  *  OR-ing together the relevant @ref JackStatus bits.
  */
 typedef enum JackStatus jack_status_t;
+
+/**
+ *  @ref jack_latency_callback_mode_t
+ */
+enum JackLatencyCallbackMode {
+
+     /**
+      * Latency Callback for Capture Latency.
+      * Input Ports have their latency value setup.
+      * In the Callback the client needs to set the latency of the output ports
+      */
+     JackCaptureLatency,
+
+     /**
+      * Latency Callback for Playback Latency.
+      * Output Ports have their latency value setup.
+      * In the Callback the client needs to set the latency of the input ports
+      */
+     JackPlaybackLatency
+
+};
+
+/**
+ *  Type of Latency Callback (Capture or Playback)
+ */
+typedef enum JackLatencyCallbackMode jack_latency_callback_mode_t;
+
+/**
+ * Prototype for the client supplied function that is called
+ * by the engine when port latencies need to be recalculated
+ *
+ * @param mode playback or capture latency
+ * @param arg pointer to a client supplied data
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef void (*JackLatencyCallback)(jack_latency_callback_mode_t mode, void *arg);
+
+/**
+ * the new latency API operates on Ranges.
+ */
+struct _jack_latency_range
+{
+    /**
+     * minimum latency
+     */
+    jack_nframes_t min;
+    /**
+     * maximum latency
+     */
+    jack_nframes_t max;
+};
+
+typedef struct _jack_latency_range jack_latency_range_t;
+
+/**
+ * Prototype for the client supplied function that is called
+ * by the engine anytime there is work to be done.
+ *
+ * @pre nframes == jack_get_buffer_size()
+ * @pre nframes == pow(2,x)
+ *
+ * @param nframes number of frames to process
+ * @param arg pointer to a client supplied structure
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackProcessCallback)(jack_nframes_t nframes, void *arg);
+
+/**
+ * Prototype for the client thread routine called
+ * by the engine when the client is inserted in the graph.
+ *
+ * @param arg pointer to a client supplied structure
+ *
+ */
+typedef void *(*JackThreadCallback)(void* arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * once after the creation of the thread in which other
+ * callbacks will be made. Special thread characteristics
+ * can be set from this callback, for example. This is a
+ * highly specialized callback and most clients will not
+ * and should not use it.
+ *
+ * @param arg pointer to a client supplied structure
+ *
+ * @return void
+ */
+typedef void (*JackThreadInitCallback)(void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever the processing graph is reordered.
+ *
+ * @param arg pointer to a client supplied structure
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackGraphOrderCallback)(void *arg);
+
+/**
+ * Prototype for the client-supplied function that is called whenever
+ * an xrun has occured.
+ *
+ * @see jack_get_xrun_delayed_usecs()
+ *
+ * @param arg pointer to a client supplied structure
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackXRunCallback)(void *arg);
+
+/**
+ * Prototype for the @a bufsize_callback that is invoked whenever the
+ * JACK engine buffer size changes.  Although this function is called
+ * in the JACK process thread, the normal process cycle is suspended
+ * during its operation, causing a gap in the audio flow.  So, the @a
+ * bufsize_callback can allocate storage, touch memory not previously
+ * referenced, and perform other operations that are not realtime
+ * safe.
+ *
+ * @param nframes buffer size
+ * @param arg pointer supplied by jack_set_buffer_size_callback().
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackBufferSizeCallback)(jack_nframes_t nframes, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * when the engine sample rate changes.
+ *
+ * @param nframes new engine sample rate
+ * @param arg pointer to a client supplied structure
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackSampleRateCallback)(jack_nframes_t nframes, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever a port is registered or unregistered.
+ *
+ * @param port the ID of the port
+ * @param arg pointer to a client supplied data
+ * @param register non-zero if the port is being registered,
+ *                     zero if the port is being unregistered
+ */
+typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int register, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever a client is registered or unregistered.
+ *
+ * @param name a null-terminated string containing the client name
+ * @param register non-zero if the client is being registered,
+ *                     zero if the client is being unregistered
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackClientRegistrationCallback)(const char* name, int register, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever a port is connected or disconnected.
+ *
+ * @param a one of two ports connected or disconnected
+ * @param b one of two ports connected or disconnected
+ * @param connect non-zero if ports were connected
+ *                    zero if ports were disconnected
+ * @param arg pointer to a client supplied data
+ */
+typedef void (*JackPortConnectCallback)(jack_port_id_t a, jack_port_id_t b, int connect, void* arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever the port name has been changed.
+ *
+ * @param port the port that has been renamed
+ * @param new_name the new name
+ * @param arg pointer to a client supplied structure
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef int (*JackPortRenameCallback)(jack_port_id_t port, const char* old_name, const char* new_name, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd starts or stops freewheeling.
+ *
+ * @param starting non-zero if we start starting to freewheel, zero otherwise
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackFreewheelCallback)(int starting, void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown. Note that after server shutdown,
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
+ *
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackShutdownCallback)(void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown. Note that after server shutdown,
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
+
+ * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
+ * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason, void *arg);
+
+/**
+ * Used for the type argument of jack_port_register() for default
+ * audio ports and midi ports.
+ */
+#define JACK_DEFAULT_AUDIO_TYPE "32 bit float mono audio"
+#define JACK_DEFAULT_MIDI_TYPE "8 bit raw midi"
+
+/**
+ * For convenience, use this typedef if you want to be able to change
+ * between float and double. You may want to typedef sample_t to
+ * jack_default_audio_sample_t in your application.
+ */
+typedef float jack_default_audio_sample_t;
+
+/**
+ *  A port has a set of flags that are formed by AND-ing together the
+ *  desired values from the list below. The flags "JackPortIsInput" and
+ *  "JackPortIsOutput" are mutually exclusive and it is an error to use
+ *  them both.
+ */
+enum JackPortFlags {
+
+    /**
+     * if JackPortIsInput is set, then the port can receive
+     * data.
+     */
+    JackPortIsInput = 0x1,
+
+    /**
+     * if JackPortIsOutput is set, then data can be read from
+     * the port.
+     */
+    JackPortIsOutput = 0x2,
+
+    /**
+     * if JackPortIsPhysical is set, then the port corresponds
+     * to some kind of physical I/O connector.
+     */
+    JackPortIsPhysical = 0x4,
+
+    /**
+     * if JackPortCanMonitor is set, then a call to
+     * jack_port_request_monitor() makes sense.
+     *
+     * Precisely what this means is dependent on the client. A typical
+     * result of it being called with TRUE as the second argument is
+     * that data that would be available from an output port (with
+     * JackPortIsPhysical set) is sent to a physical output connector
+     * as well, so that it can be heard/seen/whatever.
+     *
+     * Clients that do not control physical interfaces
+     * should never create ports with this bit set.
+     */
+    JackPortCanMonitor = 0x8,
+
+    /**
+     * JackPortIsTerminal means:
+     *
+     *  for an input port: the data received by the port
+     *                    will not be passed on or made
+     *                     available at any other port
+     *
+     * for an output port: the data available at the port
+     *                    does not originate from any other port
+     *
+     * Audio synthesizers, I/O hardware interface clients, HDR
+     * systems are examples of clients that would set this flag for
+     * their ports.
+     */
+    JackPortIsTerminal = 0x10,
+
+};
 
 /**
  * Transport states.
@@ -659,19 +731,5 @@ typedef struct {
 
 } jack_transport_info_t;
 
-/**
- * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown,
- * the client pointer is *not* deallocated by libjack,
- * the application is responsible to properly use jack_client_close()
- * to release client ressources. Warning: jack_client_close() cannot be
- * safely used inside the shutdown callback and has to be called outside of
- * the callback context.
-
- * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
- * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason, void *arg);
 
 #endif /* __jack_types_h__ */
