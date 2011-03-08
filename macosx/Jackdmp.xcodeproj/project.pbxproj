@@ -48,6 +48,7 @@
 				4BFA833C0DF6AB540087B4E1 /* PBXTargetDependency */,
 				4B32258F10A31AB400838A8E /* PBXTargetDependency */,
 				4B66550E127C356E00753A79 /* PBXTargetDependency */,
+				4B38120313269CCB00C61B14 /* PBXTargetDependency */,
 			);
 			name = "All Universal 32/64 bits";
 			productName = All;
@@ -94,6 +95,7 @@
 				4B363F530DEB0CFE001F72D9 /* PBXTargetDependency */,
 				4B363F780DEB0D85001F72D9 /* PBXTargetDependency */,
 				4B32258B10A31A9000838A8E /* PBXTargetDependency */,
+				4B38120113269CB600C61B14 /* PBXTargetDependency */,
 			);
 			name = "All Universal 32 bits";
 			productName = All;
@@ -314,6 +316,8 @@
 		4B363F230DEB0AB0001F72D9 /* monitor_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F220DEB0AB0001F72D9 /* monitor_client.c */; };
 		4B363F3E0DEB0C31001F72D9 /* showtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F3D0DEB0C31001F72D9 /* showtime.c */; };
 		4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
+		4B3811FB13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
+		4B3811FC13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
 		4B3F49080AD8503300491C6E /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* cpu.c */; };
 		4B43A8CA1014605000E52943 /* JackLoopbackDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B43A8C81014605000E52943 /* JackLoopbackDriver.cpp */; };
 		4B43A8CB1014605000E52943 /* JackLoopbackDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B43A8C91014605000E52943 /* JackLoopbackDriver.h */; };
@@ -1100,6 +1104,20 @@
 			remoteGlobalIDString = 4B363F680DEB0D4E001F72D9;
 			remoteInfo = "jack_impulse_grabber Universal";
 		};
+		4B38120013269CB600C61B14 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B3811551326878E00C61B14 /* jack_latent_client Universal */;
+			remoteInfo = "jack_latent_client Universal";
+		};
+		4B38120213269CCB00C61B14 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B38118D1326884E00C61B14 /* jack_latent_client 64 bits */;
+			remoteInfo = "jack_latent_client 64 bits";
+		};
 		4B43A8CC1014607100E52943 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1487,6 +1505,7 @@
 		4B37C20906DF1FE20016E567 /* latency.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = latency.c; path = /Developer/Examples/CoreAudio/PublicUtility/latency.c; sourceTree = "<absolute>"; };
 		4B38115F1326878E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3811971326884E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B3811FA13269C8300C61B14 /* latent_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = latent_client.c; path = "../example-clients/latent_client.c"; sourceTree = SOURCE_ROOT; };
 		4B3F49070AD8503300491C6E /* cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = cpu.c; path = ../tests/cpu.c; sourceTree = SOURCE_ROOT; };
 		4B43A8BA10145F6F00E52943 /* jack_loopback.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_loopback.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B43A8C81014605000E52943 /* JackLoopbackDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackLoopbackDriver.cpp; path = ../common/JackLoopbackDriver.cpp; sourceTree = SOURCE_ROOT; };
@@ -2509,6 +2528,7 @@
 		4B03383E0797E19900686131 /* Simple clients */ = {
 			isa = PBXGroup;
 			children = (
+				4B3811FA13269C8300C61B14 /* latent_client.c */,
 				4B6654FB127C350100753A79 /* server_control.cpp */,
 				4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */,
 				4B363F220DEB0AB0001F72D9 /* monitor_client.c */,
@@ -6739,6 +6759,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B3811FC13269C8300C61B14 /* latent_client.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6746,6 +6767,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B3811FB13269C8300C61B14 /* latent_client.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7488,6 +7510,16 @@
 			isa = PBXTargetDependency;
 			target = 4B363F680DEB0D4E001F72D9 /* jack_impulse_grabber Universal */;
 			targetProxy = 4B363F770DEB0D85001F72D9 /* PBXContainerItemProxy */;
+		};
+		4B38120113269CB600C61B14 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B3811551326878E00C61B14 /* jack_latent_client Universal */;
+			targetProxy = 4B38120013269CB600C61B14 /* PBXContainerItemProxy */;
+		};
+		4B38120313269CCB00C61B14 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B38118D1326884E00C61B14 /* jack_latent_client 64 bits */;
+			targetProxy = 4B38120213269CCB00C61B14 /* PBXContainerItemProxy */;
 		};
 		4B43A8CD1014607100E52943 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
