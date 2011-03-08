@@ -332,6 +332,17 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             break;
         }
 
+         case JackRequest::kComputeTotalLatencies: {
+            jack_log("JackRequest::ComputeTotalLatencies");
+            JackComputeTotalLatenciesRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0)
+                res.fResult = fServer->GetEngine()->ComputeTotalLatencies();
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ComputeTotalLatencies write error");
+            break;
+        }
+
         case JackRequest::kReleaseTimebase: {
             jack_log("JackRequest::ReleaseTimebase");
             JackReleaseTimebaseRequest req;

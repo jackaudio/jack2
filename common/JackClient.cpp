@@ -718,6 +718,13 @@ int JackClient::SetFreeWheel(int onoff)
     return result;
 }
 
+int JackClient::ComputeTotalLatencies()
+{
+    int result = -1;
+    fChannel->ComputeTotalLatencies(&result);
+    return result;
+}
+
 /*
 ShutDown is called:
 - from the RT thread when Execute method fails

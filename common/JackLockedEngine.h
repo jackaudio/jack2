@@ -66,7 +66,7 @@ catch (...) {
 \brief Locked Engine, access to methods is serialized using a mutex.
 */
 
-class SERVER_EXPORT JackLockedEngine 
+class SERVER_EXPORT JackLockedEngine
 {
     private:
 
@@ -94,7 +94,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.Close();
             CATCH_EXCEPTION_RETURN
         }
-    
+
         // Client management
         int ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status)
         {
@@ -226,6 +226,14 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION_RETURN
         }
 
+        int ComputeTotalLatencies()
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            return fEngine.ComputeTotalLatencies();
+            CATCH_EXCEPTION_RETURN
+        }
+
         // Graph
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end)
         {
@@ -245,7 +253,7 @@ class SERVER_EXPORT JackLockedEngine
             // RT : no lock
             fEngine.NotifyXRun(refnum);
         }
-        
+
         void NotifyGraphReorder()
         {
             TRY_CALL
@@ -298,7 +306,7 @@ class SERVER_EXPORT JackLockedEngine
             return fEngine.GetClientRefNum(name);
             CATCH_EXCEPTION_RETURN
         }
-    
+
         void NotifyQuit()
         {
             TRY_CALL
@@ -314,7 +322,7 @@ class SERVER_EXPORT JackLockedEngine
             fEngine.SessionNotify(refnum, target, type, path, socket);
             CATCH_EXCEPTION
         }
- 
+
         void SessionReply(int refnum)
         {
             TRY_CALL
@@ -322,7 +330,7 @@ class SERVER_EXPORT JackLockedEngine
             fEngine.SessionReply(refnum);
             CATCH_EXCEPTION
         }
- 
+
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result)
         {
             TRY_CALL

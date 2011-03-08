@@ -129,6 +129,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
 
         int PortRename(int refnum, jack_port_id_t port, const char* name);
 
+        int ComputeTotalLatencies();
+
         // Graph
         bool Process(jack_time_t cur_cycle_begin, jack_time_t prev_cycle_end);
 
@@ -142,8 +144,9 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void NotifyFreewheel(bool onoff);
         void NotifyQuit();
 
-        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket );
-        void SessionReply( int refnum );
+        // Session management
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket);
+        void SessionReply(int refnum);
 
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
         void GetClientNameForUUID(const char *uuid, char *name_res, int *result);

@@ -141,6 +141,7 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // Context
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetFreeWheel(int onoff);
+        virtual int ComputeTotalLatencies();
         virtual void ShutDown();
         virtual jack_native_thread_t GetThreadID();
 

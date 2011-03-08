@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -246,6 +246,13 @@ void JackSocketClientChannel::SetFreewheel(int onoff, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
+void JackSocketClientChannel::ComputeTotalLatencies(int* result)
+{
+    JackComputeTotalLatenciesRequest req;
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t ** result)
 {
     JackSessionNotifyRequest req(refnum, path, type, target);
@@ -255,21 +262,19 @@ void JackSocketClientChannel::SessionNotify(int refnum, const char* target, jack
 
     jack_session_command_t *session_command = (jack_session_command_t *)malloc( sizeof(jack_session_command_t) * (res.fCommandList.size()+1) );
     int i=0;
-   
-    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
-	session_command[i].uuid = strdup( ci->fUUID );
-	session_command[i].client_name = strdup( ci->fClientName );
-	session_command[i].command = strdup( ci->fCommand );
-	session_command[i].flags = ci->fFlags;
 
-	i+=1;
-    }	
-	
+    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
+        session_command[i].uuid = strdup( ci->fUUID );
+        session_command[i].client_name = strdup( ci->fClientName );
+        session_command[i].command = strdup( ci->fCommand );
+        session_command[i].flags = ci->fFlags;
+       i+=1;
+    }
+
     session_command[i].uuid = NULL;
     session_command[i].client_name = NULL;
     session_command[i].command = NULL;
     session_command[i].flags = (jack_session_flags_t)0;
-
 
     *result = session_command;
 }

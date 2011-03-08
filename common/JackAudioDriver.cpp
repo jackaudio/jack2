@@ -101,6 +101,7 @@ int JackAudioDriver::Attach()
     jack_port_id_t port_index;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    jack_latency_range_t range;
     int i;
 
     jack_log("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
@@ -114,7 +115,8 @@ int JackAudioDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        port->SetLatency(fEngineControl->fBufferSize + fCaptureLatency);
+        range.min = range.max = fEngineControl->fBufferSize + fCaptureLatency;
+        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
     }
@@ -129,7 +131,8 @@ int JackAudioDriver::Attach()
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
         // Add more latency if "async" mode is used...
-        port->SetLatency(fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + fPlaybackLatency);
+        range.min = range.max = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + fPlaybackLatency;
+        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
 
@@ -143,7 +146,8 @@ int JackAudioDriver::Attach()
             } else {
                 port = fGraphManager->GetPort(port_index);
                 port->SetAlias(alias);
-                port->SetLatency(fEngineControl->fBufferSize);
+                range.min = range.max = fEngineControl->fBufferSize;
+                port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
             }
         }

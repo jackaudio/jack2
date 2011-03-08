@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -71,7 +71,8 @@ struct JackRequest
         kSessionReply  = 34,
         kGetClientByUUID = 35,
         kReserveClientName = 36,
-        kGetUUIDByClient = 37
+        kGetUUIDByClient = 37,
+        kComputeTotalLatencies = 38
     };
 
     RequestType fType;
@@ -122,7 +123,7 @@ struct JackResult
     {
         return trans->Write(&fResult, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -161,7 +162,7 @@ struct JackClientCheckRequest : public JackRequest
         CheckRes(trans->Write(&fOptions, sizeof(int)));
         return trans->Write(&fUUID, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -197,7 +198,7 @@ struct JackClientCheckResult : public JackResult
         CheckRes(trans->Write(&fStatus, sizeof(int)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -210,7 +211,7 @@ struct JackClientOpenRequest : public JackRequest
     int fPID;
     int fUUID;
     char fName[JACK_CLIENT_NAME_SIZE + 1];
- 
+
     JackClientOpenRequest()
     {}
     JackClientOpenRequest(const char* name, int pid, int uuid): JackRequest(JackRequest::kClientOpen)
@@ -234,7 +235,7 @@ struct JackClientOpenRequest : public JackRequest
         CheckRes(trans->Write(&fUUID, sizeof(int)));
         return trans->Write(&fName,  sizeof(fName));
     }
-    
+
 };
 
 /*!
@@ -247,7 +248,7 @@ struct JackClientOpenResult : public JackResult
     int fSharedEngine;
     int fSharedClient;
     int fSharedGraph;
-   
+
     JackClientOpenResult()
             : JackResult(), fSharedEngine(-1), fSharedClient(-1), fSharedGraph(-1)
     {}
@@ -272,7 +273,7 @@ struct JackClientOpenResult : public JackResult
         CheckRes(trans->Write(&fSharedGraph, sizeof(int)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -299,7 +300,7 @@ struct JackClientCloseRequest : public JackRequest
         CheckRes(JackRequest::Write(trans));
         return trans->Write(&fRefNum, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -402,7 +403,7 @@ struct JackPortRegisterRequest : public JackRequest
         CheckRes(trans->Write(&fBufferSize, sizeof(unsigned int)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -428,7 +429,7 @@ struct JackPortRegisterResult : public JackResult
         CheckRes(JackResult::Write(trans));
         return trans->Write(&fPortIndex, sizeof(jack_port_id_t));
     }
-    
+
 };
 
 /*!
@@ -461,7 +462,7 @@ struct JackPortUnRegisterRequest : public JackRequest
         CheckRes(trans->Write(&fPortIndex, sizeof(jack_port_id_t)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -501,7 +502,7 @@ struct JackPortConnectNameRequest : public JackRequest
         CheckRes(trans->Write(&fDst, sizeof(fDst)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -540,7 +541,7 @@ struct JackPortDisconnectNameRequest : public JackRequest
         CheckRes(trans->Write(&fDst, sizeof(fDst)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -576,7 +577,7 @@ struct JackPortConnectRequest : public JackRequest
         CheckRes(trans->Write(&fDst, sizeof(jack_port_id_t)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -612,7 +613,7 @@ struct JackPortDisconnectRequest : public JackRequest
         CheckRes(trans->Write(&fDst, sizeof(jack_port_id_t)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -651,7 +652,7 @@ struct JackPortRenameRequest : public JackRequest
         return 0;
 
     }
-    
+
 };
 
 /*!
@@ -679,7 +680,7 @@ struct JackSetBufferSizeRequest : public JackRequest
         CheckRes(JackRequest::Write(trans));
         return trans->Write(&fBufferSize, sizeof(jack_nframes_t));
     }
-    
+
 };
 
 /*!
@@ -707,7 +708,31 @@ struct JackSetFreeWheelRequest : public JackRequest
         CheckRes(JackRequest::Write(trans));
         return trans->Write(&fOnOff, sizeof(int));
     }
-    
+
+};
+
+/*!
+\brief ComputeTotalLatencies request.
+*/
+
+struct JackComputeTotalLatenciesRequest : public JackRequest
+{
+
+    JackComputeTotalLatenciesRequest()
+        : JackRequest(JackRequest::kComputeTotalLatencies)
+    {}
+
+    int Read(JackChannelTransaction* trans)
+    {
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        return 0;
+    }
+
 };
 
 /*!
@@ -735,7 +760,7 @@ struct JackReleaseTimebaseRequest : public JackRequest
         CheckRes(JackRequest::Write(trans));
         return trans->Write(&fRefNum, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -766,7 +791,7 @@ struct JackSetTimebaseCallbackRequest : public JackRequest
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         return trans->Write(&fConditionnal, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -797,7 +822,7 @@ struct JackGetInternalClientNameRequest : public JackRequest
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         return trans->Write(&fIntRefNum, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -830,7 +855,7 @@ struct JackGetInternalClientNameResult : public JackResult
         CheckRes(trans->Write(&fName,  sizeof(fName)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -863,7 +888,7 @@ struct JackInternalClientHandleRequest : public JackRequest
         CheckRes(trans->Write(&fRefNum, sizeof(int)));
         return trans->Write(&fName,  sizeof(fName));
     }
-    
+
 };
 
 /*!
@@ -897,7 +922,7 @@ struct JackInternalClientHandleResult : public JackResult
         CheckRes(trans->Write(&fIntRefNum, sizeof(int)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -949,7 +974,7 @@ struct JackInternalClientLoadRequest : public JackRequest
         CheckRes(trans->Write(&fUUID, sizeof(int)));
         return trans->Write(&fOptions, sizeof(int));
     }
-    
+
 };
 
 /*!
@@ -983,7 +1008,7 @@ struct JackInternalClientLoadResult : public JackResult
         CheckRes(trans->Write(&fIntRefNum, sizeof(int)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -1044,7 +1069,7 @@ struct JackInternalClientUnloadResult : public JackResult
         CheckRes(trans->Write(&fStatus, sizeof(int)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -1147,7 +1172,7 @@ struct JackSessionNotifyResult : public JackResult
         CheckRes(trans->Write(terminator, sizeof(terminator)));
         return 0;
     }
-    
+
 };
 
 /*!
@@ -1245,7 +1270,7 @@ struct JackClientNameResult : public JackResult
         CheckRes(trans->Write(&fName, sizeof(fName)));
         return 0;
     }
-    
+
 };
 
 struct JackUUIDResult : public JackResult
@@ -1274,7 +1299,7 @@ struct JackUUIDResult : public JackResult
         CheckRes(trans->Write(&fUUID, sizeof(fUUID)));
         return 0;
     }
-    
+
 };
 
 struct JackGetUUIDRequest : public JackRequest

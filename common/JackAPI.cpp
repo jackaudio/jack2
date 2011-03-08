@@ -580,10 +580,10 @@ EXPORT int jack_recompute_total_latency(jack_client_t* ext_client, jack_port_t* 
     uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (client == NULL) {
-        jack_error("jack_recompute_total_latencies called with a NULL client");
+        jack_error("jack_recompute_total_latency called with a NULL client");
         return -1;
     } else if (!CheckPort(myport)) {
-        jack_error("jack_recompute_total_latencies called with a NULL port");
+        jack_error("jack_recompute_total_latency called with a NULL port");
         return -1;
     } else {
         WaitGraphChange();
@@ -603,9 +603,7 @@ EXPORT int jack_recompute_total_latencies(jack_client_t* ext_client)
         jack_error("jack_recompute_total_latencies called with a NULL client");
         return -1;
     } else {
-        WaitGraphChange();
-        JackGraphManager* manager = GetGraphManager();
-        return (manager ? manager->ComputeTotalLatencies() : -1);
+        return client->ComputeTotalLatencies();
     }
 }
 

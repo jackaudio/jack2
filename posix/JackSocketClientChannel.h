@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -77,11 +77,13 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
 
         void PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
         void PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
-        
+
         void PortRename(int refnum, jack_port_id_t port, const char* name, int* result);
 
         void SetBufferSize(jack_nframes_t buffer_size, int* result);
         void SetFreewheel(int onoff, int* result);
+
+        void ComputeTotalLatencies(int* result);
 
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);

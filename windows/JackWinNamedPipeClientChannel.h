@@ -81,6 +81,7 @@ class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface,
 
         void SetBufferSize(jack_nframes_t buffer_size, int* result);
         void SetFreewheel(int onoff, int* result);
+        void ComputeTotalLatencies(int* result);
 
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);

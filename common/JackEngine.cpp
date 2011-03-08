@@ -209,6 +209,12 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
     }
 }
 
+int JackEngine::ComputeTotalLatencies()
+{
+    // TODO : jack_compute_new_latency
+    return 0;
+}
+
 //---------------
 // Notifications
 //---------------
@@ -295,6 +301,7 @@ void JackEngine::NotifyXRun(int refnum)
 
 void JackEngine::NotifyGraphReorder()
 {
+    ComputeTotalLatencies();
     NotifyClients(kGraphOrderCallback, false, "", 0, 0);
 }
 

@@ -112,6 +112,11 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
             *result = fServer->SetFreewheel(onoff);
         }
 
+        void ComputeTotalLatencies(int* result)
+        {
+            *result = fEngine->ComputeTotalLatencies();
+        }
+
         void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t **result )
         {
             *result = NULL;
@@ -126,7 +131,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fServer->SetTimebaseCallback(refnum, conditional);
         }
-        
+
         void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
         {
             *result = fEngine->GetInternalClientName(int_ref, name_res);
@@ -139,7 +144,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
 
         void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
         {
-            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, uuid, status);    
+            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, uuid, status);
         }
 
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result)

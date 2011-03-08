@@ -108,6 +108,9 @@ class JackClientChannelInterface
         virtual void SetFreewheel(int onoff, int* result)
         {}
 
+        virtual void ComputeTotalLatencies(int* result)
+        {}
+
         virtual void ReleaseTimebase(int refnum, int* result)
         {}
 
