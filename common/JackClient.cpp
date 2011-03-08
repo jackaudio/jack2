@@ -18,7 +18,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#include "JackClient.h"
+#include "JackSystemDeps.h"
 #include "JackGraphManager.h"
 #include "JackClientControl.h"
 #include "JackEngineControl.h"
@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackTransportEngine.h"
 #include "driver_interface.h"
 #include "JackLibGlobals.h"
+
 
 #include <math.h>
 #include <string>
