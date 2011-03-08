@@ -25,6 +25,7 @@ example_programs = {
     'jack_simple_session_client' : 'simple_session_client.c',
     'jack_session_notify' : 'session_notify.c',
     'jack_server_control' : 'server_control.cpp',
+    'jack_latent_client' : 'latent_client.c',
     }
 
 example_libs = {

@@ -1485,6 +1485,8 @@
 		4B37C20306DF1FBE0016E567 /* CALatencyLog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CALatencyLog.cpp; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.cpp; sourceTree = "<absolute>"; };
 		4B37C20406DF1FBE0016E567 /* CALatencyLog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CALatencyLog.h; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h; sourceTree = "<absolute>"; };
 		4B37C20906DF1FE20016E567 /* latency.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = latency.c; path = /Developer/Examples/CoreAudio/PublicUtility/latency.c; sourceTree = "<absolute>"; };
+		4B38115F1326878E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B3811971326884E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3F49070AD8503300491C6E /* cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = cpu.c; path = ../tests/cpu.c; sourceTree = SOURCE_ROOT; };
 		4B43A8BA10145F6F00E52943 /* jack_loopback.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_loopback.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B43A8C81014605000E52943 /* JackLoopbackDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackLoopbackDriver.cpp; path = ../common/JackLoopbackDriver.cpp; sourceTree = SOURCE_ROOT; };
@@ -2006,6 +2008,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4B3811591326878E00C61B14 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B3811911326884E00C61B14 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4B43A8B510145F6F00E52943 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2484,6 +2500,8 @@
 				4BA339AC10B2E36800190E3B /* Jackservermp.framework */,
 				4B47ACD710B5890100469C67 /* Jackmp.framework */,
 				4B6654F7127C34AE00753A79 /* jack_server_control */,
+				4B38115F1326878E00C61B14 /* jack_latent_client */,
+				4B3811971326884E00C61B14 /* jack_latent_client */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3388,6 +3406,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B363F690DEB0D4E001F72D9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B3811561326878E00C61B14 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B38118E1326884E00C61B14 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -4723,6 +4755,44 @@
 			productReference = 4B363F720DEB0D4E001F72D9 /* jack_impulse_grabber */;
 			productType = "com.apple.product-type.tool";
 		};
+		4B3811551326878E00C61B14 /* jack_latent_client Universal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B38115B1326878E00C61B14 /* Build configuration list for PBXNativeTarget "jack_latent_client Universal" */;
+			buildPhases = (
+				4B3811561326878E00C61B14 /* Headers */,
+				4B3811571326878E00C61B14 /* Sources */,
+				4B3811591326878E00C61B14 /* Frameworks */,
+				4B38115A1326878E00C61B14 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "jack_latent_client Universal";
+			productInstallPath = /usr/local/bin;
+			productName = jack_metro;
+			productReference = 4B38115F1326878E00C61B14 /* jack_latent_client */;
+			productType = "com.apple.product-type.tool";
+		};
+		4B38118D1326884E00C61B14 /* jack_latent_client 64 bits */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B3811931326884E00C61B14 /* Build configuration list for PBXNativeTarget "jack_latent_client 64 bits" */;
+			buildPhases = (
+				4B38118E1326884E00C61B14 /* Headers */,
+				4B38118F1326884E00C61B14 /* Sources */,
+				4B3811911326884E00C61B14 /* Frameworks */,
+				4B3811921326884E00C61B14 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "jack_latent_client 64 bits";
+			productInstallPath = /usr/local/bin;
+			productName = jack_metro;
+			productReference = 4B3811971326884E00C61B14 /* jack_latent_client */;
+			productType = "com.apple.product-type.tool";
+		};
 		4B43A8B010145F6F00E52943 /* jack_loopback Universal */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4B43A8B610145F6F00E52943 /* Build configuration list for PBXNativeTarget "jack_loopback Universal" */;
@@ -5654,6 +5724,7 @@
 				4B363E100DEB03C5001F72D9 /* jack_evmon Universal */,
 				4B363E440DEB0775001F72D9 /* jack_bufsize Universal */,
 				4B363EDF0DEB091C001F72D9 /* jack_rec Universal */,
+				4B3811551326878E00C61B14 /* jack_latent_client Universal */,
 				4B363F140DEB0A6A001F72D9 /* jack_monitor_client Universal */,
 				4B363F2B0DEB0BD1001F72D9 /* jack_showtime Universal */,
 				4B363F680DEB0D4E001F72D9 /* jack_impulse_grabber Universal */,
@@ -5697,6 +5768,7 @@
 				4BFA82820DF6A9E40087B4E1 /* jack_evmon 64 bits */,
 				4BFA82950DF6A9E40087B4E1 /* jack_bufsize 64 bits */,
 				4BFA82A10DF6A9E40087B4E1 /* jack_rec 64 bits */,
+				4B38118D1326884E00C61B14 /* jack_latent_client 64 bits */,
 				4BFA82AD0DF6A9E40087B4E1 /* jack_monitor_client 64 bits */,
 				4BFA82B90DF6A9E40087B4E1 /* jack_showtime 64 bits */,
 				4BFA82C50DF6A9E40087B4E1 /* jack_impulse_grabber 64 bits */,
@@ -5991,6 +6063,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B363F6D0DEB0D4E001F72D9 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B38115A1326878E00C61B14 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B3811921326884E00C61B14 /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -6646,6 +6732,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B3811571326878E00C61B14 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B38118F1326884E00C61B14 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7800,7 +7900,7 @@
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
-				PRODUCT_NAME = netmanager;
+				PRODUCT_NAME = audioadapter;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -11474,7 +11574,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_alias;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -11571,7 +11671,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_evmon;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -11668,7 +11768,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_bufsize;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -11770,7 +11870,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_rec;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -11872,7 +11972,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_monitor_client;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -12066,7 +12166,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_impulse_grabber;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -12141,6 +12241,198 @@
 			};
 			name = Default;
 		};
+		4B38115C1326878E00C61B14 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_latent_client;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4B38115D1326878E00C61B14 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
+				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_latent_client;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4B38115E1326878E00C61B14 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_midiseq;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
+		4B3811941326884E00C61B14 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_latent_client;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4B3811951326884E00C61B14 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_latent_client;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4B3811961326884E00C61B14 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					i386,
+					ppc,
+				);
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_midiseq;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
 		4B43A8B710145F6F00E52943 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -12181,7 +12473,7 @@
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
-				PRODUCT_NAME = jack_dummy;
+				PRODUCT_NAME = jack_loopback;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -12319,7 +12611,7 @@
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
-				PRODUCT_NAME = jack_dummy;
+				PRODUCT_NAME = jack_loopback;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -12848,7 +13140,7 @@
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
-				PRODUCT_NAME = netmanager;
+				PRODUCT_NAME = netadapter;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -12972,7 +13264,7 @@
 					Jackservermp,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_test;
+				PRODUCT_NAME = jack_server_control;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -15750,7 +16042,7 @@
 					Jackmp,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_lsp;
+				PRODUCT_NAME = jack_server_control;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -16433,7 +16725,7 @@
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
-				PRODUCT_NAME = netmanager;
+				PRODUCT_NAME = audioadapter;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -16582,7 +16874,7 @@
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
-				PRODUCT_NAME = netmanager;
+				PRODUCT_NAME = netadapter;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -17155,7 +17447,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_evmon;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -17250,7 +17542,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_bufsize;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -17348,7 +17640,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_rec;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -17446,7 +17738,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_monitor_client;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -17632,7 +17924,7 @@
 					CoreFoundation,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jack_midiseq;
+				PRODUCT_NAME = jack_impulse_grabber;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -18493,6 +18785,26 @@
 				4B363F6F0DEB0D4E001F72D9 /* Development */,
 				4B363F700DEB0D4E001F72D9 /* Deployment */,
 				4B363F710DEB0D4E001F72D9 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4B38115B1326878E00C61B14 /* Build configuration list for PBXNativeTarget "jack_latent_client Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B38115C1326878E00C61B14 /* Development */,
+				4B38115D1326878E00C61B14 /* Deployment */,
+				4B38115E1326878E00C61B14 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4B3811931326884E00C61B14 /* Build configuration list for PBXNativeTarget "jack_latent_client 64 bits" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B3811941326884E00C61B14 /* Development */,
+				4B3811951326884E00C61B14 /* Deployment */,
+				4B3811961326884E00C61B14 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
