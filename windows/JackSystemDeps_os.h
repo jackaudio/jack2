@@ -23,6 +23,8 @@
 
 #include <windows.h>
 
+#define UINT32_MAX 4294967295U
+
 #define DRIVER_HANDLE HINSTANCE
 #define LoadDriverModule(name) LoadLibrary((name))
 #define UnloadDriverModule(handle) (FreeLibrary(((HMODULE)handle)))

@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <jack/jack.h>
 
@@ -20,12 +21,18 @@ jack_default_audio_sample_t *delay_line;
 jack_nframes_t delay_index;
 jack_nframes_t latency = 1024;
 
+#ifdef WIN32
+#define jack_sleep(val) Sleep((val))
+#else
+#define jack_sleep(val) usleep((val) * 1000)
+#endif
+
 /**
  * The process callback for this JACK application is called in a
  * special realtime thread once for each audio cycle.
  *
  * This client does nothing more than copy data from its input
- * port to its output port. It will exit when stopped by 
+ * port to its output port. It will exit when stopped by
  * the user (e.g. using Ctrl-C on a unix-ish operating system)
  */
 int
@@ -33,7 +40,7 @@ process (jack_nframes_t nframes, void *arg)
 {
 	jack_default_audio_sample_t *in, *out;
 	int k;
-	
+
 	in = jack_port_get_buffer (input_port, nframes);
 	out = jack_port_get_buffer (output_port, nframes);
 
@@ -41,9 +48,9 @@ process (jack_nframes_t nframes, void *arg)
 		out[k] = delay_line[delay_index];
 		delay_line[delay_index] = in[k];
 		delay_index = (delay_index + 1) % latency;
-	}	
+	}
 
-	return 0;      
+	return 0;
 }
 
 void
@@ -81,7 +88,7 @@ main (int argc, char *argv[])
 	const char *server_name = NULL;
 	jack_options_t options = JackNullOption;
 	jack_status_t status;
-	
+
 
 	if (argc == 2)
 		latency = atoi(argv[1]);
@@ -132,7 +139,7 @@ main (int argc, char *argv[])
 
 	jack_on_shutdown (client, jack_shutdown, 0);
 
-	/* display the current sample rate. 
+	/* display the current sample rate.
 	 */
 
 	printf ("engine sample rate: %" PRIu32 "\n",
@@ -180,7 +187,7 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
-	
+
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsInput);
 	if (ports == NULL) {
@@ -196,7 +203,7 @@ main (int argc, char *argv[])
 
 	/* keep running until stopped by the user */
 
-	sleep (-1);
+	jack_sleep (-1);
 
 	/* this is never reached but if the program
 	   had some other way to exit besides being killed,

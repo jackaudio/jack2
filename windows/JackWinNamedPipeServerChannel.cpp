@@ -252,6 +252,16 @@ bool JackClientPipeThread::HandleRequest()
                 break;
             }
 
+            case JackRequest::kComputeTotalLatencies: {
+                jack_log("JackRequest::ComputeTotalLatencies");
+                JackComputeTotalLatenciesRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0)
+                    res.fResult = fServer->GetEngine()->ComputeTotalLatencies();
+                res.Write(fPipe);
+                break;
+            }
+
             case JackRequest::kReleaseTimebase: {
                 jack_log("JackRequest::ReleaseTimebase");
                 JackReleaseTimebaseRequest req;
