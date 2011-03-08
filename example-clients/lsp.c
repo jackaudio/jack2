@@ -188,8 +188,17 @@ main (int argc, char *argv[])
 		}
 		if (show_port_latency) {
 			if (port) {
-				printf ("	port latency = %d frames\n",
+				jack_latency_range_t range;
+				printf ("	port latency = %" PRIu32 " frames\n",
 					jack_port_get_latency (port));
+
+				jack_port_get_latency_range (port, JackPlaybackLatency, &range);
+				printf ("	port playback latency = [ %" PRIu32 " %" PRIu32 " ] frames\n",
+					range.min, range.max);
+
+				jack_port_get_latency_range (port, JackCaptureLatency, &range);
+				printf ("	port capture latency = [ %" PRIu32 " %" PRIu32 " ] frames\n",
+					range.min, range.max);
 			}
 		}
 		if (show_total_latency) {

@@ -39,6 +39,7 @@ Valerio Pilo
 	* Use of latency range in all backends.
 	* ComputeTotalLatencies now a client/server call.
 	* Add latent test client for latency API.
+	* Also print playback and capture latency in jack_lsp.
 
 2011-03-04 Stephane Letz  <letz@grame.fr>
 
