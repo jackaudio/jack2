@@ -21,6 +21,7 @@
 #endif
 #include <string.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <jack/jack.h>
 
 char * my_name;

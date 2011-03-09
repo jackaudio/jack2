@@ -309,6 +309,13 @@ void JackWinNamedPipeClientChannel::ClientHasSessionCallback(const char* client_
     ServerSyncCall(&req, &res, result);
 }
 
+void JackWinNamedPipeClientChannel::ReserveClientName(int refnum, const char* client_name, const char* uuid, int* result)
+{
+    JackReserveNameRequest req(refnum, client_name, uuid);
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackWinNamedPipeClientChannel::ReleaseTimebase(int refnum, int* result)
 {
     JackReleaseTimebaseRequest req(refnum);
