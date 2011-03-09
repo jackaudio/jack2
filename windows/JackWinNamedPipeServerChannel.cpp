@@ -355,11 +355,12 @@ bool JackClientPipeThread::HandleRequest()
                     fServer->GetEngine()->SessionReply(req.fRefNum);
                     res.fResult = 0;
                 }
+                res.Write(fPipe);
                 break;
             }
 
             case JackRequest::kGetClientByUUID: {
-                jack_log("JackRequest::GetClientNameForUUID");
+                jack_log("JackRequest::GetClientByUUID");
                 JackGetClientNameRequest req;
                 JackClientNameResult res;
                 if (req.Read(fPipe) == 0) {
@@ -370,12 +371,11 @@ bool JackClientPipeThread::HandleRequest()
             }
 
             case JackRequest::kGetUUIDByClient: {
-                jack_log("JackRequest::GetUUIDForClientName");
+                jack_log("JackRequest::GetUUIDByClient");
                 JackGetUUIDRequest req;
                 JackUUIDResult res;
                 if (req.Read(fPipe) == 0) {
                     fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
-                    res.fResult = 0;
                 }
                 res.Write(fPipe);
                 break;
@@ -387,7 +387,17 @@ bool JackClientPipeThread::HandleRequest()
                 JackResult res;
                 if (req.Read(fPipe) == 0) {
                     fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
-                    res.fResult = 0;
+                }
+                res.Write(fPipe);
+                break;
+            }
+
+            case JackRequest::kClientHasSessionCallback: {
+                jack_log("JackRequest::ClientHasSessionCallback");
+                JackClientHasSessionCallbackRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
                 }
                 res.Write(fPipe);
                 break;

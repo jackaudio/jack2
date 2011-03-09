@@ -151,6 +151,7 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         void GetUUIDForClientName(const char *client_name, char *uuid_res, int *result);
         void GetClientNameForUUID(const char *uuid, char *name_res, int *result);
         void ReserveClientName(const char *name, const char *uuid, int *result);
+        void ClientHasSessionCallbackRequest(const char *name, int *result);
 };
 
 

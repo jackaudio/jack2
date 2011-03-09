@@ -447,27 +447,26 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kGetClientByUUID: {
-            jack_log("JackRequest::GetClientNameForUUID");
+            jack_log("JackRequest::GetClientByUUID");
             JackGetClientNameRequest req;
             JackClientNameResult res;
             if (req.Read(socket) == 0) {
                 fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
             }
             if (res.Write(socket) < 0)
-                jack_error("JackRequest::GetClientNameForUUID write error");
+                jack_error("JackRequest::GetClientByUUID write error");
             break;
         }
 
         case JackRequest::kGetUUIDByClient: {
-            jack_log("JackRequest::GetUUIDForClientName");
+            jack_log("JackRequest::GetUUIDByClient");
             JackGetUUIDRequest req;
             JackUUIDResult res;
             if (req.Read(socket) == 0) {
                 fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
-                res.fResult = 0;
             }
             if (res.Write(socket) < 0)
-                jack_error("JackRequest::GetUUIDForClientName write error");
+                jack_error("JackRequest::GetUUIDByClient write error");
             break;
         }
 
@@ -480,6 +479,18 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ReserveClientName write error");
+            break;
+        }
+
+        case JackRequest::kClientHasSessionCallback: {
+            jack_log("JackRequest::ClientHasSessionCallback");
+            JackClientHasSessionCallbackRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ClientHasSessionCallback write error");
             break;
         }
 

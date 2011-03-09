@@ -1108,14 +1108,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B3811551326878E00C61B14 /* jack_latent_client Universal */;
+			remoteGlobalIDString = 4B3811551326878E00C61B14;
 			remoteInfo = "jack_latent_client Universal";
 		};
 		4B38120213269CCB00C61B14 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B38118D1326884E00C61B14 /* jack_latent_client 64 bits */;
+			remoteGlobalIDString = 4B38118D1326884E00C61B14;
 			remoteInfo = "jack_latent_client 64 bits";
 		};
 		4B43A8CC1014607100E52943 /* PBXContainerItemProxy */ = {

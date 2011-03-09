@@ -107,41 +107,34 @@ class JackClientChannelInterface
         {}
         virtual void SetFreewheel(int onoff, int* result)
         {}
-
         virtual void ComputeTotalLatencies(int* result)
         {}
 
         virtual void ReleaseTimebase(int refnum, int* result)
         {}
-
         virtual void SetTimebaseCallback(int refnum, int conditional, int* result)
         {}
 
         virtual void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
         {}
-
         virtual void InternalClientHandle(int refnum, const char* client_name, int* status, int* int_ref, int* result)
         {}
-
         virtual void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
         {}
-
         virtual void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {}
 
-        virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char *path, jack_session_command_t **result)
+        virtual void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result)
         {}
-
-        virtual void SessionReply(int refnum, int *result)
+        virtual void SessionReply(int refnum, int* result)
         {}
-
-        virtual void GetUUIDForClientName(int refnum, const char *client_name, char *uuid_res, int *result)
+        virtual void GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result)
         {}
-
-        virtual void GetClientNameForUUID(int refnum, const char *uuid, char *name_res, int *result)
+        virtual void GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result)
         {}
-
-        virtual void ReserveClientName(int refnum, const char *client_name, const char *uuid, int *result)
+        virtual void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result)
+        {}
+        virtual void ClientHasSessionCallback(const char* client_name, int* result)
         {}
 
         virtual bool IsChannelThread()

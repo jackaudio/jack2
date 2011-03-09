@@ -80,7 +80,6 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fEngine->PortUnRegister(refnum, port_index);
         }
-
         void PortConnect(int refnum, const char* src, const char* dst, int* result)
         {
             *result = fEngine->PortConnect(refnum, src, dst);
@@ -89,7 +88,6 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fEngine->PortDisconnect(refnum, src, dst);
         }
-
         void PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
         {
             *result = fEngine->PortConnect(refnum, src, dst);
@@ -111,15 +109,9 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fServer->SetFreewheel(onoff);
         }
-
         void ComputeTotalLatencies(int* result)
         {
             *result = fEngine->ComputeTotalLatencies();
-        }
-
-        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t **result )
-        {
-            *result = NULL;
         }
 
         void ReleaseTimebase(int refnum, int* result)
@@ -151,6 +143,12 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fEngine->InternalClientUnload(int_ref, status);
         }
+
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t** result)
+        {
+            *result = NULL;
+        }
+
 
 };
 

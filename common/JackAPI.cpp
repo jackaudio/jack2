@@ -255,6 +255,16 @@ extern "C"
             jack_intclient_t intclient);
     EXPORT void jack_free(void* ptr);
 
+    EXPORT int jack_set_session_callback(jack_client_t* ext_client, JackSessionCallback session_callback, void* arg);
+    EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char *path);
+    EXPORT int jack_session_reply(jack_client_t *ext_client, jack_session_event_t *event);
+    EXPORT void jack_session_event_free(jack_session_event_t* ev);
+    EXPORT char *jack_get_uuid_for_client_name(jack_client_t *ext_client, const char *client_name);
+    EXPORT char *jack_get_client_name_by_uuid(jack_client_t *ext_client, const char *client_uuid);
+    EXPORT int jack_reserve_client_name(jack_client_t *ext_client, const char *name, const char *uuid);
+    EXPORT void jack_session_commands_free(jack_session_command_t *cmds);
+    EXPORT int jack_client_has_session_callback(jack_client_t *client, const char *client_name);
+
 #ifdef __cplusplus
 }
 #endif
@@ -1975,7 +1985,7 @@ EXPORT void jack_session_event_free(jack_session_event_t* ev)
     }
 }
 
-EXPORT char *jack_get_uuid_for_client_name( jack_client_t *ext_client, const char *client_name )
+EXPORT char *jack_get_uuid_for_client_name(jack_client_t *ext_client, const char *client_name)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_get_uuid_for_client_name");
@@ -1990,7 +2000,7 @@ EXPORT char *jack_get_uuid_for_client_name( jack_client_t *ext_client, const cha
     }
 }
 
-EXPORT char *jack_get_client_name_by_uuid( jack_client_t *ext_client, const char *client_uuid )
+EXPORT char *jack_get_client_name_by_uuid(jack_client_t *ext_client, const char *client_uuid)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_get_client_name_by_uuid");
@@ -2001,11 +2011,11 @@ EXPORT char *jack_get_client_name_by_uuid( jack_client_t *ext_client, const char
         jack_error("jack_get_client_name_by_uuid called with a NULL client");
         return NULL;
     } else {
-        return client->GetClientNameForUUID(client_uuid);
+        return client->GetClientNameByUUID(client_uuid);
     }
 }
 
-EXPORT int jack_reserve_client_name( jack_client_t *ext_client, const char *name, const char *uuid )
+EXPORT int jack_reserve_client_name(jack_client_t *ext_client, const char *client_name, const char *uuid)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_reserve_client_name");
@@ -2016,17 +2026,17 @@ EXPORT int jack_reserve_client_name( jack_client_t *ext_client, const char *name
         jack_error("jack_reserve_client_name called with a NULL client");
         return -1;
     } else {
-        return client->ReserveClientName(name, uuid);
+        return client->ReserveClientName(client_name, uuid);
     }
 }
 
-EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
+EXPORT void jack_session_commands_free(jack_session_command_t *cmds)
 {
     if (!cmds)
         return;
 
-    int i=0;
-    while(1) {
+    int i = 0;
+    while (1) {
         if (cmds[i].client_name)
             free ((char *)cmds[i].client_name);
         if (cmds[i].command)
@@ -2040,4 +2050,19 @@ EXPORT void jack_session_commands_free( jack_session_command_t *cmds )
     }
 
     free(cmds);
+}
+
+EXPORT int jack_client_has_session_callback(jack_client_t *ext_client, const char *client_name)
+{
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_client_has_session_callback");
+#endif
+    JackClient* client = (JackClient*)ext_client;
+    jack_log("jack_client_has_session_callback ext_client %x client %x ", ext_client, client);
+    if (client == NULL) {
+        jack_error("jack_client_has_session_callback called with a NULL client");
+        return -1;
+    } else {
+        return client->ClientHasSessionCallback(client_name);
+    }
 }

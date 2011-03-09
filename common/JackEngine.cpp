@@ -418,7 +418,7 @@ int JackEngine::ClientCheck(const char* name, int uuid, char* name_res, int prot
     std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
 
     if (res != fReservationMap.end()) {
-        strncpy( name_res, res->second.c_str(), JACK_CLIENT_NAME_SIZE );
+        strncpy(name_res, res->second.c_str(), JACK_CLIENT_NAME_SIZE);
     } else if (ClientCheckName(name)) {
 
         *status |= JackNameNotUnique;
@@ -479,7 +479,7 @@ bool JackEngine::ClientCheckName(const char* name)
             return true;
     }
 
-    for (std::map<int,std::string>::iterator i=fReservationMap.begin(); i!=fReservationMap.end(); i++) {
+    for (std::map<int,std::string>::iterator i = fReservationMap.begin(); i != fReservationMap.end(); i++) {
         if (i->second == name)
             return true;
     }
@@ -538,10 +538,10 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
     } else {
         std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
         if (res != fReservationMap.end()) {
-            strncpy( real_name, res->second.c_str(), JACK_CLIENT_NAME_SIZE );
+            strncpy(real_name, res->second.c_str(), JACK_CLIENT_NAME_SIZE);
             fReservationMap.erase(uuid);
         } else {
-            strncpy( real_name, name, JACK_CLIENT_NAME_SIZE );
+            strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
         }
 
         EnsureUUID(uuid);
@@ -912,6 +912,10 @@ int JackEngine::PortRename(int refnum, jack_port_id_t port, const char* name)
     return 0;
 }
 
+//--------------------
+// Session management
+//--------------------
+
 void JackEngine::SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, JackChannelTransaction *socket)
 {
     if (fSessionPendingReplies != 0) {
@@ -975,11 +979,11 @@ void JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
     char uuid_buf[JACK_UUID_SIZE];
-    snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
-    fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf,
-                                                                client->GetClientControl()->fName,
-                                                                client->GetClientControl()->fSessionCommand,
-                                                                client->GetClientControl()->fSessionFlags ));
+    snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+    fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
+                                                            client->GetClientControl()->fName,
+                                                            client->GetClientControl()->fSessionCommand,
+                                                            client->GetClientControl()->fSessionFlags));
     fSessionPendingReplies -= 1;
 
     if (fSessionPendingReplies == 0) {
@@ -1000,9 +1004,8 @@ void JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res, i
             return;
         }
     }
-    // did not find name.
+    // Did not find name.
     *result = -1;
-    return;
 }
 
 void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *result)
@@ -1022,24 +1025,39 @@ void JackEngine::GetClientNameForUUID(const char *uuid, char *name_res, int *res
             return;
         }
     }
-    // did not find uuid.
+    // Did not find uuid.
     *result = -1;
-    return;
 }
 
 void JackEngine::ReserveClientName(const char *name, const char *uuid, int *result)
 {
-    jack_log( "JackEngine::ReserveClientName ( name = %s, uuid = %s )", name, uuid );
+    jack_log("JackEngine::ReserveClientName ( name = %s, uuid = %s )", name, uuid);
 
     if (ClientCheckName(name)) {
         *result = -1;
-        jack_log( "name already taken" );
+        jack_log("name already taken");
         return;
     }
 
     EnsureUUID(atoi(uuid));
     fReservationMap[atoi(uuid)] = name;
     *result = 0;
+}
+
+void JackEngine::ClientHasSessionCallbackRequest(const char *name, int *result)
+{
+    JackClientInterface* client = NULL;
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        JackClientInterface* client = fClientTable[i];
+        if (client && (strcmp(client->GetClientControl()->fName, name) == 0))
+            break;
+    }
+
+    if (client) {
+        *result = client->GetClientControl()->fCallback[kSessionCallback];
+     } else {
+        *result = -1;
+    }
 }
 
 } // end of namespace

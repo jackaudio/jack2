@@ -191,16 +191,18 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
         virtual void InternalClientUnload(int ref, jack_status_t* status);
 
+        // RT Thread
         jack_nframes_t CycleWait();
         void CycleSignal(int status);
         int SetProcessThread(JackThreadCallback fun, void *arg);
 
-        // Session api
-        virtual jack_session_command_t *SessionNotify(const char *target, jack_session_event_type_t type, const char *path);
-        virtual int SessionReply(jack_session_event_t *ev);
+        // Session API
+        virtual jack_session_command_t* SessionNotify(const char* target, jack_session_event_type_t type, const char* path);
+        virtual int SessionReply(jack_session_event_t* ev);
         char* GetUUIDForClientName(const char* client_name);
-        char* GetClientNameForUUID(const char* uuid);
-        int ReserveClientName(const char *name, const char* uuid);
+        char* GetClientNameByUUID(const char* uuid);
+        int ReserveClientName(const char* client_name, const char* uuid);
+        int ClientHasSessionCallback(const char* client_name);
 
         // JackRunnableInterface interface
         bool Init();

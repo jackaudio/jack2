@@ -72,7 +72,8 @@ struct JackRequest
         kGetClientByUUID = 35,
         kReserveClientName = 36,
         kGetUUIDByClient = 37,
-        kComputeTotalLatencies = 38
+        kClientHasSessionCallback = 38,
+        kComputeTotalLatencies = 39
     };
 
     RequestType fType;
@@ -1388,6 +1389,34 @@ struct JackReserveNameRequest : public JackRequest
         CheckRes(trans->Write(&fUUID, sizeof(fUUID)));
         CheckRes(trans->Write(&fName, sizeof(fName)));
         CheckRes(trans->Write(&fRefNum, sizeof(fRefNum)));
+        return 0;
+    }
+
+};
+
+struct JackClientHasSessionCallbackRequest : public JackRequest
+{
+    char fName[JACK_CLIENT_NAME_SIZE + 1];
+
+    JackClientHasSessionCallbackRequest()
+    {}
+
+    JackClientHasSessionCallbackRequest(const char *name)
+            : JackRequest(JackRequest::kClientHasSessionCallback)
+    {
+        strncpy(fName, name, sizeof(fName));
+    }
+
+    int Read(JackChannelTransaction* trans)
+    {
+        CheckRes(trans->Read(&fName, sizeof(fName)));
+        return 0;
+    }
+
+    int Write(JackChannelTransaction* trans)
+    {
+        CheckRes(JackRequest::Write(trans));
+        CheckRes(trans->Write(&fName, sizeof(fName)));
         return 0;
     }
 

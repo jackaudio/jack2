@@ -1199,34 +1199,34 @@ void JackClient::InternalClientUnload(int ref, jack_status_t* status)
 // Session API
 //------------------
 
-jack_session_command_t *JackClient::SessionNotify( const char* target, jack_session_event_type_t type, const char* path )
+jack_session_command_t* JackClient::SessionNotify(const char* target, jack_session_event_type_t type, const char* path)
 {
-    jack_session_command_t *res;
-    fChannel->SessionNotify( GetClientControl()->fRefNum, target, type, path, &res );
+    jack_session_command_t* res;
+    fChannel->SessionNotify(GetClientControl()->fRefNum, target, type, path, &res);
     return res;
 }
 
-int JackClient::SessionReply( jack_session_event_t *ev )
+int JackClient::SessionReply(jack_session_event_t* ev)
 {
     if (ev->command_line) {
-        strncpy( GetClientControl()->fSessionCommand, ev->command_line, sizeof(GetClientControl()->fSessionCommand) );
+        strncpy(GetClientControl()->fSessionCommand, ev->command_line, sizeof(GetClientControl()->fSessionCommand));
     } else {
         GetClientControl()->fSessionCommand[0] = '\0';
     }
 
     GetClientControl()->fSessionFlags = ev->flags;
 
-    jack_log( "JackClient::SessionReply... we are here" );
+    jack_log("JackClient::SessionReply... we are here");
     if (fChannel->IsChannelThread()) {
-        jack_log( "JackClient::SessionReply... in callback reply" );
+        jack_log( "JackClient::SessionReply... in callback reply");
         fImmediateSessionReply = true;
         return 0;
     }
 
-    jack_log( "JackClient::SessionReply... out of cb" );
+    jack_log("JackClient::SessionReply... out of cb");
 
     int res;
-    fChannel->SessionReply( GetClientControl()->fRefNum, &res);
+    fChannel->SessionReply(GetClientControl()->fRefNum, &res);
     return res;
 }
 
@@ -1234,30 +1234,29 @@ char* JackClient::GetUUIDForClientName(const char* client_name)
 {
     char uuid_res[JACK_UUID_SIZE];
     int result = -1;
-    fChannel->GetUUIDForClientName( GetClientControl()->fRefNum, client_name, uuid_res, &result);
-
-    if (result)
-        return NULL;
-
-    return strdup(uuid_res);
+    fChannel->GetUUIDForClientName(GetClientControl()->fRefNum, client_name, uuid_res, &result);
+    return (result) ? NULL : strdup(uuid_res);
 }
 
-char* JackClient::GetClientNameForUUID(const char* uuid)
+char* JackClient::GetClientNameByUUID(const char* uuid)
 {
     char name_res[JACK_CLIENT_NAME_SIZE + 1];
     int result = -1;
     fChannel->GetClientNameForUUID(GetClientControl()->fRefNum, uuid, name_res, &result);
-
-    if (result)
-        return NULL;
-
-    return strdup(name_res);
+    return (result) ? NULL : strdup(name_res);
 }
 
-int JackClient::ReserveClientName(const char *name, const char* uuid)
+int JackClient::ReserveClientName(const char* client_name, const char* uuid)
 {
     int result = -1;
-    fChannel->ReserveClientName( GetClientControl()->fRefNum, name, uuid, &result);
+    fChannel->ReserveClientName( GetClientControl()->fRefNum, client_name, uuid, &result);
+    return result;
+}
+
+int JackClient::ClientHasSessionCallback(const char* client_name)
+{
+    int result = -1;
+    fChannel->ClientHasSessionCallback(client_name, &result);
     return result;
 }
 

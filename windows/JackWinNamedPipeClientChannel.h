@@ -92,10 +92,17 @@ class JackWinNamedPipeClientChannel : public detail::JackClientChannelInterface,
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
 
         void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result);
+        void SessionReply(int refnum, int* result);
+        void GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result);
+        void GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result);
+        void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result);
+        void ClientHasSessionCallback(const char* client_name, int* result);
 
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
+
+        bool IsChannelThread() { return fThread.IsThread(); }
 };
 
 } // end of namespace

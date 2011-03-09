@@ -352,6 +352,14 @@ class SERVER_EXPORT JackLockedEngine
             fEngine.ReserveClientName(name, uuid, result);
             CATCH_EXCEPTION
         }
+
+        void ClientHasSessionCallbackRequest(const char *name, int *result)
+        {
+            TRY_CALL
+            JackLock lock(&fEngine);
+            fEngine.ClientHasSessionCallbackRequest(name, result);
+            CATCH_EXCEPTION
+        }
 };
 
 } // end of namespace
