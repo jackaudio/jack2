@@ -38,6 +38,7 @@ Valerio Pilo
 
 	* jack_client_has_session_callback implementation.
 	* Fix jdelay for new latency API.
+	* Check requested buffer size and limit to 1..8192 - avoids wierd behaviour caused by jack_bufsize foobar.
 
 2011-03-08 Stephane Letz  <letz@grame.fr>
 

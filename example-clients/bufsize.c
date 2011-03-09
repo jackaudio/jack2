@@ -2,7 +2,7 @@
  *  bufsize.c -- change JACK buffer size.
  *
  *  Copyright (C) 2003 Jack O'Quin.
- *  
+ *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -64,12 +64,23 @@ void parse_arguments(int argc, char *argv[])
 		exit(9);
 	}
 
+    if (strspn (argv[1], "0123456789") != strlen (argv[1])) {
+		fprintf(stderr, "usage: %s <bufsize>\n", package);
+		exit(8);
+    }
+
 	nframes = strtoul(argv[1], NULL, 0);
 	if (errno == ERANGE) {
-		fprintf(stderr, "%s: invalid buffer size: %s\n",
+		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-8182)\n",
 			package, argv[1]);
 		exit(2);
 	}
+
+    if (nframes < 1 || nframes > 8182) {
+		fprintf(stderr, "%s: invalid buffer size: %s (range is 1-8182)\n",
+			package, argv[1]);
+		exit(3);
+    }
 }
 
 int main(int argc, char *argv[])
