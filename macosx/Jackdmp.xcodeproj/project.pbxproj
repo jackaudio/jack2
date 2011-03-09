@@ -291,7 +291,6 @@
 		4B35C53D0D4731D1000DE7AE /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B35C5490D4731D1000DE7AE /* connect.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B60CE480AAABA31004956AA /* connect.c */; };
 		4B35C5570D4731D2000DE7AE /* freewheel.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1710834EE0F00C94B91 /* freewheel.c */; };
-		4B35C5630D4731D2000DE7AE /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
 		4B35C57D0D4731D2000DE7AE /* testAtomic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */; };
 		4B35C58D0D4731D2000DE7AE /* testSem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D2470834F20600C94B91 /* testSem.cpp */; };
 		4B35C59F0D4731D2000DE7AE /* zombie.c in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8D1670834EDD900C94B91 /* zombie.c */; };
@@ -318,6 +317,8 @@
 		4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
 		4B3811FB13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
 		4B3811FC13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
+		4B3814201327AA6800C61B14 /* iodelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B38141F1327AA6800C61B14 /* iodelay.cpp */; };
+		4B3814211327AA6800C61B14 /* iodelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B38141F1327AA6800C61B14 /* iodelay.cpp */; };
 		4B3F49080AD8503300491C6E /* cpu.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F49070AD8503300491C6E /* cpu.c */; };
 		4B43A8CA1014605000E52943 /* JackLoopbackDriver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B43A8C81014605000E52943 /* JackLoopbackDriver.cpp */; };
 		4B43A8CB1014605000E52943 /* JackLoopbackDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B43A8C91014605000E52943 /* JackLoopbackDriver.h */; };
@@ -839,7 +840,6 @@
 		4BFA82B00DF6A9E40087B4E1 /* monitor_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F220DEB0AB0001F72D9 /* monitor_client.c */; };
 		4BFA82BC0DF6A9E40087B4E1 /* showtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F3D0DEB0C31001F72D9 /* showtime.c */; };
 		4BFA82C80DF6A9E40087B4E1 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
-		4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BFA99A90AAAF40C009E916C /* jdelay.cpp */; };
 		BA047C760E14E79D0041F3B6 /* JackNetSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = BA047C710E14E7540041F3B6 /* JackNetSocket.h */; };
 		BA222AD80DC88268001A17F4 /* JackNetTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BA222AD60DC88268001A17F4 /* JackNetTool.cpp */; };
 		BA222AD90DC88269001A17F4 /* JackNetTool.h in Headers */ = {isa = PBXBuildFile; fileRef = BA222AD70DC88268001A17F4 /* JackNetTool.h */; };
@@ -1470,7 +1470,7 @@
 		4B35C5440D4731D1000DE7AE /* jack_connect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_connect; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C5500D4731D1000DE7AE /* jack_disconnect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_disconnect; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C55E0D4731D2000DE7AE /* jack_freewheel */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_freewheel; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B35C56A0D4731D2000DE7AE /* jdelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jdelay; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B35C56A0D4731D2000DE7AE /* jack_iodelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_iodelay; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C5760D4731D2000DE7AE /* jack_external_metro */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_external_metro; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C5860D4731D2000DE7AE /* testAtomic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testAtomic; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C59A0D4731D2000DE7AE /* testSem */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testSem; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1506,6 +1506,7 @@
 		4B38115F1326878E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3811971326884E00C61B14 /* jack_latent_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_latent_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3811FA13269C8300C61B14 /* latent_client.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = latent_client.c; path = "../example-clients/latent_client.c"; sourceTree = SOURCE_ROOT; };
+		4B38141F1327AA6800C61B14 /* iodelay.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iodelay.cpp; path = ../tests/iodelay.cpp; sourceTree = SOURCE_ROOT; };
 		4B3F49070AD8503300491C6E /* cpu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = cpu.c; path = ../tests/cpu.c; sourceTree = SOURCE_ROOT; };
 		4B43A8BA10145F6F00E52943 /* jack_loopback.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_loopback.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B43A8C81014605000E52943 /* JackLoopbackDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackLoopbackDriver.cpp; path = ../common/JackLoopbackDriver.cpp; sourceTree = SOURCE_ROOT; };
@@ -1722,8 +1723,7 @@
 		4BFA82B70DF6A9E40087B4E1 /* jack_monitor_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_monitor_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA82C30DF6A9E40087B4E1 /* jack_showtime */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_showtime; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA82CF0DF6A9E40087B4E1 /* jack_impulse_grabber */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_impulse_grabber; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BFA99A20AAAF3B0009E916C /* jdelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jdelay; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BFA99A90AAAF40C009E916C /* jdelay.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = jdelay.cpp; path = ../tests/jdelay.cpp; sourceTree = SOURCE_ROOT; };
+		4BFA99A20AAAF3B0009E916C /* jack_iodelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_iodelay; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFB73F608AD291A00DB99B8 /* JackGlobals.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackGlobals.h; path = ../common/JackGlobals.h; sourceTree = SOURCE_ROOT; };
 		4BFB741E08AD2B9900DB99B8 /* JackMachThread.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = JackMachThread.cpp; sourceTree = SOURCE_ROOT; };
 		4BFB741F08AD2B9900DB99B8 /* JackMachThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JackMachThread.h; sourceTree = SOURCE_ROOT; };
@@ -2448,7 +2448,7 @@
 				4B699DB0097D421700A18468 /* jack_dummy.so */,
 				4B978DBB0A31CF4A009E2DD1 /* jack_portaudio.so */,
 				4BE6C6A30A3E096F005A203A /* jack_test */,
-				4BFA99A20AAAF3B0009E916C /* jdelay */,
+				4BFA99A20AAAF3B0009E916C /* jack_iodelay */,
 				4BE99D300AD7A04800C59091 /* jack_cpu */,
 				4BD623F70CBCF0F000DE782F /* inprocess.so */,
 				4BA692B00CBE4BC700EAD520 /* jack_load */,
@@ -2465,7 +2465,7 @@
 				4B35C5440D4731D1000DE7AE /* jack_connect */,
 				4B35C5500D4731D1000DE7AE /* jack_disconnect */,
 				4B35C55E0D4731D2000DE7AE /* jack_freewheel */,
-				4B35C56A0D4731D2000DE7AE /* jdelay */,
+				4B35C56A0D4731D2000DE7AE /* jack_iodelay */,
 				4B35C5760D4731D2000DE7AE /* jack_external_metro */,
 				4B35C5860D4731D2000DE7AE /* testAtomic */,
 				4B35C59A0D4731D2000DE7AE /* testSem */,
@@ -2682,8 +2682,8 @@
 		4B6BEB4A07A6CCDC00A5DBDA /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4B38141F1327AA6800C61B14 /* iodelay.cpp */,
 				4B3F49070AD8503300491C6E /* cpu.c */,
-				4BFA99A90AAAF40C009E916C /* jdelay.cpp */,
 				4BF8D23E0834F1C300C94B91 /* testAtomic.cpp */,
 				4BF8D2470834F20600C94B91 /* testSem.cpp */,
 				4BA577BC08BF8BE200F82DE1 /* testSynchroClient.cpp */,
@@ -4346,9 +4346,9 @@
 			productReference = 4B35C55E0D4731D2000DE7AE /* jack_freewheel */;
 			productType = "com.apple.product-type.tool";
 		};
-		4B35C5600D4731D2000DE7AE /* jdelay 64 bits */ = {
+		4B35C5600D4731D2000DE7AE /* jack_iodelay 64 bits */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4B35C5660D4731D2000DE7AE /* Build configuration list for PBXNativeTarget "jdelay 64 bits" */;
+			buildConfigurationList = 4B35C5660D4731D2000DE7AE /* Build configuration list for PBXNativeTarget "jack_iodelay 64 bits" */;
 			buildPhases = (
 				4B35C5610D4731D2000DE7AE /* Headers */,
 				4B35C5620D4731D2000DE7AE /* Sources */,
@@ -4359,10 +4359,10 @@
 			);
 			dependencies = (
 			);
-			name = "jdelay 64 bits";
+			name = "jack_iodelay 64 bits";
 			productInstallPath = /usr/local/bin;
 			productName = jack_lsp;
-			productReference = 4B35C56A0D4731D2000DE7AE /* jdelay */;
+			productReference = 4B35C56A0D4731D2000DE7AE /* jack_iodelay */;
 			productType = "com.apple.product-type.tool";
 		};
 		4B35C56C0D4731D2000DE7AE /* jack_external_metro 64 bits */ = {
@@ -5643,9 +5643,9 @@
 			productReference = 4BFA82CF0DF6A9E40087B4E1 /* jack_impulse_grabber */;
 			productType = "com.apple.product-type.tool";
 		};
-		4BFA99980AAAF3B0009E916C /* jdelay Universal */ = {
+		4BFA99980AAAF3B0009E916C /* jack_iodelay Universal */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jdelay Universal" */;
+			buildConfigurationList = 4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jack_iodelay Universal" */;
 			buildPhases = (
 				4BFA99990AAAF3B0009E916C /* Headers */,
 				4BFA999A0AAAF3B0009E916C /* Sources */,
@@ -5656,10 +5656,10 @@
 			);
 			dependencies = (
 			);
-			name = "jdelay Universal";
+			name = "jack_iodelay Universal";
 			productInstallPath = /usr/local/bin;
 			productName = jack_lsp;
-			productReference = 4BFA99A20AAAF3B0009E916C /* jdelay */;
+			productReference = 4BFA99A20AAAF3B0009E916C /* jack_iodelay */;
 			productType = "com.apple.product-type.tool";
 		};
 		BA222AC50DC88132001A17F4 /* jack_net Universal */ = {
@@ -5729,7 +5729,7 @@
 				4B699CD1097D421600A18468 /* jack_connect Universal */,
 				4B699CE1097D421600A18468 /* jack_disconnect Universal */,
 				4B699CF1097D421600A18468 /* jack_freewheel Universal */,
-				4BFA99980AAAF3B0009E916C /* jdelay Universal */,
+				4BFA99980AAAF3B0009E916C /* jack_iodelay Universal */,
 				4B699D03097D421600A18468 /* jack_external_metro Universal */,
 				4B699D13097D421600A18468 /* testAtomic Universal */,
 				4B699D27097D421600A18468 /* testSem Universal */,
@@ -5775,7 +5775,7 @@
 				4B35C53A0D4731D1000DE7AE /* jack_connect 64 bits */,
 				4B35C5460D4731D1000DE7AE /* jack_disconnect 64 bits */,
 				4B35C5520D4731D2000DE7AE /* jack_freewheel 64 bits */,
-				4B35C5600D4731D2000DE7AE /* jdelay 64 bits */,
+				4B35C5600D4731D2000DE7AE /* jack_iodelay 64 bits */,
 				4B35C56C0D4731D2000DE7AE /* jack_external_metro 64 bits */,
 				4B35C5780D4731D2000DE7AE /* testAtomic 64 bits */,
 				4B35C5880D4731D2000DE7AE /* testSem 64 bits */,
@@ -6573,7 +6573,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B35C5630D4731D2000DE7AE /* jdelay.cpp in Sources */,
+				4B3814211327AA6800C61B14 /* iodelay.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7308,7 +7308,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BFA99AA0AAAF40C009E916C /* jdelay.cpp in Sources */,
+				4B3814201327AA6800C61B14 /* iodelay.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7433,7 +7433,7 @@
 		};
 		4B35C6940D4733B9000DE7AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4B35C5600D4731D2000DE7AE /* jdelay 64 bits */;
+			target = 4B35C5600D4731D2000DE7AE /* jack_iodelay 64 bits */;
 			targetProxy = 4B35C6930D4733B9000DE7AE /* PBXContainerItemProxy */;
 		};
 		4B35C6960D4733B9000DE7AE /* PBXTargetDependency */ = {
@@ -7698,7 +7698,7 @@
 		};
 		4BFA99AC0AAAF41D009E916C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4BFA99980AAAF3B0009E916C /* jdelay Universal */;
+			target = 4BFA99980AAAF3B0009E916C /* jack_iodelay Universal */;
 			targetProxy = 4BFA99AB0AAAF41D009E916C /* PBXContainerItemProxy */;
 		};
 		BA222AF00DC883EF001A17F4 /* PBXTargetDependency */ = {
@@ -9777,7 +9777,7 @@
 					Jackmp,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jdelay;
+				PRODUCT_NAME = jack_iodelay;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -9806,7 +9806,7 @@
 					Jackmp,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jdelay;
+				PRODUCT_NAME = jack_iodelay;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -18049,7 +18049,7 @@
 					Jackmp,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jdelay;
+				PRODUCT_NAME = jack_iodelay;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -18080,7 +18080,7 @@
 					Jackmp,
 				);
 				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = jdelay;
+				PRODUCT_NAME = jack_iodelay;
 				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -18581,7 +18581,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		4B35C5660D4731D2000DE7AE /* Build configuration list for PBXNativeTarget "jdelay 64 bits" */ = {
+		4B35C5660D4731D2000DE7AE /* Build configuration list for PBXNativeTarget "jack_iodelay 64 bits" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4B35C5670D4731D2000DE7AE /* Development */,
@@ -19311,7 +19311,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jdelay Universal" */ = {
+		4BFA999E0AAAF3B0009E916C /* Build configuration list for PBXNativeTarget "jack_iodelay Universal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4BFA999F0AAAF3B0009E916C /* Development */,

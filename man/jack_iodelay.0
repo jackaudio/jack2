@@ -1,0 +1,53 @@
+.TH JACK_IODELAY "1" "!DATE!" "!VERSION!"
+.SH NAME
+jack_iodelay \- JACK toolkit client to measure roundtrip latency
+.SH SYNOPSIS
+.B jack_iodelay
+.SH DESCRIPTION
+.B jack_iodelay
+will create one input and one output port, and then
+measures the latency (signal delay) between them. For this to work,
+the output port must be connected to its input port. The measurement
+is accurate to a resolution of greater than 1 sample.
+.PP
+The expected use is to connect jack_iodelay's output port to a
+hardware playback port, then use a physical loopback cable from the
+corresponding hardware output connector to an input connector, and to
+connect that corresponding hardware capture port to jack_iodelay's
+input port. This creates a roundtrip that goes through any
+analog-to-digital or digital-converters that are present in the audio
+hardware. 
+.PP
+Although the hardware loopback latency is the expected use, it is also
+possible to use jack_iodelay to measure the latency along any fully
+connected signal path, such as those involving other JACK clients.
+.PP
+Once jack_iodelay completes its measurement it will print the total
+latency it has detected. This will include the JACK period length in
+addition to any other latency in the signal path. It will continue to
+print the value every 0.5 seconds or so so that if you wish you can
+vary aspects of the signal path to see their effect on the measured
+latency.
+.PP
+If no incoming signal is detected from the input port, jack_iodelay
+will print 
+.PP
+\fT Signal below threshold... .\fR
+.PP
+every second until this changes (e.g. until you establish the correct connections).
+.PP
+To use the value measured by jack_iodelay with the -I and -O arguments
+of a JACK backend (also called Input Latency and Output Latency in the
+setup dialog of qjackctl), you must subtract the JACK period size from
+the result. Then, if you believe that the latency is equally
+distributed between the input and output parts of your audio hardware
+(extremely likely), divide the result by two and use that for input
+and/or output latency value. Doing this measurement will enable JACK
+clients that use the JACK latency API to accurately position/delay
+audio to keep signals synchronized even when there are inherent delays
+in the end-to-end signal pathways.
+.SH AUTHOR
+Originally written in C++ by Fons Adriensen, ported to C by Torben Hohn.
+
+
+
