@@ -133,12 +133,17 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
     mix->lost_events += event_count - events_done;
 }
 
+static size_t MidiBufferSize()
+{
+    return BUFFER_SIZE_MAX * sizeof(float);
+}
+
 const JackPortType gMidiPortType =
-    {
-        JACK_DEFAULT_MIDI_TYPE,
-        BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t),
-        MidiBufferInit,
-        MidiBufferMixdown
-    };
+{
+    JACK_DEFAULT_MIDI_TYPE,
+    MidiBufferSize,
+    MidiBufferInit,
+    MidiBufferMixdown
+};
 
 } // namespace Jack

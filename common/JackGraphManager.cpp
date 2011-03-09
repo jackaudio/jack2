@@ -127,6 +127,19 @@ int JackGraphManager::SuspendRefNum(JackClientControl* control, JackSynchro* tab
     return manager->SuspendRefNum(control, table, fClientTiming, usec);
 }
 
+void JackGraphManager::TopologicalSort(std::vector<jack_int_t>& sorted)
+{
+    UInt16 cur_index;
+    UInt16 next_index;
+
+    do {
+        cur_index = GetCurrentIndex();
+        JackConnectionManager* manager = ReadCurrentState();
+        manager->TopologicalSort(sorted);
+        next_index = GetCurrentIndex();
+    } while (cur_index != next_index); // Until a coherent state has been read
+}
+
 // Server
 void JackGraphManager::DirectConnect(int ref1, int ref2)
 {

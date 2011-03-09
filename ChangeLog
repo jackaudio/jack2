@@ -43,6 +43,7 @@ Valerio Pilo
 	* Stop using alloca and allocate buffer on the heap for alsa_io.
 	* Rename jdelay to jack_iodelay as per Fons' request.
 	* Call buffer size callback in activate (actually this is done on client side in the RT thread Init method).
+	* JackEngine::ComputeTotalLatencies in progress.
 
 2011-03-08 Stephane Letz  <letz@grame.fr>
 

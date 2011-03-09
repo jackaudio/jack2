@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include "JackCompilerDeps.h"
 
+#include <vector>
 #include <assert.h>
 
 namespace Jack
@@ -151,7 +152,7 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
                 return true;
             }
         }
-        
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -215,6 +216,13 @@ class JackFixedMatrix
                     output[j] = i;
                     j++;
                 }
+            }
+        }
+
+        void GetOutputTable1(jack_int_t index, jack_int_t* output) const
+        {
+            for (int i = 0; i < SIZE; i++) {
+                output[i] = fTable[i][index];
             }
         }
 
@@ -359,7 +367,7 @@ struct JackClientTiming
     }
     ~JackClientTiming()
     {}
-    
+
     void Init()
     {
         fSignaledAt = 0;
@@ -367,7 +375,7 @@ struct JackClientTiming
         fFinishedAt = 0;
         fStatus = NotTriggered;
     }
-    
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -397,6 +405,8 @@ class SERVER_EXPORT JackConnectionManager
         JackLoopFeedback<CONNECTION_NUM_FOR_PORT> fLoopFeedback;		/*! Loop feedback connections */
 
         bool IsLoopPathAux(int ref1, int ref2) const;
+
+        void Visit(jack_int_t refnum, bool visited[CLIENT_NUM], std::vector<jack_int_t>& res);
 
     public:
 
@@ -461,7 +471,8 @@ class SERVER_EXPORT JackConnectionManager
         void ResetGraph(JackClientTiming* timing);
         int ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec);
-        
+        void TopologicalSort(std::vector<jack_int_t>& sorted);
+
 } POST_PACKED_STRUCTURE;
 
 } // end of namespace

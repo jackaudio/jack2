@@ -124,6 +124,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void InitRefNum(int refnum);
         int ResumeRefNum(JackClientControl* control, JackSynchro* table);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, long usecs);
+        void TopologicalSort(std::vector<jack_int_t>& sorted);
 
         JackClientTiming* GetClientTiming(int refnum)
         {

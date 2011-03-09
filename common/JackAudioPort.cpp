@@ -18,7 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+#include "JackGlobals.h"
+#include "JackEngineControl.h"
 #include "JackPortType.h"
+
 #include <string.h>
 
 #if defined (__APPLE__)
@@ -127,13 +130,18 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     }
 }
 
+static size_t AudioBufferSize()
+{
+    return GetEngineControl()->fBufferSize * sizeof(float);
+}
+
 const JackPortType gAudioPortType =
-    {
-        JACK_DEFAULT_AUDIO_TYPE,
-        BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t),
-        AudioBufferInit,
-        AudioBufferMixdown
-    };
+{
+    JACK_DEFAULT_AUDIO_TYPE,
+    AudioBufferSize,
+    AudioBufferInit,
+    AudioBufferMixdown
+};
 
 } // namespace Jack
 

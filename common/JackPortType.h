@@ -32,7 +32,7 @@ extern jack_port_type_id_t PORT_TYPES_MAX;
 struct JackPortType
 {
     const char* fName;
-    size_t fSize;
+    size_t (*size)();
     void (*init)(void* buffer, size_t buffer_size, jack_nframes_t nframes);
     void (*mixdown)(void *mixbuffer, void** src_buffers, int src_count, jack_nframes_t nframes);
 };

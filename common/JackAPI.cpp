@@ -1521,7 +1521,7 @@ EXPORT size_t jack_port_type_get_buffer_size(jack_client_t* ext_client, const ch
             jack_error("jack_port_type_get_buffer_size called with an unknown port type = %s", port_type);
             return 0;
         } else {
-            return GetPortType(port_id)->fSize;
+            return GetPortType(port_id)->size();
         }
     }
 }

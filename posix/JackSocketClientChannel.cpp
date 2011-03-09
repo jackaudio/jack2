@@ -108,7 +108,6 @@ int JackSocketClientChannel::Start()
     }
 }
 
-
 void JackSocketClientChannel::Stop()
 {
     jack_log("JackSocketClientChannel::Stop");

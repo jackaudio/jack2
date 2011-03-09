@@ -211,7 +211,27 @@ void JackEngine::CheckXRun(jack_time_t callback_usecs)  // REVOIR les conditions
 
 int JackEngine::ComputeTotalLatencies()
 {
-    // TODO : jack_compute_new_latency
+    std::vector<jack_int_t> sorted;
+    std::vector<jack_int_t>::iterator it;
+    std::vector<jack_int_t>::reverse_iterator rit;
+
+    fGraphManager->TopologicalSort(sorted);
+
+    /* iterate over all clients in graph order, and emit
+	 * capture latency callback.
+	 */
+
+    for (it = sorted.begin(); it != sorted.end(); it++) {
+        jack_log("ComputeTotalLatencies %d", *it);
+        NotifyClient(*it, kLatencyCallback, true, "", 0, 0);
+    }
+
+    /* now issue playback latency callbacks in reverse graph order
+	 */
+    for (rit = sorted.rbegin(); rit != sorted.rend(); rit++) {
+        NotifyClient(*rit, kLatencyCallback, true, "", 1, 0);
+    }
+
     return 0;
 }
 

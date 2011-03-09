@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -246,7 +246,7 @@ int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro
 int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing)
 {
     jack_time_t current_date = GetMicroSeconds();
-    const jack_int_t* outputRef = fConnectionRef.GetItems(control->fRefNum);
+    const jack_int_t* output_ref = fConnectionRef.GetItems(control->fRefNum);
     int res = 0;
 
     // Update state and timestamp of current client
@@ -256,7 +256,7 @@ int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro*
     for (int i = 0; i < CLIENT_NUM; i++) {
 
         // Signal connected clients or drivers
-        if (outputRef[i] > 0) {
+        if (output_ref[i] > 0) {
 
             // Update state and timestamp of destination clients
             timing[i].fStatus = Triggered;
@@ -270,6 +270,33 @@ int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro*
     }
 
     return res;
+}
+
+void JackConnectionManager::Visit(jack_int_t refnum, bool visited[CLIENT_NUM], std::vector<jack_int_t>& res)
+{
+    if (!visited[refnum]) {
+        visited[refnum] = true;
+        jack_int_t output_ref[CLIENT_NUM];
+        fConnectionRef.GetOutputTable1(refnum, output_ref);
+
+        //const jack_int_t* output_ref = fConnectionRef.GetItems(refnum);
+        for (int i = 0; i < CLIENT_NUM; i++) {
+            if (output_ref[i] > 0)
+                Visit(i, visited, res);
+        }
+        res.push_back(refnum);
+    }
+}
+
+void JackConnectionManager::TopologicalSort(std::vector<jack_int_t>& sorted)
+{
+    bool visited[CLIENT_NUM];
+    for (int i = 0; i < CLIENT_NUM; i++) {
+        visited[i] = false;
+    }
+
+    Visit(AUDIO_DRIVER_REFNUM, visited, sorted);
+    Visit(FREEWHEEL_DRIVER_REFNUM, visited, sorted);
 }
 
 /*!
