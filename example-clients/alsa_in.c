@@ -11,12 +11,11 @@
 #include <string.h>
 #include <signal.h>
 
-#include <alloca.h>
 #include <math.h>
 
 #include <jack/jack.h>
 #include <jack/jslist.h>
-#include <memops.h>
+#include <jack/memops.h>
 
 #include "alsa/asoundlib.h"
 
@@ -76,6 +75,12 @@ volatile float output_diff = 0.0;
 
 snd_pcm_uframes_t real_buffer_size;
 snd_pcm_uframes_t real_period_size;
+
+// buffers
+
+char *tmpbuf;
+char *outbuf;
+float *resampbuf;
 
 // format selection, and corresponding functions from memops in a nice set of structs.
 
@@ -307,8 +312,6 @@ double hann( double x )
  */
 int process (jack_nframes_t nframes, void *arg) {
 
-    char *outbuf;
-    float *resampbuf;
     int rlen;
     int err;
     snd_pcm_sframes_t delay = target_delay;
@@ -322,9 +325,14 @@ int process (jack_nframes_t nframes, void *arg) {
     // this is for compensating xruns etc...
 
     if( delay > (target_delay+max_diff) ) {
-	char *tmp = alloca( (delay-target_delay) * formats[format].sample_size * num_channels ); 
-	snd_pcm_readi( alsa_handle, tmp, delay-target_delay );
+
 	output_new_delay = (int) delay;
+
+	while ((delay-target_delay) > 0) {
+	    snd_pcm_uframes_t to_read = ((delay-target_delay) > 512) ? 512 : (delay-target_delay);
+	    snd_pcm_readi( alsa_handle, tmpbuf, to_read );
+	    delay -= to_read;
+	}
 
 	delay = target_delay;
 
@@ -399,13 +407,6 @@ int process (jack_nframes_t nframes, void *arg) {
 
     // Calculate resample_mean so we can init ourselves to saner values.
     resample_mean = 0.9999 * resample_mean + 0.0001 * current_resample_factor;
-    /*
-     * now this should do it...
-     */
-
-    outbuf = alloca( rlen * formats[format].sample_size * num_channels );
-
-    resampbuf = alloca( rlen * sizeof( float ) );
 
     // get the data...
 again:
@@ -463,6 +464,32 @@ again:
     snd_pcm_rewind( alsa_handle, put_back_samples );
 
     return 0;      
+}
+
+/**
+ * the latency callback.
+ * sets up the latencies on the ports.
+ */
+
+void
+latency_cb (jack_latency_callback_mode_t mode, void *arg)
+{
+	jack_latency_range_t range;
+	JSList *node;
+
+	range.min = range.max = target_delay;
+
+	if (mode == JackCaptureLatency) {
+		for (node = capture_ports; node; node = jack_slist_next (node)) {
+			jack_port_t *port = node->data;
+			jack_port_set_latency_range (port, mode, &range);
+		}
+	} else {
+		for (node = playback_ports; node; node = jack_slist_next (node)) {
+			jack_port_t *port = node->data;
+			jack_port_set_latency_range (port, mode, &range);
+		}
+	}
 }
 
 
@@ -661,6 +688,8 @@ int main (int argc, char *argv[]) {
 
     jack_on_shutdown (client, jack_shutdown, 0);
 
+    if (jack_set_latency_callback)
+	    jack_set_latency_callback (client, latency_cb, 0);
 
     // get jack sample_rate
     
@@ -716,6 +745,17 @@ int main (int argc, char *argv[]) {
     // alloc input ports, which are blasted out to alsa...
     alloc_ports( num_channels, 0 );
 
+    outbuf = malloc( num_periods * period_size * formats[format].sample_size * num_channels );
+    resampbuf = malloc( num_periods * period_size * sizeof( float ) );
+    tmpbuf = malloc( 512 * formats[format].sample_size * num_channels );
+
+    if ((outbuf == NULL) || (resampbuf == NULL) || (tmpbuf == NULL))
+    {
+	    fprintf( stderr, "no memory for buffers.\n" );
+	    exit(20);
+    }
+
+    memset( tmpbuf, 0, 512 * formats[format].sample_size * num_channels);
 
     /* tell the JACK server that we are ready to roll */
 
