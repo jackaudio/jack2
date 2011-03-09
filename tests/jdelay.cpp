@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003-2008 Fons Adriaensen <fons@kokkinizita.net>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -95,14 +95,14 @@ int MTDM::process (size_t len, float *ip, float *op)
 	vip = *ip++;
 	for (i = 0, F = _freq; i < 5; i++, F++)
 	{
-	    a = 2 * (float) M_PI * (F->p & 65535) / 65536.0; 
+	    a = 2 * (float) M_PI * (F->p & 65535) / 65536.0;
 	    F->p += F->f;
-	    c =  cosf (a); 
-	    s = -sinf (a); 
+	    c =  cosf (a);
+	    s = -sinf (a);
 	    vop += F->a * s;
 	    F->xa += s * vip;
 	    F->ya += c * vip;
-	} 
+	}
 	*op++ = vop;
 	if (++_cnt == 16)
 	{
@@ -142,10 +142,10 @@ int MTDM::resolve (void)
 	k = (int)(floor (p + 0.5));
 	e = fabs (p - k);
         if (e > _err) _err = e;
-        if (e > 0.4) return 1; 
+        if (e > 0.4) return 1;
 	d += m * (k & 7);
 	m *= 8;
-    }  
+    }
     _del = 16 * d;
 
     return 0;
@@ -157,6 +157,34 @@ static MTDM            mtdm;
 static jack_client_t  *jack_handle;
 static jack_port_t    *jack_capt;
 static jack_port_t    *jack_play;
+
+jack_latency_range_t   capture_latency = {-1, -1};
+jack_latency_range_t   playback_latency = {-1, -1};
+
+void
+latency_cb (jack_latency_callback_mode_t mode, void *arg)
+{
+	jack_latency_range_t range;
+
+	range.min = range.max = 0;
+
+	if (mode == JackCaptureLatency) {
+		jack_port_set_latency_range (jack_play, mode, &range);
+		jack_port_get_latency_range (jack_capt, mode, &range);
+		if ((range.min != capture_latency.min) || (range.max != capture_latency.max)) {
+			capture_latency = range;
+			printf ("new capture latency: [%d, %d]\n", range.min, range.max);
+		}
+	} else {
+		jack_port_set_latency_range (jack_capt, mode, &range);
+		jack_port_get_latency_range (jack_play, mode, &range);
+		if ((range.min != playback_latency.min) || (range.max != playback_latency.max)) {
+			playback_latency = range;
+			printf ("new playback latency: [%d, %d]\n", range.min, range.max);
+		}
+	}
+
+}
 
 int jack_callback (jack_nframes_t nframes, void *arg)
 {
@@ -182,13 +210,11 @@ int main (int ac, char *av [])
 
     jack_set_process_callback (jack_handle, jack_callback, 0);
 
+    if (jack_set_latency_callback)
+	    jack_set_latency_callback (jack_handle, latency_cb, 0);
+
     jack_capt = jack_port_register (jack_handle, "in",  JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
     jack_play = jack_port_register (jack_handle, "out", JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
-
-    printf ("capture latency  = %d\n",
-            jack_port_get_latency (jack_port_by_name (jack_handle, "system:capture_1")));
-    printf ("playback_latency = %d\n",
-            jack_port_get_latency (jack_port_by_name (jack_handle, "system:playback_1")));
 
     t = 1000.0f / jack_get_sample_rate (jack_handle);
 
@@ -200,16 +226,16 @@ int main (int ac, char *av [])
 
     while (1)
     {
- 
-    #ifdef WIN32 
-        Sleep (250); 
-    #else 
-        usleep (250000); 
- 	#endif        
+
+    #ifdef WIN32
+        Sleep (250);
+    #else
+        usleep (250000);
+ 	#endif
         if (mtdm.resolve () < 0) printf ("Signal below threshold...\n");
-        else 
+        else
         {
-            if (mtdm.err () > 0.3) 
+            if (mtdm.err () > 0.3)
             {
                 mtdm.invert ();
                 mtdm.resolve ();

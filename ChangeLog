@@ -37,6 +37,7 @@ Valerio Pilo
 2011-03-09 Stephane Letz  <letz@grame.fr>
 
 	* jack_client_has_session_callback implementation.
+	* Fix jdelay for new latency API.
 
 2011-03-08 Stephane Letz  <letz@grame.fr>
 
