@@ -162,7 +162,7 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 
         case kActivateClient:
             jack_log("JackClient::kActivateClient name = %s ref = %ld ", name, refnum);
-            Init();
+            InitAux();
             break;
     }
 
@@ -225,7 +225,9 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
                     fFreewheel(0, fFreewheelArg);
                 }
                 if (GetEngineControl()->fRealTime) {
-                    fThread.AcquireRealTime();
+                    if (fThread.AcquireRealTime() < 0) {
+                        jack_error("JackClient::AcquireRealTime error");
+                    }
                 }
                 break;
 
@@ -464,15 +466,48 @@ int JackClient::Deactivate()
 // RT thread management
 //----------------------
 
-/*!
-\brief Called once when the thread starts.
-*/
-bool JackClient::Init()
+void JackClient::InitAux()
 {
     if (fInit) {
         jack_log("JackClient::Init calling client thread init callback");
         fInit(fInitArg);
     }
+}
+
+/*!
+\brief Called once when the thread starts.
+*/
+bool JackClient::Init()
+{
+    /*
+        Execute buffer_size callback.
+
+        Since StartThread uses fThread.StartSync, we are sure that buffer_size callback
+        is executed before StartThread returns (and then IsActive will be true).
+        So no RT callback can be called at the same time.
+    */
+    jack_log("JackClient::kBufferSizeCallback buffer_size = %ld", GetEngineControl()->fBufferSize);
+    if (fBufferSize) {
+        fBufferSize(GetEngineControl()->fBufferSize, fBufferSizeArg);
+    }
+
+    // Init callback
+    InitAux();
+
+    // Setup context
+    if (!jack_tls_set(JackGlobals::fRealTime, this))
+        jack_error("failed to set thread realtime key");
+
+    if (GetEngineControl()->fRealTime)
+        set_threaded_log_function();
+
+    // Setup RT
+    if (GetEngineControl()->fRealTime) {
+        if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
+            jack_error("JackClient::AcquireRealTime error");
+        }
+    }
+
     return true;
 }
 
@@ -491,12 +526,6 @@ int JackClient::StartThread()
         return -1;
     }
 
-    if (GetEngineControl()->fRealTime) {
-        if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
-            jack_error("AcquireRealTime error");
-        }
-    }
-
     return 0;
 }
 
@@ -506,12 +535,6 @@ int JackClient::StartThread()
 
 bool JackClient::Execute()
 {
-    if (!jack_tls_set(JackGlobals::fRealTime, this))
-        jack_error("failed to set thread realtime key");
-
-    if (GetEngineControl()->fRealTime)
-        set_threaded_log_function();
-
     // Execute a dummy cycle to be sure thread has the correct properties
     DummyCycle();
 
@@ -735,7 +758,7 @@ ShutDown is called:
 
 void JackClient::ShutDown()
 {
-    jack_log("ShutDown");
+    jack_log("JackClient::ShutDown");
     JackGlobals::fServerRunning = false;
 
     if (fInfoShutdown) {
@@ -756,7 +779,7 @@ inline int JackClient::ActivateAux()
     // If activated without RT thread...
     if (IsActive() && fThread.GetStatus() != JackThread::kRunning) {
 
-        jack_log("ActivateAux");
+        jack_log("JackClient::ActivateAux");
 
         // RT thread is started
         if (StartThread() < 0)
@@ -823,14 +846,14 @@ void JackClient::TransportLocate(jack_nframes_t frame)
     jack_position_t pos;
     pos.frame = frame;
     pos.valid = (jack_position_bits_t)0;
-    jack_log("TransportLocate pos = %ld", pos.frame);
+    jack_log("JackClient::TransportLocate pos = %ld", pos.frame);
     GetEngineControl()->fTransport.RequestNewPos(&pos);
 }
 
 int JackClient::TransportReposition(jack_position_t* pos)
 {
     jack_position_t tmp = *pos;
-    jack_log("TransportReposition pos = %ld", pos->frame);
+    jack_log("JackClient::TransportReposition pos = %ld", pos->frame);
     if (tmp.valid & ~JACK_POSITION_MASK) {
         return EINVAL;
     } else {
@@ -987,8 +1010,6 @@ int JackClient::SetInitCallback(JackThreadInitCallback callback, void *arg)
 
 int JackClient::SetGraphOrderCallback(JackGraphOrderCallback callback, void *arg)
 {
-    jack_log("SetGraphOrderCallback ");
-
     if (IsActive()) {
         jack_error("You cannot set callbacks on an active client");
         return -1;
