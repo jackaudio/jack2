@@ -9,7 +9,7 @@ test_programs = {
     #'testSem': ['testSem.cpp'],
     'jack_test': ['test.cpp'],
     'jack_cpu': ['cpu.c'],
-    'jack_iodelay': ['jack_iodelay.cpp'],
+    'jack_iodelay': ['iodelay.cpp'],
     'jack_multiple_metro' : ['external_metro.cpp'],
     }
 
