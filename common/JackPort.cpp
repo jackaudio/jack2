@@ -209,7 +209,7 @@ int JackPort::GetFlags() const
 const char* JackPort::GetType() const
 {
     const JackPortType* type = GetPortType(fTypeId);
-    return type->name;
+    return type->fName;
 }
 
 void JackPort::SetName(const char* new_name)
