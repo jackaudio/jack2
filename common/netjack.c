@@ -25,7 +25,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 */
 
-
 #include <math.h>
 #include <stdio.h>
 #include <memory.h>
@@ -48,18 +47,12 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include <netinet/in.h>
 #endif
 
-#include "netjack.h"
-
 #ifdef __linux__
 #include "config.h"
 #endif
 
 #if HAVE_SAMPLERATE
 #include <samplerate.h>
-#endif
-
-#if HAVE_CELT
-#include <celt/celt.h>
 #endif
 
 #include "netjack.h"
