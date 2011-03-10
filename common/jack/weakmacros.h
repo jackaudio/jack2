@@ -43,6 +43,11 @@
 #define JACK_WEAK_EXPORT __attribute__((weak))
 #else
 /* Add other things here for non-gcc platforms */
+
+#ifdef WIN32
+#define JACK_WEAK_EXPORT
+#endif
+
 #endif
 #endif
 
@@ -55,6 +60,11 @@
 #define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT __attribute__((__deprecated__))
 #else
 /* Add other things here for non-gcc platforms */
+
+#ifdef WIN32
+#define JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT
+#endif
+
 #endif /* __GNUC__ */
 #endif
 
