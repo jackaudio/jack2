@@ -372,7 +372,7 @@ bool JackWinNamedPipeClientChannel::Init()
         jack_error("JackWinNamedPipeClientChannel: cannot establish notification pipe");
         return false;
     } else {
-        return fClient->Init();
+        return true;
     }
 }
 
