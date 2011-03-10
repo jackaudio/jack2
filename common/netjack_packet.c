@@ -75,15 +75,13 @@
 #include "netjack_packet.h"
 
 // JACK2 specific.
-#include "jack/control.h"
+#include "control.h"
 
 #ifdef NO_JACK_ERROR
 #define jack_error printf
 #endif
 
 int fraggo = 0;
-
-packet_cache *global_packcache = NULL;
 
 void
 packet_header_hton (jacknet_packet_header *pkthdr)
@@ -388,7 +386,7 @@ netjack_poll_deadline (int sockfd, jack_time_t deadline)
 #if HAVE_PPOLL
     timeout_spec.tv_nsec = (deadline - now) * 1000;
 #else
-    timeout = (deadline - now + 500) / 1000;
+    timeout = lrintf( (float)(deadline - now) / 1000.0 );
 #endif
 
 
@@ -565,7 +563,7 @@ packet_cache_drain_socket( packet_cache *pcache, int sockfd )
 	if( pcache->last_framecnt_retreived_valid && (framecnt <= pcache->last_framecnt_retreived ))
 	    continue;
 
-        cpack = packet_cache_get_packet (global_packcache, framecnt);
+        cpack = packet_cache_get_packet (pcache, framecnt);
         cache_packet_add_fragment (cpack, rx_packet, rcv_len);
 	cpack->recv_timestamp = jack_get_time();
     }
@@ -774,61 +772,6 @@ packet_cache_find_latency( packet_cache *pcache, jack_nframes_t expected_framecn
     return retval;
 }
 // fragmented packet IO
-int
-netjack_recvfrom (int sockfd, char *packet_buf, int pkt_size, int flags, struct sockaddr *addr, size_t *addr_size, int mtu)
-{
-    int retval;
-    socklen_t from_len = *addr_size;
-    if (pkt_size <= mtu) {
-        retval = recvfrom (sockfd, packet_buf, pkt_size, flags, addr, &from_len);
-	*addr_size = from_len;
-	return retval;
-    }
-
-    char *rx_packet = alloca (mtu);
-    jacknet_packet_header *pkthdr = (jacknet_packet_header *) rx_packet;
-    int rcv_len;
-    jack_nframes_t framecnt;
-    cache_packet *cpack;
-    do
-    {
-        rcv_len = recvfrom (sockfd, rx_packet, mtu, 0, addr, &from_len);
-        if (rcv_len < 0)
-            return rcv_len;
-        framecnt = ntohl (pkthdr->framecnt);
-        cpack = packet_cache_get_packet (global_packcache, framecnt);
-        cache_packet_add_fragment (cpack, rx_packet, rcv_len);
-    } while (!cache_packet_is_complete (cpack));
-    memcpy (packet_buf, cpack->packet_buf, pkt_size);
-    cache_packet_reset (cpack);
-    *addr_size = from_len;
-    return pkt_size;
-}
-
-int
-netjack_recv (int sockfd, char *packet_buf, int pkt_size, int flags, int mtu)
-{
-    if (pkt_size <= mtu)
-        return recv (sockfd, packet_buf, pkt_size, flags);
-    char *rx_packet = alloca (mtu);
-    jacknet_packet_header *pkthdr = (jacknet_packet_header *) rx_packet;
-    int rcv_len;
-    jack_nframes_t framecnt;
-    cache_packet *cpack;
-    do
-    {
-        rcv_len = recv (sockfd, rx_packet, mtu, flags);
-        if (rcv_len < 0)
-            return rcv_len;
-        framecnt = ntohl (pkthdr->framecnt);
-        cpack = packet_cache_get_packet (global_packcache, framecnt);
-        cache_packet_add_fragment (cpack, rx_packet, rcv_len);
-    } while (!cache_packet_is_complete (cpack));
-    memcpy (packet_buf, cpack->packet_buf, pkt_size);
-    cache_packet_reset (cpack);
-    return pkt_size;
-}
-
 void
 netjack_sendto (int sockfd, char *packet_buf, int pkt_size, int flags, struct sockaddr *addr, int addr_size, int mtu)
 {
@@ -1427,10 +1370,17 @@ render_payload_to_jack_ports_celt (void *packet_payload, jack_nframes_t net_peri
             // audio port, decode celt data.
 
 	    CELTDecoder *decoder = src_node->data;
+#if HAVE_CELT_API_0_8
+	    if( !packet_payload )
+		celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
+	    else
+		celt_decode_float( decoder, packet_bufX, net_period_down, buf, nframes );
+#else
 	    if( !packet_payload )
 		celt_decode_float( decoder, NULL, net_period_down, buf );
 	    else
 		celt_decode_float( decoder, packet_bufX, net_period_down, buf );
+#endif
 
 	    src_node = jack_slist_next (src_node);
         }
@@ -1472,7 +1422,11 @@ render_jack_ports_to_payload_celt (JSList *playback_ports, JSList *playback_srcs
 	    float *floatbuf = alloca (sizeof(float) * nframes );
 	    memcpy( floatbuf, buf, nframes*sizeof(float) );
 	    CELTEncoder *encoder = src_node->data;
+#if HAVE_CELT_API_0_8
+	    encoded_bytes = celt_encode_float( encoder, floatbuf, nframes, packet_bufX, net_period_up );
+#else
 	    encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
+#endif
 	    if( encoded_bytes != net_period_up )
 		printf( "something in celt changed. netjack needs to be changed to handle this.\n" );
 	    src_node = jack_slist_next( src_node );

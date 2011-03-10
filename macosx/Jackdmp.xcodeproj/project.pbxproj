@@ -1203,14 +1203,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B8F16DB13290DC80002AD73 /* jack_midi_dump Universal */;
+			remoteGlobalIDString = 4B8F16DB13290DC80002AD73;
 			remoteInfo = "jack_midi_dump Universal";
 		};
 		4B8F16FB1329169F0002AD73 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B8F16E813290E0E0002AD73 /* jack_midi_dump 64 bits */;
+			remoteGlobalIDString = 4B8F16E813290E0E0002AD73;
 			remoteInfo = "jack_midi_dump 64 bits";
 		};
 		4BA693E80CBE5BBA00EAD520 /* PBXContainerItemProxy */ = {

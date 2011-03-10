@@ -38,6 +38,8 @@ Valerio Pilo
 
 	* Latency callback must always be activated.
 	* Correct TopologicalSort. 
+	* Add jack_midi_dump client.
+	* Synchronize netjack1 with JACK1 version.
 
 2011-03-09 Stephane Letz  <letz@grame.fr>
 

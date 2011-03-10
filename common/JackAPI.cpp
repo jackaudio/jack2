@@ -260,8 +260,8 @@ extern "C"
     EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path);
     EXPORT int jack_session_reply(jack_client_t* ext_client, jack_session_event_t *event);
     EXPORT void jack_session_event_free(jack_session_event_t* ev);
-    EXPORT char *jack_get_uuid_for_client_name(jack_client_t* ext_client, const char* client_name);
-    EXPORT char *jack_get_client_name_by_uuid(jack_client_t* ext_client, const char* client_uuid);
+    EXPORT char* jack_get_uuid_for_client_name(jack_client_t* ext_client, const char* client_name);
+    EXPORT char* jack_get_client_name_by_uuid(jack_client_t* ext_client, const char* client_uuid);
     EXPORT int jack_reserve_client_name(jack_client_t* ext_client, const char* name, const char* uuid);
     EXPORT void jack_session_commands_free(jack_session_command_t *cmds);
     EXPORT int jack_client_has_session_callback(jack_client_t *client, const char* client_name);
