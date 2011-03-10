@@ -134,8 +134,8 @@ void JackGraphManager::TopologicalSort(std::vector<jack_int_t>& sorted)
 
     do {
         cur_index = GetCurrentIndex();
-        JackConnectionManager* manager = ReadCurrentState();
-        manager->TopologicalSort(sorted);
+        sorted.clear();
+        ReadCurrentState()->TopologicalSort(sorted);
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 }

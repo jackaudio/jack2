@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <iostream>
 #include <fstream>
+#include <set>
 #include <assert.h>
 
 #include "JackSystemDeps.h"
@@ -222,11 +223,11 @@ int JackEngine::ComputeTotalLatencies()
 	 */
 
     for (it = sorted.begin(); it != sorted.end(); it++) {
-        jack_log("ComputeTotalLatencies %d", *it);
+        jack_log("Sorted %d", *it);
         NotifyClient(*it, kLatencyCallback, true, "", 0, 0);
     }
 
-    /* now issue playback latency callbacks in reverse graph order
+    /* now issue playback latency callbacks in reverse graph order.
 	 */
     for (rit = sorted.rbegin(); rit != sorted.rend(); rit++) {
         NotifyClient(*rit, kLatencyCallback, true, "", 1, 0);
@@ -554,7 +555,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
 
     if (uuid < 0) {
         uuid = GetNewUUID();
-        strncpy( real_name, name, JACK_CLIENT_NAME_SIZE );
+        strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
     } else {
         std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
         if (res != fReservationMap.end()) {

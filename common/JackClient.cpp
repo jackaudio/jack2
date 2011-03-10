@@ -319,8 +319,7 @@ int JackClient::HandleLatencyCallback(int status)
 
 	for (it = fPortList.begin(); it != fPortList.end(); it++) {
 	   JackPort* port = GetGraphManager()->GetPort(*it);
-
-		if ((port->GetFlags() & JackPortIsOutput) && (mode == JackPlaybackLatency)) {
+        if ((port->GetFlags() & JackPortIsOutput) && (mode == JackPlaybackLatency)) {
             GetGraphManager()->RecalculateLatency(*it, mode);
 		}
 		if ((port->GetFlags() & JackPortIsInput) && (mode == JackCaptureLatency)) {
@@ -339,10 +338,8 @@ int JackClient::HandleLatencyCallback(int status)
 			 */
 			for (it = fPortList.begin(); it != fPortList.end(); it++) {
                 JackPort* port = GetGraphManager()->GetPort(*it);
-
-				if (port->GetFlags() & JackPortIsOutput) {
+                if (port->GetFlags() & JackPortIsOutput) {
 					jack_latency_range_t other_latency;
-
 					port->GetLatencyRange(mode, &other_latency);
 					if (other_latency.max > latency.max)
 						latency.max = other_latency.max;
@@ -358,8 +355,7 @@ int JackClient::HandleLatencyCallback(int status)
 			 */
 			for (it = fPortList.begin(); it != fPortList.end(); it++) {
                 JackPort* port = GetGraphManager()->GetPort(*it);
-
-				if (port->GetFlags() & JackPortIsInput) {
+                if (port->GetFlags() & JackPortIsInput) {
 					port->SetLatencyRange(mode, &latency);
 				}
 			}
@@ -369,11 +365,9 @@ int JackClient::HandleLatencyCallback(int status)
 			 */
 			for (it = fPortList.begin(); it != fPortList.end(); it++) {
                 JackPort* port = GetGraphManager()->GetPort(*it);
-
 				if (port->GetFlags() & JackPortIsInput) {
 					jack_latency_range_t other_latency;
-
-					port->GetLatencyRange(mode, &other_latency);
+                    port->GetLatencyRange(mode, &other_latency);
 					if (other_latency.max > latency.max)
 						latency.max = other_latency.max;
 					if (other_latency.min < latency.min)
@@ -388,8 +382,7 @@ int JackClient::HandleLatencyCallback(int status)
 			 */
 			for (it = fPortList.begin(); it != fPortList.end(); it++) {
                 JackPort* port = GetGraphManager()->GetPort(*it);
-
-				if (port->GetFlags() & JackPortIsOutput) {
+                if (port->GetFlags() & JackPortIsOutput) {
 					port->SetLatencyRange(mode, &latency);
 				}
 			}
@@ -1246,9 +1239,9 @@ int JackClient::SessionReply(jack_session_event_t* ev)
 
     jack_log("JackClient::SessionReply... out of cb");
 
-    int res;
-    fChannel->SessionReply(GetClientControl()->fRefNum, &res);
-    return res;
+    int result = -1;
+    fChannel->SessionReply(GetClientControl()->fRefNum, &result);
+    return result;
 }
 
 char* JackClient::GetUUIDForClientName(const char* client_name)

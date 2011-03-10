@@ -24,7 +24,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackActivationCount.h"
 #include "JackError.h"
 #include "JackCompilerDeps.h"
-
 #include <vector>
 #include <assert.h>
 
@@ -201,6 +200,11 @@ class JackFixedMatrix
             return fTable[index1][index2];
         }
 
+        void ClearItem(jack_int_t index1, jack_int_t index2)
+        {
+            fTable[index1][index2] = 0;
+        }
+
         /*!
         	\brief Get the output indexes of a given index.
         */
@@ -234,6 +238,14 @@ class JackFixedMatrix
             }
             return false;
         }
+
+        void Copy(JackFixedMatrix& copy)
+        {
+            for (int i = 0; i < SIZE; i++) {
+                memcpy(copy.fTable[i], fTable[i], sizeof(jack_int_t) * SIZE);
+            }
+        }
+
 
 } POST_PACKED_STRUCTURE;
 
@@ -383,11 +395,9 @@ struct JackClientTiming
 
 <UL>
 <LI>The <B>fConnection</B> array contains the list (array line) of connected ports for a given port.
-<LI>The <B>fConnectionCount</B> array contains the number of connected ports to a given port.
 <LI>The <B>fInputPort</B> array contains the list (array line) of input connected  ports for a given client.
 <LI>The <B>fOutputPort</B> array contains the list (array line) of ouput connected  ports for a given client.
 <LI>The <B>fConnectionRef</B> array contains the number of ports connected between two clients.
-<LI>The <B>fInputRef</B> array contains the number of input clients connected to a given client.
 <LI>The <B>fInputCounter</B> array contains the number of input clients connected to a given for activation purpose.
 </UL>
 */
@@ -405,8 +415,6 @@ class SERVER_EXPORT JackConnectionManager
         JackLoopFeedback<CONNECTION_NUM_FOR_PORT> fLoopFeedback;		/*! Loop feedback connections */
 
         bool IsLoopPathAux(int ref1, int ref2) const;
-
-        void Visit(jack_int_t refnum, bool visited[CLIENT_NUM], std::vector<jack_int_t>& res);
 
     public:
 

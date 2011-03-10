@@ -37,6 +37,7 @@ Valerio Pilo
 2011-03-10 Stephane Letz  <letz@grame.fr>
 
 	* Latency callback must always be activated.
+	* Correct TopologicalSort. 
 
 2011-03-09 Stephane Letz  <letz@grame.fr>
 
