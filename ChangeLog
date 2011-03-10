@@ -40,6 +40,7 @@ Valerio Pilo
 	* Correct TopologicalSort. 
 	* Add jack_midi_dump client.
 	* Synchronize netjack1 with JACK1 version.
+	* Synchronize jack_connect/jack_disconnect with JACK1 version.
 
 2011-03-09 Stephane Letz  <letz@grame.fr>
 
