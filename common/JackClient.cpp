@@ -1152,7 +1152,7 @@ int JackClient::SetLatencyCallback(JackLatencyCallback callback, void *arg)
         jack_error("You cannot set callbacks on an active client");
         return -1;
     } else {
-        GetClientControl()->fCallback[kLatencyCallback] = (callback != NULL);
+        // fCallback[kLatencyCallback] must always be 'true'
         fLatencyArg = arg;
         fLatency = callback;
         return 0;

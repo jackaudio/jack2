@@ -246,7 +246,7 @@ void JackEngine::NotifyClient(int refnum, int event, int sync, const char* messa
     // The client may be notified by the RT thread while closing
     if (client) {
 
-        if (client && client->GetClientControl()->fCallback[event]) {
+        if (client->GetClientControl()->fCallback[event]) {
             /*
                 Important for internal clients : unlock before calling the notification callbacks.
             */

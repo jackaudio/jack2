@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -25,8 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPort.h"
 #include "JackSynchro.h"
 #include "JackNotification.h"
-
-#include "jack/session.h"
+#include "session.h"
 
 namespace Jack
 {
@@ -74,6 +73,7 @@ struct JackClientControl : public JackShmMemAble
         fCallback[kAddClient] = true;
         fCallback[kRemoveClient] = true;
         fCallback[kActivateClient] = true;
+        fCallback[kLatencyCallback] = true;
         // So that driver synchro are correctly setup in "flush" or "normal" mode
         fCallback[kStartFreewheelCallback] = true;
         fCallback[kStopFreewheelCallback] = true;

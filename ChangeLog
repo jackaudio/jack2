@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-03-10 Stephane Letz  <letz@grame.fr>
+
+	* Latency callback must always be activated.
+
 2011-03-09 Stephane Letz  <letz@grame.fr>
 
 	* jack_client_has_session_callback implementation.

@@ -33,7 +33,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 
 #if defined(JACK_DBUS) && defined(__linux__)
-#include <dbus/dbus.h> 
+#include <dbus/dbus.h>
 #include "audio_reserve.h"
 #endif
 
@@ -85,7 +85,7 @@ static void copyright(FILE* file)
 {
     fprintf(file, "jackdmp " VERSION "\n"
             "Copyright 2001-2005 Paul Davis and others.\n"
-            "Copyright 2004-2010 Grame.\n"
+            "Copyright 2004-2011 Grame.\n"
             "jackdmp comes with ABSOLUTELY NO WARRANTY\n"
             "This is free software, and you are welcome to redistribute it\n"
             "under certain conditions; see the file COPYING for details\n");
@@ -114,10 +114,10 @@ static void usage(FILE* file)
             "         -d backend [ ... backend args ... ]\n"
 #ifdef __APPLE__
             "               Available backends may include: coreaudio, dummy or net.\n\n"
-#endif 
+#endif
 #ifdef WIN32
             "               Available backends may include: portaudio, dummy or net.\n\n"
-#endif 
+#endif
 #ifdef __linux__
             "               Available backends may include: alsa, dummy, freebob, firewire or net\n\n"
 #endif
@@ -178,13 +178,13 @@ int main(int argc, char* argv[])
     jackctl_driver_t * midi_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl;
     int replace_registry = 0;
-    
+
     const char *options = "-d:X:P:uvshVrRL:STFl:t:mn:p:"
 #ifdef __linux__
         "c:"
 #endif
         ;
-    
+
     struct option long_options[] = {
 #ifdef __linux__
                                        { "clock-source", 1, 0, 'c' },
@@ -199,7 +199,7 @@ int main(int argc, char* argv[])
                                        { "name", 1, 0, 'n' },
                                        { "unlock", 0, 0, 'u' },
                                        { "realtime", 0, 0, 'R' },
-                                       { "no-realtime", 0, 0, 'r' }, 
+                                       { "no-realtime", 0, 0, 'r' },
                                        { "replace-registry", 0, &replace_registry, 0 },
                                        { "loopback", 0, 0, 'L' },
                                        { "realtime-priority", 1, 0, 'P' },
@@ -239,23 +239,23 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Failed to create server object\n");
         return -1;
     }
-  
+
     server_parameters = jackctl_server_get_parameters(server_ctl);
-    
+
     // Default setting
     param = jackctl_get_parameter(server_parameters, "realtime");
     if (param != NULL) {
         value.b = true;
         jackctl_parameter_set_value(param, &value);
     }
-    
+
     opterr = 0;
     while (!seen_audio_driver &&
             (opt = getopt_long(argc, argv, options,
                                long_options, &option_index)) != EOF) {
         switch (opt) {
 
-        #ifdef __linux__        
+        #ifdef __linux__
             case 'c':
                 param = jackctl_get_parameter(server_parameters, "clock-source");
                 if (param != NULL) {
@@ -280,7 +280,7 @@ int main(int argc, char* argv[])
                 seen_audio_driver = true;
                 audio_driver_name = optarg;
                 break;
-                
+
             case 'L':
                 loopback = atoi(optarg);
                 break;
@@ -342,7 +342,7 @@ int main(int argc, char* argv[])
                     jackctl_parameter_set_value(param, &value);
                 }
                 break;
-          
+
             case 'r':
                 param = jackctl_get_parameter(server_parameters, "realtime");
                 if (param != NULL) {
@@ -388,14 +388,14 @@ int main(int argc, char* argv[])
                 goto fail_free1;
         }
     }
-    
+
     // Long option with no letter so treated separately
     param = jackctl_get_parameter(server_parameters, "replace-registry");
     if (param != NULL) {
         value.b = replace_registry;
         jackctl_parameter_set_value(param, &value);
     }
- 
+
     if (show_version) {
         printf( "jackdmp version " VERSION
                 " tmpdir " jack_server_dir
@@ -441,7 +441,7 @@ int main(int argc, char* argv[])
 
     // Setup signals then start server
     signals = jackctl_setup_signals(0);
-   
+
     if (!jackctl_server_start(server_ctl, audio_driver_ctl)) {
         fprintf(stderr, "Failed to start server\n");
         goto fail_free1;
@@ -458,7 +458,7 @@ int main(int argc, char* argv[])
 
         jackctl_server_add_slave(server_ctl, midi_driver_ctl);
     }
-    
+
     // Loopback driver
     if (loopback > 0) {
         loopback_driver_ctl = jackctl_server_get_driver(server_ctl, "loopback");
@@ -480,7 +480,7 @@ int main(int argc, char* argv[])
 
     if (!jackctl_server_stop(server_ctl))
         fprintf(stderr, "Cannot stop server...\n");
-    
+
     jackctl_server_destroy(server_ctl);
     notify_server_stop(server_name);
     return 0;
@@ -488,7 +488,7 @@ int main(int argc, char* argv[])
 fail_free1:
     jackctl_server_destroy(server_ctl);
     return -1;
-    
+
 fail_free2:
     jackctl_server_stop(server_ctl);
     jackctl_server_destroy(server_ctl);
