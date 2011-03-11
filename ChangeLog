@@ -37,7 +37,8 @@ Valerio Pilo
 2011-03-11 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackNetMaster::SetBufferSize.
-	* Use jack_default_audio_sample_t instead of float consistently.
+	* Use jack_default_audio_sample_t instead of float consistently, fix ticket #201."
+	* -X now allows to add several slave backends, add -I to load several internal clients.
 
 2011-03-10 Stephane Letz  <letz@grame.fr>
 
