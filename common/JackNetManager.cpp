@@ -388,10 +388,13 @@ namespace Jack
         return ( fReturnTransportData.fState == JackTransportNetStarting );
     }
 
-    int JackNetMaster::SetBufferSize (jack_nframes_t nframes, void* arg)
+    int JackNetMaster::SetBufferSize(jack_nframes_t nframes, void* arg)
     {
-        jack_error("Cannot handle bufer size change, so proxy will be removed...");
-        static_cast<JackNetMaster*> ( arg )->Exit();
+        JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
+        if (nframes != obj->fParams.fPeriodSize) {
+            jack_error("Cannot handle bufer size change, so proxy will be removed...");
+            obj->Exit();
+        }
         return 0;
     }
 

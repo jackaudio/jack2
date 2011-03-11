@@ -243,12 +243,8 @@ namespace Jack
     {
         jack_log ( "JackNetOneDriver::Init()" );
 
-        /* SL: no more needed
-        if( global_packcache != NULL ) {
-            FreePorts();
-            netjack_release( &netj );
-        }
-        */
+        FreePorts();
+        netjack_release( &netj );
 
         //display some additional infos
         jack_info ( "NetOne driver started" );
@@ -421,12 +417,7 @@ namespace Jack
         if (netj.srcaddress_valid)
         {
             unsigned int r;
-
-    #ifdef __APPLE__
             static const int flag = 0;
-    #else
-            static const int flag = 0;
-    #endif
 
             if (netj.reply_port)
             netj.syncsource_address.sin_port = htons(netj.reply_port);
