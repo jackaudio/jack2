@@ -26,7 +26,7 @@
 		<Project filename="jack_netadapter.cbp">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
-		<Project filename="libjack.cbp" active="1" />
+		<Project filename="libjack.cbp" />
 		<Project filename="jack_load.cbp">
 			<Depends filename="libjack.cbp" />
 		</Project>
@@ -57,10 +57,6 @@
 			<Depends filename="libjack.cbp" />
 		</Project>
 		<Project filename="jack_winmme.cbp" />
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_loopback.cbp" />
-			<Depends filename="libjackserver.cbp" />
-		</Project>
+		<Project filename="jack_loopback.cbp" active="1" />
 	</Workspace>
 </CodeBlocks_workspace_file>
