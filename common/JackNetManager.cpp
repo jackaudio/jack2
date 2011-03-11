@@ -392,7 +392,7 @@ namespace Jack
     {
         JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
         if (nframes != obj->fParams.fPeriodSize) {
-            jack_error("Cannot handle bufer size change, so proxy will be removed...");
+            jack_error("Cannot handle bufer size change, so JackNetMaster proxy will be removed...");
             obj->Exit();
         }
         return 0;
