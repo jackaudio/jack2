@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackRequest.h"
 #include "JackConstants.h"
 #include "JackNotification.h"
+#include "JackServerGlobals.h"
 
 namespace Jack
 {
@@ -33,6 +34,7 @@ int JackSocketServerNotifyChannel::Open(const char* server_name)
         return -1;
     } else {
         fRequestSocket.SetNonBlocking(true);
+        JackServerGlobals::fRTNotificationSocket = fRequestSocket.GetFd();
         return 0;
     }
 }
@@ -63,7 +65,7 @@ void JackSocketServerNotifyChannel::NotifyQuit()
         jack_error("Could not write request ref = %d notify = %d", -1, kQUIT);
     }
 }
-    
+
 
 } // end of namespace
 

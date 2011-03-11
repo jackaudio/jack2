@@ -18,7 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+#include "JackGlobals.h"
+#include "JackEngineControl.h"
 #include "JackPortType.h"
+
 #include <string.h>
 
 #if defined (__APPLE__)
@@ -46,7 +49,7 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
     frames = frames % 4;
 
     while (frames_group > 0) {
-#if defined (__SSE__) && !defined (__sun__) 
+#if defined (__SSE__) && !defined (__sun__)
         __m128 vec = _mm_add_ps(_mm_load_ps(mixbuffer), _mm_load_ps(buffer));
         _mm_store_ps(mixbuffer, vec);
 
@@ -97,7 +100,7 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     void* buffer;
 
     // Copy first buffer
-#if defined (__SSE__) && !defined (__sun__) 
+#if defined (__SSE__) && !defined (__sun__)
     jack_nframes_t frames_group = nframes / 4;
     jack_nframes_t remaining_frames = nframes % 4;
 
@@ -127,12 +130,18 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     }
 }
 
+static size_t AudioBufferSize()
+{
+    return GetEngineControl()->fBufferSize * sizeof(float);
+}
+
 const JackPortType gAudioPortType =
-    {
-        JACK_DEFAULT_AUDIO_TYPE,
-        AudioBufferInit,
-        AudioBufferMixdown
-    };
+{
+    JACK_DEFAULT_AUDIO_TYPE,
+    AudioBufferSize,
+    AudioBufferInit,
+    AudioBufferMixdown
+};
 
 } // namespace Jack
 

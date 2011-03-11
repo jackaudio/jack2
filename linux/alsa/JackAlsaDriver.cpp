@@ -276,7 +276,7 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				} else {
 					driver->channel_copy = memcpy_fake;
 				}
-			
+
 				switch (driver->dither) {
 				case Rectangular:
 					jack_info("Rectangular dithering at 16 bits");
@@ -284,42 +284,42 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
         	                                sample_move_dither_rect_d16_sSs:
         	                                sample_move_dither_rect_d16_sS;
 					break;
-				
+
 				case Triangular:
 					jack_info("Triangular dithering at 16 bits");
 					driver->write_via_copy = driver->quirk_bswap?
         	                                sample_move_dither_tri_d16_sSs:
         	                                sample_move_dither_tri_d16_sS;
 					break;
-				
+
 				case Shaped:
 					jack_info("Noise-shaped dithering at 16 bits");
 					driver->write_via_copy = driver->quirk_bswap?
         	                                sample_move_dither_shaped_d16_sSs:
         	                                sample_move_dither_shaped_d16_sS;
 					break;
-				
+
 				default:
 					driver->write_via_copy = driver->quirk_bswap?
-        	                                sample_move_d16_sSs : 
+        	                                sample_move_d16_sSs :
         					sample_move_d16_sS;
 					break;
 				}
 				break;
-			
+
 			case 3: /* NO DITHER */
 				if (driver->playback_interleaved) {
 					driver->channel_copy = memcpy_interleave_d24_s24;
 				} else {
 					driver->channel_copy = memcpy_fake;
 				}
-			
+
 				driver->write_via_copy = driver->quirk_bswap?
-					sample_move_d24_sSs: 
+					sample_move_d24_sSs:
 					sample_move_d24_sS;
 
 				break;
-									
+
 		 	case 4: /* NO DITHER */
 				if (driver->playback_interleaved) {
 					driver->channel_copy = memcpy_interleave_d32_s32;
@@ -328,7 +328,7 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 				}
 
 				driver->write_via_copy = driver->quirk_bswap?
-					sample_move_d32u24_sSs: 
+					sample_move_d32u24_sSs:
 					sample_move_d32u24_sS;
 			    break;
 
@@ -339,27 +339,27 @@ JackAlsaDriver::alsa_driver_setup_io_function_pointers (alsa_driver_t *driver)
 			}
 		}
 	}
-	
+
 	if (driver->capture_handle) {
 		switch (driver->capture_sample_bytes) {
 		case 2:
 			driver->read_via_copy = driver->quirk_bswap?
-				sample_move_dS_s16s: 
+				sample_move_dS_s16s:
 			        sample_move_dS_s16;
 			break;
 		case 3:
 			driver->read_via_copy = driver->quirk_bswap?
-				sample_move_dS_s24s: 
+				sample_move_dS_s24s:
 			        sample_move_dS_s24;
 			break;
 		case 4:
 			driver->read_via_copy = driver->quirk_bswap?
-			 	sample_move_dS_s32u24s: 
+			 	sample_move_dS_s32u24s:
 			        sample_move_dS_s32u24;
 			break;
 		}
 	}
-    
+
     return 0;
 }
 
@@ -418,7 +418,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 			}
 		}
 	}
-	
+
 	format = (sample_width == 4) ? 0 : NUMFORMATS - 1;
 
 	while (1) {
@@ -444,7 +444,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 			jack_info ("ALSA: final selected sample format for %s: %s", stream_name, formats[format].Name);
 			break;
 		}
-	} 
+	}
 
 	frame_rate = driver->frame_rate ;
 	err = snd_pcm_hw_params_set_rate_near (handle, hw_params,
@@ -464,7 +464,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 							  &channels_max);
 		*nchns = channels_max ;
 
-		if (*nchns > 1024) { 
+		if (*nchns > 1024) {
 
 			/* the hapless user is an unwitting victim of
 			   the "default" ALSA PCM device, which can
@@ -481,9 +481,9 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 "instead rather than using the plug layer. Usually the name of the\n"
 "hardware device that corresponds to the first sound card is hw:0\n"
 				);
-			*nchns = 2;  
+			*nchns = 2;
 		}
-	}				
+	}
 
 	if ((err = snd_pcm_hw_params_set_channels (handle, hw_params,
 						   *nchns)) < 0) {
@@ -491,7 +491,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 			    *nchns, stream_name);
 		return -1;
 	}
-	
+
 	if ((err = snd_pcm_hw_params_set_period_size (handle, hw_params,
 						      driver->frames_per_cycle,
 						      0))
@@ -520,7 +520,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 		return -1;
 	}
 	jack_info ("ALSA: use %d periods for %s", *nperiodsp, stream_name);
-#if 0	
+#if 0
 	if (!jack_power_of_two(driver->frames_per_cycle)) {
 		jack_error("JACK: frames must be a power of two "
 			   "(64, 512, 1024, ...)\n");
@@ -557,7 +557,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 	if (driver->soft_mode) {
 		stop_th = (snd_pcm_uframes_t)-1;
 	}
-	
+
 	if ((err = snd_pcm_sw_params_set_stop_threshold (
 		     handle, sw_params, stop_th)) < 0) {
 		jack_error ("ALSA: cannot set stop mode for %s",
@@ -594,7 +594,7 @@ JackAlsaDriver::alsa_driver_configure_stream (alsa_driver_t *driver, char *devic
 	else
 		err = snd_pcm_sw_params_set_avail_min (
 			handle, sw_params, driver->frames_per_cycle);
-			
+
 	if (err < 0) {
 		jack_error ("ALSA: cannot set avail min for %s", stream_name);
 		return -1;
@@ -1158,7 +1158,7 @@ int
 JackAlsaDriver::alsa_driver_restart (alsa_driver_t *driver)
 {
     int res;
-    
+
     driver->xrun_recovery = 1;
     if ((res = Stop()) == 0)
         res = Start();
@@ -1189,11 +1189,24 @@ JackAlsaDriver::alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed
         }
     }
 
+    if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED) {
+        jack_error("**** alsa_pcm: pcm in suspended state, resuming it" );
+        if (driver->capture_handle) {
+            if ((res = snd_pcm_prepare(driver->capture_handle)) < 0) {
+                    jack_error("error preparing after suspend: %s", snd_strerror(res));
+            }
+        } else {
+            if ((res = snd_pcm_prepare(driver->playback_handle)) < 0) {
+                    jack_error("error preparing after suspend: %s", snd_strerror(res));
+            }
+        }
+    }
+
     if (snd_pcm_status_get_state(status) == SND_PCM_STATE_XRUN
             && driver->process_count > XRUN_REPORT_DELAY) {
         struct timeval now, diff, tstamp;
         driver->xrun_count++;
-        snd_pcm_status_get_tstamp(status,&now); 
+        snd_pcm_status_get_tstamp(status,&now);
         snd_pcm_status_get_trigger_tstamp(status, &tstamp);
         timersub(&now, &tstamp, &diff);
         *delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
@@ -1253,7 +1266,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 	}
 
   again:
-	
+
 	while (need_playback || need_capture) {
 
 		int poll_result;
@@ -1269,7 +1282,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 						  driver->playback_nfds);
 			nfds += driver->playback_nfds;
 		}
-		
+
 		if (need_capture) {
 			snd_pcm_poll_descriptors (driver->capture_handle,
 						  &driver->pfd[nfds],
@@ -1279,7 +1292,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 		}
 
 		/* ALSA doesn't set POLLERR in some versions of 0.9.X */
-		
+
 		for (i = 0; i < nfds; i++) {
 			driver->pfd[i].events |= POLLERR;
 		}
@@ -1316,12 +1329,12 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 				*status = -2;
 				return 0;
 			}
-			
+
 			jack_error ("ALSA: poll call failed (%s)",
 				    strerror (errno));
 			*status = -3;
 			return 0;
-			
+
 		}
 
 		poll_ret = jack_get_microseconds ();
@@ -1332,12 +1345,12 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 		if (extra_fd < 0) {
 			if (driver->poll_next && poll_ret > driver->poll_next) {
 				*delayed_usecs = poll_ret - driver->poll_next;
-			} 
+			}
 			driver->poll_last = poll_ret;
 			driver->poll_next = poll_ret + driver->period_usecs;
 			// steph
 			/*
-			driver->engine->transport_cycle_start (driver->engine, 
+			driver->engine->transport_cycle_start (driver->engine,
 							       poll_ret);
 			*/
 		}
@@ -1358,7 +1371,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 
 				*status = -4;
 				return -1;
-			} 
+			}
 
 			/* if POLLIN was the only bit set, we're OK */
 
@@ -1414,14 +1427,14 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 #endif
 			}
 		}
-		
+
 		if (poll_result == 0) {
 			jack_error ("ALSA: poll time out, polled for %" PRIu64
 				    " usecs",
 				    poll_ret - poll_enter);
 			*status = -5;
 			return 0;
-		}		
+		}
 
 	}
 
@@ -1437,7 +1450,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 		}
 	} else {
 		/* odd, but see min() computation below */
-		capture_avail = INT_MAX; 
+		capture_avail = INT_MAX;
 	}
 
 	if (driver->playback_handle) {
@@ -1452,7 +1465,7 @@ JackAlsaDriver::alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *stat
 		}
 	} else {
 		/* odd, but see min() computation below */
-		playback_avail = INT_MAX; 
+		playback_avail = INT_MAX;
 	}
 
 	if (xrun_detected) {
@@ -1531,7 +1544,7 @@ JackAlsaDriver::alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
     if (!driver->capture_handle) {
         return 0;
     }
-   
+
     nread = 0;
     contiguous = 0;
     orig_nframes = nframes;
@@ -1559,11 +1572,11 @@ JackAlsaDriver::alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
         /* // steph
         for (chn = 0, node = driver->capture_ports; node;
              node = jack_slist_next (node), chn++) {
-        	
+
         	port = (jack_port_t *) node->data;
-        	
+
         	if (!jack_port_connected (port)) {
-        		// no-copy optimization 
+        		// no-copy optimization
         		continue;
         	}
         	buf = jack_port_get_buffer (port, orig_nframes);
@@ -1574,7 +1587,7 @@ JackAlsaDriver::alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 
         if ((err = snd_pcm_mmap_commit (driver->capture_handle,
                                         offset, contiguous)) < 0) {
-         
+
             jack_error ("ALSA: could not complete read of %"
             		PRIu32 " frames: error = %d\n", contiguous, err);
             return -1;
@@ -1702,7 +1715,7 @@ JackAlsaDriver::alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes
         		}
         		monbuf = jack_port_get_buffer (port, orig_nframes);
         		memcpy (monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
-        		mon_node = jack_slist_next (mon_node);				
+        		mon_node = jack_slist_next (mon_node);
         	}
         }
         */
@@ -1716,7 +1729,7 @@ JackAlsaDriver::alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes
                                         offset, contiguous)) < 0) {
             jack_error ("ALSA: could not complete playback of %"
             		PRIu32 " frames: error = %d", contiguous, err);
-            if (err != EPIPE && err != ESTRPIPE)
+            if (err != -EPIPE && err != -ESTRPIPE)
                 return -1;
         }
 
@@ -1739,11 +1752,11 @@ JackAlsaDriver::alsa_driver_delete (alsa_driver_t *driver)
         free (node->data);
     }
     jack_slist_free (driver->clock_sync_listeners);
-    
+
     if (driver->ctl_handle) {
         snd_ctl_close (driver->ctl_handle);
         driver->ctl_handle = 0;
-    } 
+    }
 
     if (driver->capture_handle) {
         snd_pcm_close (driver->capture_handle);
@@ -1821,14 +1834,14 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
     jack_info ("creating alsa driver ... %s|%s|%" PRIu32 "|%" PRIu32
     	"|%" PRIu32"|%" PRIu32"|%" PRIu32 "|%s|%s|%s|%s",
     	playing ? playback_alsa_device : "-",
-    	capturing ? capture_alsa_device : "-", 
+    	capturing ? capture_alsa_device : "-",
     	frames_per_cycle, user_nperiods, rate,
     	user_capture_nchnls,user_playback_nchnls,
     	hw_monitoring ? "hwmon": "nomon",
     	hw_metering ? "hwmeter":"swmeter",
     	soft_mode ? "soft-mode":"-",
     	shorts_first ? "16bit":"32bit");
- 
+
     driver = (alsa_driver_t *) calloc (1, sizeof (alsa_driver_t));
 
     jack_driver_nt_init ((jack_driver_nt_t *) driver);
@@ -1862,8 +1875,8 @@ JackAlsaDriver::alsa_driver_new (const char *name, char *playback_alsa_device,
 
     driver->playback_addr = 0;
     driver->capture_addr = 0;
-    driver->playback_interleave_skip = NULL; 
-    driver->capture_interleave_skip = NULL; 
+    driver->playback_interleave_skip = NULL;
+    driver->capture_interleave_skip = NULL;
 
     driver->silent = 0;
     driver->all_monitor_in = FALSE;
@@ -2071,6 +2084,7 @@ int JackAlsaDriver::Attach()
     unsigned long port_flags;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    jack_latency_range_t range;
 
     assert(fCaptureChannels < DRIVER_PORT_NUM);
     assert(fPlaybackChannels < DRIVER_PORT_NUM);
@@ -2097,7 +2111,8 @@ int JackAlsaDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        port->SetLatency(alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency);
+        range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
+        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fCapturePortList[i] %ld ", port_index);
     }
@@ -2114,8 +2129,10 @@ int JackAlsaDriver::Attach()
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
         // Add one buffer more latency if "async" mode is used...
-        port->SetLatency((alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
-                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency);
+        range.min = range.max = (alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
+                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency;
+
+        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] %ld ", port_index);
 
@@ -2127,7 +2144,8 @@ int JackAlsaDriver::Attach()
                 jack_error ("ALSA: cannot register monitor port for %s", name);
             } else {
                 port = fGraphManager->GetPort(port_index);
-                port->SetLatency(alsa_driver->frames_per_cycle);
+                range.min = range.max = alsa_driver->frames_per_cycle;
+                port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
             }
         }
@@ -2151,7 +2169,7 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
-static int card_to_num(const char* device) 
+static int card_to_num(const char* device)
 {
     int err;
     char* ctl_name;
@@ -2316,13 +2334,13 @@ int JackAlsaDriver::Read()
 retry:
 
     nframes = alsa_driver_wait((alsa_driver_t *)fDriver, -1, &wait_status, &fDelayedUsecs);
- 
+
     if (wait_status < 0)
         return -1;		/* driver failed */
 
     if (nframes == 0) {
         /* we detected an xrun and restarted: notify
-         * clients about the delay. 
+         * clients about the delay.
          */
         jack_log("ALSA XRun wait_status = %d", wait_status);
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
@@ -2331,7 +2349,7 @@ retry:
 
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackAlsaDriver::Read warning nframes = %ld", nframes);
-        
+
     // Has to be done before read
     JackDriver::CycleIncTime();
 
@@ -2619,7 +2637,7 @@ get_dither_constraint()
 }
 
 static int
-dither_opt (char c, DitherAlgorithm* dither) 
+dither_opt (char c, DitherAlgorithm* dither)
 {
     switch (c) {
         case '-':
@@ -2646,17 +2664,17 @@ dither_opt (char c, DitherAlgorithm* dither)
     return 0;
 }
 
-SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor () 
+SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 {
     jack_driver_desc_t * desc;
     jack_driver_param_desc_t * params;
     unsigned int i;
 
     desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-    
+
     strcpy(desc->name, "alsa");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
     strcpy(desc->desc, "Linux ALSA API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-    
+
     desc->nparams = 18;
     params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
 
@@ -2825,7 +2843,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     return desc;
 }
 
-SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
 {
     jack_nframes_t srate = 48000;
     jack_nframes_t frames_per_interrupt = 1024;

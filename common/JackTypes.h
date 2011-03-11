@@ -34,6 +34,12 @@ typedef signed long   SInt32;
 
 #include "JackTypes_os.h"
 
+/**
+ * Type used to represent the value of free running
+ * monotonic clock with units of microseconds.
+ */
+typedef uint64_t jack_time_t;
+
 typedef uint16_t jack_int_t;  // Internal type for ports and refnum
 
 typedef enum {

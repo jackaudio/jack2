@@ -104,7 +104,7 @@ typedef struct input_port_t {
 
 	// jack
 	midi_unpack_t unpack;
-	
+
 	// midi
 	int overruns;
 } input_port_t;
@@ -114,7 +114,7 @@ typedef struct output_port_t {
 
 	// jack
 	midi_pack_t packer;
-	
+
 	// midi
 	event_head_t next_event;
 	int todo;
@@ -425,16 +425,16 @@ static
 inline int midi_port_open_jack(alsa_rawmidi_t *midi, midi_port_t *port, int type, const char *alias)
 {
 	char name[128];
-	
+
 	if (type & JackPortIsOutput)
 		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++midi->midi_in_cnt);
-	else 
+	else
 		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++midi->midi_out_cnt);
 
 	port->jack = jack_port_register(midi->client, name, JACK_DEFAULT_MIDI_TYPE,
-		type | JackPortIsPhysical | JackPortIsTerminal | JackPortIsActive, 0);
-		
-	if (port->jack) 
+		type | JackPortIsPhysical | JackPortIsTerminal, 0);
+
+	if (port->jack)
 		jack_port_set_alias(port->jack, alias);
 	return port->jack == NULL;
 }
@@ -455,7 +455,7 @@ int midi_port_open(alsa_rawmidi_t *midi, midi_port_t *port)
 		out = &port->rawmidi;
 		type = JackPortIsInput;
 	}
-	
+
 	if ((err = snd_rawmidi_open(in, out, port->dev, SND_RAWMIDI_NONBLOCK))<0)
 		return err;
 
@@ -749,7 +749,7 @@ void* scan_thread(void *arg)
 	return NULL;
 }
 
-/* 
+/*
  * ------------------------------- Input/Output  ------------------------------
  */
 
@@ -836,7 +836,7 @@ void *midi_thread(void *arg)
 	npfds = 1;
 
  	if (jack_is_realtime(midi->client))
-	    set_threaded_log_function(); 	
+	    set_threaded_log_function();
 
 	//debug_log("midi_thread(%s): enter", str->name);
 
@@ -978,7 +978,7 @@ int midi_update_pfds(process_midi_t *proc)
 	return 1;
 }
 
-/* 
+/*
  * ------------------------------------ Input ------------------------------
  */
 
@@ -1083,7 +1083,7 @@ int do_midi_input(process_midi_t *proc)
 	return 1;
 }
 
-/* 
+/*
  * ------------------------------------ Output ------------------------------
  */
 
@@ -1149,7 +1149,7 @@ int do_midi_output(process_midi_t *proc)
 		} else
 			debug_log("midi_out: at %ld got %d bytes for %ld", (long)proc->cur_time, (int)port->next_event.size, (long)port->next_event.time);
 	}
-	
+
 	if (port->todo)
 		debug_log("midi_out: todo = %d at %ld", (int)port->todo, (long)proc->cur_time);
 

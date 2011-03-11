@@ -108,8 +108,8 @@ def configure(conf):
     #   conf.check_tool('compiler_cxx')
     #   conf.check_tool('compiler_cc')
  
-    conf.env.append_unique('CXXFLAGS', '-O3 -Wall')
-    conf.env.append_unique('CCFLAGS', '-O3 -Wall')
+    conf.env.append_unique('CXXFLAGS', '-Wall')
+    conf.env.append_unique('CCFLAGS', '-Wall')
 
     conf.sub_config('common')
     if conf.env['IS_LINUX']:
@@ -129,18 +129,26 @@ def configure(conf):
             conf.fatal('jackdbus was explicitly requested but cannot be built')
     conf.sub_config('example-clients')
 
-    if conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
+    if conf.check_cfg(package='celt', atleast_version='0.8.0', args='--cflags --libs'):
         conf.define('HAVE_CELT', 1)
+        conf.define('HAVE_CELT_API_0_8', 1)
+        conf.define('HAVE_CELT_API_0_7', 0)
+        conf.define('HAVE_CELT_API_0_5', 0)
+    elif conf.check_cfg(package='celt', atleast_version='0.7.0', args='--cflags --libs'):
+        conf.define('HAVE_CELT', 1)
+        conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 1)
         conf.define('HAVE_CELT_API_0_5', 0)
     elif conf.check_cfg(package='celt', atleast_version='0.5.0', args='--cflags --libs', required=True):
         conf.define('HAVE_CELT', 1)
-        conf.define('HAVE_CELT_API_0_5', 1)
+        conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 0)
+        conf.define('HAVE_CELT_API_0_5', 1)
     else:
         conf.define('HAVE_CELT', 0)
-        conf.define('HAVE_CELT_API_0_5', 0)
+        conf.define('HAVE_CELT_API_0_8', 0)
         conf.define('HAVE_CELT_API_0_7', 0)
+        conf.define('HAVE_CELT_API_0_5', 0)
 
     conf.env['LIB_PTHREAD'] = ['pthread']
     conf.env['LIB_DL'] = ['dl']
@@ -164,7 +172,7 @@ def configure(conf):
     else:
         conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib'
 
-    if Options.options.libdir:
+    if Options.options.mandir:
         conf.env['MANDIR'] = conf.env['PREFIX'] + Options.options.mandir
     else:
         conf.env['MANDIR'] = conf.env['PREFIX'] + '/share/man/man1'
@@ -198,6 +206,22 @@ def configure(conf):
         if m != None:
             svnrev = m.group(1)
 
+    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
+
+    if Options.options.mixed == True:
+        env_variant2 = conf.env.copy()
+        conf.set_env_name('lib32', env_variant2)
+        env_variant2.set_variant('lib32')
+        conf.setenv('lib32')
+        conf.env.append_unique('CXXFLAGS', '-m32')
+        conf.env.append_unique('CCFLAGS', '-m32')
+        conf.env.append_unique('LINKFLAGS', '-m32')
+        if Options.options.libdir32:
+            conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
+        else:
+            conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
+        conf.write_config_header('config.h')
+
     print
     display_msg("==================")
     version_msg = "JACK " + VERSION
@@ -214,6 +238,9 @@ def configure(conf):
     display_msg("Library directory", conf.env['LIBDIR'], 'CYAN')
     display_msg("Drivers directory", conf.env['ADDON_DIR'], 'CYAN')
     display_feature('Build debuggable binaries', conf.env['BUILD_DEBUG'])
+    display_msg('C compiler flags', repr(conf.env['CCFLAGS']))
+    display_msg('C++ compiler flags', repr(conf.env['CXXFLAGS']))
+    display_msg('Linker flags', repr(conf.env['LINKFLAGS']))
     display_feature('Build doxygen documentation', conf.env['BUILD_DOXYGEN_DOCS'])
     display_feature('Build with engine profiling', conf.env['BUILD_WITH_PROFILE'])
     display_feature('Build with 32/64 bits mixed mode', conf.env['BUILD_WITH_32_64'])
@@ -247,22 +274,6 @@ def configure(conf):
             print 'WARNING: with --enable-pkg-config-dbus-service-dir option to this script'
             print Logs.colors.NORMAL,
     print
-
-    conf.env.append_unique('LINKFLAGS', '-lm -lstdc++')
-
-    if Options.options.mixed == True:
-	env_variant2 = conf.env.copy()
-	conf.set_env_name('lib32', env_variant2)
-	env_variant2.set_variant('lib32')
-	conf.setenv('lib32')
-    	conf.env.append_unique('CXXFLAGS', '-m32')
-    	conf.env.append_unique('CCFLAGS', '-m32')
-    	conf.env.append_unique('LINKFLAGS', '-m32')
-    	if Options.options.libdir32:
-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + Options.options.libdir32
-    	else:
-	    conf.env['LIBDIR'] = conf.env['PREFIX'] + '/lib32'
-	conf.write_config_header('config.h')
 
 def build(bld):
     print ("make[1]: Entering directory `" + os.getcwd() + "/" + blddir + "'" )

@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackActivationCount.h"
 #include "JackError.h"
 #include "JackCompilerDeps.h"
-
+#include <vector>
 #include <assert.h>
 
 namespace Jack
@@ -151,7 +151,7 @@ class JackFixedArray1 : public JackFixedArray<SIZE>
                 return true;
             }
         }
-        
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -200,6 +200,11 @@ class JackFixedMatrix
             return fTable[index1][index2];
         }
 
+        void ClearItem(jack_int_t index1, jack_int_t index2)
+        {
+            fTable[index1][index2] = 0;
+        }
+
         /*!
         	\brief Get the output indexes of a given index.
         */
@@ -218,6 +223,13 @@ class JackFixedMatrix
             }
         }
 
+        void GetOutputTable1(jack_int_t index, jack_int_t* output) const
+        {
+            for (int i = 0; i < SIZE; i++) {
+                output[i] = fTable[i][index];
+            }
+        }
+
         bool IsInsideTable(jack_int_t index, jack_int_t* output) const
         {
             for (int i = 0; i < SIZE && output[i] != EMPTY; i++) {
@@ -226,6 +238,14 @@ class JackFixedMatrix
             }
             return false;
         }
+
+        void Copy(JackFixedMatrix& copy)
+        {
+            for (int i = 0; i < SIZE; i++) {
+                memcpy(copy.fTable[i], fTable[i], sizeof(jack_int_t) * SIZE);
+            }
+        }
+
 
 } POST_PACKED_STRUCTURE;
 
@@ -359,7 +379,7 @@ struct JackClientTiming
     }
     ~JackClientTiming()
     {}
-    
+
     void Init()
     {
         fSignaledAt = 0;
@@ -367,7 +387,7 @@ struct JackClientTiming
         fFinishedAt = 0;
         fStatus = NotTriggered;
     }
-    
+
 } POST_PACKED_STRUCTURE;
 
 /*!
@@ -375,11 +395,9 @@ struct JackClientTiming
 
 <UL>
 <LI>The <B>fConnection</B> array contains the list (array line) of connected ports for a given port.
-<LI>The <B>fConnectionCount</B> array contains the number of connected ports to a given port.
 <LI>The <B>fInputPort</B> array contains the list (array line) of input connected  ports for a given client.
 <LI>The <B>fOutputPort</B> array contains the list (array line) of ouput connected  ports for a given client.
 <LI>The <B>fConnectionRef</B> array contains the number of ports connected between two clients.
-<LI>The <B>fInputRef</B> array contains the number of input clients connected to a given client.
 <LI>The <B>fInputCounter</B> array contains the number of input clients connected to a given for activation purpose.
 </UL>
 */
@@ -461,7 +479,8 @@ class SERVER_EXPORT JackConnectionManager
         void ResetGraph(JackClientTiming* timing);
         int ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing, long time_out_usec);
-        
+        void TopologicalSort(std::vector<jack_int_t>& sorted);
+
 } POST_PACKED_STRUCTURE;
 
 } // end of namespace

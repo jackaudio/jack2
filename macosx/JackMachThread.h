@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -98,9 +98,9 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
         UInt64 fComputation;
         UInt64 fConstraint;
 
-        static UInt32 GetThreadSetPriority(pthread_t thread);
-        static UInt32 GetThreadScheduledPriority(pthread_t thread);
-        static UInt32 GetThreadPriority(pthread_t thread, int inWhichPriority);
+        static UInt32 GetThreadSetPriority(jack_native_thread_t thread);
+        static UInt32 GetThreadScheduledPriority(jack_native_thread_t thread);
+        static UInt32 GetThreadPriority(jack_native_thread_t thread, int inWhichPriority);
 
     public:
 
@@ -116,23 +116,23 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
 
         int AcquireRealTime();                  // Used when called from another thread
         int AcquireSelfRealTime();              // Used when called from thread itself
-        
+
         int AcquireRealTime(int priority);      // Used when called from another thread
         int AcquireSelfRealTime(int priority);  // Used when called from thread itself
-        
+
         int DropRealTime();                     // Used when called from another thread
         int DropSelfRealTime();                 // Used when called from thread itself
-        
-        void SetParams(UInt64 period, UInt64 computation, UInt64 constraint);
-        static int GetParams(pthread_t thread, UInt64* period, UInt64* computation, UInt64* constraint);
-        static int SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint);
 
-        static int AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint);
-        static int AcquireRealTimeImp(pthread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
-		{ 
-            return JackMachThread::AcquireRealTimeImp(thread, period, computation, constraint); 
+        void SetParams(UInt64 period, UInt64 computation, UInt64 constraint);
+        static int GetParams(jack_native_thread_t thread, UInt64* period, UInt64* computation, UInt64* constraint);
+        static int SetThreadToPriority(jack_native_thread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint);
+
+        static int AcquireRealTimeImp(jack_native_thread_t thread, UInt64 period, UInt64 computation, UInt64 constraint);
+        static int AcquireRealTimeImp(jack_native_thread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
+		{
+            return JackMachThread::AcquireRealTimeImp(thread, period, computation, constraint);
         }
-        static int DropRealTimeImp(pthread_t thread);
+        static int DropRealTimeImp(jack_native_thread_t thread);
 };
 
 } // end of namespace

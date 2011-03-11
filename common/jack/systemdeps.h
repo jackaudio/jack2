@@ -36,15 +36,19 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         typedef LONGLONG int64_t;
         typedef ULONGLONG uint64_t;
     #endif
-    #ifndef pthread_t
-        typedef HANDLE pthread_t;
-    #endif
+    /**
+     *  to make jack API independent of different thread implementations,
+     *  we define jack_native_thread_t to HANDLE here.
+     */
+    typedef HANDLE jack_native_thread_t;
 #elif __MINGW32__   /* MINGW */
     #include <stdint.h>
     #include <sys/types.h>
-    #ifndef pthread_t
-        typedef HANDLE pthread_t;
-    #endif
+    /**
+     *  to make jack API independent of different thread implementations,
+     *  we define jack_native_thread_t to HANDLE here.
+     */
+    typedef HANDLE jack_native_thread_t;
 #else               /* other compilers ...*/
     #include <inttypes.h>
     #include <pthread.h>
@@ -57,6 +61,13 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
     #include <inttypes.h>
     #include <pthread.h>
     #include <sys/types.h>
+
+    /**
+     *  to make jack API independent of different thread implementations,
+     *  we define jack_native_thread_t to pthread_t here.
+     */
+    typedef pthread_t jack_native_thread_t;
+
 #endif /* __APPLE__ || __linux__ || __sun__ || sun */
 
 #endif

@@ -285,7 +285,7 @@ int alsa_seqmidi_attach(alsa_midi_t *m)
 	self->client_id = snd_seq_client_id(self->seq);
 
   	self->queue = snd_seq_alloc_queue(self->seq);
-  	snd_seq_start_queue(self->seq, self->queue, 0); 
+  	snd_seq_start_queue(self->seq, self->queue, 0);
 
 	stream_attach(self, PORT_INPUT);
 	stream_attach(self, PORT_OUTPUT);
@@ -488,14 +488,14 @@ port_t* port_create(alsa_seqmidi_t *self, int type, snd_seq_addr_t addr, const s
 	/* mark anything that looks like a hardware port as physical&terminal */
 
 	if (snd_seq_port_info_get_type (info) & (SND_SEQ_PORT_TYPE_HARDWARE|SND_SEQ_PORT_TYPE_PORT|SND_SEQ_PORT_TYPE_SPECIFIC)) {
-		jack_caps |= (JackPortIsPhysical | JackPortIsTerminal | JackPortIsActive);
+		jack_caps |= (JackPortIsPhysical | JackPortIsTerminal);
 	}
 
 	if (jack_caps & JackPortIsOutput)
 		snprintf(name, sizeof(name) - 1, "system:midi_capture_%d", ++self->midi_in_cnt);
-	else 
+	else
 		snprintf(name, sizeof(name) - 1, "system:midi_playback_%d", ++self->midi_out_cnt);
-			
+
 	port->jack_port = jack_port_register(self->jack,
 		name, JACK_DEFAULT_MIDI_TYPE, jack_caps, 0);
 	if (!port->jack_port)
@@ -588,7 +588,7 @@ void update_ports(alsa_seqmidi_t *self)
 	snd_seq_port_info_alloca(&info);
 
 	while ((size = jack_ringbuffer_read(self->port_add, (char*)&addr, sizeof(addr)))) {
-		
+
 		int err;
 
 		assert (size == sizeof(addr));
@@ -666,7 +666,7 @@ void set_process_info(struct process_info *info, alsa_seqmidi_t *self, int dir, 
 	info->alsa_time = alsa_time->tv_sec * NSEC_PER_SEC + alsa_time->tv_nsec;
 
 	if (info->period_start + info->nframes < info->cur_frames) {
-		int periods_lost = (info->cur_frames - info->period_start) / info->nframes; 
+		int periods_lost = (info->cur_frames - info->period_start) / info->nframes;
 		info->period_start += periods_lost * info->nframes;
 		debug_log("xrun detected: %d periods lost\n", periods_lost);
 	}
@@ -805,7 +805,7 @@ void input_event(alsa_seqmidi_t *self, snd_seq_event_t *alsa_event, struct proce
 		ev.size = size;
 		jack_ringbuffer_write(port->early_events, (char*)&ev, sizeof(ev));
 		jack_ringbuffer_write(port->early_events, (char*)data, size);
-		debug_log("postponed to next frame +%d", (int) (event_frame - info->nframes)); 
+		debug_log("postponed to next frame +%d", (int) (event_frame - info->nframes));
 		return;
 	}
 
@@ -829,7 +829,7 @@ void alsa_seqmidi_read(alsa_midi_t *m, jack_nframes_t nframes)
 		return;
 
 	set_process_info(&info, self, PORT_INPUT, nframes);
-	jack_process(self, &info); 
+	jack_process(self, &info);
 
 	while ((res = snd_seq_event_input(self->seq, &event))>0) {
 		if (event->source.client == SND_SEQ_CLIENT_SYSTEM)

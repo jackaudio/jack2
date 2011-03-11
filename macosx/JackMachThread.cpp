@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint)
+int JackMachThread::SetThreadToPriority(jack_native_thread_t thread, UInt32 inPriority, Boolean inIsFixed, UInt64 period, UInt64 computation, UInt64 constraint)
 {
     if (inPriority == 96) {
         // REAL-TIME / TIME-CONSTRAINT THREAD
@@ -73,18 +73,18 @@ int JackMachThread::SetThreadToPriority(pthread_t thread, UInt32 inPriority, Boo
 }
 
 // returns the thread's priority as it was last set by the API
-UInt32 JackMachThread::GetThreadSetPriority(pthread_t thread)
+UInt32 JackMachThread::GetThreadSetPriority(jack_native_thread_t thread)
 {
     return GetThreadPriority(thread, THREAD_SET_PRIORITY);
 }
 
 // returns the thread's priority as it was last scheduled by the Kernel
-UInt32 JackMachThread::GetThreadScheduledPriority(pthread_t thread)
+UInt32 JackMachThread::GetThreadScheduledPriority(jack_native_thread_t thread)
 {
     return GetThreadPriority(thread, THREAD_SCHEDULED_PRIORITY);
 }
 
-UInt32 JackMachThread::GetThreadPriority(pthread_t thread, int inWhichPriority)
+UInt32 JackMachThread::GetThreadPriority(jack_native_thread_t thread, int inWhichPriority)
 {
     thread_basic_info_data_t threadInfo;
     policy_info_data_t thePolicyInfo;
@@ -127,7 +127,7 @@ UInt32 JackMachThread::GetThreadPriority(pthread_t thread, int inWhichPriority)
     return 0;
 }
 
-int JackMachThread::GetParams(pthread_t thread, UInt64* period, UInt64* computation, UInt64* constraint)
+int JackMachThread::GetParams(jack_native_thread_t thread, UInt64* period, UInt64* computation, UInt64* constraint)
 {
     thread_time_constraint_policy_data_t theTCPolicy;
     mach_msg_type_number_t count = THREAD_TIME_CONSTRAINT_POLICY_COUNT;
@@ -160,11 +160,11 @@ int JackMachThread::Kill()
 {
     // pthread_cancel still not yet implemented in Darwin (TO CHECK ON TIGER)
     jack_log("JackMachThread::Kill");
-    
-    if (fThread != (pthread_t)NULL)  { // If thread has been started
+
+    if (fThread != (jack_native_thread_t)NULL)  { // If thread has been started
         mach_port_t machThread = pthread_mach_thread_np(fThread);
         int res = (thread_terminate(machThread) == KERN_SUCCESS) ? 0 : -1;
-        fThread = (pthread_t)NULL;
+        fThread = (jack_native_thread_t)NULL;
         return res;
     } else {
         return -1;
@@ -175,7 +175,7 @@ int JackMachThread::AcquireRealTime()
 {
     jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
              long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
-    return (fThread != (pthread_t)NULL) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1; 
+    return (fThread != (jack_native_thread_t)NULL) ? AcquireRealTimeImp(fThread, fPeriod, fComputation, fConstraint) : -1;
 }
 
 int JackMachThread::AcquireSelfRealTime()
@@ -197,7 +197,7 @@ int JackMachThread::AcquireSelfRealTime(int priority)
     return AcquireSelfRealTime();
 }
 
-int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
+int JackMachThread::AcquireRealTimeImp(jack_native_thread_t thread, UInt64 period, UInt64 computation, UInt64 constraint)
 {
     SetThreadToPriority(thread, 96, true, period, computation, constraint);
     return 0;
@@ -205,7 +205,7 @@ int JackMachThread::AcquireRealTimeImp(pthread_t thread, UInt64 period, UInt64 c
 
 int JackMachThread::DropRealTime()
 {
-    return (fThread != (pthread_t)NULL) ? DropRealTimeImp(fThread) : -1;
+    return (fThread != (jack_native_thread_t)NULL) ? DropRealTimeImp(fThread) : -1;
 }
 
 int JackMachThread::DropSelfRealTime()
@@ -213,7 +213,7 @@ int JackMachThread::DropSelfRealTime()
     return DropRealTimeImp(pthread_self());
 }
 
-int JackMachThread::DropRealTimeImp(pthread_t thread)
+int JackMachThread::DropRealTimeImp(jack_native_thread_t thread)
 {
     SetThreadToPriority(thread, 63, false, 0, 0, 0);
     return 0;

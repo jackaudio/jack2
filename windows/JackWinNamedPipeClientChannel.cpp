@@ -1,20 +1,20 @@
 /*
  Copyright (C) 2004-2008 Grame
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
+
  */
 
 
@@ -246,14 +246,74 @@ void JackWinNamedPipeClientChannel::SetFreewheel(int onoff, int* result)
     ServerSyncCall(&req, &res, result);
 }
 
+void JackWinNamedPipeClientChannel::ComputeTotalLatencies(int* result)
+{
+    JackComputeTotalLatenciesRequest req;
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
 void JackWinNamedPipeClientChannel::SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result)
 {
-    JackSessionNotifyRequest req(refnum, target, type, path);
-    JackResult res;
+    JackSessionNotifyRequest req(refnum, path, type, target);
+    JackSessionNotifyResult res;
     int intresult;
     ServerSyncCall(&req, &res, &intresult);
 
-    *result = NULL;
+    jack_session_command_t* session_command = (jack_session_command_t *)malloc(sizeof(jack_session_command_t) * (res.fCommandList.size() + 1));
+    int i = 0;
+
+    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
+        session_command[i].uuid = strdup( ci->fUUID );
+        session_command[i].client_name = strdup( ci->fClientName );
+        session_command[i].command = strdup( ci->fCommand );
+        session_command[i].flags = ci->fFlags;
+        i += 1;
+    }
+
+    session_command[i].uuid = NULL;
+    session_command[i].client_name = NULL;
+    session_command[i].command = NULL;
+    session_command[i].flags = (jack_session_flags_t)0;
+
+    *result = session_command;
+}
+
+void JackWinNamedPipeClientChannel::SessionReply(int refnum, int* result)
+{
+    JackSessionReplyRequest req(refnum);
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
+void JackWinNamedPipeClientChannel::GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result)
+{
+    JackGetUUIDRequest req(client_name);
+    JackUUIDResult res;
+    ServerSyncCall(&req, &res, result);
+    strncpy(uuid_res, res.fUUID, JACK_UUID_SIZE);
+}
+
+void JackWinNamedPipeClientChannel::GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result)
+{
+    JackGetClientNameRequest req(uuid);
+    JackClientNameResult res;
+    ServerSyncCall(&req, &res, result);
+    strncpy(name_res, res.fName, JACK_CLIENT_NAME_SIZE);
+}
+
+void JackWinNamedPipeClientChannel::ClientHasSessionCallback(const char* client_name, int* result)
+{
+    JackClientHasSessionCallbackRequest req(client_name);
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
+}
+
+void JackWinNamedPipeClientChannel::ReserveClientName(int refnum, const char* client_name, const char* uuid, int* result)
+{
+    JackReserveNameRequest req(refnum, client_name, uuid);
+    JackResult res;
+    ServerSyncCall(&req, &res, result);
 }
 
 void JackWinNamedPipeClientChannel::ReleaseTimebase(int refnum, int* result)
@@ -312,7 +372,7 @@ bool JackWinNamedPipeClientChannel::Init()
         jack_error("JackWinNamedPipeClientChannel: cannot establish notification pipe");
         return false;
     } else {
-        return fClient->Init();
+        return true;
     }
 }
 

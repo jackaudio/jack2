@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -38,11 +38,11 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
 
     private:
 
-        JackClientSocket fRequestSocket;                        // Socket to communicate with the server
-        JackServerSocket fNotificationListenSocket;     // Socket listener for server notification
-        JackClientSocket* fNotificationSocket;          // Socket for server notification
+        JackClientSocket fRequestSocket;            // Socket to communicate with the server
+        JackServerSocket fNotificationListenSocket; // Socket listener for server notification
+        JackClientSocket* fNotificationSocket;      // Socket for server notification
         JackThread fThread;                         // Thread to execute the event loop
-        JackClient*     fClient;
+        JackClient* fClient;
 
         void ServerSyncCall(JackRequest* req, JackResult* res, int* result);
         void ServerAsyncCall(JackRequest* req, JackResult* res, int* result);
@@ -77,11 +77,13 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
 
         void PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
         void PortDisconnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result);
-        
+
         void PortRename(int refnum, jack_port_id_t port, const char* name, int* result);
 
         void SetBufferSize(jack_nframes_t buffer_size, int* result);
         void SetFreewheel(int onoff, int* result);
+
+        void ComputeTotalLatencies(int* result);
 
         void ReleaseTimebase(int refnum, int* result);
         void SetTimebaseCallback(int refnum, int conditional, int* result);
@@ -91,17 +93,17 @@ class JackSocketClientChannel : public detail::JackClientChannelInterface, publi
         void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result);
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result);
 
-        // Session Stuff
+        // Session API
         void SessionNotify(int refnum, const char* target, jack_session_event_type_t type, const char* path, jack_session_command_t** result);
         void SessionReply(int refnum, int* result);
-        void GetUUIDForClientName( int refnum, const char *client_name, char *uuid_res, int *result );
-        void GetClientNameForUUID( int refnum, const char *uuid, char *name_res, int *result );
-        void ReserveClientName( int refnum, const char *client_name, const char *uuid, int *result );
+        void GetUUIDForClientName(int refnum, const char* client_name, char* uuid_res, int* result);
+        void GetClientNameForUUID(int refnum, const char* uuid, char* name_res, int* result);
+        void ReserveClientName(int refnum, const char* client_name, const char *uuid, int* result);
+        void ClientHasSessionCallback(const char* client_name, int* result);
 
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
-
 
         bool IsChannelThread() { return fThread.IsThread(); }
 };

@@ -80,7 +80,6 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fEngine->PortUnRegister(refnum, port_index);
         }
-
         void PortConnect(int refnum, const char* src, const char* dst, int* result)
         {
             *result = fEngine->PortConnect(refnum, src, dst);
@@ -89,7 +88,6 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fEngine->PortDisconnect(refnum, src, dst);
         }
-
         void PortConnect(int refnum, jack_port_id_t src, jack_port_id_t dst, int* result)
         {
             *result = fEngine->PortConnect(refnum, src, dst);
@@ -111,10 +109,9 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fServer->SetFreewheel(onoff);
         }
-
-        void SessionNotify( int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t **result )
+        void ComputeTotalLatencies(int* result)
         {
-            *result = NULL;
+            *result = fEngine->ComputeTotalLatencies();
         }
 
         void ReleaseTimebase(int refnum, int* result)
@@ -126,7 +123,7 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
         {
             *result = fServer->SetTimebaseCallback(refnum, conditional);
         }
-        
+
         void GetInternalClientName(int refnum, int int_ref, char* name_res, int* result)
         {
             *result = fEngine->GetInternalClientName(int_ref, name_res);
@@ -139,13 +136,19 @@ class JackInternalClientChannel : public detail::JackClientChannelInterface
 
         void InternalClientLoad(int refnum, const char* client_name, const char* so_name, const char* objet_data, int options, int* status, int* int_ref, int uuid, int* result)
         {
-            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, uuid, status);    
+            *result = fServer->InternalClientLoad(client_name, so_name, objet_data, options, int_ref, uuid, status);
         }
 
         void InternalClientUnload(int refnum, int int_ref, int* status, int* result)
         {
             *result = fEngine->InternalClientUnload(int_ref, status);
         }
+
+        void SessionNotify(int refnum, const char *target, jack_session_event_type_t type, const char *path, jack_session_command_t** result)
+        {
+            *result = NULL;
+        }
+
 
 };
 

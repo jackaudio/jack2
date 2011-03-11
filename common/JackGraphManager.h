@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -29,14 +29,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPlatformPlug.h"
 #include "JackSystemDeps.h"
 
-
 namespace Jack
 {
 
 /*!
 \brief Graph manager: contains the connection manager and the port array.
 */
-    
+
 class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState<JackConnectionManager>
 {
 
@@ -53,6 +52,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         float* GetBuffer(jack_port_id_t port_index);
         void* GetBufferAux(JackConnectionManager* manager, jack_port_id_t port_index, jack_nframes_t frames);
         jack_nframes_t ComputeTotalLatencyAux(jack_port_id_t port_index, jack_port_id_t src_port_index, JackConnectionManager* manager, int hop_count);
+        void RecalculateLatencyAux(jack_port_id_t port_index, jack_latency_callback_mode_t mode);
 
     public:
 
@@ -65,8 +65,6 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         // Ports management
         jack_port_id_t AllocatePort(int refnum, const char* port_name, const char* port_type, JackPortFlags flags, jack_nframes_t buffer_size);
         int ReleasePort(int refnum, jack_port_id_t port_index);
-        void ActivatePort(jack_port_id_t port_index);
-        void DeactivatePort(jack_port_id_t port_index);
         void GetInputPorts(int refnum, jack_int_t* res);
         void GetOutputPorts(int refnum, jack_int_t* res);
         void RemoveAllPorts(int refnum);
@@ -74,10 +72,13 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
         JackPort* GetPort(jack_port_id_t index);
         jack_port_id_t GetPort(const char* name);
+
         int ComputeTotalLatency(jack_port_id_t port_index);
         int ComputeTotalLatencies();
+        void RecalculateLatency(jack_port_id_t port_index, jack_latency_callback_mode_t mode);
+
         int RequestMonitor(jack_port_id_t port_index, bool onoff);
-   
+
         // Connections management
         int Connect(jack_port_id_t src_index, jack_port_id_t dst_index);
         int Disconnect(jack_port_id_t src_index, jack_port_id_t dst_index);
@@ -122,6 +123,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
         void InitRefNum(int refnum);
         int ResumeRefNum(JackClientControl* control, JackSynchro* table);
         int SuspendRefNum(JackClientControl* control, JackSynchro* table, long usecs);
+        void TopologicalSort(std::vector<jack_int_t>& sorted);
 
         JackClientTiming* GetClientTiming(int refnum)
         {
@@ -130,7 +132,7 @@ class SERVER_EXPORT JackGraphManager : public JackShmMem, public JackAtomicState
 
         void Save(JackConnectionManager* dst);
         void Restore(JackConnectionManager* src);
-    
+
         static JackGraphManager* Allocate(int port_max);
         static void Destroy(JackGraphManager* manager);
 

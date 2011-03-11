@@ -134,7 +134,7 @@ namespace Jack
 
         if (jack_set_process_callback(fJackClient, SetProcess, this ) < 0)
              goto fail;
-             
+
         if (jack_set_buffer_size_callback(fJackClient, SetBufferSize, this) < 0)
              goto fail;
 
@@ -153,7 +153,7 @@ namespace Jack
             jack_error ( "Can't activate jack client." );
             goto fail;
         }
-        
+
         if (auto_connect)
             ConnectPorts();
         jack_info ( "New NetMaster started." );
@@ -172,7 +172,8 @@ namespace Jack
         uint i;
         char name[24];
         jack_nframes_t port_latency = jack_get_buffer_size ( fJackClient );
-        
+        jack_latency_range_t range;
+
         jack_log ( "JackNetMaster::AllocPorts" );
 
         //audio
@@ -182,9 +183,10 @@ namespace Jack
             if ( ( fAudioCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput | JackPortIsTerminal, 0 ) ) == NULL )
                 return -1;
             //port latency
-            jack_port_set_latency ( fAudioCapturePorts[i], 0 );
+            range.min = range.max = 0;
+            jack_port_set_latency_range(fAudioCapturePorts[i], JackCaptureLatency, &range);
         }
-        
+
         for ( i = 0; i < fParams.fReturnAudioChannels; i++ )
         {
             sprintf ( name, "from_slave_%d", i+1 );
@@ -194,17 +196,20 @@ namespace Jack
             switch ( fParams.fNetworkMode )
             {
                 case 'f' :
-                    jack_port_set_latency ( fAudioPlaybackPorts[i], ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    range.min = range.max = (fParams.fSlaveSyncMode) ? 0 : port_latency;
+                    jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
                 case 'n' :
-                    jack_port_set_latency ( fAudioPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    range.min = range.max = port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+                    jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
                 case 's' :
-                    jack_port_set_latency ( fAudioPlaybackPorts[i], 2 * port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    range.min = range.max = 2 * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+                    jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
             }
         }
-        
+
         //midi
         for ( i = 0; i < fParams.fSendMidiChannels; i++ )
         {
@@ -212,7 +217,8 @@ namespace Jack
             if ( ( fMidiCapturePorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput | JackPortIsTerminal, 0 ) ) == NULL )
                 return -1;
             //port latency
-            jack_port_set_latency ( fMidiCapturePorts[i], 0 );
+            range.min = range.max = 0;
+            jack_port_set_latency_range(fMidiCapturePorts[i], JackCaptureLatency, &range);
         }
         for ( i = 0; i < fParams.fReturnMidiChannels; i++ )
         {
@@ -223,23 +229,26 @@ namespace Jack
             switch ( fParams.fNetworkMode )
             {
                 case 'f' :
-                    jack_port_set_latency ( fMidiPlaybackPorts[i], ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    range.min = range.max = (fParams.fSlaveSyncMode) ? 0 : port_latency;
+                    jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
                 case 'n' :
-                    jack_port_set_latency ( fMidiPlaybackPorts[i], port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    range.min = range.max = port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+                    jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
                 case 's' :
-                    jack_port_set_latency ( fMidiPlaybackPorts[i], 2 * port_latency + ( fParams.fSlaveSyncMode ) ? 0 : port_latency );
+                    range.min = range.max = 2 * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+                    jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
             }
         }
         return 0;
     }
-    
+
     void JackNetMaster::ConnectPorts()
     {
         const char **ports;
-         
+
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports != NULL) {
             for (unsigned int i = 0; i < fParams.fSendAudioChannels && ports[i]; i++) {
@@ -247,7 +256,7 @@ namespace Jack
             }
             free(ports);
         }
-        
+
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
         if (ports != NULL) {
             for (unsigned int i = 0; i < fParams.fReturnAudioChannels && ports[i]; i++) {
@@ -309,7 +318,7 @@ namespace Jack
                     else
                         jack_info ( "'%s' isn't the timebase master anymore.", fParams.fName );
                     break;
-                    
+
                 case TIMEBASEMASTER :
                     timebase = jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
                     if ( timebase < 0 )
@@ -317,7 +326,7 @@ namespace Jack
                     else
                         jack_info ( "'%s' is the new timebase master.", fParams.fName );
                     break;
-                    
+
                 case CONDITIONAL_TIMEBASEMASTER :
                     timebase = jack_set_timebase_callback ( fJackClient, 1, SetTimebaseCallback, this );
                     if ( timebase != EBUSY )
@@ -340,18 +349,18 @@ namespace Jack
                     jack_transport_stop ( fJackClient );
                     jack_info ( "'%s' stops transport.", fParams.fName );
                     break;
-                    
+
                 case JackTransportStarting :
                     if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) == EINVAL )
                         jack_error ( "Can't set new position." );
                     jack_transport_start ( fJackClient );
                     jack_info ( "'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
-                    
+
                 case JackTransportNetStarting :
                     jack_info ( "'%s' is ready to roll..", fParams.fName );
                     break;
-                    
+
                 case JackTransportRolling :
                     jack_info ( "'%s' is rolling.", fParams.fName );
                     break;
@@ -377,16 +386,19 @@ namespace Jack
     }
 
 //sync--------------------------------------------------------------------------------
- 
+
     bool JackNetMaster::IsSlaveReadyToRoll()
     {
         return ( fReturnTransportData.fState == JackTransportNetStarting );
     }
-    
-    int JackNetMaster::SetBufferSize (jack_nframes_t nframes, void* arg)
+
+    int JackNetMaster::SetBufferSize(jack_nframes_t nframes, void* arg)
     {
-        jack_error("Cannot handle bufer size change, so proxy will be removed...");
-        static_cast<JackNetMaster*> ( arg )->Exit();
+        JackNetMaster* obj = static_cast<JackNetMaster*>(arg);
+        if (nframes != obj->fParams.fPeriodSize) {
+            jack_error("Cannot handle bufer size change, so JackNetMaster proxy will be removed...");
+            obj->Exit();
+        }
         return 0;
     }
 
@@ -424,10 +436,10 @@ namespace Jack
                                                  fParams.fPeriodSize ) ) );
 
         if (IsSynched()) {  // only send if connection is "synched"
-        
+
             //encode the first packet
             EncodeSyncPacket();
-   
+
             //send sync
             if ( SyncSend() == SOCKET_ERROR )
                 return SOCKET_ERROR;
@@ -443,7 +455,7 @@ namespace Jack
     #ifdef JACK_MONITOR
             fNetTimeMon->Add ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
     #endif
-    
+
         } else {
             jack_error("Connection is not synched, skip cycle...");
         }
@@ -459,7 +471,7 @@ namespace Jack
 
         //decode sync
         DecodeSyncPacket();
-  
+
         //receive data
         res = DataRecv();
         if ( ( res == 0 ) || ( res == SOCKET_ERROR ) )
@@ -498,11 +510,11 @@ namespace Jack
                     else
                         jack_error("Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP);
                     break;
-                    
+
                 case 'p':
                     fSocket.SetPort ( param->value.ui );
                     break;
-                    
+
                 case 'c':
                     fAutoConnect = param->value.i;
                     break;
@@ -646,7 +658,7 @@ namespace Jack
     JackNetMaster* JackNetMasterManager::InitMaster ( session_params_t& params )
     {
         jack_log ( "JackNetMasterManager::InitMaster, Slave : %s", params.fName );
-        
+
         //check MASTER <<==> SLAVE network protocol coherency
         if (params.fProtocolVersion != MASTER_PROTOCOL) {
             jack_error ( "Error : slave is running with a different protocol %s", params.fName );
@@ -740,7 +752,7 @@ extern "C"
         desc->params[i].value.i = DEFAULT_PORT;
         strcpy ( desc->params[i].short_desc, "UDP port" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-        
+
         i++;
         strcpy ( desc->params[i].name, "auto_connect" );
         desc->params[i].character = 'c';

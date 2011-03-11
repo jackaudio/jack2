@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -51,7 +51,7 @@ JackSocketServerChannel::~JackSocketServerChannel()
 int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
     jack_log("JackSocketServerChannel::Open");
-   
+
     // Prepare request socket
     if (fRequestListenSocket.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_log("JackSocketServerChannel::Open : cannot create result listen socket");
@@ -79,14 +79,14 @@ void JackSocketServerChannel::Close()
         delete socket;
     }
 }
-    
+
 int JackSocketServerChannel::Start()
 {
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
-    }  
-    
+    }
+
     return 0;
 }
 
@@ -166,6 +166,12 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         jack_log("HandleRequest: cannot read header");
         ClientKill(fd);  // TO CHECK SOLARIS
         return false;
+    }
+
+    if (fd == JackServerGlobals::fRTNotificationSocket && header.fType != JackRequest::kNotification) {
+        jack_error("fRTNotificationSocket = %d", JackServerGlobals::fRTNotificationSocket);
+        jack_error("JackSocketServerChannel::HandleRequest : incorrect notification !!");
+        return true;
     }
 
     // Read data
@@ -292,7 +298,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 jack_error("JackRequest::DisconnectPorts write error ref = %d", req.fRefNum);
             break;
         }
-        
+
         case JackRequest::kPortRename: {
             jack_log("JackRequest::PortRename");
             JackPortRenameRequest req;
@@ -323,6 +329,17 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 res.fResult = fServer->SetFreewheel(req.fOnOff);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::SetFreeWheel write error");
+            break;
+        }
+
+         case JackRequest::kComputeTotalLatencies: {
+            jack_log("JackRequest::ComputeTotalLatencies");
+            JackComputeTotalLatenciesRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0)
+                res.fResult = fServer->GetEngine()->ComputeTotalLatencies();
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ComputeTotalLatencies write error");
             break;
         }
 
@@ -430,27 +447,26 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         }
 
         case JackRequest::kGetClientByUUID: {
-            jack_log("JackRequest::GetClientNameForUUID");
+            jack_log("JackRequest::GetClientByUUID");
             JackGetClientNameRequest req;
             JackClientNameResult res;
             if (req.Read(socket) == 0) {
                 fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
             }
             if (res.Write(socket) < 0)
-                jack_error("JackRequest::GetClientNameForUUID write error");
+                jack_error("JackRequest::GetClientByUUID write error");
             break;
         }
 
         case JackRequest::kGetUUIDByClient: {
-            jack_log("JackRequest::GetUUIDForClientName");
+            jack_log("JackRequest::GetUUIDByClient");
             JackGetUUIDRequest req;
             JackUUIDResult res;
             if (req.Read(socket) == 0) {
                 fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
-                res.fResult = 0;
             }
             if (res.Write(socket) < 0)
-                jack_error("JackRequest::GetUUIDForClientName write error");
+                jack_error("JackRequest::GetUUIDByClient write error");
             break;
         }
 
@@ -466,11 +482,23 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             break;
         }
 
+        case JackRequest::kClientHasSessionCallback: {
+            jack_log("JackRequest::ClientHasSessionCallback");
+            JackClientHasSessionCallbackRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ClientHasSessionCallback write error");
+            break;
+        }
+
         default:
             jack_error("Unknown request %ld", header.fType);
             break;
     }
-     
+
     return true;
 }
 
@@ -511,7 +539,7 @@ bool JackSocketServerChannel::Init()
 bool JackSocketServerChannel::Execute()
 {
     try {
-    
+
         // Global poll
         if ((poll(fPollTable, fSocketTable.size() + 1, 10000) < 0) && (errno != EINTR)) {
             jack_error("Engine poll failed err = %s request thread quits...", strerror(errno));
@@ -526,22 +554,22 @@ bool JackSocketServerChannel::Execute()
                     jack_log("Poll client error err = %s", strerror(errno));
                     ClientKill(fd);
                 } else if (fPollTable[i].revents & POLLIN) {
-                    if (!HandleRequest(fd)) 
+                    if (!HandleRequest(fd))
                         jack_log("Could not handle external client request");
                 }
             }
 
             // Check the server request socket */
-            if (fPollTable[0].revents & POLLERR) 
+            if (fPollTable[0].revents & POLLERR)
                 jack_error("Error on server request socket err = %s", strerror(errno));
-       
-            if (fPollTable[0].revents & POLLIN) 
+
+            if (fPollTable[0].revents & POLLIN)
                 ClientCreate();
         }
 
         BuildPoolTable();
         return true;
-        
+
     } catch (JackQuitException& e) {
         jack_log("JackMachServerChannel::Execute JackQuitException");
         return false;

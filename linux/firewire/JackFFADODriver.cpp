@@ -272,7 +272,7 @@ JackFFADODriver::SetBufferSize (jack_nframes_t nframes)
     printError("Buffer size change requested but not supported!!!");
 
     /*
-    driver->period_size = nframes; 
+    driver->period_size = nframes;
     driver->period_usecs =
             (jack_time_t) floor ((((float) nframes) / driver->sample_rate)
                                  * 1000000.0f);
@@ -362,6 +362,7 @@ int JackFFADODriver::Attach()
     int port_index;
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];
+    jack_latency_range_t range;
 
     ffado_driver_t* driver = (ffado_driver_t*)fDriver;
 
@@ -447,7 +448,8 @@ int JackFFADODriver::Attach()
             ffado_streaming_capture_stream_onoff(driver->dev, chn, 0);
 
             port = fGraphManager->GetPort(port_index);
-            port->SetLatency(driver->period_size + driver->capture_frame_latency);
+            range.min = range.max = driver->period_size + driver->capture_frame_latency;
+            port->SetLatencyRange(JackCaptureLatency, &range);
             // capture port aliases (jackd1 style port names)
             snprintf(buf, sizeof(buf) - 1, "%s:capture_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
@@ -479,7 +481,8 @@ int JackFFADODriver::Attach()
             driver->capture_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
             port = fGraphManager->GetPort(port_index);
-            port->SetLatency(driver->period_size + driver->capture_frame_latency);
+            range.min = range.max = driver->period_size + driver->capture_frame_latency;
+            port->SetLatencyRange(JackCaptureLatency, &range);
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
@@ -523,7 +526,8 @@ int JackFFADODriver::Attach()
 
             port = fGraphManager->GetPort(port_index);
             // Add one buffer more latency if "async" mode is used...
-            port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency);
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency
+            port->SetLatencyRange(JackPlaybackLatency, &range);
             // playback port aliases (jackd1 style port names)
             snprintf(buf, sizeof(buf) - 1, "%s:playback_%i", fClientControl.fName, (int) chn + 1);
             port->SetAlias(buf);
@@ -549,7 +553,7 @@ int JackFFADODriver::Attach()
                 printError(" cannot enable port %s", buf);
             }
             // setup the midi buffer
-            
+
             // This constructor optionally accepts arguments for the
             // non-realtime buffer size and the realtime buffer size.  Ideally,
             // these would become command-line options for the FFADO driver.
@@ -558,7 +562,8 @@ int JackFFADODriver::Attach()
             driver->playback_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
             port = fGraphManager->GetPort(port_index);
-            port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency);
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency;
+            port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
@@ -676,7 +681,7 @@ retry:
 
     if (nframes == 0) {
         /* we detected an xrun and restarted: notify
-         * clients about the delay. 
+         * clients about the delay.
          */
         jack_log("FFADO XRun");
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
@@ -685,7 +690,7 @@ retry:
 
     if (nframes != fEngineControl->fBufferSize)
         jack_log("JackFFADODriver::Read warning nframes = %ld", nframes);
-        
+
     // Has to be done before read
     JackDriver::CycleIncTime();
 
@@ -755,7 +760,7 @@ extern "C"
 
         strcpy (desc->name, "firewire");                               // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Linux FFADO API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-       
+
         desc->nparams = 13;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));

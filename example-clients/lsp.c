@@ -21,6 +21,7 @@
 #endif
 #include <string.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <jack/jack.h>
 
 char * my_name;
@@ -39,6 +40,7 @@ show_usage (void)
 	fprintf (stderr, "List active Jack ports, and optionally display extra information.\n");
 	fprintf (stderr, "Optionally filter ports which match ALL strings provided after any options.\n\n");
 	fprintf (stderr, "Display options:\n");
+	fprintf (stderr, "        -s, --server <name>   Connect to the jack server named <name>\n");
 	fprintf (stderr, "        -A, --aliases         List aliases for each port\n");
 	fprintf (stderr, "        -c, --connections     List connections to/from each port\n");
 	fprintf (stderr, "        -l, --latency         Display per-port latency in frames at each port\n");
@@ -56,6 +58,7 @@ main (int argc, char *argv[])
 {
 	jack_client_t *client;
 	jack_status_t status;
+    jack_options_t options = JackNoStartServer;
 	const char **ports, **connections;
 	unsigned int i, j, k;
 	int skip_port;
@@ -68,9 +71,11 @@ main (int argc, char *argv[])
 	int c;
 	int option_index;
 	char* aliases[2];
+	char *server_name = NULL;
 	jack_port_t *port;
-	
+
 	struct option long_options[] = {
+	    { "server", 1, 0, 's' },
 		{ "aliases", 0, 0, 'A' },
 		{ "connections", 0, 0, 'c' },
 		{ "port-latency", 0, 0, 'l' },
@@ -89,8 +94,13 @@ main (int argc, char *argv[])
 		my_name ++;
 	}
 
-	while ((c = getopt_long (argc, argv, "AclLphvt", long_options, &option_index)) >= 0) {
+	while ((c = getopt_long (argc, argv, "s:AclLphvt", long_options, &option_index)) >= 0) {
 		switch (c) {
+		case 's':
+            server_name = (char *) malloc (sizeof (char) * strlen(optarg));
+            strcpy (server_name, optarg);
+            options |= JackServerName;
+            break;
 		case 'A':
 			aliases[0] = (char *) malloc (jack_port_name_size());
 			aliases[1] = (char *) malloc (jack_port_name_size());
@@ -131,7 +141,7 @@ main (int argc, char *argv[])
 	 * specify JackNoStartServer. */
 	//JOQ: need a new server name option
 
-	client = jack_client_open ("lsp", JackNoStartServer, &status);
+	client = jack_client_open ("lsp", options, &status, server_name);
 	if (client == NULL) {
 		if (status & JackServerFailed) {
 			fprintf (stderr, "JACK server not running\n");
@@ -143,7 +153,7 @@ main (int argc, char *argv[])
 	}
 
 	ports = jack_get_ports (client, NULL, NULL, 0);
-    if (!ports) 
+    if (!ports)
         goto error;
 
 	for (i = 0; ports && ports[i]; ++i) {
@@ -168,19 +178,28 @@ main (int argc, char *argv[])
 				printf ("   %s\n", aliases[i]);
 			}
 		}
-				
+
 		if (show_con) {
 			if ((connections = jack_port_get_all_connections (client, jack_port_by_name(client, ports[i]))) != 0) {
 				for (j = 0; connections[j]; j++) {
 					printf ("   %s\n", connections[j]);
 				}
 				free (connections);
-			} 
+			}
 		}
 		if (show_port_latency) {
 			if (port) {
-				printf ("	port latency = %d frames\n",
+				jack_latency_range_t range;
+				printf ("	port latency = %" PRIu32 " frames\n",
 					jack_port_get_latency (port));
+
+				jack_port_get_latency_range (port, JackPlaybackLatency, &range);
+				printf ("	port playback latency = [ %" PRIu32 " %" PRIu32 " ] frames\n",
+					range.min, range.max);
+
+				jack_port_get_latency_range (port, JackCaptureLatency, &range);
+				printf ("	port capture latency = [ %" PRIu32 " %" PRIu32 " ] frames\n",
+					range.min, range.max);
 			}
 		}
 		if (show_total_latency) {
@@ -208,12 +227,7 @@ main (int argc, char *argv[])
 				if (flags & JackPortIsTerminal) {
 					fputs ("terminal,", stdout);
 				}
-                
-                if (flags & JackPortIsActive) {
-                    fputs ("active,", stdout);
-                } else {
-                    fputs ("non-active,", stdout);
-                }
+
 				putc ('\n', stdout);
 			}
 		}
@@ -225,7 +239,7 @@ main (int argc, char *argv[])
 			}
 		}
 	}
-    
+
 error:
     if (ports)
         jack_free (ports);

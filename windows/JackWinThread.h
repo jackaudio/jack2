@@ -66,22 +66,22 @@ class SERVER_EXPORT JackWinThread : public detail::JackThreadInterface
         int DropRealTime();                     // Used when called from another thread
         int DropSelfRealTime();                 // Used when called from thread itself
 
-        pthread_t GetThreadID();
+        jack_native_thread_t GetThreadID();
         bool IsThread();
 
-        static int AcquireRealTimeImp(pthread_t thread, int priority);
-        static int AcquireRealTimeImp(pthread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
+        static int AcquireRealTimeImp(jack_native_thread_t thread, int priority);
+        static int AcquireRealTimeImp(jack_native_thread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
         {
             return JackWinThread::AcquireRealTimeImp(thread, priority);
         }
-        static int DropRealTimeImp(pthread_t thread);
-        static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
+        static int DropRealTimeImp(jack_native_thread_t thread);
+        static int StartImp(jack_native_thread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg)
         {
             return JackWinThread::StartImp(thread, priority, realtime, (ThreadCallback) start_routine, arg);
         }
-        static int StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg);
-        static int StopImp(pthread_t thread);
-        static int KillImp(pthread_t thread);
+        static int StartImp(jack_native_thread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg);
+        static int StopImp(jack_native_thread_t thread);
+        static int KillImp(jack_native_thread_t thread);
 
 };
 

@@ -25,6 +25,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <signal.h>
 #include <dlfcn.h>
 
+#define UINT32_MAX 4294967295U
+
 #define DRIVER_HANDLE void*
 #define LoadDriverModule(name) dlopen((name), RTLD_NOW | RTLD_GLOBAL)
 #define UnloadDriverModule(handle) dlclose((handle))

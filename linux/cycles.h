@@ -37,8 +37,6 @@
  * regardless of how fast the machine is.
  */
 
-#ifdef __linux__
-
 #ifdef __x86_64__
 
 typedef unsigned long cycles_t;
@@ -126,22 +124,6 @@ static inline cycles_t get_cycles(void)
 }
 
 #endif /* everything else but x86, amd64, sparcv9 or ppc */
-
-#endif /* __linux__ */
-
-
-#if defined(__FreeBSD_kernel__)
-
-#warning No suitable get_cycles() implementation. Returning 0 instead
-
-typedef unsigned long long cycles_t;
-
-static inline cycles_t get_cycles(void)
-{
-    return 0;
-}
-
-#endif /* __FreeBSD_kernel__ */
 
 
 #endif /* __jack_cycles_h__ */

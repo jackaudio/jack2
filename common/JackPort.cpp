@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -44,6 +44,8 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
     fInUse = true;
     fLatency = 0;
     fTotalLatency = 0;
+    fPlaybackLatency.min = fPlaybackLatency.max = 0;
+    fCaptureLatency.min = fCaptureLatency.max = 0;
     fTied = NO_PORT;
     // DB: At this point we do not know current buffer size in frames,
     // but every time buffer will be returned to any user,
@@ -86,6 +88,48 @@ jack_nframes_t JackPort::GetTotalLatency() const
 void JackPort::SetLatency(jack_nframes_t nframes)
 {
     fLatency = nframes;
+
+    /* setup the new latency values here,
+	 * so we dont need to change the backend codes.
+	 */
+	if (fFlags & JackPortIsOutput) {
+		fCaptureLatency.min = nframes;
+		fCaptureLatency.max = nframes;
+	}
+	if (fFlags & JackPortIsInput) {
+		fPlaybackLatency.min = nframes;
+		fPlaybackLatency.max = nframes;
+	}
+}
+
+void JackPort::SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_range_t* range)
+{
+    if (mode == JackCaptureLatency) {
+		fCaptureLatency = *range;
+
+		/* hack to set port->shared->latency up for
+		 * backend ports
+		 */
+		if ((fFlags & JackPortIsOutput) && (fFlags & JackPortIsPhysical))
+			fLatency = (range->min + range->max) / 2;
+	} else {
+        fPlaybackLatency = *range;
+
+		/* hack to set port->shared->latency up for
+		 * backend ports
+		 */
+		if ((fFlags & JackPortIsInput) && (fFlags & JackPortIsPhysical))
+			fLatency = (range->min + range->max) / 2;
+	}
+}
+
+void JackPort::GetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_range_t* range) const
+{
+    if (mode == JackCaptureLatency) {
+		*range = fCaptureLatency;
+	} else {
+		*range = fPlaybackLatency;
+    }
 }
 
 int JackPort::Tie(jack_port_id_t port_index)
@@ -103,10 +147,10 @@ int JackPort::UnTie()
 int JackPort::RequestMonitor(bool onoff)
 {
     /**
-    jackd.h 
+    jackd.h
     * If @ref JackPortCanMonitor is set for this @a port, turn input
     * monitoring on or off. Otherwise, do nothing.
-     
+
     if (!(fFlags & JackPortCanMonitor))
     	return -1;
     */
@@ -123,10 +167,10 @@ int JackPort::RequestMonitor(bool onoff)
 int JackPort::EnsureMonitor(bool onoff)
 {
     /**
-    jackd.h 
+    jackd.h
     * If @ref JackPortCanMonitor is set for this @a port, turn input
     * monitoring on or off. Otherwise, do nothing.
-     
+
     if (!(fFlags & JackPortCanMonitor))
     	return -1;
     */
@@ -165,7 +209,7 @@ int JackPort::GetFlags() const
 const char* JackPort::GetType() const
 {
     const JackPortType* type = GetPortType(fTypeId);
-    return type->name;
+    return type->fName;
 }
 
 void JackPort::SetName(const char* new_name)

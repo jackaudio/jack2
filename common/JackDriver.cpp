@@ -167,7 +167,7 @@ int JackDriver::Open(jack_nframes_t buffer_size,
 
 int JackDriver::Close()
 {
-    if (fClientControl.fRefNum >= 0) { 
+    if (fClientControl.fRefNum >= 0) {
         jack_log("JackDriver::Close");
         fGraphManager->DirectDisconnect(fClientControl.fRefNum, fClientControl.fRefNum); // Disconnect driver from itself for sync
         fClientControl.fActive = false;
@@ -207,7 +207,7 @@ int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync,
             jack_log("JackDriver::kStopFreewheel");
             SetupDriverSync(fClientControl.fRefNum, false);
             break;
-    }
+   }
 
     return 0;
 }
@@ -223,13 +223,13 @@ void JackDriver::CycleIncTime()
 }
 
 void JackDriver::CycleTakeBeginTime()
-{   
+{
     fBeginDateUst = GetMicroSeconds();  // Take callback date here
     fEngineControl->CycleIncTime(fBeginDateUst);
 }
 
 void JackDriver::CycleTakeEndTime()
-{   
+{
     fEndDateUst = GetMicroSeconds();    // Take end date here
 }
 
@@ -254,7 +254,7 @@ void JackDriver::NotifySampleRate(jack_nframes_t sample_rate)
     fEngine->NotifySampleRate(sample_rate);
     fEngineControl->InitFrameTime();
 }
-    
+
 void JackDriver::NotifyFailure(int code, const char* reason)
 {
     fEngine->NotifyFailure(code, reason);

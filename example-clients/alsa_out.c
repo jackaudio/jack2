@@ -11,12 +11,11 @@
 #include <string.h>
 #include <signal.h>
 
-#include <alloca.h>
 #include <math.h>
 
 #include <jack/jack.h>
 #include <jack/jslist.h>
-#include <memops.h>
+#include <jack/memops.h>
 
 #include "alsa/asoundlib.h"
 
@@ -35,6 +34,7 @@ snd_pcm_t *alsa_handle;
 int jack_sample_rate;
 int jack_buffer_size;
 
+int quit = 0;
 double resample_mean = 1.0;
 double static_resample_factor = 1.0;
 double resample_lower_limit = 0.25;
@@ -45,7 +45,6 @@ double *window_array;
 int offset_differential_index = 0;
 
 double offset_integral = 0;
-int quit = 0;
 
 // ------------------------------------------------------ commandline parameters
 
@@ -77,6 +76,12 @@ volatile float output_diff = 0.0;
 snd_pcm_uframes_t real_buffer_size;
 snd_pcm_uframes_t real_period_size;
 
+// buffers
+
+char *tmpbuf;
+char *outbuf;
+float *resampbuf;
+
 // format selection, and corresponding functions from memops in a nice set of structs.
 
 typedef struct alsa_format {
@@ -90,6 +95,7 @@ typedef struct alsa_format {
 alsa_format_t formats[] = {
 	{ SND_PCM_FORMAT_FLOAT_LE, 4, sample_move_dS_floatLE, sample_move_floatLE_sSs, "float" },
 	{ SND_PCM_FORMAT_S32, 4, sample_move_d32u24_sS, sample_move_dS_s32u24, "32bit" },
+	{ SND_PCM_FORMAT_S24_3LE, 3, sample_move_d24_sS, sample_move_dS_s24, "24bit - real" },
 	{ SND_PCM_FORMAT_S24, 4, sample_move_d24_sS, sample_move_dS_s24, "24bit" },
 	{ SND_PCM_FORMAT_S16, 2, sample_move_d16_sS, sample_move_dS_s16, "16bit" }
 };
@@ -311,8 +317,6 @@ double hann( double x )
  */
 int process (jack_nframes_t nframes, void *arg) {
 
-    char *outbuf;
-    float *resampbuf;
     int rlen;
     int err;
     snd_pcm_sframes_t delay = target_delay;
@@ -321,7 +325,6 @@ int process (jack_nframes_t nframes, void *arg) {
     delay = (num_periods*period_size)-snd_pcm_avail( alsa_handle ) ;
 
     delay -= jack_frames_since_cycle_start( client );
-    delay += jack_get_buffer_size( client ) / 2;
     // Do it the hard way.
     // this is for compensating xruns etc...
 
@@ -340,11 +343,14 @@ int process (jack_nframes_t nframes, void *arg) {
 		offset_array[i] = 0.0;
     }
     if( delay < (target_delay-max_diff) ) {
-	char *tmp = alloca( (target_delay-delay) * formats[format].sample_size * num_channels ); 
-	memset( tmp, 0,  formats[format].sample_size * num_channels * (target_delay-delay) );
-	snd_pcm_writei( alsa_handle, tmp, target_delay-delay );
 
 	output_new_delay = (int) delay;
+
+	while ((target_delay-delay) > 0) {
+	    snd_pcm_uframes_t to_write = ((target_delay-delay) > 512) ? 512 : (target_delay-delay);
+	    snd_pcm_writei( alsa_handle, tmpbuf, to_write );
+	    delay += to_write;
+	}
 
 	delay = target_delay;
 
@@ -461,6 +467,32 @@ again:
   }
 
     return 0;      
+}
+
+/**
+ * the latency callback.
+ * sets up the latencies on the ports.
+ */
+
+void
+latency_cb (jack_latency_callback_mode_t mode, void *arg)
+{
+	jack_latency_range_t range;
+	JSList *node;
+
+	range.min = range.max = target_delay;
+
+	if (mode == JackCaptureLatency) {
+		for (node = capture_ports; node; node = jack_slist_next (node)) {
+			jack_port_t *port = node->data;
+			jack_port_set_latency_range (port, mode, &range);
+		}
+	} else {
+		for (node = playback_ports; node; node = jack_slist_next (node)) {
+			jack_port_t *port = node->data;
+			jack_port_set_latency_range (port, mode, &range);
+		}
+	}
 }
 
 
@@ -659,6 +691,8 @@ int main (int argc, char *argv[]) {
 
     jack_on_shutdown (client, jack_shutdown, 0);
 
+    if (jack_set_latency_callback)
+	    jack_set_latency_callback (client, latency_cb, 0);
 
     // get jack sample_rate
     
@@ -713,6 +747,16 @@ int main (int argc, char *argv[]) {
 
     // alloc input ports, which are blasted out to alsa...
     alloc_ports( 0, num_channels );
+
+    outbuf = malloc( num_periods * period_size * formats[format].sample_size * num_channels );
+    resampbuf = malloc( num_periods * period_size * sizeof( float ) );
+    tmpbuf = malloc( 512 * formats[format].sample_size * num_channels );
+
+    if ((outbuf == NULL) || (resampbuf == NULL) || (tmpbuf == NULL))
+    {
+	    fprintf( stderr, "no memory for buffers.\n" );
+	    exit(20);
+    }
 
 
     /* tell the JACK server that we are ready to roll */
