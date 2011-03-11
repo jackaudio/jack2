@@ -35,7 +35,7 @@ namespace Jack
                                     void* userData)
     {
         JackPortAudioAdapter* adapter = static_cast<JackPortAudioAdapter*>(userData);
-        adapter->PushAndPull((float**)inputBuffer, (float**)outputBuffer, framesPerBuffer);
+        adapter->PushAndPull((jack_default_audio_sample_t**)inputBuffer, (jack_default_audio_sample_t**)outputBuffer, framesPerBuffer);
         return paContinue;
     }
 

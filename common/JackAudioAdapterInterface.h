@@ -88,18 +88,18 @@ namespace Jack
 
         JackResampler** fCaptureRingBuffer;
         JackResampler** fPlaybackRingBuffer;
-        
+
         unsigned int fQuality;
         unsigned int fRingbufferCurSize;
         jack_time_t fPullAndPushTime;
-  
+
         bool fRunning;
         bool fAdaptative;
-        
+
         void ResetRingBuffers();
         void AdaptRingBufferSize();
         void GrowRingBufferSize();
-        
+
     public:
 
          JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ):
@@ -122,15 +122,15 @@ namespace Jack
         {}
 
         virtual void Reset();
-       
+
         void Create();
         void Destroy();
-        
+
         virtual int Open()
         {
             return 0;
         }
-        
+
         virtual int Close()
         {
             return 0;
@@ -139,7 +139,7 @@ namespace Jack
         virtual int SetHostBufferSize ( jack_nframes_t buffer_size )
         {
             fHostBufferSize = buffer_size;
-            if (fAdaptative) 
+            if (fAdaptative)
                 AdaptRingBufferSize();
             return 0;
         }
@@ -147,7 +147,7 @@ namespace Jack
         virtual int SetAdaptedBufferSize ( jack_nframes_t buffer_size )
         {
             fAdaptedBufferSize = buffer_size;
-            if (fAdaptative) 
+            if (fAdaptative)
                 AdaptRingBufferSize();
             return 0;
         }
@@ -179,7 +179,7 @@ namespace Jack
             SetAdaptedSampleRate ( sample_rate );
             return 0;
         }
-      
+
         void SetInputs ( int inputs )
         {
             jack_log ( "JackAudioAdapterInterface::SetInputs %d", inputs );
@@ -203,10 +203,10 @@ namespace Jack
             jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
             return fPlaybackChannels;
         }
-        
-        int PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
-        int PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int inNumberFrames);
-  
+
+        int PushAndPull(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int inNumberFrames);
+        int PullAndPush(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int inNumberFrames);
+
     };
 
 }

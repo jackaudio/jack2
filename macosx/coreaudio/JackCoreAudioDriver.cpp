@@ -224,14 +224,14 @@ int JackCoreAudioDriver::Write()
 {
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
-            float* buffer = GetOutputBuffer(i);
-            int size = sizeof(float) * fEngineControl->fBufferSize;
-            memcpy((float*)fDriverOutputData->mBuffers[i].mData, buffer, size);
+            jack_default_audio_sample_t* buffer = GetOutputBuffer(i);
+            int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
+            memcpy((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, buffer, size);
             // Monitor ports
             if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0)
                 memcpy(GetMonitorBuffer(i), buffer, size);
         } else {
-            memset((float*)fDriverOutputData->mBuffers[i].mData, 0, sizeof(float) * fEngineControl->fBufferSize);
+            memset((jack_default_audio_sample_t*)fDriverOutputData->mBuffers[i].mData, 0, sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
         }
     }
     return 0;
@@ -1294,9 +1294,9 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         srcFormat.mSampleRate = samplerate;
         srcFormat.mFormatID = kAudioFormatLinearPCM;
         srcFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
-        srcFormat.mBytesPerPacket = sizeof(float);
+        srcFormat.mBytesPerPacket = sizeof(jack_default_audio_sample_t);
         srcFormat.mFramesPerPacket = 1;
-        srcFormat.mBytesPerFrame = sizeof(float);
+        srcFormat.mBytesPerFrame = sizeof(jack_default_audio_sample_t);
         srcFormat.mChannelsPerFrame = inchannels;
         srcFormat.mBitsPerChannel = 32;
         PrintStreamDesc(&srcFormat);
@@ -1324,9 +1324,9 @@ int JackCoreAudioDriver::OpenAUHAL(bool capturing,
         dstFormat.mSampleRate = samplerate;
         dstFormat.mFormatID = kAudioFormatLinearPCM;
         dstFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked | kLinearPCMFormatFlagIsNonInterleaved;
-        dstFormat.mBytesPerPacket = sizeof(float);
+        dstFormat.mBytesPerPacket = sizeof(jack_default_audio_sample_t);
         dstFormat.mFramesPerPacket = 1;
-        dstFormat.mBytesPerFrame = sizeof(float);
+        dstFormat.mBytesPerFrame = sizeof(jack_default_audio_sample_t);
         dstFormat.mChannelsPerFrame = outchannels;
         dstFormat.mBitsPerChannel = 32;
         PrintStreamDesc(&dstFormat);
@@ -1376,7 +1376,7 @@ int JackCoreAudioDriver::SetupBuffers(int inchannels)
     fJackInputData->mNumberBuffers = inchannels;
     for (int i = 0; i < inchannels; i++) {
         fJackInputData->mBuffers[i].mNumberChannels = 1;
-        fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(float);
+        fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(jack_default_audio_sample_t);
     }
     return 0;
 }
@@ -1723,7 +1723,7 @@ int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {
         fJackInputData->mBuffers[i].mNumberChannels = 1;
-        fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(float);
+        fJackInputData->mBuffers[i].mDataByteSize = fEngineControl->fBufferSize * sizeof(jack_default_audio_sample_t);
         fJackInputData->mBuffers[i].mData = GetInputBuffer(i);
     }
 

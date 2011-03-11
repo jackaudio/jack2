@@ -72,7 +72,7 @@ static void MidiBufferInit(void* buffer, size_t buffer_size, jack_nframes_t nfra
     JackMidiBuffer* midi = (JackMidiBuffer*)buffer;
     midi->magic = JackMidiBuffer::MAGIC;
     /* Since port buffer has actually always BUFFER_SIZE_MAX frames, we can safely use all the size */
-    midi->buffer_size = BUFFER_SIZE_MAX * sizeof(float);
+    midi->buffer_size = BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
     midi->Reset(nframes);
 }
 
@@ -135,7 +135,7 @@ static void MidiBufferMixdown(void* mixbuffer, void** src_buffers, int src_count
 
 static size_t MidiBufferSize()
 {
-    return BUFFER_SIZE_MAX * sizeof(float);
+    return BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t);
 }
 
 const JackPortType gMidiPortType =

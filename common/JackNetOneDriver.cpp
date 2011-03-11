@@ -743,8 +743,8 @@ namespace Jack
                 // audio port, encode celt data.
 
             int encoded_bytes;
-            float *floatbuf = (float *)alloca (sizeof(float) * nframes );
-            memcpy( floatbuf, buf, nframes*sizeof(float) );
+            jack_default_audio_sample_t *floatbuf = (jack_default_audio_sample_t *)alloca (sizeof(jack_default_audio_sample_t) * nframes );
+            memcpy( floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t) );
             CELTEncoder *encoder = (CELTEncoder *)src_node->data;
             encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
             if( encoded_bytes != (int)net_period_up )

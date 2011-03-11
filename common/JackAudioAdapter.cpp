@@ -36,17 +36,17 @@ namespace Jack
     int JackAudioAdapter::Process (jack_nframes_t frames, void* arg)
     {
         JackAudioAdapter* adapter = static_cast<JackAudioAdapter*>(arg);
-        float* inputBuffer[adapter->fAudioAdapter->GetInputs()];
-        float* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
+        jack_default_audio_sample_t* inputBuffer[adapter->fAudioAdapter->GetInputs()];
+        jack_default_audio_sample_t* outputBuffer[adapter->fAudioAdapter->GetOutputs()];
 
         // Always clear output
         for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
-            inputBuffer[i] = (float*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
-            memset(inputBuffer[i], 0, frames * sizeof(float));
+            inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
+            memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
         }
 
         for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
-            outputBuffer[i] = (float*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
+            outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
         }
 
         adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);

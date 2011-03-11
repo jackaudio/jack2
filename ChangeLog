@@ -37,6 +37,7 @@ Valerio Pilo
 2011-03-11 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackNetMaster::SetBufferSize.
+	* Use jack_default_audio_sample_t instead of float consistently.
 
 2011-03-10 Stephane Letz  <letz@grame.fr>
 

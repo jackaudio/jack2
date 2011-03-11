@@ -286,7 +286,7 @@ int JackPort::UnsetAlias(const char* alias)
 void JackPort::ClearBuffer(jack_nframes_t frames)
 {
     const JackPortType* type = GetPortType(fTypeId);
-    (type->init)(GetBuffer(), frames * sizeof(float), frames);
+    (type->init)(GetBuffer(), frames * sizeof(jack_default_audio_sample_t), frames);
 }
 
 void JackPort::MixBuffers(void** src_buffers, int src_count, jack_nframes_t buffer_size)

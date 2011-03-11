@@ -178,8 +178,8 @@ int JackAudioDriver::Write()
 {
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
-            float* buffer = GetOutputBuffer(i);
-            int size = sizeof(float) * fEngineControl->fBufferSize;
+            jack_default_audio_sample_t* buffer = GetOutputBuffer(i);
+            int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
             // Monitor ports
             if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0)
                 memcpy(GetMonitorBuffer(i), buffer, size);

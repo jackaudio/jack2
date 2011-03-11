@@ -545,18 +545,18 @@ void netjack_detach( netjack_driver_state_t *netj )
 
 netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
 		jack_client_t * client,
-                const char *name,
-                unsigned int capture_ports,
-                unsigned int playback_ports,
-                unsigned int capture_ports_midi,
-                unsigned int playback_ports_midi,
-                jack_nframes_t sample_rate,
-                jack_nframes_t period_size,
-                unsigned int listen_port,
-                unsigned int transport_sync,
-                unsigned int resample_factor,
-                unsigned int resample_factor_up,
-                unsigned int bitdepth,
+        const char *name,
+        unsigned int capture_ports,
+        unsigned int playback_ports,
+        unsigned int capture_ports_midi,
+        unsigned int playback_ports_midi,
+        jack_nframes_t sample_rate,
+        jack_nframes_t period_size,
+        unsigned int listen_port,
+        unsigned int transport_sync,
+        unsigned int resample_factor,
+        unsigned int resample_factor_up,
+        unsigned int bitdepth,
 		unsigned int use_autoconfig,
 		unsigned int latency,
 		unsigned int redundancy,
@@ -663,74 +663,74 @@ netjack_startup( netjack_driver_state_t *netj )
     netj->srcaddress_valid = 0;
     if (netj->use_autoconfig)
     {
-	jacknet_packet_header *first_packet = alloca (sizeof (jacknet_packet_header));
-#ifdef WIN32
-    int address_size = sizeof( struct sockaddr_in );
-#else
-	socklen_t address_size = sizeof (struct sockaddr_in);
-#endif
-	//jack_info ("Waiting for an incoming packet !!!");
-	//jack_info ("*** IMPORTANT *** Dont connect a client to jackd until the driver is attached to a clock source !!!");
+        jacknet_packet_header *first_packet = alloca (sizeof (jacknet_packet_header));
+    #ifdef WIN32
+        int address_size = sizeof( struct sockaddr_in );
+    #else
+        socklen_t address_size = sizeof (struct sockaddr_in);
+    #endif
+        //jack_info ("Waiting for an incoming packet !!!");
+        //jack_info ("*** IMPORTANT *** Dont connect a client to jackd until the driver is attached to a clock source !!!");
 
-    while(1) {
-    if( ! netjack_poll( netj->sockfd, 1000 ) ) {
-	    jack_info ("Waiting aborted");
-	    return -1;
-    }
-    first_pack_len = recvfrom (netj->sockfd, (char *)first_packet, sizeof (jacknet_packet_header), 0, (struct sockaddr*) & netj->syncsource_address, &address_size);
-#ifdef WIN32
-        if( first_pack_len == -1 ) {
-            first_pack_len = sizeof(jacknet_packet_header);
-            break;
+        while(1) {
+            if( ! netjack_poll( netj->sockfd, 1000 ) ) {
+                jack_info ("Waiting aborted");
+                return -1;
+            }
+            first_pack_len = recvfrom (netj->sockfd, (char *)first_packet, sizeof (jacknet_packet_header), 0, (struct sockaddr*) & netj->syncsource_address, &address_size);
+        #ifdef WIN32
+                if( first_pack_len == -1 ) {
+                    first_pack_len = sizeof(jacknet_packet_header);
+                    break;
+                }
+        #else
+                if (first_pack_len == sizeof (jacknet_packet_header))
+                    break;
+        #endif
         }
-#else
+        netj->srcaddress_valid = 1;
+
         if (first_pack_len == sizeof (jacknet_packet_header))
-            break;
-#endif
-    }
-	netj->srcaddress_valid = 1;
+        {
+            packet_header_ntoh (first_packet);
 
-	if (first_pack_len == sizeof (jacknet_packet_header))
-	{
-	    packet_header_ntoh (first_packet);
+            jack_info ("AutoConfig Override !!!");
+            if (netj->sample_rate != first_packet->sample_rate)
+            {
+                jack_info ("AutoConfig Override: Master JACK sample rate = %d", first_packet->sample_rate);
+                netj->sample_rate = first_packet->sample_rate;
+                }
 
-	    jack_info ("AutoConfig Override !!!");
-	    if (netj->sample_rate != first_packet->sample_rate)
-	    {
-		jack_info ("AutoConfig Override: Master JACK sample rate = %d", first_packet->sample_rate);
-		netj->sample_rate = first_packet->sample_rate;
-	    }
+            if (netj->period_size != first_packet->period_size)
+            {
+                jack_info ("AutoConfig Override: Master JACK period size is %d", first_packet->period_size);
+                netj->period_size = first_packet->period_size;
+                }
+            if (netj->capture_channels_audio != first_packet->capture_channels_audio)
+            {
+                jack_info ("AutoConfig Override: capture_channels_audio = %d", first_packet->capture_channels_audio);
+                netj->capture_channels_audio = first_packet->capture_channels_audio;
+            }
+            if (netj->capture_channels_midi != first_packet->capture_channels_midi)
+            {
+                jack_info ("AutoConfig Override: capture_channels_midi = %d", first_packet->capture_channels_midi);
+                netj->capture_channels_midi = first_packet->capture_channels_midi;
+            }
+            if (netj->playback_channels_audio != first_packet->playback_channels_audio)
+            {
+                jack_info ("AutoConfig Override: playback_channels_audio = %d", first_packet->playback_channels_audio);
+                netj->playback_channels_audio = first_packet->playback_channels_audio;
+                }
+            if (netj->playback_channels_midi != first_packet->playback_channels_midi)
+            {
+                jack_info ("AutoConfig Override: playback_channels_midi = %d", first_packet->playback_channels_midi);
+                netj->playback_channels_midi = first_packet->playback_channels_midi;
+            }
 
-	    if (netj->period_size != first_packet->period_size)
-	    {
-		jack_info ("AutoConfig Override: Master JACK period size is %d", first_packet->period_size);
-		netj->period_size = first_packet->period_size;
-	    }
-	    if (netj->capture_channels_audio != first_packet->capture_channels_audio)
-	    {
-		jack_info ("AutoConfig Override: capture_channels_audio = %d", first_packet->capture_channels_audio);
-		netj->capture_channels_audio = first_packet->capture_channels_audio;
-	    }
-	    if (netj->capture_channels_midi != first_packet->capture_channels_midi)
-	    {
-		jack_info ("AutoConfig Override: capture_channels_midi = %d", first_packet->capture_channels_midi);
-		netj->capture_channels_midi = first_packet->capture_channels_midi;
-	    }
-	    if (netj->playback_channels_audio != first_packet->playback_channels_audio)
-	    {
-		jack_info ("AutoConfig Override: playback_channels_audio = %d", first_packet->playback_channels_audio);
-		netj->playback_channels_audio = first_packet->playback_channels_audio;
-	    }
-	    if (netj->playback_channels_midi != first_packet->playback_channels_midi)
-	    {
-		jack_info ("AutoConfig Override: playback_channels_midi = %d", first_packet->playback_channels_midi);
-		netj->playback_channels_midi = first_packet->playback_channels_midi;
-	    }
-
-	    netj->mtu = first_packet->mtu;
-	    jack_info ("MTU is set to %d bytes", first_packet->mtu);
-	    netj->latency = first_packet->latency;
-	}
+            netj->mtu = first_packet->mtu;
+            jack_info ("MTU is set to %d bytes", first_packet->mtu);
+            netj->latency = first_packet->latency;
+        }
     }
     netj->capture_channels  = netj->capture_channels_audio + netj->capture_channels_midi;
     netj->playback_channels = netj->playback_channels_audio + netj->playback_channels_midi;
@@ -762,21 +762,21 @@ netjack_startup( netjack_driver_state_t *netj )
                              * 1000000.0f);
 
     if( netj->latency == 0 )
-	netj->deadline_offset = 50*netj->period_usecs;
+        netj->deadline_offset = 50*netj->period_usecs;
     else
-	netj->deadline_offset = netj->period_usecs + 10*netj->latency*netj->period_usecs/100;
+        netj->deadline_offset = netj->period_usecs + 10*netj->latency*netj->period_usecs/100;
 
     if( netj->bitdepth == CELT_MODE ) {
-	// celt mode.
-	// TODO: this is a hack. But i dont want to change the packet header.
-	netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
-	netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
+        // celt mode.
+        // TODO: this is a hack. But i dont want to change the packet header.
+        netj->resample_factor = (netj->resample_factor * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
+        netj->resample_factor_up = (netj->resample_factor_up * netj->period_size * 1024 / netj->sample_rate / 8)&(~1);
 
-	netj->net_period_down = netj->resample_factor;
-	netj->net_period_up = netj->resample_factor_up;
+        netj->net_period_down = netj->resample_factor;
+        netj->net_period_up = netj->resample_factor_up;
     } else {
-	netj->net_period_down = (float) netj->period_size / (float) netj->resample_factor;
-	netj->net_period_up = (float) netj->period_size / (float) netj->resample_factor_up;
+        netj->net_period_down = (float) netj->period_size / (float) netj->resample_factor;
+        netj->net_period_up = (float) netj->period_size / (float) netj->resample_factor_up;
     }
 
     netj->rx_bufsize = sizeof (jacknet_packet_header) + netj->net_period_down * netj->capture_channels * get_sample_size (netj->bitdepth);
@@ -790,9 +790,9 @@ netjack_startup( netjack_driver_state_t *netj )
 
     // Special handling for latency=0
     if( netj->latency == 0 )
-	netj->resync_threshold = 0;
+        netj->resync_threshold = 0;
     else
-	netj->resync_threshold = MIN( 15, netj->latency-1 );
+        netj->resync_threshold = MIN( 15, netj->latency-1 );
 
     netj->running_free = 0;
 

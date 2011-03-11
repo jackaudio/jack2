@@ -145,8 +145,8 @@ namespace Jack
             void* fOutputCardChannels[256];
 
             //non-interleaved mod, floating point software buffers
-            float* fInputSoftChannels[256];
-            float* fOutputSoftChannels[256];
+            jack_default_audio_sample_t* fInputSoftChannels[256];
+            jack_default_audio_sample_t* fOutputSoftChannels[256];
 
             //public methods ---------------------------------------------------------
 
@@ -165,12 +165,12 @@ namespace Jack
                 return fBuffering;
             }
 
-            float** inputSoftChannels()
+            jack_default_audio_sample_t** inputSoftChannels()
             {
                 return fInputSoftChannels;
             }
 
-            float** outputSoftChannels()
+            jack_default_audio_sample_t** outputSoftChannels()
             {
                 return fOutputSoftChannels;
             }
@@ -182,10 +182,10 @@ namespace Jack
                 fInputParams    = 0;
                 fOutputParams   = 0;
                 fPeriod = 2;
-                
+
                 fInputCardBuffer = 0;
                 fOutputCardBuffer = 0;
-                
+
                 for ( int i = 0; i < 256; i++ )
                 {
                     fInputCardChannels[i] = 0;
@@ -222,18 +222,18 @@ namespace Jack
                 //get hardware input parameters
                 check_error ( snd_pcm_hw_params_malloc ( &fInputParams ) );
                 setAudioParams ( fInputDevice, fInputParams );
-           
+
                 //get hardware output parameters
                 check_error ( snd_pcm_hw_params_malloc ( &fOutputParams ) )
                 setAudioParams ( fOutputDevice, fOutputParams );
-                
+
                 // set the number of physical input and output channels close to what we need
                 fCardInputs 	= fSoftInputs;
                 fCardOutputs 	= fSoftOutputs;
-  
+
                 snd_pcm_hw_params_set_channels_near(fInputDevice, fInputParams, &fCardInputs);
                 snd_pcm_hw_params_set_channels_near(fOutputDevice, fOutputParams, &fCardOutputs);
-     
+
                 //set input/output param
                 check_error ( snd_pcm_hw_params ( fInputDevice,  fInputParams ) );
                 check_error ( snd_pcm_hw_params ( fOutputDevice, fOutputParams ) );
@@ -260,14 +260,14 @@ namespace Jack
 
                 for ( unsigned int i = 0; i < fSoftInputs; i++ )
                 {
-                    fInputSoftChannels[i] = ( float* ) aligned_calloc ( fBuffering, sizeof ( float ) );
+                    fInputSoftChannels[i] = ( jack_default_audio_sample_t* ) aligned_calloc ( fBuffering, sizeof ( jack_default_audio_sample_t ) );
                     for ( int j = 0; j < fBuffering; j++ )
                         fInputSoftChannels[i][j] = 0.0;
                 }
 
                 for ( unsigned int i = 0; i < fSoftOutputs; i++ )
                 {
-                    fOutputSoftChannels[i] = ( float* ) aligned_calloc ( fBuffering, sizeof ( float ) );
+                    fOutputSoftChannels[i] = ( jack_default_audio_sample_t* ) aligned_calloc ( fBuffering, sizeof ( jack_default_audio_sample_t ) );
                     for ( int j = 0; j < fBuffering; j++ )
                         fOutputSoftChannels[i][j] = 0.0;
                 }
@@ -376,14 +376,14 @@ namespace Jack
                             short* buffer16b = ( short* ) fInputCardBuffer;
                             for ( s = 0; s < fBuffering; s++ )
                                 for ( c = 0; c < fCardInputs; c++ )
-                                    fInputSoftChannels[c][s] = float ( buffer16b[c + s*fCardInputs] ) * ( 1.0/float ( SHRT_MAX ) );
+                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t ( buffer16b[c + s*fCardInputs] ) * ( (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(SHRT_MAX));
                         }
                         else   // SND_PCM_FORMAT_S32
                         {
                             int32_t* buffer32b = ( int32_t* ) fInputCardBuffer;
                             for ( s = 0; s < fBuffering; s++ )
                                 for ( c = 0; c < fCardInputs; c++ )
-                                    fInputSoftChannels[c][s] = float ( buffer32b[c + s*fCardInputs] ) * ( 1.0/float ( INT_MAX ) );
+                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t ( buffer32b[c + s*fCardInputs] ) * (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(INT_MAX));
                         }
                         break;
                     case SND_PCM_ACCESS_RW_NONINTERLEAVED :
@@ -400,7 +400,7 @@ namespace Jack
                             {
                                 chan16b = ( short* ) fInputCardChannels[c];
                                 for ( s = 0; s < fBuffering; s++ )
-                                    fInputSoftChannels[c][s] = float ( chan16b[s] ) * ( 1.0/float ( SHRT_MAX ) );
+                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t(chan16b[s]) * (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(SHRT_MAX));
                             }
                         }
                         else   // SND_PCM_FORMAT_S32
@@ -410,7 +410,7 @@ namespace Jack
                             {
                                 chan32b = ( int32_t* ) fInputCardChannels[c];
                                 for ( s = 0; s < fBuffering; s++ )
-                                    fInputSoftChannels[c][s] = float ( chan32b[s] ) * ( 1.0/float ( INT_MAX ) );
+                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t(chan32b[s]) * (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(INT_MAX));
                             }
                         }
                         break;
@@ -440,8 +440,8 @@ namespace Jack
                             {
                                 for ( unsigned int c = 0; c < fCardOutputs; c++ )
                                 {
-                                    float x = fOutputSoftChannels[c][f];
-                                    buffer16b[c + f * fCardOutputs] = short ( max ( min ( x, 1.0 ), -1.0 ) * float ( SHRT_MAX ) );
+                                    jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
+                                    buffer16b[c + f * fCardOutputs] = short(max(min (x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(SHRT_MAX));
                                 }
                             }
                         }
@@ -452,8 +452,8 @@ namespace Jack
                             {
                                 for ( unsigned int c = 0; c < fCardOutputs; c++ )
                                 {
-                                    float x = fOutputSoftChannels[c][f];
-                                    buffer32b[c + f * fCardOutputs] = int32_t ( max ( min ( x, 1.0 ), -1.0 ) * float ( INT_MAX ) );
+                                    jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
+                                    buffer32b[c + f * fCardOutputs] = int32_t(max(min(x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(INT_MAX));
                                 }
                             }
                         }
@@ -474,8 +474,8 @@ namespace Jack
                                 short* chan16b = ( short* ) fOutputCardChannels[c];
                                 for ( f = 0; f < fBuffering; f++ )
                                 {
-                                    float x = fOutputSoftChannels[c][f];
-                                    chan16b[f] = short ( max ( min ( x,1.0 ), -1.0 ) * float ( SHRT_MAX ) ) ;
+                                    jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
+                                    chan16b[f] = short(max(min (x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(SHRT_MAX));
                                 }
                             }
                         }
@@ -486,8 +486,8 @@ namespace Jack
                                 int32_t* chan32b = ( int32_t* ) fOutputCardChannels[c];
                                 for ( f = 0; f < fBuffering; f++ )
                                 {
-                                    float x = fOutputSoftChannels[c][f];
-                                    chan32b[f] = int32_t ( max ( min ( x,1.0 ),-1.0 ) * float ( INT_MAX ) ) ;
+                                    jack_default_audio_sample_t x = fOutputSoftChannels[c][f];
+                                    chan32b[f] = int32_t(max(min(x, jack_default_audio_sample_t(1.0)), jack_default_audio_sample_t(-1.0)) * jack_default_audio_sample_t(INT_MAX));
                                 }
                             }
                         }
