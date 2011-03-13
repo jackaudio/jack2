@@ -832,9 +832,11 @@ int JackFreebobDriver::Open(freebob_jack_settings_t *params)
 
 int JackFreebobDriver::Close()
 {
-    JackAudioDriver::Close();
+    // Generic audio driver close
+    int res = JackAudioDriver::Close();
+
     freebob_driver_delete((freebob_driver_t*)fDriver);
-    return 0;
+    return res;
 }
 
 int JackFreebobDriver::Start()

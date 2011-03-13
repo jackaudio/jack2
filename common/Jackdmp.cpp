@@ -229,8 +229,8 @@ int main(int argc, char* argv[])
 
     int i,opt = 0;
     int option_index = 0;
-    char *master_driver_name = NULL;
-    char **master_driver_args = NULL;
+    char* master_driver_name = NULL;
+    char** master_driver_args = NULL;
     int master_driver_nargs = 1;
     int do_mlock = 1;
     int do_unlock = 0;
@@ -426,7 +426,7 @@ int main(int argc, char* argv[])
         goto fail_free1;
     }
 
-    // Audio driver
+    // Master driver
     master_driver_ctl = jackctl_server_get_driver(server_ctl, master_driver_name);
     if (master_driver_ctl == NULL) {
         fprintf(stderr, "Unknown driver \"%s\"\n", master_driver_name);
@@ -464,7 +464,7 @@ int main(int argc, char* argv[])
         goto fail_free1;
     }
 
-    // Slave driver
+    // Slave drivers
     for (it = slaves_list.begin(); it != slaves_list.end(); it++) {
         jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
         if (slave_driver_ctl == NULL) {
@@ -488,7 +488,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    // Load internal clients
+    // Internal clients
     for (it = internals_list.begin(); it != internals_list.end(); it++) {
         jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
         if (internal_driver_ctl == NULL) {

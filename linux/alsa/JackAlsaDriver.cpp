@@ -2291,7 +2291,9 @@ int JackAlsaDriver::Open(jack_nframes_t nframes,
 
 int JackAlsaDriver::Close()
 {
-    JackAudioDriver::Close();
+    // Generic audio driver close
+    int res = JackAudioDriver::Close();
+
     alsa_driver_delete((alsa_driver_t*)fDriver);
 
     if (JackServerGlobals::on_device_release != NULL)
@@ -2310,7 +2312,7 @@ int JackAlsaDriver::Close()
         }
     }
 
-    return 0;
+    return res;
 }
 
 int JackAlsaDriver::Start()

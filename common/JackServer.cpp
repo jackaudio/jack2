@@ -61,7 +61,6 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
 JackServer::~JackServer()
 {
     JackGraphManager::Destroy(fGraphManager);
-    delete fAudioDriver;
     delete fDriverInfo;
     delete fFreewheelDriver;
     delete fEngine;
@@ -136,14 +135,14 @@ int JackServer::Close()
     return 0;
 }
 
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status)
+int JackServer::InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient1(JackServerGlobals::fInstance, GetSynchroTable(), objet_data);
     assert(client);
     return InternalClientLoadAux(client, so_name, client_name, options, int_ref, uuid, status);
  }
 
-int JackServer::InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status)
+int JackServer::InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status)
 {
     JackLoadableInternalClient* client = new JackLoadableInternalClient2(JackServerGlobals::fInstance, GetSynchroTable(), parameters);
     assert(client);
@@ -154,6 +153,8 @@ int JackServer::InternalClientLoadAux(JackLoadableInternalClient* client, const 
 {
     // Clear status
     *status = 0;
+
+    // Client object is internally kept in JackEngine
     if ((client->Init(so_name) < 0) || (client->Open(JACK_DEFAULT_SERVER_NAME, client_name,  uuid, (jack_options_t)options, (jack_status_t*)status) < 0)) {
         delete client;
         int my_status1 = *status | JackFailure;
@@ -338,7 +339,6 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
         }
 
         // Delete old master
-        delete fAudioDriver;
         delete fDriverInfo;
 
         // Activate master

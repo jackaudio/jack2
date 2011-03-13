@@ -644,9 +644,11 @@ int JackFFADODriver::Open(ffado_jack_settings_t *params)
 
 int JackFFADODriver::Close()
 {
-    JackAudioDriver::Close();
+    // Generic audio driver close
+    int res = JackAudioDriver::Close();
+
     ffado_driver_delete((ffado_driver_t*)fDriver);
-    return 0;
+    return res;
 }
 
 int JackFFADODriver::Start()

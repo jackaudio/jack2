@@ -24,13 +24,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "driver_interface.h"
 #include "JackControlAPI.h"
 #include "JackPlatformPlug.h"
+#include "JackDriver.h"
 #include "JackSystemDeps.h"
-
-namespace Jack
-{
-    class JackDriverClientInterface;
-    class JackLockedEngine;
-};
 
 typedef jack_driver_desc_t * (*JackDriverDescFunction) ();
 typedef Jack::JackDriverClientInterface* (*driverInitialize) (Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
@@ -39,34 +34,30 @@ class JackDriverInfo
 {
 
     private:
-    
+
         driverInitialize fInitialize;
         DRIVER_HANDLE fHandle;
         Jack::JackDriverClientInterface* fBackend;
-        
+
     public:
-    
-        JackDriverInfo():fInitialize(NULL),fHandle(NULL)
+
+        JackDriverInfo():fInitialize(NULL),fHandle(NULL),fBackend(NULL)
         {}
-        ~JackDriverInfo()
-        {
-            if (fHandle)
-                UnloadDriverModule(fHandle);
-        }
-        
+        ~JackDriverInfo();
+
         Jack::JackDriverClientInterface* Open(jack_driver_desc_t* driver_desc, Jack::JackLockedEngine*, Jack::JackSynchro*, const JSList*);
-        
+
         Jack::JackDriverClientInterface* GetBackend()
         {
             return fBackend;
         }
-    
+
 };
 
-jack_driver_desc_t * jack_find_driver_descriptor (JSList * drivers, const char * name);
+jack_driver_desc_t * jack_find_driver_descriptor(JSList * drivers, const char * name);
 
-JSList * jack_drivers_load (JSList * drivers);
-JSList * jack_internals_load (JSList * internals);
+JSList * jack_drivers_load(JSList * drivers);
+JSList * jack_internals_load(JSList * internals);
 
 EXPORT int jackctl_parse_driver_params (jackctl_driver * driver_ptr, int argc, char* argv[]);
 EXPORT void jack_free_driver_params(JSList * param_ptr);

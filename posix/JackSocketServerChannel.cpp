@@ -392,7 +392,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackInternalClientLoadRequest req;
             JackInternalClientLoadResult res;
             if (req.Read(socket) == 0)
-                res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
+                res.fResult = fServer->InternalClientLoad1(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::InternalClientLoad write error name = %s", req.fName);
             break;

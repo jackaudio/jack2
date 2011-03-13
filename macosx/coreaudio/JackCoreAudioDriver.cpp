@@ -1551,12 +1551,15 @@ int JackCoreAudioDriver::Close()
 {
     jack_log("JackCoreAudioDriver::Close");
     Stop();
-    JackAudioDriver::Close();
+
+    // Generic audio driver close
+    int res = JackAudioDriver::Close();
+
     RemoveListeners();
     DisposeBuffers();
     CloseAUHAL();
     DestroyAggregateDevice();
-    return 0;
+    return res;
 }
 
 int JackCoreAudioDriver::Attach()

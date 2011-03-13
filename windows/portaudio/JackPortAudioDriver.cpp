@@ -180,7 +180,9 @@ error:
 
     int JackPortAudioDriver::Close()
     {
+        // Generic audio driver close
         int res = JackAudioDriver::Close();
+
         jack_log("JackPortAudioDriver::Close");
         Pa_CloseStream(fStream);
         return res;
