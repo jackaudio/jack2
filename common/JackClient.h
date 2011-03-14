@@ -44,7 +44,7 @@ struct JackEngineControl;
 \brief The base class for clients: share part of the implementation for JackInternalClient and JackLibClient.
 */
 
-class JackClient : public JackClientInterface, public JackRunnableInterface
+class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnableInterface
 {
         friend class JackDebugClient;
 

@@ -46,7 +46,7 @@ PortFollower;
 \brief A "decorator" debug client to validate API use.
 */
 
-class JackDebugClient : public JackClient
+class SERVER_EXPORT JackDebugClient : public JackClient
 {
     protected:
 
