@@ -376,14 +376,14 @@ namespace Jack
                             short* buffer16b = ( short* ) fInputCardBuffer;
                             for ( s = 0; s < fBuffering; s++ )
                                 for ( c = 0; c < fCardInputs; c++ )
-                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t ( buffer16b[c + s*fCardInputs] ) * ( (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(SHRT_MAX));
+                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t(buffer16b[c + s*fCardInputs]) * (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(SHRT_MAX));
                         }
                         else   // SND_PCM_FORMAT_S32
                         {
                             int32_t* buffer32b = ( int32_t* ) fInputCardBuffer;
                             for ( s = 0; s < fBuffering; s++ )
                                 for ( c = 0; c < fCardInputs; c++ )
-                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t ( buffer32b[c + s*fCardInputs] ) * (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(INT_MAX));
+                                    fInputSoftChannels[c][s] = jack_default_audio_sample_t(buffer32b[c + s*fCardInputs]) * (jack_default_audio_sample_t(1.0)/jack_default_audio_sample_t(INT_MAX));
                         }
                         break;
                     case SND_PCM_ACCESS_RW_NONINTERLEAVED :
