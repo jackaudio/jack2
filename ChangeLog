@@ -36,7 +36,7 @@ Valerio Pilo
 
 2011-03-13 Stephane Letz  <letz@grame.fr>
 
-	* Correct JackNetMaster::SetBufferSize.
+	* Rework internal slave driver management, JackServerGlobals now handle same parameters as jackdmp.
 
 2011-03-11 Stephane Letz  <letz@grame.fr>
 

@@ -363,8 +363,7 @@ bool JackServerGlobals::Init()
             if (!driver_desc) {
                 jack_error("jackdmp: unknown slave driver '%s'", name);
             } else {
-                JackDriverInfo* info = fInstance->AddSlave(driver_desc, NULL);
-                (*it1).second = info;
+                (*it1).second = fInstance->AddSlave(driver_desc, NULL);
             }
         }
 
@@ -374,7 +373,7 @@ bool JackServerGlobals::Init()
             if (!driver_desc) {
                 jack_error("jackdmp: unknown driver '%s'", "loopback");
             } else {
-                fInstance->AddSlave(driver_desc, NULL);
+                fSlavesList["loopback"] = fInstance->AddSlave(driver_desc, NULL);
             }
         }
 
