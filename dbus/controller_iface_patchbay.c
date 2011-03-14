@@ -323,7 +323,7 @@ jack_controller_patchbay_find_client(
     list_for_each(node_ptr, &patchbay_ptr->graph.clients)
     {
         client_ptr = list_entry(node_ptr, struct jack_graph_client, siblings);
-        if (strncmp(client_ptr->name, client_name, client_name_len) == 0)
+        if (strlen(client_ptr->name) == client_name_len && strncmp(client_ptr->name, client_name, client_name_len) == 0)
         {
             return client_ptr;
         }

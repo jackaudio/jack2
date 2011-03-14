@@ -28,6 +28,10 @@ extern "C"
 #include <jack/systemdeps.h>
 #include <jack/weakmacros.h>
 
+/* use 512KB stack per thread - the default is way too high to be feasible
+ * with mlockall() on many systems */
+#define THREAD_STACK 524288
+
 /** @file thread.h
  *
  * Library functions to standardize thread creation for JACK and its
@@ -66,7 +70,7 @@ int jack_client_max_real_time_priority (jack_client_t*) JACK_OPTIONAL_WEAK_EXPOR
  * @returns 0, if successful; EPERM, if the calling process lacks
  * required realtime privileges; otherwise some other error number.
  */
-int jack_acquire_real_time_scheduling (pthread_t thread, int priority) JACK_OPTIONAL_WEAK_EXPORT;
+int jack_acquire_real_time_scheduling (jack_native_thread_t thread, int priority) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Create a thread for JACK or one of its clients.  The thread is
@@ -85,7 +89,7 @@ int jack_acquire_real_time_scheduling (pthread_t thread, int priority) JACK_OPTI
  * @returns 0, if successful; otherwise some error number.
  */
 int jack_client_create_thread (jack_client_t* client,
-                               pthread_t *thread,
+                               jack_native_thread_t *thread,
                                int priority,
                                int realtime, 	/* boolean */
                                void *(*start_routine)(void*),
@@ -98,7 +102,7 @@ int jack_client_create_thread (jack_client_t* client,
  *
  * @returns 0, if successful; otherwise an error number.
  */
-int jack_drop_real_time_scheduling (pthread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
+int jack_drop_real_time_scheduling (jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Stop the thread, waiting for the thread handler to terminate.
@@ -107,7 +111,7 @@ int jack_drop_real_time_scheduling (pthread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
  *
  * @returns 0, if successful; otherwise an error number.
  */
-int jack_client_stop_thread(jack_client_t* client, pthread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
+int jack_client_stop_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Cancel the thread then waits for the thread handler to terminate.
@@ -116,7 +120,7 @@ int jack_client_stop_thread(jack_client_t* client, pthread_t thread) JACK_OPTION
  *
  * @returns 0, if successful; otherwise an error number.
  */
- int jack_client_kill_thread(jack_client_t* client, pthread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
+ int jack_client_kill_thread(jack_client_t* client, jack_native_thread_t thread) JACK_OPTIONAL_WEAK_EXPORT;
 
 #ifndef WIN32
 

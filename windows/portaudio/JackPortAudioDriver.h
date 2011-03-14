@@ -37,8 +37,8 @@ class JackPortAudioDriver : public JackAudioDriver
 
         PortAudioDevices* fPaDevices;
         PaStream* fStream;
-        float** fInputBuffer;
-        float** fOutputBuffer;
+        jack_default_audio_sample_t** fInputBuffer;
+        jack_default_audio_sample_t** fOutputBuffer;
         PaDeviceIndex fInputDevice;
         PaDeviceIndex fOutputDevice;
 
@@ -81,6 +81,12 @@ class JackPortAudioDriver : public JackAudioDriver
 
         int Read();
         int Write();
+
+        // BufferSize can be changed
+        bool IsFixedBufferSize()
+        {
+            return false;
+        }
 
         int SetBufferSize(jack_nframes_t buffer_size);
 };

@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -51,7 +51,7 @@ JackSocketServerChannel::~JackSocketServerChannel()
 int JackSocketServerChannel::Open(const char* server_name, JackServer* server)
 {
     jack_log("JackSocketServerChannel::Open");
-   
+
     // Prepare request socket
     if (fRequestListenSocket.Bind(jack_server_dir, server_name, 0) < 0) {
         jack_log("JackSocketServerChannel::Open : cannot create result listen socket");
@@ -79,14 +79,14 @@ void JackSocketServerChannel::Close()
         delete socket;
     }
 }
-    
+
 int JackSocketServerChannel::Start()
 {
     if (fThread.Start() != 0) {
         jack_error("Cannot start Jack server listener");
         return -1;
-    }  
-    
+    }
+
     return 0;
 }
 
@@ -102,14 +102,20 @@ void JackSocketServerChannel::ClientCreate()
     }
 }
 
-void JackSocketServerChannel::ClientAdd(int fd, char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackSocketServerChannel::ClientAdd(int fd, char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     jack_log("JackSocketServerChannel::ClientAdd");
     int refnum = -1;
-    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, &refnum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, uuid, &refnum, shared_engine, shared_client, shared_graph);
     if (*result == 0) {
         fSocketTable[fd].first = refnum;
         fRebuild = true;
+    #ifdef __APPLE__
+        int on = 1;
+        if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
+            jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fd, strerror(errno));
+        }
+    #endif
     } else {
         jack_error("Cannot create new client");
     }
@@ -162,6 +168,12 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         return false;
     }
 
+    if (fd == JackServerGlobals::fRTNotificationSocket && header.fType != JackRequest::kNotification) {
+        jack_error("fRTNotificationSocket = %d", JackServerGlobals::fRTNotificationSocket);
+        jack_error("JackSocketServerChannel::HandleRequest : incorrect notification !!");
+        return true;
+    }
+
     // Read data
     switch (header.fType) {
 
@@ -170,7 +182,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientCheckRequest req;
             JackClientCheckResult res;
             if (req.Read(socket) == 0)
-                res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
+                res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientCheck write error name = %s", req.fName);
             break;
@@ -181,7 +193,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientOpenRequest req;
             JackClientOpenResult res;
             if (req.Read(socket) == 0)
-                ClientAdd(fd, req.fName, req.fPID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+                ClientAdd(fd, req.fName, req.fPID, req.fUUID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientOpen write error name = %s", req.fName);
             break;
@@ -286,7 +298,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 jack_error("JackRequest::DisconnectPorts write error ref = %d", req.fRefNum);
             break;
         }
-        
+
         case JackRequest::kPortRename: {
             jack_log("JackRequest::PortRename");
             JackPortRenameRequest req;
@@ -317,6 +329,17 @@ bool JackSocketServerChannel::HandleRequest(int fd)
                 res.fResult = fServer->SetFreewheel(req.fOnOff);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::SetFreeWheel write error");
+            break;
+        }
+
+         case JackRequest::kComputeTotalLatencies: {
+            jack_log("JackRequest::ComputeTotalLatencies");
+            JackComputeTotalLatenciesRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0)
+                res.fResult = fServer->GetEngine()->ComputeTotalLatencies();
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ComputeTotalLatencies write error");
             break;
         }
 
@@ -369,7 +392,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackInternalClientLoadRequest req;
             JackInternalClientLoadResult res;
             if (req.Read(socket) == 0)
-                res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus);
+                res.fResult = fServer->InternalClientLoad1(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::InternalClientLoad write error name = %s", req.fName);
             break;
@@ -400,11 +423,82 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             break;
         }
 
+        case JackRequest::kSessionNotify: {
+            jack_log("JackRequest::SessionNotify");
+            JackSessionNotifyRequest req;
+            JackSessionNotifyResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
+            }
+            break;
+        }
+
+        case JackRequest::kSessionReply: {
+            jack_log("JackRequest::SessionReply");
+            JackSessionReplyRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->SessionReply(req.fRefNum);
+                res.fResult = 0;
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::SessionReply write error");
+            break;
+        }
+
+        case JackRequest::kGetClientByUUID: {
+            jack_log("JackRequest::GetClientByUUID");
+            JackGetClientNameRequest req;
+            JackClientNameResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::GetClientByUUID write error");
+            break;
+        }
+
+        case JackRequest::kGetUUIDByClient: {
+            jack_log("JackRequest::GetUUIDByClient");
+            JackGetUUIDRequest req;
+            JackUUIDResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::GetUUIDByClient write error");
+            break;
+        }
+
+        case JackRequest::kReserveClientName: {
+            jack_log("JackRequest::ReserveClientName");
+            JackReserveNameRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ReserveClientName write error");
+            break;
+        }
+
+        case JackRequest::kClientHasSessionCallback: {
+            jack_log("JackRequest::ClientHasSessionCallback");
+            JackClientHasSessionCallbackRequest req;
+            JackResult res;
+            if (req.Read(socket) == 0) {
+                fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+            }
+            if (res.Write(socket) < 0)
+                jack_error("JackRequest::ClientHasSessionCallback write error");
+            break;
+        }
+
         default:
             jack_error("Unknown request %ld", header.fType);
             break;
     }
-     
+
     return true;
 }
 
@@ -445,7 +539,7 @@ bool JackSocketServerChannel::Init()
 bool JackSocketServerChannel::Execute()
 {
     try {
-    
+
         // Global poll
         if ((poll(fPollTable, fSocketTable.size() + 1, 10000) < 0) && (errno != EINTR)) {
             jack_error("Engine poll failed err = %s request thread quits...", strerror(errno));
@@ -460,22 +554,22 @@ bool JackSocketServerChannel::Execute()
                     jack_log("Poll client error err = %s", strerror(errno));
                     ClientKill(fd);
                 } else if (fPollTable[i].revents & POLLIN) {
-                    if (!HandleRequest(fd)) 
+                    if (!HandleRequest(fd))
                         jack_log("Could not handle external client request");
                 }
             }
 
             // Check the server request socket */
-            if (fPollTable[0].revents & POLLERR) 
+            if (fPollTable[0].revents & POLLERR)
                 jack_error("Error on server request socket err = %s", strerror(errno));
-       
-            if (fPollTable[0].revents & POLLIN) 
+
+            if (fPollTable[0].revents & POLLIN)
                 ClientCreate();
         }
 
         BuildPoolTable();
         return true;
-        
+
     } catch (JackQuitException& e) {
         jack_log("JackMachServerChannel::Execute JackQuitException");
         return false;

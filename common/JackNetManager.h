@@ -54,7 +54,7 @@ namespace Jack
 
             //sync and transport
             int fLastTransportState;
-     
+
             //monitoring
 #ifdef JACK_MONITOR
             jack_time_t fPeriodUsecs;
@@ -64,7 +64,7 @@ namespace Jack
             bool Init(bool auto_connect);
             int AllocPorts();
             void FreePorts();
-     
+
             //transport
             void EncodeTransportData();
             void DecodeTransportData();
@@ -98,7 +98,7 @@ namespace Jack
             const char* fManagerName;
             char fMulticastIP[32];
             JackNetSocket fSocket;
-            pthread_t fManagerThread;
+            jack_native_thread_t fManagerThread;
             master_list_t fMasterList;
             uint32_t fGlobalID;
             bool fRunning;

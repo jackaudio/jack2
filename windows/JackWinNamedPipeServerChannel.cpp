@@ -53,7 +53,7 @@ JackClientPipeThread::~JackClientPipeThread()
     delete fPipe;
 }
 
-int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client connection
+int JackClientPipeThread::Open(JackServer* server)      // Open the Server/Client connection
 {
     // Start listening
     if (fThread.Start() != 0) {
@@ -65,13 +65,13 @@ int JackClientPipeThread::Open(JackServer* server)	// Open the Server/Client con
     return 0;
 }
 
-void JackClientPipeThread::Close()					// Close the Server/Client connection
+void JackClientPipeThread::Close()                                      // Close the Server/Client connection
 {
     jack_log("JackClientPipeThread::Close %x %ld", this, fRefNum);
     /*
-    	TODO : solve WIN32 thread Kill issue
-    	This would hang.. since Close will be followed by a delete,
-    	all ressources will be desallocated at the end.
+        TODO : solve WIN32 thread Kill issue
+        This would hang.. since Close will be followed by a delete,
+        all ressources will be desallocated at the end.
     */
 
     fThread.Kill();
@@ -115,7 +115,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientCheckRequest req;
                 JackClientCheckResult res;
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->GetEngine()->ClientCheck(req.fName, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
+                    res.fResult = fServer->GetEngine()->ClientCheck(req.fName, req.fUUID, res.fName, req.fProtocol, req.fOptions, &res.fStatus);
                 res.Write(fPipe);
                 break;
             }
@@ -125,7 +125,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackClientOpenRequest req;
                 JackClientOpenResult res;
                 if (req.Read(fPipe) == 0)
-                    ClientAdd(req.fName, req.fPID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
+                    ClientAdd(req.fName, req.fPID, req.fUUID, &res.fSharedEngine, &res.fSharedClient, &res.fSharedGraph, &res.fResult);
                 res.Write(fPipe);
                 break;
             }
@@ -252,6 +252,16 @@ bool JackClientPipeThread::HandleRequest()
                 break;
             }
 
+            case JackRequest::kComputeTotalLatencies: {
+                jack_log("JackRequest::ComputeTotalLatencies");
+                JackComputeTotalLatenciesRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0)
+                    res.fResult = fServer->GetEngine()->ComputeTotalLatencies();
+                res.Write(fPipe);
+                break;
+            }
+
             case JackRequest::kReleaseTimebase: {
                 jack_log("JackRequest::ReleaseTimebase");
                 JackReleaseTimebaseRequest req;
@@ -297,7 +307,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackInternalClientLoadRequest req;
                 JackInternalClientLoadResult res;
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, &res.fStatus);
+                    res.fResult = fServer->InternalClientLoad1(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
                 res.Write(fPipe);
                 break;
             }
@@ -326,6 +336,73 @@ bool JackClientPipeThread::HandleRequest()
                 break;
             }
 
+            case JackRequest::kSessionNotify: {
+                jack_log("JackRequest::SessionNotify");
+                JackSessionNotifyRequest req;
+                JackSessionNotifyResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe);
+                }
+                res.Write(fPipe);
+                break;
+            }
+
+            case JackRequest::kSessionReply: {
+                jack_log("JackRequest::SessionReply");
+                JackSessionReplyRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->SessionReply(req.fRefNum);
+                    res.fResult = 0;
+                }
+                res.Write(fPipe);
+                break;
+            }
+
+            case JackRequest::kGetClientByUUID: {
+                jack_log("JackRequest::GetClientByUUID");
+                JackGetClientNameRequest req;
+                JackClientNameResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->GetClientNameForUUID(req.fUUID, res.fName, &res.fResult);
+                }
+                res.Write(fPipe);
+                break;
+            }
+
+            case JackRequest::kGetUUIDByClient: {
+                jack_log("JackRequest::GetUUIDByClient");
+                JackGetUUIDRequest req;
+                JackUUIDResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->GetUUIDForClientName(req.fName, res.fUUID, &res.fResult);
+                }
+                res.Write(fPipe);
+                break;
+            }
+
+            case JackRequest::kReserveClientName: {
+                jack_log("JackRequest::ReserveClientName");
+                JackReserveNameRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->ReserveClientName(req.fName, req.fUUID, &res.fResult);
+                }
+                res.Write(fPipe);
+                break;
+            }
+
+            case JackRequest::kClientHasSessionCallback: {
+                jack_log("JackRequest::ClientHasSessionCallback");
+                JackClientHasSessionCallbackRequest req;
+                JackResult res;
+                if (req.Read(fPipe) == 0) {
+                    fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+                }
+                res.Write(fPipe);
+                break;
+            }
+
             default:
                 jack_log("Unknown request %ld", header.fType);
                 break;
@@ -337,11 +414,11 @@ bool JackClientPipeThread::HandleRequest()
     return ret;
 }
 
-void JackClientPipeThread::ClientAdd(char* name, int pid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
+void JackClientPipeThread::ClientAdd(char* name, int pid, int uuid, int* shared_engine, int* shared_client, int* shared_graph, int* result)
 {
     jack_log("JackClientPipeThread::ClientAdd %s", name);
     fRefNum = -1;
-    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, &fRefNum, shared_engine, shared_client, shared_graph);
+    *result = fServer->GetEngine()->ClientExternalOpen(name, pid, uuid, &fRefNum, shared_engine, shared_client, shared_graph);
 }
 
 void JackClientPipeThread::ClientRemove()
@@ -358,7 +435,7 @@ void JackClientPipeThread::ClientKill()
 {
     jack_log("JackClientPipeThread::ClientKill ref = %d", fRefNum);
 
-    if (fRefNum == -1) {		// Correspond to an already removed client.
+    if (fRefNum == -1) {                // Correspond to an already removed client.
         jack_log("Kill a closed client");
     } else if (fRefNum == 0) {  // Correspond to a still not opened client.
         jack_log("Kill a not opened client");
@@ -401,10 +478,10 @@ int JackWinNamedPipeServerChannel::Open(const char* server_name, JackServer* ser
 void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
-    	This would hang the server... since we are quitting it, its not really problematic,
-    	all ressources will be desallocated at the end.
+        This would hang the server... since we are quitting it, its not really problematic,
+        all ressources will be desallocated at the end.
 
-    	fRequestListenPipe.Close();
+        fRequestListenPipe.Close();
         fThread.Stop();
     */
 

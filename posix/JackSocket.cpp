@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -45,12 +45,12 @@ void JackClientSocket::SetReadTimeOut(long sec)
 {
     int	flags;
     fTimeOut = sec;
-    
+
     if ((flags = fcntl(fSocket, F_GETFL, 0)) < 0) {
 		jack_error("JackClientSocket::SetReadTimeOut error in fcntl F_GETFL");
 		return;
 	}
-    
+
 	flags |= O_NONBLOCK;
 	if (fcntl(fSocket, F_SETFL, flags) < 0) {
 		jack_error("JackClientSocket::SetReadTimeOut error in fcntl F_SETFL");
@@ -62,12 +62,12 @@ void JackClientSocket::SetWriteTimeOut(long sec)
 {
     int	flags;
     fTimeOut = sec;
-    
+
     if ((flags = fcntl(fSocket, F_GETFL, 0)) < 0) {
 		jack_error("JackClientSocket::SetWriteTimeOut error in fcntl F_GETFL");
 		return;
 	}
-    
+
 	flags |= O_NONBLOCK;
 	if (fcntl(fSocket, F_SETFL, flags) < 0) {
 		jack_error("JackClientSocket::SetWriteTimeOut error in fcntl F_SETFL");
@@ -100,7 +100,7 @@ void JackClientSocket::SetWriteTimeOut(long sec)
 #endif
 
 void JackClientSocket::SetNonBlocking(bool onoff)
-{   
+{
     if (onoff) {
         long flags = 0;
         if (fcntl(fSocket, F_SETFL, flags | O_NONBLOCK) < 0) {
@@ -129,7 +129,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
     }
 
 #ifdef __APPLE__
-    int on = 1 ;
+    int on = 1;
     if (setsockopt(fSocket, SOL_SOCKET, SO_NOSIGPIPE, (const char*)&on, sizeof(on)) < 0) {
         jack_log("setsockopt SO_NOSIGPIPE fd = %ld err = %s", fSocket, strerror(errno));
     }
@@ -140,7 +140,7 @@ int JackClientSocket::Connect(const char* dir, const char* name, int which) // A
 
 int JackClientSocket::Close()
 {
-    jack_log("JackClientSocket::Close");   
+    jack_log("JackClientSocket::Close");
     if (fSocket > 0) {
         shutdown(fSocket, SHUT_RDWR);
         close(fSocket);
@@ -161,17 +161,17 @@ int JackClientSocket::Read(void* data, int len)
         struct timeval tv;
 	    fd_set fdset;
         ssize_t	res;
-    
+
         tv.tv_sec = fTimeOut;
 	    tv.tv_usec = 0;
-    
+
 	    FD_ZERO(&fdset);
 	    FD_SET(fSocket, &fdset);
-    
+
 	    do {
 		    res = select(fSocket + 1, &fdset, NULL, NULL, &tv);
 	    } while (res < 0 && errno == EINTR);
-    
+
 	    if (res < 0) {
 		    return res;
         } else if (res == 0) {
@@ -179,9 +179,9 @@ int JackClientSocket::Read(void* data, int len)
 	    }
     }
 #endif
-        
+
     if ((res = read(fSocket, data, len)) != len) {
-        if (errno == EWOULDBLOCK) {
+        if (errno == EWOULDBLOCK || errno == EAGAIN) {
             jack_error("JackClientSocket::Read time out");
             return 0;  // For a non blocking socket, a read failure is not considered as an error
         } else if (res != 0) {
@@ -201,21 +201,21 @@ int JackClientSocket::Write(void* data, int len)
 
 #if defined(__sun__) || defined(sun)
     if (fTimeOut > 0) {
- 
+
         struct timeval tv;
 	    fd_set fdset;
         ssize_t res;
-    
+
         tv.tv_sec = fTimeOut;
 	    tv.tv_usec = 0;
-    
+
 	    FD_ZERO(&fdset);
 	    FD_SET(fSocket, &fdset);
-    
+
 	    do {
 		    res = select(fSocket + 1, NULL, &fdset, NULL, &tv);
 	    } while (res < 0 && errno == EINTR);
-    
+
 	    if (res < 0) {
 		    return res;
         } else if (res == 0) {
@@ -225,7 +225,7 @@ int JackClientSocket::Write(void* data, int len)
 #endif
 
     if ((res = write(fSocket, data, len)) != len) {
-        if (errno == EWOULDBLOCK) {
+        if (errno == EWOULDBLOCK || errno == EAGAIN) {
             jack_log("JackClientSocket::Write time out");
             return 0;  // For a non blocking socket, a write failure is not considered as an error
         } else if (res != 0) {
@@ -251,7 +251,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
     addr.sun_family = AF_UNIX;
     BuildName(name, fName, dir, which);
     strncpy(addr.sun_path, fName, sizeof(addr.sun_path) - 1);
-  
+
     jack_log("Bind: addr.sun_path %s", addr.sun_path);
     unlink(fName); // Security...
 
@@ -260,7 +260,7 @@ int JackServerSocket::Bind(const char* dir, const char* name, int which) // A re
         goto error;
     }
 
-    if (listen(fSocket, 1) < 0) {
+    if (listen(fSocket, 100) < 0) {
         jack_error("Cannot enable listen on server socket err = %s", strerror(errno));
         goto error;
     }

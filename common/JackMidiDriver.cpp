@@ -60,11 +60,11 @@ int JackMidiDriver::Open(bool capturing,
 {
     fCaptureChannels = inchannels;
     fPlaybackChannels = outchannels;
-    
+
     for (int i = 0; i < fCaptureChannels; i++) {
-        fRingBuffer[i] = jack_ringbuffer_create(sizeof(float) * BUFFER_SIZE_MAX);
+        fRingBuffer[i] = jack_ringbuffer_create(sizeof(jack_default_audio_sample_t) * BUFFER_SIZE_MAX);
     }
-  
+
     return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
@@ -141,11 +141,11 @@ int JackMidiDriver::ProcessNull()
 int JackMidiDriver::Process()
 {
     // Read input buffers for the current cycle
-    if (Read() < 0) { 
+    if (Read() < 0) {
         jack_error("JackMidiDriver::Process: read error, skip cycle");
         return 0;   // Skip cycle, but continue processing...
     }
-    
+
     fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
     if (fEngineControl->fSyncMode) {
         if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) {
@@ -153,13 +153,13 @@ int JackMidiDriver::Process()
             return -1;
         }
     }
-    
+
     // Write output buffers for the current cycle
-    if (Write() < 0) { 
+    if (Write() < 0) {
         jack_error("JackMidiDriver::Process: write error, skip cycle");
         return 0;   // Skip cycle, but continue processing...
     }
-    
+
     return 0;
 }
 

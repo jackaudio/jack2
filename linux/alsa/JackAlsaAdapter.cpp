@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #include "JackAlsaAdapter.h"
-#include "JackServerGlobals.h"
+#include "JackGlobals.h"
 #include "JackEngineControl.h"
 
 namespace Jack
@@ -104,7 +104,7 @@ namespace Jack
         fAudioInterface.longinfo();
 
         //turn the thread realtime
-        fThread.AcquireRealTime ( JackServerGlobals::fInstance->GetEngineControl()->fClientPriority );
+        fThread.AcquireRealTime(GetEngineControl()->fClientPriority);
         return 0;
     }
 
@@ -154,7 +154,7 @@ namespace Jack
         //read data from audio interface
         if (fAudioInterface.read() < 0)
             return false;
-            
+
         PushAndPull(fAudioInterface.fInputSoftChannels, fAudioInterface.fOutputSoftChannels, fAdaptedBufferSize);
 
         //write data to audio interface
@@ -273,7 +273,7 @@ extern "C"
         strcpy ( desc->params[i].short_desc,
                  "Number of playback channels (defaults to hardware max)" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-    
+
         i++;
         strcpy(desc->params[i].name, "quality");
         desc->params[i].character = 'q';
@@ -281,7 +281,7 @@ extern "C"
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';

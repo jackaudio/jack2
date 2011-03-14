@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackPort.h"
 #include "JackSynchro.h"
 #include "JackNotification.h"
+#include "session.h"
 
 namespace Jack
 {
@@ -44,22 +45,26 @@ struct JackClientControl : public JackShmMemAble
     int fPID;
     bool fActive;
 
-    JackClientControl(const char* name, int pid, int refnum)
+    int fSessionID;
+    char fSessionCommand[JACK_SESSION_COMMAND_SIZE];
+    jack_session_flags_t fSessionFlags;
+
+    JackClientControl(const char* name, int pid, int refnum, int uuid)
     {
-        Init(name, pid, refnum);
+        Init(name, pid, refnum, uuid);
     }
 
     JackClientControl(const char* name)
     {
-        Init(name, 0, -1);
+        Init(name, 0, -1, -1);
     }
 
     JackClientControl()
     {
-        Init("", 0, -1);
+        Init("", 0, -1, -1);
     }
 
-    void Init(const char* name, int pid, int refnum)
+    void Init(const char* name, int pid, int refnum, int uuid)
     {
         strcpy(fName, name);
         for (int i = 0; i < kMaxNotification; i++)
@@ -68,6 +73,7 @@ struct JackClientControl : public JackShmMemAble
         fCallback[kAddClient] = true;
         fCallback[kRemoveClient] = true;
         fCallback[kActivateClient] = true;
+        fCallback[kLatencyCallback] = true;
         // So that driver synchro are correctly setup in "flush" or "normal" mode
         fCallback[kStartFreewheelCallback] = true;
         fCallback[kStopFreewheelCallback] = true;
@@ -77,6 +83,8 @@ struct JackClientControl : public JackShmMemAble
         fTransportSync = false;
         fTransportTimebase = false;
         fActive = false;
+
+        fSessionID = uuid;
     }
 
 } POST_PACKED_STRUCTURE;

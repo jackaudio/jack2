@@ -1,19 +1,19 @@
 /*
   Copyright (C) 2001 Paul Davis
   Copyright (C) 2004 Jack O'Quin
-  
+
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation; either version 2.1 of the License, or
   (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU Lesser General Public License for more details.
-  
+
   You should have received a copy of the GNU Lesser General Public License
-  along with this program; if not, write to the Free Software 
+  along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -33,21 +33,21 @@ extern "C"
 /**
  * Note: More documentation can be found in jack/types.h.
  */
- 
+
     /*************************************************************
      * NOTE: JACK_WEAK_EXPORT ***MUST*** be used on every function
      * added to the JACK API after the 0.116.2 release.
-     * 
-     * Functions that predate this release are marked with 
+     *
+     * Functions that predate this release are marked with
      * JACK_WEAK_OPTIONAL_EXPORT which can be defined at compile
      * time in a variety of ways. The default definition is empty,
      * so that these symbols get normal linkage. If you wish to
-     * use all JACK symbols with weak linkage, include 
+     * use all JACK symbols with weak linkage, include
      * <jack/weakjack.h> before jack.h.
      *************************************************************/
-    
+
 #include <jack/weakmacros.h>
-    
+
 /**
  * Call this function to get version of the JACK, in form of several numbers
  *
@@ -200,7 +200,7 @@ int jack_get_client_pid (const char *name) JACK_OPTIONAL_WEAK_EXPORT;
  * @return the pthread ID of the thread running the JACK client side
  * code.
  */
-pthread_t jack_client_thread_id (jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
+jack_native_thread_t jack_client_thread_id (jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT;
 
 /*@}*/
 
@@ -228,7 +228,7 @@ jack_nframes_t jack_thread_wait (jack_client_t*, int status) JACK_OPTIONAL_WEAK_
 
 /**
  * Wait until this JACK client should process data.
- * 
+ *
  * @param client - pointer to a JACK client structure
  *
  * @return the number of frames of data to process
@@ -237,7 +237,7 @@ jack_nframes_t jack_thread_wait (jack_client_t*, int status) JACK_OPTIONAL_WEAK_
 
 /**
  * Signal next clients in the graph.
- * 
+ *
  * @param client - pointer to a JACK client structure
  * @param status - if non-zero, calling thread should exit
  */
@@ -254,7 +254,7 @@ void jack_cycle_signal (jack_client_t* client, int status) JACK_OPTIONAL_WEAK_EX
  * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
  * for more information.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code.
@@ -270,13 +270,13 @@ int jack_set_process_thread(jack_client_t* client, JackThreadCallback thread_cal
 
 /**
  * Tell JACK to call @a thread_init_callback once just after
- * the creation of the thread in which all other callbacks 
+ * the creation of the thread in which all other callbacks
  * will be handled.
  *
  * The code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code, causing JACK
@@ -337,7 +337,7 @@ void jack_on_shutdown (jack_client_t *client,
  */
 void jack_on_info_shutdown (jack_client_t *client,
                             JackInfoShutdownCallback shutdown_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
-    
+
 /**
  * Tell the Jack server to call @a process_callback whenever there is
  * work be done, passing @a arg as the second argument.
@@ -350,7 +350,7 @@ void jack_on_info_shutdown (jack_client_t *client,
  * http://jackit.sourceforge.net/docs/design/design.html#SECTION00411000000000000000
  * for more information.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code.
@@ -370,7 +370,7 @@ int jack_set_process_callback (jack_client_t *client,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code.
@@ -389,7 +389,7 @@ int jack_set_freewheel_callback (jack_client_t *client,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @param client pointer to JACK client structure.
@@ -410,7 +410,7 @@ int jack_set_buffer_size_callback (jack_client_t *client,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -427,7 +427,7 @@ int jack_set_sample_rate_callback (jack_client_t *client,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -444,7 +444,7 @@ int jack_set_client_registration_callback (jack_client_t *,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -452,7 +452,7 @@ int jack_set_client_registration_callback (jack_client_t *,
  int jack_set_port_registration_callback (jack_client_t *,
                                           JackPortRegistrationCallback
                                           registration_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
-        
+
  /**
  * Tell the JACK server to call @a connect_callback whenever a
  * port is connected or disconnected, passing @a arg as a parameter.
@@ -461,7 +461,7 @@ int jack_set_client_registration_callback (jack_client_t *,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -478,7 +478,7 @@ int jack_set_port_connect_callback (jack_client_t *,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -495,7 +495,7 @@ int jack_set_port_rename_callback (jack_client_t *,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
@@ -512,39 +512,97 @@ int jack_set_graph_order_callback (jack_client_t *,
  * the code in the supplied function does not need to be
  * suitable for real-time execution.
  *
- * NOTE: this function cannot be called while the client is activated 
+ * NOTE: this function cannot be called while the client is activated
  * (after jack_activate has been called.)
  *
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_xrun_callback (jack_client_t *,
                             JackXRunCallback xrun_callback, void *arg) JACK_OPTIONAL_WEAK_EXPORT;
-                            
+
+/*@}*/
+
+/**
+ * Tell the Jack server to call @a latency_callback whenever it
+ * is necessary to recompute the latencies for some or all
+ * Jack ports.
+ *
+ * @a latency_callback will be called twice each time it is
+ * needed, once being passed JackCaptureLatency and once
+ * JackPlaybackLatency. See @ref LatencyFunctions for
+ * the definition of each type of latency and related functions.
+ *
+ * <b>IMPORTANT: Most JACK clients do NOT need to register a latency
+ * callback.</b>
+ *
+ * Clients that meet any of the following conditions do NOT
+ * need to register a latency callback:
+ *
+ *    - have only input ports
+ *    - have only output ports
+ *    - their output is totally unrelated to their input
+ *    - their output is not delayed relative to their input
+ *        (i.e. data that arrives in a given process()
+ *         callback is processed and output again in the
+ *         same callback)
+ *
+ * Clients NOT registering a latency callback MUST also
+ * satisfy this condition:
+ *
+ *    - have no multiple distinct internal signal pathways
+ *
+ * This means that if your client has more than 1 input and
+ * output port, and considers them always "correlated"
+ * (e.g. as a stereo pair), then there is only 1 (e.g. stereo)
+ * signal pathway through the client. This would be true,
+ * for example, of a stereo FX rack client that has a
+ * left/right input pair and a left/right output pair.
+ *
+ * However, this is somewhat a matter of perspective. The
+ * same FX rack client could be connected so that its
+ * two input ports were connected to entirely separate
+ * sources. Under these conditions, the fact that the client
+ * does not register a latency callback MAY result
+ * in port latency values being incorrect.
+ *
+ * Clients that do not meet any of those conditions SHOULD
+ * register a latency callback.
+ *
+ * See the documentation for  @ref jack_port_set_latency_range()
+ * on how the callback should operate. Remember that the @a mode
+ * argument given to the latency callback will need to be
+ * passed into @ref jack_port_set_latency_range()
+ *
+ * @return 0 on success, otherwise a non-zero error code
+ */
+int jack_set_latency_callback (jack_client_t *,
+			       JackLatencyCallback latency_callback,
+			       void *) JACK_WEAK_EXPORT;
 /*@}*/
 
 /**
  * @defgroup ServerClientControl Controlling & querying JACK server operation
  * @{
  */
-                         
+
 /**
  * Start/Stop JACK's "freewheel" mode.
  *
  * When in "freewheel" mode, JACK no longer waits for
  * any external event to begin the start of the next process
- * cycle. 
+ * cycle.
  *
  * As a result, freewheel mode causes "faster than realtime"
  * execution of a JACK graph. If possessed, real-time
  * scheduling is dropped when entering freewheel mode, and
  * if appropriate it is reacquired when stopping.
- * 
+ *
  * IMPORTANT: on systems using capabilities to provide real-time
  * scheduling (i.e. Linux kernel 2.4), if onoff is zero, this function
- * must be called from the thread that originally called jack_activate(). 
- * This restriction does not apply to other systems (e.g. Linux kernel 2.6 
+ * must be called from the thread that originally called jack_activate().
+ * This restriction does not apply to other systems (e.g. Linux kernel 2.6
  * or OS X).
- * 
+ *
  * @param client pointer to JACK client structure
  * @param onoff  if non-zero, freewheel mode starts. Otherwise
  *                  freewheel mode ends.
@@ -569,7 +627,7 @@ int jack_set_freewheel(jack_client_t* client, int onoff) JACK_OPTIONAL_WEAK_EXPO
  * @return 0 on success, otherwise a non-zero error code
  */
 int jack_set_buffer_size (jack_client_t *client, jack_nframes_t nframes) JACK_OPTIONAL_WEAK_EXPORT;
-                       
+
 /**
  * @return the sample rate of the jack system, as set by the user when
  * jackd was started.
@@ -613,7 +671,7 @@ float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  * @defgroup PortFunctions Creating & manipulating ports
  * @{
  */
- 
+
 /**
  * Create a new port for the client. This is an object used for moving
  * data of any type in or out of the client.  Ports may be connected
@@ -625,13 +683,16 @@ float jack_cpu_load (jack_client_t *client) JACK_OPTIONAL_WEAK_EXPORT;
  * name.  Exceeding that will cause the port registration to fail and
  * return NULL.
  *
+ * The @a port_name must be unique among all ports owned by this client.
+ * If the name is not unique, the registration will fail.
+ *
  * All ports have a type, which may be any non-NULL and non-zero
  * length string, passed as an argument.  Some port types are built
  * into the JACK API, currently only JACK_DEFAULT_AUDIO_TYPE.
  *
  * @param client pointer to JACK client structure.
  * @param port_name non-empty short name for the new port (not
- * including the leading @a "client_name:").
+ * including the leading @a "client_name:"). Must be unique.
  * @param port_type port type name.  If longer than
  * jack_port_type_size(), only that many characters are significant.
  * @param flags @ref JackPortFlags bit mask.
@@ -660,7 +721,7 @@ int jack_port_unregister (jack_client_t *, jack_port_t *) JACK_OPTIONAL_WEAK_EXP
  * that can be written to; for an input port, it will be an area
  * containing the data from the port's connection(s), or
  * zero-filled. if there are multiple inbound connections, the data
- * will be mixed appropriately.  
+ * will be mixed appropriately.
  *
  * FOR OUTPUT PORTS ONLY : DEPRECATED in Jack 2.0 !!
  * ---------------------------------------------------
@@ -669,9 +730,9 @@ int jack_port_unregister (jack_client_t *, jack_port_t *) JACK_OPTIONAL_WEAK_EXP
  * either never cache the return value or ensure you have
  * a "blocksize" callback and be sure to invalidate the cached
  * address from there.
- * 
+ *
  * Caching output ports is DEPRECATED in Jack 2.0, due to some new optimization (like "pipelining").
- * Port buffers have to be retrieved in each callback for proper functionning. 
+ * Port buffers have to be retrieved in each callback for proper functionning.
  */
 void * jack_port_get_buffer (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
 
@@ -756,7 +817,7 @@ const char ** jack_port_get_connections (const jack_port_t *port) JACK_OPTIONAL_
  *          you cannot use it in a GraphReordered handler.
  *
  *     2) You need not be the owner of the port to get information
- *          about its connections. 
+ *          about its connections.
  *
  * @see jack_port_name_size()
  */
@@ -765,8 +826,8 @@ const char ** jack_port_get_all_connections (const jack_client_t *client,
 
 /**
  *
- * @deprecated This function will be removed from a future version 
- * of JACK. Do not use it. There is no replacement. It has 
+ * @deprecated This function will be removed from a future version
+ * of JACK. Do not use it. There is no replacement. It has
  * turned out to serve essentially no purpose in real-life
  * JACK clients.
  */
@@ -774,72 +835,12 @@ int jack_port_tie (jack_port_t *src, jack_port_t *dst) JACK_OPTIONAL_WEAK_DEPREC
 
 /**
  *
- * @deprecated This function will be removed from a future version 
- * of JACK. Do not use it. There is no replacement. It has 
+ * @deprecated This function will be removed from a future version
+ * of JACK. Do not use it. There is no replacement. It has
  * turned out to serve essentially no purpose in real-life
  * JACK clients.
  */
 int jack_port_untie (jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
-
- /**
- * @return the time (in frames) between data being available or
- * delivered at/to a port, and the time at which it arrived at or is
- * delivered to the "other side" of the port.  E.g. for a physical
- * audio output port, this is the time between writing to the port and
- * when the signal will leave the connector.  For a physical audio
- * input port, this is the time between the sound arriving at the
- * connector and the corresponding frames being readable from the
- * port.
- */
-jack_nframes_t jack_port_get_latency (jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
- * The maximum of the sum of the latencies in every
- * connection path that can be drawn between the port and other
- * ports with the @ref JackPortIsTerminal flag set.
- */
-jack_nframes_t jack_port_get_total_latency (jack_client_t *,
-                                            jack_port_t *port) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
- * The port latency is zero by default. Clients that control
- * physical hardware with non-zero latency should call this
- * to set the latency to its correct value. Note that the value
- * should include any systemic latency present "outside" the
- * physical hardware controlled by the client. For example,
- * for a client controlling a digital audio interface connected
- * to an external digital converter, the latency setting should
- * include both buffering by the audio interface *and* the converter. 
- */
-void jack_port_set_latency (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
-* Request a complete recomputation of a port's total latency. This
-* can be called by a client that has just changed the internal
-* latency of its port using @function jack_port_set_latency
-* and wants to ensure that all signal pathways in the graph
-* are updated with respect to the values that will be returned
-* by @function jack_port_get_total_latency. 
-* 
-* @return zero for successful execution of the request. non-zero
-*         otherwise.
-*/
-int jack_recompute_total_latency (jack_client_t*, jack_port_t* port) JACK_OPTIONAL_WEAK_EXPORT;
-
-/**
-* Request a complete recomputation of all port latencies. This
-* can be called by a client that has just changed the internal
-* latency of its port using @function jack_port_set_latency
-* and wants to ensure that all signal pathways in the graph
-* are updated with respect to the values that will be returned
-* by @function jack_port_get_total_latency. It allows a client 
-* to change multiple port latencies without triggering a 
-* recompute for each change.
-* 
-* @return zero for successful execution of the request. non-zero
-*         otherwise.
-*/
-    int jack_recompute_total_latencies (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Modify a port's short name.  May be called at any time.  If the
@@ -853,12 +854,12 @@ int jack_port_set_name (jack_port_t *port, const char *port_name) JACK_OPTIONAL_
 /**
  * Set @a alias as an alias for @a port.  May be called at any time.
  * If the alias is longer than jack_port_name_size(), it will be truncated.
- * 
+ *
  * After a successful call, and until JACK exits or
  * @function jack_port_unset_alias() is called, @alias may be
  * used as a alternate name for the port.
  *
- * Ports can have up to two aliases - if both are already 
+ * Ports can have up to two aliases - if both are already
  * set, this function will return an error.
  *
  * @return 0 on success, otherwise a non-zero error code.
@@ -867,8 +868,8 @@ int jack_port_set_alias (jack_port_t *port, const char *alias) JACK_OPTIONAL_WEA
 
 /**
  * Remove @a alias as an alias for @a port.  May be called at any time.
- * 
- * After a successful call, @a alias can no longer be 
+ *
+ * After a successful call, @a alias can no longer be
  * used as a alternate name for the port.
  *
  * @return 0 on success, otherwise a non-zero error code.
@@ -978,6 +979,224 @@ int jack_port_name_size(void) JACK_OPTIONAL_WEAK_EXPORT;
  */
 int jack_port_type_size(void) JACK_OPTIONAL_WEAK_EXPORT;
 
+/**
+ * @return the buffersize of a port of type @arg port_type.
+ *
+ * this function may only be called in a buffer_size callback.
+ */
+size_t jack_port_type_get_buffer_size (jack_client_t *client, const char *port_type) JACK_WEAK_EXPORT;
+
+/*@}*/
+
+/**
+ * @defgroup LatencyFunctions Managing and determining latency
+ *
+ * The purpose of JACK's latency API is to allow clients to
+ * easily answer two questions:
+ *
+ * - How long has it been since the data read from a port arrived
+ *   at the edge of the JACK graph (either via a physical port
+ *   or being synthesized from scratch)?
+ *
+ * - How long will it be before the data written to a port arrives
+ *   at the edge of a JACK graph?
+
+ * To help answering these two questions, all JACK ports have two
+ * latency values associated with them, both measured in frames:
+ *
+ * <b>capture latency</b>: how long since the data read from
+ *                  the buffer of a port arrived at at
+ *                  a port marked with JackPortIsTerminal.
+ *                  The data will have come from the "outside
+ *                  world" if the terminal port is also
+ *                  marked with JackPortIsPhysical, or
+ *                  will have been synthesized by the client
+ *                  that owns the terminal port.
+ *
+ * <b>playback latency</b>: how long until the data
+ *                   written to the buffer of port will reach a port
+ *                   marked with JackPortIsTerminal.
+ *
+ * Both latencies might potentially have more than one value
+ * because there may be multiple pathways to/from a given port
+ * and a terminal port. Latency is therefore generally
+ * expressed a min/max pair.
+ *
+ * In most common setups, the minimum and maximum latency
+ * are the same, but this design accomodates more complex
+ * routing, and allows applications (and thus users) to
+ * detect cases where routing is creating an anomalous
+ * situation that may either need fixing or more
+ * sophisticated handling by clients that care about
+ * latency.
+ *
+ * See also @ref jack_set_latency_callback for details on how
+ * clients that add latency to the signal path should interact
+ * with JACK to ensure that the correct latency figures are
+ * used.
+ * @{
+ */
+
+/**
+ * The port latency is zero by default. Clients that control
+ * physical hardware with non-zero latency should call this
+ * to set the latency to its correct value. Note that the value
+ * should include any systemic latency present "outside" the
+ * physical hardware controlled by the client. For example,
+ * for a client controlling a digital audio interface connected
+ * to an external digital converter, the latency setting should
+ * include both buffering by the audio interface *and* the converter.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by a latency callback that calls @ref
+ * jack_port_set_latency_range().
+ */
+void jack_port_set_latency (jack_port_t *, jack_nframes_t) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * return the latency range defined by @a mode for
+ * @a port, in frames.
+ *
+ * See @ref LatencyFunctions for the definition of each latency value.
+ *
+ * This is normally used in the LatencyCallback.
+ * and therefor safe to execute from callbacks.
+ */
+void jack_port_get_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range) JACK_WEAK_EXPORT;
+
+/**
+ * set the minimum and maximum latencies defined by
+ * @a mode for @a port, in frames.
+ *
+ * See @ref LatencyFunctions for the definition of each latency value.
+ *
+ * This function should ONLY be used inside a latency
+ * callback. The client should determine the current
+ * value of the latency using @ref jack_port_get_latency_range()
+ * (called using the same mode as @a mode)
+ * and then add some number of frames to that reflects
+ * latency added by the client.
+ *
+ * How much latency a client adds will vary
+ * dramatically. For most clients, the answer is zero
+ * and there is no reason for them to register a latency
+ * callback and thus they should never call this
+ * function.
+ *
+ * More complex clients that take an input signal,
+ * transform it in some way and output the result but
+ * not during the same process() callback will
+ * generally know a single constant value to add
+ * to the value returned by @ref jack_port_get_latency_range().
+ *
+ * Such clients would register a latency callback (see
+ * @ref jack_set_latency_callback) and must know what input
+ * ports feed which output ports as part of their
+ * internal state. Their latency callback will update
+ * the ports' latency values appropriately.
+ *
+ * A pseudo-code example will help. The @a mode argument to the latency
+ * callback will determine whether playback or capture
+ * latency is being set. The callback will use
+ * @ref jack_port_set_latency_range() as follows:
+ *
+ * \code
+ * jack_latency_range_t range;
+ * if (mode == JackPlaybackLatency) {
+ *  foreach input_port in (all self-registered port) {
+ *   jack_port_get_latency_range (port_feeding_input_port, JackPlaybackLatency, &range);
+ *   range.min += min_delay_added_as_signal_flows_from port_feeding to input_port;
+ *   range.max += max_delay_added_as_signal_flows_from port_feeding to input_port;
+ *   jack_port_set_latency_range (input_port, JackPlaybackLatency, &range);
+ *  }
+ * } else if (mode == JackCaptureLatency) {
+ *  foreach output_port in (all self-registered port) {
+ *   jack_port_get_latency_range (port_fed_by_output_port, JackCaptureLatency, &range);
+ *   range.min += min_delay_added_as_signal_flows_from_output_port_to_fed_by_port;
+ *   range.max += max_delay_added_as_signal_flows_from_output_port_to_fed_by_port;
+ *   jack_port_set_latency_range (output_port, JackCaptureLatency, &range);
+ *  }
+ * }
+ * \endcode
+ *
+ * In this relatively simple pseudo-code example, it is assumed that
+ * each input port or output is connected to only 1 output or input
+ * port respectively.
+ *
+ * If a port is connected to more than 1 other port, then the
+ * range.min and range.max values passed to @ref
+ * jack_port_set_latency_range() should reflect the minimum and
+ * maximum values across all connected ports.
+ *
+ * See the description of @ref jack_set_latency_callback for more
+ * information.
+ */
+void jack_port_set_latency_range (jack_port_t *port, jack_latency_callback_mode_t mode, jack_latency_range_t *range) JACK_WEAK_EXPORT;
+
+/**
+ * Request a complete recomputation of all port latencies. This
+ * can be called by a client that has just changed the internal
+ * latency of its port using  jack_port_set_latency
+ * and wants to ensure that all signal pathways in the graph
+ * are updated with respect to the values that will be returned
+ * by  jack_port_get_total_latency. It allows a client
+ * to change multiple port latencies without triggering a
+ * recompute for each change.
+ *
+ * @return zero for successful execution of the request. non-zero
+ *         otherwise.
+ */
+int jack_recompute_total_latencies (jack_client_t*) JACK_OPTIONAL_WEAK_EXPORT;
+
+/**
+ * @return the time (in frames) between data being available or
+ * delivered at/to a port, and the time at which it arrived at or is
+ * delivered to the "other side" of the port.  E.g. for a physical
+ * audio output port, this is the time between writing to the port and
+ * when the signal will leave the connector.  For a physical audio
+ * input port, this is the time between the sound arriving at the
+ * connector and the corresponding frames being readable from the
+ * port.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by jack_port_get_latency_range() in any existing
+ * use cases.
+ */
+jack_nframes_t jack_port_get_latency (jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * The maximum of the sum of the latencies in every
+ * connection path that can be drawn between the port and other
+ * ports with the @ref JackPortIsTerminal flag set.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by jack_port_get_latency_range() in any existing
+ * use cases.
+ */
+jack_nframes_t jack_port_get_total_latency (jack_client_t *,
+					    jack_port_t *port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
+/**
+ * Request a complete recomputation of a port's total latency. This
+ * can be called by a client that has just changed the internal
+ * latency of its port using  jack_port_set_latency
+ * and wants to ensure that all signal pathways in the graph
+ * are updated with respect to the values that will be returned
+ * by  jack_port_get_total_latency.
+ *
+ * @return zero for successful execution of the request. non-zero
+ *         otherwise.
+ *
+ * @deprecated This method will be removed in the next major
+ * release of JACK. It should not be used in new code, and should
+ * be replaced by jack_recompute_total_latencies() in any existing
+ * use cases.
+ */
+int jack_recompute_total_latency (jack_client_t*, jack_port_t* port) JACK_OPTIONAL_WEAK_DEPRECATED_EXPORT;
+
 /*@}*/
 
 /**
@@ -986,13 +1205,13 @@ int jack_port_type_size(void) JACK_OPTIONAL_WEAK_EXPORT;
  */
 
 /**
- * @param port_name_pattern A regular expression used to select 
- * ports by name.  If NULL or of zero length, no selection based 
+ * @param port_name_pattern A regular expression used to select
+ * ports by name.  If NULL or of zero length, no selection based
  * on name will be carried out.
- * @param type_name_pattern A regular expression used to select 
- * ports by type.  If NULL or of zero length, no selection based 
+ * @param type_name_pattern A regular expression used to select
+ * ports by type.  If NULL or of zero length, no selection based
  * on type will be carried out.
- * @param flags A value used to select ports by their flags.  
+ * @param flags A value used to select ports by their flags.
  * If zero, no selection based on flags will be carried out.
  *
  * @return a NULL-terminated array of ports that match the specified
@@ -1018,8 +1237,8 @@ jack_port_t * jack_port_by_name (jack_client_t *, const char *port_name) JACK_OP
  */
 jack_port_t * jack_port_by_id (jack_client_t *client,
                                jack_port_id_t port_id) JACK_OPTIONAL_WEAK_EXPORT;
-                               
-/*@}*/ 
+
+/*@}*/
 
 /**
  * @defgroup TimeFunctions Handling time
@@ -1049,7 +1268,7 @@ jack_nframes_t jack_frame_time (const jack_client_t *) JACK_OPTIONAL_WEAK_EXPORT
  * This function may only be used from the process callback, and can
  * be used to interpret timestamps generated by jack_frame_time() in
  * other threads with respect to the current process cycle.
- * 
+ *
  * This is the only jack time function that returns exact time:
  * when used during the process callback it always returns the same
  * value (until the next process callback, where it will return
@@ -1072,8 +1291,8 @@ jack_nframes_t jack_time_to_frames(const jack_client_t *client, jack_time_t) JAC
 
 /**
  * @return return JACK's current system time in microseconds,
- *         using the JACK clock source. 
- * 
+ *         using the JACK clock source.
+ *
  * The value returned is guaranteed to be monotonic, but not linear.
  */
 jack_time_t jack_get_time() JACK_OPTIONAL_WEAK_EXPORT;
@@ -1126,7 +1345,7 @@ void jack_set_info_function (void (*func)(const char *)) JACK_OPTIONAL_WEAK_EXPO
 /*@}*/
 
 /**
- * The free function to be used on memory returned by jack_port_get_connections, 
+ * The free function to be used on memory returned by jack_port_get_connections,
  * jack_port_get_all_connections and jack_get_ports functions.
  * This is MANDATORY on Windows when otherwise all nasty runtime version related crashes can occur.
  * Developers are strongly encouraged to use this function instead of the standard "free" function in new code.

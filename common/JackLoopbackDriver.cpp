@@ -34,7 +34,7 @@ int JackLoopbackDriver::Process()
 {
     // Loopback copy
     for (int i = 0; i < fCaptureChannels; i++) {
-        memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(float) * fEngineControl->fBufferSize);
+        memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
 
     fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable); // Signal all clients
@@ -54,7 +54,7 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor() 
+    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         jack_driver_desc_t * desc;
         unsigned int i;
@@ -65,7 +65,7 @@ extern "C"
 
         desc->nparams = 1;
         desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
-        
+
         i = 0;
         strcpy(desc->params[i].name, "channels");
         desc->params[i].character = 'c';
@@ -77,12 +77,12 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
         const JSList * node;
         const jack_driver_param_t * param;
         int channels = 2;
-      
+
         for (node = params; node; node = jack_slist_next (node)) {
             param = (const jack_driver_param_t *) node->data;
 
@@ -93,7 +93,7 @@ extern "C"
                     break;
                 }
         }
-        
+
         Jack::JackDriverClientInterface* driver = new Jack::JackLoopbackDriver(engine, table);
         if (driver->Open(1, 1, channels, channels, false, "loopback", "loopback", 0, 0) == 0) {
             return driver;

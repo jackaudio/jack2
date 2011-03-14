@@ -21,19 +21,20 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackResampler__
 
 #include "ringbuffer.h"
+#include "types.h"
 #include "JackError.h"
 
 namespace Jack
 {
 
 #define DEFAULT_RB_SIZE 32768
-#define DEFAULT_ADAPTATIVE_SIZE 2048		
+#define DEFAULT_ADAPTATIVE_SIZE 2048
 
 inline float Range(float min, float max, float val)
 {
     return (val < min) ? min : ((val > max) ? max : val);
 }
-    
+
 /*!
 \brief Base class for Resampler.
 */
@@ -42,27 +43,27 @@ class JackResampler
 {
 
     protected:
-    
+
         jack_ringbuffer_t* fRingBuffer;
         double fRatio;
         unsigned int fRingBufferSize;
-       
+
     public:
-    
+
         JackResampler();
         virtual ~JackResampler();
-        
+
         virtual void Reset(unsigned int new_size);
-        
-        virtual unsigned int ReadResample(float* buffer, unsigned int frames);
-        virtual unsigned int WriteResample(float* buffer, unsigned int frames);
-        
-        virtual unsigned int Read(float* buffer, unsigned int frames);
-        virtual unsigned int Write(float* buffer, unsigned int frames);
-        
+
+        virtual unsigned int ReadResample(jack_default_audio_sample_t* buffer, unsigned int frames);
+        virtual unsigned int WriteResample(jack_default_audio_sample_t* buffer, unsigned int frames);
+
+        virtual unsigned int Read(jack_default_audio_sample_t* buffer, unsigned int frames);
+        virtual unsigned int Write(jack_default_audio_sample_t* buffer, unsigned int frames);
+
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
-        
+
         unsigned int GetError()
         {
             return (jack_ringbuffer_read_space(fRingBuffer) / sizeof(float)) - (fRingBufferSize / 2);
@@ -72,12 +73,12 @@ class JackResampler
         {
             fRatio = Range(0.25, 4.0, ratio);
         }
-        
+
         double GetRatio()
         {
             return fRatio;
         }
- 
+
     };
 }
 

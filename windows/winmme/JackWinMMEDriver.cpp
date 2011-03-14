@@ -264,6 +264,9 @@ int JackWinMMEDriver::Close()
 {
     jack_log("JackWinMMEDriver::Close");
 
+    // Generic midi driver close
+    int res = JackMidiDriver::Close();
+
     // Close input
     if (fMidiDestination) {
         for (int i = 0; i < fRealCaptureChannels; i++)  {
@@ -280,7 +283,7 @@ int JackWinMMEDriver::Close()
         delete[] fMidiSource;
     }
 
-    return 0;
+    return res;
 }
 
 int JackWinMMEDriver::Attach()

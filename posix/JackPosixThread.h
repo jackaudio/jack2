@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -40,16 +40,16 @@ class SERVER_EXPORT JackPosixThread : public detail::JackThreadInterface
 
     protected:
 
-        pthread_t fThread;
+        jack_native_thread_t fThread;
         static void* ThreadHandler(void* arg);
 
     public:
 
         JackPosixThread(JackRunnableInterface* runnable, bool real_time, int priority, int cancellation)
-                : JackThreadInterface(runnable, priority, real_time, cancellation), fThread((pthread_t)NULL)
+                : JackThreadInterface(runnable, priority, real_time, cancellation), fThread((jack_native_thread_t)NULL)
         {}
         JackPosixThread(JackRunnableInterface* runnable, int cancellation = PTHREAD_CANCEL_ASYNCHRONOUS)
-                : JackThreadInterface(runnable, 0, false, cancellation), fThread((pthread_t)NULL)
+                : JackThreadInterface(runnable, 0, false, cancellation), fThread((jack_native_thread_t)NULL)
         {}
 
         int Start();
@@ -60,22 +60,23 @@ class SERVER_EXPORT JackPosixThread : public detail::JackThreadInterface
 
         int AcquireRealTime();                  // Used when called from another thread
         int AcquireSelfRealTime();              // Used when called from thread itself
-        
+
         int AcquireRealTime(int priority);      // Used when called from another thread
         int AcquireSelfRealTime(int priority);  // Used when called from thread itself
-        
+
         int DropRealTime();                     // Used when called from another thread
         int DropSelfRealTime();                 // Used when called from thread itself
 
-        pthread_t GetThreadID();
+        jack_native_thread_t GetThreadID();
+        bool IsThread();
 
-        static int AcquireRealTimeImp(pthread_t thread, int priority);
-        static int AcquireRealTimeImp(pthread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
-		{ return JackPosixThread::AcquireRealTimeImp(thread, priority); }
-        static int DropRealTimeImp(pthread_t thread);
-        static int StartImp(pthread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
-        static int StopImp(pthread_t thread);
-        static int KillImp(pthread_t thread);
+        static int AcquireRealTimeImp(jack_native_thread_t thread, int priority);
+        static int AcquireRealTimeImp(jack_native_thread_t thread, int priority, UInt64 period, UInt64 computation, UInt64 constraint)
+                { return JackPosixThread::AcquireRealTimeImp(thread, priority); }
+        static int DropRealTimeImp(jack_native_thread_t thread);
+        static int StartImp(jack_native_thread_t* thread, int priority, int realtime, void*(*start_routine)(void*), void* arg);
+        static int StopImp(jack_native_thread_t thread);
+        static int KillImp(jack_native_thread_t thread);
 };
 
 SERVER_EXPORT void ThreadExit();

@@ -30,12 +30,18 @@
 
 #include "jack/jslist.h"
 
+#if HAVE_CELT
+#include <celt/celt.h>
+#endif
+
 //#include <netinet/in.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+struct _packet_cache;
 
 typedef struct _netjack_driver_state netjack_driver_state_t;
 
@@ -106,6 +112,10 @@ struct _netjack_driver_state {
     unsigned int   resample_factor;
     unsigned int   resample_factor_up;
     int		   jitter_val;
+    struct _packet_cache * packcache;
+#if HAVE_CELT
+    CELTMode	   *celt_mode;
+#endif
 };
 
 int netjack_wait( netjack_driver_state_t *netj );
@@ -117,19 +127,19 @@ void netjack_detach( netjack_driver_state_t *netj );
 
 netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
 		jack_client_t * client,
-                const char *name,
-                unsigned int capture_ports,
-                unsigned int playback_ports,
-                unsigned int capture_ports_midi,
-                unsigned int playback_ports_midi,
-                jack_nframes_t sample_rate,
-                jack_nframes_t period_size,
-                unsigned int listen_port,
-                unsigned int transport_sync,
-                unsigned int resample_factor,
-                unsigned int resample_factor_up,
-                unsigned int bitdepth,
-		unsigned int use_autoconfig,
+        const char *name,
+        unsigned int capture_ports,
+        unsigned int playback_ports,
+        unsigned int capture_ports_midi,
+        unsigned int playback_ports_midi,
+        jack_nframes_t sample_rate,
+        jack_nframes_t period_size,
+        unsigned int listen_port,
+        unsigned int transport_sync,
+        unsigned int resample_factor,
+        unsigned int resample_factor_up,
+        unsigned int bitdepth,
+        unsigned int use_autoconfig,
 		unsigned int latency,
 		unsigned int redundancy,
 		int dont_htonl_floats,

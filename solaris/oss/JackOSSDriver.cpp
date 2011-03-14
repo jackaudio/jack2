@@ -707,7 +707,7 @@ int JackOSSDriver::ProcessSync()
     // Read input buffers for the current cycle
     if (Read() < 0) { 
         jack_error("ProcessSync: read error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+        return 0;   // Non fatal error here, skip cycle, but continue processing...
     }
 
     if (fIsMaster) {
@@ -719,7 +719,7 @@ int JackOSSDriver::ProcessSync()
     // Write output buffers for the current cycle
     if (Write() < 0) { 
         jack_error("JackAudioDriver::ProcessSync: write error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+        return 0;   // Non fatal error here, skip cycle, but continue processing...
     }
     
     return 0;

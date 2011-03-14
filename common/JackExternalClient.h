@@ -39,14 +39,14 @@ class JackExternalClient : public JackClientInterface
     private:
 
         JackNotifyChannel fChannel;   /*! Server/client communication channel */
-        JackClientControl*	fClientControl;     /*! Client control in shared memory     */
+        JackClientControl*      fClientControl;     /*! Client control in shared memory     */
 
     public:
 
         JackExternalClient();
         virtual ~JackExternalClient();
 
-        int Open(const char* name, int pid, int refnum, int* shared_client);
+        int Open(const char* name, int pid, int refnum, int uuid, int* shared_client);
         int Close();
 
         int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);

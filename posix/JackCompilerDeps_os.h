@@ -48,7 +48,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
             #define SERVER_EXPORT __attribute__((visibility("default")))
         #endif
     #else
-        #define SERVER_EXPORT
+        #define SERVER_EXPORT __attribute__((visibility("hidden")))
     #endif
 #else
     #define MEM_ALIGN(x,y) x

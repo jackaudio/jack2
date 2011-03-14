@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackEngineControl.h"
 #include "JackGlobals.h"
 #include "JackError.h"
+#include <set>
 #include <iostream>
 #include <assert.h>
 
@@ -246,7 +247,7 @@ int JackConnectionManager::SuspendRefNum(JackClientControl* control, JackSynchro
 int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro* table, JackClientTiming* timing)
 {
     jack_time_t current_date = GetMicroSeconds();
-    const jack_int_t* outputRef = fConnectionRef.GetItems(control->fRefNum);
+    const jack_int_t* output_ref = fConnectionRef.GetItems(control->fRefNum);
     int res = 0;
 
     // Update state and timestamp of current client
@@ -256,7 +257,7 @@ int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro*
     for (int i = 0; i < CLIENT_NUM; i++) {
 
         // Signal connected clients or drivers
-        if (outputRef[i] > 0) {
+        if (output_ref[i] > 0) {
 
             // Update state and timestamp of destination clients
             timing[i].fStatus = Triggered;
@@ -270,6 +271,44 @@ int JackConnectionManager::ResumeRefNum(JackClientControl* control, JackSynchro*
     }
 
     return res;
+}
+
+static bool HasNoConnection(jack_int_t* table)
+{
+    for (int ref = 0; ref < CLIENT_NUM; ref++) {
+        if (table[ref] > 0) return false;
+    }
+    return true;
+}
+
+// Using http://en.wikipedia.org/wiki/Topological_sorting
+
+void JackConnectionManager::TopologicalSort(std::vector<jack_int_t>& sorted)
+{
+    JackFixedMatrix<CLIENT_NUM> tmp;
+    std::set<jack_int_t> level;
+
+    fConnectionRef.Copy(tmp);
+
+    // Inputs of the graph
+    level.insert(AUDIO_DRIVER_REFNUM);
+    level.insert(FREEWHEEL_DRIVER_REFNUM);
+
+    while (level.size() > 0) {
+        jack_int_t refnum = *level.begin();
+        sorted.push_back(refnum);
+        level.erase(level.begin());
+        const jack_int_t* output_ref1 = tmp.GetItems(refnum);
+        for (int dst = 0; dst < CLIENT_NUM; dst++) {
+            if (output_ref1[dst] > 0) {
+                tmp.ClearItem(refnum, dst);
+                jack_int_t output_ref2[CLIENT_NUM];
+                tmp.GetOutputTable1(dst, output_ref2);
+                if (HasNoConnection(output_ref2))
+                    level.insert(dst);
+            }
+        }
+    }
 }
 
 /*!

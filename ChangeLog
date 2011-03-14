@@ -28,10 +28,101 @@ Arnold Krille
 Jan Engelhardt
 Adrian Knoth
 David Garcia Garzon
+Valerio Pilo
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2011-03-13 Stephane Letz  <letz@grame.fr>
+
+	* Rework internal slave driver management, JackServerGlobals now handle same parameters as jackdmp.
+
+2011-03-11 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackNetMaster::SetBufferSize.
+	* Use jack_default_audio_sample_t instead of float consistently, fix ticket #201."
+	* -X now allows to add several slave backends, add -I to load several internal clients.
+
+2011-03-10 Stephane Letz  <letz@grame.fr>
+
+	* Latency callback must always be activated.
+	* Correct TopologicalSort. 
+	* Add jack_midi_dump client.
+	* Synchronize netjack1 with JACK1 version.
+	* Synchronize jack_connect/jack_disconnect with JACK1 version.
+
+2011-03-09 Stephane Letz  <letz@grame.fr>
+
+	* jack_client_has_session_callback implementation.
+	* Fix jdelay for new latency API.
+	* Check requested buffer size and limit to 1..8192 - avoids wierd behaviour caused by jack_bufsize foobar.
+	* jack_port_type_get_buffer_size implementation.
+	* Stop using alloca and allocate buffer on the heap for alsa_io.
+	* Rename jdelay to jack_iodelay as per Fons' request.
+	* Call buffer size callback in activate (actually this is done on client side in the RT thread Init method).
+	* JackEngine::ComputeTotalLatencies in progress.
+
+2011-03-08 Stephane Letz  <letz@grame.fr>
+
+	* Use of latency range in all backends.
+	* ComputeTotalLatencies now a client/server call.
+	* Add latent test client for latency API.
+	* Also print playback and capture latency in jack_lsp.
+
+2011-03-04 Stephane Letz  <letz@grame.fr>
+
+	* Revert r4119 (RT notification in the server). JackAudioDriver::ProcessSync now skip backend write in case of graph process failure.
+	* Fix incorrect error codes in alsa/usx2y.c and alsa/JackAlsaDriver.cpp.
+	* Synchronize public headers with JACK1. Update OSX project.
+	* New latency API implementation (in progress).
+
+2011-02-09 Stephane Letz  <letz@grame.fr>
+
+	* Remove JackPortIsActive flag.
+
+2011-02-07 Stephane Letz  <letz@grame.fr>
+
+	* Valerio Pilo second CAS for ARMv7 patch.
+
+2011-02-03 Stephane Letz  <letz@grame.fr>
+
+	* Valerio Pilo CAS for ARMv7 patch.
+
+2011-01-11 Stephane Letz  <letz@grame.fr>
+
+	* Adrian Knoth jack_lsp patch.
+
+2010-11-17 Stephane Letz  <letz@grame.fr>
+
+	* ALSA backend : suspend/resume handling (jack1 r4075).
+	* Correct dummy driver.
+
+2010-11-05 Stephane Letz  <letz@grame.fr>
+
+	* In jackdmp.cpp, jackctl_setup_signals moved before jackctl_server_start. 
+	* Correct symbols export in backends on OSX.
+
+2010-11-03 Stephane Letz  <letz@grame.fr>
+
+	* Improve backend error handling: fatal error returned by Read/Write now cause a Process failure (so a thread exit for blocking backends). Recoverable ones (XRuns..) are now treated internally in ALSA, FreeBob and FFADO backends.
+
+2010-10-30 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackServer::Open to avoid a race when control API is used on OSX. 
+
+2010-10-29 Stephane Letz  <letz@grame.fr>
+
+	* Correct lsp.c code.
+	* Add note about unique port-name requirement.
+
+2010-09-08 Stephane Letz  <letz@grame.fr>
+
+	* Sync JackAlsaDriver::alsa_driver_check_card_type with JACK1 backend.
+
+2010-08-30 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.7 started.
 
 2010-08-25 Stephane Letz  <letz@grame.fr>
 

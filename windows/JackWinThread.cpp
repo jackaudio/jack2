@@ -1,20 +1,20 @@
 /*
  Copyright (C) 2004-2008 Grame
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
+
  */
 
 
@@ -30,19 +30,19 @@ DWORD WINAPI JackWinThread::ThreadHandler(void* arg)
 {
     JackWinThread* obj = (JackWinThread*)arg;
     JackRunnableInterface* runnable = obj->fRunnable;
-   
+
     // Signal creation thread when started with StartSync
     jack_log("ThreadHandler: start");
     obj->fStatus = kIniting;
-    
+
     // Call Init method
     if (!runnable->Init()) {
         jack_error("Thread init fails: thread quits");
         return 0;
     }
-    
+
     obj->fStatus = kRunning;
-    
+
     // If Init succeed, start the thread loop
     bool res = true;
     while (obj->fStatus == kRunning && res) {
@@ -80,11 +80,11 @@ int JackWinThread::Start()
         return 0;
     }
 }
-    
+
 int JackWinThread::StartSync()
 {
     fStatus = kStarting;
-    
+
     if (StartImp(&fThread, fPriority, fRealTime, ThreadHandler, this) < 0) {
         fStatus = kIdle;
         return -1;
@@ -97,7 +97,7 @@ int JackWinThread::StartSync()
     }
 }
 
-int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg)
+int JackWinThread::StartImp(jack_native_thread_t* thread, int priority, int realtime, ThreadCallback start_routine, void* arg)
 {
     DWORD id;
     *thread = CreateThread(NULL, 0, start_routine, arg, 0, &id);
@@ -108,7 +108,7 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
     }
 
     if (realtime) {
-        
+
         jack_log("Create RT thread");
         if (!SetThreadPriority(*thread, THREAD_PRIORITY_TIME_CRITICAL)) {
             jack_error("Cannot set priority class = %d", GetLastError());
@@ -118,7 +118,7 @@ int JackWinThread::StartImp(pthread_t* thread, int priority, int realtime, Threa
     } else {
         jack_log("Create non RT thread");
     }
-    
+
     return 0;
 }
 
@@ -153,7 +153,7 @@ int JackWinThread::Stop()
     }
 }
 
-int JackWinThread::KillImp(pthread_t thread)
+int JackWinThread::KillImp(jack_native_thread_t thread)
 {
     if (thread != (HANDLE)NULL) { // If thread has been started
         TerminateThread(thread, 0);
@@ -165,7 +165,7 @@ int JackWinThread::KillImp(pthread_t thread)
     }
 }
 
-int JackWinThread::StopImp(pthread_t thread)
+int JackWinThread::StopImp(jack_native_thread_t thread)
 {
     if (thread) { // If thread has been started
         WaitForSingleObject(thread, INFINITE);
@@ -198,7 +198,7 @@ int JackWinThread::AcquireSelfRealTime(int priority)
     return AcquireSelfRealTime();
 }
 
-int JackWinThread::AcquireRealTimeImp(pthread_t thread, int priority)
+int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
 {
     jack_log("JackWinThread::AcquireRealTime");
 
@@ -220,7 +220,7 @@ int JackWinThread::DropSelfRealTime()
     return DropRealTimeImp(GetCurrentThread());
 }
 
-int JackWinThread::DropRealTimeImp(pthread_t thread)
+int JackWinThread::DropRealTimeImp(jack_native_thread_t thread)
 {
     if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
         return 0;
@@ -230,9 +230,14 @@ int JackWinThread::DropRealTimeImp(pthread_t thread)
     }
 }
 
-pthread_t JackWinThread::GetThreadID()
+jack_native_thread_t JackWinThread::GetThreadID()
 {
     return fThread;
+}
+
+bool JackWinThread::IsThread()
+{
+    return GetCurrentThread() == fThread;
 }
 
 void JackWinThread::Terminate()
@@ -257,14 +262,14 @@ bool jack_get_thread_realtime_priority_range(int * min_ptr, int * max_ptr)
 bool jack_tls_allocate_key(jack_tls_key *key_ptr)
 {
     DWORD key;
-    
+
     key = TlsAlloc();
     if (key == TLS_OUT_OF_INDEXES)
     {
         jack_error("TlsAlloc() failed. Error is %d", (unsigned int)GetLastError());
         return false;
     }
-    
+
     *key_ptr = key;
     return true;
 }
@@ -276,7 +281,7 @@ bool jack_tls_free_key(jack_tls_key key)
         jack_error("TlsFree() failed. Error is %d", (unsigned int)GetLastError());
         return false;
     }
-    
+
     return true;
 }
 
@@ -287,7 +292,7 @@ bool jack_tls_set(jack_tls_key key, void *data_ptr)
         jack_error("TlsSetValue() failed. Error is %d", (unsigned int)GetLastError());
         return false;
     }
-    
+
     return true;
 }
 

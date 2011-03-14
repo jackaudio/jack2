@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSynchro.h"
 #include "JackPlatformPlug.h"
 #include "JackChannel.h"
-#include "types.h"
+#include "session.h"
 #include "varargs.h"
 #include <list>
 
@@ -66,6 +66,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         JackTimebaseCallback fTimebase;
         JackSyncCallback fSync;
         JackThreadCallback fThreadFun;
+        JackSessionCallback fSession;
+        JackLatencyCallback fLatency;
 
         void* fProcessArg;
         void* fGraphOrderArg;
@@ -83,20 +85,24 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         void* fTimebaseArg;
         void* fSyncArg;
         void* fThreadFunArg;
+        void* fSessionArg;
+        void* fLatencyArg;
         char fServerName[64];
 
         JackThread fThread;    /*! Thread to execute the Process function */
         detail::JackClientChannelInterface* fChannel;
         JackSynchro* fSynchroTable;
         std::list<jack_port_id_t> fPortList;
-  
+
+        bool fImmediateSessionReply;
+
         int StartThread();
         void SetupDriverSync(bool freewheel);
         bool IsActive();
 
         void CallSyncCallback();
         void CallTimebaseCallback();
-   
+
         virtual int ClientNotifyImp(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value);
 
         inline void DummyCycle();
@@ -111,14 +117,17 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         inline void CallSyncCallbackAux();
         inline void CallTimebaseCallbackAux();
         inline int ActivateAux();
-   
+        inline void InitAux();
+
+        int HandleLatencyCallback(int status);
+
     public:
 
         JackClient();
         JackClient(JackSynchro* table);
         virtual ~JackClient();
 
-        virtual int Open(const char* server_name, const char* name, jack_options_t options, jack_status_t* status) = 0;
+        virtual int Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status) = 0;
         virtual int Close();
 
         virtual JackGraphManager* GetGraphManager() const = 0;
@@ -133,8 +142,9 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // Context
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetFreeWheel(int onoff);
+        virtual int ComputeTotalLatencies();
         virtual void ShutDown();
-        virtual pthread_t GetThreadID();
+        virtual jack_native_thread_t GetThreadID();
 
         // Port management
         virtual int PortRegister(const char* port_name, const char* port_type, unsigned long flags, unsigned long buffer_size);
@@ -173,6 +183,8 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
         virtual int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
         virtual int SetPortRenameCallback(JackPortRenameCallback callback, void *arg);
+        virtual int SetSessionCallback(JackSessionCallback callback, void *arg);
+        virtual int SetLatencyCallback(JackLatencyCallback callback, void *arg);
 
         // Internal clients
         virtual char* GetInternalClientName(int ref);
@@ -180,9 +192,18 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         virtual int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
         virtual void InternalClientUnload(int ref, jack_status_t* status);
 
+        // RT Thread
         jack_nframes_t CycleWait();
         void CycleSignal(int status);
         int SetProcessThread(JackThreadCallback fun, void *arg);
+
+        // Session API
+        virtual jack_session_command_t* SessionNotify(const char* target, jack_session_event_type_t type, const char* path);
+        virtual int SessionReply(jack_session_event_t* ev);
+        char* GetUUIDForClientName(const char* client_name);
+        char* GetClientNameByUUID(const char* uuid);
+        int ReserveClientName(const char* client_name, const char* uuid);
+        int ClientHasSessionCallback(const char* client_name);
 
         // JackRunnableInterface interface
         bool Init();

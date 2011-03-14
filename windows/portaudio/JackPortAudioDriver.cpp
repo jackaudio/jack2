@@ -38,8 +38,8 @@ namespace Jack
                                     void* userData)
     {
         JackPortAudioDriver* driver = (JackPortAudioDriver*)userData;
-        driver->fInputBuffer = (float**)inputBuffer;
-        driver->fOutputBuffer = (float**)outputBuffer;
+        driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
+        driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
         // Setup threadded based log function
         set_threaded_log_function();
         driver->CycleTakeBeginTime();
@@ -49,14 +49,14 @@ namespace Jack
     int JackPortAudioDriver::Read()
     {
         for (int i = 0; i < fCaptureChannels; i++)
-            memcpy(GetInputBuffer(i), fInputBuffer[i], sizeof(float) * fEngineControl->fBufferSize);
+            memcpy(GetInputBuffer(i), fInputBuffer[i], sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
         return 0;
     }
 
     int JackPortAudioDriver::Write()
     {
         for (int i = 0; i < fPlaybackChannels; i++)
-            memcpy(fOutputBuffer[i], GetOutputBuffer(i), sizeof(float) * fEngineControl->fBufferSize);
+            memcpy(fOutputBuffer[i], GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
         return 0;
     }
 
@@ -180,7 +180,9 @@ error:
 
     int JackPortAudioDriver::Close()
     {
+        // Generic audio driver close
         int res = JackAudioDriver::Close();
+
         jack_log("JackPortAudioDriver::Close");
         Pa_CloseStream(fStream);
         return res;

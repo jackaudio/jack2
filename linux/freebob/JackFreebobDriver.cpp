@@ -260,7 +260,7 @@ JackFreebobDriver::SetBufferSize (jack_nframes_t nframes)
     printError("Buffer size change requested but not supported!!!");
 
     /*
-    driver->period_size = nframes; 
+    driver->period_size = nframes;
     driver->period_usecs =
     	(jack_time_t) floor ((((float) nframes) / driver->sample_rate)
     			     * 1000000.0f);
@@ -667,9 +667,10 @@ int JackFreebobDriver::Attach()
 {
     JackPort* port;
     int port_index;
-  
+
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];
+    jack_latency_range_t range;
 
     freebob_driver_t* driver = (freebob_driver_t*)fDriver;
 
@@ -737,7 +738,8 @@ int JackFreebobDriver::Attach()
                 return -1;
             }
             port = fGraphManager->GetPort(port_index);
-            port->SetLatency(driver->period_size + driver->capture_frame_latency);
+            range.min = range.max = driver->period_size + driver->capture_frame_latency;
+            port->SetLatencyRange(JackCaptureLatency, &range);
             fCapturePortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fCapturePortList[i] %ld ", port_index);
             driver->capture_nchannels_audio++;
@@ -766,7 +768,8 @@ int JackFreebobDriver::Attach()
             }
             port = fGraphManager->GetPort(port_index);
             // Add one buffer more latency if "async" mode is used...
-            port->SetLatency((driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency);
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency);
+            port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fPlaybackPortList[i] %ld ", port_index);
             driver->playback_nchannels_audio++;
@@ -829,9 +832,11 @@ int JackFreebobDriver::Open(freebob_jack_settings_t *params)
 
 int JackFreebobDriver::Close()
 {
-    JackAudioDriver::Close();
+    // Generic audio driver close
+    int res = JackAudioDriver::Close();
+
     freebob_driver_delete((freebob_driver_t*)fDriver);
-    return 0;
+    return res;
 }
 
 int JackFreebobDriver::Start()
@@ -854,6 +859,8 @@ int JackFreebobDriver::Read()
     int wait_status = 0;
     fDelayedUsecs = 0.f;
 
+retry:
+
     jack_nframes_t nframes = freebob_driver_wait (driver, -1, &wait_status,
                              &fDelayedUsecs);
 
@@ -864,19 +871,19 @@ int JackFreebobDriver::Read()
 
     if (nframes == 0) {
         /* we detected an xrun and restarted: notify
-         * clients about the delay. 
+         * clients about the delay.
          */
         jack_log("FreeBoB XRun");
         NotifyXRun(fBeginDateUst, fDelayedUsecs);
-        return -1;
+        goto retry; /* recoverable error*/
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackFreebobDriver::Read nframes = %ld", nframes);
+        jack_log("JackFreebobDriver::Read warning nframes = %ld", nframes);
 
     // Has to be done before read
     JackDriver::CycleIncTime();
-    
+
     printExit();
     return freebob_driver_read((freebob_driver_t *)fDriver, fEngineControl->fBufferSize);
 }
@@ -942,7 +949,7 @@ extern "C"
 
         strcpy (desc->name, "freebob");                                // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "Linux FreeBob API based audio backend");   // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-        
+
         desc->nparams = 11;
 
         params = (jack_driver_param_desc_t *)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));

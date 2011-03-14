@@ -18,6 +18,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "JackServerGlobals.h"
+#include "JackLockedEngine.h"
 #include "JackTools.h"
 #include "shm.h"
 #include <getopt.h>
@@ -28,8 +29,12 @@ static char* server_name = NULL;
 namespace Jack
 {
 
-JackServer* JackServerGlobals::fInstance; 
+JackServer* JackServerGlobals::fInstance;
 unsigned int JackServerGlobals::fUserCount;
+int JackServerGlobals::fRTNotificationSocket;
+std::map<std::string, JackDriverInfo*> JackServerGlobals::fSlavesList;
+std::map<std::string, int> JackServerGlobals::fInternalsList;
+
 bool (* JackServerGlobals::on_device_acquire)(const char * device_name) = NULL;
 void (* JackServerGlobals::on_device_release)(const char * device_name) = NULL;
 
@@ -62,6 +67,30 @@ void JackServerGlobals::Stop()
 void JackServerGlobals::Delete()
 {
     jack_log("Jackdmp: delete server");
+
+    // Slave drivers
+    std::map<std::string, JackDriverInfo*>::iterator it1;
+    for (it1 = fSlavesList.begin(); it1 != fSlavesList.end(); it1++) {
+        JackDriverInfo* info = (*it1).second;
+        if (info) {
+            fInstance->RemoveSlave((info));
+            delete (info);
+        }
+    }
+    fSlavesList.clear();
+
+    // Internal clients
+    std::map<std::string, int> ::iterator it2;
+    for (it2 = fInternalsList.begin(); it2 != fInternalsList.end(); it2++) {
+        int status;
+        int refnum = (*it2).second;
+        if (refnum > 0) {
+            // Client object is internally kept in JackEngine, and will be desallocated in InternalClientUnload
+            fInstance->GetEngine()->InternalClientUnload(refnum, &status);
+        }
+    }
+    fInternalsList.clear();
+
     delete fInstance;
     fInstance = NULL;
 }
@@ -79,49 +108,62 @@ bool JackServerGlobals::Init()
 
     int opt = 0;
     int option_index = 0;
-    int seen_driver = 0;
-    char *driver_name = NULL;
-    char **driver_args = NULL;
-    JSList* driver_params = NULL;
+    char *master_driver_name = NULL;
+    char **master_driver_args = NULL;
+    JSList* master_driver_params = NULL;
+    jack_driver_desc_t* driver_desc;
+    jack_timer_type_t clock_source = JACK_TIMER_SYSTEM_CLOCK;
     int driver_nargs = 1;
     JSList* drivers = NULL;
-    int show_version = 0;
+    int loopback = 0;
     int sync = 0;
     int rc, i;
     int ret;
+    int replace_registry = 0;
 
     FILE* fp = 0;
     char filename[255];
     char buffer[255];
     int argc = 0;
     char* argv[32];
-    jack_timer_type_t clock_source = JACK_TIMER_SYSTEM_CLOCK;
-    
+
     // First user starts the server
     if (fUserCount++ == 0) {
 
         jack_log("JackServerGlobals Init");
 
-        jack_driver_desc_t* driver_desc;
-        const char *options = "-ad:P:uvshVRL:STFl:t:mn:p:c:";
-        static struct option long_options[] = {
-                                                  { "clock-source", 1, 0, 'c' },
-                                                  { "driver", 1, 0, 'd' },
-                                                  { "verbose", 0, 0, 'v' },
-                                                  { "help", 0, 0, 'h' },
-                                                  { "port-max", 1, 0, 'p' },
-                                                  { "no-mlock", 0, 0, 'm' },
-                                                  { "name", 0, 0, 'n' },
-                                                  { "unlock", 0, 0, 'u' },
-                                                  { "realtime", 0, 0, 'R' },
-                                                  { "realtime-priority", 1, 0, 'P' },
-                                                  { "timeout", 1, 0, 't' },
-                                                  { "temporary", 0, 0, 'T' },
-                                                  { "version", 0, 0, 'V' },
-                                                  { "silent", 0, 0, 's' },
-                                                  { "sync", 0, 0, 'S' },
-                                                  { 0, 0, 0, 0 }
-                                              };
+        const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
+    #ifdef __linux__
+            "c:"
+    #endif
+        ;
+
+    struct option long_options[] = {
+    #ifdef __linux__
+                                       { "clock-source", 1, 0, 'c' },
+    #endif
+                                       { "loopback-driver", 1, 0, 'L' },
+                                       { "audio-driver", 1, 0, 'd' },
+                                       { "midi-driver", 1, 0, 'X' },
+                                       { "internal-client", 1, 0, 'I' },
+                                       { "verbose", 0, 0, 'v' },
+                                       { "help", 0, 0, 'h' },
+                                       { "port-max", 1, 0, 'p' },
+                                       { "no-mlock", 0, 0, 'm' },
+                                       { "name", 1, 0, 'n' },
+                                       { "unlock", 0, 0, 'u' },
+                                       { "realtime", 0, 0, 'R' },
+                                       { "no-realtime", 0, 0, 'r' },
+                                       { "replace-registry", 0, &replace_registry, 0 },
+                                       { "loopback", 0, 0, 'L' },
+                                       { "realtime-priority", 1, 0, 'P' },
+                                       { "timeout", 1, 0, 't' },
+                                       { "temporary", 0, 0, 'T' },
+                                       { "version", 0, 0, 'V' },
+                                       { "silent", 0, 0, 's' },
+                                       { "sync", 0, 0, 'S' },
+                                       { 0, 0, 0, 0 }
+                                   };
 
         snprintf(filename, 255, "%s/.jackdrc", getenv("HOME"));
         fp = fopen(filename, "r");
@@ -155,11 +197,11 @@ bool JackServerGlobals::Init()
         opterr = 0;
         optind = 1; // Important : to reset argv parsing
 
-        while (!seen_driver &&
+        while (!master_driver_name &&
                 (opt = getopt_long(argc, argv, options, long_options, &option_index)) != EOF) {
 
             switch (opt) {
-            
+
                 case 'c':
                     if (tolower (optarg[0]) == 'h') {
                         clock_source = JACK_TIMER_HPET;
@@ -169,12 +211,35 @@ bool JackServerGlobals::Init()
                         clock_source = JACK_TIMER_SYSTEM_CLOCK;
                     } else {
                         jack_error("unknown option character %c", optopt);
-                    }                
+                    }
                     break;
 
                 case 'd':
-                    seen_driver = 1;
-                    driver_name = optarg;
+                    master_driver_name = optarg;
+                    break;
+
+                case 'L':
+                    loopback = atoi(optarg);
+                    break;
+
+                 case 'X':
+                    fSlavesList[optarg] = NULL;
+                    break;
+
+                case 'I':
+                    fInternalsList[optarg] = -1;
+                    break;
+
+                case 'p':
+                    port_max = (unsigned int)atol(optarg);
+                    break;
+
+                case 'm':
+                    do_mlock = 0;
+                    break;
+
+                case 'u':
+                    do_unlock = 1;
                     break;
 
                 case 'v':
@@ -189,16 +254,12 @@ bool JackServerGlobals::Init()
                     server_name = optarg;
                     break;
 
-                case 'm':
-                    do_mlock = 0;
-                    break;
-
-                case 'p':
-                    port_max = (unsigned int)atol(optarg);
-                    break;
-
                 case 'P':
                     realtime_priority = atoi(optarg);
+                    break;
+
+                case 'r':
+                    realtime = 0;
                     break;
 
                 case 'R':
@@ -213,14 +274,6 @@ bool JackServerGlobals::Init()
                     client_timeout = atoi(optarg);
                     break;
 
-                case 'u':
-                    do_unlock = 1;
-                    break;
-
-                case 'V':
-                    show_version = 1;
-                    break;
-
                 default:
                     jack_error("unknown option character %c", optopt);
                     break;
@@ -233,9 +286,9 @@ bool JackServerGlobals::Init()
             goto error;
         }
 
-        driver_desc = jack_find_driver_descriptor(drivers, driver_name);
+        driver_desc = jack_find_driver_descriptor(drivers, master_driver_name);
         if (!driver_desc) {
-            jack_error("jackdmp: unknown driver '%s'", driver_name);
+            jack_error("jackdmp: unknown master driver '%s'", master_driver_name);
             goto error;
         }
 
@@ -251,14 +304,14 @@ bool JackServerGlobals::Init()
             goto error;
         }
 
-        driver_args = (char**)malloc(sizeof(char*) * driver_nargs);
-        driver_args[0] = driver_name;
+        master_driver_args = (char**)malloc(sizeof(char*) * driver_nargs);
+        master_driver_args[0] = master_driver_name;
 
         for (i = 1; i < driver_nargs; i++) {
-            driver_args[i] = argv[optind++];
+            master_driver_args[i] = argv[optind++];
         }
 
-        if (jack_parse_driver_params(driver_desc, driver_nargs, driver_args, &driver_params)) {
+        if (jack_parse_driver_params(driver_desc, driver_nargs, master_driver_args, &master_driver_params)) {
             goto error;
         }
 
@@ -293,7 +346,7 @@ bool JackServerGlobals::Init()
             free(argv[i]);
         }
 
-        int res = Start(server_name, driver_desc, driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source, JACK_DEFAULT_SELF_CONNECT_MODE);
+        int res = Start(server_name, driver_desc, master_driver_params, sync, temporary, client_timeout, realtime, realtime_priority, port_max, verbose_aux, clock_source, JACK_DEFAULT_SELF_CONNECT_MODE);
         if (res < 0) {
             jack_error("Cannot start server... exit");
             Delete();
@@ -302,21 +355,56 @@ bool JackServerGlobals::Init()
             jack_unregister_server(server_name);
             goto error;
         }
+
+        // Slave drivers
+        std::map<std::string, JackDriverInfo*>::iterator it1;
+        for (it1 = fSlavesList.begin(); it1 != fSlavesList.end(); it1++) {
+            const char* name = ((*it1).first).c_str();
+            driver_desc = jack_find_driver_descriptor(drivers, name);
+            if (!driver_desc) {
+                jack_error("jackdmp: unknown slave driver '%s'", name);
+            } else {
+                (*it1).second = fInstance->AddSlave(driver_desc, NULL);
+            }
+        }
+
+        // Loopback driver
+        if (loopback > 0) {
+            driver_desc = jack_find_driver_descriptor(drivers, "loopback");
+            if (!driver_desc) {
+                jack_error("jackdmp: unknown driver '%s'", "loopback");
+            } else {
+                fSlavesList["loopback"] = fInstance->AddSlave(driver_desc, NULL);
+            }
+        }
+
+        // Internal clients
+        std::map<std::string, int>::iterator it2;
+        for (it2 = fInternalsList.begin(); it2 != fInternalsList.end(); it2++) {
+            int status, refnum;
+            const char* name = ((*it2).first).c_str();
+            fInstance->InternalClientLoad2(name, name, NULL, JackNullOption, &refnum, -1, &status);
+            (*it2).second = refnum;
+        }
     }
 
-    if (driver_params)
-        jack_free_driver_params(driver_params);
+    if (master_driver_params)
+        jack_free_driver_params(master_driver_params);
     return true;
 
 error:
-    if (driver_params)
-        jack_free_driver_params(driver_params);
-    fUserCount--;
+    jack_log("JackServerGlobals Init error");
+    if (master_driver_params)
+        jack_free_driver_params(master_driver_params);
+    //fUserCount--;
+    Destroy();
     return false;
 }
 
 void JackServerGlobals::Destroy()
 {
+     printf("JackServerGlobals Destroy %d\n", fUserCount);
+
     if (--fUserCount == 0) {
         jack_log("JackServerGlobals Destroy");
         Stop();

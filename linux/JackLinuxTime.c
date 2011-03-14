@@ -36,6 +36,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 static jack_time_t __jack_cpu_mhz = 0;
 jack_time_t (*_jack_get_microseconds)(void) = 0;

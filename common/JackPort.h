@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -51,12 +51,14 @@ class SERVER_EXPORT JackPort
 
         jack_nframes_t fLatency;
         jack_nframes_t fTotalLatency;
+        jack_latency_range_t  fPlaybackLatency;
+        jack_latency_range_t  fCaptureLatency;
         uint8_t fMonitorRequests;
 
         bool fInUse;
         jack_port_id_t fTied;   // Locally tied source port
-        float fBuffer[BUFFER_SIZE_MAX + 4];
-     
+        jack_default_audio_sample_t fBuffer[BUFFER_SIZE_MAX + 4];
+
         bool IsUsed() const
         {
             return fInUse;
@@ -88,8 +90,12 @@ class SERVER_EXPORT JackPort
         int UnTie();
 
         jack_nframes_t GetLatency() const;
-        jack_nframes_t GetTotalLatency() const;
         void SetLatency(jack_nframes_t latency);
+
+        void SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_range_t* range);
+        void GetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_range_t* range) const;
+
+        jack_nframes_t GetTotalLatency() const;
 
         int RequestMonitor(bool onoff);
         int EnsureMonitor(bool onoff);
@@ -99,13 +105,13 @@ class SERVER_EXPORT JackPort
         }
 
         // Since we are in shared memory, the resulting pointer cannot be cached, so align it here...
-        float* GetBuffer()
+        jack_default_audio_sample_t* GetBuffer()
         {
-            return (float*)((long)fBuffer & ~15L) + 4;
+            return (jack_default_audio_sample_t*)((long)fBuffer & ~15L) + 4;
         }
 
         int GetRefNum() const;
-        
+
 } POST_PACKED_STRUCTURE;
 
 } // end of namespace

@@ -41,17 +41,17 @@ class JackCoreMidiDriver : public JackMidiDriver
         MIDIPortRef fOutputPort;
         MIDIEndpointRef* fMidiDestination;
         MIDIEndpointRef* fMidiSource;
-        
-        char fMIDIBuffer[BUFFER_SIZE_MAX * sizeof(float)]; 
-        
+
+        char fMIDIBuffer[BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t)];
+
         int fRealCaptureChannels;
         int fRealPlaybackChannels;
-         
+
         static void ReadProcAux(const MIDIPacketList *pktlist, jack_ringbuffer_t* ringbuffer);
         static void ReadProc(const MIDIPacketList *pktlist, void *refCon, void *connRefCon);
         static void ReadVirtualProc(const MIDIPacketList *pktlist, void *refCon, void *connRefCon);
         static void NotifyProc(const MIDINotification *message, void *refCon);
-     
+
     public:
 
         JackCoreMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
@@ -67,7 +67,7 @@ class JackCoreMidiDriver : public JackMidiDriver
                  jack_nframes_t capture_latency,
                  jack_nframes_t playback_latency);
         int Close();
-        
+
         int Attach();
 
         int Read();

@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackDriverLoader.h"
 #include "JackCompilerDeps.h"
 #include "JackServer.h"
+#include <map>
 
 namespace Jack
 {
@@ -38,9 +39,13 @@ struct SERVER_EXPORT JackServerGlobals
 {
     static JackServer* fInstance;
     static unsigned int fUserCount;
-    static bool (* on_device_acquire)(const char * device_name);
-    static void (* on_device_release)(const char * device_name);
- 
+    static int fRTNotificationSocket;  // For debugging purpose
+    static std::map<std::string, JackDriverInfo*> fSlavesList;
+    static std::map<std::string, int> fInternalsList;
+
+    static bool (* on_device_acquire)(const char* device_name);
+    static void (* on_device_release)(const char* device_name);
+
     JackServerGlobals();
     ~JackServerGlobals();
 

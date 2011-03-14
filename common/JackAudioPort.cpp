@@ -18,7 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
+#include "JackGlobals.h"
+#include "JackEngineControl.h"
 #include "JackPortType.h"
+
 #include <string.h>
 
 #if defined (__APPLE__)
@@ -35,18 +38,18 @@ static void AudioBufferInit(void* buffer, size_t buffer_size, jack_nframes_t)
     memset(buffer, 0, buffer_size);
 }
 
-static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_t frames)
+static inline void MixAudioBuffer(jack_default_audio_sample_t* mixbuffer, jack_default_audio_sample_t* buffer, jack_nframes_t frames)
 {
 #ifdef __APPLE__
     // It seems that a vector mult only operation does not exist...
-    float gain = 1.0f;
+    jack_default_audio_sample_t gain = jack_default_audio_sample_t(1.0);
     vDSP_vsma(buffer, 1, &gain, mixbuffer, 1, mixbuffer, 1, frames);
 #else
     jack_nframes_t frames_group = frames / 4;
     frames = frames % 4;
 
     while (frames_group > 0) {
-#if defined (__SSE__) && !defined (__sun__) 
+#if defined (__SSE__) && !defined (__sun__)
         __m128 vec = _mm_add_ps(_mm_load_ps(mixbuffer), _mm_load_ps(buffer));
         _mm_store_ps(mixbuffer, vec);
 
@@ -54,14 +57,14 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
         buffer += 4;
         frames_group--;
 #else
-    register float mixFloat1 = *mixbuffer;
-    register float sourceFloat1 = *buffer;
-    register float mixFloat2 = *(mixbuffer + 1);
-    register float sourceFloat2 = *(buffer + 1);
-    register float mixFloat3 = *(mixbuffer + 2);
-    register float sourceFloat3 = *(buffer + 2);
-    register float mixFloat4 = *(mixbuffer + 3);
-    register float sourceFloat4 = *(buffer + 3);
+    register jack_default_audio_sample_t mixFloat1 = *mixbuffer;
+    register jack_default_audio_sample_t sourceFloat1 = *buffer;
+    register jack_default_audio_sample_t mixFloat2 = *(mixbuffer + 1);
+    register jack_default_audio_sample_t sourceFloat2 = *(buffer + 1);
+    register jack_default_audio_sample_t mixFloat3 = *(mixbuffer + 2);
+    register jack_default_audio_sample_t sourceFloat3 = *(buffer + 2);
+    register jack_default_audio_sample_t mixFloat4 = *(mixbuffer + 3);
+    register jack_default_audio_sample_t sourceFloat4 = *(buffer + 3);
 
     buffer += 4;
     frames_group--;
@@ -81,8 +84,8 @@ static inline void MixAudioBuffer(float* mixbuffer, float* buffer, jack_nframes_
     }
 
     while (frames > 0) {
-        register float mixFloat1 = *mixbuffer;
-        register float sourceFloat1 = *buffer;
+        register jack_default_audio_sample_t mixFloat1 = *mixbuffer;
+        register jack_default_audio_sample_t sourceFloat1 = *buffer;
         buffer++;
         frames--;
         mixFloat1 += sourceFloat1;
@@ -97,12 +100,12 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
     void* buffer;
 
     // Copy first buffer
-#if defined (__SSE__) && !defined (__sun__) 
+#if defined (__SSE__) && !defined (__sun__)
     jack_nframes_t frames_group = nframes / 4;
     jack_nframes_t remaining_frames = nframes % 4;
 
-    float * source = static_cast<float*>(src_buffers[0]);
-    float * target = static_cast<float*>(mixbuffer);
+    jack_default_audio_sample_t * source = static_cast<jack_default_audio_sample_t*>(src_buffers[0]);
+    jack_default_audio_sample_t * target = static_cast<jack_default_audio_sample_t*>(mixbuffer);
 
     while (frames_group > 0)
     {
@@ -117,22 +120,28 @@ static void AudioBufferMixdown(void* mixbuffer, void** src_buffers, int src_coun
         target[i] = source[i];
 
 #else
-    memcpy(mixbuffer, src_buffers[0], nframes * sizeof(float));
+    memcpy(mixbuffer, src_buffers[0], nframes * sizeof(jack_default_audio_sample_t));
 #endif
 
     // Mix remaining buffers
     for (int i = 1; i < src_count; ++i) {
         buffer = src_buffers[i];
-        MixAudioBuffer(static_cast<float*>(mixbuffer), static_cast<float*>(buffer), nframes);
+        MixAudioBuffer(static_cast<jack_default_audio_sample_t*>(mixbuffer), static_cast<jack_default_audio_sample_t*>(buffer), nframes);
     }
 }
 
+static size_t AudioBufferSize()
+{
+    return GetEngineControl()->fBufferSize * sizeof(jack_default_audio_sample_t);
+}
+
 const JackPortType gAudioPortType =
-    {
-        JACK_DEFAULT_AUDIO_TYPE,
-        AudioBufferInit,
-        AudioBufferMixdown
-    };
+{
+    JACK_DEFAULT_AUDIO_TYPE,
+    AudioBufferSize,
+    AudioBufferInit,
+    AudioBufferMixdown
+};
 
 } // namespace Jack
 

@@ -107,8 +107,6 @@ struct _packet_cache
     int last_framecnt_retreived_valid;
 };
 
-extern packet_cache *global_packcache;
-
 // fragment cache function prototypes
 // XXX: Some of these are private.
 packet_cache *packet_cache_new(int num_packets, int pkt_size, int mtu);
@@ -151,10 +149,6 @@ void render_jack_ports_to_payload(int bitdepth, JSList *playback_ports, JSList *
 // XXX: This is sort of deprecated:
 //      This one waits forever. an is not using ppoll
 int netjack_poll(int sockfd, int timeout);
-
-// TODO: these are deprecated.
-//int netjack_recvfrom(int sockfd, char *packet_buf, int pkt_size, int flags, struct sockaddr *addr, socklen_t *addr_size, int mtu);
-//int netjack_recv(int sockfd, char *packet_buf, int pkt_size, int flags, int mtu);
 
 void decode_midi_buffer (uint32_t *buffer_uint32, unsigned int buffer_size_uint32, jack_default_audio_sample_t* buf);
 void encode_midi_buffer (uint32_t *buffer_uint32, unsigned int buffer_size_uint32, jack_default_audio_sample_t* buf);

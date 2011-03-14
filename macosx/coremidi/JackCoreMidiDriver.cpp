@@ -45,15 +45,15 @@ void JackCoreMidiDriver::ReadProcAux(const MIDIPacketList *pktlist, jack_ringbuf
         jack_error("ReadProc : ring buffer is full, skip events...");
         return;
     }
-    
+
     jack_ringbuffer_write(ringbuffer, (char*)&pktlist->numPackets, sizeof(UInt32));
-    
+
     for (unsigned int i = 0; i < pktlist->numPackets; ++i) {
-    
+
         MIDIPacket *packet = (MIDIPacket *)pktlist->packet;
-        
+
         // TODO : use timestamp
-        
+
         // Check available size first..
         size = jack_ringbuffer_write_space(ringbuffer);
         if (size < (sizeof(UInt16) + packet->length)) {
@@ -64,7 +64,7 @@ void JackCoreMidiDriver::ReadProcAux(const MIDIPacketList *pktlist, jack_ringbuf
         jack_ringbuffer_write(ringbuffer, (char*)&packet->length, sizeof(UInt16));
         // Write event actual data
         jack_ringbuffer_write(ringbuffer, (char*)packet->data, packet->length);
-            
+
         packet = MIDIPacketNext(packet);
     }
 }
@@ -83,7 +83,7 @@ void JackCoreMidiDriver::ReadVirtualProc(const MIDIPacketList *pktlist, void *re
 
 void JackCoreMidiDriver::NotifyProc(const MIDINotification *message, void *refCon)
 {
-	jack_info("NotifyProc %d", message->messageID);
+	jack_log("NotifyProc %d", message->messageID);
 }
 
 JackCoreMidiDriver::JackCoreMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
@@ -106,15 +106,15 @@ int JackCoreMidiDriver::Open(bool capturing,
     OSStatus err;
 	CFStringRef coutputStr;
 	std::string str;
-    
+
     // Get real input/output number
     fRealCaptureChannels = MIDIGetNumberOfSources();
     fRealPlaybackChannels = MIDIGetNumberOfDestinations();
-    
+
     // Generic JackMidiDriver Open
     if (JackMidiDriver::Open(capturing, playing, inchannels + fRealCaptureChannels, outchannels + fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
         return -1;
-    
+
     coutputStr = CFStringCreateWithCString(0, "JackMidi", CFStringGetSystemEncoding());
 	err = MIDIClientCreate(coutputStr, NotifyProc, this, &fMidiClient);
 	CFRelease(coutputStr);
@@ -122,7 +122,7 @@ int JackCoreMidiDriver::Open(bool capturing,
         jack_error("Cannot create CoreMidi client");
 		goto error;
 	}
-    
+
    	err = MIDIInputPortCreate(fMidiClient, CFSTR("Input port"), ReadProc, this, &fInputPort);
    	if (!fInputPort) {
 		jack_error("Cannot open CoreMidi in port\n");
@@ -134,10 +134,10 @@ int JackCoreMidiDriver::Open(bool capturing,
 		jack_error("Cannot open CoreMidi out port\n");
 		goto error;
 	}
-  	
+
     fMidiDestination = new MIDIEndpointRef[inchannels + fRealCaptureChannels];
     assert(fMidiDestination);
-    
+
     // Virtual input
     for (int i = 0; i < inchannels; i++)  {
         std::stringstream num;
@@ -151,13 +151,13 @@ int JackCoreMidiDriver::Open(bool capturing,
             goto error;
         }
     }
-    
+
     // Real input
     for (int i = 0; i < fRealCaptureChannels; i++)  {
         fMidiDestination[i + inchannels] = MIDIGetSource(i);
         MIDIPortConnectSource(fInputPort, fMidiDestination[i + inchannels], fRingBuffer[i + inchannels]);
     }
-	
+
     fMidiSource = new MIDIEndpointRef[outchannels + fRealPlaybackChannels];
     assert(fMidiSource);
 
@@ -172,47 +172,50 @@ int JackCoreMidiDriver::Open(bool capturing,
         if (!fMidiSource[i]) {
             jack_error("Cannot create CoreMidi source");
             goto error;
-        }	
+        }
     }
-    
+
      // Real output
     for (int i = 0; i < fRealPlaybackChannels; i++)  {
         fMidiSource[i + outchannels] = MIDIGetDestination(i);
     }
- 
+
     return 0;
-    
+
 error:
     Close();
 	return -1;
 }
-         
+
 int JackCoreMidiDriver::Close()
 {
+    // Generic midi driver close
+    int res = JackMidiDriver::Close();
+
     if (fInputPort)
 		 MIDIPortDispose(fInputPort);
-         
-    if (fOutputPort) 
+
+    if (fOutputPort)
 		MIDIPortDispose(fOutputPort);
-    
+
     // Only dispose "virtual" endpoints
     for (int i = 0; i < fCaptureChannels - fRealCaptureChannels; i++)  {
-        if (fMidiDestination)   
+        if (fMidiDestination)
             MIDIEndpointDispose(fMidiDestination[i]);
     }
     delete[] fMidiDestination;
-    
+
     // Only dispose "virtual" endpoints
     for (int i = 0; i < fPlaybackChannels - fRealPlaybackChannels; i++)  {
-        if (fMidiSource[i]) 
+        if (fMidiSource[i])
             MIDIEndpointDispose(fMidiSource[i]);
     }
     delete[] fMidiSource;
-     
-	if (fMidiClient) 
+
+	if (fMidiClient)
         MIDIClientDispose(fMidiClient);
-        
-    return 0;
+
+    return res;
 }
 
 int JackCoreMidiDriver::Attach()
@@ -229,7 +232,7 @@ int JackCoreMidiDriver::Attach()
     jack_log("JackCoreMidiDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (i = 0; i < fCaptureChannels; i++) {
-    
+
         err = MIDIObjectGetStringProperty(fMidiDestination[i], kMIDIPropertyName, &pname);
         if (err == noErr) {
             CFStringGetCString(pname, endpoint_name, sizeof(endpoint_name), 0);
@@ -238,7 +241,7 @@ int JackCoreMidiDriver::Attach()
         } else {
             snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
         }
-        
+
         snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
@@ -251,7 +254,7 @@ int JackCoreMidiDriver::Attach()
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
-        
+
         err = MIDIObjectGetStringProperty(fMidiSource[i], kMIDIPropertyName, &pname);
         if (err == noErr) {
             CFStringGetCString(pname, endpoint_name, sizeof(endpoint_name), 0);
@@ -260,7 +263,7 @@ int JackCoreMidiDriver::Attach()
         } else {
             snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
         }
-        
+
         snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
@@ -277,23 +280,23 @@ int JackCoreMidiDriver::Attach()
 int JackCoreMidiDriver::Read()
 {
     for (int chan = 0; chan < fCaptureChannels; chan++)  {
-    
+
         if (fGraphManager->GetConnectionsNum(fCapturePortList[chan]) > 0) {
-        
+
             // Get JACK port
             JackMidiBuffer* midi_buffer = GetInputBuffer(chan);
-   
+
             if (jack_ringbuffer_read_space(fRingBuffer[chan]) == 0) {
                 // Reset buffer
                 midi_buffer->Reset(midi_buffer->nframes);
             } else {
-        
+
                 while (jack_ringbuffer_read_space(fRingBuffer[chan]) > 0) {
-            
+
                     // Read event number
                     int ev_count = 0;
                     jack_ringbuffer_read(fRingBuffer[chan], (char*)&ev_count, sizeof(int));
-                
+
                     for (int j = 0; j < ev_count; j++)  {
                         // Read event length
                         UInt16 event_len;
@@ -304,7 +307,7 @@ int JackCoreMidiDriver::Read()
                     }
                 }
             }
-            
+
         } else {
             // Consume ring buffer
             jack_ringbuffer_read_advance(fRingBuffer[chan], jack_ringbuffer_read_space(fRingBuffer[chan]));
@@ -316,35 +319,35 @@ int JackCoreMidiDriver::Read()
 int JackCoreMidiDriver::Write()
 {
     MIDIPacketList* pktlist = (MIDIPacketList*)fMIDIBuffer;
-     
+
     for (int chan = 0; chan < fPlaybackChannels; chan++)  {
-    
+
          if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chan]) > 0) {
-        
+
             MIDIPacket* packet = MIDIPacketListInit(pktlist);
             JackMidiBuffer* midi_buffer = GetOutputBuffer(chan);
-            
+
             // TODO : use timestamp
-            
+
             for (unsigned int j = 0; j < midi_buffer->event_count; j++) {
                 JackMidiEvent* ev = &midi_buffer->events[j];
                 packet = MIDIPacketListAdd(pktlist, sizeof(fMIDIBuffer), packet, MIDIGetCurrentHostTime(), ev->size, ev->GetData(midi_buffer));
             }
-           
+
             if (packet) {
                 if (chan < fPlaybackChannels - fRealPlaybackChannels) {
                     OSStatus err = MIDIReceived(fMidiSource[chan], pktlist);
-                    if (err != noErr) 
+                    if (err != noErr)
                         jack_error("MIDIReceived error");
                 } else {
                     OSStatus err = MIDISend(fOutputPort, fMidiSource[chan], pktlist);
-                    if (err != noErr) 
+                    if (err != noErr)
                         jack_error("MIDISend error");
                 }
             }
         }
     }
-    
+
     return 0;
 }
 
@@ -355,7 +358,7 @@ extern "C"
 {
 #endif
 
-    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor() 
+    SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         jack_driver_desc_t * desc;
         unsigned int i;
@@ -366,7 +369,7 @@ extern "C"
 
         desc->nparams = 2;
         desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
-        
+
         i = 0;
         strcpy(desc->params[i].name, "inchannels");
         desc->params[i].character = 'i';
@@ -386,7 +389,7 @@ extern "C"
         return desc;
     }
 
-    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params) 
+    SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
     {
         const JSList * node;
         const jack_driver_param_t * param;
@@ -407,7 +410,7 @@ extern "C"
                     break;
                 }
         }
-      
+
         Jack::JackDriverClientInterface* driver = new Jack::JackCoreMidiDriver("system_midi", "coremidi", engine, table);
         if (driver->Open(1, 1, virtual_in, virtual_out, false, "in", "out", 0, 0) == 0) {
             return driver;

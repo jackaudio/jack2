@@ -23,18 +23,17 @@
 
 #include <jack/systemdeps.h>
 
-
 typedef int32_t jack_shmsize_t;
 
 /**
  * Type used to represent sample frame counts.
  */
-typedef uint32_t	jack_nframes_t;
+typedef uint32_t        jack_nframes_t;
 
 /**
  * Maximum value that can be stored in jack_nframes_t
  */
-#define JACK_MAX_FRAMES (4294967295U)	/* This should be UINT32_MAX, but C++ has a problem with that. */
+#define JACK_MAX_FRAMES (4294967295U)   /* This should be UINT32_MAX, but C++ has a problem with that. */
 
 /**
  * Type used to represent the value of free running
@@ -74,6 +73,205 @@ typedef struct _jack_client jack_client_t;
 typedef uint32_t jack_port_id_t;
 
 typedef uint32_t jack_port_type_id_t;
+
+/**
+ *  @ref jack_options_t bits
+ */
+enum JackOptions {
+
+    /**
+     * Null value to use when no option bits are needed.
+     */
+    JackNullOption = 0x00,
+
+    /**
+     * Do not automatically start the JACK server when it is not
+     * already running.  This option is always selected if
+     * \$JACK_NO_START_SERVER is defined in the calling process
+     * environment.
+     */
+    JackNoStartServer = 0x01,
+
+    /**
+     * Use the exact client name requested.  Otherwise, JACK
+     * automatically generates a unique one, if needed.
+     */
+    JackUseExactName = 0x02,
+
+    /**
+     * Open with optional <em>(char *) server_name</em> parameter.
+     */
+    JackServerName = 0x04,
+
+    /**
+     * Load internal client from optional <em>(char *)
+     * load_name</em>.  Otherwise use the @a client_name.
+     */
+    JackLoadName = 0x08,
+
+    /**
+     * Pass optional <em>(char *) load_init</em> string to the
+     * jack_initialize() entry point of an internal client.
+     */
+    JackLoadInit = 0x10,
+
+     /**
+      * pass a SessionID Token this allows the sessionmanager to identify the client again.
+      */
+    JackSessionID = 0x20
+};
+
+/** Valid options for opening an external client. */
+#define JackOpenOptions (JackSessionID|JackServerName|JackNoStartServer|JackUseExactName)
+
+/** Valid options for loading an internal client. */
+#define JackLoadOptions (JackLoadInit|JackLoadName|JackUseExactName)
+
+/**
+ *  Options for several JACK operations, formed by OR-ing together the
+ *  relevant @ref JackOptions bits.
+ */
+typedef enum JackOptions jack_options_t;
+
+/**
+ *  @ref jack_status_t bits
+ */
+enum JackStatus {
+
+    /**
+     * Overall operation failed.
+     */
+    JackFailure = 0x01,
+
+    /**
+     * The operation contained an invalid or unsupported option.
+     */
+    JackInvalidOption = 0x02,
+
+    /**
+     * The desired client name was not unique.  With the @ref
+     * JackUseExactName option this situation is fatal.  Otherwise,
+     * the name was modified by appending a dash and a two-digit
+     * number in the range "-01" to "-99".  The
+     * jack_get_client_name() function will return the exact string
+     * that was used.  If the specified @a client_name plus these
+     * extra characters would be too long, the open fails instead.
+     */
+    JackNameNotUnique = 0x04,
+
+    /**
+     * The JACK server was started as a result of this operation.
+     * Otherwise, it was running already.  In either case the caller
+     * is now connected to jackd, so there is no race condition.
+     * When the server shuts down, the client will find out.
+     */
+    JackServerStarted = 0x08,
+
+    /**
+     * Unable to connect to the JACK server.
+     */
+    JackServerFailed = 0x10,
+
+    /**
+     * Communication error with the JACK server.
+     */
+    JackServerError = 0x20,
+
+    /**
+     * Requested client does not exist.
+     */
+    JackNoSuchClient = 0x40,
+
+    /**
+     * Unable to load internal client
+     */
+    JackLoadFailure = 0x80,
+
+    /**
+     * Unable to initialize client
+     */
+    JackInitFailure = 0x100,
+
+    /**
+     * Unable to access shared memory
+     */
+    JackShmFailure = 0x200,
+
+    /**
+     * Client's protocol version does not match
+     */
+    JackVersionError = 0x400,
+
+    /**
+     * Backend error
+     */
+    JackBackendError = 0x800,
+
+    /**
+     * Client zombified failure
+     */
+    JackClientZombie = 0x1000
+};
+
+/**
+ *  Status word returned from several JACK operations, formed by
+ *  OR-ing together the relevant @ref JackStatus bits.
+ */
+typedef enum JackStatus jack_status_t;
+
+/**
+ *  @ref jack_latency_callback_mode_t
+ */
+enum JackLatencyCallbackMode {
+
+     /**
+      * Latency Callback for Capture Latency.
+      * Input Ports have their latency value setup.
+      * In the Callback the client needs to set the latency of the output ports
+      */
+     JackCaptureLatency,
+
+     /**
+      * Latency Callback for Playback Latency.
+      * Output Ports have their latency value setup.
+      * In the Callback the client needs to set the latency of the input ports
+      */
+     JackPlaybackLatency
+
+};
+
+/**
+ *  Type of Latency Callback (Capture or Playback)
+ */
+typedef enum JackLatencyCallbackMode jack_latency_callback_mode_t;
+
+/**
+ * Prototype for the client supplied function that is called
+ * by the engine when port latencies need to be recalculated
+ *
+ * @param mode playback or capture latency
+ * @param arg pointer to a client supplied data
+ *
+ * @return zero on success, non-zero on error
+ */
+typedef void (*JackLatencyCallback)(jack_latency_callback_mode_t mode, void *arg);
+
+/**
+ * the new latency API operates on Ranges.
+ */
+struct _jack_latency_range
+{
+    /**
+     * minimum latency
+     */
+    jack_nframes_t min;
+    /**
+     * maximum latency
+     */
+    jack_nframes_t max;
+};
+
+typedef struct _jack_latency_range jack_latency_range_t;
 
 /**
  * Prototype for the client supplied function that is called
@@ -165,9 +363,12 @@ typedef int (*JackSampleRateCallback)(jack_nframes_t nframes, void *arg);
  * Prototype for the client supplied function that is called
  * whenever a port is registered or unregistered.
  *
- * @param arg pointer to a client supplied structure
+ * @param port the ID of the port
+ * @param arg pointer to a client supplied data
+ * @param register non-zero if the port is being registered,
+ *                     zero if the port is being unregistered
  */
-typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int, void *arg);
+typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int register, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
@@ -178,7 +379,7 @@ typedef void (*JackPortRegistrationCallback)(jack_port_id_t port, int, void *arg
  *                     zero if the client is being unregistered
  * @param arg pointer to a client supplied structure
  */
-typedef void (*JackClientRegistrationCallback)(const char* name, int val, void *arg);
+typedef void (*JackClientRegistrationCallback)(const char* name, int register, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
@@ -215,7 +416,7 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
 
 /**
  * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown, 
+ * whenever jackd is shutdown. Note that after server shutdown,
  * the client pointer is *not* deallocated by libjack,
  * the application is responsible to properly use jack_client_close()
  * to release client ressources. Warning: jack_client_close() cannot be
@@ -225,6 +426,21 @@ typedef void (*JackFreewheelCallback)(int starting, void *arg);
  * @param arg pointer to a client supplied structure
  */
 typedef void (*JackShutdownCallback)(void *arg);
+
+/**
+ * Prototype for the client supplied function that is called
+ * whenever jackd is shutdown. Note that after server shutdown,
+ * the client pointer is *not* deallocated by libjack,
+ * the application is responsible to properly use jack_client_close()
+ * to release client ressources. Warning: jack_client_close() cannot be
+ * safely used inside the shutdown callback and has to be called outside of
+ * the callback context.
+
+ * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
+ * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
+ * @param arg pointer to a client supplied structure
+ */
+typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason, void *arg);
 
 /**
  * Used for the type argument of jack_port_register() for default
@@ -284,9 +500,9 @@ enum JackPortFlags {
     /**
      * JackPortIsTerminal means:
      *
-     *	for an input port: the data received by the port
+     *  for an input port: the data received by the port
      *                    will not be passed on or made
-     *		           available at any other port
+     *                     available at any other port
      *
      * for an output port: the data available at the port
      *                    does not originate from any other port
@@ -296,155 +512,8 @@ enum JackPortFlags {
      * their ports.
      */
     JackPortIsTerminal = 0x10,
-    
-    /**
-     * JackPortIsActive means the port has been registered and the 
-     * client is "active", that is jack_activate has been called
-     * 
-     * JackPortIsActive is on between jack_activate and jack_deactivate.
-     */
-    JackPortIsActive = 0x20
+
 };
-
-/**
- *  @ref jack_options_t bits
- */
-enum JackOptions {
-
-    /**
-     * Null value to use when no option bits are needed.
-     */
-    JackNullOption = 0x00,
-
-    /**
-     * Do not automatically start the JACK server when it is not
-     * already running.  This option is always selected if
-     * \$JACK_NO_START_SERVER is defined in the calling process
-     * environment.
-     */
-    JackNoStartServer = 0x01,
-
-    /**
-     * Use the exact client name requested.  Otherwise, JACK
-     * automatically generates a unique one, if needed.
-     */
-    JackUseExactName = 0x02,
-
-    /**
-     * Open with optional <em>(char *) server_name</em> parameter.
-     */
-    JackServerName = 0x04,
-
-    /**
-     * Load internal client from optional <em>(char *)
-     * load_name</em>.  Otherwise use the @a client_name.
-     */
-    JackLoadName = 0x08,
-
-    /**
-     * Pass optional <em>(char *) load_init</em> string to the
-     * jack_initialize() entry point of an internal client.
-     */
-    JackLoadInit = 0x10
-};
-
-/** Valid options for opening an external client. */
-#define JackOpenOptions (JackServerName|JackNoStartServer|JackUseExactName)
-
-/** Valid options for loading an internal client. */
-#define JackLoadOptions (JackLoadInit|JackLoadName|JackUseExactName)
-
-/**
- *  Options for several JACK operations, formed by OR-ing together the
- *  relevant @ref JackOptions bits.
- */
-typedef enum JackOptions jack_options_t;
-
-/**
- *  @ref jack_status_t bits
- */
-enum JackStatus {
-
-    /**
-     * Overall operation failed.
-     */
-    JackFailure = 0x01,
-
-    /**
-     * The operation contained an invalid or unsupported option.
-     */
-    JackInvalidOption = 0x02,
-
-    /**
-     * The desired client name was not unique.  With the @ref
-     * JackUseExactName option this situation is fatal.  Otherwise,
-     * the name was modified by appending a dash and a two-digit
-     * number in the range "-01" to "-99".  The
-     * jack_get_client_name() function will return the exact string
-     * that was used.  If the specified @a client_name plus these
-     * extra characters would be too long, the open fails instead.
-     */
-    JackNameNotUnique = 0x04,
-
-    /**
-     * The JACK server was started as a result of this operation.
-     * Otherwise, it was running already.  In either case the caller
-     * is now connected to jackd, so there is no race condition.
-     * When the server shuts down, the client will find out.
-     */
-    JackServerStarted = 0x08,
-
-    /**
-     * Unable to connect to the JACK server.
-     */
-    JackServerFailed = 0x10,
-
-    /**
-     * Communication error with the JACK server.
-     */
-    JackServerError = 0x20,
-
-    /**
-     * Requested client does not exist.
-     */
-    JackNoSuchClient = 0x40,
-
-    /**
-     * Unable to load internal client
-     */
-    JackLoadFailure = 0x80,
-
-    /**
-     * Unable to initialize client
-     */
-    JackInitFailure = 0x100,
-
-    /**
-     * Unable to access shared memory
-     */
-    JackShmFailure = 0x200,
-
-    /**
-     * Client's protocol version does not match
-     */
-    JackVersionError = 0x400,
-    
-    /**
-     * Backend error
-     */
-    JackBackendError = 0x800,
-    
-    /**
-     * Client zombified failure
-     */
-    JackClientZombie = 0x1000
-};
-
-/**
- *  Status word returned from several JACK operations, formed by
- *  OR-ing together the relevant @ref JackStatus bits.
- */
-typedef enum JackStatus jack_status_t;
 
 /**
  * Transport states.
@@ -456,23 +525,23 @@ typedef enum {
     JackTransportRolling = 1,       /**< Transport playing */
     JackTransportLooping = 2,       /**< For OLD_TRANSPORT, now ignored */
     JackTransportStarting = 3,      /**< Waiting for sync ready */
-    JackTransportNetStarting = 4, 	/**< Waiting for sync ready on the network*/
+    JackTransportNetStarting = 4,       /**< Waiting for sync ready on the network*/
 
 } jack_transport_state_t;
 
-typedef uint64_t jack_unique_t;		/**< Unique ID (opaque) */
+typedef uint64_t jack_unique_t;         /**< Unique ID (opaque) */
 
 /**
  * Optional struct jack_position_t fields.
  */
 typedef enum {
 
-    JackPositionBBT = 0x10,  	/**< Bar, Beat, Tick */
-    JackPositionTimecode = 0x20,	/**< External timecode */
-    JackBBTFrameOffset =      0x40,	/**< Frame offset of BBT information */
+    JackPositionBBT = 0x10,     /**< Bar, Beat, Tick */
+    JackPositionTimecode = 0x20,        /**< External timecode */
+    JackBBTFrameOffset =      0x40,     /**< Frame offset of BBT information */
     JackAudioVideoRatio =     0x80, /**< audio frames per video frame */
     JackVideoFrameOffset =   0x100  /**< frame offset of first video frame */
-    
+
 } jack_position_bits_t;
 
 /** all valid position bits */
@@ -482,31 +551,31 @@ typedef enum {
 typedef struct {
 
     /* these four cannot be set from clients: the server sets them */
-    jack_unique_t	unique_1;	/**< unique ID */
-    jack_time_t		usecs;		/**< monotonic, free-rolling */
-    jack_nframes_t	frame_rate;	/**< current frame rate (per second) */
-    jack_nframes_t	frame;		/**< frame number, always present */
+    jack_unique_t       unique_1;       /**< unique ID */
+    jack_time_t         usecs;          /**< monotonic, free-rolling */
+    jack_nframes_t      frame_rate;     /**< current frame rate (per second) */
+    jack_nframes_t      frame;          /**< frame number, always present */
 
-    jack_position_bits_t valid;		/**< which other fields are valid */
+    jack_position_bits_t valid;         /**< which other fields are valid */
 
     /* JackPositionBBT fields: */
-    int32_t		bar;		/**< current bar */
-    int32_t		beat;		/**< current beat-within-bar */
-    int32_t		tick;		/**< current tick-within-beat */
-    double		bar_start_tick;
+    int32_t             bar;            /**< current bar */
+    int32_t             beat;           /**< current beat-within-bar */
+    int32_t             tick;           /**< current tick-within-beat */
+    double              bar_start_tick;
 
-    float		beats_per_bar;	/**< time signature "numerator" */
-    float		beat_type;	/**< time signature "denominator" */
-    double		ticks_per_beat;
-    double		beats_per_minute;
+    float               beats_per_bar;  /**< time signature "numerator" */
+    float               beat_type;      /**< time signature "denominator" */
+    double              ticks_per_beat;
+    double              beats_per_minute;
 
-    /* JackPositionTimecode fields:	(EXPERIMENTAL: could change) */
-    double		frame_time;	/**< current time in seconds */
-    double		next_time;	/**< next sequential frame_time
+    /* JackPositionTimecode fields:     (EXPERIMENTAL: could change) */
+    double              frame_time;     /**< current time in seconds */
+    double              next_time;      /**< next sequential frame_time
                          (unless repositioned) */
 
     /* JackBBTFrameOffset fields: */
-    jack_nframes_t	bbt_offset;	/**< frame offset for the BBT fields
+    jack_nframes_t      bbt_offset;     /**< frame offset for the BBT fields
                          (the given bar, beat, and tick
                          values actually refer to a time
                          frame_offset frames before the
@@ -540,10 +609,10 @@ typedef struct {
     /* For binary compatibility, new fields should be allocated from
      * this padding area with new valid bits controlling access, so
      * the existing structure size and offsets are preserved. */
-    int32_t		padding[7];
+    int32_t             padding[7];
 
     /* When (unique_1 == unique_2) the contents are consistent. */
-    jack_unique_t	unique_2;	/**< unique ID */
+    jack_unique_t       unique_2;       /**< unique ID */
 
 } jack_position_t;
 
@@ -620,11 +689,11 @@ typedef void (*JackTimebaseCallback)(jack_transport_state_t state,
  */
 typedef enum {
 
-    JackTransportState = 0x1,  	/**< Transport state */
-    JackTransportPosition = 0x2,  	/**< Frame number */
-    JackTransportLoop = 0x4,  	/**< Loop boundaries (ignored) */
-    JackTransportSMPTE = 0x8,  	/**< SMPTE (ignored) */
-    JackTransportBBT = 0x10	/**< Bar, Beat, Tick */
+    JackTransportState = 0x1,   /**< Transport state */
+    JackTransportPosition = 0x2,        /**< Frame number */
+    JackTransportLoop = 0x4,    /**< Loop boundaries (ignored) */
+    JackTransportSMPTE = 0x8,   /**< SMPTE (ignored) */
+    JackTransportBBT = 0x10     /**< Bar, Beat, Tick */
 
 } jack_transport_bits_t;
 
@@ -638,17 +707,17 @@ typedef struct {
 
     /* these two cannot be set from clients: the server sets them */
 
-    jack_nframes_t frame_rate;		/**< current frame rate (per second) */
-    jack_time_t usecs;		/**< monotonic, free-rolling */
+    jack_nframes_t frame_rate;          /**< current frame rate (per second) */
+    jack_time_t usecs;          /**< monotonic, free-rolling */
 
-    jack_transport_bits_t valid;	/**< which fields are legal to read */
+    jack_transport_bits_t valid;        /**< which fields are legal to read */
     jack_transport_state_t transport_state;
     jack_nframes_t frame;
     jack_nframes_t loop_start;
     jack_nframes_t loop_end;
 
-    long smpte_offset;	/**< SMPTE offset (from frame 0) */
-    float smpte_frame_rate;	/**< 29.97, 30, 24 etc. */
+    long smpte_offset;  /**< SMPTE offset (from frame 0) */
+    float smpte_frame_rate;     /**< 29.97, 30, 24 etc. */
 
     int bar;
     int beat;
@@ -662,19 +731,5 @@ typedef struct {
 
 } jack_transport_info_t;
 
-/**
- * Prototype for the client supplied function that is called
- * whenever jackd is shutdown. Note that after server shutdown, 
- * the client pointer is *not* deallocated by libjack,
- * the application is responsible to properly use jack_client_close()
- * to release client ressources. Warning: jack_client_close() cannot be
- * safely used inside the shutdown callback and has to be called outside of
- * the callback context.
- 
- * @param code a status word, formed by OR-ing together the relevant @ref JackStatus bits.
- * @param reason a string describing the shutdown reason (backend failure, server crash... etc...)
- * @param arg pointer to a client supplied structure
- */
-typedef void (*JackInfoShutdownCallback)(jack_status_t code, const char* reason, void *arg);
 
 #endif /* __jack_types_h__ */

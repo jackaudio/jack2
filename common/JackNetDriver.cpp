@@ -118,10 +118,10 @@ namespace Jack
 
 //init and restart--------------------------------------------------------------------
     /*
-        JackNetDriver is wrapped in a JackWaitThreadedDriver decorator that behaves 
+        JackNetDriver is wrapped in a JackWaitThreadedDriver decorator that behaves
         as a "dummy driver, until Init method returns.
     */
-    
+
     bool JackNetDriver::Initialize()
     {
         jack_log("JackNetDriver::Initialize()");
@@ -147,7 +147,7 @@ namespace Jack
 
         //set global parameters
         SetParams();
-         
+
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
@@ -216,7 +216,7 @@ namespace Jack
     void JackNetDriver::FreeAll()
     {
         FreePorts();
-        
+
         delete[] fTxBuffer;
         delete[] fRxBuffer;
         delete fNetAudioCaptureBuffer;
@@ -225,7 +225,7 @@ namespace Jack
         delete fNetMidiPlaybackBuffer;
         delete[] fMidiCapturePortList;
         delete[] fMidiPlaybackPortList;
-        
+
         fTxBuffer = NULL;
         fRxBuffer = NULL;
         fNetAudioCaptureBuffer = NULL;
@@ -234,7 +234,7 @@ namespace Jack
         fNetMidiPlaybackBuffer = NULL;
         fMidiCapturePortList = NULL;
         fMidiPlaybackPortList = NULL;
-        
+
 #ifdef JACK_MONITOR
         delete fNetTimeMon;
         fNetTimeMon = NULL;
@@ -253,6 +253,7 @@ namespace Jack
         unsigned long port_flags;
         int audio_port_index;
         uint midi_port_index;
+        jack_latency_range_t range;
 
         //audio
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
@@ -269,7 +270,8 @@ namespace Jack
             port = fGraphManager->GetPort ( port_id );
             port->SetAlias ( alias );
             //port latency
-            port->SetLatency ( fEngineControl->fBufferSize );
+            range.min = range.max = fEngineControl->fBufferSize;
+            port->SetLatencyRange(JackCaptureLatency, &range);
             fCapturePortList[audio_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fCapturePortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
         }
@@ -290,15 +292,16 @@ namespace Jack
             switch ( fParams.fNetworkMode )
             {
                 case 'f' :
-                    port->SetLatency ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    range.min = range.max = (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize;
                     break;
                 case 'n' :
-                    port->SetLatency ( fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    range.min = range.max = (fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
                     break;
                 case 's' :
-                    port->SetLatency ( 2 * fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    range.min = range.max = (2 * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
                     break;
             }
+            port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[audio_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency() );
         }
@@ -316,7 +319,8 @@ namespace Jack
             }
             port = fGraphManager->GetPort ( port_id );
             //port latency
-            port->SetLatency ( fEngineControl->fBufferSize );
+            range.min = range.max = fEngineControl->fBufferSize;
+            port->SetLatencyRange(JackCaptureLatency, &range);
             fMidiCapturePortList[midi_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fMidiCapturePortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
         }
@@ -337,15 +341,16 @@ namespace Jack
             switch ( fParams.fNetworkMode )
             {
                 case 'f' :
-                    port->SetLatency ( ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    range.min = range.max = (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize;
                     break;
                 case 'n' :
-                    port->SetLatency ( fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize ) ;
+                    range.min = range.max = (fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
                     break;
                 case 's' :
-                    port->SetLatency ( 2 * fEngineControl->fBufferSize + ( fEngineControl->fSyncMode ) ? 0 : fEngineControl->fBufferSize );
+                    range.min = range.max = (2 * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
                     break;
             }
+            port->SetLatencyRange(JackPlaybackLatency, &range);
             fMidiPlaybackPortList[midi_port_index] = port_id;
             jack_log ( "JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency() );
         }
@@ -404,7 +409,7 @@ namespace Jack
         //is there a transport state change to handle ?
         if ( fSendTransportData.fNewState && ( fSendTransportData.fState != fEngineControl->fTransport.GetState() ) )
         {
-           
+
             switch ( fSendTransportData.fState )
             {
                 case JackTransportStopped :
@@ -453,13 +458,13 @@ namespace Jack
         else
             fReturnTransportData.fTimebaseMaster = NO_CHANGE;
         */
-        
+
         //update transport state and position
         fReturnTransportData.fState = fEngineControl->fTransport.Query ( &fReturnTransportData.fPosition );
-    
+
         //is it a new state (that the master need to know...) ?
         fReturnTransportData.fNewState = (( fReturnTransportData.fState == JackTransportNetStarting) &&
-                                           ( fReturnTransportData.fState != fLastTransportState ) && 
+                                           ( fReturnTransportData.fState != fLastTransportState ) &&
                                            ( fReturnTransportData.fState != fSendTransportData.fState ) );
         if ( fReturnTransportData.fNewState )
             jack_info ( "Sending '%s'.", GetTransportState ( fReturnTransportData.fState ) );
@@ -487,14 +492,14 @@ namespace Jack
             return 0;
 
 #ifdef JACK_MONITOR
-        // For timing  
+        // For timing
         fRcvSyncUst = GetMicroSeconds();
 #endif
 
         //decode sync
         //if there is an error, don't return -1, it will skip Write() and the network error probably won't be identified
         DecodeSyncPacket();
- 
+
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ( ( ( float ) ( GetMicroSeconds() - fRcvSyncUst ) / ( float ) fEngineControl->fPeriodUsecs ) * 100.f );
 #endif
@@ -529,7 +534,7 @@ namespace Jack
 
         //sync
         EncodeSyncPacket();
-   
+
         //send sync
         if ( SyncSend() == SOCKET_ERROR )
             return SOCKET_ERROR;
