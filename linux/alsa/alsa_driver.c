@@ -1117,7 +1117,7 @@ alsa_driver_stop (alsa_driver_t *driver)
         memset (buf, 0, sizeof (jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
     */
-    ClearOutput()
+    ClearOutput();
 
 	if (driver->playback_handle) {
 		if ((err = snd_pcm_drop (driver->playback_handle)) < 0) {
@@ -1639,7 +1639,7 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
             }
         }
         */
-        ReadInput();
+        ReadInput(orig_nframes, contiguous, nread);
 
 		if ((err = snd_pcm_mmap_commit (driver->capture_handle,
 				offset, contiguous)) < 0) {
@@ -1782,7 +1782,7 @@ alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
         }
         */
 
-        WriteOutput();
+        WriteOutput(orig_nframes, contiguous, nwritten); 
 
 		if (!bitset_empty (driver->channels_not_done)) {
 			alsa_driver_silence_untouched_channels (driver,
@@ -2653,6 +2653,7 @@ driver_get_descriptor ()
 	return desc;
 }
 
+/*
 jack_driver_t *
 driver_initialize (jack_client_t *client, const JSList * params)
 {
@@ -2730,7 +2731,7 @@ driver_initialize (jack_client_t *client, const JSList * params)
 
 		case 'n':
 			user_nperiods = param->value.ui;
-			if (user_nperiods < 2)	/* enforce minimum value */
+			if (user_nperiods < 2)	// enforce minimum value 
 				user_nperiods = 2;
 			break;
 
@@ -2770,7 +2771,7 @@ driver_initialize (jack_client_t *client, const JSList * params)
 		}
 	}
 
-	/* duplex is the default */
+	// duplex is the default 
 	if (!capture && !playback) {
 		capture = TRUE;
 		playback = TRUE;
@@ -2793,6 +2794,7 @@ driver_initialize (jack_client_t *client, const JSList * params)
 				systemic_input_latency,
 				systemic_output_latency, midi);
 }
+*/
 
 void
 driver_finish (jack_driver_t *driver)

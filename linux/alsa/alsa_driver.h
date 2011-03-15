@@ -264,12 +264,22 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 // Code implemented in JackAlsaDriver.cpp
 
-void ReadInput();
-void MonitorInputt();
+void ReadInput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);
+void MonitorInput();
 void ClearOutput();
-void WriteOutput();
+void WriteOutput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
 void SetTimet(jack_time_t time);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* __jack_alsa_driver_h__ */
