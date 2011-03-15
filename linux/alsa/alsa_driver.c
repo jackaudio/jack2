@@ -1108,13 +1108,16 @@ alsa_driver_stop (alsa_driver_t *driver)
 	}
 */
 
-// New code
-	int i;
-    	for (i = 0; i < fPlaybackChannels; i++) {
-        	jack_default_audio_sample_t* buf =
-            	(jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[i], fEngineControl->fBufferSize);
-        	memset (buf, 0, sizeof (jack_default_audio_sample_t) * fEngineControl->fBufferSize);
-    	}
+// Steph
+    /*
+	int chn;
+    for (chn = 0; i < fPlaybackChannels; chn++) {
+        jack_default_audio_sample_t* buf =
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], fEngineControl->fBufferSize);
+        memset (buf, 0, sizeof (jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+    }
+    */
+    ClearOutput()
 
 	if (driver->playback_handle) {
 		if ((err = snd_pcm_drop (driver->playback_handle)) < 0) {
@@ -1346,7 +1349,8 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 		poll_ret = jack_get_microseconds ();
 
         // Steph
-		fBeginDateUst = poll_ret;
+		//fBeginDateUst = poll_ret;
+        SetTime(poll_ret);
 
 		if (extra_fd < 0) {
 			if (driver->poll_next && poll_ret > driver->poll_next) {
@@ -1573,7 +1577,7 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 	snd_pcm_uframes_t offset;
 	jack_nframes_t  orig_nframes;
 	jack_default_audio_sample_t* buf;
-	channel_t chn;
+//	channel_t chn;
 //	JSList *node;
 //	jack_port_t* port;
 	int err;
@@ -1626,13 +1630,16 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 				buf + nread, contiguous);
 		}
 */
-		int i;
-        	for (chn = 0; chn < fCaptureChannels; chn++) {
-            		if (fGraphManager->GetConnectionsNum(fCapturePortList[chn]) > 0) {
-                		buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[chn], orig_nframes);
-                		alsa_driver_read_from_channel (driver, chn, buf + nread, contiguous);
-            		}
-        	}
+        /*
+		int chn;
+        for (chn = 0; chn < fCaptureChannels; chn++) {
+            if (fGraphManager->GetConnectionsNum(fCapturePortList[chn]) > 0) {
+                buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[chn], orig_nframes);
+                alsa_driver_read_from_channel (driver, chn, buf + nread, contiguous);
+            }
+        }
+        */
+        ReadInput();
 
 		if ((err = snd_pcm_mmap_commit (driver->capture_handle,
 				offset, contiguous)) < 0) {
@@ -1699,13 +1706,16 @@ alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 		}
 	}
 */
+    /*
 	int chn;
-    	for (chn = 0; chn < fCaptureChannels; chn++) {
-        	port = fGraphManager->GetPort(fCapturePortList[chn]);
-        	if (port->MonitoringInput()) {
-            		driver->input_monitor_mask |= (1 << chn);
-        	}
-    	}
+    for (chn = 0; chn < fCaptureChannels; chn++) {
+        port = fGraphManager->GetPort(fCapturePortList[chn]);
+        if (port->MonitoringInput()) {
+                driver->input_monitor_mask |= (1 << chn);
+        }
+    }
+    */
+    MonitorInput();
 
 	if (driver->hw_monitoring) {
 		if ((driver->hw->input_monitor_mask
@@ -1755,20 +1765,24 @@ alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 		}
 */
 
-       		// Steph
+        // Steph
+        /*
 		int chn;
-        	for (chn = 0; chn < fPlaybackChannels; chn++) {
-            		// Ouput ports
-            		if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
-                		buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], orig_nframes);
-                		alsa_driver_write_to_channel (driver, chn, buf + nwritten, contiguous);
-                		// Monitor ports
-                		if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[chn]) > 0) {
-                    			monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[chn], orig_nframes);
-                   			memcpy(monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
-                		}
-            		}
-        	}
+        for (chn = 0; chn < fPlaybackChannels; chn++) {
+                // Ouput ports
+                if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
+                    buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], orig_nframes);
+                    alsa_driver_write_to_channel (driver, chn, buf + nwritten, contiguous);
+                    // Monitor ports
+                    if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[chn]) > 0) {
+                        monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[chn], orig_nframes);
+                        memcpy(monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
+                    }
+                }
+        }
+        */
+
+        WriteOutput();
 
 		if (!bitset_empty (driver->channels_not_done)) {
 			alsa_driver_silence_untouched_channels (driver,

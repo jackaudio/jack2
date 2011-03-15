@@ -393,6 +393,65 @@ int JackAlsaDriver::Write()
     return alsa_driver_write((alsa_driver_t *)fDriver, fEngineControl->fBufferSize);
 }
 
+void JackAlsaDriver::ReadInputAux()
+{
+    int chn;
+    for (chn = 0; chn < fCaptureChannels; chn++) {
+        if (fGraphManager->GetConnectionsNum(fCapturePortList[chn]) > 0) {
+            buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[chn], orig_nframes);
+            alsa_driver_read_from_channel((alsa_driver_t *)fDriver, chn, buf + nread, contiguous);
+        }
+    }
+}
+
+void JackAlsaDriver::MonitorInputAux()
+{
+    int chn;
+    for (chn = 0; chn < fCaptureChannels; chn++) {
+        JackPort* port = fGraphManager->GetPort(fCapturePortList[chn]);
+        if (port->MonitoringInput()) {
+            driver->input_monitor_mask |= (1 << chn);
+        }
+    }
+}
+
+void JackAlsaDriver::ClearOutputAux()
+{
+    int chn;
+    for (chn = 0; i < fPlaybackChannels; chn++) {
+        jack_default_audio_sample_t* buf =
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], fEngineControl->fBufferSize);
+        memset (buf, 0, sizeof (jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+    }
+}
+
+void JackAlsaDriver::SetTimetAux(jack_time_t time)
+{
+    fBeginDateUst = time;
+}
+
+void JackAlsaDriver::WriteOutputAux()
+{
+    int chn;
+    jack_default_audio_sample_t* buf;
+    snd_pcm_sframes_t nwritten;
+    snd_pcm_sframes_t contiguous;
+	snd_pcm_uframes_t offset;
+
+    for (chn = 0; chn < fPlaybackChannels; chn++) {
+            // Ouput ports
+            if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
+                buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], orig_nframes);
+                alsa_driver_write_to_channel(driver, chn, buf + nwritten, contiguous);
+                // Monitor ports
+                if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[chn]) > 0) {
+                    monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[chn], orig_nframes);
+                    memcpy(monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
+                }
+            }
+    }
+}
+
 void
 JackAlsaDriver::jack_driver_init (jack_driver_t *driver)
 {
@@ -875,6 +934,8 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     return desc;
 }
 
+static Jack::JackAlsaDriver* g_alsa_driver;
+
 SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
 {
     jack_nframes_t srate = 48000;
@@ -1001,8 +1062,8 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
         playback = TRUE;
     }
 
-    Jack::JackAlsaDriver* alsa_driver = new Jack::JackAlsaDriver("system", "alsa_pcm", engine, table);
-    Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(alsa_driver);
+    g_alsa_driver = new Jack::JackAlsaDriver("system", "alsa_pcm", engine, table);
+    Jack::JackDriverClientInterface* threaded_driver = new Jack::JackThreadedDriver(g_alsa_driver);
     // Special open for ALSA driver...
     if (alsa_driver->Open(frames_per_interrupt, user_nperiods, srate, hw_monitoring, hw_metering, capture, playback, dither, soft_mode, monitor,
                           user_capture_nchnls, user_playback_nchnls, shorts_first, capture_pcm_name, playback_pcm_name,
@@ -1012,6 +1073,29 @@ SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLocke
         delete threaded_driver; // Delete the decorated driver
         return NULL;
     }
+}
+
+// Code to be used in alsa_driver.c
+
+void ReadInput();
+{
+    g_alsa_driver->ReadInputAux();
+}
+void MonitorInput()
+{
+    g_alsa_driver->MonitorInputAux();
+}
+void ClearOutput()
+{
+    g_alsa_driver->ClearOutputAux();
+}
+void WriteOutput()
+{
+    g_alsa_driver->WriteOutputAux();
+}
+void SetTimet(jack_time_t time)
+{
+    g_alsa_driver->SetTimetAux(time);
 }
 
 #ifdef __cplusplus

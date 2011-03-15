@@ -98,7 +98,7 @@ typedef struct _alsa_driver {
     snd_pcm_sw_params_t          *playback_sw_params;
     snd_pcm_hw_params_t          *capture_hw_params;
     snd_pcm_sw_params_t          *capture_sw_params;
-    jack_hardware_t              *hw;  
+    jack_hardware_t              *hw;
     ClockSyncStatus              *clock_sync_data;
     jack_client_t                *client;
     JSList                       *capture_ports;
@@ -143,17 +143,17 @@ typedef struct _alsa_driver {
 
 } alsa_driver_t;
 
-static inline void 
+static inline void
 alsa_driver_mark_channel_done (alsa_driver_t *driver, channel_t chn) {
 	bitset_remove (driver->channels_not_done, chn);
 	driver->silent[chn] = 0;
 }
 
-static inline void 
+static inline void
 alsa_driver_silence_on_channel (alsa_driver_t *driver, channel_t chn,
 				jack_nframes_t nframes) {
 	if (driver->playback_interleaved) {
-		memset_interleave 
+		memset_interleave
 			(driver->playback_addr[chn],
 			 0, nframes * driver->playback_sample_bytes,
 			 driver->interleave_unit,
@@ -165,11 +165,11 @@ alsa_driver_silence_on_channel (alsa_driver_t *driver, channel_t chn,
 	alsa_driver_mark_channel_done (driver,chn);
 }
 
-static inline void 
+static inline void
 alsa_driver_silence_on_channel_no_mark (alsa_driver_t *driver, channel_t chn,
 					jack_nframes_t nframes) {
 	if (driver->playback_interleaved) {
-		memset_interleave 
+		memset_interleave
 			(driver->playback_addr[chn],
 			 0, nframes * driver->playback_sample_bytes,
 			 driver->interleave_unit,
@@ -180,27 +180,27 @@ alsa_driver_silence_on_channel_no_mark (alsa_driver_t *driver, channel_t chn,
 	}
 }
 
-static inline void 
+static inline void
 alsa_driver_read_from_channel (alsa_driver_t *driver,
 			       channel_t channel,
 			       jack_default_audio_sample_t *buf,
 			       jack_nframes_t nsamples)
 {
-	driver->read_via_copy (buf, 
+	driver->read_via_copy (buf,
 			       driver->capture_addr[channel],
-			       nsamples, 
+			       nsamples,
 			       driver->capture_interleave_skip[channel]);
 }
 
-static inline void 
+static inline void
 alsa_driver_write_to_channel (alsa_driver_t *driver,
-			      channel_t channel, 
-			      jack_default_audio_sample_t *buf, 
+			      channel_t channel,
+			      jack_default_audio_sample_t *buf,
 			      jack_nframes_t nsamples)
 {
 	driver->write_via_copy (driver->playback_addr[channel],
-				buf, 
-				nsamples, 
+				buf,
+				nsamples,
 				driver->playback_interleave_skip[channel],
 				driver->dither_state+channel);
 	alsa_driver_mark_channel_done (driver, channel);
@@ -263,5 +263,13 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
 
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
+
+// Code implemented in JackAlsaDriver.cpp
+
+void ReadInput();
+void MonitorInputt();
+void ClearOutput();
+void WriteOutput();
+void SetTimet(jack_time_t time);
 
 #endif /* __jack_alsa_driver_h__ */

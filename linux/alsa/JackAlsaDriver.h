@@ -93,6 +93,12 @@ class JackAlsaDriver : public JackAudioDriver
 
         int SetBufferSize(jack_nframes_t buffer_size);
 
+        void ReadInputAux();
+        void MonitorInputtAux();
+        void ClearOutputtAux();
+        void WriteOutputtAux();
+        void SetTimetAux(jack_time_t time);
+
         // JACK API emulation for the midi driver
         int is_realtime() const;
         int create_thread(pthread_t *thread, int prio, int rt, void *(*start_func)(void*), void *arg);
