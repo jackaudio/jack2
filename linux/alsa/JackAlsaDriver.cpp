@@ -50,8 +50,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "memops.h"
 #include "JackServerGlobals.h"
 
-//#define DEBUG_WAKEUP 1
-
 namespace Jack
 {
 
@@ -165,9 +163,7 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
-static
-char *
-get_control_device_name(const char * device_name)
+static char* get_control_device_name(const char * device_name)
 {
     char * ctl_name;
     regex_t expression;
@@ -431,7 +427,7 @@ void JackAlsaDriver::WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes
 {
     int chn;
     jack_default_audio_sample_t* buf;
- 
+
     for (chn = 0; chn < fPlaybackChannels; chn++) {
             // Ouput ports
             if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
@@ -891,7 +887,6 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     desc->params = params;
     return desc;
 }
-
 
 static Jack::JackAlsaDriver* g_alsa_driver;
 

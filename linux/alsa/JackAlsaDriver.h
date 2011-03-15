@@ -45,10 +45,7 @@ class JackAlsaDriver : public JackAudioDriver
     public:
 
         JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-		: JackAudioDriver(name, alias, engine, table)
-		,fDriver(NULL)
-		,fReservedCaptureDevice(-1)
-		,fReservedPlaybackDevice(-1)
+		: JackAudioDriver(name, alias, engine, table),fDriver(NULL),fReservedCaptureDevice(-1),fReservedPlaybackDevice(-1)
         {}
         virtual ~JackAlsaDriver()
         {}
