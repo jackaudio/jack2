@@ -168,6 +168,37 @@ int JackAlsaDriver::Detach()
     return JackAudioDriver::Detach();
 }
 
+static
+char *
+get_control_device_name(const char * device_name)
+{
+    char * ctl_name;
+    regex_t expression;
+
+    regcomp(&expression, "(plug)?hw:[0-9](,[0-9])?", REG_ICASE | REG_EXTENDED);
+
+    if (!regexec(&expression, device_name, 0, NULL, 0)) {
+        /* the user wants a hw or plughw device, the ctl name
+         * should be hw:x where x is the card number */
+
+        char tmp[5];
+        strncpy(tmp, strstr(device_name, "hw"), 4);
+        tmp[4] = '\0';
+        jack_info("control device %s",tmp);
+        ctl_name = strdup(tmp);
+    } else {
+        ctl_name = strdup(device_name);
+    }
+
+    regfree(&expression);
+
+    if (ctl_name == NULL) {
+        jack_error("strdup(\"%s\") failed.", ctl_name);
+    }
+
+    return ctl_name;
+}
+
 static int card_to_num(const char* device)
 {
     int err;
