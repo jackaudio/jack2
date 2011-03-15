@@ -218,4 +218,50 @@ int   alsa_driver_stop_listen_for_clock_sync_status (alsa_driver_t *,
 void  alsa_driver_clock_sync_notify (alsa_driver_t *, channel_t chn,
 				     ClockSyncStatus);
 
+int
+alsa_driver_reset_parameters (alsa_driver_t *driver,
+			      jack_nframes_t frames_per_cycle,
+			      jack_nframes_t user_nperiods,
+			      jack_nframes_t rate);
+
+jack_driver_t *
+alsa_driver_new (char *name, char *playback_alsa_device,
+		 char *capture_alsa_device,
+		 jack_client_t *client,
+		 jack_nframes_t frames_per_cycle,
+		 jack_nframes_t user_nperiods,
+		 jack_nframes_t rate,
+		 int hw_monitoring,
+		 int hw_metering,
+		 int capturing,
+		 int playing,
+		 DitherAlgorithm dither,
+		 int soft_mode,
+		 int monitor,
+		 int user_capture_nchnls,
+		 int user_playback_nchnls,
+		 int shorts_first,
+		 jack_nframes_t capture_latency,
+		 jack_nframes_t playback_latency,
+		 alsa_midi_t *midi_driver
+		 );
+void
+alsa_driver_delete (alsa_driver_t *driver);
+
+int
+alsa_driver_start (alsa_driver_t *driver);
+
+int
+alsa_driver_stop (alsa_driver_t *driver);
+
+jack_nframes_t
+alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
+		  *delayed_usecs);
+
+int
+alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
+
+int
+alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
+
 #endif /* __jack_alsa_driver_h__ */
