@@ -50,7 +50,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "memops.h"
 #include "JackServerGlobals.h"
 
-
 //#define DEBUG_WAKEUP 1
 
 namespace Jack
