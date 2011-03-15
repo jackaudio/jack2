@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-03-14 Stephane Letz  <letz@grame.fr>
+
+	* Correct JackEngine::NotifyGraphReorder, update JackDebugClient with latest API.
+
 2011-03-13 Stephane Letz  <letz@grame.fr>
 
 	* Rework internal slave driver management, JackServerGlobals now handle same parameters as jackdmp.

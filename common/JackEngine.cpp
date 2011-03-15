@@ -223,7 +223,6 @@ int JackEngine::ComputeTotalLatencies()
 	 */
 
     for (it = sorted.begin(); it != sorted.end(); it++) {
-        jack_log("Sorted %d", *it);
         NotifyClient(*it, kLatencyCallback, true, "", 0, 0);
     }
 
@@ -322,8 +321,8 @@ void JackEngine::NotifyXRun(int refnum)
 
 void JackEngine::NotifyGraphReorder()
 {
-    ComputeTotalLatencies();
     NotifyClients(kGraphOrderCallback, false, "", 0, 0);
+    ComputeTotalLatencies();
 }
 
 void JackEngine::NotifyBufferSize(jack_nframes_t buffer_size)
@@ -762,7 +761,7 @@ int JackEngine::ClientDeactivate(int refnum)
     fGraphManager->GetInputPorts(refnum, input_ports);
     fGraphManager->GetOutputPorts(refnum, output_ports);
 
-    // First disconnect all ports and remove their JackPortIsActive state
+    // First disconnect all ports
     for (int i = 0; (i < PORT_NUM_FOR_CLIENT) && (input_ports[i] != EMPTY); i++) {
         PortDisconnect(refnum, input_ports[i], ALL_PORTS);
     }

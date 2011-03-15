@@ -121,12 +121,22 @@ class SERVER_EXPORT JackDebugClient : public JackClient
         int SetPortRegistrationCallback(JackPortRegistrationCallback callback, void* arg);
         int SetPortConnectCallback(JackPortConnectCallback callback, void *arg);
         int SetPortRenameCallback(JackPortRenameCallback callback, void *arg);
+        int SetSessionCallback(JackSessionCallback callback, void *arg);
+        int SetLatencyCallback(JackLatencyCallback callback, void *arg);
 
         // Internal clients
         char* GetInternalClientName(int ref);
         int InternalClientHandle(const char* client_name, jack_status_t* status);
         int InternalClientLoad(const char* client_name, jack_options_t options, jack_status_t* status, jack_varargs_t* va);
         void InternalClientUnload(int ref, jack_status_t* status);
+
+        // Session API
+        jack_session_command_t* SessionNotify(const char* target, jack_session_event_type_t type, const char* path);
+        int SessionReply(jack_session_event_t* ev);
+        char* GetUUIDForClientName(const char* client_name);
+        char* GetClientNameByUUID(const char* uuid);
+        int ReserveClientName(const char* client_name, const char* uuid);
+        int ClientHasSessionCallback(const char* client_name);
 
         JackClientControl* GetClientControl() const;
         void CheckClient(const char* function_name) const;
