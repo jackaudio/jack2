@@ -496,8 +496,8 @@ bool JackClient::Init()
 
     // Setup RT
     if (GetEngineControl()->fRealTime) {
-        if (fThread.AcquireRealTime(GetEngineControl()->fClientPriority) < 0) {
-            jack_error("JackClient::AcquireRealTime error");
+        if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
+            jack_error("JackClient::AcquireSelfRealTime error");
         }
     }
 
