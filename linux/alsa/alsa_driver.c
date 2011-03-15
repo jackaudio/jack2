@@ -18,6 +18,7 @@
 
 */
 
+
 #define __STDC_FORMAT_MACROS   // For inttypes.h to work in C++
 
 #include <math.h>
@@ -80,6 +81,43 @@ extern void show_work_times ();
 
 /* Delay (in process calls) before jackd will report an xrun */
 #define XRUN_REPORT_DELAY 0
+
+void
+jack_driver_init (jack_driver_t *driver)
+{
+    memset (driver, 0, sizeof (*driver));
+
+    driver->attach = 0;
+    driver->detach = 0;
+    driver->write = 0;
+    driver->read = 0;
+    driver->null_cycle = 0;
+    driver->bufsize = 0;
+    driver->start = 0;
+    driver->stop = 0;
+}
+
+void
+jack_driver_nt_init (jack_driver_nt_t * driver)
+{
+    memset (driver, 0, sizeof (*driver));
+
+    jack_driver_init ((jack_driver_t *) driver);
+
+    driver->attach = 0;
+    driver->detach = 0;
+    driver->bufsize = 0;
+    driver->stop = 0;
+    driver->start = 0;
+
+    driver->nt_bufsize = 0;
+    driver->nt_start = 0;
+    driver->nt_stop = 0;
+    driver->nt_attach = 0;
+    driver->nt_detach = 0;
+    driver->nt_run_cycle = 0;
+}
+
 
 static void
 alsa_driver_release_channel_dependent_memory (alsa_driver_t *driver)
@@ -1187,7 +1225,7 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 
 	if (snd_pcm_status_get_state(status) == SND_PCM_STATE_SUSPENDED)
 	{
-		MESSAGE("\n\n**** alsa_pcm: pcm in suspended state, resuming it \n\n" );
+		jack_log("**** alsa_pcm: pcm in suspended state, resuming it" );
 		if (driver->capture_handle) {
 			if ((res = snd_pcm_prepare(driver->capture_handle))
 			    < 0) {
@@ -1209,9 +1247,7 @@ alsa_driver_xrun_recovery (alsa_driver_t *driver, float *delayed_usecs)
 		snd_pcm_status_get_trigger_tstamp(status, &tstamp);
 		timersub(&now, &tstamp, &diff);
 		*delayed_usecs = diff.tv_sec * 1000000.0 + diff.tv_usec;
-		MESSAGE("\n\n**** alsa_pcm: xrun of at least %.3f "
-			"msecs\n\n",
-			*delayed_usecs / 1000.0);
+		jack_log("**** alsa_pcm: xrun of at least %.3f msecs",*delayed_usecs / 1000.0);
 	}
 
 	if (alsa_driver_restart (driver)) {
@@ -2475,6 +2511,7 @@ dither_opt (char c, DitherAlgorithm* dither)
 
 const char driver_client_name[] = "alsa_pcm";
 
+/*
 const jack_driver_desc_t *
 driver_get_descriptor ()
 {
@@ -2652,7 +2689,7 @@ driver_get_descriptor ()
 
 	return desc;
 }
-
+*/
 /*
 jack_driver_t *
 driver_initialize (jack_client_t *client, const JSList * params)

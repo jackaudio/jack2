@@ -54,8 +54,6 @@ extern "C"
 #define jack_frame_time JACK_frame_time
 #define jack_last_frame_time JACK_last_frame_time
 
-#define jack_get_microseconds GetMicroSecond
-
 #ifdef __cplusplus
 } // extern "C"
 #endif

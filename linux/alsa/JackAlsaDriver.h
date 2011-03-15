@@ -42,9 +42,6 @@ class JackAlsaDriver : public JackAudioDriver
         int fReservedCaptureDevice;
         int fReservedPlaybackDevice;
 
-        void jack_driver_init(jack_driver_t *driver);
-        void jack_driver_nt_init(jack_driver_nt_t * driver);
-
     public:
 
         JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)

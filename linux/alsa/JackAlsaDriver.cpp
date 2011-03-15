@@ -55,9 +55,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-#define jack_get_microseconds GetMicroSeconds
-
-
 int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
     jack_log("JackAlsaDriver::SetBufferSize %ld", buffer_size);
@@ -449,42 +446,6 @@ void JackAlsaDriver::WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes
     }
 }
 
-void
-JackAlsaDriver::jack_driver_init (jack_driver_t *driver)
-{
-    memset (driver, 0, sizeof (*driver));
-
-    driver->attach = 0;
-    driver->detach = 0;
-    driver->write = 0;
-    driver->read = 0;
-    driver->null_cycle = 0;
-    driver->bufsize = 0;
-    driver->start = 0;
-    driver->stop = 0;
-}
-
-void
-JackAlsaDriver::jack_driver_nt_init (jack_driver_nt_t * driver)
-{
-    memset (driver, 0, sizeof (*driver));
-
-    jack_driver_init ((jack_driver_t *) driver);
-
-    driver->attach = 0;
-    driver->detach = 0;
-    driver->bufsize = 0;
-    driver->stop = 0;
-    driver->start = 0;
-
-    driver->nt_bufsize = 0;
-    driver->nt_start = 0;
-    driver->nt_stop = 0;
-    driver->nt_attach = 0;
-    driver->nt_detach = 0;
-    driver->nt_run_cycle = 0;
-}
-
 int JackAlsaDriver::is_realtime() const
 {
     return fEngineControl->fRealTime;
@@ -752,7 +713,6 @@ dither_opt (char c, DitherAlgorithm* dither)
     return 0;
 }
 
-/*
 SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 {
     jack_driver_desc_t * desc;
@@ -931,7 +891,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     desc->params = params;
     return desc;
 }
-*/
+
 
 static Jack::JackAlsaDriver* g_alsa_driver;
 
@@ -1092,7 +1052,7 @@ void WriteOutput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_
 {
     g_alsa_driver->WriteOutputAux(orig_nframes, contiguous, nwritten);
 }
-void SetTimet(jack_time_t time)
+void SetTime(jack_time_t time)
 {
     g_alsa_driver->SetTimetAux(time);
 }

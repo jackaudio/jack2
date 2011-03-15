@@ -41,6 +41,11 @@
 #include "memops.h"
 #include "alsa_midi.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef void (*ReadCopyFunction)  (jack_default_audio_sample_t *dst, char *src,
                                    unsigned long src_bytes,
                                    unsigned long src_skip_bytes);
@@ -264,10 +269,7 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
 int
 alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+jack_time_t jack_get_microseconds(void);
 
 // Code implemented in JackAlsaDriver.cpp
 
@@ -275,7 +277,7 @@ void ReadInput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pc
 void MonitorInput();
 void ClearOutput();
 void WriteOutput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
-void SetTimet(jack_time_t time);
+void SetTime(jack_time_t time);
 
 #ifdef __cplusplus
 }
