@@ -2067,7 +2067,8 @@ alsa_driver_delete (alsa_driver_t *driver)
 	free(driver->alsa_driver);
 
 	alsa_driver_release_channel_dependent_memory (driver);
-    jack_driver_nt_finish ((jack_driver_nt_t *) driver);
+    //Steph
+    //jack_driver_nt_finish ((jack_driver_nt_t *) driver);
 	free (driver);
 }
 
