@@ -402,8 +402,6 @@ error:
 
 void JackServerGlobals::Destroy()
 {
-     printf("JackServerGlobals Destroy %d\n", fUserCount);
-
     if (--fUserCount == 0) {
         jack_log("JackServerGlobals Destroy");
         Stop();

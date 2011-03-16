@@ -237,7 +237,6 @@ int JackCoreAudioDriver::Write()
     return 0;
 }
 
-
 OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
                                                     UInt32 inChannel,
                                                     Boolean	isInput,

@@ -450,21 +450,21 @@ sigset_t
 jackctl_setup_signals(
     unsigned int flags)
 {
-        if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+    if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
         jack_error("CreateEvent fails err = %ld", GetLastError());
         return 0;
     }
 
-        (void) signal(SIGINT, do_nothing_handler);
+    (void) signal(SIGINT, do_nothing_handler);
     (void) signal(SIGABRT, do_nothing_handler);
     (void) signal(SIGTERM, do_nothing_handler);
 
-        return (sigset_t)waitEvent;
+    return (sigset_t)waitEvent;
 }
 
 void jackctl_wait_signals(sigset_t signals)
 {
-        if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
+    if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
         jack_error("WaitForSingleObject fails err = %ld", GetLastError());
     }
 }
@@ -539,7 +539,7 @@ jackctl_setup_signals(
      * explicitly reset it
      */
 
-     pthread_sigmask(SIG_BLOCK, &signals, 0);
+    pthread_sigmask(SIG_BLOCK, &signals, 0);
 
     /* install a do-nothing handler because otherwise pthreads
        behaviour is undefined when we enter sigwait.
