@@ -199,14 +199,15 @@ alsa_driver_ice1712_hardware (alsa_driver_t *driver)
         return 0;
 }
 
+// JACK2
+/*
 static int
 alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 {
-    // JACK2
-	// TODO : will need so deeped redesign
-    // driver->hw = jack_alsa_usx2y_hw_new (driver);
+        driver->hw = jack_alsa_usx2y_hw_new (driver);
 	return 0;
 }
+*/
 
 static int
 alsa_driver_generic_hardware (alsa_driver_t *driver)
@@ -1501,73 +1502,6 @@ alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
 	return avail - (avail % driver->frames_per_cycle);
 }
 
-static int
-alsa_driver_null_cycle (alsa_driver_t* driver, jack_nframes_t nframes)
-{
-	jack_nframes_t nf;
-	snd_pcm_uframes_t offset;
-	snd_pcm_uframes_t contiguous;
-	int chn;
-
-	if (nframes > driver->frames_per_cycle) {
-		return -1;
-	}
-
-        if (driver->capture_handle) {
-		nf = nframes;
-		offset = 0;
-		while (nf) {
-			contiguous = nf;
-
-                        if (alsa_driver_get_channel_addresses (driver,
-                                                               &contiguous, 0, &offset, 0)) {
-                                return -1;
-                        }
-
-			if (snd_pcm_mmap_commit (driver->capture_handle,
-						 offset, contiguous) < 0) {
-				return -1;
-			}
-
-			nf -= contiguous;
-		}
-	}
-
-	if (driver->playback_handle) {
-		nf = nframes;
-		offset = 0;
-		while (nf) {
-			contiguous = nf;
-
-                        if (alsa_driver_get_channel_addresses (driver,
-                                                               0, &contiguous, 0, &offset)) {
-                                return -1;
-                        }
-
-			for (chn = 0; chn < driver->playback_nchannels; chn++) {
-				alsa_driver_silence_on_channel (driver, chn,
-								contiguous);
-			}
-
-			if (snd_pcm_mmap_commit (driver->playback_handle,
-						 offset, contiguous) < 0) {
-				return -1;
-			}
-
-			nf -= contiguous;
-		}
-	}
-
-	return 0;
-}
-
-static int
-alsa_driver_bufsize (alsa_driver_t* driver, jack_nframes_t nframes)
-{
-	return alsa_driver_reset_parameters (driver, nframes,
-					     driver->user_nperiods,
-					     driver->frame_rate);
-}
 
 int
 alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
@@ -1576,7 +1510,7 @@ alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes)
 	snd_pcm_sframes_t nread;
 	snd_pcm_uframes_t offset;
 	jack_nframes_t  orig_nframes;
-	jack_default_audio_sample_t* buf;
+//	jack_default_audio_sample_t* buf;
 //	channel_t chn;
 //	JSList *node;
 //	jack_port_t* port;
@@ -1652,8 +1586,8 @@ alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes)
 //	channel_t chn;
 //	JSList *node;
 //	JSList *mon_node;
-	jack_default_audio_sample_t* buf;
-	jack_default_audio_sample_t* monbuf;
+//	jack_default_audio_sample_t* buf;
+//	jack_default_audio_sample_t* monbuf;
 	jack_nframes_t orig_nframes;
 	snd_pcm_sframes_t nwritten;
 	snd_pcm_sframes_t contiguous;
@@ -2222,35 +2156,6 @@ alsa_driver_clock_sync_notify (alsa_driver_t *driver, channel_t chn,
 	pthread_mutex_unlock (&driver->clock_sync_lock);
 
 }
-
-static int
-dither_opt (char c, DitherAlgorithm* dither)
-{
-	switch (c) {
-	case '-':
-	case 'n':
-		*dither = None;
-		break;
-
-	case 'r':
-		*dither = Rectangular;
-		break;
-
-	case 's':
-		*dither = Shaped;
-		break;
-
-	case 't':
-		*dither = Triangular;
-		break;
-
-	default:
-		jack_error ("ALSA driver: illegal dithering mode %c", c);
-		return -1;
-	}
-	return 0;
-}
-
 
 /* DRIVER "PLUGIN" INTERFACE */
 
