@@ -55,7 +55,7 @@ static void PrintStreamDesc(AudioStreamBasicDescription *inDesc)
     jack_log("  Bytes per Frame:%ld", inDesc->mBytesPerFrame);
     jack_log("  Channels per Frame:%ld", inDesc->mChannelsPerFrame);
     jack_log("  Bits per Channel:%ld", inDesc->mBitsPerChannel);
-    jack_log("- - - - - - - - - - - - - - - - - - - -\n");
+    jack_log("- - - - - - - - - - - - - - - - - - - -");
 }
 
 static void printError(OSStatus err)
@@ -1580,11 +1580,11 @@ int JackCoreAudioDriver::Attach()
 
         err = AudioDeviceGetPropertyInfo(fDeviceID, i + 1, true, kAudioDevicePropertyChannelName, &size, &isWritable);
         if (err != noErr)
-            jack_log("AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error ");
+            jack_log("AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error");
         if (err == noErr && size > 0) {
             err = AudioDeviceGetProperty(fDeviceID, i + 1, true, kAudioDevicePropertyChannelName, &size, channel_name);
             if (err != noErr)
-                jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error ");
+                jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error");
             snprintf(alias, sizeof(alias) - 1, "%s:%s:out_%s%u", fAliasName, fCaptureDriverName, channel_name, i + 1);
         } else {
             snprintf(alias, sizeof(alias) - 1, "%s:%s:out%u", fAliasName, fCaptureDriverName, i + 1);
@@ -1602,10 +1602,10 @@ int JackCoreAudioDriver::Attach()
         UInt32 value2 = 0;
         err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
         if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error ");
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
         err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
         if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error ");
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
 
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
@@ -1618,11 +1618,11 @@ int JackCoreAudioDriver::Attach()
 
         err = AudioDeviceGetPropertyInfo(fDeviceID, i + 1, false, kAudioDevicePropertyChannelName, &size, &isWritable);
         if (err != noErr)
-            jack_log("AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error ");
+            jack_log("AudioDeviceGetPropertyInfo kAudioDevicePropertyChannelName error");
         if (err == noErr && size > 0) {
             err = AudioDeviceGetProperty(fDeviceID, i + 1, false, kAudioDevicePropertyChannelName, &size, channel_name);
             if (err != noErr)
-                jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error ");
+                jack_log("AudioDeviceGetProperty kAudioDevicePropertyChannelName error");
             snprintf(alias, sizeof(alias) - 1, "%s:%s:in_%s%u", fAliasName, fPlaybackDriverName, channel_name, i + 1);
         } else {
             snprintf(alias, sizeof(alias) - 1, "%s:%s:in%u", fAliasName, fPlaybackDriverName, i + 1);
@@ -1640,10 +1640,10 @@ int JackCoreAudioDriver::Attach()
         UInt32 value2 = 0;
         err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
         if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error ");
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
         err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
         if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error ");
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
 
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
@@ -1654,14 +1654,13 @@ int JackCoreAudioDriver::Attach()
 
         // Monitor ports
         if (fWithMonitorPorts) {
-            jack_log("Create monitor port ");
+            jack_log("Create monitor port");
             snprintf(name, sizeof(name) - 1, "%s:monitor_%u", fClientControl.fName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
                 port = fGraphManager->GetPort(port_index);
-                port->SetAlias(alias);
                 range.min = range.max = fEngineControl->fBufferSize;
                 port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
