@@ -395,7 +395,6 @@ error:
     jack_log("JackServerGlobals Init error");
     if (master_driver_params)
         jack_free_driver_params(master_driver_params);
-    //fUserCount--;
     Destroy();
     return false;
 }
