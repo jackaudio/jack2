@@ -24,7 +24,7 @@ using Jack::JackFFADOMidiReceiveQueue;
 
 JackFFADOMidiReceiveQueue::JackFFADOMidiReceiveQueue()
 {
-    bytes_received = 0;
+    // Empty
 }
 
 jack_midi_event_t *
@@ -38,11 +38,6 @@ JackFFADOMidiReceiveQueue::DequeueEvent()
             event.size = 1;
             event.time = last_frame + index;
             index += 8;
-            bytes_received++;
-
-            jack_info("Jack::JackFFADOMidiReceiveQueue: %d bytes received",
-                      bytes_received);
-
             return &event;
         }
     }

@@ -26,7 +26,7 @@ using Jack::JackFFADOMidiSendQueue;
 
 JackFFADOMidiSendQueue::JackFFADOMidiSendQueue()
 {
-    bytes_sent = 0;
+    // Empty
 }
 
 Jack::JackMidiWriteQueue::EnqueueResult
@@ -44,10 +44,6 @@ JackFFADOMidiSendQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     }
     output_buffer[index] = 0x01000000 | ((uint32_t) *buffer);
     index += 8;
-
-    bytes_sent++;
-    jack_info("Jack::JackFFADOMidiSendQueue: %d bytes sent", bytes_sent);
-
     return OK;
 }
 
