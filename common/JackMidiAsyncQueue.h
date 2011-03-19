@@ -46,7 +46,6 @@ namespace Jack {
         static const size_t INFO_SIZE =
             sizeof(jack_nframes_t) + sizeof(size_t);
 
-        size_t advance_space;
         jack_ringbuffer_t *byte_ring;
         jack_midi_data_t *data_buffer;
         jack_midi_event_t dequeue_event;

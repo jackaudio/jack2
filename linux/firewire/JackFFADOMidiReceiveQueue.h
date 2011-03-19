@@ -28,6 +28,8 @@ namespace Jack {
 
     private:
 
+        unsigned long bytes_received;
+
         jack_midi_data_t byte;
         jack_midi_event_t event;
         jack_nframes_t index;

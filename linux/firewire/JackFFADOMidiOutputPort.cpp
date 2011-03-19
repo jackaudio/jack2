@@ -33,9 +33,9 @@ JackFFADOMidiOutputPort::JackFFADOMidiOutputPort(size_t non_rt_size,
     std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
     send_queue = new JackFFADOMidiSendQueue();
     std::auto_ptr<JackFFADOMidiSendQueue> send_queue_ptr(send_queue);
-    raw_queue = new JackMidiRawOutputWriteQueue(send_queue, max_rt_messages,
+    raw_queue = new JackMidiRawOutputWriteQueue(send_queue, non_rt_size,
                                                 max_non_rt_messages,
-                                                non_rt_size);
+                                                max_rt_messages);
     send_queue_ptr.release();
     read_queue_ptr.release();
 }

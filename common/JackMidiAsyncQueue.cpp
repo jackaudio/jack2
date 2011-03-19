@@ -26,13 +26,13 @@ using Jack::JackMidiAsyncQueue;
 JackMidiAsyncQueue::JackMidiAsyncQueue(size_t max_bytes, size_t max_messages)
 {
     data_buffer = new jack_midi_data_t[max_bytes];
-    byte_ring = jack_ringbuffer_create(max_bytes + 1);
+    byte_ring = jack_ringbuffer_create((max_bytes * sizeof(jack_midi_data_t)) +
+                                       1);
     if (byte_ring) {
         info_ring = jack_ringbuffer_create((max_messages * INFO_SIZE) + 1);
         if (info_ring) {
             jack_ringbuffer_mlock(byte_ring);
             jack_ringbuffer_mlock(info_ring);
-            advance_space = 0;
             this->max_bytes = max_bytes;
             return;
         }
@@ -54,26 +54,23 @@ JackMidiAsyncQueue::DequeueEvent()
 {
     jack_midi_event_t *event = 0;
     if (jack_ringbuffer_read_space(info_ring) >= INFO_SIZE) {
-        if (advance_space) {
-            jack_ringbuffer_read_advance(byte_ring, advance_space);
-        }
         event = &dequeue_event;
         jack_ringbuffer_read(info_ring, (char *) &(event->time),
                              sizeof(jack_nframes_t));
         size_t size;
         jack_ringbuffer_read(info_ring, (char *) &size, sizeof(size_t));
+        event->buffer = data_buffer;
         event->size = size;
         jack_ringbuffer_data_t vector[2];
         jack_ringbuffer_get_read_vector(byte_ring, vector);
         size_t size1 = vector[0].len;
-        if (size1 >= size) {
-            event->buffer = (jack_midi_data_t *) vector[0].buf;
-        } else {
-            event->buffer = data_buffer;
-            memcpy(data_buffer, vector[0].buf, size1);
-            memcpy(data_buffer + size1, vector[1].buf, size - size1);
+        memcpy(data_buffer, vector[0].buf, size1 * sizeof(jack_midi_data_t));
+        if (size1 < size) {
+            memcpy(data_buffer + size1, vector[1].buf,
+                   (size - size1) * sizeof(jack_midi_data_t));
         }
-        advance_space = size;
+        jack_ringbuffer_read_advance(byte_ring,
+                                     size * sizeof(jack_midi_data_t));
     }
     return event;
 }
@@ -82,11 +79,16 @@ Jack::JackMidiWriteQueue::EnqueueResult
 JackMidiAsyncQueue::EnqueueEvent(jack_nframes_t time, size_t size,
                                  jack_midi_data_t *buffer)
 {
-    if (! ((jack_ringbuffer_write_space(info_ring) >= INFO_SIZE) &&
-           (jack_ringbuffer_write_space(byte_ring) >= size))) {
-        return size > max_bytes ? BUFFER_TOO_SMALL : BUFFER_FULL;
+    if (size > max_bytes) {
+        return BUFFER_TOO_SMALL;
     }
-    jack_ringbuffer_write(byte_ring, (const char *) buffer, size);
+    if (! ((jack_ringbuffer_write_space(info_ring) >= INFO_SIZE) &&
+           (jack_ringbuffer_write_space(byte_ring) >=
+            (size * sizeof(jack_midi_data_t))))) {
+        return BUFFER_FULL;
+    }
+    jack_ringbuffer_write(byte_ring, (const char *) buffer,
+                          size * sizeof(jack_midi_data_t));
     jack_ringbuffer_write(info_ring, (const char *) (&time),
                           sizeof(jack_nframes_t));
     jack_ringbuffer_write(info_ring, (const char *) (&size), sizeof(size_t));

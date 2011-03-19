@@ -28,6 +28,8 @@ namespace Jack {
 
     private:
 
+        unsigned long bytes_sent;
+
         jack_nframes_t index;
         jack_nframes_t last_frame;
         jack_nframes_t length;

@@ -554,10 +554,9 @@ main(int argc, char **argv)
         if (jitter_plot[100]) {
             printf("     > 10 ms: %u\n", jitter_plot[100]);
         }
-        if (unexpected_messages) {
-            printf("\nUnexpected messages received: %d\n",
-                   unexpected_messages);
-        }
+    }
+    if (unexpected_messages) {
+        printf("\nUnexpected messages received: %d\n", unexpected_messages);
     }
  deactivate_client:
     jack_deactivate(client);
