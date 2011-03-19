@@ -58,10 +58,10 @@ def build(bld):
                        ]
 
     ffado_driver_src = ['firewire/JackFFADODriver.cpp',
-                        'firewire/JackFFADOMidiInput.cpp',
-                        'firewire/JackFFADOMidiOutput.cpp',
-                        '../common/JackPhysicalMidiInput.cpp',
-                        '../common/JackPhysicalMidiOutput.cpp'
+                        'firewire/JackFFADOMidiInputPort.cpp',
+                        'firewire/JackFFADOMidiOutputPort.cpp',
+                        'firewire/JackFFADOMidiReceiveQueue.cpp',
+                        'firewire/JackFFADOMidiSendQueue.cpp'
                        ]
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
