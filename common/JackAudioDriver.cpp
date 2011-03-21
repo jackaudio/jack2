@@ -313,6 +313,26 @@ int JackAudioDriver::ProcessGraphSync()
     return res;
 }
 
+int JackAudioDriver::Start()
+{
+    int res = JackDriver::Start();
+    if ((res >= 0) && fIsMaster) {
+        res = StartSlaves();
+    }
+    return res;
+}
+
+int JackAudioDriver::Stop()
+{
+    int res = JackDriver::Stop();
+    if (fIsMaster) {
+        if (StopSlaves() < 0) {
+            res = -1;
+        }
+    }
+    return res;
+}
+
 void JackAudioDriver::WaitUntilNextCycle()
 {
     int wait_time_usec = (int((float(fEngineControl->fBufferSize) / (float(fEngineControl->fSampleRate))) * 1000000.0f));

@@ -826,6 +826,11 @@ EXPORT const JSList * jackctl_server_get_drivers_list(jackctl_server *server_ptr
 EXPORT bool jackctl_server_stop(jackctl_server *server_ptr)
 {
     server_ptr->engine->Stop();
+    return true;
+}
+
+EXPORT bool jackctl_server_close(jackctl_server *server_ptr)
+{
     server_ptr->engine->Close();
     delete server_ptr->engine;
 
@@ -853,7 +858,7 @@ EXPORT const JSList * jackctl_server_get_parameters(jackctl_server *server_ptr)
 }
 
 EXPORT bool
-jackctl_server_start(
+jackctl_server_open(
     jackctl_server *server_ptr,
     jackctl_driver *driver_ptr)
 {
@@ -913,17 +918,7 @@ jackctl_server_start(
         goto fail_delete;
     }
 
-    rc = server_ptr->engine->Start();
-    if (rc < 0)
-    {
-        jack_error("JackServer::Start() failed with %d", rc);
-        goto fail_close;
-    }
-
     return true;
-
-fail_close:
-    server_ptr->engine->Close();
 
 fail_delete:
     delete server_ptr->engine;
@@ -944,6 +939,19 @@ fail_unregister:
 
 fail:
     return false;
+}
+
+EXPORT bool
+jackctl_server_start(
+    jackctl_server *server_ptr)
+{
+    int rc = server_ptr->engine->Start();
+    bool result = rc >= 0;
+    if (! result)
+    {
+        jack_error("JackServer::Start() failed with %d", rc);
+    }
+    return result;
 }
 
 EXPORT const char * jackctl_driver_get_name(jackctl_driver *driver_ptr)

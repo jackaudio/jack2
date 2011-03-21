@@ -87,25 +87,17 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close3;
     }
 
-    if (fFreewheelDriver->Open() < 0) { // before engine open
-        jack_error("Cannot open driver");
-        goto fail_close4;
-    }
-
     if (fAudioDriver->Attach() < 0) {
         jack_error("Cannot attach audio driver");
-        goto fail_close5;
+        goto fail_close4;
     }
 
     fFreewheelDriver->SetMaster(false);
     fAudioDriver->SetMaster(true);
-    fAudioDriver->AddSlave(fFreewheelDriver); // After ???
+    //fAudioDriver->AddSlave(fFreewheelDriver);
     InitTime();
     SetClockSource(fEngineControl->fClockSource);
     return 0;
-
-fail_close5:
-    fFreewheelDriver->Close();
 
 fail_close4:
     fEngine->Close();
@@ -128,7 +120,9 @@ int JackServer::Close()
     fChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
-    fFreewheelDriver->Close();
+    if (fFreewheel) {
+        fFreewheelDriver->Close();
+    }
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
@@ -238,6 +232,7 @@ int JackServer::SetFreewheel(bool onoff)
         } else {
             fFreewheel = false;
             fFreewheelDriver->Stop();
+            fFreewheelDriver->Close();
             fGraphManager->Restore(&fConnectionState);   // Restore previous connection state
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
@@ -250,6 +245,10 @@ int JackServer::SetFreewheel(bool onoff)
             fGraphManager->Save(&fConnectionState);     // Save connection state
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
+            if (fFreewheelDriver->Open() < 0) {
+                jack_error("Cannot open freewheel driver");
+                return -1;
+            }
             fFreewheelDriver->SetMaster(true);
             return fFreewheelDriver->Start();
         } else {
@@ -296,11 +295,11 @@ JackDriverInfo* JackServer::AddSlave(jack_driver_desc_t* driver_desc, JSList* dr
     if (slave == NULL) {
         delete info;
         return NULL;
-    } else {
-        slave->Attach();
-        fAudioDriver->AddSlave(slave);
-        return info;
     }
+    slave->Attach();
+    slave->SetMaster(false);
+    fAudioDriver->AddSlave(slave);
+    return info;
 }
 
 void JackServer::RemoveSlave(JackDriverInfo* info)
@@ -322,32 +321,30 @@ int JackServer::SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_par
     JackDriverInfo* info = new JackDriverInfo();
     JackDriverClientInterface* master = info->Open(driver_desc, fEngine, GetSynchroTable(), driver_params);
 
-    if (master == NULL || info == NULL) {
+    if (master == NULL) {
         delete info;
-        delete master;
         return -1;
-    } else {
-
-        // Get slaves list
-        std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
-        std::list<JackDriverInterface*>::const_iterator it;
-
-        // Move slaves in new master
-        for (it = slave_list.begin(); it != slave_list.end(); it++) {
-            JackDriverInterface* slave = *it;
-            master->AddSlave(slave);
-        }
-
-        // Delete old master
-        delete fDriverInfo;
-
-        // Activate master
-        fAudioDriver = master;
-        fDriverInfo = info;
-        fAudioDriver->Attach();
-        fAudioDriver->SetMaster(true);
-        return fAudioDriver->Start();
     }
+
+    // Get slaves list
+    std::list<JackDriverInterface*> slave_list = fAudioDriver->GetSlaves();
+    std::list<JackDriverInterface*>::const_iterator it;
+
+    // Move slaves in new master
+    for (it = slave_list.begin(); it != slave_list.end(); it++) {
+        JackDriverInterface* slave = *it;
+        master->AddSlave(slave);
+    }
+
+    // Delete old master
+    delete fDriverInfo;
+
+    // Activate master
+    fAudioDriver = master;
+    fDriverInfo = info;
+    fAudioDriver->Attach();
+    fAudioDriver->SetMaster(true);
+    return fAudioDriver->Start();
 }
 
 //----------------------

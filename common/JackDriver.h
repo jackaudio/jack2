@@ -198,7 +198,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Write();
 
         virtual int Start();
+        virtual int StartSlaves();
         virtual int Stop();
+        virtual int StopSlaves();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);

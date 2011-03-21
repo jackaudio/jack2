@@ -841,13 +841,23 @@ int JackFreebobDriver::Close()
 
 int JackFreebobDriver::Start()
 {
-    JackAudioDriver::Start();
-    return freebob_driver_start((freebob_driver_t *)fDriver);
+    int res = JackAudioDriver::Start();
+    if (res >= 0) {
+        res = freebob_driver_start((freebob_driver_t *)fDriver);
+        if (res < 0) {
+            JackAudioDriver::Stop();
+        }
+    }
+    return res;
 }
 
 int JackFreebobDriver::Stop()
 {
-    return freebob_driver_stop((freebob_driver_t *)fDriver);
+    int res = freebob_driver_stop((freebob_driver_t *)fDriver);
+    if (JackAudioDriver::Stop() < 0) {
+        res = -1;
+    }
+    return res;
 }
 
 int JackFreebobDriver::Read()

@@ -133,7 +133,7 @@ jackctl_server_destroy(
 	jackctl_server_t * server);
 
 /** 
- * Call this function to start JACK server
+ * Call this function to open JACK server
  * 
  * @param server server object handle
  * @param driver driver to use
@@ -141,9 +141,20 @@ jackctl_server_destroy(
  * @return success status: true - success, false - fail
  */
 bool
-jackctl_server_start(
+jackctl_server_open(
     jackctl_server_t * server,
     jackctl_driver_t * driver);
+
+/** 
+ * Call this function to start JACK server
+ * 
+ * @param server server object handle
+ * 
+ * @return success status: true - success, false - fail
+ */
+bool
+jackctl_server_start(
+    jackctl_server_t * server);
 
 /** 
  * Call this function to stop JACK server
@@ -154,6 +165,17 @@ jackctl_server_start(
  */
 bool
 jackctl_server_stop(
+	jackctl_server_t * server);
+
+/** 
+ * Call this function to close JACK server
+ * 
+ * @param server server object handle
+ * 
+ * @return success status: true - success, false - fail
+ */
+bool
+jackctl_server_close(
 	jackctl_server_t * server);
 
 /** 

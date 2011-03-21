@@ -191,16 +191,25 @@ error:
     int JackPortAudioDriver::Start()
     {
         jack_log("JackPortAudioDriver::Start");
-        JackAudioDriver::Start();
-        PaError err = Pa_StartStream(fStream);
-        return (err == paNoError) ? 0 : -1;
+        if (JackAudioDriver::Start() >= 0) {
+            PaError err = Pa_StartStream(fStream);
+            if (err == paNoError) {
+                return 0;
+            }
+            JackAudioDriver::Stop();
+        }
+        return -1;
     }
 
     int JackPortAudioDriver::Stop()
     {
         jack_log("JackPortAudioDriver::Stop");
         PaError err = Pa_StopStream(fStream);
-        return (err == paNoError) ? 0 : -1;
+        int res = (err == paNoError) ? 0 : -1;
+        if (JackAudioDriver::Stop() < 0) {
+            res = -1;
+        }
+        return res;
     }
 
     int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)

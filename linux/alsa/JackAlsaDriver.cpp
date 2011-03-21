@@ -340,13 +340,23 @@ int JackAlsaDriver::Close()
 
 int JackAlsaDriver::Start()
 {
-    JackAudioDriver::Start();
-    return alsa_driver_start((alsa_driver_t *)fDriver);
+    int res = JackAudioDriver::Start();
+    if (res >= 0) {
+        res = alsa_driver_start((alsa_driver_t *)fDriver);
+        if (res < 0) {
+            JackAudioDriver::Stop();
+        }
+    }
+    return res;
 }
 
 int JackAlsaDriver::Stop()
 {
-    return alsa_driver_stop((alsa_driver_t *)fDriver);
+    int res = alsa_driver_stop((alsa_driver_t *)fDriver);
+    if (JackAudioDriver::Stop() < 0) {
+        res = -1;
+    }
+    return res;
 }
 
 int JackAlsaDriver::Read()
