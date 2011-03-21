@@ -49,7 +49,16 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
     fGraphManager = JackGraphManager::Allocate(port_max);
     fEngineControl = new JackEngineControl(sync, temporary, timeout, rt, priority, verbose, clock, server_name);
     fEngine = new JackLockedEngine(fGraphManager, GetSynchroTable(), fEngineControl);
-    fFreewheelDriver = new JackThreadedDriver(new JackFreewheelDriver(fEngine, GetSynchroTable()));
+
+    // A distinction is made between the threaded freewheel driver and the
+    // regular freewheel driver because the freewheel driver needs to run in
+    // threaded mode when freewheel mode is active and needs to run as a slave
+    // when freewheel mode isn't active.
+    JackFreewheelDriver *freewheelDriver =
+        new JackFreewheelDriver(fEngine, GetSynchroTable());
+    fThreadedFreewheelDriver = new JackThreadedDriver(freewheelDriver);
+    fFreewheelDriver = freewheelDriver;
+
     fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
     fFreewheel = false;
@@ -62,7 +71,7 @@ JackServer::~JackServer()
 {
     JackGraphManager::Destroy(fGraphManager);
     delete fDriverInfo;
-    delete fFreewheelDriver;
+    delete fThreadedFreewheelDriver;
     delete fEngine;
     delete fEngineControl;
 }
@@ -87,17 +96,25 @@ int JackServer::Open(jack_driver_desc_t* driver_desc, JSList* driver_params)
         goto fail_close3;
     }
 
+    if (fFreewheelDriver->Open() < 0) {
+        jack_error("Cannot open freewheel driver");
+        goto fail_close4;
+    }
+
     if (fAudioDriver->Attach() < 0) {
         jack_error("Cannot attach audio driver");
-        goto fail_close4;
+        goto fail_close5;
     }
 
     fFreewheelDriver->SetMaster(false);
     fAudioDriver->SetMaster(true);
-    //fAudioDriver->AddSlave(fFreewheelDriver);
+    fAudioDriver->AddSlave(fFreewheelDriver);
     InitTime();
     SetClockSource(fEngineControl->fClockSource);
     return 0;
+
+fail_close5:
+    fFreewheelDriver->Close();
 
 fail_close4:
     fEngine->Close();
@@ -120,9 +137,7 @@ int JackServer::Close()
     fChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
-    if (fFreewheel) {
-        fFreewheelDriver->Close();
-    }
+    fFreewheelDriver->Close();
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
@@ -231,11 +246,11 @@ int JackServer::SetFreewheel(bool onoff)
             return -1;
         } else {
             fFreewheel = false;
-            fFreewheelDriver->Stop();
-            fFreewheelDriver->Close();
+            fThreadedFreewheelDriver->Stop();
             fGraphManager->Restore(&fConnectionState);   // Restore previous connection state
             fEngine->NotifyFreewheel(onoff);
             fFreewheelDriver->SetMaster(false);
+            fAudioDriver->SetMaster(true);
             return fAudioDriver->Start();
         }
     } else {
@@ -245,12 +260,9 @@ int JackServer::SetFreewheel(bool onoff)
             fGraphManager->Save(&fConnectionState);     // Save connection state
             fGraphManager->DisconnectAllPorts(fAudioDriver->GetClientControl()->fRefNum);
             fEngine->NotifyFreewheel(onoff);
-            if (fFreewheelDriver->Open() < 0) {
-                jack_error("Cannot open freewheel driver");
-                return -1;
-            }
+            fAudioDriver->SetMaster(false);
             fFreewheelDriver->SetMaster(true);
-            return fFreewheelDriver->Start();
+            return fThreadedFreewheelDriver->Start();
         } else {
             return -1;
         }

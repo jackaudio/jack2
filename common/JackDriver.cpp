@@ -324,7 +324,9 @@ int JackDriver::Write()
 
 int JackDriver::Start()
 {
-    fEngineControl->InitFrameTime();
+    if (fIsMaster) {
+        fEngineControl->InitFrameTime();
+    }
     return 0;
 }
 
