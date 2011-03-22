@@ -84,6 +84,13 @@ namespace Jack {
         EnqueueEvent(jack_nframes_t time, size_t size,
                      jack_midi_data_t *buffer);
 
+        /**
+         * Returns the maximum size event that can be enqueued right *now*.
+         */
+
+        size_t
+        GetAvailableSpace();
+
     };
 
 }

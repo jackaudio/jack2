@@ -94,3 +94,10 @@ JackMidiAsyncQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     jack_ringbuffer_write(info_ring, (const char *) (&size), sizeof(size_t));
     return OK;
 }
+
+size_t
+JackMidiAsyncQueue::GetAvailableSpace()
+{
+    return jack_ringbuffer_write_space(info_ring) < INFO_SIZE ? 0 :
+        max_bytes - jack_ringbuffer_read_space(byte_ring);
+}
