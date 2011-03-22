@@ -477,10 +477,6 @@ main(int argc, char **argv)
         error_source = "jack_connect";
         goto deactivate_client;
     }
-    jack_port_get_latency_range(remote_in_port, JackCaptureLatency,
-                                &in_latency_range);
-    jack_port_get_latency_range(remote_out_port, JackPlaybackLatency,
-                                &out_latency_range);
     code = pthread_mutex_unlock(&start_mutex);
     if (code) {
         error_message = strerror(code);

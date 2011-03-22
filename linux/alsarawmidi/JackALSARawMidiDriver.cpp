@@ -1,0 +1,586 @@
+#include <memory>
+#include <new>
+#include <stdexcept>
+
+#include <alsa/asoundlib.h>
+
+#include "JackALSARawMidiDriver.h"
+#include "JackEngineControl.h"
+#include "JackError.h"
+#include "JackMidiUtil.h"
+
+using Jack::JackALSARawMidiDriver;
+
+JackALSARawMidiDriver::JackALSARawMidiDriver(const char *name,
+                                             const char *alias,
+                                             JackLockedEngine *engine,
+                                             JackSynchro *table):
+    JackMidiDriver(name, alias, engine, table)
+{
+    thread = new JackThread(this);
+    fCaptureChannels = 0;
+    fds[0] = -1;
+    fds[1] = -1;
+    fPlaybackChannels = 0;
+    input_ports = 0;
+    output_ports = 0;
+    poll_fds = 0;
+}
+
+JackALSARawMidiDriver::~JackALSARawMidiDriver()
+{
+    Stop();
+    delete thread;
+    Close();
+}
+
+int
+JackALSARawMidiDriver::Attach()
+{
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    jack_port_id_t index;
+    const char *name;
+    JackPort *port;
+    for (int i = 0; i < fCaptureChannels; i++) {
+        JackALSARawMidiInputPort *input_port = input_ports[i];
+        name = input_port->GetName();
+        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
+                                            JACK_DEFAULT_MIDI_TYPE,
+                                            CaptureDriverFlags, buffer_size);
+        if (index == NO_PORT) {
+            jack_error("JackALSARawMidiDriver::Attach - cannot register input "
+                       "port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
+            return -1;
+        }
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(input_port->GetAlias());
+        port->SetLatency(buffer_size);
+        fCapturePortList[i] = index;
+    }
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        JackALSARawMidiOutputPort *output_port = output_ports[i];
+        name = output_port->GetName();
+        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
+                                            JACK_DEFAULT_MIDI_TYPE,
+                                            PlaybackDriverFlags, buffer_size);
+        if (index == NO_PORT) {
+            jack_error("JackALSARawMidiDriver::Attach - cannot register "
+                       "output port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
+            return -1;
+        }
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(output_port->GetAlias());
+        port->SetLatency(buffer_size);
+        fPlaybackPortList[i] = index;
+    }
+    return 0;
+}
+
+int
+JackALSARawMidiDriver::Close()
+{
+    if (input_ports) {
+        for (int i = 0; i < fCaptureChannels; i++) {
+            delete input_ports[i];
+        }
+        delete[] input_ports;
+        input_ports = 0;
+    }
+    if (output_ports) {
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            delete output_ports[i];
+        }
+        delete[] output_ports;
+        output_ports = 0;
+    }
+    return 0;
+}
+
+bool
+JackALSARawMidiDriver::Execute()
+{
+    jack_nframes_t timeout_frame = 0;
+    for (;;) {
+        jack_time_t wait_time;
+        unsigned short revents;
+        if (! timeout_frame) {
+            wait_time = 0;
+        } else {
+            jack_time_t next_time = GetTimeFromFrames(timeout_frame);
+            jack_time_t now = GetMicroSeconds();
+
+            if (next_time <= now) {
+                goto handle_ports;
+            }
+            wait_time = next_time - now;
+        }
+
+        jack_info("Calling 'Poll' with wait time '%d'.", wait_time);
+
+        if (Poll(wait_time) == -1) {
+            if (errno == EINTR) {
+                continue;
+            }
+            jack_error("JackALSARawMidiDriver::Execute - poll error: %s",
+                       strerror(errno));
+            break;
+        }
+        revents = poll_fds[0].revents;
+        if (revents & POLLHUP) {
+            close(fds[0]);
+            fds[0] = -1;
+            break;
+        }
+        if (revents & (~(POLLHUP | POLLIN))) {
+            jack_error("JackALSARawMidiDriver::Execute - unexpected poll "
+                       "event on pipe file descriptor.");
+            break;
+        }
+    handle_ports:
+        jack_nframes_t process_frame;
+        jack_nframes_t timeout_frame = 0;
+        for (int i = 0; i < fCaptureChannels; i++) {
+            process_frame = input_ports[i]->ProcessALSA();
+            if (process_frame && ((! timeout_frame) ||
+                                  (process_frame < timeout_frame))) {
+                timeout_frame = process_frame;
+            }
+        }
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            process_frame = output_ports[i]->ProcessALSA(fds[0]);
+            if (process_frame && ((! timeout_frame) ||
+                                  (process_frame < timeout_frame))) {
+                timeout_frame = process_frame;
+            }
+        }
+    }
+
+    jack_info("ALSA thread is exiting.");
+
+    return false;
+}
+
+void
+JackALSARawMidiDriver::
+GetDeviceInfo(snd_ctl_t *control, snd_rawmidi_info_t *info,
+              std::vector<snd_rawmidi_info_t *> *info_list)
+{
+    snd_rawmidi_info_set_subdevice(info, 0);
+    int code = snd_ctl_rawmidi_info(control, info);
+    if (code) {
+        if (code != -ENOENT) {
+            HandleALSAError("GetDeviceInfo", "snd_ctl_rawmidi_info", code);
+        }
+        return;
+    }
+    unsigned int count = snd_rawmidi_info_get_subdevices_count(info);
+    for (unsigned int i = 0; i < count; i++) {
+        snd_rawmidi_info_set_subdevice(info, i);
+        int code = snd_ctl_rawmidi_info(control, info);
+        if (code) {
+            HandleALSAError("GetDeviceInfo", "snd_ctl_rawmidi_info", code);
+            continue;
+        }
+        snd_rawmidi_info_t *info_copy;
+        code = snd_rawmidi_info_malloc(&info_copy);
+        if (code) {
+            HandleALSAError("GetDeviceInfo", "snd_rawmidi_info_malloc", code);
+            continue;
+        }
+        snd_rawmidi_info_copy(info_copy, info);
+        try {
+            info_list->push_back(info_copy);
+        } catch (std::bad_alloc &e) {
+            snd_rawmidi_info_free(info_copy);
+            jack_error("JackALSARawMidiDriver::GetDeviceInfo - "
+                       "std::vector::push_back: %s", e.what());
+        }
+    }
+}
+
+void
+JackALSARawMidiDriver::HandleALSAError(const char *driver_func,
+                                       const char *alsa_func, int code)
+{
+    jack_error("JackALSARawMidiDriver::%s - %s: %s", driver_func, alsa_func,
+               snd_strerror(code));
+}
+
+bool
+JackALSARawMidiDriver::Init()
+{
+    set_threaded_log_function();
+    if (thread->AcquireSelfRealTime(fEngineControl->fServerPriority + 1)) {
+        jack_error("JackALSARawMidiDriver::Init - could not acquire realtime "
+                   "scheduling.  Continuing anyway.");
+    }
+    return true;
+}
+
+int
+JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
+                            int out_channels, bool monitor,
+                            const char *capture_driver_name,
+                            const char *playback_driver_name,
+                            jack_nframes_t capture_latency,
+                            jack_nframes_t playback_latency)
+{
+    snd_rawmidi_info_t *info;
+    int code = snd_rawmidi_info_malloc(&info);
+    if (code) {
+        HandleALSAError("Open", "snd_rawmidi_info_malloc", code);
+        return -1;
+    }
+    std::vector<snd_rawmidi_info_t *> in_info_list;
+    std::vector<snd_rawmidi_info_t *> out_info_list;
+    for (int card = -1;;) {
+        int code = snd_card_next(&card);
+        if (code) {
+            HandleALSAError("Open", "snd_card_next", code);
+            continue;
+        }
+        if (card == -1) {
+            break;
+        }
+        char name[32];
+        snprintf(name, sizeof(name), "hw:%d", card);
+        snd_ctl_t *control;
+        code = snd_ctl_open(&control, name, SND_CTL_NONBLOCK);
+        if (code) {
+            HandleALSAError("Open", "snd_ctl_open", code);
+            continue;
+        }
+        for (int device = -1;;) {
+            code = snd_ctl_rawmidi_next_device(control, &device);
+            if (code) {
+                HandleALSAError("Open", "snd_ctl_rawmidi_next_device", code);
+                continue;
+            }
+            if (device == -1) {
+                break;
+            }
+            snd_rawmidi_info_set_device(info, device);
+            snd_rawmidi_info_set_stream(info, SND_RAWMIDI_STREAM_INPUT);
+            GetDeviceInfo(control, info, &in_info_list);
+            snd_rawmidi_info_set_stream(info, SND_RAWMIDI_STREAM_OUTPUT);
+            GetDeviceInfo(control, info, &out_info_list);
+        }
+        snd_ctl_close(control);
+    }
+    snd_rawmidi_info_free(info);
+    size_t potential_inputs = in_info_list.size();
+    size_t potential_outputs = out_info_list.size();
+    if (! (potential_inputs || potential_outputs)) {
+        jack_error("JackALSARawMidiDriver::Open - no ALSA raw MIDI input or "
+                   "output ports found.");
+        return -1;
+    }
+
+    // XXX: Can't use auto_ptr here.  These are arrays, and require the
+    // delete[] operator.
+    std::auto_ptr<JackALSARawMidiInputPort *> input_ptr;
+    if (potential_inputs) {
+        input_ports = new JackALSARawMidiInputPort *[potential_inputs];
+        input_ptr.reset(input_ports);
+    }
+    std::auto_ptr<JackALSARawMidiOutputPort *> output_ptr;
+    if (potential_outputs) {
+        output_ports = new JackALSARawMidiOutputPort *[potential_outputs];
+        output_ptr.reset(output_ports);
+    }
+
+    size_t num_inputs = 0;
+    size_t num_outputs = 0;
+    for (size_t i = 0; i < potential_inputs; i++) {
+        snd_rawmidi_info_t *info = in_info_list.at(i);
+        try {
+            input_ports[num_inputs] = new JackALSARawMidiInputPort(info, i);
+
+            jack_info("JackALSARawMidiDriver::Open - Input port: card=%d, "
+                      "device=%d, subdevice=%d, id=%s, name=%s, subdevice "
+                      "name=%s",
+                      snd_rawmidi_info_get_card(info),
+                      snd_rawmidi_info_get_device(info),
+                      snd_rawmidi_info_get_subdevice(info),
+                      snd_rawmidi_info_get_id(info),
+                      snd_rawmidi_info_get_name(info),
+                      snd_rawmidi_info_get_subdevice_name(info));
+
+            num_inputs++;
+        } catch (std::exception e) {
+            jack_error("JackALSARawMidiDriver::Open - while creating new "
+                       "JackALSARawMidiInputPort: %s", e.what());
+        }
+        snd_rawmidi_info_free(info);
+    }
+    for (size_t i = 0; i < potential_outputs; i++) {
+        snd_rawmidi_info_t *info = out_info_list.at(i);
+        try {
+            output_ports[num_outputs] = new JackALSARawMidiOutputPort(info, i);
+
+            jack_info("JackALSARawMidiDriver::Open - Output port: card=%d, "
+                      "device=%d, subdevice=%d, id=%s, name=%s, subdevice "
+                      "name=%s",
+                      snd_rawmidi_info_get_card(info),
+                      snd_rawmidi_info_get_device(info),
+                      snd_rawmidi_info_get_subdevice(info),
+                      snd_rawmidi_info_get_id(info),
+                      snd_rawmidi_info_get_name(info),
+                      snd_rawmidi_info_get_subdevice_name(info));
+
+            num_outputs++;
+        } catch (std::exception e) {
+            jack_error("JackALSARawMidiDriver::Open - while creating new "
+                       "JackALSARawMidiOutputPort: %s", e.what());
+        }
+        snd_rawmidi_info_free(info);
+    }
+    if (num_inputs || num_outputs) {
+        if (! JackMidiDriver::Open(capturing, playing, num_inputs, num_outputs,
+                                   monitor, capture_driver_name,
+                                   playback_driver_name, capture_latency,
+                                   playback_latency)) {
+            if (potential_inputs) {
+                input_ptr.release();
+            }
+            if (potential_outputs) {
+                output_ptr.release();
+            }
+            return 0;
+        }
+        jack_error("JackALSARawMidiDriver::Open - JackMidiDriver::Open error");
+    } else {
+        jack_error("JackALSARawMidiDriver::Open - none of the potential "
+                   "inputs or outputs were successfully opened.");
+    }
+    Close();
+    return -1;
+}
+
+#ifdef HAVE_PPOLL
+
+int
+JackALSARawMidiDriver::Poll(jack_time_t wait_time)
+{
+    struct timespec timeout;
+    struct timespec *timeout_ptr;
+    if (! wait_time) {
+        timeout_ptr = 0;
+    } else {
+        timeout.tv_sec = wait_time / 1000000;
+        timeout.tv_nsec = (wait_time % 1000000) * 1000;
+        timeout_ptr = &timeout;
+    }
+    return ppoll(poll_fds, poll_fd_count, timeout_ptr, 0);
+}
+
+#else
+
+int
+JackALSARawMidiDriver::Poll(jack_time_t wait_time)
+{
+    int result = poll(poll_fds, poll_fd_count,
+                      ! wait_time ? -1 : (int) (wait_time / 1000));
+    if ((! result) && wait_time) {
+        wait_time %= 1000;
+        if (wait_time) {
+            // Cheap hack.
+            usleep(wait_time);
+            result = poll(poll_fds, poll_fd_count, 0);
+        }
+    }
+    return result;
+}
+
+#endif
+
+int
+JackALSARawMidiDriver::Read()
+{
+    for (int i = 0; i < fCaptureChannels; i++) {
+        input_ports[i]->ProcessJack(GetInputBuffer(i),
+                                    fEngineControl->fBufferSize);
+    }
+    return 0;
+}
+
+int
+JackALSARawMidiDriver::Start()
+{
+
+    jack_info("JackALSARawMidiDriver::Start - Starting 'alsarawmidi' driver.");
+
+    // JackMidiDriver::Start();
+
+    poll_fd_count = 1;
+    for (int i = 0; i < fCaptureChannels; i++) {
+        poll_fd_count += input_ports[i]->GetPollDescriptorCount();
+    }
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        poll_fd_count += output_ports[i]->GetPollDescriptorCount();
+    }
+    try {
+        poll_fds = new pollfd[poll_fd_count];
+    } catch (std::bad_alloc e) {
+        jack_error("JackALSARawMidiDriver::Start - creating poll descriptor "
+                   "structures failed: %s", e.what());
+        return -1;
+    }
+    int flags;
+    struct pollfd *poll_fd_iter;
+    if (pipe(fds) == -1) {
+        jack_error("JackALSARawMidiDriver::Start - while creating wake pipe: "
+                   "%s", strerror(errno));
+        goto free_poll_descriptors;
+    }
+    flags = fcntl(fds[0], F_GETFL);
+    if (flags == -1) {
+        jack_error("JackALSARawMidiDriver::Start = while getting flags for "
+                   "read file descriptor: %s", strerror(errno));
+        goto close_fds;
+    }
+    if (fcntl(fds[0], F_SETFL, flags | O_NONBLOCK) == -1) {
+        jack_error("JackALSARawMidiDriver::Start - while setting non-blocking "
+                   "mode for read file descriptor: %s", strerror(errno));
+        goto close_fds;
+    }
+    flags = fcntl(fds[1], F_GETFL);
+    if (flags == -1) {
+        jack_error("JackALSARawMidiDriver::Start = while getting flags for "
+                   "write file descriptor: %s", strerror(errno));
+        goto close_fds;
+    }
+    if (fcntl(fds[1], F_SETFL, flags | O_NONBLOCK) == -1) {
+        jack_error("JackALSARawMidiDriver::Start - while setting non-blocking "
+                   "mode for write file descriptor: %s", strerror(errno));
+        goto close_fds;
+    }
+    poll_fds[0].events = POLLERR | POLLIN | POLLNVAL;
+    poll_fds[0].fd = fds[0];
+    poll_fd_iter = poll_fds + 1;
+    for (int i = 0; i < fCaptureChannels; i++) {
+        JackALSARawMidiInputPort *input_port = input_ports[i];
+        input_port->PopulatePollDescriptors(poll_fd_iter);
+        poll_fd_iter += input_port->GetPollDescriptorCount();
+    }
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        JackALSARawMidiOutputPort *output_port = output_ports[i];
+        output_port->PopulatePollDescriptors(poll_fd_iter);
+        poll_fd_iter += output_port->GetPollDescriptorCount();
+    }
+
+    jack_info("Starting ALSA thread ...");
+
+    if (! thread->StartSync()) {
+
+        jack_info("Started ALSA thread.");
+
+        return 0;
+    }
+    jack_error("JackALSARawMidiDriver::Start - failed to start MIDI "
+               "processing thread.");
+ close_fds:
+    close(fds[1]);
+    fds[1] = -1;
+    close(fds[0]);
+    fds[0] = -1;
+ free_poll_descriptors:
+    delete[] poll_fds;
+    poll_fds = 0;
+    return -1;
+}
+
+int
+JackALSARawMidiDriver::Stop()
+{
+
+    jack_info("Stopping 'alsarawmidi' driver.");
+
+    if (fds[1] != -1) {
+        close(fds[1]);
+        fds[1] = -1;
+    }
+    int result;
+    const char *verb;
+    switch (thread->GetStatus()) {
+    case JackThread::kIniting:
+    case JackThread::kStarting:
+        result = thread->Kill();
+        verb = "kill";
+        break;
+    case JackThread::kRunning:
+        result = thread->Stop();
+        verb = "stop";
+        break;
+    default:
+        result = 0;
+        verb = 0;
+    }
+    if (fds[0] != -1) {
+        close(fds[0]);
+        fds[0] = -1;
+    }
+    if (poll_fds) {
+        delete[] poll_fds;
+        poll_fds = 0;
+    }
+    if (result) {
+        jack_error("JackALSARawMidiDriver::Stop - could not %s MIDI "
+                   "processing thread.", verb);
+    }
+    return result;
+}
+
+int
+JackALSARawMidiDriver::Write()
+{
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    int write_fd = fds[1];
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size,
+                                     write_fd);
+    }
+    return 0;
+}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    SERVER_EXPORT jack_driver_desc_t *
+    driver_get_descriptor()
+    {
+        jack_driver_desc_t *desc =
+            (jack_driver_desc_t *) malloc(sizeof(jack_driver_desc_t));
+        if (desc) {
+            strcpy(desc->desc, "Alternative ALSA raw MIDI backend.");
+            strcpy(desc->name, "alsarawmidi");
+
+            // X: There could be parameters here regarding setting I/O buffer
+            // sizes.  I don't think MIDI drivers can accept parameters right
+            // now without being set as the main driver.
+            desc->nparams = 0;
+            desc->params = 0;
+        }
+        return desc;
+    }
+
+    SERVER_EXPORT Jack::JackDriverClientInterface *
+    driver_initialize(Jack::JackLockedEngine *engine, Jack::JackSynchro *table,
+                      const JSList *params)
+    {
+        Jack::JackDriverClientInterface *driver =
+            new Jack::JackALSARawMidiDriver("system", "alsarawmidi", engine,
+                                            table);
+        if (driver->Open(1, 1, 0, 0, false, "midi in", "midi out", 0, 0)) {
+            delete driver;
+            driver = 0;
+        }
+        return driver;
+    }
+
+#ifdef __cplusplus
+}
+#endif

@@ -161,7 +161,7 @@ namespace Jack {
          */
 
         jack_nframes_t
-        Process(jack_nframes_t boundary_frame);
+        Process(jack_nframes_t boundary_frame=0);
 
     };
 
