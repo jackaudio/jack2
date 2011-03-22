@@ -47,6 +47,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     fBeginDateUst = 0;
     fDelayedUsecs = 0.f;
     fIsMaster = true;
+    fIsRunning = false;
  }
 
 JackDriver::JackDriver()
@@ -56,6 +57,7 @@ JackDriver::JackDriver()
     fGraphManager = NULL;
     fBeginDateUst = 0;
     fIsMaster = true;
+    fIsRunning = false;
 }
 
 JackDriver::~JackDriver()
@@ -288,6 +290,7 @@ int JackDriver::ProcessSlaves()
         JackDriverInterface* slave = *it;
         if (slave->Process() < 0)
             res = -1;
+
     }
     return res;
 }
@@ -327,6 +330,7 @@ int JackDriver::Start()
     if (fIsMaster) {
         fEngineControl->InitFrameTime();
     }
+    fIsRunning = true;
     return 0;
 }
 
@@ -350,6 +354,7 @@ int JackDriver::StartSlaves()
 
 int JackDriver::Stop()
 {
+    fIsRunning = false;
     return 0;
 }
 

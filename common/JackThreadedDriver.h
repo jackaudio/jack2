@@ -38,14 +38,14 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
 
         JackThread fThread;
         JackDriver* fDriver;
-        
+
     public:
 
         JackThreadedDriver(JackDriver* driver);
         virtual ~JackThreadedDriver();
 
         virtual int Open();
-        
+
         virtual int Open (bool capturing,
                      bool playing,
                      int inchannels,
@@ -54,7 +54,7 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
                      const char* capture_driver_name,
                      const char* playback_driver_name,
                      jack_nframes_t capture_latency,
-                     jack_nframes_t playback_latency) 
+                     jack_nframes_t playback_latency)
         {
             return -1;
         }
@@ -70,34 +70,35 @@ class SERVER_EXPORT JackThreadedDriver : public JackDriverClientInterface, publi
                          jack_nframes_t capture_latency,
                          jack_nframes_t playback_latency);
         virtual int Close();
-  
+
         virtual int Process();
         virtual int ProcessNull();
-    
+
         virtual int Attach();
         virtual int Detach();
-     
+
         virtual int Read();
         virtual int Write();
-    
+
         virtual int Start();
         virtual int Stop();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);
         virtual int SetSampleRate(jack_nframes_t sample_rate);
-     
+
         virtual void SetMaster(bool onoff);
         virtual bool GetMaster();
         virtual void AddSlave(JackDriverInterface* slave);
         virtual void RemoveSlave(JackDriverInterface* slave);
         virtual std::list<JackDriverInterface*> GetSlaves();
         virtual int ProcessSlaves();
-        
+
         virtual int ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2);
         virtual JackClientControl* GetClientControl() const;
         virtual bool IsRealTime() const;
-   
+        virtual bool IsRunning() const;
+
         // JackRunnableInterface interface
         virtual bool Execute();
         virtual bool Init();

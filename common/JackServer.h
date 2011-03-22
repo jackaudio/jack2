@@ -71,6 +71,7 @@ class SERVER_EXPORT JackServer
 
         int Start();
         int Stop();
+        bool IsRunning();
 
         // RT thread
         void Notify(int refnum, int notify, int value);

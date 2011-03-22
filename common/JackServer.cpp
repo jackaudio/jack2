@@ -57,8 +57,8 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
     JackFreewheelDriver *freewheelDriver =
         new JackFreewheelDriver(fEngine, GetSynchroTable());
     fThreadedFreewheelDriver = new JackThreadedDriver(freewheelDriver);
-    fFreewheelDriver = freewheelDriver;
 
+   fFreewheelDriver = freewheelDriver;
     fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
     fFreewheel = false;
@@ -188,7 +188,18 @@ int JackServer::Start()
 int JackServer::Stop()
 {
     jack_log("JackServer::Stop");
-    return fAudioDriver->Stop();
+    if (fFreewheel) {
+        return fThreadedFreewheelDriver->Stop();
+    } else {
+        return fAudioDriver->Stop();
+    }
+}
+
+bool JackServer::IsRunning()
+{
+    jack_log("JackServer::IsRunning");
+    assert(fAudioDriver);
+    return fAudioDriver->IsRunning();
 }
 
 int JackServer::SetBufferSize(jack_nframes_t buffer_size)
@@ -281,7 +292,6 @@ void JackServer::Notify(int refnum, int notify, int value)
         case kXRunCallback:
             fEngine->NotifyXRun(refnum);
             break;
-
     }
 }
 

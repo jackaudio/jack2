@@ -1210,8 +1210,13 @@ EXPORT bool jackctl_server_unload_internal(
 EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr->engine != NULL) {
-        driver_ptr->info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
-        return (driver_ptr->info != 0);
+        if (server_ptr->engine->IsRunning()) {
+            jack_error("cannot add a slave in a running server");
+            return false;
+        } else {
+            driver_ptr->info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
+            return (driver_ptr->info != 0);
+        }
     } else {
         return false;
     }
@@ -1220,9 +1225,14 @@ EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver
 EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr->engine != NULL) {
-        server_ptr->engine->RemoveSlave(driver_ptr->info);
-        delete driver_ptr->info;
-        return true;
+        if (server_ptr->engine->IsRunning()) {
+            jack_error("cannot remove a slave from a running server");
+            return false;
+        } else {
+            server_ptr->engine->RemoveSlave(driver_ptr->info);
+            delete driver_ptr->info;
+            return true;
+        }
     } else {
         return false;
     }
