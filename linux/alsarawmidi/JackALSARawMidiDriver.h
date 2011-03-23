@@ -34,7 +34,7 @@ namespace Jack {
                         int code);
 
         int
-        Poll(jack_time_t wait_time);
+        Poll(const jack_time_t *wait_time);
 
     public:
 

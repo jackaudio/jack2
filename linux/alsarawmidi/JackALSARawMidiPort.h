@@ -30,7 +30,9 @@ namespace Jack {
     public:
 
         JackALSARawMidiPort(snd_rawmidi_info_t *info, size_t index);
-        virtual ~JackALSARawMidiPort();
+
+        virtual
+        ~JackALSARawMidiPort();
 
         const char *
         GetAlias();

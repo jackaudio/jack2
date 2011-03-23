@@ -49,7 +49,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     if (code) {
         error_message = snd_strerror(code);
         func = "snd_rawmidi_params_current";
-        goto close;
+        goto free_params;
     }
     code = snd_rawmidi_params_set_avail_min(rawmidi, params, 1);
     if (code) {
@@ -129,22 +129,22 @@ JackALSARawMidiPort::PopulatePollDescriptors(struct pollfd *poll_fd)
 int
 JackALSARawMidiPort::ProcessPollEvents()
 {
-    unsigned short revents;
+    unsigned short revents = 0;
     int code = snd_rawmidi_poll_descriptors_revents(rawmidi, poll_fds, num_fds,
                                                     &revents);
     if (code) {
-        jack_error("JackALSARawMidiInputPort::ProcessPollEvents - "
+        jack_error("JackALSARawMidiPort::ProcessPollEvents - "
                    "snd_rawmidi_poll_descriptors_revents: %s",
                    snd_strerror(code));
         return 0;
     }
     if (revents & POLLNVAL) {
-        jack_error("JackALSARawMidiInputPort::ProcessPollEvents - the file "
+        jack_error("JackALSARawMidiPort::ProcessPollEvents - the file "
                    "descriptor is invalid.");
     }
     if (revents & POLLERR) {
-        jack_error("JackALSARawMidiInputPort::ProcessPollEvents - an error "
-                   "has occurred on the device or stream.");
+        jack_error("JackALSARawMidiPort::ProcessPollEvents - an error has "
+                   "occurred on the device or stream.");
     }
     return revents;
 }

@@ -49,9 +49,17 @@ void
 JackMidiBufferWriteQueue::ResetMidiBuffer(JackMidiBuffer *buffer,
                                           jack_nframes_t frames)
 {
-    this->buffer = buffer;
-    buffer->Reset(frames);
-    last_frame_time = GetLastFrame();
-    max_bytes = buffer->MaxEventSize();
-    next_frame_time = last_frame_time + frames;
+    if (! buffer) {
+        jack_error("JackMidiBufferWriteQueue::ResetMidiBuffer - buffer reset "
+                   "to NULL");
+    } else if (! buffer->IsValid()) {
+        jack_error("JackMidiBufferWriteQueue::ResetMidiBuffer - buffer reset "
+                   "to invalid buffer");
+    } else {
+        this->buffer = buffer;
+        buffer->Reset(frames);
+        last_frame_time = GetLastFrame();
+        max_bytes = buffer->MaxEventSize();
+        next_frame_time = last_frame_time + frames;
+    }
 }

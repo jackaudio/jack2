@@ -85,7 +85,8 @@ jack_nframes_t lowest_latency;
 jack_time_t lowest_latency_time;
 jack_midi_data_t *message_1;
 jack_midi_data_t *message_2;
-size_t messages_processed;
+size_t messages_received;
+size_t messages_sent;
 size_t message_size;
 jack_latency_range_t out_latency_range;
 jack_port_t *out_port;
@@ -100,6 +101,7 @@ int timeout;
 jack_nframes_t total_latency;
 jack_time_t total_latency_time;
 size_t unexpected_messages;
+size_t xrun_count;
 
 static void
 output_error(const char *source, const char *message);
@@ -156,11 +158,13 @@ handle_process(jack_nframes_t frames, void *arg)
         }
         highest_latency = 0;
         lowest_latency = 0;
-        messages_processed = 0;
+        messages_received = 0;
+        messages_sent = 0;
         process_state = 1;
         total_latency = 0;
         total_latency_time = 0;
         unexpected_messages = 0;
+        xrun_count = 0;
         jack_port_get_latency_range(remote_in_port, JackCaptureLatency,
                                     &in_latency_range);
         jack_port_get_latency_range(remote_out_port, JackPlaybackLatency,
@@ -175,7 +179,7 @@ handle_process(jack_nframes_t frames, void *arg)
         last_frame_time = jack_last_frame_time(client);
         for (i = 0; i < event_count; i++) {
             jack_midi_event_get(&event, port_buffer, i);
-            message = (messages_processed % 2) ? message_2 : message_1;
+            message = (messages_received % 2) ? message_2 : message_1;
             if ((event.size == message_size) &&
                 (! memcmp(message, event.buffer,
                           message_size * sizeof(jack_midi_data_t)))) {
@@ -201,20 +205,20 @@ handle_process(jack_nframes_t frames, void *arg)
             lowest_latency = frame;
             lowest_latency_time = time;
         }
-        latency_time_values[messages_processed] = time;
-        latency_values[messages_processed] = frame;
+        latency_time_values[messages_received] = time;
+        latency_values[messages_received] = frame;
         total_latency += frame;
         total_latency_time += time;
-        messages_processed++;
-        if (messages_processed == samples) {
+        messages_received++;
+        if (messages_received == samples) {
             process_state = 2;
             sem_post(&semaphore);
             break;
         }
     send_message:
         frame = (jack_nframes_t) ((((double) rand()) / RAND_MAX) * frames);
-        if (frame == frames) {
-            frame--;
+        if (frame >= frames) {
+            frame = frames - 1;
         }
         port_buffer = jack_port_get_buffer(out_port, frames);
         jack_midi_clear_buffer(port_buffer);
@@ -223,10 +227,11 @@ handle_process(jack_nframes_t frames, void *arg)
             set_process_error(SOURCE_EVENT_RESERVE, ERROR_RESERVE);
             break;
         }
-        message = (messages_processed % 2) ? message_2 : message_1;
+        message = (messages_sent % 2) ? message_2 : message_1;
         memcpy(buffer, message, message_size * sizeof(jack_midi_data_t));
         last_activity = jack_last_frame_time(client) + frame;
         last_activity_time = jack_frames_to_time(client, last_activity);
+        messages_sent++;
 
     case 2:
         /* State: finished - do nothing */
@@ -243,6 +248,12 @@ static void
 handle_shutdown(void *arg)
 {
     set_process_error("handle_shutdown", "The JACK server has been shutdown");
+}
+
+static void
+handle_xrun(void *arg)
+{
+    xrun_count++;
 }
 
 static void
@@ -551,8 +562,14 @@ main(int argc, char **argv)
             printf("     > 10 ms: %u\n", jitter_plot[100]);
         }
     }
+    printf("\nMessages sent: %d\n"
+           "Messages received: %d\n",
+           messages_sent, messages_received);
     if (unexpected_messages) {
-        printf("\nUnexpected messages received: %d\n", unexpected_messages);
+        printf("Unexpected messages received: %d\n", unexpected_messages);
+    }
+    if (xrun_count) {
+        printf("Xruns: %d (messages may have been lost)", xrun_count);
     }
  deactivate_client:
     jack_deactivate(client);

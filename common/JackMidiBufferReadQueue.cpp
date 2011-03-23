@@ -46,12 +46,22 @@ JackMidiBufferReadQueue::DequeueEvent()
 void
 JackMidiBufferReadQueue::ResetMidiBuffer(JackMidiBuffer *buffer)
 {
+    event_count = 0;
     index = 0;
-    if (buffer) {
+    if (! buffer) {
+        jack_error("JackMidiBufferReadQueue::ResetMidiBuffer - buffer reset "
+                   "to NULL");
+    } else if (! buffer->IsValid()) {
+        jack_error("JackMidiBufferReadQueue::ResetMidiBuffer - buffer reset "
+                   "to invalid buffer");
+    } else {
+        uint32_t lost_events = buffer->lost_events;
+        if (lost_events) {
+            jack_error("JackMidiBufferReadQueue::ResetMidiBuffer - %d events "
+                       "lost during mixdown", lost_events);
+        }
         this->buffer = buffer;
         event_count = buffer->event_count;
         last_frame_time = GetLastFrame();
-    } else {
-        event_count = 0;
     }
 }

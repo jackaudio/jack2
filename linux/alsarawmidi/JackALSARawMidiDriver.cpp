@@ -39,8 +39,12 @@ JackALSARawMidiDriver::Attach()
 {
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     jack_port_id_t index;
+    jack_nframes_t latency = buffer_size;
+    jack_latency_range_t latency_range;
     const char *name;
     JackPort *port;
+    latency_range.max = latency;
+    latency_range.min = latency;
     for (int i = 0; i < fCaptureChannels; i++) {
         JackALSARawMidiInputPort *input_port = input_ports[i];
         name = input_port->GetName();
@@ -55,8 +59,13 @@ JackALSARawMidiDriver::Attach()
         }
         port = fGraphManager->GetPort(index);
         port->SetAlias(input_port->GetAlias());
-        port->SetLatency(buffer_size);
+        port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = index;
+    }
+    if (! fEngineControl->fSyncMode) {
+        latency += buffer_size;
+        latency_range.max = latency;
+        latency_range.min = latency;
     }
     for (int i = 0; i < fPlaybackChannels; i++) {
         JackALSARawMidiOutputPort *output_port = output_ports[i];
@@ -72,7 +81,7 @@ JackALSARawMidiDriver::Attach()
         }
         port = fGraphManager->GetPort(index);
         port->SetAlias(output_port->GetAlias());
-        port->SetLatency(buffer_size);
+        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = index;
     }
     return 0;
@@ -103,23 +112,19 @@ JackALSARawMidiDriver::Execute()
 {
     jack_nframes_t timeout_frame = 0;
     for (;;) {
+        jack_nframes_t process_frame;
         jack_time_t wait_time;
+        jack_time_t *wait_time_ptr;
         unsigned short revents;
         if (! timeout_frame) {
-            wait_time = 0;
+            wait_time_ptr = 0;
         } else {
             jack_time_t next_time = GetTimeFromFrames(timeout_frame);
             jack_time_t now = GetMicroSeconds();
-
-            if (next_time <= now) {
-                goto handle_ports;
-            }
-            wait_time = next_time - now;
+            wait_time = next_time <= now ? 0 : next_time - now;
+            wait_time_ptr = &wait_time;
         }
-
-        jack_info("Calling 'Poll' with wait time '%d'.", wait_time);
-
-        if (Poll(wait_time) == -1) {
+        if (Poll(wait_time_ptr) == -1) {
             if (errno == EINTR) {
                 continue;
             }
@@ -139,8 +144,7 @@ JackALSARawMidiDriver::Execute()
             break;
         }
     handle_ports:
-        jack_nframes_t process_frame;
-        jack_nframes_t timeout_frame = 0;
+        timeout_frame = 0;
         for (int i = 0; i < fCaptureChannels; i++) {
             process_frame = input_ports[i]->ProcessALSA();
             if (process_frame && ((! timeout_frame) ||
@@ -156,9 +160,6 @@ JackALSARawMidiDriver::Execute()
             }
         }
     }
-
-    jack_info("ALSA thread is exiting.");
-
     return false;
 }
 
@@ -362,15 +363,15 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
 #ifdef HAVE_PPOLL
 
 int
-JackALSARawMidiDriver::Poll(jack_time_t wait_time)
+JackALSARawMidiDriver::Poll(const jack_time_t *wait_time)
 {
     struct timespec timeout;
     struct timespec *timeout_ptr;
     if (! wait_time) {
         timeout_ptr = 0;
     } else {
-        timeout.tv_sec = wait_time / 1000000;
-        timeout.tv_nsec = (wait_time % 1000000) * 1000;
+        timeout.tv_sec = (*wait_time) / 1000000;
+        timeout.tv_nsec = ((*wait_time) % 1000000) * 1000;
         timeout_ptr = &timeout;
     }
     return ppoll(poll_fds, poll_fd_count, timeout_ptr, 0);
@@ -379,15 +380,15 @@ JackALSARawMidiDriver::Poll(jack_time_t wait_time)
 #else
 
 int
-JackALSARawMidiDriver::Poll(jack_time_t wait_time)
+JackALSARawMidiDriver::Poll(const jack_time_t *wait_time)
 {
     int result = poll(poll_fds, poll_fd_count,
-                      ! wait_time ? -1 : (int) (wait_time / 1000));
+                      ! wait_time ? -1 : (int) ((*wait_time) / 1000));
     if ((! result) && wait_time) {
-        wait_time %= 1000;
-        if (wait_time) {
+        jack_time_t time_left = (*wait_time) % 1000;
+        if (time_left) {
             // Cheap hack.
-            usleep(wait_time);
+            usleep(time_left);
             result = poll(poll_fds, poll_fd_count, 0);
         }
     }
@@ -399,9 +400,9 @@ JackALSARawMidiDriver::Poll(jack_time_t wait_time)
 int
 JackALSARawMidiDriver::Read()
 {
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     for (int i = 0; i < fCaptureChannels; i++) {
-        input_ports[i]->ProcessJack(GetInputBuffer(i),
-                                    fEngineControl->fBufferSize);
+        input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
     }
     return 0;
 }
@@ -412,8 +413,7 @@ JackALSARawMidiDriver::Start()
 
     jack_info("JackALSARawMidiDriver::Start - Starting 'alsarawmidi' driver.");
 
-    // JackMidiDriver::Start();
-
+    JackMidiDriver::Start();
     poll_fd_count = 1;
     for (int i = 0; i < fCaptureChannels; i++) {
         poll_fd_count += input_ports[i]->GetPollDescriptorCount();
@@ -471,11 +471,11 @@ JackALSARawMidiDriver::Start()
         poll_fd_iter += output_port->GetPollDescriptorCount();
     }
 
-    jack_info("Starting ALSA thread ...");
+    jack_info("JackALSARawMidiDriver::Start - starting ALSA thread ...");
 
     if (! thread->StartSync()) {
 
-        jack_info("Started ALSA thread.");
+        jack_info("JackALSARawMidiDriver::Start - started ALSA thread.");
 
         return 0;
     }
@@ -496,7 +496,7 @@ int
 JackALSARawMidiDriver::Stop()
 {
 
-    jack_info("Stopping 'alsarawmidi' driver.");
+    jack_info("JackALSARawMidiDriver::Stop - stopping 'alsarawmidi' driver.");
 
     if (fds[1] != -1) {
         close(fds[1]);

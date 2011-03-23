@@ -101,6 +101,10 @@ JackALSARawMidiOutputPort::ProcessALSA(int read_fd)
     jack_nframes_t next_frame = raw_queue->Process();
     blocked = send_queue->IsBlocked();
     if (blocked) {
+
+        jack_info("JackALSARawMidiOutputPort::ProcessALSA - MIDI port is "
+                  "blocked");
+
         SetPollEventMask(POLLERR | POLLNVAL | POLLOUT);
         return 0;
     }
@@ -122,9 +126,6 @@ JackALSARawMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
             continue;
         }
         char c = 1;
-
-        jack_info("Attempting to write to file descriptor '%d'", write_fd);
-
         ssize_t result = write(write_fd, &c, 1);
         assert(result <= 1);
         if (! result) {
