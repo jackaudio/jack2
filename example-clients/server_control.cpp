@@ -1,6 +1,6 @@
 /*
  	Copyright (C) 2008 Grame
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -74,23 +74,23 @@ jackctl_get_parameter(
 static void print_value(union jackctl_parameter_value value, jackctl_param_type_t type)
 {
     switch (type) {
-    
+
         case JackParamInt:
             printf("parameter value = %d\n", value.i);
             break;
-            
+
          case JackParamUInt:
             printf("parameter value = %u\n", value.ui);
             break;
-            
+
          case JackParamChar:
             printf("parameter value = %c\n", value.c);
             break;
-        
+
          case JackParamString:
             printf("parameter value = %s\n", value.str);
             break;
-            
+
          case JackParamBool:
             printf("parameter value = %d\n", value.b);
             break;
@@ -115,7 +115,7 @@ static void print_driver(jackctl_driver_t * driver)
     printf("\n--------------------------\n");
     printf("driver = %s\n", jackctl_driver_get_name(driver));
     printf("-------------------------- \n");
-    print_parameters(jackctl_driver_get_parameters(driver)); 
+    print_parameters(jackctl_driver_get_parameters(driver));
 }
 
 static void print_internal(jackctl_internal_t * internal)
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 		{"driver", 1, 0, 'd'},
 		{"client", 1, 0, 'c'},
 	};
-    
+
  	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
 		switch (opt) {
 			case 'd':
@@ -166,10 +166,10 @@ int main(int argc, char *argv[])
                 exit(0);
 		}
 	}
-    
+
 	server = jackctl_server_create(NULL, NULL);
     parameters = jackctl_server_get_parameters(server);
-    
+
     /*
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
@@ -179,28 +179,28 @@ int main(int argc, char *argv[])
         jackctl_parameter_set_value(param, &value);
     }
     */
-    
+
     printf("\n========================== \n");
     printf("List of server parameters \n");
     printf("========================== \n");
-    
+
     print_parameters(parameters);
-    
+
     printf("\n========================== \n");
     printf("List of drivers \n");
     printf("========================== \n");
-    
+
     drivers = jackctl_server_get_drivers_list(server);
     node_ptr = drivers;
     while (node_ptr != NULL) {
         print_driver((jackctl_driver_t *)node_ptr->data);
         node_ptr = jack_slist_next(node_ptr);
     }
-    
+
     printf("\n========================== \n");
     printf("List of internal clients \n");
     printf("========================== \n");
-    
+
     internals = jackctl_server_get_internals_list(server);
     node_ptr = internals;
     while (node_ptr != NULL) {
@@ -208,30 +208,34 @@ int main(int argc, char *argv[])
         node_ptr = jack_slist_next(node_ptr);
     }
 
+    // No error checking in this simple example...
+
     jackctl_server_open(server, jackctl_server_get_driver(server, driver_name));
     jackctl_server_start(server);
+
     jackctl_server_load_internal(server, jackctl_server_get_internal(server, client_name));
-    
+
     /*
     // Switch master test
-    
+
     jackctl_driver_t* master;
-    
+
     usleep(5000000);
     printf("jackctl_server_load_master\n");
     master = jackctl_server_get_driver(server, "coreaudio");
     jackctl_server_switch_master(server, master);
-    
+
     usleep(5000000);
     printf("jackctl_server_load_master\n");
     master = jackctl_server_get_driver(server, "dummy");
     jackctl_server_switch_master(server, master);
-    
+
     */
-      
+
     signals = jackctl_setup_signals(0);
     jackctl_wait_signals(signals);
-     
+    jackctl_server_stop(server);
+    jackctl_server_close(server);
     jackctl_server_destroy(server);
     return 0;
 }
