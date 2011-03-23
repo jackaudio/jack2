@@ -42,12 +42,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackLockedEngine.h"
 #include "JackPosixThread.h"
 #include "JackCompilerDeps.h"
-#include "hammerfall.h"
-#include "hdsp.h"
-#include "ice1712.h"
-#include "usx2y.h"
-#include "generic.h"
-#include "memops.h"
 #include "JackServerGlobals.h"
 
 namespace Jack
@@ -75,15 +69,13 @@ int JackAlsaDriver::Attach()
 {
     JackPort* port;
     int port_index;
-    unsigned long port_flags;
+    unsigned long port_flags = (unsigned long)CaptureDriverFlags;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     jack_latency_range_t range;
 
     assert(fCaptureChannels < DRIVER_PORT_NUM);
     assert(fPlaybackChannels < DRIVER_PORT_NUM);
-
-    port_flags = (unsigned long)CaptureDriverFlags;
 
     alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
 
@@ -94,10 +86,10 @@ int JackAlsaDriver::Attach()
     JackAudioDriver::SetBufferSize(alsa_driver->frames_per_cycle);
     JackAudioDriver::SetSampleRate(alsa_driver->frame_rate);
 
-    jack_log("JackAudioDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    jack_log("JackAlsaDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
     for (int i = 0; i < fCaptureChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:capture_%u", fAliasName, i + 1);
+        snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
         snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
@@ -108,13 +100,13 @@ int JackAlsaDriver::Attach()
         range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
         port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
-        jack_log("JackAudioDriver::Attach fCapturePortList[i] %ld ", port_index);
+        jack_log("JackAlsaDriver::Attach fCapturePortList[i] %ld ", port_index);
     }
 
     port_flags = (unsigned long)PlaybackDriverFlags;
 
     for (int i = 0; i < fPlaybackChannels; i++) {
-        snprintf(alias, sizeof(alias) - 1, "%s:playback_%u", fAliasName, i + 1);
+        snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
         snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
         if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, (JackPortFlags)port_flags, fEngineControl->fBufferSize)) == NO_PORT) {
             jack_error("driver: cannot register port for %s", name);
@@ -128,11 +120,11 @@ int JackAlsaDriver::Attach()
 
         port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
-        jack_log("JackAudioDriver::Attach fPlaybackPortList[i] %ld ", port_index);
+        jack_log("JackAlsaDriver::Attach fPlaybackPortList[i] %ld ", port_index);
 
         // Monitor ports
         if (fWithMonitorPorts) {
-            jack_log("Create monitor port ");
+            jack_log("Create monitor port");
             snprintf(name, sizeof(name) - 1, "%s:monitor_%d", fClientControl.fName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error ("ALSA: cannot register monitor port for %s", name);
@@ -340,13 +332,23 @@ int JackAlsaDriver::Close()
 
 int JackAlsaDriver::Start()
 {
-    JackAudioDriver::Start();
-    return alsa_driver_start((alsa_driver_t *)fDriver);
+    int res = JackAudioDriver::Start();
+    if (res >= 0) {
+        res = alsa_driver_start((alsa_driver_t *)fDriver);
+        if (res < 0) {
+            JackAudioDriver::Stop();
+        }
+    }
+    return res;
 }
 
 int JackAlsaDriver::Stop()
 {
-    return alsa_driver_stop((alsa_driver_t *)fDriver);
+    int res = alsa_driver_stop((alsa_driver_t *)fDriver);
+    if (JackAudioDriver::Stop() < 0) {
+        res = -1;
+    }
+    return res;
 }
 
 int JackAlsaDriver::Read()
@@ -373,7 +375,7 @@ retry:
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackAlsaDriver::Read warning nframes = %ld", nframes);
+        jack_log("JackAlsaDriver::Read warning fBufferSize = %ld nframes = %ld", fEngineControl->fBufferSize, nframes);
 
     // Has to be done before read
     JackDriver::CycleIncTime();
@@ -388,8 +390,7 @@ int JackAlsaDriver::Write()
 
 void JackAlsaDriver::ReadInputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread)
 {
-    int chn;
-    for (chn = 0; chn < fCaptureChannels; chn++) {
+    for (int chn = 0; chn < fCaptureChannels; chn++) {
         if (fGraphManager->GetConnectionsNum(fCapturePortList[chn]) > 0) {
             jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[chn], orig_nframes);
             alsa_driver_read_from_channel((alsa_driver_t *)fDriver, chn, buf + nread, contiguous);
@@ -399,8 +400,7 @@ void JackAlsaDriver::ReadInputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t
 
 void JackAlsaDriver::MonitorInputAux()
 {
-    int chn;
-    for (chn = 0; chn < fCaptureChannels; chn++) {
+    for (int chn = 0; chn < fCaptureChannels; chn++) {
         JackPort* port = fGraphManager->GetPort(fCapturePortList[chn]);
         if (port->MonitoringInput()) {
             ((alsa_driver_t *)fDriver)->input_monitor_mask |= (1 << chn);
@@ -410,8 +410,7 @@ void JackAlsaDriver::MonitorInputAux()
 
 void JackAlsaDriver::ClearOutputAux()
 {
-    int chn;
-    for (chn = 0; chn < fPlaybackChannels; chn++) {
+    for (int chn = 0; chn < fPlaybackChannels; chn++) {
         jack_default_audio_sample_t* buf =
             (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], fEngineControl->fBufferSize);
         memset(buf, 0, sizeof (jack_default_audio_sample_t) * fEngineControl->fBufferSize);
@@ -425,20 +424,17 @@ void JackAlsaDriver::SetTimetAux(jack_time_t time)
 
 void JackAlsaDriver::WriteOutputAux(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten)
 {
-    int chn;
-    jack_default_audio_sample_t* buf;
-
-    for (chn = 0; chn < fPlaybackChannels; chn++) {
-            // Ouput ports
-            if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
-                buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], orig_nframes);
-                alsa_driver_write_to_channel(((alsa_driver_t *)fDriver), chn, buf + nwritten, contiguous);
-                // Monitor ports
-                if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[chn]) > 0) {
-                    jack_default_audio_sample_t* monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[chn], orig_nframes);
-                    memcpy(monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
-                }
+    for (int chn = 0; chn < fPlaybackChannels; chn++) {
+        // Output ports
+        if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chn]) > 0) {
+            jack_default_audio_sample_t* buf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[chn], orig_nframes);
+            alsa_driver_write_to_channel(((alsa_driver_t *)fDriver), chn, buf + nwritten, contiguous);
+            // Monitor ports
+            if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[chn]) > 0) {
+                jack_default_audio_sample_t* monbuf = (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[chn], orig_nframes);
+                memcpy(monbuf + nwritten, buf + nwritten, contiguous * sizeof(jack_default_audio_sample_t));
             }
+        }
     }
 }
 

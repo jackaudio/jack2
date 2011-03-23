@@ -47,6 +47,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     fBeginDateUst = 0;
     fDelayedUsecs = 0.f;
     fIsMaster = true;
+    fIsRunning = false;
  }
 
 JackDriver::JackDriver()
@@ -56,6 +57,7 @@ JackDriver::JackDriver()
     fGraphManager = NULL;
     fBeginDateUst = 0;
     fIsMaster = true;
+    fIsRunning = false;
 }
 
 JackDriver::~JackDriver()
@@ -288,6 +290,7 @@ int JackDriver::ProcessSlaves()
         JackDriverInterface* slave = *it;
         if (slave->Process() < 0)
             res = -1;
+
     }
     return res;
 }
@@ -324,13 +327,47 @@ int JackDriver::Write()
 
 int JackDriver::Start()
 {
-    fEngineControl->InitFrameTime();
+    if (fIsMaster) {
+        fEngineControl->InitFrameTime();
+    }
+    fIsRunning = true;
     return 0;
+}
+
+int JackDriver::StartSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->Start() < 0) {
+            res = -1;
+
+            // XXX: We should attempt to stop all of the slaves that we've
+            // started here.
+
+            break;
+        }
+    }
+    return res;
 }
 
 int JackDriver::Stop()
 {
+    fIsRunning = false;
     return 0;
+}
+
+int JackDriver::StopSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->Stop() < 0)
+            res = -1;
+    }
+    return res;
 }
 
 bool JackDriver::IsFixedBufferSize()

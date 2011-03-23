@@ -101,13 +101,21 @@ jackctl_server_get_drivers_list(
 	jackctl_server_t * server);
 
 EXPORT bool
-jackctl_server_start(
+jackctl_server_open(
     jackctl_server_t * server,
     jackctl_driver_t * driver);
 
 EXPORT bool
+jackctl_server_start(
+    jackctl_server_t * server);
+
+EXPORT bool
 jackctl_server_stop(
-	jackctl_server_t * server);
+    jackctl_server_t * server);
+
+EXPORT bool
+jackctl_server_close(
+    jackctl_server_t * server);
 
 EXPORT const JSList *
 jackctl_server_get_parameters(
