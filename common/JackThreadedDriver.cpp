@@ -152,6 +152,11 @@ bool JackThreadedDriver::IsRealTime() const
     return fDriver->IsRealTime();
 }
 
+bool JackThreadedDriver::IsRunning() const
+{
+    return fDriver->IsRunning();
+}
+
 int JackThreadedDriver::Start()
 {
     jack_log("JackThreadedDriver::Start");
@@ -171,9 +176,9 @@ int JackThreadedDriver::Start()
 int JackThreadedDriver::Stop()
 {
     jack_log("JackThreadedDriver::Stop");
-    
+
     switch (fThread.GetStatus()) {
-            
+
         // Kill the thread in Init phase
         case JackThread::kStarting:
         case JackThread::kIniting:
@@ -182,15 +187,15 @@ int JackThreadedDriver::Stop()
                 return -1;
             }
             break;
-           
+
         // Stop when the thread cycle is finished
         case JackThread::kRunning:
             if (fThread.Stop() < 0) {
-                jack_error("Cannot stop thread"); 
+                jack_error("Cannot stop thread");
                 return -1;
             }
             break;
-            
+
         default:
             break;
     }
@@ -218,7 +223,7 @@ bool JackThreadedDriver::Init()
             if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
                 jack_error("AcquireSelfRealTime error");
             } else {
-                set_threaded_log_function(); 
+                set_threaded_log_function();
             }
         }
         return true;

@@ -653,13 +653,23 @@ int JackFFADODriver::Close()
 
 int JackFFADODriver::Start()
 {
-    JackAudioDriver::Start();
-    return ffado_driver_start((ffado_driver_t *)fDriver);
+    int res = JackAudioDriver::Start();
+    if (res >= 0) {
+        res = ffado_driver_start((ffado_driver_t *)fDriver);
+        if (res < 0) {
+            JackAudioDriver::Stop();
+        }
+    }
+    return res;
 }
 
 int JackFFADODriver::Stop()
 {
-    return ffado_driver_stop((ffado_driver_t *)fDriver);
+    int res = ffado_driver_stop((ffado_driver_t *)fDriver);
+    if (JackAudioDriver::Stop() < 0) {
+        res = -1;
+    }
+    return res;
 }
 
 int JackFFADODriver::Read()

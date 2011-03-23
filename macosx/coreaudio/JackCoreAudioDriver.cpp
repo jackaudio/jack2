@@ -1678,33 +1678,38 @@ int JackCoreAudioDriver::Attach()
 int JackCoreAudioDriver::Start()
 {
     jack_log("JackCoreAudioDriver::Start");
-    JackAudioDriver::Start();
+    if (JackAudioDriver::Start() >= 0) {
+        OSStatus err = AudioOutputUnitStart(fAUHAL);
+        if (err == noErr) {
 
-    OSStatus err = AudioOutputUnitStart(fAUHAL);
-    if (err != noErr)
-        return -1;
+            // Waiting for Measure callback to be called (= driver has started)
+            fState = false;
+            int count = 0;
+            while (!fState && count++ < WAIT_COUNTER) {
+                usleep(100000);
+                jack_log("JackCoreAudioDriver::Start wait count = %d", count);
+            }
 
-    // Waiting for Measure callback to be called (= driver has started)
-    fState = false;
-    int count = 0;
-    while (!fState && count++ < WAIT_COUNTER) {
-        usleep(100000);
-        jack_log("JackCoreAudioDriver::Start wait count = %d", count);
+            if (count < WAIT_COUNTER) {
+                jack_info("CoreAudio driver is running...");
+                return 0;
+            }
+
+            jack_error("CoreAudio driver cannot start...");
+        }
+        JackAudioDriver::Stop();
     }
-
-    if (count < WAIT_COUNTER) {
-        jack_info("CoreAudio driver is running...");
-        return 0;
-    } else {
-        jack_error("CoreAudio driver cannot start...");
-        return -1;
-    }
+    return -1;
 }
 
 int JackCoreAudioDriver::Stop()
 {
     jack_log("JackCoreAudioDriver::Stop");
-    return (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
+    int res = (AudioOutputUnitStop(fAUHAL) == noErr) ? 0 : -1;
+    if (JackAudioDriver::Stop() < 0) {
+        res = -1;
+    }
+    return res;
 }
 
 int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
