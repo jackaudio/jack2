@@ -365,7 +365,7 @@ retry:
     }
 
     if (nframes != fEngineControl->fBufferSize)
-        jack_log("JackAlsaDriver::Read warning nframes = %ld", nframes);
+        jack_log("JackAlsaDriver::Read warning fBufferSize = %ld nframes = %ld", fEngineControl->fBufferSize, nframes);
 
     // Has to be done before read
     JackDriver::CycleIncTime();
