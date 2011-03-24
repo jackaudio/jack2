@@ -572,8 +572,8 @@ extern "C" {
                       const JSList *params)
     {
         Jack::JackDriverClientInterface *driver =
-            new Jack::JackALSARawMidiDriver("system", "alsarawmidi", engine,
-                                            table);
+            new Jack::JackALSARawMidiDriver("system_midi", "alsarawmidi",
+                                            engine, table);
         if (driver->Open(1, 1, 0, 0, false, "midi in", "midi out", 0, 0)) {
             delete driver;
             driver = 0;
