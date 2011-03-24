@@ -21,8 +21,8 @@ namespace Jack {
 
         snd_rawmidi_t *rawmidi;
 
-        int
-        ProcessPollEvents();
+        bool
+        ProcessPollEvents(unsigned short *revents);
 
         void
         SetPollEventMask(unsigned short events);

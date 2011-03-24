@@ -126,27 +126,28 @@ JackALSARawMidiPort::PopulatePollDescriptors(struct pollfd *poll_fd)
     return result;
 }
 
-int
-JackALSARawMidiPort::ProcessPollEvents()
+bool
+JackALSARawMidiPort::ProcessPollEvents(unsigned short *revents)
 {
-    unsigned short revents = 0;
     int code = snd_rawmidi_poll_descriptors_revents(rawmidi, poll_fds, num_fds,
-                                                    &revents);
+                                                    revents);
     if (code) {
         jack_error("JackALSARawMidiPort::ProcessPollEvents - "
                    "snd_rawmidi_poll_descriptors_revents: %s",
                    snd_strerror(code));
-        return 0;
+        return false;
     }
-    if (revents & POLLNVAL) {
+    if ((*revents) & POLLNVAL) {
         jack_error("JackALSARawMidiPort::ProcessPollEvents - the file "
                    "descriptor is invalid.");
+        return false;
     }
-    if (revents & POLLERR) {
+    if ((*revents) & POLLERR) {
         jack_error("JackALSARawMidiPort::ProcessPollEvents - an error has "
                    "occurred on the device or stream.");
+        return false;
     }
-    return revents;
+    return true;
 }
 
 void

@@ -69,30 +69,33 @@ JackALSARawMidiInputPort::EnqueueALSAEvent()
     return (next_time < alsa_time) ? next_time : alsa_time;
 }
 
-jack_nframes_t
-JackALSARawMidiInputPort::ProcessALSA()
+bool
+JackALSARawMidiInputPort::ProcessALSA(jack_nframes_t *frame)
 {
-    unsigned short revents = ProcessPollEvents();
-    jack_nframes_t frame;
+    unsigned short revents;
+    if (! ProcessPollEvents(&revents)) {
+        return false;
+    }
     if (alsa_event) {
-        frame = EnqueueALSAEvent();
-        if (frame) {
-            return frame;
+        *frame = EnqueueALSAEvent();
+        if (*frame) {
+            return true;
         }
     }
     if (revents & POLLIN) {
         for (alsa_event = receive_queue->DequeueEvent(); alsa_event;
              alsa_event = receive_queue->DequeueEvent()) {
-            frame = EnqueueALSAEvent();
-            if (frame) {
-                return frame;
+            *frame = EnqueueALSAEvent();
+            if (*frame) {
+                return true;
             }
         }
     }
-    return raw_queue->Process();
+    *frame = raw_queue->Process();
+    return true;
 }
 
-void
+bool
 JackALSARawMidiInputPort::ProcessJack(JackMidiBuffer *port_buffer,
                                       jack_nframes_t frames)
 {
@@ -119,4 +122,5 @@ JackALSARawMidiInputPort::ProcessJack(JackMidiBuffer *port_buffer,
         }
         break;
     }
+    return true;
 }

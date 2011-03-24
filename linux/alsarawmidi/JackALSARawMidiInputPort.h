@@ -30,10 +30,10 @@ namespace Jack {
                                  size_t max_messages=1024);
         ~JackALSARawMidiInputPort();
 
-        jack_nframes_t
-        ProcessALSA();
+        bool
+        ProcessALSA(jack_nframes_t *frame);
 
-        void
+        bool
         ProcessJack(JackMidiBuffer *port_buffer, jack_nframes_t frames);
 
     };

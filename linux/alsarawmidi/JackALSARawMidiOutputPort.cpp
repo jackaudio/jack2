@@ -54,13 +54,17 @@ JackALSARawMidiOutputPort::DequeueALSAEvent(int read_fd)
     return event;
 }
 
-jack_nframes_t
-JackALSARawMidiOutputPort::ProcessALSA(int read_fd)
+bool
+JackALSARawMidiOutputPort::ProcessALSA(int read_fd, jack_nframes_t *frame)
 {
-    unsigned short revents = ProcessPollEvents();
+    unsigned short revents;
+    if (! ProcessPollEvents(&revents)) {
+        return false;
+    }
     if (blocked) {
         if (! (revents & POLLOUT)) {
-            return 0;
+            *frame = 0;
+            return true;
         }
         blocked = false;
     }
@@ -98,7 +102,7 @@ JackALSARawMidiOutputPort::ProcessALSA(int read_fd)
         break;
     }
  process_events:
-    jack_nframes_t next_frame = raw_queue->Process();
+    *frame = raw_queue->Process();
     blocked = send_queue->IsBlocked();
     if (blocked) {
 
@@ -106,13 +110,14 @@ JackALSARawMidiOutputPort::ProcessALSA(int read_fd)
                   "blocked");
 
         SetPollEventMask(POLLERR | POLLNVAL | POLLOUT);
-        return 0;
+        *frame = 0;
+    } else {
+        SetPollEventMask(POLLERR | POLLNVAL);
     }
-    SetPollEventMask(POLLERR | POLLNVAL);
-    return next_frame;
+    return true;
 }
 
-void
+bool
 JackALSARawMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
                                        jack_nframes_t frames, int write_fd)
 {
@@ -128,20 +133,21 @@ JackALSARawMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
         char c = 1;
         ssize_t result = write(write_fd, &c, 1);
         assert(result <= 1);
-        if (! result) {
-            jack_error("JackALSARawMidiOutputPort::ProcessJack - Couldn't "
-                       "write a byte to the pipe file descriptor.  Dropping "
-                       "event.");
-        } else if (result < 0) {
+        if (result < 0) {
             jack_error("JackALSARawMidiOutputPort::ProcessJack - error "
                        "writing a byte to the pipe file descriptor: %s",
                        strerror(errno));
-        } else if (thread_queue->EnqueueEvent(event->time + frames,
-                                              event->size, event->buffer) !=
-                   JackMidiWriteQueue::OK) {
-            jack_error("JackALSARawMidiOutputPort::ProcessJack - **BUG** The "
-                       "thread queue said it had enough space to enqueue a "
-                       "%d-byte event, but failed to enqueue the event.");
+            return false;
+        }
+        if (! result) {
+            // Recoverable.
+            jack_error("JackALSARawMidiOutputPort::ProcessJack - Couldn't "
+                       "write a byte to the pipe file descriptor.  Dropping "
+                       "event.");
+        } else {
+            assert(thread_queue->EnqueueEvent(event, frames) ==
+                   JackMidiWriteQueue::OK);
         }
     }
+    return true;
 }
