@@ -123,7 +123,7 @@ int JackLoadableInternalClient::Init(const char* so_name)
 {
     char path_to_so[JACK_PATH_MAX + 1];
     BuildClientPath(path_to_so, sizeof(path_to_so), so_name);
- 
+
     fHandle = LoadJackModule(path_to_so);
     jack_log("JackLoadableInternalClient::JackLoadableInternalClient path_to_so = %s", path_to_so);
 
@@ -151,7 +151,7 @@ int JackLoadableInternalClient1::Init(const char* so_name)
     if (JackLoadableInternalClient::Init(so_name) < 0) {
         return -1;
     }
-    
+
     fInitialize = (InitializeCallback)GetJackProc(fHandle, "jack_initialize");
     if (fInitialize == NULL) {
         UnloadJackModule(fHandle);
@@ -167,7 +167,7 @@ int JackLoadableInternalClient2::Init(const char* so_name)
     if (JackLoadableInternalClient::Init(so_name) < 0) {
         return -1;
     }
-    
+
     fInitialize = (InternalInitializeCallback)GetJackProc(fHandle, "jack_internal_initialize");
     if (fInitialize == NULL) {
         UnloadJackModule(fHandle);
@@ -181,7 +181,7 @@ int JackLoadableInternalClient2::Init(const char* so_name)
 JackLoadableInternalClient1::JackLoadableInternalClient1(JackServer* server, JackSynchro* table, const char* object_data)
         : JackLoadableInternalClient(server, table)
 {
-    strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);   
+    strncpy(fObjectData, object_data, JACK_LOAD_INIT_LIMIT);
 }
 
 JackLoadableInternalClient2::JackLoadableInternalClient2(JackServer* server, JackSynchro* table, const JSList*  parameters)
@@ -201,7 +201,7 @@ JackLoadableInternalClient::~JackLoadableInternalClient()
 int JackLoadableInternalClient1::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
-    
+
     if (JackInternalClient::Open(server_name, name, uuid, options, status) == 0) {
         if (fInitialize((jack_client_t*)this, fObjectData) == 0) {
             res = 0;
@@ -210,14 +210,14 @@ int JackLoadableInternalClient1::Open(const char* server_name, const char* name,
             fFinish = NULL;
         }
     }
-    
+
     return res;
 }
 
 int JackLoadableInternalClient2::Open(const char* server_name, const char* name, int uuid, jack_options_t options, jack_status_t* status)
 {
     int res = -1;
-    
+
     if (JackInternalClient::Open(server_name, name, uuid, options, status) == 0) {
         if (fInitialize((jack_client_t*)this, fParameters) == 0) {
             res = 0;
@@ -226,7 +226,7 @@ int JackLoadableInternalClient2::Open(const char* server_name, const char* name,
             fFinish = NULL;
         }
     }
-    
+
     return res;
 }
 

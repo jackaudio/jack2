@@ -519,7 +519,7 @@ void JackEngine::EnsureUUID(int uuid)
 
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
-        if (client && (client->GetClientControl()->fSessionID==uuid)) {
+        if (client && (client->GetClientControl()->fSessionID == uuid)) {
             client->GetClientControl()->fSessionID = GetNewUUID();
         }
     }
@@ -550,13 +550,13 @@ int JackEngine::GetClientRefNum(const char* name)
 // Used for external clients
 int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref, int* shared_engine, int* shared_client, int* shared_graph_manager)
 {
-    char real_name[JACK_CLIENT_NAME_SIZE+1];
+    char real_name[JACK_CLIENT_NAME_SIZE + 1];
 
     if (uuid < 0) {
         uuid = GetNewUUID();
         strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
     } else {
-        std::map<int,std::string>::iterator res = fReservationMap.find(uuid);
+        std::map<int, std::string>::iterator res = fReservationMap.find(uuid);
         if (res != fReservationMap.end()) {
             strncpy(real_name, res->second.c_str(), JACK_CLIENT_NAME_SIZE);
             fReservationMap.erase(uuid);
@@ -567,7 +567,7 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         EnsureUUID(uuid);
     }
 
-    jack_log("JackEngine::ClientExternalOpen: uuid=%d, name = %s ", uuid, real_name);
+    jack_log("JackEngine::ClientExternalOpen: uuid = %d, name = %s ", uuid, real_name);
 
     int refnum = AllocateRefnum();
     if (refnum < 0) {
@@ -958,7 +958,7 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
         if (client && client->GetClientControl()->fCallback[kSessionCallback]) {
 
             // check if this is a notification to a specific client.
-            if (target!=NULL && strlen(target)!=0) {
+            if (target != NULL && strlen(target) != 0) {
                 if (strcmp(target, client->GetClientControl()->fName)) {
                     continue;
                 }
@@ -1018,7 +1018,7 @@ void JackEngine::GetUUIDForClientName(const char *client_name, char *uuid_res, i
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
 
-        if (client && (strcmp(client_name, client->GetClientControl()->fName)==0)) {
+        if (client && (strcmp(client_name, client->GetClientControl()->fName) == 0)) {
             snprintf(uuid_res, JACK_UUID_SIZE, "%d", client->GetClientControl()->fSessionID);
             *result = 0;
             return;
