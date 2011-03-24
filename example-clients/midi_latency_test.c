@@ -250,10 +250,11 @@ handle_shutdown(void *arg)
     set_process_error("handle_shutdown", "The JACK server has been shutdown");
 }
 
-static void
+static int
 handle_xrun(void *arg)
 {
     xrun_count++;
+    return 0;
 }
 
 static void
@@ -451,6 +452,11 @@ main(int argc, char **argv)
         error_source = "jack_set_process_callback";
         goto unregister_out_port;
     }
+    if (jack_set_xrun_callback(client, handle_xrun, NULL)) {
+        error_message = "failed to set xrun callback";
+        error_source = "jack_set_xrun_callback";
+        goto unregister_out_port;
+    }
     jack_on_shutdown(client, handle_shutdown, NULL);
     jack_set_info_function(handle_info);
     process_state = 0;
@@ -502,21 +508,10 @@ main(int argc, char **argv)
     if (process_state == 2) {
         double average_latency = ((double) total_latency) / samples;
         double average_latency_time = total_latency_time / samples;
-        double high_jitter = highest_latency - average_latency;
         size_t i;
-        double low_jitter = average_latency - lowest_latency;
-        double peak_jitter;
-        double peak_jitter_time;
         double sample_rate = (double) jack_get_sample_rate(client);
         jack_nframes_t total_jitter = 0;
         jack_time_t total_jitter_time = 0;
-        if (high_jitter > low_jitter) {
-            peak_jitter = high_jitter;
-            peak_jitter_time = highest_latency_time - average_latency_time;
-        } else {
-            peak_jitter = low_jitter;
-            peak_jitter_time = average_latency_time - lowest_latency_time;
-        }
         for (i = 0; i <= 100; i++) {
             jitter_plot[i] = 0;
         }
@@ -537,7 +532,7 @@ main(int argc, char **argv)
                "Average latency: %.2f ms (%.2f frames)\n"
                "Best latency: %.2f ms (%u frames)\n"
                "Worst latency: %.2f ms (%u frames)\n"
-               "Peak MIDI jitter: %.2f ms (%.2f frames)\n"
+               "Peak MIDI jitter: %.2f ms (%u frames)\n"
                "Average MIDI jitter: %.2f ms (%.2f frames)\n",
                (out_latency_range.min / sample_rate) * 1000.0,
                (out_latency_range.max / sample_rate) * 1000.0,
@@ -548,7 +543,8 @@ main(int argc, char **argv)
                average_latency_time / 1000.0, average_latency,
                lowest_latency_time / 1000.0, lowest_latency,
                highest_latency_time / 1000.0, highest_latency,
-               peak_jitter_time / 1000.0, peak_jitter,
+               (highest_latency_time - lowest_latency_time) / 1000.0,
+               highest_latency - lowest_latency,
                (total_jitter_time / 1000.0) / samples,
                ((double) total_jitter) / samples);
         printf("\nJitter Plot:\n");
@@ -569,7 +565,7 @@ main(int argc, char **argv)
         printf("Unexpected messages received: %d\n", unexpected_messages);
     }
     if (xrun_count) {
-        printf("Xruns: %d (messages may have been lost)", xrun_count);
+        printf("Xruns: %d (messages may have been lost)\n", xrun_count);
     }
  deactivate_client:
     jack_deactivate(client);
