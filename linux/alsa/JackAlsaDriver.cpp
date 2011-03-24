@@ -1048,6 +1048,14 @@ void SetTime(jack_time_t time)
     g_alsa_driver->SetTimetAux(time);
 }
 
+int Restart()
+{
+    int res;
+    if ((res = g_alsa_driver->Stop()) == 0)
+        res = g_alsa_driver->Start();
+    return res;
+}
+
 #ifdef __cplusplus
 }
 #endif

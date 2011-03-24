@@ -1159,8 +1159,12 @@ alsa_driver_restart (alsa_driver_t *driver)
 	int res;
 
 	driver->xrun_recovery = 1;
+    // JACK2
+    /*
  	if ((res = driver->nt_stop((struct _jack_driver_nt *) driver))==0)
 		res = driver->nt_start((struct _jack_driver_nt *) driver);
+    */
+    res = Restart();
 	driver->xrun_recovery = 0;
 
 	if (res && driver->midi)
