@@ -871,7 +871,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 4B2021DC133A9BA40019E213 /* jack_midi_latency 64 bits */;
+			remoteGlobalIDString = 4B2021DC133A9BA40019E213;
 			remoteInfo = "jack_midi_latency 64 bits";
 		};
 		4B224B330E65BA330066BE5B /* PBXContainerItemProxy */ = {
