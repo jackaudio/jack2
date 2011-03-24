@@ -50,6 +50,7 @@
 				4B66550E127C356E00753A79 /* PBXTargetDependency */,
 				4B38120313269CCB00C61B14 /* PBXTargetDependency */,
 				4B8F16FC1329169F0002AD73 /* PBXTargetDependency */,
+				4B20220C133A9C370019E213 /* PBXTargetDependency */,
 			);
 			name = "All Universal 32/64 bits";
 			productName = All;
@@ -114,6 +115,7 @@
 		4B19B31B0E2362E800DD4A82 /* JackLibSampleRateResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */; };
 		4B19B31C0E2362E800DD4A82 /* JackLibSampleRateResampler.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19B30F0E2362E700DD4A82 /* JackLibSampleRateResampler.h */; };
 		4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19B3120E2362E700DD4A82 /* JackResampler.cpp */; };
+		4B20220A133A9C1C0019E213 /* midi_latency_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B202209133A9C1C0019E213 /* midi_latency_test.c */; };
 		4B2209E112F6BBF300E5DC26 /* JackSocketServerChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B30E703B8D0066E42F /* JackSocketServerChannel.cpp */; };
 		4B2209E212F6BBF400E5DC26 /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B40E703B8D0066E42F /* JackSocketServerChannel.h */; };
 		4B2209E312F6BBF500E5DC26 /* JackSocketServerNotifyChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B50E703B8D0066E42F /* JackSocketServerNotifyChannel.cpp */; };
@@ -865,6 +867,13 @@
 			remoteGlobalIDString = 4B19B2F60E23620F00DD4A82;
 			remoteInfo = audioadapter;
 		};
+		4B20220B133A9C370019E213 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B2021DC133A9BA40019E213;
+			remoteInfo = "jack_midi_latency 64 bits";
+		};
 		4B224B330E65BA330066BE5B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1418,9 +1427,6 @@
 		4B05A0640DF72BC000840F4C /* usx2y.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = usx2y.c; path = ../linux/alsa/usx2y.c; sourceTree = SOURCE_ROOT; };
 		4B05A0650DF72BC000840F4C /* usx2y.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = usx2y.h; path = ../linux/alsa/usx2y.h; sourceTree = SOURCE_ROOT; };
 		4B05A07D0DF72BC000840F4C /* driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = driver.h; path = ../linux/driver.h; sourceTree = SOURCE_ROOT; };
-		4B05A07F0DF72BC000840F4C /* ffado_driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ffado_driver.h; path = ../linux/firewire/ffado_driver.h; sourceTree = SOURCE_ROOT; };
-		4B05A0800DF72BC000840F4C /* JackFFADODriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFFADODriver.cpp; path = ../linux/firewire/JackFFADODriver.cpp; sourceTree = SOURCE_ROOT; };
-		4B05A0810DF72BC000840F4C /* JackFFADODriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFFADODriver.h; path = ../linux/firewire/JackFFADODriver.h; sourceTree = SOURCE_ROOT; };
 		4B05A0830DF72BC000840F4C /* freebob_driver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = freebob_driver.h; path = ../linux/freebob/freebob_driver.h; sourceTree = SOURCE_ROOT; };
 		4B05A0840DF72BC000840F4C /* JackFreebobDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFreebobDriver.cpp; path = ../linux/freebob/JackFreebobDriver.cpp; sourceTree = SOURCE_ROOT; };
 		4B05A0850DF72BC000840F4C /* JackFreebobDriver.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFreebobDriver.h; path = ../linux/freebob/JackFreebobDriver.h; sourceTree = SOURCE_ROOT; };
@@ -1454,6 +1460,8 @@
 		4B19B30E0E2362E700DD4A82 /* JackLibSampleRateResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackLibSampleRateResampler.cpp; path = ../common/JackLibSampleRateResampler.cpp; sourceTree = SOURCE_ROOT; };
 		4B19B30F0E2362E700DD4A82 /* JackLibSampleRateResampler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackLibSampleRateResampler.h; path = ../common/JackLibSampleRateResampler.h; sourceTree = SOURCE_ROOT; };
 		4B19B3120E2362E700DD4A82 /* JackResampler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackResampler.cpp; path = ../common/JackResampler.cpp; sourceTree = SOURCE_ROOT; };
+		4B2021E6133A9BA40019E213 /* jack_midi_latency_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_midi_latency_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B202209133A9C1C0019E213 /* midi_latency_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = midi_latency_test.c; path = "../example-clients/midi_latency_test.c"; sourceTree = SOURCE_ROOT; };
 		4B2C28F908DAD01E00249230 /* JackGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackGlobals.cpp; path = ../common/JackGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		4B3224E510A3156800838A8E /* jack_netone.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = jack_netone.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B3224E810A315B100838A8E /* JackNetOneDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackNetOneDriver.cpp; path = ../common/JackNetOneDriver.cpp; sourceTree = SOURCE_ROOT; };
@@ -1466,6 +1474,29 @@
 		4B32256110A3187800838A8E /* jack_netsource */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_netsource; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B32256310A318E300838A8E /* netsource.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = netsource.c; path = "../example-clients/netsource.c"; sourceTree = SOURCE_ROOT; };
 		4B32257B10A3190C00838A8E /* jack_netsource */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_netsource; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B349826133A6AF500D130AB /* JackALSARawMidiDriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackALSARawMidiDriver.cpp; path = ../linux/alsarawmidi/JackALSARawMidiDriver.cpp; sourceTree = SOURCE_ROOT; };
+		4B349827133A6AF500D130AB /* JackALSARawMidiDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackALSARawMidiDriver.h; path = ../linux/alsarawmidi/JackALSARawMidiDriver.h; sourceTree = SOURCE_ROOT; };
+		4B349828133A6AF500D130AB /* JackALSARawMidiInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackALSARawMidiInputPort.cpp; path = ../linux/alsarawmidi/JackALSARawMidiInputPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B349829133A6AF500D130AB /* JackALSARawMidiInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackALSARawMidiInputPort.h; path = ../linux/alsarawmidi/JackALSARawMidiInputPort.h; sourceTree = SOURCE_ROOT; };
+		4B34982A133A6AF500D130AB /* JackALSARawMidiOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackALSARawMidiOutputPort.cpp; path = ../linux/alsarawmidi/JackALSARawMidiOutputPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B34982B133A6AF500D130AB /* JackALSARawMidiOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackALSARawMidiOutputPort.h; path = ../linux/alsarawmidi/JackALSARawMidiOutputPort.h; sourceTree = SOURCE_ROOT; };
+		4B34982C133A6AF500D130AB /* JackALSARawMidiPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackALSARawMidiPort.cpp; path = ../linux/alsarawmidi/JackALSARawMidiPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B34982D133A6AF500D130AB /* JackALSARawMidiPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackALSARawMidiPort.h; path = ../linux/alsarawmidi/JackALSARawMidiPort.h; sourceTree = SOURCE_ROOT; };
+		4B34982E133A6AF500D130AB /* JackALSARawMidiReceiveQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackALSARawMidiReceiveQueue.cpp; path = ../linux/alsarawmidi/JackALSARawMidiReceiveQueue.cpp; sourceTree = SOURCE_ROOT; };
+		4B34982F133A6AF500D130AB /* JackALSARawMidiReceiveQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackALSARawMidiReceiveQueue.h; path = ../linux/alsarawmidi/JackALSARawMidiReceiveQueue.h; sourceTree = SOURCE_ROOT; };
+		4B349830133A6AF500D130AB /* JackALSARawMidiSendQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackALSARawMidiSendQueue.cpp; path = ../linux/alsarawmidi/JackALSARawMidiSendQueue.cpp; sourceTree = SOURCE_ROOT; };
+		4B349831133A6AF500D130AB /* JackALSARawMidiSendQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackALSARawMidiSendQueue.h; path = ../linux/alsarawmidi/JackALSARawMidiSendQueue.h; sourceTree = SOURCE_ROOT; };
+		4B349838133A6B6F00D130AB /* ffado_driver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ffado_driver.h; path = ../linux/firewire/ffado_driver.h; sourceTree = SOURCE_ROOT; };
+		4B349839133A6B6F00D130AB /* JackFFADODriver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackFFADODriver.cpp; path = ../linux/firewire/JackFFADODriver.cpp; sourceTree = SOURCE_ROOT; };
+		4B34983A133A6B6F00D130AB /* JackFFADODriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackFFADODriver.h; path = ../linux/firewire/JackFFADODriver.h; sourceTree = SOURCE_ROOT; };
+		4B34983B133A6B6F00D130AB /* JackFFADOMidiInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackFFADOMidiInputPort.cpp; path = ../linux/firewire/JackFFADOMidiInputPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B34983C133A6B6F00D130AB /* JackFFADOMidiInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackFFADOMidiInputPort.h; path = ../linux/firewire/JackFFADOMidiInputPort.h; sourceTree = SOURCE_ROOT; };
+		4B34983D133A6B6F00D130AB /* JackFFADOMidiOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackFFADOMidiOutputPort.cpp; path = ../linux/firewire/JackFFADOMidiOutputPort.cpp; sourceTree = SOURCE_ROOT; };
+		4B34983E133A6B6F00D130AB /* JackFFADOMidiOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackFFADOMidiOutputPort.h; path = ../linux/firewire/JackFFADOMidiOutputPort.h; sourceTree = SOURCE_ROOT; };
+		4B34983F133A6B6F00D130AB /* JackFFADOMidiReceiveQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackFFADOMidiReceiveQueue.cpp; path = ../linux/firewire/JackFFADOMidiReceiveQueue.cpp; sourceTree = SOURCE_ROOT; };
+		4B349840133A6B6F00D130AB /* JackFFADOMidiReceiveQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackFFADOMidiReceiveQueue.h; path = ../linux/firewire/JackFFADOMidiReceiveQueue.h; sourceTree = SOURCE_ROOT; };
+		4B349841133A6B6F00D130AB /* JackFFADOMidiSendQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackFFADOMidiSendQueue.cpp; path = ../linux/firewire/JackFFADOMidiSendQueue.cpp; sourceTree = SOURCE_ROOT; };
+		4B349842133A6B6F00D130AB /* JackFFADOMidiSendQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackFFADOMidiSendQueue.h; path = ../linux/firewire/JackFFADOMidiSendQueue.h; sourceTree = SOURCE_ROOT; };
 		4B35C4250D4731D1000DE7AE /* jackdmp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jackdmp; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C4830D4731D1000DE7AE /* Jackmp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackmp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B35C4FC0D4731D1000DE7AE /* Jackservermp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackservermp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1761,6 +1792,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B19B2FB0E23620F00DD4A82 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2021E0133A9BA40019E213 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2543,6 +2581,7 @@
 				4B3811971326884E00C61B14 /* jack_latent_client */,
 				4B8F16E513290DC80002AD73 /* jack_midi_dump */,
 				4B8F16F213290E0E0002AD73 /* jack_midi_dump */,
+				4B2021E6133A9BA40019E213 /* jack_midi_latency_test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2550,6 +2589,7 @@
 		4B03383E0797E19900686131 /* Simple clients */ = {
 			isa = PBXGroup;
 			children = (
+				4B202209133A9C1C0019E213 /* midi_latency_test.c */,
 				4B8F16F41329161E0002AD73 /* midi_dump.c */,
 				4B3811FA13269C8300C61B14 /* latent_client.c */,
 				4B6654FB127C350100753A79 /* server_control.cpp */,
@@ -2579,9 +2619,10 @@
 		4B05A0420DF72B8500840F4C /* Linux */ = {
 			isa = PBXGroup;
 			children = (
+				4B349837133A6B6F00D130AB /* firewire */,
+				4B349825133A6AF500D130AB /* alsarawmidi */,
 				4B05A04C0DF72BC000840F4C /* alsa */,
 				4B05A07D0DF72BC000840F4C /* driver.h */,
-				4B05A07E0DF72BC000840F4C /* firewire */,
 				4B05A0820DF72BC000840F4C /* freebob */,
 			);
 			name = Linux;
@@ -2616,17 +2657,6 @@
 			);
 			name = alsa;
 			path = ../linux/alsa;
-			sourceTree = SOURCE_ROOT;
-		};
-		4B05A07E0DF72BC000840F4C /* firewire */ = {
-			isa = PBXGroup;
-			children = (
-				4B05A07F0DF72BC000840F4C /* ffado_driver.h */,
-				4B05A0800DF72BC000840F4C /* JackFFADODriver.cpp */,
-				4B05A0810DF72BC000840F4C /* JackFFADODriver.h */,
-			);
-			name = firewire;
-			path = ../linux/firewire;
 			sourceTree = SOURCE_ROOT;
 		};
 		4B05A0820DF72BC000840F4C /* freebob */ = {
@@ -2692,6 +2722,45 @@
 			);
 			name = Adapter;
 			sourceTree = "<group>";
+		};
+		4B349825133A6AF500D130AB /* alsarawmidi */ = {
+			isa = PBXGroup;
+			children = (
+				4B349826133A6AF500D130AB /* JackALSARawMidiDriver.cpp */,
+				4B349827133A6AF500D130AB /* JackALSARawMidiDriver.h */,
+				4B349828133A6AF500D130AB /* JackALSARawMidiInputPort.cpp */,
+				4B349829133A6AF500D130AB /* JackALSARawMidiInputPort.h */,
+				4B34982A133A6AF500D130AB /* JackALSARawMidiOutputPort.cpp */,
+				4B34982B133A6AF500D130AB /* JackALSARawMidiOutputPort.h */,
+				4B34982C133A6AF500D130AB /* JackALSARawMidiPort.cpp */,
+				4B34982D133A6AF500D130AB /* JackALSARawMidiPort.h */,
+				4B34982E133A6AF500D130AB /* JackALSARawMidiReceiveQueue.cpp */,
+				4B34982F133A6AF500D130AB /* JackALSARawMidiReceiveQueue.h */,
+				4B349830133A6AF500D130AB /* JackALSARawMidiSendQueue.cpp */,
+				4B349831133A6AF500D130AB /* JackALSARawMidiSendQueue.h */,
+			);
+			name = alsarawmidi;
+			path = ../linux/alsarawmidi;
+			sourceTree = SOURCE_ROOT;
+		};
+		4B349837133A6B6F00D130AB /* firewire */ = {
+			isa = PBXGroup;
+			children = (
+				4B349838133A6B6F00D130AB /* ffado_driver.h */,
+				4B349839133A6B6F00D130AB /* JackFFADODriver.cpp */,
+				4B34983A133A6B6F00D130AB /* JackFFADODriver.h */,
+				4B34983B133A6B6F00D130AB /* JackFFADOMidiInputPort.cpp */,
+				4B34983C133A6B6F00D130AB /* JackFFADOMidiInputPort.h */,
+				4B34983D133A6B6F00D130AB /* JackFFADOMidiOutputPort.cpp */,
+				4B34983E133A6B6F00D130AB /* JackFFADOMidiOutputPort.h */,
+				4B34983F133A6B6F00D130AB /* JackFFADOMidiReceiveQueue.cpp */,
+				4B349840133A6B6F00D130AB /* JackFFADOMidiReceiveQueue.h */,
+				4B349841133A6B6F00D130AB /* JackFFADOMidiSendQueue.cpp */,
+				4B349842133A6B6F00D130AB /* JackFFADOMidiSendQueue.h */,
+			);
+			name = firewire;
+			path = ../linux/firewire;
+			sourceTree = SOURCE_ROOT;
 		};
 		4B37C20006DF1F900016E567 /* Latency */ = {
 			isa = PBXGroup;
@@ -3063,6 +3132,13 @@
 				4B19B3160E2362E800DD4A82 /* JackAudioAdapterInterface.h in Headers */,
 				4B19B31C0E2362E800DD4A82 /* JackLibSampleRateResampler.h in Headers */,
 				4BE5FED20E725C320020B576 /* JackCoreAudioAdapter.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2021DD133A9BA40019E213 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4110,6 +4186,25 @@
 			productName = jack_coreaudio;
 			productReference = 4B19B3000E23620F00DD4A82 /* audioadapter.so */;
 			productType = "com.apple.product-type.library.dynamic";
+		};
+		4B2021DC133A9BA40019E213 /* jack_midi_latency 64 bits */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4B2021E2133A9BA40019E213 /* Build configuration list for PBXNativeTarget "jack_midi_latency 64 bits" */;
+			buildPhases = (
+				4B2021DD133A9BA40019E213 /* Headers */,
+				4B2021DE133A9BA40019E213 /* Sources */,
+				4B2021E0133A9BA40019E213 /* Frameworks */,
+				4B2021E1133A9BA40019E213 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "jack_midi_latency 64 bits";
+			productInstallPath = /usr/local/bin;
+			productName = jack_metro;
+			productReference = 4B2021E6133A9BA40019E213 /* jack_midi_latency_test */;
+			productType = "com.apple.product-type.tool";
 		};
 		4B3224D710A3156800838A8E /* jack_netone Universal */ = {
 			isa = PBXNativeTarget;
@@ -5838,6 +5933,7 @@
 				4B35C50A0D4731D1000DE7AE /* jack_midiseq 64 bits */,
 				4B35C5160D4731D1000DE7AE /* jack_midisine 64 bits */,
 				4B8F16E813290E0E0002AD73 /* jack_midi_dump 64 bits */,
+				4B2021DC133A9BA40019E213 /* jack_midi_latency 64 bits */,
 				4B35C5220D4731D1000DE7AE /* jack_metro 64 bits */,
 				4B35C52E0D4731D1000DE7AE /* jack_lsp 64 bits */,
 				4B35C53A0D4731D1000DE7AE /* jack_connect 64 bits */,
@@ -5934,6 +6030,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		4B0A29280D52108E002EFF74 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2021E1133A9BA40019E213 /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -6445,6 +6548,14 @@
 				4B19B31F0E2362E800DD4A82 /* JackResampler.cpp in Sources */,
 				4BF4BAB10E3480AB00403CDF /* JackAudioAdapterFactory.cpp in Sources */,
 				4BE5FED10E725C320020B576 /* JackCoreAudioAdapter.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4B2021DE133A9BA40019E213 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B20220A133A9C1C0019E213 /* midi_latency_test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7438,6 +7549,11 @@
 			target = 4B19B2F60E23620F00DD4A82 /* audioadapter Universal */;
 			targetProxy = 4B19B32B0E23636E00DD4A82 /* PBXContainerItemProxy */;
 		};
+		4B20220C133A9C370019E213 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B2021DC133A9BA40019E213 /* jack_midi_latency 64 bits */;
+			targetProxy = 4B20220B133A9C370019E213 /* PBXContainerItemProxy */;
+		};
 		4B224B340E65BA330066BE5B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4B5E08BF0E5B66EE00BEE4E0 /* netadapter Universal */;
@@ -8131,6 +8247,101 @@
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = inprocess;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = Default;
+		};
+		4B2021E3133A9BA40019E213 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_midi_latency_test;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = YES;
+			};
+			name = Development;
+		};
+		4B2021E4133A9BA40019E213 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				COPY_PHASE_STRIP = YES;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				HEADER_SEARCH_PATHS = ../common;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_midi_latency_test;
+				REZ_EXECUTABLE = YES;
+				SDKROOT = "";
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				ZERO_LINK = NO;
+			};
+			name = Deployment;
+		};
+		4B2021E5133A9BA40019E213 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc64,
+					ppc,
+					i386,
+					x86_64,
+				);
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = ../common;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Jackmp,
+					"-framework",
+					CoreFoundation,
+				);
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = jack_midisine;
+				REZ_EXECUTABLE = YES;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = (
@@ -18731,6 +18942,16 @@
 				4B19B2FD0E23620F00DD4A82 /* Development */,
 				4B19B2FE0E23620F00DD4A82 /* Deployment */,
 				4B19B2FF0E23620F00DD4A82 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		4B2021E2133A9BA40019E213 /* Build configuration list for PBXNativeTarget "jack_midi_latency 64 bits" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4B2021E3133A9BA40019E213 /* Development */,
+				4B2021E4133A9BA40019E213 /* Deployment */,
+				4B2021E5133A9BA40019E213 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
