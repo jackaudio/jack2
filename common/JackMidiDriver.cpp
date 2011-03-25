@@ -74,9 +74,12 @@ int JackMidiDriver::Attach()
     jack_port_id_t port_index;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+    jack_latency_range_t latency_range;
+    jack_nframes_t latency = fEngineControl->fBufferSize;
     int i;
 
     jack_log("JackMidiDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
+    latency_range.max = latency_range.min = latency;
 
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
@@ -87,8 +90,14 @@ int JackMidiDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
+        port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = port_index;
         jack_log("JackMidiDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
+    }
+
+    if (!fEngineControl->fSyncMode) {
+        latency += fEngineControl->fBufferSize;;
+        latency_range.max = latency_range.min = latency;
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
@@ -100,6 +109,7 @@ int JackMidiDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
+        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackMidiDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
     }
