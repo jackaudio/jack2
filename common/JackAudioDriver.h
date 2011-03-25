@@ -35,8 +35,12 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
     protected:
 
-        void ProcessGraphAsync();
-        int ProcessGraphSync();
+        void ProcessGraphAsyncMaster();
+        void ProcessGraphAsyncSlave();
+
+        int ProcessGraphSyncMaster();
+        int ProcessGraphSyncSlave();
+
         void WaitUntilNextCycle();
 
         virtual int ProcessAsync();

@@ -34,6 +34,7 @@ namespace Jack
 class JackLockedEngine;
 class JackGraphManager;
 struct JackEngineControl;
+class JackSlaveDriverInterface;
 
 /*!
 \brief The base interface for drivers.
@@ -91,10 +92,17 @@ class SERVER_EXPORT JackDriverInterface
 
         virtual void SetMaster(bool onoff) = 0;
         virtual bool GetMaster() = 0;
+
         virtual void AddSlave(JackDriverInterface* slave) = 0;
         virtual void RemoveSlave(JackDriverInterface* slave) = 0;
+
         virtual std::list<JackDriverInterface*> GetSlaves() = 0;
-        virtual int ProcessSlaves() = 0;
+
+        virtual int ProcessReadSlaves() = 0;
+        virtual int ProcessWriteSlaves() = 0;
+
+        virtual int ProcessRead() = 0;
+        virtual int ProcessWrite() = 0;
 
         virtual bool IsRealTime() const = 0;
         virtual bool IsRunning() const = 0;
@@ -159,11 +167,11 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
         void AddSlave(JackDriverInterface* slave);
         void RemoveSlave(JackDriverInterface* slave);
+
         std::list<JackDriverInterface*> GetSlaves()
         {
             return fSlaveList;
         }
-        int ProcessSlaves();
 
         virtual int Open();
 
@@ -200,9 +208,16 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Write();
 
         virtual int Start();
-        virtual int StartSlaves();
         virtual int Stop();
+
+        virtual int StartSlaves();
         virtual int StopSlaves();
+
+        int ProcessReadSlaves();
+        int ProcessWriteSlaves();
+
+        int ProcessRead();
+        int ProcessWrite();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);
@@ -216,6 +231,19 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual bool Initialize();  // To be called by the wrapping thread Init method when the driver is a "blocking" one
 
 };
+
+/*
+class SERVER_EXPORT JackSlaveDriverInterface
+{
+
+    public:
+
+        virtual int ProcessRead()   { return 0; }
+        virtual int ProcessWrite()  { return 0; }
+
+};
+
+*/
 
 } // end of namespace
 

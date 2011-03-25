@@ -282,17 +282,40 @@ void JackDriver::RemoveSlave(JackDriverInterface* slave)
     fSlaveList.remove(slave);
 }
 
-int JackDriver::ProcessSlaves()
+int JackDriver::ProcessReadSlaves()
 {
     int res = 0;
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->Process() < 0)
+        if (slave->ProcessRead() < 0)
             res = -1;
 
     }
     return res;
+}
+
+int JackDriver::ProcessWriteSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->ProcessWrite() < 0)
+            res = -1;
+
+    }
+    return res;
+}
+
+int JackDriver::ProcessRead()
+{
+    return 0;
+}
+
+int JackDriver::ProcessWrite()
+{
+    return 0;
 }
 
 int JackDriver::Process()

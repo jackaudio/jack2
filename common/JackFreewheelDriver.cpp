@@ -28,25 +28,71 @@ namespace Jack
 
 int JackFreewheelDriver::Process()
 {
-    if (fIsMaster) {
-        jack_log("JackFreewheelDriver::Process master %lld", fEngineControl->fTimeOutUsecs);
-        JackDriver::CycleTakeBeginTime();
-        fEngine->Process(fBeginDateUst, fEndDateUst);
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable); // Signal all clients
+    int res = 0;
+
+    jack_log("JackFreewheelDriver::Process master %lld", fEngineControl->fTimeOutUsecs);
+    JackDriver::CycleTakeBeginTime();
+
+    if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
+
+        if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable)) {      // Signal all clients
+            jack_error("JackFreewheelDriver::Process: ResumeRefNum error");
+            res = -1;
+        }
+
         if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, FREEWHEEL_DRIVER_TIMEOUT * 1000000) < 0) { // Wait for all clients to finish for 10 sec
-            jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
+            jack_error("JackFreewheelDriver::ProcessSync: SuspendRefNum error");
             /* We have a client time-out error, but still continue to process, until a better recovery strategy is chosen */
             return 0;
         }
-    } else {
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable); // Signal all clients
-        if (fEngineControl->fSyncMode) {
-            if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
-                jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
-                return -1;
-            }
-        }
+
+    } else { // Graph not finished: do not activate it
+        jack_error("JackFreewheelDriver::Process: Process error");
+        res = -1;
     }
+
+   return res;
+}
+
+int JackFreewheelDriver::ProcessRead()
+{
+    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
+}
+
+int JackFreewheelDriver::ProcessWrite()
+{
+    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
+}
+
+int JackFreewheelDriver::ProcessReadSync()
+{
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {      // Signal all clients
+        jack_error("JackFreewheelDriver::ProcessReadSync: ResumeRefNum error");
+        return -1;
+    }
+    return 0;
+}
+
+int JackFreewheelDriver::ProcessWriteSync()
+{
+    if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
+        jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
+        return -1;
+    }
+    return 0;
+}
+
+int JackFreewheelDriver::ProcessReadAsync()
+{
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {      // Signal all clients
+        jack_error("JackFreewheelDriver::ProcessReadAsync: ResumeRefNum error");
+        return -1;
+    }
+    return 0;
+}
+
+int JackFreewheelDriver::ProcessWriteAsync()
+{
     return 0;
 }
 
