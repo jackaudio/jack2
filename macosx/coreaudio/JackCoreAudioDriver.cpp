@@ -386,12 +386,15 @@ OSStatus JackCoreAudioDriver::GetDefaultDevice(AudioDeviceID* id)
     jack_log("GetDefaultDevice: input = %ld output = %ld", inDefault, outDefault);
 
     // Get the device only if default input and output are the same
-    if (inDefault == outDefault) {
-        *id = inDefault;
-        return noErr;
-    } else {
+    if (inDefault != outDefault) {
         jack_error("Default input and output devices are not the same !!");
         return kAudioHardwareBadDeviceError;
+    } else if (inDefault == 0) {
+        jack_error("Default input and output devices are null !!");
+        return kAudioHardwareBadDeviceError;
+    } else {
+        *id = inDefault;
+        return noErr;
     }
 }
 
