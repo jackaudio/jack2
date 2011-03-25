@@ -63,13 +63,16 @@ namespace Jack {
                      jack_midi_data_t *buffer) = 0;
 
         /**
-         * A wrapper method for the `EnqueueEvent` method above.
+         * A wrapper method for the `EnqueueEvent` method above.  The optional
+         * 'frame_offset' argument is an amount of frames to add to the event's
+         * time.
          */
 
         inline EnqueueResult
-        EnqueueEvent(jack_midi_event_t *event)
+        EnqueueEvent(jack_midi_event_t *event, jack_nframes_t frame_offset=0)
         {
-            return EnqueueEvent(event->time, event->size, event->buffer);
+            return EnqueueEvent(event->time + frame_offset, event->size,
+                                event->buffer);
         }
 
     };

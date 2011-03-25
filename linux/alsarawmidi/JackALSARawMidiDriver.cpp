@@ -134,32 +134,44 @@ JackALSARawMidiDriver::Execute()
         }
         revents = poll_fds[0].revents;
         if (revents & POLLHUP) {
-            close(fds[0]);
-            fds[0] = -1;
+            // Driver is being stopped.
             break;
         }
-        if (revents & (~(POLLHUP | POLLIN))) {
+        if (revents & (~ POLLIN)) {
             jack_error("JackALSARawMidiDriver::Execute - unexpected poll "
                        "event on pipe file descriptor.");
             break;
         }
-    handle_ports:
         timeout_frame = 0;
         for (int i = 0; i < fCaptureChannels; i++) {
-            process_frame = input_ports[i]->ProcessALSA();
+            if (! input_ports[i]->ProcessALSA(&process_frame)) {
+                jack_error("JackALSARawMidiDriver::Execute - a fatal error "
+                           "occurred while processing ALSA input events.");
+                goto cleanup;
+            }
             if (process_frame && ((! timeout_frame) ||
                                   (process_frame < timeout_frame))) {
                 timeout_frame = process_frame;
             }
         }
         for (int i = 0; i < fPlaybackChannels; i++) {
-            process_frame = output_ports[i]->ProcessALSA(fds[0]);
+            if (! output_ports[i]->ProcessALSA(fds[0], &process_frame)) {
+                jack_error("JackALSARawMidiDriver::Execute - a fatal error "
+                           "occurred while processing ALSA output events.");
+                goto cleanup;
+            }
             if (process_frame && ((! timeout_frame) ||
                                   (process_frame < timeout_frame))) {
                 timeout_frame = process_frame;
             }
         }
     }
+ cleanup:
+    close(fds[0]);
+    fds[0] = -1;
+
+    jack_info("JackALSARawMidiDriver::Execute - ALSA thread exiting.");
+
     return false;
 }
 
@@ -402,7 +414,9 @@ JackALSARawMidiDriver::Read()
 {
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     for (int i = 0; i < fCaptureChannels; i++) {
-        input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
+        if (! input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size)) {
+            return -1;
+        }
     }
     return 0;
 }
@@ -539,8 +553,10 @@ JackALSARawMidiDriver::Write()
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     int write_fd = fds[1];
     for (int i = 0; i < fPlaybackChannels; i++) {
-        output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size,
-                                     write_fd);
+        if (! output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size,
+                                           write_fd)) {
+            return -1;
+        }
     }
     return 0;
 }
