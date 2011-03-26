@@ -1,0 +1,83 @@
+/*
+Copyright (C) 2011 Devin Anderson
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
+
+#ifndef __JackCoreMidiOutputPort__
+#define __JackCoreMidiOutputPort__
+
+#include "JackCoreMidiPort.h"
+#include "JackMidiAsyncWaitQueue.h"
+#include "JackMidiBufferReadQueue.h"
+#include "JackThread.h"
+
+namespace Jack {
+
+    class JackCoreMidiOutputPort:
+        public JackCoreMidiPort, public JackRunnableInterface {
+
+    private:
+
+        MIDITimeStamp
+        GetTimeStampFromFrames(jack_nframes_t frames);
+
+        void
+        Initialize(const char *alias_name, const char *client_name,
+                   const char *driver_name, int index,
+                   MIDIEndpointRef endpoint);
+
+        static const size_t PACKET_BUFFER_SIZE = 65536;
+
+        char packet_buffer[PACKET_BUFFER_SIZE];
+        JackMidiBufferReadQueue *read_queue;
+        int realtime_priority;
+        JackThread *thread;
+        JackMidiAsyncWaitQueue *thread_queue;
+
+    protected:
+
+        virtual void
+        SendPacketList(MIDIPacketList *packet_list) = 0;
+
+    public:
+
+        JackCoreMidiOutputPort(double time_ratio, size_t max_bytes=4096,
+                               size_t max_messages=1024);
+
+        virtual
+        ~JackCoreMidiOutputPort();
+
+        bool
+        Execute();
+
+        bool
+        Init();
+
+        void
+        ProcessJack(JackMidiBuffer *port_buffer, jack_nframes_t frames);
+
+        bool
+        Start();
+
+        bool
+        Stop();
+
+    };
+
+}
+
+#endif
