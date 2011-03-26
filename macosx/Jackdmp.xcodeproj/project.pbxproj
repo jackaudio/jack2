@@ -319,6 +319,38 @@
 		4B363F230DEB0AB0001F72D9 /* monitor_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F220DEB0AB0001F72D9 /* monitor_client.c */; };
 		4B363F3E0DEB0C31001F72D9 /* showtime.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F3D0DEB0C31001F72D9 /* showtime.c */; };
 		4B363F760DEB0D7D001F72D9 /* impulse_grabber.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */; };
+		4B370A24133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */; };
+		4B370A25133DD7E300237B68 /* JackCoreMidiInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */; };
+		4B370A26133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */; };
+		4B370A27133DD7E300237B68 /* JackCoreMidiOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */; };
+		4B370A28133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */; };
+		4B370A29133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */; };
+		4B370A2A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */; };
+		4B370A2B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */; };
+		4B370A2C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */; };
+		4B370A2D133DD7E300237B68 /* JackCoreMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */; };
+		4B370A2E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */; };
+		4B370A2F133DD7E300237B68 /* JackCoreMidiUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */; };
+		4B370A30133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */; };
+		4B370A31133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */; };
+		4B370A32133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */; };
+		4B370A33133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */; };
+		4B370A34133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */; };
+		4B370A35133DD7E300237B68 /* JackCoreMidiInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */; };
+		4B370A36133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */; };
+		4B370A37133DD7E300237B68 /* JackCoreMidiOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */; };
+		4B370A38133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */; };
+		4B370A39133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */; };
+		4B370A3A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */; };
+		4B370A3B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */; };
+		4B370A3C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */; };
+		4B370A3D133DD7E300237B68 /* JackCoreMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */; };
+		4B370A3E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */; };
+		4B370A3F133DD7E300237B68 /* JackCoreMidiUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */; };
+		4B370A40133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */; };
+		4B370A41133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */; };
+		4B370A42133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */; };
+		4B370A43133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */; };
 		4B3811FB13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
 		4B3811FC13269C8300C61B14 /* latent_client.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3811FA13269C8300C61B14 /* latent_client.c */; };
 		4B3814201327AA6800C61B14 /* iodelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B38141F1327AA6800C61B14 /* iodelay.cpp */; };
@@ -1537,6 +1569,22 @@
 		4B363F3D0DEB0C31001F72D9 /* showtime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = showtime.c; path = "../example-clients/showtime.c"; sourceTree = SOURCE_ROOT; };
 		4B363F720DEB0D4E001F72D9 /* jack_impulse_grabber */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_impulse_grabber; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B363F750DEB0D7D001F72D9 /* impulse_grabber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = impulse_grabber.c; path = "../example-clients/impulse_grabber.c"; sourceTree = SOURCE_ROOT; };
+		4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiInputPort.cpp; path = ../../coremidi/JackCoreMidiInputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiInputPort.h; path = ../../coremidi/JackCoreMidiInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiOutputPort.cpp; path = ../../coremidi/JackCoreMidiOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiOutputPort.h; path = ../../coremidi/JackCoreMidiOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiPhysicalInputPort.cpp; path = ../../coremidi/JackCoreMidiPhysicalInputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiPhysicalInputPort.h; path = ../../coremidi/JackCoreMidiPhysicalInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiPhysicalOutputPort.cpp; path = ../../coremidi/JackCoreMidiPhysicalOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiPhysicalOutputPort.h; path = ../../coremidi/JackCoreMidiPhysicalOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiPort.cpp; path = ../../coremidi/JackCoreMidiPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiPort.h; path = ../../coremidi/JackCoreMidiPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiUtil.cpp; path = ../../coremidi/JackCoreMidiUtil.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiUtil.h; path = ../../coremidi/JackCoreMidiUtil.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiVirtualInputPort.cpp; path = ../../coremidi/JackCoreMidiVirtualInputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiVirtualInputPort.h; path = ../../coremidi/JackCoreMidiVirtualInputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackCoreMidiVirtualOutputPort.cpp; path = ../../coremidi/JackCoreMidiVirtualOutputPort.cpp; sourceTree = BUILT_PRODUCTS_DIR; };
+		4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JackCoreMidiVirtualOutputPort.h; path = ../../coremidi/JackCoreMidiVirtualOutputPort.h; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B37C20306DF1FBE0016E567 /* CALatencyLog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CALatencyLog.cpp; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.cpp; sourceTree = "<absolute>"; };
 		4B37C20406DF1FBE0016E567 /* CALatencyLog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CALatencyLog.h; path = /Developer/Examples/CoreAudio/PublicUtility/CALatencyLog.h; sourceTree = "<absolute>"; };
 		4B37C20906DF1FE20016E567 /* latency.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = latency.c; path = /Developer/Examples/CoreAudio/PublicUtility/latency.c; sourceTree = "<absolute>"; };
@@ -3047,6 +3095,22 @@
 		4BF3390D0F8B86AF0080FB5B /* MIDI */ = {
 			isa = PBXGroup;
 			children = (
+				4B370A14133DD7E200237B68 /* JackCoreMidiInputPort.cpp */,
+				4B370A15133DD7E200237B68 /* JackCoreMidiInputPort.h */,
+				4B370A16133DD7E200237B68 /* JackCoreMidiOutputPort.cpp */,
+				4B370A17133DD7E200237B68 /* JackCoreMidiOutputPort.h */,
+				4B370A18133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.cpp */,
+				4B370A19133DD7E200237B68 /* JackCoreMidiPhysicalInputPort.h */,
+				4B370A1A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp */,
+				4B370A1B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h */,
+				4B370A1C133DD7E300237B68 /* JackCoreMidiPort.cpp */,
+				4B370A1D133DD7E300237B68 /* JackCoreMidiPort.h */,
+				4B370A1E133DD7E300237B68 /* JackCoreMidiUtil.cpp */,
+				4B370A1F133DD7E300237B68 /* JackCoreMidiUtil.h */,
+				4B370A20133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp */,
+				4B370A21133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h */,
+				4B370A22133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp */,
+				4B370A23133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h */,
 				4BF3391F0F8B873E0080FB5B /* JackMidiDriver.cpp */,
 				4BF339200F8B873E0080FB5B /* JackMidiDriver.h */,
 				4BF339140F8B86DC0080FB5B /* JackCoreMidiDriver.h */,
@@ -3994,6 +4058,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BDCDB951001FB9C00B15929 /* JackCoreMidiDriver.h in Headers */,
+				4B370A35133DD7E300237B68 /* JackCoreMidiInputPort.h in Headers */,
+				4B370A37133DD7E300237B68 /* JackCoreMidiOutputPort.h in Headers */,
+				4B370A39133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.h in Headers */,
+				4B370A3B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h in Headers */,
+				4B370A3D133DD7E300237B68 /* JackCoreMidiPort.h in Headers */,
+				4B370A3F133DD7E300237B68 /* JackCoreMidiUtil.h in Headers */,
+				4B370A41133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h in Headers */,
+				4B370A43133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4054,6 +4126,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BF3391A0F8B86DC0080FB5B /* JackCoreMidiDriver.h in Headers */,
+				4B370A25133DD7E300237B68 /* JackCoreMidiInputPort.h in Headers */,
+				4B370A27133DD7E300237B68 /* JackCoreMidiOutputPort.h in Headers */,
+				4B370A29133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.h in Headers */,
+				4B370A2B133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.h in Headers */,
+				4B370A2D133DD7E300237B68 /* JackCoreMidiPort.h in Headers */,
+				4B370A2F133DD7E300237B68 /* JackCoreMidiUtil.h in Headers */,
+				4B370A31133DD7E300237B68 /* JackCoreMidiVirtualInputPort.h in Headers */,
+				4B370A33133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7383,6 +7463,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BDCDB971001FB9C00B15929 /* JackCoreMidiDriver.cpp in Sources */,
+				4B370A34133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */,
+				4B370A36133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */,
+				4B370A38133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */,
+				4B370A3A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */,
+				4B370A3C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */,
+				4B370A3E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */,
+				4B370A40133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */,
+				4B370A42133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7448,6 +7536,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BF3391B0F8B86DC0080FB5B /* JackCoreMidiDriver.cpp in Sources */,
+				4B370A24133DD7E300237B68 /* JackCoreMidiInputPort.cpp in Sources */,
+				4B370A26133DD7E300237B68 /* JackCoreMidiOutputPort.cpp in Sources */,
+				4B370A28133DD7E300237B68 /* JackCoreMidiPhysicalInputPort.cpp in Sources */,
+				4B370A2A133DD7E300237B68 /* JackCoreMidiPhysicalOutputPort.cpp in Sources */,
+				4B370A2C133DD7E300237B68 /* JackCoreMidiPort.cpp in Sources */,
+				4B370A2E133DD7E300237B68 /* JackCoreMidiUtil.cpp in Sources */,
+				4B370A30133DD7E300237B68 /* JackCoreMidiVirtualInputPort.cpp in Sources */,
+				4B370A32133DD7E300237B68 /* JackCoreMidiVirtualOutputPort.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

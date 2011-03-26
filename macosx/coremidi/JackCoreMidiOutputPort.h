@@ -35,11 +35,6 @@ namespace Jack {
         MIDITimeStamp
         GetTimeStampFromFrames(jack_nframes_t frames);
 
-        void
-        Initialize(const char *alias_name, const char *client_name,
-                   const char *driver_name, int index,
-                   MIDIEndpointRef endpoint);
-
         static const size_t PACKET_BUFFER_SIZE = 65536;
 
         char packet_buffer[PACKET_BUFFER_SIZE];
@@ -50,12 +45,17 @@ namespace Jack {
 
     protected:
 
-        virtual void
+        virtual bool
         SendPacketList(MIDIPacketList *packet_list) = 0;
+
+        void
+        Initialize(const char *alias_name, const char *client_name,
+                   const char *driver_name, int index,
+                   MIDIEndpointRef endpoint);
 
     public:
 
-        JackCoreMidiOutputPort(double time_ratio, size_t max_bytes=4096,
+        JackCoreMidiOutputPort(double time_ratio, int realtime_priority, size_t max_bytes=4096,
                                size_t max_messages=1024);
 
         virtual

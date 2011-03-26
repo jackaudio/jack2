@@ -20,8 +20,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackCoreMidiUtil__
 #define __JackCoreMidiUtil__
 
-#include <ErrorLib.h>
-
+#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
 #include <string>
 
 namespace Jack {

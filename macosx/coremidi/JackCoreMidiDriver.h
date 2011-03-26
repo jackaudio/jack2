@@ -50,11 +50,11 @@ namespace Jack {
         int num_physical_outputs;
         int num_virtual_inputs;
         int num_virtual_outputs;
-        JackCoreMidiPhysicalInputPort *physical_input_ports;
-        JackCoreMidiPhysicalOutputPort *physical_output_ports;
+        JackCoreMidiPhysicalInputPort **physical_input_ports;
+        JackCoreMidiPhysicalOutputPort **physical_output_ports;
         double time_ratio;
-        JackCoreMidiVirtualInputPort *virtual_input_ports;
-        JackCoreMidiVirtualOutputPort *virtual_output_ports;
+        JackCoreMidiVirtualInputPort **virtual_input_ports;
+        JackCoreMidiVirtualOutputPort **virtual_output_ports;
 
     public:
 

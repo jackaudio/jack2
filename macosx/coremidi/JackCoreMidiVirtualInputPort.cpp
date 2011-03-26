@@ -50,7 +50,7 @@ JackCoreMidiVirtualInputPort(const char *alias_name, const char *client_name,
 {
     std::stringstream stream;
     stream << "JackMidi" << (index + 1);
-    CFStringRef name = CFStringCreateWithString(0, stream.str().c_str(),
+    CFStringRef name = CFStringCreateWithCString(0, stream.str().c_str(),
                                                 CFStringGetSystemEncoding());
     if (! name) {
         throw std::bad_alloc();

@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <new>
 
 #include "JackCoreMidiOutputPort.h"
+#include "JackMidiUtil.h"
 
 using Jack::JackCoreMidiOutputPort;
 
@@ -126,7 +127,7 @@ JackCoreMidiOutputPort::Execute()
 }
 
 MIDITimeStamp
-JackCoreMidiPort::GetTimeStampFromFrames(jack_nframes_t frames)
+JackCoreMidiOutputPort::GetTimeStampFromFrames(jack_nframes_t frames)
 {
     return GetTimeFromFrames(frames) / time_ratio;
 }
@@ -148,7 +149,7 @@ JackCoreMidiOutputPort::Initialize(const char *alias_name,
                                   const char *driver_name, int index,
                                   MIDIEndpointRef endpoint)
 {
-    Initialize(alias_name, client_name, driver_name, index, endpoint, true);
+    JackCoreMidiPort::Initialize(alias_name, client_name, driver_name, index, endpoint, true);
 }
 
 void

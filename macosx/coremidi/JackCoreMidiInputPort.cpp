@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackCoreMidiInputPort.h"
 #include "JackMidiUtil.h"
+//#include "types.h"
 
 using Jack::JackCoreMidiInputPort;
 
@@ -47,8 +48,8 @@ JackCoreMidiInputPort::~JackCoreMidiInputPort()
     delete[] sysex_buffer;
 }
 
-jack_frames_t
-JackCoreMidiPort::GetFramesFromTimeStamp(MIDITimeStamp timestamp)
+jack_nframes_t
+JackCoreMidiInputPort::GetFramesFromTimeStamp(MIDITimeStamp timestamp)
 {
     return GetFramesFromTime((jack_time_t) (timestamp * time_ratio));
 }
@@ -59,7 +60,7 @@ JackCoreMidiInputPort::Initialize(const char *alias_name,
                                   const char *driver_name, int index,
                                   MIDIEndpointRef endpoint)
 {
-    Initialize(alias_name, client_name, driver_name, index, endpoint, false);
+    JackCoreMidiPort::Initialize(alias_name, client_name, driver_name, index, endpoint, false);
 }
 
 void
@@ -127,7 +128,7 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
         case JackMidiWriteQueue::BUFFER_TOO_SMALL:
             jack_error("JackCoreMidiInputPort::ProcessCoreMidi - The thread "
                        "queue couldn't enqueue a %d-byte packet.  Dropping "
-                       "event.", event->size);
+                       "event.", event.size);
             break;
         default:
             ;
@@ -143,7 +144,7 @@ void
 JackCoreMidiInputPort::ProcessJack(JackMidiBuffer *port_buffer,
                                    jack_nframes_t frames)
 {
-    write_queue->ResetMidiBuffer(port_buffer);
+    write_queue->ResetMidiBuffer(port_buffer, frames);
     if (! jack_event) {
         jack_event = thread_queue->DequeueEvent();
     }

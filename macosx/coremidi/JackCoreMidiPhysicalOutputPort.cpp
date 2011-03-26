@@ -55,7 +55,7 @@ JackCoreMidiPhysicalOutputPort::~JackCoreMidiPhysicalOutputPort()
 bool
 JackCoreMidiPhysicalOutputPort::SendPacketList(MIDIPacketList *packet_list)
 {
-    OSStatus status = MIDISend(internal_output, source, packet_list);
+    OSStatus status = MIDISend(internal_output, endpoint, packet_list);
     bool result = status == noErr;
     if (! result) {
         WriteMacOSError("JackCoreMidiPhysicalOutputPort::SendPacketList",

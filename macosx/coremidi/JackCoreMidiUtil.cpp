@@ -20,6 +20,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <sstream>
 
 #include "JackError.h"
+#include "JackCoreMidiUtil.h"
+#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
 
 std::string
 Jack::GetMacOSErrorString(OSStatus status)
@@ -42,3 +44,4 @@ Jack::WriteMacOSError(const char *jack_function, const char *mac_function,
     jack_error("%s - %s: %s", jack_function, mac_function,
                GetMacOSStatusString(status).c_str());
 }
+

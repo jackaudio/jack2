@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <sstream>
 #include <stdexcept>
+#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
 
 #include "JackCoreMidiUtil.h"
 #include "JackCoreMidiVirtualOutputPort.h"
@@ -62,11 +63,11 @@ JackCoreMidiVirtualOutputPort::~JackCoreMidiVirtualOutputPort()
 bool
 JackCoreMidiVirtualOutputPort::SendPacketList(MIDIPacketList *packet_list)
 {
-    OSStatus status = MIDIReceived(source, packet_list);
+    OSStatus status = MIDIReceived(endpoint, packet_list);
     bool result = status == noErr;
     if (! result) {
         WriteMacOSError("JackCoreMidiVirtualOutputPort::SendPacketList",
-                        "MIDIReceived" status);
+                        "MIDIReceived", status);
     }
     return result;
 }

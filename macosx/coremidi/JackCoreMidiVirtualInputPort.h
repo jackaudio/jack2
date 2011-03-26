@@ -30,7 +30,7 @@ namespace Jack {
 
         static void
         HandleInputEvent(const MIDIPacketList *packet_list, void *port,
-                         void *src_ref)
+                         void *src_ref);
 
     public:
 

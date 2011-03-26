@@ -26,6 +26,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCoreMidiUtil.h"
 #include "JackEngineControl.h"
 
+namespace Jack
+{
+
 ///////////////////////////////////////////////////////////////////////////////
 // Static callbacks
 ///////////////////////////////////////////////////////////////////////////////
@@ -255,6 +258,9 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     int po_count = 0;
     int vi_count = 0;
     int vo_count = 0;
+    ItemCount potential_po_count;
+    ItemCount potential_pi_count;
+
     CFStringRef name = CFStringCreateWithCString(0, "JackMidi",
                                                  CFStringGetSystemEncoding());
     if (! name) {
@@ -277,7 +283,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (in_channels) {
         try {
             virtual_input_ports =
-                new JackCoreMidiVirtualInputPort[in_channels];
+                new JackCoreMidiVirtualInputPort*[in_channels];
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating virtual "
                        "input port array: %s", e.what());
@@ -302,7 +308,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (out_channels) {
         try {
             virtual_output_ports =
-                new JackCoreMidiVirtualOutputPort[out_channels];
+                new JackCoreMidiVirtualOutputPort*[out_channels];
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating virtual "
                        "output port array: %s", e.what());
@@ -325,7 +331,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     }
 
     // Allocate and connect physical inputs
-    ItemCount potential_pi_count = MIDIGetNumberOfSources();
+    potential_pi_count = MIDIGetNumberOfSources();
     if (potential_pi_count) {
         status = MIDIInputPortCreate(client, CFSTR("Physical Input Port"),
                                      HandleInputEvent, this, &internal_input);
@@ -336,7 +342,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
         }
         try {
             physical_input_ports =
-                new JackCoreMidiPhysicalInputPort[potential_pi_count];
+                new JackCoreMidiPhysicalInputPort*[potential_pi_count];
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating physical "
                        "input port array: %s", e.what());
@@ -359,7 +365,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     }
 
     // Allocate and connect physical outputs
-    ItemCount potential_po_count = MIDIGetNumberOfDestinations();
+    potential_po_count = MIDIGetNumberOfDestinations();
     if (potential_po_count) {
         status = MIDIOutputPortCreate(client, CFSTR("Physical Output Port"),
                                       &internal_output);
@@ -370,7 +376,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
         }
         try {
             physical_output_ports =
-                new JackCoreMidiPhysicalOutputPort[potential_po_count];
+                new JackCoreMidiPhysicalOutputPort*[potential_po_count];
         } catch (std::exception e) {
             jack_error("JackCoreMidiDriver::Open - while creating physical "
                        "output port array: %s", e.what());
@@ -625,6 +631,8 @@ JackCoreMidiDriver::Write()
     }
     return 0;
 }
+
+} // end of namespace
 
 #ifdef __cplusplus
 extern "C" {

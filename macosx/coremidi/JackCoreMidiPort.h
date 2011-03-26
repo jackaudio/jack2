@@ -31,7 +31,6 @@ namespace Jack {
     private:
 
         char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        MIDIEndpointRef endpoint;
         bool initialized;
         char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 
@@ -46,6 +45,7 @@ namespace Jack {
                    MIDIEndpointRef endpoint, bool is_output);
 
         double time_ratio;
+         MIDIEndpointRef endpoint;
 
     public:
 
