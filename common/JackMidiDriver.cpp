@@ -164,12 +164,12 @@ int JackMidiDriver::ProcessReadSync()
 
     // Read input buffers for the current cycle
     if (Read() < 0) {
-        jack_error("JackMidiDriver::ProcessSync: read error, skip cycle");
+        jack_error("JackMidiDriver::ProcessReadSync: read error, skip cycle");
         res = -1;
     }
 
     if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
-        jack_error("JackMidiDriver::ProcessSync - ResumeRefNum error");
+        jack_error("JackMidiDriver::ProcessReadSync - ResumeRefNum error");
         res = -1;
     }
 
@@ -183,13 +183,13 @@ int JackMidiDriver::ProcessWriteSync()
     if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable,
                                      DRIVER_TIMEOUT_FACTOR *
                                      fEngineControl->fTimeOutUsecs) < 0) {
-        jack_error("JackMidiDriver::ProcessSync - SuspendRefNum error");
+        jack_error("JackMidiDriver::ProcessWriteSync - SuspendRefNum error");
         res = -1;
     }
 
     // Write output buffers from the current cycle
     if (Write() < 0) {
-        jack_error("JackMidiDriver::ProcessSync - Write error");
+        jack_error("JackMidiDriver::ProcessWriteSync - Write error");
         res = -1;
     }
 
@@ -202,18 +202,18 @@ int JackMidiDriver::ProcessReadAsync()
 
     // Read input buffers for the current cycle
     if (Read() < 0) {
-        jack_error("JackMidiDriver::ProcessAsync: read error, skip cycle");
+        jack_error("JackMidiDriver::ProcessReadAsync: read error, skip cycle");
         res = -1;
     }
 
     // Write output buffers from the previous cycle
     if (Write() < 0) {
-        jack_error("JackMidiDriver::ProcessAsync - Write error");
+        jack_error("JackMidiDriver::ProcessReadAsync - Write error");
         res = -1;
     }
 
     if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
-        jack_error("JackMidiDriver::ProcessAsync - ResumeRefNum error");
+        jack_error("JackMidiDriver::ProcessReadAsync - ResumeRefNum error");
         res = -1;
     }
 

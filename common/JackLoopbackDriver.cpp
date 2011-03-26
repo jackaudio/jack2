@@ -30,20 +30,61 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
 
-int JackLoopbackDriver::Process()
+int JackLoopbackDriver::ProcessRead()
 {
+    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
+}
+
+int JackLoopbackDriver::ProcessWrite()
+{
+    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
+}
+
+int JackLoopbackDriver::ProcessReadSync()
+{
+    int res = 0;
+
     // Loopback copy
     for (int i = 0; i < fCaptureChannels; i++) {
         memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
     }
 
-    fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable); // Signal all clients
-    if (fEngineControl->fSyncMode) {
-        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
-            jack_error("JackLoopbackDriver::ProcessSync SuspendRefNum error");
-            return -1;
-        }
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+        jack_error("JackLoopbackDriver::ProcessReadSync - ResumeRefNum error");
+        res = -1;
     }
+
+    return res;
+}
+
+int JackLoopbackDriver::ProcessWriteSync()
+{
+    if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
+        jack_error("JackLoopbackDriver::ProcessWriteSync SuspendRefNum error");
+        return -1;
+    }
+    return 0;
+}
+
+int JackLoopbackDriver::ProcessReadAsync()
+{
+    int res = 0;
+
+    // Loopback copy
+    for (int i = 0; i < fCaptureChannels; i++) {
+        memcpy(GetInputBuffer(i), GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
+    }
+
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+        jack_error("JackLoopbackDriver::ProcessReadAsync - ResumeRefNum error");
+        res = -1;
+    }
+
+    return res;
+}
+
+int JackLoopbackDriver::ProcessWriteAsync()
+{
     return 0;
 }
 

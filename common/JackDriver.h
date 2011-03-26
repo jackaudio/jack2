@@ -232,19 +232,6 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
 
 };
 
-/*
-class SERVER_EXPORT JackSlaveDriverInterface
-{
-
-    public:
-
-        virtual int ProcessRead()   { return 0; }
-        virtual int ProcessWrite()  { return 0; }
-
-};
-
-*/
-
 } // end of namespace
 
 #endif
