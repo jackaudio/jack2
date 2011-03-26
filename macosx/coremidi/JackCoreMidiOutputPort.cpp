@@ -60,7 +60,7 @@ JackCoreMidiOutputPort::Execute()
         if (! event) {
             event = thread_queue->DequeueEvent((long) 0);
         }
-        jack_midi_data_t *data = event->data;
+        jack_midi_data_t *data = event->buffer;
 
         // This is the latest time that the packet list can be sent out.  We
         // may want to consider subtracting some frames to leave room for the
@@ -79,10 +79,10 @@ JackCoreMidiOutputPort::Execute()
                 if (! event) {
                     break;
                 }
-                packet = MIDIPacketListAdd(packet_list, midi_buffer_size,
+                packet = MIDIPacketListAdd(packet_list, sizeof(packet_buffer),
                                            packet,
                                            GetTimeStampFromFrames(event->time),
-                                           event->size, event->data);
+                                           event->size, event->buffer);
                 if (! packet) {
                     break;
                 }
@@ -107,8 +107,9 @@ JackCoreMidiOutputPort::Execute()
                     if (num_bytes > 256) {
                         num_bytes = 256;
                     }
-                    packet = MIDIPacketListAdd(packet_list, midi_buffer_size,
-                                               packet, timestamp, num_bytes,
+                    packet = MIDIPacketListAdd(packet_list,
+                                               sizeof(packet_buffer), packet,
+                                               timestamp, num_bytes,
                                                data + bytes_sent);
                     if (! packet) {
                         break;

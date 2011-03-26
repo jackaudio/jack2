@@ -100,9 +100,8 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
                     sysex_bytes_sent = 0;
                     goto get_next_packet;
                 }
-                event.data = sysex_buffer;
+                event.buffer = sysex_buffer;
                 event.size = sysex_bytes_sent;
-                event.time = ;
                 sysex_bytes_sent = 0;
                 goto send_event;
             }
@@ -115,7 +114,7 @@ JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
                 goto buffer_sysex_bytes;
             }
         }
-        event.data = data;
+        event.buffer = data;
         event.size = size;
 
     send_event:

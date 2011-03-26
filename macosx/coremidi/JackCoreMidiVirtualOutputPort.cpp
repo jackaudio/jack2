@@ -19,7 +19,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <sstream>
 #include <stdexcept>
-#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
 
 #include "JackCoreMidiUtil.h"
 #include "JackCoreMidiVirtualOutputPort.h"

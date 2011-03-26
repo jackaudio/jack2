@@ -26,8 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCoreMidiUtil.h"
 #include "JackEngineControl.h"
 
-namespace Jack
-{
+using Jack::JackCoreMidiDriver;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Static callbacks
@@ -631,8 +630,6 @@ JackCoreMidiDriver::Write()
     }
     return 0;
 }
-
-} // end of namespace
 
 #ifdef __cplusplus
 extern "C" {

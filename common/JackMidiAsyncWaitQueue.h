@@ -44,6 +44,8 @@ namespace Jack {
 
     public:
 
+        using JackMidiAsyncQueue::EnqueueEvent;
+
         /**
          * Creates a new asynchronous MIDI wait message queue.  The queue can
          * store up to `max_messages` MIDI messages and up to `max_bytes` of
