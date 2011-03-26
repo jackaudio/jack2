@@ -107,13 +107,11 @@ JackALSARawMidiInputPort::ProcessJack(JackMidiBuffer *port_buffer,
 
         // We add `frames` so that MIDI events align with audio as closely as
         // possible.
-        switch (write_queue->EnqueueEvent(jack_event->time + frames,
-                                          jack_event->size,
-                                          jack_event->buffer)) {
+        switch (write_queue->EnqueueEvent(jack_event, frames)) {
         case JackMidiWriteQueue::BUFFER_TOO_SMALL:
-            jack_error("JackALSARawMidiInputPort::Process - The write queue "
-                       "couldn't enqueue a %d-byte event.  Dropping event.",
-                       jack_event->size);
+            jack_error("JackALSARawMidiInputPort::ProcessJack - The write "
+                       "queue couldn't enqueue a %d-byte event.  Dropping "
+                       "event.", jack_event->size);
             // Fallthrough on purpose
         case JackMidiWriteQueue::OK:
             continue;
