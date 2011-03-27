@@ -39,7 +39,6 @@ namespace Jack {
 
         char packet_buffer[PACKET_BUFFER_SIZE];
         JackMidiBufferReadQueue *read_queue;
-        int realtime_priority;
         JackThread *thread;
         JackMidiAsyncWaitQueue *thread_queue;
 
@@ -55,7 +54,7 @@ namespace Jack {
 
     public:
 
-        JackCoreMidiOutputPort(double time_ratio, int realtime_priority, size_t max_bytes=4096,
+        JackCoreMidiOutputPort(double time_ratio, size_t max_bytes=4096,
                                size_t max_messages=1024);
 
         virtual

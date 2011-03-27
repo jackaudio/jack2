@@ -30,9 +30,9 @@ JackCoreMidiPhysicalOutputPort(const char *alias_name, const char *client_name,
                                const char *driver_name, int index,
                                MIDIClientRef client,
                                MIDIPortRef internal_output, double time_ratio,
-                               int realtime_priority, size_t max_bytes,
+                               size_t max_bytes,
                                size_t max_messages):
-    JackCoreMidiOutputPort(time_ratio, realtime_priority, max_bytes,
+    JackCoreMidiOutputPort(time_ratio, max_bytes,
                            max_messages)
 {
     MIDIEndpointRef destination = MIDIGetDestination(index);

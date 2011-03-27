@@ -267,8 +267,10 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
                    "client name string");
         return -1;
     }
+
     OSStatus status = MIDIClientCreate(name, HandleNotificationEvent, this,
                                        &client);
+
     CFRelease(name);
     if (status != noErr) {
         WriteMacOSError("JackCoreMidiDriver::Close", "MIDIClientCreate",
@@ -276,7 +278,6 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
         return -1;
     }
     char *client_name = fClientControl.fName;
-    int port_rt_priority = fEngineControl->fServerPriority + 1;
 
     // Allocate and connect virtual inputs
     if (in_channels) {
@@ -319,8 +320,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
                     new JackCoreMidiVirtualOutputPort(fAliasName, client_name,
                                                       playback_driver_name,
                                                       vo_count, client,
-                                                      time_ratio,
-                                                      port_rt_priority);
+                                                      time_ratio);
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating virtual "
                            "output port: %s", e.what());
@@ -387,8 +387,7 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
                     new JackCoreMidiPhysicalOutputPort(fAliasName, client_name,
                                                        playback_driver_name, i,
                                                        client, internal_output,
-                                                       time_ratio,
-                                                       port_rt_priority);
+                                                       time_ratio);
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical output port: %s", e.what());

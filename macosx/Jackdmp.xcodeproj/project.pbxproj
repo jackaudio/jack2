@@ -1861,7 +1861,7 @@
 		4BF8D2470834F20600C94B91 /* testSem.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSem.cpp; path = ../tests/testSem.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0D08AC88EF00D1A344 /* JackFrameTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackFrameTimer.cpp; path = ../common/JackFrameTimer.cpp; sourceTree = SOURCE_ROOT; };
 		4BF8FB0E08AC88EF00D1A344 /* JackFrameTimer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackFrameTimer.h; path = ../common/JackFrameTimer.h; sourceTree = SOURCE_ROOT; };
-		4BFA5E980DEC4D9C00FA4CDB /* testSem */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testSem; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BFA5E980DEC4D9C00FA4CDB /* testMutex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = testMutex; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA5E9E0DEC4DD900FA4CDB /* testMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testMutex.cpp; path = ../tests/testMutex.cpp; sourceTree = SOURCE_ROOT; };
 		4BFA828C0DF6A9E40087B4E1 /* jack_evmon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_evmon; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BFA829F0DF6A9E40087B4E1 /* jack_bufsize */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = jack_bufsize; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2662,7 +2662,7 @@
 				4B363F1E0DEB0A6A001F72D9 /* jack_monitor_client */,
 				4B363F350DEB0BD1001F72D9 /* jack_showtime */,
 				4B363F720DEB0D4E001F72D9 /* jack_impulse_grabber */,
-				4BFA5E980DEC4D9C00FA4CDB /* testSem */,
+				4BFA5E980DEC4D9C00FA4CDB /* testMutex */,
 				4BFA828C0DF6A9E40087B4E1 /* jack_evmon */,
 				4BFA829F0DF6A9E40087B4E1 /* jack_bufsize */,
 				4BFA82AB0DF6A9E40087B4E1 /* jack_rec */,
@@ -5871,7 +5871,7 @@
 			name = "testMutex Universal";
 			productInstallPath = /usr/local/bin;
 			productName = testSem;
-			productReference = 4BFA5E980DEC4D9C00FA4CDB /* testSem */;
+			productReference = 4BFA5E980DEC4D9C00FA4CDB /* testMutex */;
 			productType = "com.apple.product-type.tool";
 		};
 		4BFA82820DF6A9E40087B4E1 /* jack_evmon 64 bits */ = {
@@ -9502,6 +9502,7 @@
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
 					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1)",
+					"$(OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2)",
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (

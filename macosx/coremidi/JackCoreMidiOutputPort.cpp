@@ -26,7 +26,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 using Jack::JackCoreMidiOutputPort;
 
 JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
-                                               int realtime_priority,
                                                size_t max_bytes,
                                                size_t max_messages):
     JackCoreMidiPort(time_ratio)
@@ -36,7 +35,6 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
     thread_queue = new JackMidiAsyncWaitQueue(max_bytes, max_messages);
     std::auto_ptr<JackMidiAsyncWaitQueue> thread_ptr(thread_queue);
     thread = new JackThread(this);
-    this->realtime_priority = realtime_priority;
     thread_ptr.release();
     read_ptr.release();
 }
@@ -137,7 +135,15 @@ bool
 JackCoreMidiOutputPort::Init()
 {
     set_threaded_log_function();
-    if (thread->AcquireSelfRealTime(realtime_priority)) {
+
+    // OSX only...
+    UInt64 period = 0;
+    UInt64 computation = 500 * 1000;
+    UInt64 constraint = 500 * 1000;
+    thread->SetParams(period, computation, constraint);
+
+    // Use the server priority : y
+    if (thread->AcquireSelfRealTime()) {
         jack_error("JackCoreMidiOutputPort::Init - could not acquire realtime "
                    "scheduling.  Continuing anyway.");
     }

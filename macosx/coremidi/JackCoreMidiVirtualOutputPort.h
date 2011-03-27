@@ -37,7 +37,6 @@ namespace Jack {
                                       const char *client_name,
                                       const char *driver_name, int index,
                                       MIDIClientRef client, double time_ratio,
-                                      int realtime_priority,
                                       size_t max_bytes=4096,
                                       size_t max_messages=1024);
 
