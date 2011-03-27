@@ -476,7 +476,9 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Unknown driver \"%s\"\n", *it);
             goto close_server;
         }
-        jackctl_server_add_slave(server_ctl, slave_driver_ctl);
+        if (!jackctl_server_add_slave(server_ctl, slave_driver_ctl)) {
+            fprintf(stderr, "Driver \"%s\" cannot be loaded\n", *it);
+        }
     }
 
     // Loopback driver
@@ -491,7 +493,9 @@ int main(int argc, char* argv[])
                 value.ui = loopback;
                 jackctl_parameter_set_value(param, &value);
             }
-            jackctl_server_add_slave(server_ctl, loopback_driver_ctl);
+            if (!jackctl_server_add_slave(server_ctl, loopback_driver_ctl)) {
+                fprintf(stderr, "Driver \"loopback\" cannot be loaded\n");
+            }
         }
 
     }
@@ -509,7 +513,9 @@ int main(int argc, char* argv[])
             fprintf(stderr, "Unknown internal \"%s\"\n", *it);
             goto stop_server;
         }
-        jackctl_server_load_internal(server_ctl, internal_driver_ctl);
+        if (!jackctl_server_load_internal(server_ctl, internal_driver_ctl)) {
+            fprintf(stderr, "Internal client \"%s\" cannot be loaded\n", *it);
+        }
     }
 
     notify_server_start(server_name);

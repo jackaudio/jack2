@@ -357,7 +357,9 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical input port: %s", e.what());
-                continue;
+                //continue;
+                // SL : seems safer to fail here?
+                goto destroy_internal_input_port;
             }
             pi_count++;
         }
@@ -391,7 +393,9 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
             } catch (std::exception e) {
                 jack_error("JackCoreMidiDriver::Open - while creating "
                            "physical output port: %s", e.what());
-                continue;
+                //continue;
+                // SL : seems safer to fail here?
+                goto destroy_internal_output_port;
             }
             po_count++;
         }

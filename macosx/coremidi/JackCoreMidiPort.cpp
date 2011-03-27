@@ -65,6 +65,7 @@ JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
     char endpoint_name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     CFStringRef endpoint_name_ref;
     int num = index + 1;
+    Boolean res;
     OSStatus result = MIDIObjectGetStringProperty(endpoint, kMIDIPropertyName,
                                                   &endpoint_name_ref);
     if (result != noErr) {
@@ -72,10 +73,10 @@ JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
                         "MIDIObjectGetStringProperty", result);
         goto get_basic_alias;
     }
-    result = CFStringGetCString(endpoint_name_ref, endpoint_name,
+    res = CFStringGetCString(endpoint_name_ref, endpoint_name,
                                 sizeof(endpoint_name), 0);
     CFRelease(endpoint_name_ref);
-    if (result != noErr) {
+    if (!res) {
         jack_error("JackCoreMidiPort::Initialize - failed to allocate memory "
                    "for endpoint name.");
     get_basic_alias:

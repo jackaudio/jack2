@@ -68,6 +68,8 @@ JackMidiAsyncWaitQueue::DequeueEvent(jack_nframes_t frame)
 jack_midi_event_t *
 JackMidiAsyncWaitQueue::DequeueEvent(long usec)
 {
+printf("JackMidiAsyncWaitQueue::DequeueEvent 0 %d\n", semaphore);
+
     return ((usec < 0) ? semaphore.Wait() : semaphore.TimedWait(usec)) ?
         JackMidiAsyncQueue::DequeueEvent() : 0;
 }
