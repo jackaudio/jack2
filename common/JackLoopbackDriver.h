@@ -33,6 +33,14 @@ namespace Jack
 class JackLoopbackDriver : public JackAudioDriver
 {
 
+    private:
+
+        virtual int ProcessReadSync();
+        virtual int ProcessWriteSync();
+
+        virtual int ProcessReadAsync();
+        virtual int ProcessWriteAsync();
+
     public:
 
         JackLoopbackDriver(JackLockedEngine* engine, JackSynchro* table)
@@ -41,7 +49,8 @@ class JackLoopbackDriver : public JackAudioDriver
         virtual ~JackLoopbackDriver()
         {}
 
-        int Process();
+        virtual int ProcessRead();
+        virtual int ProcessWrite();
 };
 
 } // end of namespace

@@ -34,6 +34,15 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-03-24 Stephane Letz  <letz@grame.fr>
+
+	* Implement renaming in JackDriver::Open to avoid name collision (thanks Devin Anderson).
+	* Correct alsa_driver_restart (thanks Devin Anderson).
+
+2011-03-23 Stephane Letz  <letz@grame.fr>
+
+	* Devin Anderson server-ctl-proposal branch merged on trunk: improved control API, slave backend reworked.
+
 2011-03-14 Stephane Letz  <letz@grame.fr>
 
 	* Correct JackEngine::NotifyGraphReorder, update JackDebugClient with latest API.

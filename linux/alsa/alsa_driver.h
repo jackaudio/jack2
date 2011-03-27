@@ -278,6 +278,7 @@ void MonitorInput();
 void ClearOutput();
 void WriteOutput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
 void SetTime(jack_time_t time);
+int Restart();
 
 #ifdef __cplusplus
 }

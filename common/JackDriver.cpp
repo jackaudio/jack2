@@ -82,7 +82,7 @@ int JackDriver::Open()
     return 0;
 }
 
-int JackDriver::Open (bool capturing,
+int JackDriver::Open(bool capturing,
                      bool playing,
                      int inchannels,
                      int outchannels,
@@ -95,6 +95,15 @@ int JackDriver::Open (bool capturing,
     jack_log("JackDriver::Open capture_driver_name = %s", capture_driver_name);
     jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
     int refnum = -1;
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    int status;
+
+    // Check name and possibly rename
+    if (fEngine->ClientCheck(fClientControl.fName, -1, name_res, JACK_PROTOCOL_VERSION, (int)JackNullOption, (int*)&status) < 0) {
+        jack_error("Client name = %s conflits with another running client", fClientControl.fName);
+        return -1;
+    }
+    strcpy(fClientControl.fName, name_res);
 
     if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for driver");
@@ -137,6 +146,15 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     jack_log("JackDriver::Open capture_driver_name = %s", capture_driver_name);
     jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
     int refnum = -1;
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    int status;
+
+    // Check name and possibly rename
+    if (fEngine->ClientCheck(fClientControl.fName, -1, name_res, JACK_PROTOCOL_VERSION, (int)JackNullOption, (int*)&status) < 0) {
+        jack_error("Client name = %s conflits with another running client", fClientControl.fName);
+        return -1;
+    }
+    strcpy(fClientControl.fName, name_res);
 
     if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for driver");
@@ -282,17 +300,40 @@ void JackDriver::RemoveSlave(JackDriverInterface* slave)
     fSlaveList.remove(slave);
 }
 
-int JackDriver::ProcessSlaves()
+int JackDriver::ProcessReadSlaves()
 {
     int res = 0;
     list<JackDriverInterface*>::const_iterator it;
     for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
         JackDriverInterface* slave = *it;
-        if (slave->Process() < 0)
+        if (slave->ProcessRead() < 0)
             res = -1;
 
     }
     return res;
+}
+
+int JackDriver::ProcessWriteSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->ProcessWrite() < 0)
+            res = -1;
+
+    }
+    return res;
+}
+
+int JackDriver::ProcessRead()
+{
+    return 0;
+}
+
+int JackDriver::ProcessWrite()
+{
+    return 0;
 }
 
 int JackDriver::Process()
