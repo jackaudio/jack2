@@ -20,8 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackCoreMidiOutputPort__
 #define __JackCoreMidiOutputPort__
 
+#include <semaphore.h>
+
 #include "JackCoreMidiPort.h"
-#include "JackMidiAsyncWaitQueue.h"
+#include "JackMidiAsyncQueue.h"
 #include "JackMidiBufferReadQueue.h"
 #include "JackThread.h"
 
@@ -32,6 +34,9 @@ namespace Jack {
 
     private:
 
+        jack_midi_event_t *
+        GetCoreMidiEvent(bool block);
+
         MIDITimeStamp
         GetTimeStampFromFrames(jack_nframes_t frames);
 
@@ -39,8 +44,10 @@ namespace Jack {
 
         char packet_buffer[PACKET_BUFFER_SIZE];
         JackMidiBufferReadQueue *read_queue;
+        char semaphore_name[128];
         JackThread *thread;
-        JackMidiAsyncWaitQueue *thread_queue;
+        JackMidiAsyncQueue *thread_queue;
+        sem_t *thread_queue_semaphore;
 
     protected:
 

@@ -18,7 +18,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <cassert>
+#include <cerrno>
+#include <cstring>
 #include <new>
+#include <stdexcept>
 
 #include "JackCoreMidiOutputPort.h"
 #include "JackMidiUtil.h"
@@ -31,18 +34,27 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
     JackCoreMidiPort(time_ratio)
 {
     read_queue = new JackMidiBufferReadQueue();
-    std::auto_ptr<JackMidiBufferReadQueue> read_ptr(read_queue);
-    thread_queue = new JackMidiAsyncWaitQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncWaitQueue> thread_ptr(thread_queue);
+    std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
+    thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
+    std::auto_ptr<JackMidiAsyncWaitQueue> thread_queue_ptr(thread_queue);
     thread = new JackThread(this);
+    std::auto_ptr<JackThread> thread_ptr(thread);
+    sprintf(semaphore_name, "coremidi_thread_queue_semaphore_%p", this);
+    thread_queue_semaphore = sem_open(semaphore_name, O_CREAT, 0777, 0);
+    if (thread_queue_semaphore == (sem_t *) SEM_FAILED) {
+        throw std::runtime_error(strerror(errno));
+    }
     thread_ptr.release();
-    read_ptr.release();
+    thread_queue_ptr.release();
+    read_queue_ptr.release();
 }
 
 JackCoreMidiOutputPort::~JackCoreMidiOutputPort()
 {
     Stop();
     delete thread;
+    sem_destroy(thread_queue_semaphore);
+    sem_unlink(semaphore_name);
     delete read_queue;
     delete thread_queue;
 }
@@ -57,7 +69,7 @@ JackCoreMidiOutputPort::Execute()
         assert(packet);
         assert(thread_queue);
         if (! event) {
-            event = thread_queue->DequeueEvent((long) 0);
+            event = GetCoreMidiEvent(true);
         }
         jack_midi_data_t *data = event->buffer;
 
@@ -74,7 +86,7 @@ JackCoreMidiOutputPort::Execute()
                                    timestamp, size, data);
         if (packet) {
             while (GetCurrentFrame() < send_time) {
-                event = thread_queue->DequeueEvent();
+                event = GetCoreMidiEvent(false);
                 if (! event) {
                     break;
                 }
@@ -126,6 +138,29 @@ JackCoreMidiOutputPort::Execute()
     return false;
 }
 
+jack_midi_event_t *
+JackCoreMidiOutputPort::GetCoreMidiEvent(bool block)
+{
+    if (! block) {
+        if (sem_trywait(thread_queue_semaphore)) {
+            if (errno != ETIMEDOUT) {
+                jack_error("JackCoreMidiOutputPort::Execute - sem_trywait: %s",
+                           strerror(errno));
+            }
+            return 0;
+        }
+    } else {
+        while (sem_wait(thread_queue_semaphore)) {
+            if (errno != EINTR) {
+                jack_error("JackCoreMidiOutputPort::Execute - sem_wait: %s",
+                           strerror(errno));
+                return 0;
+            }
+        }
+    }
+    return thread_queue->DequeueEvent();
+}
+
 MIDITimeStamp
 JackCoreMidiOutputPort::GetTimeStampFromFrames(jack_nframes_t frames)
 {
@@ -157,7 +192,8 @@ JackCoreMidiOutputPort::Initialize(const char *alias_name,
                                   const char *driver_name, int index,
                                   MIDIEndpointRef endpoint)
 {
-    JackCoreMidiPort::Initialize(alias_name, client_name, driver_name, index, endpoint, true);
+    JackCoreMidiPort::Initialize(alias_name, client_name, driver_name, index,
+                                 endpoint, true);
 }
 
 void
@@ -171,14 +207,18 @@ JackCoreMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
         case JackMidiWriteQueue::BUFFER_FULL:
             jack_error("JackCoreMidiOutputPort::ProcessJack - The thread "
                        "queue buffer is full.  Dropping event.");
-            continue;
+            break;
         case JackMidiWriteQueue::BUFFER_TOO_SMALL:
             jack_error("JackCoreMidiOutputPort::ProcessJack - The thread "
                        "queue couldn't enqueue a %d-byte event.  Dropping "
                        "event.", event->size);
-            // Fallthrough on purpose
+            break;
         default:
-            ;
+            if (sem_post(thread_queue_semaphore)) {
+                jack_error("JackCoreMidiOutputPort::ProcessJack - unexpected "
+                           "error while posting to thread queue semaphore: %s",
+                           strerror(errno));
+            }
         }
     }
 }
