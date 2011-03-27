@@ -22,11 +22,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <string>
 
-#include <CarbonCore/Debugging.h>
-
-// Import?  What does this line do?  Is it necessary now that I'm not including
-// the same library I was including?
-#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
+#include <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
+#include <CoreServices/../Frameworks/CarbonCore.framework/Headers/Debugging.h>
 
 namespace Jack {
 

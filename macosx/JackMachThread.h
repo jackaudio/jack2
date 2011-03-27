@@ -62,7 +62,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #define __JackMachThread__
 
 #include "JackPosixThread.h"
-#import <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
+#include <CoreServices/../Frameworks/CarbonCore.framework/Headers/MacTypes.h>
 
 #include <mach/thread_policy.h>
 #include <mach/thread_act.h>
