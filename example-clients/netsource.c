@@ -139,24 +139,24 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
             printf( "jack_netsource: cannot register %s port\n", buf);
             break;
         }
-	if( bitdepth == 1000 ) {
-#if HAVE_CELT
-#if HAVE_CELT_API_0_11
-	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), jack_get_buffer_size(client), NULL );
-	    capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create_custom( celt_mode, 1, NULL ) );
-#elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
-	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), jack_get_buffer_size(client), NULL );
-	    capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create( celt_mode, 1, NULL ) );
-#else
-	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), 1, jack_get_buffer_size(client), NULL );
-	    capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create( celt_mode ) );
-#endif
-#endif
-	} else {
-#if HAVE_SAMPLERATE
-	    capture_srcs = jack_slist_append (capture_srcs, src_new (SRC_LINEAR, 1, NULL));
-#endif
-	}
+	if (bitdepth == 1000) {
+        #if HAVE_CELT
+        #if HAVE_CELT_API_0_11
+            CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), jack_get_buffer_size(client), NULL );
+            capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create_custom( celt_mode, 1, NULL ) );
+        #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
+            CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), jack_get_buffer_size(client), NULL );
+            capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create( celt_mode, 1, NULL ) );
+        #else
+            CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), 1, jack_get_buffer_size(client), NULL );
+            capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create( celt_mode ) );
+        #endif
+        #endif
+        } else {
+        #if HAVE_SAMPLERATE
+                capture_srcs = jack_slist_append (capture_srcs, src_new (SRC_LINEAR, 1, NULL));
+        #endif
+        }
         capture_ports = jack_slist_append (capture_ports, port);
     }
 
@@ -185,25 +185,25 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
             printf ("jack_netsource: cannot register %s port\n", buf);
             break;
         }
-	if( bitdepth == 1000 ) {
-#if HAVE_CELT
-#if HAVE_CELT_API_0_11
-	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), jack_get_buffer_size(client), NULL );
-	    playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create_custom( celt_mode, 1, NULL ) );
-#elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
-	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), jack_get_buffer_size(client), NULL );
-	    playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create( celt_mode, 1, NULL ) );
-#else
-	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), 1, jack_get_buffer_size(client), NULL );
-	    playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create( celt_mode ) );
-#endif
-#endif
-	} else {
-#if HAVE_SAMPLERATE
-	    playback_srcs = jack_slist_append (playback_srcs, src_new (SRC_LINEAR, 1, NULL));
-#endif
-	}
-	playback_ports = jack_slist_append (playback_ports, port);
+        if( bitdepth == 1000 ) {
+    #if HAVE_CELT
+    #if HAVE_CELT_API_0_11
+            CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), jack_get_buffer_size(client), NULL );
+            playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create_custom( celt_mode, 1, NULL ) );
+    #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
+            CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), jack_get_buffer_size(client), NULL );
+            playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create( celt_mode, 1, NULL ) );
+    #else
+            CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), 1, jack_get_buffer_size(client), NULL );
+            playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create( celt_mode ) );
+    #endif
+    #endif
+        } else {
+    #if HAVE_SAMPLERATE
+            playback_srcs = jack_slist_append (playback_srcs, src_new (SRC_LINEAR, 1, NULL));
+    #endif
+        }
+        playback_ports = jack_slist_append (playback_ports, port);
     }
 
     /* Allocate midi playback channels */
@@ -232,7 +232,7 @@ sync_cb (jack_transport_state_t state, jack_position_t *pos, void *arg)
     int retval = sync_state;
 
     if (! state_connected) {
-	return 1;
+        return 1;
     }
     if (latency_count) {
         latency_count--;
@@ -281,13 +281,12 @@ process (jack_nframes_t nframes, void *arg)
     jack_time_t packet_recv_timestamp;
 
     if( bitdepth == 1000 )
-	net_period = (factor * jack_get_buffer_size(client) * 1024 / jack_get_sample_rate(client) / 8)&(~1) ;
+        net_period = (factor * jack_get_buffer_size(client) * 1024 / jack_get_sample_rate(client) / 8)&(~1) ;
     else
-	net_period = (float) nframes / (float) factor;
+        net_period = (float) nframes / (float) factor;
 
     rx_bufsize =  get_sample_size (bitdepth) * capture_channels * net_period + sizeof (jacknet_packet_header);
     tx_bufsize =  get_sample_size (bitdepth) * playback_channels * net_period + sizeof (jacknet_packet_header);
-
 
     /* Allocate a buffer where both In and Out Buffer will fit */
     packet_buf_tx = alloca (tx_bufsize);
@@ -352,29 +351,29 @@ process (jack_nframes_t nframes, void *arg)
 
 
     if( reply_port )
-	input_fd = insockfd;
+        input_fd = insockfd;
     else
-	input_fd = outsockfd;
+        input_fd = outsockfd;
 
     // for latency == 0 we can poll.
     if( (latency == 0) || (freewheeling!=0)  ) {
-	jack_time_t deadline = jack_get_time() + 1000000 * jack_get_buffer_size(client)/jack_get_sample_rate(client);
-	// Now loop until we get the right packet.
-	while(1) {
-	    jack_nframes_t got_frame;
-	    if ( ! netjack_poll_deadline( input_fd, deadline ) )
-		break;
+        jack_time_t deadline = jack_get_time() + 1000000 * jack_get_buffer_size(client)/jack_get_sample_rate(client);
+        // Now loop until we get the right packet.
+        while(1) {
+            jack_nframes_t got_frame;
+            if ( ! netjack_poll_deadline( input_fd, deadline ) )
+            break;
 
-	    packet_cache_drain_socket(packcache, input_fd);
+            packet_cache_drain_socket(packcache, input_fd);
 
-	    if (packet_cache_get_next_available_framecnt( packcache, framecnt - latency, &got_frame ))
-		if( got_frame == (framecnt - latency) )
-		    break;
-	}
+            if (packet_cache_get_next_available_framecnt( packcache, framecnt - latency, &got_frame ))
+            if( got_frame == (framecnt - latency) )
+                break;
+        }
     } else {
-	// normally:
-	// only drain socket.
-	packet_cache_drain_socket(packcache, input_fd);
+        // normally:
+        // only drain socket.
+        packet_cache_drain_socket(packcache, input_fd);
     }
 
     size = packet_cache_retreive_packet_pointer( packcache, framecnt - latency, (char**)&rx_packet_ptr, rx_bufsize, &packet_recv_timestamp );
@@ -382,15 +381,15 @@ process (jack_nframes_t nframes, void *arg)
      * to the JACK ports so it can be played. */
     if (size == rx_bufsize)
     {
-	uint32_t *packet_buf_rx = rx_packet_ptr;
-	jacknet_packet_header *pkthdr_rx = (jacknet_packet_header *) packet_buf_rx;
-	packet_bufX = packet_buf_rx + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
-	// calculate how much time there would have been, if this packet was sent at the deadline.
+        uint32_t *packet_buf_rx = rx_packet_ptr;
+        jacknet_packet_header *pkthdr_rx = (jacknet_packet_header *) packet_buf_rx;
+        packet_bufX = packet_buf_rx + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
+        // calculate how much time there would have been, if this packet was sent at the deadline.
 
-	int recv_time_offset = (int) (jack_get_time() - packet_recv_timestamp);
-	packet_header_ntoh (pkthdr_rx);
-	deadline_goodness = recv_time_offset - (int)pkthdr_rx->latency;
-	//printf( "deadline goodness = %d ---> off: %d\n", deadline_goodness, recv_time_offset );
+        int recv_time_offset = (int) (jack_get_time() - packet_recv_timestamp);
+        packet_header_ntoh (pkthdr_rx);
+        deadline_goodness = recv_time_offset - (int)pkthdr_rx->latency;
+        //printf( "deadline goodness = %d ---> off: %d\n", deadline_goodness, recv_time_offset );
 
         if (cont_miss)
         {
@@ -400,26 +399,26 @@ process (jack_nframes_t nframes, void *arg)
         render_payload_to_jack_ports (bitdepth, packet_bufX, net_period,
 		capture_ports, capture_srcs, nframes, dont_htonl_floats);
 
-	state_currentframe = framecnt;
-	state_recv_packet_queue_time = recv_time_offset;
-	state_connected = 1;
+        state_currentframe = framecnt;
+        state_recv_packet_queue_time = recv_time_offset;
+        state_connected = 1;
         sync_state = pkthdr_rx->sync_state;
-	packet_cache_release_packet( packcache, framecnt - latency );
+        packet_cache_release_packet( packcache, framecnt - latency );
     }
     /* Second alternative : we've received something that's not
      * as big as expected or we missed a packet. We render silence
      * to the ouput ports */
     else
     {
-	jack_nframes_t latency_estimate;
-	if( packet_cache_find_latency( packcache, framecnt, &latency_estimate ) )
-	    //if( (state_latency == 0) || (latency_estimate < state_latency) )
-		state_latency = latency_estimate;
+        jack_nframes_t latency_estimate;
+        if( packet_cache_find_latency( packcache, framecnt, &latency_estimate ) )
+            //if( (state_latency == 0) || (latency_estimate < state_latency) )
+            state_latency = latency_estimate;
 
-	// Set the counters up.
-	state_currentframe = framecnt;
-	//state_latency = framecnt - pkthdr->framecnt;
-	state_netxruns += 1;
+        // Set the counters up.
+        state_currentframe = framecnt;
+        //state_latency = framecnt - pkthdr->framecnt;
+        state_netxruns += 1;
 
         //printf ("Frame %d  \tPacket missed or incomplete (expected: %d bytes, got: %d bytes)\n", framecnt, rx_bufsize, size);
         //printf ("Frame %d  \tPacket missed or incomplete\n", framecnt);
@@ -440,7 +439,7 @@ process (jack_nframes_t nframes, void *arg)
             chn++;
         }
     }
-    if( latency != 0 ) {
+    if (latency != 0) {
 	    /* reset packet_bufX... */
 	    packet_bufX = packet_buf_tx + sizeof (jacknet_packet_header) / sizeof (jack_default_audio_sample_t);
 
@@ -630,15 +629,15 @@ main (int argc, char *argv[])
             case 'b':
                 bitdepth = atoi (optarg);
                 break;
-	    case 'c':
+            case 'c':
 #if HAVE_CELT
-	        bitdepth = 1000;
+                bitdepth = 1000;
                 factor = atoi (optarg);
 #else
-                printf( "not built with celt supprt\n" );
+                printf( "not built with celt support\n" );
                 exit(10);
 #endif
-	        break;
+                break;
             case 'm':
                 mtu = atoi (optarg);
                 break;
@@ -679,24 +678,24 @@ main (int argc, char *argv[])
     outsockfd = socket (AF_INET, SOCK_DGRAM, 0);
     insockfd = socket (AF_INET, SOCK_DGRAM, 0);
 
-    if( (outsockfd == -1) || (insockfd == -1) ) {
+    if ((outsockfd == -1) || (insockfd == -1)) {
         fprintf (stderr, "cant open sockets\n" );
         return 1;
     }
 
     init_sockaddr_in ((struct sockaddr_in *) &destaddr, peer_ip, peer_port);
-    if(bind_port) {
+    if (bind_port) {
         init_sockaddr_in ((struct sockaddr_in *) &bindaddr, NULL, bind_port);
         if( bind (outsockfd, &bindaddr, sizeof (bindaddr)) ) {
-		fprintf (stderr, "bind failure\n" );
-	}
+            fprintf (stderr, "bind failure\n" );
+        }
     }
-    if(reply_port)
+    if (reply_port)
     {
         init_sockaddr_in ((struct sockaddr_in *) &bindaddr, NULL, reply_port);
         if( bind (insockfd, &bindaddr, sizeof (bindaddr)) ) {
-		fprintf (stderr, "bind failure\n" );
-	}
+            fprintf (stderr, "bind failure\n" );
+        }
     }
 
     /* try to become a client of the JACK server */
@@ -717,9 +716,9 @@ main (int argc, char *argv[])
     alloc_ports (capture_channels_audio, playback_channels_audio, capture_channels_midi, playback_channels_midi);
 
     if( bitdepth == 1000 )
-	net_period = (factor * jack_get_buffer_size(client) * 1024 / jack_get_sample_rate(client) / 8)&(~1) ;
+        net_period = (factor * jack_get_buffer_size(client) * 1024 / jack_get_sample_rate(client) / 8)&(~1) ;
     else
-	net_period = ceilf((float) jack_get_buffer_size (client) / (float) factor);
+        net_period = ceilf((float) jack_get_buffer_size (client) / (float) factor);
 
     int rx_bufsize =  get_sample_size (bitdepth) * capture_channels * net_period + sizeof (jacknet_packet_header);
     packcache = packet_cache_new (latency + 50, rx_bufsize, mtu);
@@ -763,26 +762,26 @@ main (int argc, char *argv[])
 
 	if (statecopy_connected)
 	{
-            if (statecopy_netxruns != state_netxruns) {
-		statecopy_netxruns = state_netxruns;
-		printf ("%s: at frame %06d -> total netxruns %d  (%d%%) queue time= %d\n",
+        if (statecopy_netxruns != state_netxruns) {
+            statecopy_netxruns = state_netxruns;
+            printf ("%s: at frame %06d -> total netxruns %d  (%d%%) queue time= %d\n",
 				client_name,
 				state_currentframe,
 				statecopy_netxruns,
 				100*statecopy_netxruns/state_currentframe,
 				state_recv_packet_queue_time);
 
-		fflush(stdout);
+            fflush(stdout);
             }
-        }
-        else
+    }
+    else
+    {
+        if (statecopy_latency != state_latency)
         {
-            if (statecopy_latency != state_latency)
-            {
-                statecopy_latency = state_latency;
-                if (statecopy_latency > 1)
-                printf ("current latency %d\n", statecopy_latency);
-		fflush(stdout);
+            statecopy_latency = state_latency;
+            if (statecopy_latency > 1)
+            printf ("current latency %d\n", statecopy_latency);
+            fflush(stdout);
             }
         }
     }
