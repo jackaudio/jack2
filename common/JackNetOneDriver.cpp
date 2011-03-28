@@ -153,8 +153,7 @@ namespace Jack
                 }
                 //port = fGraphManager->GetPort ( port_id );
 
-            netj.capture_ports =
-            jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
+            netj.capture_ports = jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
 
             if( netj.bitdepth == CELT_MODE ) {
         #if HAVE_CELT
@@ -202,8 +201,7 @@ namespace Jack
             }
             //port = fGraphManager->GetPort ( port_id );
 
-            netj.playback_ports =
-            jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
+            netj.playback_ports = jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
 
             if( netj.bitdepth == CELT_MODE ) {
         #if HAVE_CELT

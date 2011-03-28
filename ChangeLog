@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-03-28 Stephane Letz  <letz@grame.fr>
+
+	* Correction of jack_connect/jack_disconnect: use of jack_activate and volatile keyword for thread shared variable.
+
 2011-03-24 Stephane Letz  <letz@grame.fr>
 
 	* Implement renaming in JackDriver::Open to avoid name collision (thanks Devin Anderson).
