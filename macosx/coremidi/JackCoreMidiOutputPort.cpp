@@ -67,7 +67,6 @@ JackCoreMidiOutputPort::Execute()
     for (;;) {
         MIDIPacket *packet = MIDIPacketListInit(packet_list);
         assert(packet);
-        assert(thread_queue);
         if (! event) {
             event = GetCoreMidiEvent(true);
         }
