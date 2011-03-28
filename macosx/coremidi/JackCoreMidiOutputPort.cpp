@@ -171,13 +171,12 @@ JackCoreMidiOutputPort::Init()
 {
     set_threaded_log_function();
 
-    // OSX only...
+    // OSX only, values read in RT CoreMidi thread
     UInt64 period = 0;
-    UInt64 computation = 500 * 1000;
+    UInt64 computation = 250 * 1000;
     UInt64 constraint = 500 * 1000;
     thread->SetParams(period, computation, constraint);
 
-    // Use the server priority : y
     if (thread->AcquireSelfRealTime()) {
         jack_error("JackCoreMidiOutputPort::Init - could not acquire realtime "
                    "scheduling.  Continuing anyway.");
