@@ -36,10 +36,10 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
     read_queue = new JackMidiBufferReadQueue();
     std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncWaitQueue> thread_queue_ptr(thread_queue);
+    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     thread = new JackThread(this);
     std::auto_ptr<JackThread> thread_ptr(thread);
-    sprintf(semaphore_name, "coremidi_thread_queue_semaphore_%p", this);
+    sprintf(semaphore_name, "coremidi_%p", this);
     thread_queue_semaphore = sem_open(semaphore_name, O_CREAT, 0777, 0);
     if (thread_queue_semaphore == (sem_t *) SEM_FAILED) {
         throw std::runtime_error(strerror(errno));
@@ -67,7 +67,6 @@ JackCoreMidiOutputPort::Execute()
     for (;;) {
         MIDIPacket *packet = MIDIPacketListInit(packet_list);
         assert(packet);
-        assert(thread_queue);
         if (! event) {
             event = GetCoreMidiEvent(true);
         }
@@ -202,7 +201,7 @@ JackCoreMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
 {
     read_queue->ResetMidiBuffer(port_buffer);
     for (jack_midi_event_t *event = read_queue->DequeueEvent(); event;
-         event = read_queue->DequeueEvent()) {
+        event = read_queue->DequeueEvent()) {
         switch (thread_queue->EnqueueEvent(event, frames)) {
         case JackMidiWriteQueue::BUFFER_FULL:
             jack_error("JackCoreMidiOutputPort::ProcessJack - The thread "

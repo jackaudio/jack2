@@ -1,4 +1,4 @@
-/** @file simple_client.c
+/** @file control.c
  *
  * @brief This simple client demonstrates the basic features of JACK
  * as they would be used by many applications.
@@ -14,14 +14,14 @@
 
 jack_client_t *client;
 static int reorder = 0;
-   
+
 static int Jack_Graph_Order_Callback(void *arg)
 {
     const char **ports;
     int i;
-	
+
     printf("Jack_Graph_Order_Callback count = %d\n", reorder++);
-    
+
     ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical|JackPortIsOutput);
     if (ports) {
         for (i = 0;  ports[i]; ++i) {
@@ -29,15 +29,15 @@ static int Jack_Graph_Order_Callback(void *arg)
         }
         free(ports);
     }
-    
+
     ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical|JackPortIsInput);
-    if (ports) { 
+    if (ports) {
         for (i = 0;  ports[i]; ++i) {
             printf("name: %s\n", ports[i]);
         }
         free(ports);
     }
-	
+
     return 0;
 }
 
@@ -46,7 +46,7 @@ main (int argc, char *argv[])
 {
 	jack_options_t options = JackNullOption;
 	jack_status_t status;
-	
+
 	/* open a client connection to the JACK server */
 
 	client = jack_client_open("control_client", options, &status);
@@ -54,7 +54,7 @@ main (int argc, char *argv[])
 		printf("jack_client_open() failed \n");
 		exit(1);
 	}
-	
+
 	if (jack_set_graph_order_callback(client, Jack_Graph_Order_Callback, 0) != 0) {
         printf("Error when calling jack_set_graph_order_callback() !\n");
     }
@@ -66,10 +66,10 @@ main (int argc, char *argv[])
 		printf("cannot activate client");
 		exit(1);
 	}
-	
-    printf("Type 'q' to quit\n");	
+
+    printf("Type 'q' to quit\n");
     while ((getchar() != 'q')) {}
-  
+
 	jack_client_close(client);
 	exit (0);
 }
