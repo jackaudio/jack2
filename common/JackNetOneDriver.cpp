@@ -702,7 +702,7 @@ namespace Jack
                 // audio port, decode celt data.
                 CELTDecoder *decoder = (CELTDecoder *)src_node->data;
 
-        #if HAVE_CELT_API_0_8
+        #if HAVE_CELT_API_0_8 | HAVE_CELT_API_0_11
                 if( !packet_payload )
                         celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
                 else
@@ -758,7 +758,7 @@ namespace Jack
             jack_default_audio_sample_t *floatbuf = (jack_default_audio_sample_t *)alloca (sizeof(jack_default_audio_sample_t) * nframes );
             memcpy( floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t) );
             CELTEncoder *encoder = (CELTEncoder *)src_node->data;
- #if HAVE_CELT_API_0_8
+ #if HAVE_CELT_API_0_8 | HAVE_CELT_API_0_11
             encoded_bytes = celt_encode_float( encoder, floatbuf, nframes, packet_bufX, net_period_up );
 #else
             encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
