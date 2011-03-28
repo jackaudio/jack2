@@ -141,7 +141,10 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
         }
 	if( bitdepth == 1000 ) {
 #if HAVE_CELT
-#if HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
+#if HAVE_CELT_API_0_11
+	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), jack_get_buffer_size(client), NULL );
+	    capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create_custom( celt_mode, 1, NULL ) );
+#elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
 	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate( client ), jack_get_buffer_size(client), NULL );
 	    capture_srcs = jack_slist_append(capture_srcs, celt_decoder_create( celt_mode, 1, NULL ) );
 #else
@@ -184,7 +187,10 @@ alloc_ports (int n_capture_audio, int n_playback_audio, int n_capture_midi, int 
         }
 	if( bitdepth == 1000 ) {
 #if HAVE_CELT
-#if HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
+#if HAVE_CELT_API_0_11
+	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), jack_get_buffer_size(client), NULL );
+	    playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create_custom( celt_mode, 1, NULL ) );
+#elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
 	    CELTMode *celt_mode = celt_mode_create( jack_get_sample_rate (client), jack_get_buffer_size(client), NULL );
 	    playback_srcs = jack_slist_append(playback_srcs, celt_encoder_create( celt_mode, 1, NULL ) );
 #else
