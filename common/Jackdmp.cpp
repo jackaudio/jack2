@@ -478,6 +478,7 @@ int main(int argc, char* argv[])
         }
         if (!jackctl_server_add_slave(server_ctl, slave_driver_ctl)) {
             fprintf(stderr, "Driver \"%s\" cannot be loaded\n", *it);
+            goto close_server;
         }
     }
 
@@ -495,6 +496,7 @@ int main(int argc, char* argv[])
             }
             if (!jackctl_server_add_slave(server_ctl, loopback_driver_ctl)) {
                 fprintf(stderr, "Driver \"loopback\" cannot be loaded\n");
+                goto close_server;
             }
         }
 
@@ -515,6 +517,7 @@ int main(int argc, char* argv[])
         }
         if (!jackctl_server_load_internal(server_ctl, internal_driver_ctl)) {
             fprintf(stderr, "Internal client \"%s\" cannot be loaded\n", *it);
+            goto stop_server;
         }
     }
 

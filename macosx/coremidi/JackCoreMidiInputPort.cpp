@@ -147,6 +147,7 @@ JackCoreMidiInputPort::ProcessJack(JackMidiBuffer *port_buffer,
     if (! jack_event) {
         jack_event = thread_queue->DequeueEvent();
     }
+
     for (; jack_event; jack_event = thread_queue->DequeueEvent()) {
         // Add 'frames' to MIDI events to align with audio.
         switch (write_queue->EnqueueEvent(jack_event, frames)) {
