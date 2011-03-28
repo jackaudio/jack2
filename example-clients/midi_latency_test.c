@@ -407,7 +407,7 @@ main(int argc, char **argv)
     switch (message_size) {
     case 1:
         message_1[0] = 0xf6;
-        message_2[0] = 0xf8;
+        message_2[0] = 0xfe;
         break;
     case 2:
         message_1[0] = 0xc0;
