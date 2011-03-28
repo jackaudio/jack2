@@ -143,7 +143,7 @@ JackCoreMidiOutputPort::GetCoreMidiEvent(bool block)
 {
     if (! block) {
         if (sem_trywait(thread_queue_semaphore)) {
-            if (errno != ETIMEDOUT) {
+            if (errno != EAGAIN) {
                 jack_error("JackCoreMidiOutputPort::Execute - sem_trywait: %s",
                            strerror(errno));
             }
