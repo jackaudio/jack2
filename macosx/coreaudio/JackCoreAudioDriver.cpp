@@ -1552,7 +1552,6 @@ error:
 int JackCoreAudioDriver::Close()
 {
     jack_log("JackCoreAudioDriver::Close");
-    Stop();
 
     // Generic audio driver close
     int res = JackAudioDriver::Close();
