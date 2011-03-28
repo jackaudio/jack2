@@ -1368,21 +1368,20 @@ render_payload_to_jack_ports_celt (void *packet_payload, jack_nframes_t net_peri
         if (jack_port_is_audio (porttype))
         {
             // audio port, decode celt data.
+            CELTDecoder *decoder = src_node->data;
+    #if HAVE_CELT_API_0_8
+            if( !packet_payload )
+                celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
+            else
+                celt_decode_float( decoder, packet_bufX, net_period_down, buf, nframes );
+    #else
+            if( !packet_payload )
+                celt_decode_float( decoder, NULL, net_period_down, buf );
+            else
+                celt_decode_float( decoder, packet_bufX, net_period_down, buf );
+    #endif
 
-	    CELTDecoder *decoder = src_node->data;
-#if HAVE_CELT_API_0_8
-	    if( !packet_payload )
-		celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
-	    else
-		celt_decode_float( decoder, packet_bufX, net_period_down, buf, nframes );
-#else
-	    if( !packet_payload )
-		celt_decode_float( decoder, NULL, net_period_down, buf );
-	    else
-		celt_decode_float( decoder, packet_bufX, net_period_down, buf );
-#endif
-
-	    src_node = jack_slist_next (src_node);
+            src_node = jack_slist_next (src_node);
         }
         else if (jack_port_is_midi (porttype))
         {
@@ -1390,8 +1389,8 @@ render_payload_to_jack_ports_celt (void *packet_payload, jack_nframes_t net_peri
             // convert the data buffer to a standard format (uint32_t based)
             unsigned int buffer_size_uint32 = net_period_down / 2;
             uint32_t * buffer_uint32 = (uint32_t*) packet_bufX;
-	    if( packet_payload )
-		decode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
+            if( packet_payload )
+                decode_midi_buffer (buffer_uint32, buffer_size_uint32, buf);
         }
         packet_bufX = (packet_bufX + net_period_down);
         node = jack_slist_next (node);
