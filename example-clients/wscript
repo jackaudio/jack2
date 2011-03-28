@@ -129,7 +129,7 @@ def build(bld):
         prog.uselib_local = 'clientlib'
         prog.target = 'jack_netsource'
 
-     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
+    if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
  	    prog = bld.new_task_gen('cc', 'program')
  	    prog.includes = os_incdir + ['../common/jack', '../common']
  	    prog.source = ['alsa_in.c', '../common/memops.c']
