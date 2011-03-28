@@ -95,11 +95,13 @@ char *program_name;
 jack_port_t *remote_in_port;
 jack_port_t *remote_out_port;
 size_t samples;
+
 #ifdef __APPLE__
 sem_t* semaphore;
 #else
 sem_t semaphore;
 #endif
+
 pthread_mutex_t start_mutex;
 int timeout;
 jack_nframes_t total_latency;
@@ -216,11 +218,13 @@ handle_process(jack_nframes_t frames, void *arg)
         messages_received++;
         if (messages_received == samples) {
             process_state = 2;
-        #ifdef __APPLE__
+
+#ifdef __APPLE__
             sem_post(semaphore);
-        #else
+#else
             sem_post(&semaphore);
-        #endif
+#endif
+
             break;
         }
     send_message:
@@ -310,11 +314,13 @@ set_process_error(const char *source, const char *message)
     error_source = source;
     error_message = message;
     process_state = -1;
- #ifdef __APPLE__
+
+#ifdef __APPLE__
     sem_post(semaphore);
 #else
     sem_post(&semaphore);
 #endif
+
 }
 
 int
@@ -472,6 +478,7 @@ main(int argc, char **argv)
     jack_on_shutdown(client, handle_shutdown, NULL);
     jack_set_info_function(handle_info);
     process_state = 0;
+
 #ifdef __APPLE__
     // sem_init is not implemented on OSX
     char name[128];
@@ -488,6 +495,7 @@ main(int argc, char **argv)
         goto unregister_out_port;
     }
 #endif
+
     code = pthread_mutex_init(&start_mutex, NULL);
     if (code) {
         error_message = strerror(errno);
@@ -523,15 +531,19 @@ main(int argc, char **argv)
         error_source = "pthread_mutex_unlock";
         goto deactivate_client;
     }
+
 #ifdef __APPLE__
-    while (sem_wait(semaphore) != 0) {}
+    while (sem_wait(semaphore) != 0) {
 #else
-    if (sem_wait(&semaphore)) {
-        error_message = strerror(errno);
-        error_source = "sem_wait";
-        goto deactivate_client;
-    }
+    while (sem_wait(&semaphore) != 0) {
 #endif
+
+        if (errno != EINTR) {
+            error_message = strerror(errno);
+            error_source = "sem_wait";
+            goto deactivate_client;
+        }
+    }
     if (process_state == 2) {
         double average_latency = ((double) total_latency) / samples;
         double average_latency_time = total_latency_time / samples;
@@ -599,11 +611,14 @@ main(int argc, char **argv)
  destroy_mutex:
     pthread_mutex_destroy(&start_mutex);
  destroy_semaphore:
+
 #ifdef __APPLE__
     sem_destroy(semaphore);
+    sem_unlink(name);
 #else
     sem_destroy(&semaphore);
 #endif
+
  unregister_out_port:
     jack_port_unregister(client, out_port);
  unregister_in_port:
@@ -623,8 +638,5 @@ main(int argc, char **argv)
         output_error(error_source, error_message);
         exit(EXIT_FAILURE);
     }
-#ifdef __APPLE__
-    sem_unlink(name);
-#endif
     return EXIT_SUCCESS;
 }
