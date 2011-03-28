@@ -396,15 +396,12 @@ error:
     jack_log("JackServerGlobals Init error");
     if (master_driver_params)
         jack_free_driver_params(master_driver_params);
-    //fUserCount--;
     Destroy();
     return false;
 }
 
 void JackServerGlobals::Destroy()
 {
-     printf("JackServerGlobals Destroy %d\n", fUserCount);
-
     if (--fUserCount == 0) {
         jack_log("JackServerGlobals Destroy");
         Stop();

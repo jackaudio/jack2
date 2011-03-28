@@ -31,7 +31,7 @@
 jack_port_t *input_port;
 jack_port_t *output_port;
 int connecting, disconnecting;
-int done = 0;
+volatile int done = 0;
 #define TRUE 1
 #define FALSE 0
 
@@ -57,7 +57,6 @@ show_usage (char *my_name)
 	fprintf (stderr, "        -h, --help            Display this help message\n\n");
 	fprintf (stderr, "For more information see http://jackaudio.org/\n");
 }
-
 
 int
 main (int argc, char *argv[])
@@ -181,11 +180,11 @@ main (int argc, char *argv[])
 	if ((port1 = jack_port_by_name(client, portA)) == 0) {
 		fprintf (stderr, "ERROR %s not a valid port\n", portA);
 		goto exit;
-		}
+    }
 	if ((port2 = jack_port_by_name(client, portB)) == 0) {
 		fprintf (stderr, "ERROR %s not a valid port\n", portB);
 		goto exit;
-		}
+    }
 
 	port1_flags = jack_port_flags (port1);
 	port2_flags = jack_port_flags (port2);
@@ -207,17 +206,25 @@ main (int argc, char *argv[])
 		goto exit;
 	}
 
+    /* tell the JACK server that we are ready to roll */
+    if (jack_activate (client)) {
+        fprintf (stderr, "cannot activate client");
+        goto exit;
+    }
+
 	/* connect the ports. Note: you can't do this before
 	   the client is activated (this may change in the future).
 	*/
 
 	if (connecting) {
 		if (jack_connect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
+            fprintf (stderr, "cannot connect client, already connected?\n");
 			goto exit;
 		}
 	}
 	if (disconnecting) {
 		if (jack_disconnect(client, jack_port_name(src_port), jack_port_name(dst_port))) {
+            fprintf (stderr, "cannot disconnect client, already disconnected?\n");
 			goto exit;
 		}
 	}

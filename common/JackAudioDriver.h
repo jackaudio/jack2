@@ -92,6 +92,9 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
         virtual int Attach();
         virtual int Detach();
 
+        virtual int Start();
+        virtual int Stop();
+
         virtual int Write();
 
         virtual int SetBufferSize(jack_nframes_t buffer_size);

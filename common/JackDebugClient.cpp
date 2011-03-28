@@ -505,6 +505,54 @@ int JackDebugClient::SetPortRenameCallback(JackPortRenameCallback callback, void
     return fClient->SetPortRenameCallback(callback, arg);
 }
 
+int JackDebugClient::SetSessionCallback(JackSessionCallback callback, void *arg)
+{
+    CheckClient("SetSessionCallback");
+    return fClient->SetSessionCallback(callback, arg);
+}
+
+int JackDebugClient::SetLatencyCallback(JackLatencyCallback callback, void *arg)
+{
+    CheckClient("SetLatencyCallback");
+    return fClient->SetLatencyCallback(callback, arg);
+}
+
+jack_session_command_t* JackDebugClient::SessionNotify(const char* target, jack_session_event_type_t type, const char* path)
+{
+    CheckClient("SessionNotify");
+    return fClient->SessionNotify(target, type, path);
+}
+
+int JackDebugClient::SessionReply(jack_session_event_t* ev)
+{
+    CheckClient("SessionReply");
+    return fClient->SessionReply(ev);
+}
+
+char* JackDebugClient::GetUUIDForClientName(const char* client_name)
+{
+    CheckClient("GetUUIDForClientName");
+    return fClient->GetUUIDForClientName(client_name);
+}
+
+char* JackDebugClient::GetClientNameByUUID(const char* uuid)
+{
+    CheckClient("GetClientNameByUUID");
+    return fClient->GetClientNameByUUID(uuid);
+}
+
+int JackDebugClient::ReserveClientName(const char* client_name, const char* uuid)
+{
+    CheckClient("ReserveClientName");
+    return fClient->ReserveClientName(client_name, uuid);
+}
+
+int JackDebugClient::ClientHasSessionCallback(const char* client_name)
+{
+    CheckClient("ClientHasSessionCallback");
+    return fClient->ClientHasSessionCallback(client_name);
+}
+
 JackClientControl* JackDebugClient::GetClientControl() const
 {
     CheckClient("GetClientControl");

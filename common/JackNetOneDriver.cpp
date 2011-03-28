@@ -36,7 +36,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #endif
 
 #if HAVE_CELT
-#include "celt/celt.h"
+#include <celt/celt.h>
 #endif
 
 #define MIN(x,y) ((x)<(y) ? (x) : (y))
@@ -153,12 +153,15 @@ namespace Jack
                 }
                 //port = fGraphManager->GetPort ( port_id );
 
-            netj.capture_ports =
-            jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
+            netj.capture_ports = jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
 
             if( netj.bitdepth == CELT_MODE ) {
         #if HAVE_CELT
-        #if HAVE_CELT_API_0_7
+        #if HAVE_CELT_API_0_11
+                celt_int32 lookahead;
+                CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
+                netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create_custom( celt_mode, 1, NULL ) );
+        #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
                 celt_int32 lookahead;
                 CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
                 netj.capture_srcs = jack_slist_append(netj.capture_srcs, celt_decoder_create( celt_mode, 1, NULL ) );
@@ -202,12 +205,13 @@ namespace Jack
             }
             //port = fGraphManager->GetPort ( port_id );
 
-            netj.playback_ports =
-            jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
-
+            netj.playback_ports = jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
             if( netj.bitdepth == CELT_MODE ) {
         #if HAVE_CELT
-        #if HAVE_CELT_API_0_7
+        #if HAVE_CELT_API_0_11
+                CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
+                netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create_custom( celt_mode, 1, NULL ) );
+        #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
                 CELTMode *celt_mode = celt_mode_create( netj.sample_rate, netj.period_size, NULL );
                 netj.playback_srcs = jack_slist_append(netj.playback_srcs, celt_encoder_create( celt_mode, 1, NULL ) );
         #else
@@ -697,10 +701,18 @@ namespace Jack
             {
                 // audio port, decode celt data.
                 CELTDecoder *decoder = (CELTDecoder *)src_node->data;
+
+        #if HAVE_CELT_API_0_8 | HAVE_CELT_API_0_11
                 if( !packet_payload )
-                    celt_decode_float( decoder, NULL, net_period_down, buf );
+                        celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
                 else
-                    celt_decode_float( decoder, packet_bufX, net_period_down, buf );
+                        celt_decode_float( decoder, packet_bufX, net_period_down, buf, nframes );
+        #else
+                if( !packet_payload )
+                        celt_decode_float( decoder, NULL, net_period_down, buf );
+                else
+                        celt_decode_float( decoder, packet_bufX, net_period_down, buf );
+        #endif
 
                 src_node = jack_slist_next (src_node);
             }
@@ -746,8 +758,12 @@ namespace Jack
             jack_default_audio_sample_t *floatbuf = (jack_default_audio_sample_t *)alloca (sizeof(jack_default_audio_sample_t) * nframes );
             memcpy( floatbuf, buf, nframes * sizeof(jack_default_audio_sample_t) );
             CELTEncoder *encoder = (CELTEncoder *)src_node->data;
+ #if HAVE_CELT_API_0_8 | HAVE_CELT_API_0_11
+            encoded_bytes = celt_encode_float( encoder, floatbuf, nframes, packet_bufX, net_period_up );
+#else
             encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
-            if( encoded_bytes != (int)net_period_up )
+#endif
+           if( encoded_bytes != (int)net_period_up )
             jack_error( "something in celt changed. netjack needs to be changed to handle this." );
             src_node = jack_slist_next( src_node );
             }

@@ -119,7 +119,7 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
                      desc->name);
         }
 
-        printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
+        jack_log("Parameters for driver '%s' (all parameters are optional):", desc->name);
         jack_print_driver_options (desc, stdout);
         return 1;
     }
@@ -263,7 +263,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
                      desc->name);
         }
 
-        printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
+        jack_log("Parameters for driver '%s' (all parameters are optional):", desc->name);
         jack_print_driver_options (desc, stdout);
         return 1;
     }

@@ -50,6 +50,7 @@ class SERVER_EXPORT JackServer
         JackDriverInfo* fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
+        JackDriverClientInterface* fThreadedFreewheelDriver;
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
@@ -70,6 +71,7 @@ class SERVER_EXPORT JackServer
 
         int Start();
         int Stop();
+        bool IsRunning();
 
         // RT thread
         void Notify(int refnum, int notify, int value);

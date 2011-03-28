@@ -245,6 +245,10 @@ int main(int argc, char* argv[])
     std::list<char*> slaves_list;
     std::list<char*>::iterator it;
 
+    // Assume that we fail.
+    int return_value = -1;
+    bool notify_sent = false;
+
     copyright(stdout);
 #if defined(JACK_DBUS) && defined(__linux__)
     server_ctl = jackctl_server_create(audio_acquire, audio_release);
@@ -286,7 +290,7 @@ int main(int argc, char* argv[])
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
-                        goto fail_free1;
+                        goto destroy_server;
                     }
                 }
                 break;
@@ -296,7 +300,7 @@ int main(int argc, char* argv[])
                 param = jackctl_get_parameter(server_parameters, "self-connect-mode");
                 if (param != NULL) {
                     bool value_valid = false;
-                    for (int k=0; k<jackctl_parameter_get_enum_constraints_count( param ); k++ ) {
+                    for (uint32_t k=0; k<jackctl_parameter_get_enum_constraints_count( param ); k++ ) {
                         value = jackctl_parameter_get_enum_constraint_value( param, k );
                         if( value.c == optarg[0] )
                             value_valid = true;
@@ -307,7 +311,7 @@ int main(int argc, char* argv[])
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
-                        goto fail_free1;
+                        goto destroy_server;
                     }
                 }
                 break;
@@ -423,7 +427,7 @@ int main(int argc, char* argv[])
 
             case 'h':
                 usage(stdout);
-                goto fail_free1;
+                goto destroy_server;
         }
     }
 
@@ -444,14 +448,14 @@ int main(int argc, char* argv[])
 
     if (!master_driver_name) {
         usage(stderr);
-        goto fail_free1;
+        goto destroy_server;
     }
 
     // Master driver
     master_driver_ctl = jackctl_server_get_driver(server_ctl, master_driver_name);
     if (master_driver_ctl == NULL) {
         fprintf(stderr, "Unknown driver \"%s\"\n", master_driver_name);
-        goto fail_free1;
+        goto destroy_server;
     }
 
     if (optind < argc) {
@@ -463,7 +467,7 @@ int main(int argc, char* argv[])
     if (master_driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                 " anything when run like this.\n");
-        goto fail_free1;
+        goto destroy_server;
     }
 
     master_driver_args = (char **) malloc(sizeof(char *) * master_driver_nargs);
@@ -474,15 +478,16 @@ int main(int argc, char* argv[])
     }
 
     if (jackctl_parse_driver_params(master_driver_ctl, master_driver_nargs, master_driver_args)) {
-        goto fail_free1;
+        goto destroy_server;
     }
 
-    // Setup signals then start server
+    // Setup signals
     signals = jackctl_setup_signals(0);
 
-    if (!jackctl_server_start(server_ctl, master_driver_ctl)) {
-        fprintf(stderr, "Failed to start server\n");
-        goto fail_free1;
+    // Open server
+    if (! jackctl_server_open(server_ctl, master_driver_ctl)) {
+        fprintf(stderr, "Failed to open server\n");
+        goto destroy_server;
     }
 
     // Slave drivers
@@ -490,7 +495,7 @@ int main(int argc, char* argv[])
         jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
         if (slave_driver_ctl == NULL) {
             fprintf(stderr, "Unknown driver \"%s\"\n", *it);
-            goto fail_free2;
+            goto close_server;
         }
         jackctl_server_add_slave(server_ctl, slave_driver_ctl);
     }
@@ -498,6 +503,8 @@ int main(int argc, char* argv[])
     // Loopback driver
     if (loopback > 0) {
         loopback_driver_ctl = jackctl_server_get_driver(server_ctl, "loopback");
+
+        // XX: What if this fails?
         if (loopback_driver_ctl != NULL) {
             const JSList * loopback_parameters = jackctl_driver_get_parameters(loopback_driver_ctl);
             param = jackctl_get_parameter(loopback_parameters, "channels");
@@ -507,6 +514,13 @@ int main(int argc, char* argv[])
             }
             jackctl_server_add_slave(server_ctl, loopback_driver_ctl);
         }
+
+    }
+
+    // Start the server
+    if (!jackctl_server_start(server_ctl)) {
+        fprintf(stderr, "Failed to start server\n");
+        goto close_server;
     }
 
     // Internal clients
@@ -514,30 +528,28 @@ int main(int argc, char* argv[])
         jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
         if (internal_driver_ctl == NULL) {
             fprintf(stderr, "Unknown internal \"%s\"\n", *it);
-            goto fail_free2;
+            goto stop_server;
         }
         jackctl_server_load_internal(server_ctl, internal_driver_ctl);
     }
 
     notify_server_start(server_name);
+    notify_sent = true;
+    return_value = 0;
 
     // Waits for signal
     jackctl_wait_signals(signals);
 
-    if (!jackctl_server_stop(server_ctl))
+ stop_server:
+    if (! jackctl_server_stop(server_ctl)) {
         fprintf(stderr, "Cannot stop server...\n");
-
+    }
+    if (notify_sent) {
+        notify_server_stop(server_name);
+    }
+ close_server:
+    jackctl_server_close(server_ctl);
+ destroy_server:
     jackctl_server_destroy(server_ctl);
-    notify_server_stop(server_name);
-    return 0;
-
-fail_free1:
-    jackctl_server_destroy(server_ctl);
-    return -1;
-
-fail_free2:
-    jackctl_server_stop(server_ctl);
-    jackctl_server_destroy(server_ctl);
-    notify_server_stop(server_name);
-    return -1;
+    return return_value;
 }

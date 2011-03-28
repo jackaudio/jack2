@@ -526,7 +526,7 @@ int JackFFADODriver::Attach()
 
             port = fGraphManager->GetPort(port_index);
             // Add one buffer more latency if "async" mode is used...
-            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
             port->SetLatencyRange(JackPlaybackLatency, &range);
             // playback port aliases (jackd1 style port names)
             snprintf(buf, sizeof(buf) - 1, "%s:playback_%i", fClientControl.fName, (int) chn + 1);
@@ -653,13 +653,23 @@ int JackFFADODriver::Close()
 
 int JackFFADODriver::Start()
 {
-    JackAudioDriver::Start();
-    return ffado_driver_start((ffado_driver_t *)fDriver);
+    int res = JackAudioDriver::Start();
+    if (res >= 0) {
+        res = ffado_driver_start((ffado_driver_t *)fDriver);
+        if (res < 0) {
+            JackAudioDriver::Stop();
+        }
+    }
+    return res;
 }
 
 int JackFFADODriver::Stop()
 {
-    return ffado_driver_stop((ffado_driver_t *)fDriver);
+    int res = ffado_driver_stop((ffado_driver_t *)fDriver);
+    if (JackAudioDriver::Stop() < 0) {
+        res = -1;
+    }
+    return res;
 }
 
 int JackFFADODriver::Read()

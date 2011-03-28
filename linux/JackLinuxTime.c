@@ -14,7 +14,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -82,7 +82,7 @@ static int jack_hpet_init ()
 	}
 
 	/* this assumes period to be constant. if needed,
-	   it can be moved to the clock access function 
+	   it can be moved to the clock access function
 	*/
 	hpet_period = *((uint32_t *) (hpet_ptr + HPET_PERIOD));
 	hpet_caps = *((uint32_t *) (hpet_ptr + HPET_CAPS));
@@ -93,7 +93,7 @@ static int jack_hpet_init ()
 	return 0;
 }
 
-static jack_time_t jack_get_microseconds_from_hpet (void) 
+static jack_time_t jack_get_microseconds_from_hpet (void)
 {
 	hpet_counter_t hpet_counter;
 	long double hpet_time;
@@ -116,7 +116,7 @@ static int jack_hpet_init ()
 	return -1;
 }
 
-static jack_time_t jack_get_microseconds_from_hpet (void) 
+static jack_time_t jack_get_microseconds_from_hpet (void)
 {
 	/* never called */
 	return 0;
@@ -168,7 +168,7 @@ static jack_time_t jack_get_mhz (void)
 		ret = sscanf(buf, "bogomips per cpu: %" SCNu64, &mhz);
 #else /* MIPS, ARM, alpha */
 		ret = sscanf(buf, "BogoMIPS        : %" SCNu64, &mhz);
-#endif 
+#endif
 
 		if (ret == 1)
 		{
@@ -182,7 +182,7 @@ static jack_time_t jack_get_mhz (void)
 
 #ifndef HAVE_CLOCK_GETTIME
 
-static jack_time_t jack_get_microseconds_from_system (void) 
+static jack_time_t jack_get_microseconds_from_system (void)
 {
 	jack_time_t jackTime;
 	struct timeval tv;
@@ -194,7 +194,7 @@ static jack_time_t jack_get_microseconds_from_system (void)
 
 #else
 
-static jack_time_t jack_get_microseconds_from_system (void) 
+static jack_time_t jack_get_microseconds_from_system (void)
 {
 	jack_time_t jackTime;
 	struct timespec time;
@@ -208,7 +208,7 @@ static jack_time_t jack_get_microseconds_from_system (void)
 #endif /* HAVE_CLOCK_GETTIME */
 
 
-SERVER_EXPORT void JackSleep(long usec) 
+SERVER_EXPORT void JackSleep(long usec)
 {
 	usleep(usec);
 }
@@ -266,3 +266,9 @@ SERVER_EXPORT jack_time_t GetMicroSeconds()
 {
 	return _jack_get_microseconds();
 }
+
+SERVER_EXPORT jack_time_t jack_get_microseconds()
+{
+	return _jack_get_microseconds();
+}
+

@@ -1598,6 +1598,7 @@
 		4B98AE010931D30C0091932A /* JackDebugClient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackDebugClient.h; path = ../common/JackDebugClient.h; sourceTree = SOURCE_ROOT; };
 		4B9A25B30DBF8330006E9FBC /* JackError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackError.cpp; path = ../common/JackError.cpp; sourceTree = SOURCE_ROOT; };
 		4B9A26000DBF8584006E9FBC /* jslist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jslist.h; path = ../common/jack/jslist.h; sourceTree = SOURCE_ROOT; };
+		4BA2574C132FB49B009F2D3F /* alsa_driver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alsa_driver.c; path = ../linux/alsa/alsa_driver.c; sourceTree = SOURCE_ROOT; };
 		4BA339AC10B2E36800190E3B /* Jackservermp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jackservermp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BA577BC08BF8BE200F82DE1 /* testSynchroClient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroClient.cpp; path = ../tests/testSynchroClient.cpp; sourceTree = SOURCE_ROOT; };
 		4BA577FB08BF8E4600F82DE1 /* testSynchroServer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = testSynchroServer.cpp; path = ../tests/testSynchroServer.cpp; sourceTree = SOURCE_ROOT; };
@@ -2683,6 +2684,7 @@
 		4B05A09D0DF72C6000840F4C /* Additional */ = {
 			isa = PBXGroup;
 			children = (
+				4BA2574C132FB49B009F2D3F /* alsa_driver.c */,
 				4B05A08A0DF72BF600840F4C /* Windows */,
 				4B05A0420DF72B8500840F4C /* Linux */,
 			);

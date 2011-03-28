@@ -44,7 +44,7 @@ struct JackEngineControl;
 \brief The base class for clients: share part of the implementation for JackInternalClient and JackLibClient.
 */
 
-class JackClient : public JackClientInterface, public JackRunnableInterface
+class SERVER_EXPORT JackClient : public JackClientInterface, public JackRunnableInterface
 {
         friend class JackDebugClient;
 
@@ -195,15 +195,15 @@ class JackClient : public JackClientInterface, public JackRunnableInterface
         // RT Thread
         jack_nframes_t CycleWait();
         void CycleSignal(int status);
-        int SetProcessThread(JackThreadCallback fun, void *arg);
+        virtual int SetProcessThread(JackThreadCallback fun, void *arg);
 
         // Session API
         virtual jack_session_command_t* SessionNotify(const char* target, jack_session_event_type_t type, const char* path);
         virtual int SessionReply(jack_session_event_t* ev);
-        char* GetUUIDForClientName(const char* client_name);
-        char* GetClientNameByUUID(const char* uuid);
-        int ReserveClientName(const char* client_name, const char* uuid);
-        int ClientHasSessionCallback(const char* client_name);
+        virtual char* GetUUIDForClientName(const char* client_name);
+        virtual char* GetClientNameByUUID(const char* uuid);
+        virtual int ReserveClientName(const char* client_name, const char* uuid);
+        virtual int ClientHasSessionCallback(const char* client_name);
 
         // JackRunnableInterface interface
         bool Init();
