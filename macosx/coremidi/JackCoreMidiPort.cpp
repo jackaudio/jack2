@@ -81,10 +81,10 @@ JackCoreMidiPort::Initialize(const char *alias_name, const char *client_name,
                    "for endpoint name.");
     get_basic_alias:
         snprintf(alias, sizeof(alias) - 1, "%s:%s:%s%d", alias_name,
-                 driver_name, is_output ? "out" : "in", num);
+                 driver_name, is_output ? "in" : "out", num);
     } else {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:%s%d", alias_name,
-                 endpoint_name, is_output ? "out" : "in", num);
+                 endpoint_name, is_output ? "in" : "out", num);
     }
     snprintf(name, sizeof(name) - 1, "%s:%s_%d", client_name,
              is_output ? "playback" : "capture", num);

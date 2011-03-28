@@ -44,7 +44,7 @@ class JackLoopbackDriver : public JackAudioDriver
     public:
 
         JackLoopbackDriver(JackLockedEngine* engine, JackSynchro* table)
-                : JackAudioDriver("loopback", "", engine, table)
+                : JackAudioDriver("loopback", "loopback", engine, table)
         {}
         virtual ~JackLoopbackDriver()
         {}
