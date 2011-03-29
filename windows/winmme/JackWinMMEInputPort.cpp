@@ -55,7 +55,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiInOpen(&handle, index, HandleMidiInputEvent, this,
-                                 CALLBACK_FUNCTION);
+                                 CALLBACK_FUNCTION | MIDI_IO_STATUS);
     if (result != MMSYSERR_NOERROR) {
         GetErrorString(result, error_message);
         goto delete_sysex_buffer;
@@ -185,6 +185,7 @@ JackWinMMEInputPort::ProcessJack()
 void
 JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
 {
+    set_threaded_log_function();
     jack_nframes_t current_frame = GetCurrentFrame();
     switch (message) {
     case MIM_CLOSE:

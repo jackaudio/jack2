@@ -180,8 +180,11 @@ JackWinMMEOutputPort::Execute()
             continue;
         }
         MIDIHDR header;
+        header.dwBufferLength = size;
+        header.dwBytesRecorded = size;
         header.dwFlags = 0;
-        header.dwLength = size;
+        header.dwOffset = 0;
+        header.dwUser = 0;
         header.lpData = data;
         result = midiOutPrepareHeader(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
@@ -238,6 +241,7 @@ void
 JackWinMMEOutputPort::HandleMessage(UINT message, DWORD_PTR param1,
                                     DWORD_PTR param2)
 {
+    set_threaded_log_function();
     switch (message) {
     case MOM_CLOSE:
         jack_info("JackWinMMEOutputPort::HandleMessage - MIDI device closed.");
@@ -250,6 +254,12 @@ JackWinMMEOutputPort::HandleMessage(UINT message, DWORD_PTR param1,
         break;
     case MOM_OPEN:
         jack_info("JackWinMMEOutputPort::HandleMessage - MIDI device opened.");
+        break;
+    case MOM_POSITIONCB:
+        LPMIDIHDR header = (LPMIDIHDR) param2;
+        jack_info("JackWinMMEOutputPort::HandleMessage - %d bytes out of %d "
+                  "bytes of the current sysex message have been sent.",
+                  header->dwOffset, header->dwBytesRecorded);
     }
 }
 
