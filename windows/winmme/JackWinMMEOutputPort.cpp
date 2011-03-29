@@ -52,6 +52,8 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
     std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    thread = new JackThread(this);
+    std::auto_ptr<JackThread> thread_ptr(thread);
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiOutOpen(&handle, index, HandleMessageEvent, this,
                                   CALLBACK_FUNCTION);
@@ -82,6 +84,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", alias_name, driver_name,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:playback_%d", client_name, index + 1);
+    thread_ptr.release();
     write_queue_ptr.release();
     thread_queue_ptr.release();
     return;

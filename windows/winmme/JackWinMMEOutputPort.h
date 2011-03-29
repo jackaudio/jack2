@@ -25,10 +25,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackMidiAsyncQueue.h"
 #include "JackMidiBufferReadQueue.h"
+#include "JackThread.h"
 
 namespace Jack {
 
-    class JackWinMMEOutputPort {
+    class JackWinMMEOutputPort: public JackRunnableInterface {
 
     private:
 
@@ -60,6 +61,7 @@ namespace Jack {
         char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
         JackMidiBufferReadQueue *read_queue;
         HANDLE sysex_semaphore;
+        JackThread *thread;
         JackMidiAsyncQueue *thread_queue;
         HANDLE thread_queue_semaphore;
 
