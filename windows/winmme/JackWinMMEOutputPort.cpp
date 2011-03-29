@@ -247,10 +247,7 @@ JackWinMMEOutputPort::HandleMessage(UINT message, DWORD_PTR param1,
         jack_info("JackWinMMEOutputPort::HandleMessage - MIDI device closed.");
         break;
     case MOM_DONE:
-        if (! ReleaseSemaphore(sysex_semaphore, 1, NULL)) {
-            WriteOSError("JackWinMMEOutputPort::HandleMessage",
-                         "ReleaseSemaphore");
-        }
+        Signal(sysex_semaphore);
         break;
     case MOM_OPEN:
         jack_info("JackWinMMEOutputPort::HandleMessage - MIDI device opened.");
@@ -294,12 +291,19 @@ JackWinMMEOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
                        event->size);
             break;
         default:
-            if (! ReleaseSemaphore(thread_queue_semaphore, 1, NULL)) {
-                WriteOSError("JackWinMMEOutputPort::ProcessJack",
-                             "ReleaseSemaphore");
-            }
+            Signal(thread_queue_semaphore);
         }
     }
+}
+
+bool
+JackWinMMEOutputPort::Signal(Handle semaphore)
+{
+    bool result = (bool) ReleaseSemaphore(semaphore, 1, NULL);
+    if (! result) {
+        WriteOSError("JackWinMMEOutputPort::Signal", "ReleaseSemaphore");
+    }
+    return result;
 }
 
 bool
@@ -319,15 +323,31 @@ JackWinMMEOutputPort::Start()
 bool
 JackWinMMEOutputPort::Stop()
 {
-    bool result = thread->GetStatus() == JackThread::kIdle;
-    if (! result) {
-        result = ! thread->Kill();
-        if (! result) {
-            jack_error("JackWinMMEOutputPort::Stop - failed to stop MIDI "
-                       "processing thread.");
-        }
+
+    jack_info("JackWinMMEOutputPort::Stop - stopping MIDI output port "
+              "processing thread.");
+
+    int result;
+    const char *verb;
+    switch (thread->GetStatus()) {
+    case JackThread::kIniting:
+    case JackThread::kStarting:
+        result = thread->Kill();
+        verb = "kill";
+        break;
+    case JackThread::kRunning:
+        Signal(thread_queue_semaphore);
+        result = thread->Stop();
+        verb = "stop";
+        break;
+    default:
+        return true;
     }
-    return result;
+    if (result) {
+        jack_error("JackWinMMEOutputPort::Stop - could not %s MIDI processing "
+                   "thread.", verb);
+    }
+    return ! result;
 }
 
 bool

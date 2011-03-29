@@ -47,6 +47,9 @@ namespace Jack {
         HandleMessage(UINT message, DWORD_PTR param1, DWORD_PTR param2);
 
         bool
+        Signal(Handle semaphore);
+
+        bool
         Wait(Handle semaphore);
 
         void
