@@ -44,6 +44,7 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
     if (thread_queue_semaphore == (sem_t *) SEM_FAILED) {
         throw std::runtime_error(strerror(errno));
     }
+    advance_schedule_time = 0;
     thread_ptr.release();
     thread_queue_ptr.release();
     read_queue_ptr.release();
@@ -71,20 +72,15 @@ JackCoreMidiOutputPort::Execute()
             event = GetCoreMidiEvent(true);
         }
         jack_midi_data_t *data = event->buffer;
-
-        // This is the latest time that the packet list can be sent out.  We
-        // may want to consider subtracting some frames to leave room for the
-        // CoreMIDI driver/client to handle all of the events.  There's a
-        // property called 'kMIDIPropertyAdvanceScheduleTimeMuSec' that might
-        // be useful in this case.
-        jack_nframes_t send_time = event->time;
-
+        jack_nframes_t send_frame = event->time;
+        jack_time_t send_time =
+            GetTimeFromFrames(send_frame) - advance_schedule_time;
         size_t size = event->size;
-        MIDITimeStamp timestamp = GetTimeStampFromFrames(send_time);
+        MIDITimeStamp timestamp = GetTimeStampFromFrames(send_frame);
         packet = MIDIPacketListAdd(packet_list, PACKET_BUFFER_SIZE, packet,
                                    timestamp, size, data);
         if (packet) {
-            while (GetCurrentFrame() < send_time) {
+            while (GetMicroSeconds() < send_time) {
                 event = GetCoreMidiEvent(false);
                 if (! event) {
                     break;
@@ -186,12 +182,15 @@ JackCoreMidiOutputPort::Init()
 
 void
 JackCoreMidiOutputPort::Initialize(const char *alias_name,
-                                  const char *client_name,
-                                  const char *driver_name, int index,
-                                  MIDIEndpointRef endpoint)
+                                   const char *client_name,
+                                   const char *driver_name, int index,
+                                   MIDIEndpointRef endpoint,
+                                   SInt32 advance_schedule_time)
 {
     JackCoreMidiPort::Initialize(alias_name, client_name, driver_name, index,
                                  endpoint, true);
+    assert(advance_schedule_time >= 0);
+    this->advance_schedule_time = advance_schedule_time;
 }
 
 void
