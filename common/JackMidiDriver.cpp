@@ -143,6 +143,27 @@ int JackMidiDriver::Write()
     return 0;
 }
 
+int JackMidiDriver::SetBufferSize(jack_nframes_t buffer_size)
+{
+    jack_latency_range_t latency_range;
+    latency_range.max = buffer_size;
+    latency_range.min = buffer_size;
+    for (int i = 0; i < fCaptureChannels; i++) {
+        fGraphManager->GetPort(fCapturePortList[i])->
+            SetLatencyRange(JackCaptureLatency, &latency_range);
+    }
+    if (! fEngineControl->fSyncMode) {
+        buffer_size *= 2;
+        latency_range.max = buffer_size;
+        latency_range.min = buffer_size;
+    }
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        fGraphManager->GetPort(fPlaybackPortList[i])->
+            SetLatencyRange(JackPlaybackLatency, &latency_range);
+    }
+    return 0;
+}
+
 int JackMidiDriver::ProcessNull()
 {
     return 0;
