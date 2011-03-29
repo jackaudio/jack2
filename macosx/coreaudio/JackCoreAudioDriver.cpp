@@ -195,7 +195,7 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
     driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
     driver->fDriverOutputData = ioData;
 
-    // Setup threadded based log function once...
+    // Setup threaded based log function et get RT thread parameters once...
     if (set_threaded_log_function()) {
 
         jack_log("set_threaded_log_function");

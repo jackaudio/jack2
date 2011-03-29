@@ -45,7 +45,7 @@ namespace Jack {
                    MIDIEndpointRef endpoint, bool is_output);
 
         double time_ratio;
-         MIDIEndpointRef endpoint;
+        MIDIEndpointRef endpoint;
 
     public:
 

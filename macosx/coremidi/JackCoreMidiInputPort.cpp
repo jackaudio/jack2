@@ -66,6 +66,8 @@ JackCoreMidiInputPort::Initialize(const char *alias_name,
 void
 JackCoreMidiInputPort::ProcessCoreMidi(const MIDIPacketList *packet_list)
 {
+    set_threaded_log_function();
+
     unsigned int packet_count = packet_list->numPackets;
     assert(packet_count);
     MIDIPacket *packet = (MIDIPacket *) packet_list->packet;
