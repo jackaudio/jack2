@@ -71,6 +71,7 @@ int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
 void JackAlsaDriver::UpdateLatencies()
 {
     jack_latency_range_t range;
+    alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
 
     for (int i = 0; i < fCaptureChannels; i++) {
         range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
