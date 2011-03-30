@@ -49,7 +49,7 @@ JackCoreMidiVirtualInputPort(const char *alias_name, const char *client_name,
     JackCoreMidiInputPort(time_ratio, max_bytes, max_messages)
 {
     std::stringstream stream;
-    stream << "JackMidi" << (index + 1);
+    stream << "virtual" << (index + 1);
     CFStringRef name = CFStringCreateWithCString(0, stream.str().c_str(),
                                                 CFStringGetSystemEncoding());
     if (! name) {

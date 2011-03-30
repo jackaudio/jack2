@@ -279,56 +279,6 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
     }
     char *client_name = fClientControl.fName;
 
-    // Allocate and connect virtual inputs
-    if (in_channels) {
-        try {
-            virtual_input_ports =
-                new JackCoreMidiVirtualInputPort*[in_channels];
-        } catch (std::exception e) {
-            jack_error("JackCoreMidiDriver::Open - while creating virtual "
-                       "input port array: %s", e.what());
-            goto destroy_client;
-        }
-        for (vi_count = 0; vi_count < in_channels; vi_count++) {
-            try {
-                virtual_input_ports[vi_count] =
-                    new JackCoreMidiVirtualInputPort(fAliasName, client_name,
-                                                     capture_driver_name,
-                                                     vi_count, client,
-                                                     time_ratio);
-            } catch (std::exception e) {
-                jack_error("JackCoreMidiDriver::Open - while creating virtual "
-                           "input port: %s", e.what());
-                goto destroy_virtual_input_ports;
-            }
-        }
-    }
-
-    // Allocate and connect virtual outputs
-    if (out_channels) {
-        try {
-            virtual_output_ports =
-                new JackCoreMidiVirtualOutputPort*[out_channels];
-        } catch (std::exception e) {
-            jack_error("JackCoreMidiDriver::Open - while creating virtual "
-                       "output port array: %s", e.what());
-            goto destroy_virtual_input_ports;
-        }
-        for (vo_count = 0; vo_count < out_channels; vo_count++) {
-            try {
-                virtual_output_ports[vo_count] =
-                    new JackCoreMidiVirtualOutputPort(fAliasName, client_name,
-                                                      playback_driver_name,
-                                                      vo_count, client,
-                                                      time_ratio);
-            } catch (std::exception e) {
-                jack_error("JackCoreMidiDriver::Open - while creating virtual "
-                           "output port: %s", e.what());
-                goto destroy_virtual_output_ports;
-            }
-        }
-    }
-
     // Allocate and connect physical inputs
     potential_pi_count = MIDIGetNumberOfSources();
     if (potential_pi_count) {
@@ -396,6 +346,57 @@ JackCoreMidiDriver::Open(bool capturing, bool playing, int in_channels,
             po_count++;
         }
     }
+
+    // Allocate and connect virtual inputs
+    if (in_channels) {
+        try {
+            virtual_input_ports =
+                new JackCoreMidiVirtualInputPort*[in_channels];
+        } catch (std::exception e) {
+            jack_error("JackCoreMidiDriver::Open - while creating virtual "
+                       "input port array: %s", e.what());
+            goto destroy_client;
+        }
+        for (vi_count = 0; vi_count < in_channels; vi_count++) {
+            try {
+                virtual_input_ports[vi_count] =
+                    new JackCoreMidiVirtualInputPort(fAliasName, client_name,
+                                                     capture_driver_name,
+                                                     vi_count + pi_count, client,
+                                                     time_ratio);
+            } catch (std::exception e) {
+                jack_error("JackCoreMidiDriver::Open - while creating virtual "
+                           "input port: %s", e.what());
+                goto destroy_virtual_input_ports;
+            }
+        }
+    }
+
+    // Allocate and connect virtual outputs
+    if (out_channels) {
+        try {
+            virtual_output_ports =
+                new JackCoreMidiVirtualOutputPort*[out_channels];
+        } catch (std::exception e) {
+            jack_error("JackCoreMidiDriver::Open - while creating virtual "
+                       "output port array: %s", e.what());
+            goto destroy_virtual_input_ports;
+        }
+        for (vo_count = 0; vo_count < out_channels; vo_count++) {
+            try {
+                virtual_output_ports[vo_count] =
+                    new JackCoreMidiVirtualOutputPort(fAliasName, client_name,
+                                                      playback_driver_name,
+                                                      vo_count + po_count, client,
+                                                      time_ratio);
+            } catch (std::exception e) {
+                jack_error("JackCoreMidiDriver::Open - while creating virtual "
+                           "output port: %s", e.what());
+                goto destroy_virtual_output_ports;
+            }
+        }
+    }
+
 
     if (! (pi_count || po_count || in_channels || out_channels)) {
         jack_error("JackCoreMidiDriver::Open - no CoreMIDI inputs or outputs "
