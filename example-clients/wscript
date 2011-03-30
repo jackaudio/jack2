@@ -63,7 +63,7 @@ def configure(conf):
 
     conf.env['BUILD_EXAMPLE_CLIENT_REC'] = conf.is_defined('HAVE_SNDFILE')
 
-    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.is_defined('HAVE_SAMPLERATE') and conf.is_defined('HAVE_ALSA')
+    conf.env['BUILD_EXAMPLE_ALSA_IO'] = conf.is_defined('HAVE_SAMPLERATE') and conf.env['BUILD_DRIVER_ALSA']
 
 def build(bld):
     if bld.env['IS_LINUX']:
@@ -137,21 +137,21 @@ def build(bld):
         prog.target = 'jack_netsource'
 
     if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
-	    prog = bld.new_task_gen('cc', 'program')
-	    prog.includes = os_incdir + ['../common/jack', '../common']
-	    prog.source = ['alsa_in.c', '../common/memops.c']
-	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
-	    prog.uselib = 'ALSA SAMPLERATE'
-	    prog.uselib_local = 'clientlib'
-	    prog.target = 'alsa_in'
+ 	    prog = bld.new_task_gen('cc', 'program')
+ 	    prog.includes = os_incdir + ['../common/jack', '../common']
+ 	    prog.source = ['alsa_in.c', '../common/memops.c']
+ 	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+ 	    prog.uselib = 'ALSA SAMPLERATE'
+ 	    prog.uselib_local = 'clientlib'
+ 	    prog.target = 'alsa_in'
 
-	    prog = bld.new_task_gen('cc', 'program')
-	    prog.includes = os_incdir + ['../common/jack', '../common']
-	    prog.source = ['alsa_out.c', '../common/memops.c']
-	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
-	    prog.uselib = 'ALSA SAMPLERATE'
-	    prog.uselib_local = 'clientlib'
-	    prog.target = 'alsa_out'
+ 	    prog = bld.new_task_gen('cc', 'program')
+ 	    prog.includes = os_incdir + ['../common/jack', '../common']
+ 	    prog.source = ['alsa_out.c', '../common/memops.c']
+ 	    prog.env.append_value("CCFLAGS", "-DNO_JACK_ERROR")
+ 	    prog.uselib = 'ALSA SAMPLERATE'
+ 	    prog.uselib_local = 'clientlib'
+ 	    prog.target = 'alsa_out'
 
     for example_lib, example_lib_source in example_libs.items():
         lib = bld.new_task_gen('cc', 'shlib')

@@ -63,7 +63,7 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
     }
 
     jack_log("jack_client_new %s", client_name);
- 
+
     if (status == NULL)         /* no status from caller? */
         status = &my_status;    /* use local status word */
     *status = (jack_status_t)0;
@@ -77,13 +77,13 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
 
     /* parse variable arguments */
     jack_varargs_init(&va);
- 
+
     if (!JackServerGlobals::Init()) { // jack server initialisation
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     }
- 
+
     if (JACK_DEBUG) {
         client = new JackDebugClient(new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable())); // Debug mode
     } else {
@@ -114,7 +114,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     }
 
     jack_log("jack_client_open %s", client_name);
- 
+
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */
     *status = (jack_status_t)0;
@@ -128,13 +128,13 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
 
     /* parse variable arguments */
     jack_varargs_parse(options, ap, &va);
- 
+
     if (!JackServerGlobals::Init()) { // jack server initialisation
         int my_status1 = (JackFailure | JackServerError);
         *status = (jack_status_t)my_status1;
         return NULL;
     }
- 
+
     if (JACK_DEBUG) {
         client = new JackDebugClient(new JackInternalClient(JackServerGlobals::fInstance, GetSynchroTable())); // Debug mode
     } else {
@@ -180,7 +180,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_close");
-#endif    
+#endif
     assert(JackGlobals::fOpenMutex);
     JackGlobals::fOpenMutex->Lock();
     int res = -1;
@@ -200,7 +200,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
 
 EXPORT int jack_get_client_pid(const char *name)
 {
-    return (JackServerGlobals::fInstance != NULL) 
+    return (JackServerGlobals::fInstance != NULL)
         ? JackServerGlobals::fInstance->GetEngine()->GetClientPID(name)
         : 0;
 }

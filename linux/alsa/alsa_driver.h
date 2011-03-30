@@ -32,11 +32,19 @@
 #define IS_BE 0
 #endif
 
+#define TRUE 1
+#define FALSE 0
+
 #include "types.h"
 #include "hardware.h"
 #include "driver.h"
 #include "memops.h"
 #include "alsa_midi.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef void (*ReadCopyFunction)  (jack_default_audio_sample_t *dst, char *src,
                                    unsigned long src_bytes,
@@ -45,13 +53,8 @@ typedef void (*WriteCopyFunction) (char *dst, jack_default_audio_sample_t *src,
                                    unsigned long src_bytes,
                                    unsigned long dst_skip_bytes,
                                    dither_state_t *state);
-typedef void (*CopyCopyFunction)  (char *dst, char *src,
-                                   unsigned long src_bytes,
-                                   unsigned long dst_skip_bytes,
-                                   unsigned long src_skip_byte);
 
-typedef struct _alsa_driver
-{
+typedef struct _alsa_driver {
 
     JACK_DRIVER_NT_DECL
 
@@ -124,7 +127,6 @@ typedef struct _alsa_driver
 
     ReadCopyFunction read_via_copy;
     WriteCopyFunction write_via_copy;
-    CopyCopyFunction channel_copy;
 
     int             dither;
     dither_state_t *dither_state;
@@ -144,100 +146,143 @@ typedef struct _alsa_driver
     alsa_midi_t *midi;
     int xrun_recovery;
 
-}
-alsa_driver_t;
+} alsa_driver_t;
 
 static inline void
-alsa_driver_mark_channel_done (alsa_driver_t *driver, channel_t chn)
-{
-    bitset_remove (driver->channels_not_done, chn);
-    driver->silent[chn] = 0;
+alsa_driver_mark_channel_done (alsa_driver_t *driver, channel_t chn) {
+	bitset_remove (driver->channels_not_done, chn);
+	driver->silent[chn] = 0;
 }
 
 static inline void
 alsa_driver_silence_on_channel (alsa_driver_t *driver, channel_t chn,
-                                jack_nframes_t nframes)
-{
-    if (driver->playback_interleaved) {
-        memset_interleave
-        (driver->playback_addr[chn],
-         0, nframes * driver->playback_sample_bytes,
-         driver->interleave_unit,
-         driver->playback_interleave_skip[chn]);
-    } else {
-        memset (driver->playback_addr[chn], 0,
-                nframes * driver->playback_sample_bytes);
-    }
-    alsa_driver_mark_channel_done (driver, chn);
+				jack_nframes_t nframes) {
+	if (driver->playback_interleaved) {
+		memset_interleave
+			(driver->playback_addr[chn],
+			 0, nframes * driver->playback_sample_bytes,
+			 driver->interleave_unit,
+			 driver->playback_interleave_skip[chn]);
+	} else {
+		memset (driver->playback_addr[chn], 0,
+			nframes * driver->playback_sample_bytes);
+	}
+	alsa_driver_mark_channel_done (driver,chn);
 }
 
 static inline void
 alsa_driver_silence_on_channel_no_mark (alsa_driver_t *driver, channel_t chn,
-                                        jack_nframes_t nframes)
-{
-    if (driver->playback_interleaved) {
-        memset_interleave
-        (driver->playback_addr[chn],
-         0, nframes * driver->playback_sample_bytes,
-         driver->interleave_unit,
-         driver->playback_interleave_skip[chn]);
-    } else {
-        memset (driver->playback_addr[chn], 0,
-                nframes * driver->playback_sample_bytes);
-    }
+					jack_nframes_t nframes) {
+	if (driver->playback_interleaved) {
+		memset_interleave
+			(driver->playback_addr[chn],
+			 0, nframes * driver->playback_sample_bytes,
+			 driver->interleave_unit,
+			 driver->playback_interleave_skip[chn]);
+	} else {
+		memset (driver->playback_addr[chn], 0,
+			nframes * driver->playback_sample_bytes);
+	}
 }
 
 static inline void
 alsa_driver_read_from_channel (alsa_driver_t *driver,
-                               channel_t channel,
-                               jack_default_audio_sample_t *buf,
-                               jack_nframes_t nsamples)
+			       channel_t channel,
+			       jack_default_audio_sample_t *buf,
+			       jack_nframes_t nsamples)
 {
-    driver->read_via_copy (buf,
-                           driver->capture_addr[channel],
-                           nsamples,
-                           driver->capture_interleave_skip[channel]);
+	driver->read_via_copy (buf,
+			       driver->capture_addr[channel],
+			       nsamples,
+			       driver->capture_interleave_skip[channel]);
 }
 
 static inline void
 alsa_driver_write_to_channel (alsa_driver_t *driver,
-                              channel_t channel,
-                              jack_default_audio_sample_t *buf,
-                              jack_nframes_t nsamples)
+			      channel_t channel,
+			      jack_default_audio_sample_t *buf,
+			      jack_nframes_t nsamples)
 {
-    driver->write_via_copy (driver->playback_addr[channel],
-                            buf,
-                            nsamples,
-                            driver->playback_interleave_skip[channel],
-                            driver->dither_state + channel);
-    alsa_driver_mark_channel_done (driver, channel);
-}
-
-static inline void
-alsa_driver_copy_channel (alsa_driver_t *driver,
-                          channel_t input_channel,
-                          channel_t output_channel,
-                          jack_nframes_t nsamples)
-{
-
-    driver->channel_copy (driver->playback_addr[output_channel],
-                          driver->capture_addr[input_channel],
-                          nsamples * driver->playback_sample_bytes,
-                          driver->playback_interleave_skip[output_channel],
-                          driver->capture_interleave_skip[input_channel]);
-    alsa_driver_mark_channel_done (driver, output_channel);
+	driver->write_via_copy (driver->playback_addr[channel],
+				buf,
+				nsamples,
+				driver->playback_interleave_skip[channel],
+				driver->dither_state+channel);
+	alsa_driver_mark_channel_done (driver, channel);
 }
 
 void  alsa_driver_silence_untouched_channels (alsa_driver_t *driver,
-        jack_nframes_t nframes);
+					      jack_nframes_t nframes);
 void  alsa_driver_set_clock_sync_status (alsa_driver_t *driver, channel_t chn,
-        ClockSyncStatus status);
+					 ClockSyncStatus status);
 int   alsa_driver_listen_for_clock_sync_status (alsa_driver_t *,
-        ClockSyncListenerFunction,
-        void *arg);
+						ClockSyncListenerFunction,
+						void *arg);
 int   alsa_driver_stop_listen_for_clock_sync_status (alsa_driver_t *,
-        unsigned int);
+						     unsigned int);
 void  alsa_driver_clock_sync_notify (alsa_driver_t *, channel_t chn,
-                                     ClockSyncStatus);
+				     ClockSyncStatus);
+
+int
+alsa_driver_reset_parameters (alsa_driver_t *driver,
+			      jack_nframes_t frames_per_cycle,
+			      jack_nframes_t user_nperiods,
+			      jack_nframes_t rate);
+
+jack_driver_t *
+alsa_driver_new (char *name, char *playback_alsa_device,
+		 char *capture_alsa_device,
+		 jack_client_t *client,
+		 jack_nframes_t frames_per_cycle,
+		 jack_nframes_t user_nperiods,
+		 jack_nframes_t rate,
+		 int hw_monitoring,
+		 int hw_metering,
+		 int capturing,
+		 int playing,
+		 DitherAlgorithm dither,
+		 int soft_mode,
+		 int monitor,
+		 int user_capture_nchnls,
+		 int user_playback_nchnls,
+		 int shorts_first,
+		 jack_nframes_t capture_latency,
+		 jack_nframes_t playback_latency,
+		 alsa_midi_t *midi_driver
+		 );
+void
+alsa_driver_delete (alsa_driver_t *driver);
+
+int
+alsa_driver_start (alsa_driver_t *driver);
+
+int
+alsa_driver_stop (alsa_driver_t *driver);
+
+jack_nframes_t
+alsa_driver_wait (alsa_driver_t *driver, int extra_fd, int *status, float
+		  *delayed_usecs);
+
+int
+alsa_driver_read (alsa_driver_t *driver, jack_nframes_t nframes);
+
+int
+alsa_driver_write (alsa_driver_t* driver, jack_nframes_t nframes);
+
+jack_time_t jack_get_microseconds(void);
+
+// Code implemented in JackAlsaDriver.cpp
+
+void ReadInput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nread);
+void MonitorInput();
+void ClearOutput();
+void WriteOutput(jack_nframes_t orig_nframes, snd_pcm_sframes_t contiguous, snd_pcm_sframes_t nwritten);
+void SetTime(jack_time_t time);
+int Restart();
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* __jack_alsa_driver_h__ */

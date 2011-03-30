@@ -38,8 +38,8 @@ namespace Jack
                                     void* userData)
     {
         JackPortAudioDriver* driver = (JackPortAudioDriver*)userData;
-        driver->fInputBuffer = (float**)inputBuffer;
-        driver->fOutputBuffer = (float**)outputBuffer;
+        driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
+        driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
         // Setup threadded based log function
         set_threaded_log_function();
         driver->CycleTakeBeginTime();
@@ -49,14 +49,14 @@ namespace Jack
     int JackPortAudioDriver::Read()
     {
         for (int i = 0; i < fCaptureChannels; i++)
-            memcpy(GetInputBuffer(i), fInputBuffer[i], sizeof(float) * fEngineControl->fBufferSize);
+            memcpy(GetInputBuffer(i), fInputBuffer[i], sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
         return 0;
     }
 
     int JackPortAudioDriver::Write()
     {
         for (int i = 0; i < fPlaybackChannels; i++)
-            memcpy(fOutputBuffer[i], GetOutputBuffer(i), sizeof(float) * fEngineControl->fBufferSize);
+            memcpy(fOutputBuffer[i], GetOutputBuffer(i), sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize);
         return 0;
     }
 
@@ -180,7 +180,9 @@ error:
 
     int JackPortAudioDriver::Close()
     {
+        // Generic audio driver close
         int res = JackAudioDriver::Close();
+
         jack_log("JackPortAudioDriver::Close");
         Pa_CloseStream(fStream);
         return res;
@@ -189,16 +191,25 @@ error:
     int JackPortAudioDriver::Start()
     {
         jack_log("JackPortAudioDriver::Start");
-        JackAudioDriver::Start();
-        PaError err = Pa_StartStream(fStream);
-        return (err == paNoError) ? 0 : -1;
+        if (JackAudioDriver::Start() >= 0) {
+            PaError err = Pa_StartStream(fStream);
+            if (err == paNoError) {
+                return 0;
+            }
+            JackAudioDriver::Stop();
+        }
+        return -1;
     }
 
     int JackPortAudioDriver::Stop()
     {
         jack_log("JackPortAudioDriver::Stop");
         PaError err = Pa_StopStream(fStream);
-        return (err == paNoError) ? 0 : -1;
+        int res = (err == paNoError) ? 0 : -1;
+        if (JackAudioDriver::Stop() < 0) {
+            res = -1;
+        }
+        return res;
     }
 
     int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)

@@ -119,7 +119,7 @@ jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSL
                      desc->name);
         }
 
-        printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
+        jack_log("Parameters for driver '%s' (all parameters are optional):", desc->name);
         jack_print_driver_options (desc, stdout);
         return 1;
     }
@@ -263,7 +263,7 @@ jackctl_parse_driver_params (jackctl_driver *driver_ptr, int argc, char* argv[])
                      desc->name);
         }
 
-        printf ("Parameters for driver '%s' (all parameters are optional):\n", desc->name);
+        jack_log("Parameters for driver '%s' (all parameters are optional):", desc->name);
         jack_print_driver_options (desc, stdout);
         return 1;
     }
@@ -446,7 +446,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
         free(filename);
         return NULL;
     }
-  
+
     if ((descriptor = so_get_descriptor ()) == NULL) {
         jack_error("driver from '%s' returned NULL descriptor", filename);
         UnloadDriverModule(dlhandle);
@@ -467,7 +467,7 @@ jack_get_descriptor (JSList * drivers, const char * sofile, const char * symbol)
     /* check it doesn't exist already */
     for (node = drivers; node; node = jack_slist_next (node)) {
         other_descriptor = (jack_driver_desc_t *) node->data;
-    
+
         if (strcmp(descriptor->name, other_descriptor->name) == 0) {
             jack_error("the drivers in '%s' and '%s' both have the name '%s'; using the first",
                        other_descriptor->file, filename, other_descriptor->name);
@@ -603,7 +603,7 @@ jack_drivers_load (JSList * drivers) {
     }
 
     while ((dir_entry = readdir(dir_stream))) {
-    
+
         /* check the filename is of the right format */
         if (strncmp ("jack_", dir_entry->d_name, 5) != 0) {
             continue;
@@ -619,7 +619,7 @@ jack_drivers_load (JSList * drivers) {
         }
 
         desc = jack_get_descriptor (drivers, dir_entry->d_name, "driver_get_descriptor");
-         
+
         if (desc) {
             driver_list = jack_slist_append (driver_list, desc);
         } else {
@@ -771,9 +771,9 @@ jack_internals_load (JSList * internals) {
 
 #endif
 
-Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver_desc, 
-                                                    Jack::JackLockedEngine* engine, 
-                                                    Jack::JackSynchro* synchro, 
+Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver_desc,
+                                                    Jack::JackLockedEngine* engine,
+                                                    Jack::JackSynchro* synchro,
                                                     const JSList* params)
 {
 #ifdef WIN32
@@ -783,7 +783,7 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
 #endif
 
     fHandle = LoadDriverModule (driver_desc->file);
-    
+
     if (fHandle == NULL) {
 #ifdef WIN32
         if ((errstr = GetLastError ()) != 0) {
@@ -809,8 +809,14 @@ Jack::JackDriverClientInterface* JackDriverInfo::Open(jack_driver_desc_t* driver
         jack_error("no initialize function in shared object %s\n", driver_desc->file);
         return NULL;
     }
-    
+
     fBackend = fInitialize(engine, synchro, params);
     return fBackend;
 }
 
+JackDriverInfo::~JackDriverInfo()
+{
+    delete fBackend;
+    if (fHandle)
+        UnloadDriverModule(fHandle);
+}

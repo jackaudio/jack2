@@ -97,6 +97,7 @@ class SERVER_EXPORT JackDriverInterface
         virtual int ProcessSlaves() = 0;
 
         virtual bool IsRealTime() const = 0;
+        virtual bool IsRunning() const = 0;
 };
 
 /*!
@@ -134,6 +135,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         JackClientControl fClientControl;
         std::list<JackDriverInterface*> fSlaveList;
         bool fIsMaster;
+        bool fIsRunning;
 
         void CycleIncTime();
         void CycleTakeBeginTime();
@@ -198,7 +200,9 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual int Write();
 
         virtual int Start();
+        virtual int StartSlaves();
         virtual int Stop();
+        virtual int StopSlaves();
 
         virtual bool IsFixedBufferSize();
         virtual int SetBufferSize(jack_nframes_t buffer_size);
@@ -208,6 +212,7 @@ class SERVER_EXPORT JackDriver : public JackDriverClientInterface
         virtual JackClientControl* GetClientControl() const;
 
         virtual bool IsRealTime() const;
+        virtual bool IsRunning() const { return fIsRunning; }
         virtual bool Initialize();  // To be called by the wrapping thread Init method when the driver is a "blocking" one
 
 };

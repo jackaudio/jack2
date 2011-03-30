@@ -153,12 +153,19 @@ jack_controller_start_server(
 
     controller_ptr->xruns = 0;
 
-    if (!jackctl_server_start(
+    if (!jackctl_server_open(
             controller_ptr->server,
             controller_ptr->driver))
     {
-        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to start server");
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to open server");
         goto fail;
+    }
+
+    if (!jackctl_server_start(
+            controller_ptr->server))
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to start server");
+        goto fail_close_server;
     }
 
     controller_ptr->client = jack_client_open(
@@ -213,6 +220,12 @@ fail_stop_server:
         jack_error("failed to stop jack server");
     }
 
+fail_close_server:
+    if (!jackctl_server_close(controller_ptr->server))
+    {
+        jack_error("failed to close jack server");
+    }
+
 fail:
     return FALSE;
 }
@@ -247,6 +260,12 @@ jack_controller_stop_server(
     if (!jackctl_server_stop(controller_ptr->server))
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to stop server");
+        return FALSE;
+    }
+
+    if (!jackctl_server_close(controller_ptr->server))
+    {
+        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to close server");
         return FALSE;
     }
 

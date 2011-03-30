@@ -47,6 +47,7 @@ JackDriver::JackDriver(const char* name, const char* alias, JackLockedEngine* en
     fBeginDateUst = 0;
     fDelayedUsecs = 0.f;
     fIsMaster = true;
+    fIsRunning = false;
  }
 
 JackDriver::JackDriver()
@@ -56,6 +57,7 @@ JackDriver::JackDriver()
     fGraphManager = NULL;
     fBeginDateUst = 0;
     fIsMaster = true;
+    fIsRunning = false;
 }
 
 JackDriver::~JackDriver()
@@ -80,7 +82,7 @@ int JackDriver::Open()
     return 0;
 }
 
-int JackDriver::Open (bool capturing,
+int JackDriver::Open(bool capturing,
                      bool playing,
                      int inchannels,
                      int outchannels,
@@ -93,6 +95,15 @@ int JackDriver::Open (bool capturing,
     jack_log("JackDriver::Open capture_driver_name = %s", capture_driver_name);
     jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
     int refnum = -1;
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    int status;
+
+    // Check name and possibly rename
+    if (fEngine->ClientCheck(fClientControl.fName, -1, name_res, JACK_PROTOCOL_VERSION, (int)JackNullOption, (int*)&status) < 0) {
+        jack_error("Client name = %s conflits with another running client", fClientControl.fName);
+        return -1;
+    }
+    strcpy(fClientControl.fName, name_res);
 
     if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for driver");
@@ -135,6 +146,15 @@ int JackDriver::Open(jack_nframes_t buffer_size,
     jack_log("JackDriver::Open capture_driver_name = %s", capture_driver_name);
     jack_log("JackDriver::Open playback_driver_name = %s", playback_driver_name);
     int refnum = -1;
+    char name_res[JACK_CLIENT_NAME_SIZE + 1];
+    int status;
+
+    // Check name and possibly rename
+    if (fEngine->ClientCheck(fClientControl.fName, -1, name_res, JACK_PROTOCOL_VERSION, (int)JackNullOption, (int*)&status) < 0) {
+        jack_error("Client name = %s conflits with another running client", fClientControl.fName);
+        return -1;
+    }
+    strcpy(fClientControl.fName, name_res);
 
     if (fEngine->ClientInternalOpen(fClientControl.fName, &refnum, &fEngineControl, &fGraphManager, this, false) != 0) {
         jack_error("Cannot allocate internal client for driver");
@@ -288,6 +308,7 @@ int JackDriver::ProcessSlaves()
         JackDriverInterface* slave = *it;
         if (slave->Process() < 0)
             res = -1;
+
     }
     return res;
 }
@@ -324,13 +345,47 @@ int JackDriver::Write()
 
 int JackDriver::Start()
 {
-    fEngineControl->InitFrameTime();
+    if (fIsMaster) {
+        fEngineControl->InitFrameTime();
+    }
+    fIsRunning = true;
     return 0;
+}
+
+int JackDriver::StartSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->Start() < 0) {
+            res = -1;
+
+            // XXX: We should attempt to stop all of the slaves that we've
+            // started here.
+
+            break;
+        }
+    }
+    return res;
 }
 
 int JackDriver::Stop()
 {
+    fIsRunning = false;
     return 0;
+}
+
+int JackDriver::StopSlaves()
+{
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->Stop() < 0)
+            res = -1;
+    }
+    return res;
 }
 
 bool JackDriver::IsFixedBufferSize()

@@ -44,13 +44,15 @@ def build(bld):
   	
     create_jack_driver_obj(bld, 'dummy', '../common/JackDummyDriver.cpp')
     
-    alsa_driver_src = ['alsa/JackAlsaDriver.cpp',
+    alsa_driver_src = [
+                       'alsa/JackAlsaDriver.cpp',
                        'alsa/alsa_rawmidi.c',
                        'alsa/alsa_seqmidi.c',
                        'alsa/alsa_midi_jackmp.cpp',
                        '../common/memops.c',
                        'alsa/generic_hw.c',
                        'alsa/hdsp.c',
+		       'alsa/alsa_driver.c',
                        'alsa/hammerfall.c',
                        'alsa/ice1712.c'
                        ]

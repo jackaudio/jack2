@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <getopt.h>
 #include <cstring>
 #include <cstdio>
+#include <list>
 
 #include "types.h"
 #include "jack.h"
@@ -101,7 +102,8 @@ static void usage(FILE* file)
             "               [ --timeout OR -t client-timeout-in-msecs ]\n"
             "               [ --loopback OR -L loopback-port-number ]\n"
             "               [ --port-max OR -p maximum-number-of-ports]\n"
-            "               [ --midi OR -X midi-driver ]\n"
+            "               [ --slave-backend OR -X slave-backend-name ]\n"
+            "               [ --internal-client OR -I internal-client-name ]\n"
             "               [ --verbose OR -v ]\n"
 #ifdef __linux__
             "               [ --clocksource OR -c [ c(ycle) | h(pet) | s(ystem) ]\n"
@@ -111,21 +113,21 @@ static void usage(FILE* file)
             "               [ --sync OR -S ]\n"
             "               [ --temporary OR -T ]\n"
             "               [ --version OR -V ]\n"
-            "         -d backend [ ... backend args ... ]\n"
+            "         -d master-backend-name [ ... master-backend args ... ]\n"
 #ifdef __APPLE__
-            "               Available backends may include: coreaudio, dummy or net.\n\n"
+            "               Available master backends may include: coreaudio, dummy or net.\n\n"
 #endif
 #ifdef WIN32
-            "               Available backends may include: portaudio, dummy or net.\n\n"
+            "               Available master backends may include: portaudio, dummy or net.\n\n"
 #endif
 #ifdef __linux__
-            "               Available backends may include: alsa, dummy, freebob, firewire or net\n\n"
+            "               Available master backends may include: alsa, dummy, freebob, firewire or net\n\n"
 #endif
 #if defined(__sun__) || defined(sun)
-            "               Available backends may include: boomer, oss, dummy or net.\n\n"
+            "               Available master backends may include: boomer, oss, dummy or net.\n\n"
 #endif
-            "       jackdmp -d backend --help\n"
-            "             to display options for each backend\n\n");
+            "       jackdmp -d master-backend-name --help\n"
+            "             to display options for each master backend\n\n");
 }
 
 // To put in the control.h interface??
@@ -145,6 +147,20 @@ jackctl_server_get_driver(
             return (jackctl_driver_t *)node_ptr->data;
         }
 
+        node_ptr = jack_slist_next(node_ptr);
+    }
+
+    return NULL;
+}
+
+static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server, const char *internal_name)
+{
+    const JSList * node_ptr = jackctl_server_get_internals_list(server);
+
+    while (node_ptr) {
+        if (strcmp(jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data), internal_name) == 0) {
+            return (jackctl_internal_t *)node_ptr->data;
+        }
         node_ptr = jack_slist_next(node_ptr);
     }
 
@@ -174,12 +190,11 @@ int main(int argc, char* argv[])
     jackctl_server_t * server_ctl;
     const JSList * server_parameters;
     const char* server_name = "default";
-    jackctl_driver_t * audio_driver_ctl;
-    jackctl_driver_t * midi_driver_ctl;
+    jackctl_driver_t * master_driver_ctl;
     jackctl_driver_t * loopback_driver_ctl;
     int replace_registry = 0;
 
-    const char *options = "-d:X:P:uvshVrRL:STFl:t:mn:p:"
+    const char *options = "-d:X:I:P:uvshVrRL:STFl:t:mn:p:"
 #ifdef __linux__
         "c:"
 #endif
@@ -192,6 +207,7 @@ int main(int argc, char* argv[])
                                        { "loopback-driver", 1, 0, 'L' },
                                        { "audio-driver", 1, 0, 'd' },
                                        { "midi-driver", 1, 0, 'X' },
+                                       { "internal-client", 1, 0, 'I' },
                                        { "verbose", 0, 0, 'v' },
                                        { "help", 0, 0, 'h' },
                                        { "port-max", 1, 0, 'p' },
@@ -213,14 +229,9 @@ int main(int argc, char* argv[])
 
     int i,opt = 0;
     int option_index = 0;
-    bool seen_audio_driver = false;
-    bool seen_midi_driver = false;
-    char *audio_driver_name = NULL;
-    char **audio_driver_args = NULL;
-    int audio_driver_nargs = 1;
-    char *midi_driver_name = NULL;
-    char **midi_driver_args = NULL;
-    int midi_driver_nargs = 1;
+    char* master_driver_name = NULL;
+    char** master_driver_args = NULL;
+    int master_driver_nargs = 1;
     int do_mlock = 1;
     int do_unlock = 0;
     int loopback = 0;
@@ -228,6 +239,14 @@ int main(int argc, char* argv[])
     sigset_t signals;
     jackctl_parameter_t* param;
     union jackctl_parameter_value value;
+
+    std::list<char*> internals_list;
+    std::list<char*> slaves_list;
+    std::list<char*>::iterator it;
+
+    // Assume that we fail.
+    int return_value = -1;
+    bool notify_sent = false;
 
     copyright(stdout);
 #if defined(JACK_DBUS) && defined(__linux__)
@@ -250,7 +269,7 @@ int main(int argc, char* argv[])
     }
 
     opterr = 0;
-    while (!seen_audio_driver &&
+    while (!master_driver_name &&
             (opt = getopt_long(argc, argv, options,
                                long_options, &option_index)) != EOF) {
         switch (opt) {
@@ -270,15 +289,14 @@ int main(int argc, char* argv[])
                         jackctl_parameter_set_value(param, &value);
                     } else {
                         usage(stdout);
-                        goto fail_free1;
+                        goto destroy_server;
                     }
                 }
                 break;
         #endif
 
             case 'd':
-                seen_audio_driver = true;
-                audio_driver_name = optarg;
+                master_driver_name = optarg;
                 break;
 
             case 'L':
@@ -286,8 +304,11 @@ int main(int argc, char* argv[])
                 break;
 
             case 'X':
-                seen_midi_driver = true;
-                midi_driver_name = optarg;
+                slaves_list.push_back(optarg);
+                break;
+
+            case 'I':
+                internals_list.push_back(optarg);
                 break;
 
             case 'p':
@@ -385,7 +406,7 @@ int main(int argc, char* argv[])
 
             case 'h':
                 usage(stdout);
-                goto fail_free1;
+                goto destroy_server;
         }
     }
 
@@ -404,64 +425,65 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    if (!seen_audio_driver) {
+    if (!master_driver_name) {
         usage(stderr);
-        goto fail_free1;
+        goto destroy_server;
     }
 
-    // Audio driver
-    audio_driver_ctl = jackctl_server_get_driver(server_ctl, audio_driver_name);
-    if (audio_driver_ctl == NULL) {
-        fprintf(stderr, "Unknown driver \"%s\"\n", audio_driver_name);
-        goto fail_free1;
+    // Master driver
+    master_driver_ctl = jackctl_server_get_driver(server_ctl, master_driver_name);
+    if (master_driver_ctl == NULL) {
+        fprintf(stderr, "Unknown driver \"%s\"\n", master_driver_name);
+        goto destroy_server;
     }
 
     if (optind < argc) {
-        audio_driver_nargs = 1 + argc - optind;
+        master_driver_nargs = 1 + argc - optind;
     } else {
-        audio_driver_nargs = 1;
+        master_driver_nargs = 1;
     }
 
-    if (audio_driver_nargs == 0) {
+    if (master_driver_nargs == 0) {
         fprintf(stderr, "No driver specified ... hmm. JACK won't do"
                 " anything when run like this.\n");
-        goto fail_free1;
+        goto destroy_server;
     }
 
-    audio_driver_args = (char **) malloc(sizeof(char *) * audio_driver_nargs);
-    audio_driver_args[0] = audio_driver_name;
+    master_driver_args = (char **) malloc(sizeof(char *) * master_driver_nargs);
+    master_driver_args[0] = master_driver_name;
 
-    for (i = 1; i < audio_driver_nargs; i++) {
-        audio_driver_args[i] = argv[optind++];
+    for (i = 1; i < master_driver_nargs; i++) {
+        master_driver_args[i] = argv[optind++];
     }
 
-    if (jackctl_parse_driver_params(audio_driver_ctl, audio_driver_nargs, audio_driver_args)) {
-        goto fail_free1;
+    if (jackctl_parse_driver_params(master_driver_ctl, master_driver_nargs, master_driver_args)) {
+        goto destroy_server;
     }
 
-    // Setup signals then start server
+    // Setup signals
     signals = jackctl_setup_signals(0);
 
-    if (!jackctl_server_start(server_ctl, audio_driver_ctl)) {
-        fprintf(stderr, "Failed to start server\n");
-        goto fail_free1;
+    // Open server
+    if (! jackctl_server_open(server_ctl, master_driver_ctl)) {
+        fprintf(stderr, "Failed to open server\n");
+        goto destroy_server;
     }
 
-    // MIDI driver
-    if (seen_midi_driver) {
-
-        midi_driver_ctl = jackctl_server_get_driver(server_ctl, midi_driver_name);
-        if (midi_driver_ctl == NULL) {
-            fprintf(stderr, "Unknown driver \"%s\"\n", midi_driver_name);
-            goto fail_free2;
+    // Slave drivers
+    for (it = slaves_list.begin(); it != slaves_list.end(); it++) {
+        jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
+        if (slave_driver_ctl == NULL) {
+            fprintf(stderr, "Unknown driver \"%s\"\n", *it);
+            goto close_server;
         }
-
-        jackctl_server_add_slave(server_ctl, midi_driver_ctl);
+        jackctl_server_add_slave(server_ctl, slave_driver_ctl);
     }
 
     // Loopback driver
     if (loopback > 0) {
         loopback_driver_ctl = jackctl_server_get_driver(server_ctl, "loopback");
+
+        // XX: What if this fails?
         if (loopback_driver_ctl != NULL) {
             const JSList * loopback_parameters = jackctl_driver_get_parameters(loopback_driver_ctl);
             param = jackctl_get_parameter(loopback_parameters, "channels");
@@ -471,27 +493,42 @@ int main(int argc, char* argv[])
             }
             jackctl_server_add_slave(server_ctl, loopback_driver_ctl);
         }
+
+    }
+
+    // Start the server
+    if (!jackctl_server_start(server_ctl)) {
+        fprintf(stderr, "Failed to start server\n");
+        goto close_server;
+    }
+
+    // Internal clients
+    for (it = internals_list.begin(); it != internals_list.end(); it++) {
+        jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
+        if (internal_driver_ctl == NULL) {
+            fprintf(stderr, "Unknown internal \"%s\"\n", *it);
+            goto stop_server;
+        }
+        jackctl_server_load_internal(server_ctl, internal_driver_ctl);
     }
 
     notify_server_start(server_name);
+    notify_sent = true;
+    return_value = 0;
 
     // Waits for signal
     jackctl_wait_signals(signals);
 
-    if (!jackctl_server_stop(server_ctl))
+ stop_server:
+    if (! jackctl_server_stop(server_ctl)) {
         fprintf(stderr, "Cannot stop server...\n");
-
+    }
+    if (notify_sent) {
+        notify_server_stop(server_name);
+    }
+ close_server:
+    jackctl_server_close(server_ctl);
+ destroy_server:
     jackctl_server_destroy(server_ctl);
-    notify_server_stop(server_name);
-    return 0;
-
-fail_free1:
-    jackctl_server_destroy(server_ctl);
-    return -1;
-
-fail_free2:
-    jackctl_server_stop(server_ctl);
-    jackctl_server_destroy(server_ctl);
-    notify_server_stop(server_name);
-    return -1;
+    return return_value;
 }

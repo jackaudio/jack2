@@ -77,7 +77,7 @@ JackPort* JackGraphManager::GetPort(jack_port_id_t port_index)
     return &fPortArray[port_index];
 }
 
-float* JackGraphManager::GetBuffer(jack_port_id_t port_index)
+jack_default_audio_sample_t* JackGraphManager::GetBuffer(jack_port_id_t port_index)
 {
     return fPortArray[port_index].GetBuffer();
 }

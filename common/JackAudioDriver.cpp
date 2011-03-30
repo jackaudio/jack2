@@ -138,14 +138,13 @@ int JackAudioDriver::Attach()
 
         // Monitor ports
         if (fWithMonitorPorts) {
-            jack_log("Create monitor port ");
+            jack_log("Create monitor port");
             snprintf(name, sizeof(name) - 1, "%s:monitor_%u", fClientControl.fName, i + 1);
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
                 port = fGraphManager->GetPort(port_index);
-                port->SetAlias(alias);
                 range.min = range.max = fEngineControl->fBufferSize;
                 port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
@@ -178,8 +177,8 @@ int JackAudioDriver::Write()
 {
     for (int i = 0; i < fPlaybackChannels; i++) {
         if (fGraphManager->GetConnectionsNum(fPlaybackPortList[i]) > 0) {
-            float* buffer = GetOutputBuffer(i);
-            int size = sizeof(float) * fEngineControl->fBufferSize;
+            jack_default_audio_sample_t* buffer = GetOutputBuffer(i);
+            int size = sizeof(jack_default_audio_sample_t) * fEngineControl->fBufferSize;
             // Monitor ports
             if (fWithMonitorPorts && fGraphManager->GetConnectionsNum(fMonitorPortList[i]) > 0)
                 memcpy(GetMonitorBuffer(i), buffer, size);
@@ -310,6 +309,26 @@ int JackAudioDriver::ProcessGraphSync()
         res = -1;
     }
 
+    return res;
+}
+
+int JackAudioDriver::Start()
+{
+    int res = JackDriver::Start();
+    if ((res >= 0) && fIsMaster) {
+        res = StartSlaves();
+    }
+    return res;
+}
+
+int JackAudioDriver::Stop()
+{
+    int res = JackDriver::Stop();
+    if (fIsMaster) {
+        if (StopSlaves() < 0) {
+            res = -1;
+        }
+    }
     return res;
 }
 

@@ -21,6 +21,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __JackLibSampleRateResampler__
 
 #include "JackResampler.h"
+#include "types.h"
+
 #include <samplerate.h>
 
 namespace Jack
@@ -34,20 +36,20 @@ class JackLibSampleRateResampler : public JackResampler
 {
 
     private:
-    
+
         SRC_STATE* fResampler;
-           
+
     public:
-    
+
         JackLibSampleRateResampler();
         JackLibSampleRateResampler(unsigned int quality);
         virtual ~JackLibSampleRateResampler();
-        
-        unsigned int ReadResample(float* buffer, unsigned int frames);
-        unsigned int WriteResample(float* buffer, unsigned int frames);
-        
+
+        unsigned int ReadResample(jack_default_audio_sample_t* buffer, unsigned int frames);
+        unsigned int WriteResample(jack_default_audio_sample_t* buffer, unsigned int frames);
+
         void Reset(unsigned int new_size);
-          
+
     };
 }
 

@@ -50,6 +50,7 @@ class SERVER_EXPORT JackServer
         JackDriverInfo* fDriverInfo;
         JackDriverClientInterface* fAudioDriver;
         JackDriverClientInterface* fFreewheelDriver;
+        JackDriverClientInterface* fThreadedFreewheelDriver;
         JackLockedEngine* fEngine;
         JackEngineControl* fEngineControl;
         JackGraphManager* fGraphManager;
@@ -57,7 +58,7 @@ class SERVER_EXPORT JackServer
         JackConnectionManager fConnectionState;
         JackSynchro fSynchroTable[CLIENT_NUM];
         bool fFreewheel;
-        
+
         int InternalClientLoadAux(JackLoadableInternalClient* client, const char* so_name, const char* client_name, int options, int* int_ref, int uuid, int* status);
 
     public:
@@ -70,6 +71,7 @@ class SERVER_EXPORT JackServer
 
         int Start();
         int Stop();
+        bool IsRunning();
 
         // RT thread
         void Notify(int refnum, int notify, int value);
@@ -77,19 +79,19 @@ class SERVER_EXPORT JackServer
         // Command thread : API
         int SetBufferSize(jack_nframes_t buffer_size);
         int SetFreewheel(bool onoff);
-        int InternalClientLoad(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status);
-        int InternalClientLoad(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status);
+        int InternalClientLoad1(const char* client_name, const char* so_name, const char* objet_data, int options, int* int_ref, int uuid, int* status);
+        int InternalClientLoad2(const char* client_name, const char* so_name, const JSList * parameters, int options, int* int_ref, int uuid, int* status);
         void ClientKill(int refnum);
 
         // Transport management
         int ReleaseTimebase(int refnum);
         int SetTimebaseCallback(int refnum, int conditional);
-        
+
         // Backend management
         JackDriverInfo* AddSlave(jack_driver_desc_t* driver_desc, JSList* driver_params);
         void RemoveSlave(JackDriverInfo* info);
         int SwitchMaster(jack_driver_desc_t* driver_desc, JSList* driver_params);
- 
+
         // Object access
         JackLockedEngine* GetEngine();
         JackEngineControl* GetEngineControl();

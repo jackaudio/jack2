@@ -39,23 +39,23 @@ extern "C"
     }
     jack_varargs_t;
 
-    static const char* jack_default_server_name (void) 
-        {
+    static const char* jack_default_server_name (void)
+    {
         const char *server_name;
         if ((server_name = getenv("JACK_DEFAULT_SERVER")) == NULL)
             server_name = "default";
         return server_name;
     }
 
-    static inline void jack_varargs_init (jack_varargs_t *va) 
-        {
+    static inline void jack_varargs_init (jack_varargs_t *va)
+    {
         memset (va, 0, sizeof(jack_varargs_t));
         va->server_name = (char*)jack_default_server_name();
         va->session_id = -1;
     }
 
-    static inline void jack_varargs_parse (jack_options_t options, va_list ap, jack_varargs_t *va) 
-        {
+    static inline void jack_varargs_parse (jack_options_t options, va_list ap, jack_varargs_t *va)
+    {
         // initialize default settings
         jack_varargs_init (va);
 

@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackError.h"
 #include <assert.h>
 #include <signal.h>
- 
+
 
 namespace Jack
 {
@@ -42,13 +42,13 @@ class JackClient;
 \brief Global library static structure: singleton kind of pattern.
 */
 
-struct JackLibGlobals
+struct SERVER_EXPORT JackLibGlobals
 {
     JackShmReadWritePtr<JackGraphManager> fGraphManager;	/*! Shared memory Port manager */
     JackShmReadWritePtr<JackEngineControl> fEngineControl;	/*! Shared engine control */  // transport engine has to be writable
     JackSynchro fSynchroTable[CLIENT_NUM];                  /*! Shared synchro table */
     sigset_t fProcessSignals;
- 
+
     static int fClientCount;
     static JackLibGlobals* fGlobals;
 
@@ -67,7 +67,7 @@ struct JackLibGlobals
         sigemptyset(&signals);
         sigaddset(&signals, SIGPIPE);
         sigprocmask(SIG_BLOCK, &signals, &fProcessSignals);
-    #endif       
+    #endif
     }
 
     ~JackLibGlobals()
@@ -83,13 +83,13 @@ struct JackLibGlobals
        // TODO
     #else
        sigprocmask(SIG_BLOCK, &fProcessSignals, 0);
-    #endif   
+    #endif
     }
 
     static void Init()
     {
         if (!JackGlobals::fServerRunning && fClientCount > 0) {
-        
+
             // Cleanup remaining clients
             jack_error("Jack server was closed but clients are still allocated, cleanup...");
             for (int i = 0; i < CLIENT_NUM; i++) {
@@ -101,13 +101,13 @@ struct JackLibGlobals
                     JackGlobals::fClientTable[CLIENT_NUM] = NULL;
                 }
             }
-            
+
             // Cleanup global context
             fClientCount = 0;
             delete fGlobals;
             fGlobals = NULL;
         }
-        
+
         if (fClientCount++ == 0 && !fGlobals) {
             jack_log("JackLibGlobals Init %x", fGlobals);
             InitTime();

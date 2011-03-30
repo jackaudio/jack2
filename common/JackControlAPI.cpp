@@ -78,15 +78,15 @@ struct jackctl_server
     /* int32_t, msecs; if zero, use period size. */
     union jackctl_parameter_value client_timeout;
     union jackctl_parameter_value default_client_timeout;
-    
+
     /* uint32_t, clock source type */
     union jackctl_parameter_value clock_source;
     union jackctl_parameter_value default_clock_source;
-   
+
     /* uint32_t, max port number */
     union jackctl_parameter_value port_max;
     union jackctl_parameter_value default_port_max;
-    
+
     /* bool */
     union jackctl_parameter_value replace_registry;
     union jackctl_parameter_value default_replace_registry;
@@ -366,7 +366,7 @@ jackctl_internals_load(
     }
 
     while (descriptor_node_ptr != NULL)
-    {     
+    {
         internal_ptr = (struct jackctl_internal *)malloc(sizeof(struct jackctl_internal));
         if (internal_ptr == NULL)
         {
@@ -450,21 +450,21 @@ sigset_t
 jackctl_setup_signals(
     unsigned int flags)
 {
-        if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
+    if ((waitEvent = CreateEvent(NULL, FALSE, FALSE, NULL)) == NULL) {
         jack_error("CreateEvent fails err = %ld", GetLastError());
         return 0;
     }
 
-        (void) signal(SIGINT, do_nothing_handler);
+    (void) signal(SIGINT, do_nothing_handler);
     (void) signal(SIGABRT, do_nothing_handler);
     (void) signal(SIGTERM, do_nothing_handler);
 
-        return (sigset_t)waitEvent;
+    return (sigset_t)waitEvent;
 }
 
 void jackctl_wait_signals(sigset_t signals)
 {
-        if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
+    if (WaitForSingleObject(waitEvent, INFINITE) != WAIT_OBJECT_0) {
         jack_error("WaitForSingleObject fails err = %ld", GetLastError());
     }
 }
@@ -539,7 +539,7 @@ jackctl_setup_signals(
      * explicitly reset it
      */
 
-     pthread_sigmask(SIG_BLOCK, &signals, 0);
+    pthread_sigmask(SIG_BLOCK, &signals, 0);
 
     /* install a do-nothing handler because otherwise pthreads
        behaviour is undefined when we enter sigwait.
@@ -745,7 +745,7 @@ EXPORT jackctl_server_t * jackctl_server_create(
     {
         goto fail_free_parameters;
     }
-    
+
     value.ui = PORT_NUM;
     if (jackctl_add_parameter(
           &server_ptr->parameters,
@@ -795,7 +795,7 @@ EXPORT jackctl_server_t * jackctl_server_create(
     {
         goto fail_free_parameters;
     }
-    
+
     /* Allowed to fail */
     jackctl_internals_load(server_ptr);
 
@@ -826,6 +826,11 @@ EXPORT const JSList * jackctl_server_get_drivers_list(jackctl_server *server_ptr
 EXPORT bool jackctl_server_stop(jackctl_server *server_ptr)
 {
     server_ptr->engine->Stop();
+    return true;
+}
+
+EXPORT bool jackctl_server_close(jackctl_server *server_ptr)
+{
     server_ptr->engine->Close();
     delete server_ptr->engine;
 
@@ -853,7 +858,7 @@ EXPORT const JSList * jackctl_server_get_parameters(jackctl_server *server_ptr)
 }
 
 EXPORT bool
-jackctl_server_start(
+jackctl_server_open(
     jackctl_server *server_ptr,
     jackctl_driver *driver_ptr)
 {
@@ -882,7 +887,7 @@ jackctl_server_start(
 
     if (!server_ptr->realtime.b && server_ptr->client_timeout.i == 0)
         server_ptr->client_timeout.i = 500; /* 0.5 sec; usable when non realtime. */
-    
+
     /* check port max value before allocating server */
     if (server_ptr->port_max.ui > PORT_NUM_MAX) {
         jack_error("JACK server started with too much ports %d (when port max can be %d)", server_ptr->port_max.ui, PORT_NUM_MAX);
@@ -896,7 +901,7 @@ jackctl_server_start(
         server_ptr->client_timeout.i,
         server_ptr->realtime.b,
         server_ptr->realtime_priority.i,
-        server_ptr->port_max.ui,                                
+        server_ptr->port_max.ui,
         server_ptr->verbose.b,
         (jack_timer_type_t)server_ptr->clock_source.ui,
         server_ptr->name.str);
@@ -913,17 +918,7 @@ jackctl_server_start(
         goto fail_delete;
     }
 
-    rc = server_ptr->engine->Start();
-    if (rc < 0)
-    {
-        jack_error("JackServer::Start() failed with %d", rc);
-        goto fail_close;
-    }
-
     return true;
-
-fail_close:
-    server_ptr->engine->Close();
 
 fail_delete:
     delete server_ptr->engine;
@@ -944,6 +939,19 @@ fail_unregister:
 
 fail:
     return false;
+}
+
+EXPORT bool
+jackctl_server_start(
+    jackctl_server *server_ptr)
+{
+    int rc = server_ptr->engine->Start();
+    bool result = rc >= 0;
+    if (! result)
+    {
+        jack_error("JackServer::Start() failed with %d", rc);
+    }
+    return result;
 }
 
 EXPORT const char * jackctl_driver_get_name(jackctl_driver *driver_ptr)
@@ -1179,7 +1187,7 @@ EXPORT bool jackctl_server_load_internal(
 {
     int status;
     if (server_ptr->engine != NULL) {
-        server_ptr->engine->InternalClientLoad(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, -1, &status);
+        server_ptr->engine->InternalClientLoad2(internal->desc_ptr->name, internal->desc_ptr->name, internal->set_parameters, JackNullOption, &internal->refnum, -1, &status);
         return (internal->refnum > 0);
     } else {
         return false;
@@ -1192,6 +1200,7 @@ EXPORT bool jackctl_server_unload_internal(
 {
     int status;
     if (server_ptr->engine != NULL && internal->refnum > 0) {
+        // Client object is internally kept in JackEngine, and will be desallocated in InternalClientUnload
         return ((server_ptr->engine->GetEngine()->InternalClientUnload(internal->refnum, &status)) == 0);
     } else {
         return false;
@@ -1201,8 +1210,13 @@ EXPORT bool jackctl_server_unload_internal(
 EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr->engine != NULL) {
-        driver_ptr->info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
-        return (driver_ptr->info != 0);
+        if (server_ptr->engine->IsRunning()) {
+            jack_error("cannot add a slave in a running server");
+            return false;
+        } else {
+            driver_ptr->info = server_ptr->engine->AddSlave(driver_ptr->desc_ptr, driver_ptr->set_parameters);
+            return (driver_ptr->info != 0);
+        }
     } else {
         return false;
     }
@@ -1211,9 +1225,14 @@ EXPORT bool jackctl_server_add_slave(jackctl_server * server_ptr, jackctl_driver
 EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_driver * driver_ptr)
 {
     if (server_ptr->engine != NULL) {
-        server_ptr->engine->RemoveSlave(driver_ptr->info);
-        delete driver_ptr->info;
-        return true;
+        if (server_ptr->engine->IsRunning()) {
+            jack_error("cannot remove a slave from a running server");
+            return false;
+        } else {
+            server_ptr->engine->RemoveSlave(driver_ptr->info);
+            delete driver_ptr->info;
+            return true;
+        }
     } else {
         return false;
     }

@@ -307,7 +307,7 @@ bool JackClientPipeThread::HandleRequest()
                 JackInternalClientLoadRequest req;
                 JackInternalClientLoadResult res;
                 if (req.Read(fPipe) == 0)
-                    res.fResult = fServer->InternalClientLoad(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
+                    res.fResult = fServer->InternalClientLoad1(req.fName, req.fDllName, req.fLoadInitName, req.fOptions, &res.fIntRefNum, req.fUUID, &res.fStatus);
                 res.Write(fPipe);
                 break;
             }
