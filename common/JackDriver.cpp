@@ -418,12 +418,28 @@ bool JackDriver::IsFixedBufferSize()
 
 int JackDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    return 0;
+    int res = 0;
+
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->SetBufferSize(buffer_size) < 0)
+            res = -1;
+    }
+
+    return res;
 }
 
 int JackDriver::SetSampleRate(jack_nframes_t sample_rate)
 {
-    return 0;
+    int res = 0;
+    list<JackDriverInterface*>::const_iterator it;
+    for (it = fSlaveList.begin(); it != fSlaveList.end(); it++) {
+        JackDriverInterface* slave = *it;
+        if (slave->SetSampleRate(sample_rate) < 0)
+            res = -1;
+    }
+    return res;
 }
 
 bool JackDriver::Initialize()

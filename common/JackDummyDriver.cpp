@@ -78,6 +78,7 @@ int JackDummyDriver::Process()
 
 int JackDummyDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
+    // Generic change, never fails
     JackAudioDriver::SetBufferSize(buffer_size);
     fWaitTime = (unsigned long)((((float)buffer_size) / ((float)fEngineControl->fSampleRate)) * 1000000.0f);
     return 0;

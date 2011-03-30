@@ -145,6 +145,7 @@ int JackMidiDriver::Write()
 
 int JackMidiDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
+    // Update latencies
     jack_latency_range_t latency_range;
     latency_range.max = buffer_size;
     latency_range.min = buffer_size;

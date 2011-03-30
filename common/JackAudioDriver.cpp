@@ -44,12 +44,17 @@ JackAudioDriver::~JackAudioDriver()
 
 int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
+    // Update engine and graph manager state
     fEngineControl->fBufferSize = buffer_size;
     fGraphManager->SetBufferSize(buffer_size);
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
     if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    return 0;
+
+    UpdateLatencies();
+
+    // Redirect on slaves drivers...
+    return JackDriver::SetBufferSize(buffer_size);
 }
 
 int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
@@ -58,7 +63,8 @@ int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
     if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    return 0;
+
+    return JackDriver::SetSampleRate(sample_rate);
 }
 
 int JackAudioDriver::Open(jack_nframes_t buffer_size,
@@ -95,13 +101,33 @@ int JackAudioDriver::Open(bool capturing,
     return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
+void JackAudioDriver::UpdateLatencies()
+{
+    jack_latency_range_t range;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        range.max = range.min = fEngineControl->fBufferSize;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (! fEngineControl->fSyncMode) {
+            range.max = range.min = fEngineControl->fBufferSize * 2;
+        }
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+        if (fWithMonitorPorts) {
+            range.min = range.max = fEngineControl->fBufferSize;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
+}
+
 int JackAudioDriver::Attach()
 {
     JackPort* port;
     jack_port_id_t port_index;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
     int i;
 
     jack_log("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
@@ -115,8 +141,6 @@ int JackAudioDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        range.min = range.max = fEngineControl->fBufferSize + fCaptureLatency;
-        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
     }
@@ -130,9 +154,6 @@ int JackAudioDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        // Add more latency if "async" mode is used...
-        range.min = range.max = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + fPlaybackLatency;
-        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
 
@@ -144,14 +165,12 @@ int JackAudioDriver::Attach()
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
-                port = fGraphManager->GetPort(port_index);
-                range.min = range.max = fEngineControl->fBufferSize;
-                port->SetLatencyRange(JackCaptureLatency, &range);
-                fMonitorPortList[i] = port_index;
+                 fMonitorPortList[i] = port_index;
             }
         }
     }
 
+    UpdateLatencies();
     return 0;
 }
 
