@@ -45,11 +45,11 @@ static void
 usage ()
 {
 	fprintf (stderr, "\n"
-"usage: jack_net_master \n"
-"              [ -b buffer size (default = %d) ]\n"
-"              [ -r sample rate (default = %d) ]\n"
-"              [ -a hostname (default = %s) ]\n"
-"              [ -p port (default = %d) ]\n", BUFFER_SIZE, SAMPLE_RATE, DEFAULT_MULTICAST_IP, DEFAULT_PORT);
+    "usage: jack_net_master \n"
+    "              [ -b buffer size (default = %d) ]\n"
+    "              [ -r sample rate (default = %d) ]\n"
+    "              [ -a hostname (default = %s) ]\n"
+    "              [ -p port (default = %d) ]\n", BUFFER_SIZE, SAMPLE_RATE, DEFAULT_MULTICAST_IP, DEFAULT_PORT);
 }
 
 int

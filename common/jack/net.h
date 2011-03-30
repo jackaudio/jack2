@@ -55,7 +55,7 @@ typedef struct {
     int audio_output;   // to master or from slave
     int midi_input;     // from master or to slave
     int midi_output;    // to master or from slave
-    int mtu;            // Network  Maximum Transmission Unit
+    int mtu;            // network Maximum Transmission Unit
     int time_out;       // in second, -1 means in infinite
     int encoder;        // Encoder type (one of JackNetEncoder)
     int kbps;           // KB per second for CELT encoder

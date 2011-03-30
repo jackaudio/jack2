@@ -85,7 +85,6 @@
 		4BCB37C8112D647C008C7BC1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		4BCB37C9112D647C008C7BC1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
 		4BCB37CA112D647C008C7BC1 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B1A95750F49CEAB00D3626B /* AudioToolbox.framework */; };
-		4BCB37D6112D64B4008C7BC1 /* HardwareClock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BCB37D5112D64B4008C7BC1 /* HardwareClock.cpp */; };
 		4BCB37D9112D64D8008C7BC1 /* iphone-faust.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BCB37D8112D64D8008C7BC1 /* iphone-faust.mm */; };
 		4BCF75DA10BC2FD90082C526 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		4BCF75DC10BC2FD90082C526 /* JackMachThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B1A93550F49ACFC00D3626B /* JackMachThread.cpp */; };
@@ -181,7 +180,6 @@
 		4BBDC8F90F5420C000465F9C /* freeverb.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = freeverb.mm; sourceTree = SOURCE_ROOT; };
 		4BC9C1D31135AA1800D22670 /* iPhoneNetMasterAppl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "iPhoneNetMasterAppl-Info.plist"; sourceTree = "<group>"; };
 		4BCB37CE112D647C008C7BC1 /* iPhoneFaust.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneFaust.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4BCB37D5112D64B4008C7BC1 /* HardwareClock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HardwareClock.cpp; sourceTree = SOURCE_ROOT; };
 		4BCB37D8112D64D8008C7BC1 /* iphone-faust.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "iphone-faust.mm"; sourceTree = SOURCE_ROOT; };
 		4BCF75F210BC2FD90082C526 /* iPhoneThruNet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iPhoneThruNet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BCF75F610BC30140082C526 /* audio_thru.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = audio_thru.mm; sourceTree = SOURCE_ROOT; };
@@ -305,7 +303,6 @@
 			isa = PBXGroup;
 			children = (
 				4BCB37D8112D64D8008C7BC1 /* iphone-faust.mm */,
-				4BCB37D5112D64B4008C7BC1 /* HardwareClock.cpp */,
 				4BF15E2411356A3E00B36B9A /* CAHostTimeBase.cpp */,
 				4BF15F7711357A0E00B36B9A /* TiPhoneCoreAudioRenderer.cpp */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -703,7 +700,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4BCB37D6112D64B4008C7BC1 /* HardwareClock.cpp in Sources */,
 				4BCB37D9112D64D8008C7BC1 /* iphone-faust.mm in Sources */,
 				4BF15E2A11356A3E00B36B9A /* CAHostTimeBase.cpp in Sources */,
 				4BF15F7D11357A0E00B36B9A /* TiPhoneCoreAudioRenderer.cpp in Sources */,

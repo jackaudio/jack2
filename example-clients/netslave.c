@@ -42,11 +42,11 @@ static void
 usage ()
 {
 	fprintf (stderr, "\n"
-"usage: jack_net_slave \n"
-"              [ -C capture channels (default = 2)]\n"
-"              [ -P playback channels (default = 2) ]\n"
-"              [ -a hostname (default = %s) ]\n"
-"              [ -p port (default = %d)]\n", DEFAULT_MULTICAST_IP, DEFAULT_PORT);
+    "usage: jack_net_slave \n"
+    "              [ -C capture channels (default = 2)]\n"
+    "              [ -P playback channels (default = 2) ]\n"
+    "              [ -a hostname (default = %s) ]\n"
+    "              [ -p port (default = %d)]\n", DEFAULT_MULTICAST_IP, DEFAULT_PORT);
 }
 
 static void net_shutdown(void* data)
@@ -55,15 +55,15 @@ static void net_shutdown(void* data)
 }
 
 static int net_process(jack_nframes_t buffer_size,
-                            int audio_input, 
-                            float** audio_input_buffer, 
-                            int midi_input,
-                            void** midi_input_buffer,
-                            int audio_output,
-                            float** audio_output_buffer, 
-                            int midi_output, 
-                            void** midi_output_buffer, 
-                            void* data)
+                        int audio_input, 
+                        float** audio_input_buffer, 
+                        int midi_input,
+                        void** midi_input_buffer,
+                        int audio_output,
+                        float** audio_output_buffer, 
+                        int midi_output, 
+                        void** midi_output_buffer, 
+                        void* data)
 {
     int i;
     

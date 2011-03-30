@@ -250,16 +250,16 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
                     
                     case JackFloatEncoder:
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
                         break;
                         
                     case JackIntEncoder:
-                        fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData );
+                        fNetAudioCaptureBuffer = new NetIntAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData);
                         break;
                         
                     case JackCeltEncoder:
                     #ifdef CELT
-                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fTxData, fParams.fKBps );
+                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData, fParams.fKBps);
                     #endif
                         break;
                 }
@@ -270,16 +270,16 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
                     
                     case JackFloatEncoder:
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
                         break;
                         
                     case JackIntEncoder:
-                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData );
+                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData);
                         break;
                         
                     case JackCeltEncoder:
                     #ifdef CELT
-                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fRxData, fParams.fKBps  );
+                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData, fParams.fKBps);
                     #endif
                         break;
                 }
@@ -552,7 +552,7 @@ namespace Jack
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetAudioPlaybackBuffer->RenderFromNetwork (rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
+                        fNetAudioPlaybackBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
                         // Last audio packet is received, so finish rendering...
                         if (fRxHeader.fIsLastPckt)
                             fNetAudioPlaybackBuffer->RenderToJackPorts();
