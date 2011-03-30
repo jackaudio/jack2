@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-03-30 Stephane Letz  <letz@grame.fr>
+
+	* Version 1.9.8 started. 
+
 2011-03-29 Stephane Letz  <letz@grame.fr>
 
 	* Synchronize JackWeakAPI.cpp with new APIs. 
