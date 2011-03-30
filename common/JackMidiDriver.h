@@ -54,6 +54,8 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
         virtual int ProcessReadAsync();
         virtual int ProcessWriteAsync();
 
+        virtual void UpdateLatencies();
+
     public:
 
         JackMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
@@ -68,6 +70,8 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
                         const char* playback_driver_name,
                         jack_nframes_t capture_latency,
                         jack_nframes_t playback_latency);
+
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
 
         virtual int ProcessRead();
         virtual int ProcessWrite();

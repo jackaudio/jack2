@@ -35,7 +35,7 @@ JackCoreMidiVirtualOutputPort(const char *alias_name, const char *client_name,
                            max_messages)
 {
     std::stringstream stream;
-    stream << "JackMidi" << (index + 1);
+    stream << "virtual" << (index + 1);
     CFStringRef name = CFStringCreateWithCString(0, stream.str().c_str(),
                                                  CFStringGetSystemEncoding());
     if (! name) {
@@ -47,7 +47,7 @@ JackCoreMidiVirtualOutputPort(const char *alias_name, const char *client_name,
     if (status != noErr) {
         throw std::runtime_error(GetMacOSErrorString(status));
     }
-    Initialize(alias_name, client_name, driver_name, index, source);
+    Initialize(alias_name, client_name, driver_name, index, source, 0);
 }
 
 JackCoreMidiVirtualOutputPort::~JackCoreMidiVirtualOutputPort()

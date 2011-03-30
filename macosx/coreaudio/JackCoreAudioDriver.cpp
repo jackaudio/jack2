@@ -1563,6 +1563,53 @@ int JackCoreAudioDriver::Close()
     return res;
 }
 
+void JackCoreAudioDriver::UpdateLatencies()
+{
+    UInt32 size;
+    OSStatus err;
+    jack_latency_range_t range;
+    range.max = fEngineControl->fBufferSize;
+    range.min = fEngineControl->fBufferSize;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        size = sizeof(UInt32);
+        UInt32 value1 = 0;
+        UInt32 value2 = 0;
+        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
+
+        range.min = range.max = fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        size = sizeof(UInt32);
+        UInt32 value1 = 0;
+        UInt32 value2 = 0;
+        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
+
+        // Add more latency if "async" mode is used...
+        range.min = range.max
+            = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency;
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+
+        // Monitor port
+        if (fWithMonitorPorts) {
+            range.min = range.max = fEngineControl->fBufferSize;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
+}
+
 int JackCoreAudioDriver::Attach()
 {
     OSStatus err;
@@ -1573,7 +1620,6 @@ int JackCoreAudioDriver::Attach()
     char channel_name[64];
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
 
     jack_log("JackCoreAudioDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
@@ -1598,20 +1644,8 @@ int JackCoreAudioDriver::Attach()
             return -1;
         }
 
-        size = sizeof(UInt32);
-        UInt32 value1 = 0;
-        UInt32 value2 = 0;
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
-
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        range.min = range.max = fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency;
-        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
     }
 
@@ -1636,21 +1670,8 @@ int JackCoreAudioDriver::Attach()
             return -1;
         }
 
-        size = sizeof(UInt32);
-        UInt32 value1 = 0;
-        UInt32 value2 = 0;
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
-
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        // Add more latency if "async" mode is used...
-        range.min = range.max = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency;
-        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
 
         // Monitor ports
@@ -1661,13 +1682,12 @@ int JackCoreAudioDriver::Attach()
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
-                port = fGraphManager->GetPort(port_index);
-                range.min = range.max = fEngineControl->fBufferSize;
-                port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
             }
         }
     }
+
+    UpdateLatencies();
 
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {
@@ -1716,17 +1736,19 @@ int JackCoreAudioDriver::Stop()
 
 int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    OSStatus err;
     UInt32 outSize = sizeof(UInt32);
 
-    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
+    OSStatus err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
     if (err != noErr) {
         jack_error("Cannot set buffer size %ld", buffer_size);
         printError(err);
         return -1;
     }
 
-    JackAudioDriver::SetBufferSize(buffer_size); // never fails
+    JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
+
+    // CoreAudio specific
+    UpdateLatencies();
 
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {

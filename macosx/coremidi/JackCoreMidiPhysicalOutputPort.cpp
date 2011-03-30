@@ -43,7 +43,20 @@ JackCoreMidiPhysicalOutputPort(const char *alias_name, const char *client_name,
                << "' is not available";
         throw std::runtime_error(stream.str().c_str());
     }
-    Initialize(alias_name, client_name, driver_name, index, destination);
+    SInt32 advance_schedule_time;
+    OSStatus status =
+        MIDIObjectGetIntegerProperty(destination,
+                                     kMIDIPropertyAdvanceScheduleTimeMuSec,
+                                     &advance_schedule_time);
+    if (status != noErr) {
+        WriteMacOSError("JackCoreMidiPhysicalOutputPort [constructor]",
+                        "MIDIObjectGetIntegerProperty", status);
+        advance_schedule_time = 0;
+    } else if (advance_schedule_time < 0) {
+        advance_schedule_time = 0;
+    }
+    Initialize(alias_name, client_name, driver_name, index, destination,
+               advance_schedule_time);
     this->internal_output = internal_output;
 }
 

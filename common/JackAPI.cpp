@@ -116,7 +116,7 @@ extern "C"
     EXPORT int jack_set_xrun_callback(jack_client_t *,
                                        JackXRunCallback xrun_callback, void *arg);
     EXPORT int jack_set_latency_callback(jack_client_t *client,
-			       JackLatencyCallback callback, void *arg);
+			       JackLatencyCallback latency_callback, void *arg);
 
     EXPORT int jack_activate(jack_client_t *client);
     EXPORT int jack_deactivate(jack_client_t *client);

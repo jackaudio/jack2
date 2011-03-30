@@ -48,6 +48,8 @@ class JackPortAudioDriver : public JackAudioDriver
                           PaStreamCallbackFlags statusFlags,
                           void* userData);
 
+        void UpdateLatencies();
+
     public:
 
         JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, PortAudioDevices* pa_devices)

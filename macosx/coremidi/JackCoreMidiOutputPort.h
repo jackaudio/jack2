@@ -42,6 +42,7 @@ namespace Jack {
 
         static const size_t PACKET_BUFFER_SIZE = 65536;
 
+        SInt32 advance_schedule_time;
         char packet_buffer[PACKET_BUFFER_SIZE];
         JackMidiBufferReadQueue *read_queue;
         char semaphore_name[128];
@@ -57,7 +58,7 @@ namespace Jack {
         void
         Initialize(const char *alias_name, const char *client_name,
                    const char *driver_name, int index,
-                   MIDIEndpointRef endpoint);
+                   MIDIEndpointRef endpoint, SInt32 advance_schedule_time);
 
     public:
 
