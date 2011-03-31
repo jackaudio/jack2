@@ -58,7 +58,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     MMRESULT result = midiOutOpen(&handle, index, (DWORD)HandleMessageEvent,
                                   (DWORD)this, CALLBACK_FUNCTION);
     if (result != MMSYSERR_NOERROR) {
-        GetMMErrorString(result, error_message);
+        GetOutErrorString(result, error_message);
         goto raise_exception;
     }
     thread_queue_semaphore = CreateSemaphore(NULL, 0, max_messages, NULL);
@@ -75,7 +75,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     char *name_tmp;
     result = midiOutGetDevCaps(index, &capabilities, sizeof(capabilities));
     if (result != MMSYSERR_NOERROR) {
-        WriteMMError("JackWinMMEOutputPort [constructor]", "midiOutGetDevCaps",
+        WriteOutError("JackWinMMEOutputPort [constructor]", "midiOutGetDevCaps",
                      result);
         name_tmp = driver_name;
     } else {
@@ -95,7 +95,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
  close_handle:
     result = midiOutClose(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteMMError("JackWinMMEOutputPort [constructor]", "midiOutClose",
+        WriteOutError("JackWinMMEOutputPort [constructor]", "midiOutClose",
                      result);
     }
  raise_exception:
@@ -107,12 +107,12 @@ JackWinMMEOutputPort::~JackWinMMEOutputPort()
     Stop();
     MMRESULT result = midiOutReset(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteMMError("JackWinMMEOutputPort [destructor]", "midiOutReset",
+        WriteOutError("JackWinMMEOutputPort [destructor]", "midiOutReset",
                      result);
     }
     result = midiOutClose(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteMMError("JackWinMMEOutputPort [destructor]", "midiOutClose",
+        WriteOutError("JackWinMMEOutputPort [destructor]", "midiOutClose",
                      result);
     }
     if (! CloseHandle(sysex_semaphore)) {
@@ -179,7 +179,7 @@ JackWinMMEOutputPort::Execute()
             message |= (DWORD) data[0];
             result = midiOutShortMsg(handle, message);
             if (result != MMSYSERR_NOERROR) {
-                WriteMMError("JackWinMMEOutputPort::Execute",
+                WriteOutError("JackWinMMEOutputPort::Execute",
                              "midiOutShortMsg", result);
             }
             continue;
@@ -193,13 +193,13 @@ JackWinMMEOutputPort::Execute()
         header.lpData = (LPSTR)data;
         result = midiOutPrepareHeader(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
-            WriteMMError("JackWinMMEOutputPort::Execute",
+            WriteOutError("JackWinMMEOutputPort::Execute",
                          "midiOutPrepareHeader", result);
             continue;
         }
         result = midiOutLongMsg(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
-            WriteMMError("JackWinMMEOutputPort::Execute", "midiOutLongMsg",
+            WriteOutError("JackWinMMEOutputPort::Execute", "midiOutLongMsg",
                          result);
             continue;
         }
@@ -213,7 +213,7 @@ JackWinMMEOutputPort::Execute()
 
         result = midiOutUnprepareHeader(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
-            WriteMMError("JackWinMMEOutputPort::Execute",
+            WriteOutError("JackWinMMEOutputPort::Execute",
                          "midiOutUnprepareHeader", result);
             break;
         }
@@ -221,38 +221,6 @@ JackWinMMEOutputPort::Execute()
     }
  stop_execution:
     return false;
-}
-
-const char *
-JackWinMMEOutputPort::GetAlias()
-{
-     return alias;
-}
-
-void
-JackWinMMEOutputPort::GetMMErrorString(MMRESULT error, LPTSTR text)
-{
-    MMRESULT result = midiOutGetErrorText(error, text, MAXERRORLENGTH);
-    if (result != MMSYSERR_NOERROR) {
-        snprintf(text, MAXERRORLENGTH, "Unknown MM error code '%d'", error);
-    }
-}
-
-const char *
-JackWinMMEOutputPort::GetName()
-{
-     return name;
-}
-
-void
-JackWinMMEOutputPort::GetOSErrorString(LPTSTR text)
-{
-    DWORD error = GetLastError();
-    if (! FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), text,
-                        MAXERRORLENGTH, NULL)) {
-        snprintf(text, MAXERRORLENGTH, "Unknown OS error code '%d'", error);
-    }
 }
 
 void
@@ -388,18 +356,19 @@ JackWinMMEOutputPort::Wait(HANDLE semaphore)
 }
 
 void
-JackWinMMEOutputPort::WriteMMError(const char *jack_func, const char *mm_func,
+JackWinMMEOutputPort::GetOutErrorString(MMRESULT error, LPTSTR text)
+{
+    MMRESULT result = midiOutGetErrorText(error, text, MAXERRORLENGTH);
+    if (result != MMSYSERR_NOERROR) {
+        snprintf(text, MAXERRORLENGTH, "Unknown MM error code '%d'", error);
+    }
+}
+
+void
+JackWinMMEOutputPort::WriteOutError(const char *jack_func, const char *mm_func,
                                    MMRESULT result)
 {
     char error_message[MAXERRORLENGTH];
     GetMMErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
-}
-
-void
-JackWinMMEOutputPort::WriteOSError(const char *jack_func, const char *os_func)
-{
-    char error_message[MAXERRORLENGTH];
-    GetOSErrorString(error_message);
-    jack_error("%s - %s: %s", jack_func, os_func, error_message);
 }

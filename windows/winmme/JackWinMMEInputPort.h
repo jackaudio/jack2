@@ -24,10 +24,11 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackMidiAsyncQueue.h"
 #include "JackMidiBufferWriteQueue.h"
+#include "JackWinMMEPort.h"
 
 namespace Jack {
 
-    class JackWinMMEInputPort {
+    class JackWinMMEInputPort : public JackRunnableInterface {
 
     private:
 
@@ -39,18 +40,9 @@ namespace Jack {
         EnqueueMessage(jack_nframes_t time, size_t length,
                        jack_midi_data_t *data);
 
-        void
-        GetErrorString(MMRESULT error, LPTSTR text);
 
         void
         ProcessWinMME(UINT message, DWORD param1, DWORD param2);
-
-        void
-        WriteError(const char *jack_func, const char *mm_func,
-                   MMRESULT result);
-
-        char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
 
         HMIDIIN handle;
         jack_midi_event_t *jack_event;
@@ -61,6 +53,13 @@ namespace Jack {
 
         bool started;
 
+        void
+        WriteOSError(const char *jack_func, const char *os_func);
+
+        void
+        WriteInError(const char *jack_func, const char *mm_func,
+                                MMRESULT result);
+
     public:
 
         JackWinMMEInputPort(const char *alias_name, const char *client_name,
@@ -68,12 +67,6 @@ namespace Jack {
                             size_t max_bytes=4096, size_t max_messages=1024);
 
         ~JackWinMMEInputPort();
-
-        const char *
-        GetAlias();
-
-        const char *
-        GetName();
 
         void
         ProcessJack(JackMidiBuffer *port_buffer, jack_nframes_t frames);

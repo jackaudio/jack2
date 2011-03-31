@@ -29,19 +29,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack {
 
-    class JackWinMMEOutputPort: public JackRunnableInterface {
+    class JackWinMMEOutputPort :
+            public JackWinMMEPort, public JackRunnableInterface {
 
     private:
 
         static void CALLBACK
         HandleMessageEvent(HMIDIOUT handle, UINT message, DWORD_PTR port,
                            DWORD_PTR param1, DWORD_PTR param2);
-
-        void
-        GetMMErrorString(MMRESULT error, LPTSTR text);
-
-        void
-        GetOSErrorString(LPTSTR text);
 
         void
         HandleMessage(UINT message, DWORD_PTR param1, DWORD_PTR param2);
@@ -52,16 +47,6 @@ namespace Jack {
         bool
         Wait(HANDLE semaphore);
 
-        void
-        WriteMMError(const char *jack_func, const char *mm_func,
-                     MMRESULT result);
-
-        void
-        WriteOSError(const char *jack_func, const char *os_func);
-
-        char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-
         HMIDIOUT handle;
         JackMidiBufferReadQueue *read_queue;
         HANDLE sysex_semaphore;
@@ -70,7 +55,11 @@ namespace Jack {
         HANDLE thread_queue_semaphore;
 
         void
-        GetErrorString(MMRESULT error, LPTSTR text);
+        GetOutErrorString(MMRESULT error, LPTSTR text);
+
+        void
+        WriteOutError(const char *jack_func, const char *mm_func,
+                                   MMRESULT result);
 
     public:
 
@@ -94,12 +83,6 @@ namespace Jack {
 
         bool
         Stop();
-
-        const char *
-        GetAlias();
-
-        const char *
-        GetName();
 
     };
 

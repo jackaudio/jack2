@@ -59,7 +59,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
                                  (DWORD)this,
                                  CALLBACK_FUNCTION | MIDI_IO_STATUS);
     if (result != MMSYSERR_NOERROR) {
-        GetErrorString(result, error_message);
+        GetInErrorString(result, error_message);
         goto delete_sysex_buffer;
     }
     sysex_header.dwBufferLength = max_bytes;
@@ -70,19 +70,19 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     sysex_header.lpNext = 0;
     result = midiInPrepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
-        GetErrorString(result, error_message);
+        GetInErrorString(result, error_message);
         goto close_handle;
     }
     result = midiInAddBuffer(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
-        GetErrorString(result, error_message);
+        GetInErrorString(result, error_message);
         goto unprepare_header;
     }
     MIDIINCAPS capabilities;
     char *name_tmp;
     result = midiInGetDevCaps(index, &capabilities, sizeof(capabilities));
     if (result != MMSYSERR_NOERROR) {
-        WriteError("JackWinMMEInputPort [constructor]", "midiInGetDevCaps",
+        WriteInError("JackWinMMEInputPort [constructor]", "midiInGetDevCaps",
                    result);
         name_tmp = driver_name;
     } else {
@@ -100,13 +100,13 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
  unprepare_header:
     result = midiInUnprepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
-        WriteError("JackWinMMEInputPort [constructor]",
+        WriteInError("JackWinMMEInputPort [constructor]",
                    "midiInUnprepareHeader", result);
     }
  close_handle:
     result = midiInClose(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteError("JackWinMMEInputPort [constructor]", "midiInClose", result);
+        WriteInError("JackWinMMEInputPort [constructor]", "midiInClose", result);
     }
  delete_sysex_buffer:
     delete[] sysex_buffer;
@@ -118,16 +118,16 @@ JackWinMMEInputPort::~JackWinMMEInputPort()
     Stop();
     MMRESULT result = midiInReset(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteError("JackWinMMEInputPort [destructor]", "midiInReset", result);
+        WriteInError("JackWinMMEInputPort [destructor]", "midiInReset", result);
     }
     result = midiInUnprepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
-        WriteError("JackWinMMEInputPort [destructor]", "midiInUnprepareHeader",
+        WriteInError("JackWinMMEInputPort [destructor]", "midiInUnprepareHeader",
                    result);
     }
     result = midiInClose(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteError("JackWinMMEInputPort [destructor]", "midiInClose", result);
+        WriteInError("JackWinMMEInputPort [destructor]", "midiInClose", result);
     }
     delete[] sysex_buffer;
     delete thread_queue;
@@ -151,27 +151,6 @@ JackWinMMEInputPort::EnqueueMessage(jack_nframes_t time, size_t length,
         break;
     default:
         ;
-    }
-}
-
-const char *
-JackWinMMEInputPort::GetAlias()
-{
-    return alias;
-}
-
-const char *
-JackWinMMEInputPort::GetName()
-{
-    return name;
-}
-
-void
-JackWinMMEInputPort::GetErrorString(MMRESULT error, LPTSTR text)
-{
-    MMRESULT result = midiInGetErrorText(error, text, MAXERRORLENGTH);
-    if (result != MMSYSERR_NOERROR) {
-        snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
     }
 }
 
@@ -254,7 +233,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
         MMRESULT result = midiInAddBuffer(handle, &sysex_header,
                                           sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
-            WriteError("JackWinMMEInputPort::ProcessWinMME", "midiInAddBuffer",
+            WriteInError("JackWinMMEInputPort::ProcessWinMME", "midiInAddBuffer",
                        result);
         }
         break;
@@ -274,7 +253,7 @@ JackWinMMEInputPort::Start()
         MMRESULT result = midiInStart(handle);
         started = result == MMSYSERR_NOERROR;
         if (! started) {
-            WriteError("JackWinMMEInputPort::Start", "midiInStart", result);
+            WriteInError("JackWinMMEInputPort::Start", "midiInStart", result);
         }
     }
     return started;
@@ -287,17 +266,27 @@ JackWinMMEInputPort::Stop()
         MMRESULT result = midiInStop(handle);
         started = result != MMSYSERR_NOERROR;
         if (started) {
-            WriteError("JackWinMMEInputPort::Stop", "midiInStop", result);
+            WriteInError("JackWinMMEInputPort::Stop", "midiInStop", result);
         }
     }
     return ! started;
 }
 
 void
-JackWinMMEInputPort::WriteError(const char *jack_func, const char *mm_func,
+JackWinMMEInputPort::GetInErrorString(MMRESULT error, LPTSTR text)
+{
+    MMRESULT result = midiInGetErrorText(error, text, MAXERRORLENGTH);
+    if (result != MMSYSERR_NOERROR) {
+        snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
+    }
+}
+
+void
+JackWinMMEInputPort::WriteInError(const char *jack_func, const char *mm_func,
                                 MMRESULT result)
 {
     char error_message[MAXERRORLENGTH];
-    GetErrorString(result, error_message);
+    GetInErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }
+
