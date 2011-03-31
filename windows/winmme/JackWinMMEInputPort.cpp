@@ -78,6 +78,23 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
         goto unprepare_header;
     }
 
+    MIDIINCAPS capabilities;
+    char *name_tmp;
+    result = midiInGetDevCaps(index, &capabilities, sizeof(capabilities));
+    /*
+    Devin : FIXME
+    if (result != MMSYSERR_NOERROR) {
+        WriteMMError("JackWinMMEOutputPort [constructor]", "midiOutGetDevCaps",
+                     result);
+        name_tmp = driver_name;
+    } else {
+        name_tmp = capabilities.szPname;
+    }
+    */
+    snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", alias_name, driver_name,
+             index + 1);
+    snprintf(name, sizeof(name) - 1, "%s:capture_%d", client_name, index + 1);
+
     jack_event = 0;
     started = false;
     write_queue_ptr.release();
@@ -147,6 +164,12 @@ JackWinMMEInputPort::GetAlias()
     return alias;
 }
 
+const char *
+JackWinMMEInputPort::GetName()
+{
+    return name;
+}
+
 void
 JackWinMMEInputPort::GetErrorString(MMRESULT error, LPTSTR text)
 {
@@ -154,12 +177,6 @@ JackWinMMEInputPort::GetErrorString(MMRESULT error, LPTSTR text)
     if (result != MMSYSERR_NOERROR) {
         snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
     }
-}
-
-const char *
-JackWinMMEInputPort::GetName()
-{
-    return name;
 }
 
 void

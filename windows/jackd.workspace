@@ -5,7 +5,7 @@
 		<Project filename="jackd.cbp">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
-		<Project filename="jack_portaudio.cbp" active="1">
+		<Project filename="jack_portaudio.cbp">
 			<Depends filename="libjackserver.cbp" />
 		</Project>
 		<Project filename="jack_netdriver.cbp">
@@ -56,7 +56,7 @@
 		<Project filename="multiple_metro.cbp">
 			<Depends filename="libjack.cbp" />
 		</Project>
-		<Project filename="jack_winmme.cbp" />
+		<Project filename="jack_winmme.cbp" active="1" />
 		<Project filename="jack_loopback.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

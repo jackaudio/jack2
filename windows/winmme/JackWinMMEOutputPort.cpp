@@ -88,7 +88,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:playback_%d", client_name, index + 1);
     thread_ptr.release();
-     thread_queue_ptr.release();
+    thread_queue_ptr.release();
     return;
 
  destroy_thread_queue_semaphore:
@@ -132,9 +132,15 @@ bool
 JackWinMMEOutputPort::Execute()
 {
     for (;;) {
+        jack_log("JackWinMMEOutputPort::Execute TOTO");
+        JackSleep(100000);
+
         if (! Wait(thread_queue_semaphore)) {
+            jack_log("JackWinMMEOutputPort::Execute BREAK");
+
             break;
         }
+        /*
         jack_midi_event_t *event = thread_queue->DequeueEvent();
         if (! event) {
             break;
@@ -214,6 +220,7 @@ JackWinMMEOutputPort::Execute()
                          "midiOutUnprepareHeader", result);
             break;
         }
+        */
     }
  stop_execution:
     return false;
@@ -358,6 +365,8 @@ JackWinMMEOutputPort::Stop()
 bool
 JackWinMMEOutputPort::Wait(HANDLE semaphore)
 {
+    jack_log("JackWinMMEOutputPort::Wait %d", semaphore);
+
     DWORD result = WaitForSingleObject(semaphore, INFINITE);
     switch (result) {
     case WAIT_FAILED:

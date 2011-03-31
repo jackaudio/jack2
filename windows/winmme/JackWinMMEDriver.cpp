@@ -52,6 +52,9 @@ JackWinMMEDriver::Attach()
     latency_range.max = latency;
     latency_range.min = latency;
 
+    jack_info("JackWinMMEDriver::Attach - fCaptureChannels  %d", fCaptureChannels);
+    jack_info("JackWinMMEDriver::Attach - fPlaybackChannels  %d", fPlaybackChannels);
+
     // Inputs
     for (int i = 0; i < fCaptureChannels; i++) {
         JackWinMMEInputPort *input_port = input_ports[i];
@@ -130,9 +133,13 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
 {
     const char *client_name = fClientControl.fName;
     int input_count = 0;
+    int output_count = 0;
     int num_potential_inputs = midiInGetNumDevs();
     int num_potential_outputs = midiOutGetNumDevs();
-    int output_count = 0;
+
+    jack_info("JackWinMMEDriver::Open - num_potential_inputs  %d", num_potential_inputs);
+    jack_info("JackWinMMEDriver::Open - num_potential_outputs  %d", num_potential_outputs);
+
     if (num_potential_inputs) {
         try {
             input_ports = new JackWinMMEInputPort *[num_potential_inputs];
@@ -175,6 +182,11 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
             output_count++;
         }
     }
+
+    jack_info("JackWinMMEDriver::Open - input_count  %d", input_count);
+    jack_info("JackWinMMEDriver::Open - output_count  %d", output_count);
+
+
     if (! (input_count || output_count)) {
         jack_error("JackWinMMEDriver::Open - no WinMME inputs or outputs "
                    "allocated.");
@@ -200,10 +212,25 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
 int
 JackWinMMEDriver::Read()
 {
+
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     for (int i = 0; i < fCaptureChannels; i++) {
         input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
     }
+
+    return 0;
+}
+
+
+int
+JackWinMMEDriver::Write()
+{
+    /*
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
+    }
+    */
     return 0;
 }
 
@@ -285,16 +312,6 @@ JackWinMMEDriver::Stop()
     }
 
     return result;
-}
-
-int
-JackWinMMEDriver::Write()
-{
-    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
-    for (int i = 0; i < fPlaybackChannels; i++) {
-        output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
-    }
-    return 0;
 }
 
 #ifdef __cplusplus
