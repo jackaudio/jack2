@@ -24,6 +24,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackError.h"
 #include "JackMidiUtil.h"
 #include "JackWinMMEInputPort.h"
+#include "JackMidiWriteQueue.h"
 
 using Jack::JackWinMMEInputPort;
 
@@ -54,7 +55,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
-    MMRESULT result = midiInOpen(&handle, index, HandleMidiInputEvent, this,
+    MMRESULT result = midiInOpen(&handle, index, (DWORD)HandleMidiInputEvent, (DWORD)this,
                                  CALLBACK_FUNCTION | MIDI_IO_STATUS);
     if (result != MMSYSERR_NOERROR) {
         GetErrorString(result, error_message);
@@ -64,7 +65,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     sysex_header.dwBytesRecorded = 0;
     sysex_header.dwFlags = 0;
     sysex_header.dwUser = 0;
-    sysex_header.lpData = (((LPBYTE) sysex_header) + sizeof(MIDIHDR));
+    sysex_header.lpData = (LPSTR)(((LPBYTE) &sysex_header) + sizeof(MIDIHDR));
     sysex_header.lpNext = 0;
     result = midiInPrepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
@@ -84,7 +85,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     return;
 
  unprepare_header:
-    result = midiInUnprepareHeader(handle, sysex_header, sizeof(MIDIHDR));
+    result = midiInUnprepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
         WriteError("JackWinMMEInputPort [constructor]",
                    "midiInUnprepareHeader", result);
@@ -106,7 +107,7 @@ JackWinMMEInputPort::~JackWinMMEInputPort()
     if (result != MMSYSERR_NOERROR) {
         WriteError("JackWinMMEInputPort [destructor]", "midiInReset", result);
     }
-    result = midiInUnprepareHeader(handle, sysex_header, sizeof(MIDIHDR));
+    result = midiInUnprepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
         WriteError("JackWinMMEInputPort [destructor]", "midiInUnprepareHeader",
                    result);
@@ -128,12 +129,12 @@ JackWinMMEInputPort::EnqueueMessage(jack_nframes_t time, size_t length,
     case JackMidiWriteQueue::BUFFER_FULL:
         jack_error("JackWinMMEInputPort::EnqueueMessage - The thread queue "
                    "cannot currently accept a %d-byte event.  Dropping event.",
-                   size);
+                   length);
         break;
     case JackMidiWriteQueue::BUFFER_TOO_SMALL:
         jack_error("JackWinMMEInputPort::EnqueueMessage - The thread queue "
                    "buffer is too small to enqueue a %d-byte event.  Dropping "
-                   "event.", size);
+                   "event.", length);
         break;
     default:
         ;
@@ -162,20 +163,20 @@ JackWinMMEInputPort::GetName()
 }
 
 void
-JackWinMMEInputPort::ProcessJack()
+JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer, jack_nframes_t frames)
 {
     write_queue->ResetMidiBuffer(port_buffer, frames);
     if (! jack_event) {
         jack_event = thread_queue->DequeueEvent();
     }
     for (; jack_event; jack_event = thread_queue->DequeueEvent()) {
-        switch (write_queue->EnqueueEvent(event)) {
-        case BUFFER_TOO_SMALL:
+        switch (write_queue->EnqueueEvent(jack_event)) {
+        case JackMidiWriteQueue::BUFFER_TOO_SMALL:
             jack_error("JackWinMMEMidiInputPort::Process - The buffer write "
                        "queue couldn't enqueue a %d-byte event. Dropping "
-                       "event.", event->size);
+                       "event.", jack_event->size);
             // Fallthrough on purpose
-        case OK:
+        case JackMidiWriteQueue::OK:
             continue;
         }
         break;
@@ -224,14 +225,14 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
         EnqueueMessage(current_frame, (size_t) length, message_buffer);
         break;
     case MIM_LONGDATA:
-        LPMIDIHDR header = (LPMIDIHDR) dwParam1;
+        LPMIDIHDR header = (LPMIDIHDR) param1;
         jack_midi_data_t *data = (jack_midi_data_t *) header->lpData;
-        size_t length = header->dwBytesRecorded;
-        if ((data[0] != 0xf0) || (data[length - 1] != 0xf7)) {
+        size_t length1 = header->dwBytesRecorded;
+        if ((data[0] != 0xf0) || (data[length1 - 1] != 0xf7)) {
             jack_error("JackWinMMEInputPort::ProcessWinMME - Discarding "
                        "%d-byte sysex chunk.", length);
         } else {
-            EnqueueMessage(current_frame, length, data);
+            EnqueueMessage(current_frame, length1, data);
         }
         // Is this realtime-safe?  This function isn't run in the JACK thread,
         // but we still want it to perform as quickly as possible.  Even if
@@ -282,7 +283,7 @@ void
 JackWinMMEInputPort::WriteError(const char *jack_func, const char *mm_func,
                                 MMRESULT result)
 {
-    const char error_message[MAXERRORLENGTH];
+    char error_message[MAXERRORLENGTH];
     GetErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }

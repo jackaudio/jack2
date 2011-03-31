@@ -154,8 +154,6 @@
 		<Unit filename="..\common\JackMidiPort.cpp" />
 		<Unit filename="..\common\JackNetInterface.cpp" />
 		<Unit filename="..\common\JackNetTool.cpp" />
-		<Unit filename="..\common\JackPhysicalMidiInput.cpp" />
-		<Unit filename="..\common\JackPhysicalMidiOutput.cpp" />
 		<Unit filename="..\common\JackPort.cpp" />
 		<Unit filename="..\common\JackPortType.cpp" />
 		<Unit filename="..\common\JackRestartThreadedDriver.cpp" />

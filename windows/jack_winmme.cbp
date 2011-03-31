@@ -102,10 +102,21 @@
 			<Add library="libjackserver" />
 			<Add library="winmm" />
 		</Linker>
+		<Unit filename="..\common\JackMidiAsyncQueue.cpp" />
+		<Unit filename="..\common\JackMidiBufferReadQueue.cpp" />
+		<Unit filename="..\common\JackMidiBufferWriteQueue.cpp" />
+		<Unit filename="..\common\JackMidiReadQueue.cpp" />
+		<Unit filename="..\common\JackMidiUtil.cpp" />
+		<Unit filename="..\common\JackMidiWriteQueue.cpp" />
 		<Unit filename="jackwinmme.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
 		<Unit filename="winmme\JackWinMMEDriver.cpp" />
+		<Unit filename="winmme\JackWinMMEDriver.h" />
+		<Unit filename="winmme\JackWinMMEInputPort.cpp" />
+		<Unit filename="winmme\JackWinMMEInputPort.h" />
+		<Unit filename="winmme\JackWinMMEOutputPort.cpp" />
+		<Unit filename="winmme\JackWinMMEOutputPort.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

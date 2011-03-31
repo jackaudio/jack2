@@ -55,7 +55,7 @@ namespace Jack {
         char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
         bool started;
         jack_midi_data_t *sysex_buffer;
-        MIDIHDR sysex_header
+        MIDIHDR sysex_header;
         JackMidiAsyncQueue *thread_queue;
         JackMidiBufferWriteQueue *write_queue;
 
@@ -74,7 +74,7 @@ namespace Jack {
         GetName();
 
         void
-        ProcessJack();
+        ProcessJack(JackMidiBuffer *port_buffer, jack_nframes_t frames);
 
         bool
         Start();

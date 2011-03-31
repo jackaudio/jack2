@@ -47,10 +47,10 @@ namespace Jack {
         HandleMessage(UINT message, DWORD_PTR param1, DWORD_PTR param2);
 
         bool
-        Signal(Handle semaphore);
+        Signal(HANDLE semaphore);
 
         bool
-        Wait(Handle semaphore);
+        Wait(HANDLE semaphore);
 
         void
         WriteMMError(const char *jack_func, const char *mm_func,
@@ -60,13 +60,17 @@ namespace Jack {
         WriteOSError(const char *jack_func, const char *os_func);
 
         char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        HMIDIOUT handle;
         char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+
+        HMIDIOUT handle;
         JackMidiBufferReadQueue *read_queue;
         HANDLE sysex_semaphore;
         JackThread *thread;
         JackMidiAsyncQueue *thread_queue;
         HANDLE thread_queue_semaphore;
+
+        void
+        GetErrorString(MMRESULT error, LPTSTR text);
 
     public:
 
@@ -90,6 +94,12 @@ namespace Jack {
 
         bool
         Stop();
+
+        const char *
+        GetAlias();
+
+        const char *
+        GetName();
 
     };
 
