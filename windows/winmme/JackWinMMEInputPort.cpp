@@ -160,6 +160,12 @@ JackWinMMEInputPort::GetAlias()
     return alias;
 }
 
+const char *
+JackWinMMEInputPort::GetName()
+{
+    return name;
+}
+
 void
 JackWinMMEInputPort::GetErrorString(MMRESULT error, LPTSTR text)
 {
@@ -167,12 +173,6 @@ JackWinMMEInputPort::GetErrorString(MMRESULT error, LPTSTR text)
     if (result != MMSYSERR_NOERROR) {
         snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
     }
-}
-
-const char *
-JackWinMMEInputPort::GetName()
-{
-    return name;
 }
 
 void

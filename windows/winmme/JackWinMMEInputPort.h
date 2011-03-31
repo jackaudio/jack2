@@ -50,14 +50,16 @@ namespace Jack {
                    MMRESULT result);
 
         char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+        char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+
         HMIDIIN handle;
         jack_midi_event_t *jack_event;
-        char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        bool started;
         jack_midi_data_t *sysex_buffer;
         MIDIHDR sysex_header;
         JackMidiAsyncQueue *thread_queue;
         JackMidiBufferWriteQueue *write_queue;
+
+        bool started;
 
     public:
 

@@ -129,9 +129,15 @@ bool
 JackWinMMEOutputPort::Execute()
 {
     for (;;) {
+        jack_log("JackWinMMEOutputPort::Execute TOTO");
+        JackSleep(100000);
+
         if (! Wait(thread_queue_semaphore)) {
+            jack_log("JackWinMMEOutputPort::Execute BREAK");
+
             break;
         }
+        /*
         jack_midi_event_t *event = thread_queue->DequeueEvent();
         if (! event) {
             break;
@@ -211,6 +217,7 @@ JackWinMMEOutputPort::Execute()
                          "midiOutUnprepareHeader", result);
             break;
         }
+        */
     }
  stop_execution:
     return false;
@@ -364,6 +371,8 @@ JackWinMMEOutputPort::Stop()
 bool
 JackWinMMEOutputPort::Wait(HANDLE semaphore)
 {
+    jack_log("JackWinMMEOutputPort::Wait %d", semaphore);
+
     DWORD result = WaitForSingleObject(semaphore, INFINITE);
     switch (result) {
     case WAIT_FAILED:
