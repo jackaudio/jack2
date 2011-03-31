@@ -55,10 +55,10 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     thread = new JackThread(this);
     std::auto_ptr<JackThread> thread_ptr(thread);
     char error_message[MAXERRORLENGTH];
-    MMRESULT result = midiOutOpen(&handle, index, (DWORD)HandleMessageEvent, (DWORD)this,
-                                  CALLBACK_FUNCTION);
+    MMRESULT result = midiOutOpen(&handle, index, (DWORD)HandleMessageEvent,
+                                  (DWORD)this, CALLBACK_FUNCTION);
     if (result != MMSYSERR_NOERROR) {
-        GetErrorString(result, error_message);
+        GetMMErrorString(result, error_message);
         goto raise_exception;
     }
     thread_queue_semaphore = CreateSemaphore(NULL, 0, max_messages, NULL);
@@ -74,8 +74,6 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     MIDIOUTCAPS capabilities;
     char *name_tmp;
     result = midiOutGetDevCaps(index, &capabilities, sizeof(capabilities));
-    /*
-    Devin : FIXME
     if (result != MMSYSERR_NOERROR) {
         WriteMMError("JackWinMMEOutputPort [constructor]", "midiOutGetDevCaps",
                      result);
@@ -83,12 +81,11 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     } else {
         name_tmp = capabilities.szPname;
     }
-    */
-    snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", alias_name, driver_name,
+    snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", alias_name, name_tmp,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:playback_%d", client_name, index + 1);
     thread_ptr.release();
-     thread_queue_ptr.release();
+    thread_queue_ptr.release();
     return;
 
  destroy_thread_queue_semaphore:
@@ -219,6 +216,12 @@ JackWinMMEOutputPort::Execute()
     return false;
 }
 
+const char *
+JackWinMMEOutputPort::GetAlias()
+{
+     return alias;
+}
+
 void
 JackWinMMEOutputPort::GetMMErrorString(MMRESULT error, LPTSTR text)
 {
@@ -228,18 +231,21 @@ JackWinMMEOutputPort::GetMMErrorString(MMRESULT error, LPTSTR text)
     }
 }
 
+const char *
+JackWinMMEOutputPort::GetName()
+{
+     return name;
+}
+
 void
 JackWinMMEOutputPort::GetOSErrorString(LPTSTR text)
 {
     DWORD error = GetLastError();
-    /*
-    Devin: FIXME
     if (! FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), &text,
+                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), text,
                         MAXERRORLENGTH, NULL)) {
         snprintf(text, MAXERRORLENGTH, "Unknown OS error code '%d'", error);
     }
-    */
 }
 
 void
@@ -385,27 +391,6 @@ void
 JackWinMMEOutputPort::WriteOSError(const char *jack_func, const char *os_func)
 {
     char error_message[MAXERRORLENGTH];
-    // Devin : FIXME
-    //GetOSErrorString(result, error_message);
+    GetOSErrorString(error_message);
     jack_error("%s - %s: %s", jack_func, os_func, error_message);
-}
-
-const char *
-JackWinMMEOutputPort::GetAlias()
-{
-     return alias;
-}
-const char *
-JackWinMMEOutputPort::GetName()
-{
-     return name;
-}
-
-void
-JackWinMMEOutputPort::GetErrorString(MMRESULT error, LPTSTR text)
-{
-    MMRESULT result = midiInGetErrorText(error, text, MAXERRORLENGTH);
-    if (result != MMSYSERR_NOERROR) {
-        snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
-    }
 }

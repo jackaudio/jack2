@@ -55,7 +55,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
-    MMRESULT result = midiInOpen(&handle, index, (DWORD)HandleMidiInputEvent, (DWORD)this,
+    MMRESULT result = midiInOpen(&handle, index, (DWORD)HandleMidiInputEvent,
+                                 (DWORD)this,
                                  CALLBACK_FUNCTION | MIDI_IO_STATUS);
     if (result != MMSYSERR_NOERROR) {
         GetErrorString(result, error_message);
@@ -77,7 +78,19 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
         GetErrorString(result, error_message);
         goto unprepare_header;
     }
-
+    MIDIINCAPS capabilities;
+    char *name_tmp;
+    result = midiInGetDevCaps(index, &capabilities, sizeof(capabilities));
+    if (result != MMSYSERR_NOERROR) {
+        WriteError("JackWinMMEInputPort [constructor]", "midiInGetDevCaps",
+                   result);
+        name_tmp = driver_name;
+    } else {
+        name_tmp = capabilities.szPname;
+    }
+    snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", alias_name, name_tmp,
+             index + 1);
+    snprintf(name, sizeof(name) - 1, "%s:capture_%d", client_name, index + 1);
     jack_event = 0;
     started = false;
     write_queue_ptr.release();
@@ -163,7 +176,8 @@ JackWinMMEInputPort::GetName()
 }
 
 void
-JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer, jack_nframes_t frames)
+JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer,
+                                 jack_nframes_t frames)
 {
     write_queue->ResetMidiBuffer(port_buffer, frames);
     if (! jack_event) {
