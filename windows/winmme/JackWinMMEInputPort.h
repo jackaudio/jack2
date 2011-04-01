@@ -28,7 +28,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Jack {
 
-    class JackWinMMEInputPort : public JackRunnableInterface {
+    class JackWinMMEInputPort : public JackWinMMEPort {
 
     private:
 
@@ -53,12 +53,13 @@ namespace Jack {
 
         bool started;
 
-        void
-        WriteOSError(const char *jack_func, const char *os_func);
 
         void
         WriteInError(const char *jack_func, const char *mm_func,
                                 MMRESULT result);
+
+        void
+        GetInErrorString(MMRESULT error, LPTSTR text);
 
     public:
 

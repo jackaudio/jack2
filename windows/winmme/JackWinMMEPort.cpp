@@ -21,6 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdexcept>
 
 #include "JackWinMMEPort.h"
+#include "JackError.h"
 
 using Jack::JackWinMMEPort;
 
@@ -28,16 +29,14 @@ using Jack::JackWinMMEPort;
 // Class
 ///////////////////////////////////////////////////////////////////////////////
 
-JackWinMMEPort::JackWinMMEPort(const char *alias_name,
-                                    const char *client_name,
-                                    const char *driver_name)
+JackWinMMEPort::JackWinMMEPort()
 {}
 
 JackWinMMEPort::~JackWinMMEPort()
 {}
 
-const JackWinMMEPort *
-JackWinMMEOutputPort::GetAlias()
+const char *
+JackWinMMEPort::GetAlias()
 {
      return alias;
 }

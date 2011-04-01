@@ -77,7 +77,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     if (result != MMSYSERR_NOERROR) {
         WriteOutError("JackWinMMEOutputPort [constructor]", "midiOutGetDevCaps",
                      result);
-        name_tmp = driver_name;
+        name_tmp = (char*)driver_name;
     } else {
         name_tmp = capabilities.szPname;
     }
@@ -369,6 +369,6 @@ JackWinMMEOutputPort::WriteOutError(const char *jack_func, const char *mm_func,
                                    MMRESULT result)
 {
     char error_message[MAXERRORLENGTH];
-    GetMMErrorString(result, error_message);
+    GetOutErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }

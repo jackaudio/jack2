@@ -78,16 +78,18 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
         GetInErrorString(result, error_message);
         goto unprepare_header;
     }
+
     MIDIINCAPS capabilities;
     char *name_tmp;
     result = midiInGetDevCaps(index, &capabilities, sizeof(capabilities));
     if (result != MMSYSERR_NOERROR) {
         WriteInError("JackWinMMEInputPort [constructor]", "midiInGetDevCaps",
                    result);
-        name_tmp = driver_name;
+        name_tmp = (char*) driver_name;
     } else {
         name_tmp = capabilities.szPname;
     }
+
     snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", alias_name, name_tmp,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:capture_%d", client_name, index + 1);

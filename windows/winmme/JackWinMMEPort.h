@@ -20,8 +20,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackWinMMEPort__
 #define __JackWinMMEPort__
 
-#include <mmsystem.h>
 #include <windows.h>
+#include <mmsystem.h>
+
+#include "JackConstants.h"
 
 namespace Jack {
 
@@ -34,8 +36,7 @@ namespace Jack {
 
     public:
 
-        JackWinMMEPort(const char *alias_name, const char *client_name,
-                             const char *driver_name);
+        JackWinMMEPort();
 
         ~JackWinMMEPort();
 
@@ -49,7 +50,7 @@ namespace Jack {
         GetOSErrorString(LPTSTR text);
 
         void
-        GetInErrorString(MMRESULT error, LPTSTR text);
+        WriteOSError(const char *jack_func, const char *os_func);
 
     };
 
