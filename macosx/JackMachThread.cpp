@@ -164,7 +164,7 @@ int JackMachThread::AcquireRealTime()
 
 int JackMachThread::AcquireSelfRealTime()
 {
-    jack_log("JackMachThread::AcquireRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
+    jack_log("JackMachThread::AcquireSelfRealTime fPeriod = %ld fComputation = %ld fConstraint = %ld",
              long(fPeriod / 1000), long(fComputation / 1000), long(fConstraint / 1000));
     return AcquireRealTimeImp(pthread_self(), fPeriod, fComputation, fConstraint);
 }

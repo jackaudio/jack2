@@ -232,6 +232,8 @@ int JackPosixThread::AcquireRealTimeImp(jack_native_thread_t thread, int priorit
     memset(&rtparam, 0, sizeof(rtparam));
     rtparam.sched_priority = priority;
 
+    jack_log("JackPosixThread::AcquireRealTimeImp priority = %d", priority);
+
     if ((res = pthread_setschedparam(thread, JACK_SCHED_POLICY, &rtparam)) != 0) {
         jack_error("Cannot use real-time scheduling (RR/%d)"
                    "(%d: %s)", rtparam.sched_priority, res,
