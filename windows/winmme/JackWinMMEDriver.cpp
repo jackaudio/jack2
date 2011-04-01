@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2009 Grame
+Copyright (C) 2011 Devin Anderson
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,400 +18,301 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
-#include "JackWinMMEDriver.h"
-#include "JackGraphManager.h"
 #include "JackEngineControl.h"
-#include "JackDriverLoader.h"
+#include "JackWinMMEDriver.h"
 
-#include <assert.h>
-#include <iostream>
-#include <sstream>
-#include <string>
+using Jack::JackWinMMEDriver;
 
-#include <windows.h>
-#include <windowsx.h>
-#include <mmsystem.h>
-
-namespace Jack
+JackWinMMEDriver::JackWinMMEDriver(const char *name, const char *alias,
+                                   JackLockedEngine *engine,
+                                   JackSynchro *table):
+    JackMidiDriver(name, alias, engine, table)
 {
-
-static bool InitHeaders(MidiSlot* slot)
-{
-    slot->fHeader = (LPMIDIHDR)GlobalAllocPtr(GMEM_MOVEABLE|GMEM_SHARE|GMEM_ZEROINIT, sizeof(MIDIHDR) + kBuffSize);
- 	if (!slot->fHeader)
-        return false;
-
-	slot->fHeader->lpData = (LPSTR)((LPBYTE)slot->fHeader + sizeof(MIDIHDR));
-	slot->fHeader->dwBufferLength = kBuffSize;
-	slot->fHeader->dwFlags = 0;
-	slot->fHeader->dwUser = 0;
-	slot->fHeader->lpNext = 0;
-	slot->fHeader->dwBytesRecorded = 0;
-	return true;
+    fCaptureChannels = 0;
+    fPlaybackChannels = 0;
+    input_ports = 0;
+    output_ports = 0;
 }
-
-void CALLBACK JackWinMMEDriver::MidiInProc(HMIDIIN hMidiIn, UINT wMsg, DWORD userData, DWORD dwParam1, DWORD dwParam2)
-{
-    jack_ringbuffer_t* ringbuffer = (jack_ringbuffer_t*)userData;
-    //jack_info("JackWinMMEDriver::MidiInProc 0\n");
-
-	switch (wMsg) {
-		case MIM_OPEN:
-            break;
-
-		case MIM_ERROR:
-		case MIM_DATA: {
-
-            //jack_info("JackWinMMEDriver::MidiInProc");
-
-            // One event
-            unsigned int num_packet = 1;
-            jack_ringbuffer_write(ringbuffer, (char*)&num_packet, sizeof(unsigned int));
-
-            // Write event actual data
-            jack_ringbuffer_write(ringbuffer, (char*)&dwParam1, 3);
-       		break;
-		}
-
-		case MIM_LONGERROR:
-		case MIM_LONGDATA:
-            /*
-			Nothing for now
-            */
-			break;
-	}
-}
-
-JackWinMMEDriver::JackWinMMEDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)
-    : JackMidiDriver(name, alias, engine, table),
-    fRealCaptureChannels(0),
-    fRealPlaybackChannels(0),
-    fMidiSource(NULL),
-    fMidiDestination(NULL)
-{}
 
 JackWinMMEDriver::~JackWinMMEDriver()
-{}
-
-int JackWinMMEDriver::Open(bool capturing,
-         bool playing,
-         int inchannels,
-         int outchannels,
-         bool monitor,
-         const char* capture_driver_name,
-         const char* playback_driver_name,
-         jack_nframes_t capture_latency,
-         jack_nframes_t playback_latency)
 {
-
-    jack_log("JackWinMMEDriver::Open");
-
-    fRealCaptureChannels = midiInGetNumDevs();
-	fRealPlaybackChannels = midiOutGetNumDevs();
-
-    // Generic JackMidiDriver Open
-    if (JackMidiDriver::Open(capturing, playing, fRealCaptureChannels, fRealPlaybackChannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency) != 0)
-        return -1;
-
-    fMidiDestination = new MidiSlot[fRealCaptureChannels];
-    assert(fMidiDestination);
-
-    // Real input
-    int devindex = 0;
-    for (int i = 0; i < fRealCaptureChannels; i++)  {
-
-        HMIDIIN handle;
-        fMidiDestination[devindex].fIndex = i;
-        MMRESULT ret = midiInOpen(&handle, fMidiDestination[devindex].fIndex, (DWORD)MidiInProc, (DWORD)fRingBuffer[devindex], CALLBACK_FUNCTION);
-
-        if (ret == MMSYSERR_NOERROR) {
-            fMidiDestination[devindex].fHandle = handle;
-            if (!InitHeaders(&fMidiDestination[devindex])) {
-                jack_error("memory allocation failed");
-                midiInClose(handle);
-                continue;
-            }
-            ret = midiInPrepareHeader(handle, fMidiDestination[devindex].fHeader, sizeof(MIDIHDR));
-
-            if (ret == MMSYSERR_NOERROR) {
-                fMidiDestination[devindex].fHeader->dwUser = 1;
-                ret = midiInAddBuffer(handle, fMidiDestination[devindex].fHeader, sizeof(MIDIHDR));
-                if (ret == MMSYSERR_NOERROR) {
-                    ret = midiInStart(handle);
-                    if (ret != MMSYSERR_NOERROR) {
-                        jack_error("midiInStart error");
-                        CloseInput(&fMidiDestination[devindex]);
-                        continue;
-                    }
-                } else {
-                    jack_error ("midiInAddBuffer error");
-                    CloseInput(&fMidiDestination[devindex]);
-                    continue;
-                }
-            } else {
-                jack_error("midiInPrepareHeader error");
-                midiInClose(handle);
-                continue;
-            }
-        } else {
-            jack_error ("midiInOpen error");
-            continue;
-        }
-        devindex += 1;
-    }
-    fRealCaptureChannels = devindex;
-    fCaptureChannels = devindex;
-
-    fMidiSource = new MidiSlot[fRealPlaybackChannels];
-    assert(fMidiSource);
-
-    // Real output
-    devindex = 0;
-    for (int i = 0; i < fRealPlaybackChannels; i++)  {
-        MMRESULT res;
-        HMIDIOUT handle;
-        fMidiSource[devindex].fIndex = i;
-        UINT ret = midiOutOpen(&handle, fMidiSource[devindex].fIndex, 0L, 0L, CALLBACK_NULL);
-        if (ret == MMSYSERR_NOERROR) {
-            fMidiSource[devindex].fHandle = handle;
-            if (!InitHeaders(&fMidiSource[devindex])) {
-                jack_error("memory allocation failed");
-                midiOutClose(handle);
-                continue;
-            }
-            res = midiOutPrepareHeader(handle, fMidiSource[devindex].fHeader, sizeof(MIDIHDR));
-            if (res != MMSYSERR_NOERROR) {
-                jack_error("midiOutPrepareHeader error %d %d %d", i, handle, res);
-                continue;
-            } else {
-                fMidiSource[devindex].fHeader->dwUser = 1;
-            }
-        } else {
-            jack_error("midiOutOpen error");
-            continue;
-        }
-        devindex += 1;
-    }
-    fRealPlaybackChannels = devindex;
-    fPlaybackChannels = devindex;
-    return 0;
+    Stop();
+    Close();
 }
 
-void JackWinMMEDriver::CloseInput(MidiSlot* slot)
+int
+JackWinMMEDriver::Attach()
 {
-    MMRESULT res;
-    int retry = 0;
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    jack_port_id_t index;
+    jack_nframes_t latency = buffer_size;
+    jack_latency_range_t latency_range;
+    const char *name;
+    JackPort *port;
+    latency_range.max = latency;
+    latency_range.min = latency;
 
-    if (slot->fHandle == 0)
-        return;
+    jack_info("JackWinMMEDriver::Attach - fCaptureChannels  %d", fCaptureChannels);
+    jack_info("JackWinMMEDriver::Attach - fPlaybackChannels  %d", fPlaybackChannels);
 
-    HMIDIIN handle = (HMIDIIN)slot->fHandle;
-    slot->fHeader->dwUser = 0;
-    res = midiInStop(handle);
-    if (res != MMSYSERR_NOERROR) {
-        jack_error("midiInStop error");
-    }
-    res = midiInReset(handle);
-    if (res != MMSYSERR_NOERROR) {
-        jack_error("midiInReset error");
-    }
-    res = midiInUnprepareHeader(handle, slot->fHeader, sizeof(MIDIHDR));
-    if (res != MMSYSERR_NOERROR) {
-        jack_error("midiInUnprepareHeader error");
-    }
-    do {
-        res = midiInClose(handle);
-        if (res != MMSYSERR_NOERROR) {
-            jack_error("midiInClose error");
-        }
-        if (res == MIDIERR_STILLPLAYING)
-            midiInReset(handle);
-        Sleep (10);
-        retry++;
-    } while ((res == MIDIERR_STILLPLAYING) && (retry < 10));
-
-    if (slot->fHeader) {
-        GlobalFreePtr(slot->fHeader);
-    }
-}
-
-void JackWinMMEDriver::CloseOutput(MidiSlot* slot)
-{
-    MMRESULT res;
-    int retry = 0;
-
-    if (slot->fHandle == 0)
-        return;
-
-    HMIDIOUT handle = (HMIDIOUT)slot->fHandle;
-    res = midiOutReset(handle);
-    if (res != MMSYSERR_NOERROR)
-        jack_error("midiOutReset error");
-    midiOutUnprepareHeader(handle, slot->fHeader, sizeof(MIDIHDR));
-    do {
-        res = midiOutClose(handle);
-        if (res != MMSYSERR_NOERROR)
-            jack_error("midiOutClose error");
-        Sleep(10);
-        retry++;
-    } while ((res == MIDIERR_STILLPLAYING) && (retry < 10));
-
-    if (slot->fHeader) {
-        GlobalFreePtr(slot->fHeader);
-    }
-}
-
-int JackWinMMEDriver::Close()
-{
-    jack_log("JackWinMMEDriver::Close");
-
-    // Generic midi driver close
-    int res = JackMidiDriver::Close();
-
-    // Close input
-    if (fMidiDestination) {
-        for (int i = 0; i < fRealCaptureChannels; i++)  {
-            CloseInput(&fMidiDestination[i]);
-        }
-        delete[] fMidiDestination;
-    }
-
-    // Close output
-    if (fMidiSource) {
-        for (int i = 0; i < fRealPlaybackChannels; i++)  {
-            CloseOutput(&fMidiSource[i]);
-        }
-        delete[] fMidiSource;
-    }
-
-    return res;
-}
-
-int JackWinMMEDriver::Attach()
-{
-    JackPort* port;
-    jack_port_id_t port_index;
-    char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    MMRESULT res;
-    int i;
-
-    jack_log("JackMidiDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
-
-    for (i = 0; i < fCaptureChannels; i++) {
-        MIDIINCAPS caps;
-		res = midiInGetDevCaps(fMidiDestination[i].fIndex, &caps, sizeof(caps));
-		if (res == MMSYSERR_NOERROR) {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, caps.szPname, i + 1);
-		} else {
-		    snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
-		}
-        snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
-
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
-            jack_error("driver: cannot register port for %s", name);
+    // Inputs
+    for (int i = 0; i < fCaptureChannels; i++) {
+        JackWinMMEInputPort *input_port = input_ports[i];
+        name = input_port->GetName();
+        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
+                                            JACK_DEFAULT_MIDI_TYPE,
+                                            CaptureDriverFlags, buffer_size);
+        if (index == NO_PORT) {
+            jack_error("JackWinMMEDriver::Attach - cannot register input port "
+                       "with name '%s'.", name);
+            // X: Do we need to deallocate ports?
             return -1;
         }
-        port = fGraphManager->GetPort(port_index);
-        port->SetAlias(alias);
-        fCapturePortList[i] = port_index;
-        jack_log("JackMidiDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(input_port->GetAlias());
+        port->SetLatencyRange(JackCaptureLatency, &latency_range);
+        fCapturePortList[i] = index;
     }
 
-    for (i = 0; i < fPlaybackChannels; i++) {
-        MIDIOUTCAPS caps;
-		res = midiOutGetDevCaps(fMidiSource[i].fIndex, &caps, sizeof(caps));
-        if (res == MMSYSERR_NOERROR) {
-            snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, caps.szPname, i + 1);
-		} else {
-		    snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fPlaybackDriverName, i + 1);
-		}
-        snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
+    if (! fEngineControl->fSyncMode) {
+        latency += buffer_size;
+        latency_range.max = latency;
+        latency_range.min = latency;
+    }
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_MIDI_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
-            jack_error("driver: cannot register port for %s", name);
+    // Outputs
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        JackWinMMEOutputPort *output_port = output_ports[i];
+        name = output_port->GetName();
+        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
+                                            JACK_DEFAULT_MIDI_TYPE,
+                                            PlaybackDriverFlags, buffer_size);
+        if (index == NO_PORT) {
+            jack_error("JackWinMMEDriver::Attach - cannot register output "
+                       "port with name '%s'.", name);
+            // X: Do we need to deallocate ports?
             return -1;
         }
-        port = fGraphManager->GetPort(port_index);
-        port->SetAlias(alias);
-        fPlaybackPortList[i] = port_index;
-        jack_log("JackMidiDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
+        port = fGraphManager->GetPort(index);
+        port->SetAlias(output_port->GetAlias());
+        port->SetLatencyRange(JackPlaybackLatency, &latency_range);
+        fPlaybackPortList[i] = index;
     }
 
     return 0;
 }
 
-int JackWinMMEDriver::Read()
+int
+JackWinMMEDriver::Close()
 {
-    size_t size;
+    int result = JackMidiDriver::Close();
+    if (input_ports) {
+        for (int i = 0; i < fCaptureChannels; i++) {
+            delete input_ports[i];
+        }
+        delete[] input_ports;
+        input_ports = 0;
+    }
+    if (output_ports) {
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            delete output_ports[i];
+        }
+        delete[] output_ports;
+        output_ports = 0;
+    }
+    return result;
+}
 
-    for (int chan = 0; chan < fCaptureChannels; chan++)  {
+int
+JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
+                       int out_channels, bool monitor,
+                       const char* capture_driver_name,
+                       const char* playback_driver_name,
+                       jack_nframes_t capture_latency,
+                       jack_nframes_t playback_latency)
+{
+    const char *client_name = fClientControl.fName;
+    int input_count = 0;
+    int output_count = 0;
+    int num_potential_inputs = midiInGetNumDevs();
+    int num_potential_outputs = midiOutGetNumDevs();
 
-        if (fGraphManager->GetConnectionsNum(fCapturePortList[chan]) > 0) {
+    jack_info("JackWinMMEDriver::Open - num_potential_inputs  %d", num_potential_inputs);
+    jack_info("JackWinMMEDriver::Open - num_potential_outputs  %d", num_potential_outputs);
 
-            JackMidiBuffer* midi_buffer = GetInputBuffer(chan);
-
-            if (jack_ringbuffer_read_space (fRingBuffer[chan]) == 0) {
-                // Reset buffer
-                midi_buffer->Reset(midi_buffer->nframes);
-            } else {
-
-                while ((size = jack_ringbuffer_read_space (fRingBuffer[chan])) > 0) {
-
-                    //jack_info("jack_ringbuffer_read_space %d", size);
-                    int ev_count = 0;
-                    jack_ringbuffer_read(fRingBuffer[chan], (char*)&ev_count, sizeof(int));
-
-                    if (ev_count > 0) {
-                        for (int j = 0; j < ev_count; j++)  {
-                            unsigned int event_len = 3;
-                            // Read event actual data
-                            jack_midi_data_t* dest = midi_buffer->ReserveEvent(0, event_len);
-                            jack_ringbuffer_read(fRingBuffer[chan], (char*)dest, event_len);
-                        }
-                    }
-                }
+    if (num_potential_inputs) {
+        try {
+            input_ports = new JackWinMMEInputPort *[num_potential_inputs];
+        } catch (std::exception e) {
+            jack_error("JackWinMMEDriver::Open - while creating input port "
+                       "array: %s", e.what());
+            return -1;
+        }
+        for (int i = 0; i < num_potential_inputs; i++) {
+            try {
+                input_ports[input_count] =
+                    new JackWinMMEInputPort(fAliasName, client_name,
+                                            capture_driver_name, i);
+            } catch (std::exception e) {
+                jack_error("JackWinMMEDriver::Open - while creating input "
+                           "port: %s", e.what());
+                continue;
             }
-        } else {
-            //jack_info("Consume ring buffer");
-            jack_ringbuffer_read_advance(fRingBuffer[chan], jack_ringbuffer_read_space(fRingBuffer[chan]));
+            input_count++;
         }
     }
-    return 0;
+    if (num_potential_outputs) {
+        try {
+            output_ports = new JackWinMMEOutputPort *[num_potential_outputs];
+        } catch (std::exception e) {
+            jack_error("JackWinMMEDriver::Open - while creating output port "
+                       "array: %s", e.what());
+            goto destroy_input_ports;
+        }
+        for (int i = 0; i < num_potential_outputs; i++) {
+            try {
+                output_ports[output_count] =
+                    new JackWinMMEOutputPort(fAliasName, client_name,
+                                             playback_driver_name, i);
+            } catch (std::exception e) {
+                jack_error("JackWinMMEDriver::Open - while creating output "
+                           "port: %s", e.what());
+                continue;
+            }
+            output_count++;
+        }
+    }
+
+    jack_info("JackWinMMEDriver::Open - input_count  %d", input_count);
+    jack_info("JackWinMMEDriver::Open - output_count  %d", output_count);
+
+
+    if (! (input_count || output_count)) {
+        jack_error("JackWinMMEDriver::Open - no WinMME inputs or outputs "
+                   "allocated.");
+    } else if (! JackMidiDriver::Open(capturing, playing, input_count,
+                                      output_count, monitor,
+                                      capture_driver_name,
+                                      playback_driver_name, capture_latency,
+                                      playback_latency)) {
+        return 0;
+    }
+
+ destroy_input_ports:
+    if (input_ports) {
+        for (int i = 0; i < input_count; i++) {
+            delete input_ports[i];
+        }
+        delete[] input_ports;
+        input_ports = 0;
+    }
+    return -1;
 }
 
-int JackWinMMEDriver::Write()
+int
+JackWinMMEDriver::Read()
 {
-    for (int chan = 0; chan < fPlaybackChannels; chan++)  {
 
-        if (fGraphManager->GetConnectionsNum(fPlaybackPortList[chan]) > 0) {
-
-            JackMidiBuffer* midi_buffer = GetOutputBuffer(chan);
-
-            // TODO : use timestamp
-
-            for (unsigned int j = 0; j < midi_buffer->event_count; j++) {
-                JackMidiEvent* ev = &midi_buffer->events[j];
-                if (ev->size <= 3) {
-                    jack_midi_data_t *d = ev->GetData(midi_buffer);
-                    DWORD winev = 0;
-                    if (ev->size > 0) winev |= d[0];
-                    if (ev->size > 1) winev |= (d[1] << 8);
-                    if (ev->size > 2) winev |= (d[2] << 16);
-                    MMRESULT res = midiOutShortMsg((HMIDIOUT)fMidiSource[chan].fHandle, winev);
-                    if (res != MMSYSERR_NOERROR)
-                        jack_error ("midiOutShortMsg error res %d", res);
-                } else  {
-
-                }
-            }
-        }
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    for (int i = 0; i < fCaptureChannels; i++) {
+        input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
     }
 
     return 0;
 }
 
-} // end of namespace
+
+int
+JackWinMMEDriver::Write()
+{
+    /*
+    jack_nframes_t buffer_size = fEngineControl->fBufferSize;
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
+    }
+    */
+    return 0;
+}
+
+int
+JackWinMMEDriver::Start()
+{
+    jack_info("JackWinMMEDriver::Start - Starting driver.");
+
+    JackMidiDriver::Start();
+
+    int input_count = 0;
+    int output_count = 0;
+
+    jack_info("JackWinMMEDriver::Start - Enabling input ports.");
+
+    for (; input_count < fCaptureChannels; input_count++) {
+        if (input_ports[input_count]->Start() < 0) {
+            jack_error("JackWinMMEDriver::Start - Failed to enable input "
+                       "port.");
+            goto stop_input_ports;
+        }
+    }
+
+    jack_info("JackWinMMEDriver::Start - Enabling output ports.");
+
+    for (; output_count < fPlaybackChannels; output_count++) {
+        if (output_ports[output_count]->Start() < 0) {
+            jack_error("JackWinMMEDriver::Start - Failed to enable output "
+                       "port.");
+            goto stop_output_ports;
+        }
+    }
+
+    jack_info("JackWinMMEDriver::Start - Driver started.");
+
+    return 0;
+
+ stop_output_ports:
+    for (int i = 0; i < output_count; i++) {
+        if (output_ports[i]->Stop() < 0) {
+            jack_error("JackWinMMEDriver::Start - Failed to disable output "
+                       "port.");
+        }
+    }
+ stop_input_ports:
+    for (int i = 0; i < input_count; i++) {
+        if (input_ports[i]->Stop() < 0) {
+            jack_error("JackWinMMEDriver::Start - Failed to disable input "
+                       "port.");
+        }
+    }
+
+    return -1;
+}
+
+int
+JackWinMMEDriver::Stop()
+{
+    int result = 0;
+
+    jack_info("JackWinMMEDriver::Stop - disabling input ports.");
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        if (input_ports[i]->Stop() < 0) {
+            jack_error("JackWinMMEDriver::Stop - Failed to disable input "
+                       "port.");
+            result = -1;
+        }
+    }
+
+    jack_info("JackWinMMEDriver::Stop - disabling output ports.");
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (output_ports[i]->Stop() < 0) {
+            jack_error("JackWinMMEDriver::Stop - Failed to disable output "
+                       "port.");
+            result = -1;
+        }
+    }
+
+    return result;
+}
 
 #ifdef __cplusplus
 extern "C"

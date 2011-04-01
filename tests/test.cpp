@@ -972,14 +972,14 @@ int main (int argc, char *argv[])
 
     float factor = 0.5f;
     old_buffer_size = jack_get_buffer_size(client1);
-    Log("Testing BufferSize change & Callback...\n--> Current buffer size : %i.\n", old_buffer_size);
+    Log("Testing BufferSize change & Callback...\n--> Current buffer size : %d.\n", old_buffer_size);
     linebuf = linecount;
     if (jack_set_buffer_size(client1, (jack_nframes_t)(old_buffer_size * factor)) < 0) {
         printf("!!! ERROR !!! jack_set_buffer_size fails !\n");
     }
     jack_sleep(1 * 1000);
     cur_buffer_size = jack_get_buffer_size(client1);
-    if ((old_buffer_size * factor) != cur_buffer_size) {
+    if (abs((old_buffer_size * factor) - cur_buffer_size) > 5) {  // Tolerance needed for dummy driver...
         printf("!!! ERROR !!! Buffer size has not been changed !\n");
         printf("!!! Maybe jack was compiled without the '--enable-resize' flag...\n");
     } else {

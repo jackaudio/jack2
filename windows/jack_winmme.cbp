@@ -106,6 +106,12 @@
 			<Option compilerVar="WINDRES" />
 		</Unit>
 		<Unit filename="winmme\JackWinMMEDriver.cpp" />
+		<Unit filename="winmme\JackWinMMEDriver.h" />
+		<Unit filename="winmme\JackWinMMEInputPort.cpp" />
+		<Unit filename="winmme\JackWinMMEInputPort.h" />
+		<Unit filename="winmme\JackWinMMEOutputPort.cpp" />
+		<Unit filename="winmme\JackWinMMEOutputPort.h" />
+		<Unit filename="winmme\JackWinMMEPort.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

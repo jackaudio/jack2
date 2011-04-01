@@ -248,7 +248,7 @@ error:
         } else {
             JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
             // PortAudio specific
-            UpdateLatencies();
+            JackAudioDriver::UpdateLatencies();
             return 0;
         }
     }

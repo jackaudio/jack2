@@ -37,7 +37,7 @@ namespace Jack {
             BUFFER_FULL,
             BUFFER_TOO_SMALL,
             EVENT_EARLY,
-            ERROR,
+            EN_ERROR,
             OK
         };
 
@@ -54,7 +54,7 @@ namespace Jack {
          * if the write queue isn't able to accept the event right now,
          * `BUFFER_TOO_SMALL` if this write queue will never be able to accept
          * the event because the event is too large, `EVENT_EARLY` if this
-         * queue cannot schedule events ahead of time, and `ERROR` if an error
+         * queue cannot schedule events ahead of time, and `EN_ERROR` if an error
          * occurs that cannot be specified by another return code.
          */
 

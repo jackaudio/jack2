@@ -30,7 +30,7 @@ JackALSARawMidiSendQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     }
     jack_error("JackALSARawMidiSendQueue::EnqueueEvent - snd_rawmidi_write: "
                "%s", snd_strerror(result));
-    return ERROR;
+    return EN_ERROR;
 }
 
 bool
