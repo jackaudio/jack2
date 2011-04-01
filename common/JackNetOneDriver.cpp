@@ -118,9 +118,12 @@ namespace Jack
 
     int JackNetOneDriver::Close()
     {
+        // Generic audio driver close
+        int res = JackAudioDriver::Close();
+
         FreePorts();
-        netjack_release( &netj );
-        return JackDriver::Close();
+        netjack_release(&netj);
+        return res;
     }
 
     int JackNetOneDriver::Attach()

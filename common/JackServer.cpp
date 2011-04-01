@@ -58,7 +58,7 @@ JackServer::JackServer(bool sync, bool temporary, int timeout, bool rt, int prio
         new JackFreewheelDriver(fEngine, GetSynchroTable());
     fThreadedFreewheelDriver = new JackThreadedDriver(freewheelDriver);
 
-   fFreewheelDriver = freewheelDriver;
+    fFreewheelDriver = freewheelDriver;
     fDriverInfo = new JackDriverInfo();
     fAudioDriver = NULL;
     fFreewheel = false;
