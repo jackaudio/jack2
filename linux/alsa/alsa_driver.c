@@ -204,8 +204,8 @@ alsa_driver_ice1712_hardware (alsa_driver_t *driver)
 static int
 alsa_driver_usx2y_hardware (alsa_driver_t *driver)
 {
-        driver->hw = jack_alsa_usx2y_hw_new (driver);
-	return 0;
+    driver->hw = jack_alsa_usx2y_hw_new (driver);
+    return 0;
 }
 */
 

@@ -199,7 +199,6 @@ int JackThreadedDriver::Stop()
         case JackThread::kIniting:
             if (fThread.Kill() < 0) {
                 jack_error("Cannot kill thread");
-                return -1;
             }
             break;
 
@@ -207,7 +206,6 @@ int JackThreadedDriver::Stop()
         case JackThread::kRunning:
             if (fThread.Stop() < 0) {
                 jack_error("Cannot stop thread");
-                return -1;
             }
             break;
 

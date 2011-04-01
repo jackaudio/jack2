@@ -158,6 +158,7 @@ namespace Jack
 #ifdef JACK_MONITOR
         fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
+        fSocket.Close();
 
         switch ( fThread.GetStatus() )
         {
@@ -171,7 +172,7 @@ namespace Jack
                 }
                 break;
                 // Stop when the thread cycle is finished
-                
+
             case JackThread::kRunning:
                 if ( fThread.Stop() < 0 )
                 {
@@ -179,11 +180,11 @@ namespace Jack
                     return -1;
                 }
                 break;
-                
+
             default:
                 break;
         }
-        fSocket.Close();
+
         return 0;
     }
 
@@ -224,16 +225,16 @@ namespace Jack
         //set audio adapter parameters
         SetAdaptedBufferSize ( fParams.fPeriodSize );
         SetAdaptedSampleRate ( fParams.fSampleRate );
-        
+
         // Will do "something" on OSX only...
         fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
-        
+
         if (fThread.AcquireSelfRealTime(GetEngineControl()->fClientPriority) < 0) {
             jack_error("AcquireSelfRealTime error");
         } else {
             set_threaded_log_function();
         }
-  
+
         //init done, display parameters
         SessionParamsDisplay ( &fParams );
         return true;
@@ -276,13 +277,13 @@ namespace Jack
                     jack_transport_stop ( fJackClient );
                     jack_info ( "NetMaster : transport stops." );
                     break;
-                    
+
                 case JackTransportStarting :
                     jack_transport_reposition ( fJackClient, &fSendTransportData.fPosition );
                     jack_transport_start ( fJackClient );
                     jack_info ( "NetMaster : transport starts." );
                     break;
-                    
+
                 case JackTransportRolling :
                     //TODO , we need to :
                     // - find a way to call TransportEngine->SetNetworkSync()
@@ -344,7 +345,7 @@ namespace Jack
     int JackNetAdapter::Write()
     {
         EncodeSyncPacket();
-     
+
         if ( SyncSend() == SOCKET_ERROR )
             return SOCKET_ERROR;
 
@@ -358,7 +359,7 @@ namespace Jack
         //in case of fatal network error, stop the process
         if (Read() == SOCKET_ERROR)
             return SOCKET_ERROR;
-            
+
         PushAndPull(fSoftCaptureBuffer, fSoftPlaybackBuffer, fAdaptedBufferSize);
 
         //then write data to network
@@ -368,7 +369,7 @@ namespace Jack
 
         return 0;
     }
-    
+
 } // namespace Jack
 
 //loader------------------------------------------------------------------------------
@@ -385,10 +386,10 @@ extern "C"
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
         jack_driver_desc_t* desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
-        
+
         strcpy(desc->name, "netadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack net <==> audio backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-       
+
         desc->nparams = 11;
         desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
 
@@ -455,7 +456,7 @@ extern "C"
         strcpy ( desc->params[i].value.str, "slow" );
         strcpy ( desc->params[i].short_desc, "Slow, Normal or Fast mode." );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-        
+
         i++;
         strcpy(desc->params[i].name, "quality");
         desc->params[i].character = 'q';
@@ -463,7 +464,7 @@ extern "C"
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
+
         i++;
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';
@@ -471,7 +472,7 @@ extern "C"
         desc->params[i].value.ui = 32768;
         strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
         strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (if not set => automatic adaptative)");
-        
+
         i++;
         strcpy ( desc->params[i].name, "auto-connect" );
         desc->params[i].character = 'c';
@@ -479,7 +480,7 @@ extern "C"
         desc->params[i].value.i = false;
         strcpy ( desc->params[i].short_desc, "Auto connect netmaster to system ports" );
         strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-    
+
         return desc;
     }
 
@@ -490,9 +491,9 @@ extern "C"
         Jack::JackAudioAdapter* adapter;
         jack_nframes_t buffer_size = jack_get_buffer_size ( jack_client );
         jack_nframes_t sample_rate = jack_get_sample_rate ( jack_client );
-        
+
         try {
-        
+
             adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackNetAdapter(jack_client, buffer_size, sample_rate, params), params, false);
             assert ( adapter );
 
@@ -503,7 +504,7 @@ extern "C"
                 delete adapter;
                 return 1;
             }
-            
+
         } catch (...) {
             return 1;
         }
