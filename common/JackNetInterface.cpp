@@ -24,9 +24,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
-/*  
- TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames, 
- probably also use BUFFER_SIZE_MAX in everything related to MIDI events 
+/*
+ TODO : since midi buffers now uses up to BUFFER_SIZE_MAX frames,
+ probably also use BUFFER_SIZE_MAX in everything related to MIDI events
  handling (see MidiBufferInit in JackMidiPort.cpp)
 */
 
@@ -212,7 +212,7 @@ namespace Jack
         //timeout on receive (for init)
         if ( fSocket.SetTimeOut ( MASTER_INIT_TIMEOUT ) < 0 )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
-            
+
         //connect
         if ( fSocket.Connect() == SOCKET_ERROR ) {
             jack_error ( "Can't connect : %s", StrError ( NET_ERROR_CODE ) );
@@ -230,17 +230,17 @@ namespace Jack
             memset(&net_params, 0, sizeof ( session_params_t ));
             SetPacketType ( &fParams, SLAVE_SETUP );
             SessionParamsHToN(&fParams, &net_params);
-            
+
             if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
                 jack_error ( "Error in send : ", StrError ( NET_ERROR_CODE ) );
-                
+
             memset(&net_params, 0, sizeof ( session_params_t ));
             if ( ( ( rx_bytes = fSocket.Recv ( &net_params, sizeof ( session_params_t ), 0 ) ) == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Problem with network." );
                 return false;
             }
-            
+
             SessionParamsNToH(&net_params, &host_params);
         }
         while ( ( GetPacketType ( &host_params ) != START_MASTER ) && ( ++attempt < SLAVE_SETUP_RETRY ) );
@@ -315,7 +315,7 @@ namespace Jack
         jack_info ( "Exiting '%s'", fParams.fName );
         SetPacketType ( &fParams, KILL_MASTER );
         JackNetSocket mcast_socket ( fMulticastIP, fSocket.GetPort() );
-        
+
         session_params_t net_params;
         memset(&net_params, 0, sizeof ( session_params_t ));
         SessionParamsHToN(&fParams, &net_params);
@@ -324,7 +324,7 @@ namespace Jack
             jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
         if ( mcast_socket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
             jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
-            
+
         mcast_socket.Close();
     }
 
@@ -343,25 +343,25 @@ namespace Jack
                 jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
                 //ask to the manager to properly remove the master
                 Exit();
-                
+
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
             }
             else
                 jack_error ( "Error in master receive : %s", StrError ( NET_ERROR_CODE ) );
         }
-        
+
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
         PacketHeaderNToH(header, header);
         return rx_bytes;
     }
-    
+
     int JackNetMasterInterface::Send ( size_t size, int flags )
     {
         int tx_bytes;
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fTxBuffer);
         PacketHeaderHToN(header, header);
-        
+
         if ( ( ( tx_bytes = fSocket.Send ( fTxBuffer, size, flags ) ) == SOCKET_ERROR ) && fRunning )
         {
             net_error_t error = fSocket.GetError();
@@ -370,7 +370,7 @@ namespace Jack
                 //fatal connection issue, exit
                 jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError ( NET_ERROR_CODE ) );
                 Exit();
-                
+
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
             }
@@ -379,7 +379,7 @@ namespace Jack
         }
         return tx_bytes;
     }
-    
+
     bool JackNetMasterInterface::IsSynched()
     {
         if (fParams.fNetworkMode == 's') {
@@ -388,7 +388,7 @@ namespace Jack
             return true;
         }
     }
-    
+
     int JackNetMasterInterface::SyncSend()
     {
         fTxHeader.fCycle++;
@@ -446,12 +446,12 @@ namespace Jack
     {
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
         int rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-        
+
         if ( ( rx_bytes == 0 ) || ( rx_bytes == SOCKET_ERROR ) )
             return rx_bytes;
 
         fCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
-      
+
         switch ( fParams.fNetworkMode )
         {
             case 's' :
@@ -464,7 +464,7 @@ namespace Jack
                      return 0;
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                    
+
                 if (fCycleOffset > 2) {
                     jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 }
@@ -479,8 +479,8 @@ namespace Jack
                     return 0;
                 else
                     rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                    
-                if (fCycleOffset != 1) 
+
+                if (fCycleOffset != 1)
                     jack_info("'%s' can't run in normal network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 break;
 
@@ -490,7 +490,7 @@ namespace Jack
                 //    - here, receive data, we can't keep it queued on the rx buffer,
                 //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
                 rx_bytes = Recv ( rx_head->fPacketSize, 0 );
-                
+
                 if (fCycleOffset != 0)
                     jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 break;
@@ -499,7 +499,7 @@ namespace Jack
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }
-    
+
     int JackNetMasterInterface::DataRecv()
     {
         int rx_bytes = 0;
@@ -507,12 +507,12 @@ namespace Jack
         uint recvd_midi_pckt = 0;
         uint recvd_audio_pckt = 0;
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
-        
+
         while ( !fRxHeader.fIsLastPckt )
         {
             //how much data is queued on the rx buffer ?
             rx_bytes = Recv ( fParams.fMtu, MSG_PEEK );
-              
+
             if ( rx_bytes == SOCKET_ERROR )
                 return rx_bytes;
             //if no data
@@ -564,7 +564,7 @@ namespace Jack
         }
         return rx_bytes;
     }
-    
+
     void JackNetMasterInterface::EncodeSyncPacket()
     {
         //this method contains every step of sync packet informations coding
@@ -632,9 +632,9 @@ namespace Jack
 
         return true;
     }
-    
+
     // Separate the connection protocol into two separated step
-    
+
     bool JackNetSlaveInterface::InitConnection()
     {
         jack_log ( "JackNetSlaveInterface::InitConnection()" );
@@ -653,10 +653,10 @@ namespace Jack
                 return false;
         }
         while (status != NET_CONNECTED);
-  
+
         return true;
     }
-    
+
     bool JackNetSlaveInterface::InitRendering()
     {
         jack_log("JackNetSlaveInterface::InitRendering()");
@@ -670,8 +670,8 @@ namespace Jack
             if (status == NET_ERROR)
                 return false;
         }
-        while (status != NET_ROLLING);   
-        
+        while (status != NET_ROLLING);
+
         return true;
     }
 
@@ -695,7 +695,7 @@ namespace Jack
         }
 
         //timeout on receive
-        if ( fSocket.SetTimeOut ( SLAVE_INIT_TIMEOUT ) == SOCKET_ERROR ) 
+        if ( fSocket.SetTimeOut ( SLAVE_INIT_TIMEOUT ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
         //disable local loop
@@ -712,7 +712,7 @@ namespace Jack
             SessionParamsHToN(&fParams, &net_params);
             if ( fSocket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
                 jack_error ( "Error in data send : %s", StrError ( NET_ERROR_CODE ) );
-                
+
             //filter incoming packets : don't exit while no error is detected
             memset(&net_params, 0, sizeof ( session_params_t ));
             rx_bytes = fSocket.CatchHost ( &net_params, sizeof ( session_params_t ), 0 );
@@ -762,7 +762,7 @@ namespace Jack
 
     void JackNetSlaveInterface::SetParams()
     {
-        jack_log ( "JackNetSlaveInterface::SetParams" );
+        jack_log("JackNetSlaveInterface::SetParams");
 
         JackNetInterface::SetParams();
 
@@ -801,7 +801,7 @@ namespace Jack
             else
                 jack_error ( "Fatal error in slave receive : %s", StrError ( NET_ERROR_CODE ) );
         }
-        
+
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
         PacketHeaderNToH(header, header);
         return rx_bytes;
@@ -812,7 +812,7 @@ namespace Jack
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fTxBuffer);
         PacketHeaderHToN(header, header);
         int tx_bytes = fSocket.Send ( fTxBuffer, size, flags );
-         
+
         //handle errors
         if ( tx_bytes == SOCKET_ERROR )
         {
@@ -842,7 +842,7 @@ namespace Jack
                 return rx_bytes;
         }
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
-        
+
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
         return rx_bytes;
     }
@@ -953,7 +953,7 @@ namespace Jack
         }
         return 0;
     }
-    
+
     //network sync------------------------------------------------------------------------
     void JackNetSlaveInterface::EncodeSyncPacket()
     {
@@ -970,7 +970,7 @@ namespace Jack
         //then others
         //...
     }
-    
+
     void JackNetSlaveInterface::DecodeSyncPacket()
     {
         //this method contains every step of sync packet informations decoding process

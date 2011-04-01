@@ -40,6 +40,7 @@ Valerio Pilo
 	* Cleanup JackThreadedDriver::Stop.
 	* Correct JackNetOneDriver::Close.
 	* Correction in jackdmp.cpp: notify_server_stop should be done after server destruction.
+	* Improve error management in JackNetDriver. 
 
 2011-03-30 Stephane Letz  <letz@grame.fr>
 

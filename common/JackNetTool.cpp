@@ -151,11 +151,13 @@ namespace Jack
 
     void NetAudioBuffer::SetBuffer ( int index, sample_t* buffer )
     {
+        assert(fPortBuffer);
         fPortBuffer[index] = buffer;
     }
 
     sample_t* NetAudioBuffer::GetBuffer ( int index )
     {
+        assert(fPortBuffer);
         return fPortBuffer[index];
     }
 

@@ -142,8 +142,10 @@ namespace Jack
                     ( fParams.fSlaveSyncMode ) ? "sync" : "async", ( fParams.fTransportSync ) ? "with" : "without" );
 
         //init network
-        if ( !JackNetSlaveInterface::Init() )
+        if (!JackNetSlaveInterface::Init()) {
+            jack_error("Starting network fails...");
             return false;
+        }
 
         //set global parameters
         SetParams();
@@ -163,14 +165,13 @@ namespace Jack
         }
 
         //register jack ports
-        if ( AllocPorts() != 0 )
-        {
-            jack_error ( "Can't allocate ports." );
+        if (AllocPorts() != 0) {
+            jack_error("Can't allocate ports.");
             return false;
         }
 
         //init done, display parameters
-        SessionParamsDisplay ( &fParams );
+        SessionParamsDisplay(&fParams);
 
         //monitor
 #ifdef JACK_MONITOR
