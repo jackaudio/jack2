@@ -44,7 +44,7 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
         
                 JackDriver* fDriver;
                 JackThread fThread;
-                bool fRunning;
+                volatile bool fRunning;
                 
                 JackDriverStarter(JackDriver* driver)
                     :fDriver(driver),fThread(this),fRunning(false)

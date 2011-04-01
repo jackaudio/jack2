@@ -571,7 +571,7 @@ bool JackSocketServerChannel::Execute()
         return true;
 
     } catch (JackQuitException& e) {
-        jack_log("JackMachServerChannel::Execute JackQuitException");
+        jack_log("JackSocketServerChannel::Execute JackQuitException");
         return false;
     }
 }

@@ -71,6 +71,7 @@ int JackExternalClient::Open(const char* name, int pid, int refnum, int uuid, in
 
 int JackExternalClient::Close()
 {
+    jack_log("JackExternalClient::Close");
     fChannel.Close();
     if (fClientControl) {
         fClientControl->~JackClientControl();

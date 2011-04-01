@@ -532,12 +532,12 @@ int main(int argc, char* argv[])
     if (! jackctl_server_stop(server_ctl)) {
         fprintf(stderr, "Cannot stop server...\n");
     }
-    if (notify_sent) {
-        notify_server_stop(server_name);
-    }
  close_server:
     jackctl_server_close(server_ctl);
  destroy_server:
     jackctl_server_destroy(server_ctl);
+    if (notify_sent) {
+        notify_server_stop(server_name);
+    }
     return return_value;
 }
