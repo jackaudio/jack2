@@ -46,6 +46,16 @@ class JackFreewheelDriver : public JackDriver
         }
 
         int Process();
+
+        int ProcessRead();
+        int ProcessWrite();
+
+        int ProcessReadSync();
+        int ProcessWriteSync();
+
+        int ProcessReadAsync();
+        int ProcessWriteAsync();
+
 };
 
 } // end of namespace

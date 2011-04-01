@@ -55,14 +55,40 @@ int JackAlsaDriver::SetBufferSize(jack_nframes_t buffer_size)
                                            ((alsa_driver_t *)fDriver)->frame_rate);
 
     if (res == 0) { // update fEngineControl and fGraphManager
-        JackAudioDriver::SetBufferSize(buffer_size); // never fails
+        JackAudioDriver::SetBufferSize(buffer_size);  // Generic change, never fails
+        // ALSA specific
+        UpdateLatencies();
     } else {
+        // Restore old values
         alsa_driver_reset_parameters((alsa_driver_t *)fDriver, fEngineControl->fBufferSize,
                                      ((alsa_driver_t *)fDriver)->user_nperiods,
                                      ((alsa_driver_t *)fDriver)->frame_rate);
     }
 
     return res;
+}
+
+void JackAlsaDriver::UpdateLatencies()
+{
+    jack_latency_range_t range;
+    alsa_driver_t* alsa_driver = (alsa_driver_t*)fDriver;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        // Add one buffer more latency if "async" mode is used...
+        range.min = range.max = (alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
+                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency;
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+        // Monitor port
+        if (fWithMonitorPorts) {
+            range.min = range.max = alsa_driver->frames_per_cycle;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
 }
 
 int JackAlsaDriver::Attach()
@@ -72,7 +98,6 @@ int JackAlsaDriver::Attach()
     unsigned long port_flags = (unsigned long)CaptureDriverFlags;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
 
     assert(fCaptureChannels < DRIVER_PORT_NUM);
     assert(fPlaybackChannels < DRIVER_PORT_NUM);
@@ -97,8 +122,6 @@ int JackAlsaDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        range.min = range.max = alsa_driver->frames_per_cycle + alsa_driver->capture_frame_latency;
-        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
         jack_log("JackAlsaDriver::Attach fCapturePortList[i] %ld ", port_index);
     }
@@ -114,11 +137,6 @@ int JackAlsaDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        // Add one buffer more latency if "async" mode is used...
-        range.min = range.max = (alsa_driver->frames_per_cycle * (alsa_driver->user_nperiods - 1)) +
-                         ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + alsa_driver->playback_frame_latency;
-
-        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAlsaDriver::Attach fPlaybackPortList[i] %ld ", port_index);
 
@@ -129,13 +147,12 @@ int JackAlsaDriver::Attach()
             if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
                 jack_error ("ALSA: cannot register monitor port for %s", name);
             } else {
-                port = fGraphManager->GetPort(port_index);
-                range.min = range.max = alsa_driver->frames_per_cycle;
-                port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
             }
         }
     }
+
+    UpdateLatencies();
 
     if (alsa_driver->midi) {
         int err = (alsa_driver->midi->attach)(alsa_driver->midi);

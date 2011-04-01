@@ -44,12 +44,17 @@ JackAudioDriver::~JackAudioDriver()
 
 int JackAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
+    // Update engine and graph manager state
     fEngineControl->fBufferSize = buffer_size;
     fGraphManager->SetBufferSize(buffer_size);
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
     if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    return 0;
+
+    UpdateLatencies();
+
+    // Redirect on slaves drivers...
+    return JackDriver::SetBufferSize(buffer_size);
 }
 
 int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
@@ -58,7 +63,8 @@ int JackAudioDriver::SetSampleRate(jack_nframes_t sample_rate)
     fEngineControl->fPeriodUsecs = jack_time_t(1000000.f / fEngineControl->fSampleRate * fEngineControl->fBufferSize);	// in microsec
     if (!fEngineControl->fTimeOut)
         fEngineControl->fTimeOutUsecs = jack_time_t(2.f * fEngineControl->fPeriodUsecs);
-    return 0;
+
+    return JackDriver::SetSampleRate(sample_rate);
 }
 
 int JackAudioDriver::Open(jack_nframes_t buffer_size,
@@ -95,13 +101,33 @@ int JackAudioDriver::Open(bool capturing,
     return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
+void JackAudioDriver::UpdateLatencies()
+{
+    jack_latency_range_t range;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        range.max = range.min = fEngineControl->fBufferSize;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (! fEngineControl->fSyncMode) {
+            range.max = range.min = fEngineControl->fBufferSize * 2;
+        }
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+        if (fWithMonitorPorts) {
+            range.min = range.max = fEngineControl->fBufferSize;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
+}
+
 int JackAudioDriver::Attach()
 {
     JackPort* port;
     jack_port_id_t port_index;
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
     int i;
 
     jack_log("JackAudioDriver::Attach fBufferSize = %ld fSampleRate = %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
@@ -115,8 +141,6 @@ int JackAudioDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        range.min = range.max = fEngineControl->fBufferSize + fCaptureLatency;
-        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
     }
@@ -130,9 +154,6 @@ int JackAudioDriver::Attach()
         }
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        // Add more latency if "async" mode is used...
-        range.min = range.max = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + fPlaybackLatency;
-        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
 
@@ -144,14 +165,12 @@ int JackAudioDriver::Attach()
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
-                port = fGraphManager->GetPort(port_index);
-                range.min = range.max = fEngineControl->fBufferSize;
-                port->SetLatencyRange(JackCaptureLatency, &range);
-                fMonitorPortList[i] = port_index;
+                 fMonitorPortList[i] = port_index;
             }
         }
     }
 
+    UpdateLatencies();
     return 0;
 }
 
@@ -193,9 +212,9 @@ int JackAudioDriver::ProcessNull()
     JackDriver::CycleTakeBeginTime();
 
     if (fEngineControl->fSyncMode) {
-        ProcessGraphSync();
+        ProcessGraphSyncMaster();
     } else {
-        ProcessGraphAsync();
+        ProcessGraphAsyncMaster();
     }
 
     // Keep end cycle time
@@ -230,9 +249,9 @@ int JackAudioDriver::ProcessAsync()
 
     // Process graph
     if (fIsMaster) {
-        ProcessGraphAsync();
+        ProcessGraphAsyncMaster();
     } else {
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
+        ProcessGraphAsyncSlave();
     }
 
     // Keep end cycle time
@@ -255,12 +274,12 @@ int JackAudioDriver::ProcessSync()
 
     // Process graph
     if (fIsMaster) {
-        if (ProcessGraphSync() < 0) {
+        if (ProcessGraphSyncMaster() < 0) {
             jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
             goto end;
         }
     } else {
-        if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+        if (ProcessGraphSyncSlave() < 0) {
             jack_error("JackAudioDriver::ProcessSync: process error, skip cycle...");
             goto end;
         }
@@ -279,27 +298,50 @@ end:
     return 0;
 }
 
-void JackAudioDriver::ProcessGraphAsync()
+void JackAudioDriver::ProcessGraphAsyncMaster()
 {
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
     if (!fEngine->Process(fBeginDateUst, fEndDateUst))
-        jack_error("JackAudioDriver::ProcessGraphAsync: Process error");
-    fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
-    if (ProcessSlaves() < 0)
-        jack_error("JackAudioDriver::ProcessGraphAsync: ProcessSlaves error");
+        jack_error("JackAudioDriver::ProcessGraphAsyncMaster: Process error");
+
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0)
+        jack_error("JackAudioDriver::ProcessGraphAsyncMaster: ResumeRefNum error");
+
+    if (ProcessReadSlaves() < 0)
+        jack_error("JackAudioDriver::ProcessGraphAsyncMaster: ProcessReadSlaves error");
+
+     if (ProcessWriteSlaves() < 0)
+        jack_error("JackAudioDriver::ProcessGraphAsyncMaster: ProcessWriteSlaves error");
 }
 
-int JackAudioDriver::ProcessGraphSync()
+void JackAudioDriver::ProcessGraphAsyncSlave()
+{
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0)
+        jack_error("JackAudioDriver::ProcessGraphAsyncSlave: ResumeRefNum error");
+}
+
+int JackAudioDriver::ProcessGraphSyncMaster()
 {
     int res = 0;
 
     // fBeginDateUst is set in the "low level" layer, fEndDateUst is from previous cycle
     if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
-        fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
-        if (ProcessSlaves() < 0) {
-            jack_error("JackAudioDriver::ProcessGraphSync: ProcessSlaves error, engine may now behave abnormally!!");
+
+        if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+            jack_error("JackAudioDriver::ProcessGraphSyncMaster: ResumeRefNum error");
             res = -1;
         }
+
+        if (ProcessReadSlaves() < 0) {
+            jack_error("JackAudioDriver::ProcessGraphSync: ProcessReadSlaves error, engine may now behave abnormally!!");
+            res = -1;
+        }
+
+        if (ProcessWriteSlaves() < 0) {
+            jack_error("JackAudioDriver::ProcessGraphSync: ProcessWriteSlaves error, engine may now behave abnormally!!");
+            res = -1;
+        }
+
         if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, DRIVER_TIMEOUT_FACTOR * fEngineControl->fTimeOutUsecs) < 0) {
             jack_error("JackAudioDriver::ProcessGraphSync: SuspendRefNum error, engine may now behave abnormally!!");
             res = -1;
@@ -310,6 +352,11 @@ int JackAudioDriver::ProcessGraphSync()
     }
 
     return res;
+}
+
+int JackAudioDriver::ProcessGraphSyncSlave()
+{
+   return fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
 }
 
 int JackAudioDriver::Start()

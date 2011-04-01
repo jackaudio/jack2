@@ -151,8 +151,16 @@ namespace Jack
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-        assert ( fMidiCapturePortList );
-        assert ( fMidiPlaybackPortList );
+
+        assert(fMidiCapturePortList);
+        assert(fMidiPlaybackPortList);
+
+        for (uint midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+            fMidiCapturePortList[midi_port_index] = NULL;
+        }
+        for (uint midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
+            fMidiPlaybackPortList[midi_port_index] = NULL;
+        }
 
         //register jack ports
         if ( AllocPorts() != 0 )
@@ -362,20 +370,32 @@ namespace Jack
     {
         jack_log ( "JackNetDriver::FreePorts" );
 
-        int audio_port_index;
-        uint midi_port_index;
-        for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
-            if (fCapturePortList[audio_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index] );
-        for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
-            if (fPlaybackPortList[audio_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index] );
-        for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
-            if (fMidiCapturePortList[midi_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index] );
-        for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
-            if (fMidiPlaybackPortList[midi_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index] );
+        for (int audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++) {
+            if (fCapturePortList[audio_port_index] > 0) {
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index]);
+            }
+        }
+
+        for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
+            if (fPlaybackPortList[audio_port_index] > 0) {
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index]);
+            }
+        }
+
+        for (uint midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+            if (fMidiCapturePortList && fMidiCapturePortList[midi_port_index] > 0) {
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index]);
+            }
+        }
+
+        for (uint midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
+            if (fMidiPlaybackPortList && fMidiPlaybackPortList[midi_port_index] > 0) {
+                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index]);
+            }
+        }
+        // Clear MIDI channels
+        fParams.fSendMidiChannels = 0;
+        fParams.fReturnMidiChannels = 0;
         return 0;
     }
 

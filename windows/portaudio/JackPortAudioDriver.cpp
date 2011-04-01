@@ -86,13 +86,11 @@ namespace Jack
             return -1;
 
         //get devices
-        if (capturing)
-        {
+        if (capturing) {
             if (fPaDevices->GetInputDeviceFromName(capture_driver_uid, fInputDevice, in_max) < 0)
                 goto error;
         }
-        if (playing)
-        {
+        if (playing) {
             if (fPaDevices->GetOutputDeviceFromName(playback_driver_uid, fOutputDevice, out_max) < 0)
                 goto error;
         }
@@ -100,25 +98,21 @@ namespace Jack
         jack_log("JackPortAudioDriver::Open fInputDevice = %d, fOutputDevice %d", fInputDevice, fOutputDevice);
 
         //default channels number required
-        if (inchannels == 0)
-        {
+        if (inchannels == 0) {
             jack_log("JackPortAudioDriver::Open setup max in channels = %ld", in_max);
             inchannels = in_max;
         }
-        if (outchannels == 0)
-        {
+        if (outchannels == 0) {
             jack_log("JackPortAudioDriver::Open setup max out channels = %ld", out_max);
             outchannels = out_max;
         }
 
         //too many channels required, take max available
-        if (inchannels > in_max)
-        {
+        if (inchannels > in_max) {
             jack_error("This device has only %d available input channels.", in_max);
             inchannels = in_max;
         }
-        if (outchannels > out_max)
-        {
+        if (outchannels > out_max) {
             jack_error("This device has only %d available output channels.", out_max);
             outchannels = out_max;
         }
@@ -148,8 +142,7 @@ namespace Jack
                             paNoFlag,  // Clipping is on...
                             Render,
                             this);
-        if (err != paNoError)
-        {
+        if (err != paNoError) {
             jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             goto error;
         }
@@ -218,13 +211,12 @@ error:
         PaStreamParameters inputParameters;
         PaStreamParameters outputParameters;
 
-        if ((err = Pa_CloseStream(fStream)) != paNoError)
-        {
+        if ((err = Pa_CloseStream(fStream)) != paNoError) {
             jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
             return -1;
         }
 
-        //change parametering
+        // Update parameters
         inputParameters.device = fInputDevice;
         inputParameters.channelCount = fCaptureChannels;
         inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
@@ -250,15 +242,14 @@ error:
                             Render,
                             this);
 
-        if (err != paNoError)
-        {
+        if (err != paNoError) {
             jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             return -1;
-        }
-        else
-        {
-            // Only done when success
-            return JackAudioDriver::SetBufferSize(buffer_size); // never fails
+        } else {
+            JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
+            // PortAudio specific
+            JackAudioDriver::UpdateLatencies();
+            return 0;
         }
     }
 

@@ -1,5 +1,6 @@
 /*
 Copyright (C) 2009 Grame
+Copyright (C) 2011 Devin Anderson
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,61 +21,74 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __JackCoreMidiDriver__
 #define __JackCoreMidiDriver__
 
-#include <CoreMIDI/CoreMIDI.h>
+#include "JackCoreMidiPhysicalInputPort.h"
+#include "JackCoreMidiPhysicalOutputPort.h"
+#include "JackCoreMidiVirtualInputPort.h"
+#include "JackCoreMidiVirtualOutputPort.h"
 #include "JackMidiDriver.h"
-#include "JackTime.h"
 
-namespace Jack
-{
+namespace Jack {
 
-/*!
-\brief The CoreMidi driver.
-*/
-
-class JackCoreMidiDriver : public JackMidiDriver
-{
+    class JackCoreMidiDriver: public JackMidiDriver {
 
     private:
 
-        MIDIClientRef fMidiClient;
-        MIDIPortRef fInputPort;
-        MIDIPortRef fOutputPort;
-        MIDIEndpointRef* fMidiDestination;
-        MIDIEndpointRef* fMidiSource;
+        static void
+        HandleInputEvent(const MIDIPacketList *packet_list, void *driver,
+                         void *port);
 
-        char fMIDIBuffer[BUFFER_SIZE_MAX * sizeof(jack_default_audio_sample_t)];
+        static void
+        HandleNotificationEvent(const MIDINotification *message, void *driver);
 
-        int fRealCaptureChannels;
-        int fRealPlaybackChannels;
+        void
+        HandleNotification(const MIDINotification *message);
 
-        static void ReadProcAux(const MIDIPacketList *pktlist, jack_ringbuffer_t* ringbuffer);
-        static void ReadProc(const MIDIPacketList *pktlist, void *refCon, void *connRefCon);
-        static void ReadVirtualProc(const MIDIPacketList *pktlist, void *refCon, void *connRefCon);
-        static void NotifyProc(const MIDINotification *message, void *refCon);
+        MIDIClientRef client;
+        MIDIPortRef internal_input;
+        MIDIPortRef internal_output;
+        int num_physical_inputs;
+        int num_physical_outputs;
+        int num_virtual_inputs;
+        int num_virtual_outputs;
+        JackCoreMidiPhysicalInputPort **physical_input_ports;
+        JackCoreMidiPhysicalOutputPort **physical_output_ports;
+        double time_ratio;
+        JackCoreMidiVirtualInputPort **virtual_input_ports;
+        JackCoreMidiVirtualOutputPort **virtual_output_ports;
 
     public:
 
-        JackCoreMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
-        virtual ~JackCoreMidiDriver();
+        JackCoreMidiDriver(const char* name, const char* alias,
+                           JackLockedEngine* engine, JackSynchro* table);
 
-        int Open( bool capturing,
-                 bool playing,
-                 int chan_in,
-                 int chan_out,
-                 bool monitor,
-                 const char* capture_driver_name,
-                 const char* playback_driver_name,
-                 jack_nframes_t capture_latency,
-                 jack_nframes_t playback_latency);
-        int Close();
+        ~JackCoreMidiDriver();
 
-        int Attach();
+        int
+        Attach();
 
-        int Read();
-        int Write();
+        int
+        Close();
 
-};
+        int
+        Open(bool capturing, bool playing, int num_inputs, int num_outputs,
+             bool monitor, const char* capture_driver_name,
+             const char* playback_driver_name, jack_nframes_t capture_latency,
+             jack_nframes_t playback_latency);
 
-} // end of namespace
+        int
+        Read();
+
+        int
+        Start();
+
+        int
+        Stop();
+
+        int
+        Write();
+
+    };
+
+}
 
 #endif

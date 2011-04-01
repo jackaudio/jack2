@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009 Devin Anderson
+Copyright (C) 2010 Devin Anderson
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -17,38 +17,23 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackFFADOMidiOutput__
-#define __JackFFADOMidiOutput__
+#ifndef __JackMidiReceiveQueue__
+#define __JackMidiReceiveQueue__
 
-#include "JackPhysicalMidiOutput.h"
+#include "JackMidiReadQueue.h"
 
 namespace Jack {
 
-    class JackFFADOMidiOutput: public JackPhysicalMidiOutput {
+    /**
+     * Implemented by MIDI input connections.
+     */
 
-    private:
-
-        uint32_t *output_buffer;
-
-    protected:
-
-        jack_nframes_t
-        Advance(jack_nframes_t);
-
-        jack_nframes_t
-        Send(jack_nframes_t, jack_midi_data_t);
+    class SERVER_EXPORT JackMidiReceiveQueue: public JackMidiReadQueue {
 
     public:
 
-        JackFFADOMidiOutput(size_t non_rt_buffer_size=1024,
-                            size_t rt_buffer_size=64);
-        ~JackFFADOMidiOutput();
-
-        inline void
-        SetOutputBuffer(uint32_t *output_buffer)
-        {
-            this->output_buffer = output_buffer;
-        }
+        virtual
+        ~JackMidiReceiveQueue();
 
     };
 

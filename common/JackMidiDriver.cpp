@@ -104,6 +104,7 @@ int JackMidiDriver::Attach()
         jack_log("JackMidiDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
     }
 
+    UpdateLatencies();
     return 0;
 }
 
@@ -133,33 +134,108 @@ int JackMidiDriver::Write()
     return 0;
 }
 
+void JackMidiDriver::UpdateLatencies()
+{
+    jack_latency_range_t range;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        range.max = range.min = fEngineControl->fBufferSize;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        if (! fEngineControl->fSyncMode) {
+            range.max = range.min = fEngineControl->fBufferSize * 2;
+        }
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+    }
+}
+
+int JackMidiDriver::SetBufferSize(jack_nframes_t buffer_size)
+{
+    UpdateLatencies();
+    return 0;
+}
+
 int JackMidiDriver::ProcessNull()
 {
     return 0;
 }
 
-int JackMidiDriver::Process()
+int JackMidiDriver::ProcessRead()
 {
+    return (fEngineControl->fSyncMode) ? ProcessReadSync() : ProcessReadAsync();
+}
+
+int JackMidiDriver::ProcessWrite()
+{
+    return (fEngineControl->fSyncMode) ? ProcessWriteSync() : ProcessWriteAsync();
+}
+
+int JackMidiDriver::ProcessReadSync()
+{
+    int res = 0;
+
     // Read input buffers for the current cycle
     if (Read() < 0) {
-        jack_error("JackMidiDriver::Process: read error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+        jack_error("JackMidiDriver::ProcessReadSync: read error, skip cycle");
+        res = -1;
     }
 
-    fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable);
-    if (fEngineControl->fSyncMode) {
-        if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable, fEngineControl->fTimeOutUsecs) < 0) {
-            jack_error("JackFreewheelDriver::ProcessSync SuspendRefNum error");
-            return -1;
-        }
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+        jack_error("JackMidiDriver::ProcessReadSync - ResumeRefNum error");
+        res = -1;
     }
 
-    // Write output buffers for the current cycle
+    return res;
+}
+
+int JackMidiDriver::ProcessWriteSync()
+{
+    int res = 0;
+
+    if (fGraphManager->SuspendRefNum(&fClientControl, fSynchroTable,
+                                     DRIVER_TIMEOUT_FACTOR *
+                                     fEngineControl->fTimeOutUsecs) < 0) {
+        jack_error("JackMidiDriver::ProcessWriteSync - SuspendRefNum error");
+        res = -1;
+    }
+
+    // Write output buffers from the current cycle
     if (Write() < 0) {
-        jack_error("JackMidiDriver::Process: write error, skip cycle");
-        return 0;   // Skip cycle, but continue processing...
+        jack_error("JackMidiDriver::ProcessWriteSync - Write error");
+        res = -1;
     }
 
+    return res;
+}
+
+int JackMidiDriver::ProcessReadAsync()
+{
+    int res = 0;
+
+    // Read input buffers for the current cycle
+    if (Read() < 0) {
+        jack_error("JackMidiDriver::ProcessReadAsync: read error, skip cycle");
+        res = -1;
+    }
+
+    // Write output buffers from the previous cycle
+    if (Write() < 0) {
+        jack_error("JackMidiDriver::ProcessReadAsync - Write error");
+        res = -1;
+    }
+
+    if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable) < 0) {
+        jack_error("JackMidiDriver::ProcessReadAsync - ResumeRefNum error");
+        res = -1;
+    }
+
+    return res;
+}
+
+int JackMidiDriver::ProcessWriteAsync()
+{
     return 0;
 }
 

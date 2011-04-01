@@ -40,7 +40,7 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionOutput	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionGlobal	((CAAudioHardwareDeviceSectionID)0x00)
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
-    
+
 #define WAIT_COUNTER 60
 
 /*!
@@ -74,13 +74,13 @@ class JackCoreAudioDriver : public JackAudioDriver
         float fIOUsage;
         float fComputationGrain;
         bool fClockDriftCompensate;
-    
-        /*    
+
+        /*
     #ifdef MAC_OS_X_VERSION_10_5
         AudioDeviceIOProcID fMesureCallbackID;
     #endif
         */
-    
+
         static	OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
@@ -106,13 +106,13 @@ class JackCoreAudioDriver : public JackAudioDriver
         OSStatus GetDefaultOutputDevice(AudioDeviceID* id);
         OSStatus GetDeviceNameFromID(AudioDeviceID id, char* name);
         OSStatus GetTotalChannels(AudioDeviceID device, int& channelCount, bool isInput);
-   
+
         // Setup
         OSStatus CreateAggregateDevice(AudioDeviceID captureDeviceID, AudioDeviceID playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus CreateAggregateDeviceAux(vector<AudioDeviceID> captureDeviceID, vector<AudioDeviceID> playbackDeviceID, jack_nframes_t samplerate, AudioDeviceID* outAggregateDevice);
         OSStatus DestroyAggregateDevice();
         bool IsAggregateDevice(AudioDeviceID device);
-        
+
         int SetupDevices(const char* capture_driver_uid,
                          const char* playback_driver_uid,
                          char* capture_driver_name,
@@ -146,9 +146,11 @@ class JackCoreAudioDriver : public JackAudioDriver
 
         int AddListeners();
         void RemoveListeners();
-        
+
         bool TakeHogAux(AudioDeviceID deviceID, bool isInput);
         bool TakeHog();
+
+        void UpdateLatencies();
 
     public:
 

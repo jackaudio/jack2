@@ -39,15 +39,23 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
 
         int fCaptureChannels;
         int fPlaybackChannels;
-        
+
         jack_ringbuffer_t* fRingBuffer[DRIVER_PORT_NUM];
 
         jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
         jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
-   
+
         JackMidiBuffer* GetInputBuffer(int port_index);
         JackMidiBuffer* GetOutputBuffer(int port_index);
- 
+
+        virtual int ProcessReadSync();
+        virtual int ProcessWriteSync();
+
+        virtual int ProcessReadAsync();
+        virtual int ProcessWriteAsync();
+
+        virtual void UpdateLatencies();
+
     public:
 
         JackMidiDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table);
@@ -62,16 +70,20 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
                         const char* playback_driver_name,
                         jack_nframes_t capture_latency,
                         jack_nframes_t playback_latency);
-                        
-        virtual int Process();
+
+        virtual int SetBufferSize(jack_nframes_t buffer_size);
+
+        virtual int ProcessRead();
+        virtual int ProcessWrite();
+
         virtual int ProcessNull();
 
         virtual int Attach();
         virtual int Detach();
-        
+
         virtual int Read();
         virtual int Write();
- 
+
 };
 
 } // end of namespace

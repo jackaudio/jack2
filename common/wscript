@@ -130,8 +130,21 @@ def build(bld):
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
-        'JackPhysicalMidiInput.cpp',
-        'JackPhysicalMidiOutput.cpp',
+
+        #'JackPhysicalMidiInput.cpp',
+        #'JackPhysicalMidiOutput.cpp',
+
+        'JackMidiAsyncQueue.cpp',
+        'JackMidiAsyncWaitQueue.cpp',
+        'JackMidiBufferReadQueue.cpp',
+        'JackMidiBufferWriteQueue.cpp',
+        'JackMidiRawInputWriteQueue.cpp',
+        'JackMidiRawOutputWriteQueue.cpp',
+        'JackMidiReadQueue.cpp',
+        'JackMidiReceiveQueue.cpp',
+        'JackMidiSendQueue.cpp',
+        'JackMidiUtil.cpp',
+        'JackMidiWriteQueue.cpp'
         ]
 
     if bld.env['IS_LINUX']:

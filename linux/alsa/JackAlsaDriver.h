@@ -42,6 +42,8 @@ class JackAlsaDriver : public JackAudioDriver
         int fReservedCaptureDevice;
         int fReservedPlaybackDevice;
 
+        void UpdateLatencies();
+
     public:
 
         JackAlsaDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table)

@@ -35,8 +35,12 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
     protected:
 
-        void ProcessGraphAsync();
-        int ProcessGraphSync();
+        void ProcessGraphAsyncMaster();
+        void ProcessGraphAsyncSlave();
+
+        int ProcessGraphSyncMaster();
+        int ProcessGraphSyncSlave();
+
         void WaitUntilNextCycle();
 
         virtual int ProcessAsync();
@@ -58,6 +62,7 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
         jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
 
         void HandleLatencyCallback(int status);
+        void UpdateLatencies();
 
     public:
 

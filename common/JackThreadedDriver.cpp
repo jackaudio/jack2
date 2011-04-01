@@ -127,9 +127,24 @@ void JackThreadedDriver::RemoveSlave(JackDriverInterface* slave)
     fDriver->RemoveSlave(slave);
 }
 
-int JackThreadedDriver::ProcessSlaves()
+int JackThreadedDriver::ProcessReadSlaves()
 {
-    return fDriver->ProcessSlaves();
+    return fDriver->ProcessReadSlaves();
+}
+
+int JackThreadedDriver::ProcessWriteSlaves()
+{
+    return fDriver->ProcessWriteSlaves();
+}
+
+int JackThreadedDriver::ProcessRead()
+{
+    return fDriver->ProcessRead();
+}
+
+int JackThreadedDriver::ProcessWrite()
+{
+    return fDriver->ProcessWrite();
 }
 
 std::list<JackDriverInterface*> JackThreadedDriver::GetSlaves()

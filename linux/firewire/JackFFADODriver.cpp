@@ -36,8 +36,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <string.h>
 
 #include "JackFFADODriver.h"
-#include "JackFFADOMidiInput.h"
-#include "JackFFADOMidiOutput.h"
+#include "JackFFADOMidiInputPort.h"
+#include "JackFFADOMidiOutputPort.h"
 #include "JackEngineControl.h"
 #include "JackClientControl.h"
 #include "JackPort.h"
@@ -94,14 +94,9 @@ JackFFADODriver::ffado_driver_read (ffado_driver_t * driver, jack_nframes_t nfra
     /* process the midi data */
     for (chn = 0; chn < driver->capture_nchannels; chn++) {
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
-            JackFFADOMidiInput *midi_input = (JackFFADOMidiInput *) driver->capture_channels[chn].midi_input;
+            JackFFADOMidiInputPort *midi_input = (JackFFADOMidiInputPort *) driver->capture_channels[chn].midi_input;
             JackMidiBuffer *buffer = (JackMidiBuffer *) fGraphManager->GetBuffer(fCapturePortList[chn], nframes);
-            if (! buffer) {
-                continue;
-            }
-            midi_input->SetInputBuffer(driver->capture_channels[chn].midi_buffer);
-            midi_input->SetPortBuffer(buffer);
-            midi_input->Process(nframes);
+            midi_input->Process(buffer, driver->capture_channels[chn].midi_buffer, nframes);
         }
     }
 
@@ -138,16 +133,9 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
                 memset(midi_buffer, 0, nframes * sizeof(uint32_t));
                 buf = (jack_default_audio_sample_t *) fGraphManager->GetBuffer(fPlaybackPortList[chn], nframes);
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(midi_buffer));
-                /* if the returned buffer is invalid, continue */
-                if (!buf) {
-                    ffado_streaming_playback_stream_onoff(driver->dev, chn, 0);
-                    continue;
-                }
-                ffado_streaming_playback_stream_onoff(driver->dev, chn, 1);
-                JackFFADOMidiOutput *midi_output = (JackFFADOMidiOutput *) driver->playback_channels[chn].midi_output;
-                midi_output->SetPortBuffer((JackMidiBuffer *) buf);
-                midi_output->SetOutputBuffer(midi_buffer);
-                midi_output->Process(nframes);
+                ffado_streaming_playback_stream_onoff(driver->dev, chn, buf ? 1 : 0);
+                JackFFADOMidiOutputPort *midi_output = (JackFFADOMidiOutputPort *) driver->playback_channels[chn].midi_output;
+                midi_output->Process((JackMidiBuffer *) buf, midi_buffer, nframes);
 
             } else { // always have a valid buffer
                 ffado_streaming_set_playback_stream_buffer(driver->dev, chn, (char *)(driver->nullbuffer));
@@ -155,9 +143,7 @@ JackFFADODriver::ffado_driver_write (ffado_driver_t * driver, jack_nframes_t nfr
             }
         }
     }
-
     ffado_streaming_transfer_playback_buffers(driver->dev);
-
     printExit();
     return 0;
 }
@@ -476,7 +462,7 @@ int JackFFADODriver::Attach()
                 printError(" cannot enable port %s", buf);
             }
 
-            driver->capture_channels[chn].midi_input = new JackFFADOMidiInput();
+            driver->capture_channels[chn].midi_input = new JackFFADOMidiInputPort();
             // setup the midi buffer
             driver->capture_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
@@ -557,12 +543,12 @@ int JackFFADODriver::Attach()
             // This constructor optionally accepts arguments for the
             // non-realtime buffer size and the realtime buffer size.  Ideally,
             // these would become command-line options for the FFADO driver.
-            driver->playback_channels[chn].midi_output = new JackFFADOMidiOutput();
+            driver->playback_channels[chn].midi_output = new JackFFADOMidiOutputPort();
 
             driver->playback_channels[chn].midi_buffer = (uint32_t *)calloc(driver->period_size, sizeof(uint32_t));
 
             port = fGraphManager->GetPort(port_index);
-            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + driver->playback_frame_latency;
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
@@ -600,7 +586,7 @@ int JackFFADODriver::Detach()
         if (driver->capture_channels[chn].midi_buffer)
             free(driver->capture_channels[chn].midi_buffer);
         if (driver->capture_channels[chn].midi_input)
-            delete ((JackFFADOMidiInput *) (driver->capture_channels[chn].midi_input));
+            delete ((JackFFADOMidiInputPort *) (driver->capture_channels[chn].midi_input));
     }
     free(driver->capture_channels);
 
@@ -608,7 +594,7 @@ int JackFFADODriver::Detach()
         if (driver->playback_channels[chn].midi_buffer)
             free(driver->playback_channels[chn].midi_buffer);
         if (driver->playback_channels[chn].midi_output)
-            delete ((JackFFADOMidiOutput *) (driver->playback_channels[chn].midi_output));
+            delete ((JackFFADOMidiOutputPort *) (driver->playback_channels[chn].midi_output));
     }
     free(driver->playback_channels);
 
