@@ -1365,7 +1365,7 @@ render_payload_to_jack_ports_celt (void *packet_payload, jack_nframes_t net_peri
         {
             // audio port, decode celt data.
             CELTDecoder *decoder = src_node->data;
-    #if HAVE_CELT_API_0_8 | HAVE_CELT_API_0_11
+    #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
             if( !packet_payload )
                 celt_decode_float( decoder, NULL, net_period_down, buf, nframes );
             else
@@ -1417,7 +1417,7 @@ render_jack_ports_to_payload_celt (JSList *playback_ports, JSList *playback_srcs
 	    float *floatbuf = alloca (sizeof(float) * nframes );
 	    memcpy( floatbuf, buf, nframes*sizeof(float) );
 	    CELTEncoder *encoder = src_node->data;
-#if HAVE_CELT_API_0_8 | HAVE_CELT_API_0_11
+#if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
 	    encoded_bytes = celt_encode_float( encoder, floatbuf, nframes, packet_bufX, net_period_up );
 #else
 	    encoded_bytes = celt_encode_float( encoder, floatbuf, NULL, packet_bufX, net_period_up );
