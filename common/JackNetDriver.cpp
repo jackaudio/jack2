@@ -622,32 +622,32 @@ namespace Jack
             i++;
             strcpy ( desc->params[i].name, "input_ports" );
             desc->params[i].character = 'C';
-            desc->params[i].type = JackDriverParamUInt;
-            desc->params[i].value.ui = 2;
+            desc->params[i].type = JackDriverParamInt;
+            desc->params[i].value.i = -1;
             strcpy ( desc->params[i].short_desc, "Number of audio input ports" );
             strcpy ( desc->params[i].long_desc, "Number of audio input ports. If -1, audio physical input from the master");
 
             i++;
             strcpy ( desc->params[i].name, "output_ports" );
             desc->params[i].character = 'P';
-            desc->params[i].type = JackDriverParamUInt;
-            desc->params[i].value.ui = 2;
+            desc->params[i].type = JackDriverParamInt;
+            desc->params[i].value.i = -1;
             strcpy ( desc->params[i].short_desc, "Number of audio output ports" );
             strcpy ( desc->params[i].long_desc, "Number of audio output ports. If -1, audio physical output from the master");
 
             i++;
             strcpy ( desc->params[i].name, "midi_in_ports" );
             desc->params[i].character = 'i';
-            desc->params[i].type = JackDriverParamUInt;
-            desc->params[i].value.ui = 0;
+            desc->params[i].type = JackDriverParamInt;
+            desc->params[i].value.i = 0;
             strcpy ( desc->params[i].short_desc, "Number of midi input ports" );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 
             i++;
             strcpy ( desc->params[i].name, "midi_out_ports" );
             desc->params[i].character = 'o';
-            desc->params[i].type = JackDriverParamUInt;
-            desc->params[i].value.ui = 0;
+            desc->params[i].type = JackDriverParamInt;
+            desc->params[i].value.i = 0;
             strcpy ( desc->params[i].short_desc, "Number of midi output ports" );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
 

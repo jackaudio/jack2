@@ -31,7 +31,9 @@ namespace Jack
 
     class SERVER_EXPORT JackNetInterface
     {
+
         protected:
+
             session_params_t fParams;
             JackNetSocket fSocket;
             char fMulticastIP[32];
@@ -40,7 +42,7 @@ namespace Jack
             //headers
             packet_header_t fTxHeader;
             packet_header_t fRxHeader;
-            
+
             // transport
             net_transport_data_t fSendTransportData;
             net_transport_data_t fReturnTransportData;
@@ -93,7 +95,9 @@ namespace Jack
             JackNetInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip );
 
         public:
+
             virtual ~JackNetInterface();
+
     };
 
     /**
@@ -102,32 +106,35 @@ namespace Jack
 
     class SERVER_EXPORT JackNetMasterInterface : public JackNetInterface
     {
+
         protected:
+
             bool fRunning;
             int fCycleOffset;
 
             bool Init();
             int SetRxTimeout();
             void SetParams();
-            
+
             void Exit();
-            
+
             int SyncRecv();
             int SyncSend();
-            
+
             int DataRecv();
             int DataSend();
-            
+
              //sync packet
             void EncodeSyncPacket();
             void DecodeSyncPacket();
 
             int Send ( size_t size, int flags );
             int Recv ( size_t size, int flags );
-            
+
             bool IsSynched();
 
         public:
+
             JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0)
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
@@ -143,25 +150,26 @@ namespace Jack
 
     class SERVER_EXPORT JackNetSlaveInterface : public JackNetInterface
     {
+
         protected:
-        
+
             static uint fSlaveCounter;
-       
+
             bool Init();
             bool InitConnection();
             bool InitRendering();
-            
+
             net_status_t SendAvailableToMaster();
             net_status_t SendStartToMaster();
-            
+
             void SetParams();
-            
+
             int SyncRecv();
             int SyncSend();
-            
+
             int DataRecv();
             int DataSend();
-            
+
             //sync packet
             void EncodeSyncPacket();
             void DecodeSyncPacket();
@@ -170,6 +178,7 @@ namespace Jack
             int Send ( size_t size, int flags );
 
         public:
+
             JackNetSlaveInterface() : JackNetInterface()
             {
                 //open Socket API with the first slave
@@ -182,6 +191,7 @@ namespace Jack
                     }
                 }
             }
+
             JackNetSlaveInterface ( const char* ip, int port ) : JackNetInterface ( ip, port )
             {
                 //open Socket API with the first slave
@@ -194,6 +204,7 @@ namespace Jack
                     }
                 }
             }
+
             ~JackNetSlaveInterface()
             {
                 //close Socket API with the last slave

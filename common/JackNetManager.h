@@ -40,7 +40,6 @@ namespace Jack
 
         private:
 
-        private:
             static int SetProcess ( jack_nframes_t nframes, void* arg );
             static int SetBufferSize (jack_nframes_t nframes, void* arg);
             static void SetTimebaseCallback ( jack_transport_state_t state, jack_nframes_t nframes, jack_position_t* pos, int new_pos, void* arg );
@@ -77,6 +76,7 @@ namespace Jack
             void ConnectPorts();
 
         public:
+
             JackNetMaster ( JackNetSocket& socket, session_params_t& params, const char* multicast_ip);
             ~JackNetMaster ();
 
