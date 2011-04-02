@@ -117,8 +117,7 @@ namespace Jack
 
             int SyncCallback ( jack_transport_state_t state, jack_position_t* pos );
 
-            int CountPhysicalInputs();
-            int CountPhysicalOutputs();
+            int CountIO(int flags);
 
         public:
 

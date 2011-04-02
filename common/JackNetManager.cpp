@@ -542,25 +542,12 @@ namespace Jack
         SocketAPIEnd();
     }
 
-    int JackNetMasterManager::CountPhysicalInputs()
+    int JackNetMasterManager::CountIO(int flags)
     {
         const char **ports;
         int count = 0;
 
-        ports = jack_get_ports(fManagerClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
-        if (ports != NULL) {
-            while(ports[count]) count++;
-            free(ports);
-        }
-        return count;
-    }
-
-    int JackNetMasterManager::CountPhysicalOutputs()
-    {
-        const char **ports;
-        int count = 0;
-
-        ports = jack_get_ports(fManagerClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        ports = jack_get_ports(fManagerClient, NULL, NULL, flags);
         if (ports != NULL) {
             while(ports[count]) count++;
             free(ports);
@@ -697,12 +684,12 @@ namespace Jack
         params.fBitdepth = 0;
 
         if (params.fSendAudioChannels == -1) {
-            params.fSendAudioChannels = CountPhysicalInputs();
-            jack_info( "Takes physical %d inputs for client", params.fSendAudioChannels);
+            params.fSendAudioChannels = CountIO(JackPortIsPhysical | JackPortIsOutput);
+            jack_info("Takes physical %d inputs for client", params.fSendAudioChannels);
         }
 
         if (params.fReturnAudioChannels == -1) {
-            params.fReturnAudioChannels = CountPhysicalOutputs();
+            params.fReturnAudioChannels = CountIO(JackPortIsPhysical | JackPortIsInput);
             jack_info("Takes physical %d outputs for client", params.fReturnAudioChannels);
         }
 

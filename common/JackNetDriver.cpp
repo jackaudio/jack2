@@ -124,7 +124,7 @@ namespace Jack
 
     bool JackNetDriver::Initialize()
     {
-        jack_log("JackNetDriver::Initialize()");
+        jack_log("JackNetDriver::Initialize() ");
 
         //new loading, but existing socket, restart the driver
         if (fSocket.IsSocket()) {
@@ -625,7 +625,7 @@ namespace Jack
             desc->params[i].type = JackDriverParamUInt;
             desc->params[i].value.ui = 2;
             strcpy ( desc->params[i].short_desc, "Number of audio input ports" );
-            strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+            strcpy ( desc->params[i].long_desc, "Number of audio input ports. If -1, audio physical input from the master");
 
             i++;
             strcpy ( desc->params[i].name, "output_ports" );
@@ -633,7 +633,7 @@ namespace Jack
             desc->params[i].type = JackDriverParamUInt;
             desc->params[i].value.ui = 2;
             strcpy ( desc->params[i].short_desc, "Number of audio output ports" );
-            strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+            strcpy ( desc->params[i].long_desc, "Number of audio output ports. If -1, audio physical output from the master");
 
             i++;
             strcpy ( desc->params[i].name, "midi_in_ports" );
@@ -688,8 +688,8 @@ namespace Jack
             uint transport_sync = 1;
             jack_nframes_t period_size = 128;
             jack_nframes_t sample_rate = 48000;
-            int audio_capture_ports = 2;
-            int audio_playback_ports = 2;
+            int audio_capture_ports = -1;
+            int audio_playback_ports = -1;
             int midi_input_ports = 0;
             int midi_output_ports = 0;
             bool monitor = false;
