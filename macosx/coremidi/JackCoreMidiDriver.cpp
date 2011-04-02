@@ -650,7 +650,7 @@ extern "C" {
         i = 0;
         strcpy(desc->params[i].name, "inchannels");
         desc->params[i].character = 'i';
-        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "CoreMIDI virtual bus");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
@@ -658,7 +658,7 @@ extern "C" {
         i++;
         strcpy(desc->params[i].name, "outchannels");
         desc->params[i].character = 'o';
-        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "CoreMIDI virtual bus");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);

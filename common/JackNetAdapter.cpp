@@ -497,10 +497,9 @@ extern "C"
             adapter = new Jack::JackAudioAdapter(jack_client, new Jack::JackNetAdapter(jack_client, buffer_size, sample_rate, params), params, false);
             assert ( adapter );
 
-            if ( adapter->Open() == 0 )
+            if (adapter->Open() == 0) {
                 return 0;
-            else
-            {
+            } else {
                 delete adapter;
                 return 1;
             }

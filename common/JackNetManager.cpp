@@ -37,7 +37,7 @@ namespace Jack
         fSendTransportData.fState = -1;
         fReturnTransportData.fState = -1;
         fLastTransportState = -1;
-        uint port_index;
+        int port_index;
 
         //jack audio ports
         fAudioCapturePorts = new jack_port_t* [fParams.fSendAudioChannels];
@@ -164,7 +164,7 @@ namespace Jack
 //jack ports--------------------------------------------------------------------------
     int JackNetMaster::AllocPorts()
     {
-        uint i;
+        int i;
         char name[24];
         jack_nframes_t port_latency = jack_get_buffer_size ( fJackClient );
         jack_latency_range_t range;
@@ -247,7 +247,7 @@ namespace Jack
 
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports != NULL) {
-            for (unsigned int i = 0; i < fParams.fSendAudioChannels && ports[i]; i++) {
+            for (int i = 0; i < fParams.fSendAudioChannels && ports[i]; i++) {
                 jack_connect(fJackClient, ports[i], jack_port_name(fAudioCapturePorts[i]));
             }
             free(ports);
@@ -255,7 +255,7 @@ namespace Jack
 
         ports = jack_get_ports(fJackClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
         if (ports != NULL) {
-            for (unsigned int i = 0; i < fParams.fReturnAudioChannels && ports[i]; i++) {
+            for (int i = 0; i < fParams.fReturnAudioChannels && ports[i]; i++) {
                 jack_connect(fJackClient, jack_port_name(fAudioPlaybackPorts[i]), ports[i]);
             }
             free(ports);
@@ -266,7 +266,7 @@ namespace Jack
     {
         jack_log ( "JackNetMaster::FreePorts, ID %u", fParams.fID );
 
-        uint port_index;
+        int port_index;
         for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
             if ( fAudioCapturePorts[port_index] )
                 jack_port_unregister ( fJackClient, fAudioCapturePorts[port_index] );
@@ -409,7 +409,7 @@ namespace Jack
         if ( !fRunning )
             return 0;
 
-        uint port_index;
+        int port_index;
         int res = 0;
 
 #ifdef JACK_MONITOR

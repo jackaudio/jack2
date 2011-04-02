@@ -56,6 +56,7 @@ JackDriver::JackDriver()
     fEngine = NULL;
     fGraphManager = NULL;
     fBeginDateUst = 0;
+    fDelayedUsecs = 0.f;
     fIsMaster = true;
     fIsRunning = false;
 }
