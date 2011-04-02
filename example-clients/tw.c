@@ -1,4 +1,4 @@
-/** @file simple_client.c
+/** @file tw.c
  *
  * @brief This simple client demonstrates the basic features of JACK
  * as they would be used by many applications.
@@ -42,56 +42,56 @@ _process (jack_nframes_t nframes)
 {
 	jack_default_audio_sample_t *in, *out;
 	jack_transport_state_t ts = jack_transport_query(client, NULL);
-	
+
 	if (ts == JackTransportRolling) {
-		
+
 		if (client_state == Init)
 			client_state = Run;
-		
+
 		in = jack_port_get_buffer (input_port, nframes);
 		out = jack_port_get_buffer (output_port, nframes);
 		memcpy (out, in,
 			sizeof (jack_default_audio_sample_t) * nframes);
-		
+
 	} else if (ts == JackTransportStopped) {
-		
+
 		if (client_state == Run) {
 			client_state = Exit;
 			return -1;  // to stop the thread
 		}
 	}
 
-	return 0;      
+	return 0;
 }
 
-static void* jack_thread(void *arg) 
+static void* jack_thread(void *arg)
 {
 	jack_client_t* client = (jack_client_t*) arg;
-	
+
 	while (1) {
-    
+
 		jack_nframes_t frames = jack_cycle_wait (client);
 		int status = _process(frames);
 		jack_cycle_signal (client, status);
-        
+
         /*
             Possibly do something else after signaling next clients in the graph
         */
-        
+
         /* End condition */
         if (status != 0)
-            return 0;  
+            return 0;
 	}
-    
+
     /* not reached*/
 	return 0;
 }
 
 /*
-static void* jack_thread(void *arg) 
+static void* jack_thread(void *arg)
 {
 	jack_client_t* client = (jack_client_t*) arg;
-	
+
 	while (1) {
 		jack_nframes_t frames;
 		int status;
@@ -103,7 +103,7 @@ static void* jack_thread(void *arg)
 		frames = jack_cycle_wait (client);
 		status = _process(frames);
 		jack_cycle_signal (client, status);
-		// cycle 3		
+		// cycle 3
 		frames = jack_cycle_wait (client);
 		status = _process(frames);
 		jack_cycle_signal (client, status);
@@ -112,7 +112,7 @@ static void* jack_thread(void *arg)
 		status = _process(frames);
 		jack_cycle_signal (client, status);
 	}
-	
+
 	return 0;
 }
 */
@@ -172,8 +172,8 @@ main (int argc, char *argv[])
 
 	/* tell the JACK server to call `process()' whenever
 	   there is work to be done.
-	*/    
-    if (jack_set_process_thread(client, jack_thread, client) < 0) 
+	*/
+    if (jack_set_process_thread(client, jack_thread, client) < 0)
 		exit(1);
 
 	/* tell the JACK server to call `jack_shutdown()' if
@@ -183,7 +183,7 @@ main (int argc, char *argv[])
 
 	jack_on_shutdown (client, jack_shutdown, 0);
 
-	/* display the current sample rate. 
+	/* display the current sample rate.
 	 */
 
 	printf ("engine sample rate: %" PRIu32 "\n",
@@ -231,7 +231,7 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
-	
+
 	ports = jack_get_ports (client, NULL, NULL,
 				JackPortIsPhysical|JackPortIsInput);
 	if (ports == NULL) {
@@ -244,7 +244,7 @@ main (int argc, char *argv[])
 	}
 
 	free (ports);
-    
+
     /* install a signal handler to properly quits jack client */
     signal(SIGQUIT, signal_handler);
 	signal(SIGTERM, signal_handler);
