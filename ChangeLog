@@ -34,6 +34,11 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-04-02 Stephane Letz  <letz@grame.fr>
+
+	* Netdriver can now ask for in/out values from the master (in progress).
+	* Correct drivers parameter settings.
+
 2011-04-01 Stephane Letz  <letz@grame.fr>
 
 	* Merge newer-midi branch (Devin Anderson redesign of the MIDI drivers: alsarawmidi, ffado, coremidi and winmme).

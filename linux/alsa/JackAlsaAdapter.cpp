@@ -259,7 +259,7 @@ extern "C"
         i++;
         strcpy ( desc->params[i].name, "inchannels" );
         desc->params[i].character = 'i';
-        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.i = 0;
         strcpy ( desc->params[i].short_desc,
                  "Number of capture channels (defaults to hardware max)" );
@@ -268,7 +268,7 @@ extern "C"
         i++;
         strcpy ( desc->params[i].name, "outchannels" );
         desc->params[i].character = 'o';
-        desc->params[i].type = JackDriverParamUInt;
+        desc->params[i].type = JackDriverParamInt;
         desc->params[i].value.i = 0;
         strcpy ( desc->params[i].short_desc,
                  "Number of playback channels (defaults to hardware max)" );
@@ -277,7 +277,7 @@ extern "C"
         i++;
         strcpy(desc->params[i].name, "quality");
         desc->params[i].character = 'q';
-        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
@@ -285,7 +285,7 @@ extern "C"
         i++;
         strcpy(desc->params[i].name, "ring-buffer");
         desc->params[i].character = 'g';
-        desc->params[i].type = JackDriverParamInt;
+        desc->params[i].type = JackDriverParamUInt;
         desc->params[i].value.ui = 32768;
         strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
         strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (if not set => automatic adaptative)");

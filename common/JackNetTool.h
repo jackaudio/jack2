@@ -81,10 +81,10 @@ namespace Jack
         uint32_t fMtu;                      //connection mtu
         uint32_t fID;                       //slave's ID
         uint32_t fTransportSync;            //is the transport synced ?
-        uint32_t fSendAudioChannels;        //number of master->slave channels
-        uint32_t fReturnAudioChannels;      //number of slave->master channels
-        uint32_t fSendMidiChannels;         //number of master->slave midi channels
-        uint32_t fReturnMidiChannels;       //number of slave->master midi channels
+        int32_t fSendAudioChannels;        //number of master->slave channels
+        int32_t fReturnAudioChannels;      //number of slave->master channels
+        int32_t fSendMidiChannels;         //number of master->slave midi channels
+        int32_t fReturnMidiChannels;       //number of slave->master midi channels
         uint32_t fSampleRate;               //session sample rate
         uint32_t fPeriodSize;               //period size
         uint32_t fFramesPerPacket;          //complete frames per packet

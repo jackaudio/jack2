@@ -542,6 +542,32 @@ namespace Jack
         SocketAPIEnd();
     }
 
+    int JackNetMasterManager::CountPhysicalInputs()
+    {
+        const char **ports;
+        int count = 0;
+
+        ports = jack_get_ports(fManagerClient, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
+        if (ports != NULL) {
+            while(ports[count]) count++;
+            free(ports);
+        }
+        return count;
+    }
+
+    int JackNetMasterManager::CountPhysicalOutputs()
+    {
+        const char **ports;
+        int count = 0;
+
+        ports = jack_get_ports(fManagerClient, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        if (ports != NULL) {
+            while(ports[count]) count++;
+            free(ports);
+        }
+        return count;
+    }
+
     int JackNetMasterManager::SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg )
     {
         return static_cast<JackNetMasterManager*> ( arg )->SyncCallback ( state, pos );
@@ -669,13 +695,23 @@ namespace Jack
         params.fSampleRate = jack_get_sample_rate ( fManagerClient );
         params.fPeriodSize = jack_get_buffer_size ( fManagerClient );
         params.fBitdepth = 0;
-        SetSlaveName ( params );
+
+        if (params.fSendAudioChannels == -1) {
+            params.fSendAudioChannels = CountPhysicalInputs();
+            jack_info( "Takes physical %d inputs for client", params.fSendAudioChannels);
+        }
+
+        if (params.fReturnAudioChannels == -1) {
+            params.fReturnAudioChannels = CountPhysicalOutputs();
+            jack_info("Takes physical %d outputs for client", params.fReturnAudioChannels);
+        }
+
+        SetSlaveName (params);
 
         //create a new master and add it to the list
         JackNetMaster* master = new JackNetMaster(fSocket, params, fMulticastIP);
-        if ( master->Init(fAutoConnect) )
-        {
-            fMasterList.push_back ( master );
+        if (master->Init(fAutoConnect)) {
+            fMasterList.push_back(master);
             return master;
         }
         delete master;

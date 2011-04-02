@@ -845,7 +845,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     i++;
     strcpy (params[i].name, "inchannels");
     params[i].character = 'i';
-    params[i].type = JackDriverParamUInt;
+    params[i].type = JackDriverParamInt;
     params[i].value.i = 0;
     strcpy (params[i].short_desc,
             "Number of capture channels (defaults to hardware max)");
@@ -854,7 +854,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     i++;
     strcpy (params[i].name, "outchannels");
     params[i].character = 'o';
-    params[i].type = JackDriverParamUInt;
+    params[i].type = JackDriverParamInt;
     params[i].value.i = 0;
     strcpy (params[i].short_desc,
             "Number of playback channels (defaults to hardware max)");
@@ -872,7 +872,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     strcpy (params[i].name, "input-latency");
     params[i].character = 'I';
     params[i].type = JackDriverParamUInt;
-    params[i].value.i = 0;
+    params[i].value.ui = 0;
     strcpy (params[i].short_desc, "Extra input latency (frames)");
     strcpy (params[i].long_desc, params[i].short_desc);
 
@@ -880,7 +880,7 @@ SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
     strcpy (params[i].name, "output-latency");
     params[i].character = 'O';
     params[i].type = JackDriverParamUInt;
-    params[i].value.i = 0;
+    params[i].value.ui = 0;
     strcpy (params[i].short_desc, "Extra output latency (frames)");
     strcpy (params[i].long_desc, params[i].short_desc);
 

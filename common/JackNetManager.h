@@ -37,6 +37,9 @@ namespace Jack
     class JackNetMaster : public JackNetMasterInterface
     {
             friend class JackNetMasterManager;
+
+        private:
+
         private:
             static int SetProcess ( jack_nframes_t nframes, void* arg );
             static int SetBufferSize (jack_nframes_t nframes, void* arg);
@@ -90,7 +93,9 @@ namespace Jack
     class JackNetMasterManager
     {
             friend class JackNetMaster;
+
         private:
+
             static int SetSyncCallback ( jack_transport_state_t state, jack_position_t* pos, void* arg );
             static void* NetManagerThread ( void* arg );
 
@@ -111,7 +116,12 @@ namespace Jack
             void SetSlaveName ( session_params_t& params );
 
             int SyncCallback ( jack_transport_state_t state, jack_position_t* pos );
+
+            int CountPhysicalInputs();
+            int CountPhysicalOutputs();
+
         public:
+
             JackNetMasterManager ( jack_client_t* jack_client, const JSList* params);
             ~JackNetMasterManager();
     };

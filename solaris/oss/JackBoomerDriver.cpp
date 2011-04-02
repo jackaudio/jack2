@@ -911,7 +911,7 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     strcpy(desc->params[i].name, "input-latency");
     desc->params[i].character = 'I';
     desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.i = 0;
+    desc->params[i].value.ui = 0;
     strcpy(desc->params[i].short_desc, "Extra input latency");
     strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
@@ -919,7 +919,7 @@ SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     strcpy(desc->params[i].name, "output-latency");
     desc->params[i].character = 'O';
     desc->params[i].type = JackDriverParamUInt;
-    desc->params[i].value.i = 0;
+    desc->params[i].value.ui = 0;
     strcpy(desc->params[i].short_desc, "Extra output latency");
     strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 

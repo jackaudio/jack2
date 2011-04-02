@@ -1511,7 +1511,7 @@ extern "C"
         strcpy(desc->params[i].name, "channels");
         desc->params[i].character = 'c';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = -1;
+        desc->params[i].value.i = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of channels");
         strcpy(desc->params[i].long_desc, "Maximum number of channels. If -1, max possible number of channels will be used");
 
@@ -1519,7 +1519,7 @@ extern "C"
         strcpy(desc->params[i].name, "inchannels");
         desc->params[i].character = 'i';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = -1;
+        desc->params[i].value.i = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of input channels");
         strcpy(desc->params[i].long_desc, "Maximum number of input channels. If -1, max possible number of input channels will be used");
 
@@ -1527,7 +1527,7 @@ extern "C"
         strcpy(desc->params[i].name, "outchannels");
         desc->params[i].character = 'o';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = -1;
+        desc->params[i].value.i = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of output channels");
         strcpy(desc->params[i].long_desc, "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
