@@ -49,6 +49,7 @@ class JackPortAudioDriver : public JackAudioDriver
                           void* userData);
 
         void UpdateLatencies();
+        int OpenStream();
 
     public:
 

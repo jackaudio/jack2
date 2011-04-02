@@ -22,7 +22,7 @@
 #define __JackWaitThreadedDriver__
 
 #include "JackThreadedDriver.h"
-#include "JackAudioDriver.h"
+#include "JackDriver.h"
 
 namespace Jack
 {

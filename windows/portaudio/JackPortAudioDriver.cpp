@@ -60,6 +60,40 @@ namespace Jack
         return 0;
     }
 
+    int JackPortAudioDriver::OpenStream()
+    {
+        PaStreamParameters inputParameters;
+        PaStreamParameters outputParameters;
+
+        // Update parameters
+        inputParameters.device = fInputDevice;
+        inputParameters.channelCount = fCaptureChannels;
+        inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
+        inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
+                                           ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
+                                           : 0;
+        inputParameters.hostApiSpecificStreamInfo = NULL;
+
+        outputParameters.device = fOutputDevice;
+        outputParameters.channelCount = fPlaybackChannels;
+        outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
+        outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
+                                            ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
+                                            : 0;
+        outputParameters.hostApiSpecificStreamInfo = NULL;
+
+        PaError err = Pa_OpenStream(&fStream,
+                            (fInputDevice == paNoDevice) ? 0 : &inputParameters,
+                            (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
+                            fEngineControl->fSampleRate,
+                            buffer_size,
+                            paNoFlag,  // Clipping is on...
+                            Render,
+                            this);
+
+        return (err == paNoError) ? 0: -1;
+    }
+
     int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
                                   jack_nframes_t samplerate,
                                   bool capturing,
@@ -72,9 +106,6 @@ namespace Jack
                                   jack_nframes_t capture_latency,
                                   jack_nframes_t playback_latency)
     {
-        PaError err = paNoError;
-        PaStreamParameters inputParameters;
-        PaStreamParameters outputParameters;
         int in_max = 0;
         int out_max = 0;
 
@@ -117,32 +148,7 @@ namespace Jack
             outchannels = out_max;
         }
 
-        //in/out streams parametering
-        inputParameters.device = fInputDevice;
-        inputParameters.channelCount = inchannels;
-        inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-        inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-										   ? fPaDevices->GetDeviceInfo(fInputDevice)->defaultLowInputLatency
-                                           : 0;
-        inputParameters.hostApiSpecificStreamInfo = NULL;
-
-        outputParameters.device = fOutputDevice;
-        outputParameters.channelCount = outchannels;
-        outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-        outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
-                                            ? fPaDevices->GetDeviceInfo(fOutputDevice)->defaultLowOutputLatency
-                                            : 0;
-        outputParameters.hostApiSpecificStreamInfo = NULL;
-
-        err = Pa_OpenStream(&fStream,
-                            (fInputDevice == paNoDevice) ? 0 : &inputParameters,
-                            (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
-                            samplerate,
-                            buffer_size,
-                            paNoFlag,  // Clipping is on...
-                            Render,
-                            this);
-        if (err != paNoError) {
+        if (OpenStream() < 0) {
             jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             goto error;
         }
@@ -208,41 +214,13 @@ error:
     int JackPortAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
     {
         PaError err;
-        PaStreamParameters inputParameters;
-        PaStreamParameters outputParameters;
 
         if ((err = Pa_CloseStream(fStream)) != paNoError) {
             jack_error("Pa_CloseStream error = %s", Pa_GetErrorText(err));
             return -1;
         }
 
-        // Update parameters
-        inputParameters.device = fInputDevice;
-        inputParameters.channelCount = fCaptureChannels;
-        inputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-        inputParameters.suggestedLatency = (fInputDevice != paNoDevice)		// TODO: check how to setup this on ASIO
-                                           ? Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency
-                                           : 0;
-        inputParameters.hostApiSpecificStreamInfo = NULL;
-
-        outputParameters.device = fOutputDevice;
-        outputParameters.channelCount = fPlaybackChannels;
-        outputParameters.sampleFormat = paFloat32 | paNonInterleaved;		// 32 bit floating point output
-        outputParameters.suggestedLatency = (fOutputDevice != paNoDevice)	// TODO: check how to setup this on ASIO
-                                            ? Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency
-                                            : 0;
-        outputParameters.hostApiSpecificStreamInfo = NULL;
-
-        err = Pa_OpenStream(&fStream,
-                            (fInputDevice == paNoDevice) ? 0 : &inputParameters,
-                            (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
-                            fEngineControl->fSampleRate,
-                            buffer_size,
-                            paNoFlag,  // Clipping is on...
-                            Render,
-                            this);
-
-        if (err != paNoError) {
+        if (OpenStream() < 0) {
             jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             return -1;
         } else {
@@ -402,8 +380,7 @@ extern "C"
         {
             param = (const jack_driver_param_t *) node->data;
 
-            switch (param->character)
-            {
+            switch (param->character) {
 
             case 'd':
                 capture_pcm_name = param->value.str;
@@ -474,12 +451,12 @@ extern "C"
         }
 
         Jack::JackDriverClientInterface* driver = new Jack::JackPortAudioDriver("system", "portaudio", engine, table, pa_devices);
-        if (driver->Open(frames_per_interrupt, srate, capture, playback, chan_in, chan_out, monitor, capture_pcm_name, playback_pcm_name, systemic_input_latency, systemic_output_latency) == 0)
-        {
+        if (driver->Open(frames_per_interrupt, srate, capture, playback,
+            chan_in, chan_out, monitor, capture_pcm_name,
+            playback_pcm_name, systemic_input_latency,
+            systemic_output_latency) == 0) {
             return driver;
-        }
-        else
-        {
+        } else {
             delete driver;
             return NULL;
         }

@@ -27,19 +27,18 @@ PortAudioDevices::PortAudioDevices()
     PaError err;
 	PaDeviceIndex id;
 	jack_log("Initializing PortAudio...");
-    if ( ( err = Pa_Initialize() ) == paNoError )
-    {
+    if ((err = Pa_Initialize() ) == paNoError) {
         fNumHostApi = Pa_GetHostApiCount();
         fNumDevice = Pa_GetDeviceCount();
         fDeviceInfo = new PaDeviceInfo*[fNumDevice];
-        for ( id = 0; id < fNumDevice; id++ )
+        for (id = 0; id < fNumDevice; id++)
             fDeviceInfo[id] = const_cast<PaDeviceInfo*>(Pa_GetDeviceInfo(id));
         fHostName = new string[fNumHostApi];
-        for ( id = 0; id < fNumHostApi; id++ )
+        for (id = 0; id < fNumHostApi; id++)
             fHostName[id] = string ( Pa_GetHostApiInfo(id)->name );
-    }
-    else
+    } else {
 		jack_error("JackPortAudioDriver::Pa_Initialize error = %s", Pa_GetErrorText(err));
+    }
 }
 
 PortAudioDevices::~PortAudioDevices()
