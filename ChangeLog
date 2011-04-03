@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-04-03 Stephane Letz  <letz@grame.fr>
+
+	* Fix in JackCoreAudioDriver::Read when there is no inputs.
+
 2011-04-02 Stephane Letz  <letz@grame.fr>
 
 	* Netdriver can now ask for in/out values from the master (in progress).

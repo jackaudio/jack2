@@ -216,8 +216,11 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
 
 int JackCoreAudioDriver::Read()
 {
-    OSStatus err = AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
-    return (err == noErr) ? 0 : -1;
+    if (fCaptureChannels > 0)  { // Calling AudioUnitRender with no input returns a '????' error (callback setting issue ??), so hack to avoid it here...
+        return (AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData) == noErr)  ? 0 : -1;
+    } else {
+        return 0;
+    }
 }
 
 int JackCoreAudioDriver::Write()
