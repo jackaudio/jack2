@@ -101,7 +101,6 @@ struct jackctl_driver
     jack_driver_desc_t * desc_ptr;
     JSList * parameters;
     JSList * set_parameters;
-    //JackDriverInfo* info;
     JSList * infos;
 };
 
@@ -1238,10 +1237,14 @@ EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_dri
             return false;
         } else {
             JackDriverInfo* info = (JackDriverInfo*)driver_ptr->infos->data;
-            driver_ptr->infos = jack_slist_remove(driver_ptr->infos, info);
-            server_ptr->engine->RemoveSlave(info);
-            delete info;
-            return true;
+            if (info) {
+                driver_ptr->infos = jack_slist_remove(driver_ptr->infos, info);
+                server_ptr->engine->RemoveSlave(info);
+                delete info;
+                return true;
+            } else {
+                return false;
+            }
         }
     } else {
         return false;
