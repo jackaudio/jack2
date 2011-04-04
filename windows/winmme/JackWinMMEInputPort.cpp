@@ -112,6 +112,9 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     }
  delete_sysex_buffer:
     delete[] sysex_buffer;
+    // auto_ptr causing crash so explicitly deleting here...
+    delete thread_queue;
+    delete write_queue;
     throw std::runtime_error(error_message);
 }
 

@@ -186,7 +186,6 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
     jack_info("JackWinMMEDriver::Open - input_count  %d", input_count);
     jack_info("JackWinMMEDriver::Open - output_count  %d", output_count);
 
-
     if (! (input_count || output_count)) {
         jack_error("JackWinMMEDriver::Open - no WinMME inputs or outputs "
                    "allocated.");

@@ -100,6 +100,10 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
                      result);
     }
  raise_exception:
+    // auto_ptr causing crash so explicitly deleting here...
+    delete read_queue;
+    delete thread_queue;
+    delete thread;
     throw std::runtime_error(error_message);
 }
 
