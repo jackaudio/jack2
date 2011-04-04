@@ -113,7 +113,7 @@ size_t unexpected_messages;
 size_t xrun_count;
 
 #ifdef WIN32
-char *semaphore_error_msg;
+char semaphore_error_msg[1024];
 #endif
 
 static void
@@ -196,7 +196,7 @@ get_semaphore_error()
     if (! FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                         semaphore_error_msg, 1024, NULL)) {
-        sprintf(semaphore_error_msg, 1024, "Unknown OS error code '%d'",
+        sprintf(semaphore_error_msg, 1023, "Unknown OS error code '%d'",
                 error);
     }
     return semaphore_error_msg;
