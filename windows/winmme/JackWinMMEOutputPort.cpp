@@ -86,6 +86,7 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     snprintf(name, sizeof(name) - 1, "%s:playback_%d", client_name, index + 1);
     //thread_ptr.release();
     //thread_queue_ptr.release();
+    //thread_ptr.release();
     return;
 
  destroy_thread_queue_semaphore:
@@ -123,6 +124,7 @@ JackWinMMEOutputPort::~JackWinMMEOutputPort()
     }
     delete read_queue;
     delete thread_queue;
+    delete thread;
 }
 
 bool
