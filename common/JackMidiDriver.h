@@ -40,8 +40,6 @@ class SERVER_EXPORT JackMidiDriver : public JackDriver
         int fCaptureChannels;
         int fPlaybackChannels;
 
-        jack_ringbuffer_t* fRingBuffer[DRIVER_PORT_NUM];
-
         jack_port_id_t fCapturePortList[DRIVER_PORT_NUM];
         jack_port_id_t fPlaybackPortList[DRIVER_PORT_NUM];
 

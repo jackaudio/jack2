@@ -82,7 +82,7 @@ namespace Jack
                                             : 0;
         outputParameters.hostApiSpecificStreamInfo = NULL;
 
-        PaError err = Pa_OpenStream(&fStream,
+        return Pa_OpenStream(&fStream,
                             (fInputDevice == paNoDevice) ? 0 : &inputParameters,
                             (fOutputDevice == paNoDevice) ? 0 : &outputParameters,
                             fEngineControl->fSampleRate,
@@ -90,8 +90,6 @@ namespace Jack
                             paNoFlag,  // Clipping is on...
                             Render,
                             this);
-
-        return err;
     }
 
     int JackPortAudioDriver::Open(jack_nframes_t buffer_size,

@@ -34,19 +34,10 @@ JackMidiDriver::JackMidiDriver(const char* name, const char* alias, JackLockedEn
         : JackDriver(name, alias, engine, table),
         fCaptureChannels(0),
         fPlaybackChannels(0)
-{
-    for (int i = 0; i < DRIVER_PORT_NUM; i++) {
-        fRingBuffer[i] = NULL;
-    }
-}
+{}
 
 JackMidiDriver::~JackMidiDriver()
-{
-    for (int i = 0; i < fCaptureChannels; i++) {
-        if (fRingBuffer[i])
-            jack_ringbuffer_free(fRingBuffer[i]);
-    }
-}
+{}
 
 int JackMidiDriver::Open(bool capturing,
                         bool playing,
@@ -60,11 +51,6 @@ int JackMidiDriver::Open(bool capturing,
 {
     fCaptureChannels = inchannels;
     fPlaybackChannels = outchannels;
-
-    for (int i = 0; i < fCaptureChannels; i++) {
-        fRingBuffer[i] = jack_ringbuffer_create(sizeof(jack_default_audio_sample_t) * BUFFER_SIZE_MAX);
-    }
-
     return JackDriver::Open(capturing, playing, inchannels, outchannels, monitor, capture_driver_name, playback_driver_name, capture_latency, playback_latency);
 }
 
