@@ -137,6 +137,7 @@ int JackServer::Close()
     fChannel.Close();
     fAudioDriver->Detach();
     fAudioDriver->Close();
+    fFreewheelDriver->Close();
     fEngine->Close();
     // TODO: move that in reworked JackServerGlobals::Destroy()
     JackMessageBuffer::Destroy();
