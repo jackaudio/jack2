@@ -212,7 +212,6 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
 int
 JackWinMMEDriver::Read()
 {
-
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     for (int i = 0; i < fCaptureChannels; i++) {
         input_ports[i]->ProcessJack(GetInputBuffer(i), buffer_size);
@@ -221,16 +220,14 @@ JackWinMMEDriver::Read()
     return 0;
 }
 
-
 int
 JackWinMMEDriver::Write()
 {
-    /*
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     for (int i = 0; i < fPlaybackChannels; i++) {
         output_ports[i]->ProcessJack(GetOutputBuffer(i), buffer_size);
     }
-    */
+
     return 0;
 }
 

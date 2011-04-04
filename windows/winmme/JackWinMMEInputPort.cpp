@@ -50,9 +50,9 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
                                          size_t max_bytes, size_t max_messages)
 {
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    //std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     write_queue = new JackMidiBufferWriteQueue();
-    std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
+    //std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiInOpen(&handle, index, (DWORD)HandleMidiInputEvent,
@@ -95,8 +95,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     snprintf(name, sizeof(name) - 1, "%s:capture_%d", client_name, index + 1);
     jack_event = 0;
     started = false;
-    write_queue_ptr.release();
-    thread_queue_ptr.release();
+    //write_queue_ptr.release();
+    //thread_queue_ptr.release();
     return;
 
  unprepare_header:
@@ -183,6 +183,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
 {
     set_threaded_log_function();
     jack_nframes_t current_frame = GetCurrentFrame();
+
     switch (message) {
     case MIM_CLOSE:
         jack_info("JackWinMMEInputPort::ProcessWinMME - MIDI device closed.");
@@ -196,12 +197,13 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
         jack_midi_data_t message_buffer[3];
         jack_midi_data_t status = param1 & 0xff;
         int length = GetMessageLength(status);
+
         switch (length) {
         case 3:
-            message_buffer[2] = param1 & 0xff0000;
+             message_buffer[2] = (param1 >> 16)  & 0xff;
             // Fallthrough on purpose.
         case 2:
-            message_buffer[1] = param1 & 0xff00;
+            message_buffer[1] = (param1 >> 8) & 0xff;
             // Fallthrough on purpose.
         case 1:
             message_buffer[0] = status;

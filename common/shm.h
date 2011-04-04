@@ -14,7 +14,7 @@ extern "C"
 {
 #endif
 
-#define MAX_SERVERS 64			/* maximum concurrent servers */
+#define MAX_SERVERS 8			/* maximum concurrent servers */
 #define MAX_SHM_ID 256			/* generally about 16 per server */
 #define JACK_SERVER_NAME_SIZE 256	/* maximum length of server name */
 #define JACK_SHM_MAGIC 0x4a41434b	/* shm magic number: "JACK" */
