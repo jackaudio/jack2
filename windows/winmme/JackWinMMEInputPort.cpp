@@ -117,7 +117,6 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
 
 JackWinMMEInputPort::~JackWinMMEInputPort()
 {
-    Stop();
     MMRESULT result = midiInReset(handle);
     if (result != MMSYSERR_NOERROR) {
         WriteInError("JackWinMMEInputPort [destructor]", "midiInReset", result);
@@ -293,4 +292,5 @@ JackWinMMEInputPort::WriteInError(const char *jack_func, const char *mm_func,
     GetInErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }
+
 

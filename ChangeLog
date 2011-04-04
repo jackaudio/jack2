@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-04-04 Stephane Letz  <letz@grame.fr>
+
+	* Correct driver lifetime management.
+
 2011-04-03 Stephane Letz  <letz@grame.fr>
 
 	* Fix in JackCoreAudioDriver::Read when there is no inputs.

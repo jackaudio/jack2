@@ -105,7 +105,6 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
 
 JackWinMMEOutputPort::~JackWinMMEOutputPort()
 {
-    Stop();
     MMRESULT result = midiOutReset(handle);
     if (result != MMSYSERR_NOERROR) {
         WriteOutError("JackWinMMEOutputPort [destructor]", "midiOutReset",
@@ -310,7 +309,6 @@ JackWinMMEOutputPort::Start()
 bool
 JackWinMMEOutputPort::Stop()
 {
-
     jack_info("JackWinMMEOutputPort::Stop - stopping MIDI output port "
               "processing thread.");
 
@@ -371,3 +369,4 @@ JackWinMMEOutputPort::WriteOutError(const char *jack_func, const char *mm_func,
     GetOutErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }
+

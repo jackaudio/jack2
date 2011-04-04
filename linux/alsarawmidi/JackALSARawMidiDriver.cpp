@@ -48,9 +48,7 @@ JackALSARawMidiDriver::JackALSARawMidiDriver(const char *name,
 
 JackALSARawMidiDriver::~JackALSARawMidiDriver()
 {
-    Stop();
     delete thread;
-    Close();
 }
 
 int
@@ -109,6 +107,9 @@ JackALSARawMidiDriver::Attach()
 int
 JackALSARawMidiDriver::Close()
 {
+    // Generic MIDI driver close
+    int result = JackMidiDriver::Close();
+
     if (input_ports) {
         for (int i = 0; i < fCaptureChannels; i++) {
             delete input_ports[i];
@@ -123,7 +124,7 @@ JackALSARawMidiDriver::Close()
         delete[] output_ports;
         output_ports = 0;
     }
-    return 0;
+    return result;
 }
 
 bool
@@ -528,7 +529,6 @@ JackALSARawMidiDriver::Start()
 int
 JackALSARawMidiDriver::Stop()
 {
-
     jack_info("JackALSARawMidiDriver::Stop - stopping 'alsarawmidi' driver.");
 
     if (fds[1] != -1) {

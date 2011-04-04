@@ -75,10 +75,7 @@ JackCoreMidiDriver::JackCoreMidiDriver(const char *name, const char *alias,
 }
 
 JackCoreMidiDriver::~JackCoreMidiDriver()
-{
-    Stop();
-    Close();
-}
+{}
 
 int
 JackCoreMidiDriver::Attach()
@@ -181,7 +178,9 @@ JackCoreMidiDriver::Attach()
 int
 JackCoreMidiDriver::Close()
 {
-    int result = 0;
+    // Generic MIDI driver close
+    int result = JackMidiDriver::Close();
+
     OSStatus status;
     if (physical_input_ports) {
         for (int i = 0; i < num_physical_inputs; i++) {

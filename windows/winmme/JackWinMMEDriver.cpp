@@ -35,10 +35,7 @@ JackWinMMEDriver::JackWinMMEDriver(const char *name, const char *alias,
 }
 
 JackWinMMEDriver::~JackWinMMEDriver()
-{
-    Stop();
-    Close();
-}
+{}
 
 int
 JackWinMMEDriver::Attach()
@@ -105,7 +102,9 @@ JackWinMMEDriver::Attach()
 int
 JackWinMMEDriver::Close()
 {
+    // Generic MIDI driver close
     int result = JackMidiDriver::Close();
+
     if (input_ports) {
         for (int i = 0; i < fCaptureChannels; i++) {
             delete input_ports[i];

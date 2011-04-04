@@ -53,7 +53,6 @@ JackCoreMidiOutputPort::JackCoreMidiOutputPort(double time_ratio,
 
 JackCoreMidiOutputPort::~JackCoreMidiOutputPort()
 {
-    Stop();
     delete thread;
     sem_destroy(thread_queue_semaphore);
     sem_unlink(semaphore_name);
