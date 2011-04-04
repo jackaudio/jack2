@@ -60,7 +60,7 @@ namespace Jack
         return 0;
     }
 
-    int JackPortAudioDriver::OpenStream()
+    PaError JackPortAudioDriver::OpenStream(jack_nframes_t buffer_size)
     {
         PaStreamParameters inputParameters;
         PaStreamParameters outputParameters;
@@ -91,7 +91,7 @@ namespace Jack
                             Render,
                             this);
 
-        return (err == paNoError) ? 0: -1;
+        return err;
     }
 
     int JackPortAudioDriver::Open(jack_nframes_t buffer_size,
@@ -108,6 +108,7 @@ namespace Jack
     {
         int in_max = 0;
         int out_max = 0;
+        PaError err = paNoError;
 
         jack_log("JackPortAudioDriver::Open nframes = %ld in = %ld out = %ld capture name = %s playback name = %s samplerate = %ld",
                  buffer_size, inchannels, outchannels, capture_driver_uid, playback_driver_uid, samplerate);
@@ -148,7 +149,11 @@ namespace Jack
             outchannels = out_max;
         }
 
-        if (OpenStream() < 0) {
+        // Core driver may have changed the in/out values
+        fCaptureChannels = inchannels;
+        fPlaybackChannels = outchannels;
+
+        if ((err = OpenStream(buffer_size)) != paNoError) {
             jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             goto error;
         }
@@ -158,10 +163,6 @@ namespace Jack
         fEngineControl->fComputation = 500 * 1000;
         fEngineControl->fConstraint = fEngineControl->fPeriodUsecs * 1000;
 #endif
-
-        // Core driver may have changed the in/out values
-        fCaptureChannels = inchannels;
-        fPlaybackChannels = outchannels;
 
         assert(strlen(capture_driver_uid) < JACK_CLIENT_NAME_SIZE);
         assert(strlen(playback_driver_uid) < JACK_CLIENT_NAME_SIZE);
@@ -220,7 +221,7 @@ error:
             return -1;
         }
 
-        if (OpenStream() < 0) {
+       if ((err = OpenStream(buffer_size)) != paNoError) {
             jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
             return -1;
         } else {

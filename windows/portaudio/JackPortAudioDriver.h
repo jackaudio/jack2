@@ -49,7 +49,7 @@ class JackPortAudioDriver : public JackAudioDriver
                           void* userData);
 
         void UpdateLatencies();
-        int OpenStream();
+        PaError OpenStream(jack_nframes_t buffer_size);
 
     public:
 
