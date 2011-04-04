@@ -49,11 +49,11 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
                                            size_t max_messages)
 {
     read_queue = new JackMidiBufferReadQueue();
-    //std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
+    std::auto_ptr<JackMidiBufferReadQueue> read_queue_ptr(read_queue);
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    //std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     thread = new JackThread(this);
-    //std::auto_ptr<JackThread> thread_ptr(thread);
+    std::auto_ptr<JackThread> thread_ptr(thread);
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiOutOpen(&handle, index, (DWORD)HandleMessageEvent,
                                   (DWORD)this, CALLBACK_FUNCTION);
@@ -84,9 +84,9 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", alias_name, name_tmp,
              index + 1);
     snprintf(name, sizeof(name) - 1, "%s:playback_%d", client_name, index + 1);
-    //thread_ptr.release();
-    //thread_queue_ptr.release();
-    //thread_ptr.release();
+    read_queue_ptr.release();
+    thread_queue_ptr.release();
+    thread_ptr.release();
     return;
 
  destroy_thread_queue_semaphore:
@@ -100,10 +100,6 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
                      result);
     }
  raise_exception:
-    // auto_ptr causing crash so explicitly deleting here...
-    delete read_queue;
-    delete thread_queue;
-    delete thread;
     throw std::runtime_error(error_message);
 }
 

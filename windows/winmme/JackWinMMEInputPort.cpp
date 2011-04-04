@@ -50,9 +50,9 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
                                          size_t max_bytes, size_t max_messages)
 {
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
-    //std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
+    std::auto_ptr<JackMidiAsyncQueue> thread_queue_ptr(thread_queue);
     write_queue = new JackMidiBufferWriteQueue();
-    //std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
+    std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
     MMRESULT result = midiInOpen(&handle, index, (DWORD)HandleMidiInputEvent,
@@ -95,8 +95,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     snprintf(name, sizeof(name) - 1, "%s:capture_%d", client_name, index + 1);
     jack_event = 0;
     started = false;
-    //write_queue_ptr.release();
-    //thread_queue_ptr.release();
+    write_queue_ptr.release();
+    thread_queue_ptr.release();
     return;
 
  unprepare_header:
@@ -112,9 +112,6 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     }
  delete_sysex_buffer:
     delete[] sysex_buffer;
-    // auto_ptr causing crash so explicitly deleting here...
-    delete thread_queue;
-    delete write_queue;
     throw std::runtime_error(error_message);
 }
 
