@@ -162,10 +162,10 @@ namespace Jack
         assert(fMidiPlaybackPortList);
 
         for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
-            fMidiCapturePortList[midi_port_index] = NULL;
+            fMidiCapturePortList[midi_port_index] = 0;
         }
         for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
-            fMidiPlaybackPortList[midi_port_index] = NULL;
+            fMidiPlaybackPortList[midi_port_index] = 0;
         }
 
         //register jack ports
