@@ -630,7 +630,7 @@ main(int argc, char **argv)
         error_source = "post_semaphore";
         goto deactivate_client;
     }
-    if (wait_semaphore(process_semaphore, 1)) {
+    if (wait_semaphore(process_semaphore, 1) == -1) {
         error_message = get_semaphore_error();
         error_source = "wait_semaphore";
         goto deactivate_client;
