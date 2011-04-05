@@ -20,7 +20,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #ifndef __JackChannel__
 #define __JackChannel__
 
-#include "session.h"
+#include "types.h"
+#include "JackSession.h"
+//#include "session.h"
 
 namespace Jack
 {
