@@ -53,7 +53,7 @@ namespace Jack {
                         int code);
 
         int
-        Poll(const jack_time_t *wait_time);
+        Poll(const jack_nframes_t *wakeup_frame);
 
     public:
 

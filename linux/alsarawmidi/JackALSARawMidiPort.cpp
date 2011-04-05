@@ -82,6 +82,12 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         func = "snd_rawmidi_params_set_no_active_sensing";
         goto free_params;
     }
+    code = snd_rawmidi_params(rawmidi, params);
+    if (code) {
+        error_message = snd_strerror(code);
+        func = "snd_rawmidi_params";
+        goto free_params;
+    }
     snd_rawmidi_params_free(params);
     num_fds = snd_rawmidi_poll_descriptors_count(rawmidi);
     if (! num_fds) {
