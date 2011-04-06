@@ -44,10 +44,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  * suite.
  *
  * To port this program to non-POSIX platforms, you'll have to include
- * implementations for mutexes, semaphores, and command-line argument handling.
+ * implementations for semaphores and command-line argument handling.
  */
 
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,10 +73,12 @@ typedef sem_t *semaphore_t;
 #endif
 
 const char *ERROR_RESERVE = "could not reserve MIDI event on port buffer";
+const char *ERROR_SHUTDOWN = "the JACK server has been shutdown";
 const char *ERROR_TIMEOUT = "timed out while waiting for MIDI message";
 
 const char *SOURCE_EVENT_RESERVE = "jack_midi_event_reserve";
 const char *SOURCE_PROCESS = "handle_process";
+const char *SOURCE_SHUTDOWN = "handle_shutdown";
 const char *SOURCE_SIGNAL_SEMAPHORE = "signal_semaphore";
 const char *SOURCE_WAIT_SEMAPHORE = "wait_semaphore";
 
@@ -180,7 +183,7 @@ destroy_semaphore(semaphore_t semaphore, int id)
 }
 
 static void
-die(char *source, char *error_message)
+die(const char *source, const char *error_message)
 {
     output_error(source, error_message);
     output_usage();
@@ -305,7 +308,6 @@ handle_process(jack_nframes_t frames, void *arg)
             frame = frames - 1;
         }
         port_buffer = jack_port_get_buffer(out_port, frames);
-        jack_midi_clear_buffer(port_buffer);
         buffer = jack_midi_event_reserve(port_buffer, frame, message_size);
         if (buffer == NULL) {
             set_process_error(SOURCE_EVENT_RESERVE, ERROR_RESERVE);
@@ -331,7 +333,7 @@ handle_process(jack_nframes_t frames, void *arg)
 static void
 handle_shutdown(void *arg)
 {
-    set_process_error("handle_shutdown", "The JACK server has been shutdown");
+    set_process_error(SOURCE_SHUTDOWN, ERROR_SHUTDOWN);
 }
 
 static int
@@ -446,6 +448,7 @@ int
 main(int argc, char **argv)
 {
     size_t jitter_plot[101];
+    size_t latency_plot[101];
     int long_index = 0;
     struct option long_options[] = {
         {"help", 0, NULL, 'h'},
@@ -639,15 +642,26 @@ main(int argc, char **argv)
         double average_latency = ((double) total_latency) / samples;
         double average_latency_time = total_latency_time / samples;
         size_t i;
+        double latency_plot_offset =
+            floor(((double) lowest_latency_time) / 100.0) / 10.0;
         double sample_rate = (double) jack_get_sample_rate(client);
         jack_nframes_t total_jitter = 0;
         jack_time_t total_jitter_time = 0;
         for (i = 0; i <= 100; i++) {
             jitter_plot[i] = 0;
+            latency_plot[i] = 0;
         }
         for (i = 0; i < samples; i++) {
+            double latency_time_value = (double) latency_time_values[i];
+            double latency_plot_time =
+                (latency_time_value / 1000.0) - latency_plot_offset;
             double jitter_time = ABS(average_latency_time -
-                                     ((double) latency_time_values[i]));
+                                     latency_time_value);
+            if (latency_plot_time >= 10.0) {
+                (latency_plot[100])++;
+            } else {
+                (latency_plot[(int) (latency_plot_time * 10.0)])++;
+            }
             if (jitter_time >= 10000.0) {
                 (jitter_plot[100])++;
             } else {
@@ -660,8 +674,8 @@ main(int argc, char **argv)
         printf("Reported out-port latency: %.2f-%.2f ms (%u-%u frames)\n"
                "Reported in-port latency: %.2f-%.2f ms (%u-%u frames)\n"
                "Average latency: %.2f ms (%.2f frames)\n"
-               "Best latency: %.2f ms (%u frames)\n"
-               "Worst latency: %.2f ms (%u frames)\n"
+               "Lowest latency: %.2f ms (%u frames)\n"
+               "Highest latency: %.2f ms (%u frames)\n"
                "Peak MIDI jitter: %.2f ms (%u frames)\n"
                "Average MIDI jitter: %.2f ms (%.2f frames)\n",
                (out_latency_range.min / sample_rate) * 1000.0,
@@ -686,6 +700,19 @@ main(int argc, char **argv)
         }
         if (jitter_plot[100]) {
             printf("     > 10 ms: %u\n", jitter_plot[100]);
+        }
+        printf("\nLatency Plot:\n");
+        for (i = 0; i < 100; i++) {
+            if (latency_plot[i]) {
+                printf("%.1f - %.1f ms: %u\n",
+                       latency_plot_offset + (((float) i) / 10.0),
+                       latency_plot_offset + (((float) (i + 1)) / 10.0),
+                       latency_plot[i]);
+            }
+        }
+        if (latency_plot[100]) {
+            printf("     > %.1f ms: %u\n", latency_plot_offset + 10.0,
+                   latency_plot[100]);
         }
     }
     printf("\nMessages sent: %d\n"

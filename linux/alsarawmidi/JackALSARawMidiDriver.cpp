@@ -133,18 +133,14 @@ JackALSARawMidiDriver::Execute()
     jack_nframes_t timeout_frame = 0;
     for (;;) {
         jack_nframes_t process_frame;
-        jack_time_t wait_time;
-        jack_time_t *wait_time_ptr;
         unsigned short revents;
+        jack_nframes_t *timeout_frame_ptr;
         if (! timeout_frame) {
-            wait_time_ptr = 0;
+            timeout_frame_ptr = 0;
         } else {
-            jack_time_t next_time = GetTimeFromFrames(timeout_frame);
-            jack_time_t now = GetMicroSeconds();
-            wait_time = next_time <= now ? 0 : next_time - now;
-            wait_time_ptr = &wait_time;
+            timeout_frame_ptr = &timeout_frame;
         }
-        if (Poll(wait_time_ptr) == -1) {
+        if (Poll(timeout_frame_ptr) == -1) {
             if (errno == EINTR) {
                 continue;
             }
@@ -392,42 +388,28 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     return -1;
 }
 
-#ifdef HAVE_PPOLL
-
 int
-JackALSARawMidiDriver::Poll(const jack_time_t *wait_time)
+JackALSARawMidiDriver::Poll(const jack_nframes_t *wakeup_frame)
 {
     struct timespec timeout;
     struct timespec *timeout_ptr;
-    if (! wait_time) {
+    if (! wakeup_frame) {
         timeout_ptr = 0;
     } else {
-        timeout.tv_sec = (*wait_time) / 1000000;
-        timeout.tv_nsec = ((*wait_time) % 1000000) * 1000;
         timeout_ptr = &timeout;
+        jack_time_t next_time = GetTimeFromFrames(*wakeup_frame);
+        jack_time_t now = GetMicroSeconds();
+        if (next_time <= now) {
+            timeout.tv_sec = 0;
+            timeout.tv_nsec = 0;
+        } else {
+            jack_time_t wait_time = next_time - now;
+            timeout.tv_sec = wait_time / 1000000;
+            timeout.tv_nsec = (wait_time % 1000000) * 1000;
+        }
     }
     return ppoll(poll_fds, poll_fd_count, timeout_ptr, 0);
 }
-
-#else
-
-int
-JackALSARawMidiDriver::Poll(const jack_time_t *wait_time)
-{
-    int result = poll(poll_fds, poll_fd_count,
-                      ! wait_time ? -1 : (int) ((*wait_time) / 1000));
-    if ((! result) && wait_time) {
-        jack_time_t time_left = (*wait_time) % 1000;
-        if (time_left) {
-            // Cheap hack.
-            usleep(time_left);
-            result = poll(poll_fds, poll_fd_count, 0);
-        }
-    }
-    return result;
-}
-
-#endif
 
 int
 JackALSARawMidiDriver::Read()
