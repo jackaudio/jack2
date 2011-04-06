@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="mingw_64" />
 		<Build>
-            <Target title="Win32 Release 64bits">
+			<Target title="Win32 Release 64bits">
 				<Option output="Release\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="3" />
@@ -78,9 +78,9 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
-                    <Add option="-m32" />
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -100,8 +100,12 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
 					<Add directory="Release\bin" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Debug 32bits">
 				<Option output="Debug\bin\libjackserver" prefix_auto="1" extension_auto="1" />
@@ -111,9 +115,9 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
-                    <Add option="-m32" />
 					<Add option="-Wall" />
 					<Add option="-g" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -133,8 +137,12 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
 					<Add directory="Debug\bin" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
 				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
@@ -144,9 +152,9 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
-                    <Add option="-m32" />
 					<Add option="-O2" />
 					<Add option="-Wall" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -167,8 +175,12 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
 					<Add directory="Release\bin" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
