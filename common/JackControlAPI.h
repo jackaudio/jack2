@@ -28,6 +28,7 @@
 #ifdef WIN32
 #ifdef __MINGW32__
 #include <sys/types.h>
+typedef _sigset_t	sigset_t;
 #else
 typedef HANDLE sigset_t;
 #endif
@@ -169,11 +170,11 @@ jackctl_parameter_set_value(
 EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
 	jackctl_parameter_t * parameter);
-    
-EXPORT union jackctl_parameter_value 
+
+EXPORT union jackctl_parameter_value
 jackctl_parameter_get_default_value(
     jackctl_parameter *parameter_ptr);
-    
+
 EXPORT bool
 jackctl_parameter_has_range_constraint(
 	jackctl_parameter_t * parameter_ptr);
@@ -210,33 +211,33 @@ EXPORT bool
 jackctl_parameter_constraint_is_fake_value(
 	jackctl_parameter_t * parameter_ptr);
 
-EXPORT const JSList * 
+EXPORT const JSList *
 jackctl_server_get_internals_list(
     jackctl_server *server_ptr);
-    
-EXPORT const char * 
+
+EXPORT const char *
 jackctl_internal_get_name(
     jackctl_internal *internal_ptr);
-    
-EXPORT const JSList * 
+
+EXPORT const JSList *
 jackctl_internal_get_parameters(
     jackctl_internal *internal_ptr);
-    
+
 EXPORT bool jackctl_server_load_internal(
     jackctl_server * server,
     jackctl_internal * internal);
-    
+
 EXPORT bool jackctl_server_unload_internal(
     jackctl_server * server,
     jackctl_internal * internal);
-    
+
 EXPORT bool jackctl_server_add_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
 EXPORT bool jackctl_server_remove_slave(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 
-EXPORT bool 
+EXPORT bool
 jackctl_server_switch_master(jackctl_server_t * server,
                             jackctl_driver_t * driver);
 

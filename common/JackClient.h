@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackSynchro.h"
 #include "JackPlatformPlug.h"
 #include "JackChannel.h"
-//#include "session.h"
 #include "varargs.h"
 #include <list>
 

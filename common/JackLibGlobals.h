@@ -32,6 +32,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <assert.h>
 #include <signal.h>
 
+#ifdef __MINGW32__
+#include <sys/types.h>
+typedef _sigset_t sigset_t;
+#else
+typedef HANDLE sigset_t;
+#endif
 
 namespace Jack
 {
