@@ -653,14 +653,14 @@ main(int argc, char **argv)
         }
         for (i = 0; i < samples; i++) {
             double latency_time_value = (double) latency_time_values[i];
-            double relational_latency_time =
-                latency_time_value - lowest_latency_time;
+            double latency_plot_time =
+                (latency_time_value / 1000.0) - latency_plot_offset;
             double jitter_time = ABS(average_latency_time -
                                      latency_time_value);
-            if (relational_latency_time >= 10000.0) {
+            if (latency_plot_time >= 10.0) {
                 (latency_plot[100])++;
             } else {
-                (latency_plot[(int) (relational_latency_time / 100.0)])++;
+                (latency_plot[(int) (latency_plot_time * 10.0)])++;
             }
             if (jitter_time >= 10000.0) {
                 (jitter_plot[100])++;
