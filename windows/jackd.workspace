@@ -1,62 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="jack">
-		<Project filename="libjackserver.cbp" active="1" />
-		<Project filename="jackd.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_portaudio.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_netdriver.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_netonedriver.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_dummy.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_netmanager.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_audioadapter.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
-		<Project filename="jack_netadapter.cbp">
-			<Depends filename="libjackserver.cbp" />
-		</Project>
+		<Project filename="libjackserver.cbp" />
+		<Project filename="jack_portaudio.cbp" />
+		<Project filename="jack_netdriver.cbp" />
+		<Project filename="jack_netonedriver.cbp" />
+		<Project filename="jack_dummy.cbp" />
+		<Project filename="jack_netmanager.cbp" />
+		<Project filename="jack_audioadapter.cbp" />
+		<Project filename="jack_netadapter.cbp" />
 		<Project filename="libjack.cbp" />
-		<Project filename="jack_load.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_unload.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_lsp.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_latent_client.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_netsource.cbp">
-			<Depends filename="libjack.cbp" />
-			<Depends filename="jack_netonedriver.cbp" />
-		</Project>
-		<Project filename="jack_metro.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_connect.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_disconnect.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
+		<Project filename="jack_load.cbp" />
+		<Project filename="jack_unload.cbp" />
+		<Project filename="jack_lsp.cbp" />
+		<Project filename="jack_latent_client.cbp" />
+		<Project filename="jack_netsource.cbp" />
+		<Project filename="jack_metro.cbp" />
+		<Project filename="jack_connect.cbp" />
+		<Project filename="jack_disconnect.cbp" />
 		<Project filename="jack_test.cbp" />
-		<Project filename="multiple_metro.cbp">
-			<Depends filename="libjack.cbp" />
-		</Project>
-		<Project filename="jack_winmme.cbp" />
+		<Project filename="multiple_metro.cbp" />
+		<Project filename="jack_winmme.cbp" active="1" />
 		<Project filename="jack_loopback.cbp" />
+		<Project filename="jackd.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

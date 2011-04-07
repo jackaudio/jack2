@@ -192,7 +192,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
                   "driver thinks that JACK is not processing messages fast "
                   "enough.");
         // Fallthrough on purpose.
-    case MIM_DATA:
+    case MIM_DATA: {
         jack_midi_data_t message_buffer[3];
         jack_midi_data_t status = param1 & 0xff;
         int length = GetMessageLength(status);
@@ -220,13 +220,14 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
         }
         EnqueueMessage(current_frame, (size_t) length, message_buffer);
         break;
-    case MIM_LONGDATA:
+    }
+    case MIM_LONGDATA: {
         LPMIDIHDR header = (LPMIDIHDR) param1;
         jack_midi_data_t *data = (jack_midi_data_t *) header->lpData;
         size_t length1 = header->dwBytesRecorded;
         if ((data[0] != 0xf0) || (data[length1 - 1] != 0xf7)) {
             jack_error("JackWinMMEInputPort::ProcessWinMME - Discarding "
-                       "%d-byte sysex chunk.", length);
+                       "%d-byte sysex chunk.", length1);
         } else {
             EnqueueMessage(current_frame, length1, data);
         }
@@ -240,6 +241,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
                        result);
         }
         break;
+    }
     case MIM_LONGERROR:
         jack_error("JackWinMMEInputPort::ProcessWinMME - Invalid or "
                    "incomplete sysex message received.");

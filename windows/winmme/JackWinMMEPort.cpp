@@ -19,6 +19,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <memory>
 #include <stdexcept>
+#include <stdio.h>
 
 #include "JackWinMMEPort.h"
 #include "JackError.h"
