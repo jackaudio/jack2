@@ -23,6 +23,7 @@
 				<Linker>
 					<Add directory="Release\bin64" />
                     <Add library="libjackserver64" />
+                    <Add library="libsamplerate-0-x86_64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -42,6 +43,7 @@
 				<Linker>
 					<Add directory="Debug\bin64" />
                     <Add library="libjackserver64" />
+                    <Add library="libsamplerate-0-x86_64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -62,6 +64,7 @@
 				<Linker>
 					<Add directory="Release\bin64" />
                     <Add library="libjackserver64" />
+                    <Add library="libsamplerate-0-x86_64" />
 				</Linker>
 			</Target>
             <Target title="Win32 Release 32bits">
@@ -83,6 +86,7 @@
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
                     <Add library="libjackserver" />
+                    <Add library="libsamplerate-0" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jacknetadapter.res jacknetadapter.rc" />
@@ -107,6 +111,7 @@
 					<Add directory="Debug\bin" />
                     <Add option="-m32" />
                     <Add library="libjackserver" />
+                    <Add library="libsamplerate-0" />
 				</Linker>
                  <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jacknetadapter.res jacknetadapter.rc" />
@@ -132,6 +137,7 @@
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
                     <Add library="libjackserver" />
+                    <Add library="libsamplerate-0" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jacknetadapter.res jacknetadapter.rc" />
@@ -158,8 +164,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libsamplerate-0" />
-			<Add directory="Release\bin" />
 		</Linker>
 		<Unit filename="..\common\JackAudioAdapter.cpp" />
 		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />

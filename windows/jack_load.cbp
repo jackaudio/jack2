@@ -137,7 +137,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjack" />
 		</Linker>
 		<Unit filename="..\example-clients\ipload.c">
 			<Option compilerVar="CC" />

@@ -134,8 +134,7 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjack" />
-		</Linker>
+			</Linker>
 		<Unit filename="..\example-clients\lsp.c">
 			<Option compilerVar="CC" />
 		</Unit>

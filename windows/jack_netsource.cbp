@@ -22,6 +22,7 @@
 				<Linker>
 					<Add directory="Release\bin64" />
                     <Add library="libjack64" />
+                    <Add library="libsamplerate-0-x86_84" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -40,6 +41,7 @@
 				<Linker>
 					<Add directory="Debug\bin64" />
                     <Add library="libjack64" />
+                    <Add library="libsamplerate-0-x86_84" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -59,6 +61,7 @@
 				<Linker>
 					<Add directory="Release\bin64" />
                     <Add library="libjack64" />
+                    <Add library="libsamplerate-0-x86_84" />
 				</Linker>
 			</Target>
             <Target title="Win32 Release 32bits">
@@ -79,6 +82,7 @@
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
                     <Add library="libjack" />
+                    <Add library="libsamplerate-0" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 32bits">
@@ -99,6 +103,7 @@
 					<Add directory="Debug\bin" />
                     <Add option="-m32" />
                     <Add library="libjack" />
+                    <Add library="libsamplerate-0" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
@@ -120,6 +125,7 @@
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
                     <Add library="libjack" />
+                    <Add library="libsamplerate-0" />
 				</Linker>
 			</Target>
 		</Build>
@@ -143,9 +149,7 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libsamplerate-0" />
 			<Add library="ws2_32" />
-			<Add directory="Release\bin" />
 		</Linker>
 		<Unit filename="..\common\netjack_packet.c">
 			<Option compilerVar="CC" />
