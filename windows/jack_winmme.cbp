@@ -29,6 +29,7 @@
 				<Linker>
 					<Add directory="..\windows" />
 					<Add directory="Release\bin64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -54,6 +55,7 @@
 				<Linker>
 					<Add directory="Debug\bin64" />
 					<Add directory="..\windows" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -80,6 +82,7 @@
 				<Linker>
 					<Add directory="Release\bin64" />
 					<Add directory="..\windows" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
             <Target title="Win32 Release 32bits">
@@ -107,6 +110,7 @@
 					<Add directory="..\windows" />
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jackwinmme.res jackwinmme.rc" />
@@ -137,6 +141,7 @@
 					<Add directory="Debug\bin" />
 					<Add directory="..\windows" />
                     <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jackwinmme.res jackwinmme.rc" />
@@ -168,6 +173,7 @@
 					<Add directory="Release\bin" />
 					<Add directory="..\windows" />
                     <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jackwinmme.res jackwinmme.rc" />
@@ -190,7 +196,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjackserver" />
 			<Add library="winmm" />
 		</Linker>
 		<Unit filename="jackwinmme.rc">

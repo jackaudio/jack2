@@ -22,6 +22,7 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -40,6 +41,7 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -59,6 +61,7 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin64" />
+                    <Add library="libjackserver64" />
 				</Linker>
 			</Target>
             <Target title="Win32 Release 32bits">
@@ -79,6 +82,7 @@
 				<Linker>
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jacknetadapter.res jacknetadapter.rc" />
@@ -102,6 +106,7 @@
 				<Linker>
 					<Add directory="Debug\bin" />
                     <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
                  <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jacknetadapter.res jacknetadapter.rc" />
@@ -126,6 +131,7 @@
 				<Linker>
 					<Add directory="Release\bin" />
                     <Add option="-m32" />
+                    <Add library="libjackserver" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jacknetadapter.res jacknetadapter.rc" />
@@ -152,7 +158,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjackserver" />
 			<Add library="libsamplerate-0" />
 			<Add directory="Release\bin" />
 		</Linker>

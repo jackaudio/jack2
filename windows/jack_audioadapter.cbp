@@ -24,6 +24,9 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin64" />
+                    <Add library="libsamplerate-0-x86_64" />
+                    <Add library="libjackserver64" />
+                    <Add library="portaudio_x86_64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -44,6 +47,9 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin64" />
+                    <Add library="libsamplerate-0-x86_64" />
+                    <Add library="libjackserver64" />
+                    <Add library="portaudio_x86_64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -65,6 +71,9 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin64" />
+                    <Add library="libsamplerate-0-x86_64" />
+                    <Add library="libjackserver64" />
+                    <Add library="portaudio_x86_64" />
 				</Linker>
 			</Target>
             <Target title="Win32 Release 32bits">
@@ -87,6 +96,9 @@
 				<Linker>
                     <Add option="-m32" />
 					<Add directory="Release\bin" />
+                    <Add library="libsamplerate-0" />
+                    <Add library="libjackserver" />
+                    <Add library="portaudio_x86" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jackaudioadapter.res jackaudioadapter.rc" />
@@ -112,6 +124,9 @@
 				<Linker>
                     <Add option="-m32" />
 					<Add directory="Debug\bin" />
+                    <Add library="libsamplerate-0" />
+                    <Add library="libjackserver" />
+                    <Add library="portaudio_x86" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/jackaudioadapter.res jackaudioadapter.rc" />
@@ -138,6 +153,9 @@
 				<Linker>
                     <Add option="-m32" />
 					<Add directory="Release\bin" />
+                    <Add library="libsamplerate-0" />
+                    <Add library="libjackserver" />
+                    <Add library="portaudio_x86" />
 				</Linker>
                 <ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/jackaudioadapter.res jackaudioadapter.rc" />
@@ -160,9 +178,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libsamplerate-0" />
-			<Add library="libjackserver" />
-			<Add library="portaudio_x86" />
 		</Linker>
 		<Unit filename="..\common\JackAudioAdapter.cpp" />
 		<Unit filename="..\common\JackAudioAdapterFactory.cpp" />

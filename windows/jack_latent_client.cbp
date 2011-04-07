@@ -21,6 +21,7 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin64" />
+                    <Add library="libjack64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -37,6 +38,7 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Debug\bin64" />
+                    <Add library="libjack64" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -54,6 +56,7 @@
 				</Compiler>
 				<Linker>
 					<Add directory="Release\bin64" />
+                    <Add library="libjack64" />
 				</Linker>
 			</Target>
             <Target title="Win32 Release 32bits">
@@ -73,6 +76,7 @@
 				<Linker>
                     <Add option="-m32" />
 					<Add directory="Release\bin" />
+                    <Add library="libjack" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 32bits">
@@ -91,6 +95,7 @@
 				<Linker>
                     <Add option="-m32" />
 					<Add directory="Debug\bin" />
+                    <Add library="libjack" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
@@ -110,6 +115,7 @@
 				<Linker>
                     <Add option="-m32" />
 					<Add directory="Release\bin" />
+                    <Add library="libjack" />
 				</Linker>
 			</Target>
 		</Build>
@@ -128,7 +134,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjack" />
 		</Linker>
 		<Unit filename="..\example-clients\latent_client.c">
 			<Option compilerVar="CC" />
