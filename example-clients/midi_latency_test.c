@@ -60,9 +60,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #ifdef WIN32
 #include <windows.h>
+#include <unistd.h>
 #else
 #include <semaphore.h>
 #endif
+
+#include <signal.h>
 
 #define ABS(x) (((x) >= 0) ? (x) : (-(x)))
 
@@ -114,6 +117,13 @@ jack_nframes_t total_latency;
 jack_time_t total_latency_time;
 size_t unexpected_messages;
 size_t xrun_count;
+
+static void signal_handler(int sig)
+{
+	jack_client_close(client);
+	fprintf(stderr, "signal received, exiting ...\n");
+	exit(0);
+}
 
 #ifdef WIN32
 char semaphore_error_msg[1024];
@@ -463,6 +473,7 @@ main(int argc, char **argv)
     program_name = argv[0];
     samples = 1024;
     timeout = 5;
+
     for (;;) {
         char c = getopt_long(argc, argv, option_string, long_options,
                              &long_index);
@@ -554,6 +565,19 @@ main(int argc, char **argv)
                (message_size - 2) * sizeof(jack_midi_data_t));
         message_2[message_size - 1] = 0xf7;
     }
+
+    /* install a signal handler to properly quits jack client */
+#ifdef WIN32
+	signal(SIGINT, signal_handler);
+    signal(SIGABRT, signal_handler);
+	signal(SIGTERM, signal_handler);
+#else
+	signal(SIGQUIT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGHUP, signal_handler);
+	signal(SIGINT, signal_handler);
+#endif
+
     client = jack_client_open(program_name, JackNullOption, NULL);
     if (client == NULL) {
         error_message = "failed to open JACK client";
