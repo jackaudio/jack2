@@ -28,11 +28,12 @@ using Jack::JackALSARawMidiPort;
 JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
                                          size_t index)
 {
+    int card = snd_rawmidi_info_get_card(info);
+    unsigned int device = snd_rawmidi_info_get_device(info);
+    unsigned int subdevice = snd_rawmidi_info_get_subdevice(info);
     char device_id[32];
-    snprintf(device_id, sizeof(device_id), "hw:%d,%d,%d",
-             snd_rawmidi_info_get_card(info),
-             snd_rawmidi_info_get_device(info),
-             snd_rawmidi_info_get_subdevice(info));
+    snprintf(device_id, sizeof(device_id), "hw:%d,%d,%d", card, device,
+             subdevice);
     const char *alias_prefix;
     const char *error_message;
     snd_rawmidi_t **in;
@@ -76,6 +77,15 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         func = "snd_rawmidi_params_set_avail_min";
         goto free_params;
     }
+
+    // Smallest valid buffer size.
+    code = snd_rawmidi_params_set_buffer_size(rawmidi, params, 32);
+    if (code) {
+        error_message = snd_strerror(code);
+        func = "snd_rawmidi_params_set_buffer_size";
+        goto free_params;
+    }
+
     code = snd_rawmidi_params_set_no_active_sensing(rawmidi, params, 1);
     if (code) {
         error_message = snd_strerror(code);
@@ -95,12 +105,9 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         func = "snd_rawmidi_poll_descriptors_count";
         goto close;
     }
-    snprintf(alias, sizeof(alias), "%s%d", alias_prefix, index);
-    device_name = snd_rawmidi_info_get_subdevice_name(info);
-    if (! strlen(device_name)) {
-        device_name = snd_rawmidi_info_get_name(info);
-    }
-    snprintf(name, sizeof(name), "system:%s %s", device_name, name_suffix);
+    snprintf(alias, sizeof(alias), "%s%d", alias_prefix, index + 1);
+    snprintf(name, sizeof(name), "system:%d-%d %s %d %s", card + 1, device + 1,
+             snd_rawmidi_info_get_name(info), subdevice + 1, name_suffix);
     return;
  free_params:
     snd_rawmidi_params_free(params);
