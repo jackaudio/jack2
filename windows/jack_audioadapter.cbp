@@ -132,7 +132,7 @@
 					<Add before="windres -F pe-i386 -O coff -o Debug/jackaudioadapter.res jackaudioadapter.rc" />
 				</ExtraCommands>
 			</Target>
-			<Target title="Win32 Profiling 32bits<Option compiler="mingw_64" />">
+			<Target title="Win32 Profiling 32bits">
 				<Option output="Release\bin\jack\audioadapter" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="3" />

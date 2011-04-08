@@ -215,7 +215,7 @@ bool
 jackctl_add_driver_parameters(
     struct jackctl_driver * driver_ptr)
 {
-    int i;
+    unsigned int i;
 
     union jackctl_parameter_value jackctl_value;
     jackctl_param_type_t jackctl_type;
