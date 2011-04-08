@@ -54,6 +54,7 @@ JackALSARawMidiDriver::~JackALSARawMidiDriver()
 int
 JackALSARawMidiDriver::Attach()
 {
+    const char *alias;
     jack_nframes_t buffer_size = fEngineControl->fBufferSize;
     jack_port_id_t index;
     jack_nframes_t latency = buffer_size;
@@ -74,10 +75,15 @@ JackALSARawMidiDriver::Attach()
             // X: Do we need to deallocate ports?
             return -1;
         }
+        alias = input_port->GetAlias();
         port = fGraphManager->GetPort(index);
-        port->SetAlias(input_port->GetAlias());
+        port->SetAlias(alias);
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = index;
+
+        jack_info("JackALSARawMidiDriver::Attach - input port registered "
+                  "(name='%s', alias='%s').", name, alias);
+
     }
     if (! fEngineControl->fSyncMode) {
         latency += buffer_size;
@@ -96,10 +102,15 @@ JackALSARawMidiDriver::Attach()
             // X: Do we need to deallocate ports?
             return -1;
         }
+        alias = output_port->GetAlias();
         port = fGraphManager->GetPort(index);
-        port->SetAlias(output_port->GetAlias());
+        port->SetAlias(alias);
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = index;
+
+        jack_info("JackALSARawMidiDriver::Attach - output port registered "
+                  "(name='%s', alias='%s').", name, alias);
+
     }
     return 0;
 }
