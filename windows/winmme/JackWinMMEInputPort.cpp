@@ -55,8 +55,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
-    MMRESULT result = midiInOpen(&handle, index, (DWORD)HandleMidiInputEvent,
-                                 (DWORD)this,
+    MMRESULT result = midiInOpen(&handle, index, (DWORD_PTR)HandleMidiInputEvent,
+                                 (DWORD_PTR)this,
                                  CALLBACK_FUNCTION | MIDI_IO_STATUS);
     if (result != MMSYSERR_NOERROR) {
         GetInErrorString(result, error_message);
