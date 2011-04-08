@@ -20,9 +20,9 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add library="libjack64" />
+					<Add library="libsamplerate_x86_64" />
 					<Add directory="Release64\bin" />
-                    <Add library="libjack64" />
-                    <Add library="libsamplerate-0-x86_84" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -39,9 +39,9 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add library="libjack64" />
+					<Add library="libsamplerate_x86_64" />
 					<Add directory="Debug64\bin" />
-                    <Add library="libjack64" />
-                    <Add library="libsamplerate-0-x86_84" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -59,12 +59,12 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add library="libjack64" />
+					<Add library="libsamplerate_x86_64" />
 					<Add directory="Release64\bin" />
-                    <Add library="libjack64" />
-                    <Add library="libsamplerate-0-x86_84" />
 				</Linker>
 			</Target>
-            <Target title="Win32 Release 32bits">
+			<Target title="Win32 Release 32bits">
 				<Option output="Release\bin\jack_netsource" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release\" />
 				<Option type="1" />
@@ -72,17 +72,17 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
+					<Add library="libjack" />
+					<Add library="libsamplerate-0" />
 					<Add directory="Release\bin" />
-                    <Add option="-m32" />
-                    <Add library="libjack" />
-                    <Add library="libsamplerate-0" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 32bits">
@@ -93,17 +93,17 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
 					<Add directory="..\common\jack" />
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
+					<Add library="libjack" />
+					<Add library="libsamplerate-0" />
 					<Add directory="Debug\bin" />
-                    <Add option="-m32" />
-                    <Add library="libjack" />
-                    <Add library="libsamplerate-0" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
@@ -114,7 +114,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add option="-DJACK_MONITOR" />
 					<Add directory="..\example-clients" />
 					<Add directory="..\windows" />
@@ -122,10 +122,10 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add option="-m32" />
+					<Add library="libjack" />
+					<Add library="libsamplerate-0" />
 					<Add directory="Release\bin" />
-                    <Add option="-m32" />
-                    <Add library="libjack" />
-                    <Add library="libsamplerate-0" />
 				</Linker>
 			</Target>
 		</Build>
