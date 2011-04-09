@@ -116,6 +116,8 @@ def main():
         print "    dp                         - get parameters of currently selected driver"
         print "    dpd <param>                - get long description for driver parameter"
         print "    dps <param> <value>        - set driver parameter"
+        print "    asd <driver>               - add slave driver"
+        print "    rsd <driver>               - remove slave driver"
         print "    il                         - get list of available internals"
         print "    ip <name>                  - get parameters of given internal"
         print "    ipd <name> <param>         - get long description for internal parameter"
@@ -305,6 +307,26 @@ def main():
                 name = sys.argv[index]
                 index += 1
                 result = control_iface.UnloadInternal(name)
+            elif arg == 'asd':
+                print "--- add slave driver"
+
+                if index >= len(sys.argv):
+                    print "add slave driver command requires driver name argument"
+                    sys.exit()
+
+                name = sys.argv[index]
+                index += 1
+                result = control_iface.AddSlaveDriver(name)
+            elif arg == 'rsd':
+                print "--- remove slave driver"
+
+                if index >= len(sys.argv):
+                    print "remove slave driver command requires driver name argument"
+                    sys.exit()
+
+                name = sys.argv[index]
+                index += 1
+                result = control_iface.RemoveSlaveDriver(name)
             else:
                 print "Unknown command '%s'" % arg
         except dbus.DBusException, e:
