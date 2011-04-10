@@ -159,6 +159,12 @@ JackALSARawMidiDriver::Execute()
                        strerror(errno));
             break;
         }
+
+        if (timeout_frame_ptr) {
+            jack_info("JackALSARawMidiDriver::Execute - '%d', '%d'",
+                      timeout_frame, GetCurrentFrame());
+        }
+
         revents = poll_fds[0].revents;
         if (revents & POLLHUP) {
             // Driver is being stopped.
@@ -170,10 +176,10 @@ JackALSARawMidiDriver::Execute()
             break;
         }
         timeout_frame = 0;
-        for (int i = 0; i < fCaptureChannels; i++) {
-            if (! input_ports[i]->ProcessALSA(&process_frame)) {
+        for (int i = 0; i < fPlaybackChannels; i++) {
+            if (! output_ports[i]->ProcessALSA(fds[0], &process_frame)) {
                 jack_error("JackALSARawMidiDriver::Execute - a fatal error "
-                           "occurred while processing ALSA input events.");
+                           "occurred while processing ALSA output events.");
                 goto cleanup;
             }
             if (process_frame && ((! timeout_frame) ||
@@ -181,10 +187,10 @@ JackALSARawMidiDriver::Execute()
                 timeout_frame = process_frame;
             }
         }
-        for (int i = 0; i < fPlaybackChannels; i++) {
-            if (! output_ports[i]->ProcessALSA(fds[0], &process_frame)) {
+        for (int i = 0; i < fCaptureChannels; i++) {
+            if (! input_ports[i]->ProcessALSA(&process_frame)) {
                 jack_error("JackALSARawMidiDriver::Execute - a fatal error "
-                           "occurred while processing ALSA output events.");
+                           "occurred while processing ALSA input events.");
                 goto cleanup;
             }
             if (process_frame && ((! timeout_frame) ||
@@ -337,17 +343,6 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         snd_rawmidi_info_t *info = in_info_list.at(i);
         try {
             input_ports[num_inputs] = new JackALSARawMidiInputPort(info, i);
-
-            jack_info("JackALSARawMidiDriver::Open - Input port: card=%d, "
-                      "device=%d, subdevice=%d, id=%s, name=%s, subdevice "
-                      "name=%s",
-                      snd_rawmidi_info_get_card(info),
-                      snd_rawmidi_info_get_device(info),
-                      snd_rawmidi_info_get_subdevice(info),
-                      snd_rawmidi_info_get_id(info),
-                      snd_rawmidi_info_get_name(info),
-                      snd_rawmidi_info_get_subdevice_name(info));
-
             num_inputs++;
         } catch (std::exception e) {
             jack_error("JackALSARawMidiDriver::Open - while creating new "
@@ -359,17 +354,6 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         snd_rawmidi_info_t *info = out_info_list.at(i);
         try {
             output_ports[num_outputs] = new JackALSARawMidiOutputPort(info, i);
-
-            jack_info("JackALSARawMidiDriver::Open - Output port: card=%d, "
-                      "device=%d, subdevice=%d, id=%s, name=%s, subdevice "
-                      "name=%s",
-                      snd_rawmidi_info_get_card(info),
-                      snd_rawmidi_info_get_device(info),
-                      snd_rawmidi_info_get_subdevice(info),
-                      snd_rawmidi_info_get_id(info),
-                      snd_rawmidi_info_get_name(info),
-                      snd_rawmidi_info_get_subdevice_name(info));
-
             num_outputs++;
         } catch (std::exception e) {
             jack_error("JackALSARawMidiDriver::Open - while creating new "

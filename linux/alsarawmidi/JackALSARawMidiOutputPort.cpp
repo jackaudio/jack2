@@ -124,10 +124,6 @@ JackALSARawMidiOutputPort::ProcessALSA(int read_fd, jack_nframes_t *frame)
     *frame = raw_queue->Process();
     blocked = send_queue->IsBlocked();
     if (blocked) {
-
-        jack_info("JackALSARawMidiOutputPort::ProcessALSA - MIDI port is "
-                  "blocked");
-
         SetPollEventMask(POLLERR | POLLNVAL | POLLOUT);
         *frame = 0;
     } else {
