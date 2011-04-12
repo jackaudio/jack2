@@ -180,7 +180,7 @@ JackALSARawMidiDriver::Execute()
             break;
         }
 
-        if (timeout_frame_ptr) {
+        if (timeout_ptr) {
             jack_info("JackALSARawMidiDriver::Execute - '%d', '%d'",
                       timeout_frame, GetCurrentFrame());
         }
@@ -233,13 +233,13 @@ JackALSARawMidiDriver::
 FreeDeviceInfo(std::vector<snd_rawmidi_info_t *> *in_info_list,
                std::vector<snd_rawmidi_info_t *> *out_info_list)
 {
-    size_t length = in_info_list.size();
+    size_t length = in_info_list->size();
     for (size_t i = 0; i < length; i++) {
-        snd_rawmidi_info_free(in_info_list.at(i));
+        snd_rawmidi_info_free(in_info_list->at(i));
     }
-    length = out_info_list.size();
+    length = out_info_list->size();
     for (size_t i = 0; i < length; i++) {
-        snd_rawmidi_info_free(out_info_list.at(i));
+        snd_rawmidi_info_free(out_info_list->at(i));
     }
 }
 
@@ -359,6 +359,8 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         FreeDeviceInfo(&in_info_list, &out_info_list);
         return -1;
     }
+    size_t num_inputs = 0;
+    size_t num_outputs = 0;
     if (potential_inputs) {
         try {
             input_ports = new JackALSARawMidiInputPort *[potential_inputs];
@@ -379,8 +381,6 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
             goto delete_input_ports;
         }
     }
-    size_t num_inputs = 0;
-    size_t num_outputs = 0;
     for (size_t i = 0; i < potential_inputs; i++) {
         snd_rawmidi_info_t *info = in_info_list.at(i);
         try {
@@ -415,7 +415,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         return 0;
     }
     if (output_ports) {
-        for (int i = 0; i < num_outputs; i++) {
+        for (size_t i = 0; i < num_outputs; i++) {
             delete output_ports[i];
         }
         delete[] output_ports;
@@ -423,7 +423,7 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     }
  delete_input_ports:
     if (input_ports) {
-        for (int i = 0; i < num_inputs; i++) {
+        for (size_t i = 0; i < num_inputs; i++) {
             delete input_ports[i];
         }
         delete[] input_ports;
