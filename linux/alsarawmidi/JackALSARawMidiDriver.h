@@ -45,15 +45,16 @@ namespace Jack {
         JackThread *thread;
 
         void
+        FreeDeviceInfo(std::vector<snd_rawmidi_info_t *> *in_info_list,
+                       std::vector<snd_rawmidi_info_t *> *out_info_list);
+
+        void
         GetDeviceInfo(snd_ctl_t *control, snd_rawmidi_info_t *info,
                       std::vector<snd_rawmidi_info_t *> *info_list);
 
         void
         HandleALSAError(const char *driver_func, const char *alsa_func,
                         int code);
-
-        int
-        Poll(const jack_nframes_t *wakeup_frame);
 
     public:
 

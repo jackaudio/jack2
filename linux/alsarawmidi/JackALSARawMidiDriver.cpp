@@ -145,13 +145,33 @@ JackALSARawMidiDriver::Execute()
     for (;;) {
         jack_nframes_t process_frame;
         unsigned short revents;
-        jack_nframes_t *timeout_frame_ptr;
+        struct timespec timeout;
+        struct timespec *timeout_ptr;
         if (! timeout_frame) {
-            timeout_frame_ptr = 0;
+            timeout_ptr = 0;
         } else {
-            timeout_frame_ptr = &timeout_frame;
+
+            // We use a relative timeout here.  By the time ppoll is called,
+            // the wait time is larger than it needs to be.  Maybe we should
+            // use a timerfd instead.
+            //
+            // Also, ppoll is inefficient in certain cases.  We might want to
+            // consider replacing it with epoll, though I'm uncertain as to
+            // whether or not it would be more efficient in this case.
+
+            timeout_ptr = &timeout;
+            jack_time_t next_time = GetTimeFromFrames(timeout_frame);
+            jack_time_t now = GetMicroSeconds();
+            if (next_time <= now) {
+                timeout.tv_sec = 0;
+                timeout.tv_nsec = 0;
+            } else {
+                jack_time_t wait_time = next_time - now;
+                timeout.tv_sec = wait_time / 1000000;
+                timeout.tv_nsec = (wait_time % 1000000) * 1000;
+            }
         }
-        if (Poll(timeout_frame_ptr) == -1) {
+        if (ppoll(poll_fds, poll_fd_count, timeout_ptr, 0) == -1) {
             if (errno == EINTR) {
                 continue;
             }
@@ -206,6 +226,21 @@ JackALSARawMidiDriver::Execute()
     jack_info("JackALSARawMidiDriver::Execute - ALSA thread exiting.");
 
     return false;
+}
+
+void
+JackALSARawMidiDriver::
+FreeDeviceInfo(std::vector<snd_rawmidi_info_t *> *in_info_list,
+               std::vector<snd_rawmidi_info_t *> *out_info_list)
+{
+    size_t length = in_info_list.size();
+    for (size_t i = 0; i < length; i++) {
+        snd_rawmidi_info_free(in_info_list.at(i));
+    }
+    length = out_info_list.size();
+    for (size_t i = 0; i < length; i++) {
+        snd_rawmidi_info_free(out_info_list.at(i));
+    }
 }
 
 void
@@ -321,22 +356,29 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
     if (! (potential_inputs || potential_outputs)) {
         jack_error("JackALSARawMidiDriver::Open - no ALSA raw MIDI input or "
                    "output ports found.");
+        FreeDeviceInfo(&in_info_list, &out_info_list);
         return -1;
     }
-
-    // XXX: Can't use auto_ptr here.  These are arrays, and require the
-    // delete[] operator.
-    std::auto_ptr<JackALSARawMidiInputPort *> input_ptr;
     if (potential_inputs) {
-        input_ports = new JackALSARawMidiInputPort *[potential_inputs];
-        input_ptr.reset(input_ports);
+        try {
+            input_ports = new JackALSARawMidiInputPort *[potential_inputs];
+        } catch (std::exception e) {
+            jack_error("JackALSARawMidiDriver::Open - while creating input "
+                       "port array: %s", e.what());
+            FreeDeviceInfo(&in_info_list, &out_info_list);
+            return -1;
+        }
     }
-    std::auto_ptr<JackALSARawMidiOutputPort *> output_ptr;
     if (potential_outputs) {
-        output_ports = new JackALSARawMidiOutputPort *[potential_outputs];
-        output_ptr.reset(output_ports);
+        try {
+            output_ports = new JackALSARawMidiOutputPort *[potential_outputs];
+        } catch (std::exception e) {
+            jack_error("JackALSARawMidiDriver::Open - while creating output "
+                       "port array: %s", e.what());
+            FreeDeviceInfo(&in_info_list, &out_info_list);
+            goto delete_input_ports;
+        }
     }
-
     size_t num_inputs = 0;
     size_t num_outputs = 0;
     for (size_t i = 0; i < potential_inputs; i++) {
@@ -361,49 +403,33 @@ JackALSARawMidiDriver::Open(bool capturing, bool playing, int in_channels,
         }
         snd_rawmidi_info_free(info);
     }
-    if (num_inputs || num_outputs) {
-        if (! JackMidiDriver::Open(capturing, playing, num_inputs, num_outputs,
-                                   monitor, capture_driver_name,
-                                   playback_driver_name, capture_latency,
-                                   playback_latency)) {
-            if (potential_inputs) {
-                input_ptr.release();
-            }
-            if (potential_outputs) {
-                output_ptr.release();
-            }
-            return 0;
-        }
-        jack_error("JackALSARawMidiDriver::Open - JackMidiDriver::Open error");
-    } else {
+    if (! (num_inputs || num_outputs)) {
         jack_error("JackALSARawMidiDriver::Open - none of the potential "
                    "inputs or outputs were successfully opened.");
-    }
-    Close();
-    return -1;
-}
-
-int
-JackALSARawMidiDriver::Poll(const jack_nframes_t *wakeup_frame)
-{
-    struct timespec timeout;
-    struct timespec *timeout_ptr;
-    if (! wakeup_frame) {
-        timeout_ptr = 0;
+    } else if (JackMidiDriver::Open(capturing, playing, num_inputs,
+                                    num_outputs, monitor, capture_driver_name,
+                                    playback_driver_name, capture_latency,
+                                    playback_latency)) {
+        jack_error("JackALSARawMidiDriver::Open - JackMidiDriver::Open error");
     } else {
-        timeout_ptr = &timeout;
-        jack_time_t next_time = GetTimeFromFrames(*wakeup_frame);
-        jack_time_t now = GetMicroSeconds();
-        if (next_time <= now) {
-            timeout.tv_sec = 0;
-            timeout.tv_nsec = 0;
-        } else {
-            jack_time_t wait_time = next_time - now;
-            timeout.tv_sec = wait_time / 1000000;
-            timeout.tv_nsec = (wait_time % 1000000) * 1000;
-        }
+        return 0;
     }
-    return ppoll(poll_fds, poll_fd_count, timeout_ptr, 0);
+    if (output_ports) {
+        for (int i = 0; i < num_outputs; i++) {
+            delete output_ports[i];
+        }
+        delete[] output_ports;
+        output_ports = 0;
+    }
+ delete_input_ports:
+    if (input_ports) {
+        for (int i = 0; i < num_inputs; i++) {
+            delete input_ports[i];
+        }
+        delete[] input_ports;
+        input_ports = 0;
+    }
+    return -1;
 }
 
 int
