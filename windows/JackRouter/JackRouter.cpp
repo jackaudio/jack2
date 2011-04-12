@@ -29,13 +29,12 @@ Copyright (C) 2006 Grame
 #include "profport.h"
 
 /*
-
 	08/07/2007 SL : USe jack_client_open instead of jack_client_new (automatic client renaming).
 	09/08/2007 SL : Add JackRouter.ini parameter file.
 	09/20/2007 SL : Better error report in DllRegisterServer (for Vista).
 	09/27/2007 SL : Add AUDO_CONNECT property in JackRouter.ini file.
 	10/10/2007 SL : Use ASIOSTInt32LSB instead of ASIOSTInt16LSB.
-
+	12/04/2011 SL : Compilation on Windows 64.
  */
 
 //------------------------------------------------------------------------------------------
@@ -54,7 +53,13 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 #if WINDOWS
 #include "windows.h"
 #include "mmsystem.h"
-#include "psapi.h"
+#ifdef _WIN64
+#define JACK_ROUTER "JackRouter64.dll"
+#include <psapi.h>
+#else
+#define JACK_ROUTER "JackRouter.dll"
+#include "./psapi.h"
+#endif
 
 using namespace std;
 
@@ -95,11 +100,11 @@ HRESULT _stdcall DllRegisterServer()
 	LONG	rc;
 	char	errstr[128];
 
-	rc = RegisterAsioDriver (IID_ASIO_DRIVER,"JackRouter.dll","JackRouter","JackRouter","Apartment");
+	rc = RegisterAsioDriver (IID_ASIO_DRIVER, JACK_ROUTER,"JackRouter","JackRouter","Apartment");
 
 	if (rc) {
 		memset(errstr,0,128);
-		sprintf(errstr,"Register Server failed ! (%d)",rc);
+		sprintf(errstr,"Register Server failed ! (%s %d)",JACK_ROUTER, rc);
 		MessageBox(0,(LPCTSTR)errstr,(LPCTSTR)"JackRouter",MB_OK);
 		return -1;
 	}
@@ -115,7 +120,7 @@ HRESULT _stdcall DllUnregisterServer()
 	LONG	rc;
 	char	errstr[128];
 
-	rc = UnregisterAsioDriver (IID_ASIO_DRIVER,"JackRouter.dll","JackRouter");
+	rc = UnregisterAsioDriver (IID_ASIO_DRIVER,JACK_ROUTER,"JackRouter");
 
 	if (rc) {
 		memset(errstr,0,128);
@@ -175,7 +180,7 @@ JackRouter::JackRouter() : AsioDriver()
 	printf("Constructor\n");
 
 	// Use "jackrouter.ini" parameters if available
-	HMODULE handle = LoadLibrary("JackRouter.dll");
+	HMODULE handle = LoadLibrary(JACK_ROUTER);
 
 	if (handle) {
 
@@ -209,15 +214,11 @@ JackRouter::~JackRouter()
 {
 	stop ();
 	disposeBuffers ();
-	printf("Destructor\n");
 	jack_client_close(fClient);
+	printf("Destructor\n");
 }
 
 //------------------------------------------------------------------------------------------
-#include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
-#include "psapi.h"
 
 static bool GetEXEName(DWORD dwProcessID, char* name)
 {
