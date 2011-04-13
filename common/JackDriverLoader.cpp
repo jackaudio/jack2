@@ -531,7 +531,7 @@ jack_drivers_load (JSList * drivers) {
     HANDLE file;
     const char * ptr = NULL;
     JSList * driver_list = NULL;
-    jack_driver_desc_t * desc;
+    jack_driver_desc_t * desc = NULL;
 
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
         // for WIN32 ADDON_DIR is defined in JackConstants.h as relative path
@@ -551,6 +551,11 @@ jack_drivers_load (JSList * drivers) {
     }
 
     do {
+        /* check the filename is of the right format */
+        if (strncmp ("jack_", filedata.cFileName, 5) != 0) {
+            continue;
+        }
+
         ptr = strrchr (filedata.cFileName, '.');
         if (!ptr) {
             continue;
@@ -558,6 +563,11 @@ jack_drivers_load (JSList * drivers) {
         ptr++;
         if (strncmp ("dll", ptr, 3) != 0) {
             continue;
+        }
+
+        /* check if dll is an internal client */
+        if (check_symbol(filedata.cFileName, "jack_internal_initialize")) {
+             continue;
         }
 
         desc = jack_get_descriptor (drivers, filedata.cFileName, "driver_get_descriptor");
@@ -586,7 +596,7 @@ jack_drivers_load (JSList * drivers) {
     const char * ptr;
     int err;
     JSList * driver_list = NULL;
-    jack_driver_desc_t * desc;
+    jack_driver_desc_t * desc = NULL;
 
     const char* driver_dir;
     if ((driver_dir = getenv("JACK_DRIVER_DIR")) == 0) {
@@ -618,8 +628,12 @@ jack_drivers_load (JSList * drivers) {
             continue;
         }
 
-        desc = jack_get_descriptor (drivers, dir_entry->d_name, "driver_get_descriptor");
+        /* check if dll is an internal client */
+        if (check_symbol(dir_entry->d_name, "jack_internal_initialize")) {
+             continue;
+        }
 
+        desc = jack_get_descriptor (drivers, dir_entry->d_name, "driver_get_descriptor");
         if (desc) {
             driver_list = jack_slist_append (driver_list, desc);
         } else {
@@ -669,7 +683,7 @@ jack_internals_load (JSList * internals) {
     file = (HANDLE )FindFirstFile(dll_filename, &filedata);
 
     if (file == INVALID_HANDLE_VALUE) {
-        jack_error("error");
+        jack_error("could not open driver directory %s", driver_dir);
         return NULL;
     }
 

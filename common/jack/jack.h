@@ -233,7 +233,7 @@ jack_nframes_t jack_thread_wait (jack_client_t*, int status) JACK_OPTIONAL_WEAK_
  *
  * @return the number of frames of data to process
  */
-    jack_nframes_t jack_cycle_wait (jack_client_t* client) JACK_OPTIONAL_WEAK_EXPORT;
+jack_nframes_t jack_cycle_wait (jack_client_t* client) JACK_OPTIONAL_WEAK_EXPORT;
 
 /**
  * Signal next clients in the graph.
