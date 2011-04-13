@@ -104,7 +104,7 @@ HRESULT _stdcall DllRegisterServer()
 
 	if (rc) {
 		memset(errstr,0,128);
-		sprintf(errstr,"Register Server failed ! (%s %d)",JACK_ROUTER, rc);
+		sprintf(errstr,"Register Server failed ! (%d)", rc);
 		MessageBox(0,(LPCTSTR)errstr,(LPCTSTR)"JackRouter",MB_OK);
 		return -1;
 	}
