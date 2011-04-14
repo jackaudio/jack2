@@ -74,9 +74,6 @@
 
 #include "netjack_packet.h"
 
-// JACK2 specific.
-#include "control.h"
-
 #ifdef NO_JACK_ERROR
 #define jack_error printf
 #endif

@@ -64,6 +64,56 @@ jack_controller_find_driver(
     return NULL;
 }
 
+bool
+jack_controller_add_slave_drivers(
+    struct jack_controller * controller_ptr)
+{
+    struct list_head * node_ptr;
+    struct jack_controller_slave_driver * driver_ptr;
+
+    list_for_each(node_ptr, &controller_ptr->slave_drivers)
+    {
+        driver_ptr = list_entry(node_ptr, struct jack_controller_slave_driver, siblings);
+        driver_ptr->handle = jack_controller_find_driver(controller_ptr->server, driver_ptr->name);
+
+        if (driver_ptr->handle == NULL)
+        {
+            jack_error("Unknown driver \"%s\"", driver_ptr->name);
+            goto fail;
+        }
+
+        if (!jackctl_server_add_slave(controller_ptr->server, driver_ptr->handle))
+        {
+            jack_error("Driver \"%s\" cannot be loaded", driver_ptr->name);
+            goto fail;
+        }
+    }
+
+    return true;
+
+fail:
+    driver_ptr->handle = NULL;
+    return false;
+}
+
+void
+jack_controller_remove_slave_drivers(
+    struct jack_controller * controller_ptr)
+{
+    struct list_head * node_ptr;
+    struct jack_controller_slave_driver * driver_ptr;
+
+    list_for_each(node_ptr, &controller_ptr->slave_drivers)
+    {
+        driver_ptr = list_entry(node_ptr, struct jack_controller_slave_driver, siblings);
+        if (driver_ptr->handle != NULL)
+        {
+            jackctl_server_remove_slave(controller_ptr->server, driver_ptr->handle);
+            driver_ptr->handle = NULL;
+        }
+    }
+}
+
 jackctl_internal_t *
 jack_controller_find_internal(
     jackctl_server_t *server,
@@ -161,6 +211,8 @@ jack_controller_start_server(
         goto fail;
     }
 
+    jack_controller_add_slave_drivers(controller_ptr);
+
     if (!jackctl_server_start(
             controller_ptr->server))
     {
@@ -221,6 +273,8 @@ fail_stop_server:
     }
 
 fail_close_server:
+    jack_controller_remove_slave_drivers(controller_ptr);
+
     if (!jackctl_server_close(controller_ptr->server))
     {
         jack_error("failed to close jack server");
@@ -262,6 +316,8 @@ jack_controller_stop_server(
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to stop server");
         return FALSE;
     }
+
+    jack_controller_remove_slave_drivers(controller_ptr);
 
     if (!jackctl_server_close(controller_ptr->server))
     {
@@ -387,6 +443,7 @@ jack_controller_create(
     controller_ptr->started = false;
     controller_ptr->driver = NULL;
     controller_ptr->driver_set = false;
+    INIT_LIST_HEAD(&controller_ptr->slave_drivers);
 
     drivers = (JSList *)jackctl_server_get_drivers_list(controller_ptr->server);
     controller_ptr->drivers_count = jack_slist_length(drivers);
@@ -465,41 +522,58 @@ fail:
 }
 
 bool
-jack_controller_add_slave(
-    struct jack_controller *controller_ptr,
+jack_controller_add_slave_driver(
+    struct jack_controller * controller_ptr,
     const char * driver_name)
 {
-    jackctl_driver_t *driver;
+    struct jack_controller_slave_driver * driver_ptr;
 
-    driver = jack_controller_find_driver(controller_ptr->server, driver_name);
-      
-    if (driver == NULL)
+    driver_ptr = malloc(sizeof(struct jack_controller_slave_driver));
+    if (driver_ptr == NULL)
     {
+        jack_error("malloc() failed to allocate jack_controller_slave_driver struct");
         return false;
     }
 
-    jack_info("driver \"%s\" selected", driver_name);
+    driver_ptr->name = strdup(driver_name);
+    if (driver_ptr->name == NULL)
+    {
+        jack_error("strdup() failed for slave driver name \"%s\"", driver_name);
+        free(driver_ptr);
+        return false;
+    }
 
-    return jackctl_server_add_slave(controller_ptr->server, driver);
+    driver_ptr->handle = NULL;
+
+    jack_info("slave driver \"%s\" added", driver_name);
+
+    list_add_tail(&driver_ptr->siblings, &controller_ptr->slave_drivers);
+
+    return true;
 }
 
 bool
-jack_controller_remove_slave(
-    struct jack_controller *controller_ptr,
+jack_controller_remove_slave_driver(
+    struct jack_controller * controller_ptr,
     const char * driver_name)
 {
-    jackctl_driver_t *driver;
+    struct list_head * node_ptr;
+    struct jack_controller_slave_driver * driver_ptr;
 
-    driver = jack_controller_find_driver(controller_ptr->server, driver_name);
-      
-    if (driver == NULL)
+    list_for_each(node_ptr, &controller_ptr->slave_drivers)
     {
-        return false;
+        driver_ptr = list_entry(node_ptr, struct jack_controller_slave_driver, siblings);
+        if (strcmp(driver_ptr->name, driver_name) == 0)
+        {
+            jack_info("slave driver \"%s\" removed", driver_name);
+            list_del(&driver_ptr->siblings);
+            free(driver_ptr->name);
+            free(driver_ptr);
+            return true;
+        }
     }
 
-    jack_info("driver \"%s\" selected", driver_name);
-
-    return jackctl_server_remove_slave(controller_ptr->server, driver);
+    return false;
 }
 
 bool

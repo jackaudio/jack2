@@ -26,6 +26,14 @@
 #include "jack/control.h"
 #include "jack/jack.h"
 #include "jackdbus.h"
+#include "list.h"
+
+struct jack_controller_slave_driver
+{
+    struct list_head siblings;
+    char * name;
+    jackctl_driver_t * handle;
+};
 
 struct jack_controller
 {
@@ -45,6 +53,7 @@ struct jack_controller
 
     jackctl_driver_t *driver;
     bool driver_set;            /* whether driver is manually set, if false - DEFAULT_DRIVER is auto set */
+    struct list_head slave_drivers;
 
     struct jack_dbus_object_descriptor dbus_descriptor;
 };
@@ -87,12 +96,12 @@ jack_controller_switch_master(
     void *dbus_call_context_ptr);
     
 bool
-jack_controller_add_slave(
+jack_controller_add_slave_driver(
     struct jack_controller *controller_ptr,
     const char * driver_name);
     
 bool
-jack_controller_remove_slave(
+jack_controller_remove_slave_driver(
     struct jack_controller *controller_ptr,
     const char * driver_name);
 

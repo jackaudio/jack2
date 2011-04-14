@@ -4,13 +4,13 @@
 	<Project>
 		<Option title="jack_netadapter" />
 		<Option pch_mode="2" />
-		<Option compiler="gcc" />
+		<Option compiler="mingw_64" />
 		<Build>
-			<Target title="Win32 Release">
-				<Option output="Release\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release\" />
+			<Target title="Win32 Release 64bits">
+				<Option output="Release64\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release64\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -21,14 +21,16 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Release\bin" />
+					<Add library="libjackserver64" />
+					<Add library="libsamplerate_x86_64" />
+					<Add directory="Release64\bin" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Debug">
-				<Option output="Debug\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug\" />
+			<Target title="Win32 Debug 64bits">
+				<Option output="Debug64\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug64\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
@@ -39,14 +41,16 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Debug\bin" />
+					<Add library="libjackserver64" />
+					<Add library="libsamplerate_x86_64" />
+					<Add directory="Debug64\bin" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Profiling">
-				<Option output="Release\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release\" />
+			<Target title="Win32 Profiling 64bits">
+				<Option output="Release64\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release64\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_64" />
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
@@ -58,8 +62,86 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
+					<Add library="libjackserver64" />
+					<Add library="libsamplerate_x86_64" />
+					<Add directory="Release64\bin" />
+				</Linker>
+			</Target>
+			<Target title="Win32 Release 32bits">
+				<Option output="Release\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release\" />
+				<Option type="3" />
+				<Option compiler="mingw_64" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-DSERVER_SIDE" />
+					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add library="libjackserver" />
+					<Add library="libsamplerate-0" />
 					<Add directory="Release\bin" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/jacknetadapter.res jacknetadapter.rc" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win32 Debug 32bits">
+				<Option output="Debug\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug\" />
+				<Option type="3" />
+				<Option compiler="mingw_64" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-DSERVER_SIDE" />
+					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add library="libjackserver" />
+					<Add library="libsamplerate-0" />
+					<Add directory="Debug\bin" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Debug/jacknetadapter.res jacknetadapter.rc" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win32 Profiling 32bits">
+				<Option output="Release\bin\jack\netadapter" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release\" />
+				<Option type="3" />
+				<Option compiler="mingw_64" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DBUILD_DLL" />
+					<Add option="-DJACK_MONITOR" />
+					<Add option="-DSERVER_SIDE" />
+					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add library="libjackserver" />
+					<Add library="libsamplerate-0" />
+					<Add directory="Release\bin" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/jacknetadapter.res jacknetadapter.rc" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
@@ -82,9 +164,6 @@
 			<Add library="uuid" />
 			<Add library="odbc32" />
 			<Add library="odbccp32" />
-			<Add library="libjackserver" />
-			<Add library="libsamplerate-0" />
-			<Add directory="Release\bin" />
 		</Linker>
 		<Unit filename="..\common\JackAudioAdapter.cpp" />
 		<Unit filename="..\common\JackAudioAdapterInterface.cpp" />

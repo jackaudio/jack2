@@ -215,7 +215,7 @@ bool
 jackctl_add_driver_parameters(
     struct jackctl_driver * driver_ptr)
 {
-    int i;
+    unsigned int i;
 
     union jackctl_parameter_value jackctl_value;
     jackctl_param_type_t jackctl_type;
@@ -1237,8 +1237,9 @@ EXPORT bool jackctl_server_remove_slave(jackctl_server * server_ptr, jackctl_dri
             jack_error("cannot remove a slave from a running server");
             return false;
         } else {
-            JackDriverInfo* info = (JackDriverInfo*)driver_ptr->infos->data;
-            if (info) {
+            if (driver_ptr->infos) {
+                JackDriverInfo* info = (JackDriverInfo*)driver_ptr->infos->data;
+                assert(info);
                 driver_ptr->infos = jack_slist_remove(driver_ptr->infos, info);
                 server_ptr->engine->RemoveSlave(info);
                 delete info;

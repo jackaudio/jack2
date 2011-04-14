@@ -55,8 +55,8 @@ JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
     thread = new JackThread(this);
     std::auto_ptr<JackThread> thread_ptr(thread);
     char error_message[MAXERRORLENGTH];
-    MMRESULT result = midiOutOpen(&handle, index, (DWORD)HandleMessageEvent,
-                                  (DWORD)this, CALLBACK_FUNCTION);
+    MMRESULT result = midiOutOpen(&handle, index, (DWORD_PTR)HandleMessageEvent,
+                                  (DWORD_PTR)this, CALLBACK_FUNCTION);
     if (result != MMSYSERR_NOERROR) {
         GetOutErrorString(result, error_message);
         goto raise_exception;
