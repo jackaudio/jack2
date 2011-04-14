@@ -161,15 +161,14 @@ JackALSARawMidiDriver::Execute()
             // times, but, strangely, it actually slowed things down, and made
             // the code a lot more complicated.
             //
-            // Another alternative would be to use 'epoll' interface.  The
-            // problem with the 'epoll' interface is that the timeout
+            // I wonder about using the 'epoll' interface instead of 'ppoll()'.
+            // The problem with the 'epoll' interface is that the timeout
             // resolution of 'epoll_wait()' is set in milliseconds.  We need
             // microsecond resolution.  Without microsecond resolution, we
             // impose the same jitter as USB MIDI.
             //
-            // Of course, a bigger problem is that 'ppoll()' returns later than
-            // the wait time.  The problem can be minimized with high precision
-            // timers.
+            // Another problem is that 'ppoll()' returns later than the wait
+            // time.  The problem can be minimized with high precision timers.
 
             timeout_ptr = &timeout;
             jack_time_t next_time = GetTimeFromFrames(timeout_frame);
