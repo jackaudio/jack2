@@ -124,7 +124,8 @@ namespace Jack
 
     bool JackNetDriver::Initialize()
     {
-        jack_log("JackNetDriver::Initialize() ");
+        jack_log("JackNetDriver::Initialize()");
+        FreePorts();
 
         //new loading, but existing socket, restart the driver
         if (fSocket.IsSocket()) {
@@ -373,29 +374,33 @@ namespace Jack
 
     int JackNetDriver::FreePorts()
     {
-        jack_log ( "JackNetDriver::FreePorts" );
+        jack_log("JackNetDriver::FreePorts");
 
         for (int audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++) {
             if (fCapturePortList[audio_port_index] > 0) {
                 fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index]);
+                fCapturePortList[audio_port_index] = 0;
             }
         }
 
         for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
             if (fPlaybackPortList[audio_port_index] > 0) {
                 fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index]);
+                fPlaybackPortList[audio_port_index] = 0;
             }
         }
 
         for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
             if (fMidiCapturePortList && fMidiCapturePortList[midi_port_index] > 0) {
                 fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index]);
+                fMidiCapturePortList[midi_port_index] =0;
             }
         }
 
         for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
             if (fMidiPlaybackPortList && fMidiPlaybackPortList[midi_port_index] > 0) {
                 fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index]);
+                fMidiPlaybackPortList[midi_port_index] = 0;
             }
         }
         // Clear MIDI channels
