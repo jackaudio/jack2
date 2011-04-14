@@ -53,9 +53,8 @@
    <bgfoot> </> 
    <bgback> </>
    <files listview >
-      <_><src>..\Release\bin\libjack.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
-<_><src>.\src\vcredist_2008_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\src\vcredist_2010_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libjack.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
@@ -71,7 +70,7 @@
 <_><src>..\Release\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\libsamplerate-0.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\libsamplerate_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\jack\jack_netone.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
@@ -108,7 +107,6 @@
 
    </files>
    <runx listview >
-   <_><type>app</><path>inst</><file>vcredist_2008_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
    <_><type>app</><path>inst</><file>vcredist_2010_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
    </runx>
    <registry listview >

@@ -104,9 +104,9 @@ namespace Jack
         }
 
         //max channels
-        if ( in_max == 0 )
+        if ( in_max == 0 && fInputDevice != paNoDevice)
             in_max = fPaDevices.GetDeviceInfo ( fInputDevice )->maxInputChannels;
-        if ( out_max == 0 )
+        if ( out_max == 0 && fOutputDevice != paNoDevice)
             out_max = fPaDevices.GetDeviceInfo ( fOutputDevice )->maxOutputChannels;
 
         //effective channels
@@ -125,6 +125,11 @@ namespace Jack
         PaError err;
         PaStreamParameters inputParameters;
         PaStreamParameters outputParameters;
+
+        if (fInputDevice == paNoDevice && fOutputDevice == paNoDevice) {
+            jack_error("No input and output device!!");
+            return -1;
+        }
 
         if ( JackAudioAdapterInterface::Open() < 0 )
             return -1;

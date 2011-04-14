@@ -53,9 +53,8 @@
    <bgfoot> </> 
    <bgback> </>
    <files listview >
-      <_><src>.\src\vcredist_2008_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-	  <_><src>.\src\vcredist_2010_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-	  <_><src>.\src\vcredist_2010_x64.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\vcredist_2010_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\vcredist_2010_x64.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libjack64.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libjack64.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libjack64.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
@@ -119,7 +118,6 @@
 
    </files>
    <runx listview >
-   <_><type>app</><path>inst</><file>vcredist_2008_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
    <_><type>app</><path>inst</><file>vcredist_2010_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
    <_><type>app</><path>inst</><file>vcredist_2010_x64.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
    </runx>

@@ -7,14 +7,12 @@
 		<Project filename="jack_netonedriver.cbp" />
 		<Project filename="jack_dummy.cbp" />
 		<Project filename="jack_netmanager.cbp" />
-		<Project filename="jack_audioadapter.cbp" />
-		<Project filename="jack_netadapter.cbp" />
+		<Project filename="jack_audioadapter.cbp" active="1" />
 		<Project filename="libjack.cbp" />
 		<Project filename="jack_load.cbp" />
 		<Project filename="jack_unload.cbp" />
 		<Project filename="jack_lsp.cbp" />
 		<Project filename="jack_latent_client.cbp" />
-		<Project filename="jack_netsource.cbp" />
 		<Project filename="jack_metro.cbp" />
 		<Project filename="jack_connect.cbp" />
 		<Project filename="jack_disconnect.cbp" />
@@ -23,6 +21,8 @@
 		<Project filename="jack_winmme.cbp" />
 		<Project filename="jack_loopback.cbp" />
 		<Project filename="jackd.cbp" />
-		<Project filename="jack_midi_latency_test.cbp" active="1" />
+		<Project filename="jack_midi_latency_test.cbp" />
+		<Project filename="jack_netadapter.cbp" />
+		<Project filename="jack_netsource.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
