@@ -129,10 +129,6 @@ JackMidiRawOutputWriteQueue::SendByte(jack_nframes_t time,
     case BUFFER_TOO_SMALL:
         HandleWriteQueueBug(time, byte);
     case OK:
-
-        jack_info("JackMidiRawOutputWriteQueue::SendByte - '%d', '%d'", time,
-                  GetCurrentFrame());
-
         return true;
     default:
         // This is here to stop compilers from warning us about not handling

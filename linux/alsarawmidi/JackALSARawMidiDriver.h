@@ -40,6 +40,7 @@ namespace Jack {
         int fds[2];
         JackALSARawMidiInputPort **input_ports;
         JackALSARawMidiOutputPort **output_ports;
+        jack_nframes_t *output_port_timeouts;
         nfds_t poll_fd_count;
         struct pollfd *poll_fds;
         JackThread *thread;

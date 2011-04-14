@@ -17,16 +17,18 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <cassert>
 #include <stdexcept>
 #include <string>
 
 #include "JackALSARawMidiPort.h"
+#include "JackALSARawMidiUtil.h"
 #include "JackError.h"
 
 using Jack::JackALSARawMidiPort;
 
 JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
-                                         size_t index)
+                                         size_t index, unsigned short io_mask)
 {
     int card = snd_rawmidi_info_get_card(info);
     unsigned int device = snd_rawmidi_info_get_device(info);
@@ -50,7 +52,6 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         name_suffix = "in";
         out = 0;
     }
-    const char *device_name;
     const char *func;
     int code = snd_rawmidi_open(in, out, device_id, SND_RAWMIDI_NONBLOCK);
     if (code) {
@@ -77,15 +78,6 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         func = "snd_rawmidi_params_set_avail_min";
         goto free_params;
     }
-
-    // Smallest valid buffer size.
-    code = snd_rawmidi_params_set_buffer_size(rawmidi, params, 32);
-    if (code) {
-        error_message = snd_strerror(code);
-        func = "snd_rawmidi_params_set_buffer_size";
-        goto free_params;
-    }
-
     code = snd_rawmidi_params_set_no_active_sensing(rawmidi, params, 1);
     if (code) {
         error_message = snd_strerror(code);
@@ -99,15 +91,23 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         goto free_params;
     }
     snd_rawmidi_params_free(params);
-    num_fds = snd_rawmidi_poll_descriptors_count(rawmidi);
-    if (! num_fds) {
+    alsa_poll_fd_count = snd_rawmidi_poll_descriptors_count(rawmidi);
+    if (! alsa_poll_fd_count) {
         error_message = "returned '0' count for poll descriptors";
         func = "snd_rawmidi_poll_descriptors_count";
+        goto close;
+    }
+    try {
+        CreateNonBlockingPipe(fds);
+    } catch (std::exception e) {
+        error_message = e.what();
+        func = "CreateNonBlockingPipe";
         goto close;
     }
     snprintf(alias, sizeof(alias), "%s%d", alias_prefix, index + 1);
     snprintf(name, sizeof(name), "system:%d-%d %s %d %s", card + 1, device + 1,
              snd_rawmidi_info_get_name(info), subdevice + 1, name_suffix);
+    this->io_mask = io_mask;
     return;
  free_params:
     snd_rawmidi_params_free(params);
@@ -119,6 +119,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
 
 JackALSARawMidiPort::~JackALSARawMidiPort()
 {
+    DestroyNonBlockingPipe(fds);
     if (rawmidi) {
         int code = snd_rawmidi_close(rawmidi);
         if (code) {
@@ -135,6 +136,32 @@ JackALSARawMidiPort::GetAlias()
     return alias;
 }
 
+int
+JackALSARawMidiPort::GetIOPollEvent()
+{
+    unsigned short events;
+    int code = snd_rawmidi_poll_descriptors_revents(rawmidi, alsa_poll_fds,
+                                                    alsa_poll_fd_count,
+                                                    &events);
+    if (code) {
+        jack_error("JackALSARawMidiPort::GetIOPollEvents - "
+                   "snd_rawmidi_poll_descriptors_revents: %s",
+                   snd_strerror(code));
+        return -1;
+    }
+    if (events & POLLNVAL) {
+        jack_error("JackALSARawMidiPort::GetIOPollEvents - the file "
+                   "descriptor is invalid.");
+        return -1;
+    }
+    if (events & POLLERR) {
+        jack_error("JackALSARawMidiPort::GetIOPollEvents - an error has "
+                   "occurred on the device or stream.");
+        return -1;
+    }
+    return (events & io_mask) ? 1 : 0;
+}
+
 const char *
 JackALSARawMidiPort::GetName()
 {
@@ -144,48 +171,76 @@ JackALSARawMidiPort::GetName()
 int
 JackALSARawMidiPort::GetPollDescriptorCount()
 {
-    return num_fds;
+    return alsa_poll_fd_count + 1;
 }
 
-bool
-JackALSARawMidiPort::PopulatePollDescriptors(struct pollfd *poll_fd)
+int
+JackALSARawMidiPort::GetQueuePollEvent()
 {
-    bool result = snd_rawmidi_poll_descriptors(rawmidi, poll_fd, num_fds) ==
-        num_fds;
-    if (result) {
-        poll_fds = poll_fd;
-    }
-    return result;
-}
-
-bool
-JackALSARawMidiPort::ProcessPollEvents(unsigned short *revents)
-{
-    int code = snd_rawmidi_poll_descriptors_revents(rawmidi, poll_fds, num_fds,
-                                                    revents);
-    if (code) {
-        jack_error("JackALSARawMidiPort::ProcessPollEvents - "
-                   "snd_rawmidi_poll_descriptors_revents: %s",
-                   snd_strerror(code));
-        return false;
-    }
-    if ((*revents) & POLLNVAL) {
-        jack_error("JackALSARawMidiPort::ProcessPollEvents - the file "
+    unsigned short events = queue_poll_fd->revents;
+    if (events & POLLNVAL) {
+        jack_error("JackALSARawMidiPort::GetQueuePollEvents - the file "
                    "descriptor is invalid.");
-        return false;
+        return -1;
     }
-    if ((*revents) & POLLERR) {
-        jack_error("JackALSARawMidiPort::ProcessPollEvents - an error has "
+    if (events & POLLERR) {
+        jack_error("JackALSARawMidiPort::GetQueuePollEvents - an error has "
                    "occurred on the device or stream.");
-        return false;
+        return -1;
     }
-    return true;
+    int event = events & POLLIN ? 1 : 0;
+    if (event) {
+        char c;
+        ssize_t result = read(fds[0], &c, 1);
+        assert(result);
+        if (result < 0) {
+            jack_error("JackALSARawMidiPort::GetQueuePollEvents - error "
+                       "reading a byte from the pipe file descriptor: %s",
+                       strerror(errno));
+            return -1;
+        }
+    }
+    return event;
 }
 
 void
-JackALSARawMidiPort::SetPollEventMask(unsigned short events)
+JackALSARawMidiPort::PopulatePollDescriptors(struct pollfd *poll_fd)
 {
-    for (int i = 0; i < num_fds; i++) {
-        (poll_fds + i)->events = events;
+    alsa_poll_fds = poll_fd + 1;
+    assert(snd_rawmidi_poll_descriptors(rawmidi, alsa_poll_fds,
+                                        alsa_poll_fd_count) ==
+           alsa_poll_fd_count);
+    queue_poll_fd = poll_fd;
+    queue_poll_fd->events = POLLERR | POLLIN | POLLNVAL;
+    queue_poll_fd->fd = fds[0];
+    SetIOEventsEnabled(true);
+}
+
+void
+JackALSARawMidiPort::SetIOEventsEnabled(bool enabled)
+{
+    unsigned short mask = POLLNVAL | POLLERR | (enabled ? io_mask : 0);
+    for (int i = 0; i < alsa_poll_fd_count; i++) {
+        (alsa_poll_fds + i)->events = mask;
     }
+}
+
+bool
+JackALSARawMidiPort::TriggerQueueEvent()
+{
+    char c;
+    ssize_t result = write(fds[1], &c, 1);
+    assert(result <= 1);
+    switch (result) {
+    case 1:
+        return true;
+    case 0:
+        jack_error("JackALSARawMidiPort::TriggerQueueEvent - error writing a "
+                   "byte to the pipe file descriptor: %s", strerror(errno));
+        break;
+    default:
+        jack_error("JackALSARawMidiPort::TriggerQueueEvent - couldn't write a "
+                   "byte to the pipe file descriptor.");
+    }
+    return false;
 }

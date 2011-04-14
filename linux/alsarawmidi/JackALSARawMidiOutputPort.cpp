@@ -17,6 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <cassert>
 #include <memory>
 
 #include "JackALSARawMidiOutputPort.h"
@@ -25,15 +26,15 @@ using Jack::JackALSARawMidiOutputPort;
 
 JackALSARawMidiOutputPort::JackALSARawMidiOutputPort(snd_rawmidi_info_t *info,
                                                      size_t index,
+                                                     size_t max_bytes_per_poll,
                                                      size_t max_bytes,
                                                      size_t max_messages):
-    JackALSARawMidiPort(info, index)
+    JackALSARawMidiPort(info, index, POLLOUT)
 {
     alsa_event = 0;
-    blocked = false;
     read_queue = new JackMidiBufferReadQueue();
     std::auto_ptr<JackMidiBufferReadQueue> read_ptr(read_queue);
-    send_queue = new JackALSARawMidiSendQueue(rawmidi);
+    send_queue = new JackALSARawMidiSendQueue(rawmidi, max_bytes_per_poll);
     std::auto_ptr<JackALSARawMidiSendQueue> send_ptr(send_queue);
     thread_queue = new JackMidiAsyncQueue(max_bytes, max_messages);
     std::auto_ptr<JackMidiAsyncQueue> thread_ptr(thread_queue);
@@ -52,117 +53,94 @@ JackALSARawMidiOutputPort::~JackALSARawMidiOutputPort()
     delete thread_queue;
 }
 
-jack_midi_event_t *
-JackALSARawMidiOutputPort::DequeueALSAEvent(int read_fd)
+bool
+JackALSARawMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
+                                       jack_nframes_t frames)
 {
-    jack_midi_event_t *event = thread_queue->DequeueEvent();
-    if (event) {
-        char c;
-        ssize_t result = read(read_fd, &c, 1);
-        if (! result) {
-            jack_error("JackALSARawMidiOutputPort::DequeueALSAEvent - **BUG** "
-                       "An event was dequeued from the thread queue, but no "
-                       "byte was available for reading from the pipe file "
-                       "descriptor.");
-        } else if (result < 0) {
-            jack_error("JackALSARawMidiOutputPort::DequeueALSAEvent - error "
-                       "reading a byte from the pipe file descriptor: %s",
-                       strerror(errno));
+    read_queue->ResetMidiBuffer(port_buffer);
+    bool enqueued = false;
+    for (jack_midi_event_t *event = read_queue->DequeueEvent(); event;
+         event = read_queue->DequeueEvent()) {
+        switch (thread_queue->EnqueueEvent(event, frames)) {
+        case JackMidiWriteQueue::BUFFER_FULL:
+            jack_error("JackALSARawMidiOutputPort::ProcessJack - The thread "
+                       "queue doesn't have enough room to enqueue a %d-byte "
+                       "event.  Dropping event.", event->size);
+            continue;
+        case JackMidiWriteQueue::BUFFER_TOO_SMALL:
+            jack_error("JackALSARawMidiOutputPort::ProcessJack - The thread "
+                       "queue is too small to enqueue a %d-byte event.  "
+                       "Dropping event.", event->size);
+            continue;
+        default:
+            enqueued = true;
         }
     }
-    return event;
+    return enqueued ? TriggerQueueEvent() : true;
 }
 
 bool
-JackALSARawMidiOutputPort::ProcessALSA(int read_fd, jack_nframes_t *frame)
+JackALSARawMidiOutputPort::ProcessPollEvents(bool handle_output, bool timeout,
+                                             jack_nframes_t *frame)
 {
-    unsigned short revents;
-    if (! ProcessPollEvents(&revents)) {
+    int io_event;
+    int queue_event;
+    send_queue->ResetPollByteCount();
+    if (! handle_output) {
+        assert(timeout);
+        goto process_raw_queue;
+    }
+    io_event = GetIOPollEvent();
+    if (io_event == -1) {
         return false;
     }
-    if (blocked) {
-        if (! (revents & POLLOUT)) {
-            *frame = 0;
-            return true;
-        }
-        blocked = false;
+    queue_event = GetQueuePollEvent();
+    if (queue_event == -1) {
+        return false;
+    }
+    if (io_event || timeout) {
+    process_raw_queue:
+        // We call the 'Process' event early because there are events waiting
+        // to be processed that either need to be sent now, or before now.
+        raw_queue->Process();
+    } else if (! queue_event) {
+        return true;
     }
     if (! alsa_event) {
-        alsa_event = DequeueALSAEvent(read_fd);
+        alsa_event = thread_queue->DequeueEvent();
     }
-    for (; alsa_event; alsa_event = DequeueALSAEvent(read_fd)) {
+    for (; alsa_event; alsa_event = thread_queue->DequeueEvent()) {
         switch (raw_queue->EnqueueEvent(alsa_event)) {
-        case JackMidiWriteQueue::BUFFER_FULL:
-            // Try to free up some space by processing events early.
-            raw_queue->Process();
-            switch (raw_queue->EnqueueEvent(alsa_event)) {
-            case JackMidiWriteQueue::BUFFER_TOO_SMALL:
-                jack_error("JackALSARawMidiOutputPort::ProcessALSA - **BUG** "
-                           "JackMidiRawOutputWriteQueue::EnqueueEvent "
-                           "returned `BUFFER_FULL`, and then returned "
-                           "`BUFFER_TOO_SMALL` after a Process() call.");
-                // Fallthrough on purpose
-            case JackMidiWriteQueue::OK:
-                continue;
-            default:
-                ;
-            }
-            goto process_events;
         case JackMidiWriteQueue::BUFFER_TOO_SMALL:
-            jack_error("JackALSARawMidiOutputPort::ProcessALSA - The raw "
+            jack_error("JackALSARawMidiOutputPort::ProcessQueues - The raw "
                        "output queue couldn't enqueue a %d-byte event.  "
                        "Dropping event.", alsa_event->size);
-            // Fallthrough on purpose
+            // Fallthrough on purpose.
         case JackMidiWriteQueue::OK:
             continue;
         default:
             ;
         }
-        break;
-    }
- process_events:
-    *frame = raw_queue->Process();
-    blocked = send_queue->IsBlocked();
-    if (blocked) {
-        SetPollEventMask(POLLERR | POLLNVAL | POLLOUT);
-        *frame = 0;
-    } else {
-        SetPollEventMask(POLLERR | POLLNVAL);
-    }
-    return true;
-}
 
-bool
-JackALSARawMidiOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
-                                       jack_nframes_t frames, int write_fd)
-{
-    read_queue->ResetMidiBuffer(port_buffer);
-    for (jack_midi_event_t *event = read_queue->DequeueEvent(); event;
-         event = read_queue->DequeueEvent()) {
-        if (event->size > thread_queue->GetAvailableSpace()) {
-            jack_error("JackALSARawMidiOutputPort::ProcessJack - The thread "
-                       "queue doesn't have enough room to enqueue a %d-byte "
-                       "event.  Dropping event.", event->size);
-            continue;
+        // Try to free up some space by processing events early.
+        *frame = raw_queue->Process();
+
+        switch (raw_queue->EnqueueEvent(alsa_event)) {
+        case JackMidiWriteQueue::BUFFER_FULL:
+            goto set_io_events;
+        case JackMidiWriteQueue::BUFFER_TOO_SMALL:
+            // This shouldn't happen.
+            assert(false);
+        default:
+            ;
         }
-        char c = 1;
-        ssize_t result = write(write_fd, &c, 1);
-        assert(result <= 1);
-        if (result < 0) {
-            jack_error("JackALSARawMidiOutputPort::ProcessJack - error "
-                       "writing a byte to the pipe file descriptor: %s",
-                       strerror(errno));
-            return false;
-        }
-        if (! result) {
-            // Recoverable.
-            jack_error("JackALSARawMidiOutputPort::ProcessJack - Couldn't "
-                       "write a byte to the pipe file descriptor.  Dropping "
-                       "event.");
-        } else {
-            assert(thread_queue->EnqueueEvent(event, frames) ==
-                   JackMidiWriteQueue::OK);
-        }
+    }
+    *frame = raw_queue->Process();
+ set_io_events:
+    bool blocked = send_queue->IsBlocked();
+    SetIOEventsEnabled(blocked);
+    if (blocked) {
+        *frame = 0;
     }
     return true;
 }
