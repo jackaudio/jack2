@@ -131,9 +131,6 @@ namespace Jack
             return -1;
         }
 
-        if ( JackAudioAdapterInterface::Open() < 0 )
-            return -1;
-
         jack_log("JackPortAudioAdapter::Open fInputDevice = %d DeviceName %s", fInputDevice, fPaDevices.GetFullName(fInputDevice).c_str());
         jack_log("JackPortAudioAdapter::Open fOutputDevice = %d DeviceName %s", fOutputDevice, fPaDevices.GetFullName(fOutputDevice).c_str());
         jack_log("JackPortAudioAdapter::Open fAdaptedBufferSize = %u fAdaptedSampleRate %u", fAdaptedBufferSize, fAdaptedSampleRate);
@@ -191,7 +188,7 @@ namespace Jack
         jack_log ( "JackPortAudioAdapter:: Pa_StopStream" );
         Pa_CloseStream ( fStream );
         jack_log ( "JackPortAudioAdapter:: Pa_CloseStream" );
-        return JackAudioAdapterInterface::Close();
+        return 0;
     }
 
     int JackPortAudioAdapter::SetSampleRate ( jack_nframes_t sample_rate )
@@ -314,3 +311,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
