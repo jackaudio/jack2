@@ -54,23 +54,16 @@ JackMidiAsyncQueue::DequeueEvent()
 {
     jack_midi_event_t *event = 0;
     if (jack_ringbuffer_read_space(info_ring) >= INFO_SIZE) {
+        size_t size;
         event = &dequeue_event;
         jack_ringbuffer_read(info_ring, (char *) &(event->time),
                              sizeof(jack_nframes_t));
-        size_t size;
-        jack_ringbuffer_read(info_ring, (char *) &size, sizeof(size_t));
+        jack_ringbuffer_read(info_ring, (char *) &size,
+                             sizeof(size_t));
+        jack_ringbuffer_read(byte_ring, (char *) data_buffer,
+                             size * sizeof(jack_midi_data_t));
         event->buffer = data_buffer;
         event->size = size;
-        jack_ringbuffer_data_t vector[2];
-        jack_ringbuffer_get_read_vector(byte_ring, vector);
-        size_t size1 = vector[0].len;
-        memcpy(data_buffer, vector[0].buf, size1 * sizeof(jack_midi_data_t));
-        if (size1 < size) {
-            memcpy(data_buffer + size1, vector[1].buf,
-                   (size - size1) * sizeof(jack_midi_data_t));
-        }
-        jack_ringbuffer_read_advance(byte_ring,
-                                     size * sizeof(jack_midi_data_t));
     }
     return event;
 }
