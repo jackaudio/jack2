@@ -540,12 +540,15 @@ int main(int argc, char* argv[])
     // Slave drivers
     for (it = slaves_list.begin(); it != slaves_list.end(); it++) {
         jackctl_driver_t * slave_driver_ctl = jackctl_server_get_driver(server_ctl, *it);
-        jackctl_server_remove_slave(server_ctl, slave_driver_ctl);
+        if (slave_driver_ctl)
+            jackctl_server_remove_slave(server_ctl, slave_driver_ctl);
     }
+
     // Internal clients
     for (it = internals_list.begin(); it != internals_list.end(); it++) {
         jackctl_internal_t * internal_driver_ctl = jackctl_server_get_internal(server_ctl, *it);
-        jackctl_server_unload_internal(server_ctl, internal_driver_ctl);
+        if (internal_driver_ctl)
+            jackctl_server_unload_internal(server_ctl, internal_driver_ctl);
     }
     jackctl_server_close(server_ctl);
  destroy_server:
