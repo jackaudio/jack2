@@ -55,11 +55,10 @@ $Id: net_driver.c,v 1.17 2006/04/16 20:16:10 torbenh Exp $
 #include <samplerate.h>
 #endif
 
+#include "JackError.h"
+
 #include "netjack.h"
 #include "netjack_packet.h"
-
-// JACK2
-#include "control.h"
 
 #define MIN(x,y) ((x)<(y) ? (x) : (y))
 

@@ -46,6 +46,7 @@ jack_controller_settings_uninit();
 
 #define JACK_DBUS_ERROR_UNKNOWN_METHOD              "org.jackaudio.Error.UnknownMethod"
 #define JACK_DBUS_ERROR_SERVER_NOT_RUNNING          "org.jackaudio.Error.ServerNotRunning"
+#define JACK_DBUS_ERROR_SERVER_RUNNING              "org.jackaudio.Error.ServerRunning"
 #define JACK_DBUS_ERROR_UNKNOWN_DRIVER              "org.jackaudio.Error.UnknownDriver"
 #define JACK_DBUS_ERROR_UNKNOWN_INTERNAL            "org.jackaudio.Error.UnknownInternal"
 #define JACK_DBUS_ERROR_UNKNOWN_PARAMETER           "org.jackaudio.Error.UnknownParameter"

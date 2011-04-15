@@ -4,13 +4,13 @@
 	<Project>
 		<Option title="libjackserver" />
 		<Option pch_mode="2" />
-		<Option compiler="gcc" />
+		<Option compiler="mingw_64" />
 		<Build>
-			<Target title="Win32 Release">
-				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release" />
+			<Target title="Win32 Release 64bits">
+				<Option output="Release64\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release64" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -35,14 +35,14 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
-					<Add directory="Release\bin" />
+					<Add directory="Release\bin64" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Debug">
-				<Option output="Debug\bin\libjackserver" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Debug" />
+			<Target title="Win32 Debug 64bits">
+				<Option output="Debug64\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug64" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -67,14 +67,14 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
-					<Add directory="Debug\bin" />
+					<Add directory="Debug\bin64" />
 				</Linker>
 			</Target>
-			<Target title="Win32 Profiling">
-				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
-				<Option object_output="Release" />
+			<Target title="Win32 Profiling 64bits">
+				<Option output="Release64\bin\libjackserver64" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release64" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_64" />
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
@@ -100,8 +100,120 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
+					<Add directory="Release\bin64" />
+				</Linker>
+			</Target>
+			<Target title="Win32 Release 32bits">
+				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release" />
+				<Option type="3" />
+				<Option compiler="mingw_64" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DLIBJACKDMP_EXPORTS" />
+					<Add option="-DREGEX_MALLOC" />
+					<Add option="-DSTDC_HEADERS" />
+					<Add option="-DSERVER_SIDE" />
+					<Add option="-D__SMP__" />
+					<Add option="-DHAVE_CONFIG_H" />
+					<Add directory="." />
+					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
 					<Add directory="Release\bin" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win32 Debug 32bits">
+				<Option output="Debug\bin\libjackserver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Debug" />
+				<Option type="3" />
+				<Option compiler="mingw_64" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DLIBJACKDMP_EXPORTS" />
+					<Add option="-DREGEX_MALLOC" />
+					<Add option="-DSTDC_HEADERS" />
+					<Add option="-DSERVER_SIDE" />
+					<Add option="-D__SMP__" />
+					<Add option="-DHAVE_CONFIG_H" />
+					<Add directory="." />
+					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add directory="Debug\bin" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Debug/libjackserver.res libjackserver.rc" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Win32 Profiling 32bits">
+				<Option output="Release\bin\libjackserver" prefix_auto="1" extension_auto="1" />
+				<Option object_output="Release" />
+				<Option type="3" />
+				<Option compiler="mingw_64" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-D_MBCS" />
+					<Add option="-D_USRDLL" />
+					<Add option="-DLIBJACKDMP_EXPORTS" />
+					<Add option="-DREGEX_MALLOC" />
+					<Add option="-DSTDC_HEADERS" />
+					<Add option="-DSERVER_SIDE" />
+					<Add option="-D__SMP__" />
+					<Add option="-DJACK_MONITOR" />
+					<Add option="-DHAVE_CONFIG_H" />
+					<Add directory="." />
+					<Add directory="..\windows" />
+					<Add directory="..\common\jack" />
+					<Add directory="..\common" />
+					<Add directory="tre-0.8.0\win32" />
+					<Add directory="tre-0.8.0\lib" />
+				</Compiler>
+				<Linker>
+					<Add option="-m32" />
+					<Add directory="Release\bin" />
+				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjackserver.res libjackserver.rc" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>
@@ -150,12 +262,16 @@
 		<Unit filename="..\common\JackLoopbackDriver.cpp" />
 		<Unit filename="..\common\JackMessageBuffer.cpp" />
 		<Unit filename="..\common\JackMidiAPI.cpp" />
+		<Unit filename="..\common\JackMidiAsyncQueue.cpp" />
+		<Unit filename="..\common\JackMidiBufferReadQueue.cpp" />
+		<Unit filename="..\common\JackMidiBufferWriteQueue.cpp" />
 		<Unit filename="..\common\JackMidiDriver.cpp" />
 		<Unit filename="..\common\JackMidiPort.cpp" />
+		<Unit filename="..\common\JackMidiReadQueue.cpp" />
+		<Unit filename="..\common\JackMidiUtil.cpp" />
+		<Unit filename="..\common\JackMidiWriteQueue.cpp" />
 		<Unit filename="..\common\JackNetInterface.cpp" />
 		<Unit filename="..\common\JackNetTool.cpp" />
-		<Unit filename="..\common\JackPhysicalMidiInput.cpp" />
-		<Unit filename="..\common\JackPhysicalMidiOutput.cpp" />
 		<Unit filename="..\common\JackPort.cpp" />
 		<Unit filename="..\common\JackPortType.cpp" />
 		<Unit filename="..\common\JackRestartThreadedDriver.cpp" />

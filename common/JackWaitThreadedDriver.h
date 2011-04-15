@@ -22,15 +22,15 @@
 #define __JackWaitThreadedDriver__
 
 #include "JackThreadedDriver.h"
-#include "JackAudioDriver.h"
+#include "JackDriver.h"
 
 namespace Jack
 {
-    
-/*!
-\brief To be used as a wrapper of JackNetDriver. 
 
-The idea is to behave as the "dummy" driver, until the network connection is really started and processing starts. 
+/*!
+\brief To be used as a wrapper of JackNetDriver.
+
+The idea is to behave as the "dummy" driver, until the network connection is really started and processing starts.
 The Execute method will call the ProcessNull method until the decorated driver Init method returns.
 A helper JackDriverStarter thread is used for that purpose.
 */
@@ -38,54 +38,58 @@ A helper JackDriverStarter thread is used for that purpose.
 class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
 {
     private:
-    
-        struct SERVER_EXPORT JackDriverStarter : public JackRunnableInterface 
+
+        struct SERVER_EXPORT JackDriverStarter : public JackRunnableInterface
         {
-        
+
                 JackDriver* fDriver;
                 JackThread fThread;
-                bool fRunning;
-                
+                volatile bool fRunning;
+
                 JackDriverStarter(JackDriver* driver)
                     :fDriver(driver),fThread(this),fRunning(false)
                 {}
-                
+
                 ~JackDriverStarter()
                 {
                      fThread.Kill();
                 }
-                
+
                 int Start()
                 {
                     fRunning = false;
                     return fThread.Start();
                 }
-            
+
                 // JackRunnableInterface interface
                 bool Execute()
                 {
-                    // Blocks until decorated driver is started (that is when it's Initialize method returns true).
-                    while (!fDriver->Initialize()) {}
-                    fRunning = true;
+                    // Blocks until decorated driver is started (that is when it's Initialize method returns).
+                    if (fDriver->Initialize()) {
+                        fRunning = true;
+                    } else {
+                        jack_error("Initing net driver fails...");
+                    }
+                    
                     return false;
                 }
-        
+
         };
-        
+
         JackDriverStarter fStarter;
-                
+
     public:
 
-        JackWaitThreadedDriver(JackDriver* netdriver)
-            :JackThreadedDriver(netdriver),fStarter(netdriver)
+        JackWaitThreadedDriver(JackDriver* net_driver)
+            :JackThreadedDriver(net_driver), fStarter(net_driver)
         {}
         virtual ~JackWaitThreadedDriver()
         {}
-    
+
         // JackRunnableInterface interface
         bool Init();
         bool Execute();
-};    
+};
 
 
 } // end of namespace

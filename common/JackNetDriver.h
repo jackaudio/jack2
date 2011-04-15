@@ -36,15 +36,17 @@ namespace Jack
 
     class JackNetDriver : public JackAudioDriver, public JackNetSlaveInterface
     {
+
         private:
+
             //jack data
             jack_port_id_t* fMidiCapturePortList;
             jack_port_id_t* fMidiPlaybackPortList;
-	   
+
             //transport
             int fLastTransportState;
             int fLastTimebaseMaster;
-  
+
             //monitoring
 	#ifdef JACK_MONITOR
             JackGnuPlotMonitor<float>* fNetTimeMon;
@@ -53,7 +55,7 @@ namespace Jack
 
             bool Initialize();
             void FreeAll();
-            
+
             int AllocPorts();
             int FreePorts();
 
@@ -65,6 +67,7 @@ namespace Jack
             JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
 
         public:
+
             JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                             const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
                             char* net_name, uint transport_sync, char network_master_mode );

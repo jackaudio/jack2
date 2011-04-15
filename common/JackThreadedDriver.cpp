@@ -127,9 +127,24 @@ void JackThreadedDriver::RemoveSlave(JackDriverInterface* slave)
     fDriver->RemoveSlave(slave);
 }
 
-int JackThreadedDriver::ProcessSlaves()
+int JackThreadedDriver::ProcessReadSlaves()
 {
-    return fDriver->ProcessSlaves();
+    return fDriver->ProcessReadSlaves();
+}
+
+int JackThreadedDriver::ProcessWriteSlaves()
+{
+    return fDriver->ProcessWriteSlaves();
+}
+
+int JackThreadedDriver::ProcessRead()
+{
+    return fDriver->ProcessRead();
+}
+
+int JackThreadedDriver::ProcessWrite()
+{
+    return fDriver->ProcessWrite();
 }
 
 std::list<JackDriverInterface*> JackThreadedDriver::GetSlaves()
@@ -184,7 +199,6 @@ int JackThreadedDriver::Stop()
         case JackThread::kIniting:
             if (fThread.Kill() < 0) {
                 jack_error("Cannot kill thread");
-                return -1;
             }
             break;
 
@@ -192,7 +206,6 @@ int JackThreadedDriver::Stop()
         case JackThread::kRunning:
             if (fThread.Stop() < 0) {
                 jack_error("Cannot stop thread");
-                return -1;
             }
             break;
 

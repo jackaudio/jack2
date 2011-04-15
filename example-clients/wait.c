@@ -40,7 +40,7 @@ main (int argc, char *argv[])
 	int wait_timeout = 0;
 	time_t start_timestamp;
 
-	
+
 	struct option long_options[] = {
 		{ "server", 1, 0, 's' },
 		{ "wait", 0, 0, 'w' },

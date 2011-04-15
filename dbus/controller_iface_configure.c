@@ -605,14 +605,80 @@ oom:
 
 static
 void
+jack_controller_fill_parameter_info(
+    jackctl_parameter_t * parameter,
+    struct parameter_info * info_ptr)
+{
+    info_ptr->type = jackctl_parameter_get_type(parameter);
+    info_ptr->name = jackctl_parameter_get_name(parameter);
+    info_ptr->short_decr = jackctl_parameter_get_short_description(parameter);
+    info_ptr->long_descr = jackctl_parameter_get_long_description(parameter);
+}
+
+static
+bool
+jack_controller_append_parameter_info_struct(
+    DBusMessageIter * iter_ptr,
+    struct parameter_info * info_ptr)
+{
+    DBusMessageIter struct_iter;
+    unsigned char type;
+
+    /* Open the struct. */
+    if (!dbus_message_iter_open_container(iter_ptr, DBUS_TYPE_STRUCT, NULL, &struct_iter))
+    {
+        goto fail;
+    }
+
+    /* Append parameter type. */
+    type = PARAM_TYPE_JACK_TO_DBUS(info_ptr->type);
+    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_BYTE, &type))
+    {
+        goto fail_close;
+    }
+
+    /* Append parameter name. */
+    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &info_ptr->name))
+    {
+        goto fail_close;
+    }
+
+    /* Append parameter short description. */
+    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &info_ptr->short_decr))
+    {
+        goto fail_close;
+    }
+
+    /* Append parameter long description. */
+    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &info_ptr->long_descr))
+    {
+        goto fail_close;
+    }
+
+    /* Close the struct. */
+    if (!dbus_message_iter_close_container(iter_ptr, &struct_iter))
+    {
+        goto fail;
+    }
+
+    return true;
+
+fail_close:
+    dbus_message_iter_close_container(iter_ptr, &struct_iter);
+
+fail:
+    return false;
+}
+
+static
+void
 jack_controller_get_parameters_info(
     struct jack_dbus_method_call * call,
     struct parameter_info * special_parameter_info_ptr,
     const JSList * parameters_list)
 {
-    DBusMessageIter iter, array_iter, struct_iter;
-    unsigned char type;
-    const char *str;
+    DBusMessageIter iter, array_iter;
+    struct parameter_info info;
 
     call->reply = dbus_message_new_method_return (call->message);
     if (!call->reply)
@@ -630,39 +696,7 @@ jack_controller_get_parameters_info(
 
     if (special_parameter_info_ptr != NULL)
     {
-        /* Open the struct. */
-        if (!dbus_message_iter_open_container (&array_iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
-        {
-            goto fail_close_unref;
-        }
-
-        /* Append parameter type. */
-        type = PARAM_TYPE_JACK_TO_DBUS(special_parameter_info_ptr->type);
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_BYTE, &type))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Append parameter name. */
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING, &special_parameter_info_ptr->name))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Append parameter short description. */
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING, &special_parameter_info_ptr->short_decr))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Append parameter long description. */
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING, &special_parameter_info_ptr->long_descr))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Close the struct. */
-        if (!dbus_message_iter_close_container (&array_iter, &struct_iter))
+        if (!jack_controller_append_parameter_info_struct(&array_iter, special_parameter_info_ptr))
         {
             goto fail_close_unref;
         }
@@ -671,42 +705,8 @@ jack_controller_get_parameters_info(
     /* Append parameter descriptions to the array. */
     while (parameters_list != NULL)
     {
-        /* Open the struct. */
-        if (!dbus_message_iter_open_container (&array_iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
-        {
-            goto fail_close_unref;
-        }
-
-        /* Append parameter type. */
-        type = PARAM_TYPE_JACK_TO_DBUS(jackctl_parameter_get_type(parameters_list->data));
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_BYTE, &type))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Append parameter name. */
-        str = jackctl_parameter_get_name(parameters_list->data);
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING, &str))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Append parameter short description. */
-        str = jackctl_parameter_get_short_description(parameters_list->data);
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING, &str))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Append parameter long description. */
-        str = jackctl_parameter_get_long_description(parameters_list->data);
-        if (!dbus_message_iter_append_basic (&struct_iter, DBUS_TYPE_STRING, &str))
-        {
-            goto fail_close2_unref;
-        }
-
-        /* Close the struct. */
-        if (!dbus_message_iter_close_container (&array_iter, &struct_iter))
+        jack_controller_fill_parameter_info(parameters_list->data, &info);
+        if (!jack_controller_append_parameter_info_struct(&array_iter, &info))
         {
             goto fail_close_unref;
         }
@@ -721,9 +721,6 @@ jack_controller_get_parameters_info(
     }
 
     return;
-
-fail_close2_unref:
-    dbus_message_iter_close_container (&iter, &struct_iter);
 
 fail_close_unref:
     dbus_message_iter_close_container (&iter, &array_iter);
@@ -851,8 +848,7 @@ jack_controller_get_parameter_info_ex(
     struct jack_dbus_method_call * call,
     struct parameter_info * info_ptr)
 {
-    DBusMessageIter iter, struct_iter;
-    unsigned char type;
+    DBusMessageIter iter;
 
     call->reply = dbus_message_new_method_return(call->message);
     if (!call->reply)
@@ -862,47 +858,12 @@ jack_controller_get_parameter_info_ex(
 
     dbus_message_iter_init_append(call->reply, &iter);
 
-    /* Open the struct. */
-    if (!dbus_message_iter_open_container(&iter, DBUS_TYPE_STRUCT, NULL, &struct_iter))
-    {
-        goto fail_unref;
-    }
-
-    /* Append parameter type. */
-    type = PARAM_TYPE_JACK_TO_DBUS(info_ptr->type);
-    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_BYTE, &type))
-    {
-        goto fail_close_unref;
-    }
-
-    /* Append parameter name. */
-    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &info_ptr->name))
-    {
-        goto fail_close_unref;
-    }
-
-    /* Append parameter short description. */
-    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &info_ptr->short_decr))
-    {
-        goto fail_close_unref;
-    }
-
-    /* Append parameter long description. */
-    if (!dbus_message_iter_append_basic(&struct_iter, DBUS_TYPE_STRING, &info_ptr->long_descr))
-    {
-        goto fail_close_unref;
-    }
-
-    /* Close the struct. */
-    if (!dbus_message_iter_close_container(&iter, &struct_iter))
+    if (!jack_controller_append_parameter_info_struct(&iter, info_ptr))
     {
         goto fail_unref;
     }
 
     return;
-
-fail_close_unref:
-    dbus_message_iter_close_container(&iter, &struct_iter);
 
 fail_unref:
     dbus_message_unref(call->reply);
@@ -920,11 +881,7 @@ jack_controller_get_parameter_info(
 {
     struct parameter_info info;
 
-    info.type = jackctl_parameter_get_type(parameter);
-    info.name = jackctl_parameter_get_name(parameter);
-    info.short_decr = jackctl_parameter_get_short_description(parameter);
-    info.long_descr = jackctl_parameter_get_long_description(parameter);
-
+    jack_controller_fill_parameter_info(parameter, &info);
     jack_controller_get_parameter_info_ex(call, &info);
 }
 

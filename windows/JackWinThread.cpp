@@ -200,7 +200,7 @@ int JackWinThread::AcquireSelfRealTime(int priority)
 
 int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
 {
-    jack_log("JackWinThread::AcquireRealTime");
+    jack_log("JackWinThread::AcquireRealTimeImp priority = %d", THREAD_PRIORITY_TIME_CRITICAL);
 
     if (SetThreadPriority(thread, THREAD_PRIORITY_TIME_CRITICAL)) {
         return 0;

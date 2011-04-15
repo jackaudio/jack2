@@ -85,7 +85,7 @@ bool JackClientPipeThread::Execute()
         jack_log("JackClientPipeThread::Execute");
         return (HandleRequest());
     } catch (JackQuitException& e) {
-        jack_log("JackMachServerChannel::Execute JackQuitException");
+        jack_log("JackClientPipeThread::Execute JackQuitException");
         return false;
     }
 }

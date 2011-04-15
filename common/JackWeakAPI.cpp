@@ -235,7 +235,7 @@ DECL_FUNCTION(jack_time_t, jack_frames_to_time, (const jack_client_t *client, ja
 DECL_FUNCTION(jack_nframes_t, jack_frame_time, (const jack_client_t *client), (client));
 DECL_FUNCTION(jack_nframes_t, jack_last_frame_time, (const jack_client_t *client), (client));
 DECL_FUNCTION(float, jack_cpu_load, (jack_client_t *client), (client));
-DECL_FUNCTION_NULL(pthread_t, jack_client_thread_id, (jack_client_t *client), (client));
+DECL_FUNCTION_NULL(jack_native_thread_t, jack_client_thread_id, (jack_client_t *client), (client));
 DECL_VOID_FUNCTION(jack_set_error_function, (print_function fun), (fun));
 DECL_VOID_FUNCTION(jack_set_info_function, (print_function fun), (fun));
 
@@ -261,17 +261,17 @@ DECL_VOID_FUNCTION(jack_set_transport_info, (jack_client_t *client, jack_transpo
 
 DECL_FUNCTION(int, jack_client_real_time_priority, (jack_client_t* client), (client));
 DECL_FUNCTION(int, jack_client_max_real_time_priority, (jack_client_t* client), (client));
-DECL_FUNCTION(int, jack_acquire_real_time_scheduling, (pthread_t thread, int priority), (thread, priority));
+DECL_FUNCTION(int, jack_acquire_real_time_scheduling, (jack_native_thread_t thread, int priority), (thread, priority));
 DECL_FUNCTION(int, jack_client_create_thread, (jack_client_t* client,
-                                      pthread_t *thread,
+                                      jack_native_thread_t *thread,
                                       int priority,
                                       int realtime, 	// boolean
                                       thread_routine routine,
                                       void *arg), (client, thread, priority, realtime, routine, arg));
-DECL_FUNCTION(int, jack_drop_real_time_scheduling, (pthread_t thread), (thread));
+DECL_FUNCTION(int, jack_drop_real_time_scheduling, (jack_native_thread_t thread), (thread));
 
-DECL_FUNCTION(int, jack_client_stop_thread, (jack_client_t* client, pthread_t thread), (client, thread));
-DECL_FUNCTION(int, jack_client_kill_thread, (jack_client_t* client, pthread_t thread), (client, thread));
+DECL_FUNCTION(int, jack_client_stop_thread, (jack_client_t* client, jack_native_thread_t thread), (client, thread));
+DECL_FUNCTION(int, jack_client_kill_thread, (jack_client_t* client, jack_native_thread_t thread), (client, thread));
 #ifndef WIN32
 DECL_VOID_FUNCTION(jack_set_thread_creator, (jack_thread_creator_t jtc), (jtc));
 #endif

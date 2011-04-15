@@ -125,6 +125,7 @@ namespace Jack
     bool JackNetDriver::Initialize()
     {
         jack_log("JackNetDriver::Initialize()");
+        FreePorts();
 
         //new loading, but existing socket, restart the driver
         if (fSocket.IsSocket()) {
@@ -143,7 +144,7 @@ namespace Jack
 
         //init network
         if (!JackNetSlaveInterface::Init()) {
-            jack_error("JackNetSlaveInterface::Init() error..." );
+            jack_error("Starting network fails...");
             return false;
         }
 
@@ -153,21 +154,32 @@ namespace Jack
             return false;
         }
         
+        // If -1 at conection time, in/out channels count is sent by the master
+        fCaptureChannels = fParams.fSendAudioChannels;
+        fPlaybackChannels = fParams.fReturnAudioChannels;
+
         //allocate midi ports lists
         fMidiCapturePortList = new jack_port_id_t [fParams.fSendMidiChannels];
         fMidiPlaybackPortList = new jack_port_id_t [fParams.fReturnMidiChannels];
-        assert ( fMidiCapturePortList );
-        assert ( fMidiPlaybackPortList );
+
+        assert(fMidiCapturePortList);
+        assert(fMidiPlaybackPortList);
+
+        for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+            fMidiCapturePortList[midi_port_index] = 0;
+        }
+        for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
+            fMidiPlaybackPortList[midi_port_index] = 0;
+        }
 
         //register jack ports
-        if ( AllocPorts() != 0 )
-        {
-            jack_error ( "Can't allocate ports." );
+        if (AllocPorts() != 0) {
+            jack_error("Can't allocate ports.");
             return false;
         }
 
         //init done, display parameters
-        SessionParamsDisplay ( &fParams );
+        SessionParamsDisplay(&fParams);
 
         //monitor
 #ifdef JACK_MONITOR
@@ -257,7 +269,7 @@ namespace Jack
         char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
         unsigned long port_flags;
         int audio_port_index;
-        uint midi_port_index;
+        int midi_port_index;
         jack_latency_range_t range;
 
         //audio
@@ -365,22 +377,38 @@ namespace Jack
 
     int JackNetDriver::FreePorts()
     {
-        jack_log ( "JackNetDriver::FreePorts" );
+        jack_log("JackNetDriver::FreePorts");
 
-        int audio_port_index;
-        uint midi_port_index;
-        for ( audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++ )
-            if (fCapturePortList[audio_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fCapturePortList[audio_port_index] );
-        for ( audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++ )
-            if (fPlaybackPortList[audio_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fPlaybackPortList[audio_port_index] );
-        for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
-            if (fMidiCapturePortList[midi_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiCapturePortList[midi_port_index] );
-        for ( midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++ )
-            if (fMidiPlaybackPortList[midi_port_index] > 0)
-                fGraphManager->ReleasePort ( fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index] );
+        for (int audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++) {
+            if (fCapturePortList[audio_port_index] > 0) {
+                fGraphManager->ReleasePort(fClientControl.fRefNum, fCapturePortList[audio_port_index]);
+                fCapturePortList[audio_port_index] = 0;
+            }
+        }
+
+        for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
+            if (fPlaybackPortList[audio_port_index] > 0) {
+                fGraphManager->ReleasePort(fClientControl.fRefNum, fPlaybackPortList[audio_port_index]);
+                fPlaybackPortList[audio_port_index] = 0;
+            }
+        }
+
+        for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+            if (fMidiCapturePortList && fMidiCapturePortList[midi_port_index] > 0) {
+                fGraphManager->ReleasePort(fClientControl.fRefNum, fMidiCapturePortList[midi_port_index]);
+                fMidiCapturePortList[midi_port_index] = 0;
+            }
+        }
+
+        for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
+            if (fMidiPlaybackPortList && fMidiPlaybackPortList[midi_port_index] > 0) {
+                fGraphManager->ReleasePort(fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index]);
+                fMidiPlaybackPortList[midi_port_index] = 0;
+            }
+        }
+        // Clear MIDI channels
+        fParams.fSendMidiChannels = 0;
+        fParams.fReturnMidiChannels = 0;
         return 0;
     }
 
@@ -479,8 +507,8 @@ namespace Jack
 //driver processes--------------------------------------------------------------------
     int JackNetDriver::Read()
     {
-        uint midi_port_index;
-        uint audio_port_index;
+        int midi_port_index;
+        int audio_port_index;
 
         //buffers
         for ( midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++ )
@@ -524,7 +552,7 @@ namespace Jack
 
     int JackNetDriver::Write()
     {
-        uint midi_port_index;
+        int midi_port_index;
         int audio_port_index;
 
         //buffers
@@ -603,17 +631,17 @@ namespace Jack
             strcpy ( desc->params[i].name, "input_ports" );
             desc->params[i].character = 'C';
             desc->params[i].type = JackDriverParamInt;
-            desc->params[i].value.i = 2;
+            desc->params[i].value.i = -1;
             strcpy ( desc->params[i].short_desc, "Number of audio input ports" );
-            strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+            strcpy ( desc->params[i].long_desc, "Number of audio input ports. If -1, audio physical input from the master");
 
             i++;
             strcpy ( desc->params[i].name, "output_ports" );
             desc->params[i].character = 'P';
             desc->params[i].type = JackDriverParamInt;
-            desc->params[i].value.i = 2;
+            desc->params[i].value.i = -1;
             strcpy ( desc->params[i].short_desc, "Number of audio output ports" );
-            strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+            strcpy ( desc->params[i].long_desc, "Number of audio output ports. If -1, audio physical output from the master");
 
             i++;
             strcpy ( desc->params[i].name, "midi_in_ports" );
@@ -626,7 +654,7 @@ namespace Jack
             i++;
             strcpy ( desc->params[i].name, "midi_out_ports" );
             desc->params[i].character = 'o';
-            desc->params[i].type = JackDriverParamUInt;
+            desc->params[i].type = JackDriverParamInt;
             desc->params[i].value.i = 0;
             strcpy ( desc->params[i].short_desc, "Number of midi output ports" );
             strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
@@ -668,8 +696,8 @@ namespace Jack
             uint transport_sync = 1;
             jack_nframes_t period_size = 128;
             jack_nframes_t sample_rate = 48000;
-            int audio_capture_ports = 2;
-            int audio_playback_ports = 2;
+            int audio_capture_ports = -1;
+            int audio_playback_ports = -1;
             int midi_input_ports = 0;
             int midi_output_ports = 0;
             bool monitor = false;

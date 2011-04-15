@@ -40,6 +40,7 @@ namespace Jack
     class SERVER_EXPORT JackNetUnixSocket
     {
         private:
+
             int fSockfd;
             int fPort;
             int fTimeOut;
@@ -50,7 +51,9 @@ namespace Jack
             int WaitRead();
             int WaitWrite();
         #endif
+
         public:
+
             JackNetUnixSocket();
             JackNetUnixSocket ( const char* ip, int port );
             JackNetUnixSocket ( const JackNetUnixSocket& );

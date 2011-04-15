@@ -107,7 +107,7 @@ class SERVER_EXPORT JackPort
         // Since we are in shared memory, the resulting pointer cannot be cached, so align it here...
         jack_default_audio_sample_t* GetBuffer()
         {
-            return (jack_default_audio_sample_t*)((long)fBuffer & ~15L) + 4;
+            return (jack_default_audio_sample_t*)((uintptr_t)fBuffer & ~15L) + 4;
         }
 
         int GetRefNum() const;

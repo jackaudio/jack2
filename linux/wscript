@@ -57,15 +57,25 @@ def build(bld):
                        'alsa/ice1712.c'
                        ]
 
+    alsarawmidi_driver_src = ['alsarawmidi/JackALSARawMidiDriver.cpp',
+                              'alsarawmidi/JackALSARawMidiInputPort.cpp',
+                              'alsarawmidi/JackALSARawMidiOutputPort.cpp',
+                              'alsarawmidi/JackALSARawMidiPort.cpp',
+                              'alsarawmidi/JackALSARawMidiReceiveQueue.cpp',
+                              'alsarawmidi/JackALSARawMidiSendQueue.cpp'
+                              ]
+
     ffado_driver_src = ['firewire/JackFFADODriver.cpp',
-                        'firewire/JackFFADOMidiInput.cpp',
-                        'firewire/JackFFADOMidiOutput.cpp',
-                        '../common/JackPhysicalMidiInput.cpp',
-                        '../common/JackPhysicalMidiOutput.cpp'
+                        'firewire/JackFFADOMidiInputPort.cpp',
+                        'firewire/JackFFADOMidiOutputPort.cpp',
+                        'firewire/JackFFADOMidiReceiveQueue.cpp',
+                        'firewire/JackFFADOMidiSendQueue.cpp'
                        ]
 
     if bld.env['BUILD_DRIVER_ALSA'] == True:
         create_jack_driver_obj(bld, 'alsa', alsa_driver_src, "ALSA")
+        create_jack_driver_obj(bld, 'alsarawmidi', alsarawmidi_driver_src,
+                               "ALSA")
 
     if bld.env['BUILD_DRIVER_FREEBOB'] == True:
         create_jack_driver_obj(bld, 'freebob', 'freebob/JackFreebobDriver.cpp', "LIBFREEBOB")

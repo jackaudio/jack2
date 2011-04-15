@@ -11,7 +11,7 @@ import Task
 import re
 import Logs
 
-VERSION='1.9.7'
+VERSION='1.9.8'
 APPNAME='jack'
 JACK_API_VERSION = '0.1.0'
 

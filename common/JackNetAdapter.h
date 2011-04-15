@@ -30,44 +30,48 @@ namespace Jack
     \brief Net adapter.
     */
 
-    class JackNetAdapter : public JackAudioAdapterInterface, public JackNetSlaveInterface, public JackRunnableInterface
+    class JackNetAdapter : public JackAudioAdapterInterface,
+        public JackNetSlaveInterface,
+        public JackRunnableInterface
     {
-    private:
-        //jack data
-        jack_client_t* fJackClient;
 
-        //transport data
-        int fLastTransportState;
-        int fLastTimebaseMaster;
-     
-        //sample buffers
-        sample_t** fSoftCaptureBuffer;
-        sample_t** fSoftPlaybackBuffer;
+        private:
 
-        //adapter thread
-        JackThread fThread;
+            //jack data
+            jack_client_t* fJackClient;
 
-        //transport
-        void EncodeTransportData();
-        void DecodeTransportData();
+            //transport data
+            int fLastTransportState;
+            int fLastTimebaseMaster;
 
-    public:
+            //sample buffers
+            sample_t** fSoftCaptureBuffer;
+            sample_t** fSoftPlaybackBuffer;
 
-        JackNetAdapter ( jack_client_t* jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params );
-        ~JackNetAdapter();
+            //adapter thread
+            JackThread fThread;
 
-        int Open();
-        int Close();
+            //transport
+            void EncodeTransportData();
+            void DecodeTransportData();
 
-        int SetBufferSize ( jack_nframes_t buffer_size );
+        public:
 
-        bool Init();
-        bool Execute();
+            JackNetAdapter(jack_client_t* jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
+            ~JackNetAdapter();
 
-        int Read();
-        int Write();
+            int Open();
+            int Close();
 
-        int Process();
+            int SetBufferSize(jack_nframes_t buffer_size);
+
+            bool Init();
+            bool Execute();
+
+            int Read();
+            int Write();
+
+            int Process();
     };
 }
 

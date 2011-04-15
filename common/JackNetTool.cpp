@@ -374,11 +374,13 @@ namespace Jack
 
     void NetCeltAudioBuffer::SetBuffer(int index, sample_t* buffer)
     {
+        assert(fPortBuffer);
         fPortBuffer[index] = buffer;
     }
 
     sample_t* NetCeltAudioBuffer::GetBuffer(int index)
     {
+        assert(fPortBuffer);
         return fPortBuffer[index];
     }
 

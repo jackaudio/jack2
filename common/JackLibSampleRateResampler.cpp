@@ -148,7 +148,7 @@ unsigned int JackLibSampleRateResampler::WriteResample(jack_default_audio_sample
 
             res = src_process(fResampler, &src_data);
             if (res != 0) {
-                jack_error("JackLibSampleRateResampler::ReadResample ratio = %f err = %s", fRatio, src_strerror(res));
+                jack_error("JackLibSampleRateResampler::WriteResample ratio = %f err = %s", fRatio, src_strerror(res));
                 return 0;
             }
 
@@ -167,7 +167,7 @@ unsigned int JackLibSampleRateResampler::WriteResample(jack_default_audio_sample
 
     if (read_frames < frames) {
         jack_error("Input available = %ld", available_frames);
-        jack_error("JackLibSampleRateResampler::ReadResample error read_frames = %ld", read_frames);
+        jack_error("JackLibSampleRateResampler::WriteResample error read_frames = %ld", read_frames);
     }
 
     return read_frames;

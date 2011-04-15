@@ -1,4 +1,4 @@
-/** @file simple_client.c
+/** @file thru_client.c
  *
  * @brief This simple through client demonstrates the basic features of JACK
  * as they would be used by many applications.

@@ -104,9 +104,9 @@ namespace Jack
         }
 
         //max channels
-        if ( in_max == 0 )
+        if ( in_max == 0 && fInputDevice != paNoDevice)
             in_max = fPaDevices.GetDeviceInfo ( fInputDevice )->maxInputChannels;
-        if ( out_max == 0 )
+        if ( out_max == 0 && fOutputDevice != paNoDevice)
             out_max = fPaDevices.GetDeviceInfo ( fOutputDevice )->maxOutputChannels;
 
         //effective channels
@@ -126,8 +126,10 @@ namespace Jack
         PaStreamParameters inputParameters;
         PaStreamParameters outputParameters;
 
-        if ( JackAudioAdapterInterface::Open() < 0 )
+        if (fInputDevice == paNoDevice && fOutputDevice == paNoDevice) {
+            jack_error("No input and output device!!");
             return -1;
+        }
 
         jack_log("JackPortAudioAdapter::Open fInputDevice = %d DeviceName %s", fInputDevice, fPaDevices.GetFullName(fInputDevice).c_str());
         jack_log("JackPortAudioAdapter::Open fOutputDevice = %d DeviceName %s", fOutputDevice, fPaDevices.GetFullName(fOutputDevice).c_str());
@@ -186,7 +188,7 @@ namespace Jack
         jack_log ( "JackPortAudioAdapter:: Pa_StopStream" );
         Pa_CloseStream ( fStream );
         jack_log ( "JackPortAudioAdapter:: Pa_CloseStream" );
-        return JackAudioAdapterInterface::Close();
+        return 0;
     }
 
     int JackPortAudioAdapter::SetSampleRate ( jack_nframes_t sample_rate )
@@ -309,3 +311,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+

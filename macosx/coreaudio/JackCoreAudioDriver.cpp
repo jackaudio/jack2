@@ -195,7 +195,7 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
     driver->fCurrentTime = (AudioTimeStamp *)inTimeStamp;
     driver->fDriverOutputData = ioData;
 
-    // Setup threadded based log function once...
+    // Setup threaded based log function et get RT thread parameters once...
     if (set_threaded_log_function()) {
 
         jack_log("set_threaded_log_function");
@@ -216,8 +216,11 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
 
 int JackCoreAudioDriver::Read()
 {
-    OSStatus err = AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData);
-    return (err == noErr) ? 0 : -1;
+    if (fCaptureChannels > 0)  { // Calling AudioUnitRender with no input returns a '????' error (callback setting issue ??), so hack to avoid it here...
+        return (AudioUnitRender(fAUHAL, fActionFags, fCurrentTime, 1, fEngineControl->fBufferSize, fJackInputData) == noErr)  ? 0 : -1;
+    } else {
+        return 0;
+    }
 }
 
 int JackCoreAudioDriver::Write()
@@ -386,12 +389,15 @@ OSStatus JackCoreAudioDriver::GetDefaultDevice(AudioDeviceID* id)
     jack_log("GetDefaultDevice: input = %ld output = %ld", inDefault, outDefault);
 
     // Get the device only if default input and output are the same
-    if (inDefault == outDefault) {
-        *id = inDefault;
-        return noErr;
-    } else {
+    if (inDefault != outDefault) {
         jack_error("Default input and output devices are not the same !!");
         return kAudioHardwareBadDeviceError;
+    } else if (inDefault == 0) {
+        jack_error("Default input and output devices are null !!");
+        return kAudioHardwareBadDeviceError;
+    } else {
+        *id = inDefault;
+        return noErr;
     }
 }
 
@@ -1549,7 +1555,6 @@ error:
 int JackCoreAudioDriver::Close()
 {
     jack_log("JackCoreAudioDriver::Close");
-    Stop();
 
     // Generic audio driver close
     int res = JackAudioDriver::Close();
@@ -1559,6 +1564,53 @@ int JackCoreAudioDriver::Close()
     CloseAUHAL();
     DestroyAggregateDevice();
     return res;
+}
+
+void JackCoreAudioDriver::UpdateLatencies()
+{
+    UInt32 size;
+    OSStatus err;
+    jack_latency_range_t range;
+    range.max = fEngineControl->fBufferSize;
+    range.min = fEngineControl->fBufferSize;
+
+    for (int i = 0; i < fCaptureChannels; i++) {
+        size = sizeof(UInt32);
+        UInt32 value1 = 0;
+        UInt32 value2 = 0;
+        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
+
+        range.min = range.max = fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency;
+        fGraphManager->GetPort(fCapturePortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+    }
+
+    for (int i = 0; i < fPlaybackChannels; i++) {
+        size = sizeof(UInt32);
+        UInt32 value1 = 0;
+        UInt32 value2 = 0;
+        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
+        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
+        if (err != noErr)
+            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
+
+        // Add more latency if "async" mode is used...
+        range.min = range.max
+            = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency;
+        fGraphManager->GetPort(fPlaybackPortList[i])->SetLatencyRange(JackPlaybackLatency, &range);
+
+        // Monitor port
+        if (fWithMonitorPorts) {
+            range.min = range.max = fEngineControl->fBufferSize;
+            fGraphManager->GetPort(fMonitorPortList[i])->SetLatencyRange(JackCaptureLatency, &range);
+        }
+    }
 }
 
 int JackCoreAudioDriver::Attach()
@@ -1571,7 +1623,6 @@ int JackCoreAudioDriver::Attach()
     char channel_name[64];
     char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
     char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-    jack_latency_range_t range;
 
     jack_log("JackCoreAudioDriver::Attach fBufferSize %ld fSampleRate %ld", fEngineControl->fBufferSize, fEngineControl->fSampleRate);
 
@@ -1596,20 +1647,8 @@ int JackCoreAudioDriver::Attach()
             return -1;
         }
 
-        size = sizeof(UInt32);
-        UInt32 value1 = 0;
-        UInt32 value2 = 0;
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertyLatency, &size, &value1);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
-        err = AudioDeviceGetProperty(fDeviceID, 0, true, kAudioDevicePropertySafetyOffset, &size, &value2);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
-
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        range.min = range.max = fEngineControl->fBufferSize + value1 + value2 + fCaptureLatency;
-        port->SetLatencyRange(JackCaptureLatency, &range);
         fCapturePortList[i] = port_index;
     }
 
@@ -1634,21 +1673,8 @@ int JackCoreAudioDriver::Attach()
             return -1;
         }
 
-        size = sizeof(UInt32);
-        UInt32 value1 = 0;
-        UInt32 value2 = 0;
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertyLatency, &size, &value1);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertyLatency error");
-        err = AudioDeviceGetProperty(fDeviceID, 0, false, kAudioDevicePropertySafetyOffset, &size, &value2);
-        if (err != noErr)
-            jack_log("AudioDeviceGetProperty kAudioDevicePropertySafetyOffset error");
-
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
-        // Add more latency if "async" mode is used...
-        range.min = range.max = fEngineControl->fBufferSize + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize * fIOUsage) + value1 + value2 + fPlaybackLatency;
-        port->SetLatencyRange(JackPlaybackLatency, &range);
         fPlaybackPortList[i] = port_index;
 
         // Monitor ports
@@ -1659,13 +1685,12 @@ int JackCoreAudioDriver::Attach()
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
-                port = fGraphManager->GetPort(port_index);
-                range.min = range.max = fEngineControl->fBufferSize;
-                port->SetLatencyRange(JackCaptureLatency, &range);
                 fMonitorPortList[i] = port_index;
             }
         }
     }
+
+    UpdateLatencies();
 
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {
@@ -1714,17 +1739,19 @@ int JackCoreAudioDriver::Stop()
 
 int JackCoreAudioDriver::SetBufferSize(jack_nframes_t buffer_size)
 {
-    OSStatus err;
     UInt32 outSize = sizeof(UInt32);
 
-    err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
+    OSStatus err = AudioDeviceSetProperty(fDeviceID, NULL, 0, false, kAudioDevicePropertyBufferFrameSize, outSize, &buffer_size);
     if (err != noErr) {
         jack_error("Cannot set buffer size %ld", buffer_size);
         printError(err);
         return -1;
     }
 
-    JackAudioDriver::SetBufferSize(buffer_size); // never fails
+    JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails
+
+    // CoreAudio specific
+    UpdateLatencies();
 
     // Input buffers do no change : prepare them only once
     for (int i = 0; i < fCaptureChannels; i++) {
@@ -1820,7 +1847,7 @@ extern "C"
         strcpy(desc->params[i].name, "channels");
         desc->params[i].character = 'c';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = -1;
+        desc->params[i].value.i = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of channels");
         strcpy(desc->params[i].long_desc, "Maximum number of channels. If -1, max possible number of channels will be used");
 
@@ -1828,7 +1855,7 @@ extern "C"
         strcpy(desc->params[i].name, "inchannels");
         desc->params[i].character = 'i';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = -1;
+        desc->params[i].value.i = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of input channels");
         strcpy(desc->params[i].long_desc, "Maximum number of input channels. If -1, max possible number of input channels will be used");
 
@@ -1836,7 +1863,7 @@ extern "C"
         strcpy(desc->params[i].name, "outchannels");
         desc->params[i].character = 'o';
         desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = -1;
+        desc->params[i].value.i = -1;
         strcpy(desc->params[i].short_desc, "Maximum number of output channels");
         strcpy(desc->params[i].long_desc, "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
@@ -1897,7 +1924,7 @@ extern "C"
         strcpy(desc->params[i].name, "input-latency");
         desc->params[i].character = 'I';
         desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.i = 0;
+        desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Extra input latency (frames)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
@@ -1905,7 +1932,7 @@ extern "C"
         strcpy(desc->params[i].name, "output-latency");
         desc->params[i].character = 'O';
         desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.i = 0;
+        desc->params[i].value.ui = 0;
         strcpy(desc->params[i].short_desc, "Extra output latency (frames)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
@@ -1929,7 +1956,7 @@ extern "C"
         strcpy(desc->params[i].name, "async-latency");
         desc->params[i].character = 'L';
         desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.i = 100;
+        desc->params[i].value.ui = 100;
         strcpy(desc->params[i].short_desc, "Extra output latency in asynchronous mode (percent)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
@@ -1937,7 +1964,7 @@ extern "C"
         strcpy(desc->params[i].name, "grain");
         desc->params[i].character = 'G';
         desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.i = 100;
+        desc->params[i].value.ui = 100;
         strcpy(desc->params[i].short_desc, "Computation grain in RT thread (percent)");
         strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 

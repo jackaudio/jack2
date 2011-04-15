@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009 Devin Anderson
+Copyright (C) 2010 Devin Anderson
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -17,35 +17,33 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
 
-#ifndef __JackFFADOMidiInput__
-#define __JackFFADOMidiInput__
+#ifndef __JackMidiSendQueue__
+#define __JackMidiSendQueue__
 
-#include "JackPhysicalMidiInput.h"
+#include "JackMidiWriteQueue.h"
 
 namespace Jack {
 
-    class JackFFADOMidiInput: public JackPhysicalMidiInput {
+    /**
+     * Implemented by MIDI output connections.
+     */
 
-    private:
-
-        uint32_t *input_buffer;
-        bool new_period;
-
-    protected:
-
-        jack_nframes_t
-        Receive(jack_midi_data_t *, jack_nframes_t, jack_nframes_t);
+    class SERVER_EXPORT JackMidiSendQueue: public JackMidiWriteQueue {
 
     public:
 
-        JackFFADOMidiInput(size_t buffer_size=1024);
-        ~JackFFADOMidiInput();
+        using JackMidiWriteQueue::EnqueueEvent;
 
-        inline void
-        SetInputBuffer(uint32_t *input_buffer)
-        {
-            this->input_buffer = input_buffer;
-        }
+        virtual
+        ~JackMidiSendQueue();
+
+        /**
+         * Returns the next frame that a MIDI message can be sent at.  The
+         * default method returns the current frame.
+         */
+
+        virtual jack_nframes_t
+        GetNextScheduleFrame();
 
     };
 
