@@ -53,8 +53,6 @@
    <bgfoot> </> 
    <bgback> </>
    <files listview >
-<_><src>.\src\vcredist_2010_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>.\src\vcredist_2010_x64.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libjack64.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libjack64.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libjack64.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
@@ -71,6 +69,7 @@
 <_><src>..\Release\bin\libjackserver.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjackserver.dll</><dest>sys</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_connect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_disconnect.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_load.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -81,7 +80,6 @@
 <_><src>..\Release64\bin\jackd.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\libsamplerate_x86_64.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\portaudio_x86_64.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>..\Release\bin\portaudio_x86.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack\jack_net.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack\jack_netone.dll</><dest>inst</><custom>jack</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release64\bin\jack_netsource.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -105,9 +103,14 @@
 <_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
-<_><src>.\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>.\JackRouter64.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>.\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\JackRouter.ini</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\msvcr100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\msvcp100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\64bits\JackRouter.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\64bits\JackRouter.ini</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\64bits\msvcr100.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\64bits\msvcp100.dll</><dest>inst</><custom>64bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -118,9 +121,7 @@
 
    </files>
    <runx listview >
-   <_><type>app</><path>inst</><file>vcredist_2010_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
-   <_><type>app</><path>inst</><file>vcredist_2010_x64.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
-   </runx>
+    </runx>
    <registry listview >
       
    </registry>
@@ -138,8 +139,8 @@
       
    </copy>
    <activex listview >
-	  <_><path>inst</><name>JackRouter.dll</></>
- 	  <_><path>inst</><name>JackRouter64.dll</></>
+	  <_><path>inst</><name>32bits\JackRouter.dll</></>
+ 	  <_><path>inst</><name>64bits\JackRouter.dll</></>
 
    </activex>
    <font listview >
