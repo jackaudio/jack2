@@ -28,12 +28,12 @@ namespace Jack
 
 int JackFreewheelDriver::Process()
 {
-    int res = 0;
+   int res = 0;
 
-    jack_log("JackFreewheelDriver::Process master %lld", fEngineControl->fTimeOutUsecs);
-    JackDriver::CycleTakeBeginTime();
+   jack_log("JackFreewheelDriver::Process master %lld", fEngineControl->fTimeOutUsecs);
+   JackDriver::CycleTakeBeginTime();
 
-    if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
+   if (fEngine->Process(fBeginDateUst, fEndDateUst)) {
 
         if (fGraphManager->ResumeRefNum(&fClientControl, fSynchroTable)) {      // Signal all clients
             jack_error("JackFreewheelDriver::Process: ResumeRefNum error");
@@ -46,10 +46,10 @@ int JackFreewheelDriver::Process()
             return 0;
         }
 
-    } else { // Graph not finished: do not activate it
+   } else { // Graph not finished: do not activate it
         jack_error("JackFreewheelDriver::Process: Process error");
         res = -1;
-    }
+   }
 
    return res;
 }
