@@ -81,7 +81,7 @@
 				<Linker>
 					<Add option="-m32" />
 					<Add library="libjack" />
-					<Add library="libsamplerate-0" />
+					<Add library="libsamplerate_x86" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>
@@ -102,7 +102,7 @@
 				<Linker>
 					<Add option="-m32" />
 					<Add library="libjack" />
-					<Add library="libsamplerate-0" />
+					<Add library="libsamplerate_x86" />
 					<Add directory="Debug\bin" />
 				</Linker>
 			</Target>
@@ -124,7 +124,7 @@
 				<Linker>
 					<Add option="-m32" />
 					<Add library="libjack" />
-					<Add library="libsamplerate-0" />
+					<Add library="libsamplerate_x86" />
 					<Add directory="Release\bin" />
 				</Linker>
 			</Target>

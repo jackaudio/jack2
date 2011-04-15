@@ -15,3 +15,10 @@ Just use : 'dlltool -l libjackserver.lib -D libjackserver.dll -d libjackserver.d
 Once all binaries are available, just execute the script in 'CreateInstall' to make 'setup.exe'.
 The setup will copy all binaries to a specified folder, register the JackRouter (in order to have it in the ASIO drivers list) and create some shortcuts in the start menu.
 It's a good and proper way to get jack installed on windows.
+
+64 bits compilation
+====================
+
+- for some reasons CodeBlocks create libjack.dll.a and libjack.dll.def names. So the ".dll" part has to be removed before using "lib" tool to create ".lib" files.
+
+- to create 64 bits ".lib" files, the "/MACHINE:X64 option has to be used.

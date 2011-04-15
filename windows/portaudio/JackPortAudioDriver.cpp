@@ -151,8 +151,9 @@ namespace Jack
         fCaptureChannels = inchannels;
         fPlaybackChannels = outchannels;
 
-        if ((err = OpenStream(buffer_size)) != paNoError) {
-            jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
+        err = OpenStream(buffer_size);
+        if (err != paNoError) {
+            jack_error("Pa_OpenStream error %d = %s", err, Pa_GetErrorText(err));
             goto error;
         }
 
@@ -172,7 +173,7 @@ namespace Jack
 
 error:
         JackAudioDriver::Close();
-        jack_error("Can't open default PortAudio device : %s", Pa_GetErrorText(err));
+        jack_error("Can't open default PortAudio device");
         return -1;
     }
 
@@ -219,8 +220,9 @@ error:
             return -1;
         }
 
-       if ((err = OpenStream(buffer_size)) != paNoError) {
-            jack_error("Pa_OpenStream error = %s", Pa_GetErrorText(err));
+        err = OpenStream(buffer_size);
+        if (err != paNoError) {
+            jack_error("Pa_OpenStream error %d = %s", err, Pa_GetErrorText(err));
             return -1;
         } else {
             JackAudioDriver::SetBufferSize(buffer_size); // Generic change, never fails

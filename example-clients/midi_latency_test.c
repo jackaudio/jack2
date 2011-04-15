@@ -77,7 +77,7 @@ typedef sem_t *semaphore_t;
 
 const char *ERROR_RESERVE = "could not reserve MIDI event on port buffer";
 const char *ERROR_SHUTDOWN = "the JACK server has been shutdown";
-const char *ERROR_TIMEOUT = "timed out while waiting for MIDI message";
+const char *ERROR_TIMEOUT1 = "timed out while waiting for MIDI message";
 
 const char *SOURCE_EVENT_RESERVE = "jack_midi_event_reserve";
 const char *SOURCE_PROCESS = "handle_process";
@@ -209,7 +209,7 @@ get_semaphore_error()
     if (! FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error,
                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                         semaphore_error_msg, 1024, NULL)) {
-        sprintf(semaphore_error_msg, 1023, "Unknown OS error code '%d'",
+        snprintf(semaphore_error_msg, 1023, "Unknown OS error code '%d'",
                 error);
     }
     return semaphore_error_msg;
@@ -284,7 +284,7 @@ handle_process(jack_nframes_t frames, void *arg)
         microseconds = jack_frames_to_time(client, last_frame_time) -
             last_activity_time;
         if ((microseconds / 1000000) >= timeout) {
-            set_process_error(SOURCE_PROCESS, ERROR_TIMEOUT);
+            set_process_error(SOURCE_PROCESS, ERROR_TIMEOUT1);
         }
         break;
     found_message:

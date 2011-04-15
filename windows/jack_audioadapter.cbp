@@ -95,7 +95,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add library="libsamplerate-0" />
+					<Add library="libsamplerate_x86" />
 					<Add library="libjackserver" />
 					<Add library="portaudio_x86" />
 					<Add directory="Release\bin" />
@@ -123,7 +123,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add library="libsamplerate-0" />
+					<Add library="libsamplerate_x86" />
 					<Add library="libjackserver" />
 					<Add library="portaudio_x86" />
 					<Add directory="Debug\bin" />
@@ -152,7 +152,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add library="libsamplerate-0" />
+					<Add library="libsamplerate_x86" />
 					<Add library="libjackserver" />
 					<Add library="portaudio_x86" />
 					<Add directory="Release\bin" />
