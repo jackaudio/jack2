@@ -57,7 +57,11 @@ static void __attribute__((constructor)) tryload_libjack()
     #ifdef __APPLE__
         libjack_handle = dlopen("libjack.0.dylib", RTLD_LAZY);
     #elif defined(WIN32)
-        libjack_handle = LoadLibrary("libjack.dll");
+        #ifdef _WIN64
+            libjack_handle = LoadLibrary("libjack64.dll");
+        #else
+            libjack_handle = LoadLibrary("libjack.dll");
+        #endif
     #else
         libjack_handle = dlopen("libjack.so.0", RTLD_LAZY);
     #endif
