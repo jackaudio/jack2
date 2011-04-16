@@ -55,7 +55,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     std::auto_ptr<JackMidiBufferWriteQueue> write_queue_ptr(write_queue);
     sysex_buffer = new jack_midi_data_t[max_bytes];
     char error_message[MAXERRORLENGTH];
-    MMRESULT result = midiInOpen(&handle, index, (DWORD_PTR)HandleMidiInputEvent,
+    MMRESULT result = midiInOpen(&handle, index,
+                                 (DWORD_PTR) HandleMidiInputEvent,
                                  (DWORD_PTR)this,
                                  CALLBACK_FUNCTION | MIDI_IO_STATUS);
     if (result != MMSYSERR_NOERROR) {
@@ -108,7 +109,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
  close_handle:
     result = midiInClose(handle);
     if (result != MMSYSERR_NOERROR) {
-        WriteInError("JackWinMMEInputPort [constructor]", "midiInClose", result);
+        WriteInError("JackWinMMEInputPort [constructor]", "midiInClose",
+                     result);
     }
  delete_sysex_buffer:
     delete[] sysex_buffer;
@@ -123,8 +125,8 @@ JackWinMMEInputPort::~JackWinMMEInputPort()
     }
     result = midiInUnprepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
-        WriteInError("JackWinMMEInputPort [destructor]", "midiInUnprepareHeader",
-                   result);
+        WriteInError("JackWinMMEInputPort [destructor]",
+                     "midiInUnprepareHeader", result);
     }
     result = midiInClose(handle);
     if (result != MMSYSERR_NOERROR) {
@@ -156,6 +158,15 @@ JackWinMMEInputPort::EnqueueMessage(jack_nframes_t time, size_t length,
 }
 
 void
+JackWinMMEInputPort::GetInErrorString(MMRESULT error, LPTSTR text)
+{
+    MMRESULT result = midiInGetErrorText(error, text, MAXERRORLENGTH);
+    if (result != MMSYSERR_NOERROR) {
+        snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
+    }
+}
+
+void
 JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer,
                                  jack_nframes_t frames)
 {
@@ -164,7 +175,7 @@ JackWinMMEInputPort::ProcessJack(JackMidiBuffer *port_buffer,
         jack_event = thread_queue->DequeueEvent();
     }
     for (; jack_event; jack_event = thread_queue->DequeueEvent()) {
-        switch (write_queue->EnqueueEvent(jack_event)) {
+        switch (write_queue->EnqueueEvent(jack_event, frames)) {
         case JackMidiWriteQueue::BUFFER_TOO_SMALL:
             jack_error("JackWinMMEMidiInputPort::Process - The buffer write "
                        "queue couldn't enqueue a %d-byte event. Dropping "
@@ -223,13 +234,19 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
     }
     case MIM_LONGDATA: {
         LPMIDIHDR header = (LPMIDIHDR) param1;
+        size_t byte_count = header->dwBytesRecorded;
+        if (! byte_count) {
+            jack_info("JackWinMMEInputPort::ProcessWinMME - WinMME driver has "
+                      "returned sysex header to us with no bytes.  The JACK "
+                      "driver is probably being stopped.");
+            break;
+        }
         jack_midi_data_t *data = (jack_midi_data_t *) header->lpData;
-        size_t length1 = header->dwBytesRecorded;
-        if ((data[0] != 0xf0) || (data[length1 - 1] != 0xf7)) {
+        if ((data[0] != 0xf0) || (data[byte_count - 1] != 0xf7)) {
             jack_error("JackWinMMEInputPort::ProcessWinMME - Discarding "
-                       "%d-byte sysex chunk.", length1);
+                       "%d-byte sysex chunk.", byte_count);
         } else {
-            EnqueueMessage(current_frame, length1, data);
+            EnqueueMessage(current_frame, byte_count, data);
         }
         // Is this realtime-safe?  This function isn't run in the JACK thread,
         // but we still want it to perform as quickly as possible.  Even if
@@ -237,8 +254,8 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
         MMRESULT result = midiInAddBuffer(handle, &sysex_header,
                                           sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
-            WriteInError("JackWinMMEInputPort::ProcessWinMME", "midiInAddBuffer",
-                       result);
+            WriteInError("JackWinMMEInputPort::ProcessWinMME",
+                         "midiInAddBuffer", result);
         }
         break;
     }
@@ -278,15 +295,6 @@ JackWinMMEInputPort::Stop()
 }
 
 void
-JackWinMMEInputPort::GetInErrorString(MMRESULT error, LPTSTR text)
-{
-    MMRESULT result = midiInGetErrorText(error, text, MAXERRORLENGTH);
-    if (result != MMSYSERR_NOERROR) {
-        snprintf(text, MAXERRORLENGTH, "Unknown error code '%d'", error);
-    }
-}
-
-void
 JackWinMMEInputPort::WriteInError(const char *jack_func, const char *mm_func,
                                 MMRESULT result)
 {
@@ -294,5 +302,3 @@ JackWinMMEInputPort::WriteInError(const char *jack_func, const char *mm_func,
     GetInErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }
-
-
