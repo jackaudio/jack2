@@ -78,6 +78,15 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         func = "snd_rawmidi_params_set_avail_min";
         goto free_params;
     }
+
+    // Minimum buffer size allowed by ALSA
+    code = snd_rawmidi_params_set_buffer_size(rawmidi, params, 32);
+    if (code) {
+        error_message = snd_strerror(code);
+        func = "snd_rawmidi_params_set_buffer_size";
+        goto free_params;
+    }
+
     code = snd_rawmidi_params_set_no_active_sensing(rawmidi, params, 1);
     if (code) {
         error_message = snd_strerror(code);
