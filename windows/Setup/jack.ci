@@ -53,7 +53,6 @@
    <bgfoot> </> 
    <bgback> </>
    <files listview >
-<_><src>.\src\vcredist_2010_x86.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.a</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.lib</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
 <_><src>..\Release\bin\libjack.def</><dest>inst</><custom>lib</><ifexist>overnewer</><recurs>0</></>
@@ -95,8 +94,10 @@
 <_><src>..\..\common\jack\systemdeps.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakjack.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
 <_><src>..\..\common\jack\weakmacros.h</><dest>inst</><custom>includes\jack</><ifexist>overnewer</><recurs>1</></>
-<_><src>.\JackRouter.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
-<_><src>.\JackRouter.ini</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\JackRouter.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\JackRouter.ini</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\msvcr100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
+<_><src>.\src\32bits\msvcp100.dll</><dest>inst</><custom>32bits</><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\mingwm10.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\qjackctl.exe</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
 <_><src>.\qjackctl\QtCore4.dll</><dest>inst</><custom></><ifexist>overnewer</><recurs>0</></>
@@ -107,7 +108,6 @@
 
    </files>
    <runx listview >
-   <_><type>app</><path>inst</><file>vcredist_2010_x86.exe</><cmdline></><wait>1</><workdir>inst</><custdir></><when>end</></>
    </runx>
    <registry listview >
       
@@ -126,7 +126,7 @@
       
    </copy>
    <activex listview >
-      <_><path>inst</><name>JackRouter.dll</></>
+      <_><path>inst</><name>32bits\JackRouter.dll</></>
 
    </activex>
    <font listview >

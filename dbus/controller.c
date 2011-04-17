@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008,2010 Nedko Arnaudov
+    Copyright (C) 2007,2008,2010,2011 Nedko Arnaudov
     Copyright (C) 2007-2008 Juuso Alasuutari
 
     This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
     NULL
 };
 
+static
 jackctl_driver_t *
 jack_controller_find_driver(
     jackctl_server_t *server,
@@ -114,6 +115,7 @@ jack_controller_remove_slave_drivers(
     }
 }
 
+static
 jackctl_internal_t *
 jack_controller_find_internal(
     jackctl_server_t *server,
@@ -136,41 +138,17 @@ jack_controller_find_internal(
     return NULL;
 }
 
-jackctl_parameter_t *
-jack_controller_find_parameter(
-    const JSList * parameters_list,
-    const char * parameter_name)
-{
-    while (parameters_list)
-    {
-        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0)
-        {
-            return parameters_list->data;
-        }
-
-        parameters_list = jack_slist_next(parameters_list);
-    }
-
-    return NULL;
-}
-
 bool
 jack_controller_select_driver(
     struct jack_controller * controller_ptr,
     const char * driver_name)
 {
-    jackctl_driver_t *driver;
-
-    driver = jack_controller_find_driver(controller_ptr->server, driver_name);
-    if (driver == NULL)
+    if (!jack_params_set_driver(controller_ptr->params, driver_name))
     {
         return false;
     }
 
     jack_info("driver \"%s\" selected", driver_name);
-
-    controller_ptr->driver = driver;
-    controller_ptr->driver_set = true;
 
     return true;
 }
@@ -195,17 +173,11 @@ jack_controller_start_server(
 
     assert(!controller_ptr->started); /* should be ensured by caller */
 
-    if (controller_ptr->driver == NULL)
-    {
-        jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Select driver first!");
-        goto fail;
-    }
-
     controller_ptr->xruns = 0;
 
     if (!jackctl_server_open(
             controller_ptr->server,
-            controller_ptr->driver))
+            jack_params_get_driver(controller_ptr->params)))
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to open server");
         goto fail;
@@ -337,11 +309,12 @@ jack_controller_switch_master(
 {
     if (!jackctl_server_switch_master(
             controller_ptr->server,
-            controller_ptr->driver))
+            jack_params_get_driver(controller_ptr->params)))
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to switch master");
         return FALSE;
     }
+
 
     return TRUE;
 }
@@ -413,11 +386,6 @@ jack_controller_create(
         DBusConnection *connection)
 {
     struct jack_controller *controller_ptr;
-    const JSList * node_ptr;
-    const char ** driver_name_target;
-    const char ** internal_name_target;
-    JSList * drivers;
-    JSList * internals;
     DBusObjectPathVTable vtable =
     {
         jack_dbus_message_handler_unregister,
@@ -439,54 +407,16 @@ jack_controller_create(
         goto fail_free;
     }
 
-    controller_ptr->client = NULL;
-    controller_ptr->started = false;
-    controller_ptr->driver = NULL;
-    controller_ptr->driver_set = false;
-    INIT_LIST_HEAD(&controller_ptr->slave_drivers);
-
-    drivers = (JSList *)jackctl_server_get_drivers_list(controller_ptr->server);
-    controller_ptr->drivers_count = jack_slist_length(drivers);
-    controller_ptr->driver_names = malloc(controller_ptr->drivers_count * sizeof(const char *));
-    if (controller_ptr->driver_names == NULL)
+    controller_ptr->params = jack_params_create(controller_ptr->server);
+    if (controller_ptr->params == NULL)
     {
-        jack_error("Ran out of memory trying to allocate driver names array");
+        jack_error("Failed to initialize parameter tree");
         goto fail_destroy_server;
     }
 
-    driver_name_target = controller_ptr->driver_names;
-    node_ptr = jackctl_server_get_drivers_list(controller_ptr->server);
-    while (node_ptr != NULL)
-    {
-        *driver_name_target = jackctl_driver_get_name((jackctl_driver_t *)node_ptr->data);
-
-        /* select default driver */
-        if (controller_ptr->driver == NULL && strcmp(*driver_name_target, DEFAULT_DRIVER) == 0)
-        {
-            controller_ptr->driver = (jackctl_driver_t *)node_ptr->data;
-        }
-
-        node_ptr = jack_slist_next(node_ptr);
-        driver_name_target++;
-    }
-    
-    internals = (JSList *)jackctl_server_get_internals_list(controller_ptr->server);
-    controller_ptr->internals_count = jack_slist_length(internals);
-    controller_ptr->internal_names = malloc(controller_ptr->internals_count * sizeof(const char *));
-    if (controller_ptr->internal_names == NULL)
-    {
-        jack_error("Ran out of memory trying to allocate internals names array");
-        goto fail_free_driver_names_array;
-    }
-
-    internal_name_target = controller_ptr->internal_names;
-    node_ptr = jackctl_server_get_internals_list(controller_ptr->server);
-    while (node_ptr != NULL)
-    {
-        *internal_name_target = jackctl_internal_get_name((jackctl_internal_t *)node_ptr->data);
-        node_ptr = jack_slist_next(node_ptr);
-        internal_name_target++;
-    }
+    controller_ptr->client = NULL;
+    controller_ptr->started = false;
+    INIT_LIST_HEAD(&controller_ptr->slave_drivers);
 
     controller_ptr->dbus_descriptor.context = controller_ptr;
     controller_ptr->dbus_descriptor.interfaces = g_jackcontroller_interfaces;
@@ -498,18 +428,15 @@ jack_controller_create(
             &controller_ptr->dbus_descriptor))
     {
         jack_error("Ran out of memory trying to register D-Bus object path");
-        goto fail_free_internal_names_array;
+        goto fail_destroy_params;
     }
 
     jack_controller_settings_load(controller_ptr);
 
     return controller_ptr;
 
-fail_free_internal_names_array:
-    free(controller_ptr->internal_names);
-
-fail_free_driver_names_array:
-    free(controller_ptr->driver_names);
+fail_destroy_params:
+    jack_params_destroy(controller_ptr->params);
 
 fail_destroy_server:
     jackctl_server_destroy(controller_ptr->server);
@@ -623,9 +550,7 @@ jack_controller_destroy(
         jack_controller_stop_server(controller_ptr, NULL);
     }
 
-    free(controller_ptr->driver_names);
-    free(controller_ptr->internal_names);
-
+    jack_params_destroy(controller_ptr->params);
     jackctl_server_destroy(controller_ptr->server);
 
     free(controller_ptr);
