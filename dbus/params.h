@@ -54,6 +54,7 @@ struct jack_parameter
     void * obj;
     struct jack_parameter_vtable vtable;
     struct list_head siblings;
+    bool ext;
     jackctl_param_type_t type;
     const char * name;
     const char * short_decr;
@@ -105,6 +106,6 @@ jack_params_iterate_params(
 
 const struct jack_parameter * jack_params_get_parameter(jack_params_handle params, const char * const * address);
 
-bool jack_params_add_parameter(jack_params_handle params, const char * const * address, bool end, struct jack_parameter * param_ptr);
+void jack_params_add_parameter(jack_params_handle params, const char * const * address, bool end, struct jack_parameter * param_ptr);
 
 #endif /* #ifndef PARAMS_H__A23EDE06_C1C9_4489_B253_FD1B26B66929__INCLUDED */

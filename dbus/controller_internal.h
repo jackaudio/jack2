@@ -34,6 +34,7 @@ struct jack_controller_slave_driver
     struct list_head siblings;
     char * name;
     jackctl_driver_t * handle;
+    bool loaded;
 };
 
 struct jack_controller
@@ -48,6 +49,9 @@ struct jack_controller
     unsigned int xruns;
 
     struct list_head slave_drivers;
+    bool slave_drivers_set;
+    struct jack_parameter slave_drivers_vparam;
+    union jackctl_parameter_value slave_drivers_vparam_value;
 
     struct jack_dbus_object_descriptor dbus_descriptor;
 };

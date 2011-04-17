@@ -142,6 +142,7 @@ static bool add_controlapi_param(struct list_head * parent_list_ptr, jackctl_par
         goto fail;
     }
 
+    param_ptr->ext = false;
     param_ptr->obj = param;
     param_ptr->vtable.is_set = controlapi_parameter_is_set;
     param_ptr->vtable.reset = controlapi_parameter_reset;
@@ -211,6 +212,11 @@ static void free_params(struct list_head * parent_list_ptr)
     {
         param_ptr = list_entry(parent_list_ptr->next, struct jack_parameter, siblings);
         list_del(&param_ptr->siblings);
+
+        if (param_ptr->ext)
+        {
+            continue;
+        }
 
         if ((param_ptr->constraint_flags & JACK_CONSTRAINT_FLAG_VALID) != 0 &&
             !param_ptr->constraint_range &&
@@ -456,6 +462,7 @@ static bool init_engine_driver_parameter(struct jack_params * params_ptr)
         goto fail;
     }
 
+    param_ptr->ext = false;
     param_ptr->obj = params_ptr;
     param_ptr->vtable.is_set = engine_driver_parameter_is_set;
     param_ptr->vtable.reset = engine_driver_parameter_reset;
@@ -691,7 +698,7 @@ const struct jack_parameter * jack_params_get_parameter(jack_params_handle param
     return NULL;
 }
 
-bool jack_params_add_parameter(jack_params_handle params, const char * const * address, bool end, struct jack_parameter * param_ptr)
+void jack_params_add_parameter(jack_params_handle params, const char * const * address, bool end, struct jack_parameter * param_ptr)
 {
     struct jack_parameter_container * container_ptr;
 
@@ -699,8 +706,10 @@ bool jack_params_add_parameter(jack_params_handle params, const char * const * a
     if (container_ptr == NULL || !container_ptr->leaf)
     {
         assert(false);
-        return false;
+        return;
     }
+
+    param_ptr->ext = true;
 
     if (end)
     {
@@ -711,7 +720,7 @@ bool jack_params_add_parameter(jack_params_handle params, const char * const * a
         list_add(&param_ptr->siblings, &container_ptr->children);
     }
 
-    return true;
+    return;
 }
 
 #undef params_ptr
