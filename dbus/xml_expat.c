@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008 Nedko Arnaudov
+    Copyright (C) 2007,2008,2011 Nedko Arnaudov
     
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
 #include <expat.h>
 #include <dbus/dbus.h>
 
@@ -46,27 +47,16 @@ jack_controller_settings_uninit()
 {
 }
 
-#define PARSE_CONTEXT_ROOT        0
-#define PARSE_CONTEXT_JACK        1
-#define PARSE_CONTEXT_ENGINE      1
-#define PARSE_CONTEXT_DRIVERS     2
-#define PARSE_CONTEXT_DRIVER      3
-#define PARSE_CONTEXT_OPTION      4
-#define PARSE_CONTEXT_INTERNALS   5
-#define PARSE_CONTEXT_INTERNAL    6
-
-#define MAX_STACK_DEPTH       10
-
 struct parse_context
 {
     struct jack_controller *controller_ptr;
     XML_Bool error;
-    unsigned int element[MAX_STACK_DEPTH];
-    signed int depth;
-    jackctl_driver_t *driver;
-    jackctl_internal_t *internal;
+    bool option_value_capture;
     char option[JACK_PARAM_STRING_MAX+1];
     int option_used;
+    const char * address[PARAM_ADDRESS_SIZE];
+    int address_index;
+    char * container;
     char *name;
 };
 
@@ -80,7 +70,7 @@ jack_controller_settings_callback_chrdata(void *data, const XML_Char *s, int len
         return;
     }
 
-    if (context_ptr->element[context_ptr->depth] == PARSE_CONTEXT_OPTION)
+    if (context_ptr->option_value_capture)
     {
         if (context_ptr->option_used + len >= JACK_PARAM_STRING_MAX)
         {
@@ -97,107 +87,69 @@ jack_controller_settings_callback_chrdata(void *data, const XML_Char *s, int len
 void
 jack_controller_settings_callback_elstart(void *data, const char *el, const char **attr)
 {
-    jackctl_driver_t *driver;
-    jackctl_internal_t *internal;
-
     if (context_ptr->error)
     {
         return;
     }
 
-    if (context_ptr->depth + 1 >= MAX_STACK_DEPTH)
+    if (context_ptr->address_index >= PARAM_ADDRESS_SIZE)
     {
-        jack_error("xml parse max stack depth reached");
+        assert(context_ptr->address_index == PARAM_ADDRESS_SIZE);
+        jack_error("xml param address max depth reached");
         context_ptr->error = XML_TRUE;
         return;
     }
 
+    //jack_info("<%s>", el);
+
     if (strcmp(el, "jack") == 0)
     {
-        //jack_info("<jack>");
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_JACK;
         return;
     }
 
-    if (strcmp(el, "engine") == 0)
+    if (strcmp(el, PTNODE_ENGINE) == 0)
     {
-        //jack_info("<engine>");
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_ENGINE;
+        context_ptr->address[context_ptr->address_index++] = PTNODE_ENGINE;
         return;
     }
 
-    if (strcmp(el, "drivers") == 0)
+    if (strcmp(el, PTNODE_DRIVERS) == 0)
     {
-        //jack_info("<drivers>");
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_DRIVERS;
+        context_ptr->address[context_ptr->address_index++] = PTNODE_DRIVERS;
         return;
     }
     
-    if (strcmp(el, "internals") == 0)
+    if (strcmp(el, PTNODE_INTERNALS) == 0)
     {
-        //jack_info("<internals>");
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_INTERNALS;
+        context_ptr->address[context_ptr->address_index++] = PTNODE_INTERNALS;
         return;
     }
 
-    if (strcmp(el, "driver") == 0)
+    if (strcmp(el, "driver") == 0 ||
+        strcmp(el, "internal") == 0)
     {
         if ((attr[0] == NULL || attr[2] != NULL) || strcmp(attr[0], "name") != 0)
         {
-            jack_error("<driver> XML element must contain exactly one attribute, named \"name\"");
+            jack_error("<%s> XML element must contain exactly one attribute, named \"name\"", el);
             context_ptr->error = XML_TRUE;
             return;
         }
 
-        //jack_info("<driver>");
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_DRIVER;
-
-        driver = jack_controller_find_driver(context_ptr->controller_ptr->server, attr[1]);
-        if (driver == NULL)
+        context_ptr->container = strdup(attr[1]);
+        if (context_ptr->container == NULL)
         {
-            jack_error("ignoring settings for unknown driver \"%s\"", attr[1]);
-        }
-        else
-        {
-            jack_info("setting for driver \"%s\" found", attr[1]);
-        }
-
-        context_ptr->driver = driver;
-
-        return;
-    }
-    
-    if (strcmp(el, "internal") == 0)
-    {
-        if ((attr[0] == NULL || attr[2] != NULL) || strcmp(attr[0], "name") != 0)
-        {
-            jack_error("<internal> XML element must contain exactly one attribute, named \"name\"");
+            jack_error("strdup() failed");
             context_ptr->error = XML_TRUE;
             return;
         }
 
-        //jack_info("<internal>");
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_INTERNAL;
-
-        internal = jack_controller_find_internal(context_ptr->controller_ptr->server, attr[1]);
-        if (internal == NULL)
-        {
-            jack_error("ignoring settings for unknown internal \"%s\"", attr[1]);
-        }
-        else
-        {
-            jack_info("setting for internal \"%s\" found", attr[1]);
-        }
-
-        context_ptr->internal = internal;
+        context_ptr->address[context_ptr->address_index++] = context_ptr->container;
 
         return;
     }
-
-
+    
     if (strcmp(el, "option") == 0)
     {
-        //jack_info("<option>");
         if ((attr[0] == NULL || attr[2] != NULL) || strcmp(attr[0], "name") != 0)
         {
             jack_error("<option> XML element must contain exactly one attribute, named \"name\"");
@@ -213,7 +165,8 @@ jack_controller_settings_callback_elstart(void *data, const char *el, const char
             return;
         }
 
-        context_ptr->element[++context_ptr->depth] = PARSE_CONTEXT_OPTION;
+        context_ptr->address[context_ptr->address_index++] = context_ptr->name;
+        context_ptr->option_value_capture = true;
         context_ptr->option_used = 0;
         return;
     }
@@ -225,49 +178,48 @@ jack_controller_settings_callback_elstart(void *data, const char *el, const char
 void
 jack_controller_settings_callback_elend(void *data, const char *el)
 {
+    int i;
+
     if (context_ptr->error)
     {
         return;
     }
 
-    //jack_info("element end (depth = %d, element = %u)", context_ptr->depth, context_ptr->element[context_ptr->depth]);
+    //jack_info("</%s> (depth = %d)", el, context_ptr->address_index);
 
-    if (context_ptr->element[context_ptr->depth] == PARSE_CONTEXT_OPTION)
+    if (strcmp(el, "option") == 0)
     {
+        assert(context_ptr->option_value_capture);
         context_ptr->option[context_ptr->option_used] = 0;
 
-        if (context_ptr->depth == 2 &&
-            context_ptr->element[0] == PARSE_CONTEXT_JACK &&
-            context_ptr->element[1] == PARSE_CONTEXT_ENGINE)
+        for (i = context_ptr->address_index; i < PARAM_ADDRESS_SIZE; i++)
         {
-            jack_controller_settings_set_engine_option(context_ptr->controller_ptr, context_ptr->name, context_ptr->option);
+            context_ptr->address[context_ptr->address_index] = NULL;
         }
 
-        if (context_ptr->depth == 3 &&
-            context_ptr->element[0] == PARSE_CONTEXT_JACK &&
-            context_ptr->element[1] == PARSE_CONTEXT_DRIVERS &&
-            context_ptr->element[2] == PARSE_CONTEXT_DRIVER &&
-            context_ptr->driver != NULL)
-        {
-            jack_controller_settings_set_driver_option(context_ptr->driver, context_ptr->name, context_ptr->option);
-        }
-        
-        if (context_ptr->depth == 3 &&
-            context_ptr->element[0] == PARSE_CONTEXT_JACK &&
-            context_ptr->element[1] == PARSE_CONTEXT_INTERNALS &&
-            context_ptr->element[2] == PARSE_CONTEXT_INTERNAL &&
-            context_ptr->internal != NULL)
-        {
-            jack_controller_settings_set_internal_option(context_ptr->internal, context_ptr->name, context_ptr->option);
-        }
-    }
+        jack_controller_deserialize_parameter_value(context_ptr->controller_ptr, context_ptr->address, context_ptr->option);
 
-    context_ptr->depth--;
-
-    if (context_ptr->name != NULL)
-    {
         free(context_ptr->name);
         context_ptr->name = NULL;
+        context_ptr->option_value_capture = false;
+        context_ptr->address_index--;
+    }
+    else if (context_ptr->container != NULL)
+    {
+        //jack_info("'%s'", context_ptr->container);
+        free(context_ptr->container);
+        context_ptr->container = NULL;
+        context_ptr->address_index--;
+    }
+    else if (strcmp(el, PTNODE_ENGINE) == 0 ||
+             strcmp(el, PTNODE_DRIVERS) == 0 ||
+             strcmp(el, PTNODE_INTERNALS) == 0)
+    {
+        context_ptr->address_index--;
+    }
+    else
+    {
+        //jack_info("no depth decrement");
     }
 }
 
@@ -341,14 +293,20 @@ jack_controller_settings_load(
 
     context.controller_ptr = controller_ptr;
     context.error = XML_FALSE;
-    context.depth = -1;
+    context.option_value_capture = false;
+    context.address_index = 0;
     context.name = NULL;
+    context.container = NULL;
 
     XML_SetElementHandler(parser, jack_controller_settings_callback_elstart, jack_controller_settings_callback_elend);
     XML_SetCharacterDataHandler(parser, jack_controller_settings_callback_chrdata);
     XML_SetUserData(parser, &context);
 
     xmls = XML_ParseBuffer(parser, bytes_read, XML_TRUE);
+
+    free(context.name);
+    free(context.container);
+
     if (xmls == XML_STATUS_ERROR)
     {
         jack_error("XML_ParseBuffer() failed.");

@@ -52,6 +52,7 @@ def build(bld):
     obj.source = [
         'jackdbus.c',
         'controller.c',
+        'params.c',
         'controller_iface_configure.c',
         'controller_iface_control.c',
         'controller_iface_introspectable.c',

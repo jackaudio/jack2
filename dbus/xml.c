@@ -1,6 +1,6 @@
 /* -*- Mode: C ; c-basic-offset: 4 -*- */
 /*
-    Copyright (C) 2007,2008 Nedko Arnaudov
+    Copyright (C) 2007,2008,2011 Nedko Arnaudov
     
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,358 +25,116 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <assert.h>
 #include <dbus/dbus.h>
 
 #include "controller_internal.h"
 
 void
-jack_controller_settings_set_bool_option(
-    const char *value_str,
-    int *value_ptr)
+jack_controller_deserialize_parameter_value(
+    struct jack_controller *controller_ptr,
+    const char * const * address,
+    const char * option_value)
 {
-    if (strcmp(value_str, "true") == 0)
-    {
-        *value_ptr = true;
-    }
-    else if (strcmp(value_str, "false") == 0)
-    {
-        *value_ptr = false;
-    }
-    else
-    {
-        jack_error("ignoring unknown bool value \"%s\"", value_str);
-    }
-}
-
-void
-jack_controller_settings_set_sint_option(
-    const char *value_str,
-    int *value_ptr)
-{
-    *value_ptr = atoi(value_str);
-}
-
-void
-jack_controller_settings_set_uint_option(
-    const char *value_str,
-    unsigned int *value_ptr)
-{
-    *value_ptr = strtoul(value_str, NULL, 10);
-}
-
-void
-jack_controller_settings_set_char_option(
-    const char *value_str,
-    char *value_ptr)
-{
-    if (value_str[0] == 0 || value_str[1] != 0)
-    {
-        jack_error("invalid char option value \"%s\"", value_str);
-        return;
-    }
-
-    *value_ptr = *value_str;
-}
-
-void
-jack_controller_settings_set_string_option(
-    const char *value_str,
-    char *value_ptr,
-    size_t max_size)
-{
+    const struct jack_parameter * param_ptr;
+    union jackctl_parameter_value value;
     size_t size;
 
-    size = strlen(value_str);
-
-    if (size >= max_size)
+    param_ptr = jack_params_get_parameter(controller_ptr->params, address);
+    if (param_ptr == NULL)
     {
-        jack_error("string option value \"%s\" is too long, max is %u chars (including terminating zero)", value_str, (unsigned int)max_size);
+        jack_error("Unknown parameter");
+        goto ignore;
+    }
+
+    jack_info("setting parameter '%s':'%s':'%s' to value \"%s\"", address[0], address[1], address[2], option_value);
+
+    switch (param_ptr->type)
+    {
+    case JackParamInt:
+        value.i = atoi(option_value);
+        break;
+    case JackParamUInt:
+        value.ui = strtoul(option_value, NULL, 10);
+        break;
+    case JackParamChar:
+        if (option_value[0] == 0 || option_value[1] != 0)
+        {
+            jack_error("invalid char option value \"%s\"", option_value);
+            goto ignore;
+        }
+        value.c = *option_value;
+        break;
+    case JackParamString:
+        size = strlen(option_value);
+        if (size >= sizeof(value.str))
+        {
+            jack_error("string option value \"%s\" is too long, max is %zu chars (including terminating zero)", option_value, sizeof(value.str));
+            goto ignore;
+        }
+
+        strcpy(value.str, option_value);
+        break;
+    case JackParamBool:
+        if (strcmp(option_value, "true") == 0)
+        {
+            value.b = true;
+        }
+        else if (strcmp(option_value, "false") == 0)
+        {
+            value.b = false;
+        }
+        else
+        {
+            jack_error("ignoring unknown bool value \"%s\"", option_value);
+            goto ignore;
+        }
+        break;
+    default:
+        jack_error("Unknown type %d", (int)param_ptr->type);
+        goto ignore;
+    }
+
+    if (param_ptr->vtable.set_value(param_ptr->obj, &value))
+    {
         return;
     }
 
-    strcpy(value_ptr, value_str);
+    jack_error("Parameter set failed");
+
+ignore:
+    jack_error("Ignoring restore attempt of parameter '%s':'%s':'%s'", address[0], address[1], address[2]);
 }
 
 void
-jack_controller_settings_set_driver_option(
-    jackctl_driver_t *driver,
-    const char *option_name,
-    const char *option_value)
+jack_controller_serialize_parameter_value(
+    const struct jack_parameter * param_ptr,
+    char * value_buffer)
 {
-    jackctl_parameter_t *parameter;
-    jackctl_param_type_t type;
-    int value_int = 0;
-    unsigned int value_uint = 0;
     union jackctl_parameter_value value;
 
-    jack_info("setting driver option \"%s\" to value \"%s\"", option_name, option_value);
+    value = param_ptr->vtable.get_value(param_ptr->obj);
 
-    parameter = jack_controller_find_parameter(jackctl_driver_get_parameters(driver), option_name);
-    if (parameter == NULL)
-    {
-        jack_error(
-            "Unknown parameter \"%s\" of driver \"%s\"",
-            option_name,
-            jackctl_driver_get_name(driver));
-        return;
-    }
-
-    type = jackctl_parameter_get_type(parameter);
-
-    switch (type)
+    switch (param_ptr->type)
     {
     case JackParamInt:
-        jack_controller_settings_set_sint_option(option_value, &value_int);
-        value.i = value_int;
-        break;
+        sprintf(value_buffer, "%d", (int)value.i);
+        return;
     case JackParamUInt:
-        jack_controller_settings_set_uint_option(option_value, &value_uint);
-        value.ui = value_uint;
-        break;
+        sprintf(value_buffer, "%u", (unsigned int)value.ui);
+        return;
     case JackParamChar:
-        jack_controller_settings_set_char_option(option_value, &value.c);
-        break;
+        sprintf(value_buffer, "%c", (char)value.c);
+        return;
     case JackParamString:
-        jack_controller_settings_set_string_option(option_value, value.str, sizeof(value.str));
-        break;
+        strcpy(value_buffer, value.str);
+        return;
     case JackParamBool:
-        jack_controller_settings_set_bool_option(option_value, &value_int);
-        value.i = value_int;
-        break;
-    default:
-        jack_error("Parameter \"%s\" of driver \"%s\" is of unknown type %d",
-               jackctl_parameter_get_name(parameter),
-               jackctl_driver_get_name(driver),
-               type);
-    }
-
-    jackctl_parameter_set_value(parameter, &value);
-}
-
-void
-jack_controller_settings_set_internal_option(
-    jackctl_internal_t *internal,
-    const char *option_name,
-    const char *option_value)
-{
-    jackctl_parameter_t *parameter;
-    jackctl_param_type_t type;
-    int value_int = 0;
-    unsigned int value_uint = 0;
-    union jackctl_parameter_value value;
-
-    jack_info("setting internal option \"%s\" to value \"%s\"", option_name, option_value);
-
-    parameter = jack_controller_find_parameter(jackctl_internal_get_parameters(internal), option_name);
-    if (parameter == NULL)
-    {
-        jack_error(
-            "Unknown parameter \"%s\" of internal \"%s\"",
-            option_name,
-            jackctl_internal_get_name(internal));
+        strcpy(value_buffer, value.b ? "true" : "false");
         return;
     }
 
-    type = jackctl_parameter_get_type(parameter);
-
-    switch (type)
-    {
-    case JackParamInt:
-        jack_controller_settings_set_sint_option(option_value, &value_int);
-        value.i = value_int;
-        break;
-    case JackParamUInt:
-        jack_controller_settings_set_uint_option(option_value, &value_uint);
-        value.ui = value_uint;
-        break;
-    case JackParamChar:
-        jack_controller_settings_set_char_option(option_value, &value.c);
-        break;
-    case JackParamString:
-        jack_controller_settings_set_string_option(option_value, value.str, sizeof(value.str));
-        break;
-    case JackParamBool:
-        jack_controller_settings_set_bool_option(option_value, &value_int);
-        value.i = value_int;
-        break;
-    default:
-        jack_error("Parameter \"%s\" of internal \"%s\" is of unknown type %d",
-               jackctl_parameter_get_name(parameter),
-               jackctl_internal_get_name(internal),
-               type);
-    }
-
-    jackctl_parameter_set_value(parameter, &value);
-}
-
-void
-jack_controller_settings_set_engine_option(
-    struct jack_controller *controller_ptr,
-    const char *option_name,
-    const char *option_value)
-{
-    jackctl_parameter_t *parameter;
-    jackctl_param_type_t type;
-    int value_int = 0;
-    unsigned int value_uint = 0;
-    union jackctl_parameter_value value;
-
-    jack_info("setting engine option \"%s\" to value \"%s\"", option_name, option_value);
-
-    if (strcmp(option_name, "driver") == 0)
-    {
-        if (!jack_controller_select_driver(controller_ptr, option_value))
-        {
-            jack_error("unknown driver '%s'", option_value);
-        }
-
-        return;
-    }
-
-    parameter = jack_controller_find_parameter(jackctl_server_get_parameters(controller_ptr->server), option_name);
-    if (parameter == NULL)
-    {
-        jack_error(
-            "Unknown engine parameter \"%s\"",
-            option_name);
-        return;
-    }
-
-    type = jackctl_parameter_get_type(parameter);
-
-    switch (type)
-    {
-    case JackParamInt:
-        jack_controller_settings_set_sint_option(option_value, &value_int);
-        value.i = value_int;
-        break;
-    case JackParamUInt:
-        jack_controller_settings_set_uint_option(option_value, &value_uint);
-        value.ui = value_uint;
-        break;
-    case JackParamChar:
-        jack_controller_settings_set_char_option(option_value, &value.c);
-        break;
-    case JackParamString:
-        jack_controller_settings_set_string_option(option_value, value.str, sizeof(value.str));
-        break;
-    case JackParamBool:
-        jack_controller_settings_set_bool_option(option_value, &value_int);
-        value.i = value_int;
-        break;
-    default:
-        jack_error("Engine parameter \"%s\" is of unknown type %d",
-               jackctl_parameter_get_name(parameter),
-               type);
-    }
-
-    jackctl_parameter_set_value(parameter, &value);
-}
-
-static
-bool
-jack_controller_settings_save_options(
-    void *context,
-    const JSList * parameters_list,
-    void *dbus_call_context_ptr)
-{
-    jackctl_parameter_t *parameter;
-    jackctl_param_type_t type;
-    union jackctl_parameter_value value;
-    const char * name;
-    char value_str[50];
-
-    while (parameters_list != NULL)
-    {
-        parameter = (jackctl_parameter_t *)parameters_list->data;
-
-        if (jackctl_parameter_is_set(parameter))
-        {
-            type = jackctl_parameter_get_type(parameter);
-            value = jackctl_parameter_get_value(parameter);
-            name = jackctl_parameter_get_name(parameter);
-        
-            switch (type)
-            {
-            case JackParamInt:
-                sprintf(value_str, "%d", (int)value.i);
-                if (!jack_controller_settings_write_option(context, name, value_str, dbus_call_context_ptr))
-                {
-                    return false;
-                }
-                break;
-            case JackParamUInt:
-                sprintf(value_str, "%u", (unsigned int)value.ui);
-                if (!jack_controller_settings_write_option(context, name, value_str, dbus_call_context_ptr))
-                {
-                    return false;
-                }
-                break;
-            case JackParamChar:
-                sprintf(value_str, "%c", (char)value.c);
-                if (!jack_controller_settings_write_option(context, name, value_str, dbus_call_context_ptr))
-                {
-                    return false;
-                }
-                break;
-            case JackParamString:
-                if (!jack_controller_settings_write_option(context, name, value.str, dbus_call_context_ptr))
-                {
-                    return false;
-                }
-                break;
-            case JackParamBool:
-                if (!jack_controller_settings_write_option(context, name, value.b ? "true" : "false", dbus_call_context_ptr))
-                {
-                    return false;
-                }
-                break;
-            default:
-                jack_error("parameter of unknown type %d", type);
-            }
-        }
-
-        parameters_list = jack_slist_next(parameters_list);
-    }
-
-    return true;
-}
-
-bool
-jack_controller_settings_save_engine_options(
-    void *context,
-    struct jack_controller *controller_ptr,
-    void *dbus_call_context_ptr)
-{
-    if (controller_ptr->driver != NULL)
-    {
-        if (!jack_controller_settings_write_option(
-                context,
-                "driver",
-                jackctl_driver_get_name(controller_ptr->driver),
-                dbus_call_context_ptr))
-        {
-            return false;
-        }
-    }
-
-    return jack_controller_settings_save_options(context, jackctl_server_get_parameters(controller_ptr->server), dbus_call_context_ptr);
-}
-
-bool
-jack_controller_settings_save_driver_options(
-    void *context,
-    jackctl_driver_t *driver,
-    void *dbus_call_context_ptr)
-{
-    return jack_controller_settings_save_options(context, jackctl_driver_get_parameters(driver), dbus_call_context_ptr);
-}
-
-bool
-jack_controller_settings_save_internal_options(
-    void *context,
-    jackctl_internal_t *internal,
-    void *dbus_call_context_ptr)
-{
-    return jack_controller_settings_save_options(context, jackctl_internal_get_parameters(internal), dbus_call_context_ptr);
+    jack_error("parameter of unknown type %d", (int)param_ptr->type);
+    assert(false);
+    *value_buffer = 0;
 }

@@ -53,54 +53,57 @@ jack_controller_settings_write_string(int fd, const char * string, void *dbus_ca
 
 struct save_context
 {
+    void * call;
     int fd;
-    const char *indent;
+    const char * indent;
+    jack_params_handle params;
+    const char * address[PARAM_ADDRESS_SIZE];
+    const char * str;
 };
 
-#define save_context_ptr ((struct save_context *)context)
-#define fd (save_context_ptr->fd)
+#define ctx_ptr ((struct save_context *)context)
+#define fd (ctx_ptr->fd)
 
-bool
-jack_controller_settings_write_option(
-    void *context,
-    const char *name,
-    const char *content,
-    void *dbus_call_context_ptr)
+static bool jack_controller_serialize_parameter(void * context, const struct jack_parameter * param_ptr)
 {
-    if (!jack_controller_settings_write_string(fd, save_context_ptr->indent, dbus_call_context_ptr))
+    char value[JACK_PARAM_STRING_MAX + 1];
+
+    if (!param_ptr->vtable.is_set(param_ptr->obj))
     {
-        return false;
+        return true;
     }
 
-    if (!jack_controller_settings_write_string(fd, "<option name=\"", dbus_call_context_ptr))
-    {
-        return false;
-    }
+    jack_controller_serialize_parameter_value(param_ptr, value);
 
-    if (!jack_controller_settings_write_string(fd, name, dbus_call_context_ptr))
-    {
-        return false;
-    }
+    return
+        jack_controller_settings_write_string(fd, ctx_ptr->indent, ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, "<option name=\"", ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, param_ptr->name, ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, "\">", ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, value, ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, "</option>\n", ctx_ptr->call);
+}
 
-    if (!jack_controller_settings_write_string(fd, "\">", dbus_call_context_ptr))
-    {
-        return false;
-    }
+bool serialize_modules(void * context, const char * name)
+{
+    ctx_ptr->indent = "   ";
+    ctx_ptr->address[1] = name;
+    ctx_ptr->address[2] = NULL;
 
-    if (!jack_controller_settings_write_string(fd, content, dbus_call_context_ptr))
-    {
-        return false;
-    }
-
-    if (!jack_controller_settings_write_string(fd, "</option>\n", dbus_call_context_ptr))
-    {
-        return false;
-    }
-
-    return true;
+    return
+        jack_controller_settings_write_string(fd, "  <", ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, ctx_ptr->str, ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, " name=\"", ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, name, ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, "\">\n", ctx_ptr->call) &&
+        jack_params_iterate_params(ctx_ptr->params, ctx_ptr->address, jack_controller_serialize_parameter, ctx_ptr) &&
+        jack_controller_settings_write_string(fd, "  </", ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, ctx_ptr->str, ctx_ptr->call) &&
+        jack_controller_settings_write_string(fd, ">\n", ctx_ptr->call);
 }
 
 #undef fd
+#undef ctx_ptr
 
 bool
 jack_controller_settings_save(
@@ -114,9 +117,9 @@ jack_controller_settings_save(
     time_t timestamp;
     char timestamp_str[26];
     struct save_context context;
-    const JSList * node_ptr;
-    jackctl_driver_t *driver;
-    jackctl_internal_t *internal;
+    const char * modules[] = {"driver", "internal", NULL};
+    char buffer[100];
+    unsigned int i;
 
     time(&timestamp);
     ctime_r(&timestamp, timestamp_str);
@@ -147,6 +150,7 @@ jack_controller_settings_save(
     }
 
     context.fd = fd;
+    context.call = dbus_call_context_ptr;
 
     if (!jack_controller_settings_write_string(fd, "<?xml version=\"1.0\"?>\n", dbus_call_context_ptr))
     {
@@ -196,7 +200,9 @@ jack_controller_settings_save(
     }
 
     context.indent = "  ";
-    if (!jack_controller_settings_save_engine_options(&context, controller_ptr, dbus_call_context_ptr))
+    context.address[0] = PTNODE_ENGINE;
+    context.address[1] = NULL;
+    if (!jack_params_iterate_params(controller_ptr->params, context.address, jack_controller_serialize_parameter, &context))
     {
         goto exit_close;
     }
@@ -206,100 +212,50 @@ jack_controller_settings_save(
         goto exit_close;
     }
 
-    /* drivers */
-    
-    if (!jack_controller_settings_write_string(fd, " <drivers>\n", dbus_call_context_ptr))
+    for (i = 0; modules[i] != NULL; i++)
     {
-        goto exit_close;
-    }
-
-    node_ptr = jackctl_server_get_drivers_list(controller_ptr->server);
-
-    while (node_ptr != NULL)
-    {
-        driver = (jackctl_driver_t *)node_ptr->data;
-
-        if (!jack_controller_settings_write_string(fd, "  <driver name=\"", dbus_call_context_ptr))
+        if (!jack_controller_settings_write_string(fd, " <", dbus_call_context_ptr))
         {
             goto exit_close;
         }
 
-        if (!jack_controller_settings_write_string(fd, jackctl_driver_get_name(driver), dbus_call_context_ptr))
+        if (!jack_controller_settings_write_string(fd, modules[i], dbus_call_context_ptr))
         {
             goto exit_close;
         }
 
-        if (!jack_controller_settings_write_string(fd, "\">\n", dbus_call_context_ptr))
+        if (!jack_controller_settings_write_string(fd, "s>\n", dbus_call_context_ptr))
         {
             goto exit_close;
         }
 
-        context.indent = "   ";
+        context.indent = "  ";
+        context.params = controller_ptr->params;
+        context.str = modules[i];
+        strcpy(buffer, modules[i]);
+        strcat(buffer, "s");
+        context.address[0] = buffer;
+        context.address[1] = NULL;
 
-        if (!jack_controller_settings_save_driver_options(&context, driver, dbus_call_context_ptr))
+        if (!jack_params_iterate_container(controller_ptr->params, context.address, serialize_modules, &context))
         {
             goto exit_close;
         }
 
-        if (!jack_controller_settings_write_string(fd, "  </driver>\n", dbus_call_context_ptr))
+        if (!jack_controller_settings_write_string(fd, " </", dbus_call_context_ptr))
         {
             goto exit_close;
         }
 
-        node_ptr = jack_slist_next(node_ptr);
-    }
-
-    if (!jack_controller_settings_write_string(fd, " </drivers>\n", dbus_call_context_ptr))
-    {
-        goto exit_close;
-    }
-    
-    /* internals */
-    
-    if (!jack_controller_settings_write_string(fd, " <internals>\n", dbus_call_context_ptr))
-    {
-        goto exit_close;
-    }
-
-    node_ptr = jackctl_server_get_internals_list(controller_ptr->server);
-
-    while (node_ptr != NULL)
-    {
-        internal = (jackctl_internal_t *)node_ptr->data;
-
-        if (!jack_controller_settings_write_string(fd, "  <internal name=\"", dbus_call_context_ptr))
+        if (!jack_controller_settings_write_string(fd, modules[i], dbus_call_context_ptr))
         {
             goto exit_close;
         }
 
-        if (!jack_controller_settings_write_string(fd, jackctl_internal_get_name(internal), dbus_call_context_ptr))
+        if (!jack_controller_settings_write_string(fd, "s>\n", dbus_call_context_ptr))
         {
             goto exit_close;
         }
-
-        if (!jack_controller_settings_write_string(fd, "\">\n", dbus_call_context_ptr))
-        {
-            goto exit_close;
-        }
-
-        context.indent = "   ";
-
-        if (!jack_controller_settings_save_internal_options(&context, internal, dbus_call_context_ptr))
-        {
-            goto exit_close;
-        }
-
-        if (!jack_controller_settings_write_string(fd, "  </internal>\n", dbus_call_context_ptr))
-        {
-            goto exit_close;
-        }
-
-        node_ptr = jack_slist_next(node_ptr);
-    }
-
-    if (!jack_controller_settings_write_string(fd, " </internals>\n", dbus_call_context_ptr))
-    {
-        goto exit_close;
     }
 
     if (!jack_controller_settings_write_string(fd, "</jack>\n", dbus_call_context_ptr))
