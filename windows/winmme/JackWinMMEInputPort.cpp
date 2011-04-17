@@ -64,11 +64,8 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
         goto delete_sysex_buffer;
     }
     sysex_header.dwBufferLength = max_bytes;
-    sysex_header.dwBytesRecorded = 0;
     sysex_header.dwFlags = 0;
-    sysex_header.dwUser = 0;
     sysex_header.lpData = (LPSTR)(((LPBYTE) &sysex_header) + sizeof(MIDIHDR));
-    sysex_header.lpNext = 0;
     result = midiInPrepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
         GetInErrorString(result, error_message);
@@ -104,7 +101,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     result = midiInUnprepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
         WriteInError("JackWinMMEInputPort [constructor]",
-                   "midiInUnprepareHeader", result);
+                     "midiInUnprepareHeader", result);
     }
  close_handle:
     result = midiInClose(handle);
