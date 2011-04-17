@@ -239,7 +239,7 @@ handle_process(jack_nframes_t frames, void *arg)
         switch (wait_semaphore(init_semaphore, 0)) {
         case -1:
             set_process_error(SOURCE_WAIT_SEMAPHORE, get_semaphore_error());
-            // Fallthrough on purpose
+            /* Fallthrough on purpose */
         case 0:
             return 0;
         }
@@ -299,7 +299,7 @@ handle_process(jack_nframes_t frames, void *arg)
         if (messages_received == samples) {
             process_state = 2;
             if (! signal_semaphore(process_semaphore)) {
-                // Sigh ...
+                /* Sigh ... */
                 die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
             }
             break;
@@ -343,7 +343,7 @@ handle_signal(int sig)
 {
     process_state = -2;
     if (! signal_semaphore(process_semaphore)) {
-        /* Sigh */
+        /* Sigh ... */
         die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
     }
 }
@@ -427,7 +427,7 @@ set_process_error(const char *source, const char *message)
     error_message = message;
     process_state = -1;
     if (! signal_semaphore(process_semaphore)) {
-        // Sigh
+        /* Sigh ... */
         output_error(source, message);
         die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
     }
@@ -763,7 +763,13 @@ main(int argc, char **argv)
             printf("     > %.1f ms: %u\n", latency_plot_offset + 10.0,
                    latency_plot[100]);
         }
-    } else {
+    }
+ deactivate_client:
+    jack_deactivate(client);
+
+    /* Output this information after deactivation to prevent two threads
+       from accessing data at the same time. */
+    if (process_state != 2) {
         printf("\nMessages sent: %d\nMessages received: %d\n", messages_sent,
                messages_received);
     }
@@ -773,8 +779,7 @@ main(int argc, char **argv)
     if (xrun_count) {
         printf("Xruns: %d\n", xrun_count);
     }
- deactivate_client:
-    jack_deactivate(client);
+
  destroy_process_semaphore:
     destroy_semaphore(process_semaphore, 1);
  destroy_init_semaphore:
