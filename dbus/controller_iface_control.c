@@ -127,8 +127,6 @@ jack_control_run_method(
             assert(call->reply != NULL);
             return true;
         }
-
-        jack_controller_control_send_signal_server_stopped();
     }
     else if (strcmp (call->method_name, "GetLoad") == 0)
     {
