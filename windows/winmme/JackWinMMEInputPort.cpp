@@ -138,10 +138,11 @@ JackWinMMEInputPort::~JackWinMMEInputPort()
 }
 
 void
-JackWinMMEInputPort::EnqueueMessage(jack_nframes_t time, size_t length,
+JackWinMMEInputPort::EnqueueMessage(DWORD timestamp, size_t length,
                                     jack_midi_data_t *data)
 {
-    switch (thread_queue->EnqueueEvent(time, length, data)) {
+    jack_nframes_t frame = GetFramesFromTime(start_time + (timestamp * 1000));
+    switch (thread_queue->EnqueueEvent(frame, length, data)) {
     case JackMidiWriteQueue::BUFFER_FULL:
         jack_error("JackWinMMEInputPort::EnqueueMessage - The thread queue "
                    "cannot currently accept a %d-byte event.  Dropping event.",
@@ -192,8 +193,6 @@ void
 JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
 {
     set_threaded_log_function();
-    jack_nframes_t current_frame = GetCurrentFrame();
-
     switch (message) {
     case MIM_CLOSE:
         jack_info("JackWinMMEInputPort::ProcessWinMME - MIDI device closed.");
@@ -229,7 +228,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
                        "status byte.");
             return;
         }
-        EnqueueMessage(current_frame, (size_t) length, message_buffer);
+        EnqueueMessage(dwParam2, (size_t) length, message_buffer);
         break;
     }
     case MIM_LONGDATA: {
@@ -246,7 +245,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
             jack_error("JackWinMMEInputPort::ProcessWinMME - Discarding "
                        "%d-byte sysex chunk.", byte_count);
         } else {
-            EnqueueMessage(current_frame, byte_count, data);
+            EnqueueMessage(dwParam2, byte_count, data);
         }
         // Is this realtime-safe?  This function isn't run in the JACK thread,
         // but we still want it to perform as quickly as possible.  Even if
@@ -272,6 +271,7 @@ bool
 JackWinMMEInputPort::Start()
 {
     if (! started) {
+        start_time = GetMicroSeconds();
         MMRESULT result = midiInStart(handle);
         started = result == MMSYSERR_NOERROR;
         if (! started) {

@@ -37,29 +37,26 @@ namespace Jack {
                              DWORD param1, DWORD param2);
 
         void
-        EnqueueMessage(jack_nframes_t time, size_t length,
-                       jack_midi_data_t *data);
+        EnqueueMessage(DWORD timestamp, size_t length, jack_midi_data_t *data);
 
+        void
+        GetInErrorString(MMRESULT error, LPTSTR text);
 
         void
         ProcessWinMME(UINT message, DWORD param1, DWORD param2);
-
-        HMIDIIN handle;
-        jack_midi_event_t *jack_event;
-        jack_midi_data_t *sysex_buffer;
-        MIDIHDR sysex_header;
-        JackMidiAsyncQueue *thread_queue;
-        JackMidiBufferWriteQueue *write_queue;
-
-        bool started;
-
 
         void
         WriteInError(const char *jack_func, const char *mm_func,
                                 MMRESULT result);
 
-        void
-        GetInErrorString(MMRESULT error, LPTSTR text);
+        HMIDIIN handle;
+        jack_midi_event_t *jack_event;
+        jack_time_t start_time;
+        bool started;
+        jack_midi_data_t *sysex_buffer;
+        MIDIHDR sysex_header;
+        JackMidiAsyncQueue *thread_queue;
+        JackMidiBufferWriteQueue *write_queue;
 
     public:
 

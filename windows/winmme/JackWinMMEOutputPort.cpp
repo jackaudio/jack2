@@ -217,7 +217,6 @@ JackWinMMEOutputPort::Execute()
         }
 
     }
- stop_execution:
     return false;
 }
 
@@ -262,7 +261,6 @@ JackWinMMEOutputPort::ProcessJack(JackMidiBuffer *port_buffer,
                                   jack_nframes_t frames)
 {
     read_queue->ResetMidiBuffer(port_buffer);
-
     for (jack_midi_event_t *event = read_queue->DequeueEvent(); event;
         event = read_queue->DequeueEvent()) {
 
@@ -369,4 +367,3 @@ JackWinMMEOutputPort::WriteOutError(const char *jack_func, const char *mm_func,
     GetOutErrorString(result, error_message);
     jack_error("%s - %s: %s", jack_func, mm_func, error_message);
 }
-
