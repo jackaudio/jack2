@@ -42,6 +42,7 @@ struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
     NULL
 };
 
+static
 jackctl_driver_t *
 jack_controller_find_driver(
     jackctl_server_t *server,
@@ -114,6 +115,7 @@ jack_controller_remove_slave_drivers(
     }
 }
 
+static
 jackctl_internal_t *
 jack_controller_find_internal(
     jackctl_server_t *server,
@@ -131,24 +133,6 @@ jack_controller_find_internal(
         }
 
         node_ptr = jack_slist_next(node_ptr);
-    }
-
-    return NULL;
-}
-
-jackctl_parameter_t *
-jack_controller_find_parameter(
-    const JSList * parameters_list,
-    const char * parameter_name)
-{
-    while (parameters_list)
-    {
-        if (strcmp(jackctl_parameter_get_name((jackctl_parameter_t *)parameters_list->data), parameter_name) == 0)
-        {
-            return parameters_list->data;
-        }
-
-        parameters_list = jack_slist_next(parameters_list);
     }
 
     return NULL;

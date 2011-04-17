@@ -59,21 +59,6 @@ struct jack_controller
     "You probably don't want to edit this because\n"        \
     "it will be overwritten next time jackdbus saves.\n"
 
-jackctl_driver_t *
-jack_controller_find_driver(
-    jackctl_server_t *server,
-    const char *driver_name);
-    
-jackctl_internal_t *
-jack_controller_find_internal(
-    jackctl_server_t *server,
-    const char *internal_name);
-
-jackctl_parameter_t *
-jack_controller_find_parameter(
-    const JSList *parameters_list,
-    const char *parameter_name);
-
 bool
 jack_controller_start_server(
     struct jack_controller *controller_ptr,
