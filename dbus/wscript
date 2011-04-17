@@ -59,7 +59,6 @@ def build(bld):
         'controller_iface_transport.c',
         'xml.c',
         'xml_expat.c',
-        #'xml_libxml.c',
         #'xml_nop.c',
         'xml_write_raw.c',
         'sigsegv.c',
