@@ -13,12 +13,14 @@ def configure(conf):
 
     conf.define('HAVE_PPOLL', 1 )
 
-
 def create_jack_driver_obj(bld, target, sources, uselib = None):
     driver = bld.new_task_gen('cxx', 'shlib')
     driver.features.append('cc')
     driver.env['shlib_PATTERN'] = 'jack_%s.so'
-    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
+
+    #driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL']
+    driver.defines = ['HAVE_CONFIG_H','SERVER_SIDE', 'HAVE_PPOLL', 'HAVE_TIMERFD']
+
     driver.includes = ['.', '../linux', '../posix', '../common', '../common/jack', '../dbus']
     driver.target = target
     driver.source = sources
@@ -62,7 +64,8 @@ def build(bld):
                               'alsarawmidi/JackALSARawMidiOutputPort.cpp',
                               'alsarawmidi/JackALSARawMidiPort.cpp',
                               'alsarawmidi/JackALSARawMidiReceiveQueue.cpp',
-                              'alsarawmidi/JackALSARawMidiSendQueue.cpp'
+                              'alsarawmidi/JackALSARawMidiSendQueue.cpp',
+                              'alsarawmidi/JackALSARawMidiUtil.cpp'
                               ]
 
     ffado_driver_src = ['firewire/JackFFADODriver.cpp',

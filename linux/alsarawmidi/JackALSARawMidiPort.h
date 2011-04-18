@@ -32,23 +32,36 @@ namespace Jack {
     private:
 
         char alias[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
+        struct pollfd *alsa_poll_fds;
+        int alsa_poll_fd_count;
+        int fds[2];
+        unsigned short io_mask;
         char name[JACK_CLIENT_NAME_SIZE + JACK_PORT_NAME_SIZE];
-        int num_fds;
-        struct pollfd *poll_fds;
+        struct pollfd *queue_poll_fd;
 
     protected:
 
         snd_rawmidi_t *rawmidi;
 
-        bool
-        ProcessPollEvents(unsigned short *revents);
+        int
+        GetIOPollEvent();
+
+        int
+        GetQueuePollEvent();
 
         void
-        SetPollEventMask(unsigned short events);
+        SetIOEventsEnabled(bool enabled);
+
+        void
+        SetQueueEventsEnabled(bool enabled);
+
+        bool
+        TriggerQueueEvent();
 
     public:
 
-        JackALSARawMidiPort(snd_rawmidi_info_t *info, size_t index);
+        JackALSARawMidiPort(snd_rawmidi_info_t *info, size_t index,
+                            unsigned short io_mask);
 
         virtual
         ~JackALSARawMidiPort();
@@ -62,7 +75,7 @@ namespace Jack {
         int
         GetPollDescriptorCount();
 
-        bool
+        void
         PopulatePollDescriptors(struct pollfd *poll_fd);
 
     };

@@ -55,10 +55,11 @@ Jack::ApplyRunningStatus(jack_midi_event_t *event,
 jack_nframes_t
 Jack::GetCurrentFrame()
 {
+    jack_time_t time = GetMicroSeconds();
     JackEngineControl *control = GetEngineControl();
     JackTimer timer;
     control->ReadFrameTime(&timer);
-    return timer.Time2Frames(GetMicroSeconds(), control->fBufferSize);
+    return timer.Time2Frames(time, control->fBufferSize);
 }
 
 jack_nframes_t

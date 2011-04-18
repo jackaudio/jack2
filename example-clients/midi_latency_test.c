@@ -49,6 +49,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <errno.h>
 #include <math.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,8 +66,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include <semaphore.h>
 #endif
 
-#include <signal.h>
-
 #define ABS(x) (((x) >= 0) ? (x) : (-(x)))
 
 #ifdef WIN32
@@ -75,9 +74,9 @@ typedef HANDLE semaphore_t;
 typedef sem_t *semaphore_t;
 #endif
 
+const char *ERROR_MSG_TIMEOUT = "timed out while waiting for MIDI message";
 const char *ERROR_RESERVE = "could not reserve MIDI event on port buffer";
 const char *ERROR_SHUTDOWN = "the JACK server has been shutdown";
-const char *ERROR_TIMEOUT1 = "timed out while waiting for MIDI message";
 
 const char *SOURCE_EVENT_RESERVE = "jack_midi_event_reserve";
 const char *SOURCE_PROCESS = "handle_process";
@@ -107,7 +106,7 @@ size_t message_size;
 jack_latency_range_t out_latency_range;
 jack_port_t *out_port;
 semaphore_t process_semaphore;
-int process_state;
+volatile sig_atomic_t process_state;
 char *program_name;
 jack_port_t *remote_in_port;
 jack_port_t *remote_out_port;
@@ -118,13 +117,6 @@ jack_time_t total_latency_time;
 size_t unexpected_messages;
 size_t xrun_count;
 
-static void signal_handler(int sig)
-{
-	jack_client_close(client);
-	fprintf(stderr, "signal received, exiting ...\n");
-	exit(0);
-}
-
 #ifdef WIN32
 char semaphore_error_msg[1024];
 #endif
@@ -133,7 +125,7 @@ static void
 output_error(const char *source, const char *message);
 
 static void
-output_usage();
+output_usage(void);
 
 static void
 set_process_error(const char *source, const char *message);
@@ -150,7 +142,7 @@ create_semaphore(int id)
     semaphore_t semaphore;
 
 #ifdef WIN32
-    semaphore = CreateSemaphore(NULL, 0, 1, NULL);
+    semaphore = CreateSemaphore(NULL, 0, 2, NULL);
 #elif defined (__APPLE__)
     char name[128];
     sprintf(name, "midi_sem_%d", id);
@@ -201,7 +193,7 @@ die(const char *source, const char *error_message)
 }
 
 static const char *
-get_semaphore_error()
+get_semaphore_error(void)
 {
 
 #ifdef WIN32
@@ -247,7 +239,7 @@ handle_process(jack_nframes_t frames, void *arg)
         switch (wait_semaphore(init_semaphore, 0)) {
         case -1:
             set_process_error(SOURCE_WAIT_SEMAPHORE, get_semaphore_error());
-            // Fallthrough on purpose
+            /* Fallthrough on purpose */
         case 0:
             return 0;
         }
@@ -284,7 +276,7 @@ handle_process(jack_nframes_t frames, void *arg)
         microseconds = jack_frames_to_time(client, last_frame_time) -
             last_activity_time;
         if ((microseconds / 1000000) >= timeout) {
-            set_process_error(SOURCE_PROCESS, ERROR_TIMEOUT1);
+            set_process_error(SOURCE_PROCESS, ERROR_MSG_TIMEOUT);
         }
         break;
     found_message:
@@ -307,7 +299,7 @@ handle_process(jack_nframes_t frames, void *arg)
         if (messages_received == samples) {
             process_state = 2;
             if (! signal_semaphore(process_semaphore)) {
-                // Sigh ...
+                /* Sigh ... */
                 die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
             }
             break;
@@ -331,11 +323,11 @@ handle_process(jack_nframes_t frames, void *arg)
 
     case 2:
         /* State: finished - do nothing */
-
     case -1:
         /* State: error - do nothing */
+    case -2:
+        /* State: signalled - do nothing */
         ;
-
     }
     return 0;
 }
@@ -344,6 +336,16 @@ static void
 handle_shutdown(void *arg)
 {
     set_process_error(SOURCE_SHUTDOWN, ERROR_SHUTDOWN);
+}
+
+static void
+handle_signal(int sig)
+{
+    process_state = -2;
+    if (! signal_semaphore(process_semaphore)) {
+        /* Sigh ... */
+        die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
+    }
 }
 
 static int
@@ -360,7 +362,7 @@ output_error(const char *source, const char *message)
 }
 
 static void
-output_usage()
+output_usage(void)
 {
     fprintf(stderr, "Usage: %s [options] out-port-name in-port-name\n\n"
             "\t-h, --help              print program usage\n"
@@ -392,6 +394,32 @@ parse_positive_number_arg(char *s, char *name)
     return result;
 }
 
+static int
+register_signal_handler(void (*func)(int))
+{
+
+#ifdef WIN32
+    if (signal(SIGABRT, func) == SIG_ERR) {
+        return 0;
+    }
+#else
+    if (signal(SIGQUIT, func) == SIG_ERR) {
+        return 0;
+    }
+    if (signal(SIGHUP, func) == SIG_ERR) {
+        return 0;
+    }
+#endif
+
+    if (signal(SIGINT, func) == SIG_ERR) {
+        return 0;
+    }
+    if (signal(SIGTERM, func) == SIG_ERR) {
+        return 0;
+    }
+    return 1;
+}
+
 static void
 set_process_error(const char *source, const char *message)
 {
@@ -399,7 +427,7 @@ set_process_error(const char *source, const char *message)
     error_message = message;
     process_state = -1;
     if (! signal_semaphore(process_semaphore)) {
-        // Sigh
+        /* Sigh ... */
         output_error(source, message);
         die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
     }
@@ -565,19 +593,6 @@ main(int argc, char **argv)
                (message_size - 2) * sizeof(jack_midi_data_t));
         message_2[message_size - 1] = 0xf7;
     }
-
-    /* install a signal handler to properly quits jack client */
-#ifdef WIN32
-	signal(SIGINT, signal_handler);
-    signal(SIGABRT, signal_handler);
-	signal(SIGTERM, signal_handler);
-#else
-	signal(SIGQUIT, signal_handler);
-	signal(SIGTERM, signal_handler);
-	signal(SIGHUP, signal_handler);
-	signal(SIGINT, signal_handler);
-#endif
-
     client = jack_client_open(program_name, JackNullOption, NULL);
     if (client == NULL) {
         error_message = "failed to open JACK client";
@@ -657,9 +672,19 @@ main(int argc, char **argv)
         error_source = "post_semaphore";
         goto deactivate_client;
     }
+    if (! register_signal_handler(handle_signal)) {
+        error_message = strerror(errno);
+        error_source = "register_signal_handler";
+        goto deactivate_client;
+    }
     if (wait_semaphore(process_semaphore, 1) == -1) {
         error_message = get_semaphore_error();
         error_source = "wait_semaphore";
+        goto deactivate_client;
+    }
+    if (! register_signal_handler(SIG_DFL)) {
+        error_message = strerror(errno);
+        error_source = "register_signal_handler";
         goto deactivate_client;
     }
     if (process_state == 2) {
@@ -739,17 +764,22 @@ main(int argc, char **argv)
                    latency_plot[100]);
         }
     }
-    printf("\nMessages sent: %d\n"
-           "Messages received: %d\n",
-           messages_sent, messages_received);
+ deactivate_client:
+    jack_deactivate(client);
+
+    /* Output this information after deactivation to prevent two threads
+       from accessing data at the same time. */
+    if (process_state != 2) {
+        printf("\nMessages sent: %d\nMessages received: %d\n", messages_sent,
+               messages_received);
+    }
     if (unexpected_messages) {
         printf("Unexpected messages received: %d\n", unexpected_messages);
     }
     if (xrun_count) {
-        printf("Xruns: %d (messages may have been lost)\n", xrun_count);
+        printf("Xruns: %d\n", xrun_count);
     }
- deactivate_client:
-    jack_deactivate(client);
+
  destroy_process_semaphore:
     destroy_semaphore(process_semaphore, 1);
  destroy_init_semaphore:

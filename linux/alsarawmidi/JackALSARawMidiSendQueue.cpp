@@ -24,10 +24,14 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using Jack::JackALSARawMidiSendQueue;
 
-JackALSARawMidiSendQueue::JackALSARawMidiSendQueue(snd_rawmidi_t *rawmidi)
+JackALSARawMidiSendQueue::JackALSARawMidiSendQueue(snd_rawmidi_t *rawmidi,
+                                                   size_t bytes_per_poll)
 {
+    assert(bytes_per_poll > 0);
+    this->bytes_per_poll = bytes_per_poll;
     this->rawmidi = rawmidi;
     blocked = false;
+    bytes_available = bytes_per_poll;
 }
 
 Jack::JackMidiWriteQueue::EnqueueResult
@@ -38,10 +42,14 @@ JackALSARawMidiSendQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     if (time > GetCurrentFrame()) {
         return EVENT_EARLY;
     }
+    if (! bytes_available) {
+        return BUFFER_FULL;
+    }
     ssize_t result = snd_rawmidi_write(rawmidi, buffer, 1);
     switch (result) {
     case 1:
         blocked = false;
+        bytes_available--;
         return OK;
     case -EWOULDBLOCK:
         blocked = true;
@@ -56,4 +64,10 @@ bool
 JackALSARawMidiSendQueue::IsBlocked()
 {
     return blocked;
+}
+
+void
+JackALSARawMidiSendQueue::ResetPollByteCount()
+{
+    bytes_available = bytes_per_poll;
 }

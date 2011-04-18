@@ -27,7 +27,7 @@ namespace Jack {
 
     /**
      * This queue enqueues valid MIDI events and modifies them for raw output
-     * to a write queue.  It has a number of advantages over straight MIDI
+     * to a write queue.  It has a couple of advantages over straight MIDI
      * event copying:
      *
      * -Running status: Status bytes can be omitted when the status byte of the
@@ -39,10 +39,6 @@ namespace Jack {
      * non-realtime bytes so that realtime messages can be sent as close as
      * possible to the time they're scheduled for sending.
      *
-     * -Time optimization: Bytes in non-realtime messages are sent out early
-     * when possible, with the last byte of the message being sent out as close
-     * to the specified event time as possible.
-     *
      * Use this queue if the MIDI API you're interfacing with allows you to
      * send raw MIDI bytes.
      */
@@ -52,7 +48,6 @@ namespace Jack {
 
     private:
 
-        jack_nframes_t last_enqueued_message_time;
         jack_midi_event_t *non_rt_event;
         jack_nframes_t non_rt_event_time;
         JackMidiAsyncQueue *non_rt_queue;
@@ -62,20 +57,17 @@ namespace Jack {
         jack_midi_data_t running_status;
         JackMidiSendQueue *send_queue;
 
-        bool
+        void
         DequeueNonRealtimeEvent();
 
-        bool
+        void
         DequeueRealtimeEvent();
 
         bool
         SendByte(jack_nframes_t time, jack_midi_data_t byte);
 
         bool
-        WriteNonRealtimeEvents(jack_nframes_t boundary_frame);
-
-        bool
-        WriteRealtimeEvents(jack_nframes_t boundary_frame);
+        SendNonRTBytes(jack_nframes_t boundary_frame);
 
     protected:
 

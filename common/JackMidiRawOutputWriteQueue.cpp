@@ -50,27 +50,23 @@ JackMidiRawOutputWriteQueue::~JackMidiRawOutputWriteQueue()
     delete rt_queue;
 }
 
-bool
+void
 JackMidiRawOutputWriteQueue::DequeueNonRealtimeEvent()
 {
     non_rt_event = non_rt_queue->DequeueEvent();
-    bool result = non_rt_event != 0;
-    if (result) {
+    if (non_rt_event) {
         non_rt_event_time = non_rt_event->time;
         running_status = ApplyRunningStatus(non_rt_event, running_status);
     }
-    return result;
 }
 
-bool
+void
 JackMidiRawOutputWriteQueue::DequeueRealtimeEvent()
 {
     rt_event = rt_queue->DequeueEvent();
-    bool result = rt_event != 0;
-    if (result) {
+    if (rt_event) {
         rt_event_time = rt_event->time;
     }
-    return result;
 }
 
 Jack::JackMidiWriteQueue::EnqueueResult
@@ -79,11 +75,7 @@ JackMidiRawOutputWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
 {
     JackMidiAsyncQueue *queue = (size == 1) && (*buffer >= 0xf8) ? rt_queue :
         non_rt_queue;
-    EnqueueResult result = queue->EnqueueEvent(time, size, buffer);
-    if (result == OK) {
-        last_enqueued_message_time = time;
-    }
-    return result;
+    return queue->EnqueueEvent(time, size, buffer);
 }
 
 void
@@ -99,38 +91,34 @@ JackMidiRawOutputWriteQueue::HandleWriteQueueBug(jack_nframes_t time,
 jack_nframes_t
 JackMidiRawOutputWriteQueue::Process(jack_nframes_t boundary_frame)
 {
-    jack_nframes_t current_frame = send_queue->GetNextScheduleFrame();
-    while (STILL_TIME(current_frame, boundary_frame)) {
-        if (! non_rt_event) {
-            DequeueNonRealtimeEvent();
-        }
-        if (! rt_event) {
-            DequeueRealtimeEvent();
-        }
-        if (! (non_rt_event || rt_event)) {
-            return 0;
-        }
-        if (! WriteRealtimeEvents(boundary_frame)) {
-            break;
-        }
-        jack_nframes_t non_rt_boundary =
-            rt_event && STILL_TIME(rt_event_time, boundary_frame) ?
-            rt_event_time : boundary_frame;
-        if (! WriteNonRealtimeEvents(non_rt_boundary)) {
-            break;
-        }
-        current_frame = send_queue->GetNextScheduleFrame();
+    if (! non_rt_event) {
+        DequeueNonRealtimeEvent();
     }
-
-    // If we get here, that means there is some sort of message available, and
-    // that either we can't currently write to the write queue or we have
-    // reached the boundary frame.  Return the earliest time that a message is
-    // scheduled to be sent.
-
-    return ! non_rt_event ? rt_event_time :
-        non_rt_event->size > 1 ? current_frame :
-        ! rt_event ? non_rt_event_time :
-        non_rt_event_time < rt_event_time ? non_rt_event_time : rt_event_time;
+    if (! rt_event) {
+        DequeueRealtimeEvent();
+    }
+    while (rt_event) {
+        jack_nframes_t current_frame = send_queue->GetNextScheduleFrame();
+        if ((rt_event_time > current_frame) && non_rt_event &&
+            (non_rt_event_time < rt_event_time)) {
+            if (! SendNonRTBytes(rt_event_time < boundary_frame ?
+                                 rt_event_time : boundary_frame)) {
+                return non_rt_event_time;
+            }
+            current_frame = send_queue->GetNextScheduleFrame();
+        }
+        if (! STILL_TIME(current_frame, boundary_frame)) {
+            return (! non_rt_event) ? rt_event_time :
+                non_rt_event_time < rt_event_time ? non_rt_event_time :
+                rt_event_time;
+        }
+        if (! SendByte(rt_event_time, *(rt_event->buffer))) {
+            return rt_event_time;
+        }
+        DequeueRealtimeEvent();
+    }
+    SendNonRTBytes(boundary_frame);
+    return non_rt_event ? non_rt_event_time : 0;
 }
 
 bool
@@ -151,78 +139,20 @@ JackMidiRawOutputWriteQueue::SendByte(jack_nframes_t time,
 }
 
 bool
-JackMidiRawOutputWriteQueue::
-WriteNonRealtimeEvents(jack_nframes_t boundary_frame)
+JackMidiRawOutputWriteQueue::SendNonRTBytes(jack_nframes_t boundary_frame)
 {
-    if (! non_rt_event) {
-        if (! DequeueNonRealtimeEvent()) {
-            return true;
-        }
-    }
-    jack_nframes_t current_frame = send_queue->GetNextScheduleFrame();
-    do {
-
-        // Send out as much of the non-realtime buffer as we can, save for one
-        // byte which we will send out when the message is supposed to arrive.
-
-        for (; non_rt_event->size > 1;
+    while (non_rt_event) {
+        for (; non_rt_event->size;
              (non_rt_event->size)--, (non_rt_event->buffer)++) {
+            jack_nframes_t current_frame = send_queue->GetNextScheduleFrame();
             if (! STILL_TIME(current_frame, boundary_frame)) {
                 return true;
             }
-            if (! SendByte(current_frame, *(non_rt_event->buffer))) {
+            if (! SendByte(non_rt_event_time, *(non_rt_event->buffer))) {
                 return false;
             }
-            current_frame = send_queue->GetNextScheduleFrame();
         }
-        if (! (STILL_TIME(current_frame, boundary_frame) &&
-               STILL_TIME(non_rt_event_time, boundary_frame))) {
-            return true;
-        }
-
-        // There's still time.  Try to send the byte.
-
-        if (! SendByte(non_rt_event_time, *(non_rt_event->buffer))) {
-            return false;
-        }
-        current_frame = send_queue->GetNextScheduleFrame();
-        if (! DequeueNonRealtimeEvent()) {
-            break;
-        }
-    } while (STILL_TIME(current_frame, boundary_frame));
+        DequeueNonRealtimeEvent();
+    }
     return true;
-}
-
-bool
-JackMidiRawOutputWriteQueue::WriteRealtimeEvents(jack_nframes_t boundary_frame)
-{
-    jack_nframes_t current_frame = send_queue->GetNextScheduleFrame();
-    if (! rt_event) {
-        if (! DequeueRealtimeEvent()) {
-            return true;
-        }
-    }
-    for (;;) {
-        if (! STILL_TIME(current_frame, boundary_frame)) {
-            return false;
-        }
-
-        // If:
-        //     -there's still time before we need to send the realtime event
-        //     -there's a non-realtime event available for sending
-        //     -non-realtime data can be scheduled before this event
-
-        if ((rt_event_time > current_frame) && non_rt_event &&
-            ((non_rt_event->size > 1) ||
-             (non_rt_event_time < rt_event_time))) {
-            return true;
-        }
-        if (! SendByte(rt_event_time, *(rt_event->buffer))) {
-            return false;
-        }
-        current_frame = send_queue->GetNextScheduleFrame();
-        if (! DequeueRealtimeEvent()) {
-            return true;
-        }
-    }
 }
