@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <stdexcept>
 
 #include "JackError.h"
+#include "JackTime.h"
 #include "JackMidiUtil.h"
 #include "JackWinMMEInputPort.h"
 #include "JackMidiWriteQueue.h"
@@ -225,7 +226,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
                        "status byte.");
             return;
         }
-        EnqueueMessage(dwParam2, (size_t) length, message_buffer);
+        EnqueueMessage(param2, (size_t) length, message_buffer);
         break;
     }
     case MIM_LONGDATA: {
@@ -242,7 +243,7 @@ JackWinMMEInputPort::ProcessWinMME(UINT message, DWORD param1, DWORD param2)
             jack_error("JackWinMMEInputPort::ProcessWinMME - Discarding "
                        "%d-byte sysex chunk.", byte_count);
         } else {
-            EnqueueMessage(dwParam2, byte_count, data);
+            EnqueueMessage(param2, byte_count, data);
         }
         // Is this realtime-safe?  This function isn't run in the JACK thread,
         // but we still want it to perform as quickly as possible.  Even if
