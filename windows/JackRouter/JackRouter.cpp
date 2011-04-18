@@ -54,7 +54,7 @@ static const double twoRaisedTo32Reciprocal = 1. / twoRaisedTo32;
 #include "windows.h"
 #include "mmsystem.h"
 #ifdef _WIN64
-#define JACK_ROUTER "JackRouter64.dll"
+#define JACK_ROUTER "JackRouter.dll"
 #include <psapi.h>
 #else
 #define JACK_ROUTER "JackRouter.dll"

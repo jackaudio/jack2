@@ -28,14 +28,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack {
 
     /**
-     * This is a MIDI message queue designed to allow two threads to pass MIDI
-     * messages between two threads (though it can also be used to buffer
-     * events internally).  This is especially useful if the MIDI API
-     * you're attempting to interface with doesn't provide the ability to
-     * schedule MIDI events ahead of time and/or has blocking send/receive
-     * calls, as it allows a separate thread to handle input/output while the
-     * JACK process thread copies events from a `JackMidiBufferReadQueue` to
-     * this queue, or from this queue to a `JackMidiBufferWriteQueue`.
+     * This is a MIDI message queue designed to allow one thread to pass MIDI
+     * messages to another thread (though it can also be used to buffer events
+     * internally).  This is especially useful if the MIDI API you're
+     * attempting to interface with doesn't provide the ability to schedule
+     * MIDI events ahead of time and/or has blocking send/receive calls, as it
+     * allows a separate thread to handle input/output while the JACK process
+     * thread copies events from a MIDI buffer to this queue, or vice versa.
      */
 
     class SERVER_EXPORT JackMidiAsyncQueue:
@@ -64,7 +63,8 @@ namespace Jack {
 
         JackMidiAsyncQueue(size_t max_bytes=4096, size_t max_messages=1024);
 
-        virtual ~JackMidiAsyncQueue();
+        virtual
+        ~JackMidiAsyncQueue();
 
         /**
          * Dequeues and returns a MIDI event.  Returns '0' if there are no MIDI

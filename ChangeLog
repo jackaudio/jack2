@@ -34,6 +34,10 @@ Valerio Pilo
   Jackdmp changes log
 ---------------------------
 
+2011-04-18 Stephane Letz  <letz@grame.fr>
+
+	* JackWeakAPI.cpp renamed in JackWeakAPI.c.
+
 2011-04-04 Stephane Letz  <letz@grame.fr>
 
 	* Correct driver lifetime management.

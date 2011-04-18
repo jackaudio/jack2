@@ -40,9 +40,14 @@ namespace Jack {
         int fds[2];
         JackALSARawMidiInputPort **input_ports;
         JackALSARawMidiOutputPort **output_ports;
+        jack_nframes_t *output_port_timeouts;
         nfds_t poll_fd_count;
         struct pollfd *poll_fds;
         JackThread *thread;
+
+        void
+        FreeDeviceInfo(std::vector<snd_rawmidi_info_t *> *in_info_list,
+                       std::vector<snd_rawmidi_info_t *> *out_info_list);
 
         void
         GetDeviceInfo(snd_ctl_t *control, snd_rawmidi_info_t *info,
@@ -51,9 +56,6 @@ namespace Jack {
         void
         HandleALSAError(const char *driver_func, const char *alsa_func,
                         int code);
-
-        int
-        Poll(const jack_nframes_t *wakeup_frame);
 
     public:
 

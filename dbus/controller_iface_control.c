@@ -30,6 +30,7 @@
 
 #include "jackdbus.h"
 #include "controller_internal.h"
+#include "xml.h"
 
 #define JACK_DBUS_IFACE_NAME "org.jackaudio.JackControl"
 
@@ -127,8 +128,6 @@ jack_control_run_method(
             assert(call->reply != NULL);
             return true;
         }
-
-        jack_controller_control_send_signal_server_stopped();
     }
     else if (strcmp (call->method_name, "GetLoad") == 0)
     {
@@ -246,11 +245,16 @@ jack_control_run_method(
             goto exit;
         }
         
-        if (!jack_controller_add_slave_driver(controller_ptr, driver_name)) {
+        if (!jack_controller_add_slave_driver(controller_ptr, driver_name))
+        {
             jack_dbus_error(
                 call,
                 JACK_DBUS_ERROR_GENERIC,
                 "jack_controller_add_slave_driver failed for driver (%s)", driver_name);
+        }
+        else
+        {
+            jack_controller_settings_save_auto(controller_ptr);
         }
     }
     else if (strcmp (call->method_name, "RemoveSlaveDriver") == 0)
@@ -270,11 +274,16 @@ jack_control_run_method(
             goto exit;
         }
         
-        if (!jack_controller_remove_slave_driver(controller_ptr, driver_name)) {
+        if (!jack_controller_remove_slave_driver(controller_ptr, driver_name))
+        {
             jack_dbus_error(
                 call,
                 JACK_DBUS_ERROR_GENERIC,
                 "jack_controller_remove_slave_driver failed for driver (%s)", driver_name);
+        }
+        else
+        {
+            jack_controller_settings_save_auto(controller_ptr);
         }
     }
     else if (strcmp (call->method_name, "UnloadInternal") == 0)

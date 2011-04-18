@@ -66,6 +66,12 @@ JackMidiRawInputWriteQueue::EnqueueEvent(jack_nframes_t time, size_t size,
     return packet_queue->EnqueueEvent(time, size, buffer);
 }
 
+size_t
+JackMidiRawInputWriteQueue::GetAvailableSpace()
+{
+    return packet_queue->GetAvailableSpace();
+}
+
 void
 JackMidiRawInputWriteQueue::HandleBufferFailure(size_t unbuffered_bytes,
                                                 size_t total_bytes)

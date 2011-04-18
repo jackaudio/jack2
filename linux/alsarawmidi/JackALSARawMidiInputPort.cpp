@@ -17,6 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <cassert>
 #include <memory>
 
 #include "JackALSARawMidiInputPort.h"
@@ -28,7 +29,7 @@ JackALSARawMidiInputPort::JackALSARawMidiInputPort(snd_rawmidi_info_t *info,
                                                    size_t index,
                                                    size_t max_bytes,
                                                    size_t max_messages):
-    JackALSARawMidiPort(info, index)
+    JackALSARawMidiPort(info, index, POLLIN)
 {
     alsa_event = 0;
     jack_event = 0;
@@ -53,91 +54,69 @@ JackALSARawMidiInputPort::~JackALSARawMidiInputPort()
     delete write_queue;
 }
 
-jack_nframes_t
-JackALSARawMidiInputPort::EnqueueALSAEvent()
-{
-    switch (raw_queue->EnqueueEvent(alsa_event)) {
-    case JackMidiWriteQueue::BUFFER_FULL:
-        // Processing events early might free up some space in the raw queue.
-        raw_queue->Process();
-        switch (raw_queue->EnqueueEvent(alsa_event)) {
-        case JackMidiWriteQueue::BUFFER_TOO_SMALL:
-            jack_error("JackALSARawMidiInputPort::Process - **BUG** "
-                       "JackMidiRawInputWriteQueue::EnqueueEvent returned "
-                       "`BUFFER_FULL` and then returned `BUFFER_TOO_SMALL` "
-                       "after a `Process()` call.");
-            // Fallthrough on purpose
-        case JackMidiWriteQueue::OK:
-            return 0;
-        default:
-            ;
-        }
-        break;
-    case JackMidiWriteQueue::BUFFER_TOO_SMALL:
-        jack_error("JackALSARawMidiInputPort::Execute - The thread queue "
-                   "couldn't enqueue a %d-byte packet.  Dropping event.",
-                   alsa_event->size);
-        // Fallthrough on purpose
-    case JackMidiWriteQueue::OK:
-        return 0;
-    default:
-        ;
-    }
-    jack_nframes_t alsa_time = alsa_event->time;
-    jack_nframes_t next_time = raw_queue->Process();
-    return (next_time < alsa_time) ? next_time : alsa_time;
-}
-
-bool
-JackALSARawMidiInputPort::ProcessALSA(jack_nframes_t *frame)
-{
-    unsigned short revents;
-    if (! ProcessPollEvents(&revents)) {
-        return false;
-    }
-    if (alsa_event) {
-        *frame = EnqueueALSAEvent();
-        if (*frame) {
-            return true;
-        }
-    }
-    if (revents & POLLIN) {
-        for (alsa_event = receive_queue->DequeueEvent(); alsa_event;
-             alsa_event = receive_queue->DequeueEvent()) {
-            *frame = EnqueueALSAEvent();
-            if (*frame) {
-                return true;
-            }
-        }
-    }
-    *frame = raw_queue->Process();
-    return true;
-}
-
 bool
 JackALSARawMidiInputPort::ProcessJack(JackMidiBuffer *port_buffer,
                                       jack_nframes_t frames)
 {
     write_queue->ResetMidiBuffer(port_buffer, frames);
+    bool dequeued = false;
     if (! jack_event) {
-        jack_event = thread_queue->DequeueEvent();
+        goto dequeue_event;
     }
-    for (; jack_event; jack_event = thread_queue->DequeueEvent()) {
-
-        // We add `frames` so that MIDI events align with audio as closely as
-        // possible.
+    for (;;) {
         switch (write_queue->EnqueueEvent(jack_event, frames)) {
         case JackMidiWriteQueue::BUFFER_TOO_SMALL:
             jack_error("JackALSARawMidiInputPort::ProcessJack - The write "
                        "queue couldn't enqueue a %d-byte event.  Dropping "
                        "event.", jack_event->size);
-            // Fallthrough on purpose
+            // Fallthrough on purpose.
         case JackMidiWriteQueue::OK:
-            continue;
+            break;
         default:
-            ;
+            goto trigger_queue_event;
         }
-        break;
+    dequeue_event:
+        jack_event = thread_queue->DequeueEvent();
+        if (! jack_event) {
+            break;
+        }
+        dequeued = true;
     }
+ trigger_queue_event:
+    return dequeued ? TriggerQueueEvent() : true;
+}
+
+bool
+JackALSARawMidiInputPort::ProcessPollEvents(jack_nframes_t current_frame)
+{
+    if (GetQueuePollEvent() == -1) {
+        return false;
+    }
+    int io_event = GetIOPollEvent();
+    switch (io_event) {
+    case -1:
+        return false;
+    case 1:
+        alsa_event = receive_queue->DequeueEvent();
+    }
+    if (alsa_event) {
+        size_t size = alsa_event->size;
+        size_t space = raw_queue->GetAvailableSpace();
+        bool enough_room = space >= size;
+        if (enough_room) {
+            assert(raw_queue->EnqueueEvent(current_frame, size,
+                                           alsa_event->buffer) ==
+                   JackMidiWriteQueue::OK);
+            alsa_event = 0;
+        } else if (space) {
+            assert(raw_queue->EnqueueEvent(current_frame, space,
+                                           alsa_event->buffer) ==
+                   JackMidiWriteQueue::OK);
+            alsa_event->buffer += space;
+            alsa_event->size -= space;
+        }
+        SetIOEventsEnabled(enough_room);
+    }
+    raw_queue->Process();
     return true;
 }

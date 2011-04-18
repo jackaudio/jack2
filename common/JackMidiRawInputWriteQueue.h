@@ -143,6 +143,13 @@ namespace Jack {
                      jack_midi_data_t *buffer);
 
         /**
+         * Returns the maximum size event that can be enqueued right *now*.
+         */
+
+        size_t
+        GetAvailableSpace();
+
+        /**
          * The `Process()` method should be called each time the
          * `EnqueueEvent()` method returns `OK`.  The `Process()` method will
          * return the next frame at which an event should be sent.  The return

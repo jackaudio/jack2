@@ -68,8 +68,6 @@
 #include <samplerate.h>
 #endif
 
-#include "JackError.h"
-
 #if HAVE_CELT
 #include <celt/celt.h>
 #endif
