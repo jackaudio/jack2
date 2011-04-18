@@ -1,10 +1,6 @@
 //=============================================================================
-//  MuseScore
-//  Linux Music Score Editor
-//  $Id:
 //
-//  jackWeakAPI based on code from Stéphane Letz (Grame)
-//  partly based on Julien Pommier (PianoTeq : http://www.pianoteq.com/) code.
+//  jackWeakAPI partly based on Julien Pommier (PianoTeq : http://www.pianoteq.com/) code.
 //
 //  Copyright (C) 2002-2007 Werner Schweer and others
 //  Copyright (C) 2009 Grame
@@ -24,6 +20,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <jack/jack.h>
+#include <jack/session.h>
 #include <jack/thread.h>
 #include <jack/midiport.h>
 #include <math.h>
@@ -31,7 +28,7 @@
 #include <dlfcn.h>
 #endif
 #include <stdlib.h>
-#include <iostream>
+#include <stdio.h>
 
 /* dynamically load libjack and forward all registered calls to libjack
    (similar to what relaytool is trying to do, but more portably..)
@@ -40,16 +37,13 @@
 typedef void (*print_function)(const char *);
 typedef void *(*thread_routine)(void*);
 
-using std::cerr;
-
-int libjack_is_present = 0;     // public symbol, similar to what relaytool does.
+static int libjack_is_present = 0;     // public symbol, similar to what relaytool does.
 
 #ifdef WIN32
-HMODULE libjack_handle = 0;
+static HMODULE libjack_handle = 0;
 #else
 static void *libjack_handle = 0;
 #endif
-
 
 static void __attribute__((constructor)) tryload_libjack()
 {
@@ -293,8 +287,8 @@ DECL_VOID_FUNCTION(jack_free, (void* ptr), (ptr));
 
 // session
 DECL_FUNCTION(int, jack_set_session_callback, (jack_client_t* ext_client, JackSessionCallback session_callback, void* arg), (ext_client, session_callback, arg));
-DECL_FUNCTION(jack_session_command_t*, jack_session_notify, (jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path), (ext_client, target, ev_type, path)à);
-DECL_FUNCTION(int jack_session_reply, (jack_client_t* ext_client, jack_session_event_t *event), (ext_client, event));
+DECL_FUNCTION(jack_session_command_t*, jack_session_notify, (jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path), (ext_client, target, ev_type, path));
+DECL_FUNCTION(int, jack_session_reply, (jack_client_t* ext_client, jack_session_event_t *event), (ext_client, event));
 DECL_VOID_FUNCTION(jack_session_event_free, (jack_session_event_t* ev), (ev));
 DECL_FUNCTION(char*, jack_get_uuid_for_client_name, (jack_client_t* ext_client, const char* client_name),(ext_client, client_name));
 DECL_FUNCTION(char*, jack_get_client_name_by_uuid, (jack_client_t* ext_client, const char* client_uuid),(ext_client, client_uuid));
