@@ -130,37 +130,31 @@ bool
 JackWinMMEOutputPort::Execute()
 {
     for (;;) {
-         if (! Wait(thread_queue_semaphore)) {
+        if (! Wait(thread_queue_semaphore)) {
             jack_log("JackWinMMEOutputPort::Execute BREAK");
-
+            
             break;
         }
-
         jack_midi_event_t *event = thread_queue->DequeueEvent();
         if (! event) {
             break;
         }
         jack_time_t frame_time = GetTimeFromFrames(event->time);
-        for (jack_time_t current_time = GetMicroSeconds();
-             frame_time > current_time; current_time = GetMicroSeconds()) {
-            jack_time_t sleep_time = frame_time - current_time;
+        jack_time_t current_time = GetMicroSeconds();
+        if (frame_time > current_time) {
+            LARGE_INTEGER due_time;
 
-            // Windows has a millisecond sleep resolution for its Sleep calls.
-            // This is unfortunate, as MIDI timing often requires a higher
-            // resolution.  For now, we attempt to compensate by letting an
-            // event be sent if we're less than 500 microseconds from sending
-            // the event.  We assume that it's better to let an event go out
-            // 499 microseconds early than let an event go out 501 microseconds
-            // late.  Of course, that's assuming optimal sleep times, which is
-            // a whole different Windows issue ...
-            if (sleep_time < 500) {
+            // 100 ns resolution
+            due_time.QuadPart = - ((frame_time - current_time) * 10);
+            if (! SetWaitableTimer(timer, &due_time, 0, NULL, NULL, 0)) {
+                WriteOSError("JackWinMMEOutputPort::Execute",
+                             "ChangeTimerQueueTimer");
                 break;
             }
 
-            if (sleep_time < 1000) {
-                sleep_time = 1000;
+            if (! Wait(timer)) {
+                break;
             }
-            JackSleep(sleep_time);
         }
         jack_midi_data_t *data = event->buffer;
         DWORD message = 0;
@@ -214,6 +208,15 @@ JackWinMMEOutputPort::Execute()
         }
     }
     return false;
+}
+
+void
+JackWinMMEOutputPort::GetOutErrorString(MMRESULT error, LPTSTR text)
+{
+    MMRESULT result = midiOutGetErrorText(error, text, MAXERRORLENGTH);
+    if (result != MMSYSERR_NOERROR) {
+        snprintf(text, MAXERRORLENGTH, "Unknown MM error code '%d'", error);
+    }
 }
 
 void
@@ -289,15 +292,23 @@ JackWinMMEOutputPort::Signal(HANDLE semaphore)
 bool
 JackWinMMEOutputPort::Start()
 {
-    bool result = thread->GetStatus() != JackThread::kIdle;
-    if (! result) {
-        result = ! thread->StartSync();
-        if (! result) {
-            jack_error("JackWinMMEOutputPort::Start - failed to start MIDI "
-                       "processing thread.");
-        }
+    if (thread->GetStatus() != JackThread::kIdle) {
+        return true;
     }
-    return result;
+    timer = CreateWaitableTimer(NULL, FALSE, NULL);
+    if (! timer) {
+        WriteOSError("JackWinMMEOutputPort::Start", "CreateWaitableTimer");
+        return false;
+    }
+    if (! thread->StartSync()) {
+        return true;
+    }
+    jack_error("JackWinMMEOutputPort::Start - failed to start MIDI processing "
+               "thread.");
+    if (! CloseHandle(timer)) {
+        WriteOSError("JackWinMMEOutputPort::Start", "CloseHandle");
+    }
+    return false;
 }
 
 bool
@@ -326,6 +337,10 @@ JackWinMMEOutputPort::Stop()
         jack_error("JackWinMMEOutputPort::Stop - could not %s MIDI processing "
                    "thread.", verb);
     }
+    if (! CloseHandle(timer)) {
+        WriteOSError("JackWinMMEOutputPort::Stop", "CloseHandle");
+        result = -1;
+    }
     return ! result;
 }
 
@@ -344,15 +359,6 @@ JackWinMMEOutputPort::Wait(HANDLE semaphore)
                    "'WaitForSingleObject'.");
     }
     return false;
-}
-
-void
-JackWinMMEOutputPort::GetOutErrorString(MMRESULT error, LPTSTR text)
-{
-    MMRESULT result = midiOutGetErrorText(error, text, MAXERRORLENGTH);
-    if (result != MMSYSERR_NOERROR) {
-        snprintf(text, MAXERRORLENGTH, "Unknown MM error code '%d'", error);
-    }
 }
 
 void
