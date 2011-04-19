@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackException.h"
 #include "JackAudioAdapterInterface.h"
 
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -293,7 +294,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     void AllocPorts()
     {
-        unsigned int port_index;
+        int port_index;
 
         // Set buffers
         if (fParams.fSendAudioChannels > 0) {
@@ -331,7 +332,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
 
     void FreePorts()
     {
-        unsigned int port_index;
+        int port_index;
 
         if (fAudioPlaybackBuffer) {
             for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++)
@@ -365,7 +366,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
     int Read(int audio_input, float** audio_input_buffer, int midi_input, void** midi_input_buffer)
      {
         try {
-            assert((unsigned int)audio_input == fParams.fReturnAudioChannels);
+            assert(audio_input == fParams.fReturnAudioChannels);
 
             for (int port_index = 0; port_index < audio_input; port_index++) {
                 fNetAudioPlaybackBuffer->SetBuffer(port_index, audio_input_buffer[port_index]);
@@ -390,7 +391,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
      int Write(int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
      {
         try {
-             assert((unsigned int)audio_output == fParams.fSendAudioChannels);
+             assert(audio_output == fParams.fSendAudioChannels);
 
              for (int port_index = 0;  port_index < audio_output; port_index++) {
                  fNetAudioCaptureBuffer->SetBuffer(port_index, audio_output_buffer[port_index]);
@@ -544,7 +545,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     void AllocPorts()
     {
-        unsigned int port_index;
+        int port_index;
 
         // Set buffers
         fAudioCaptureBuffer = new float*[fParams.fSendAudioChannels];
@@ -574,7 +575,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     void FreePorts()
     {
-        unsigned int port_index;
+        int port_index;
 
         if (fAudioCaptureBuffer) {
             for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++)
@@ -615,7 +616,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     bool Init()
     {
         // Will do "something" on OSX only...
-        fThread.SetParams(float(fParams.fPeriodSize) / float(fParams.fSampleRate) * 1000000, 100 * 1000, 500 * 1000);
+        fThread.SetParams(UInt64(float(fParams.fPeriodSize)/float(fParams.fSampleRate)*1000000), 100 * 1000, 500 * 1000);
         return (fThread.AcquireRealTime(80) == 0);      // TODO: get a value from the server
     }
 
