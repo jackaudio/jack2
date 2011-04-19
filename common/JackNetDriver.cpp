@@ -149,7 +149,10 @@ namespace Jack
         }
 
         //set global parameters
-        SetParams();
+        if (!SetParams()) {
+            jack_error("SetParams error..." );
+            return false;
+        }
 
         // If -1 at conection time, in/out channels count is sent by the master
         fCaptureChannels = fParams.fSendAudioChannels;

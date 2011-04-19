@@ -102,7 +102,7 @@ namespace Jack
 
     public:
 
-         JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate ):
+         JackAudioAdapterInterface ( jack_nframes_t buffer_size, jack_nframes_t sample_rate, jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE):
             fCaptureChannels ( 0 ),
             fPlaybackChannels ( 0 ),
             fHostBufferSize ( buffer_size ),
@@ -112,10 +112,28 @@ namespace Jack
             fPIControler(sample_rate / sample_rate, 256),
             fCaptureRingBuffer(NULL), fPlaybackRingBuffer(NULL),
             fQuality(0),
-            fRingbufferCurSize(DEFAULT_ADAPTATIVE_SIZE),
+            fRingbufferCurSize(ring_buffer_size),
             fPullAndPushTime(0),
             fRunning(false),
             fAdaptative(true)
+        {}
+        JackAudioAdapterInterface ( jack_nframes_t host_buffer_size,
+                                    jack_nframes_t host_sample_rate,
+                                    jack_nframes_t adapted_buffer_size,
+                                    jack_nframes_t adapted_sample_rate,
+                                    jack_nframes_t ring_buffer_size = DEFAULT_ADAPTATIVE_SIZE ) :
+                fCaptureChannels ( 0 ),
+                fPlaybackChannels ( 0 ),
+                fHostBufferSize ( host_buffer_size ),
+                fHostSampleRate ( host_sample_rate ),
+                fAdaptedBufferSize ( adapted_buffer_size),
+                fAdaptedSampleRate ( adapted_sample_rate ),
+                fPIControler(host_sample_rate / host_sample_rate, 256),
+                fQuality(0),
+                fRingbufferCurSize(ring_buffer_size),
+                fPullAndPushTime(0),
+                fRunning(false),
+                fAdaptative(true)
         {}
 
         virtual ~JackAudioAdapterInterface()
@@ -123,8 +141,8 @@ namespace Jack
 
         virtual void Reset();
 
-        void Create();
-        void Destroy();
+        virtual void Create();
+        virtual void Destroy();
 
         virtual int Open()
         {
@@ -194,18 +212,18 @@ namespace Jack
 
         int GetInputs()
         {
-            jack_log ( "JackAudioAdapterInterface::GetInputs %d", fCaptureChannels );
+            //jack_log("JackAudioAdapterInterface::GetInputs %d", fCaptureChannels);
             return fCaptureChannels;
         }
 
         int GetOutputs()
         {
-            jack_log ( "JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels );
+            //jack_log ("JackAudioAdapterInterface::GetOutputs %d", fPlaybackChannels);
             return fPlaybackChannels;
         }
 
-        int PushAndPull(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int inNumberFrames);
-        int PullAndPush(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int inNumberFrames);
+        int PushAndPull(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int frames);
+        int PullAndPush(jack_default_audio_sample_t** inputBuffer, jack_default_audio_sample_t** outputBuffer, unsigned int frames);
 
     };
 

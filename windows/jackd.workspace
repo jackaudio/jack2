@@ -20,6 +20,7 @@
 		<Project filename="multiple_metro.cbp" />
 		<Project filename="jack_winmme.cbp" />
 		<Project filename="jack_loopback.cbp" />
+		<Project filename="libjacknet.cbp" active="1" />
 		<Project filename="jackd.cbp" />
 		<Project filename="jack_midi_latency_test.cbp" />
 		<Project filename="jack_netadapter.cbp" />

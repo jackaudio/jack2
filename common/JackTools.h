@@ -141,7 +141,7 @@ namespace Jack
 
             T Add ( T measure_point )
             {
-				return fCurrentMeasure[fMeasureId++] = measure_point;
+                return fCurrentMeasure[fMeasureId++] = measure_point;
             }
 
             uint32_t AddLast ( T measure_point )

@@ -113,11 +113,16 @@ namespace Jack
     bool JackNetMaster::Init(bool auto_connect)
     {
         //network init
-        if ( !JackNetMasterInterface::Init() )
+        if (!JackNetMasterInterface::Init()){
+            jack_error("JackNetMasterInterface::Init() error..." );
             return false;
+        }
 
         //set global parameters
-        SetParams();
+        if (!SetParams()) {
+            jack_error("SetParams error..." );
+            return false;
+        }
 
         //jack client and process
         jack_status_t status;
@@ -204,7 +209,6 @@ namespace Jack
                     break;
             }
         }
-
 
         //midi
         for ( i = 0; i < fParams.fSendMidiChannels; i++ )
@@ -626,8 +630,6 @@ namespace Jack
         if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
             jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
 
-        jack_info ( "Waiting for a slave..." );
-
         //main loop, wait for data, deal with it and wait again
         do
         {
@@ -681,7 +683,6 @@ namespace Jack
         params.fID = ++fGlobalID;
         params.fSampleRate = jack_get_sample_rate ( fManagerClient );
         params.fPeriodSize = jack_get_buffer_size ( fManagerClient );
-        params.fBitdepth = 0;
 
         if (params.fSendAudioChannels == -1) {
             params.fSendAudioChannels = CountIO(JackPortIsPhysical | JackPortIsOutput);

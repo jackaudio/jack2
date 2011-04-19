@@ -26,7 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 namespace Jack
 {
     JackNetAdapter::JackNetAdapter ( jack_client_t* jack_client, jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params )
-            : JackAudioAdapterInterface ( buffer_size, sample_rate ), JackNetSlaveInterface(), fThread ( this )
+            : JackAudioAdapterInterface ( buffer_size, sample_rate), JackNetSlaveInterface(), fThread ( this )
     {
         jack_log ( "JackNetAdapter::JackNetAdapter" );
 
@@ -40,8 +40,8 @@ namespace Jack
         fSocket.GetName ( fParams.fSlaveNetName );
         fParams.fMtu = DEFAULT_MTU;
         fParams.fTransportSync = 0;
-        fParams.fSendAudioChannels = 2;
-        fParams.fReturnAudioChannels = 2;
+        int send_audio = -1;
+        int return_audio = -1;
         fParams.fSendMidiChannels = 0;
         fParams.fReturnMidiChannels = 0;
         fParams.fSampleRate = sample_rate;
@@ -71,10 +71,10 @@ namespace Jack
                     fParams.fMtu = param->value.i;
                     break;
                 case 'C' :
-                    fParams.fSendAudioChannels = param->value.i;
+                    send_audio = param->value.i;
                     break;
                 case 'P' :
-                    fParams.fReturnAudioChannels = param->value.i;
+                    return_audio = param->value.i;
                     break;
                 case 'n' :
                     strncpy ( fParams.fName, param->value.str, JACK_CLIENT_NAME_SIZE );
@@ -105,7 +105,13 @@ namespace Jack
         //set the socket parameters
         fSocket.SetPort ( port );
         fSocket.SetAddress ( fMulticastIP, port );
-
+        
+        // If not set, takes deafault
+        fParams.fSendAudioChannels = (send_audio == -1) ? 2 : send_audio;
+            
+        // If not set, takes deafault
+        fParams.fReturnAudioChannels = (return_audio == -1) ? 2 : return_audio;
+      
         //set the audio adapter interface channel values
         SetInputs ( fParams.fSendAudioChannels );
         SetOutputs ( fParams.fReturnAudioChannels );
@@ -117,18 +123,18 @@ namespace Jack
 
     JackNetAdapter::~JackNetAdapter()
     {
-        jack_log ( "JackNetAdapter::~JackNetAdapter" );
+        jack_log ("JackNetAdapter::~JackNetAdapter");
 
         int port_index;
-        if ( fSoftCaptureBuffer )
+        if (fSoftCaptureBuffer)
         {
-            for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+            for (port_index = 0; port_index < fCaptureChannels; port_index++)
                 delete[] fSoftCaptureBuffer[port_index];
             delete[] fSoftCaptureBuffer;
         }
-        if ( fSoftPlaybackBuffer )
+        if (fSoftPlaybackBuffer)
         {
-            for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+            for ( port_index = 0; port_index < fPlaybackChannels; port_index++)
                 delete[] fSoftPlaybackBuffer[port_index];
             delete[] fSoftPlaybackBuffer;
         }
@@ -195,6 +201,8 @@ namespace Jack
     }
 
 //thread------------------------------------------------------------------------------
+    // TODO : if failure, thread exist... need to restart ?
+    
     bool JackNetAdapter::Init()
     {
         jack_log ( "JackNetAdapter::Init" );
@@ -202,24 +210,34 @@ namespace Jack
         int port_index;
 
         //init network connection
-        if ( !JackNetSlaveInterface::Init() )
+        if (!JackNetSlaveInterface::Init()) {
+            jack_error("JackNetSlaveInterface::Init() error..." );
             return false;
+        }
 
         //then set global parameters
-        SetParams();
+        if (!SetParams()) {
+            jack_error("SetParams error..." );
+            return false;
+        }
 
         //set buffers
-        fSoftCaptureBuffer = new sample_t*[fCaptureChannels];
-        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-        {
-            fSoftCaptureBuffer[port_index] = new sample_t[fParams.fPeriodSize];
-            fNetAudioCaptureBuffer->SetBuffer ( port_index, fSoftCaptureBuffer[port_index] );
+        if (fCaptureChannels > 0) {
+            fSoftCaptureBuffer = new sample_t*[fCaptureChannels];
+            for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
+            {
+                fSoftCaptureBuffer[port_index] = new sample_t[fParams.fPeriodSize];
+                fNetAudioCaptureBuffer->SetBuffer ( port_index, fSoftCaptureBuffer[port_index] );
+            }
         }
-        fSoftPlaybackBuffer = new sample_t*[fPlaybackChannels];
-        for ( port_index = 0; port_index < fCaptureChannels; port_index++ )
-        {
-            fSoftPlaybackBuffer[port_index] = new sample_t[fParams.fPeriodSize];
-            fNetAudioPlaybackBuffer->SetBuffer ( port_index, fSoftPlaybackBuffer[port_index] );
+        
+        if (fPlaybackChannels > 0) {
+            fSoftPlaybackBuffer = new sample_t*[fPlaybackChannels];
+            for ( port_index = 0; port_index < fPlaybackChannels; port_index++ )
+            {
+                fSoftPlaybackBuffer[port_index] = new sample_t[fParams.fPeriodSize];
+                fNetAudioPlaybackBuffer->SetBuffer ( port_index, fSoftPlaybackBuffer[port_index] );
+            }
         }
 
         //set audio adapter parameters
