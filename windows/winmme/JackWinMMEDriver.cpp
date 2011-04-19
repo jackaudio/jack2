@@ -32,6 +32,7 @@ JackWinMMEDriver::JackWinMMEDriver(const char *name, const char *alias,
     fPlaybackChannels = 0;
     input_ports = 0;
     output_ports = 0;
+    period = 0;
 }
 
 JackWinMMEDriver::~JackWinMMEDriver()
@@ -119,7 +120,7 @@ JackWinMMEDriver::Close()
         delete[] output_ports;
         output_ports = 0;
     }
-    if (period != 1000) {
+    if (period) {
         if (timeEndPeriod(period) != TIMERR_NOERROR) {
             jack_error("JackWinMMEDriver::Close - failed to unset timer "
                        "resolution.");
@@ -146,18 +147,25 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
     jack_info("JackWinMMEDriver::Open - num_potential_inputs  %d", num_potential_inputs);
     jack_info("JackWinMMEDriver::Open - num_potential_outputs  %d", num_potential_outputs);
 
-    // Get the best minimum timer resolution possible.
-    for (period = 1; i < 1000; i++) {
-        if (timeBeginPeriod(period) == TIMERR_NOERROR) {
-            jack_info("JackWinMMEDriver::Open - timer resolution set to %d "
-                      "milliseconds.", period);
-            goto open_inputs;
+    period = 0;
+    TIMECAPS caps;
+    if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMEERR_NOERROR) {
+        jack_error("JackWinMMEDriver::Open - could not get timer device "
+                   "capabilities.  Continuing anyway ...");
+    } else {
+        period = caps.wPeriodMin;
+        if (timeBeginPeriod(period) != TIMERR_NOERROR) {
+            jack_error("JackWinMMEDriver::Open - could not set minimum timer "
+                       "resolution.  Continuing anyway ...");
+            period = 0;
+        } else {
+
+            jack_info("JackWinMMEDriver::Open - multimedia timer resolution "
+                      "set to %d milliseconds.", period);
+
         }
     }
-    jack_error("JackWinMMEDriver::Open - could not set any timer resolution.  "
-               "Continuing anyway ...");
 
- open_inputs:
     if (num_potential_inputs) {
         try {
             input_ports = new JackWinMMEInputPort *[num_potential_inputs];
@@ -231,7 +239,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
         input_ports = 0;
     }
  unset_timer_resolution:
-    if (period != 1000) {
+    if (period) {
         if (timeEndPeriod(period) != TIMERR_NOERROR) {
             jack_error("JackWinMMEDriver::Open - failed to unset timer "
                        "resolution.");
