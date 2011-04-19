@@ -393,7 +393,7 @@ namespace Jack
 #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
             int res = celt_encode_float(fCeltEncoder[port_index], floatbuf, fPeriodSize, fCompressedBuffer[port_index], fCompressedSizeByte);
 #else
-	    int res = celt_encode_float(fCeltEncoder[port_index], floatbuf, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
+            int res = celt_encode_float(fCeltEncoder[port_index], floatbuf, NULL, fCompressedBuffer[port_index], fCompressedSizeByte);
 #endif
             if (res != fCompressedSizeByte) {
                 jack_error("celt_encode_float error fCompressedSizeByte = %d  res = %d", fCompressedSizeByte, res);
@@ -409,7 +409,7 @@ namespace Jack
 #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
             int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize );
 #else
-	    int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
+            int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
 #endif
             if (res != CELT_OK) {
                 jack_error("celt_decode_float error res = %d", fCompressedSizeByte, res);
