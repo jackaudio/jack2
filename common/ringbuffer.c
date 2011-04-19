@@ -59,7 +59,7 @@ EXPORT void jack_ringbuffer_reset_size (jack_ringbuffer_t * rb, size_t sz);
 EXPORT size_t jack_ringbuffer_write(jack_ringbuffer_t *rb, const char *src,
                                  size_t cnt);
 void jack_ringbuffer_write_advance(jack_ringbuffer_t *rb, size_t cnt);
-size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);                                                                
+size_t jack_ringbuffer_write_space(const jack_ringbuffer_t *rb);
 
 /* Create a new ringbuffer to hold at least `sz' bytes of data. The
    actual buffer size is rounded up to the next power of two.  */
@@ -69,13 +69,13 @@ jack_ringbuffer_create (size_t sz)
 {
 	int power_of_two;
 	jack_ringbuffer_t *rb;
-	
+
 	if ((rb = (jack_ringbuffer_t *) malloc (sizeof (jack_ringbuffer_t))) == NULL) {
 		return NULL;
 	}
-	
+
 	for (power_of_two = 1; 1 << power_of_two < sz; power_of_two++);
-	
+
 	rb->size = 1 << power_of_two;
 	rb->size_mask = rb->size;
 	rb->size_mask -= 1;
@@ -86,7 +86,7 @@ jack_ringbuffer_create (size_t sz)
 		return NULL;
 	}
 	rb->mlocked = 0;
-	
+
 	return rb;
 }
 
@@ -126,6 +126,7 @@ jack_ringbuffer_reset (jack_ringbuffer_t * rb)
 {
 	rb->read_ptr = 0;
 	rb->write_ptr = 0;
+    memset(rb->buf, 0, rb->size);
 }
 
 /* Reset the read and write pointers to zero. This is not thread
@@ -149,10 +150,10 @@ EXPORT size_t
 jack_ringbuffer_read_space (const jack_ringbuffer_t * rb)
 {
 	size_t w, r;
-	
+
 	w = rb->write_ptr;
 	r = rb->read_ptr;
-	
+
 	if (w > r) {
 		return w - r;
 	} else {
@@ -219,8 +220,8 @@ jack_ringbuffer_read (jack_ringbuffer_t * rb, char *dest, size_t cnt)
 	return to_read;
 }
 
-/* The copying data reader w/o read pointer advance.  Copy at most 
-   `cnt' bytes from `rb' to `dest'.  Returns the actual number of bytes 
+/* The copying data reader w/o read pointer advance.  Copy at most
+   `cnt' bytes from `rb' to `dest'.  Returns the actual number of bytes
    copied. */
 
 EXPORT size_t

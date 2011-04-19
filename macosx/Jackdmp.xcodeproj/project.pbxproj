@@ -9506,6 +9506,7 @@
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Carbon,
 					"-framework",
@@ -9574,6 +9575,7 @@
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Carbon,
 					"-framework",

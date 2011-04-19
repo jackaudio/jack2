@@ -61,6 +61,9 @@ class JackResampler
         virtual unsigned int Read(jack_default_audio_sample_t* buffer, unsigned int frames);
         virtual unsigned int Write(jack_default_audio_sample_t* buffer, unsigned int frames);
 
+        virtual unsigned int Read(void* buffer, unsigned int bytes);
+        virtual unsigned int Write(void* buffer, unsigned int bytes);
+
         virtual unsigned int ReadSpace();
         virtual unsigned int WriteSpace();
 

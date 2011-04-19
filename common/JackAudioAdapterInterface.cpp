@@ -17,9 +17,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 #include "JackAudioAdapter.h"
+#ifndef MY_TARGET_OS_IPHONE
 #include "JackLibSampleRateResampler.h"
-#include "JackTime.h"  
+#endif
+#include "JackTime.h"
 #include <stdio.h>
 
 namespace Jack
@@ -66,11 +72,11 @@ namespace Jack
         fprintf(file, buffer);
         sprintf(buffer, "\"JackAudioAdapter.log\" using 3 title \"Ringbuffer error with timing correction\" with lines");
         fprintf(file, buffer);
-        
-        fprintf(file, "\n unset multiplot\n");  
+
+        fprintf(file, "\n unset multiplot\n");
         fprintf(file, "set output 'AdapterTiming1.svg\n");
         fprintf(file, "set terminal svg\n");
-        
+
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
@@ -84,9 +90,9 @@ namespace Jack
         fprintf(file, buffer);
         fprintf(file, "unset multiplot\n");
         fprintf(file, "unset output\n");
-        
+
         fclose(file);
-   
+
         // Adapter timing 2
         file = fopen("AdapterTiming2.plot", "w");
         fprintf(file, "set multiplot\n");
@@ -100,11 +106,11 @@ namespace Jack
         fprintf(file, buffer);
         sprintf(buffer, "\"JackAudioAdapter.log\" using 5 title \"Ratio 2\" with lines");
         fprintf(file, buffer);
-        
-        fprintf(file, "\n unset multiplot\n");  
+
+        fprintf(file, "\n unset multiplot\n");
         fprintf(file, "set output 'AdapterTiming2.svg\n");
         fprintf(file, "set terminal svg\n");
-        
+
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
@@ -118,7 +124,7 @@ namespace Jack
         fprintf(file, buffer);
         fprintf(file, "unset multiplot\n");
         fprintf(file, "unset output\n");
-        
+
         fclose(file);
 
         // Adapter timing 3
@@ -134,11 +140,11 @@ namespace Jack
         fprintf(file, buffer);
         sprintf(buffer, "\"JackAudioAdapter.log\" using 7 title \"Frames position in producer ringbuffer\" with lines");
         fprintf(file, buffer);
-        
-        fprintf(file, "\n unset multiplot\n");  
+
+        fprintf(file, "\n unset multiplot\n");
         fprintf(file, "set output 'AdapterTiming3.svg\n");
         fprintf(file, "set terminal svg\n");
-        
+
         fprintf(file, "set multiplot\n");
         fprintf(file, "set grid\n");
         fprintf(file, "set title \"Audio adapter timing: host [rate = %.1f kHz buffer = %d frames] adapter [rate = %.1f kHz buffer = %d frames] \"\n"
@@ -152,7 +158,7 @@ namespace Jack
         fprintf(file, buffer);
         fprintf(file, "unset multiplot\n");
         fprintf(file, "unset output\n");
-        
+
         fclose(file);
     }
 
@@ -162,47 +168,51 @@ namespace Jack
     {
         fRingbufferCurSize *= 2;
     }
-    
+
     void JackAudioAdapterInterface::AdaptRingBufferSize()
     {
         if (fHostBufferSize > fAdaptedBufferSize)
             fRingbufferCurSize = 4 * fHostBufferSize;
-        else 
+        else
             fRingbufferCurSize = 4 * fAdaptedBufferSize;
     }
-        
+
     void JackAudioAdapterInterface::ResetRingBuffers()
     {
-        if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+        if (fRingbufferCurSize > DEFAULT_RB_SIZE)
             fRingbufferCurSize = DEFAULT_RB_SIZE;
-        
+
         for (int i = 0; i < fCaptureChannels; i++)
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
         for (int i = 0; i < fPlaybackChannels; i++)
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
     }
-    
+
     void JackAudioAdapterInterface::Reset()
     {
         ResetRingBuffers();
         fRunning = false;
     }
 
+#ifdef MY_TARGET_OS_IPHONE
+    void JackAudioAdapterInterface::Create()
+    {}
+#else
     void JackAudioAdapterInterface::Create()
     {
         //ringbuffers
         fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
         fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
-        
+
         if (fAdaptative) {
             AdaptRingBufferSize();
             jack_info("Ringbuffer automatic adaptative mode size = %d frames", fRingbufferCurSize);
         } else {
-            if (fRingbufferCurSize > DEFAULT_RB_SIZE) 
+            if (fRingbufferCurSize > DEFAULT_RB_SIZE)
                 fRingbufferCurSize = DEFAULT_RB_SIZE;
             jack_info("Fixed ringbuffer size = %d frames", fRingbufferCurSize);
         }
-        
+
         for (int i = 0; i < fCaptureChannels; i++ ) {
             fCaptureRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
             fCaptureRingBuffer[i]->Reset(fRingbufferCurSize);
@@ -211,12 +221,13 @@ namespace Jack
             fPlaybackRingBuffer[i] = new JackLibSampleRateResampler(fQuality);
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
         }
-     
+
         if (fCaptureChannels > 0)
             jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
         if (fPlaybackChannels > 0)
             jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace());
     }
+#endif
 
     void JackAudioAdapterInterface::Destroy()
     {
@@ -228,39 +239,45 @@ namespace Jack
         delete[] fCaptureRingBuffer;
         delete[] fPlaybackRingBuffer;
     }
-    
+
     int JackAudioAdapterInterface::PushAndPull(float** inputBuffer, float** outputBuffer, unsigned int frames)
     {
         bool failure = false;
         fRunning = true;
-   
+
         // Finer estimation of the position in the ringbuffer
         int delta_frames = (fPullAndPushTime > 0) ? (int)((float(long(GetMicroSeconds() - fPullAndPushTime)) * float(fAdaptedSampleRate)) / 1000000.f) : 0;
-        
+
         double ratio = 1;
-        
+
         // TODO : done like this just to avoid crash when input only or output only...
         if (fCaptureChannels > 0)
             ratio = fPIControler.GetRatio(fCaptureRingBuffer[0]->GetError() - delta_frames);
         else if (fPlaybackChannels > 0)
             ratio = fPIControler.GetRatio(fPlaybackRingBuffer[0]->GetError() - delta_frames);
-        
+
     #ifdef JACK_MONITOR
-        if (fCaptureRingBuffer[0] != NULL)
+        if (fCaptureRingBuffer && fCaptureRingBuffer[0] != NULL)
             fTable.Write(fCaptureRingBuffer[0]->GetError(), fCaptureRingBuffer[0]->GetError() - delta_frames, ratio, 1/ratio, fCaptureRingBuffer[0]->ReadSpace(), fCaptureRingBuffer[0]->ReadSpace());
     #endif
-    
+
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
             fCaptureRingBuffer[i]->SetRatio(ratio);
-            if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], frames) < frames)
-                failure = true;
+            if (inputBuffer[i]) {
+                if (fCaptureRingBuffer[i]->WriteResample(inputBuffer[i], frames) < frames) {
+                    failure = true;
+                }
+            }
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
             fPlaybackRingBuffer[i]->SetRatio(1/ratio);
-            if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames)
-                 failure = true;
+            if (outputBuffer[i]) {
+                if (fPlaybackRingBuffer[i]->ReadResample(outputBuffer[i], frames) < frames) {
+                     failure = true;
+                }
+            }
         }
         // Reset all ringbuffers in case of failure
         if (failure) {
@@ -276,26 +293,32 @@ namespace Jack
         }
     }
 
-    int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames) 
+    int JackAudioAdapterInterface::PullAndPush(float** inputBuffer, float** outputBuffer, unsigned int frames)
     {
         fPullAndPushTime = GetMicroSeconds();
         if (!fRunning)
             return 0;
 
         int res = 0;
-    
+
         // Push/pull from ringbuffer
         for (int i = 0; i < fCaptureChannels; i++) {
-            if (fCaptureRingBuffer[i]->Read(inputBuffer[i], frames) < frames)
-                res = -1;
+            if (inputBuffer[i]) {
+                if (fCaptureRingBuffer[i]->Read(inputBuffer[i], frames) < frames) {
+                    res = -1;
+                }
+            }
         }
 
         for (int i = 0; i < fPlaybackChannels; i++) {
-            if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], frames) < frames)
-                res = -1;
+            if (outputBuffer[i]) {
+                if (fPlaybackRingBuffer[i]->Write(outputBuffer[i], frames) < frames) {
+                    res = -1;
+                }
+            }
         }
-        
+
         return res;
     }
- 
+
 } // namespace

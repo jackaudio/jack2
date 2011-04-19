@@ -34,10 +34,11 @@ namespace Jack
 
         protected:
 
+            void Initialize();
+
             session_params_t fParams;
             JackNetSocket fSocket;
             char fMulticastIP[32];
-            uint fNSubProcess;
 
             //headers
             packet_header_t fTxHeader;
@@ -59,19 +60,12 @@ namespace Jack
             NetAudioBuffer* fNetAudioCaptureBuffer;
             NetAudioBuffer* fNetAudioPlaybackBuffer;
 
-            //sizes
-            int fAudioRxLen;
-            int fAudioTxLen;
-            int fPayloadSize;
-
             //utility methods
-            void SetFramesPerPacket();
             int SetNetBufferSize();
-            int GetNMidiPckt();
-            bool IsNextPacket();
+            void FreeNetworkBuffers();
 
             //virtual methods : depends on the sub class master/slave
-            virtual void SetParams();
+            virtual bool SetParams();
             virtual bool Init() = 0;
 
             //transport
@@ -111,10 +105,11 @@ namespace Jack
 
             bool fRunning;
             int fCycleOffset;
+            int fLastfCycleOffset;
 
             bool Init();
             int SetRxTimeout();
-            void SetParams();
+            bool SetParams();
 
             void Exit();
 
@@ -134,8 +129,7 @@ namespace Jack
             bool IsSynched();
 
         public:
-
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0)
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fLastfCycleOffset(0)
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
                     : JackNetInterface ( params, socket, multicast_ip )
@@ -156,13 +150,13 @@ namespace Jack
             static uint fSlaveCounter;
 
             bool Init();
-            bool InitConnection();
+            bool InitConnection(int time_out);
             bool InitRendering();
 
-            net_status_t SendAvailableToMaster();
+            net_status_t SendAvailableToMaster(long count = LONG_MAX);  // long here (and not int...)
             net_status_t SendStartToMaster();
 
-            void SetParams();
+            bool SetParams();
 
             int SyncRecv();
             int SyncSend();
@@ -221,8 +215,11 @@ namespace Jack
 #define SLAVE_SETUP_RETRY 5
 
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
-#define SLAVE_INIT_TIMEOUT 2000000      // in usec
+#define SLAVE_INIT_TIMEOUT 1000000      // in usec
 
-#define MAX_LATENCY 6
+#define CYCLE_OFFSET_FAST   0
+#define CYCLE_OFFSET_NORMAL 1
+#define CYCLE_OFFSET_SLOW   30
+#define MAX_LATENCY CYCLE_OFFSET_SLOW * 4
 
 #endif

@@ -70,6 +70,7 @@ class SERVER_EXPORT JackWaitThreadedDriver : public JackThreadedDriver
                     } else {
                         jack_error("Initing net driver fails...");
                     }
+
                     return false;
                 }
 
