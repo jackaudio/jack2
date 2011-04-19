@@ -674,7 +674,7 @@ namespace Jack
 
         //check MASTER <<==> SLAVE network protocol coherency
         if (params.fProtocolVersion != MASTER_PROTOCOL) {
-            jack_error ( "Error : slave is running with a different protocol %s", params.fName );
+            jack_error ( "Error : slave %s is running with a different protocol %d != %d", params.fName,  params.fProtocolVersion, MASTER_PROTOCOL);
             return NULL;
         }
 
