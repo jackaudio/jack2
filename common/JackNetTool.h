@@ -417,21 +417,23 @@ namespace Jack
         //network<->buffer
         int RenderFromNetwork(char* net_buffer, int cycle,  int subcycle, size_t copy_size)
         {
-             for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
                 float* src = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
                 float* dst = (float*)(fPortBuffer[port_index] + subcycle * fSubPeriodSize);
                 for (unsigned int sample = 0; sample < fSubPeriodBytesSize / sizeof(float); sample++) {
                     dst[sample] = SwapFloat(src[sample]);
                 }
             }
-
+            if (subcycle != fLastSubCycle + 1) {
+                jack_error("Packet(s) missing from... %d %d", fLastSubCycle, subcycle);
+            }
+            fLastSubCycle = subcycle;
             return copy_size;
         }
 
         int RenderToNetwork(char* net_buffer, int subcycle, size_t total_size)
         {
-
-             for ( int port_index = 0; port_index < fNPorts; port_index++ ) {
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
                 float* src = (float*)(fPortBuffer[port_index] + subcycle * fSubPeriodSize);
                 float* dst = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
                 for (unsigned int sample = 0; sample < fSubPeriodBytesSize / sizeof(float); sample++) {
@@ -444,12 +446,12 @@ namespace Jack
 
     #else
 
-        int RenderFromJackPorts ()
+        int RenderFromJackPorts()
         {
             return fNPorts * fSubPeriodBytesSize;  // in bytes
         }
 
-        int RenderToJackPorts ()
+        int RenderToJackPorts()
         {
             fLastSubCycle = -1;
             return fPeriodSize * sizeof(sample_t);  // in bytes; TODO
