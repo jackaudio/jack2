@@ -50,7 +50,8 @@ JackWinMMEDriver::Attach()
     const char *name;
     JackPort *port;
     latency_range.max = latency +
-        ((jack_nframes_t) std::ceil((period / 1000.0) * sample_rate));
+        ((jack_nframes_t) std::ceil((period / 1000.0) *
+                                    fEngineControl->fSampleRate));
     latency_range.min = latency;
 
     jack_info("JackWinMMEDriver::Attach - fCaptureChannels  %d", fCaptureChannels);
