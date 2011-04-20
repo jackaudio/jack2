@@ -37,6 +37,9 @@ namespace Jack {
                            DWORD_PTR param1, DWORD_PTR param2);
 
         void
+        GetOutErrorString(MMRESULT error, LPTSTR text);
+
+        void
         HandleMessage(UINT message, DWORD_PTR param1, DWORD_PTR param2);
 
         bool
@@ -45,19 +48,17 @@ namespace Jack {
         bool
         Wait(HANDLE semaphore);
 
+        void
+        WriteOutError(const char *jack_func, const char *mm_func,
+                                   MMRESULT result);
+
         HMIDIOUT handle;
         JackMidiBufferReadQueue *read_queue;
         HANDLE sysex_semaphore;
         JackThread *thread;
         JackMidiAsyncQueue *thread_queue;
         HANDLE thread_queue_semaphore;
-
-        void
-        GetOutErrorString(MMRESULT error, LPTSTR text);
-
-        void
-        WriteOutError(const char *jack_func, const char *mm_func,
-                                   MMRESULT result);
+        HANDLE timer;
 
     public:
 

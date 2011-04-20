@@ -33,6 +33,7 @@ namespace Jack {
 
         JackWinMMEInputPort **input_ports;
         JackWinMMEOutputPort **output_ports;
+        UINT period;
 
     public:
 

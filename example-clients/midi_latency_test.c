@@ -85,6 +85,8 @@ const char *SOURCE_SIGNAL_SEMAPHORE = "signal_semaphore";
 const char *SOURCE_WAIT_SEMAPHORE = "wait_semaphore";
 
 jack_client_t *client;
+semaphore_t connect_semaphore;
+volatile int connections_established;
 const char *error_message;
 const char *error_source;
 jack_nframes_t highest_latency;
@@ -111,6 +113,8 @@ char *program_name;
 jack_port_t *remote_in_port;
 jack_port_t *remote_out_port;
 size_t samples;
+const char *target_in_port_name;
+const char *target_out_port_name;
 int timeout;
 jack_nframes_t total_latency;
 jack_time_t total_latency_time;
@@ -132,6 +136,11 @@ set_process_error(const char *source, const char *message);
 
 static int
 signal_semaphore(semaphore_t semaphore);
+
+static jack_port_t *
+update_connection(jack_port_t *remote_port, int connected,
+                  jack_port_t *local_port, jack_port_t *current_port,
+                  const char *target_name);
 
 static int
 wait_semaphore(semaphore_t semaphore, int block);
@@ -215,6 +224,53 @@ static void
 handle_info(const char *message)
 {
     /* Suppress info */
+}
+
+static void
+handle_port_connection_change(jack_port_id_t port_id_1,
+                              jack_port_id_t port_id_2, int connected,
+                              void *arg)
+{
+    jack_port_t *port_1;
+    jack_port_t *port_2;
+    if ((remote_in_port != NULL) && (remote_out_port != NULL)) {
+        return;
+    }
+    port_1 = jack_port_by_id(client, port_id_1);
+    port_2 = jack_port_by_id(client, port_id_2);
+
+    /* The 'update_connection' call is not RT-safe.  It calls
+       'jack_port_get_connections' and 'jack_free'.  This might be a problem
+       with JACK 1, as this callback runs in the process thread in JACK 1. */
+
+    if (port_1 == in_port) {
+        remote_in_port = update_connection(port_2, connected, in_port,
+                                           remote_in_port,
+                                           target_in_port_name);
+    } else if (port_2 == in_port) {
+        remote_in_port = update_connection(port_1, connected, in_port,
+                                           remote_in_port,
+                                           target_in_port_name);
+    } else if (port_1 == out_port) {
+        remote_out_port = update_connection(port_2, connected, out_port,
+                                            remote_out_port,
+                                            target_out_port_name);
+    } else if (port_2 == out_port) {
+        remote_out_port = update_connection(port_1, connected, out_port,
+                                            remote_out_port,
+                                            target_out_port_name);
+    }
+    if ((remote_in_port != NULL) && (remote_out_port != NULL)) {
+        connections_established = 1;
+        if (! signal_semaphore(connect_semaphore)) {
+            /* Sigh ... */
+            die("post_semaphore", get_semaphore_error());
+        }
+        if (! signal_semaphore(init_semaphore)) {
+            /* Sigh ... */
+            die("post_semaphore", get_semaphore_error());
+        }
+    }
 }
 
 static int
@@ -342,6 +398,10 @@ static void
 handle_signal(int sig)
 {
     process_state = -2;
+    if (! signal_semaphore(connect_semaphore)) {
+        /* Sigh ... */
+        die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
+    }
     if (! signal_semaphore(process_semaphore)) {
         /* Sigh ... */
         die(SOURCE_SIGNAL_SEMAPHORE, get_semaphore_error());
@@ -364,12 +424,14 @@ output_error(const char *source, const char *message)
 static void
 output_usage(void)
 {
-    fprintf(stderr, "Usage: %s [options] out-port-name in-port-name\n\n"
+    fprintf(stderr, "Usage: %s [options] [out-port-name in-port-name]\n\n"
             "\t-h, --help              print program usage\n"
-            "\t-m, --message-size=size set size of MIDI messages to send\n"
-            "\t-s, --samples=n         number of MIDI messages to send\n"
-            "\t-t, --timeout=seconds   wait time before giving up on message\n"
-            "\n", program_name);
+            "\t-m, --message-size=size set size of MIDI messages to send "
+            "(default: 3)\n"
+            "\t-s, --samples=n         number of MIDI messages to send "
+            "(default: 1024)\n"
+            "\t-t, --timeout=seconds   message timeout (default: 5)\n\n",
+            program_name);
 }
 
 static unsigned long
@@ -445,6 +507,46 @@ signal_semaphore(semaphore_t semaphore)
 
 }
 
+static jack_port_t *
+update_connection(jack_port_t *remote_port, int connected,
+                  jack_port_t *local_port, jack_port_t *current_port,
+                  const char *target_name)
+{
+    if (connected) {
+        if (current_port) {
+            return current_port;
+        }
+        if (target_name) {
+            if (strcmp(target_name, jack_port_name(remote_port))) {
+                return NULL;
+            }
+        }
+        return remote_port;
+    }
+    if (! strcmp(jack_port_name(remote_port), jack_port_name(current_port))) {
+        const char **port_names;
+        if (target_name) {
+            return NULL;
+        }
+        port_names = jack_port_get_connections(local_port);
+        if (port_names == NULL) {
+            return NULL;
+        }
+
+        /* If a connected port is disconnected and other ports are still
+           connected, then we take the first port name in the array and use it
+           as our remote port.  It's a dumb implementation. */
+        current_port = jack_port_by_name(client, port_names[0]);
+
+        jack_free(port_names);
+        if (current_port == NULL) {
+            /* Sigh */
+            die("jack_port_by_name", "failed to get port by name");
+        }
+    }
+    return current_port;
+}
+
 static int
 wait_semaphore(semaphore_t semaphore, int block)
 {
@@ -494,11 +596,15 @@ main(int argc, char **argv)
         {"samples", 1, NULL, 's'},
         {"timeout", 1, NULL, 't'}
     };
+    size_t name_arg_count;
     char *option_string = "hm:s:t:";
     int show_usage = 0;
+    connections_established = 0;
     error_message = NULL;
     message_size = 3;
     program_name = argv[0];
+    remote_in_port = 0;
+    remote_out_port = 0;
     samples = 1024;
     timeout = 5;
 
@@ -536,7 +642,17 @@ main(int argc, char **argv)
         }
     }
  parse_port_names:
-    if ((argc - optind) != 2) {
+    name_arg_count = argc - optind;
+    switch (name_arg_count) {
+    case 2:
+        target_in_port_name = argv[optind + 1];
+        target_out_port_name = argv[optind];
+        break;
+    case 0:
+        target_in_port_name = 0;
+        target_out_port_name = 0;
+        break;
+    default:
         output_usage();
         return EXIT_FAILURE;
     }
@@ -599,18 +715,6 @@ main(int argc, char **argv)
         error_source = "jack_client_open";
         goto free_message_2;
     }
-    remote_in_port = jack_port_by_name(client, argv[optind + 1]);
-    if (remote_in_port == NULL) {
-        error_message = "invalid port name";
-        error_source = argv[optind + 1];
-        goto close_client;
-    }
-    remote_out_port = jack_port_by_name(client, argv[optind]);
-    if (remote_out_port == NULL) {
-        error_message = "invalid port name";
-        error_source = argv[optind];
-        goto close_client;
-    }
     in_port = jack_port_register(client, "in", JACK_DEFAULT_MIDI_TYPE,
                                  JackPortIsInput, 0);
     if (in_port == NULL) {
@@ -635,16 +739,29 @@ main(int argc, char **argv)
         error_source = "jack_set_xrun_callback";
         goto unregister_out_port;
     }
+    if (jack_set_port_connect_callback(client, handle_port_connection_change,
+                                       NULL)) {
+        error_message = "failed to set port connection callback";
+        error_source = "jack_set_port_connect_callback";
+        goto unregister_out_port;
+    }
     jack_on_shutdown(client, handle_shutdown, NULL);
     jack_set_info_function(handle_info);
     process_state = 0;
-    init_semaphore = create_semaphore(0);
-    if (init_semaphore == NULL) {
+
+    connect_semaphore = create_semaphore(0);
+    if (connect_semaphore == NULL) {
         error_message = get_semaphore_error();
         error_source = "create_semaphore";
         goto unregister_out_port;
     }
-    process_semaphore = create_semaphore(1);
+    init_semaphore = create_semaphore(1);
+    if (init_semaphore == NULL) {
+        error_message = get_semaphore_error();
+        error_source = "create_semaphore";
+        goto destroy_connect_semaphore;;
+    }
+    process_semaphore = create_semaphore(2);
     if (process_semaphore == NULL) {
         error_message = get_semaphore_error();
         error_source = "create_semaphore";
@@ -655,32 +772,38 @@ main(int argc, char **argv)
         error_source = "jack_activate";
         goto destroy_process_semaphore;
     }
-    if (jack_connect(client, jack_port_name(out_port),
-                     jack_port_name(remote_out_port))) {
-        error_message = "could not connect MIDI out port";
-        error_source = "jack_connect";
-        goto deactivate_client;
-    }
-    if (jack_connect(client, jack_port_name(remote_in_port),
-                     jack_port_name(in_port))) {
-        error_message = "could not connect MIDI in port";
-        error_source = "jack_connect";
-        goto deactivate_client;
-    }
-    if (! signal_semaphore(init_semaphore)) {
-        error_message = get_semaphore_error();
-        error_source = "post_semaphore";
-        goto deactivate_client;
+    if (name_arg_count) {
+        if (jack_connect(client, jack_port_name(out_port),
+                         target_out_port_name)) {
+            error_message = "could not connect MIDI out port";
+            error_source = "jack_connect";
+            goto deactivate_client;
+        }
+        if (jack_connect(client, target_in_port_name,
+                         jack_port_name(in_port))) {
+            error_message = "could not connect MIDI in port";
+            error_source = "jack_connect";
+            goto deactivate_client;
+        }
     }
     if (! register_signal_handler(handle_signal)) {
         error_message = strerror(errno);
         error_source = "register_signal_handler";
         goto deactivate_client;
     }
-    if (wait_semaphore(process_semaphore, 1) == -1) {
+    printf("Waiting for connections ...\n");
+    if (wait_semaphore(connect_semaphore, 1) == -1) {
         error_message = get_semaphore_error();
         error_source = "wait_semaphore";
         goto deactivate_client;
+    }
+    if (connections_established) {
+        printf("Waiting for test completion ...\n\n");
+        if (wait_semaphore(process_semaphore, 1) == -1) {
+            error_message = get_semaphore_error();
+            error_source = "wait_semaphore";
+            goto deactivate_client;
+        }
     }
     if (! register_signal_handler(SIG_DFL)) {
         error_message = strerror(errno);
@@ -766,24 +889,20 @@ main(int argc, char **argv)
     }
  deactivate_client:
     jack_deactivate(client);
-
-    /* Output this information after deactivation to prevent two threads
-       from accessing data at the same time. */
-    if (process_state != 2) {
-        printf("\nMessages sent: %d\nMessages received: %d\n", messages_sent,
-               messages_received);
-    }
+    printf("\nMessages sent: %d\nMessages received: %d\n", messages_sent,
+           messages_received);
     if (unexpected_messages) {
         printf("Unexpected messages received: %d\n", unexpected_messages);
     }
     if (xrun_count) {
         printf("Xruns: %d\n", xrun_count);
     }
-
  destroy_process_semaphore:
-    destroy_semaphore(process_semaphore, 1);
+    destroy_semaphore(process_semaphore, 2);
  destroy_init_semaphore:
-    destroy_semaphore(init_semaphore, 0);
+    destroy_semaphore(init_semaphore, 1);
+ destroy_connect_semaphore:
+    destroy_semaphore(connect_semaphore, 0);
  unregister_out_port:
     jack_port_unregister(client, out_port);
  unregister_in_port:
