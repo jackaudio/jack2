@@ -32,7 +32,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "netjack_packet.h"
 
 #if HAVE_SAMPLERATE
-#include "samplerate.h"
+#include <samplerate.h>
 #endif
 
 #if HAVE_CELT

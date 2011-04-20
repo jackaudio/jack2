@@ -215,13 +215,13 @@ better performance but does not permit JACK MIDI communication with
 software written to use the ALSA "sequencer" API.
 .SS COREAUDIO BACKEND PARAMETERS
 .TP
-\fB\-c \-\-channel\fR
+\fB\-c \-\-channels\fR
 Maximum number of channels (default: 2)
 .TP
-\fB\-i \-\-channelin\fR
+\fB\-i \-\-inchannels\fR
 Maximum number of input channels (default: 2)
 .TP
-\fB\-o \-\-channelout\fR
+\fB\-o \-\-outchannels\fR
 Maximum number of output channels (default: 2)
 .TP
 \fB\-C \-\-capture\fR
@@ -229,6 +229,9 @@ Whether or not to capture (default: true)
 .TP
 \fB\-P \-\-playback\fR
 Whether or not to playback (default: true)
+.TP
+\fB\-D \-\-monitor\fR
+Provide monitor ports for the output (default: false)
 .TP
 \fB\-D \-\-duplex\fR
 Capture and playback (default: true)
@@ -239,11 +242,29 @@ Sample rate (default: 44100)
 \fB\-p \-\-period\fR
 Frames per period (default: 128). Must be a power of 2.
 .TP
-\fB\-n \-\-name\fR
-Driver name (default: none)
+\fB\-d \-\-device\fR
+CoreAudio device name (default: none)
 .TP
-\fB\-I \-\-id\fR
-Audio Device ID (default: 0)
+\fB\-I \-\-input\-latency\fR
+Extra input latency (frames) (default: 0)
+.TP
+\fB\-O \-\-output\-latency\fR
+Extra output latency (frames) (default: 0)
+.TP
+\fB\-l \-\-list\-devices \fR
+Display available CoreAudio devices (default: false)
+.TP
+\fB\-H \-\-hog \fR
+Take exclusive access of the audio device (default: false)
+.TP
+\fB\-L \-\-async\-latency  \fR
+Extra output latency in asynchronous mode (percent) (default: 100)
+.TP
+\fB\-G \-\-grain  \fR
+Computation grain in RT thread (percent) (default: 100)
+.TP
+\fB\-s \-\-clock\-drift  \fR
+Whether to compensate clock drift in dynamically created aggregate device (default: false)
 .SS DUMMY BACKEND PARAMETERS
 .TP
 \fB\-C, \-\-capture \fIint\fR
@@ -267,7 +288,7 @@ Specify number of usecs to wait between engine processes.
 The default value is 21333.
 
 
-.SS NET BACKEND PARAMETERS
+.SS NETONE BACKEND PARAMETERS
 
 .TP
  \fB\-i, \-\-audio\-ins \fIint\fR

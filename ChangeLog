@@ -27,11 +27,16 @@ Mario Lang
 Arnold Krille
 Jan Engelhardt
 Adrian Knoth
+David Garcia Garzon
 Valerio Pilo
 
 ---------------------------
   Jackdmp changes log
 ---------------------------
+
+2011-04-20 Stephane Letz  <letz@grame.fr>
+
+	* Add XRun detection in PortAudio driver.
 
 2011-04-18 Stephane Letz  <letz@grame.fr>
 
@@ -106,7 +111,7 @@ Valerio Pilo
 
 	* jack_client_has_session_callback implementation.
 	* Fix jdelay for new latency API.
-	* Check requested buffer size and limit to 1..8192 - avoids wierd behaviour caused by jack_bufsize foobar.
+	* Check requested buffer size and limit to 1..8192 - avoids weird behaviour caused by jack_bufsize foobar.
 	* jack_port_type_get_buffer_size implementation.
 	* Stop using alloca and allocate buffer on the heap for alsa_io.
 	* Rename jdelay to jack_iodelay as per Fons' request.

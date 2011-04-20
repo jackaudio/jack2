@@ -520,8 +520,6 @@ namespace Jack
     {
         int rx_bytes = 0;
         uint recvd_midi_pckt = 0;
-        uint recvd_audio_pckt = 0;
-
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
         while ( !fRxHeader.fIsLastPckt )
@@ -911,8 +909,6 @@ namespace Jack
     {
         int rx_bytes = 0;
         uint recvd_midi_pckt = 0;
-        uint recvd_audio_pckt = 0;
-
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*> ( fRxBuffer );
 
         while ( !fRxHeader.fIsLastPckt )

@@ -40,6 +40,25 @@ namespace Jack
         JackPortAudioDriver* driver = (JackPortAudioDriver*)userData;
         driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
         driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
+
+        if (statusFlags) {
+            if (statusFlags & paOutputUnderflow)
+                jack_error("JackPortAudioDriver::Render paOutputUnderflow");
+            if (statusFlags & paInputUnderflow)
+                jack_error("JackPortAudioDriver::Render paInputUnderflow");
+            if (statusFlags & paOutputOverflow)
+                jack_error("JackPortAudioDriver::Render paOutputOverflow");
+            if (statusFlags & paInputOverflow)
+                jack_error("JackPortAudioDriver::Render paInputOverflow");
+            if (statusFlags & paPrimingOutput)
+                jack_error("JackPortAudioDriver::Render paOutputUnderflow");
+
+            if (statusFlags != paPrimingOutput) {
+                jack_time_t cur_time = GetMicroSeconds();
+                driver->NotifyXRun(cur_time, float(cur_time - driver->fBeginDateUst));   // Better this value than nothing...
+            }
+        }
+
         // Setup threadded based log function
         set_threaded_log_function();
         driver->CycleTakeBeginTime();

@@ -65,7 +65,7 @@ def build(bld):
         ]
 
     includes = ['.', './jack', '..']
-    uselib = ["PTHREAD"]
+    uselib = ["PTHREAD", "CELT"]
 
     if bld.env['IS_LINUX']:
         common_libsources += [
@@ -130,10 +130,6 @@ def build(bld):
         'JackNetTool.cpp',
         'JackNetInterface.cpp',
         'JackArgParser.cpp',
-
-        #'JackPhysicalMidiInput.cpp',
-        #'JackPhysicalMidiOutput.cpp',
-
         'JackMidiAsyncQueue.cpp',
         'JackMidiAsyncWaitQueue.cpp',
         'JackMidiBufferReadQueue.cpp',
@@ -192,7 +188,7 @@ def build(bld):
     netlib.includes = includes
     netlib.name         = 'netlib'
     netlib.target       = 'jacknet'
-    netlib.uselib = 'SAMPLERATE'
+    netlib.uselib = ['SAMPLERATE', 'CELT']
     netlib.install_path = '${LIBDIR}'
     netlib.source = ['JackNetAPI.cpp', 
 		'JackNetInterface.cpp', 
