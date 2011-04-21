@@ -68,14 +68,14 @@ namespace Jack
 
         public:
 
-            JackNetDriver ( const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-                            const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
-                            char* net_name, uint transport_sync, char network_master_mode );
+            JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
+                        const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
+                        char* net_name, uint transport_sync, char network_master_mode, int celt_encoding);
             ~JackNetDriver();
 
-            int Open ( jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
-                       int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
-                       const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency );
+            int Open(jack_nframes_t frames_per_cycle, jack_nframes_t rate, bool capturing, bool playing,
+                    int inchannels, int outchannels, bool monitor, const char* capture_driver_name,
+                    const char* playback_driver_name, jack_nframes_t capture_latency, jack_nframes_t playback_latency);
             int Close();
 
             int Attach();
