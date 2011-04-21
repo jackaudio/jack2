@@ -265,6 +265,8 @@ namespace Jack
                 }
             }
 
+            assert(fNetAudioCaptureBuffer);
+
             if (fParams.fReturnAudioChannels) {
 
                 switch (fParams.fSampleEncoder) {
@@ -284,6 +286,8 @@ namespace Jack
                         break;
                 }
             }
+
+             assert(fNetAudioPlaybackBuffer);
 
         } catch (exception&) {
             jack_error("NetAudioBuffer allocation error...");
@@ -788,40 +792,44 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
                         break;
 
                     case JackIntEncoder:
-                        fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+                        fNetAudioCaptureBuffer = new NetIntAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
                         break;
 
                     case JackCeltEncoder:
                     #ifdef CELT
-                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData, fParams.fKBps );
+                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData, fParams.fKBps);
                     #endif
                         break;
                 }
             }
+
+            assert(fNetAudioCaptureBuffer);
 
             if (fParams.fReturnAudioChannels) {
 
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
                         break;
 
                     case JackIntEncoder:
-                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData);
+                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
                         break;
 
                     case JackCeltEncoder:
                     #ifdef CELT
-                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData, fParams.fKBps );
+                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData, fParams.fKBps);
                     #endif
                         break;
                 }
             }
+
+            assert(fNetAudioPlaybackBuffer);
 
         } catch (exception&) {
             jack_error("NetAudioBuffer allocation error...");
