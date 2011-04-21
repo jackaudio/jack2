@@ -663,6 +663,7 @@ namespace Jack
             strcpy(desc->params[i].short_desc, "Number of midi output ports");
             strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
 
+#if HAVE_CELT
             i++;
             strcpy(desc->params[i].name, "celt");
             desc->params[i].character = 'c';
@@ -670,7 +671,7 @@ namespace Jack
             desc->params[i].value.i = -1;
             strcpy(desc->params[i].short_desc, "Set CELT encoding and number of kBits per channel");
             strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
+#endif
             i++;
             strcpy(desc->params[i].name, "client_name");
             desc->params[i].character = 'n';
@@ -745,9 +746,11 @@ namespace Jack
                     case 'o':
                         midi_output_ports = param->value.i;
                         break;
+                    #if HAVE_CELT
                     case 'c':
                         celt_encoding = param->value.i;
                         break;
+                    #endif
                     case 'n' :
                         strncpy(net_name, param->value.str, JACK_CLIENT_NAME_SIZE);
                         break;
