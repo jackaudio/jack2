@@ -24,6 +24,7 @@
 		<Project filename="jack_midi_latency_test.cbp" />
 		<Project filename="jack_netadapter.cbp" />
 		<Project filename="jack_netsource.cbp" />
-		<Project filename="libjacknet.cbp" active="1" />
+		<Project filename="libjacknet.cbp" />
+		<Project filename="jack_midi_dump.cbp" active="1" />
 	</Workspace>
 </CodeBlocks_workspace_file>

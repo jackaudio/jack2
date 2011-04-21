@@ -153,7 +153,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
 
     period = 0;
     TIMECAPS caps;
-    if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMEERR_NOERROR) {
+    if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMERR_NOERROR) {
         jack_error("JackWinMMEDriver::Open - could not get timer device "
                    "capabilities.  Continuing anyway ...");
     } else {
