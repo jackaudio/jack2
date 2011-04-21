@@ -66,7 +66,7 @@ JackWinMMEInputPort::JackWinMMEInputPort(const char *alias_name,
     }
     sysex_header.dwBufferLength = max_bytes;
     sysex_header.dwFlags = 0;
-    sysex_header.lpData = (LPSTR)(((LPBYTE) &sysex_header) + sizeof(MIDIHDR));
+    sysex_header.lpData = (LPSTR)sysex_buffer;
     result = midiInPrepareHeader(handle, &sysex_header, sizeof(MIDIHDR));
     if (result != MMSYSERR_NOERROR) {
         GetInErrorString(result, error_message);
