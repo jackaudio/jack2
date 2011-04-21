@@ -44,6 +44,7 @@ bool JackPort::Allocate(int refnum, const char* port_name, const char* port_type
     fInUse = true;
     fLatency = 0;
     fTotalLatency = 0;
+    fMonitorRequests = 0;
     fPlaybackLatency.min = fPlaybackLatency.max = 0;
     fCaptureLatency.min = fCaptureLatency.max = 0;
     fTied = NO_PORT;
@@ -65,6 +66,8 @@ void JackPort::Release()
     fLatency = 0;
     fTotalLatency = 0;
     fMonitorRequests = 0;
+    fPlaybackLatency.min = fPlaybackLatency.max = 0;
+    fCaptureLatency.min = fCaptureLatency.max = 0;
     fTied = NO_PORT;
     fAlias1[0] = '\0';
     fAlias2[0] = '\0';
@@ -107,7 +110,7 @@ void JackPort::SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_r
     if (mode == JackCaptureLatency) {
 		fCaptureLatency = *range;
 
-		/* hack to set port->shared->latency up for
+		/* hack to set latency up for
 		 * backend ports
 		 */
 		if ((fFlags & JackPortIsOutput) && (fFlags & JackPortIsPhysical))
@@ -115,7 +118,7 @@ void JackPort::SetLatencyRange(jack_latency_callback_mode_t mode, jack_latency_r
 	} else {
         fPlaybackLatency = *range;
 
-		/* hack to set port->shared->latency up for
+		/* hack to set latency up for
 		 * backend ports
 		 */
 		if ((fFlags & JackPortIsInput) && (fFlags & JackPortIsPhysical))
