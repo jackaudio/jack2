@@ -128,6 +128,9 @@
 					<Add directory="Release\bin" />
 					<Add library="libsamplerate_x86" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjacknet.res libjacknet.rc" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Debug 32bits">
 				<Option output="Debug\bin\libjacknet" prefix_auto="1" extension_auto="1" />
@@ -160,6 +163,9 @@
 					<Add directory="Debug\bin" />
 					<Add library="libsamplerate_x86" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Debug/libjacknet.res libjacknet.rc" />
+				</ExtraCommands>
 			</Target>
 			<Target title="Win32 Profiling 32bits">
 				<Option output="Release\bin\libjacknet" prefix_auto="1" extension_auto="1" />
@@ -193,6 +199,9 @@
 					<Add directory="Release\bin" />
 					<Add library="libsamplerate_x86" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="windres -F pe-i386 -O coff -o Release/libjacknet.res libjacknet.rc" />
+				</ExtraCommands>
 			</Target>
 		</Build>
 		<Compiler>

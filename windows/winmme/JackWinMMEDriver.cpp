@@ -18,6 +18,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 */
 
+#include <cmath>
+
 #include "JackEngineControl.h"
 #include "JackWinMMEDriver.h"
 
@@ -47,7 +49,9 @@ JackWinMMEDriver::Attach()
     jack_latency_range_t latency_range;
     const char *name;
     JackPort *port;
-    latency_range.max = latency;
+    latency_range.max = latency +
+        ((jack_nframes_t) std::ceil((period / 1000.0) *
+                                    fEngineControl->fSampleRate));
     latency_range.min = latency;
 
     jack_info("JackWinMMEDriver::Attach - fCaptureChannels  %d", fCaptureChannels);
@@ -149,7 +153,7 @@ JackWinMMEDriver::Open(bool capturing, bool playing, int in_channels,
 
     period = 0;
     TIMECAPS caps;
-    if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMEERR_NOERROR) {
+    if (timeGetDevCaps(&caps, sizeof(TIMECAPS)) != TIMERR_NOERROR) {
         jack_error("JackWinMMEDriver::Open - could not get timer device "
                    "capabilities.  Continuing anyway ...");
     } else {

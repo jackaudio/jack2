@@ -10,16 +10,16 @@ static void
 describe (jack_midi_event_t* event, char* buffer, size_t buflen)
 {
 	assert (buflen > 0);
-	
+
 	buffer[0] = '\0';
-	
+
 	if (event->size == 0) {
 		return;
 	}
-		
+
 	int type = event->buffer[0] & 0xf0;
 	int channel = event->buffer[0] & 0xf;
-	
+
 	switch (type) {
 	case 0x90:
 		assert (event->size == 3);
@@ -48,12 +48,12 @@ process (jack_nframes_t frames, void* arg)
 
 	buffer = jack_port_get_buffer (port, frames);
 	assert (buffer);
-	
+
 	N = jack_midi_get_event_count (buffer);
 	for (i = 0; i < N; ++i) {
 		jack_midi_event_t event;
 		int r;
-		
+
 		r = jack_midi_event_get (&event, buffer, i);
 		if (r == 0) {
 			size_t j;
@@ -65,7 +65,7 @@ process (jack_nframes_t frames, void* arg)
 
 			describe (&event, description, sizeof (description));
 			printf (" %s", description);
-			
+
 			printf ("\n");
 		}
 	}
@@ -108,7 +108,14 @@ main (int argc, char* argv[])
 		exit (EXIT_FAILURE);
 	}
 
-	sleep (-1);
+	/* run until interrupted */
+	while (1) {
+	#ifdef WIN32
+		Sleep(1000);
+	#else
+		sleep(1);
+	#endif
+	};
 
 	return 0;
 }
