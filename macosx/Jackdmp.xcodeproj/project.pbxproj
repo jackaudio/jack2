@@ -13694,7 +13694,10 @@
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
 					/usr/local/lib/libsamplerate.a,
 					"-framework",
@@ -13745,7 +13748,10 @@
 				MACH_O_TYPE = mh_dylib;
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
 					/opt/local/lib/libsamplerate.a,
 					"-framework",
@@ -17627,8 +17633,13 @@
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_STYLE = DYNAMIC;
 				MACH_O_TYPE = mh_dylib;
-				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = "-DMACH_RPC_MACH_SEMA";
+				OTHER_CFLAGS = "-DJACK_32_64";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-DJACK_32_64",
+					"-DHAVE_CELT",
+					"-DSERVER_SIDE",
+					"-DMACH_RPC_MACH_SEMA",
+				);
 				OTHER_LDFLAGS = (
 					/opt/local/lib/libsamplerate.a,
 					"-framework",
@@ -17679,9 +17690,10 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = "-DJACK_32_64";
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DJACK_32_64",
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
-					"-DJACK_32_64",
 				);
 				OTHER_LDFLAGS = (
 					/opt/local/lib/libsamplerate.a,
