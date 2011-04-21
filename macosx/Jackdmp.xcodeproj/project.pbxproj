@@ -9497,7 +9497,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DCELT",
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DJACK_32_64",
 					"-D__SMP__",
@@ -9566,7 +9566,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DCELT",
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DJACK_32_64",
 					"-D__SMP__",
@@ -14335,7 +14335,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DCELT",
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
@@ -14396,6 +14396,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-D__SMP__",
 					"-DMACH_RPC_MACH_SEMA",
@@ -16448,7 +16449,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DCELT",
+					"-DHAVE_CELT",
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
 					"-DJACK_32_64",
@@ -16517,7 +16518,7 @@
 					"-DUSE_POSIX_SHM",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
-					"-DCELT",
+					"-DHAVE_CELT",
 					"-DJACK_MONITOR",
 					"-DSERVER_SIDE",
 					"-DJACK_32_64",

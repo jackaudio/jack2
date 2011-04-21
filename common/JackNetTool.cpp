@@ -249,7 +249,7 @@ namespace Jack
 
     // Celt audio buffer *********************************************************************************
 
-#ifdef CELT
+#ifdef HAVE_CELT
 
     #define KPS 32
     #define KPS_DIV 8
@@ -729,6 +729,7 @@ namespace Jack
                 break;
             case (JackCeltEncoder):
                 jack_info ( "SampleEncoder : %s", "CELT");
+                jack_info ( "kBits : %d", params->fKBps);
                 break;
         };
         jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
