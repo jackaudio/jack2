@@ -768,7 +768,7 @@ int JackFreebobDriver::Attach()
             }
             port = fGraphManager->GetPort(port_index);
             // Add one buffer more latency if "async" mode is used...
-            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency);
+            range.min = range.max = (driver->period_size * (driver->device_options.nb_buffers - 1)) + ((fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize) + driver->playback_frame_latency;
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fPlaybackPortList[i] %ld ", port_index);
