@@ -249,7 +249,7 @@ namespace Jack
 
     // Celt audio buffer *********************************************************************************
 
-#ifdef HAVE_CELT
+#if HAVE_CELT
 
     #define KPS 32
     #define KPS_DIV 8

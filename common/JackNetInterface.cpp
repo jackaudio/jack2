@@ -258,7 +258,7 @@ namespace Jack
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef HAVE_CELT
+                    #if HAVE_CELT
                         fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData, fParams.fKBps);
                     #endif
                         break;
@@ -280,7 +280,7 @@ namespace Jack
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef HAVE_CELT
+                    #if HAVE_CELT
                         fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData, fParams.fKBps);
                     #endif
                         break;
@@ -800,7 +800,7 @@ namespace Jack
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef HAVE_CELT
+                    #if HAVE_CELT
                         fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData, fParams.fKBps);
                     #endif
                         break;
@@ -822,7 +822,7 @@ namespace Jack
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef HAVE_CELT
+                    #if HAVE_CELT
                         fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData, fParams.fKBps);
                     #endif
                         break;
