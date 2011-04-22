@@ -408,8 +408,7 @@ extern "C"
         strcpy(desc->name, "netadapter");                              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy(desc->desc, "netjack net <==> audio backend adapter");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-        desc->nparams = 12;
-        desc->params = (jack_driver_param_desc_t*) calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+        desc->params = (jack_driver_param_desc_t*) calloc(12, sizeof(jack_driver_param_desc_t));
 
         int i = 0;
         strcpy(desc->params[i].name, "multicast_ip");
@@ -508,6 +507,8 @@ extern "C"
         desc->params[i].value.i = false;
         strcpy (desc->params[i].short_desc, "Auto connect netmaster to system ports");
         strcpy (desc->params[i].long_desc, desc->params[i].short_desc);
+
+        desc->nparams = i + 1;
 
         return desc;
     }

@@ -784,8 +784,7 @@ extern "C"
         strcpy ( desc->name, "netone" );                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
         strcpy ( desc->desc, "netjack one slave backend component" ); // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-        desc->nparams = 18;
-        params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
+        params = ( jack_driver_param_desc_t* ) calloc ( 18, sizeof ( jack_driver_param_desc_t ) );
 
         int i = 0;
         strcpy (params[i].name, "audio-ins");
@@ -943,6 +942,8 @@ extern "C"
         strcpy (params[i].short_desc,
                 "always use deadline");
         strcpy (params[i].long_desc, params[i].short_desc);
+
+        desc->nparams = i + 1;
 
         desc->params = params;
 
