@@ -172,7 +172,7 @@ JackWinMMEOutputPort::Execute()
             result = midiOutShortMsg(handle, message);
             if (result != MMSYSERR_NOERROR) {
                 WriteOutError("JackWinMMEOutputPort::Execute",
-                             "midiOutShortMsg", result);
+                              "midiOutShortMsg", result);
             }
             continue;
         }
@@ -183,13 +183,13 @@ JackWinMMEOutputPort::Execute()
         result = midiOutPrepareHeader(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
             WriteOutError("JackWinMMEOutputPort::Execute",
-                         "midiOutPrepareHeader", result);
+                          "midiOutPrepareHeader", result);
             continue;
         }
         result = midiOutLongMsg(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
             WriteOutError("JackWinMMEOutputPort::Execute", "midiOutLongMsg",
-                         result);
+                          result);
             continue;
         }
 
@@ -203,7 +203,7 @@ JackWinMMEOutputPort::Execute()
         result = midiOutUnprepareHeader(handle, &header, sizeof(MIDIHDR));
         if (result != MMSYSERR_NOERROR) {
             WriteOutError("JackWinMMEOutputPort::Execute",
-                         "midiOutUnprepareHeader", result);
+                          "midiOutUnprepareHeader", result);
             break;
         }
     }

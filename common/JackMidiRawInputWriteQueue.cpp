@@ -31,14 +31,11 @@ JackMidiRawInputWriteQueue(JackMidiWriteQueue *write_queue,
 {
     packet_queue = new JackMidiAsyncQueue(max_packet_data, max_packets);
     std::auto_ptr<JackMidiAsyncQueue> packet_queue_ptr(packet_queue);
-    input_ring = jack_ringbuffer_create(max_packet_data + 1);
-    if (! input_ring) {
-        throw std::bad_alloc();
-    }
-    jack_ringbuffer_mlock(input_ring);
+    input_buffer = new jack_midi_data_t[max_packet_data];
     Clear();
     expected_bytes = 0;
     event_pending = false;
+    input_buffer_size = max_packet_data;
     packet = 0;
     status_byte = 0;
     this->write_queue = write_queue;
@@ -47,14 +44,13 @@ JackMidiRawInputWriteQueue(JackMidiWriteQueue *write_queue,
 
 JackMidiRawInputWriteQueue::~JackMidiRawInputWriteQueue()
 {
-    jack_ringbuffer_free(input_ring);
+    delete[] input_buffer;
     delete packet_queue;
 }
 
 void
 JackMidiRawInputWriteQueue::Clear()
 {
-    jack_ringbuffer_reset(input_ring);
     total_bytes = 0;
     unbuffered_bytes = 0;
 }
@@ -121,12 +117,7 @@ JackMidiRawInputWriteQueue::PrepareBufferedEvent(jack_nframes_t time)
     if (! result) {
         HandleBufferFailure(unbuffered_bytes, total_bytes);
     } else {
-        size_t size = jack_ringbuffer_read_space(input_ring);
-        jack_ringbuffer_data_t vector[2];
-        jack_ringbuffer_get_read_vector(input_ring, vector);
-        // We don't worry about the second part of the vector, as we reset the
-        // ringbuffer after each parsed message.
-        PrepareEvent(time, size, (jack_midi_data_t *) vector[0].buf);
+        PrepareEvent(time, total_bytes, input_buffer);
     }
     Clear();
     if (status_byte >= 0xf0) {
@@ -279,7 +270,9 @@ JackMidiRawInputWriteQueue::ProcessByte(jack_nframes_t time,
 void
 JackMidiRawInputWriteQueue::RecordByte(jack_midi_data_t byte)
 {
-    if (jack_ringbuffer_write(input_ring, (const char *) &byte, 1) != 1) {
+    if (total_bytes < input_buffer_size) {
+        input_buffer[total_bytes] = byte;
+    } else {
         unbuffered_bytes++;
     }
     total_bytes++;
