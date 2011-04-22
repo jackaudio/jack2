@@ -604,8 +604,7 @@ namespace Jack
             strcpy(desc->name, "net");                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
             strcpy(desc->desc, "netjack slave backend component"); // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
 
-            desc->nparams = 11;
-            desc->params = (jack_driver_param_desc_t*) calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+            desc->params = (jack_driver_param_desc_t*) calloc(11, sizeof(jack_driver_param_desc_t));
 
             int i = 0;
             strcpy(desc->params[i].name, "multicast_ip");
@@ -695,6 +694,8 @@ namespace Jack
             strcpy(desc->params[i].value.str, "slow");
             strcpy(desc->params[i].short_desc, "Slow, Normal or Fast mode.");
             strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+
+            desc->nparams = i + 1;
 
             return desc;
         }
