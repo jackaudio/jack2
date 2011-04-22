@@ -22,7 +22,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include "JackMidiAsyncQueue.h"
 #include "JackMidiWriteQueue.h"
-#include "ringbuffer.h"
 
 namespace Jack {
 
@@ -42,7 +41,8 @@ namespace Jack {
         jack_midi_data_t event_byte;
         bool event_pending;
         size_t expected_bytes;
-        jack_ringbuffer_t *input_ring;
+        jack_midi_data_t *input_buffer;
+        size_t input_buffer_size;
         jack_midi_event_t *packet;
         JackMidiAsyncQueue *packet_queue;
         jack_midi_data_t status_byte;
