@@ -146,7 +146,7 @@ JackWinMMEOutputPort::Execute()
 
             // 100 ns resolution
             due_time.QuadPart =
-                -((LONG LONG) ((frame_time - current_time) * 10));
+                -((LONGLONG) ((frame_time - current_time) * 10));
             if (! SetWaitableTimer(timer, &due_time, 0, NULL, NULL, 0)) {
                 WriteOSError("JackWinMMEOutputPort::Execute",
                              "ChangeTimerQueueTimer");
