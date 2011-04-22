@@ -151,7 +151,7 @@ alsa_driver_check_card_type (alsa_driver_t *driver)
 		 * should be hw:x where x is the card number */
 
 		char tmp[5];
-		strncpy(tmp,strstr(driver->alsa_name_playback,"hw"),4);
+		strncpy(tmp,strcasestr(driver->alsa_name_playback,"hw"),4);
 		tmp[4]='\0';
 		jack_info("control device %s",tmp);
 		ctl_name = strdup(tmp);

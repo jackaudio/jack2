@@ -258,11 +258,13 @@ namespace Jack
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef CELT
+                    #ifdef HAVE_CELT
                         fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fTxData, fParams.fKBps);
                     #endif
                         break;
                 }
+
+                assert(fNetAudioCaptureBuffer);
             }
 
             if (fParams.fReturnAudioChannels) {
@@ -278,11 +280,13 @@ namespace Jack
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef CELT
+                    #ifdef HAVE_CELT
                         fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fRxData, fParams.fKBps);
                     #endif
                         break;
                 }
+
+                assert(fNetAudioPlaybackBuffer);
             }
 
         } catch (exception&) {
@@ -788,19 +792,21 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+                        fNetAudioCaptureBuffer = new NetFloatAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
                         break;
 
                     case JackIntEncoder:
-                        fNetAudioCaptureBuffer = new NetIntAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData );
+                        fNetAudioCaptureBuffer = new NetIntAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData);
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef CELT
-                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fSendAudioChannels, fRxData, fParams.fKBps );
+                    #ifdef HAVE_CELT
+                        fNetAudioCaptureBuffer = new NetCeltAudioBuffer(&fParams, fParams.fSendAudioChannels, fRxData, fParams.fKBps);
                     #endif
                         break;
                 }
+
+                assert(fNetAudioCaptureBuffer);
             }
 
             if (fParams.fReturnAudioChannels) {
@@ -808,19 +814,21 @@ namespace Jack
                 switch (fParams.fSampleEncoder) {
 
                     case JackFloatEncoder:
-                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData );
+                        fNetAudioPlaybackBuffer = new NetFloatAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
                         break;
 
                     case JackIntEncoder:
-                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData);
+                        fNetAudioPlaybackBuffer = new NetIntAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData);
                         break;
 
                     case JackCeltEncoder:
-                    #ifdef CELT
-                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer ( &fParams, fParams.fReturnAudioChannels, fTxData, fParams.fKBps );
+                    #ifdef HAVE_CELT
+                        fNetAudioPlaybackBuffer = new NetCeltAudioBuffer(&fParams, fParams.fReturnAudioChannels, fTxData, fParams.fKBps);
                     #endif
                         break;
                 }
+
+                assert(fNetAudioPlaybackBuffer);
             }
 
         } catch (exception&) {

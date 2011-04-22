@@ -871,6 +871,7 @@ extern "C"
                 "Factor for sample rate reduction on the upstream");
         strcpy (params[i].long_desc, params[i].short_desc);
 
+#if HAVE_CELT
         i++;
         strcpy (params[i].name, "celt");
         params[i].character  = 'c';
@@ -879,7 +880,7 @@ extern "C"
         strcpy (params[i].short_desc,
                 "sets celt encoding and number of kbits per channel");
         strcpy (params[i].long_desc, params[i].short_desc);
-
+#endif
         i++;
         strcpy (params[i].name, "bit-depth");
         params[i].character  = 'b';

@@ -558,7 +558,7 @@ namespace Jack
             int RenderToNetwork (int subcycle, size_t total_size );
     };
 
-#ifdef CELT
+#ifdef HAVE_CELT
 
 #include <celt/celt.h>
 
