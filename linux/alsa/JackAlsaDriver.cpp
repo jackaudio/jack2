@@ -725,179 +725,84 @@ dither_opt (char c, DitherAlgorithm* dither)
 SERVER_EXPORT const jack_driver_desc_t* driver_get_descriptor ()
 {
     jack_driver_desc_t * desc;
-    jack_driver_param_desc_t * params;
-    unsigned int i;
+    jack_driver_desc_filler_t filler;
+    jack_driver_param_value_t value;
 
-    desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
+    desc = jack_driver_descriptor_construct("alsa", "Linux ALSA API based audio backend", &filler);
 
-    strcpy(desc->name, "alsa");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-    strcpy(desc->desc, "Linux ALSA API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+    strcpy(value.str, "none");
+    jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports.  Optionally set device", NULL);
 
-    desc->nparams = 18;
-    params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+    strcpy(value.str, "hw:0");
+    jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, enum_alsa_devices(), "ALSA device name", NULL);
 
-    i = 0;
-    strcpy (params[i].name, "capture");
-    params[i].character = 'C';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "none");
-    strcpy (params[i].short_desc,
-            "Provide capture ports.  Optionally set device");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.ui = 48000U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-    i++;
-    strcpy (params[i].name, "playback");
-    params[i].character = 'P';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "none");
-    strcpy (params[i].short_desc,
-            "Provide playback ports.  Optionally set device");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.ui = 1024U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-    i++;
-    strcpy (params[i].name, "device");
-    params[i].character = 'd';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "hw:0");
-    strcpy (params[i].short_desc, "ALSA device name");
-    strcpy (params[i].long_desc, params[i].short_desc);
-    params[i].constraint = enum_alsa_devices();
+    value.ui = 2U;
+    jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods of playback latency", NULL);
 
-    i++;
-    strcpy (params[i].name, "rate");
-    params[i].character = 'r';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 48000U;
-    strcpy (params[i].short_desc, "Sample rate");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "hwmon", 'H', JackDriverParamBool, &value, NULL, "Hardware monitoring, if available", NULL);
 
-    i++;
-    strcpy (params[i].name, "period");
-    params[i].character = 'p';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 1024U;
-    strcpy (params[i].short_desc, "Frames per period");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "hwmeter", 'M', JackDriverParamBool, &value, NULL, "Hardware metering, if available", NULL);
 
-    i++;
-    strcpy (params[i].name, "nperiods");
-    params[i].character = 'n';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 2U;
-    strcpy (params[i].short_desc, "Number of periods of playback latency");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 1;
+    jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
-    i++;
-    strcpy (params[i].name, "hwmon");
-    params[i].character = 'H';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Hardware monitoring, if available");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "softmode", 's', JackDriverParamBool, &value, NULL, "Soft-mode, no xrun handling", NULL);
 
-    i++;
-    strcpy (params[i].name, "hwmeter");
-    params[i].character = 'M';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Hardware metering, if available");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-    i++;
-    strcpy (params[i].name, "duplex");
-    params[i].character = 'D';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 1;
-    strcpy (params[i].short_desc,
-            "Provide both capture and playback ports");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.c = 'n';
+    jack_driver_descriptor_add_parameter(
+        desc,
+        &filler,
+        "dither",
+        'z',
+        JackDriverParamChar,
+        &value,
+        get_dither_constraint(),
+        "Dithering mode",
+        "Dithering mode:\n"
+        "  n - none\n"
+        "  r - rectangular\n"
+        "  s - shaped\n"
+        "  t - triangular");
 
-    i++;
-    strcpy (params[i].name, "softmode");
-    params[i].character = 's';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Soft-mode, no xrun handling");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
-    i++;
-    strcpy (params[i].name, "monitor");
-    params[i].character = 'm';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc, "Provide monitor ports for the output");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    value.i = FALSE;
+    jack_driver_descriptor_add_parameter(desc, &filler, "shorts", 'S', JackDriverParamBool, &value, NULL, "Try 16-bit samples before 32-bit", NULL);
 
-    i++;
-    strcpy (params[i].name, "dither");
-    params[i].character = 'z';
-    params[i].type = JackDriverParamChar;
-    params[i].value.c = 'n';
-    strcpy (params[i].short_desc, "Dithering mode");
-    strcpy (params[i].long_desc,
-            "Dithering mode:\n"
-            "  n - none\n"
-            "  r - rectangular\n"
-            "  s - shaped\n"
-            "  t - triangular");
-    params[i].constraint = get_dither_constraint();
+    value.ui = 0;
+    jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency (frames)", NULL);
+    jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency (frames)", NULL);
 
-    i++;
-    strcpy (params[i].name, "inchannels");
-    params[i].character = 'i';
-    params[i].type = JackDriverParamInt;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc,
-            "Number of capture channels (defaults to hardware max)");
-    strcpy (params[i].long_desc, params[i].short_desc);
+    strcpy(value.str, "none");
+    jack_driver_descriptor_add_parameter(
+        desc,
+        &filler,
+        "midi-driver",
+        'X',
+        JackDriverParamString,
+        &value,
+        get_midi_driver_constraint(),
+        "ALSA device name",
+        "ALSA MIDI driver:\n"
+        " none - no MIDI driver\n"
+        " seq - ALSA Sequencer driver\n"
+        " raw - ALSA RawMIDI driver\n");
 
-    i++;
-    strcpy (params[i].name, "outchannels");
-    params[i].character = 'o';
-    params[i].type = JackDriverParamInt;
-    params[i].value.i = 0;
-    strcpy (params[i].short_desc,
-            "Number of playback channels (defaults to hardware max)");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "shorts");
-    params[i].character = 'S';
-    params[i].type = JackDriverParamBool;
-    params[i].value.i = FALSE;
-    strcpy (params[i].short_desc, "Try 16-bit samples before 32-bit");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "input-latency");
-    params[i].character = 'I';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 0;
-    strcpy (params[i].short_desc, "Extra input latency (frames)");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "output-latency");
-    params[i].character = 'O';
-    params[i].type = JackDriverParamUInt;
-    params[i].value.ui = 0;
-    strcpy (params[i].short_desc, "Extra output latency (frames)");
-    strcpy (params[i].long_desc, params[i].short_desc);
-
-    i++;
-    strcpy (params[i].name, "midi-driver");
-    params[i].character = 'X';
-    params[i].type = JackDriverParamString;
-    strcpy (params[i].value.str, "none");
-    strcpy (params[i].short_desc, "ALSA MIDI driver name (seq|raw)");
-    strcpy (params[i].long_desc,
-            "ALSA MIDI driver:\n"
-            " none - no MIDI driver\n"
-            " seq - ALSA Sequencer driver\n"
-            " raw - ALSA RawMIDI driver\n");
-    params[i].constraint = get_midi_driver_constraint();
-
-    desc->params = params;
     return desc;
 }
 

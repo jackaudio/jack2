@@ -362,16 +362,8 @@ extern "C"
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         jack_driver_desc_t * desc;
-        //unsigned int i;
 
-        desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-        strcpy(desc->name, "winmme");                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "WinMME API based MIDI backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-
-        desc->nparams = 0;
-        desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
-
-        return desc;
+        return jack_driver_descriptor_construct("winmme", "WinMME API based MIDI backend", NULL);
     }
 
     SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)

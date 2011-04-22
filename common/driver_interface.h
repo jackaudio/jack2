@@ -111,8 +111,31 @@ extern "C"
     }
     jack_driver_desc_t;
 
+    typedef struct {
+        uint32_t size;          /* size of the param array, in elements */
+    }
+    jack_driver_desc_filler_t;
 
 SERVER_EXPORT int jack_parse_driver_params (jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr);
+
+jack_driver_desc_t *            /* newlly allocated driver descriptor, NULL on failure */
+jack_driver_descriptor_construct(
+    const char * name,          /* driver name */
+    const char * description,   /* driver description */
+    jack_driver_desc_filler_t * filler); /* Pointer to stack var to be supplied to jack_driver_descriptor_add_parameter() as well.
+                                            Can be NULL for drivers that have no parameters. */
+
+int                            /* 0 on failure */
+jack_driver_descriptor_add_parameter(
+    jack_driver_desc_t * driver_descr,  /* pointer to driver descriptor as returned by jack_driver_descriptor_construct() */
+    jack_driver_desc_filler_t * filler, /* Pointer to the stack var that was supplied to jack_driver_descriptor_add_parameter(). */
+    const char * name,                  /* parameter's name */
+    char character,                     /* parameter's character (for getopt, etc) */
+    jack_driver_param_type_t type,      /* The parameter's type */
+    const jack_driver_param_value_t * value_ptr, /* Pointer to parameter's (default) value */
+    jack_driver_param_constraint_desc_t * constraint, /* Pointer to parameter constraint descriptor. NULL if there is no constraint */
+    const char * short_desc,            /* A short (~30 chars) description for the user */
+    const char * long_desc);            /* A longer description for the user, if NULL short_desc will be used */
 
 #ifdef __cplusplus
 }

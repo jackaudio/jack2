@@ -260,119 +260,44 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     {
-        jack_driver_desc_t *desc;
-        unsigned int i;
-        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        strcpy(desc->name, "portaudio");                             // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "PortAudio API based audio backend");     // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("portaudio", "PortAudio API based audio backend", &filler);
 
-        desc->nparams = 13;
-        desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+        value.ui = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamUInt, &value, NULL, "Maximum number of channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamUInt, &value, NULL, "Maximum number of input channels", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamUInt, &value, NULL, "Maximum number of output channels", NULL);
 
-        i = 0;
-        strcpy(desc->params[i].name, "channels");
-        desc->params[i].character = 'c';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Maximum number of channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        strcpy(value.str, "will take default PortAudio input device");
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports. Optionally set PortAudio device name", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "inchannels");
-        desc->params[i].character = 'i';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Maximum number of input channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        strcpy(value.str, "will take default PortAudio output device");
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports. Optionally set PortAudio device name", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "outchannels");
-        desc->params[i].character = 'o';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Maximum number of output channels");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "capture");
-        desc->params[i].character = 'C';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default PortAudio input device");
-        strcpy(desc->params[i].short_desc, "Provide capture ports. Optionally set PortAudio device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = TRUE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "playback");
-        desc->params[i].character = 'P';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default PortAudio output device");
-        strcpy(desc->params[i].short_desc, "Provide playback ports. Optionally set PortAudio device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 44100U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy (desc->params[i].name, "monitor");
-        desc->params[i].character = 'm';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = 0;
-        strcpy(desc->params[i].short_desc, "Provide monitor ports for the output");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 128U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "duplex");
-        desc->params[i].character = 'D';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
-        strcpy(desc->params[i].short_desc, "Provide both capture and playback ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        strcpy(value.str, "will take default PortAudio device name");
+        jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "PortAudio device name", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "rate");
-        desc->params[i].character = 'r';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 44100U;
-        strcpy(desc->params[i].short_desc, "Sample rate");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "period");
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 128U;
-        strcpy(desc->params[i].short_desc, "Frames per period");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "device");
-        desc->params[i].character = 'd';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].value.str, "will take default PortAudio device name");
-        strcpy(desc->params[i].short_desc, "PortAudio device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "input-latency");
-        desc->params[i].character = 'I';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Extra input latency");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "output-latency");
-        desc->params[i].character = 'O';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Extra output latency");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "list-devices");
-        desc->params[i].character = 'l';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
-        strcpy(desc->params[i].short_desc, "Display available PortAudio devices");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = TRUE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available PortAudio devices", NULL);
 
         return desc;
     }

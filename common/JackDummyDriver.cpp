@@ -93,63 +93,26 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor () {
         jack_driver_desc_t * desc;
-        unsigned int i;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-        strcpy(desc->name, "dummy");                  // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Timer based backend");    // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("dummy", "Timer based backend", &filler);
 
-        desc->nparams = 6;
-        desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
+        value.ui = 2U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamUInt, &value, NULL, "Number of capture ports", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamUInt, &value, NULL, "Number of playback ports", NULL);
 
-        i = 0;
-        strcpy(desc->params[i].name, "capture");
-        desc->params[i].character = 'C';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 2U;
-        strcpy(desc->params[i].short_desc, "Number of capture ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 48000U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "playback");
-        desc->params[i].character = 'P';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[1].value.ui = 2U;
-        strcpy(desc->params[i].short_desc, "Number of playback ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "rate");
-        desc->params[i].character = 'r';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 48000U;
-        strcpy(desc->params[i].short_desc, "Sample rate");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 1024U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "monitor");
-        desc->params[i].character = 'm';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = 0;
-        strcpy(desc->params[i].short_desc, "Provide monitor ports for the output");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "period");
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 1024U;
-        strcpy(desc->params[i].short_desc, "Frames per period");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "wait");
-        desc->params[i].character = 'w';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 21333U;
-        strcpy(desc->params[i].short_desc,
-               "Number of usecs to wait between engine processes");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui = 21333U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "wait", 'w', JackDriverParamUInt, &value, NULL, "Number of usecs to wait between engine processes", NULL);
 
         return desc;
     }

@@ -834,3 +834,104 @@ JackDriverInfo::~JackDriverInfo()
     if (fHandle)
         UnloadDriverModule(fHandle);
 }
+
+EXPORT
+jack_driver_desc_t *
+jack_driver_descriptor_construct(
+    const char * name,
+    const char * description,
+    jack_driver_desc_filler_t * filler_ptr)
+{
+    size_t name_len;
+    size_t description_len;
+    jack_driver_desc_t * desc_ptr;
+
+    name_len = strlen(name);
+    description_len = strlen(description);
+
+    if (name_len > sizeof(desc_ptr->name) - 1 ||
+        description_len > sizeof(desc_ptr->desc) - 1) {
+        assert(false);
+        return 0;
+    }
+
+    desc_ptr = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
+    if (desc_ptr == NULL) {
+        jack_error("calloc() failed to allocate memory for driver descriptor struct");
+        return 0;
+    }
+
+    memcpy(desc_ptr->name, name, name_len + 1);
+    memcpy(desc_ptr->desc, description, description_len + 1);
+
+    desc_ptr->nparams = 0;
+
+    if (filler_ptr != NULL) {
+        filler_ptr->size = 0;
+    }
+
+    return desc_ptr;
+}
+
+EXPORT
+int
+jack_driver_descriptor_add_parameter(
+    jack_driver_desc_t * desc_ptr,
+    jack_driver_desc_filler_t * filler_ptr,
+    const char * name,
+    char character,
+    jack_driver_param_type_t type,
+    const jack_driver_param_value_t * value_ptr,
+    jack_driver_param_constraint_desc_t * constraint,
+    const char * short_desc,
+    const char * long_desc)
+{
+    size_t name_len;
+    size_t short_desc_len;
+    size_t long_desc_len;
+    jack_driver_param_desc_t * param_ptr;
+    size_t newsize;
+
+    name_len = strlen(name);
+    short_desc_len = strlen(short_desc);
+
+    if (long_desc != NULL) {
+        long_desc_len = strlen(long_desc);
+    } else {
+        long_desc = short_desc;
+        long_desc_len = short_desc_len;
+    }
+
+    if (name_len > sizeof(param_ptr->name) - 1 ||
+        short_desc_len > sizeof(param_ptr->short_desc) - 1 ||
+        long_desc_len > sizeof(param_ptr->long_desc) - 1) {
+        assert(false);
+        return 0;
+    }
+
+    if (desc_ptr->nparams == filler_ptr->size) {
+        newsize = filler_ptr->size + 20; // most drivers have less than 20 parameters
+        param_ptr = (jack_driver_param_desc_t*)realloc (desc_ptr->params, newsize * sizeof (jack_driver_param_desc_t));
+        if (param_ptr == NULL) {
+            jack_error("realloc() failed for parameter array of %zu elements", newsize);
+            return false;
+        }
+        filler_ptr->size = newsize;
+        desc_ptr->params = param_ptr;
+    }
+
+    assert(desc_ptr->nparams < filler_ptr->size);
+    param_ptr = desc_ptr->params + desc_ptr->nparams;
+
+    memcpy(param_ptr->name, name, name_len + 1);
+    param_ptr->character = character;
+    param_ptr->type = type;
+    param_ptr->value = *value_ptr;
+    param_ptr->constraint = constraint;
+    memcpy(param_ptr->short_desc, short_desc, short_desc_len + 1);
+    memcpy(param_ptr->long_desc, long_desc, long_desc_len + 1);
+
+    desc_ptr->nparams++;
+
+    return true;
+}
