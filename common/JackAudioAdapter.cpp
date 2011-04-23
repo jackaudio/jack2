@@ -143,35 +143,34 @@ namespace Jack
         fCapturePortList = new jack_port_t*[fAudioAdapter->GetInputs()];
         fPlaybackPortList = new jack_port_t*[fAudioAdapter->GetOutputs()];
 
-        for (int i = 0; i < fAudioAdapter->GetInputs(); i++)
-        {
+        for (int i = 0; i < fAudioAdapter->GetInputs(); i++) {
             sprintf(name, "capture_%d", i + 1);
             if ((fCapturePortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0)) == NULL)
                 goto fail;
         }
 
-        for (int i = 0; i < fAudioAdapter->GetOutputs(); i++)
-        {
+        for (int i = 0; i < fAudioAdapter->GetOutputs(); i++) {
             sprintf(name, "playback_%d", i + 1);
-            if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0 )) == NULL)
+            if ((fPlaybackPortList[i] = jack_port_register(fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0)) == NULL)
                 goto fail;
         }
 
         //callbacks and activation
-        if ( jack_set_process_callback ( fJackClient, Process, this ) < 0 )
+        if (jack_set_process_callback(fJackClient, Process, this) < 0)
             goto fail;
-        if ( jack_set_buffer_size_callback ( fJackClient, BufferSize, this ) < 0 )
+        if (jack_set_buffer_size_callback(fJackClient, BufferSize, this) < 0)
             goto fail;
-        if ( jack_set_sample_rate_callback ( fJackClient, SampleRate, this ) < 0 )
+        if (jack_set_sample_rate_callback(fJackClient, SampleRate, this) < 0)
             goto fail;
-        if ( jack_activate ( fJackClient ) < 0 )
+        if (jack_activate(fJackClient) < 0)
             goto fail;
 
         if (fAutoConnect)
             ConnectPorts();
 
-        // Ring buffer are now allocated..
+        // Ring buffers are now allocated..
         return fAudioAdapter->Open();
+        return 0;
 
     fail:
         FreePorts();

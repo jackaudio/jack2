@@ -98,13 +98,13 @@ namespace Jack
         float audio_size = (fNetAudioCaptureBuffer)
                             ? fNetAudioCaptureBuffer->GetCycleSize()
                             : (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->GetCycleSize() : 0;
-        jack_log ("audio_size %f", audio_size);
+        jack_log("audio_size %f", audio_size);
 
         //midi
         float midi_size = (fNetMidiCaptureBuffer)
                             ? fNetMidiCaptureBuffer->GetCycleSize()
                             : (fNetMidiPlaybackBuffer) ? fNetMidiPlaybackBuffer->GetCycleSize() : 0;
-        jack_log ("midi_size %f", midi_size);
+        jack_log("midi_size %f", midi_size);
 
         //bufsize = sync + audio + midi
         int bufsize = MAX_LATENCY * (fParams.fMtu + (int)audio_size + (int) midi_size);
@@ -837,7 +837,7 @@ namespace Jack
         }
 
         //set the new buffer sizes
-        if ( SetNetBufferSize() == SOCKET_ERROR ) {
+        if (SetNetBufferSize() == SOCKET_ERROR) {
             jack_error ( "Can't set net buffer sizes : %s", StrError ( NET_ERROR_CODE ) );
             goto error;
         }

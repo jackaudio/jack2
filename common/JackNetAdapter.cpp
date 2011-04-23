@@ -116,10 +116,10 @@ namespace Jack
         fSocket.SetPort(port);
         fSocket.SetAddress(fMulticastIP, port);
 
-        // If not set, takes deafault
+        // If not set, takes default
         fParams.fSendAudioChannels = (send_audio == -1) ? 2 : send_audio;
 
-        // If not set, takes deafault
+        // If not set, takes default
         fParams.fReturnAudioChannels = (return_audio == -1) ? 2 : return_audio;
 
         //set the audio adapter interface channel values
@@ -135,14 +135,13 @@ namespace Jack
     {
         jack_log("JackNetAdapter::~JackNetAdapter");
 
-        int port_index;
         if (fSoftCaptureBuffer) {
-            for (port_index = 0; port_index < fCaptureChannels; port_index++)
+            for (int port_index = 0; port_index < fCaptureChannels; port_index++)
                 delete[] fSoftCaptureBuffer[port_index];
             delete[] fSoftCaptureBuffer;
         }
         if (fSoftPlaybackBuffer) {
-            for (port_index = 0; port_index < fPlaybackChannels; port_index++)
+            for (int port_index = 0; port_index < fPlaybackChannels; port_index++)
                 delete[] fSoftPlaybackBuffer[port_index];
             delete[] fSoftPlaybackBuffer;
         }
@@ -151,8 +150,6 @@ namespace Jack
 //open/close--------------------------------------------------------------------------
     int JackNetAdapter::Open()
     {
-        jack_log("JackNetAdapter::Open");
-
         jack_info("NetAdapter started in %s mode %s Master's transport sync.",
                     (fParams.fSlaveSyncMode) ? "sync" : "async", (fParams.fTransportSync) ? "with" : "without");
 
@@ -212,8 +209,6 @@ namespace Jack
     {
         jack_log("JackNetAdapter::Init");
 
-        int port_index;
-
         //init network connection
         if (!JackNetSlaveInterface::Init()) {
             jack_error("JackNetSlaveInterface::Init() error...");
@@ -229,8 +224,7 @@ namespace Jack
         //set buffers
         if (fCaptureChannels > 0) {
             fSoftCaptureBuffer = new sample_t*[fCaptureChannels];
-            for (port_index = 0; port_index < fCaptureChannels; port_index++)
-            {
+            for (int port_index = 0; port_index < fCaptureChannels; port_index++) {
                 fSoftCaptureBuffer[port_index] = new sample_t[fParams.fPeriodSize];
                 fNetAudioCaptureBuffer->SetBuffer(port_index, fSoftCaptureBuffer[port_index]);
             }
@@ -238,8 +232,7 @@ namespace Jack
 
         if (fPlaybackChannels > 0) {
             fSoftPlaybackBuffer = new sample_t*[fPlaybackChannels];
-            for (port_index = 0; port_index < fPlaybackChannels; port_index++)
-            {
+            for (int port_index = 0; port_index < fPlaybackChannels; port_index++) {
                 fSoftPlaybackBuffer[port_index] = new sample_t[fParams.fPeriodSize];
                 fNetAudioPlaybackBuffer->SetBuffer(port_index, fSoftPlaybackBuffer[port_index]);
             }
@@ -273,7 +266,7 @@ namespace Jack
             return false;
         } catch (JackNetException& e) {
             e.PrintMessage();
-            jack_info("NetAdapter is restarted.");
+            jack_info("NetAdapter is restarted");
             Reset();
             fThread.DropSelfRealTime();
             fThread.SetStatus(JackThread::kIniting);

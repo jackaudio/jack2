@@ -812,7 +812,7 @@ extern "C"
 
 #if HAVE_CELT
         value.ui = 0U;
-        jack_driver_descriptor_add_parameter(desc, &filler, "celt", 'c', JackDriverParamUInt, &value, NULL, "sets celt encoding and number of kbits per channel", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "celt", 'c', JackDriverParamUInt, &value, NULL, "Set CELT encoding and number of kbits per channel", NULL);
 #endif
         value.ui = 0U;
         jack_driver_descriptor_add_parameter(desc, &filler, "bit-depth", 'b', JackDriverParamUInt, &value, NULL, "Sample bit-depth (0 for float, 8 for 8bit and 16 for 16bit)", NULL);
@@ -821,19 +821,19 @@ extern "C"
         jack_driver_descriptor_add_parameter(desc, &filler, "transport-sync", 't', JackDriverParamBool, &value, NULL, "Whether to slave the transport to the master transport", NULL);
 
         value.ui = true;
-        jack_driver_descriptor_add_parameter(desc, &filler, "autoconf", 'a', JackDriverParamBool, &value, NULL, "Whether to use Autoconfig, or just start.", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "autoconf", 'a', JackDriverParamBool, &value, NULL, "Whether to use Autoconfig, or just start", NULL);
 
         value.ui = 1U;
         jack_driver_descriptor_add_parameter(desc, &filler, "redundancy", 'R', JackDriverParamUInt, &value, NULL, "Send packets N times", NULL);
 
         value.ui = false;
-        jack_driver_descriptor_add_parameter(desc, &filler, "native-endian", 'e', JackDriverParamBool, &value, NULL, "Dont convert samples to network byte order.", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "native-endian", 'e', JackDriverParamBool, &value, NULL, "Dont convert samples to network byte order", NULL);
 
         value.i = 0;
-        jack_driver_descriptor_add_parameter(desc, &filler, "jitterval", 'J', JackDriverParamInt, &value, NULL, "attempted jitterbuffer microseconds on master", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "jitterval", 'J', JackDriverParamInt, &value, NULL, "Attempted jitterbuffer microseconds on master", NULL);
 
         value.i = false;
-        jack_driver_descriptor_add_parameter(desc, &filler, "always-deadline", 'D', JackDriverParamBool, &value, NULL, "always use deadline", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "always-deadline", 'D', JackDriverParamBool, &value, NULL, "Always use deadline", NULL);
 
         return desc;
     }
