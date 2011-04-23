@@ -145,16 +145,42 @@ JackWinMMEOutputPort::Execute()
             LARGE_INTEGER due_time;
 
             // 100 ns resolution
-            due_time.QuadPart = - ((frame_time - current_time) * 10);
+            due_time.QuadPart =
+                -((LONGLONG) ((frame_time - current_time) * 10));
             if (! SetWaitableTimer(timer, &due_time, 0, NULL, NULL, 0)) {
                 WriteOSError("JackWinMMEOutputPort::Execute",
                              "ChangeTimerQueueTimer");
                 break;
             }
 
+            // Debugging code
+            jack_log("JackWinMMEOutputPort::Execute - waiting at %f for %f "
+                     "milliseconds before sending message (current frame: %d, "
+                     "send frame: %d)",
+                     ((double) current_time) / 1000.0,
+                     ((double) (frame_time - current_time)) / 1000.0,
+                     GetFramesFromTime(current_time), event->time);
+            // End debugging code
+
             if (! Wait(timer)) {
                 break;
             }
+
+            // Debugging code
+            jack_time_t wakeup_time = GetMicroSeconds();
+            jack_log("JackWinMMEOutputPort::Execute - woke up at %f.",
+                     ((double) wakeup_time) / 1000.0);
+            if (wakeup_time > frame_time) {
+                jack_log("JackWinMMEOutputPort::Execute - overslept by %f "
+                         "milliseconds.",
+                         ((double) (wakeup_time - frame_time)) / 1000.0);
+            } else if (wakeup_time < frame_time) {
+                jack_log("JackWinMMEOutputPort::Execute - woke up %f "
+                         "milliseconds too early.",
+                         ((double) (frame_time - wakeup_time)) / 1000.0);
+            }
+            // End debugging code
+
         }
         jack_midi_data_t *data = event->buffer;
         DWORD message = 0;

@@ -36,20 +36,20 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     char device_id[32];
     snprintf(device_id, sizeof(device_id), "hw:%d,%d,%d", card, device,
              subdevice);
-    const char *alias_prefix;
+    const char *alias_suffix;
     const char *error_message;
     snd_rawmidi_t **in;
+    const char *name_prefix;
     snd_rawmidi_t **out;
-    const char *name_suffix;
     if (snd_rawmidi_info_get_stream(info) == SND_RAWMIDI_STREAM_OUTPUT) {
-        alias_prefix = "system:midi_playback_";
+        alias_suffix = "out";
         in = 0;
-        name_suffix = "out";
+        name_prefix = "system:midi_playback_";
         out = &rawmidi;
     } else {
-        alias_prefix = "system:midi_capture_";
+        alias_suffix = "in";
         in = &rawmidi;
-        name_suffix = "in";
+        name_prefix = "system:midi_capture_";
         out = 0;
     }
     const char *func;
@@ -113,9 +113,10 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
         func = "CreateNonBlockingPipe";
         goto close;
     }
-    snprintf(alias, sizeof(alias), "%s%d", alias_prefix, index + 1);
-    snprintf(name, sizeof(name), "system:%d-%d %s %d %s", card + 1, device + 1,
-             snd_rawmidi_info_get_name(info), subdevice + 1, name_suffix);
+    snprintf(alias, sizeof(alias), "system:%d-%d %s %d %s", card + 1,
+             device + 1, snd_rawmidi_info_get_name(info), subdevice + 1,
+             alias_suffix);
+    snprintf(name, sizeof(name), "%s%d", name_prefix, index + 1);
     this->io_mask = io_mask;
     return;
  free_params:
