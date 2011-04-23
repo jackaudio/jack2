@@ -62,7 +62,18 @@ def build(bld):
 
     create_jack_audio_driver_obj(bld, 'coreaudio', 'coreaudio/JackCoreAudioDriver.cpp')
 
-    create_jack_midi_driver_obj(bld, 'coremidi', 'coremidi/JackCoreMidiDriver.cpp')
+    create_jack_midi_driver_obj(
+        bld,
+        'coremidi',
+        ['coremidi/JackCoreMidiInputPort.cpp',
+         'coremidi/JackCoreMidiOutputPort.cpp',
+         'coremidi/JackCoreMidiPhysicalInputPort.cpp',
+         'coremidi/JackCoreMidiPhysicalOutputPort.cpp',
+         'coremidi/JackCoreMidiVirtualInputPort.cpp',
+         'coremidi/JackCoreMidiVirtualOutputPort.cpp',
+         'coremidi/JackCoreMidiPort.cpp',
+         'coremidi/JackCoreMidiUtil.cpp',
+         'coremidi/JackCoreMidiDriver.cpp'])
     
     portaudio_src = [
         '../windows/JackPortAudioDriver.cpp',
