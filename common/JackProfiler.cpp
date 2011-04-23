@@ -206,37 +206,16 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
-        jack_driver_desc_t* desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
-        
-        strcpy(desc->name, "profiler");                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "real-time server profiling");  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
-       
-        desc->nparams = 3;
-        desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
-        
-        int i = 0;
-        strcpy(desc->params[i].name, "cpu-load");
-        desc->params[i].character = 'c';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = FALSE;
-        strcpy(desc->params[i].short_desc, "Show DSP CPU load");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
-        i++;
-        strcpy(desc->params[i].name, "driver-period");
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = FALSE;
-        strcpy(desc->params[i].short_desc, "Show driver period");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-        
-        i++;
-        strcpy(desc->params[i].name, "driver-end-time");
-        desc->params[i].character = 'e';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = FALSE;
-        strcpy(desc->params[i].short_desc, "Show driver end time");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
+
+        desc = jack_driver_descriptor_construct("profiler", "real-time server profiling", &filler);
+
+        value.i = FALSE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "cpu-load", 'c', JackDriverParamBool, &value, NULL, "Show DSP CPU load", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "driver-period", 'p', JackDriverParamBool, &value, NULL, "Show driver period", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "driver-end-time", 'e', JackDriverParamBool, &value, NULL, "Show driver end time", NULL);
 
         return desc;
     }

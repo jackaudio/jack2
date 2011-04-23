@@ -187,108 +187,40 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
-        jack_driver_desc_t *desc;
-        unsigned int i;
-        desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        strcpy ( desc->name, "audioadapter" );                         // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy ( desc->desc, "netjack audio <==> net backend adapter" );  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("audioadapter", "netjack audio <==> net backend adapter", &filler);
 
-        desc->nparams = 11;
-        desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
+        strcpy(value.str, "none");
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Provide capture ports.  Optionally set device", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Provide playback ports.  Optionally set device", NULL);
 
-        i = 0;
-        strcpy ( desc->params[i].name, "capture" );
-        desc->params[i].character = 'C';
-        desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, "none" );
-        strcpy ( desc->params[i].short_desc,
-                 "Provide capture ports.  Optionally set device" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        strcpy(value.str, "hw:0");
+        jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "ALSA device name", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "playback" );
-        desc->params[i].character = 'P';
-        desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, "none" );
-        strcpy ( desc->params[i].short_desc,
-                 "Provide playback ports.  Optionally set device" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.ui  = 48000U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "device" );
-        desc->params[i].character = 'd';
-        desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, "hw:0" );
-        strcpy ( desc->params[i].short_desc, "ALSA device name" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.ui  = 512U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "periodsize", 'p', JackDriverParamUInt, &value, NULL, "Period size", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "rate" );
-        desc->params[i].character = 'r';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 48000U;
-        strcpy ( desc->params[i].short_desc, "Sample rate" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.ui  = 2U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "nperiods", 'n', JackDriverParamUInt, &value, NULL, "Number of periods of playback latency", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "periodsize" );
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 512U;
-        strcpy ( desc->params[i].short_desc, "Period size" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.i  = true;
+        jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "nperiods" );
-        desc->params[i].character = 'n';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 2U;
-        strcpy ( desc->params[i].short_desc, "Number of periods of playback latency" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.i  = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Number of capture channels (defaults to hardware max)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Number of playback channels (defaults to hardware max)", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "duplex" );
-        desc->params[i].character = 'D';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = true;
-        strcpy ( desc->params[i].short_desc,
-                 "Provide both capture and playback ports" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.ui  = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "quality", 'q', JackDriverParamUInt, &value, NULL, "Resample algorithm quality (0 - 4)", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "inchannels" );
-        desc->params[i].character = 'i';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = 0;
-        strcpy ( desc->params[i].short_desc,
-                 "Number of capture channels (defaults to hardware max)" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-
-        i++;
-        strcpy ( desc->params[i].name, "outchannels" );
-        desc->params[i].character = 'o';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = 0;
-        strcpy ( desc->params[i].short_desc,
-                 "Number of playback channels (defaults to hardware max)" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-
-        i++;
-        strcpy(desc->params[i].name, "quality");
-        desc->params[i].character = 'q';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Resample algorithm quality (0 - 4)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "ring-buffer");
-        desc->params[i].character = 'g';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 32768;
-        strcpy(desc->params[i].short_desc, "Fixed ringbuffer size");
-        strcpy(desc->params[i].long_desc, "Fixed ringbuffer size (if not set => automatic adaptative)");
+        value.ui = 32768;
+        jack_driver_descriptor_add_parameter(desc, &filler, "ring-buffer", 'g', JackDriverParamUInt, &value, NULL, "Fixed ringbuffer size", "Fixed ringbuffer size (if not set => automatic adaptative)");
 
         return desc;
     }

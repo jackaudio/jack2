@@ -630,19 +630,11 @@ extern "C" {
     SERVER_EXPORT jack_driver_desc_t *
     driver_get_descriptor()
     {
-        jack_driver_desc_t *desc =
-            (jack_driver_desc_t *) malloc(sizeof(jack_driver_desc_t));
-        if (desc) {
-            strcpy(desc->desc, "Alternative ALSA raw MIDI backend.");
-            strcpy(desc->name, "alsarawmidi");
+        // X: There could be parameters here regarding setting I/O buffer
+        // sizes.  I don't think MIDI drivers can accept parameters right
+        // now without being set as the main driver.
 
-            // X: There could be parameters here regarding setting I/O buffer
-            // sizes.  I don't think MIDI drivers can accept parameters right
-            // now without being set as the main driver.
-            desc->nparams = 0;
-            desc->params = 0;
-        }
-        return desc;
+        return jack_driver_descriptor_construct("alsarawmidi", "Alternative ALSA raw MIDI backend.", NULL);
     }
 
     SERVER_EXPORT Jack::JackDriverClientInterface *

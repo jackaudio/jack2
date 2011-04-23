@@ -98,22 +98,13 @@ extern "C"
     SERVER_EXPORT jack_driver_desc_t * driver_get_descriptor()
     {
         jack_driver_desc_t * desc;
-        unsigned int i;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        desc = (jack_driver_desc_t*)calloc (1, sizeof (jack_driver_desc_t));
-        strcpy(desc->name, "loopback");              // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Loopback backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("loopback", "Loopback backend", &filler);
 
-        desc->nparams = 1;
-        desc->params = (jack_driver_param_desc_t*)calloc (desc->nparams, sizeof (jack_driver_param_desc_t));
-
-        i = 0;
-        strcpy(desc->params[i].name, "channels");
-        desc->params[i].character = 'c';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Maximum number of loopback ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamInt, &value, NULL, "Maximum number of loopback ports", NULL);
 
         return desc;
     }

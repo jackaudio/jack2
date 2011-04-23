@@ -751,38 +751,20 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor()
     {
-        jack_driver_desc_t *desc;
-        desc = ( jack_driver_desc_t* ) calloc ( 1, sizeof ( jack_driver_desc_t ) );
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        strcpy ( desc->name, "netmanager" );                        // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy ( desc->desc, "netjack multi-cast master component" );  // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("netmanager", "netjack multi-cast master component", &filler);
 
-        desc->nparams = 3;
-        desc->params = ( jack_driver_param_desc_t* ) calloc ( desc->nparams, sizeof ( jack_driver_param_desc_t ) );
+        strcpy(value.str, DEFAULT_MULTICAST_IP );
+        jack_driver_descriptor_add_parameter(desc, &filler, "multicast_ip", 'a', JackDriverParamString, &value, NULL, "Multicast Address", NULL);
 
-        int i = 0;
-        strcpy ( desc->params[i].name, "multicast_ip" );
-        desc->params[i].character = 'a';
-        desc->params[i].type = JackDriverParamString;
-        strcpy ( desc->params[i].value.str, DEFAULT_MULTICAST_IP );
-        strcpy ( desc->params[i].short_desc, "Multicast Address" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.i = DEFAULT_PORT;
+        jack_driver_descriptor_add_parameter(desc, &filler, "udp_net_port", 'p', JackDriverParamInt, &value, NULL, "UDP port", NULL);
 
-        i++;
-        strcpy ( desc->params[i].name, "udp_net_port" );
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = DEFAULT_PORT;
-        strcpy ( desc->params[i].short_desc, "UDP port" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
-
-        i++;
-        strcpy ( desc->params[i].name, "auto_connect" );
-        desc->params[i].character = 'c';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = false;
-        strcpy ( desc->params[i].short_desc, "Auto connect netmaster to system ports" );
-        strcpy ( desc->params[i].long_desc, desc->params[i].short_desc );
+        value.i = false;
+        jack_driver_descriptor_add_parameter(desc, &filler, "auto_connect", 'c', JackDriverParamBool, &value, NULL, "Auto connect netmaster to system ports", NULL);
 
         return desc;
     }

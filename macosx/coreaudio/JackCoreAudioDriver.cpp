@@ -1833,148 +1833,54 @@ extern "C"
 
     SERVER_EXPORT jack_driver_desc_t* driver_get_descriptor()
     {
-        jack_driver_desc_t *desc;
-        unsigned int i;
-        desc = (jack_driver_desc_t*)calloc(1, sizeof(jack_driver_desc_t));
+        jack_driver_desc_t * desc;
+        jack_driver_desc_filler_t filler;
+        jack_driver_param_value_t value;
 
-        strcpy(desc->name, "coreaudio");                                    // size MUST be less then JACK_DRIVER_NAME_MAX + 1
-        strcpy(desc->desc, "Apple CoreAudio API based audio backend");      // size MUST be less then JACK_DRIVER_PARAM_DESC + 1
+        desc = jack_driver_descriptor_construct("coreaudio", "Apple CoreAudio API based audio backend", &filler);
 
-        desc->nparams = 17;
-        desc->params = (jack_driver_param_desc_t*)calloc(desc->nparams, sizeof(jack_driver_param_desc_t));
+        value.i = -1;
+        jack_driver_descriptor_add_parameter(desc, &filler, "channels", 'c', JackDriverParamInt, &value, NULL, "Maximum number of channels", "Maximum number of channels. If -1, max possible number of channels will be used");
+        jack_driver_descriptor_add_parameter(desc, &filler, "inchannels", 'i', JackDriverParamInt, &value, NULL, "Maximum number of input channels", "Maximum number of input channels. If -1, max possible number of input channels will be used");
+        jack_driver_descriptor_add_parameter(desc, &filler, "outchannels", 'o', JackDriverParamInt, &value, NULL, "Maximum number of output channels", "Maximum number of output channels. If -1, max possible number of output channels will be used");
 
-        i = 0;
-        strcpy(desc->params[i].name, "channels");
-        desc->params[i].character = 'c';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = -1;
-        strcpy(desc->params[i].short_desc, "Maximum number of channels");
-        strcpy(desc->params[i].long_desc, "Maximum number of channels. If -1, max possible number of channels will be used");
+        value.str[0] = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "capture", 'C', JackDriverParamString, &value, NULL, "Input CoreAudio device name", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "playback", 'P', JackDriverParamString, &value, NULL, "Output CoreAudio device name", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "inchannels");
-        desc->params[i].character = 'i';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = -1;
-        strcpy(desc->params[i].short_desc, "Maximum number of input channels");
-        strcpy(desc->params[i].long_desc, "Maximum number of input channels. If -1, max possible number of input channels will be used");
+        value.i  = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "monitor", 'm', JackDriverParamBool, &value, NULL, "Provide monitor ports for the output", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "outchannels");
-        desc->params[i].character = 'o';
-        desc->params[i].type = JackDriverParamInt;
-        desc->params[i].value.i = -1;
-        strcpy(desc->params[i].short_desc, "Maximum number of output channels");
-        strcpy(desc->params[i].long_desc, "Maximum number of output channels. If -1, max possible number of output channels will be used");
+        value.i  = TRUE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "duplex", 'D', JackDriverParamBool, &value, NULL, "Provide both capture and playback ports", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "capture");
-        desc->params[i].character = 'C';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].short_desc, "Input CoreAudio device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui  = 44100U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "playback");
-        desc->params[i].character = 'P';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].short_desc, "Output CoreAudio device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui  = 128U;
+        jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
-        i++;
-        strcpy (desc->params[i].name, "monitor");
-        desc->params[i].character = 'm';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = 0;
-        strcpy(desc->params[i].short_desc, "Provide monitor ports for the output");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.str[0] = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "device", 'd', JackDriverParamString, &value, NULL, "CoreAudio device name", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "duplex");
-        desc->params[i].character = 'D';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = TRUE;
-        strcpy(desc->params[i].short_desc, "Provide both capture and playback ports");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui  = 0;
+        jack_driver_descriptor_add_parameter(desc, &filler, "input-latency", 'I', JackDriverParamUInt, &value, NULL, "Extra input latency (frames)", NULL);
+        jack_driver_descriptor_add_parameter(desc, &filler, "output-latency", 'O', JackDriverParamUInt, &value, NULL, "Extra output latency (frames)", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "rate");
-        desc->params[i].character = 'r';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 44100U;
-        strcpy(desc->params[i].short_desc, "Sample rate");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i  = FALSE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "list-devices", 'l', JackDriverParamBool, &value, NULL, "Display available CoreAudio devices", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "period");
-        desc->params[i].character = 'p';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 128U;
-        strcpy(desc->params[i].short_desc, "Frames per period");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.i  = FALSE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "hog", 'H', JackDriverParamBool, &value, NULL, "Take exclusive access of the audio device", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "device");
-        desc->params[i].character = 'd';
-        desc->params[i].type = JackDriverParamString;
-        strcpy(desc->params[i].short_desc, "CoreAudio device name");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui  = 100;
+        jack_driver_descriptor_add_parameter(desc, &filler, "async-latency", 'L', JackDriverParamUInt, &value, NULL, "Extra output latency in asynchronous mode (percent)", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "input-latency");
-        desc->params[i].character = 'I';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Extra input latency (frames)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
+        value.ui  = 100;
+        jack_driver_descriptor_add_parameter(desc, &filler, "grain", 'G', JackDriverParamUInt, &value, NULL, "Computation grain in RT thread (percent)", NULL);
 
-        i++;
-        strcpy(desc->params[i].name, "output-latency");
-        desc->params[i].character = 'O';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 0;
-        strcpy(desc->params[i].short_desc, "Extra output latency (frames)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "list-devices");
-        desc->params[i].character = 'l';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = FALSE;
-        strcpy(desc->params[i].short_desc, "Display available CoreAudio devices");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "hog");
-        desc->params[i].character = 'H';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = FALSE;
-        strcpy(desc->params[i].short_desc, "Take exclusive access of the audio device");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "async-latency");
-        desc->params[i].character = 'L';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 100;
-        strcpy(desc->params[i].short_desc, "Extra output latency in asynchronous mode (percent)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "grain");
-        desc->params[i].character = 'G';
-        desc->params[i].type = JackDriverParamUInt;
-        desc->params[i].value.ui = 100;
-        strcpy(desc->params[i].short_desc, "Computation grain in RT thread (percent)");
-        strcpy(desc->params[i].long_desc, desc->params[i].short_desc);
-
-        i++;
-        strcpy(desc->params[i].name, "clock-drift");
-        desc->params[i].character = 's';
-        desc->params[i].type = JackDriverParamBool;
-        desc->params[i].value.i = FALSE;
-        strcpy(desc->params[i].short_desc, "Clock drift compensation");
-        strcpy(desc->params[i].long_desc, "Whether to compensate clock drift in dynamically created aggregate device");
+        value.i = FALSE;
+        jack_driver_descriptor_add_parameter(desc, &filler, "clock-drift", 's', JackDriverParamBool, &value, NULL, "Clock drift compensation", "Whether to compensate clock drift in dynamically created aggregate device");
 
         return desc;
     }
