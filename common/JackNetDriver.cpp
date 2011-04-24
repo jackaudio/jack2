@@ -21,7 +21,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackEngineControl.h"
 #include "JackGraphManager.h"
 #include "JackWaitThreadedDriver.h"
-
+#include "JackLockedEngine.h"
 
 using namespace std;
 
@@ -295,6 +295,7 @@ namespace Jack
             port->SetLatencyRange(JackCaptureLatency, &range);
             fCapturePortList[audio_port_index] = port_id;
             jack_log("JackNetDriver::AllocPorts() fCapturePortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency());
+            fEngine->NotifyPortRegistration(port_id, true);
         }
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
         for (audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++)
@@ -325,6 +326,7 @@ namespace Jack
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[audio_port_index] = port_id;
             jack_log("JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_id, port->GetLatency());
+            fEngine->NotifyPortRegistration(port_id, true);
         }
         //midi
         port_flags = JackPortIsOutput | JackPortIsPhysical | JackPortIsTerminal;
@@ -344,6 +346,7 @@ namespace Jack
             port->SetLatencyRange(JackCaptureLatency, &range);
             fMidiCapturePortList[midi_port_index] = port_id;
             jack_log("JackNetDriver::AllocPorts() fMidiCapturePortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency());
+            fEngine->NotifyPortRegistration(port_id, true);
         }
 
         port_flags = JackPortIsInput | JackPortIsPhysical | JackPortIsTerminal;
@@ -374,6 +377,7 @@ namespace Jack
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fMidiPlaybackPortList[midi_port_index] = port_id;
             jack_log("JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_id, port->GetLatency());
+            fEngine->NotifyPortRegistration(port_id, true);
         }
 
         return 0;
@@ -386,6 +390,7 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fCaptureChannels; audio_port_index++) {
             if (fCapturePortList[audio_port_index] > 0) {
                 fGraphManager->ReleasePort(fClientControl.fRefNum, fCapturePortList[audio_port_index]);
+                fEngine->NotifyPortRegistration(fCapturePortList[audio_port_index], false);
                 fCapturePortList[audio_port_index] = 0;
             }
         }
@@ -393,6 +398,7 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
             if (fPlaybackPortList[audio_port_index] > 0) {
                 fGraphManager->ReleasePort(fClientControl.fRefNum, fPlaybackPortList[audio_port_index]);
+                fEngine->NotifyPortRegistration(fPlaybackPortList[audio_port_index], false);
                 fPlaybackPortList[audio_port_index] = 0;
             }
         }
@@ -400,6 +406,7 @@ namespace Jack
         for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
             if (fMidiCapturePortList && fMidiCapturePortList[midi_port_index] > 0) {
                 fGraphManager->ReleasePort(fClientControl.fRefNum, fMidiCapturePortList[midi_port_index]);
+                fEngine->NotifyPortRegistration(fMidiCapturePortList[midi_port_index], false);
                 fMidiCapturePortList[midi_port_index] = 0;
             }
         }
@@ -407,6 +414,7 @@ namespace Jack
         for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
             if (fMidiPlaybackPortList && fMidiPlaybackPortList[midi_port_index] > 0) {
                 fGraphManager->ReleasePort(fClientControl.fRefNum, fMidiPlaybackPortList[midi_port_index]);
+                fEngine->NotifyPortRegistration(fMidiPlaybackPortList[midi_port_index], false);
                 fMidiPlaybackPortList[midi_port_index] = 0;
             }
         }

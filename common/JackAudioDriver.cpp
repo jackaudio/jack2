@@ -149,6 +149,7 @@ int JackAudioDriver::Attach()
         port->SetAlias(alias);
         fCapturePortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
+        fEngine->NotifyPortRegistration(port_index, true);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
@@ -162,6 +163,7 @@ int JackAudioDriver::Attach()
         port->SetAlias(alias);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAudioDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
+        fEngine->NotifyPortRegistration(port_index, true);
 
         // Monitor ports
         if (fWithMonitorPorts) {
@@ -172,6 +174,7 @@ int JackAudioDriver::Attach()
                 return -1;
             } else {
                  fMonitorPortList[i] = port_index;
+                 fEngine->NotifyPortRegistration(port_index, true);
             }
         }
     }
@@ -187,12 +190,16 @@ int JackAudioDriver::Detach()
 
     for (i = 0; i < fCaptureChannels; i++) {
         fGraphManager->ReleasePort(fClientControl.fRefNum, fCapturePortList[i]);
+        fEngine->NotifyPortRegistration(fCapturePortList[i], false);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
         fGraphManager->ReleasePort(fClientControl.fRefNum, fPlaybackPortList[i]);
-        if (fWithMonitorPorts)
+        fEngine->NotifyPortRegistration(fPlaybackPortList[i], false);
+        if (fWithMonitorPorts) {
             fGraphManager->ReleasePort(fClientControl.fRefNum, fMonitorPortList[i]);
+            fEngine->NotifyPortRegistration(fMonitorPortList[i], false);
+        }
     }
 
     return 0;

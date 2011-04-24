@@ -23,6 +23,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackNetOneDriver.h"
 #include "JackEngineControl.h"
+#include "JackLockedEngine.h"
 #include "JackGraphManager.h"
 #include "JackWaitThreadedDriver.h"
 #include "JackTools.h"
@@ -177,6 +178,7 @@ int JackNetOneDriver::AllocPorts()
             netj.capture_srcs = jack_slist_append(netj.capture_srcs, (void *)src_new(SRC_LINEAR, 1, NULL));
 #endif
         }
+        fEngine->NotifyPortRegistration(port_id, true);
     }
     for (chn = netj.capture_channels_audio; chn < netj.capture_channels; chn++) {
         snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
@@ -190,6 +192,7 @@ int JackNetOneDriver::AllocPorts()
 
         netj.capture_ports =
             jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
+        fEngine->NotifyPortRegistration(port_id, true);
     }
 
     for (chn = 0; chn < netj.playback_channels_audio; chn++) {
@@ -221,6 +224,7 @@ int JackNetOneDriver::AllocPorts()
             netj.playback_srcs = jack_slist_append(netj.playback_srcs, (void *)src_new(SRC_LINEAR, 1, NULL));
 #endif
         }
+        fEngine->NotifyPortRegistration(port_id, true);
     }
     for (chn = netj.playback_channels_audio; chn < netj.playback_channels; chn++) {
         snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
@@ -234,6 +238,7 @@ int JackNetOneDriver::AllocPorts()
 
         netj.playback_ports =
             jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
+        fEngine->NotifyPortRegistration(port_id, true);
     }
     return 0;
 }
@@ -439,6 +444,7 @@ JackNetOneDriver::FreePorts ()
         node = jack_slist_remove_link( node, this_node );
         jack_slist_free_1( this_node );
         fGraphManager->ReleasePort( fClientControl.fRefNum, port_id );
+        fEngine->NotifyPortRegistration(port_id, false);
     }
     netj.capture_ports = NULL;
 
@@ -449,6 +455,7 @@ JackNetOneDriver::FreePorts ()
         node = jack_slist_remove_link( node, this_node );
         jack_slist_free_1( this_node );
         fGraphManager->ReleasePort( fClientControl.fRefNum, port_id );
+        fEngine->NotifyPortRegistration(port_id, false);
     }
     netj.playback_ports = NULL;
 

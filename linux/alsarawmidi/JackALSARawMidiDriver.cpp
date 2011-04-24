@@ -86,6 +86,7 @@ JackALSARawMidiDriver::Attach()
         jack_info("JackALSARawMidiDriver::Attach - input port registered "
                   "(name='%s', alias='%s').", name, alias);
 
+        fEngine->NotifyPortRegistration(index, true);
     }
     if (! fEngineControl->fSyncMode) {
         latency += buffer_size;
@@ -113,6 +114,7 @@ JackALSARawMidiDriver::Attach()
         jack_info("JackALSARawMidiDriver::Attach - output port registered "
                   "(name='%s', alias='%s').", name, alias);
 
+        fEngine->NotifyPortRegistration(index, true);
     }
     return 0;
 }

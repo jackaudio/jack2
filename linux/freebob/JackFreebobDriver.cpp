@@ -39,6 +39,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
+#include "JackLockedEngine.h"
 
 namespace Jack
 {
@@ -743,6 +744,8 @@ int JackFreebobDriver::Attach()
             fCapturePortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fCapturePortList[i] %ld ", port_index);
             driver->capture_nchannels_audio++;
+
+            fEngine->NotifyPortRegistration(port_index, true);
         }
     }
 
@@ -773,6 +776,8 @@ int JackFreebobDriver::Attach()
             fPlaybackPortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fPlaybackPortList[i] %ld ", port_index);
             driver->playback_nchannels_audio++;
+
+            fEngine->NotifyPortRegistration(port_index, true);
         }
     }
 

@@ -124,6 +124,7 @@ int JackAlsaDriver::Attach()
         port->SetAlias(alias);
         fCapturePortList[i] = port_index;
         jack_log("JackAlsaDriver::Attach fCapturePortList[i] %ld ", port_index);
+        fEngine->NotifyPortRegistration(port_index, true);
     }
 
     port_flags = (unsigned long)PlaybackDriverFlags;
@@ -139,6 +140,7 @@ int JackAlsaDriver::Attach()
         port->SetAlias(alias);
         fPlaybackPortList[i] = port_index;
         jack_log("JackAlsaDriver::Attach fPlaybackPortList[i] %ld ", port_index);
+        fEngine->NotifyPortRegistration(port_index, true);
 
         // Monitor ports
         if (fWithMonitorPorts) {
@@ -148,6 +150,7 @@ int JackAlsaDriver::Attach()
                 jack_error ("ALSA: cannot register monitor port for %s", name);
             } else {
                 fMonitorPortList[i] = port_index;
+                fEngine->NotifyPortRegistration(port_index, true);
             }
         }
     }

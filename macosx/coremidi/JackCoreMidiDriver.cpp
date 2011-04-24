@@ -107,6 +107,7 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = index;
+        fEngine->NotifyPortRegistration(index, true);
     }
 
     // Virtual inputs
@@ -126,6 +127,7 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[num_physical_inputs + i] = index;
+        fEngine->NotifyPortRegistration(index, true);
     }
 
     if (! fEngineControl->fSyncMode) {
@@ -151,6 +153,7 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = index;
+        fEngine->NotifyPortRegistration(index, true);
     }
 
     // Virtual outputs
@@ -170,6 +173,7 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[num_physical_outputs + i] = index;
+        fEngine->NotifyPortRegistration(index, true);
     }
 
     return 0;

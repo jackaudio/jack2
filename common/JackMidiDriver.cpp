@@ -75,6 +75,7 @@ int JackMidiDriver::Attach()
         port->SetAlias(alias);
         fCapturePortList[i] = port_index;
         jack_log("JackMidiDriver::Attach fCapturePortList[i] port_index = %ld", port_index);
+        fEngine->NotifyPortRegistration(port_index, true);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
@@ -88,6 +89,7 @@ int JackMidiDriver::Attach()
         port->SetAlias(alias);
         fPlaybackPortList[i] = port_index;
         jack_log("JackMidiDriver::Attach fPlaybackPortList[i] port_index = %ld", port_index);
+        fEngine->NotifyPortRegistration(port_index, true);
     }
 
     UpdateLatencies();
@@ -101,10 +103,12 @@ int JackMidiDriver::Detach()
 
     for (i = 0; i < fCaptureChannels; i++) {
         fGraphManager->ReleasePort(fClientControl.fRefNum, fCapturePortList[i]);
+        fEngine->NotifyPortRegistration(fCapturePortList[i], false);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
         fGraphManager->ReleasePort(fClientControl.fRefNum, fPlaybackPortList[i]);
+        fEngine->NotifyPortRegistration(fPlaybackPortList[i], false);
     }
 
     return 0;

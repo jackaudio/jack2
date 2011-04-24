@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackTools.h"
 #include "JackCompilerDeps.h"
+#include "JackLockedEngine.h"
 
 #include <iostream>
 #include <CoreServices/CoreServices.h>
@@ -1650,6 +1651,7 @@ int JackCoreAudioDriver::Attach()
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
         fCapturePortList[i] = port_index;
+        fEngine->NotifyPortRegistration(port_index, true);
     }
 
     for (int i = 0; i < fPlaybackChannels; i++) {
@@ -1676,6 +1678,7 @@ int JackCoreAudioDriver::Attach()
         port = fGraphManager->GetPort(port_index);
         port->SetAlias(alias);
         fPlaybackPortList[i] = port_index;
+        fEngine->NotifyPortRegistration(port_index, true);
 
         // Monitor ports
         if (fWithMonitorPorts) {
@@ -1686,6 +1689,7 @@ int JackCoreAudioDriver::Attach()
                 return -1;
             } else {
                 fMonitorPortList[i] = port_index;
+                fEngine->NotifyPortRegistration(port_index, true);
             }
         }
     }

@@ -43,6 +43,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackPort.h"
 #include "JackGraphManager.h"
 #include "JackCompilerDeps.h"
+#include "JackLockedEngine.h"
 
 namespace Jack
 {
@@ -443,6 +444,8 @@ int JackFFADODriver::Attach()
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
 
+            fEngine->NotifyPortRegistration(port_index, true);
+
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
             snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering midi capture port %s", buf);
@@ -472,6 +475,9 @@ int JackFFADODriver::Attach()
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
+
+            fEngine->NotifyPortRegistration(port_index, true);
+
         } else {
             printMessage ("Don't register capture port %s", portname);
         }
@@ -520,6 +526,9 @@ int JackFFADODriver::Attach()
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
+
+            fEngine->NotifyPortRegistration(port_index, true);
+
         } else if (driver->playback_channels[chn].stream_type == ffado_stream_type_midi) {
             snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_out", portname);
             printMessage ("Registering midi playback port %s", buf);
@@ -553,6 +562,9 @@ int JackFFADODriver::Attach()
             fPlaybackPortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fPlaybackPortList[i] %ld ", port_index);
             fPlaybackChannels++;
+
+            fEngine->NotifyPortRegistration(port_index, true);
+
         } else {
             printMessage ("Don't register playback port %s", portname);
         }
