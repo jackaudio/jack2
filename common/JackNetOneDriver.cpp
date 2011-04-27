@@ -136,7 +136,7 @@ int JackNetOneDriver::Detach()
 
 int JackNetOneDriver::AllocPorts()
 {
-    jack_port_id_t port_id;
+    jack_port_id_t port_index;
     char buf[64];
     unsigned int chn;
 
@@ -146,16 +146,16 @@ int JackNetOneDriver::AllocPorts()
     for (chn = 0; chn < netj.capture_channels_audio; chn++) {
         snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
 
-        if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
-                         CaptureDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT ) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
+            CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error ( "driver: cannot register port for %s", buf );
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_id );
+        //port = fGraphManager->GetPort ( port_index );
 
-        netj.capture_ports = jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
+        netj.capture_ports = jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_index);
 
-        if( netj.bitdepth == CELT_MODE ) {
+        if (netj.bitdepth == CELT_MODE) {
 #if HAVE_CELT
 #if HAVE_CELT_API_0_11
             celt_int32 lookahead;
@@ -178,34 +178,33 @@ int JackNetOneDriver::AllocPorts()
             netj.capture_srcs = jack_slist_append(netj.capture_srcs, (void *)src_new(SRC_LINEAR, 1, NULL));
 #endif
         }
-        fEngine->NotifyPortRegistration(port_id, true);
     }
+
     for (chn = netj.capture_channels_audio; chn < netj.capture_channels; chn++) {
         snprintf (buf, sizeof(buf) - 1, "system:capture_%u", chn + 1);
 
-        if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
-                         CaptureDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT ) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
+            CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error ( "driver: cannot register port for %s", buf );
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_id );
+        //port = fGraphManager->GetPort ( port_index );
 
         netj.capture_ports =
-            jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_id);
-        fEngine->NotifyPortRegistration(port_id, true);
+            jack_slist_append (netj.capture_ports, (void *)(intptr_t)port_index);
     }
 
     for (chn = 0; chn < netj.playback_channels_audio; chn++) {
         snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
 
-        if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
-                         PlaybackDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT ) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_AUDIO_TYPE,
+            PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error ( "driver: cannot register port for %s", buf );
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_id );
+        //port = fGraphManager->GetPort ( port_index );
 
-        netj.playback_ports = jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
+        netj.playback_ports = jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_index);
         if( netj.bitdepth == CELT_MODE ) {
 #if HAVE_CELT
 #if HAVE_CELT_API_0_11
@@ -224,21 +223,19 @@ int JackNetOneDriver::AllocPorts()
             netj.playback_srcs = jack_slist_append(netj.playback_srcs, (void *)src_new(SRC_LINEAR, 1, NULL));
 #endif
         }
-        fEngine->NotifyPortRegistration(port_id, true);
     }
     for (chn = netj.playback_channels_audio; chn < netj.playback_channels; chn++) {
         snprintf (buf, sizeof(buf) - 1, "system:playback_%u", chn + 1);
 
-        if ( ( port_id = fGraphManager->AllocatePort ( fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
-                         PlaybackDriverFlags, fEngineControl->fBufferSize ) ) == NO_PORT ) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, buf, JACK_DEFAULT_MIDI_TYPE,
+            PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error ( "driver: cannot register port for %s", buf );
             return -1;
         }
-        //port = fGraphManager->GetPort ( port_id );
+        //port = fGraphManager->GetPort ( port_index );
 
         netj.playback_ports =
-            jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_id);
-        fEngine->NotifyPortRegistration(port_id, true);
+            jack_slist_append (netj.playback_ports, (void *)(intptr_t)port_index);
     }
     return 0;
 }
@@ -440,22 +437,20 @@ JackNetOneDriver::FreePorts ()
 
     while( node != NULL ) {
         JSList *this_node = node;
-        jack_port_id_t port_id = (jack_port_id_t)(intptr_t) node->data;
+        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
         node = jack_slist_remove_link( node, this_node );
         jack_slist_free_1( this_node );
-        fGraphManager->ReleasePort( fClientControl.fRefNum, port_id );
-        fEngine->NotifyPortRegistration(port_id, false);
+        fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
     netj.capture_ports = NULL;
 
     node = netj.playback_ports;
     while( node != NULL ) {
         JSList *this_node = node;
-        jack_port_id_t port_id = (jack_port_id_t)(intptr_t) node->data;
+        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
         node = jack_slist_remove_link( node, this_node );
         jack_slist_free_1( this_node );
-        fGraphManager->ReleasePort( fClientControl.fRefNum, port_id );
-        fEngine->NotifyPortRegistration(port_id, false);
+        fEngine->PortUnRegister(fClientControl.fRefNum, port_index);
     }
     netj.playback_ports = NULL;
 
@@ -529,11 +524,11 @@ JackNetOneDriver::render_payload_to_jack_ports_float ( void *packet_payload, jac
 #if HAVE_SAMPLERATE
         SRC_DATA src;
 #endif
-        jack_port_id_t port_id = (jack_port_id_t)(intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort( port_id );
+        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
+        JackPort *port = fGraphManager->GetPort( port_index );
 
         jack_default_audio_sample_t* buf =
-            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_id, fEngineControl->fBufferSize);
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
 
         const char *porttype = port->GetType();
 
@@ -601,11 +596,11 @@ JackNetOneDriver::render_jack_ports_to_payload_float (JSList *playback_ports, JS
 #endif
         unsigned int i;
         int_float_t val;
-        jack_port_id_t port_id = (jack_port_id_t)(intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort( port_id );
+        jack_port_id_t port_index = (jack_port_id_t)(intptr_t) node->data;
+        JackPort *port = fGraphManager->GetPort( port_index );
 
         jack_default_audio_sample_t* buf =
-            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_id, fEngineControl->fBufferSize);
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
 
         const char *porttype = port->GetType();
 
@@ -668,11 +663,11 @@ JackNetOneDriver::render_payload_to_jack_ports_celt (void *packet_payload, jack_
     unsigned char *packet_bufX = (unsigned char *)packet_payload;
 
     while (node != NULL) {
-        jack_port_id_t port_id = (jack_port_id_t) (intptr_t)node->data;
-        JackPort *port = fGraphManager->GetPort( port_id );
+        jack_port_id_t port_index = (jack_port_id_t) (intptr_t)node->data;
+        JackPort *port = fGraphManager->GetPort( port_index );
 
         jack_default_audio_sample_t* buf =
-            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_id, fEngineControl->fBufferSize);
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
 
         const char *portname = port->GetType();
 
@@ -717,11 +712,11 @@ JackNetOneDriver::render_jack_ports_to_payload_celt (JSList *playback_ports, JSL
     unsigned char *packet_bufX = (unsigned char *)packet_payload;
 
     while (node != NULL) {
-        jack_port_id_t port_id = (jack_port_id_t) (intptr_t) node->data;
-        JackPort *port = fGraphManager->GetPort( port_id );
+        jack_port_id_t port_index = (jack_port_id_t) (intptr_t) node->data;
+        JackPort *port = fGraphManager->GetPort( port_index );
 
         jack_default_audio_sample_t* buf =
-            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_id, fEngineControl->fBufferSize);
+            (jack_default_audio_sample_t*)fGraphManager->GetBuffer(port_index, fEngineControl->fBufferSize);
 
         const char *portname = port->GetType();
 

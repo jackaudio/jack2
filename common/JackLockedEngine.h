@@ -261,13 +261,7 @@ class SERVER_EXPORT JackLockedEngine
             fEngine.NotifyGraphReorder();
             CATCH_EXCEPTION
         }
-        void NotifyPortRegistration(jack_port_id_t port_index, bool onoff)
-        {
-            TRY_CALL
-            JackLock lock(&fEngine);
-            fEngine.NotifyPortRegistation(port_index, onoff);
-            CATCH_EXCEPTION
-        }
+
         void NotifyBufferSize(jack_nframes_t buffer_size)
         {
             TRY_CALL

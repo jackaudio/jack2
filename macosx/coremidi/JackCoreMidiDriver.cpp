@@ -94,9 +94,9 @@ JackCoreMidiDriver::Attach()
     for (int i = 0; i < num_physical_inputs; i++) {
         port_obj = physical_input_ports[i];
         name = port_obj->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            CaptureDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            CaptureDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackCoreMidiDriver::Attach - cannot register physical "
                        "input port with name '%s'.", name);
@@ -107,16 +107,15 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = index;
-        fEngine->NotifyPortRegistration(index, true);
     }
 
     // Virtual inputs
     for (int i = 0; i < num_virtual_inputs; i++) {
         port_obj = virtual_input_ports[i];
         name = port_obj->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            CaptureDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            CaptureDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
                        "input port with name '%s'.", name);
@@ -127,7 +126,6 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[num_physical_inputs + i] = index;
-        fEngine->NotifyPortRegistration(index, true);
     }
 
     if (! fEngineControl->fSyncMode) {
@@ -140,9 +138,9 @@ JackCoreMidiDriver::Attach()
     for (int i = 0; i < num_physical_outputs; i++) {
         port_obj = physical_output_ports[i];
         name = port_obj->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            PlaybackDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            PlaybackDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackCoreMidiDriver::Attach - cannot register physical "
                        "output port with name '%s'.", name);
@@ -153,16 +151,15 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = index;
-        fEngine->NotifyPortRegistration(index, true);
     }
 
     // Virtual outputs
     for (int i = 0; i < num_virtual_outputs; i++) {
         port_obj = virtual_output_ports[i];
         name = port_obj->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            PlaybackDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            PlaybackDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
                        "output port with name '%s'.", name);
@@ -173,7 +170,6 @@ JackCoreMidiDriver::Attach()
         port->SetAlias(port_obj->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[num_physical_outputs + i] = index;
-        fEngine->NotifyPortRegistration(index, true);
     }
 
     return 0;

@@ -420,10 +420,10 @@ int JackFFADODriver::Attach()
         if (driver->capture_channels[chn].stream_type == ffado_stream_type_audio) {
             snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering audio capture port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               CaptureDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -444,15 +444,13 @@ int JackFFADODriver::Attach()
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
 
-            fEngine->NotifyPortRegistration(port_index, true);
-
         } else if (driver->capture_channels[chn].stream_type == ffado_stream_type_midi) {
             snprintf(buf, sizeof(buf) - 1, "firewire_pcm:%s_in", portname);
             printMessage ("Registering midi capture port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_MIDI_TYPE,
                               CaptureDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -475,8 +473,6 @@ int JackFFADODriver::Attach()
             fCapturePortList[chn] = port_index;
             jack_log("JackFFADODriver::Attach fCapturePortList[i] %ld ", port_index);
             fCaptureChannels++;
-
-            fEngine->NotifyPortRegistration(port_index, true);
 
         } else {
             printMessage ("Don't register capture port %s", portname);

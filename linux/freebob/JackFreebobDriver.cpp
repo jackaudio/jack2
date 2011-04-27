@@ -731,10 +731,10 @@ int JackFreebobDriver::Attach()
         } else {
             printMessage ("Registering capture port %s", buf);
 
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               CaptureDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -744,8 +744,6 @@ int JackFreebobDriver::Attach()
             fCapturePortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fCapturePortList[i] %ld ", port_index);
             driver->capture_nchannels_audio++;
-
-            fEngine->NotifyPortRegistration(port_index, true);
         }
     }
 
@@ -762,10 +760,10 @@ int JackFreebobDriver::Attach()
             printMessage ("Don't register playback port %s", buf);
         } else {
             printMessage ("Registering playback port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               PlaybackDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -776,8 +774,6 @@ int JackFreebobDriver::Attach()
             fPlaybackPortList[i] = port_index;
             jack_log("JackFreebobDriver::Attach fPlaybackPortList[i] %ld ", port_index);
             driver->playback_nchannels_audio++;
-
-            fEngine->NotifyPortRegistration(port_index, true);
         }
     }
 

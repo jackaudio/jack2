@@ -68,9 +68,9 @@ JackALSARawMidiDriver::Attach()
     for (int i = 0; i < fCaptureChannels; i++) {
         JackALSARawMidiInputPort *input_port = input_ports[i];
         name = input_port->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            CaptureDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            CaptureDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackALSARawMidiDriver::Attach - cannot register input "
                        "port with name '%s'.", name);
@@ -85,8 +85,6 @@ JackALSARawMidiDriver::Attach()
 
         jack_info("JackALSARawMidiDriver::Attach - input port registered "
                   "(name='%s', alias='%s').", name, alias);
-
-        fEngine->NotifyPortRegistration(index, true);
     }
     if (! fEngineControl->fSyncMode) {
         latency += buffer_size;
@@ -96,9 +94,9 @@ JackALSARawMidiDriver::Attach()
     for (int i = 0; i < fPlaybackChannels; i++) {
         JackALSARawMidiOutputPort *output_port = output_ports[i];
         name = output_port->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            PlaybackDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            PlaybackDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackALSARawMidiDriver::Attach - cannot register "
                        "output port with name '%s'.", name);
@@ -113,8 +111,6 @@ JackALSARawMidiDriver::Attach()
 
         jack_info("JackALSARawMidiDriver::Attach - output port registered "
                   "(name='%s', alias='%s').", name, alias);
-
-        fEngine->NotifyPortRegistration(index, true);
     }
     return 0;
 }
@@ -158,7 +154,7 @@ JackALSARawMidiDriver::Execute()
             // called.  This means that the amount of time that passes between
             // 'GetMicroSeconds()' and 'ppoll()' is time that will be lost
             // while waiting for 'poll() to timeout.
-            // 
+            //
             // I tried to replace the timeout with a 'timerfd' with absolute
             // times, but, strangely, it actually slowed things down, and made
             // the code a lot more complicated.
