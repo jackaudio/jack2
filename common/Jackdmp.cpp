@@ -115,13 +115,13 @@ static void usage(FILE* file)
             "               [ --version OR -V ]\n"
             "         -d master-backend-name [ ... master-backend args ... ]\n"
 #ifdef __APPLE__
-            "               Available master backends may include: coreaudio, dummy or net.\n\n"
+            "               Available master backends may include: coreaudio, dummy, net or netone.\n\n"
 #endif
 #ifdef WIN32
-            "               Available master backends may include: portaudio, dummy or net.\n\n"
+            "               Available master backends may include: portaudio, dummy, net or netone.\n\n"
 #endif
 #ifdef __linux__
-            "               Available master backends may include: alsa, dummy, freebob, firewire or net\n\n"
+            "               Available master backends may include: alsa, dummy, freebob, firewire, net or netone.\n\n"
 #endif
 #if defined(__sun__) || defined(sun)
             "               Available master backends may include: boomer, oss, dummy or net.\n\n"

@@ -51,10 +51,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 /* These two required by FreeBSD. */
 #include <sys/types.h>
 
-
 #include <jack/jack.h>
 
-//#include <net_driver.h>
 #include <netjack_packet.h>
 #if HAVE_SAMPLERATE
 #include <samplerate.h>

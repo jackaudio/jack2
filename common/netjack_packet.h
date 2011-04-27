@@ -34,12 +34,9 @@
 
 #include <jack/jack.h>
 #include <jack/types.h>
-//#include <jack/engine.h>
 #include <jack/jslist.h>
-
 #include <jack/midiport.h>
 
-//#include <netinet/in.h>
 // The Packet Header.
 
 #define CELT_MODE 1000   // Magic bitdepth value that indicates CELT compression

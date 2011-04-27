@@ -24,17 +24,13 @@
 #include <unistd.h>
 
 #include <jack/types.h>
-//#include <jack/driver.h>
 #include <jack/jack.h>
 #include <jack/transport.h>
-
 #include "jack/jslist.h"
 
 #if HAVE_CELT
 #include <celt/celt.h>
 #endif
-
-//#include <netinet/in.h>
 
 #ifdef __cplusplus
 extern "C"

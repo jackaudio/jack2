@@ -286,7 +286,7 @@ extern "C"
         value.ui = 44100U;
         jack_driver_descriptor_add_parameter(desc, &filler, "rate", 'r', JackDriverParamUInt, &value, NULL, "Sample rate", NULL);
 
-        value.ui = 128U;
+        value.ui = 512U;
         jack_driver_descriptor_add_parameter(desc, &filler, "period", 'p', JackDriverParamUInt, &value, NULL, "Frames per period", NULL);
 
         strcpy(value.str, "will take default PortAudio device name");
