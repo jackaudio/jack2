@@ -277,6 +277,20 @@ namespace Jack
             if (error != CELT_OK)
                 goto error;
 
+    #if HAVE_CELT_API_0_11
+
+            fCeltEncoder[i] = celt_encoder_create_custom(fCeltMode[i], 1, &error);
+            if (error != CELT_OK)
+                goto error;
+            celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(1));
+
+            fCeltDecoder[i] = celt_decoder_create_custom(fCeltMode[i], 1, &error);
+            if (error != CELT_OK)
+                goto error;
+            celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
+
+    #elif HAVE_CELT_API_0_7 || HAVE_CELT_API_0_8
+
             fCeltEncoder[i] = celt_encoder_create(fCeltMode[i], 1, &error);
             if (error != CELT_OK)
                 goto error;
@@ -286,6 +300,20 @@ namespace Jack
             if (error != CELT_OK)
                 goto error;
             celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
+
+    #else
+
+            fCeltEncoder[i] = celt_encoder_create(fCeltMode[i]);
+            if (error != CELT_OK)
+                goto error;
+            celt_encoder_ctl(fCeltEncoder[i], CELT_SET_COMPLEXITY(1));
+
+            fCeltDecoder[i] = celt_decoder_create(fCeltMode[i]);
+            if (error != CELT_OK)
+                goto error;
+            celt_decoder_ctl(fCeltDecoder[i], CELT_SET_COMPLEXITY(1));
+
+    #endif
         }
 
         fPortBuffer = new sample_t* [fNPorts];
