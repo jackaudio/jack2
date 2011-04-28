@@ -92,7 +92,7 @@ namespace Jack
 
     JackNetMaster::~JackNetMaster()
     {
-        jack_log ( "JackNetMaster::~JackNetMaster, ID %u.", fParams.fID );
+        jack_log ( "JackNetMaster::~JackNetMaster, ID %u", fParams.fID );
 
         if ( fJackClient )
         {
@@ -113,7 +113,7 @@ namespace Jack
     bool JackNetMaster::Init(bool auto_connect)
     {
         //network init
-        if (!JackNetMasterInterface::Init()){
+        if (!JackNetMasterInterface::Init()) {
             jack_error("JackNetMasterInterface::Init() error..." );
             return false;
         }
@@ -128,7 +128,7 @@ namespace Jack
         jack_status_t status;
         if ( ( fJackClient = jack_client_open ( fClientName, JackNullOption, &status, NULL ) ) == NULL )
         {
-            jack_error ( "Can't open a new jack client." );
+            jack_error ( "Can't open a new jack client" );
             return false;
         }
 
@@ -140,7 +140,7 @@ namespace Jack
 
         if ( AllocPorts() != 0 )
         {
-            jack_error ( "Can't allocate jack ports." );
+            jack_error ( "Can't allocate jack ports" );
             goto fail;
         }
 
@@ -150,13 +150,13 @@ namespace Jack
         //finally activate jack client
         if ( jack_activate ( fJackClient ) != 0 )
         {
-            jack_error ( "Can't activate jack client." );
+            jack_error ( "Can't activate jack client" );
             goto fail;
         }
 
         if (auto_connect)
             ConnectPorts();
-        jack_info ( "New NetMaster started." );
+        jack_info ( "New NetMaster started" );
         return true;
 
     fail:
@@ -314,17 +314,17 @@ namespace Jack
                 case RELEASE_TIMEBASEMASTER :
                     timebase = jack_release_timebase ( fJackClient );
                     if ( timebase < 0 )
-                        jack_error ( "Can't release timebase master." );
+                        jack_error ( "Can't release timebase master" );
                     else
-                        jack_info ( "'%s' isn't the timebase master anymore.", fParams.fName );
+                        jack_info ( "'%s' isn't the timebase master anymore", fParams.fName );
                     break;
 
                 case TIMEBASEMASTER :
                     timebase = jack_set_timebase_callback ( fJackClient, 0, SetTimebaseCallback, this );
                     if ( timebase < 0 )
-                        jack_error ( "Can't set a new timebase master." );
+                        jack_error ( "Can't set a new timebase master" );
                     else
-                        jack_info ( "'%s' is the new timebase master.", fParams.fName );
+                        jack_info ( "'%s' is the new timebase master", fParams.fName );
                     break;
 
                 case CONDITIONAL_TIMEBASEMASTER :
@@ -332,9 +332,9 @@ namespace Jack
                     if ( timebase != EBUSY )
                     {
                         if ( timebase < 0 )
-                            jack_error ( "Can't set a new timebase master." );
+                            jack_error ( "Can't set a new timebase master" );
                         else
-                            jack_info ( "'%s' is the new timebase master.", fParams.fName );
+                            jack_info ( "'%s' is the new timebase master", fParams.fName );
                     }
                     break;
             }
@@ -347,22 +347,22 @@ namespace Jack
             {
                 case JackTransportStopped :
                     jack_transport_stop ( fJackClient );
-                    jack_info ( "'%s' stops transport.", fParams.fName );
+                    jack_info ( "'%s' stops transport", fParams.fName );
                     break;
 
                 case JackTransportStarting :
                     if ( jack_transport_reposition ( fJackClient, &fReturnTransportData.fPosition ) == EINVAL )
-                        jack_error ( "Can't set new position." );
+                        jack_error ( "Can't set new position" );
                     jack_transport_start ( fJackClient );
                     jack_info ( "'%s' starts transport frame = %d", fParams.fName, fReturnTransportData.fPosition.frame);
                     break;
 
                 case JackTransportNetStarting :
-                    jack_info ( "'%s' is ready to roll..", fParams.fName );
+                    jack_info ( "'%s' is ready to roll...", fParams.fName );
                     break;
 
                 case JackTransportRolling :
-                    jack_info ( "'%s' is rolling.", fParams.fName );
+                    jack_info ( "'%s' is rolling", fParams.fName );
                     break;
             }
         }
@@ -526,11 +526,11 @@ namespace Jack
 
         //activate the client (for sync callback)
         if ( jack_activate ( fManagerClient ) != 0 )
-            jack_error ( "Can't activate the network manager client, transport disabled." );
+            jack_error ( "Can't activate the network manager client, transport disabled" );
 
         //launch the manager thread
         if ( jack_client_create_thread ( fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this ) )
-            jack_error ( "Can't create the network manager control thread." );
+            jack_error ( "Can't create the network manager control thread" );
     }
 
     JackNetMasterManager::~JackNetMasterManager()
@@ -579,7 +579,7 @@ namespace Jack
     void* JackNetMasterManager::NetManagerThread ( void* arg )
     {
         JackNetMasterManager* master_manager = static_cast<JackNetMasterManager*> ( arg );
-        jack_info ( "Starting Jack Network Manager." );
+        jack_info ( "Starting Jack Network Manager" );
         jack_info ( "Listening on '%s:%d'", master_manager->fMulticastIP, master_manager->fSocket.GetPort() );
         master_manager->Run();
         return NULL;
@@ -641,7 +641,7 @@ namespace Jack
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
                 if ( ++attempt == 10 )
                 {
-                    jack_error ( "Can't receive on the socket, exiting net manager." );
+                    jack_error ( "Can't receive on the socket, exiting net manager" );
                     return;
                 }
             }
@@ -718,7 +718,7 @@ namespace Jack
 
     master_list_it_t JackNetMasterManager::FindMaster ( uint32_t id )
     {
-        jack_log ( "JackNetMasterManager::FindMaster, ID %u.", id );
+        jack_log ( "JackNetMasterManager::FindMaster, ID %u", id );
 
         master_list_it_t it;
         for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
@@ -729,7 +729,7 @@ namespace Jack
 
     int JackNetMasterManager::KillMaster ( session_params_t* params )
     {
-        jack_log ( "JackNetMasterManager::KillMaster, ID %u.", params->fID );
+        jack_log ( "JackNetMasterManager::KillMaster, ID %u", params->fID );
 
         master_list_it_t master = FindMaster ( params->fID );
         if ( master != fMasterList.end() )

@@ -154,7 +154,7 @@ namespace Jack
 
     bool JackNetMasterInterface::Init()
     {
-        jack_log ( "JackNetMasterInterface::Init, ID %u.", fParams.fID );
+        jack_log ( "JackNetMasterInterface::Init, ID %u", fParams.fID );
 
         session_params_t host_params;
         uint attempt = 0;
@@ -186,12 +186,12 @@ namespace Jack
             SessionParamsHToN(&fParams, &net_params);
 
             if ( fSocket.Send ( &net_params, sizeof ( session_params_t ), 0 ) == SOCKET_ERROR )
-                jack_error ( "Error in send : ", StrError ( NET_ERROR_CODE ) );
+                jack_error("Error in send : %s", StrError(NET_ERROR_CODE));
 
             memset(&net_params, 0, sizeof (session_params_t));
             if (((rx_bytes = fSocket.Recv(&net_params, sizeof(session_params_t), 0)) == SOCKET_ERROR) && (fSocket.GetError() != NET_NO_DATA))
             {
-                jack_error ( "Problem with network." );
+                jack_error ( "Problem with network" );
                 return false;
             }
 
@@ -199,7 +199,7 @@ namespace Jack
         }
         while ( ( GetPacketType ( &host_params ) != START_MASTER ) && ( ++attempt < SLAVE_SETUP_RETRY ) );
         if ( attempt == SLAVE_SETUP_RETRY ) {
-            jack_error ( "Slave doesn't respond, exiting." );
+            jack_error ( "Slave doesn't respond, exiting" );
             return false;
         }
 
@@ -315,24 +315,24 @@ namespace Jack
 
     void JackNetMasterInterface::Exit()
     {
-        jack_log ( "JackNetMasterInterface::Exit, ID %u", fParams.fID );
+        jack_log("JackNetMasterInterface::Exit, ID %u", fParams.fID);
 
         //stop process
         fRunning = false;
 
         //send a 'multicast euthanasia request' - new socket is required on macosx
-        jack_info ( "Exiting '%s'", fParams.fName );
-        SetPacketType ( &fParams, KILL_MASTER );
-        JackNetSocket mcast_socket ( fMulticastIP, fSocket.GetPort() );
+        jack_info("Exiting '%s'", fParams.fName);
+        SetPacketType(&fParams, KILL_MASTER);
+        JackNetSocket mcast_socket(fMulticastIP, fSocket.GetPort());
 
         session_params_t net_params;
-        memset(&net_params, 0, sizeof ( session_params_t ));
+        memset(&net_params, 0, sizeof(session_params_t));
         SessionParamsHToN(&fParams, &net_params);
 
-        if ( mcast_socket.NewSocket() == SOCKET_ERROR )
-            jack_error ( "Can't create socket : %s", StrError ( NET_ERROR_CODE ) );
-        if ( mcast_socket.SendTo ( &net_params, sizeof ( session_params_t ), 0, fMulticastIP ) == SOCKET_ERROR )
-            jack_error ( "Can't send suicide request : %s", StrError ( NET_ERROR_CODE ) );
+        if (mcast_socket.NewSocket() == SOCKET_ERROR)
+            jack_error("Can't create socket : %s", StrError(NET_ERROR_CODE));
+        if (mcast_socket.SendTo(&net_params, sizeof(session_params_t), 0, fMulticastIP) == SOCKET_ERROR)
+            jack_error("Can't send suicide request : %s", StrError(NET_ERROR_CODE));
 
         mcast_socket.Close();
     }
@@ -348,14 +348,14 @@ namespace Jack
                 return 0;
             } else if (error == NET_CONN_ERROR) {
                 //fatal connection issue, exit
-                jack_error ( "'%s' : %s, exiting.", fParams.fName, StrError(NET_ERROR_CODE));
+                jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
                 //ask to the manager to properly remove the master
                 Exit();
 
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
             } else {
-                jack_error ( "Error in master receive : %s", StrError(NET_ERROR_CODE));
+                jack_error("Error in master receive : %s", StrError(NET_ERROR_CODE));
             }
         }
 
@@ -374,7 +374,7 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             if (error == NET_CONN_ERROR) {
                 //fatal connection issue, exit
-                jack_error ("'%s' : %s, exiting.", fParams.fName, StrError (NET_ERROR_CODE));
+                jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
                 Exit();
 
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
@@ -861,7 +861,7 @@ namespace Jack
                 jack_error ( "No data, is the master still running ?" );
             //if a network error occurs, this exception will restart the driver
             } else if ( error == NET_CONN_ERROR ) {
-                jack_error ( "Connection lost." );
+                jack_error ( "Recv connection lost" );
                 throw JackNetException();
             } else {
                 jack_error ( "Fatal error in slave receive : %s", StrError ( NET_ERROR_CODE ) );
@@ -885,7 +885,7 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             //if a network error occurs, this exception will restart the driver
             if ( error == NET_CONN_ERROR ) {
-                jack_error ( "Connection lost." );
+                jack_error ( "Send connection lost" );
                 throw JackNetException();
             } else {
                 jack_error ( "Fatal error in slave send : %s", StrError ( NET_ERROR_CODE ) );
@@ -954,7 +954,7 @@ namespace Jack
                         break;
 
                     case 's':   //sync
-                        jack_info ( "NetSlave : overloaded, skipping receive." );
+                        jack_info("NetSlave : overloaded, skipping receive");
                         // TODO : finish midi and audio rendering ?
                         fNetAudioCaptureBuffer->RenderToJackPorts();
                         return 0;

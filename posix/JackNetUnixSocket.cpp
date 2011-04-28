@@ -99,13 +99,13 @@ namespace Jack
             Reset();
         }
         fSockfd = socket ( AF_INET, SOCK_DGRAM, 0 );
-        
+
         /* Enable address reuse */
         int res, on = 1;
         if ((res = setsockopt( fSockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on))) < 0) {
             StrError(NET_ERROR_CODE);
         }
-            
+
         return fSockfd;
     }
 
@@ -230,12 +230,12 @@ namespace Jack
     {
         int	flags;
         fTimeOut = us;
-    
+
         if ((flags = fcntl(fSockfd, F_GETFL, 0)) < 0) {
 		    jack_error("JackNetUnixSocket::SetTimeOut error in fcntl F_GETFL");
 		    return -1;
 	    }
-    
+
 	    flags |= O_NONBLOCK;
 	    if (fcntl(fSockfd, F_SETFL, flags) < 0) {
 		    jack_error("JackNetUnixSocket::SetTimeOut error in fcntl F_SETFL");
@@ -252,17 +252,17 @@ namespace Jack
             struct timeval tv;
 	        fd_set fdset;
             ssize_t	res;
-    
+
             tv.tv_sec = fTimeOut / 1000000;
 	        tv.tv_usec = fTimeOut % 1000000;
-    
+
 	        FD_ZERO(&fdset);
 	        FD_SET(fSockfd, &fdset);
-    
+
 	        do {
 		        res = select(fSockfd + 1, &fdset, NULL, NULL, &tv);
 	        } while (res < 0 && errno == EINTR);
-    
+
 	        if (res < 0) {
  		        return res;
             } else if (res == 0) {
@@ -281,17 +281,17 @@ namespace Jack
             struct timeval tv;
 	        fd_set fdset;
             ssize_t	res;
-    
+
             tv.tv_sec = fTimeOut / 1000000;
-	        tv.tv_usec = fTimeOut % 1000000;
-    
+            tv.tv_usec = fTimeOut % 1000000;
+
 	        FD_ZERO(&fdset);
 	        FD_SET(fSockfd, &fdset);
-    
+
 	        do {
 		        res = select(fSockfd + 1, NULL, &fdset, NULL, &tv);
 	        } while (res < 0 && errno == EINTR);
-    
+
 	        if (res < 0) {
 		        return res;
             } else if (res == 0) {
@@ -375,7 +375,7 @@ namespace Jack
     #if defined(__sun__) || defined(sun)
         if (WaitRead() < 0)
             return -1;
-    #endif  
+    #endif
         return recvfrom ( fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*> ( &fRecvAddr ), &addr_len );
     }
 
@@ -384,7 +384,7 @@ namespace Jack
     #if defined(__sun__) || defined(sun)
         if (WaitRead() < 0)
             return -1;
-    #endif    
+    #endif
         return recv ( fSockfd, buffer, nbytes, flags );
     }
 
@@ -394,7 +394,7 @@ namespace Jack
     #if defined(__sun__) || defined(sun)
         if (WaitRead() < 0)
             return -1;
-    #endif    
+    #endif
         return recvfrom ( fSockfd, buffer, nbytes, flags, reinterpret_cast<socket_address_t*> ( &fSendAddr ), &addr_len );
     }
 
@@ -405,7 +405,7 @@ namespace Jack
             case EAGAIN:
             case ETIMEDOUT:
                 return NET_NO_DATA;
-                
+
             case ECONNABORTED:
             case ECONNREFUSED:
             case ECONNRESET:
@@ -415,9 +415,10 @@ namespace Jack
             case ENETDOWN:
             case ENETUNREACH:
                 return NET_CONN_ERROR;
-                
+
             default:
-                return NET_OP_ERROR;
+                //return NET_OP_ERROR;
+                return NET_CONN_ERROR;
         }
     }
 }
