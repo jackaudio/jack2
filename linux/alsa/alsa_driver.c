@@ -52,6 +52,8 @@ extern void show_work_times ();
 
 #undef DEBUG_WAKEUP
 
+char* strcasestr(const char* haystack, const char* needle);
+
 /* Delay (in process calls) before jackd will report an xrun */
 #define XRUN_REPORT_DELAY 0
 
