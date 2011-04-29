@@ -667,7 +667,7 @@ JackFreebobDriver::freebob_driver_midi_finish (freebob_driver_midi_handle_t *m)
 int JackFreebobDriver::Attach()
 {
     JackPort* port;
-    int port_index;
+    jack_port_id_t port_index;
 
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];

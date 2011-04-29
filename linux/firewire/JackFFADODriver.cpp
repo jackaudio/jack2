@@ -346,7 +346,7 @@ JackFFADODriver::ffado_driver_delete (ffado_driver_t *driver)
 int JackFFADODriver::Attach()
 {
     JackPort* port;
-    int port_index;
+    jack_port_id_t port_index;
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];
     jack_latency_range_t range;
