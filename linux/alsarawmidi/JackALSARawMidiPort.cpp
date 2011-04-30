@@ -116,7 +116,7 @@ JackALSARawMidiPort::JackALSARawMidiPort(snd_rawmidi_info_t *info,
     snprintf(alias, sizeof(alias), "system:%d-%d %s %d %s", card + 1,
              device + 1, snd_rawmidi_info_get_name(info), subdevice + 1,
              alias_suffix);
-    snprintf(name, sizeof(name), "%s%d", name_prefix, index + 1);
+    snprintf(name, sizeof(name), "%s%zu", name_prefix, index + 1);
     this->io_mask = io_mask;
     return;
  free_params:

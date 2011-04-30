@@ -866,36 +866,36 @@ main(int argc, char **argv)
         printf("\nJitter Plot:\n");
         for (i = 0; i < 100; i++) {
             if (jitter_plot[i]) {
-                printf("%.1f - %.1f ms: %u\n", ((float) i) / 10.0,
+                printf("%.1f - %.1f ms: %zu\n", ((float) i) / 10.0,
                        ((float) (i + 1)) / 10.0, jitter_plot[i]);
             }
         }
         if (jitter_plot[100]) {
-            printf("     > 10 ms: %u\n", jitter_plot[100]);
+            printf("     > 10 ms: %zu\n", jitter_plot[100]);
         }
         printf("\nLatency Plot:\n");
         for (i = 0; i < 100; i++) {
             if (latency_plot[i]) {
-                printf("%.1f - %.1f ms: %u\n",
+                printf("%.1f - %.1f ms: %zu\n",
                        latency_plot_offset + (((float) i) / 10.0),
                        latency_plot_offset + (((float) (i + 1)) / 10.0),
                        latency_plot[i]);
             }
         }
         if (latency_plot[100]) {
-            printf("     > %.1f ms: %u\n", latency_plot_offset + 10.0,
+            printf("     > %.1f ms: %zu\n", latency_plot_offset + 10.0,
                    latency_plot[100]);
         }
     }
  deactivate_client:
     jack_deactivate(client);
-    printf("\nMessages sent: %d\nMessages received: %d\n", messages_sent,
+    printf("\nMessages sent: %zu\nMessages received: %zu\n", messages_sent,
            messages_received);
     if (unexpected_messages) {
-        printf("Unexpected messages received: %d\n", unexpected_messages);
+        printf("Unexpected messages received: %zu\n", unexpected_messages);
     }
     if (xrun_count) {
-        printf("Xruns: %d\n", xrun_count);
+        printf("Xruns: %zu\n", xrun_count);
     }
  destroy_process_semaphore:
     destroy_semaphore(process_semaphore, 2);

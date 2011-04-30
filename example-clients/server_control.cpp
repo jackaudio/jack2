@@ -53,6 +53,7 @@ static jackctl_internal_t * jackctl_server_get_internal(jackctl_server_t *server
     return NULL;
 }
 
+#if 0
 static jackctl_parameter_t *
 jackctl_get_parameter(
     const JSList * parameters_list,
@@ -70,6 +71,7 @@ jackctl_get_parameter(
 
     return NULL;
 }
+#endif
 
 static void print_value(union jackctl_parameter_value value, jackctl_param_type_t type)
 {

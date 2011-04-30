@@ -647,7 +647,7 @@ int main (int argc, char *argv[])
                                            &status, "inprocess", "");
 
     if (intclient == 0 || status & JackFailure) {
-        printf("!!! ERROR !!! cannot load internal client \"inprocess\" intclient %d status 0x%2.0x !\n", intclient, status);
+        printf("!!! ERROR !!! cannot load internal client \"inprocess\" intclient 0x%llX status 0x%2.0x !\n", (unsigned long long)intclient, status);
 	} else {
 
         Log("\"inprocess\" server internal client loaded\n");
@@ -663,7 +663,7 @@ int main (int argc, char *argv[])
         if (intclient1 == intclient) {
             Log("jack_internal_client_handle returns correct handle\n");
         } else {
-            printf("!!! ERROR !!! jack_internal_client_handle returns incorrect handle %d\n", intclient1);
+            printf("!!! ERROR !!! jack_internal_client_handle returns incorrect handle 0x%llX\n", (unsigned long long)intclient1);
         }
 
         // Unload internal client

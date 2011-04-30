@@ -20,6 +20,7 @@
 
 
 #define __STDC_FORMAT_MACROS   // For inttypes.h to work in C++
+#define _GNU_SOURCE            /* for strcasestr() from string.h */
 
 #include <math.h>
 #include <stdio.h>

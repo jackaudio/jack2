@@ -73,6 +73,7 @@
 #endif
 
 #include "netjack_packet.h"
+#include "JackError.h"
 
 #ifdef NO_JACK_ERROR
 #define jack_error printf
