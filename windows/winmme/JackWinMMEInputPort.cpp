@@ -139,7 +139,17 @@ void
 JackWinMMEInputPort::EnqueueMessage(DWORD timestamp, size_t length,
                                     jack_midi_data_t *data)
 {
-    jack_nframes_t frame = GetFramesFromTime(start_time + (timestamp * 1000));
+    jack_nframes_t frame =
+        GetFramesFromTime(start_time + (((jack_time_t) timestamp) * 1000));
+
+    // Debugging code
+    jack_time_t current_time = GetMicroSeconds();
+    jack_log("JackWinMMEInputPort::EnqueueMessage - enqueueing event at %f "
+             "(frame: %d) with start offset '%d' scheduled for frame '%d'",
+             ((double) current_time) / 1000.0, GetFramesFromTime(current_time),
+             timestamp, frame);
+    // End debugging code
+
     switch (thread_queue->EnqueueEvent(frame, length, data)) {
     case JackMidiWriteQueue::BUFFER_FULL:
         jack_error("JackWinMMEInputPort::EnqueueMessage - The thread queue "
