@@ -8878,7 +8878,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = ../common;
+				HEADER_SEARCH_PATHS = (
+					../macosx,
+					../common,
+				);
 				OTHER_CFLAGS = (
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
@@ -8919,7 +8922,10 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				HEADER_SEARCH_PATHS = ../common;
+				HEADER_SEARCH_PATHS = (
+					../macosx,
+					../common,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DHAVE_CELT",
@@ -8996,7 +9002,10 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = ../common;
+				HEADER_SEARCH_PATHS = (
+					../macosx,
+					../common,
+				);
 				OTHER_CFLAGS = (
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
@@ -9031,7 +9040,10 @@
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				HEADER_SEARCH_PATHS = ../common;
+				HEADER_SEARCH_PATHS = (
+					../macosx,
+					../common,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
 					"-DHAVE_CELT",

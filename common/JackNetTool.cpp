@@ -88,14 +88,14 @@ namespace Jack
 {
 // NetMidiBuffer**********************************************************************************
 
-    NetMidiBuffer::NetMidiBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+    NetMidiBuffer::NetMidiBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
     {
         fNPorts = nports;
-        fMaxBufsize = fNPorts * sizeof ( sample_t ) * params->fPeriodSize ;
-        fMaxPcktSize = params->fMtu - sizeof ( packet_header_t );
+        fMaxBufsize = fNPorts * sizeof(sample_t) * params->fPeriodSize ;
+        fMaxPcktSize = params->fMtu - sizeof(packet_header_t);
         fBuffer = new char[fMaxBufsize];
         fPortBuffer = new JackMidiBuffer* [fNPorts];
-        for ( int port_index = 0; port_index < fNPorts; port_index++ )
+        for (int port_index = 0; port_index < fNPorts; port_index++)
             fPortBuffer[port_index] = NULL;
         fNetBuffer = net_buffer;
 
@@ -126,25 +126,25 @@ namespace Jack
         return 0;
     }
 
-    void NetMidiBuffer::SetBuffer ( int index, JackMidiBuffer* buffer )
+    void NetMidiBuffer::SetBuffer(int index, JackMidiBuffer* buffer)
     {
         fPortBuffer[index] = buffer;
     }
 
-    JackMidiBuffer* NetMidiBuffer::GetBuffer ( int index )
+    JackMidiBuffer* NetMidiBuffer::GetBuffer(int index)
     {
         return fPortBuffer[index];
     }
 
     void NetMidiBuffer::DisplayEvents()
     {
-        for ( int port_index = 0; port_index < fNPorts; port_index++ )
+        for (int port_index = 0; port_index < fNPorts; port_index++)
         {
-            for ( uint event = 0; event < fPortBuffer[port_index]->event_count; event++ )
-                if ( fPortBuffer[port_index]->IsValid() )
-                    jack_info ( "port %d : midi event %u/%u -> time : %u, size : %u",
+            for (uint event = 0; event < fPortBuffer[port_index]->event_count; event++)
+                if (fPortBuffer[port_index]->IsValid())
+                    jack_info("port %d : midi event %u/%u -> time : %u, size : %u",
                                 port_index + 1, event + 1, fPortBuffer[port_index]->event_count,
-                                fPortBuffer[port_index]->events[event].time, fPortBuffer[port_index]->events[event].size );
+                                fPortBuffer[port_index]->events[event].time, fPortBuffer[port_index]->events[event].size);
         }
     }
 
@@ -152,15 +152,14 @@ namespace Jack
     {
         int pos = 0;
         size_t copy_size;
-        for ( int port_index = 0; port_index < fNPorts; port_index++ )
+        for (int port_index = 0; port_index < fNPorts; port_index++)
         {
             char* write_pos = fBuffer + pos;
-
-            copy_size = sizeof ( JackMidiBuffer ) + fPortBuffer[port_index]->event_count * sizeof ( JackMidiEvent );
-            memcpy ( fBuffer + pos, fPortBuffer[port_index], copy_size );
+            copy_size = sizeof(JackMidiBuffer) + fPortBuffer[port_index]->event_count * sizeof(JackMidiEvent);
+            memcpy(fBuffer + pos, fPortBuffer[port_index], copy_size);
             pos += copy_size;
-            memcpy ( fBuffer + pos, fPortBuffer[port_index] + ( fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos ),
-                     fPortBuffer[port_index]->write_pos );
+            memcpy(fBuffer + pos, fPortBuffer[port_index] +(fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
+                     fPortBuffer[port_index]->write_pos);
             pos += fPortBuffer[port_index]->write_pos;
 
             JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(write_pos);
@@ -173,28 +172,27 @@ namespace Jack
     {
         int pos = 0;
         int copy_size;
-        for ( int port_index = 0; port_index < fNPorts; port_index++ )
+        for (int port_index = 0; port_index < fNPorts; port_index++)
         {
             JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(fBuffer + pos);
             MidiBufferNToH(midi_buffer, midi_buffer);
-
-            copy_size = sizeof ( JackMidiBuffer ) + reinterpret_cast<JackMidiBuffer*> ( fBuffer + pos )->event_count * sizeof ( JackMidiEvent );
-            memcpy ( fPortBuffer[port_index], fBuffer + pos, copy_size );
+            copy_size = sizeof(JackMidiBuffer) + reinterpret_cast<JackMidiBuffer*>(fBuffer + pos)->event_count * sizeof(JackMidiEvent);
+            memcpy(fPortBuffer[port_index], fBuffer + pos, copy_size);
             pos += copy_size;
-            memcpy ( fPortBuffer[port_index] + ( fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos ),
-                     fBuffer + pos, fPortBuffer[port_index]->write_pos );
+            memcpy(fPortBuffer[port_index] +(fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
+                     fBuffer + pos, fPortBuffer[port_index]->write_pos);
             pos += fPortBuffer[port_index]->write_pos;
         }
         return pos;
     }
 
-    int NetMidiBuffer::RenderFromNetwork ( int subcycle, size_t copy_size )
+    int NetMidiBuffer::RenderFromNetwork(int subcycle, size_t copy_size)
     {
-        memcpy ( fBuffer + subcycle * fMaxPcktSize, fNetBuffer, copy_size );
+        memcpy(fBuffer + subcycle * fMaxPcktSize, fNetBuffer, copy_size);
         return copy_size;
     }
 
-    int NetMidiBuffer::RenderToNetwork ( int subcycle, size_t total_size )
+    int NetMidiBuffer::RenderToNetwork(int subcycle, size_t total_size)
     {
         int size = total_size - subcycle * fMaxPcktSize;
         int copy_size = (size <= fMaxPcktSize) ? size : fMaxPcktSize;
@@ -204,7 +202,7 @@ namespace Jack
 
 // net audio buffer *********************************************************************************
 
-    NetFloatAudioBuffer::NetFloatAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+    NetFloatAudioBuffer::NetFloatAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
         : fPortBuffer(params, nports), fNetBuffer(net_buffer)
     {}
 
@@ -216,12 +214,12 @@ namespace Jack
         return fPortBuffer.GetCycleSize();
     }
 
-    void NetFloatAudioBuffer::SetBuffer ( int index, sample_t* buffer )
+    void NetFloatAudioBuffer::SetBuffer(int index, sample_t* buffer)
     {
         fPortBuffer.SetBuffer(index, buffer);
     }
 
-    sample_t* NetFloatAudioBuffer::GetBuffer ( int index )
+    sample_t* NetFloatAudioBuffer::GetBuffer(int index)
     {
         return fPortBuffer.GetBuffer(index);
     }
@@ -237,12 +235,12 @@ namespace Jack
     }
 
      //network<->buffer
-    int NetFloatAudioBuffer::RenderFromNetwork ( int cycle,  int subcycle, size_t copy_size )
+    int NetFloatAudioBuffer::RenderFromNetwork(int cycle,  int subcycle, size_t copy_size)
     {
         return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, subcycle, copy_size);
     }
 
-    int NetFloatAudioBuffer::RenderToNetwork (int subcycle, size_t total_size )
+    int NetFloatAudioBuffer::RenderToNetwork (int subcycle, size_t total_size)
     {
         return fPortBuffer.RenderToNetwork(fNetBuffer, subcycle, total_size);
     }
@@ -254,7 +252,7 @@ namespace Jack
     #define KPS 32
     #define KPS_DIV 8
 
-    NetCeltAudioBuffer::NetCeltAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer, int kbps )
+    NetCeltAudioBuffer::NetCeltAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer, int kbps)
         : fNetBuffer(net_buffer)
     {
         int res1, res2;
@@ -322,7 +320,7 @@ namespace Jack
 
         /*
         celt_int32 lookahead;
-        celt_mode_info( celt_mode, CELT_GET_LOOKAHEAD, &lookahead );
+        celt_mode_info(celt_mode, CELT_GET_LOOKAHEAD, &lookahead);
         */
 
         fCompressedSizeByte = (kbps * params->fPeriodSize * 1024) / (params->fSampleRate * 8);
@@ -435,7 +433,7 @@ namespace Jack
     {
         for (int port_index = 0; port_index < fNPorts; port_index++) {
 #if HAVE_CELT_API_0_8 || HAVE_CELT_API_0_11
-            int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize );
+            int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index], fPeriodSize);
 #else
             int res = celt_decode_float(fCeltDecoder[port_index], fCompressedBuffer[port_index], fCompressedSizeByte, fPortBuffer[port_index]);
 #endif
@@ -449,7 +447,7 @@ namespace Jack
         return 0;
     }
 
-      //network<->buffer
+    //network<->buffer
     int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int subcycle, size_t copy_size)
     {
         if (subcycle == fNumPackets - 1) {
@@ -484,7 +482,7 @@ namespace Jack
 
 #endif
 
-    NetIntAudioBuffer::NetIntAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+    NetIntAudioBuffer::NetIntAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
         : fNetBuffer(net_buffer)
     {
         int res1, res2;
@@ -524,7 +522,7 @@ namespace Jack
 
         fLastSubCycle = -1;
         return;
-     }
+    }
 
     NetIntAudioBuffer::~NetIntAudioBuffer()
     {
@@ -617,7 +615,7 @@ namespace Jack
 // Buffered
 
 /*
-    NetBufferedAudioBuffer::NetBufferedAudioBuffer ( session_params_t* params, uint32_t nports, char* net_buffer )
+    NetBufferedAudioBuffer::NetBufferedAudioBuffer(session_params_t* params, uint32_t nports, char* net_buffer)
     {
         fMaxCycle = 0;
         fNetBuffer = net_buffer;
@@ -627,7 +625,7 @@ namespace Jack
         }
 
         fJackPortBuffer = new sample_t* [nports];
-        for ( uint32_t port_index = 0; port_index < nports; port_index++ )
+        for (uint32_t port_index = 0; port_index < nports; port_index++)
             fJackPortBuffer[port_index] = NULL;
     }
 
@@ -641,17 +639,17 @@ namespace Jack
         return fPortBuffer[0].GetCycleSize();
     }
 
-    void NetBufferedAudioBuffer::SetBuffer ( int index, sample_t* buffer )
+    void NetBufferedAudioBuffer::SetBuffer(int index, sample_t* buffer)
     {
         fJackPortBuffer[index] = buffer;
     }
 
-    sample_t* NetBufferedAudioBuffer::GetBuffer ( int index )
+    sample_t* NetBufferedAudioBuffer::GetBuffer(int index)
     {
         return fJackPortBuffer[index];
     }
 
-    void NetBufferedAudioBuffer::RenderFromJackPorts (int subcycle )
+    void NetBufferedAudioBuffer::RenderFromJackPorts (int subcycle)
     {
         fPortBuffer[0].RenderFromJackPorts(fNetBuffer, subcycle);  // Always use first buffer...
     }
@@ -673,101 +671,101 @@ namespace Jack
 
 // SessionParams ************************************************************************************
 
-    SERVER_EXPORT void SessionParamsHToN ( session_params_t* src_params, session_params_t* dst_params )
+    SERVER_EXPORT void SessionParamsHToN(session_params_t* src_params, session_params_t* dst_params)
     {
         memcpy(dst_params, src_params, sizeof(session_params_t));
-        dst_params->fPacketID = htonl ( src_params->fPacketID );
-        dst_params->fMtu = htonl ( src_params->fMtu );
-        dst_params->fID = htonl ( src_params->fID );
-        dst_params->fTransportSync = htonl ( src_params->fTransportSync );
-        dst_params->fSendAudioChannels = htonl ( src_params->fSendAudioChannels );
-        dst_params->fReturnAudioChannels = htonl ( src_params->fReturnAudioChannels );
-        dst_params->fSendMidiChannels = htonl ( src_params->fSendMidiChannels );
-        dst_params->fReturnMidiChannels = htonl ( src_params->fReturnMidiChannels );
-        dst_params->fSampleRate = htonl ( src_params->fSampleRate );
-        dst_params->fPeriodSize = htonl ( src_params->fPeriodSize );
-        dst_params->fSampleEncoder = htonl ( src_params->fSampleEncoder );
-        dst_params->fSlaveSyncMode = htonl ( src_params->fSlaveSyncMode );
+        dst_params->fPacketID = htonl(src_params->fPacketID);
+        dst_params->fMtu = htonl(src_params->fMtu);
+        dst_params->fID = htonl(src_params->fID);
+        dst_params->fTransportSync = htonl(src_params->fTransportSync);
+        dst_params->fSendAudioChannels = htonl(src_params->fSendAudioChannels);
+        dst_params->fReturnAudioChannels = htonl(src_params->fReturnAudioChannels);
+        dst_params->fSendMidiChannels = htonl(src_params->fSendMidiChannels);
+        dst_params->fReturnMidiChannels = htonl(src_params->fReturnMidiChannels);
+        dst_params->fSampleRate = htonl(src_params->fSampleRate);
+        dst_params->fPeriodSize = htonl(src_params->fPeriodSize);
+        dst_params->fSampleEncoder = htonl(src_params->fSampleEncoder);
+        dst_params->fSlaveSyncMode = htonl(src_params->fSlaveSyncMode);
     }
 
-    SERVER_EXPORT void SessionParamsNToH (  session_params_t* src_params, session_params_t* dst_params )
+    SERVER_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params)
     {
         memcpy(dst_params, src_params, sizeof(session_params_t));
-        dst_params->fPacketID = ntohl ( src_params->fPacketID );
-        dst_params->fMtu = ntohl ( src_params->fMtu );
-        dst_params->fID = ntohl ( src_params->fID );
-        dst_params->fTransportSync = ntohl ( src_params->fTransportSync );
-        dst_params->fSendAudioChannels = ntohl ( src_params->fSendAudioChannels );
-        dst_params->fReturnAudioChannels = ntohl ( src_params->fReturnAudioChannels );
-        dst_params->fSendMidiChannels = ntohl ( src_params->fSendMidiChannels );
-        dst_params->fReturnMidiChannels = ntohl ( src_params->fReturnMidiChannels );
-        dst_params->fSampleRate = ntohl ( src_params->fSampleRate );
-        dst_params->fPeriodSize = ntohl ( src_params->fPeriodSize );
-        dst_params->fSampleEncoder = ntohl ( src_params->fSampleEncoder );
-        dst_params->fSlaveSyncMode = ntohl ( src_params->fSlaveSyncMode );
+        dst_params->fPacketID = ntohl(src_params->fPacketID);
+        dst_params->fMtu = ntohl(src_params->fMtu);
+        dst_params->fID = ntohl(src_params->fID);
+        dst_params->fTransportSync = ntohl(src_params->fTransportSync);
+        dst_params->fSendAudioChannels = ntohl(src_params->fSendAudioChannels);
+        dst_params->fReturnAudioChannels = ntohl(src_params->fReturnAudioChannels);
+        dst_params->fSendMidiChannels = ntohl(src_params->fSendMidiChannels);
+        dst_params->fReturnMidiChannels = ntohl(src_params->fReturnMidiChannels);
+        dst_params->fSampleRate = ntohl(src_params->fSampleRate);
+        dst_params->fPeriodSize = ntohl(src_params->fPeriodSize);
+        dst_params->fSampleEncoder = ntohl(src_params->fSampleEncoder);
+        dst_params->fSlaveSyncMode = ntohl(src_params->fSlaveSyncMode);
     }
 
-    SERVER_EXPORT void SessionParamsDisplay ( session_params_t* params )
+    SERVER_EXPORT void SessionParamsDisplay(session_params_t* params)
     {
         char encoder[16];
-        switch ( params->fSampleEncoder )
+        switch (params->fSampleEncoder)
         {
             case JackFloatEncoder:
-                strcpy ( encoder, "float" );
+                strcpy(encoder, "float");
                 break;
             case JackIntEncoder:
-                strcpy ( encoder, "integer" );
+                strcpy(encoder, "integer");
                 break;
             case JackCeltEncoder:
-                strcpy ( encoder, "CELT" );
+                strcpy(encoder, "CELT");
                 break;
         }
 
         char mode[8];
-        switch ( params->fNetworkMode )
+        switch (params->fNetworkMode)
         {
             case 's' :
-                strcpy ( mode, "slow" );
+                strcpy(mode, "slow");
                 break;
             case 'n' :
-                strcpy ( mode, "normal" );
+                strcpy(mode, "normal");
                 break;
             case 'f' :
-                strcpy ( mode, "fast" );
+                strcpy(mode, "fast");
                 break;
         }
-        jack_info ( "**************** Network parameters ****************" );
-        jack_info ( "Name : %s", params->fName );
-        jack_info ( "Protocol revision : %d", params->fProtocolVersion );
-        jack_info ( "MTU : %u", params->fMtu );
-        jack_info ( "Master name : %s", params->fMasterNetName );
-        jack_info ( "Slave name : %s", params->fSlaveNetName );
-        jack_info ( "ID : %u", params->fID );
-        jack_info ( "Transport Sync : %s", ( params->fTransportSync ) ? "yes" : "no" );
-        jack_info ( "Send channels (audio - midi) : %d - %d", params->fSendAudioChannels, params->fSendMidiChannels );
-        jack_info ( "Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels );
-        jack_info ( "Sample rate : %u frames per second", params->fSampleRate );
-        jack_info ( "Period size : %u frames per period", params->fPeriodSize );
+        jack_info("**************** Network parameters ****************");
+        jack_info("Name : %s", params->fName);
+        jack_info("Protocol revision : %d", params->fProtocolVersion);
+        jack_info("MTU : %u", params->fMtu);
+        jack_info("Master name : %s", params->fMasterNetName);
+        jack_info("Slave name : %s", params->fSlaveNetName);
+        jack_info("ID : %u", params->fID);
+        jack_info("Transport Sync : %s", (params->fTransportSync) ? "yes" : "no");
+        jack_info("Send channels (audio - midi) : %d - %d", params->fSendAudioChannels, params->fSendMidiChannels);
+        jack_info("Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels);
+        jack_info("Sample rate : %u frames per second", params->fSampleRate);
+        jack_info("Period size : %u frames per period", params->fPeriodSize);
         switch (params->fSampleEncoder) {
             case (JackFloatEncoder):
-                jack_info ( "SampleEncoder : %s", "Float" );
+                jack_info("SampleEncoder : %s", "Float");
                 break;
             case (JackIntEncoder):
-                jack_info ( "SampleEncoder : %s", "16 bits integer");
+                jack_info("SampleEncoder : %s", "16 bits integer");
                 break;
             case (JackCeltEncoder):
-                jack_info ( "SampleEncoder : %s", "CELT");
-                jack_info ( "kBits : %d", params->fKBps);
+                jack_info("SampleEncoder : %s", "CELT");
+                jack_info("kBits : %d", params->fKBps);
                 break;
         };
-        jack_info ( "Slave mode : %s", ( params->fSlaveSyncMode ) ? "sync" : "async" );
-        jack_info ( "Network mode : %s", mode );
-        jack_info ( "****************************************************" );
+        jack_info("Slave mode : %s", (params->fSlaveSyncMode) ? "sync" : "async");
+        jack_info("Network mode : %s", mode);
+        jack_info("****************************************************");
     }
 
-    SERVER_EXPORT sync_packet_type_t GetPacketType ( session_params_t* params )
+    SERVER_EXPORT sync_packet_type_t GetPacketType(session_params_t* params)
     {
-        switch ( params->fPacketID )
+        switch (params->fPacketID)
         {
             case 0:
                 return SLAVE_AVAILABLE;
@@ -783,9 +781,9 @@ namespace Jack
         return INVALID;
     }
 
-    SERVER_EXPORT int SetPacketType ( session_params_t* params, sync_packet_type_t packet_type )
+    SERVER_EXPORT int SetPacketType(session_params_t* params, sync_packet_type_t packet_type)
     {
-        switch ( packet_type )
+        switch (packet_type)
         {
             case INVALID:
                 return -1;
@@ -809,53 +807,53 @@ namespace Jack
 
 // Packet header **********************************************************************************
 
-    SERVER_EXPORT void PacketHeaderHToN ( packet_header_t* src_header, packet_header_t* dst_header )
+    SERVER_EXPORT void PacketHeaderHToN(packet_header_t* src_header, packet_header_t* dst_header)
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
-        dst_header->fID = htonl ( src_header->fID );
-        dst_header->fNumPacket = htonl ( src_header->fNumPacket );
-        dst_header->fPacketSize = htonl ( src_header->fPacketSize );
-        dst_header->fCycle = htonl ( src_header->fCycle );
-        dst_header->fSubCycle = htonl ( src_header->fSubCycle );
-        dst_header->fIsLastPckt = htonl ( src_header->fIsLastPckt );
+        dst_header->fID = htonl(src_header->fID);
+        dst_header->fNumPacket = htonl(src_header->fNumPacket);
+        dst_header->fPacketSize = htonl(src_header->fPacketSize);
+        dst_header->fCycle = htonl(src_header->fCycle);
+        dst_header->fSubCycle = htonl(src_header->fSubCycle);
+        dst_header->fIsLastPckt = htonl(src_header->fIsLastPckt);
     }
 
-    SERVER_EXPORT void PacketHeaderNToH ( packet_header_t* src_header, packet_header_t* dst_header )
+    SERVER_EXPORT void PacketHeaderNToH(packet_header_t* src_header, packet_header_t* dst_header)
     {
         memcpy(dst_header, src_header, sizeof(packet_header_t));
-        dst_header->fID = ntohl ( src_header->fID );
-        dst_header->fNumPacket = ntohl ( src_header->fNumPacket );
-        dst_header->fPacketSize = ntohl ( src_header->fPacketSize );
-        dst_header->fCycle = ntohl ( src_header->fCycle );
-        dst_header->fSubCycle = ntohl ( src_header->fSubCycle );
-        dst_header->fIsLastPckt = ntohl ( src_header->fIsLastPckt );
+        dst_header->fID = ntohl(src_header->fID);
+        dst_header->fNumPacket = ntohl(src_header->fNumPacket);
+        dst_header->fPacketSize = ntohl(src_header->fPacketSize);
+        dst_header->fCycle = ntohl(src_header->fCycle);
+        dst_header->fSubCycle = ntohl(src_header->fSubCycle);
+        dst_header->fIsLastPckt = ntohl(src_header->fIsLastPckt);
     }
 
-    SERVER_EXPORT void PacketHeaderDisplay ( packet_header_t* header )
+    SERVER_EXPORT void PacketHeaderDisplay(packet_header_t* header)
     {
         char bitdepth[16];
-        jack_info ( "********************Header********************" );
-        jack_info ( "Data type : %c", header->fDataType );
-        jack_info ( "Data stream : %c", header->fDataStream );
-        jack_info ( "ID : %u", header->fID );
-        jack_info ( "Cycle : %u", header->fCycle );
-        jack_info ( "SubCycle : %u", header->fSubCycle );
-        jack_info ( "Midi packets : %u", header->fNumPacket );
-        jack_info ( "Last packet : '%s'", ( header->fIsLastPckt ) ? "yes" : "no" );
-        jack_info ( "Bitdepth : %s", bitdepth );
-        jack_info ( "**********************************************" );
+        jack_info("********************Header********************");
+        jack_info("Data type : %c", header->fDataType);
+        jack_info("Data stream : %c", header->fDataStream);
+        jack_info("ID : %u", header->fID);
+        jack_info("Cycle : %u", header->fCycle);
+        jack_info("SubCycle : %u", header->fSubCycle);
+        jack_info("Midi packets : %u", header->fNumPacket);
+        jack_info("Last packet : '%s'", (header->fIsLastPckt) ? "yes" : "no");
+        jack_info("Bitdepth : %s", bitdepth);
+        jack_info("**********************************************");
     }
 
-    SERVER_EXPORT void NetTransportDataDisplay ( net_transport_data_t* data )
+    SERVER_EXPORT void NetTransportDataDisplay(net_transport_data_t* data)
     {
-        jack_info ( "********************Network Transport********************" );
-        jack_info ( "Transport new state : %u", data->fNewState );
-        jack_info ( "Transport timebase master : %u", data->fTimebaseMaster );
-        jack_info ( "Transport cycle state : %u", data->fState );
-        jack_info ( "**********************************************" );
+        jack_info("********************Network Transport********************");
+        jack_info("Transport new state : %u", data->fNewState);
+        jack_info("Transport timebase master : %u", data->fTimebaseMaster);
+        jack_info("Transport cycle state : %u", data->fState);
+        jack_info("**********************************************");
     }
 
-    SERVER_EXPORT void MidiBufferHToN ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer )
+    SERVER_EXPORT void MidiBufferHToN(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer)
     {
         dst_buffer->magic = htonl(src_buffer->magic);
         dst_buffer->buffer_size = htonl(src_buffer->buffer_size);
@@ -866,7 +864,7 @@ namespace Jack
         dst_buffer->mix_index = htonl(src_buffer->mix_index);
     }
 
-    SERVER_EXPORT void MidiBufferNToH ( JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer )
+    SERVER_EXPORT void MidiBufferNToH(JackMidiBuffer* src_buffer, JackMidiBuffer* dst_buffer)
     {
         dst_buffer->magic = ntohl(src_buffer->magic);
         dst_buffer->buffer_size = ntohl(src_buffer->buffer_size);
@@ -877,7 +875,7 @@ namespace Jack
         dst_buffer->mix_index = ntohl(src_buffer->mix_index);
     }
 
-    SERVER_EXPORT void TransportDataHToN ( net_transport_data_t* src_params, net_transport_data_t* dst_params )
+    SERVER_EXPORT void TransportDataHToN(net_transport_data_t* src_params, net_transport_data_t* dst_params)
     {
         dst_params->fNewState = htonl(src_params->fNewState);
         dst_params->fTimebaseMaster = htonl(src_params->fTimebaseMaster);
@@ -903,7 +901,7 @@ namespace Jack
         dst_params->fPosition.unique_2 = htonll(src_params->fPosition.unique_2);
     }
 
-    SERVER_EXPORT void TransportDataNToH ( net_transport_data_t* src_params, net_transport_data_t* dst_params )
+    SERVER_EXPORT void TransportDataNToH(net_transport_data_t* src_params, net_transport_data_t* dst_params)
     {
         dst_params->fNewState = ntohl(src_params->fNewState);
         dst_params->fTimebaseMaster =  ntohl(src_params->fTimebaseMaster);
@@ -934,18 +932,18 @@ namespace Jack
     SERVER_EXPORT int SocketAPIInit()
     {
 #ifdef WIN32
-        WORD wVersionRequested = MAKEWORD ( 2, 2 );
+        WORD wVersionRequested = MAKEWORD(2, 2);
         WSADATA wsaData;
 
-        if ( WSAStartup ( wVersionRequested, &wsaData ) != 0 )
+        if (WSAStartup(wVersionRequested, &wsaData) != 0)
         {
-            jack_error ( "WSAStartup error : %s", strerror ( NET_ERROR_CODE ) );
+            jack_error("WSAStartup error : %s", strerror(NET_ERROR_CODE));
             return -1;
         }
 
-        if ( LOBYTE ( wsaData.wVersion ) != 2 || HIBYTE ( wsaData.wVersion ) != 2 )
+        if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
         {
-            jack_error ( "Could not find a useable version of Winsock.dll\n" );
+            jack_error("Could not find a useable version of Winsock.dll\n");
             WSACleanup();
             return -1;
         }
@@ -961,9 +959,9 @@ namespace Jack
         return 0;
     }
 
-    SERVER_EXPORT const char* GetTransportState ( int transport_state )
+    SERVER_EXPORT const char* GetTransportState(int transport_state)
     {
-        switch ( transport_state )
+        switch (transport_state)
         {
             case JackTransportRolling:
                 return "rolling";
