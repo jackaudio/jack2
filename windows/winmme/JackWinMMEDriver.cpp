@@ -61,10 +61,9 @@ JackWinMMEDriver::Attach()
     for (int i = 0; i < fCaptureChannels; i++) {
         JackWinMMEInputPort *input_port = input_ports[i];
         name = input_port->GetName();
-        fEngine->PortRegister(fClientControl.fRefNum, name,
-                            JACK_DEFAULT_MIDI_TYPE,
-                            CaptureDriverFlags, buffer_size, &index);
-        if (index == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name,
+                                JACK_DEFAULT_MIDI_TYPE,
+                                CaptureDriverFlags, buffer_size, &index) < 0) {
             jack_error("JackWinMMEDriver::Attach - cannot register input port "
                        "with name '%s'.", name);
             // X: Do we need to deallocate ports?
@@ -86,10 +85,9 @@ JackWinMMEDriver::Attach()
     for (int i = 0; i < fPlaybackChannels; i++) {
         JackWinMMEOutputPort *output_port = output_ports[i];
         name = output_port->GetName();
-        fEngine->PortRegister(fClientControl.fRefNum, name,
-                            JACK_DEFAULT_MIDI_TYPE,
-                            PlaybackDriverFlags, buffer_size, &index);
-        if (index == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name,
+                                JACK_DEFAULT_MIDI_TYPE,
+                                PlaybackDriverFlags, buffer_size, &index) < 0) {
             jack_error("JackWinMMEDriver::Attach - cannot register output "
                        "port with name '%s'.", name);
             // X: Do we need to deallocate ports?
