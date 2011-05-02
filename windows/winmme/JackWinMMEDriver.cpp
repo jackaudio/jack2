@@ -61,9 +61,9 @@ JackWinMMEDriver::Attach()
     for (int i = 0; i < fCaptureChannels; i++) {
         JackWinMMEInputPort *input_port = input_ports[i];
         name = input_port->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            CaptureDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            CaptureDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackWinMMEDriver::Attach - cannot register input port "
                        "with name '%s'.", name);
@@ -74,7 +74,6 @@ JackWinMMEDriver::Attach()
         port->SetAlias(input_port->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = index;
-        fEngine->NotifyPortRegistration(index, true);
     }
 
     if (! fEngineControl->fSyncMode) {
@@ -87,9 +86,9 @@ JackWinMMEDriver::Attach()
     for (int i = 0; i < fPlaybackChannels; i++) {
         JackWinMMEOutputPort *output_port = output_ports[i];
         name = output_port->GetName();
-        index = fGraphManager->AllocatePort(fClientControl.fRefNum, name,
-                                            JACK_DEFAULT_MIDI_TYPE,
-                                            PlaybackDriverFlags, buffer_size);
+        fEngine->PortRegister(fClientControl.fRefNum, name,
+                            JACK_DEFAULT_MIDI_TYPE,
+                            PlaybackDriverFlags, buffer_size, &index);
         if (index == NO_PORT) {
             jack_error("JackWinMMEDriver::Attach - cannot register output "
                        "port with name '%s'.", name);
@@ -100,7 +99,6 @@ JackWinMMEDriver::Attach()
         port->SetAlias(output_port->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = index;
-        fEngine->NotifyPortRegistration(index, true);
     }
 
     return 0;
