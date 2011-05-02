@@ -74,6 +74,7 @@ JackWinMMEDriver::Attach()
         port->SetAlias(input_port->GetAlias());
         port->SetLatencyRange(JackCaptureLatency, &latency_range);
         fCapturePortList[i] = index;
+        fEngine->NotifyPortRegistration(index, true);
     }
 
     if (! fEngineControl->fSyncMode) {
@@ -99,6 +100,7 @@ JackWinMMEDriver::Attach()
         port->SetAlias(output_port->GetAlias());
         port->SetLatencyRange(JackPlaybackLatency, &latency_range);
         fPlaybackPortList[i] = index;
+        fEngine->NotifyPortRegistration(index, true);
     }
 
     return 0;

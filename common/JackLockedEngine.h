@@ -261,6 +261,7 @@ class SERVER_EXPORT JackLockedEngine
             fEngine.NotifyGraphReorder();
             CATCH_EXCEPTION
         }
+
         void NotifyBufferSize(jack_nframes_t buffer_size)
         {
             TRY_CALL

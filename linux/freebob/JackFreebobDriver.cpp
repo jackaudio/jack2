@@ -39,6 +39,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackClientControl.h"
 #include "JackPort.h"
 #include "JackGraphManager.h"
+#include "JackLockedEngine.h"
 
 namespace Jack
 {
@@ -666,7 +667,7 @@ JackFreebobDriver::freebob_driver_midi_finish (freebob_driver_midi_handle_t *m)
 int JackFreebobDriver::Attach()
 {
     JackPort* port;
-    int port_index;
+    jack_port_id_t port_index;
 
     char buf[JACK_PORT_NAME_SIZE];
     char portname[JACK_PORT_NAME_SIZE];
@@ -730,10 +731,10 @@ int JackFreebobDriver::Attach()
         } else {
             printMessage ("Registering capture port %s", buf);
 
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               CaptureDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }
@@ -759,10 +760,10 @@ int JackFreebobDriver::Attach()
             printMessage ("Don't register playback port %s", buf);
         } else {
             printMessage ("Registering playback port %s", buf);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, buf,
+            if (fEngine->PortRegister(fClientControl.fRefNum, buf,
                               JACK_DEFAULT_AUDIO_TYPE,
                               PlaybackDriverFlags,
-                              fEngineControl->fBufferSize)) == NO_PORT) {
+                              fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("driver: cannot register port for %s", buf);
                 return -1;
             }

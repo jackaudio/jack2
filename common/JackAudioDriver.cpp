@@ -141,7 +141,7 @@ int JackAudioDriver::Attach()
     for (i = 0; i < fCaptureChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:out%d", fAliasName, fCaptureDriverName, i + 1);
         snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
@@ -154,7 +154,7 @@ int JackAudioDriver::Attach()
     for (i = 0; i < fPlaybackChannels; i++) {
         snprintf(alias, sizeof(alias) - 1, "%s:%s:in%d", fAliasName, fPlaybackDriverName, i + 1);
         snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("driver: cannot register port for %s", name);
             return -1;
         }
@@ -167,7 +167,7 @@ int JackAudioDriver::Attach()
         if (fWithMonitorPorts) {
             jack_log("Create monitor port");
             snprintf(name, sizeof(name) - 1, "%s:monitor_%u", fClientControl.fName, i + 1);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize)) == NO_PORT) {
+            if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
@@ -186,13 +186,14 @@ int JackAudioDriver::Detach()
     jack_log("JackAudioDriver::Detach");
 
     for (i = 0; i < fCaptureChannels; i++) {
-        fGraphManager->ReleasePort(fClientControl.fRefNum, fCapturePortList[i]);
+        fEngine->PortUnRegister(fClientControl.fRefNum, fCapturePortList[i]);
     }
 
     for (i = 0; i < fPlaybackChannels; i++) {
-        fGraphManager->ReleasePort(fClientControl.fRefNum, fPlaybackPortList[i]);
-        if (fWithMonitorPorts)
-            fGraphManager->ReleasePort(fClientControl.fRefNum, fMonitorPortList[i]);
+        fEngine->PortUnRegister(fClientControl.fRefNum, fPlaybackPortList[i]);
+        if (fWithMonitorPorts) {
+            fEngine->PortUnRegister(fClientControl.fRefNum, fMonitorPortList[i]);
+        }
     }
 
     return 0;

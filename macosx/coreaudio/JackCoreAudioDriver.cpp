@@ -27,6 +27,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackGlobals.h"
 #include "JackTools.h"
 #include "JackCompilerDeps.h"
+#include "JackLockedEngine.h"
 
 #include <iostream>
 #include <CoreServices/CoreServices.h>
@@ -1642,7 +1643,7 @@ int JackCoreAudioDriver::Attach()
 
         snprintf(name, sizeof(name) - 1, "%s:capture_%d", fClientControl.fName, i + 1);
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, CaptureDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("Cannot register port for %s", name);
             return -1;
         }
@@ -1668,7 +1669,7 @@ int JackCoreAudioDriver::Attach()
 
         snprintf(name, sizeof(name) - 1, "%s:playback_%d", fClientControl.fName, i + 1);
 
-        if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, PlaybackDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
             jack_error("Cannot register port for %s", name);
             return -1;
         }
@@ -1681,7 +1682,7 @@ int JackCoreAudioDriver::Attach()
         if (fWithMonitorPorts) {
             jack_log("Create monitor port");
             snprintf(name, sizeof(name) - 1, "%s:monitor_%u", fClientControl.fName, i + 1);
-            if ((port_index = fGraphManager->AllocatePort(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize)) == NO_PORT) {
+            if (fEngine->PortRegister(fClientControl.fRefNum, name, JACK_DEFAULT_AUDIO_TYPE, MonitorDriverFlags, fEngineControl->fBufferSize, &port_index) < 0) {
                 jack_error("Cannot register monitor port for %s", name);
                 return -1;
             } else {
