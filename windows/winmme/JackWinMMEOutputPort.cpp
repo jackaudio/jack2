@@ -149,7 +149,7 @@ JackWinMMEOutputPort::Execute()
                 -((LONGLONG) ((frame_time - current_time) * 10));
             if (! SetWaitableTimer(timer, &due_time, 0, NULL, NULL, 0)) {
                 WriteOSError("JackWinMMEOutputPort::Execute",
-                             "ChangeTimerQueueTimer");
+                             "SetWaitableTimer");
                 break;
             }
 
