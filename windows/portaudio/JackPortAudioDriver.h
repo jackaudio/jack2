@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "JackAudioDriver.h"
 #include "JackPortAudioDevices.h"
+#include "JackMMCSS.h"
 
 namespace Jack
 {
@@ -30,7 +31,7 @@ namespace Jack
 \brief The PortAudio driver.
 */
 
-class JackPortAudioDriver : public JackAudioDriver
+class JackPortAudioDriver : public JackMMCSS, public JackAudioDriver
 {
 
     private:
@@ -54,7 +55,7 @@ class JackPortAudioDriver : public JackAudioDriver
     public:
 
         JackPortAudioDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table, PortAudioDevices* pa_devices)
-                : JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
+                : JackMMCSS(), JackAudioDriver(name, alias, engine, table), fStream(NULL), fInputBuffer(NULL), fOutputBuffer(NULL),
                 fInputDevice(paNoDevice), fOutputDevice(paNoDevice)
         {
             fPaDevices = pa_devices;

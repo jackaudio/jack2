@@ -61,6 +61,7 @@ JackWinMMEDriver::Attach()
     for (int i = 0; i < fCaptureChannels; i++) {
         JackWinMMEInputPort *input_port = input_ports[i];
         name = input_port->GetName();
+        printf("register port %d",buffer_size);
         if (fEngine->PortRegister(fClientControl.fRefNum, name,
                                 JACK_DEFAULT_MIDI_TYPE,
                                 CaptureDriverFlags, buffer_size, &index) < 0) {

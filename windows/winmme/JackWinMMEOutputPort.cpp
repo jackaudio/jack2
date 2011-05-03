@@ -23,6 +23,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackMidiUtil.h"
 #include "JackTime.h"
 #include "JackWinMMEOutputPort.h"
+#include "JackGlobals.h"
+#include "JackEngineControl.h"
 
 using Jack::JackWinMMEOutputPort;
 
@@ -44,7 +46,8 @@ JackWinMMEOutputPort::HandleMessageEvent(HMIDIOUT handle, UINT message,
 
 JackWinMMEOutputPort::JackWinMMEOutputPort(const char *alias_name,
                                            const char *client_name,
-                                           const char *driver_name, UINT index,
+                                           const char *driver_name,
+                                           UINT index,
                                            size_t max_bytes,
                                            size_t max_messages)
 {
@@ -132,7 +135,7 @@ JackWinMMEOutputPort::Execute()
     for (;;) {
         if (! Wait(thread_queue_semaphore)) {
             jack_log("JackWinMMEOutputPort::Execute BREAK");
-            
+
             break;
         }
         jack_midi_event_t *event = thread_queue->DequeueEvent();
@@ -274,7 +277,7 @@ JackWinMMEOutputPort::Init()
     set_threaded_log_function();
     // XX: Can more be done?  Ideally, this thread should have the JACK server
     // thread priority + 1.
-    if (thread->AcquireSelfRealTime()) {
+    if (thread->AcquireSelfRealTime(GetEngineControl()->fServerPriority)) {
         jack_error("JackWinMMEOutputPort::Init - could not acquire realtime "
                    "scheduling. Continuing anyway.");
     }
