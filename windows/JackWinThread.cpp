@@ -20,7 +20,6 @@
 #include "JackWinThread.h"
 #include "JackError.h"
 #include "JackTime.h"
-#include <avrt.h>
 #include <assert.h>
 #include <stdio.h>
 
