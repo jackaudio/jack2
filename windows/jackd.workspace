@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
 	<Workspace title="jack">
-		<Project filename="libjackserver.cbp" />
+		<Project filename="libjackserver.cbp" active="1" />
 		<Project filename="jack_portaudio.cbp" />
 		<Project filename="jack_netdriver.cbp" />
 		<Project filename="jack_netonedriver.cbp" />
@@ -18,7 +18,7 @@
 		<Project filename="jack_disconnect.cbp" />
 		<Project filename="jack_test.cbp" />
 		<Project filename="multiple_metro.cbp" />
-		<Project filename="jack_winmme.cbp" active="1" />
+		<Project filename="jack_winmme.cbp" />
 		<Project filename="jack_loopback.cbp" />
 		<Project filename="jackd.cbp" />
 		<Project filename="jack_midi_latency_test.cbp" />

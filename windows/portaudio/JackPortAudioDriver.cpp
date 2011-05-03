@@ -41,6 +41,8 @@ namespace Jack
         driver->fInputBuffer = (jack_default_audio_sample_t**)inputBuffer;
         driver->fOutputBuffer = (jack_default_audio_sample_t**)outputBuffer;
 
+        MMCSSAcquireRealTime(GetCurrentThread());
+
         if (statusFlags) {
             if (statusFlags & paOutputUnderflow)
                 jack_error("JackPortAudioDriver::Render paOutputUnderflow");

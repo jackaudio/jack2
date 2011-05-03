@@ -17,12 +17,11 @@
 
  */
 
-
-
 #ifndef __JackWinThread__
 #define __JackWinThread__
 
 #include "JackThread.h"
+#include "JackMMCSS.h"
 #include "JackCompilerDeps.h"
 #include "JackSystemDeps.h"
 #include <windows.h>
@@ -36,7 +35,7 @@ typedef DWORD (WINAPI *ThreadCallback)(void *arg);
 \brief Windows threads.
 */
 
-class SERVER_EXPORT JackWinThread : public detail::JackThreadInterface
+class SERVER_EXPORT JackWinThread : public JackMMCSS, public detail::JackThreadInterface
 {
 
     private:

@@ -37,113 +37,113 @@ extern "C"
 {
 #endif
 
-struct _packet_cache;
+    struct _packet_cache;
 
-typedef struct _netjack_driver_state netjack_driver_state_t;
+    typedef struct _netjack_driver_state netjack_driver_state_t;
 
-struct _netjack_driver_state {
-    jack_nframes_t  net_period_up;
-    jack_nframes_t  net_period_down;
+    struct _netjack_driver_state {
+        jack_nframes_t  net_period_up;
+        jack_nframes_t  net_period_down;
 
-    jack_nframes_t  sample_rate;
-    jack_nframes_t  bitdepth;
-    jack_nframes_t  period_size;
-    jack_time_t	    period_usecs;
-    int		    dont_htonl_floats;
-    int		    always_deadline;
+        jack_nframes_t  sample_rate;
+        jack_nframes_t  bitdepth;
+        jack_nframes_t  period_size;
+        jack_time_t	    period_usecs;
+        int		    dont_htonl_floats;
+        int		    always_deadline;
 
-    jack_nframes_t  codec_latency;
+        jack_nframes_t  codec_latency;
 
-    unsigned int    listen_port;
+        unsigned int    listen_port;
 
-    unsigned int    capture_channels;
-    unsigned int    playback_channels;
-    unsigned int    capture_channels_audio;
-    unsigned int    playback_channels_audio;
-    unsigned int    capture_channels_midi;
-    unsigned int    playback_channels_midi;
+        unsigned int    capture_channels;
+        unsigned int    playback_channels;
+        unsigned int    capture_channels_audio;
+        unsigned int    playback_channels_audio;
+        unsigned int    capture_channels_midi;
+        unsigned int    playback_channels_midi;
 
-    JSList	    *capture_ports;
-    JSList	    *playback_ports;
-    JSList	    *playback_srcs;
-    JSList	    *capture_srcs;
+        JSList	    *capture_ports;
+        JSList	    *playback_ports;
+        JSList	    *playback_srcs;
+        JSList	    *capture_srcs;
 
-    jack_client_t   *client;
+        jack_client_t   *client;
 
 #ifdef WIN32
-    SOCKET	    sockfd;
-    SOCKET	    outsockfd;
+        SOCKET	    sockfd;
+        SOCKET	    outsockfd;
 #else
-    int		    sockfd;
-    int		    outsockfd;
+        int		    sockfd;
+        int		    outsockfd;
 #endif
 
-    struct sockaddr_in syncsource_address;
+        struct sockaddr_in syncsource_address;
 
-    int		    reply_port;
-    int		    srcaddress_valid;
+        int		    reply_port;
+        int		    srcaddress_valid;
 
-    int sync_state;
-    unsigned int handle_transport_sync;
+        int sync_state;
+        unsigned int handle_transport_sync;
 
-    unsigned int *rx_buf;
-    unsigned int rx_bufsize;
-    //unsigned int tx_bufsize;
-    unsigned int mtu;
-    unsigned int latency;
-    unsigned int redundancy;
+        unsigned int *rx_buf;
+        unsigned int rx_bufsize;
+        //unsigned int tx_bufsize;
+        unsigned int mtu;
+        unsigned int latency;
+        unsigned int redundancy;
 
-    jack_nframes_t expected_framecnt;
-    int		   expected_framecnt_valid;
-    unsigned int   num_lost_packets;
-    jack_time_t	   next_deadline;
-    jack_time_t	   deadline_offset;
-    int		   next_deadline_valid;
-    int		   packet_data_valid;
-    int		   resync_threshold;
-    int		   running_free;
-    int		   deadline_goodness;
-    jack_time_t	   time_to_deadline;
-    unsigned int   use_autoconfig;
-    unsigned int   resample_factor;
-    unsigned int   resample_factor_up;
-    int		   jitter_val;
-    struct _packet_cache * packcache;
+        jack_nframes_t expected_framecnt;
+        int		   expected_framecnt_valid;
+        unsigned int   num_lost_packets;
+        jack_time_t	   next_deadline;
+        jack_time_t	   deadline_offset;
+        int		   next_deadline_valid;
+        int		   packet_data_valid;
+        int		   resync_threshold;
+        int		   running_free;
+        int		   deadline_goodness;
+        jack_time_t	   time_to_deadline;
+        unsigned int   use_autoconfig;
+        unsigned int   resample_factor;
+        unsigned int   resample_factor_up;
+        int		   jitter_val;
+        struct _packet_cache * packcache;
 #if HAVE_CELT
-    CELTMode	   *celt_mode;
+        CELTMode	   *celt_mode;
 #endif
-};
+    };
 
-int netjack_wait( netjack_driver_state_t *netj );
-void netjack_send_silence( netjack_driver_state_t *netj, int syncstate );
-void netjack_read( netjack_driver_state_t *netj, jack_nframes_t nframes ) ;
-void netjack_write( netjack_driver_state_t *netj, jack_nframes_t nframes, int syncstate );
-void netjack_attach( netjack_driver_state_t *netj );
-void netjack_detach( netjack_driver_state_t *netj );
+    int netjack_wait( netjack_driver_state_t *netj );
+    void netjack_send_silence( netjack_driver_state_t *netj, int syncstate );
+    void netjack_read( netjack_driver_state_t *netj, jack_nframes_t nframes ) ;
+    void netjack_write( netjack_driver_state_t *netj, jack_nframes_t nframes, int syncstate );
+    void netjack_attach( netjack_driver_state_t *netj );
+    void netjack_detach( netjack_driver_state_t *netj );
 
-netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
-		jack_client_t * client,
-        const char *name,
-        unsigned int capture_ports,
-        unsigned int playback_ports,
-        unsigned int capture_ports_midi,
-        unsigned int playback_ports_midi,
-        jack_nframes_t sample_rate,
-        jack_nframes_t period_size,
-        unsigned int listen_port,
-        unsigned int transport_sync,
-        unsigned int resample_factor,
-        unsigned int resample_factor_up,
-        unsigned int bitdepth,
-        unsigned int use_autoconfig,
-		unsigned int latency,
-		unsigned int redundancy,
-		int dont_htonl_floats,
-		int always_deadline,
-		int jitter_val );
+    netjack_driver_state_t *netjack_init (netjack_driver_state_t *netj,
+                                          jack_client_t * client,
+                                          const char *name,
+                                          unsigned int capture_ports,
+                                          unsigned int playback_ports,
+                                          unsigned int capture_ports_midi,
+                                          unsigned int playback_ports_midi,
+                                          jack_nframes_t sample_rate,
+                                          jack_nframes_t period_size,
+                                          unsigned int listen_port,
+                                          unsigned int transport_sync,
+                                          unsigned int resample_factor,
+                                          unsigned int resample_factor_up,
+                                          unsigned int bitdepth,
+                                          unsigned int use_autoconfig,
+                                          unsigned int latency,
+                                          unsigned int redundancy,
+                                          int dont_htonl_floats,
+                                          int always_deadline,
+                                          int jitter_val );
 
-void netjack_release( netjack_driver_state_t *netj );
-int netjack_startup( netjack_driver_state_t *netj );
+    void netjack_release( netjack_driver_state_t *netj );
+    int netjack_startup( netjack_driver_state_t *netj );
 
 #ifdef __cplusplus
 }

@@ -32,8 +32,8 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Release64\bin" />
 					<Add library="libsamplerate_x86_64" />
+					<Add directory="Release64\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Debug 64bits">
@@ -62,8 +62,8 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Debug64\bin" />
 					<Add library="libsamplerate_x86_64" />
+					<Add directory="Debug64\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Profiling 64bits">
@@ -93,8 +93,8 @@
 					<Add directory="..\common" />
 				</Compiler>
 				<Linker>
-					<Add directory="Release64\bin" />
 					<Add library="libsamplerate_x86_64" />
+					<Add directory="Release64\bin" />
 				</Linker>
 			</Target>
 			<Target title="Win32 Release 32bits">
@@ -125,8 +125,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add directory="Release\bin" />
 					<Add library="libsamplerate_x86" />
+					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/libjacknet.res libjacknet.rc" />
@@ -160,8 +160,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add directory="Debug\bin" />
 					<Add library="libsamplerate_x86" />
+					<Add directory="Debug\bin" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/libjacknet.res libjacknet.rc" />
@@ -196,8 +196,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
-					<Add directory="Release\bin" />
 					<Add library="libsamplerate_x86" />
+					<Add directory="Release\bin" />
 				</Linker>
 				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/libjacknet.res libjacknet.rc" />
@@ -235,6 +235,7 @@
 		<Unit filename="..\common\ringbuffer.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="JackMMCSS.cpp" />
 		<Unit filename="JackNetWinSocket.cpp" />
 		<Unit filename="JackWinThread.cpp" />
 		<Unit filename="JackWinTime.c">

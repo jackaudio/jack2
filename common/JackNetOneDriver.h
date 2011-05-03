@@ -90,6 +90,7 @@ class JackNetOneDriver : public JackAudioDriver
         }
 
 };
+
 }
 
 #endif

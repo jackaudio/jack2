@@ -133,7 +133,7 @@
 					<Add library="odbccp32" />
 				</Linker>
 			</Target>
-            <Target title="Win32 Release 32bits">
+			<Target title="Win32 Release 32bits">
 				<Option output="Release\bin\libjack" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
 				<Option type="3" />
@@ -143,7 +143,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -162,7 +162,7 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add library="kernel32" />
 					<Add library="user32" />
 					<Add library="gdi32" />
@@ -176,7 +176,7 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 				</Linker>
-                <ExtraCommands>
+				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/libjack.res libjack.rc" />
 				</ExtraCommands>
 			</Target>
@@ -190,7 +190,7 @@
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -209,7 +209,7 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add library="kernel32" />
 					<Add library="user32" />
 					<Add library="gdi32" />
@@ -223,7 +223,7 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 				</Linker>
-                <ExtraCommands>
+				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Debug/libjack.res libjack.rc" />
 				</ExtraCommands>
 			</Target>
@@ -237,7 +237,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -257,7 +257,7 @@
 					<Add directory="tre-0.8.0\lib" />
 				</Compiler>
 				<Linker>
-                    <Add option="-m32" />
+					<Add option="-m32" />
 					<Add library="kernel32" />
 					<Add library="user32" />
 					<Add library="gdi32" />
@@ -271,7 +271,7 @@
 					<Add library="odbc32" />
 					<Add library="odbccp32" />
 				</Linker>
-                <ExtraCommands>
+				<ExtraCommands>
 					<Add before="windres -F pe-i386 -O coff -o Release/libjack.res libjack.rc" />
 				</ExtraCommands>
 			</Target>
@@ -322,6 +322,7 @@
 		<Unit filename="..\common\shm.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="JackMMCSS.cpp" />
 		<Unit filename="JackWinNamedPipe.cpp" />
 		<Unit filename="JackWinNamedPipeClientChannel.cpp" />
 		<Unit filename="JackWinProcessSync.cpp" />

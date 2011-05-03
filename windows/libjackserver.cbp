@@ -289,6 +289,7 @@
 		<Unit filename="..\common\shm.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="JackMMCSS.cpp" />
 		<Unit filename="JackNetWinSocket.cpp" />
 		<Unit filename="JackWinNamedPipe.cpp" />
 		<Unit filename="JackWinNamedPipeClientChannel.cpp" />
