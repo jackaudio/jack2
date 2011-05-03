@@ -94,10 +94,9 @@ JackCoreMidiDriver::Attach()
     for (int i = 0; i < num_physical_inputs; i++) {
         port_obj = physical_input_ports[i];
         name = port_obj->GetName();
-        fEngine->PortRegister(fClientControl.fRefNum, name,
-                            JACK_DEFAULT_MIDI_TYPE,
-                            CaptureDriverFlags, buffer_size, &index);
-        if (index == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name,
+                                JACK_DEFAULT_MIDI_TYPE,
+                                CaptureDriverFlags, buffer_size, &index) < 0) {
             jack_error("JackCoreMidiDriver::Attach - cannot register physical "
                        "input port with name '%s'.", name);
             // X: Do we need to deallocate ports?
@@ -113,10 +112,9 @@ JackCoreMidiDriver::Attach()
     for (int i = 0; i < num_virtual_inputs; i++) {
         port_obj = virtual_input_ports[i];
         name = port_obj->GetName();
-        fEngine->PortRegister(fClientControl.fRefNum, name,
-                            JACK_DEFAULT_MIDI_TYPE,
-                            CaptureDriverFlags, buffer_size, &index);
-        if (index == NO_PORT) {
+        if (fEngine->PortRegister(fClientControl.fRefNum, name,
+                                JACK_DEFAULT_MIDI_TYPE,
+                                CaptureDriverFlags, buffer_size, &index) < 0) {
             jack_error("JackCoreMidiDriver::Attach - cannot register virtual "
                        "input port with name '%s'.", name);
             // X: Do we need to deallocate ports?
