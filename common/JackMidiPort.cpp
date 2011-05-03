@@ -52,6 +52,8 @@ SERVER_EXPORT jack_midi_data_t* JackMidiBuffer::ReserveEvent(jack_nframes_t time
 {
     jack_shmsize_t space = MaxEventSize();
     if (space == 0 || size > space) {
+        jack_error("JackMidiBuffer::ReserveEvent - the buffer does not have "
+                   "enough room to enqueue a %lu byte event", size);
         lost_events++;
         return 0;
     }

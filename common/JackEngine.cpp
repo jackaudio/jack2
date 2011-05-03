@@ -804,7 +804,8 @@ int JackEngine::PortRegister(int refnum, const char* name, const char *type, uns
         return -1;
     }
 
-    *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, buffer_size);
+    // buffer_size is actually ignored...
+    *port_index = fGraphManager->AllocatePort(refnum, name, type, (JackPortFlags)flags, fEngineControl->fBufferSize);
     if (*port_index != NO_PORT) {
         if (client->GetClientControl()->fActive)
             NotifyPortRegistation(*port_index, true);

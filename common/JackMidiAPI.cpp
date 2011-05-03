@@ -98,10 +98,24 @@ EXPORT
 jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t time, size_t data_size)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
-    if (!buf && !buf->IsValid())
+    if (! buf) {
+        jack_error("jack_midi_event_reserve: port buffer is set to NULL");
         return 0;
-    if (time >= buf->nframes || (buf->event_count && buf->events[buf->event_count - 1].time > time))
+    }
+    if (! buf->IsValid()) {
+        jack_error("jack_midi_event_reserve: port buffer is invalid");
         return 0;
+    }
+    if (time >= buf->nframes) {
+        jack_error("jack_midi_event_reserve: time parameter is out of range "
+                   "(%lu >= %lu)", time, buf->nframes);
+        return 0;
+    }
+    if (buf->event_count && (buf->events[buf->event_count - 1].time > time)) {
+        jack_error("jack_midi_event_reserve: time parameter is earlier than "
+                   "last reserved event");
+        return 0;
+    }
     return buf->ReserveEvent(time, data_size);
 }
 
