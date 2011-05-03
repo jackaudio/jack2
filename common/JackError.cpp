@@ -33,7 +33,7 @@ static bool change_thread_log_function(jack_log_function_t log_function)
             && jack_tls_set(JackGlobals::fKeyLogFunction, (void*)log_function));
 }
 
-EXPORT int set_threaded_log_function()
+SERVER_EXPORT int set_threaded_log_function()
 {
     return change_thread_log_function(JackMessageBufferAdd);
 }
@@ -88,7 +88,7 @@ static void jack_format_and_log(int level, const char *prefix, const char *fmt, 
     log_function(level, buffer);
 }
 
-EXPORT void jack_error(const char *fmt, ...)
+SERVER_EXPORT void jack_error(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -96,7 +96,7 @@ EXPORT void jack_error(const char *fmt, ...)
 	va_end(ap);
 }
 
-EXPORT void jack_info(const char *fmt, ...)
+SERVER_EXPORT void jack_info(const char *fmt, ...)
 {
 	va_list ap;
 	va_start(ap, fmt);
@@ -104,7 +104,7 @@ EXPORT void jack_info(const char *fmt, ...)
 	va_end(ap);
 }
 
-EXPORT void jack_log(const char *fmt,...)
+SERVER_EXPORT void jack_log(const char *fmt,...)
 {
 	if (JackGlobals::fVerbose) {
 		va_list ap;
@@ -114,23 +114,23 @@ EXPORT void jack_log(const char *fmt,...)
 	}
 }
 
-EXPORT void default_jack_error_callback(const char *desc)
+SERVER_EXPORT void default_jack_error_callback(const char *desc)
 {
     fprintf(stderr, "%s\n", desc);
     fflush(stderr);
 }
 
-EXPORT void default_jack_info_callback(const char *desc)
+SERVER_EXPORT void default_jack_info_callback(const char *desc)
 {
     fprintf(stdout, "%s\n", desc);
     fflush(stdout);
 }
 
-EXPORT void silent_jack_error_callback(const char *desc)
+SERVER_EXPORT void silent_jack_error_callback(const char *desc)
 {}
 
-EXPORT void silent_jack_info_callback(const char *desc)
+SERVER_EXPORT void silent_jack_info_callback(const char *desc)
 {}
 
-EXPORT void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
-EXPORT void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;
+SERVER_EXPORT void (*jack_error_callback)(const char *desc) = &default_jack_error_callback;
+SERVER_EXPORT void (*jack_info_callback)(const char *desc) = &default_jack_info_callback;
