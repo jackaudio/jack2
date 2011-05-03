@@ -147,12 +147,8 @@
 		4B32253510A3173D00838A8E /* netjack_packet.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3224EC10A315C400838A8E /* netjack_packet.c */; };
 		4B32253610A3173E00838A8E /* netjack_packet.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B3224ED10A315C400838A8E /* netjack_packet.h */; };
 		4B32256410A318E300838A8E /* netsource.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B32256310A318E300838A8E /* netsource.c */; };
-		4B32256B10A318FA00838A8E /* netjack.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3224EE10A315C400838A8E /* netjack.c */; };
-		4B32256C10A318FB00838A8E /* netjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B3224EF10A315C400838A8E /* netjack.h */; };
 		4B32256D10A318FC00838A8E /* netjack_packet.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3224EC10A315C400838A8E /* netjack_packet.c */; };
 		4B32256E10A318FD00838A8E /* netjack_packet.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B3224ED10A315C400838A8E /* netjack_packet.h */; };
-		4B32257D10A3195700838A8E /* netjack.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3224EE10A315C400838A8E /* netjack.c */; };
-		4B32257E10A3195800838A8E /* netjack.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B3224EF10A315C400838A8E /* netjack.h */; };
 		4B32257F10A3195900838A8E /* netjack_packet.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B3224EC10A315C400838A8E /* netjack_packet.c */; };
 		4B32258010A3195A00838A8E /* netjack_packet.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B3224ED10A315C400838A8E /* netjack_packet.h */; };
 		4B32258110A3195B00838A8E /* netsource.c in Sources */ = {isa = PBXBuildFile; fileRef = 4B32256310A318E300838A8E /* netsource.c */; };
@@ -3310,7 +3306,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B32256C10A318FB00838A8E /* netjack.h in Headers */,
 				4B32256E10A318FD00838A8E /* netjack_packet.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3319,7 +3314,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B32257E10A3195800838A8E /* netjack.h in Headers */,
 				4B32258010A3195A00838A8E /* netjack_packet.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6768,7 +6762,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B32256410A318E300838A8E /* netsource.c in Sources */,
-				4B32256B10A318FA00838A8E /* netjack.c in Sources */,
 				4B32256D10A318FC00838A8E /* netjack_packet.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6777,7 +6770,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4B32257D10A3195700838A8E /* netjack.c in Sources */,
 				4B32257F10A3195900838A8E /* netjack_packet.c in Sources */,
 				4B32258110A3195B00838A8E /* netsource.c in Sources */,
 			);
@@ -8883,13 +8875,14 @@
 					../common,
 				);
 				OTHER_CFLAGS = (
+					"-DNO_JACK_ERROR",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DNO_JACK_ERROR",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
-					"$(OTHER_CFLAGS)",
 				);
 				OTHER_LDFLAGS = (
 					libcelt.a,
@@ -8928,13 +8921,14 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
+					"-DNO_JACK_ERROR",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DNO_JACK_ERROR",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
-					"$(OTHER_CFLAGS)",
 				);
 				OTHER_LDFLAGS = (
 					libcelt.a,
@@ -9007,6 +9001,7 @@
 					../common,
 				);
 				OTHER_CFLAGS = (
+					"-DNO_JACK_ERROR",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 				);
@@ -9046,6 +9041,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.4;
 				OTHER_CFLAGS = (
+					"-DNO_JACK_ERROR",
 					"-DHAVE_CELT",
 					"-DHAVE_CELT_API_0_7",
 				);
