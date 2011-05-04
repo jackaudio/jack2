@@ -105,8 +105,8 @@ jack_nframes_t lowest_latency;
 jack_time_t lowest_latency_time;
 jack_midi_data_t *message_1;
 jack_midi_data_t *message_2;
-size_t messages_received;
-size_t messages_sent;
+int messages_received;
+int messages_sent;
 size_t message_size;
 jack_latency_range_t out_latency_range;
 jack_port_t *out_port;
@@ -121,8 +121,8 @@ const char *target_out_port_name;
 int timeout;
 jack_nframes_t total_latency;
 jack_time_t total_latency_time;
-size_t unexpected_messages;
-size_t xrun_count;
+int unexpected_messages;
+int xrun_count;
 
 #ifdef WIN32
 char semaphore_error_msg[1024];
@@ -611,8 +611,8 @@ wait_semaphore(semaphore_t semaphore, int block)
 int
 main(int argc, char **argv)
 {
-    size_t jitter_plot[101];
-    size_t latency_plot[101];
+    int jitter_plot[101];
+    int latency_plot[101];
     int long_index = 0;
     struct option long_options[] = {
         {"help", 0, NULL, 'h'},
@@ -904,36 +904,36 @@ main(int argc, char **argv)
         printf("\nJitter Plot:\n");
         for (i = 0; i < 100; i++) {
             if (jitter_plot[i]) {
-                printf("%.1f - %.1f ms: %zu\n", ((float) i) / 10.0,
+                printf("%.1f - %.1f ms: %d\n", ((float) i) / 10.0,
                        ((float) (i + 1)) / 10.0, jitter_plot[i]);
             }
         }
         if (jitter_plot[100]) {
-            printf("     > 10 ms: %zu\n", jitter_plot[100]);
+            printf("     > 10 ms: %d\n", jitter_plot[100]);
         }
         printf("\nLatency Plot:\n");
         for (i = 0; i < 100; i++) {
             if (latency_plot[i]) {
-                printf("%.1f - %.1f ms: %zu\n",
+                printf("%.1f - %.1f ms: %d\n",
                        latency_plot_offset + (((float) i) / 10.0),
                        latency_plot_offset + (((float) (i + 1)) / 10.0),
                        latency_plot[i]);
             }
         }
         if (latency_plot[100]) {
-            printf("     > %.1f ms: %zu\n", latency_plot_offset + 10.0,
+            printf("     > %.1f ms: %d\n", latency_plot_offset + 10.0,
                    latency_plot[100]);
         }
     }
  deactivate_client:
     jack_deactivate(client);
-    printf("\nMessages sent: %zu\nMessages received: %zu\n", messages_sent,
+    printf("\nMessages sent: %d\nMessages received: %d\n", messages_sent,
            messages_received);
     if (unexpected_messages) {
-        printf("Unexpected messages received: %zu\n", unexpected_messages);
+        printf("Unexpected messages received: %d\n", unexpected_messages);
     }
     if (xrun_count) {
-        printf("Xruns: %zu\n", xrun_count);
+        printf("Xruns: %d\n", xrun_count);
     }
  destroy_process_semaphore:
     destroy_semaphore(process_semaphore, 2);
