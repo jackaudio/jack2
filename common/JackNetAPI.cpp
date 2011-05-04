@@ -475,6 +475,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fParams.fNetworkMode = request->mode;
         fParams.fSampleEncoder = request->encoder;
         fParams.fKBps = request->kbps;
+        fParams.fSlaveSyncMode = 1;
         fConnectTimeOut = request->time_out;
 
         // Create name with hostname and client name
@@ -517,8 +518,8 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         if (fShutdownCallback)
             fShutdownCallback(fShutdownArg);
 
-        // Init complete network connection
-        if (!JackNetSlaveInterface::Init())
+        // Init network connection
+        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut))
             return -1;
 
         // Then set global parameters
@@ -695,7 +696,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Start()
     {
-        // Finish connection..
+        // Finish connection...
         if (!JackNetSlaveInterface::InitRendering()) {
             return -1;
         }
