@@ -65,6 +65,10 @@ extern "C"
 
     typedef struct {
 
+        int audio_input;
+        int audio_output;
+        int midi_input;
+        int midi_output;
         jack_nframes_t buffer_size;
         jack_nframes_t sample_rate;
         char master_name[MASTER_NAME_SIZE];
@@ -505,6 +509,10 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
          if (result != NULL) {
             result->buffer_size = fParams.fPeriodSize;
             result->sample_rate = fParams.fSampleRate;
+            result->audio_input = fParams.fSendAudioChannels;
+            result->audio_output = fParams.fReturnAudioChannels;
+            result->midi_input = fParams.fSendMidiChannels;
+            result->midi_output = fParams.fReturnMidiChannels;
             strcpy(result->master_name, fParams.fMasterNetName);
         }
 

@@ -51,10 +51,10 @@ enum JackNetEncoder {
 
 typedef struct {
 
-    int audio_input;    // from master or to slave
-    int audio_output;   // to master or from slave
-    int midi_input;     // from master or to slave
-    int midi_output;    // to master or from slave
+    int audio_input;    // from master or to slave (-1 for get master audio physical outputs)
+    int audio_output;   // to master or from slave (-1 for get master audio physical inputs)
+    int midi_input;     // from master or to slave (-1 for get master MIDI physical outputs)
+    int midi_output;    // to master or from slave (-1 for get master MIDI physical inputs)
     int mtu;            // network Maximum Transmission Unit
     int time_out;       // in second, -1 means in infinite
     int encoder;        // Encoder type (one of JackNetEncoder)
@@ -65,9 +65,13 @@ typedef struct {
 
 typedef struct {
 
-    jack_nframes_t buffer_size;
-    jack_nframes_t sample_rate;
-    char master_name[MASTER_NAME_SIZE];
+    int audio_input;                    // master audio physical outputs
+    int audio_output;                   // master audio physical inputs
+    int midi_input;                     // master MIDI physical outputs
+    int midi_output;                    // master MIDI physical inputs
+    jack_nframes_t buffer_size;         // mater buffer size
+    jack_nframes_t sample_rate;         // mater sample rate
+    char master_name[MASTER_NAME_SIZE]; // master machine name
 
 } jack_master_t;
 
