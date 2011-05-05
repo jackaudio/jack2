@@ -15,6 +15,7 @@
 			dependencies = (
 				4B35C6800D4733B9000DE7AE /* PBXTargetDependency */,
 				4B35C6820D4733B9000DE7AE /* PBXTargetDependency */,
+				4BB492A71372A393005F2601 /* PBXTargetDependency */,
 				4B35C67E0D4733B9000DE7AE /* PBXTargetDependency */,
 				4B35C6AC0D4733B9000DE7AE /* PBXTargetDependency */,
 				4B35C6B00D4733B9000DE7AE /* PBXTargetDependency */,
@@ -1320,6 +1321,13 @@
 			remoteGlobalIDString = 4BA7FEB90D8E76270017FF73;
 			remoteInfo = "jack_control Universal";
 		};
+		4BB492A61372A393005F2601 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B8692821371DB4700D2D11B /* Jacknet.framework 64 bits */;
+			remoteInfo = "Jacknet.framework 64 bits";
+		};
 		4BD624D20CBCF55700DE782F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1726,7 +1734,6 @@
 		4B80D7E60BA0D17400F035BB /* JackMidiPort.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackMidiPort.cpp; path = ../common/JackMidiPort.cpp; sourceTree = SOURCE_ROOT; };
 		4B80D7E70BA0D17400F035BB /* JackMidiAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JackMidiAPI.cpp; path = ../common/JackMidiAPI.cpp; sourceTree = SOURCE_ROOT; };
 		4B8692DB1371DB4700D2D11B /* Jacknet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Jacknet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4B8692DE1371DB4700D2D11B /* Jack-Info copy.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Jack-Info copy.plist"; sourceTree = "<group>"; };
 		4B8693151371DD0A00D2D11B /* JackNetAPI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JackNetAPI.cpp; path = ../common/JackNetAPI.cpp; sourceTree = SOURCE_ROOT; };
 		4B869B3D08C8D21C001CF041 /* driver_interface.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = driver_interface.h; path = ../common/driver_interface.h; sourceTree = SOURCE_ROOT; };
 		4B869B4208C8D22F001CF041 /* JackDriverLoader.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JackDriverLoader.h; path = ../common/JackDriverLoader.h; sourceTree = SOURCE_ROOT; };
@@ -2593,7 +2600,6 @@
 				0249A662FF388D9811CA2CEA /* External Frameworks and Libraries */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 				4B464301076CAC7700E5077C /* Jack-Info.plist */,
-				4B8692DE1371DB4700D2D11B /* Jack-Info copy.plist */,
 			);
 			name = JackServer;
 			sourceTree = "<group>";
@@ -8117,6 +8123,11 @@
 			isa = PBXTargetDependency;
 			target = 4BA7FEB90D8E76270017FF73 /* jack_server_control Universal */;
 			targetProxy = 4BA7FECC0D8E76810017FF73 /* PBXContainerItemProxy */;
+		};
+		4BB492A71372A393005F2601 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B8692821371DB4700D2D11B /* Jacknet.framework 64 bits */;
+			targetProxy = 4BB492A61372A393005F2601 /* PBXContainerItemProxy */;
 		};
 		4BD624D30CBCF55700DE782F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -16231,6 +16242,8 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT_API_0_7",
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
 					"-D__SMP__",
@@ -16239,6 +16252,7 @@
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					/opt/local/lib/libsamplerate.a,
 					"-framework",
 					CoreAudio,
@@ -16300,6 +16314,8 @@
 					"-D__SMP__",
 				);
 				OTHER_CPLUSPLUSFLAGS = (
+					"-DHAVE_CELT_API_0_7",
+					"-DHAVE_CELT",
 					"-DSERVER_SIDE",
 					"-DMACH_RPC_MACH_SEMA",
 					"-DJACK_32_64",
@@ -16308,6 +16324,7 @@
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DJACK_LOCATION=\\\"/usr/local/bin\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					/opt/local/lib/libsamplerate.a,
 					"-framework",
 					CoreAudio,
@@ -17512,11 +17529,7 @@
 					"-framework",
 					Jackservermp,
 					"-framework",
-					CoreAudio,
-					"-framework",
 					CoreServices,
-					"-framework",
-					AudioUnit,
 				);
 				OTHER_REZFLAGS = "";
 				PREBINDING = NO;

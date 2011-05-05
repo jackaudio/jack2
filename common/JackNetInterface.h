@@ -219,7 +219,8 @@ namespace Jack
 
 #define CYCLE_OFFSET_FAST   0
 #define CYCLE_OFFSET_NORMAL 1
-#define CYCLE_OFFSET_SLOW   30
+#define CYCLE_OFFSET_SLOW   2
+//#define CYCLE_OFFSET_SLOW   30
 #define MAX_LATENCY CYCLE_OFFSET_SLOW * 4
 
 #endif
