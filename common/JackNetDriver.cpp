@@ -158,7 +158,7 @@ namespace Jack
             return false;
         }
 
-        // If -1 at conection time, in/out channels count is sent by the master
+        // If -1 at connection time, in/out channels count is sent by the master
         fCaptureChannels = fParams.fSendAudioChannels;
         fPlaybackChannels = fParams.fReturnAudioChannels;
 

@@ -1816,12 +1816,18 @@ EXPORT int jack_internal_client_new (const char* client_name,
                                      const char* load_name,
                                      const char* load_init)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_internal_client_new");
+#endif
     jack_error("jack_internal_client_new: deprecated");
     return -1;
 }
 
 EXPORT void jack_internal_client_close (const char* client_name)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_internal_client_close");
+#endif
     jack_error("jack_internal_client_close: deprecated");
 }
 
@@ -1873,7 +1879,7 @@ EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client,
         jack_varargs_t va;
         jack_status_t my_status;
 
-        if (status == NULL)                     /* no status from caller? */
+        if (status == NULL)             /* no status from caller? */
             status = &my_status;        /* use local status word */
         *status = (jack_status_t)0;
 
@@ -1892,6 +1898,9 @@ EXPORT jack_intclient_t jack_internal_client_load_aux(jack_client_t* ext_client,
 
 EXPORT jack_intclient_t jack_internal_client_load(jack_client_t *client, const char* client_name, jack_options_t options, jack_status_t *status, ...)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_internal_client_load");
+#endif
     va_list ap;
     va_start(ap, status);
     jack_intclient_t res = jack_internal_client_load_aux(client, client_name, options, status, ap);
@@ -1918,14 +1927,14 @@ EXPORT jack_status_t jack_internal_client_unload(jack_client_t* ext_client, jack
     }
 }
 
-EXPORT
-void
-jack_get_version(
-    int *major_ptr,
-    int *minor_ptr,
-    int *micro_ptr,
-    int *proto_ptr)
+EXPORT void jack_get_version(int *major_ptr,
+                            int *minor_ptr,
+                            int *micro_ptr,
+                            int *proto_ptr)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_get_version");
+#endif
     // FIXME: We need these comming from build system
     *major_ptr = 0;
     *minor_ptr = 0;
@@ -1933,15 +1942,19 @@ jack_get_version(
     *proto_ptr = 0;
 }
 
-EXPORT
-const char*
-jack_get_version_string()
+EXPORT const char* jack_get_version_string()
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_get_version_string");
+#endif
     return VERSION;
 }
 
 EXPORT void jack_free(void* ptr)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_free");
+#endif
     if (ptr) {
         free(ptr);
     }
@@ -1995,6 +2008,9 @@ EXPORT int jack_session_reply(jack_client_t* ext_client, jack_session_event_t *e
 
 EXPORT void jack_session_event_free(jack_session_event_t* ev)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_session_event_free");
+#endif
     if (ev) {
         if (ev->session_dir)
             free((void *)ev->session_dir);
@@ -2053,6 +2069,10 @@ EXPORT int jack_reserve_client_name(jack_client_t* ext_client, const char* clien
 
 EXPORT void jack_session_commands_free(jack_session_command_t *cmds)
 {
+#ifdef __CLIENTDEBUG__
+    JackGlobals::CheckContext("jack_session_commands_free");
+#endif
+
     if (!cmds)
         return;
 
