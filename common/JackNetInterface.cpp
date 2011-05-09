@@ -401,7 +401,6 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = (fParams.fSendMidiChannels == 0 && fParams.fSendAudioChannels == 0) ?  1 : 0;
-        //fTxHeader.fPacketSize = HEADER_SIZE;
         fTxHeader.fPacketSize = fParams.fMtu;
 
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
@@ -456,7 +455,6 @@ namespace Jack
     int JackNetMasterInterface::SyncRecv()
     {
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
-        //int rx_bytes = Recv(HEADER_SIZE, MSG_PEEK);
         int rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
 
         if ((rx_bytes == 0) || (rx_bytes == SOCKET_ERROR))
@@ -533,7 +531,6 @@ namespace Jack
         while (!fRxHeader.fIsLastPckt)
         {
             //how much data is queued on the rx buffer ?
-            //rx_bytes = Recv(HEADER_SIZE, MSG_PEEK);
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
 
             //error here, problem with recv, just skip the cycle (return -1)
@@ -908,7 +905,6 @@ namespace Jack
         //receive sync (launch the cycle)
         do
         {
-            //rx_bytes = Recv(HEADER_SIZE, 0);
             rx_bytes = Recv(fParams.fMtu, 0);
             //connection issue, send will detect it, so don't skip the cycle (return 0)
             if (rx_bytes == SOCKET_ERROR)
@@ -929,7 +925,6 @@ namespace Jack
         while (!fRxHeader.fIsLastPckt)
         {
             //how much data is queued on the rx buffer ?
-            //rx_bytes = Recv(HEADER_SIZE, MSG_PEEK);
             rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
 
             //error here, problem with recv, just skip the cycle (return -1)
@@ -985,7 +980,6 @@ namespace Jack
         fTxHeader.fSubCycle = 0;
         fTxHeader.fDataType = 's';
         fTxHeader.fIsLastPckt = (fParams.fReturnMidiChannels == 0 && fParams.fReturnAudioChannels == 0) ?  1 : 0;
-        //fTxHeader.fPacketSize = HEADER_SIZE;
         fTxHeader.fPacketSize = fParams.fMtu;
 
         memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
