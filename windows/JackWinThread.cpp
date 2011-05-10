@@ -203,7 +203,7 @@ int JackWinThread::AcquireRealTimeImp(jack_native_thread_t thread, int priority)
     jack_log("JackWinThread::AcquireRealTimeImp priority = %d", THREAD_PRIORITY_TIME_CRITICAL);
 
     if (priority >= 90 && MMCSSAcquireRealTime(thread) == 0) {
-        jack_info("MMCSS API used to acquire RT for thread: %ld", thread);
+        jack_info("MMCSS API used to acquire RT for thread");
         return 0;
     } else {
         jack_info("MMCSS API not used...");
@@ -229,7 +229,7 @@ int JackWinThread::DropSelfRealTime()
 int JackWinThread::DropRealTimeImp(jack_native_thread_t thread)
 {
     if (MMCSSDropRealTime(thread) == 0 ) {
-        jack_info("MMCSS API used to drop RT for thread: %ld", thread);
+        jack_info("MMCSS API used to drop RT for thread");
         return 0;
     } else if (SetThreadPriority(thread, THREAD_PRIORITY_NORMAL)) {
         return 0;
