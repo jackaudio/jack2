@@ -550,10 +550,15 @@ namespace Jack
     {
         const char **ports;
         int count = 0;
+        jack_port_t* port;
 
         ports = jack_get_ports(fManagerClient, NULL, NULL, flags);
         if (ports != NULL) {
-            while(ports[count]) count++;
+            while (ports[count]
+                    && (port = jack_port_by_name(fManagerClient, ports[count]))
+                    && (strcmp(jack_port_type(port), JACK_DEFAULT_AUDIO_TYPE) == 0)) {
+                count++;
+            }
             free(ports);
         }
         return count;
