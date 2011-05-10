@@ -410,9 +410,6 @@ namespace Jack
                 fMidiPlaybackPortList[midi_port_index] = 0;
             }
         }
-        // Clear MIDI channels
-        fParams.fSendMidiChannels = 0;
-        fParams.fReturnMidiChannels = 0;
         return 0;
     }
 

@@ -114,16 +114,11 @@ namespace Jack
         return fCycleSize;
     }
 
-    int NetMidiBuffer::GetNumPackets()
+    int NetMidiBuffer::GetNumPackets(int data_size, int max_size)
     {
-        /*
-        return (data_size % PACKET_AVAILABLE_SIZE)
-                ? (data_size / PACKET_AVAILABLE_SIZE + 1)
-                : data_size / PACKET_AVAILABLE_SIZE;
-        */
-
-        //TODO
-        return 0;
+        return (data_size % max_size)
+                ? (data_size / max_size + 1)
+                : data_size / max_size;
     }
 
     void NetMidiBuffer::SetBuffer(int index, JackMidiBuffer* buffer)

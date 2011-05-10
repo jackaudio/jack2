@@ -243,7 +243,7 @@ namespace Jack
             // needed size in bytes for an entire cycle
             size_t GetCycleSize();
 
-            int GetNumPackets();
+            int GetNumPackets(int data_sizen, int max_size);
 
             //utility
             void DisplayEvents();

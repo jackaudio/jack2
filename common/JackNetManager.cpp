@@ -673,9 +673,9 @@ namespace Jack
         while ( fRunning );
     }
 
-    JackNetMaster* JackNetMasterManager::InitMaster ( session_params_t& params )
+    JackNetMaster* JackNetMasterManager::InitMaster(session_params_t& params)
     {
-        jack_log ( "JackNetMasterManager::InitMaster, Slave : %s", params.fName );
+        jack_log("JackNetMasterManager::InitMaster, Slave : %s", params.fName);
 
         //check MASTER <<==> SLAVE network protocol coherency
         if (params.fProtocolVersion != MASTER_PROTOCOL) {
@@ -699,7 +699,7 @@ namespace Jack
             jack_info("Takes physical %d outputs for client", params.fReturnAudioChannels);
         }
 
-        SetSlaveName (params);
+        SetSlaveName(params);
 
         //create a new master and add it to the list
         JackNetMaster* master = new JackNetMaster(fSocket, params, fMulticastIP);
