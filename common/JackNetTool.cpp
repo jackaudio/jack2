@@ -153,7 +153,7 @@ namespace Jack
             copy_size = sizeof(JackMidiBuffer) + fPortBuffer[port_index]->event_count * sizeof(JackMidiEvent);
             memcpy(fBuffer + pos, fPortBuffer[port_index], copy_size);
             pos += copy_size;
-            memcpy(fBuffer + pos, fPortBuffer[port_index] +(fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
+            memcpy(fBuffer + pos, fPortBuffer[port_index] + (fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
                      fPortBuffer[port_index]->write_pos);
             pos += fPortBuffer[port_index]->write_pos;
 
@@ -174,7 +174,7 @@ namespace Jack
             copy_size = sizeof(JackMidiBuffer) + reinterpret_cast<JackMidiBuffer*>(fBuffer + pos)->event_count * sizeof(JackMidiEvent);
             memcpy(fPortBuffer[port_index], fBuffer + pos, copy_size);
             pos += copy_size;
-            memcpy(fPortBuffer[port_index] +(fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
+            memcpy(fPortBuffer[port_index] + (fPortBuffer[port_index]->buffer_size - fPortBuffer[port_index]->write_pos),
                      fBuffer + pos, fPortBuffer[port_index]->write_pos);
             pos += fPortBuffer[port_index]->write_pos;
         }
@@ -833,7 +833,7 @@ namespace Jack
         jack_info("ID : %u", header->fID);
         jack_info("Cycle : %u", header->fCycle);
         jack_info("SubCycle : %u", header->fSubCycle);
-        jack_info("Midi packets : %u", header->fNumPacket);
+        jack_info("DATA packets : %u", header->fNumPacket);
         jack_info("Last packet : '%s'", (header->fIsLastPckt) ? "yes" : "no");
         jack_info("Bitdepth : %s", bitdepth);
         jack_info("**********************************************");

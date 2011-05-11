@@ -550,9 +550,9 @@ namespace Jack
 
         //buffers
         for (midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++)
-            fNetMidiPlaybackBuffer->SetBuffer (midi_port_index, GetMidiOutputBuffer (midi_port_index));
+            fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, GetMidiOutputBuffer (midi_port_index));
         for (audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++)
-            fNetAudioPlaybackBuffer->SetBuffer (audio_port_index, GetOutputBuffer (audio_port_index));
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer (audio_port_index));
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add(((float) (GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);

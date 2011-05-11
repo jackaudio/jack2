@@ -422,18 +422,26 @@ namespace Jack
 #endif
 
         //buffers
-        for ( port_index = 0; port_index < fParams.fSendMidiChannels; port_index++ )
-            fNetMidiCaptureBuffer->SetBuffer ( port_index, static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiCapturePorts[port_index],
-                                               fParams.fPeriodSize ) ) );
-        for ( port_index = 0; port_index < fParams.fSendAudioChannels; port_index++ )
-            fNetAudioCaptureBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioCapturePorts[port_index],
-                                                fParams.fPeriodSize ) ) );
-        for ( port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++ )
-            fNetMidiPlaybackBuffer->SetBuffer ( port_index, static_cast<JackMidiBuffer*> ( jack_port_get_buffer ( fMidiPlaybackPorts[port_index],
-                                                fParams.fPeriodSize ) ) );
-        for ( port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++ )
-            fNetAudioPlaybackBuffer->SetBuffer ( port_index, static_cast<sample_t*> ( jack_port_get_buffer ( fAudioPlaybackPorts[port_index],
-                                                 fParams.fPeriodSize ) ) );
+        for (port_index = 0; port_index < fParams.fSendMidiChannels; port_index++) {
+            fNetMidiCaptureBuffer->SetBuffer(port_index,
+                                            static_cast<JackMidiBuffer*>(jack_port_get_buffer(fMidiCapturePorts[port_index],
+                                            fParams.fPeriodSize)));
+        }
+        for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++) {
+            fNetAudioCaptureBuffer->SetBuffer(port_index,
+                                                static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[port_index],
+                                                fParams.fPeriodSize)));
+        }
+        for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
+            fNetMidiPlaybackBuffer->SetBuffer(port_index,
+                                                static_cast<JackMidiBuffer*>(jack_port_get_buffer(fMidiPlaybackPorts[port_index],
+                                                fParams.fPeriodSize)));
+        }
+        for (port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++) {
+            fNetAudioPlaybackBuffer->SetBuffer(port_index,
+                                                static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[port_index],
+                                                fParams.fPeriodSize)));
+        }
 
         if (IsSynched()) {  // only send if connection is "synched"
 
@@ -441,11 +449,11 @@ namespace Jack
             EncodeSyncPacket();
 
             //send sync
-            if ( SyncSend() == SOCKET_ERROR )
+            if (SyncSend() == SOCKET_ERROR)
                 return SOCKET_ERROR;
 
     #ifdef JACK_MONITOR
-            fNetTimeMon->Add ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+            fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs ) * 100.f);
     #endif
 
             //send data
@@ -453,7 +461,7 @@ namespace Jack
                 return SOCKET_ERROR;
 
     #ifdef JACK_MONITOR
-            fNetTimeMon->Add ( ( ( ( float ) (GetMicroSeconds() - begin_time ) ) / ( float ) fPeriodUsecs ) * 100.f );
+            fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
     #endif
 
         } else {

@@ -472,7 +472,7 @@ namespace Jack
                 if (fCycleOffset < CYCLE_OFFSET_SLOW) {
                     return 0;
                 } else {
-                    rx_bytes = Recv (rx_head->fPacketSize, 0);
+                    rx_bytes = Recv(rx_head->fPacketSize, 0);
                 }
 
                 /*
@@ -780,10 +780,10 @@ namespace Jack
 
        //midi net buffers
         if (fParams.fSendMidiChannels > 0)
-            fNetMidiCaptureBuffer = new NetMidiBuffer(&fParams, fParams.fSendMidiChannels, fTxData);
+            fNetMidiCaptureBuffer = new NetMidiBuffer(&fParams, fParams.fSendMidiChannels, fRxData);
 
         if (fParams.fReturnMidiChannels > 0)
-            fNetMidiPlaybackBuffer = new NetMidiBuffer(&fParams, fParams.fReturnMidiChannels, fRxData);
+            fNetMidiPlaybackBuffer = new NetMidiBuffer(&fParams, fParams.fReturnMidiChannels, fTxData);
 
         try {
 
