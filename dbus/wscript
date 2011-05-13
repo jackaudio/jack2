@@ -49,6 +49,7 @@ def build(bld):
         sysdeps_dbus_include = ['../macosx', '../posix']
 
     obj.includes = sysdeps_dbus_include + ['.', '../', '../common', '../common/jack']
+    obj.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
     obj.source = [
         'jackdbus.c',
         'controller.c',
