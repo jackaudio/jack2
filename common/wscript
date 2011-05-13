@@ -11,6 +11,7 @@ def configure(conf):
     if conf.is_defined('HAVE_SAMPLERATE'):
         conf.env['LIB_SAMPLERATE'] = ['samplerate']
 
+    conf.env['BUILD_NETLIB'] = conf.is_defined('HAVE_SAMPLERATE')
     conf.env['BUILD_ADAPTER'] = conf.is_defined('HAVE_SAMPLERATE')
 
 def create_jack_process_obj(bld, target, sources, uselib = None):
@@ -182,37 +183,39 @@ def build(bld):
     if bld.env['IS_SUN']:
         serverlib.env.append_value("LINKFLAGS", "-lnsl -lsocket")
 
-    netlib = bld.new_task_gen('cxx', 'shlib')
-    netlib.features.append('cc')
-    netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
-    netlib.includes = includes
-    netlib.name         = 'netlib'
-    netlib.target       = 'jacknet'
-    netlib.uselib = ['SAMPLERATE', 'CELT']
-    netlib.install_path = '${LIBDIR}'
-    netlib.source = ['JackNetAPI.cpp', 
-		'JackNetInterface.cpp', 
-		'JackNetTool.cpp', 
-		'JackAudioAdapterInterface.cpp', 
-		'JackLibSampleRateResampler.cpp',
-		'JackResampler.cpp', 
-                'JackGlobals.cpp',
-		'ringbuffer.c']
+    if bld.env['BUILD_NETLIB'] == True:
+        netlib = bld.new_task_gen('cxx', 'shlib')
+        netlib.features.append('cc')
+        netlib.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
+        netlib.includes = includes
+        netlib.name         = 'netlib'
+        netlib.target       = 'jacknet'
+        netlib.uselib = ['SAMPLERATE', 'CELT']
+        netlib.install_path = '${LIBDIR}'
+        netlib.source = [
+            'JackNetAPI.cpp',
+            'JackNetInterface.cpp',
+            'JackNetTool.cpp',
+            'JackAudioAdapterInterface.cpp',
+            'JackLibSampleRateResampler.cpp',
+            'JackResampler.cpp',
+            'JackGlobals.cpp',
+            'ringbuffer.c']
 
-    if bld.env['IS_LINUX']:
-        netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../linux/JackLinuxTime.c']
-        netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+        if bld.env['IS_LINUX']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../linux/JackLinuxTime.c']
+            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
 
-    if bld.env['IS_SUN']:
-        netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../solaris/JackSolarisTime.c']
-        netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+        if bld.env['IS_SUN']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../solaris/JackSolarisTime.c']
+            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
        
 
-    if bld.env['IS_MACOSX']:
-        netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../macosx/JackMachThread.cpp', '../macosx/JackMachTime.c']
-	netlib.env.append_value("LINKFLAGS", "-framework CoreAudio -single_module")
+        if bld.env['IS_MACOSX']:
+            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../macosx/JackMachThread.cpp', '../macosx/JackMachTime.c']
+            netlib.env.append_value("LINKFLAGS", "-framework CoreAudio -single_module")
 
-    netlib.vnum = bld.env['JACK_API_VERSION']
+        netlib.vnum = bld.env['JACK_API_VERSION']
 
     clientlib = bld.new_task_gen('cxx', 'shlib')
     clientlib.features.append('cc')
