@@ -93,7 +93,7 @@ int JackNetOneDriver::Open ( jack_nframes_t buffer_size, jack_nframes_t samplera
                              const char* capture_driver_name, const char* playback_driver_name,
                              jack_nframes_t capture_latency, jack_nframes_t playback_latency )
 {
-    if ( JackAudioDriver::Open ( buffer_size,
+    return JackAudioDriver::Open(buffer_size,
                                  samplerate,
                                  capturing,
                                  playing,
@@ -103,15 +103,7 @@ int JackNetOneDriver::Open ( jack_nframes_t buffer_size, jack_nframes_t samplera
                                  capture_driver_name,
                                  playback_driver_name,
                                  capture_latency,
-                                 playback_latency ) == 0 ) {
-        fEngineControl->fPeriod = 0;
-        fEngineControl->fComputation = 500 * 1000;
-        fEngineControl->fConstraint = 500 * 1000;
-        return 0;
-    } else {
-        jack_error( "open fail" );
-        return -1;
-    }
+                                 playback_latency);
 }
 
 int JackNetOneDriver::Close()

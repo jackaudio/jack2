@@ -53,9 +53,6 @@ int JackDummyDriver::Open(jack_nframes_t buffer_size,
                             playback_driver_name,
                             capture_latency,
                             playback_latency) == 0) {
-        fEngineControl->fPeriod = 0;
-        fEngineControl->fComputation = 500 * 1000;
-        fEngineControl->fConstraint = 500 * 1000;
         int buffer_size = int((fWaitTime * fEngineControl->fSampleRate) / 1000000.0f);
         if (buffer_size > BUFFER_SIZE_MAX) {
             buffer_size = BUFFER_SIZE_MAX;
