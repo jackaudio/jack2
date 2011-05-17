@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 Grame
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -62,7 +62,7 @@ main (int argc, char *argv[])
  	const char *options = "b:r:a:p:";
     int option_index;
 	int opt;
- 
+
     struct option long_options[] =
 	{
 		{"buffer size", 1, 0, 'b'},
@@ -71,40 +71,40 @@ main (int argc, char *argv[])
 		{"port", 1, 0, 'p'},
 		{0, 0, 0, 0}
 	};
-	
+
 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
-    
+
 		switch (opt) {
-        
+
 		case 'b':
 			buffer_size = atoi(optarg);
 			break;
-            
+
 		case 'r':
 			sample_rate = atoi(optarg);
 			break;
-            
+
 		case 'a':
             multicast_ip = strdup(optarg);
             break;
-            
+
 		case 'p':
 			port = atoi(optarg);
 			break;
-	
+
 		case 'h':
 			usage();
 			return -1;
 		}
 	}
-  
+
     int i;
-    jack_master_t request = { buffer_size, sample_rate, "master" };
+    jack_master_t request = { -1, -1, -1, -1, buffer_size, sample_rate, "master" };
     jack_slave_t result;
     float** audio_input_buffer;
     float** audio_output_buffer;
     int wait_usec = (int) ((((float)buffer_size) * 1000000) / ((float)sample_rate));
-    
+
     printf("Waiting for a slave...\n");
 
     if ((net = jack_net_master_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "net_master", &request, &result))  == 0) {
@@ -113,7 +113,7 @@ main (int argc, char *argv[])
 	}
 
     printf("Slave is running...\n");
-    
+
     /* install a signal handler to properly quits jack client */
 #ifdef WIN32
 	signal(SIGINT, signal_handler);
@@ -125,37 +125,37 @@ main (int argc, char *argv[])
 	signal(SIGHUP, signal_handler);
 	signal(SIGINT, signal_handler);
 #endif
-    
+
     // Allocate buffers
     audio_input_buffer = calloc(result.audio_input, sizeof(float*));
     for (i = 0; i < result.audio_input; i++) {
         audio_input_buffer[i] = calloc(buffer_size, sizeof(float));
     }
-    
+
     audio_output_buffer = calloc(result.audio_output, sizeof(float*));
     for (i = 0; i < result.audio_output; i++) {
         audio_output_buffer[i] = calloc(buffer_size, sizeof(float));
     }
-    
+
     /*
     Run until interrupted.
-     
+
     WARNING !! : this code is given for demonstration purpose. For proper timing bevahiour
     it has to be called in a real-time context (which is *not* the case here...)
     */
-    
+
   	while (1) {
-        
+
         // Copy input to output
         for (i = 0; i < result.audio_input; i++) {
             memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
         }
-        
+
         if (jack_net_master_send(net, result.audio_output, audio_output_buffer, 0, NULL) < 0) {
             printf("jack_net_master_send failure, exiting\n");
             break;
         }
-        
+
         if (jack_net_master_recv(net, result.audio_input, audio_input_buffer, 0, NULL) < 0) {
             printf("jack_net_master_recv failure, exiting\n");
             break;
@@ -163,19 +163,19 @@ main (int argc, char *argv[])
 
         usleep(wait_usec);
 	};
-    
+
     // Wait for application end
     jack_net_master_close(net);
-    
+
     for (i = 0; i < result.audio_input; i++) {
         free(audio_input_buffer[i]);
     }
     free(audio_input_buffer);
-    
+
     for (i = 0; i < result.audio_output; i++) {
           free(audio_output_buffer[i]);
     }
     free(audio_output_buffer);
-    
+
     exit (0);
 }
