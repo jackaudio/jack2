@@ -232,7 +232,7 @@ bool JackThreadedDriver::Init()
             jack_log("JackThreadedDriver::Init IsRealTime");
             // Will do "something" on OSX only...
             GetEngineControl()->fPeriod = GetEngineControl()->fConstraint = GetEngineControl()->fPeriodUsecs * 1000;
-            GetEngineControl()->fComputation = JackMachThread::ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
+            GetEngineControl()->fComputation = ComputationMicroSec(GetEngineControl()->fBufferSize) * 1000;
             fThread.SetParams(GetEngineControl()->fPeriod, GetEngineControl()->fComputation, GetEngineControl()->fConstraint);
             if (fThread.AcquireSelfRealTime(GetEngineControl()->fServerPriority) < 0) {
                 jack_error("AcquireSelfRealTime error");

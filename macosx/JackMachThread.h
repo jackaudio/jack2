@@ -134,17 +134,6 @@ class SERVER_EXPORT JackMachThread : public JackPosixThread
         }
         static int DropRealTimeImp(jack_native_thread_t thread);
 
-        static int ComputationMicroSec(int buffer_size)
-        {
-            if (buffer_size < 128) {
-                return 500;
-            } else if (buffer_size < 256) {
-                return 300;
-            } else {
-                return 100;
-            }
-        }
-
 };
 
 } // end of namespace
