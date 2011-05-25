@@ -330,14 +330,16 @@ jack_controller_switch_master(
     struct jack_controller * controller_ptr,
     void *dbus_call_context_ptr)
 {
+    assert(controller_ptr->started); /* should be ensured by caller */
+
     if (!jackctl_server_switch_master(
             controller_ptr->server,
             jack_params_get_driver(controller_ptr->params)))
     {
         jack_dbus_error(dbus_call_context_ptr, JACK_DBUS_ERROR_GENERIC, "Failed to switch master");
+        controller_ptr->started = false;
         return FALSE;
     }
-
 
     return TRUE;
 }
@@ -390,10 +392,10 @@ on_device_release(const char * device_name)
 
     // Look for corresponding reserved device
     for (i = 0; i < DEVICE_MAX; i++) {
- 	if (strcmp(g_reserved_device[i].device_name, device_name) == 0)  
+ 	if (strcmp(g_reserved_device[i].device_name, device_name) == 0)
 	    break;
     }
-   
+
     if (i < DEVICE_MAX) {
 	jack_info("Released audio card %s", device_name);
         rd_release(g_reserved_device[i].reserved_device);

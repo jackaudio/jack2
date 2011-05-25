@@ -122,11 +122,18 @@ jack_control_run_method(
     }
     else if (strcmp (call->method_name, "SwitchMaster") == 0)
     {
-        if (!jack_controller_switch_master(controller_ptr, call))
+        if (!controller_ptr->started)
         {
-            /* the reply is set by the failed function */
-            assert(call->reply != NULL);
-            return true;
+            goto not_started;
+        }
+        else
+        {
+            if (!jack_controller_switch_master(controller_ptr, call))
+            {
+                /* the reply is set by the failed function */
+                assert(call->reply != NULL);
+                return true;
+            }
         }
     }
     else if (strcmp (call->method_name, "GetLoad") == 0)
@@ -220,7 +227,7 @@ jack_control_run_method(
             */
             goto exit;
         }
-    
+
         if (!jack_controller_load_internal(controller_ptr, internal_name)) {
             jack_dbus_error(
                 call,
@@ -244,7 +251,7 @@ jack_control_run_method(
             */
             goto exit;
         }
-        
+
         if (!jack_controller_add_slave_driver(controller_ptr, driver_name))
         {
             jack_dbus_error(
@@ -273,7 +280,7 @@ jack_control_run_method(
             */
             goto exit;
         }
-        
+
         if (!jack_controller_remove_slave_driver(controller_ptr, driver_name))
         {
             jack_dbus_error(
@@ -297,7 +304,7 @@ jack_control_run_method(
             */
             goto exit;
         }
-        
+
         if (!jack_controller_unload_internal(controller_ptr, internal_name)) {
             jack_dbus_error(
                 call,
