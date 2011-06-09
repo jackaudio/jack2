@@ -352,7 +352,6 @@ namespace Jack
                 jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
                 //ask to the manager to properly remove the master
                 Exit();
-
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
             } else {
@@ -377,7 +376,6 @@ namespace Jack
                 //fatal connection issue, exit
                 jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
                 Exit();
-
                 // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
                 ThreadExit();
             } else {
@@ -454,8 +452,10 @@ namespace Jack
         packet_header_t* rx_head = reinterpret_cast<packet_header_t*>(fRxBuffer);
         int rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
 
-        if ((rx_bytes == 0) || (rx_bytes == SOCKET_ERROR))
-            return rx_bytes;
+        if ((rx_bytes == 0) || (rx_bytes == SOCKET_ERROR)) {
+            // O bytes considered an error (lost connection)
+            return SOCKET_ERROR;
+        }
 
         fCycleOffset = fTxHeader.fCycle - rx_head->fCycle;
 
@@ -467,7 +467,6 @@ namespace Jack
                 //  - if the network is two fast, just wait the next cycle, this mode allows a shorter cycle duration for the master
                 //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
                 //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
-
 
                 if (fCycleOffset < CYCLE_OFFSET_SLOW) {
                     return 0;
@@ -511,7 +510,6 @@ namespace Jack
                 if (fCycleOffset > CYCLE_OFFSET_FAST) {
                     jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 }
-                break;
                 break;
         }
 
