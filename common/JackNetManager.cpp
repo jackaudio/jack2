@@ -414,31 +414,28 @@ namespace Jack
         if (!fRunning)
             return 0;
 
-        int port_index;
-        int res = 0;
-
 #ifdef JACK_MONITOR
         jack_time_t begin_time = GetMicroSeconds();
         fNetTimeMon->New();
 #endif
 
         //buffers
-        for (port_index = 0; port_index < fParams.fSendMidiChannels; port_index++) {
+        for (int port_index = 0; port_index < fParams.fSendMidiChannels; port_index++) {
             fNetMidiCaptureBuffer->SetBuffer(port_index,
                                             static_cast<JackMidiBuffer*>(jack_port_get_buffer(fMidiCapturePorts[port_index],
                                             fParams.fPeriodSize)));
         }
-        for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++) {
+        for (int port_index = 0; port_index < fParams.fSendAudioChannels; port_index++) {
             fNetAudioCaptureBuffer->SetBuffer(port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[port_index],
                                                 fParams.fPeriodSize)));
         }
-        for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
+        for (int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
             fNetMidiPlaybackBuffer->SetBuffer(port_index,
                                                 static_cast<JackMidiBuffer*>(jack_port_get_buffer(fMidiPlaybackPorts[port_index],
                                                 fParams.fPeriodSize)));
         }
-        for (port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++) {
+        for (int port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++) {
             fNetAudioPlaybackBuffer->SetBuffer(port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[port_index],
                                                 fParams.fPeriodSize)));
@@ -450,16 +447,47 @@ namespace Jack
             EncodeSyncPacket();
 
             //send sync
-            if (SyncSend() == SOCKET_ERROR)
-                return SOCKET_ERROR;
+            switch (SyncSend()) {
+
+                case 0:
+                    jack_error("Connection is not yet synched, skip cycle...");
+                    return 0;
+
+                case SOCKET_ERROR:
+                    jack_error("Connection is lost, quit master...");
+                    //ask to the manager to properly remove the master
+                    Exit();
+                    //UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+                    ThreadExit();
+                    break;
+
+                default:
+                    break;
+            }
 
     #ifdef JACK_MONITOR
             fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs ) * 100.f);
     #endif
 
             //send data
-            if (DataSend() == SOCKET_ERROR)
-                return SOCKET_ERROR;
+            switch (DataSend()) {
+
+                case 0:
+                    jack_error("Connection is not yet synched, skip cycle...");
+                    return 0;
+
+                case SOCKET_ERROR:
+                    jack_error("Connection is lost, quit master...");
+                    //ask to the manager to properly remove the master
+                    Exit();
+                    //UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+                    ThreadExit();
+                    break;
+
+                default:
+                    break;
+            }
+
 
     #ifdef JACK_MONITOR
             fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
@@ -470,12 +498,11 @@ namespace Jack
         }
 
         //receive sync
-        res = SyncRecv();
-        switch (res) {
+        switch (SyncRecv()) {
 
             case 0:
                 jack_error("Connection is not yet synched, skip cycle...");
-                return res;
+                return 0;
 
             case SOCKET_ERROR:
                 jack_error("Connection is lost, quit master...");
@@ -497,12 +524,11 @@ namespace Jack
         DecodeSyncPacket();
 
         //receive data
-        res = DataRecv();
-        switch (res) {
+        switch (DataRecv()) {
 
             case 0:
                 jack_error("Connection is not yet synched, skip cycle...");
-                return res;
+                return 0;
 
             case SOCKET_ERROR:
                 jack_error("Connection is lost, quit master...");
