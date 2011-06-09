@@ -404,7 +404,7 @@ namespace Jack
     }
 
 //process-----------------------------------------------------------------------------
-    int JackNetMaster::SetProcess ( jack_nframes_t nframes, void* arg )
+    int JackNetMaster::SetProcess(jack_nframes_t nframes, void* arg)
     {
         return static_cast<JackNetMaster*> ( arg )->Process();
     }
@@ -446,49 +446,17 @@ namespace Jack
             //encode the first packet
             EncodeSyncPacket();
 
-            //send sync
-            switch (SyncSend()) {
-
-                case 0:
-                    jack_error("Connection is not yet synched, skip cycle...");
-                    return 0;
-
-                case SOCKET_ERROR:
-                    jack_error("Connection is lost, quit master...");
-                    //ask to the manager to properly remove the master
-                    Exit();
-                    //UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-                    ThreadExit();
-                    break;
-
-                default:
-                    break;
-            }
+            if ( SyncSend() == SOCKET_ERROR )
+                return SOCKET_ERROR;
 
     #ifdef JACK_MONITOR
             fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs ) * 100.f);
     #endif
 
             //send data
-            switch (DataSend()) {
-
-                case 0:
-                    jack_error("Connection is not yet synched, skip cycle...");
-                    return 0;
-
-                case SOCKET_ERROR:
-                    jack_error("Connection is lost, quit master...");
-                    //ask to the manager to properly remove the master
-                    Exit();
-                    //UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-                    ThreadExit();
-                    break;
-
-                default:
-                    break;
-            }
-
-
+            if ( DataSend() == SOCKET_ERROR )
+                return SOCKET_ERROR;
+      
     #ifdef JACK_MONITOR
             fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
     #endif
