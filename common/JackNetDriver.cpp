@@ -450,17 +450,6 @@ namespace Jack
                 free(connections);
             }
         }
-   }
-
-    void JackNetDriver::RestoreConnections()
-    {
-        list<pair<string, string> >::const_iterator it;
-
-        for (it = fConnections.begin(); it != fConnections.end(); it++) {
-            pair<string, string> connection = *it;
-            jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
-            fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
-        }
     }
 
     JackMidiBuffer* JackNetDriver::GetMidiInputBuffer(int port_index)

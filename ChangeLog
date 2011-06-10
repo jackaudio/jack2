@@ -38,6 +38,7 @@ Chris Caudle
 2011-06-10 Stephane Letz  <letz@grame.fr>
 
 	* SaveConnections/RestoreConnections in NetDriver.
+	* SaveConnections/RestoreConnections moved in JackAudioDriver.
 
 2011-06-09 Stephane Letz  <letz@grame.fr>
 
