@@ -47,6 +47,8 @@ namespace Jack
             int fLastTransportState;
             int fLastTimebaseMaster;
 
+            std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
+
             //monitoring
 	#ifdef JACK_MONITOR
             JackGnuPlotMonitor<float>* fNetTimeMon;
@@ -63,8 +65,11 @@ namespace Jack
             void EncodeTransportData();
             void DecodeTransportData();
 
-            JackMidiBuffer* GetMidiInputBuffer ( int port_index );
-            JackMidiBuffer* GetMidiOutputBuffer ( int port_index );
+            JackMidiBuffer* GetMidiInputBuffer(int port_index);
+            JackMidiBuffer* GetMidiOutputBuffer(int port_index);
+
+            void SaveConnections();
+            void RestoreConnections();
 
         public:
 

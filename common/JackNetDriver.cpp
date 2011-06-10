@@ -121,6 +121,7 @@ namespace Jack
     bool JackNetDriver::Initialize()
     {
         jack_log("JackNetDriver::Initialize()");
+        SaveConnections();
         FreePorts();
 
         //new loading, but existing socket, restart the driver
@@ -223,6 +224,8 @@ namespace Jack
 
         //transport engine parametering
         fEngineControl->fTransport.SetNetworkSync(fParams.fTransportSync);
+
+        RestoreConnections();
         return true;
     }
 
@@ -403,6 +406,61 @@ namespace Jack
             }
         }
         return 0;
+    }
+
+    void JackNetDriver::SaveConnections()
+    {
+        const char** connections;
+        fConnections.clear();
+
+        for (int i = 0; i < fCaptureChannels; ++i) {
+            if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fCapturePortList[i])) != 0) {
+                for (int j = 0; connections[j]; j++) {
+                    fConnections.push_back(make_pair(fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]));
+                    jack_info("Save connection: %s %s", fGraphManager->GetPort(fCapturePortList[i])->GetName(), connections[j]);
+                }
+                free(connections);
+            }
+        }
+
+        for (int i = 0; i < fPlaybackChannels; ++i) {
+            if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fPlaybackPortList[i])) != 0) {
+                for (int j = 0; connections[j]; j++) {
+                    fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName()));
+                    jack_info("Save connection: %s %s", connections[j], fGraphManager->GetPort(fPlaybackPortList[i])->GetName());
+                }
+                free(connections);
+            }
+        }
+
+        for (int i = 0; i < fParams.fSendMidiChannels; ++i) {
+            if (fCapturePortList[i] && (connections = fGraphManager->GetConnections(fMidiCapturePortList[i])) != 0) {
+                for (int j = 0; connections[j]; j++) {
+                    fConnections.push_back(make_pair(fGraphManager->GetPort(fMidiCapturePortList[i])->GetName(), connections[j]));
+                }
+                free(connections);
+            }
+        }
+
+        for (int i = 0; i < fParams.fReturnMidiChannels; ++i) {
+            if (fPlaybackPortList[i] && (connections = fGraphManager->GetConnections(fMidiPlaybackPortList[i])) != 0) {
+                for (int j = 0; connections[j]; j++) {
+                    fConnections.push_back(make_pair(connections[j], fGraphManager->GetPort(fMidiPlaybackPortList[i])->GetName()));
+                }
+                free(connections);
+            }
+        }
+   }
+
+    void JackNetDriver::RestoreConnections()
+    {
+        list<pair<string, string> >::const_iterator it;
+
+        for (it = fConnections.begin(); it != fConnections.end(); it++) {
+            pair<string, string> connection = *it;
+            jack_info("Restore connection: %s %s", connection.first.c_str(), connection.second.c_str());
+            fEngine->PortConnect(fClientControl.fRefNum, connection.first.c_str(), connection.second.c_str());
+        }
     }
 
     JackMidiBuffer* JackNetDriver::GetMidiInputBuffer(int port_index)

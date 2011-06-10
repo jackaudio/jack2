@@ -35,6 +35,38 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-10 Stephane Letz  <letz@grame.fr>
+
+	* SaveConnections/RestoreConnections in NetDriver.
+
+2011-06-09 Stephane Letz  <letz@grame.fr>
+
+	* Correct NetJack2 connection handling
+
+2011-05-27 Stephane Letz  <letz@grame.fr>
+
+	* Correct rd_acquire in dbus code.
+
+2011-05-16 Stephane Letz  <letz@grame.fr>
+
+	* Correct OSX real-time thread setup.
+
+2011-05-11 Stephane Letz  <letz@grame.fr>
+
+	* Correct MIDI in NetJack2.
+
+2011-05-05 Stephane Letz  <letz@grame.fr>
+
+	* Libjacknet in progress.
+
+2011-05-02 Stephane Letz  <letz@grame.fr>
+
+	* Merge branch 'switch-master-port-registration-notifications : correct driver port registration.
+
+2011-04-21 Stephane Letz  <letz@grame.fr>
+
+	* CELT code for NetJack2.
+
 2011-04-20 Stephane Letz  <letz@grame.fr>
 
 	* Add XRun detection in PortAudio driver.
