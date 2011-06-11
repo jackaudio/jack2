@@ -1,20 +1,20 @@
 /*
  Copyright (C) 2004-2008 Grame
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
- along with this program; if not, write to the Free Software 
+ along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
+
  */
 
 #ifndef __JackShmMem__
@@ -47,12 +47,12 @@ class JackMem
         static size_t gSize;
 
     protected:
-    
+
         JackMem(): fSize(gSize)
         {}
         ~JackMem()
         {}
-        
+
     public:
 
         void* operator new(size_t size)
@@ -65,7 +65,7 @@ class JackMem
         {
             free(ptr);
         }
-	
+
         void LockMemory()
         {
             LockMemoryImp(this, fSize);
@@ -87,11 +87,11 @@ A class which objects possibly want to be allocated in shared memory derives fro
 class JackShmMemAble
 {
     protected:
-        
+
         jack_shm_info_t fInfo;
-        
+
     public:
-             
+
         void Init();
 
         int GetShmIndex()
@@ -126,18 +126,18 @@ class SERVER_EXPORT JackShmMem : public JackShmMemAble
 {
 
      protected:
-    
+
         JackShmMem();
         ~JackShmMem();
-  
+
     public:
-    
+
         void* operator new(size_t size);
         void* operator new(size_t size, void* memory);
-        
+
         void operator delete(void* p, size_t size);
 		void operator delete(void* p);
-   
+
 };
 
 /*!
@@ -159,7 +159,7 @@ class JackShmReadWritePtr
                 if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
-                if (jack_attach_shm(&fInfo)) {
+                if (jack_attach_lib_shm(&fInfo)) {
                     throw - 2;
                 }
                 GetShmAddress()->LockMemory();
@@ -184,7 +184,7 @@ class JackShmReadWritePtr
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr::~JackShmReadWritePtr %ld", fInfo.index);
                 GetShmAddress()->UnlockMemory();
-                jack_release_shm(&fInfo);
+                jack_release_lib_shm(&fInfo);
                 fInfo.index = -1;
              }
         }
@@ -240,7 +240,7 @@ class JackShmReadWritePtr1
                 if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
-                if (jack_attach_shm(&fInfo)) {
+                if (jack_attach_lib_shm(&fInfo)) {
                     throw - 2;
                 }
                 /*
@@ -271,7 +271,7 @@ class JackShmReadWritePtr1
             if (fInfo.index >= 0) {
                 jack_log("JackShmReadWritePtr1::~JackShmReadWritePtr1 %ld", fInfo.index);
                 GetShmAddress()->UnlockMemory();
-                jack_release_shm(&fInfo);
+                jack_release_lib_shm(&fInfo);
                 fInfo.index = -1;
             }
         }
@@ -327,7 +327,7 @@ class JackShmReadPtr
                 if (jack_initialize_shm(server_name) < 0)
                     throw - 1;
                 fInfo.index = index;
-                if (jack_attach_shm_read(&fInfo)) {
+                if (jack_attach_lib_shm_read(&fInfo)) {
                     throw - 2;
                 }
                 GetShmAddress()->LockMemory();
@@ -352,7 +352,7 @@ class JackShmReadPtr
             if (fInfo.index >= 0) {
                 jack_log("JackShmPtrRead::~JackShmPtrRead %ld", fInfo.index);
                 GetShmAddress()->UnlockMemory();
-                jack_release_shm(&fInfo);
+                jack_release_lib_shm(&fInfo);
                 fInfo.index = -1;
             }
         }

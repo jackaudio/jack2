@@ -147,9 +147,12 @@ extern "C"
     int jack_shmalloc (const char *shm_name, jack_shmsize_t size,
                                   jack_shm_info_t* result);
     void jack_release_shm (jack_shm_info_t*);
+    void jack_release_lib_shm (jack_shm_info_t*);
     void jack_destroy_shm (jack_shm_info_t*);
     int jack_attach_shm (jack_shm_info_t*);
+    int jack_attach_lib_shm (jack_shm_info_t*);
     int jack_attach_shm_read (jack_shm_info_t*);
+    int jack_attach_lib_shm_read (jack_shm_info_t*);
     int jack_resize_shm (jack_shm_info_t*, jack_shmsize_t size);
 
 #ifdef __cplusplus

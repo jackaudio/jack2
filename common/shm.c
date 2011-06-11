@@ -12,21 +12,21 @@
 
 /*
  Copyright (C) 2001-2003 Paul Davis
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU Lesser General Public License as published by
  the Free Software Foundation; either version 2.1 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU Lesser General Public License for more details.
- 
+
  You should have received a copy of the GNU Lesser General Public License
- along with this program; if not, write to the Free Software 
+ along with this program; if not, write to the Free Software
  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- 
+
  */
 
 #include "JackConstants.h"
@@ -636,6 +636,24 @@ jack_resize_shm (jack_shm_info_t* si, jack_shmsize_t size)
 	return jack_attach_shm (si);
 }
 
+int
+jack_attach_lib_shm (jack_shm_info_t* si)
+{
+    int res = jack_attach_shm(si);
+    if (res == 0)
+        si->size = jack_shm_registry[si->index].size; // Keep size in si struct
+    return res;
+}
+
+int
+jack_attach_lib_shm_read (jack_shm_info_t* si)
+{
+    int res = jack_attach_shm_read(si);
+    if (res == 0)
+        si->size = jack_shm_registry[si->index].size; // Keep size in si struct
+    return res;
+}
+
 #ifdef USE_POSIX_SHM
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -759,6 +777,15 @@ jack_release_shm (jack_shm_info_t* si)
 	/* registry may or may not be locked */
 	if (si->ptr.attached_at != MAP_FAILED) {
 		munmap (si->ptr.attached_at, jack_shm_registry[si->index].size);
+  	}
+}
+
+void
+jack_release_lib_shm (jack_shm_info_t* si)
+{
+	/* registry may or may not be locked */
+	if (si->ptr.attached_at != MAP_FAILED) {
+       munmap (si->ptr.attached_at, si->size);
 	}
 }
 
@@ -961,6 +988,12 @@ jack_release_shm (jack_shm_info_t* si)
 	}
 }
 
+void
+jack_release_lib_shm (jack_shm_info_t* si)
+{
+	jack_release_shm(si);
+}
+
 int
 jack_shmalloc (const char *shm_name, jack_shmsize_t size, jack_shm_info_t* si)
 {
@@ -1158,6 +1191,12 @@ jack_release_shm (jack_shm_info_t* si)
 	if (si->attached_at != MAP_FAILED) {
 		shmdt (si->attached_at);
 	}
+}
+
+void
+jack_release_lib_shm (jack_shm_info_t* si)
+{
+	jack_release_shm(si);
 }
 
 int
