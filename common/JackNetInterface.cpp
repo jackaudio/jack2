@@ -206,6 +206,7 @@ namespace Jack
         return true;
     }
 
+    /*
     int JackNetMasterInterface::SetRxTimeout()
     {
         jack_log("JackNetMasterInterface::SetRxTimeout");
@@ -225,6 +226,15 @@ namespace Jack
 
         return fSocket.SetTimeOut(static_cast<int>(time));
     }
+     */
+    
+    int JackNetMasterInterface::SetRxTimeout()
+    {
+        jack_log("JackNetMasterInterface::SetRxTimeout");
+        float time = 3 * 1000000.f * (static_cast<float>(fParams.fPeriodSize) / static_cast<float>(fParams.fSampleRate));
+        return fSocket.SetTimeOut(static_cast<int>(time));
+    }
+    
 
     bool JackNetMasterInterface::SetParams()
     {
@@ -296,11 +306,10 @@ namespace Jack
         }
 
         //set the new timeout for the socket
-        /*
         if (SetRxTimeout() == SOCKET_ERROR) {
             jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
             goto error;
-        }*/
+        }
 
         //set the new rx buffer size
         if (SetNetBufferSize() == SOCKET_ERROR) {
