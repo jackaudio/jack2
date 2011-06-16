@@ -226,15 +226,14 @@ namespace Jack
 
         return fSocket.SetTimeOut(static_cast<int>(time));
     }
-     */
-    
+    */
+
     int JackNetMasterInterface::SetRxTimeout()
     {
         jack_log("JackNetMasterInterface::SetRxTimeout");
         float time = 3 * 1000000.f * (static_cast<float>(fParams.fPeriodSize) / static_cast<float>(fParams.fSampleRate));
         return fSocket.SetTimeOut(static_cast<int>(time));
     }
-    
 
     bool JackNetMasterInterface::SetParams()
     {
@@ -348,6 +347,16 @@ namespace Jack
         mcast_socket.Close();
     }
 
+    void JackNetMasterInterface::FatalError()
+    {
+        //fatal connection issue, exit
+        jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
+        //ask to the manager to properly remove the master
+        Exit();
+        // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+        ThreadExit();
+    }
+
     int JackNetMasterInterface::Recv(size_t size, int flags)
     {
         int rx_bytes;
@@ -360,23 +369,13 @@ namespace Jack
             if (error == NET_NO_DATA) {
                 return 0;
             } else if (error == NET_CONN_ERROR) {
-                //fatal connection issue, exit
-                jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
-                //ask to the manager to properly remove the master
-                Exit();
-                // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-                ThreadExit();
+                FatalError();
             } else {
                 jack_error("Error in master receive : %s", StrError(NET_ERROR_CODE));
             }
             */
 
-            //fatal connection issue, exit
-            jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
-            //ask to the manager to properly remove the master
-            Exit();
-            // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-            ThreadExit();
+            FatalError();
         }
 
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
@@ -393,11 +392,7 @@ namespace Jack
         if (((tx_bytes = fSocket.Send(fTxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
             net_error_t error = fSocket.GetError();
             if (error == NET_CONN_ERROR) {
-                //fatal connection issue, exit
-                jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
-                Exit();
-                // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
-                ThreadExit();
+                FatalError();
             } else {
                 jack_error("Error in master send : %s", StrError(NET_ERROR_CODE));
             }
@@ -936,8 +931,7 @@ namespace Jack
             if (rx_bytes == SOCKET_ERROR)
                 return rx_bytes;
 
-            if (rx_bytes && (rx_head->fDataStream == 's') && (rx_head->fID == fParams.fID))
-            {
+            if (rx_bytes && (rx_head->fDataStream == 's') && (rx_head->fID == fParams.fID)) {
                 switch (rx_head->fDataType)
                 {
                     case 'm':   //midi

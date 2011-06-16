@@ -128,6 +128,8 @@ namespace Jack
 
             bool IsSynched();
 
+            void FatalError();
+
         public:
             JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fLastfCycleOffset(0)
             {}
