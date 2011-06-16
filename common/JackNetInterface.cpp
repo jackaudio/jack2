@@ -867,8 +867,7 @@ namespace Jack
                 jack_error("No data, is the master still running ?");
             //if a network error occurs, this exception will restart the driver
             } else if (error == NET_CONN_ERROR) {
-                jack_error("Recv connection lost");
-                throw JackNetException();
+                FatalError();
             } else {
                 jack_error("Fatal error in slave receive : %s", StrError(NET_ERROR_CODE));
             }
@@ -877,6 +876,12 @@ namespace Jack
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
         PacketHeaderNToH(header, header);
         return rx_bytes;
+    }
+
+    void JackNetSlaveInterface::FatalError()
+    {
+        jack_error("Send connection lost");
+        throw JackNetException();
     }
 
     int JackNetSlaveInterface::Send(size_t size, int flags)
@@ -890,8 +895,7 @@ namespace Jack
             net_error_t error = fSocket.GetError();
             //if a network error occurs, this exception will restart the driver
             if (error == NET_CONN_ERROR) {
-                jack_error("Send connection lost");
-                throw JackNetException();
+                FatalError();
             } else {
                 jack_error("Fatal error in slave send : %s", StrError(NET_ERROR_CODE));
             }
