@@ -261,13 +261,6 @@ int main(int argc, char* argv[])
 
     server_parameters = jackctl_server_get_parameters(server_ctl);
 
-    // Default setting
-    param = jackctl_get_parameter(server_parameters, "realtime");
-    if (param != NULL) {
-        value.b = true;
-        jackctl_parameter_set_value(param, &value);
-    }
-
     opterr = 0;
     while (!master_driver_name &&
             (opt = getopt_long(argc, argv, options,

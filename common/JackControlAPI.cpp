@@ -664,7 +664,7 @@ EXPORT jackctl_server_t * jackctl_server_create(
         goto fail_free_parameters;
     }
 
-    value.b = false;
+    value.b = true;
     if (jackctl_add_parameter(
             &server_ptr->parameters,
             "realtime",
