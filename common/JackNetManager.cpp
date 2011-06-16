@@ -411,6 +411,8 @@ namespace Jack
 
     int JackNetMaster::Process()
     {
+        int res;
+
         if (!fRunning)
             return 0;
 
@@ -446,7 +448,7 @@ namespace Jack
             //encode the first packet
             EncodeSyncPacket();
 
-            if ( SyncSend() == SOCKET_ERROR )
+            if (SyncSend() == SOCKET_ERROR)
                 return SOCKET_ERROR;
 
     #ifdef JACK_MONITOR
@@ -454,9 +456,9 @@ namespace Jack
     #endif
 
             //send data
-            if ( DataSend() == SOCKET_ERROR )
+            if (DataSend() == SOCKET_ERROR)
                 return SOCKET_ERROR;
-      
+
     #ifdef JACK_MONITOR
             fNetTimeMon->Add((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
     #endif
@@ -466,6 +468,11 @@ namespace Jack
         }
 
         //receive sync
+        res = SyncRecv();
+        if ((res == 0) || (res == SOCKET_ERROR))
+            return res;
+
+        /*
         switch (SyncRecv()) {
 
             case 0:
@@ -483,6 +490,7 @@ namespace Jack
             default:
                 break;
         }
+        */
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add ((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);
@@ -492,6 +500,11 @@ namespace Jack
         DecodeSyncPacket();
 
         //receive data
+        res = DataRecv();
+        if ((res == 0) || (res == SOCKET_ERROR))
+            return res;
+
+        /*
         switch (DataRecv()) {
 
             case 0:
@@ -509,6 +522,7 @@ namespace Jack
             default:
                 break;
         }
+        */
 
 #ifdef JACK_MONITOR
         fNetTimeMon->AddLast((((float) (GetMicroSeconds() - begin_time)) / (float) fPeriodUsecs) * 100.f);

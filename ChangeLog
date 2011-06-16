@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-16 Stephane Letz  <letz@grame.fr>
+
+	* Changes in NetJack2 connection management: no more timeout, any transmission error considered as fatal.
+
 2011-06-11 Stephane Letz  <letz@grame.fr>
 
 	* Special version of jack_attach_shm/jack_release_shm on client side for POSIX shared mem, to solve a memory leak issue.

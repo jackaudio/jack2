@@ -296,10 +296,11 @@ namespace Jack
         }
 
         //set the new timeout for the socket
+        /*
         if (SetRxTimeout() == SOCKET_ERROR) {
             jack_error("Can't set rx timeout : %s", StrError(NET_ERROR_CODE));
             goto error;
-        }
+        }*/
 
         //set the new rx buffer size
         if (SetNetBufferSize() == SOCKET_ERROR) {
@@ -343,6 +344,8 @@ namespace Jack
         int rx_bytes;
 
         if (((rx_bytes = fSocket.Recv(fRxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
+
+            /*
             net_error_t error = fSocket.GetError();
             //no data isn't really a network error, so just return 0 available read bytes
             if (error == NET_NO_DATA) {
@@ -357,6 +360,14 @@ namespace Jack
             } else {
                 jack_error("Error in master receive : %s", StrError(NET_ERROR_CODE));
             }
+            */
+
+            //fatal connection issue, exit
+            jack_error("'%s' : %s, exiting", fParams.fName, StrError(NET_ERROR_CODE));
+            //ask to the manager to properly remove the master
+            Exit();
+            // UGLY temporary way to be sure the thread does not call code possibly causing a deadlock in JackEngine.
+            ThreadExit();
         }
 
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
