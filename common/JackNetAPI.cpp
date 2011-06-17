@@ -645,8 +645,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
             fThread.DropRealTime();
             fThread.SetStatus(JackThread::kIniting);
             FreePorts();
-            Restart();
-            if (Init()) {
+            if (Restart() == 0 && Init()) {
                 fThread.SetStatus(JackThread::kRunning);
                 return true;
             } else {
