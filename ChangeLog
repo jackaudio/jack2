@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-17 Stephane Letz  <letz@grame.fr>
+
+	* NetJack2 : connection error handling.
+
 2011-06-16 Stephane Letz  <letz@grame.fr>
 
 	* Changes in NetJack2 connection management: no more timeout, any transmission error considered as fatal.

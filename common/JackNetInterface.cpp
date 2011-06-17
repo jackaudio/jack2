@@ -390,12 +390,15 @@ namespace Jack
         PacketHeaderHToN(header, header);
 
         if (((tx_bytes = fSocket.Send(fTxBuffer, size, flags)) == SOCKET_ERROR) && fRunning) {
+            /*
             net_error_t error = fSocket.GetError();
             if (error == NET_CONN_ERROR) {
                 FatalError();
             } else {
                 jack_error("Error in master send : %s", StrError(NET_ERROR_CODE));
             }
+            */
+            FatalError();
         }
         return tx_bytes;
     }
@@ -861,6 +864,7 @@ namespace Jack
         int rx_bytes = fSocket.Recv(fRxBuffer, size, flags);
         //handle errors
         if (rx_bytes == SOCKET_ERROR) {
+            /*
             net_error_t error = fSocket.GetError();
             //no data isn't really an error in realtime processing, so just return 0
             if (error == NET_NO_DATA) {
@@ -871,6 +875,8 @@ namespace Jack
             } else {
                 jack_error("Fatal error in slave receive : %s", StrError(NET_ERROR_CODE));
             }
+            */
+            FatalError();
         }
 
         packet_header_t* header = reinterpret_cast<packet_header_t*>(fRxBuffer);
@@ -892,6 +898,7 @@ namespace Jack
 
         //handle errors
         if (tx_bytes == SOCKET_ERROR) {
+            /*
             net_error_t error = fSocket.GetError();
             //if a network error occurs, this exception will restart the driver
             if (error == NET_CONN_ERROR) {
@@ -899,6 +906,8 @@ namespace Jack
             } else {
                 jack_error("Fatal error in slave send : %s", StrError(NET_ERROR_CODE));
             }
+            */
+            FatalError();
         }
         return tx_bytes;
     }
