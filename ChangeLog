@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-20 Stephane Letz  <letz@grame.fr>
+
+	* Correct Dummy driver.
+
 2011-06-17 Stephane Letz  <letz@grame.fr>
 
 	* NetJack2 : connection error handling.

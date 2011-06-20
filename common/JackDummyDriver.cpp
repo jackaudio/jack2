@@ -26,6 +26,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackCompilerDeps.h"
 #include <iostream>
 #include <unistd.h>
+#include <math.h>
 
 namespace Jack
 {
@@ -53,7 +54,7 @@ int JackDummyDriver::Open(jack_nframes_t buffer_size,
                             playback_driver_name,
                             capture_latency,
                             playback_latency) == 0) {
-        int buffer_size = int((fWaitTime * fEngineControl->fSampleRate) / 1000000.0f);
+        int buffer_size = lroundf((fWaitTime * fEngineControl->fSampleRate) / 1000000.0f);
         if (buffer_size > BUFFER_SIZE_MAX) {
             buffer_size = BUFFER_SIZE_MAX;
             jack_error("Buffer size set to %d ", BUFFER_SIZE_MAX);
