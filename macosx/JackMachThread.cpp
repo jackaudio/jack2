@@ -22,7 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #include "JackMachThread.h"
 #include "JackError.h"
 
+#ifdef MY_TARGET_OS_IPHONE
 #include "/Developer/Extras/CoreAudio/PublicUtility/CAHostTimeBase.h"
+#endif
 
 namespace Jack
 {

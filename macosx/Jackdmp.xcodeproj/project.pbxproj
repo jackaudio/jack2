@@ -6114,7 +6114,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 4B699DD5097D427F00A18468 /* Build configuration list for PBXProject "Jackdmp" */;
 			compatibilityVersion = "Xcode 2.4";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -14470,6 +14469,7 @@
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Carbon,
 					"-framework",
@@ -14534,6 +14534,7 @@
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Carbon,
 					"-framework",
