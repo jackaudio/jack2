@@ -42,6 +42,7 @@ typedef	UInt8	CAAudioHardwareDeviceSectionID;
 #define	kAudioDeviceSectionWildcard	((CAAudioHardwareDeviceSectionID)0xFF)
 
 #define WAIT_COUNTER 60
+#define WAIT_NOTIFICATION_COUNTER 30
 
 /*!
 \brief The CoreAudio driver.
@@ -99,6 +100,12 @@ class JackCoreAudioDriver : public JackAudioDriver
                                                Boolean	isInput,
                                                AudioDevicePropertyID inPropertyID,
                                                void* inClientData);
+    
+        static OSStatus BSNotificationCallback(AudioDeviceID inDevice,
+                                                UInt32 inChannel,
+                                                Boolean	isInput,
+                                                AudioDevicePropertyID inPropertyID,
+                                                void* inClientData);
 
         OSStatus GetDeviceIDFromUID(const char* UID, AudioDeviceID* id);
         OSStatus GetDefaultDevice(AudioDeviceID* id);

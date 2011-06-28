@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-28 Stephane Letz  <letz@grame.fr>
+
+	* Another round of code improvements to handle completely buggy Digidesign CoreAudio user-land driver. 
+
 2011-06-20 Stephane Letz  <letz@grame.fr>
 
 	* Correct Dummy driver.
