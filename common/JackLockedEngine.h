@@ -44,14 +44,23 @@ catch (...) {
     } catch(std::bad_alloc& e) {                    \
         jack_error("Memory allocation error...");   \
         return -1;                                  \
-    } catch(JackTemporaryException& e) {                       \
-        jack_error("JackTemporaryException : now quits...");   \
-        JackTools::KillServer();                     \
-        return -1;                                  \
     } catch (...) {                                 \
         jack_error("Unknown error...");             \
         throw;                                      \
     }                                               \
+
+#define CATCH_CLOSE_EXCEPTION_RETURN                      \
+    } catch(std::bad_alloc& e) {                    \
+        jack_error("Memory allocation error...");   \
+        return -1;                                  \
+    } catch(JackTemporaryException& e) {                       \
+        jack_error("JackTemporaryException : now quits...");   \
+        JackTools::KillServer();                     \
+        return 0;                                   \
+    } catch (...) {                                 \
+        jack_error("Unknown error...");             \
+        throw;                                      \
+    }
 
 #define CATCH_EXCEPTION                      \
     } catch(std::bad_alloc& e) {                    \
@@ -122,15 +131,15 @@ class SERVER_EXPORT JackLockedEngine
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            return (fEngine.CheckClient(refnum)) ? fEngine.ClientExternalClose(refnum) : - 1;
-            CATCH_EXCEPTION_RETURN
+            return (fEngine.CheckClient(refnum)) ? fEngine.ClientExternalClose(refnum) : -1;
+            CATCH_CLOSE_EXCEPTION_RETURN
         }
         int ClientInternalClose(int refnum, bool wait)
         {
             TRY_CALL
             JackLock lock(&fEngine);
             return (fEngine.CheckClient(refnum)) ? fEngine.ClientInternalClose(refnum, wait) : -1;
-            CATCH_EXCEPTION_RETURN
+            CATCH_CLOSE_EXCEPTION_RETURN
         }
 
         int ClientActivate(int refnum, bool is_real_time)

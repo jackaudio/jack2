@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-06-29 Stephane Letz  <letz@grame.fr>
+
+	* Special CATCH_CLOSE_EXCEPTION_RETURN to handle Close API calls. 
+
 2011-06-28 Stephane Letz  <letz@grame.fr>
 
 	* Another round of code improvements to handle completely buggy Digidesign CoreAudio user-land driver. 
