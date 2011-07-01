@@ -30,10 +30,12 @@ namespace Jack
     {
         jack_log("JackNetAdapter::JackNetAdapter");
 
-        //global parametering
-        //we can't call JackNetSlaveInterface constructor with some parameters before
-        //because we don't have full parametering right now
-        //parameters will be parsed from the param list, and then JackNetSlaveInterface will be filled with proper values
+        /*
+        Global parameter setting : we can't call JackNetSlaveInterface constructor with some parameters before,
+        because we don't have full parametering right now, parameters will be parsed from the param list,
+        and then JackNetSlaveInterface will be filled with proper values.
+        */
+
         strcpy(fMulticastIP, DEFAULT_MULTICAST_IP);
         uint port = DEFAULT_PORT;
         GetHostName(fParams.fName, JACK_CLIENT_NAME_SIZE);
@@ -48,6 +50,7 @@ namespace Jack
         fParams.fPeriodSize = buffer_size;
         fParams.fSlaveSyncMode = 1;
         fParams.fNetworkMode = 's';
+        fParams.fSampleEncoder = JackFloatEncoder;
         fJackClient = jack_client;
 
         //options parsing
@@ -87,8 +90,6 @@ namespace Jack
                     if (param->value.i > 0) {
                         fParams.fSampleEncoder = JackCeltEncoder;
                         fParams.fKBps = param->value.i;
-                    } else {
-                        fParams.fSampleEncoder = JackFloatEncoder;
                     }
                     break;
             #endif
@@ -112,7 +113,7 @@ namespace Jack
              }
         }
 
-        //set the socket parameters
+        // Set the socket parameters
         fSocket.SetPort(port);
         fSocket.SetAddress(fMulticastIP, port);
 
@@ -122,11 +123,11 @@ namespace Jack
         // If not set, takes default
         fParams.fReturnAudioChannels = (return_audio == -1) ? 2 : return_audio;
 
-        //set the audio adapter interface channel values
+        // Set the audio adapter interface channel values
         SetInputs(fParams.fSendAudioChannels);
         SetOutputs(fParams.fReturnAudioChannels);
 
-        //soft buffers will be allocated later (once network initialization done)
+        // Soft buffers will be allocated later (once network initialization done)
         fSoftCaptureBuffer = NULL;
         fSoftPlaybackBuffer = NULL;
     }
@@ -163,38 +164,21 @@ namespace Jack
 
     int JackNetAdapter::Close()
     {
+        int res = 0;
         jack_log("JackNetAdapter::Close");
 
 #ifdef JACK_MONITOR
         fTable.Save(fHostBufferSize, fHostSampleRate, fAdaptedSampleRate, fAdaptedBufferSize);
 #endif
-        fSocket.Close();
 
-        switch (fThread.GetStatus())
-        {
-                // Kill the thread in Init phase
-            case JackThread::kStarting:
-            case JackThread::kIniting:
-                if (fThread.Kill() < 0) {
-                    jack_error("Cannot kill thread");
-                    return -1;
-                }
-                break;
-                // Stop when the thread cycle is finished
-
-            case JackThread::kRunning:
-                if (fThread.Stop() < 0) {
-                    jack_error ("Cannot stop thread");
-                    return -1;
-                }
-                break;
-
-            default:
-                break;
+        if (fThread.Kill() < 0) {
+            jack_error("Cannot kill thread");
+            res = -1;
         }
 
-        return 0;
-    }
+        fSocket.Close();
+        return res;
+   }
 
     int JackNetAdapter::SetBufferSize(jack_nframes_t buffer_size)
     {
@@ -300,7 +284,7 @@ namespace Jack
                     break;
 
                 case JackTransportRolling :
-                    //TODO , we need to :
+                    // TODO, we need to :
                     // - find a way to call TransportEngine->SetNetworkSync()
                     // - turn the transport state to JackTransportRolling
                     jack_info("NetMaster : transport rolls.");

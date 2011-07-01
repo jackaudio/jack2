@@ -82,7 +82,7 @@ extern "C" {
 #endif
 
 /**
- * @defgroup ServerControl Controling the server
+ * @defgroup ControlAPI the API for starting and controlling a JACK server
  * @{
  */
 
