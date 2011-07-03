@@ -207,12 +207,12 @@ OSStatus JackCoreAudioDriver::Render(void *inRefCon,
             driver->fEngineControl->fComputation = driver->fEngineControl->fPeriod * driver->fComputationGrain;
         }
     }
-    
+
     // Signal waiting start function...
     driver->fState = true;
- 
+
     driver->CycleTakeBeginTime();
-    
+
     if (driver->Process() < 0) {
         jack_error("Process error, stopping driver.");
         driver->NotifyFailure(JackBackendError, "Process error, stopping driver.");    // Message length limited to JACK_MESSAGE_SIZE
@@ -279,7 +279,7 @@ OSStatus JackCoreAudioDriver::SRNotificationCallback(AudioDeviceID inDevice,
 
     return noErr;
 }
-    
+
 OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
                                                      UInt32 inChannel,
                                                      Boolean	isInput,
@@ -287,9 +287,9 @@ OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
                                                      void* inClientData)
 {
     JackCoreAudioDriver* driver = (JackCoreAudioDriver*)inClientData;
-    
+
     switch (inPropertyID) {
-            
+
         case kAudioDevicePropertyBufferFrameSize: {
             jack_log("JackCoreAudioDriver::BSNotificationCallback kAudioDevicePropertyBufferFrameSize");
             // Check new buffer size
@@ -306,9 +306,9 @@ OSStatus JackCoreAudioDriver::BSNotificationCallback(AudioDeviceID inDevice,
             break;
         }
     }
-    
+
     return noErr;
-}    
+}
 
 // A better implementation would possibly try to recover in case of hardware device change (see HALLAB HLFilePlayerWindowControllerAudioDevicePropertyListenerProc code)
 OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
@@ -351,13 +351,13 @@ OSStatus JackCoreAudioDriver::DeviceNotificationCallback(AudioDeviceID inDevice,
             OSStatus err = AudioDeviceGetProperty(driver->fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, &outsize, &sample_rate);
             if (err != noErr)
                 return kAudioHardwareUnsupportedOperationError;
-        
+
             char device_name[256];
             const char* digidesign_name = "Digidesign";
             driver->GetDeviceNameFromID(driver->fDeviceID, device_name);
-            
+
             if (sample_rate != driver->fEngineControl->fSampleRate) {
-           
+
                // Digidesign hardware, so "special" code : change the SR again here
                if (strncmp(device_name, digidesign_name, 10) == 0) {
 
@@ -1110,7 +1110,7 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
     OSStatus err = noErr;
     UInt32 tmp_buffer_size = buffer_size;
     UInt32 outSize = sizeof(UInt32);
-    
+
     err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyBufferFrameSize, &outSize, &tmp_buffer_size);
     if (err != noErr) {
         jack_error("Cannot get buffer size %ld", buffer_size);
@@ -1119,11 +1119,11 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
     } else {
         jack_log("Current buffer size = %ld", tmp_buffer_size);
     }
-    
+
     // If needed, set new buffer size
     if (buffer_size != tmp_buffer_size) {
         tmp_buffer_size = buffer_size;
-        
+
         // To get BS change notification
         err = AudioDeviceAddPropertyListener(fDeviceID, 0, true, kAudioDevicePropertyBufferFrameSize, BSNotificationCallback, this);
         if (err != noErr) {
@@ -1131,28 +1131,28 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
             printError(err);
             return -1;
         }
-        
+
         // Waiting for BS change notification
         int count = 0;
         fState = false;
-        
+
         err = AudioDeviceSetProperty(fDeviceID, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyBufferFrameSize, outSize, &tmp_buffer_size);
         if (err != noErr) {
             jack_error("Cannot set buffer size = %ld", tmp_buffer_size);
             printError(err);
             goto error;
         }
-        
+
         while (!fState && count++ < WAIT_NOTIFICATION_COUNTER) {
             usleep(100000);
             jack_log("Wait count = %d", count);
         }
-        
+
         if (count >= WAIT_NOTIFICATION_COUNTER) {
             jack_error("Did not get buffer size notification...");
             goto error;
         }
-        
+
         // Check new buffer size
         outSize =  sizeof(UInt32);
         err = AudioDeviceGetProperty(fDeviceID, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyBufferFrameSize, &outSize, &tmp_buffer_size);
@@ -1162,19 +1162,19 @@ int JackCoreAudioDriver::SetupBufferSize(jack_nframes_t buffer_size)
         } else {
             jack_log("Checked buffer size = %ld", tmp_buffer_size);
         }
-        
+
         // Remove BS change notification
         AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyBufferFrameSize, BSNotificationCallback);
     }
-        
+
     return 0;
-    
-error:   
-    
+
+error:
+
     // Remove SR change notification
     AudioDeviceRemovePropertyListener(fDeviceID, 0, true, kAudioDevicePropertyBufferFrameSize, BSNotificationCallback);
     return -1;
-    
+
 }
 
 int JackCoreAudioDriver::SetupSampleRate(jack_nframes_t sample_rate)
@@ -1210,23 +1210,23 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
             printError(err);
             return -1;
         }
-        
+
         // Waiting for SR change notification
         int count = 0;
         fState = false;
-        
+
         err = AudioDeviceSetProperty(inDevice, NULL, 0, kAudioDeviceSectionGlobal, kAudioDevicePropertyNominalSampleRate, outSize, &tmp_sample_rate);
         if (err != noErr) {
             jack_error("Cannot set sample rate = %ld", sample_rate);
             printError(err);
             goto error;
         }
-   
+
         while (!fState && count++ < WAIT_NOTIFICATION_COUNTER) {
             usleep(100000);
             jack_log("Wait count = %d", count);
         }
-        
+
         if (count >= WAIT_NOTIFICATION_COUNTER) {
             jack_error("Did not get sample rate notification...");
             goto error;
@@ -1247,9 +1247,9 @@ int JackCoreAudioDriver::SetupSampleRateAux(AudioDeviceID inDevice, jack_nframes
     }
 
     return 0;
-    
-error:   
-    
+
+error:
+
     // Remove SR change notification
     AudioDeviceRemovePropertyListener(inDevice, 0, true, kAudioDevicePropertyNominalSampleRate, SRNotificationCallback);
     return -1;
@@ -1644,10 +1644,10 @@ int JackCoreAudioDriver::Open(jack_nframes_t buffer_size,
 
     if (SetupSampleRate(sample_rate) < 0)
         goto error;
-   
+
     if (OpenAUHAL(capturing, playing, inchannels, outchannels, in_nChannels, out_nChannels, buffer_size, sample_rate) < 0)
         goto error;
-    
+
     if (capturing && inchannels > 0)
         if (SetupBuffers(inchannels) < 0)
             goto error;
@@ -1817,14 +1817,14 @@ int JackCoreAudioDriver::Start()
 {
     jack_log("JackCoreAudioDriver::Start");
     if (JackAudioDriver::Start() == 0) {
-        
+
         // Waiting for Render callback to be called (= driver has started)
         fState = false;
         int count = 0;
-        
+
         OSStatus err = AudioOutputUnitStart(fAUHAL);
         if (err == noErr) {
-    
+
             while (!fState && count++ < WAIT_COUNTER) {
                 usleep(100000);
                 jack_log("JackCoreAudioDriver::Start wait count = %d", count);
@@ -2077,7 +2077,7 @@ extern "C"
 
                 case 'l':
                     Jack::DisplayDeviceNames();
-                    break;
+                    return NULL;
 
                 case 'H':
                     hogged = true;
