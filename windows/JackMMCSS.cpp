@@ -56,10 +56,13 @@ int JackMMCSS::MMCSSAcquireRealTime(jack_native_thread_t thread)
         DWORD dummy = 0;
         HANDLE task = ffMMCSSFun1("Pro Audio", &dummy);
         if (task == NULL) {
-            jack_error("Cannot use MMCSS %d", GetLastError());
+            jack_error("AvSetMmThreadCharacteristics error : %d", GetLastError());
         } else if (ffMMCSSFun2(task, AVRT_PRIORITY_CRITICAL)) {
             fHandleTable[thread] = task;
+            jack_log("AvSetMmThreadPriority success");
             return 0;
+        } else {
+            jack_error("AvSetMmThreadPriority error : %d", GetLastError());
         }
      }
 
@@ -70,7 +73,11 @@ int JackMMCSS::MMCSSDropRealTime(jack_native_thread_t thread)
 {
     if (fHandleTable.find(thread) != fHandleTable.end()) {
         HANDLE task = fHandleTable[thread];
-        ffMMCSSFun3(task);
+        if (ffMMCSSFun3(task) == 0) {
+            jack_error("AvRevertMmThreadCharacteristics error : %d", GetLastError());
+        } else {
+            jack_log("AvRevertMmThreadCharacteristics success");
+        }
         return 0;
     } else {
         return -1;
