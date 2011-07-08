@@ -165,7 +165,7 @@ static OSStatus DisplayDeviceNames()
         if (err != noErr)
             return err;
 
-        jack_info("Device name = \'%s\', internal_name = \'%s\' (to be used as -C, -P, or -d parameter)", device_name, internal_name);
+        jack_info("Device name = \'%s\', internal name = \'%s\' (to be used as -C, -P, or -d parameter)", device_name, internal_name);
     }
 
     return noErr;

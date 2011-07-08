@@ -396,24 +396,24 @@ void JackAudioDriver::WaitUntilNextCycle()
 		JackSleep(wait_time_usec);
 }
 
-jack_default_audio_sample_t* JackAudioDriver::GetInputBuffer(int port_index)
+jack_default_audio_sample_t* JackAudioDriver::GetInputBuffer(int port_index, bool nulled)
 {
     return fCapturePortList[port_index]
-        ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[port_index], fEngineControl->fBufferSize)
+        ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fCapturePortList[port_index], fEngineControl->fBufferSize, nulled)
         : NULL;
 }
 
-jack_default_audio_sample_t* JackAudioDriver::GetOutputBuffer(int port_index)
+jack_default_audio_sample_t* JackAudioDriver::GetOutputBuffer(int port_index, bool nulled)
 {
     return fPlaybackPortList[port_index]
-        ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[port_index], fEngineControl->fBufferSize)
+        ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fPlaybackPortList[port_index], fEngineControl->fBufferSize, nulled)
         : NULL;
 }
 
-jack_default_audio_sample_t* JackAudioDriver::GetMonitorBuffer(int port_index)
+jack_default_audio_sample_t* JackAudioDriver::GetMonitorBuffer(int port_index,  bool nulled)
 {
     return fPlaybackPortList[port_index]
-        ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[port_index], fEngineControl->fBufferSize)
+        ? (jack_default_audio_sample_t*)fGraphManager->GetBuffer(fMonitorPortList[port_index], fEngineControl->fBufferSize, nulled)
         : NULL;
 }
 

@@ -59,13 +59,14 @@ namespace Jack
         for (node = params; node; node = jack_slist_next(node))
         {
             param = (const jack_driver_param_t*) node->data;
-            switch (param->character)
-            {
+
+            switch (param->character) {
                 case 'a' :
-                    if (strlen(param->value.str) < 32)
+                    if (strlen(param->value.str) < 32) {
                         strcpy(fMulticastIP, param->value.str);
-                    else
+                    } else {
                         jack_error("Can't use multicast address %s, using default %s", param->value.ui, DEFAULT_MULTICAST_IP);
+                    }
                     break;
                 case 'p' :
                     fSocket.SetPort(param->value.ui);
@@ -94,14 +95,15 @@ namespace Jack
                     break;
             #endif
                 case 'm' :
-                    if (strcmp(param->value.str, "normal") == 0)
+                    if (strcmp(param->value.str, "normal") == 0) {
                         fParams.fNetworkMode = 'n';
-                    else if (strcmp(param->value.str, "slow") == 0)
+                    } else if (strcmp(param->value.str, "slow") == 0) {
                         fParams.fNetworkMode = 's';
-                    else if (strcmp(param->value.str, "fast") == 0)
+                    } else if (strcmp(param->value.str, "fast") == 0) {
                         fParams.fNetworkMode = 'f';
-                    else
+                    } else {
                         jack_error("Unknown network mode, using 'normal' mode.");
+                    }
                     break;
                 case 'q':
                     fQuality = param->value.ui;

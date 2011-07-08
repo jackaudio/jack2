@@ -166,7 +166,7 @@ bool JackGraphManager::IsDirectConnection(int ref1, int ref2)
 }
 
 // RT
-void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buffer_size)
+void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buffer_size, bool nulled)
 {
     AssertPort(port_index);
     AssertBufferSize(buffer_size);
@@ -191,7 +191,7 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
     // No connections : return a zero-filled buffer
     if (len == 0) {
         port->ClearBuffer(buffer_size);
-        return port->GetBuffer();
+        return  (nulled) ? NULL : port->GetBuffer();
 
     // One connection
     } else if (len == 1) {
@@ -791,9 +791,9 @@ const char** JackGraphManager::GetConnections(jack_port_id_t port_index)
         next_index = GetCurrentIndex();
     } while (cur_index != next_index); // Until a coherent state has been read
 
-    if (res[0]) {	// at least one connection
+    if (res[0]) {	// At least one connection
         return res;
-    } else {		// empty array, should return NULL
+    } else {		// Empty array, should return NULL
         free(res);
         return NULL;
     }
@@ -874,10 +874,10 @@ const char** JackGraphManager::GetPorts(const char* port_name_pattern, const cha
         next_index = GetCurrentIndex();
     } while (cur_index != next_index);  // Until a coherent state has been read
 
-    if (res[0]) {    // at least one port
+    if (res[0]) {    // At least one port
         return res;
     } else {
-        free(res);   // empty array, should return NULL
+        free(res);   // Empty array, should return NULL
         return NULL;
     }
 }

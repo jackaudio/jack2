@@ -455,8 +455,9 @@ namespace Jack
             for (subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
                 fTxHeader.fSubCycle = subproc;
                 fTxHeader.fIsLastPckt = (subproc == (fTxHeader.fNumPacket - 1)) ? 1 : 0;
-                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioCaptureBuffer->RenderToNetwork(subproc, data_size);
+                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioCaptureBuffer->RenderToNetwork(subproc, data_size, fTxHeader.fActivePorts);
                 memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+                //PacketHeaderDisplay(&fTxHeader);
                 if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
                     return SOCKET_ERROR;
             }
@@ -570,7 +571,8 @@ namespace Jack
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetAudioPlaybackBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
+                        fRxHeader.fActivePorts = rx_head->fActivePorts;
+                        fNetAudioPlaybackBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
                         // Last audio packet is received, so finish rendering...
                         if (fRxHeader.fIsLastPckt)
                             fNetAudioPlaybackBuffer->RenderToJackPorts();
@@ -962,7 +964,8 @@ namespace Jack
                         fRxHeader.fCycle = rx_head->fCycle;
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
-                        fNetAudioCaptureBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE);
+                        fRxHeader.fActivePorts = rx_head->fActivePorts;
+                        fNetAudioCaptureBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
                         // Last audio packet is received, so finish rendering...
                         if (fRxHeader.fIsLastPckt)
                             fNetAudioCaptureBuffer->RenderToJackPorts();
@@ -1028,8 +1031,9 @@ namespace Jack
             for (subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
                 fTxHeader.fSubCycle = subproc;
                 fTxHeader.fIsLastPckt = (subproc == (fTxHeader.fNumPacket - 1)) ? 1 : 0;
-                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioPlaybackBuffer->RenderToNetwork(subproc, data_size);
+                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioPlaybackBuffer->RenderToNetwork(subproc, data_size, fTxHeader.fActivePorts);
                 memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
+                //PacketHeaderDisplay(&fTxHeader);
                 if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
                     return SOCKET_ERROR;
             }

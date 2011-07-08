@@ -41,12 +41,22 @@ namespace Jack
 
         // Always clear output
         for (int i = 0; i < adapter->fAudioAdapter->GetInputs(); i++) {
+        #ifdef OPTIMIZED_PROTOCOL
+            inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer_nulled(adapter->fCapturePortList[i], frames);
+            if (inputBuffer[i])
+                memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
+        #else
             inputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fCapturePortList[i], frames);
             memset(inputBuffer[i], 0, frames * sizeof(jack_default_audio_sample_t));
+        #endif
         }
 
         for (int i = 0; i < adapter->fAudioAdapter->GetOutputs(); i++) {
+        #ifdef OPTIMIZED_PROTOCOL
+            outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer_nulled(adapter->fPlaybackPortList[i], frames);
+        #else
             outputBuffer[i] = (jack_default_audio_sample_t*)jack_port_get_buffer(adapter->fPlaybackPortList[i], frames);
+        #endif
         }
 
         adapter->fAudioAdapter->PullAndPush(inputBuffer, outputBuffer, frames);

@@ -92,12 +92,12 @@ namespace Jack
                 return true;
             }
 
-            int SetBufferSize ( jack_nframes_t buffer_size )
+            int SetBufferSize(jack_nframes_t buffer_size)
             {
                 return -1;
             }
 
-            int SetSampleRate ( jack_nframes_t sample_rate )
+            int SetSampleRate(jack_nframes_t sample_rate)
             {
                 return -1;
             }

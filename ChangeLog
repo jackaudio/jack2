@@ -35,6 +35,18 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-07-08 Stephane Letz  <letz@grame.fr>
+
+	* NetJack2 now only send data on network for connected ports.
+
+2011-07-03 Stephane Letz  <letz@grame.fr>
+
+	* More debug code in JackMMCSS class.
+
+2011-07-03 Stephane Letz  <letz@grame.fr>
+
+	* -l in JackCoreAudioDriver now display devices names and then quit.
+
 2011-07-01 Stephane Letz  <letz@grame.fr>
 
 	* Fix bugs in JackNetAdapter.

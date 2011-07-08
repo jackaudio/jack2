@@ -22,6 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace std;
 
+
 namespace Jack
 {
 //JackNetMaster******************************************************************************************************
@@ -428,9 +429,19 @@ namespace Jack
                                             fParams.fPeriodSize)));
         }
         for (int port_index = 0; port_index < fParams.fSendAudioChannels; port_index++) {
+
+        #ifdef OPTIMIZED_PROTOCOL
+               fNetAudioCaptureBuffer->SetBuffer(port_index,
+                                                static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioCapturePorts[port_index],
+                                                fParams.fPeriodSize)));
+        #else
             fNetAudioCaptureBuffer->SetBuffer(port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[port_index],
                                                 fParams.fPeriodSize)));
+        #endif
+
+
+
         }
         for (int port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
             fNetMidiPlaybackBuffer->SetBuffer(port_index,
@@ -438,9 +449,18 @@ namespace Jack
                                                 fParams.fPeriodSize)));
         }
         for (int port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++) {
+            /*
+            */
+
+        #ifdef OPTIMIZED_PROTOCOL
+            fNetAudioPlaybackBuffer->SetBuffer(port_index,
+                                                static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioPlaybackPorts[port_index],
+                                                fParams.fPeriodSize)));
+        #else
             fNetAudioPlaybackBuffer->SetBuffer(port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[port_index],
                                                 fParams.fPeriodSize)));
+        #endif
         }
 
         if (IsSynched()) {  // only send if connection is "synched"

@@ -133,13 +133,13 @@ namespace Jack
 
     void NetMidiBuffer::DisplayEvents()
     {
-        for (int port_index = 0; port_index < fNPorts; port_index++)
-        {
-            for (uint event = 0; event < fPortBuffer[port_index]->event_count; event++)
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
+            for (uint event = 0; event < fPortBuffer[port_index]->event_count; event++) {
                 if (fPortBuffer[port_index]->IsValid())
                     jack_info("port %d : midi event %u/%u -> time : %u, size : %u",
                                 port_index + 1, event + 1, fPortBuffer[port_index]->event_count,
                                 fPortBuffer[port_index]->events[event].time, fPortBuffer[port_index]->events[event].size);
+            }
         }
     }
 
@@ -147,8 +147,8 @@ namespace Jack
     {
         int pos = 0;
         size_t copy_size;
-        for (int port_index = 0; port_index < fNPorts; port_index++)
-        {
+
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
             char* write_pos = fBuffer + pos;
             copy_size = sizeof(JackMidiBuffer) + fPortBuffer[port_index]->event_count * sizeof(JackMidiEvent);
             memcpy(fBuffer + pos, fPortBuffer[port_index], copy_size);
@@ -167,8 +167,8 @@ namespace Jack
     {
         int pos = 0;
         int copy_size;
-        for (int port_index = 0; port_index < fNPorts; port_index++)
-        {
+
+        for (int port_index = 0; port_index < fNPorts; port_index++) {
             JackMidiBuffer* midi_buffer = reinterpret_cast<JackMidiBuffer*>(fBuffer + pos);
             MidiBufferNToH(midi_buffer, midi_buffer);
             copy_size = sizeof(JackMidiBuffer) + reinterpret_cast<JackMidiBuffer*>(fBuffer + pos)->event_count * sizeof(JackMidiEvent);
@@ -181,17 +181,17 @@ namespace Jack
         return pos;
     }
 
-    int NetMidiBuffer::RenderFromNetwork(int subcycle, size_t copy_size)
+    int NetMidiBuffer::RenderFromNetwork(int sub_cycle, size_t copy_size)
     {
-        memcpy(fBuffer + subcycle * fMaxPcktSize, fNetBuffer, copy_size);
+        memcpy(fBuffer + sub_cycle * fMaxPcktSize, fNetBuffer, copy_size);
         return copy_size;
     }
 
-    int NetMidiBuffer::RenderToNetwork(int subcycle, size_t total_size)
+    int NetMidiBuffer::RenderToNetwork(int sub_cycle, size_t total_size)
     {
-        int size = total_size - subcycle * fMaxPcktSize;
+        int size = total_size - sub_cycle * fMaxPcktSize;
         int copy_size = (size <= fMaxPcktSize) ? size : fMaxPcktSize;
-        memcpy(fNetBuffer, fBuffer + subcycle * fMaxPcktSize, copy_size);
+        memcpy(fNetBuffer, fBuffer + sub_cycle * fMaxPcktSize, copy_size);
         return copy_size;
     }
 
@@ -219,25 +219,25 @@ namespace Jack
         return fPortBuffer.GetBuffer(index);
     }
 
-    int NetFloatAudioBuffer::RenderFromJackPorts ()
+    int NetFloatAudioBuffer::RenderFromJackPorts()
     {
         return fPortBuffer.RenderFromJackPorts();
     }
 
-    int NetFloatAudioBuffer::RenderToJackPorts ()
+    int NetFloatAudioBuffer::RenderToJackPorts()
     {
         return fPortBuffer.RenderToJackPorts();
     }
 
      //network<->buffer
-    int NetFloatAudioBuffer::RenderFromNetwork(int cycle,  int subcycle, size_t copy_size)
+    int NetFloatAudioBuffer::RenderFromNetwork(int cycle,  int sub_cycle, size_t copy_size, uint32_t  port_num)
     {
-        return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, subcycle, copy_size);
+        return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, sub_cycle, copy_size, port_num);
     }
 
-    int NetFloatAudioBuffer::RenderToNetwork (int subcycle, size_t total_size)
+    int NetFloatAudioBuffer::RenderToNetwork(int sub_cycle, size_t total_size, uint32_t&  port_num)
     {
-        return fPortBuffer.RenderToNetwork(fNetBuffer, subcycle, total_size);
+        return fPortBuffer.RenderToNetwork(fNetBuffer, sub_cycle, total_size, port_num);
     }
 
     // Celt audio buffer *********************************************************************************
@@ -443,36 +443,36 @@ namespace Jack
     }
 
     //network<->buffer
-    int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int subcycle, size_t copy_size)
+    int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
-        if (subcycle == fNumPackets - 1) {
+        if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
+                memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
         } else {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+                memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
         }
 
-        if (subcycle != fLastSubCycle + 1)
-            jack_error("Packet(s) missing from... %d %d", fLastSubCycle, subcycle);
+        if (sub_cycle != fLastSubCycle + 1)
+            jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
 
-        fLastSubCycle = subcycle;
+        fLastSubCycle = sub_cycle;
         return copy_size;
     }
 
-    int NetCeltAudioBuffer::RenderToNetwork(int subcycle, size_t total_size)
+    int NetCeltAudioBuffer::RenderToNetwork(int sub_cycle, size_t total_size, uint32_t& port_num)
     {
-        if (subcycle == fNumPackets - 1) {
+        port_num = fNPorts;
+
+        if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fNetBuffer + port_index * fLastSubPeriodBytesSize, fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fLastSubPeriodBytesSize);
+                memcpy(fNetBuffer + port_index * fLastSubPeriodBytesSize, fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fLastSubPeriodBytesSize);
             return fNPorts * fLastSubPeriodBytesSize;
         } else {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fCompressedBuffer[port_index] + subcycle * fSubPeriodBytesSize, fSubPeriodBytesSize);
+                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fSubPeriodBytesSize);
             return fNPorts * fSubPeriodBytesSize;
         }
-
-        return fNPorts * fSubPeriodBytesSize;
     }
 
 #endif
@@ -577,32 +577,34 @@ namespace Jack
     }
 
      //network<->buffer
-    int NetIntAudioBuffer::RenderFromNetwork(int cycle, int subcycle, size_t copy_size)
+    int NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
-        if (subcycle == fNumPackets - 1) {
+        if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fIntBuffer[port_index] + subcycle * fSubPeriodSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
+                memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
         } else {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fIntBuffer[port_index] + subcycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
+                memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
         }
 
-        if (subcycle != fLastSubCycle + 1)
-            jack_error("Packet(s) missing from... %d %d", fLastSubCycle, subcycle);
+        if (sub_cycle != fLastSubCycle + 1)
+            jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
 
-        fLastSubCycle = subcycle;
+        fLastSubCycle = sub_cycle;
         return copy_size;
     }
 
-    int NetIntAudioBuffer::RenderToNetwork(int subcycle, size_t total_size)
+    int NetIntAudioBuffer::RenderToNetwork(int sub_cycle, size_t total_size, uint32_t& port_num)
     {
-        if (subcycle == fNumPackets - 1) {
+        port_num = fNPorts;
+
+        if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fNetBuffer + port_index * fLastSubPeriodBytesSize, fIntBuffer[port_index] + subcycle * fSubPeriodSize, fLastSubPeriodBytesSize);
+                memcpy(fNetBuffer + port_index * fLastSubPeriodBytesSize, fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fLastSubPeriodBytesSize);
             return fNPorts * fLastSubPeriodBytesSize;
         } else {
             for (int port_index = 0; port_index < fNPorts; port_index++)
-                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fIntBuffer[port_index] + subcycle * fSubPeriodSize, fSubPeriodBytesSize);
+                memcpy(fNetBuffer + port_index * fSubPeriodBytesSize, fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fSubPeriodBytesSize);
             return fNPorts * fSubPeriodBytesSize;
         }
     }
@@ -644,17 +646,17 @@ namespace Jack
         return fJackPortBuffer[index];
     }
 
-    void NetBufferedAudioBuffer::RenderFromJackPorts (int subcycle)
+    void NetBufferedAudioBuffer::RenderFromJackPorts (int sub_cycle)
     {
-        fPortBuffer[0].RenderFromJackPorts(fNetBuffer, subcycle);  // Always use first buffer...
+        fPortBuffer[0].RenderFromJackPorts(fNetBuffer, sub_cycle);  // Always use first buffer...
     }
 
-    void NetBufferedAudioBuffer::RenderToJackPorts (int cycle, int subcycle)
+    void NetBufferedAudioBuffer::RenderToJackPorts (int cycle, int sub_cycle)
     {
         if (cycle < fMaxCycle) {
-            jack_info("Wrong order fCycle %d subcycle %d fMaxCycle %d", cycle, subcycle, fMaxCycle);
+            jack_info("Wrong order fCycle %d sub_cycle %d fMaxCycle %d", cycle, sub_cycle, fMaxCycle);
         }
-        fPortBuffer[cycle % AUDIO_BUFFER_SIZE].RenderToJackPorts(fNetBuffer, subcycle);
+        fPortBuffer[cycle % AUDIO_BUFFER_SIZE].RenderToJackPorts(fNetBuffer, sub_cycle);
     }
 
     void NetBufferedAudioBuffer::FinishRenderToJackPorts (int cycle)
@@ -833,7 +835,9 @@ namespace Jack
         jack_info("ID : %u", header->fID);
         jack_info("Cycle : %u", header->fCycle);
         jack_info("SubCycle : %u", header->fSubCycle);
+        jack_info("Active ports : %u", header->fActivePorts);
         jack_info("DATA packets : %u", header->fNumPacket);
+        jack_info("DATA size : %u", header->fPacketSize);
         jack_info("Last packet : '%s'", (header->fIsLastPckt) ? "yes" : "no");
         jack_info("Bitdepth : %s", bitdepth);
         jack_info("**********************************************");

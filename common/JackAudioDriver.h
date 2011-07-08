@@ -59,9 +59,9 @@ class SERVER_EXPORT JackAudioDriver : public JackDriver
 
         std::list<std::pair<std::string, std::string> > fConnections;		// Connections list
 
-        jack_default_audio_sample_t* GetInputBuffer(int port_index);
-        jack_default_audio_sample_t* GetOutputBuffer(int port_index);
-        jack_default_audio_sample_t* GetMonitorBuffer(int port_index);
+        jack_default_audio_sample_t* GetInputBuffer(int port_index, bool nulled = false);
+        jack_default_audio_sample_t* GetOutputBuffer(int port_index, bool nulled = false);
+        jack_default_audio_sample_t* GetMonitorBuffer(int port_index, bool nulled = false);
 
         void HandleLatencyCallback(int status);
         void UpdateLatencies();

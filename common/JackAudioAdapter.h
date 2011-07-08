@@ -34,9 +34,9 @@ namespace Jack
     {
         private:
 
-            static int Process ( jack_nframes_t, void* arg );
-            static int BufferSize ( jack_nframes_t buffer_size, void *arg );
-            static int SampleRate ( jack_nframes_t sample_rate, void *arg );
+            static int Process(jack_nframes_t, void* arg);
+            static int BufferSize(jack_nframes_t buffer_size, void* arg);
+            static int SampleRate(jack_nframes_t sample_rate, void* arg);
 
             jack_port_t** fCapturePortList;
             jack_port_t** fPlaybackPortList;
