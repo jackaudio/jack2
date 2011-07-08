@@ -353,12 +353,12 @@ EXPORT void* jack_port_get_buffer(jack_port_t* port, jack_nframes_t frames)
 EXPORT void* jack_port_get_buffer_nulled(jack_port_t* port, jack_nframes_t frames)
 {
 #ifdef __CLIENTDEBUG__
-    JackGlobals::CheckContext("jack_port_get_buffer");
+    JackGlobals::CheckContext("jack_port_get_buffer_nulled");
 #endif
     uintptr_t port_aux = (uintptr_t)port;
     jack_port_id_t myport = (jack_port_id_t)port_aux;
     if (!CheckPort(myport)) {
-        jack_error("jack_port_get_buffer called with an incorrect port %ld", myport);
+        jack_error("jack_port_get_buffer_nulled called with an incorrect port %ld", myport);
         return NULL;
     } else {
         JackGraphManager* manager = GetGraphManager();

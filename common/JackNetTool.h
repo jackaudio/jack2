@@ -1,5 +1,5 @@
 /*
-Copyright(C) 2008 Romain Moret at Grame
+Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -307,6 +307,8 @@ namespace Jack
 
     struct JackPortList {
 
+        // "[---Header---|--audio data--|--audio data--]..."
+
         jack_nframes_t fPeriodSize;
         jack_nframes_t fSubPeriodSize;
         size_t fSubPeriodBytesSize;
@@ -494,6 +496,8 @@ namespace Jack
 
     struct JackOptimizedPortList : JackPortList {
 
+        // "[---Header---|--active_port_num---audio data--|--active_port_num---audio data--]..."
+
         JackOptimizedPortList(session_params_t* params, uint32_t nports)
             :JackPortList(params, nports)
         {}
@@ -558,6 +562,7 @@ namespace Jack
 
         virtual int RenderToNetwork(char* net_buffer,int sub_cycle, size_t total_size, uint32_t& port_num)
         {
+            // Init active port count
             port_num = 0;
 
             for (int port_index = 0; port_index < fNPorts; port_index++) {
@@ -574,45 +579,6 @@ namespace Jack
         }
 
     #endif
-
-    };
-
-    struct JackPortListAllocate : public JackPortList {
-
-        JackPortListAllocate()
-        {
-            fNPorts = 0;
-            fPeriodSize = 0;
-            fSubPeriodSize = 0;
-            fSubPeriodBytesSize = 0;
-            fPortBuffer = 0;
-        }
-
-        ~JackPortListAllocate()
-        {
-            for (int port_index = 0; port_index < fNPorts; port_index++)
-                delete [] fPortBuffer[port_index];
-            delete [] fPortBuffer;
-        }
-
-        void Init(session_params_t* params, uint32_t nports)
-        {
-            fNPorts = nports;
-            fPeriodSize = params->fPeriodSize;
-
-            if (params->fSendAudioChannels == 0 && params->fReturnAudioChannels == 0) {
-                fSubPeriodSize = params->fPeriodSize;
-            } else {
-                jack_nframes_t period = (int) powf(2.f, (int)(log(float((params->fMtu - sizeof(packet_header_t)))
-                                                   / (max(params->fReturnAudioChannels, params->fSendAudioChannels) * sizeof(sample_t))) / log(2.)));
-                fSubPeriodSize = (period > params->fPeriodSize) ? params->fPeriodSize : period;
-            }
-
-            fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t);
-            fPortBuffer = new sample_t* [fNPorts];
-            for (int port_index = 0; port_index < fNPorts; port_index++)
-                fPortBuffer[port_index] = new sample_t[fPeriodSize];
-        }
 
     };
 
@@ -673,8 +639,8 @@ namespace Jack
             int fCompressedSizeByte;
             jack_nframes_t fPeriodSize;
             int fNumPackets;
-            float fCycleDuration; // in sec
-            size_t fCycleSize; // needed size in bytes for an entire cycle
+            float fCycleDuration;   // in sec
+            size_t fCycleSize;      // needed size in bytes for an entire cycle
 
             size_t fSubPeriodBytesSize;
             size_t fLastSubPeriodBytesSize;
@@ -722,8 +688,8 @@ namespace Jack
             jack_nframes_t fPeriodSize;
 
             int fNumPackets;
-            float fCycleDuration; // in sec
-            size_t fCycleSize; // needed size in bytes for an entire cycle
+            float fCycleDuration;   // in sec
+            size_t fCycleSize;      // needed size in bytes for an entire cycle
 
             size_t fSubPeriodSize;
             size_t fSubPeriodBytesSize;
@@ -761,10 +727,48 @@ namespace Jack
             int RenderToNetwork(int sub_cycle, size_t total_size, uint32_t& port_num);
     };
 
-
+    /*
     #define AUDIO_BUFFER_SIZE 8
 
-    /*
+    struct JackPortListAllocate : public JackPortList {
+
+        JackPortListAllocate()
+        {
+            fNPorts = 0;
+            fPeriodSize = 0;
+            fSubPeriodSize = 0;
+            fSubPeriodBytesSize = 0;
+            fPortBuffer = 0;
+        }
+
+        ~JackPortListAllocate()
+        {
+            for (int port_index = 0; port_index < fNPorts; port_index++)
+                delete [] fPortBuffer[port_index];
+            delete [] fPortBuffer;
+        }
+
+        void Init(session_params_t* params, uint32_t nports)
+        {
+            fNPorts = nports;
+            fPeriodSize = params->fPeriodSize;
+
+            if (params->fSendAudioChannels == 0 && params->fReturnAudioChannels == 0) {
+                fSubPeriodSize = params->fPeriodSize;
+            } else {
+                jack_nframes_t period = (int) powf(2.f, (int)(log(float((params->fMtu - sizeof(packet_header_t)))
+                                                   / (max(params->fReturnAudioChannels, params->fSendAudioChannels) * sizeof(sample_t))) / log(2.)));
+                fSubPeriodSize = (period > params->fPeriodSize) ? params->fPeriodSize : period;
+            }
+
+            fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t);
+            fPortBuffer = new sample_t* [fNPorts];
+            for (int port_index = 0; port_index < fNPorts; port_index++)
+                fPortBuffer[port_index] = new sample_t[fPeriodSize];
+        }
+
+    };
+
     class SERVER_EXPORT NetBufferedAudioBuffer : public NetAudioBuffer
     {
 
@@ -809,7 +813,7 @@ namespace Jack
     };
     */
 
-//utility *************************************************************************************
+    //utility *************************************************************************************
 
     //socket API management
     SERVER_EXPORT int SocketAPIInit();

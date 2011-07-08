@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008 Romain Moret at Grame
+Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -290,3 +290,4 @@ bool PortAudioDevices::IsDuplex ( PaDeviceIndex id )
     //then the device isn't full duplex
     return false;
 }
+
