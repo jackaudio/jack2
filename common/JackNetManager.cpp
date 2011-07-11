@@ -558,14 +558,24 @@ namespace Jack
 
         fManagerClient = client;
         fManagerName = jack_get_client_name ( fManagerClient );
-        strcpy(fMulticastIP, DEFAULT_MULTICAST_IP);
-        fSocket.SetPort ( DEFAULT_PORT );
         fGlobalID = 0;
         fRunning = true;
         fAutoConnect = false;
 
         const JSList* node;
         const jack_driver_param_t* param;
+
+        // Possibly use env variable
+        const char* default_udp_port = getenv("JACK_NETJACK_PORT");
+        fSocket.SetPort((default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT);
+
+        const char* default_multicast_ip = getenv("JACK_NETJACK_MULTICAST");
+        if (default_multicast_ip) {
+            strcpy(fMulticastIP, default_multicast_ip);
+        } else {
+            strcpy(fMulticastIP, DEFAULT_MULTICAST_IP);
+        }
+
         for ( node = params; node; node = jack_slist_next ( node ) )
         {
             param = ( const jack_driver_param_t* ) node->data;

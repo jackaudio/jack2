@@ -28,11 +28,11 @@ using namespace std;
 namespace Jack
 {
     JackNetDriver::JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
-                                const char* ip, int port, int mtu, int midi_input_ports, int midi_output_ports,
+                                const char* ip, int udp_port, int mtu, int midi_input_ports, int midi_output_ports,
                                 char* net_name, uint transport_sync, char network_mode, int celt_encoding)
-            : JackAudioDriver(name, alias, engine, table), JackNetSlaveInterface(ip, port)
+            : JackAudioDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
     {
-        jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, port);
+        jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, udp_port);
 
         // Use the hostname if no name parameter was given
         if (strcmp(net_name, "") == 0)
@@ -659,9 +659,8 @@ namespace Jack
         SERVER_EXPORT Jack::JackDriverClientInterface* driver_initialize(Jack::JackLockedEngine* engine, Jack::JackSynchro* table, const JSList* params)
         {
             char multicast_ip[16];
-            strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
             char net_name[JACK_CLIENT_NAME_SIZE + 1];
-            int udp_port = DEFAULT_PORT;
+            int udp_port;
             int mtu = DEFAULT_MTU;
             uint transport_sync = 1;
             jack_nframes_t period_size = 128;
@@ -677,6 +676,17 @@ namespace Jack
             const jack_driver_param_t* param;
 
             net_name[0] = 0;
+
+            // Possibly use env variable
+            const char* default_udp_port = getenv("JACK_NETJACK_PORT");
+            udp_port = (default_udp_port) ? atoi(default_udp_port) : DEFAULT_PORT;
+
+            const char* default_multicast_ip = getenv("JACK_NETJACK_MULTICAST");
+            if (default_multicast_ip) {
+                strcpy(multicast_ip, default_multicast_ip);
+            } else {
+                strcpy(multicast_ip, DEFAULT_MULTICAST_IP);
+            }
 
             for (node = params; node; node = jack_slist_next(node)) {
                 param = (const jack_driver_param_t*) node->data;
