@@ -449,13 +449,13 @@ namespace Jack
         //audio
         if (fParams.fSendAudioChannels > 0) {
             fTxHeader.fDataType = 'a';
-            data_size = fNetAudioCaptureBuffer->RenderFromJackPorts();
+            fNetAudioCaptureBuffer->RenderFromJackPorts();
             fTxHeader.fNumPacket = fNetAudioCaptureBuffer->GetNumPackets();
 
             for (subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
                 fTxHeader.fSubCycle = subproc;
                 fTxHeader.fIsLastPckt = (subproc == (fTxHeader.fNumPacket - 1)) ? 1 : 0;
-                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioCaptureBuffer->RenderToNetwork(subproc, data_size, fTxHeader.fActivePorts);
+                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioCaptureBuffer->RenderToNetwork(subproc,fTxHeader.fActivePorts);
                 memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
                 //PacketHeaderDisplay(&fTxHeader);
                 if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
@@ -1025,13 +1025,13 @@ namespace Jack
         //audio
         if (fParams.fReturnAudioChannels > 0) {
             fTxHeader.fDataType = 'a';
-            data_size = fNetAudioPlaybackBuffer->RenderFromJackPorts();
+            fNetAudioPlaybackBuffer->RenderFromJackPorts();
             fTxHeader.fNumPacket = fNetAudioPlaybackBuffer->GetNumPackets();
 
             for (subproc = 0; subproc < fTxHeader.fNumPacket; subproc++) {
                 fTxHeader.fSubCycle = subproc;
                 fTxHeader.fIsLastPckt = (subproc == (fTxHeader.fNumPacket - 1)) ? 1 : 0;
-                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioPlaybackBuffer->RenderToNetwork(subproc, data_size, fTxHeader.fActivePorts);
+                fTxHeader.fPacketSize = HEADER_SIZE + fNetAudioPlaybackBuffer->RenderToNetwork(subproc, fTxHeader.fActivePorts);
                 memcpy(fTxBuffer, &fTxHeader, HEADER_SIZE);
                 //PacketHeaderDisplay(&fTxHeader);
                 if (Send(fTxHeader.fPacketSize, 0) == SOCKET_ERROR)
