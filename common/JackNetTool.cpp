@@ -180,10 +180,9 @@ namespace Jack
         }
     }
 
-    int NetMidiBuffer::RenderFromNetwork(int sub_cycle, size_t copy_size)
+    void NetMidiBuffer::RenderFromNetwork(int sub_cycle, size_t copy_size)
     {
         memcpy(fBuffer + sub_cycle * fMaxPcktSize, fNetBuffer, copy_size);
-        return copy_size;
     }
 
     int NetMidiBuffer::RenderToNetwork(int sub_cycle, size_t total_size)
@@ -229,15 +228,26 @@ namespace Jack
     }
 
      //network<->buffer
-    int NetFloatAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+    void NetFloatAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
-        return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, sub_cycle, copy_size, port_num);
+        fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, sub_cycle, copy_size, port_num);
     }
 
     int NetFloatAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t& port_num)
     {
         return fPortBuffer.RenderToNetwork(fNetBuffer, sub_cycle, port_num);
     }
+
+    void NetFloatAudioBuffer::ActivePortsToNetwork(char* net_buffer, uint32_t& port_num)
+    {
+        fPortBuffer.ActivePortsToNetwork(net_buffer, port_num);
+    }
+
+    void NetFloatAudioBuffer::ActivePortsFromNetwork(char* net_buffer, uint32_t port_num)
+    {
+        fPortBuffer.ActivePortsFromNetwork(net_buffer, port_num);
+    }
+
 
     // Celt audio buffer *********************************************************************************
 
@@ -433,7 +443,7 @@ namespace Jack
     }
 
     //network<->buffer
-    int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+    void NetCeltAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
         if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
@@ -447,7 +457,6 @@ namespace Jack
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
 
         fLastSubCycle = sub_cycle;
-        return copy_size;
     }
 
     int NetCeltAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t& port_num)
@@ -564,7 +573,7 @@ namespace Jack
      }
 
      //network<->buffer
-    int NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+    void NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
         if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
@@ -578,7 +587,6 @@ namespace Jack
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
 
         fLastSubCycle = sub_cycle;
-        return copy_size;
     }
 
     int NetIntAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t& port_num)
@@ -797,6 +805,7 @@ namespace Jack
         dst_header->fID = htonl(src_header->fID);
         dst_header->fNumPacket = htonl(src_header->fNumPacket);
         dst_header->fPacketSize = htonl(src_header->fPacketSize);
+        dst_header->fActivePorts = htonl(src_header->fActivePorts);
         dst_header->fCycle = htonl(src_header->fCycle);
         dst_header->fSubCycle = htonl(src_header->fSubCycle);
         dst_header->fIsLastPckt = htonl(src_header->fIsLastPckt);
@@ -808,6 +817,7 @@ namespace Jack
         dst_header->fID = ntohl(src_header->fID);
         dst_header->fNumPacket = ntohl(src_header->fNumPacket);
         dst_header->fPacketSize = ntohl(src_header->fPacketSize);
+        dst_header->fActivePorts = ntohl(src_header->fActivePorts);
         dst_header->fCycle = ntohl(src_header->fCycle);
         dst_header->fSubCycle = ntohl(src_header->fSubCycle);
         dst_header->fIsLastPckt = ntohl(src_header->fIsLastPckt);

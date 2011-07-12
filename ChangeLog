@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-07-12 Stephane Letz  <letz@grame.fr>
+
+	* NetJack2 now only send data on network only is ports are connected both sides.
+
 2011-07-11 Stephane Letz  <letz@grame.fr>
 
 	* Add JACK_NETJACK_PORT and JACK_NETJACK_MULTICAST environment variables for NetJack2.

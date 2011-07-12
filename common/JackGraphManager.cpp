@@ -180,13 +180,16 @@ void* JackGraphManager::GetBuffer(jack_port_id_t port_index, jack_nframes_t buff
         return GetBuffer(0); // port_index 0 is not used
     }
 
+    jack_int_t len = manager->Connections(port_index);
+
     // Output port
     if (port->fFlags & JackPortIsOutput) {
-        return (port->fTied != NO_PORT) ? GetBuffer(port->fTied, buffer_size) : GetBuffer(port_index);
-    }
-
-    // Input port
-    jack_int_t len = manager->Connections(port_index);
+        if (port->fTied != NO_PORT) {
+            return GetBuffer(port->fTied, buffer_size);
+        } else {
+            return (len == 0 && nulled) ? NULL : GetBuffer(port_index);
+        }
+     }
 
     // No connections : return a zero-filled buffer
     if (len == 0) {

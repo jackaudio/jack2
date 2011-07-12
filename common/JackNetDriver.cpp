@@ -521,18 +521,17 @@ namespace Jack
 //driver processes--------------------------------------------------------------------
     int JackNetDriver::Read()
     {
-        int midi_port_index;
-        int audio_port_index;
-
         //buffers
-        for (midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++)
+        for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
             fNetMidiCaptureBuffer->SetBuffer(midi_port_index, GetMidiInputBuffer(midi_port_index));
-        for (audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++)
+        }
+        for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
             fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer(audio_port_index, true));
         #else
             fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer(audio_port_index));
         #endif
+        }
 
 #ifdef JACK_MONITOR
         fNetTimeMon->New();
@@ -570,18 +569,22 @@ namespace Jack
 
     int JackNetDriver::Write()
     {
-        int midi_port_index;
-        int audio_port_index;
-
         //buffers
-        for (midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++)
+        for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
             fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, GetMidiOutputBuffer(midi_port_index));
-        for (audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++)
+        }
+        for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
-            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index, true));
+            // Port is connected on other side..
+            if ((long)fNetAudioPlaybackBuffer->GetBuffer(audio_port_index) == -1) {
+                fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index, true));
+            } else {
+                fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
+            }
         #else
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
         #endif
+        }
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add(((float) (GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
@@ -595,7 +598,7 @@ namespace Jack
             return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->Add(((float)(GetMicroSeconds() - fRcvSyncUst) / (float) fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->Add(((float)(GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         //send data
@@ -603,7 +606,7 @@ namespace Jack
             return SOCKET_ERROR;
 
 #ifdef JACK_MONITOR
-        fNetTimeMon->AddLast(((float)(GetMicroSeconds() - fRcvSyncUst) / (float) fEngineControl->fPeriodUsecs) * 100.f);
+        fNetTimeMon->AddLast(((float)(GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         return 0;

@@ -39,8 +39,8 @@ using namespace std;
 #endif
 #endif
 
-#define MASTER_PROTOCOL 3
-#define SLAVE_PROTOCOL 3
+#define MASTER_PROTOCOL 4
+#define SLAVE_PROTOCOL 4
 
 #define OPTIMIZED_PROTOCOL
 
@@ -256,7 +256,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            int RenderFromNetwork(int sub_cycle, size_t copy_size);
+            void RenderFromNetwork(int sub_cycle, size_t copy_size);
             int RenderToNetwork(int sub_cycle, size_t total_size);
 
             void SetBuffer(int index, JackMidiBuffer* buffer);
@@ -288,8 +288,11 @@ namespace Jack
             virtual void RenderToJackPorts() = 0;
 
             //network<->buffer
-            virtual int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
+            virtual void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
+            virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num) {}
+
             virtual int RenderToNetwork(int sub_cycle, uint32_t& port_num) = 0;
+            virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num) {}
 
             virtual void SetBuffer(int index, sample_t* buffer) = 0;
             virtual sample_t* GetBuffer(int index) = 0;
@@ -337,8 +340,9 @@ namespace Jack
             fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t);
 
             fPortBuffer = new sample_t* [fNPorts];
-            for (int port_index = 0; port_index < fNPorts; port_index++)
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
                 fPortBuffer[port_index] = NULL;
+            }
 
             fCycleDuration = float(fSubPeriodSize) / float(params->fSampleRate);
             fCycleSize = params->fMtu * (fPeriodSize / fSubPeriodSize);
@@ -420,7 +424,7 @@ namespace Jack
         {}
 
         //network<->buffer
-        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 float* src = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
@@ -433,7 +437,6 @@ namespace Jack
                 jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
             }
             fLastSubCycle = sub_cycle;
-            return copy_size;
         }
 
         virtual int RenderToNetwork(char* net_buffer, int sub_cycle, uint32_t& port_num)
@@ -462,7 +465,7 @@ namespace Jack
         }
 
         //network<->buffer
-        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 memcpy(fPortBuffer[port_index] + sub_cycle * fSubPeriodSize, net_buffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
@@ -471,7 +474,6 @@ namespace Jack
                 jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
             }
             fLastSubCycle = sub_cycle;
-            return copy_size;
         }
 
         virtual int RenderToNetwork(char* net_buffer, int sub_cycle, uint32_t& port_num)
@@ -485,10 +487,19 @@ namespace Jack
 
     #endif
 
+        virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num)
+        {}
+
+        virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num)
+        {
+            port_num = fNPorts;
+        }
+
     };
 
     struct JackOptimizedPortList : JackPortList {
 
+        // Consuming port list is transmitted in the Sync packed
         // "[---Header---|--active_port_num---audio data--|--active_port_num---audio data--]..."
 
         JackOptimizedPortList(session_params_t* params, uint32_t nports)
@@ -511,7 +522,7 @@ namespace Jack
             }
 
             fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
-            return fPeriodSize / fSubPeriodSize; // At least one packet...
+            return fPeriodSize / fSubPeriodSize; // At least one packet
         }
 
     #ifdef __BIG_ENDIAN__
@@ -521,36 +532,40 @@ namespace Jack
     #else
 
         //network<->buffer
-        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
-            /// Setup rendering parameters
-            int sub_period_size, sub_period_bytes_size;
-            if (port_num == 0) {
-                sub_period_size = fPeriodSize;
-            } else {
-                jack_nframes_t period = (int) powf(2.f, (int)(log(float(fPacketSize) / (port_num * sizeof(sample_t))) / log(2.)));
-                sub_period_size = (period > fPeriodSize) ? fPeriodSize : period;
-            }
-            sub_period_bytes_size = sub_period_size * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
+            if (port_num > 0)  {
 
-            if (sub_cycle == 0) { // Cleanup all JACK ports
-                for (int port_index = 0; port_index < fNPorts; port_index++) {
-                    memset(fPortBuffer[port_index], 0, fPeriodSize * sizeof(sample_t));
+                /// Setup rendering parameters
+                int sub_period_size, sub_period_bytes_size;
+                if (port_num == 0) {
+                    sub_period_size = fPeriodSize;
+                } else {
+                    jack_nframes_t period = (int) powf(2.f, (int)(log(float(fPacketSize) / (port_num * sizeof(sample_t))) / log(2.)));
+                    sub_period_size = (period > fPeriodSize) ? fPeriodSize : period;
                 }
-            }
+                sub_period_bytes_size = sub_period_size * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
 
-            for (uint32_t port_index = 0; port_index < port_num; port_index++) {
-                // Only copy to active ports : read the active port number then audio data
-                int* active_port_address = (int*)(net_buffer + port_index * sub_period_bytes_size);
-                int active_port = (int)(*active_port_address);
-                memcpy(fPortBuffer[active_port] + sub_cycle * sub_period_size, (char*)(active_port_address + 1), sub_period_bytes_size - sizeof(int));
-            }
+                if (sub_cycle == 0) { // Cleanup all JACK ports
+                    for (int port_index = 0; port_index < fNPorts; port_index++) {
+                        if (fPortBuffer[port_index])
+                            memset(fPortBuffer[port_index], 0, fPeriodSize * sizeof(sample_t));
+                    }
+                }
 
-            if (sub_cycle != fLastSubCycle + 1) {
-                jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                for (uint32_t port_index = 0; port_index < port_num; port_index++) {
+                    // Only copy to active ports : read the active port number then audio data
+                    int* active_port_address = (int*)(net_buffer + port_index * sub_period_bytes_size);
+                    int active_port = (int)(*active_port_address);
+                    if (fPortBuffer[port_index])
+                        memcpy(fPortBuffer[active_port] + sub_cycle * sub_period_size, (char*)(active_port_address + 1), sub_period_bytes_size - sizeof(int));
+                }
+
+                if (sub_cycle != fLastSubCycle + 1) {
+                    jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                }
+                fLastSubCycle = sub_cycle;
             }
-            fLastSubCycle = sub_cycle;
-            return copy_size;
         }
 
         virtual int RenderToNetwork(char* net_buffer,int sub_cycle, uint32_t& port_num)
@@ -572,6 +587,37 @@ namespace Jack
         }
 
     #endif
+
+        virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num)
+        {
+            // Init active port count
+            port_num = 0;
+            short* active_port_address = (short*)net_buffer;
+
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
+                // Write the active port number
+                if (fPortBuffer[port_index]) {
+                    *active_port_address = port_index;
+                    active_port_address++;
+                    port_num++;
+                    assert(port_num < 512);
+                }
+            }
+        }
+
+        virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num)
+        {
+            short* active_port_address = (short*)net_buffer;
+
+            for (int port_index = 0; port_index < fNPorts; port_index++) {
+                fPortBuffer[port_index] = NULL;
+            }
+
+            for (uint port_index = 0; port_index < port_num; port_index++) {
+                fPortBuffer[*active_port_address] = (sample_t*)-1;
+                active_port_address++;
+            }
+        }
 
     };
 
@@ -613,8 +659,11 @@ namespace Jack
             sample_t* GetBuffer(int index);
 
             //network<->buffer
-            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
-            int RenderToNetwork(int sub_cycle, uint32_t&  port_num);
+            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
+
+            int RenderToNetwork(int sub_cycle, uint32_t&  ort_num);
+            void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num);
     };
 
 #if HAVE_CELT
@@ -625,9 +674,9 @@ namespace Jack
     {
         private:
 
-            CELTMode ** fCeltMode;
-            CELTEncoder ** fCeltEncoder;
-            CELTDecoder ** fCeltDecoder;
+            CELTMode** fCeltMode;
+            CELTEncoder** fCeltEncoder;
+            CELTDecoder** fCeltDecoder;
 
             int fCompressedSizeByte;
             jack_nframes_t fPeriodSize;
@@ -667,7 +716,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t&  port_num);
     };
 
@@ -716,7 +765,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t& port_num);
     };
 
@@ -790,10 +839,9 @@ namespace Jack
             //void FinishRenderToJackPorts(int cycle);
 
             //network<->buffer
-            int RenderFromNetwork(int sub_cycle, size_t copy_size)
+            void RenderFromNetwork(int sub_cycle, size_t copy_size)
             {
                 // TODO
-                return 0;
             }
             int RenderToNetwork(int sub_cycle, size_t total_size)
             {
