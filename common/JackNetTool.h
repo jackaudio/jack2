@@ -614,6 +614,7 @@ namespace Jack
             }
 
             for (uint port_index = 0; port_index < port_num; port_index++) {
+                // Use -1 when port is actually connected on other side
                 fPortBuffer[*active_port_address] = (sample_t*)-1;
                 active_port_address++;
             }

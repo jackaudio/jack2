@@ -432,6 +432,7 @@ namespace Jack
 
         #ifdef OPTIMIZED_PROTOCOL
             if ((long)fNetAudioCaptureBuffer->GetBuffer(audio_port_index) == -1) {
+                // Port is connected on other side...
                 fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioCapturePorts[audio_port_index],
                                                 fParams.fPeriodSize)));

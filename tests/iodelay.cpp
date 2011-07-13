@@ -235,14 +235,18 @@ int main (int ac, char *av [])
         if (mtdm.resolve () < 0) printf ("Signal below threshold...\n");
         else
         {
+            jack_nframes_t systemic_latency;
             if (mtdm.err () > 0.3)
             {
                 mtdm.invert ();
                 mtdm.resolve ();
             }
-            printf ("%10.3lf frames %10.3lf ms", mtdm.del (), mtdm.del () * t);
-            if (mtdm.err () > 0.2) printf (" ??");
-                if (mtdm.inv ()) printf (" Inv");
+            systemic_latency = (jack_nframes_t) floor (mtdm->_del - (capture_latency.max + playback_latency.max));
+
+            printf ("%10.3lf frames %10.3lf ms total roundtrip latency\n\textra loopback latency: %u frames\n\tuse %u for the backend arguments -I and -O", mtdm->_del, mtdm->_del * t,
+                    systemic_latency, systemic_latency/2);
+            if (mtdm->_err > 0.2) printf (" ??");
+                if (mtdm->_inv) printf (" Inv");
             printf ("\n");
         }
     }
