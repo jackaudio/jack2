@@ -76,13 +76,7 @@ class JackCoreAudioDriver : public JackAudioDriver
         float fComputationGrain;
         bool fClockDriftCompensate;
 
-        /*
-    #ifdef MAC_OS_X_VERSION_10_5
-        AudioDeviceIOProcID fMesureCallbackID;
-    #endif
-        */
-
-        static	OSStatus Render(void *inRefCon,
+        static OSStatus Render(void *inRefCon,
                                AudioUnitRenderActionFlags *ioActionFlags,
                                const AudioTimeStamp *inTimeStamp,
                                UInt32 inBusNumber,
@@ -90,17 +84,17 @@ class JackCoreAudioDriver : public JackAudioDriver
                                AudioBufferList *ioData);
 
         static OSStatus DeviceNotificationCallback(AudioDeviceID inDevice,
-                UInt32 inChannel,
-                Boolean	isInput,
-                AudioDevicePropertyID inPropertyID,
-                void* inClientData);
+                                                    UInt32 inChannel,
+                                                    Boolean	isInput,
+                                                    AudioDevicePropertyID inPropertyID,
+                                                    void* inClientData);
 
         static OSStatus SRNotificationCallback(AudioDeviceID inDevice,
                                                UInt32 inChannel,
                                                Boolean	isInput,
                                                AudioDevicePropertyID inPropertyID,
                                                void* inClientData);
-    
+
         static OSStatus BSNotificationCallback(AudioDeviceID inDevice,
                                                 UInt32 inChannel,
                                                 Boolean	isInput,

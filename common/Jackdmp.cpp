@@ -526,6 +526,7 @@ int main(int argc, char* argv[])
     if (! jackctl_server_stop(server_ctl)) {
         fprintf(stderr, "Cannot stop server...\n");
     }
+
  close_server:
     if (loopback > 0 && loopback_driver_ctl) {
         jackctl_server_remove_slave(server_ctl, loopback_driver_ctl);
@@ -544,6 +545,7 @@ int main(int argc, char* argv[])
             jackctl_server_unload_internal(server_ctl, internal_driver_ctl);
     }
     jackctl_server_close(server_ctl);
+
  destroy_server:
     jackctl_server_destroy(server_ctl);
     if (notify_sent) {

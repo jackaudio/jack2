@@ -534,6 +534,14 @@ namespace Jack
         //network<->buffer
         virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            // Cleanup all JACK ports at the beginning of the cycle
+            if (sub_cycle == 0) {
+                for (int port_index = 0; port_index < fNPorts; port_index++) {
+                    if (fPortBuffer[port_index])
+                        memset(fPortBuffer[port_index], 0, fPeriodSize * sizeof(sample_t));
+                }
+            }
+
             if (port_num > 0)  {
 
                 /// Setup rendering parameters
@@ -546,12 +554,7 @@ namespace Jack
                 }
                 sub_period_bytes_size = sub_period_size * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
 
-                if (sub_cycle == 0) { // Cleanup all JACK ports
-                    for (int port_index = 0; port_index < fNPorts; port_index++) {
-                        if (fPortBuffer[port_index])
-                            memset(fPortBuffer[port_index], 0, fPeriodSize * sizeof(sample_t));
-                    }
-                }
+
 
                 for (uint32_t port_index = 0; port_index < port_num; port_index++) {
                     // Only copy to active ports : read the active port number then audio data
