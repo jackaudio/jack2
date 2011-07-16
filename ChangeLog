@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-07-16 Stephane Letz  <letz@grame.fr>
+
+	* Error in JackActivationCount::Signal now uses jack_log instead of jack_error.
+
 2011-07-12 Stephane Letz  <letz@grame.fr>
 
 	* NetJack2 now only send data on network only is ports are connected both sides.
