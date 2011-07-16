@@ -35,7 +35,7 @@ showtime ()
 	transport_state = jack_transport_query (client, &current);
 	frame_time = jack_frame_time (client);
 	
-	printf ("frame = %u  frame_time = %u usecs = %ld \t",  current.frame, frame_time, current.usecs);
+	printf ("frame = %u  frame_time = %u usecs = %lld \t",  current.frame, frame_time, current.usecs);
 
 	switch (transport_state) {
 	case JackTransportStopped:
