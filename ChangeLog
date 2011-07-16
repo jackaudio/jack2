@@ -38,6 +38,7 @@ Chris Caudle
 2011-07-16 Stephane Letz  <letz@grame.fr>
 
 	* Error in JackActivationCount::Signal now uses jack_log instead of jack_error.
+	* EXPORT macro renamed to LIB_EXPORT.
 
 2011-07-12 Stephane Letz  <letz@grame.fr>
 

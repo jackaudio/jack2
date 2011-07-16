@@ -38,17 +38,17 @@ JackGraphManager* JackInternalClient::fGraphManager = NULL;
 JackEngineControl* JackInternalClient::fEngineControl = NULL;
 
 // Used for external C API (JackAPI.cpp)
-EXPORT JackGraphManager* GetGraphManager()
+LIB_EXPORT JackGraphManager* GetGraphManager()
 {
     return JackServerGlobals::fInstance->GetGraphManager();
 }
 
-EXPORT JackEngineControl* GetEngineControl()
+LIB_EXPORT JackEngineControl* GetEngineControl()
 {
     return JackServerGlobals::fInstance->GetEngineControl();
 }
 
-EXPORT JackSynchro* GetSynchroTable()
+LIB_EXPORT JackSynchro* GetSynchroTable()
 {
     return JackServerGlobals::fInstance->GetSynchroTable();
 }

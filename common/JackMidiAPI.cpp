@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -30,22 +30,22 @@ extern "C"
 {
 #endif
 
-    EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer);
+    LIB_EXPORT jack_nframes_t jack_midi_get_event_count(void* port_buffer);
 
-    EXPORT int jack_midi_event_get(jack_midi_event_t* event,
+    LIB_EXPORT int jack_midi_event_get(jack_midi_event_t* event,
                                    void* port_buffer, jack_nframes_t event_index);
 
-    EXPORT void jack_midi_clear_buffer(void* port_buffer);
+    LIB_EXPORT void jack_midi_clear_buffer(void* port_buffer);
 
-    EXPORT size_t jack_midi_max_event_size(void* port_buffer);
+    LIB_EXPORT size_t jack_midi_max_event_size(void* port_buffer);
 
-    EXPORT jack_midi_data_t* jack_midi_event_reserve(void* port_buffer,
+    LIB_EXPORT jack_midi_data_t* jack_midi_event_reserve(void* port_buffer,
             jack_nframes_t time, size_t data_size);
 
-    EXPORT int jack_midi_event_write(void* port_buffer,
+    LIB_EXPORT int jack_midi_event_write(void* port_buffer,
                                      jack_nframes_t time, const jack_midi_data_t* data, size_t data_size);
 
-    EXPORT jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer);
+    LIB_EXPORT jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer);
 
 #ifdef __cplusplus
 }
@@ -53,7 +53,7 @@ extern "C"
 
 using namespace Jack;
 
-EXPORT
+LIB_EXPORT
 jack_nframes_t jack_midi_get_event_count(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
@@ -62,7 +62,7 @@ jack_nframes_t jack_midi_get_event_count(void* port_buffer)
     return buf->event_count;
 }
 
-EXPORT
+LIB_EXPORT
 int jack_midi_event_get(jack_midi_event_t *event, void* port_buffer, jack_nframes_t event_index)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
@@ -77,7 +77,7 @@ int jack_midi_event_get(jack_midi_event_t *event, void* port_buffer, jack_nframe
     return 0;
 }
 
-EXPORT
+LIB_EXPORT
 void jack_midi_clear_buffer(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
@@ -85,7 +85,7 @@ void jack_midi_clear_buffer(void* port_buffer)
         buf->Reset(buf->nframes);
 }
 
-EXPORT
+LIB_EXPORT
 size_t jack_midi_max_event_size(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
@@ -94,7 +94,7 @@ size_t jack_midi_max_event_size(void* port_buffer)
     return 0;
 }
 
-EXPORT
+LIB_EXPORT
 jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t time, size_t data_size)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;
@@ -119,7 +119,7 @@ jack_midi_data_t* jack_midi_event_reserve(void* port_buffer, jack_nframes_t time
     return buf->ReserveEvent(time, data_size);
 }
 
-EXPORT
+LIB_EXPORT
 int jack_midi_event_write(void* port_buffer,
                           jack_nframes_t time, const jack_midi_data_t* data, size_t data_size)
 {
@@ -135,7 +135,7 @@ int jack_midi_event_write(void* port_buffer,
     return 0;
 }
 
-EXPORT
+LIB_EXPORT
 jack_nframes_t jack_midi_get_lost_event_count(void* port_buffer)
 {
     JackMidiBuffer *buf = (JackMidiBuffer*)port_buffer;

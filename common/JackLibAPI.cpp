@@ -13,7 +13,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -42,11 +42,11 @@ extern "C"
     jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
-    EXPORT jack_client_t * jack_client_open (const char *client_name,
+    LIB_EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-    EXPORT int jack_client_close (jack_client_t *client);
-    EXPORT int jack_get_client_pid (const char *name);
+    LIB_EXPORT int jack_client_close (jack_client_t *client);
+    LIB_EXPORT int jack_get_client_pid (const char *name);
 
 #ifdef __cplusplus
 }
@@ -60,14 +60,14 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
     jack_varargs_t va;          /* variable arguments */
     jack_status_t my_status;
     JackClient* client;
- 
+
     if (client_name == NULL) {
         jack_error("jack_client_new called with a NULL client_name");
         return NULL;
     }
 
     jack_log("jack_client_new %s", client_name);
-   
+
     if (status == NULL)         /* no status from caller? */
         status = &my_status;    /* use local status word */
     *status = (jack_status_t)0;
@@ -81,7 +81,7 @@ jack_client_t* jack_client_new_aux(const char* client_name, jack_options_t optio
 
     /* parse variable arguments */
     jack_varargs_init(&va);
-        
+
     JackLibGlobals::Init(); // jack library initialisation
 
     if (try_start_server(&va, options, status)) {
@@ -113,14 +113,14 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     jack_varargs_t va;		/* variable arguments */
     jack_status_t my_status;
     JackClient* client;
- 
+
     if (client_name == NULL) {
         jack_error("jack_client_open called with a NULL client_name");
         return NULL;
     }
 
     jack_log("jack_client_open %s", client_name);
-   
+
     if (status == NULL)			/* no status from caller? */
         status = &my_status;	/* use local status word */
     *status = (jack_status_t)0;
@@ -134,7 +134,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
 
     /* parse variable arguments */
     jack_varargs_parse(options, ap, &va);
-        
+
     JackLibGlobals::Init(); // jack library initialisation
 
     if (try_start_server(&va, options, status)) {
@@ -161,7 +161,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     }
 }
 
-EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
 #ifdef __CLIENTDEBUG__
         JackGlobals::CheckContext("jack_client_open");
@@ -184,7 +184,7 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     }
 }
 
-EXPORT int jack_client_close(jack_client_t* ext_client)
+LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_close");
@@ -206,7 +206,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     return res;
 }
 
-EXPORT int jack_get_client_pid(const char *name)
+LIB_EXPORT int jack_get_client_pid(const char *name)
 {
     jack_error("jack_get_client_pid : not implemented on library side");
     return 0;

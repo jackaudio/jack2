@@ -38,15 +38,15 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
         #endif
     #endif
     #define MEM_ALIGN(x,y) x __attribute__((aligned(y)))
-    #define EXPORT __attribute__((visibility("default")))
+    #define LIB_EXPORT __attribute__((visibility("default")))
     #ifdef SERVER_SIDE
         #define SERVER_EXPORT __attribute__((visibility("default")))
     #else
-        #define SERVER_EXPORT 
+        #define SERVER_EXPORT
     #endif
 #else
     #define MEM_ALIGN(x,y) x
-    #define EXPORT
+    #define LIB_EXPORT
     #define SERVER_EXPORT
     /* Add other things here for non-gcc platforms for POST_PACKED_STRUCTURE */
 #endif

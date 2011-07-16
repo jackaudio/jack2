@@ -88,7 +88,7 @@ SERVER_EXPORT void jack_free_driver_params(JSList * driver_params)
     }
 }
 
-EXPORT int
+LIB_EXPORT int
 jack_parse_driver_params(jack_driver_desc_t * desc, int argc, char* argv[], JSList ** param_ptr)
 {
     struct option * long_options;
@@ -835,7 +835,7 @@ JackDriverInfo::~JackDriverInfo()
         UnloadDriverModule(fHandle);
 }
 
-EXPORT
+LIB_EXPORT
 jack_driver_desc_t *
 jack_driver_descriptor_construct(
     const char * name,
@@ -873,7 +873,7 @@ jack_driver_descriptor_construct(
     return desc_ptr;
 }
 
-EXPORT
+LIB_EXPORT
 int
 jack_driver_descriptor_add_parameter(
     jack_driver_desc_t * desc_ptr,

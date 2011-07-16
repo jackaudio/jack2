@@ -53,9 +53,9 @@ struct JackGlobals {
 };
 
 // Each "side" server and client will implement this to get the shared graph manager, engine control and inter-process synchro table.
-extern EXPORT JackGraphManager* GetGraphManager();
-extern EXPORT JackEngineControl* GetEngineControl();
-extern EXPORT JackSynchro* GetSynchroTable();
+extern LIB_EXPORT JackGraphManager* GetGraphManager();
+extern LIB_EXPORT JackEngineControl* GetEngineControl();
+extern LIB_EXPORT JackSynchro* GetSynchroTable();
 
 } // end of namespace
 

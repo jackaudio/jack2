@@ -39,11 +39,11 @@ extern "C"
     jack_client_t * jack_client_open_aux (const char *client_name,
             jack_options_t options,
             jack_status_t *status, va_list ap);
-    EXPORT jack_client_t * jack_client_open (const char *client_name,
+    LIB_EXPORT jack_client_t * jack_client_open (const char *client_name,
             jack_options_t options,
             jack_status_t *status, ...);
-    EXPORT int jack_client_close (jack_client_t *client);
-    EXPORT int jack_get_client_pid (const char *name);
+    LIB_EXPORT int jack_client_close (jack_client_t *client);
+    LIB_EXPORT int jack_get_client_pid (const char *name);
 
 #ifdef __cplusplus
 }
@@ -153,7 +153,7 @@ jack_client_t* jack_client_open_aux(const char* client_name, jack_options_t opti
     }
 }
 
-EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
+LIB_EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options_t options, jack_status_t* status, ...)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_open");
@@ -176,7 +176,7 @@ EXPORT jack_client_t* jack_client_open(const char* ext_client_name, jack_options
     }
 }
 
-EXPORT int jack_client_close(jack_client_t* ext_client)
+LIB_EXPORT int jack_client_close(jack_client_t* ext_client)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_client_close");
@@ -198,7 +198,7 @@ EXPORT int jack_client_close(jack_client_t* ext_client)
     return res;
 }
 
-EXPORT int jack_get_client_pid(const char *name)
+LIB_EXPORT int jack_get_client_pid(const char *name)
 {
     return (JackServerGlobals::fInstance != NULL)
         ? JackServerGlobals::fInstance->GetEngine()->GetClientPID(name)
