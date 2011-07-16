@@ -50,17 +50,17 @@ class JackOSSAdapter : public JackAudioAdapterInterface, public JackRunnableInte
 {
 
     enum { kRead = 1, kWrite = 2, kReadWrite = 3 };
-     
+
     private:
-    
+
         JackThread fThread;
-        
+
         char fCaptureDriverName[JACK_CLIENT_NAME_SIZE + 1];
         char fPlaybackDriverName[JACK_CLIENT_NAME_SIZE + 1];
-        
+
         int fInFD;
         int fOutFD;
-        
+
         int fBits;
         int fSampleFormat;
         int fNperiods;
@@ -68,38 +68,38 @@ class JackOSSAdapter : public JackAudioAdapterInterface, public JackRunnableInte
         int	fRWMode;
         bool fIgnoreHW;
         bool fExcl;
-        
+
         unsigned int fInputBufferSize;
         unsigned int fOutputBufferSize;
-        
+
         void* fInputBuffer;
         void* fOutputBuffer;
-        
+
         float** fInputSampleBuffer;
         float** fOutputSampleBuffer;
-        
+
         bool fFirstCycle;
-        
+
         int OpenInput();
         int OpenOutput();
         void CloseAux();
         void SetSampleFormat();
         void DisplayDeviceInfo();
-   
+
     public:
-    
+
         JackOSSAdapter(jack_nframes_t buffer_size, jack_nframes_t sample_rate, const JSList* params);
         ~JackOSSAdapter()
         {}
-        
+
         int Open();
         int Close();
-        
+
         int Read();
         int Write();
-         
+
         int SetBufferSize(jack_nframes_t buffer_size);
-        
+
         bool Execute();
 };
 
@@ -113,7 +113,7 @@ extern "C"
 #include "JackCompilerDeps.h"
 #include "driver_interface.h"
 
-EXPORT jack_driver_desc_t* jack_get_descriptor();
+SERVER_EXPORT jack_driver_desc_t* jack_get_descriptor();
 
 #ifdef __cplusplus
 }
