@@ -25,23 +25,25 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class HardwareClock
 {
-public:
-	HardwareClock();
+    public:
 
-	void Reset();
-	void Update();
+        HardwareClock();
 
-	float GetDeltaTime() const;
-	double GetTime() const;
+        void Reset();
+        void Update();
 
-private:
-	double m_clockToSeconds;
+        float GetDeltaTime() const;
+        double GetTime() const;
 
-	uint64_t m_startAbsTime;
-	uint64_t m_lastAbsTime;
+    private:
 
-	double m_time;
-	float m_deltaTime;
+        double m_clockToSeconds;
+
+        uint64_t m_startAbsTime;
+        uint64_t m_lastAbsTime;
+
+        double m_time;
+        float m_deltaTime;
 };
 
 HardwareClock::HardwareClock()

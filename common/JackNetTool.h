@@ -366,7 +366,7 @@ namespace Jack
             fPortBuffer = 0;
         }
 
-        ~JackPortList()
+        virtual ~JackPortList()
         {
             delete [] fPortBuffer;
         }
@@ -506,6 +506,9 @@ namespace Jack
             :JackPortList(params, nports)
         {}
 
+        virtual ~JackOptimizedPortList()
+        {}
+
         int GetNumPackets()
         {
             // Count active ports
@@ -553,8 +556,6 @@ namespace Jack
                     sub_period_size = (period > fPeriodSize) ? fPeriodSize : period;
                 }
                 sub_period_bytes_size = sub_period_size * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
-
-
 
                 for (uint32_t port_index = 0; port_index < port_num; port_index++) {
                     // Only copy to active ports : read the active port number then audio data
