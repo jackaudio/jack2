@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -38,7 +38,7 @@ void JackMachSemaphore::BuildName(const char* client_name, const char* server_na
 bool JackMachSemaphore::Signal()
 {
     if (!fSemaphore) {
-        jack_error("JackMachSemaphore::Signal name = %s already desallocated!!", fName);
+        jack_error("JackMachSemaphore::Signal name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -55,13 +55,13 @@ bool JackMachSemaphore::Signal()
 bool JackMachSemaphore::SignalAll()
 {
     if (!fSemaphore) {
-        jack_error("JackMachSemaphore::SignalAll name = %s already desallocated!!", fName);
+        jack_error("JackMachSemaphore::SignalAll name = %s already deallocated!!", fName);
         return false;
     }
 
     if (fFlush)
         return true;
-        
+
     kern_return_t res;
     // When signaled several times, do not accumulate signals...
     if ((res = semaphore_signal_all(fSemaphore)) != KERN_SUCCESS) {
@@ -73,7 +73,7 @@ bool JackMachSemaphore::SignalAll()
 bool JackMachSemaphore::Wait()
 {
     if (!fSemaphore) {
-        jack_error("JackMachSemaphore::Wait name = %s already desallocated!!", fName);
+        jack_error("JackMachSemaphore::Wait name = %s already deallocated!!", fName);
         return false;
     }
 
@@ -87,10 +87,10 @@ bool JackMachSemaphore::Wait()
 bool JackMachSemaphore::TimedWait(long usec)
 {
     if (!fSemaphore) {
-        jack_error("JackMachSemaphore::TimedWait name = %s already desallocated!!", fName);
+        jack_error("JackMachSemaphore::TimedWait name = %s already deallocated!!", fName);
         return false;
     }
-    
+
     kern_return_t res;
     mach_timespec time;
     time.tv_sec = usec / 1000000;

@@ -1203,7 +1203,7 @@ LIB_EXPORT bool jackctl_server_unload_internal(
 {
     int status;
     if (server_ptr->engine != NULL && internal->refnum > 0) {
-        // Client object is internally kept in JackEngine, and will be desallocated in InternalClientUnload
+        // Client object is internally kept in JackEngine, and will be deallocated in InternalClientUnload
         return ((server_ptr->engine->GetEngine()->InternalClientUnload(internal->refnum, &status)) == 0);
     } else {
         return false;
