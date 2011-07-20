@@ -58,6 +58,7 @@ def build(bld):
         'controller_iface_control.c',
         'controller_iface_introspectable.c',
         'controller_iface_patchbay.c',
+        'controller_iface_session_manager.c',
         'controller_iface_transport.c',
         'xml.c',
         'xml_expat.c',

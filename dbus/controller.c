@@ -38,6 +38,7 @@ struct jack_dbus_interface_descriptor * g_jackcontroller_interfaces[] =
     &g_jack_controller_iface_control,
     &g_jack_controller_iface_configure,
     &g_jack_controller_iface_patchbay,
+    &g_jack_controller_iface_session_manager,
     &g_jack_controller_iface_transport,
     NULL
 };
