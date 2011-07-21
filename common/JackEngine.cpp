@@ -966,11 +966,11 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             }
 
             char path_buf[JACK_PORT_NAME_SIZE];
-            snprintf( path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR );
+            snprintf(path_buf, sizeof(path_buf), "%s%s%c", path, client->GetClientControl()->fName, DIR_SEPARATOR);
 
             int res = JackTools::MkDir(path_buf);
             if (res)
-                jack_error( "JackEngine::SessionNotify: can not create session directory '%s'", path_buf );
+                jack_error("JackEngine::SessionNotify: can not create session directory '%s'", path_buf);
 
             int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int) type, 0);
 
@@ -978,11 +978,11 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
                 fSessionPendingReplies += 1;
             } else if (result == 1) {
                 char uuid_buf[JACK_UUID_SIZE];
-                snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID );
-                fSessionResult->fCommandList.push_back( JackSessionCommand( uuid_buf,
-                                                                            client->GetClientControl()->fName,
-                                                                            client->GetClientControl()->fSessionCommand,
-                                                                            client->GetClientControl()->fSessionFlags ));
+                snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+                fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
+                                                                        client->GetClientControl()->fName,
+                                                                        client->GetClientControl()->fSessionCommand,
+                                                                        client->GetClientControl()->fSessionFlags));
             }
         }
     }
@@ -1065,7 +1065,7 @@ void JackEngine::ReserveClientName(const char *name, const char *uuid, int *resu
     *result = 0;
 }
 
-void JackEngine::ClientHasSessionCallbackRequest(const char *name, int *result)
+void JackEngine::ClientHasSessionCallback(const char *name, int *result)
 {
     JackClientInterface* client = NULL;
     for (int i = 0; i < CLIENT_NUM; i++) {

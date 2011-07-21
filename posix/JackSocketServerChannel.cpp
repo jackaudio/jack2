@@ -487,7 +487,7 @@ bool JackSocketServerChannel::HandleRequest(int fd)
             JackClientHasSessionCallbackRequest req;
             JackResult res;
             if (req.Read(socket) == 0) {
-                fServer->GetEngine()->ClientHasSessionCallbackRequest(req.fName, &res.fResult);
+                fServer->GetEngine()->ClientHasSessionCallback(req.fName, &res.fResult);
             }
             if (res.Write(socket) < 0)
                 jack_error("JackRequest::ClientHasSessionCallback write error");

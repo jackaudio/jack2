@@ -363,11 +363,11 @@ class SERVER_EXPORT JackLockedEngine
             CATCH_EXCEPTION
         }
 
-        void ClientHasSessionCallbackRequest(const char *name, int *result)
+        void ClientHasSessionCallback(const char *name, int *result)
         {
             TRY_CALL
             JackLock lock(&fEngine);
-            fEngine.ClientHasSessionCallbackRequest(name, result);
+            fEngine.ClientHasSessionCallback(name, result);
             CATCH_EXCEPTION
         }
 };

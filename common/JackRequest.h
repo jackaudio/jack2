@@ -1142,7 +1142,7 @@ struct JackSessionNotifyResult : public JackResult
     int Read(JackChannelTransaction* trans)
     {
         CheckRes(JackResult::Read(trans));
-        while(1) {
+        while (true) {
             JackSessionCommand buffer;
 
             CheckRes(trans->Read(buffer.fUUID, sizeof(buffer.fUUID)));
@@ -1164,7 +1164,7 @@ struct JackSessionNotifyResult : public JackResult
         terminator[0] = '\0';
 
         CheckRes(JackResult::Write(trans));
-        for (std::list<JackSessionCommand>::iterator i=fCommandList.begin(); i!=fCommandList.end(); i++) {
+        for (std::list<JackSessionCommand>::iterator i = fCommandList.begin(); i != fCommandList.end(); i++) {
             CheckRes(trans->Write(i->fUUID, sizeof(i->fUUID)));
             CheckRes(trans->Write(i->fClientName, sizeof(i->fClientName)));
             CheckRes(trans->Write(i->fCommand, sizeof(i->fCommand)));
