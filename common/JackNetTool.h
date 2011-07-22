@@ -101,7 +101,7 @@ namespace Jack
         uint32_t fSampleEncoder;            //samples encoder
         uint32_t fKBps;                     //KB per second for CELT encoder
         uint32_t fSlaveSyncMode;            //is the slave in sync mode ?
-        char fNetworkMode;                  //fast, normal or slow mode
+        uint32_t fNetworkLatency;           //network latency
     };
 
 //net status **********************************************************************************

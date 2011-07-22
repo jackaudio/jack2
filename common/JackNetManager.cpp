@@ -196,6 +196,9 @@ namespace Jack
             if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0 ) ) == NULL )
                 return -1;
             //port latency
+            range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+            jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
+            /*
             switch ( fParams.fNetworkMode )
             {
                 case 'f' :
@@ -211,6 +214,7 @@ namespace Jack
                     jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
             }
+            */
         }
 
         //midi
@@ -229,6 +233,9 @@ namespace Jack
             if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0 ) ) == NULL )
                 return -1;
             //port latency
+            range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+            jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
+            /*
             switch ( fParams.fNetworkMode )
             {
                 case 'f' :
@@ -244,6 +251,7 @@ namespace Jack
                     jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
                     break;
             }
+            */
         }
         return 0;
     }

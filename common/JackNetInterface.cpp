@@ -107,7 +107,7 @@ namespace Jack
         jack_log("midi_size %f", midi_size);
 
         //bufsize = sync + audio + midi
-        int bufsize = MAX_LATENCY * (fParams.fMtu + (int)audio_size + (int) midi_size);
+        int bufsize = NETWORK_MAX_LATENCY * (fParams.fMtu + (int)audio_size + (int) midi_size);
         jack_log("SetNetBufferSize bufsize = %d", bufsize);
 
         //tx buffer
@@ -405,11 +405,7 @@ namespace Jack
 
     bool JackNetMasterInterface::IsSynched()
     {
-        if (fParams.fNetworkMode == 's') {
-            return (fCycleOffset < (CYCLE_OFFSET_SLOW + 1));
-        } else {
-            return true;
-        }
+        return (fCycleOffset <= fMaxCycleOffset);
     }
 
     int JackNetMasterInterface::SyncSend()
@@ -487,8 +483,10 @@ namespace Jack
         if (fNetAudioCaptureBuffer)
             fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
 
+        /*
         switch (fParams.fNetworkMode)
         {
+
             case 's' :
                 //slow mode : allow to use full bandwidth and heavy process on the slave
                 //  - extra latency is set to two cycles, one cycle for send/receive operations + one cycle for heavy process on the slave
@@ -502,13 +500,12 @@ namespace Jack
                     rx_bytes = Recv(rx_head->fPacketSize, 0);
                 }
 
-                /*
-                rx_bytes = Recv(rx_head->fPacketSize, 0);
+                //rx_bytes = Recv(rx_head->fPacketSize, 0);
 
-                if (fCycleOffset != fLastfCycleOffset)
-                    jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
-                fLastfCycleOffset = fCycleOffset;
-                */
+                //if (fCycleOffset != fLastfCycleOffset)
+                //    jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
+                //fLastfCycleOffset = fCycleOffset;
+
 
                 break;
 
@@ -539,6 +536,13 @@ namespace Jack
                     jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
                 }
                 break;
+        }
+        */
+
+        if (fCycleOffset < fMaxCycleOffset) {
+            return 0;
+        } else {
+            rx_bytes = Recv(rx_head->fPacketSize, 0);
         }
 
         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
