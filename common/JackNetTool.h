@@ -585,8 +585,9 @@ namespace Jack
                 }
 
                 fLastSubCycle = sub_cycle;
-                return res;
             }
+
+            return res;
         }
 
         virtual int RenderToNetwork(char* net_buffer,int sub_cycle, uint32_t& port_num)
