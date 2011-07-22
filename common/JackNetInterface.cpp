@@ -206,28 +206,6 @@ namespace Jack
         return true;
     }
 
-    /*
-    int JackNetMasterInterface::SetRxTimeout()
-    {
-        jack_log("JackNetMasterInterface::SetRxTimeout");
-
-        float time = 0;
-
-        //slow or normal mode, short timeout on recv (2 audio subcycles)
-        if ((fParams.fNetworkMode == 's') || (fParams.fNetworkMode == 'n')) {
-            time = 2000000.f * ((fNetAudioCaptureBuffer)
-                                ? fNetAudioCaptureBuffer->GetCycleDuration()
-                                : (fNetAudioPlaybackBuffer) ? fNetAudioPlaybackBuffer->GetCycleDuration() : 0);
-        }
-        //fast mode, wait for 75% of the entire cycle duration
-        else if (fParams.fNetworkMode == 'f') {
-            time = 750000.f * (static_cast<float>(fParams.fPeriodSize) / static_cast<float>(fParams.fSampleRate));
-        }
-
-        return fSocket.SetTimeOut(static_cast<int>(time));
-    }
-    */
-
     int JackNetMasterInterface::SetRxTimeout()
     {
         jack_log("JackNetMasterInterface::SetRxTimeout");
@@ -482,62 +460,6 @@ namespace Jack
         // Read active ports list
         if (fNetAudioCaptureBuffer)
             fNetAudioCaptureBuffer->ActivePortsFromNetwork(fRxData, rx_head->fActivePorts);
-
-        /*
-        switch (fParams.fNetworkMode)
-        {
-
-            case 's' :
-                //slow mode : allow to use full bandwidth and heavy process on the slave
-                //  - extra latency is set to two cycles, one cycle for send/receive operations + one cycle for heavy process on the slave
-                //  - if the network is two fast, just wait the next cycle, this mode allows a shorter cycle duration for the master
-                //  - this mode will skip the two first cycles, thus it lets time for data to be processed and queued on the socket rx buffer
-                //the slow mode is the safest mode because it wait twice the bandwidth relative time (send/return + process)
-
-                if (fCycleOffset < CYCLE_OFFSET_SLOW) {
-                    return 0;
-                } else {
-                    rx_bytes = Recv(rx_head->fPacketSize, 0);
-                }
-
-                //rx_bytes = Recv(rx_head->fPacketSize, 0);
-
-                //if (fCycleOffset != fLastfCycleOffset)
-                //    jack_info("Warning : '%s' runs in slow network mode, but data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
-                //fLastfCycleOffset = fCycleOffset;
-
-
-                break;
-
-            case 'n' :
-                //normal use of the network :
-                //  - extra latency is set to one cycle, what is the time needed to receive streams using full network bandwidth
-                //  - if the network is too fast, just wait the next cycle, the benefit here is the master's cycle is shorter
-                //  - indeed, data is supposed to be on the network rx buffer, so we don't have to wait for it
-                if (fCycleOffset < CYCLE_OFFSET_NORMAL) {
-                    return 0;
-                } else {
-                    rx_bytes = Recv(rx_head->fPacketSize, 0);
-                }
-
-                if (fCycleOffset > CYCLE_OFFSET_NORMAL)  {
-                    jack_info("'%s' can't run in normal network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
-                }
-                break;
-
-            case 'f' :
-                //fast mode suppose the network bandwith is larger than required for the transmission (only a few channels for example)
-                //    - packets can be quickly received, quickly is here relative to the cycle duration
-                //    - here, receive data, we can't keep it queued on the rx buffer,
-                //    - but if there is a cycle offset, tell the user, that means we're not in fast mode anymore, network is too slow
-                rx_bytes = Recv(rx_head->fPacketSize, 0);
-
-                if (fCycleOffset > CYCLE_OFFSET_FAST) {
-                    jack_info("'%s' can't run in fast network mode, data received too late (%d cycle(s) offset)", fParams.fName, fCycleOffset);
-                }
-                break;
-        }
-        */
 
         if (fCycleOffset < fMaxCycleOffset) {
             return 0;

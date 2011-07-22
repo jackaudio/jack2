@@ -185,20 +185,7 @@ namespace Jack
         plot_name = string(fParams.fName);
         plot_name += string("_slave");
         plot_name += (fEngineControl->fSyncMode) ? string("_sync") : string("_async");
-        switch (fParams.fNetworkMode)
-        {
-            case 's' :
-                plot_name += string("_slow");
-                break;
-
-            case 'n' :
-                plot_name += string("_normal");
-                break;
-
-            case 'f' :
-                plot_name += string("_fast");
-                break;
-        }
+        plot_name +=  string("_latency");
         fNetTimeMon = new JackGnuPlotMonitor<float>(128, 5, plot_name);
         string net_time_mon_fields[] =
         {
@@ -304,23 +291,8 @@ namespace Jack
             }
             port = fGraphManager->GetPort(port_index);
             port->SetAlias(alias);
-
             //port latency
             range.min = range.max = (fParams.fNetworkLatency * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-            /*
-            switch (fParams.fNetworkMode)
-            {
-                case 'f' :
-                    range.min = range.max = (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize;
-                    break;
-                case 'n' :
-                    range.min = range.max = (fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-                case 's' :
-                    range.min = range.max = (2 * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-            }
-            */
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[audio_port_index] = port_index;
             jack_log("JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_index, port->GetLatency());
@@ -359,20 +331,6 @@ namespace Jack
             port = fGraphManager->GetPort(port_index);
             //port latency
             range.min = range.max = (fParams.fNetworkLatency * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-            /*
-            switch (fParams.fNetworkMode)
-            {
-                case 'f' :
-                    range.min = range.max = (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize;
-                    break;
-                case 'n' :
-                    range.min = range.max = (fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-                case 's' :
-                    range.min = range.max = (2 * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-            }
-            */
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fMidiPlaybackPortList[midi_port_index] = port_index;
             jack_log("JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_index, port->GetLatency());

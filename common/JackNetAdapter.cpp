@@ -96,17 +96,6 @@ namespace Jack
             #endif
                 case 'l' :
                     fParams.fNetworkLatency = param->value.i;
-                    /*
-                    if (strcmp(param->value.str, "normal") == 0) {
-                        fParams.fNetworkMode = 'n';
-                    } else if (strcmp(param->value.str, "slow") == 0) {
-                        fParams.fNetworkMode = 's';
-                    } else if (strcmp(param->value.str, "fast") == 0) {
-                        fParams.fNetworkMode = 'f';
-                    } else {
-                        jack_error("Unknown network mode, using 'normal' mode.");
-                    }
-                    */
                     break;
                 case 'q':
                     fQuality = param->value.ui;

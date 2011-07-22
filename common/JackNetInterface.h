@@ -224,13 +224,6 @@ namespace Jack
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
 #define SLAVE_INIT_TIMEOUT 1000000      // in usec
 
-/*
-#define CYCLE_OFFSET_FAST   0
-#define CYCLE_OFFSET_NORMAL 1
-#define CYCLE_OFFSET_SLOW   2
-//#define CYCLE_OFFSET_SLOW   30
-*/
-
 #define CYCLE_OFFSET_SLOW   10
 #define NETWORK_MAX_LATENCY CYCLE_OFFSET_SLOW
 
