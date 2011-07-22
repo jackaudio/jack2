@@ -637,7 +637,11 @@ namespace Jack
 
             for (uint port_index = 0; port_index < port_num; port_index++) {
                 // Use -1 when port is actually connected on other side
-                fPortBuffer[*active_port_address] = (sample_t*)-1;
+                if (*active_port_address >= 0 && *active_port_address < fNPorts) {
+                    fPortBuffer[*active_port_address] = (sample_t*)-1;
+                } else {
+                    jack_error("ActivePortsFromNetwork: incorrect port = %d", *active_port_address);
+                }
                 active_port_address++;
             }
         }

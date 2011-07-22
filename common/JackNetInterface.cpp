@@ -477,7 +477,7 @@ namespace Jack
         int rx_bytes = Recv(fParams.fMtu, MSG_PEEK);
 
         if ((rx_bytes == 0) || (rx_bytes == SOCKET_ERROR)) {
-            // O bytes considered an error (lost connection)
+            // 0 bytes considered an error (lost connection)
             return SOCKET_ERROR;
         }
 
