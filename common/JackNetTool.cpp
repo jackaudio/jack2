@@ -230,9 +230,9 @@ namespace Jack
     }
 
      //network<->buffer
-    void NetFloatAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+    int NetFloatAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
-        fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, sub_cycle, copy_size, port_num);
+        return fPortBuffer.RenderFromNetwork(fNetBuffer, cycle, sub_cycle, copy_size, port_num);
     }
 
     int NetFloatAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t& port_num)
@@ -445,8 +445,10 @@ namespace Jack
     }
 
     //network<->buffer
-    void NetCeltAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+    int NetCeltAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
+        int res = 0;
+
         if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
                 memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
@@ -455,10 +457,13 @@ namespace Jack
                 memcpy(fCompressedBuffer[port_index] + sub_cycle * fSubPeriodBytesSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
         }
 
-        if (sub_cycle != fLastSubCycle + 1)
+        if (sub_cycle != fLastSubCycle + 1) {
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+            res = 1;
+        }
 
         fLastSubCycle = sub_cycle;
+        return res;
     }
 
     int NetCeltAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t& port_num)
@@ -575,8 +580,10 @@ namespace Jack
      }
 
      //network<->buffer
-    void NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+    int NetIntAudioBuffer::RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
     {
+        int res = 0;
+
         if (sub_cycle == fNumPackets - 1) {
             for (int port_index = 0; port_index < fNPorts; port_index++)
                 memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fLastSubPeriodBytesSize, fLastSubPeriodBytesSize);
@@ -585,10 +592,13 @@ namespace Jack
                 memcpy(fIntBuffer[port_index] + sub_cycle * fSubPeriodSize, fNetBuffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
         }
 
-        if (sub_cycle != fLastSubCycle + 1)
+        if (sub_cycle != fLastSubCycle + 1) {
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+            res = -1;
+        }
 
         fLastSubCycle = sub_cycle;
+        return res;
     }
 
     int NetIntAudioBuffer::RenderToNetwork(int sub_cycle, uint32_t& port_num)

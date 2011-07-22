@@ -42,6 +42,8 @@ using namespace std;
 #define MASTER_PROTOCOL 4
 #define SLAVE_PROTOCOL 4
 
+#define NET_PACKET_ERROR -2
+
 #define OPTIMIZED_PROTOCOL
 
 namespace Jack
@@ -288,7 +290,7 @@ namespace Jack
             virtual void RenderToJackPorts() = 0;
 
             //network<->buffer
-            virtual void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
+            virtual int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
             virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num) {}
 
             virtual int RenderToNetwork(int sub_cycle, uint32_t& port_num) = 0;
@@ -424,8 +426,10 @@ namespace Jack
         {}
 
         //network<->buffer
-        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            int res = 0;
+
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 float* src = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
                 float* dst = (float*)(fPortBuffer[port_index] + sub_cycle * fSubPeriodSize);
@@ -435,8 +439,11 @@ namespace Jack
             }
             if (sub_cycle != fLastSubCycle + 1) {
                 jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                res = -1;
             }
+
             fLastSubCycle = sub_cycle;
+            return res;
         }
 
         virtual int RenderToNetwork(char* net_buffer, int sub_cycle, uint32_t& port_num)
@@ -465,15 +472,20 @@ namespace Jack
         }
 
         //network<->buffer
-        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            int res = 0;
+
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 memcpy(fPortBuffer[port_index] + sub_cycle * fSubPeriodSize, net_buffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
             }
             if (sub_cycle != fLastSubCycle + 1) {
                 jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                res = -1;
             }
+
             fLastSubCycle = sub_cycle;
+            return res;
         }
 
         virtual int RenderToNetwork(char* net_buffer, int sub_cycle, uint32_t& port_num)
@@ -535,8 +547,10 @@ namespace Jack
     #else
 
         //network<->buffer
-        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            int res = 0;
+
             // Cleanup all JACK ports at the beginning of the cycle
             if (sub_cycle == 0) {
                 for (int port_index = 0; port_index < fNPorts; port_index++) {
@@ -567,8 +581,11 @@ namespace Jack
 
                 if (sub_cycle != fLastSubCycle + 1) {
                     jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                    res = -1;
                 }
+
                 fLastSubCycle = sub_cycle;
+                return res;
             }
         }
 
@@ -664,7 +681,7 @@ namespace Jack
             sample_t* GetBuffer(int index);
 
             //network<->buffer
-            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
 
             int RenderToNetwork(int sub_cycle, uint32_t&  ort_num);
@@ -721,7 +738,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t&  port_num);
     };
 
@@ -770,7 +787,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t& port_num);
     };
 

@@ -554,8 +554,13 @@ namespace Jack
         fNetTimeMon->Add(((float)(GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
 #endif
         //audio, midi or sync if driver is late
-        if (DataRecv() == SOCKET_ERROR)
+        int res = DataRecv();
+        if (res == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        } else if (res == NET_PACKET_ERROR) {
+            jack_time_t cur_time = GetMicroSeconds();
+            NotifyXRun(cur_time, float(cur_time - fBeginDateUst));   // Better this value than nothing...
+        }
 
         //take the time at the beginning of the cycle
         JackDriver::CycleTakeBeginTime();

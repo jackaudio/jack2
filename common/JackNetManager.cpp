@@ -19,6 +19,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "JackNetManager.h"
 #include "JackArgParser.h"
 #include "JackTime.h"
+#include "JackServerGlobals.h"
+#include "JackLockedEngine.h"
 
 using namespace std;
 
@@ -407,7 +409,11 @@ namespace Jack
 //process-----------------------------------------------------------------------------
     int JackNetMaster::SetProcess(jack_nframes_t nframes, void* arg)
     {
-        return static_cast<JackNetMaster*> ( arg )->Process();
+        try {
+            return static_cast<JackNetMaster*>(arg)->Process();
+        } catch (JackNetException& e) {
+            return 0;
+        }
     }
 
     int JackNetMaster::Process()
@@ -441,8 +447,8 @@ namespace Jack
             }
         #else
             fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
-                                                static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[audio_port_index],
-                                                fParams.fPeriodSize)));
+                                            static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[audio_port_index],
+                                            fParams.fPeriodSize)));
         #endif
             // TODO
         }
@@ -523,8 +529,12 @@ namespace Jack
 
         //receive data
         res = DataRecv();
-        if ((res == 0) || (res == SOCKET_ERROR))
+        if ((res == 0) || (res == SOCKET_ERROR)) {
             return res;
+        } else if (res == NET_PACKET_ERROR) {
+            // Well not a real XRun, but...
+            JackServerGlobals::fInstance->GetEngine()->NotifyXRun(GetMicroSeconds(), 0);
+        }
 
         /*
         switch (DataRecv()) {

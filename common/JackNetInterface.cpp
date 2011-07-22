@@ -581,7 +581,7 @@ namespace Jack
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fRxHeader.fActivePorts = rx_head->fActivePorts;
-                        fNetAudioPlaybackBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
+                        rx_bytes = fNetAudioPlaybackBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
                         // Last audio packet is received, so finish rendering...
                         if (fRxHeader.fIsLastPckt)
                             fNetAudioPlaybackBuffer->RenderToJackPorts();
@@ -591,7 +591,7 @@ namespace Jack
                         jack_info("NetMaster : overloaded, skipping receive from '%s'", fParams.fName);
                         // TODO : finish midi and audio rendering ?
                         fNetAudioPlaybackBuffer->RenderToJackPorts();
-                        return 0;
+                        return NET_PACKET_ERROR;
                 }
             }
         }
@@ -978,7 +978,7 @@ namespace Jack
                         fRxHeader.fSubCycle = rx_head->fSubCycle;
                         fRxHeader.fIsLastPckt = rx_head->fIsLastPckt;
                         fRxHeader.fActivePorts = rx_head->fActivePorts;
-                        fNetAudioCaptureBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
+                        rx_bytes = fNetAudioCaptureBuffer->RenderFromNetwork(rx_head->fCycle, rx_head->fSubCycle, rx_bytes - HEADER_SIZE, fRxHeader.fActivePorts);
                         // Last audio packet is received, so finish rendering...
                         if (fRxHeader.fIsLastPckt)
                             fNetAudioCaptureBuffer->RenderToJackPorts();
@@ -988,13 +988,13 @@ namespace Jack
                         jack_info("NetSlave : overloaded, skipping receive");
                         // TODO : finish midi and audio rendering ?
                         fNetAudioCaptureBuffer->RenderToJackPorts();
-                        return 0;
+                        return NET_PACKET_ERROR;
                 }
             }
         }
 
         fRxHeader.fCycle = rx_head->fCycle;
-        return 0;
+        return rx_bytes;
     }
 
     int JackNetSlaveInterface::SyncSend()
