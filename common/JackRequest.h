@@ -31,7 +31,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 namespace Jack
 {
 
-#define CheckRes(exp) { if ((exp) < 0) return -1;}
+#define CheckRes(exp) { if ((exp) < 0) return -1; }
+
+/*!
+\brief Session API constants.
+*/
+
+enum JackSessionReply {
+
+    kImmediateSessionReply = 1,
+    kPendingSessionReply = 2
+
+};
 
 /*!
 \brief Request from client to server.
@@ -1119,11 +1130,11 @@ struct JackSessionCommand
     JackSessionCommand()
     {}
 
-    JackSessionCommand( const char *uuid, const char *clientname, const char *command, jack_session_flags_t flags )
+    JackSessionCommand(const char *uuid, const char *clientname, const char *command, jack_session_flags_t flags)
     {
-        strncpy( fUUID, uuid, sizeof(fUUID));
-        strncpy( fClientName, clientname, sizeof(fClientName));
-        strncpy( fCommand, command, sizeof(fCommand));
+        strncpy(fUUID, uuid, sizeof(fUUID));
+        strncpy(fClientName, clientname, sizeof(fClientName));
+        strncpy(fCommand, command, sizeof(fCommand));
         fFlags = flags;
     }
 };
@@ -1184,19 +1195,20 @@ struct JackSessionNotifyRequest : public JackRequest
 {
     char fPath[JACK_MESSAGE_SIZE + 1];
     char fDst[JACK_CLIENT_NAME_SIZE + 1];
-    jack_session_event_type_t  fEventType;
-    int  fRefNum;
+    jack_session_event_type_t fEventType;
+    int fRefNum;
 
     JackSessionNotifyRequest()
     {}
-    JackSessionNotifyRequest(int refnum, const char *path, jack_session_event_type_t type, const char *dst)
+    JackSessionNotifyRequest(int refnum, const char* path, jack_session_event_type_t type, const char* dst)
             : JackRequest(JackRequest::kSessionNotify), fEventType(type), fRefNum(refnum)
     {
         snprintf(fPath, sizeof(fPath), "%s", path);
-        if (dst)
+        if (dst) {
             snprintf(fDst, sizeof(fDst), "%s", dst);
-        else
+        } else {
             fDst[0] = '\0';
+        }
     }
 
     int Read(JackChannelTransaction* trans)
@@ -1276,7 +1288,6 @@ struct JackClientNameResult : public JackResult
 
 struct JackUUIDResult : public JackResult
 {
-
     char fUUID[JACK_UUID_SIZE];
 
     JackUUIDResult(): JackResult()

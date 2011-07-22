@@ -54,8 +54,8 @@ class SERVER_EXPORT JackEngine : public JackLockAble
         jack_time_t fLastSwitchUsecs;
 
         int fSessionPendingReplies;
-        JackChannelTransaction *fSessionTransaction;
-        JackSessionNotifyResult *fSessionResult;
+        JackChannelTransaction* fSessionTransaction;
+        JackSessionNotifyResult* fSessionResult;
         std::map<int,std::string> fReservationMap;
         int fMaxUUID;
 

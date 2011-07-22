@@ -972,11 +972,11 @@ void JackEngine::SessionNotify(int refnum, const char *target, jack_session_even
             if (res)
                 jack_error("JackEngine::SessionNotify: can not create session directory '%s'", path_buf);
 
-            int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int) type, 0);
+            int result = client->ClientNotify(i, client->GetClientControl()->fName, kSessionCallback, true, path_buf, (int)type, 0);
 
-            if (result == 2) {
+            if (result == kPendingSessionReply) {
                 fSessionPendingReplies += 1;
-            } else if (result == 1) {
+            } else if (result == kImmediateSessionReply) {
                 char uuid_buf[JACK_UUID_SIZE];
                 snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
                 fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
@@ -1000,7 +1000,7 @@ void JackEngine::SessionReply(int refnum)
 {
     JackClientInterface* client = fClientTable[refnum];
     char uuid_buf[JACK_UUID_SIZE];
-    snprintf( uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
+    snprintf(uuid_buf, sizeof(uuid_buf), "%d", client->GetClientControl()->fSessionID);
     fSessionResult->fCommandList.push_back(JackSessionCommand(uuid_buf,
                                                             client->GetClientControl()->fName,
                                                             client->GetClientControl()->fSessionCommand,

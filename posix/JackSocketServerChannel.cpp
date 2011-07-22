@@ -426,7 +426,6 @@ bool JackSocketServerChannel::HandleRequest(int fd)
         case JackRequest::kSessionNotify: {
             jack_log("JackRequest::SessionNotify");
             JackSessionNotifyRequest req;
-            JackSessionNotifyResult res;
             if (req.Read(socket) == 0) {
                 fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, socket);
             }

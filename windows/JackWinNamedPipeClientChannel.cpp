@@ -263,10 +263,10 @@ void JackWinNamedPipeClientChannel::SessionNotify(int refnum, const char* target
     jack_session_command_t* session_command = (jack_session_command_t *)malloc(sizeof(jack_session_command_t) * (res.fCommandList.size() + 1));
     int i = 0;
 
-    for (std::list<JackSessionCommand>::iterator ci=res.fCommandList.begin(); ci!=res.fCommandList.end(); ci++) {
-        session_command[i].uuid = strdup( ci->fUUID );
-        session_command[i].client_name = strdup( ci->fClientName );
-        session_command[i].command = strdup( ci->fCommand );
+    for (std::list<JackSessionCommand>::iterator ci = res.fCommandList.begin(); ci != res.fCommandList.end(); ci++) {
+        session_command[i].uuid = strdup(ci->fUUID);
+        session_command[i].client_name = strdup(ci->fClientName);
+        session_command[i].command = strdup(ci->fCommand);
         session_command[i].flags = ci->fFlags;
         i += 1;
     }

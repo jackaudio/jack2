@@ -339,7 +339,6 @@ bool JackClientPipeThread::HandleRequest()
             case JackRequest::kSessionNotify: {
                 jack_log("JackRequest::SessionNotify");
                 JackSessionNotifyRequest req;
-                JackSessionNotifyResult res;
                 if (req.Read(fPipe) == 0) {
                     fServer->GetEngine()->SessionNotify(req.fRefNum, req.fDst, req.fEventType, req.fPath, fPipe);
                 }
