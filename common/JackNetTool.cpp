@@ -459,7 +459,7 @@ namespace Jack
 
         if (sub_cycle != fLastSubCycle + 1) {
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
-            res = 1;
+            res = NET_PACKET_ERROR;
         }
 
         fLastSubCycle = sub_cycle;
@@ -594,7 +594,7 @@ namespace Jack
 
         if (sub_cycle != fLastSubCycle + 1) {
             jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
-            res = -1;
+            res = NET_PACKET_ERROR;
         }
 
         fLastSubCycle = sub_cycle;
