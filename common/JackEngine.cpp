@@ -563,7 +563,6 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         } else {
             strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
         }
-
         EnsureUUID(uuid);
     }
 
@@ -686,12 +685,12 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     int i;
 
     fGraphManager->GetInputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY); i++) {
         PortUnRegister(refnum, ports[i]);
     }
 
     fGraphManager->GetOutputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY); i++) {
         PortUnRegister(refnum, ports[i]);
     }
 

@@ -138,11 +138,12 @@ struct JackClientCheckRequest : public JackRequest
     int fProtocol;
     int fOptions;
     int fUUID;
+    int fOpen;
 
     JackClientCheckRequest()
     {}
-    JackClientCheckRequest(const char* name, int protocol, int options, int uuid)
-        : JackRequest(JackRequest::kClientCheck), fProtocol(protocol), fOptions(options), fUUID(uuid)
+    JackClientCheckRequest(const char* name, int protocol, int options, int uuid, int open = false)
+        : JackRequest(JackRequest::kClientCheck), fProtocol(protocol), fOptions(options), fUUID(uuid), fOpen(open)
     {
         snprintf(fName, sizeof(fName), "%s", name);
     }
@@ -152,7 +153,8 @@ struct JackClientCheckRequest : public JackRequest
         CheckRes(trans->Read(&fName, sizeof(fName)));
         CheckRes(trans->Read(&fProtocol, sizeof(int)));
         CheckRes(trans->Read(&fOptions, sizeof(int)));
-        return trans->Read(&fUUID, sizeof(int));
+        CheckRes(trans->Read(&fUUID, sizeof(int)));
+        return trans->Read(&fOpen, sizeof(int));
     }
 
     int Write(JackChannelTransaction* trans)
@@ -161,7 +163,8 @@ struct JackClientCheckRequest : public JackRequest
         CheckRes(trans->Write(&fName,  sizeof(fName)));
         CheckRes(trans->Write(&fProtocol, sizeof(int)));
         CheckRes(trans->Write(&fOptions, sizeof(int)));
-        return trans->Write(&fUUID, sizeof(int));
+        CheckRes(trans->Write(&fUUID, sizeof(int)));
+        return trans->Write(&fOpen, sizeof(int));
     }
 
 };

@@ -943,14 +943,12 @@ namespace Jack
         WORD wVersionRequested = MAKEWORD(2, 2);
         WSADATA wsaData;
 
-        if (WSAStartup(wVersionRequested, &wsaData) != 0)
-        {
+        if (WSAStartup(wVersionRequested, &wsaData) != 0) {
             jack_error("WSAStartup error : %s", strerror(NET_ERROR_CODE));
             return -1;
         }
 
-        if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
-        {
+        if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
             jack_error("Could not find a useable version of Winsock.dll\n");
             WSACleanup();
             return -1;

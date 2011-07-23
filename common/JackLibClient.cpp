@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with this program; if not, write to the Free Software 
+along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
@@ -109,13 +109,13 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
     }
 
     SetupDriverSync(false);
- 
+
     // Connect shared synchro : the synchro must be usable in I/O mode when several clients live in the same process
     if (!fSynchroTable[GetClientControl()->fRefNum].Connect(name_res, fServerName)) {
         jack_error("Cannot ConnectSemaphore %s client", name_res);
         goto error;
     }
-  
+
     JackGlobals::fClientTable[GetClientControl()->fRefNum] = this;
     JackGlobals::fServerRunning = true;
     SetClockSource(GetEngineControl()->fClockSource);
@@ -146,7 +146,7 @@ int JackLibClient::ClientNotifyImp(int refnum, const char* name, int notify, int
 
         case kRemoveClient:
             jack_log("JackClient::RemoveClient name = %s, ref = %ld ", name, refnum);
-            if (strcmp(GetClientControl()->fName, name) != 0)
+            if (GetClientControl() && strcmp(GetClientControl()->fName, name) != 0)
                 res = fSynchroTable[refnum].Disconnect() ? 0 : -1;
             break;
     }
