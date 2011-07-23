@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 Grame
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -55,18 +55,18 @@ static void net_shutdown(void* data)
 }
 
 static int net_process(jack_nframes_t buffer_size,
-                        int audio_input, 
-                        float** audio_input_buffer, 
+                        int audio_input,
+                        float** audio_input_buffer,
                         int midi_input,
                         void** midi_input_buffer,
                         int audio_output,
-                        float** audio_output_buffer, 
-                        int midi_output, 
-                        void** midi_output_buffer, 
+                        float** audio_output_buffer,
+                        int midi_output,
+                        void** midi_output_buffer,
                         void* data)
 {
     int i;
-    
+
     // Copy input to output
     for (i = 0; i < audio_input; i++) {
         memcpy(audio_output_buffer[i], audio_input_buffer[i], buffer_size * sizeof(float));
@@ -84,7 +84,7 @@ main (int argc, char *argv[])
  	const char *options = "C:P:a:p:";
     int option_index;
 	int opt;
-    
+
 	struct option long_options[] =
 	{
 		{"audio input", 1, 0, 'C'},
@@ -93,36 +93,36 @@ main (int argc, char *argv[])
 		{"port", 1, 0, 'p'},
 		{0, 0, 0, 0}
 	};
-	
+
 	while ((opt = getopt_long (argc, argv, options, long_options, &option_index)) != EOF) {
-    
+
 		switch (opt) {
-        
+
 		case 'C':
 			audio_input = atoi(optarg);
 			break;
-            
+
 		case 'P':
 			audio_output = atoi(optarg);
 			break;
-            
+
 		case 'a':
             multicast_ip = strdup(optarg);
             break;
-            
+
 		case 'p':
 			port = atoi(optarg);
 			break;
-	
+
 		case 'h':
 			usage();
 			return -1;
 		}
 	}
 
-    jack_slave_t request = { audio_input, audio_output, 0, 0, DEFAULT_MTU, -1, JackSlowMode };
+    jack_slave_t request = { audio_input, audio_output, 0, 0, DEFAULT_MTU, -1, 2 };
     jack_master_t result;
-    
+
     printf("Waiting for a master...\n");
 
     if ((net = jack_net_slave_open(DEFAULT_MULTICAST_IP, DEFAULT_PORT, "net_slave", &request, &result))  == 0) {
@@ -139,7 +139,7 @@ main (int argc, char *argv[])
     	fprintf(stderr, "Cannot sactivate client\n");
 		return 1;
 	}
-   
+
     /* install a signal handler to properly quits jack client */
 #ifdef WIN32
 	signal(SIGINT, signal_handler);
@@ -160,7 +160,7 @@ main (int argc, char *argv[])
 		sleep(1);
 	#endif
 	};
-    
+
     // Wait for application end
     jack_net_slave_deactivate(net);
     jack_net_slave_close(net);

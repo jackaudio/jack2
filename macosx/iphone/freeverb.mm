@@ -25,7 +25,7 @@
 #include <pwd.h>
 #include <sys/types.h>
 #include <assert.h>
-#include <pthread.h> 
+#include <pthread.h>
 #include <sys/wait.h>
 #include <libgen.h>
 #include <jack/net.h>
@@ -52,7 +52,7 @@ using namespace std;
         #define AVOIDDENORMALS _mm_setcsr(_mm_getcsr() | 0x8000)
     #endif
 #else
-    #define AVOIDDENORMALS 
+    #define AVOIDDENORMALS
 #endif
 
 //#define BENCHMARKMODE
@@ -61,7 +61,7 @@ struct Meta : map<const char*, const char*>
 {
     void declare (const char* key, const char* value) { (*this)[key]=value; }
 };
-	
+
 
 #define max(x,y) (((x)>(y)) ? (x) : (y))
 #define min(x,y) (((x)<(y)) ? (x) : (y))
@@ -91,37 +91,37 @@ class UI
 {
 	bool	fStopped;
 public:
-		
+
 	UI() : fStopped(false) {}
 	virtual ~UI() {}
-	
+
 	// -- active widgets
-	
+
 	virtual void addButton(const char* label, float* zone) = 0;
 	virtual void addToggleButton(const char* label, float* zone) = 0;
 	virtual void addCheckButton(const char* label, float* zone) = 0;
 	virtual void addVerticalSlider(const char* label, float* zone, float init, float min, float max, float step) = 0;
 	virtual void addHorizontalSlider(const char* label, float* zone, float init, float min, float max, float step) = 0;
 	virtual void addNumEntry(const char* label, float* zone, float init, float min, float max, float step) = 0;
-	
+
 	// -- passive widgets
-	
+
 	virtual void addNumDisplay(const char* label, float* zone, int precision) = 0;
 	virtual void addTextDisplay(const char* label, float* zone, char* names[], float min, float max) = 0;
 	virtual void addHorizontalBargraph(const char* label, float* zone, float min, float max) = 0;
 	virtual void addVerticalBargraph(const char* label, float* zone, float min, float max) = 0;
-	
+
 	// -- frames and labels
-	
+
 	virtual void openFrameBox(const char* label) = 0;
 	virtual void openTabBox(const char* label) = 0;
 	virtual void openHorizontalBox(const char* label) = 0;
 	virtual void openVerticalBox(const char* label) = 0;
 	virtual void closeBox() = 0;
-	
+
 	virtual void show() = 0;
 	virtual void run() = 0;
-	
+
 	void stop()		{ fStopped = true; }
 	bool stopped() 	{ return fStopped; }
 
@@ -132,24 +132,24 @@ struct param {
 	float* fZone; float fMin; float fMax;
 	param(float* z, float a, float b) : fZone(z), fMin(a), fMax(b) {}
 };
-	
+
 class CMDUI : public UI
 {
 	int					fArgc;
 	char**				fArgv;
 	stack<string>		fPrefix;
 	map<string, param>	fKeyParam;
-	
+
 	void addOption(const char* label, float* zone, float min, float max)
 	{
 		string fullname = fPrefix.top() + label;
 		fKeyParam.insert(make_pair(fullname, param(zone, min, max)));
 	}
-	
+
 	void openAnyBox(const char* label)
 	{
 		string prefix;
-		
+
 		if (label && label[0]) {
 			prefix = fPrefix.top() + "-" + label;
 		} else {
@@ -157,21 +157,21 @@ class CMDUI : public UI
 		}
 		fPrefix.push(prefix);
 	}
-	
+
 public:
-		
+
 	CMDUI(int argc, char *argv[]) : UI(), fArgc(argc), fArgv(argv) { fPrefix.push("--"); }
 	virtual ~CMDUI() {}
-	
+
 	virtual void addButton(const char* label, float* zone) 		{};
 	virtual void addToggleButton(const char* label, float* zone) 	{};
 	virtual void addCheckButton(const char* label, float* zone) 	{};
-		
+
 	virtual void addVerticalSlider(const char* label, float* zone, float init, float min, float max, float step)
 	{
 		addOption(label,zone,min,max);
 	}
-		
+
 	virtual void addHorizontalSlider(const char* label, float* zone, float init, float min, float max, float step)
 	{
 		addOption(label,zone,min,max);
@@ -181,9 +181,9 @@ public:
 	{
 		addOption(label,zone,min,max);
 	}
-		
+
 	// -- passive widgets
-	
+
 	virtual void addNumDisplay(const char* label, float* zone, int precision) 						{}
 	virtual void addTextDisplay(const char* label, float* zone, char* names[], float min, float max) 	{}
 	virtual void addHorizontalBargraph(const char* label, float* zone, float min, float max) 			{}
@@ -193,11 +193,11 @@ public:
 	virtual void openTabBox(const char* label)		{ openAnyBox(label); }
 	virtual void openHorizontalBox(const char* label)	{ openAnyBox(label); }
 	virtual void openVerticalBox(const char* label)	{ openAnyBox(label); }
-	
+
 	virtual void closeBox() 					{ fPrefix.pop(); }
-	
+
 	virtual void show() {}
-	virtual void run() 	
+	virtual void run()
 	{
 		char c;
 		printf("Type 'q' to quit\n");
@@ -205,8 +205,8 @@ public:
 			sleep(1);
 		}
 	}
-	
-	void print() 
+
+	void print()
 	{
 		map<string, param>::iterator i;
 		cout << fArgc << "\n";
@@ -215,13 +215,13 @@ public:
 			cout << "[ " << i->first << " " << i->second.fMin << ".." << i->second.fMax <<" ] ";
 		}
 	}
-		
+
 	void process_command()
 	{
 		map<string, param>::iterator p;
 		for (int i = 1; i < fArgc; i++) {
 			if (fArgv[i][0] == '-') {
-				p = fKeyParam.find(fArgv[i]); 
+				p = fKeyParam.find(fArgv[i]);
 				if (p == fKeyParam.end()) {
 					cout << fArgv[0] << " : unrecognized option " << fArgv[i] << "\n";
 					print();
@@ -233,13 +233,13 @@ public:
 			}
 		}
 	}
-		
+
 	void process_init()
 	{
 		map<string, param>::iterator p;
 		for (int i = 1; i < fArgc; i++) {
 			if (fArgv[i][0] == '-') {
-				p = fKeyParam.find(fArgv[i]); 
+				p = fKeyParam.find(fArgv[i]);
 				if (p == fKeyParam.end()) {
 					cout << fArgv[0] << " : unrecognized option " << fArgv[i] << "\n";
 					exit(1);
@@ -256,14 +256,14 @@ public:
 //----------------------------------------------------------------
 //  Signal processor definition
 //----------------------------------------------------------------
-			
+
 class dsp {
  protected:
 	int fSamplingFreq;
  public:
 	dsp() {}
 	virtual ~dsp() {}
-	
+
 	virtual int getNumInputs() 										= 0;
 	virtual int getNumOutputs() 									= 0;
 	virtual void buildUserInterface(UI* interface) 					= 0;
@@ -271,12 +271,12 @@ class dsp {
  	virtual void compute(int len, float** inputs, float** outputs) 	= 0;
  	virtual void conclude() 										{}
 };
-		
+
 
 //----------------------------------------------------------------------------
 // 	FAUST generated code
 //----------------------------------------------------------------------------
-		
+
 
 class mydsp : public dsp {
   private:
@@ -349,7 +349,7 @@ class mydsp : public dsp {
 	float 	fVec23[256];
 	float 	fRec24[2];
   public:
-	static void metadata(Meta* m) 	{ 
+	static void metadata(Meta* m) 	{
 		m->declare("name", "freeverb");
 		m->declare("version", "1.0");
 		m->declare("author", "Grame");
@@ -580,8 +580,8 @@ class mydsp : public dsp {
 };
 
 
-		
-				
+
+
 mydsp	DSP;
 
 
@@ -601,7 +601,7 @@ int		gNumInChans;
 int		gNumOutChans;
 
 //----------------------------------------------------------------------------
-// Jack Callbacks 
+// Jack Callbacks
 //----------------------------------------------------------------------------
 
 static void net_shutdown(void *)
@@ -633,7 +633,7 @@ void printstats()
     low = hi = tot = (stops[KSKIP] - starts[KSKIP]);
 
     if (mesure < KMESURE) {
-    
+
         for (int i = KSKIP+1; i<mesure; i++) {
             unsigned long long int m = stops[i] - starts[i];
             if (m<low) low = m;
@@ -643,7 +643,7 @@ void printstats()
         cout << low << ' ' << tot/(mesure-KSKIP) << ' ' << hi << endl;
 
     } else {
-    
+
         for (int i = KSKIP+1; i<KMESURE; i++) {
             unsigned long long int m = stops[i] - starts[i];
             if (m<low) low = m;
@@ -652,7 +652,7 @@ void printstats()
         }
         cout << low << ' ' << tot/(KMESURE-KSKIP) << ' ' << hi << endl;
 
-    }    
+    }
 }
 
 #else
@@ -663,20 +663,20 @@ void printstats()
 #endif
 
 static int net_process(jack_nframes_t buffer_size,
-            int audio_input, 
-            float** audio_input_buffer, 
+            int audio_input,
+            float** audio_input_buffer,
             int midi_input,
             void** midi_input_buffer,
             int audio_output,
-            float** audio_output_buffer, 
-            int midi_output, 
-            void** midi_output_buffer, 
+            float** audio_output_buffer,
+            int midi_output,
+            void** midi_output_buffer,
             void* data)
 {
     AVOIDDENORMALS;
     STARTMESURE
     DSP.compute(buffer_size, audio_input_buffer, audio_output_buffer);
-    STOPMESURE  
+    STOPMESURE
 	return 0;
 }
 
@@ -687,68 +687,68 @@ static int net_process(jack_nframes_t buffer_size,
 
 *******************************************************************************
 *******************************************************************************/
-	
+
 //-------------------------------------------------------------------------
 // 									MAIN
 //-------------------------------------------------------------------------
 
 
 #define TEST_MASTER "194.5.49.5"
-  
+
 int main(int argc, char *argv[]) {
-    
+
     UI* interface = new CMDUI(argc, argv);
     jack_net_slave_t* net;
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
+
     //Jack::JackAudioQueueAdapter audio(2, 2, 1024, 44100, NULL);
-    
+
     gNumInChans = DSP.getNumInputs();
 	gNumOutChans = DSP.getNumOutputs();
- 
-    jack_slave_t request = { gNumInChans, gNumOutChans, 0, 0, DEFAULT_MTU, -1, JackSlowMode };
+
+    jack_slave_t request = { gNumInChans, gNumOutChans, 0, 0, DEFAULT_MTU, -1, 2 };
     jack_master_t result;
-    
+
     printf("Network\n");
-    
+
     //if (audio.Open() < 0) {
     //    fprintf(stderr, "Cannot open audio\n");
     //    return 1;
     //}
-    
+
      //audio.Start();
-    
+
     // Hang around forever...
 	 //while(1) CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.25, false);
-   
+
     if ((net = jack_net_slave_open(TEST_MASTER, DEFAULT_PORT, "iPhone", &request, &result)) == 0) {
 	    fprintf(stderr, "jack remote server not running ?\n");
 	    return 1;
 	}
- 
+
     jack_set_net_slave_process_callback(net, net_process, NULL);
-    
+
     // We want to restart (that is "wait for available master" again)
     //jack_set_net_shutdown_callback(net, net_shutdown, 0);
-    
+
     DSP.init(result.sample_rate);
 	DSP.buildUserInterface(interface);
-    
+
     if (jack_net_slave_activate(net) != 0) {
 	    fprintf(stderr, "cannot activate net");
 	    return 1;
 	}
-    
+
     int retVal = UIApplicationMain(argc, argv, nil, nil);
     [pool release];
-    
+
     // Wait for application end
     jack_net_slave_deactivate(net);
     jack_net_slave_close(net);
-    
+
     //if (audio.Close() < 0) {
     //    fprintf(stderr, "Cannot close audio\n");
     //}
-    
+
     return retVal;
 }

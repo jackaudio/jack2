@@ -35,13 +35,6 @@ extern "C"
 
     #define MASTER_NAME_SIZE 256
 
-    enum JackNetMode {
-
-        JackFastMode = 'f',
-        JackNormalMode = 'n',
-        JackSlowMode = 's',
-    };
-
     enum JackNetEncoder {
 
         JackFloatEncoder = 0,
