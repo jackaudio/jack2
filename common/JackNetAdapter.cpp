@@ -49,7 +49,7 @@ namespace Jack
         fParams.fSampleRate = sample_rate;
         fParams.fPeriodSize = buffer_size;
         fParams.fSlaveSyncMode = 1;
-        fParams.fNetworkMode = 's';
+        fParams.fNetworkLatency = 2;
         fParams.fSampleEncoder = JackFloatEncoder;
         fJackClient = jack_client;
 
@@ -94,16 +94,8 @@ namespace Jack
                     }
                     break;
             #endif
-                case 'm' :
-                    if (strcmp(param->value.str, "normal") == 0) {
-                        fParams.fNetworkMode = 'n';
-                    } else if (strcmp(param->value.str, "slow") == 0) {
-                        fParams.fNetworkMode = 's';
-                    } else if (strcmp(param->value.str, "fast") == 0) {
-                        fParams.fNetworkMode = 'f';
-                    } else {
-                        jack_error("Unknown network mode, using 'normal' mode.");
-                    }
+                case 'l' :
+                    fParams.fNetworkLatency = param->value.i;
                     break;
                 case 'q':
                     fQuality = param->value.ui;

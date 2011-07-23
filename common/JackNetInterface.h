@@ -107,6 +107,7 @@ namespace Jack
 
             bool fRunning;
             int fCycleOffset;
+            int fMaxCycleOffset;
             int fLastfCycleOffset;
 
             bool Init();
@@ -133,7 +134,7 @@ namespace Jack
             void FatalError();
 
         public:
-            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fLastfCycleOffset(0)
+            JackNetMasterInterface() : JackNetInterface(), fRunning(false), fCycleOffset(0), fMaxCycleOffset(0), fLastfCycleOffset(0)
             {}
             JackNetMasterInterface ( session_params_t& params, JackNetSocket& socket, const char* multicast_ip )
                     : JackNetInterface ( params, socket, multicast_ip )
@@ -223,10 +224,7 @@ namespace Jack
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
 #define SLAVE_INIT_TIMEOUT 1000000      // in usec
 
-#define CYCLE_OFFSET_FAST   0
-#define CYCLE_OFFSET_NORMAL 1
-#define CYCLE_OFFSET_SLOW   2
-//#define CYCLE_OFFSET_SLOW   30
-#define MAX_LATENCY CYCLE_OFFSET_SLOW * 4
+#define CYCLE_OFFSET_SLOW   10
+#define NETWORK_MAX_LATENCY CYCLE_OFFSET_SLOW
 
 #endif

@@ -64,18 +64,7 @@ namespace Jack
         plot_name = string ( fParams.fName );
         plot_name += string ( "_master" );
         plot_name += string ( ( fParams.fSlaveSyncMode ) ? "_sync" : "_async" );
-        switch ( fParams.fNetworkMode )
-        {
-            case 's' :
-                plot_name += string ( "_slow" );
-                break;
-            case 'n' :
-                plot_name += string ( "_normal" );
-                break;
-            case 'f' :
-                plot_name += string ( "_fast" );
-                break;
-        }
+        plot_name += string ( "_latency" );
         fNetTimeMon = new JackGnuPlotMonitor<float> ( 128, 4, plot_name );
         string net_time_mon_fields[] =
         {
@@ -196,21 +185,8 @@ namespace Jack
             if ( ( fAudioPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput | JackPortIsTerminal, 0 ) ) == NULL )
                 return -1;
             //port latency
-            switch ( fParams.fNetworkMode )
-            {
-                case 'f' :
-                    range.min = range.max = (fParams.fSlaveSyncMode) ? 0 : port_latency;
-                    jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
-                    break;
-                case 'n' :
-                    range.min = range.max = port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
-                    jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
-                    break;
-                case 's' :
-                    range.min = range.max = 2 * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
-                    jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
-                    break;
-            }
+            range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+            jack_port_set_latency_range(fAudioPlaybackPorts[i], JackPlaybackLatency, &range);
         }
 
         //midi
@@ -229,21 +205,8 @@ namespace Jack
             if ( ( fMidiPlaybackPorts[i] = jack_port_register ( fJackClient, name, JACK_DEFAULT_MIDI_TYPE,  JackPortIsOutput | JackPortIsTerminal, 0 ) ) == NULL )
                 return -1;
             //port latency
-            switch ( fParams.fNetworkMode )
-            {
-                case 'f' :
-                    range.min = range.max = (fParams.fSlaveSyncMode) ? 0 : port_latency;
-                    jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
-                    break;
-                case 'n' :
-                    range.min = range.max = port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
-                    jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
-                    break;
-                case 's' :
-                    range.min = range.max = 2 * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
-                    jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
-                    break;
-            }
+            range.min = range.max = fParams.fNetworkLatency * port_latency + (fParams.fSlaveSyncMode) ? 0 : port_latency;
+            jack_port_set_latency_range(fMidiPlaybackPorts[i], JackPlaybackLatency, &range);
         }
         return 0;
     }

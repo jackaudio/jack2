@@ -29,7 +29,7 @@ namespace Jack
 {
     JackNetDriver::JackNetDriver(const char* name, const char* alias, JackLockedEngine* engine, JackSynchro* table,
                                 const char* ip, int udp_port, int mtu, int midi_input_ports, int midi_output_ports,
-                                char* net_name, uint transport_sync, char network_mode, int celt_encoding)
+                                char* net_name, uint transport_sync, int network_latency, int celt_encoding)
             : JackAudioDriver(name, alias, engine, table), JackNetSlaveInterface(ip, udp_port)
     {
         jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, udp_port);
@@ -50,7 +50,7 @@ namespace Jack
         strcpy(fParams.fName, net_name);
         fSocket.GetName(fParams.fSlaveNetName);
         fParams.fTransportSync = transport_sync;
-        fParams.fNetworkMode = network_mode;
+        fParams.fNetworkLatency = network_latency;
         fSendTransportData.fState = -1;
         fReturnTransportData.fState = -1;
         fLastTransportState = -1;
@@ -185,20 +185,7 @@ namespace Jack
         plot_name = string(fParams.fName);
         plot_name += string("_slave");
         plot_name += (fEngineControl->fSyncMode) ? string("_sync") : string("_async");
-        switch (fParams.fNetworkMode)
-        {
-            case 's' :
-                plot_name += string("_slow");
-                break;
-
-            case 'n' :
-                plot_name += string("_normal");
-                break;
-
-            case 'f' :
-                plot_name += string("_fast");
-                break;
-        }
+        plot_name +=  string("_latency");
         fNetTimeMon = new JackGnuPlotMonitor<float>(128, 5, plot_name);
         string net_time_mon_fields[] =
         {
@@ -305,18 +292,7 @@ namespace Jack
             port = fGraphManager->GetPort(port_index);
             port->SetAlias(alias);
             //port latency
-            switch (fParams.fNetworkMode)
-            {
-                case 'f' :
-                    range.min = range.max = (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize;
-                    break;
-                case 'n' :
-                    range.min = range.max = (fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-                case 's' :
-                    range.min = range.max = (2 * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-            }
+            range.min = range.max = (fParams.fNetworkLatency * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fPlaybackPortList[audio_port_index] = port_index;
             jack_log("JackNetDriver::AllocPorts() fPlaybackPortList[%d] audio_port_index = %ld fPortLatency = %ld", audio_port_index, port_index, port->GetLatency());
@@ -354,18 +330,7 @@ namespace Jack
             }
             port = fGraphManager->GetPort(port_index);
             //port latency
-            switch (fParams.fNetworkMode)
-            {
-                case 'f' :
-                    range.min = range.max = (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize;
-                    break;
-                case 'n' :
-                    range.min = range.max = (fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-                case 's' :
-                    range.min = range.max = (2 * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
-                    break;
-            }
+            range.min = range.max = (fParams.fNetworkLatency * fEngineControl->fBufferSize + (fEngineControl->fSyncMode) ? 0 : fEngineControl->fBufferSize);
             port->SetLatencyRange(JackPlaybackLatency, &range);
             fMidiPlaybackPortList[midi_port_index] = port_index;
             jack_log("JackNetDriver::AllocPorts() fMidiPlaybackPortList[%d] midi_port_index = %ld fPortLatency = %ld", midi_port_index, port_index, port->GetLatency());
@@ -658,8 +623,8 @@ namespace Jack
             value.ui = 1U;
             jack_driver_descriptor_add_parameter(desc, &filler, "transport_sync", 't', JackDriverParamUInt, &value, NULL, "Sync transport with master's", NULL);
 
-            strcpy(value.str, "slow");
-            jack_driver_descriptor_add_parameter(desc, &filler, "mode", 'm', JackDriverParamString, &value, NULL, "Slow, Normal or Fast mode.", NULL);
+            value.ui = 2U;
+            jack_driver_descriptor_add_parameter(desc, &filler, "latency", 'l', JackDriverParamUInt, &value, NULL, "Network latency", NULL);
 
             return desc;
         }
@@ -679,7 +644,7 @@ namespace Jack
             int midi_output_ports = 0;
             int celt_encoding = -1;
             bool monitor = false;
-            char network_mode = 's';
+            int network_latency = 2;
             const JSList* node;
             const jack_driver_param_t* param;
 
@@ -732,7 +697,9 @@ namespace Jack
                     case 't' :
                         transport_sync = param->value.ui;
                         break;
-                    case 'm' :
+                    case 'l' :
+                        network_latency = param->value.ui;
+                        /*
                         if (strcmp(param->value.str, "normal") == 0)
                             network_mode = 'n';
                         else if (strcmp(param->value.str, "slow") == 0)
@@ -741,6 +708,7 @@ namespace Jack
                             network_mode = 'f';
                         else
                             jack_error("Unknown network mode, using 'normal' mode.");
+                        */
                         break;
                 }
             }
@@ -751,7 +719,7 @@ namespace Jack
                         new Jack::JackNetDriver("system", "net_pcm", engine, table, multicast_ip, udp_port, mtu,
                                                 midi_input_ports, midi_output_ports,
                                                 net_name, transport_sync,
-                                                network_mode, celt_encoding));
+                                                network_latency, celt_encoding));
                 if (driver->Open(period_size, sample_rate, 1, 1, audio_capture_ports, audio_playback_ports, monitor, "from_master_", "to_master_", 0, 0) == 0) {
                     return driver;
                 } else {

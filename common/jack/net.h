@@ -35,13 +35,6 @@ extern "C"
 
 #define SOCKET_ERROR -1
 
-enum JackNetMode {
-
-    JackFastMode = 'f',
-    JackNormalMode = 'n',
-    JackSlowMode = 's',
-};
-
 enum JackNetEncoder {
 
     JackFloatEncoder = 0,   // Samples are transmitted as float
@@ -59,7 +52,7 @@ typedef struct {
     int time_out;       // in second, -1 means in infinite
     int encoder;        // Encoder type (one of JackNetEncoder)
     int kbps;           // KB per second for CELT encoder
-    char mode;          // one of JackNetMode
+    int latency;        // network latency
 
 } jack_slave_t;
 

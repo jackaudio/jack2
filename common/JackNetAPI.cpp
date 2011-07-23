@@ -59,7 +59,7 @@ extern "C"
         int time_out;   // in millisecond, -1 means in infinite
         int encoder;
         int kbps;       // KB per second for CELT encoder
-        char mode;
+        int latency;
 
     } jack_slave_t;
 
@@ -251,7 +251,7 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         result->midi_input = fParams.fSendMidiChannels;
         result->midi_output = fParams.fReturnMidiChannels;
         result->mtu = fParams.fMtu;
-        result->mode = fParams.fNetworkMode;
+        result->latency = fParams.fNetworkLatency;
         return 0;
 
     error:
@@ -472,7 +472,7 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
         fParams.fReturnAudioChannels = request->audio_output;
         fParams.fSendMidiChannels = request->midi_input;
         fParams.fReturnMidiChannels = request->midi_output;
-        fParams.fNetworkMode = request->mode;
+        fParams.fNetworkLatency = request->latency;
         fParams.fSampleEncoder = request->encoder;
         fParams.fKBps = request->kbps;
         fParams.fSlaveSyncMode = 1;

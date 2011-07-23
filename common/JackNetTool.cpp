@@ -690,6 +690,7 @@ namespace Jack
         dst_params->fPeriodSize = htonl(src_params->fPeriodSize);
         dst_params->fSampleEncoder = htonl(src_params->fSampleEncoder);
         dst_params->fSlaveSyncMode = htonl(src_params->fSlaveSyncMode);
+        dst_params->fNetworkLatency = htonl(src_params->fNetworkLatency);
     }
 
     SERVER_EXPORT void SessionParamsNToH(session_params_t* src_params, session_params_t* dst_params)
@@ -707,6 +708,7 @@ namespace Jack
         dst_params->fPeriodSize = ntohl(src_params->fPeriodSize);
         dst_params->fSampleEncoder = ntohl(src_params->fSampleEncoder);
         dst_params->fSlaveSyncMode = ntohl(src_params->fSlaveSyncMode);
+        dst_params->fNetworkLatency = ntohl(src_params->fNetworkLatency);
     }
 
     SERVER_EXPORT void SessionParamsDisplay(session_params_t* params)
@@ -725,19 +727,6 @@ namespace Jack
                 break;
         }
 
-        char mode[8];
-        switch (params->fNetworkMode)
-        {
-            case 's' :
-                strcpy(mode, "slow");
-                break;
-            case 'n' :
-                strcpy(mode, "normal");
-                break;
-            case 'f' :
-                strcpy(mode, "fast");
-                break;
-        }
         jack_info("**************** Network parameters ****************");
         jack_info("Name : %s", params->fName);
         jack_info("Protocol revision : %d", params->fProtocolVersion);
@@ -750,6 +739,7 @@ namespace Jack
         jack_info("Return channels (audio - midi) : %d - %d", params->fReturnAudioChannels, params->fReturnMidiChannels);
         jack_info("Sample rate : %u frames per second", params->fSampleRate);
         jack_info("Period size : %u frames per period", params->fPeriodSize);
+        jack_info("Network latency : %u cycles", params->fNetworkLatency);
         switch (params->fSampleEncoder) {
             case (JackFloatEncoder):
                 jack_info("SampleEncoder : %s", "Float");
@@ -763,7 +753,6 @@ namespace Jack
                 break;
         };
         jack_info("Slave mode : %s", (params->fSlaveSyncMode) ? "sync" : "async");
-        jack_info("Network mode : %s", mode);
         jack_info("****************************************************");
     }
 
