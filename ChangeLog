@@ -35,6 +35,10 @@ Chris Caudle
   Jackdmp changes log
 ---------------------------
 
+2011-07-23 Stephane Letz  <letz@grame.fr>
+
+	* Possible fix for http://trac.jackaudio.org/ticket/193.
+
 2011-07-22 Stephane Letz  <letz@grame.fr>
 
 	* NetJack2: improve error reporting.
