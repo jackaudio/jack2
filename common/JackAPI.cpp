@@ -1993,7 +1993,7 @@ LIB_EXPORT int jack_set_session_callback(jack_client_t* ext_client, JackSessionC
     }
 }
 
-LIB_EXPORT jack_session_command_t *jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path)
+LIB_EXPORT jack_session_command_t* jack_session_notify(jack_client_t* ext_client, const char* target, jack_session_event_type_t ev_type, const char* path)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_session_notify");
@@ -2039,7 +2039,7 @@ LIB_EXPORT void jack_session_event_free(jack_session_event_t* ev)
     }
 }
 
-LIB_EXPORT char *jack_get_uuid_for_client_name(jack_client_t* ext_client, const char* client_name)
+LIB_EXPORT char* jack_get_uuid_for_client_name(jack_client_t* ext_client, const char* client_name)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_get_uuid_for_client_name");
@@ -2054,7 +2054,7 @@ LIB_EXPORT char *jack_get_uuid_for_client_name(jack_client_t* ext_client, const 
     }
 }
 
-LIB_EXPORT char *jack_get_client_name_by_uuid(jack_client_t* ext_client, const char* client_uuid)
+LIB_EXPORT char* jack_get_client_name_by_uuid(jack_client_t* ext_client, const char* client_uuid)
 {
 #ifdef __CLIENTDEBUG__
     JackGlobals::CheckContext("jack_get_client_name_by_uuid");

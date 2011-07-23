@@ -71,7 +71,7 @@ void JackClientPipeThread::Close()                                      // Close
     /*
         TODO : solve WIN32 thread Kill issue
         This would hang.. since Close will be followed by a delete,
-        all ressources will be desallocated at the end.
+        all ressources will be deallocated at the end.
     */
 
     fThread.Kill();
@@ -478,7 +478,7 @@ void JackWinNamedPipeServerChannel::Close()
 {
     /* TODO : solve WIN32 thread Kill issue
         This would hang the server... since we are quitting it, its not really problematic,
-        all ressources will be desallocated at the end.
+        all ressources will be deallocated at the end.
 
         fRequestListenPipe.Close();
         fThread.Stop();

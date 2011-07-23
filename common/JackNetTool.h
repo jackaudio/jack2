@@ -42,6 +42,8 @@ using namespace std;
 #define MASTER_PROTOCOL 4
 #define SLAVE_PROTOCOL 4
 
+#define NET_PACKET_ERROR -2
+
 #define OPTIMIZED_PROTOCOL
 
 namespace Jack
@@ -288,7 +290,7 @@ namespace Jack
             virtual void RenderToJackPorts() = 0;
 
             //network<->buffer
-            virtual void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
+            virtual int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num) = 0;
             virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num) {}
 
             virtual int RenderToNetwork(int sub_cycle, uint32_t& port_num) = 0;
@@ -366,7 +368,7 @@ namespace Jack
             fPortBuffer = 0;
         }
 
-        ~JackPortList()
+        virtual ~JackPortList()
         {
             delete [] fPortBuffer;
         }
@@ -424,8 +426,10 @@ namespace Jack
         {}
 
         //network<->buffer
-        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            int res = 0;
+
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 float* src = (float*)(net_buffer + port_index * fSubPeriodBytesSize);
                 float* dst = (float*)(fPortBuffer[port_index] + sub_cycle * fSubPeriodSize);
@@ -435,8 +439,11 @@ namespace Jack
             }
             if (sub_cycle != fLastSubCycle + 1) {
                 jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                res = NET_PACKET_ERROR;
             }
+
             fLastSubCycle = sub_cycle;
+            return res;
         }
 
         virtual int RenderToNetwork(char* net_buffer, int sub_cycle, uint32_t& port_num)
@@ -465,15 +472,20 @@ namespace Jack
         }
 
         //network<->buffer
-        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            int res = 0;
+
             for (int port_index = 0; port_index < fNPorts; port_index++) {
                 memcpy(fPortBuffer[port_index] + sub_cycle * fSubPeriodSize, net_buffer + port_index * fSubPeriodBytesSize, fSubPeriodBytesSize);
             }
             if (sub_cycle != fLastSubCycle + 1) {
                 jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                res = NET_PACKET_ERROR;
             }
+
             fLastSubCycle = sub_cycle;
+            return res;
         }
 
         virtual int RenderToNetwork(char* net_buffer, int sub_cycle, uint32_t& port_num)
@@ -506,6 +518,9 @@ namespace Jack
             :JackPortList(params, nports)
         {}
 
+        virtual ~JackOptimizedPortList()
+        {}
+
         int GetNumPackets()
         {
             // Count active ports
@@ -532,8 +547,10 @@ namespace Jack
     #else
 
         //network<->buffer
-        virtual void RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
+        virtual int RenderFromNetwork(char* net_buffer, int cycle, int sub_cycle, size_t copy_size, uint32_t port_num)
         {
+            int res = 0;
+
             // Cleanup all JACK ports at the beginning of the cycle
             if (sub_cycle == 0) {
                 for (int port_index = 0; port_index < fNPorts; port_index++) {
@@ -554,8 +571,6 @@ namespace Jack
                 }
                 sub_period_bytes_size = sub_period_size * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
 
-
-
                 for (uint32_t port_index = 0; port_index < port_num; port_index++) {
                     // Only copy to active ports : read the active port number then audio data
                     int* active_port_address = (int*)(net_buffer + port_index * sub_period_bytes_size);
@@ -566,9 +581,13 @@ namespace Jack
 
                 if (sub_cycle != fLastSubCycle + 1) {
                     jack_error("Packet(s) missing from... %d %d", fLastSubCycle, sub_cycle);
+                    res = NET_PACKET_ERROR;
                 }
+
                 fLastSubCycle = sub_cycle;
             }
+
+            return res;
         }
 
         virtual int RenderToNetwork(char* net_buffer,int sub_cycle, uint32_t& port_num)
@@ -618,7 +637,11 @@ namespace Jack
 
             for (uint port_index = 0; port_index < port_num; port_index++) {
                 // Use -1 when port is actually connected on other side
-                fPortBuffer[*active_port_address] = (sample_t*)-1;
+                if (*active_port_address >= 0 && *active_port_address < fNPorts) {
+                    fPortBuffer[*active_port_address] = (sample_t*)-1;
+                } else {
+                    jack_error("ActivePortsFromNetwork: incorrect port = %d", *active_port_address);
+                }
                 active_port_address++;
             }
         }
@@ -663,7 +686,7 @@ namespace Jack
             sample_t* GetBuffer(int index);
 
             //network<->buffer
-            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num);
 
             int RenderToNetwork(int sub_cycle, uint32_t&  ort_num);
@@ -720,7 +743,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t&  port_num);
     };
 
@@ -769,7 +792,7 @@ namespace Jack
             void RenderToJackPorts();
 
             //network<->buffer
-            void RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
+            int RenderFromNetwork(int cycle, int sub_cycle, size_t copy_size, uint32_t port_num);
             int RenderToNetwork(int sub_cycle, uint32_t& port_num);
     };
 
