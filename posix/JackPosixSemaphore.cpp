@@ -187,7 +187,7 @@ bool JackPosixSemaphore::ConnectOutput(const char* name, const char* server_name
 bool JackPosixSemaphore::Disconnect()
 {
     if (fSemaphore) {
-	jack_log("JackPosixSemaphore::Disconnect name = %s", fName);
+        jack_log("JackPosixSemaphore::Disconnect name = %s", fName);
         if (sem_close(fSemaphore) != 0) {
             jack_error("Disconnect: can't disconnect named semaphore name = %s err = %s", fName, strerror(errno));
             return false;

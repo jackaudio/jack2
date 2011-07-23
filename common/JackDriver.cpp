@@ -217,6 +217,8 @@ void JackDriver::SetupDriverSync(int ref, bool freewheel)
 
 int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync, const char* message, int value1, int value2)
 {
+    jack_log("JackDriver::ClientNotify ref = %ld driver = %s name = %s notify = %ld", refnum, fClientControl.fName, name, notify);
+
     switch (notify) {
 
         case kStartFreewheelCallback:
@@ -228,7 +230,7 @@ int JackDriver::ClientNotify(int refnum, const char* name, int notify, int sync,
             jack_log("JackDriver::kStopFreewheel");
             SetupDriverSync(fClientControl.fRefNum, false);
             break;
-   }
+    }
 
     return 0;
 }
