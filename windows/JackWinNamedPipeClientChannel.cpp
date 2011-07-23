@@ -55,10 +55,10 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
 
     /*
     16/08/07: was called before doing "fRequestPipe.Connect" .... still necessary?
-       if (fNotificationListenPipe.Bind(jack_client_dir, name, 0) < 0) {
-           jack_error("Cannot bind pipe");
-           goto error;
-       }
+    if (fNotificationListenPipe.Bind(jack_client_dir, name, 0) < 0) {
+        jack_error("Cannot bind pipe");
+        goto error;
+    }
     */
 
     if (fRequestPipe.Connect(jack_server_dir, server_name, 0) < 0) {
@@ -67,10 +67,14 @@ int JackWinNamedPipeClientChannel::Open(const char* server_name, const char* nam
     }
 
     // Check name in server
-    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);
     if (result < 0) {
-        jack_error("Client name = %s conflits with another running client", name);
-        goto error;
+        int status1 = *status;
+        if (status1 & JackVersionError) {
+            jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
+        } else {
+            jack_error("Client name = %s conflits with another running client", name);
+        }
     }
 
     if (fNotificationListenPipe.Bind(jack_client_dir, name_res, 0) < 0) {
@@ -142,9 +146,9 @@ void JackWinNamedPipeClientChannel::ServerAsyncCall(JackRequest* req, JackResult
     }
 }
 
-void JackWinNamedPipeClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
+void JackWinNamedPipeClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
 {
-    JackClientCheckRequest req(name, protocol, options, uuid);
+    JackClientCheckRequest req(name, protocol, options, uuid, open);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
     *status = res.fStatus;

@@ -62,13 +62,14 @@ int JackSocketClientChannel::Open(const char* server_name, const char* name, int
     }
 
     // Check name in server
-    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result);
+    ClientCheck(name, uuid, name_res, JACK_PROTOCOL_VERSION, (int)options, (int*)status, &result, true);
     if (result < 0) {
         int status1 = *status;
-        if (status1 & JackVersionError)
+        if (status1 & JackVersionError) {
             jack_error("JACK protocol mismatch %d", JACK_PROTOCOL_VERSION);
-        else
+        } else {
             jack_error("Client name = %s conflits with another running client", name);
+        }
         goto error;
     }
 
@@ -141,9 +142,9 @@ void JackSocketClientChannel::ServerAsyncCall(JackRequest* req, JackResult* res,
     }
 }
 
-void JackSocketClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result)
+void JackSocketClientChannel::ClientCheck(const char* name, int uuid, char* name_res, int protocol, int options, int* status, int* result, int open)
 {
-    JackClientCheckRequest req(name, protocol, options, uuid);
+    JackClientCheckRequest req(name, protocol, options, uuid, open);
     JackClientCheckResult res;
     ServerSyncCall(&req, &res, result);
     *status = res.fStatus;

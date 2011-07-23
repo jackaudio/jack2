@@ -149,6 +149,8 @@ int JackClient::ClientNotify(int refnum, const char* name, int notify, int sync,
 {
     int res = 0;
 
+    jack_log("JackClient::ClientNotify ref = %ld name = %s notify = %ld", refnum, name, notify);
+
     // Done all time: redirected on subclass implementation JackLibClient and JackInternalClient
     switch (notify) {
 

@@ -275,10 +275,10 @@ int JackEngine::NotifyAddClient(JackClientInterface* new_client, const char* nam
     // Notify existing clients of the new client and new client of existing clients.
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* old_client = fClientTable[i];
-        if (old_client) {
+        if (old_client && old_client != new_client) {
             if (old_client->ClientNotify(refnum, name, kAddClient, true, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient old_client fails name = %s", old_client->GetClientControl()->fName);
-                return -1;
+                // Not considered as a failure...
             }
             if (new_client->ClientNotify(i, old_client->GetClientControl()->fName, kAddClient, true, "", 0, 0) < 0) {
                 jack_error("NotifyAddClient new_client fails name = %s", name);
@@ -296,7 +296,7 @@ void JackEngine::NotifyRemoveClient(const char* name, int refnum)
     for (int i = 0; i < CLIENT_NUM; i++) {
         JackClientInterface* client = fClientTable[i];
         if (client) {
-            client->ClientNotify(refnum, name, kRemoveClient, true, "",0, 0);
+            client->ClientNotify(refnum, name, kRemoveClient, true, "", 0, 0);
         }
     }
 }
@@ -563,7 +563,6 @@ int JackEngine::ClientExternalOpen(const char* name, int pid, int uuid, int* ref
         } else {
             strncpy(real_name, name, JACK_CLIENT_NAME_SIZE);
         }
-
         EnsureUUID(uuid);
     }
 
@@ -686,12 +685,12 @@ int JackEngine::ClientCloseAux(int refnum, JackClientInterface* client, bool wai
     int i;
 
     fGraphManager->GetInputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY); i++) {
         PortUnRegister(refnum, ports[i]);
     }
 
     fGraphManager->GetOutputPorts(refnum, ports);
-    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY) ; i++) {
+    for (i = 0; (i < PORT_NUM_FOR_CLIENT) && (ports[i] != EMPTY); i++) {
         PortUnRegister(refnum, ports[i]);
     }
 
