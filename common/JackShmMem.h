@@ -156,11 +156,12 @@ class JackShmReadWritePtr
         {
             if (fInfo.index < 0 && index >= 0) {
                 jack_log("JackShmReadWritePtr::Init %ld %ld", index, fInfo.index);
-                if (jack_initialize_shm(server_name) < 0)
-                    throw - 1;
+                if (jack_initialize_shm(server_name) < 0) {
+                    throw std::bad_alloc();
+                }
                 fInfo.index = index;
                 if (jack_attach_lib_shm(&fInfo)) {
-                    throw - 2;
+                    throw std::bad_alloc();
                 }
                 GetShmAddress()->LockMemory();
             }
@@ -237,11 +238,12 @@ class JackShmReadWritePtr1
         {
             if (fInfo.index < 0 && index >= 0) {
                 jack_log("JackShmReadWritePtr1::Init %ld %ld", index, fInfo.index);
-                if (jack_initialize_shm(server_name) < 0)
-                    throw - 1;
+                if (jack_initialize_shm(server_name) < 0) {
+                    throw std::bad_alloc();
+                }
                 fInfo.index = index;
                 if (jack_attach_lib_shm(&fInfo)) {
-                    throw - 2;
+                    throw std::bad_alloc();
                 }
                 /*
                 nobody else needs to access this shared memory any more, so
@@ -324,11 +326,12 @@ class JackShmReadPtr
         {
             if (fInfo.index < 0 && index >= 0) {
                 jack_log("JackShmPtrRead::Init %ld %ld", index, fInfo.index);
-                if (jack_initialize_shm(server_name) < 0)
-                    throw - 1;
+                if (jack_initialize_shm(server_name) < 0) {
+                    throw std::bad_alloc();
+                }
                 fInfo.index = index;
                 if (jack_attach_lib_shm_read(&fInfo)) {
-                    throw - 2;
+                    throw std::bad_alloc();
                 }
                 GetShmAddress()->LockMemory();
             }

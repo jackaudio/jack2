@@ -35,8 +35,9 @@ namespace Jack
         jack_log("JackNetDriver::JackNetDriver ip %s, port %d", ip, udp_port);
 
         // Use the hostname if no name parameter was given
-        if (strcmp(net_name, "") == 0)
+        if (strcmp(net_name, "") == 0) {
             GetHostName(net_name, JACK_CLIENT_NAME_SIZE);
+        }
 
         fParams.fMtu = mtu;
         fParams.fSendMidiChannels = midi_input_ports;
@@ -94,8 +95,9 @@ namespace Jack
     int JackNetDriver::Close()
     {
 #ifdef JACK_MONITOR
-        if (fNetTimeMon)
+        if (fNetTimeMon) {
             fNetTimeMon->Save();
+        }
 #endif
         FreeAll();
         return JackDriver::Close();
@@ -420,8 +422,9 @@ namespace Jack
         bool conditional;
         if (fSendTransportData.fTimebaseMaster == TIMEBASEMASTER) {
             fEngineControl->fTransport.GetTimebaseMaster(refnum, conditional);
-            if (refnum != -1)
+            if (refnum != -1) {
                 fEngineControl->fTransport.ResetTimebase(refnum);
+            }
             jack_info("The NetMaster is now the new timebase master.");
         }
 
@@ -503,8 +506,9 @@ namespace Jack
 #endif
 
         //receive sync (launch the cycle)
-        if (SyncRecv() == SOCKET_ERROR)
+        if (SyncRecv() == SOCKET_ERROR) {
             return 0;
+        }
 
 #ifdef JACK_MONITOR
         // For timing
@@ -564,16 +568,18 @@ namespace Jack
         EncodeSyncPacket();
 
         //send sync
-        if (SyncSend() == SOCKET_ERROR)
+        if (SyncSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
 #ifdef JACK_MONITOR
         fNetTimeMon->Add(((float)(GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
 #endif
 
         //send data
-        if (DataSend() == SOCKET_ERROR)
+        if (DataSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
 #ifdef JACK_MONITOR
         fNetTimeMon->AddLast(((float)(GetMicroSeconds() - fRcvSyncUst) / (float)fEngineControl->fPeriodUsecs) * 100.f);
@@ -699,16 +705,10 @@ namespace Jack
                         break;
                     case 'l' :
                         network_latency = param->value.ui;
-                        /*
-                        if (strcmp(param->value.str, "normal") == 0)
-                            network_mode = 'n';
-                        else if (strcmp(param->value.str, "slow") == 0)
-                            network_mode = 's';
-                        else if (strcmp(param->value.str, "fast") == 0)
-                            network_mode = 'f';
-                        else
-                            jack_error("Unknown network mode, using 'normal' mode.");
-                        */
+                        if (network_latency > NETWORK_MAX_LATENCY) {
+                            printf("Error : network latency is limited to %d\n", NETWORK_MAX_LATENCY);
+                            return NULL;
+                        }
                         break;
                 }
             }

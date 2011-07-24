@@ -391,27 +391,35 @@ JackCoreAudioAdapter::JackCoreAudioAdapter(jack_nframes_t buffer_size, jack_nfra
         fPlaying = true;
     }
 
-    if (SetupDevices(fCaptureUID, fPlaybackUID, captureName, playbackName, fAdaptedSampleRate) < 0)
-        throw -1;
+    if (SetupDevices(fCaptureUID, fPlaybackUID, captureName, playbackName, fAdaptedSampleRate) < 0) {
+       throw std::bad_alloc();
+    }
 
-    if (SetupChannels(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, true) < 0)
-        throw -1;
+    if (SetupChannels(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, true) < 0) {
+        throw std::bad_alloc();
+    }
 
-    if (SetupBufferSize(fAdaptedBufferSize) < 0)
-         throw -1;
+    if (SetupBufferSize(fAdaptedBufferSize) < 0) {
+        throw std::bad_alloc();
+    }
 
-    if (SetupSampleRate(fAdaptedSampleRate) < 0)
-        throw -1;
+    if (SetupSampleRate(fAdaptedSampleRate) < 0) {
+        throw std::bad_alloc();
+    }
 
-    if (OpenAUHAL(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, fAdaptedBufferSize, fAdaptedSampleRate) < 0)
-        throw -1;
+    if (OpenAUHAL(fCapturing, fPlaying, fCaptureChannels, fPlaybackChannels, in_nChannels, out_nChannels, fAdaptedBufferSize, fAdaptedSampleRate) < 0) {
+        throw std::bad_alloc();
+    }
 
-    if (fCapturing && fCaptureChannels > 0)
-        if (SetupBuffers(fCaptureChannels) < 0)
-            throw -1;
+    if (fCapturing && fCaptureChannels > 0) {
+        if (SetupBuffers(fCaptureChannels) < 0) {
+            throw std::bad_alloc();
+        }
+    }
 
-    if (AddListeners() < 0)
-        throw -1;
+    if (AddListeners() < 0) {
+        throw std::bad_alloc();
+    }
 }
 
 OSStatus JackCoreAudioAdapter::GetDefaultDevice(AudioDeviceID* id)

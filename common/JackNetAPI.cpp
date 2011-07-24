@@ -40,6 +40,7 @@ extern "C"
         JackFloatEncoder = 0,
         JackIntEncoder = 1,
         JackCeltEncoder = 2,
+        JackMaxEncoder = 3
     };
 
     typedef struct {
@@ -50,9 +51,9 @@ extern "C"
         int midi_output;
         int mtu;
         int time_out;   // in millisecond, -1 means in infinite
-        int encoder;
+        int encoder;    // one of JackNetEncoder
         int kbps;       // KB per second for CELT encoder
-        int latency;
+        int latency;    // network cycles
 
     } jack_slave_t;
 
@@ -183,16 +184,19 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         }
 
         // Join multicast group
-        if (fSocket.JoinMCastGroup(fMulticastIP) == SOCKET_ERROR)
-             fprintf(stderr, "Can't join multicast group : %s\n", StrError(NET_ERROR_CODE));
+        if (fSocket.JoinMCastGroup(fMulticastIP) == SOCKET_ERROR) {
+            fprintf(stderr, "Can't join multicast group : %s\n", StrError(NET_ERROR_CODE));
+        }
 
         // Local loop
-        if (fSocket.SetLocalLoop() == SOCKET_ERROR)
+        if (fSocket.SetLocalLoop() == SOCKET_ERROR) {
             fprintf(stderr, "Can't set local loop : %s\n", StrError(NET_ERROR_CODE));
+        }
 
         // Set a timeout on the multicast receive (the thread can now be cancelled)
-        if (fSocket.SetTimeOut(2000000) == SOCKET_ERROR)
+        if (fSocket.SetTimeOut(2000000) == SOCKET_ERROR) {
             fprintf(stderr, "Can't set timeout : %s\n", StrError(NET_ERROR_CODE));
+        }
 
          //main loop, wait for data, deal with it and wait again
          //utility variables
@@ -271,12 +275,14 @@ struct JackNetExtMaster : public JackNetMasterInterface {
         fSocket.Close();
 
         // Network slave init
-        if (!JackNetMasterInterface::Init())
+        if (!JackNetMasterInterface::Init()) {
             return -1;
+        }
 
         // Set global parameters
-        if (!SetParams())
+        if (!SetParams()) {
             return -1;
+        }
 
         AllocPorts();
         return 0;
@@ -369,8 +375,9 @@ struct JackNetExtMaster : public JackNetMasterInterface {
                 fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_input_buffer)[midi_port_index]);
             }
 
-            if (SyncRecv() == SOCKET_ERROR)
+            if (SyncRecv() == SOCKET_ERROR) {
                 return 0;
+            }
 
             DecodeSyncPacket();
             return DataRecv();
@@ -384,22 +391,23 @@ struct JackNetExtMaster : public JackNetMasterInterface {
      int Write(int audio_output, float** audio_output_buffer, int midi_output, void** midi_output_buffer)
      {
         try {
-             assert(audio_output == fParams.fSendAudioChannels);
+            assert(audio_output == fParams.fSendAudioChannels);
 
-             for (int audio_port_index = 0; audio_port_index < audio_output; audio_port_index++) {
-                 fNetAudioCaptureBuffer->SetBuffer(audio_port_index, audio_output_buffer[audio_port_index]);
-             }
+            for (int audio_port_index = 0; audio_port_index < audio_output; audio_port_index++) {
+                fNetAudioCaptureBuffer->SetBuffer(audio_port_index, audio_output_buffer[audio_port_index]);
+            }
 
-             for (int midi_port_index = 0; midi_port_index < midi_output; midi_port_index++) {
-                 fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
-             }
+            for (int midi_port_index = 0; midi_port_index < midi_output; midi_port_index++) {
+                fNetMidiCaptureBuffer->SetBuffer(midi_port_index, ((JackMidiBuffer**)midi_output_buffer)[midi_port_index]);
+            }
 
-             EncodeSyncPacket();
+            EncodeSyncPacket();
 
-             if (SyncSend() == SOCKET_ERROR)
-                 return SOCKET_ERROR;
+            if (SyncSend() == SOCKET_ERROR) {
+                return SOCKET_ERROR;
+            }
 
-             return DataSend();
+            return DataSend();
 
         } catch (JackNetException& e) {
             jack_error("Connection lost.");
@@ -486,13 +494,20 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     int Open(jack_master_t* result)
     {
-        // Init network connection
-        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut))
+        if (fParams.fNetworkLatency > NETWORK_MAX_LATENCY) {
+            printf("Error : network latency is limited to %d\n", NETWORK_MAX_LATENCY);
             return -1;
+        }
+
+        // Init network connection
+        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) {
+            return -1;
+        }
 
         // Then set global parameters
-        if (!SetParams())
+        if (!SetParams()) {
             return -1;
+        }
 
          // Set result
          if (result != NULL) {
@@ -512,23 +527,28 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     int Restart()
     {
         // If shutdown cb is set, then call it
-        if (fShutdownCallback)
+        if (fShutdownCallback) {
             fShutdownCallback(fShutdownArg);
+        }
 
         // Init network connection
-        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut))
+        if (!JackNetSlaveInterface::InitConnection(fConnectTimeOut)) {
             return -1;
+        }
 
         // Then set global parameters
-        if (!SetParams())
+        if (!SetParams()) {
             return -1;
+        }
 
         // We need to notify possibly new buffer size and sample rate (see Execute)
-        if (fBufferSizeCallback)
+        if (fBufferSizeCallback) {
             fBufferSizeCallback(fParams.fPeriodSize, fBufferSizeArg);
+        }
 
-        if (fSampleRateCallback)
+        if (fSampleRateCallback) {
             fSampleRateCallback(fParams.fSampleRate, fSampleRateArg);
+        }
 
         AllocPorts();
         return 0;
@@ -543,62 +563,58 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
     void AllocPorts()
     {
-        int port_index;
-
         // Set buffers
         fAudioCaptureBuffer = new float*[fParams.fSendAudioChannels];
-        for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++) {
-           fAudioCaptureBuffer[port_index] = new float[fParams.fPeriodSize];
-           fNetAudioCaptureBuffer->SetBuffer(port_index, fAudioCaptureBuffer[port_index]);
+        for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
+            fAudioCaptureBuffer[audio_port_index] = new float[fParams.fPeriodSize];
+            fNetAudioCaptureBuffer->SetBuffer(audio_port_index, fAudioCaptureBuffer[audio_port_index]);
         }
 
         fMidiCaptureBuffer = new JackMidiBuffer*[fParams.fSendMidiChannels];
-        for (port_index = 0; port_index < fParams.fSendMidiChannels; port_index++) {
-           fMidiCaptureBuffer[port_index] = (JackMidiBuffer*)new float[fParams.fPeriodSize];
-           fNetMidiCaptureBuffer->SetBuffer(port_index, fMidiCaptureBuffer[port_index]);
+        for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++) {
+            fMidiCaptureBuffer[midi_port_index] = (JackMidiBuffer*)new float[fParams.fPeriodSize];
+            fNetMidiCaptureBuffer->SetBuffer(midi_port_index, fMidiCaptureBuffer[midi_port_index]);
         }
 
         fAudioPlaybackBuffer = new float*[fParams.fReturnAudioChannels];
-        for (port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++) {
-           fAudioPlaybackBuffer[port_index] = new float[fParams.fPeriodSize];
-           fNetAudioPlaybackBuffer->SetBuffer(port_index, fAudioPlaybackBuffer[port_index]);
+        for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
+            fAudioPlaybackBuffer[audio_port_index] = new float[fParams.fPeriodSize];
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, fAudioPlaybackBuffer[audio_port_index]);
         }
 
         fMidiPlaybackBuffer = new JackMidiBuffer*[fParams.fReturnMidiChannels];
-        for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++) {
-           fMidiPlaybackBuffer[port_index] = (JackMidiBuffer*)new float[fParams.fPeriodSize];
-           fNetMidiPlaybackBuffer->SetBuffer(port_index, fMidiPlaybackBuffer[port_index]);
+        for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++) {
+            fMidiPlaybackBuffer[midi_port_index] = (JackMidiBuffer*)new float[fParams.fPeriodSize];
+            fNetMidiPlaybackBuffer->SetBuffer(midi_port_index, fMidiPlaybackBuffer[midi_port_index]);
         }
     }
 
     void FreePorts()
     {
-        int port_index;
-
         if (fAudioCaptureBuffer) {
-            for (port_index = 0; port_index < fParams.fSendAudioChannels; port_index++)
-                delete[] fAudioCaptureBuffer[port_index];
+            for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++)
+                delete[] fAudioCaptureBuffer[audio_port_index];
             delete[] fAudioCaptureBuffer;
             fAudioCaptureBuffer = NULL;
         }
 
         if (fMidiCaptureBuffer) {
-            for (port_index = 0; port_index < fParams.fSendMidiChannels; port_index++)
-                delete[] (fMidiCaptureBuffer[port_index]);
+            for (int midi_port_index = 0; midi_port_index < fParams.fSendMidiChannels; midi_port_index++)
+                delete[] (fMidiCaptureBuffer[midi_port_index]);
             delete[] fMidiCaptureBuffer;
             fMidiCaptureBuffer = NULL;
         }
 
         if (fAudioPlaybackBuffer) {
-            for (port_index = 0; port_index < fParams.fReturnAudioChannels; port_index++)
-                delete[] fAudioPlaybackBuffer[port_index];
+            for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++)
+                delete[] fAudioPlaybackBuffer[audio_port_index];
             delete[] fAudioPlaybackBuffer;
             fAudioPlaybackBuffer = NULL;
         }
 
         if (fMidiPlaybackBuffer) {
-            for (port_index = 0; port_index < fParams.fReturnMidiChannels; port_index++)
-                delete[] fMidiPlaybackBuffer[port_index];
+            for (int midi_port_index = 0; midi_port_index < fParams.fReturnMidiChannels; midi_port_index++)
+                delete[] fMidiPlaybackBuffer[midi_port_index];
             delete[] fMidiPlaybackBuffer;
             fMidiPlaybackBuffer = NULL;
         }
@@ -647,8 +663,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     {
         // Don't return -1 in case of sync recv failure
         // we need the process to continue for network error detection
-        if (SyncRecv() == SOCKET_ERROR)
+        if (SyncRecv() == SOCKET_ERROR) {
             return 0;
+        }
 
         DecodeSyncPacket();
         return DataRecv();
@@ -658,8 +675,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     {
         EncodeSyncPacket();
 
-        if (SyncSend() == SOCKET_ERROR)
+        if (SyncSend() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
         return DataSend();
     }
@@ -668,8 +686,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
     {
         // Read data from the network
         // in case of fatal network error, stop the process
-        if (Read() == SOCKET_ERROR)
+        if (Read() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
         fProcessCallback(fParams.fPeriodSize,
                         fParams.fSendAudioChannels,
@@ -684,8 +703,9 @@ struct JackNetExtSlave : public JackNetSlaveInterface, public JackRunnableInterf
 
         // Then write data to network
         // in case of failure, stop process
-        if (Write() == SOCKET_ERROR)
+        if (Write() == SOCKET_ERROR) {
             return SOCKET_ERROR;
+        }
 
         return 0;
     }
@@ -770,10 +790,12 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
     {
         //ringbuffers
 
-        if (fCaptureChannels > 0)
+        if (fCaptureChannels > 0) {
             fCaptureRingBuffer = new JackResampler*[fCaptureChannels];
-        if (fPlaybackChannels > 0)
+        }
+        if (fPlaybackChannels > 0) {
             fPlaybackRingBuffer = new JackResampler*[fPlaybackChannels];
+        }
 
         if (fAdaptative) {
             AdaptRingBufferSize();
@@ -793,10 +815,12 @@ struct JackNetAdapter : public JackAudioAdapterInterface {
             fPlaybackRingBuffer[i]->Reset(fRingbufferCurSize);
         }
 
-        if (fCaptureChannels > 0)
+        if (fCaptureChannels > 0) {
             jack_log("ReadSpace = %ld", fCaptureRingBuffer[0]->ReadSpace());
-        if (fPlaybackChannels > 0)
+        }
+        if (fPlaybackChannels > 0) {
             jack_log("WriteSpace = %ld", fPlaybackRingBuffer[0]->WriteSpace());
+        }
     }
 
     virtual ~JackNetAdapter()
@@ -916,7 +940,11 @@ SERVER_EXPORT jack_adapter_t* jack_create_adapter(int input, int output,
                                                 jack_nframes_t adapted_buffer_size,
                                                 jack_nframes_t adapted_sample_rate)
 {
-    return (jack_adapter_t*)new JackNetAdapter(input, output, host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate);
+    try {
+        return (jack_adapter_t*)new JackNetAdapter(input, output, host_buffer_size, host_sample_rate, adapted_buffer_size, adapted_sample_rate);
+    } catch (...) {
+        return NULL;
+    }
 }
 
 SERVER_EXPORT int jack_destroy_adapter(jack_adapter_t* adapter)

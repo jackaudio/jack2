@@ -100,11 +100,8 @@ int JackLibClient::Open(const char* server_name, const char* name, int uuid, jac
         JackLibGlobals::fGlobals->fGraphManager.SetShmIndex(shared_graph, fServerName);
         fClientControl.SetShmIndex(shared_client, fServerName);
         JackGlobals::fVerbose = GetEngineControl()->fVerbose;
-    } catch (int n) {
-        jack_error("Map shared memory segments exception %d", n);
-        goto error;
     } catch (...) {
-        jack_error("Unknown error...");
+        jack_error("Map shared memory segments exception");
         goto error;
     }
 
