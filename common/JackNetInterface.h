@@ -1,5 +1,4 @@
 /*
-Copyright (C) 2001 Paul Davis
 Copyright (C) 2008-2011 Romain Moret at Grame
 
 This program is free software; you can redistribute it and/or modify
