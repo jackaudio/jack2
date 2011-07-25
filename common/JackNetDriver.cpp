@@ -506,7 +506,8 @@ namespace Jack
 
         //receive sync (launch the cycle)
         if (SyncRecv() == SOCKET_ERROR) {
-            return 0;
+            //return 0;
+            return SOCKET_ERROR;
         }
 
 #ifdef JACK_MONITOR

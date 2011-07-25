@@ -590,6 +590,32 @@
 		4B6C738A0CC60A85001AFFD4 /* thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737D0CC60A6D001AFFD4 /* thread.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B6C738B0CC60A86001AFFD4 /* transport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B6C737E0CC60A6D001AFFD4 /* transport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4B6F7AEE0CD0CDBD00F48A9D /* JackEngineControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B6F7AEC0CD0CDBD00F48A9D /* JackEngineControl.cpp */; };
+		4B6FE13A13DDABE000B4B943 /* JackSocketServerNotifyChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B60E703B8D0066E42F /* JackSocketServerNotifyChannel.h */; };
+		4B6FE13B13DDABE700B4B943 /* JackSocketServerNotifyChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B50E703B8D0066E42F /* JackSocketServerNotifyChannel.cpp */; };
+		4B6FE13C13DDABF100B4B943 /* JackSocketServerChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B40E703B8D0066E42F /* JackSocketServerChannel.h */; };
+		4B6FE13D13DDABFA00B4B943 /* JackSocketServerChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B30E703B8D0066E42F /* JackSocketServerChannel.cpp */; };
+		4B6FE13E13DDAC0500B4B943 /* JackSocketNotifyChannel.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6B20E703B8D0066E42F /* JackSocketNotifyChannel.h */; };
+		4B6FE13F13DDAC0C00B4B943 /* JackSocketNotifyChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6B10E703B8D0066E42F /* JackSocketNotifyChannel.cpp */; };
+		4B6FE14413DDAC4700B4B943 /* JackSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4BC3B6AD0E703B8D0066E42F /* JackSocket.cpp */; };
+		4B6FE14513DDAC4C00B4B943 /* JackSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 4BC3B6AE0E703B8D0066E42F /* JackSocket.h */; };
+		4B6FE14D13DDACCC00B4B943 /* JackMidiAsyncQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193931133F311400547810 /* JackMidiAsyncQueue.cpp */; };
+		4B6FE14E13DDACD200B4B943 /* JackMidiAsyncQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B193932133F311400547810 /* JackMidiAsyncQueue.h */; };
+		4B6FE15313DDACEF00B4B943 /* JackMidiBufferWriteQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193968133F319000547810 /* JackMidiBufferWriteQueue.cpp */; };
+		4B6FE15413DDACF300B4B943 /* JackMidiBufferWriteQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B193969133F319000547810 /* JackMidiBufferWriteQueue.h */; };
+		4B6FE15B13DDAD3D00B4B943 /* JackMidiWriteQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19397A133F31CB00547810 /* JackMidiWriteQueue.h */; };
+		4B6FE15C13DDAD4600B4B943 /* JackMidiWriteQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193979133F31CB00547810 /* JackMidiWriteQueue.cpp */; };
+		4B6FE15D13DDAD4E00B4B943 /* JackMidiUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B193978133F31CB00547810 /* JackMidiUtil.h */; };
+		4B6FE15E13DDAD5300B4B943 /* JackMidiUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193977133F31CB00547810 /* JackMidiUtil.cpp */; };
+		4B6FE15F13DDAD5900B4B943 /* JackMidiSendQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B193976133F31CB00547810 /* JackMidiSendQueue.h */; };
+		4B6FE16013DDAD5F00B4B943 /* JackMidiSendQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193975133F31CB00547810 /* JackMidiSendQueue.cpp */; };
+		4B6FE16113DDAD6600B4B943 /* JackMidiReceiveQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B193974133F31CB00547810 /* JackMidiReceiveQueue.h */; };
+		4B6FE16213DDAD6F00B4B943 /* JackMidiReceiveQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193973133F31CB00547810 /* JackMidiReceiveQueue.cpp */; };
+		4B6FE16313DDAD7700B4B943 /* JackMidiReadQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B193946133F315200547810 /* JackMidiReadQueue.h */; };
+		4B6FE16413DDAD7F00B4B943 /* JackMidiReadQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B193945133F315200547810 /* JackMidiReadQueue.cpp */; };
+		4B6FE16513DDAD8800B4B943 /* JackMidiBufferReadQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19395E133F317300547810 /* JackMidiBufferReadQueue.h */; };
+		4B6FE16613DDAD8F00B4B943 /* JackMidiBufferReadQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19395D133F317300547810 /* JackMidiBufferReadQueue.cpp */; };
+		4B6FE16713DDAD9700B4B943 /* JackMidiAsyncWaitQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B19393C133F313000547810 /* JackMidiAsyncWaitQueue.h */; };
+		4B6FE16813DDAD9F00B4B943 /* JackMidiAsyncWaitQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B19393B133F313000547810 /* JackMidiAsyncWaitQueue.cpp */; };
 		4B80D7E80BA0D17400F035BB /* JackMidiPort.h in Headers */ = {isa = PBXBuildFile; fileRef = 4B80D7E50BA0D17400F035BB /* JackMidiPort.h */; };
 		4B80D7E90BA0D17400F035BB /* JackMidiPort.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E60BA0D17400F035BB /* JackMidiPort.cpp */; };
 		4B80D7EA0BA0D17400F035BB /* JackMidiAPI.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4B80D7E70BA0D17400F035BB /* JackMidiAPI.cpp */; };
@@ -4172,6 +4198,19 @@
 				4BC2CA60113C6CD20076717C /* JackNetUnixSocket.h in Headers */,
 				4B5160AE13215EF900BB7DCB /* systemdeps.h in Headers */,
 				4B193996133F321500547810 /* JackFilters.h in Headers */,
+				4B6FE13A13DDABE000B4B943 /* JackSocketServerNotifyChannel.h in Headers */,
+				4B6FE13C13DDABF100B4B943 /* JackSocketServerChannel.h in Headers */,
+				4B6FE13E13DDAC0500B4B943 /* JackSocketNotifyChannel.h in Headers */,
+				4B6FE14513DDAC4C00B4B943 /* JackSocket.h in Headers */,
+				4B6FE14E13DDACD200B4B943 /* JackMidiAsyncQueue.h in Headers */,
+				4B6FE15413DDACF300B4B943 /* JackMidiBufferWriteQueue.h in Headers */,
+				4B6FE15B13DDAD3D00B4B943 /* JackMidiWriteQueue.h in Headers */,
+				4B6FE15D13DDAD4E00B4B943 /* JackMidiUtil.h in Headers */,
+				4B6FE15F13DDAD5900B4B943 /* JackMidiSendQueue.h in Headers */,
+				4B6FE16113DDAD6600B4B943 /* JackMidiReceiveQueue.h in Headers */,
+				4B6FE16313DDAD7700B4B943 /* JackMidiReadQueue.h in Headers */,
+				4B6FE16513DDAD8800B4B943 /* JackMidiBufferReadQueue.h in Headers */,
+				4B6FE16713DDAD9700B4B943 /* JackMidiAsyncWaitQueue.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7642,6 +7681,19 @@
 				4BA339A410B2E36800190E3B /* JackArgParser.cpp in Sources */,
 				4BC2CA5D113C6CC90076717C /* JackNetInterface.cpp in Sources */,
 				4BC2CA5F113C6CD10076717C /* JackNetUnixSocket.cpp in Sources */,
+				4B6FE13B13DDABE700B4B943 /* JackSocketServerNotifyChannel.cpp in Sources */,
+				4B6FE13D13DDABFA00B4B943 /* JackSocketServerChannel.cpp in Sources */,
+				4B6FE13F13DDAC0C00B4B943 /* JackSocketNotifyChannel.cpp in Sources */,
+				4B6FE14413DDAC4700B4B943 /* JackSocket.cpp in Sources */,
+				4B6FE14D13DDACCC00B4B943 /* JackMidiAsyncQueue.cpp in Sources */,
+				4B6FE15313DDACEF00B4B943 /* JackMidiBufferWriteQueue.cpp in Sources */,
+				4B6FE15C13DDAD4600B4B943 /* JackMidiWriteQueue.cpp in Sources */,
+				4B6FE15E13DDAD5300B4B943 /* JackMidiUtil.cpp in Sources */,
+				4B6FE16013DDAD5F00B4B943 /* JackMidiSendQueue.cpp in Sources */,
+				4B6FE16213DDAD6F00B4B943 /* JackMidiReceiveQueue.cpp in Sources */,
+				4B6FE16413DDAD7F00B4B943 /* JackMidiReadQueue.cpp in Sources */,
+				4B6FE16613DDAD8F00B4B943 /* JackMidiBufferReadQueue.cpp in Sources */,
+				4B6FE16813DDAD9F00B4B943 /* JackMidiAsyncWaitQueue.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -16793,6 +16845,7 @@
 				);
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Carbon,
 					"-framework",
@@ -16865,6 +16918,7 @@
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_1 = "-DADDON_DIR=\\\"/usr/local/lib/jackmp\\\"";
 				OTHER_CPLUSPLUSFLAGS_QUOTED_FOR_TARGET_2 = "-DLIB_DIR=\\\"lib\\\"";
 				OTHER_LDFLAGS = (
+					libcelt.a,
 					"-framework",
 					Carbon,
 					"-framework",
