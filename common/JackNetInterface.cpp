@@ -492,7 +492,7 @@ namespace Jack
         if (MidiSend(fNetMidiCaptureBuffer, fParams.fSendMidiChannels, fParams.fSendAudioChannels) == SOCKET_ERROR) {
             return SOCKET_ERROR;
         }
-        return AudioSend(fNetAudioPlaybackBuffer, fParams.fSendAudioChannels);
+        return AudioSend(fNetAudioCaptureBuffer, fParams.fSendAudioChannels);
     }
 
     int JackNetMasterInterface::SyncRecv()

@@ -400,7 +400,6 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
 
         #ifdef OPTIMIZED_PROTOCOL
-            /*
             if ((intptr_t)fNetAudioCaptureBuffer->GetBuffer(audio_port_index) == -1) {
                 // Port is connected on other side...
                 fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
@@ -409,11 +408,6 @@ namespace Jack
             } else {
                 fNetAudioCaptureBuffer->SetBuffer(audio_port_index, NULL);
             }
-            */
-            fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
-                                            static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[audio_port_index],
-                                            fParams.fPeriodSize)));
-
         #else
             fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
                                             static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[audio_port_index],
@@ -430,14 +424,8 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
 
         #ifdef OPTIMIZED_PROTOCOL
-            /*
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioPlaybackPorts[audio_port_index],
-                                                fParams.fPeriodSize)));
-            */
-
-            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
-                                                static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[audio_port_index],
                                                 fParams.fPeriodSize)));
         #else
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,

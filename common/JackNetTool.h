@@ -354,7 +354,7 @@ namespace Jack
 
         virtual int GetNumPackets()
         {
-            jack_info("GetNumPackets packet = %d  fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
+            jack_log("GetNumPackets packet = %d  fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
                 fPeriodSize / fSubPeriodSize, fPeriodSize, fSubPeriodSize, fSubPeriodBytesSize);
             return fPeriodSize / fSubPeriodSize;
         }
@@ -504,6 +504,7 @@ namespace Jack
 
         virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num)
         {
+            // Default behaviour: all ports are active
             port_num = fNPorts;
         }
 
@@ -537,6 +538,10 @@ namespace Jack
             }
 
             fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
+
+            jack_log("GetNumPackets packet = %d  fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
+                fPeriodSize / fSubPeriodSize, fPeriodSize, fSubPeriodSize, fSubPeriodBytesSize);
+
             return fPeriodSize / fSubPeriodSize; // At least one packet
         }
 
@@ -610,10 +615,8 @@ namespace Jack
 
     #endif
 
-        /*
         virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num)
         {
-
             // Init active port count
             port_num = 0;
             short* active_port_address = (short*)net_buffer;
@@ -631,9 +634,6 @@ namespace Jack
 
         virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num)
         {
-            // steph
-            return;
-
             short* active_port_address = (short*)net_buffer;
 
             for (int port_index = 0; port_index < fNPorts; port_index++) {
@@ -650,7 +650,6 @@ namespace Jack
                 active_port_address++;
             }
         }
-        */
 
     };
 
