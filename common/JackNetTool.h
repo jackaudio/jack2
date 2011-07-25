@@ -354,8 +354,10 @@ namespace Jack
 
         virtual int GetNumPackets()
         {
+            /*
             jack_log("GetNumPackets packet = %d  fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
                 fPeriodSize / fSubPeriodSize, fPeriodSize, fSubPeriodSize, fSubPeriodBytesSize);
+            */
             return fPeriodSize / fSubPeriodSize;
         }
 
@@ -539,9 +541,10 @@ namespace Jack
 
             fSubPeriodBytesSize = fSubPeriodSize * sizeof(sample_t) + sizeof(uint32_t); // The port number in coded on 4 bytes
 
+            /*
             jack_log("GetNumPackets packet = %d  fPeriodSize = %d fSubPeriodSize = %d fSubPeriodBytesSize = %d",
                 fPeriodSize / fSubPeriodSize, fPeriodSize, fSubPeriodSize, fSubPeriodBytesSize);
-
+            */
             return fPeriodSize / fSubPeriodSize; // At least one packet
         }
 

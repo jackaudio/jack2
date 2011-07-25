@@ -895,8 +895,9 @@ namespace Jack
         do {
             rx_bytes = Recv(fParams.fMtu, 0);
             // connection issue, send will detect it, so don't skip the cycle (return 0)
-            if (rx_bytes == SOCKET_ERROR)
+            if (rx_bytes == SOCKET_ERROR) {
                 return rx_bytes;
+            }
         }
         while ((strcmp(rx_head->fPacketType, "header") != 0) && (rx_head->fDataType != 's'));
 
