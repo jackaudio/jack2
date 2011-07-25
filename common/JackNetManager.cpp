@@ -86,11 +86,10 @@ namespace Jack
     {
         jack_log ( "JackNetMaster::~JackNetMaster, ID %u", fParams.fID );
 
-        if ( fJackClient )
-        {
-            jack_deactivate ( fJackClient );
+        if (fJackClient) {
+            jack_deactivate(fJackClient);
             FreePorts();
-            jack_client_close ( fJackClient );
+            jack_client_close(fJackClient);
         }
         delete[] fAudioCapturePorts;
         delete[] fAudioPlaybackPorts;
@@ -118,21 +117,21 @@ namespace Jack
 
         //jack client and process
         jack_status_t status;
-        if ( ( fJackClient = jack_client_open ( fClientName, JackNullOption, &status, NULL ) ) == NULL )
-        {
-            jack_error ( "Can't open a new jack client" );
+        if ((fJackClient = jack_client_open ( fClientName, JackNullOption, &status, NULL)) == NULL) {
+            jack_error("Can't open a new jack client");
             return false;
         }
 
-        if (jack_set_process_callback(fJackClient, SetProcess, this ) < 0)
-             goto fail;
+        if (jack_set_process_callback(fJackClient, SetProcess, this ) < 0) {
+            goto fail;
+        }
 
-        if (jack_set_buffer_size_callback(fJackClient, SetBufferSize, this) < 0)
-             goto fail;
+        if (jack_set_buffer_size_callback(fJackClient, SetBufferSize, this) < 0) {
+            goto fail;
+        }
 
-        if ( AllocPorts() != 0 )
-        {
-            jack_error ( "Can't allocate jack ports" );
+        if (AllocPorts() != 0) {
+            jack_error("Can't allocate jack ports");
             goto fail;
         }
 
@@ -140,20 +139,20 @@ namespace Jack
         fRunning = true;
 
         //finally activate jack client
-        if ( jack_activate ( fJackClient ) != 0 )
-        {
-            jack_error ( "Can't activate jack client" );
+        if (jack_activate(fJackClient) != 0) {
+            jack_error("Can't activate jack client");
             goto fail;
         }
 
-        if (auto_connect)
+        if (auto_connect) {
             ConnectPorts();
-        jack_info ( "New NetMaster started" );
+        }
+        jack_info("New NetMaster started");
         return true;
 
     fail:
         FreePorts();
-        jack_client_close ( fJackClient );
+        jack_client_close(fJackClient);
         fJackClient = NULL;
         return false;
     }
@@ -383,8 +382,9 @@ namespace Jack
     {
         int res;
 
-        if (!fRunning)
+        if (!fRunning) {
             return 0;
+        }
 
 #ifdef JACK_MONITOR
         jack_time_t begin_time = GetMicroSeconds();
@@ -400,6 +400,7 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
 
         #ifdef OPTIMIZED_PROTOCOL
+            /*
             if ((intptr_t)fNetAudioCaptureBuffer->GetBuffer(audio_port_index) == -1) {
                 // Port is connected on other side...
                 fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
@@ -408,6 +409,11 @@ namespace Jack
             } else {
                 fNetAudioCaptureBuffer->SetBuffer(audio_port_index, NULL);
             }
+            */
+            fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
+                                            static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[audio_port_index],
+                                            fParams.fPeriodSize)));
+
         #else
             fNetAudioCaptureBuffer->SetBuffer(audio_port_index,
                                             static_cast<sample_t*>(jack_port_get_buffer(fAudioCapturePorts[audio_port_index],
@@ -424,8 +430,14 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fParams.fReturnAudioChannels; audio_port_index++) {
 
         #ifdef OPTIMIZED_PROTOCOL
+            /*
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
                                                 static_cast<sample_t*>(jack_port_get_buffer_nulled(fAudioPlaybackPorts[audio_port_index],
+                                                fParams.fPeriodSize)));
+            */
+
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
+                                                static_cast<sample_t*>(jack_port_get_buffer(fAudioPlaybackPorts[audio_port_index],
                                                 fParams.fPeriodSize)));
         #else
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index,
@@ -460,8 +472,9 @@ namespace Jack
 
         //receive sync
         res = SyncRecv();
-        if ((res == 0) || (res == SOCKET_ERROR))
+        if ((res == 0) || (res == SOCKET_ERROR)) {
             return res;
+        }
 
         /*
         switch (SyncRecv()) {
@@ -577,12 +590,14 @@ namespace Jack
         jack_set_sync_callback ( fManagerClient, SetSyncCallback, this );
 
         //activate the client (for sync callback)
-        if ( jack_activate ( fManagerClient ) != 0 )
-            jack_error ( "Can't activate the network manager client, transport disabled" );
+        if (jack_activate(fManagerClient) != 0) {
+            jack_error("Can't activate the network manager client, transport disabled");
+        }
 
         //launch the manager thread
-        if ( jack_client_create_thread ( fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this ) )
-            jack_error ( "Can't create the network manager control thread" );
+        if (jack_client_create_thread ( fManagerClient, &fManagerThread, 0, 0, NetManagerThread, this)) {
+            jack_error("Can't create the network manager control thread");
+        }
     }
 
     JackNetMasterManager::~JackNetMasterManager()
@@ -626,9 +641,10 @@ namespace Jack
         //check if each slave is ready to roll
         int ret = 1;
         master_list_it_t it;
-        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            if ( ! ( *it )->IsSlaveReadyToRoll() )
+        for (it = fMasterList.begin(); it != fMasterList.end(); it++)
+            if (!(*it)->IsSlaveReadyToRoll()) {
                 ret = 0;
+            }
         jack_log ( "JackNetMasterManager::SyncCallback returns '%s'", ( ret ) ? "true" : "false" );
         return ret;
     }
@@ -654,38 +670,38 @@ namespace Jack
         JackNetMaster* net_master;
 
         //init socket API (win32)
-        if ( SocketAPIInit() < 0 )
-        {
-            jack_error ( "Can't init Socket API, exiting..." );
+        if (SocketAPIInit() < 0) {
+            jack_error("Can't init Socket API, exiting...");
             return;
         }
 
         //socket
-        if ( fSocket.NewSocket() == SOCKET_ERROR )
-        {
-            jack_error ( "Can't create the network management input socket : %s", StrError ( NET_ERROR_CODE ) );
+        if (fSocket.NewSocket() == SOCKET_ERROR) {
+            jack_error("Can't create the network management input socket : %s", StrError(NET_ERROR_CODE));
             return;
         }
 
         //bind the socket to the local port
-        if ( fSocket.Bind() == SOCKET_ERROR )
-        {
-            jack_error ( "Can't bind the network manager socket : %s", StrError ( NET_ERROR_CODE ) );
+        if (fSocket.Bind() == SOCKET_ERROR) {
+            jack_error("Can't bind the network manager socket : %s", StrError(NET_ERROR_CODE));
             fSocket.Close();
             return;
         }
 
         //join multicast group
-        if ( fSocket.JoinMCastGroup ( fMulticastIP ) == SOCKET_ERROR )
-            jack_error ( "Can't join multicast group : %s", StrError ( NET_ERROR_CODE ) );
+        if (fSocket.JoinMCastGroup ( fMulticastIP ) == SOCKET_ERROR) {
+            jack_error("Can't join multicast group : %s", StrError(NET_ERROR_CODE));
+        }
 
         //local loop
-        if ( fSocket.SetLocalLoop() == SOCKET_ERROR )
-            jack_error ( "Can't set local loop : %s", StrError ( NET_ERROR_CODE ) );
+        if (fSocket.SetLocalLoop() == SOCKET_ERROR) {
+            jack_error("Can't set local loop : %s", StrError(NET_ERROR_CODE));
+        }
 
         //set a timeout on the multicast receive (the thread can now be cancelled)
-        if ( fSocket.SetTimeOut ( 2000000 ) == SOCKET_ERROR )
-            jack_error ( "Can't set timeout : %s", StrError ( NET_ERROR_CODE ) );
+        if (fSocket.SetTimeOut(2000000) == SOCKET_ERROR) {
+            jack_error("Can't set timeout : %s", StrError(NET_ERROR_CODE));
+        }
 
         //main loop, wait for data, deal with it and wait again
         do
@@ -696,14 +712,12 @@ namespace Jack
             if ( ( rx_bytes == SOCKET_ERROR ) && ( fSocket.GetError() != NET_NO_DATA ) )
             {
                 jack_error ( "Error in receive : %s", StrError ( NET_ERROR_CODE ) );
-                if ( ++attempt == 10 )
-                {
+                if (++attempt == 10) {
                     jack_error ( "Can't receive on the socket, exiting net manager" );
                     return;
                 }
             }
-            if ( rx_bytes == sizeof ( session_params_t ) )
-            {
+            if ( rx_bytes == sizeof ( session_params_t ) ) {
                 switch ( GetPacketType ( &host_params ) )
                 {
                     case SLAVE_AVAILABLE:
@@ -768,9 +782,11 @@ namespace Jack
         jack_log ( "JackNetMasterManager::SetSlaveName" );
 
         master_list_it_t it;
-        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            if ( strcmp ( ( *it )->fParams.fName, params.fName ) == 0 )
-                sprintf ( params.fName, "%s-%u", params.fName, params.fID );
+        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ ) {
+            if (strcmp((*it)->fParams.fName, params.fName) == 0) {
+                sprintf(params.fName, "%s-%u", params.fName, params.fID);
+            }
+        }
     }
 
     master_list_it_t JackNetMasterManager::FindMaster ( uint32_t id )
@@ -778,9 +794,11 @@ namespace Jack
         jack_log ( "JackNetMasterManager::FindMaster, ID %u", id );
 
         master_list_it_t it;
-        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ )
-            if ( ( *it )->fParams.fID == id )
+        for ( it = fMasterList.begin(); it != fMasterList.end(); it++ ) {
+            if ((*it)->fParams.fID == id) {
                 return it;
+            }
+        }
         return it;
     }
 
@@ -789,8 +807,7 @@ namespace Jack
         jack_log ( "JackNetMasterManager::KillMaster, ID %u", params->fID );
 
         master_list_it_t master = FindMaster ( params->fID );
-        if ( master != fMasterList.end() )
-        {
+        if (master != fMasterList.end()) {
             fMasterList.erase ( master );
             delete *master;
             return 1;

@@ -610,8 +610,10 @@ namespace Jack
 
     #endif
 
+        /*
         virtual void ActivePortsToNetwork(char* net_buffer, uint32_t& port_num)
         {
+
             // Init active port count
             port_num = 0;
             short* active_port_address = (short*)net_buffer;
@@ -629,6 +631,9 @@ namespace Jack
 
         virtual void ActivePortsFromNetwork(char* net_buffer, uint32_t port_num)
         {
+            // steph
+            return;
+
             short* active_port_address = (short*)net_buffer;
 
             for (int port_index = 0; port_index < fNPorts; port_index++) {
@@ -645,6 +650,7 @@ namespace Jack
                 active_port_address++;
             }
         }
+        */
 
     };
 

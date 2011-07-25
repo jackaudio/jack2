@@ -34,7 +34,7 @@ namespace Jack
 #define MASTER_INIT_TIMEOUT 1000000     // in usec
 #define SLAVE_INIT_TIMEOUT 1000000      // in usec
 
-#define NETWORK_MAX_LATENCY 10
+#define NETWORK_MAX_LATENCY 20
 
     /**
     \Brief This class describes the basic Net Interface, used by both master and slave
@@ -145,8 +145,8 @@ namespace Jack
             void EncodeSyncPacket();
             void DecodeSyncPacket();
 
-            int Send ( size_t size, int flags );
-            int Recv ( size_t size, int flags );
+            int Send(size_t size, int flags);
+            int Recv(size_t size, int flags);
 
             bool IsSynched();
 

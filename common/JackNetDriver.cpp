@@ -494,7 +494,8 @@ namespace Jack
         }
         for (int audio_port_index = 0; audio_port_index < fParams.fSendAudioChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
-            fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer(audio_port_index, true));
+           // fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer(audio_port_index, true));
+            fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer(audio_port_index));
         #else
             fNetAudioCaptureBuffer->SetBuffer(audio_port_index, GetInputBuffer(audio_port_index));
         #endif
@@ -549,11 +550,14 @@ namespace Jack
         for (int audio_port_index = 0; audio_port_index < fPlaybackChannels; audio_port_index++) {
         #ifdef OPTIMIZED_PROTOCOL
             // Port is connected on other side...
+            /*
             if ((intptr_t)fNetAudioPlaybackBuffer->GetBuffer(audio_port_index) == -1) {
                 fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index, true));
             } else {
                 fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, NULL);
             }
+            */
+            fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
         #else
             fNetAudioPlaybackBuffer->SetBuffer(audio_port_index, GetOutputBuffer(audio_port_index));
         #endif
